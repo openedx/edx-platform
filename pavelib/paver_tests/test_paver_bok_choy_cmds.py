@@ -33,6 +33,7 @@ class TestPaverBokChoyCmd(unittest.TestCase):
 
         expected_statement = [
             "DEFAULT_STORE={}".format(store),
+            "SAVED_SOURCE_DIR='{}/test_root/log{}'".format(REPO_DIR, shard_str),
             "SCREENSHOT_DIR='{}/test_root/log{}'".format(REPO_DIR, shard_str),
             "BOK_CHOY_HAR_DIR='{}/test_root/log{}/hars'".format(REPO_DIR, shard_str),
             "BOKCHOY_A11Y_CUSTOM_RULES_FILE='{}/{}'".format(
