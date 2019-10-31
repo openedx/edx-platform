@@ -29,7 +29,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from simple_history.models import HistoricalRecords
 from six.moves import map
 
-from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField, UnsignedBigIntOneToOneField
+from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField
 from lms.djangoapps.grades import constants, events
 from openedx.core.lib.cache_utils import get_cache
 
@@ -655,7 +655,7 @@ class PersistentSubsectionGradeOverride(models.Model):
     class Meta(object):
         app_label = "grades"
 
-    grade = UnsignedBigIntOneToOneField(PersistentSubsectionGrade, related_name='override')
+    grade = models.OneToOneField(PersistentSubsectionGrade, related_name='override')
 
     # Created/modified timestamps prevent race-conditions when using with async rescoring tasks
     created = models.DateTimeField(auto_now_add=True, db_index=True)
