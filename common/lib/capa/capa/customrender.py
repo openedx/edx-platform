@@ -165,7 +165,7 @@ class ClarificationRenderer(object):
 
     def __init__(self, system, xml):
         self.system = system
-        # Get any text content found inside this tag prior to the first child tag. It may be a string or None type.
+        # Get any text content found inside this tag prior to the first child tag. It may be a string or None type
         initial_text = xml.text if xml.text else ''
         self.inner_html = initial_text + ''.join(etree.tostring(element) for element in xml)
         self.tail = xml.tail
