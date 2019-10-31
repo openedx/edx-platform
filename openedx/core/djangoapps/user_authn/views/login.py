@@ -115,7 +115,7 @@ def _enforce_password_policy_compliance(request, user):
     except password_policy_compliance.NonCompliantPasswordException as e:
         send_password_reset_email_for_user(user, request)
         # Prevent the login attempt.
-        raise AuthFailedError(six.text_type(e))
+        raise AuthFailedError(HTML(six.text_type(e)))
 
 
 def _generate_not_activated_message(user):
