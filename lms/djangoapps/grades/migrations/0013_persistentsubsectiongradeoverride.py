@@ -3,8 +3,6 @@ from __future__ import absolute_import, unicode_literals
 
 from django.db import migrations, models
 
-from lms.djangoapps.courseware.fields import UnsignedBigIntOneToOneField
-
 
 class Migration(migrations.Migration):
 
@@ -23,7 +21,7 @@ class Migration(migrations.Migration):
                 ('possible_all_override', models.FloatField(null=True, blank=True)),
                 ('earned_graded_override', models.FloatField(null=True, blank=True)),
                 ('possible_graded_override', models.FloatField(null=True, blank=True)),
-                ('grade', UnsignedBigIntOneToOneField(related_name='override', to='grades.PersistentSubsectionGrade')),
+                ('grade', models.OneToOneField(related_name='override', to='grades.PersistentSubsectionGrade')),
             ],
         ),
     ]
