@@ -3,8 +3,6 @@ Middleware for Language Preferences
 """
 from __future__ import absolute_import
 
-import logging
-
 from django.conf import settings
 from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.utils.translation.trans_real import parse_accept_lang_header
@@ -13,8 +11,6 @@ from openedx.core.djangoapps.lang_pref import COOKIE_DURATION, LANGUAGE_HEADER, 
 from openedx.core.djangoapps.user_api.errors import UserAPIInternalError, UserAPIRequestError
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
-
-log = logging.getLogger(__name__)
 
 
 class LanguagePreferenceMiddleware(object):
@@ -33,9 +29,6 @@ class LanguagePreferenceMiddleware(object):
         cookie_lang = request.COOKIES.get(settings.LANGUAGE_COOKIE, None)
         if cookie_lang:
             if request.user.is_authenticated:
-                log.info(u'Updating the language to {lang} of the user:{username} and request url'
-                         u'was {url}'.format(lang=cookie_lang, username=request.user.username,
-                                             url=request.build_absolute_uri()))
                 set_user_preference(request.user, LANGUAGE_KEY, cookie_lang)
             else:
                 request._anonymous_user_cookie_lang = cookie_lang
@@ -67,9 +60,6 @@ class LanguagePreferenceMiddleware(object):
             anonymous_cookie_lang = getattr(request, '_anonymous_user_cookie_lang', None)
             if anonymous_cookie_lang:
                 user_pref = anonymous_cookie_lang
-                log.info(u'Updating the language to {lang} of the user:{username} and request url'
-                         u' was {url}'.format(lang=user_pref, username=current_user.username,
-                                              url=request.build_absolute_uri()))
                 set_user_preference(current_user, LANGUAGE_KEY, anonymous_cookie_lang)
             else:
                 # Get the user's language preference
@@ -81,9 +71,6 @@ class LanguagePreferenceMiddleware(object):
 
             # If set, set the user_pref in the LANGUAGE_COOKIE
             if user_pref:
-                log.info(u'setting language cookie to {lang} for the user:{username} and request url'
-                         u' was {url}'.format(lang=user_pref, username=current_user.username,
-                                              url=request.build_absolute_uri()))
                 if not is_request_from_mobile_app(request):
                     response.set_cookie(
                         settings.LANGUAGE_COOKIE,
@@ -92,9 +79,6 @@ class LanguagePreferenceMiddleware(object):
                         max_age=COOKIE_DURATION,
                     )
             else:
-                log.info(u'deleting language cookie to {lang} for the user:{username} and request url'
-                         u' was {url}'.format(lang=user_pref, username=current_user.username,
-                                              url=request.build_absolute_uri()))
                 response.delete_cookie(
                     settings.LANGUAGE_COOKIE,
                     domain=settings.SESSION_COOKIE_DOMAIN
