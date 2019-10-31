@@ -48,6 +48,7 @@ import capa.safe_exec as safe_exec
 import capa.xqueue_interface as xqueue_interface
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib import edx_six
+from openedx.core.lib.grade_utils import round_away_from_zero
 
 from . import correctmap
 from .registry import TagRegistry
@@ -727,7 +728,7 @@ class ChoiceResponse(LoncapaResponse):
         good_non_answers = sum([1 for blank in student_non_answers if blank in self.incorrect_choices])
         edc_current_grade = good_answers + good_non_answers
 
-        return_grade = round(self.get_max_score() * float(edc_current_grade) / float(edc_max_grade), 2)
+        return_grade = round_away_from_zero(self.get_max_score() * float(edc_current_grade) / float(edc_max_grade), 2)
 
         if edc_current_grade == edc_max_grade:
             return CorrectMap(self.answer_id, correctness='correct')
@@ -764,10 +765,10 @@ class ChoiceResponse(LoncapaResponse):
             return_grade = self.get_max_score()
             return CorrectMap(self.answer_id, correctness='correct', npoints=return_grade)
         elif halves_error_count == 1 and len(all_choices) > 2:
-            return_grade = round(self.get_max_score() / 2.0, 2)
+            return_grade = round_away_from_zero(self.get_max_score() / 2.0, 2)
             return CorrectMap(self.answer_id, correctness='partially-correct', npoints=return_grade)
         elif halves_error_count == 2 and len(all_choices) > 4:
-            return_grade = round(self.get_max_score() / 4.0, 2)
+            return_grade = round_away_from_zero(self.get_max_score() / 4.0, 2)
             return CorrectMap(self.answer_id, correctness='partially-correct', npoints=return_grade)
         else:
             return CorrectMap(self.answer_id, 'incorrect')
