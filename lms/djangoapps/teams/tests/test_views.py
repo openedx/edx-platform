@@ -22,6 +22,7 @@ from search.search_engine_base import SearchEngine
 from six.moves import range
 
 from common.test.utils import skip_signal
+from course_modes.models import CourseMode
 from lms.djangoapps.courseware.tests.factories import StaffFactory
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
@@ -291,6 +292,13 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             username='student_enrolled_other_course_not_on_team'
         )
 
+        # This is a Masters student who should be in the organization protected bubble
+        cls.create_and_enroll_student(
+            courses=[cls.test_course_1, cls.test_course_2],
+            username='student_masters',
+            mode=CourseMode.MASTERS
+        )
+
         with skip_signal(
             post_save,
             receiver=course_team_post_save_callback,
@@ -327,6 +335,16 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                 topic_id='topic_7'
             )
 
+            cls.masters_only_team = CourseTeamFactory.create(
+                name='masters_course_1',
+                description='masters student group',
+                country='US',
+                language='EN',
+                course_id=cls.test_course_1.id,
+                topic_id='topic_0',
+                organization_protected=True
+            )
+
         cls.test_team_name_id_map = {team.name: team for team in (
             cls.solar_team,
             cls.wind_team,
@@ -335,6 +353,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             cls.public_profile_team,
             cls.search_team,
             cls.chinese_team,
+            cls.masters_only_team,
         )}
 
         for user, course in [('staff', cls.test_course_1), ('course_staff', cls.test_course_1)]:
@@ -349,6 +368,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         cls.nuclear_team.add_user(cls.users['student_enrolled_both_courses_other_team'])
         cls.another_team.add_user(cls.users['student_enrolled_both_courses_other_team'])
         cls.public_profile_team.add_user(cls.users['student_enrolled_public_profile'])
+        cls.masters_only_team.add_user(cls.users['student_masters'])
 
     def build_membership_data_raw(self, username, team):
         """Assembles a membership creation payload based on the raw values provided."""
@@ -359,7 +379,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         return self.build_membership_data_raw(self.users[username].username, team.team_id)
 
     @classmethod
-    def create_and_enroll_student(cls, courses=None, username=None):
+    def create_and_enroll_student(cls, courses=None, username=None, mode=None):
         """ Creates a new student and enrolls that student in the course.
 
         Adds the new user to the cls.users dictionary with the username as the key.
@@ -372,7 +392,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             user = UserFactory.create(password=cls.test_password)
         courses = courses if courses is not None else [cls.test_course_1]
         for course in courses:
-            CourseEnrollment.enroll(user, course.id, check_access=True)
+            CourseEnrollment.enroll(user, course.id, mode=mode, check_access=True)
         cls.users[user.username] = user
 
         return user.username
@@ -542,6 +562,12 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         for field in ['id', 'name', 'course_id', 'topic_id', 'date_created', 'description']:
             self.assertIn(field, team)
 
+    def reset_search_index(self):
+        """Clear out the search index and reindex the teams."""
+        CourseTeamIndexer.engine().destroy()
+        for team in self.test_team_name_id_map.values():
+            CourseTeamIndexer.index(team)
+
 
 @ddt.ddt
 class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
@@ -554,16 +580,17 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         (None, 401),
         ('student_inactive', 401),
         ('student_unenrolled', 403),
-        ('student_enrolled', 200),
-        ('staff', 200),
-        ('course_staff', 200),
-        ('community_ta', 200),
+        ('student_enrolled', 200, 3),
+        ('staff', 200, 4),
+        ('course_staff', 200, 4),
+        ('community_ta', 200, 3),
+        ('student_masters', 200, 1)
     )
     @ddt.unpack
-    def test_access(self, user, status):
+    def test_access(self, user, status, expected_teams_count=0):
         teams = self.get_teams_list(user=user, expected_status=status)
         if status == 200:
-            self.assertEqual(3, teams['count'])
+            self.assertEqual(expected_teams_count, teams['count'])
 
     def test_missing_course_id(self):
         self.get_teams_list(400, no_course_id=True)
@@ -669,13 +696,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
     )
     @ddt.unpack
     def test_text_search(self, text_search, expected_team_names):
-        def reset_search_index():
-            """Clear out the search index and reindex the teams."""
-            CourseTeamIndexer.engine().destroy()
-            for team in self.test_team_name_id_map.values():
-                CourseTeamIndexer.index(team)
-
-        reset_search_index()
+        self.reset_search_index()
         self.verify_names(
             {'course_id': self.test_course_2.id, 'text_search': text_search},
             200,
@@ -692,13 +713,30 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
 
         # Verify that the searches still work for a user from a different locale
         with translation.override('ar'):
-            reset_search_index()
+            self.reset_search_index()
             self.verify_names(
                 {'course_id': self.test_course_2.id, 'text_search': text_search},
                 200,
                 expected_team_names,
                 user='student_enrolled_public_profile'
             )
+
+    @ddt.data(
+        ('masters', ['masters_course_1']),
+        ('group', ['masters_course_1']),
+        ('Sólar', []),
+        ('Wind', []),
+    )
+    @ddt.unpack
+    def test_text_search_masters(self, text_search, expected_team_names):
+        # Verify that the search is working with Masters learner
+        self.reset_search_index()
+        self.verify_names(
+            {'course_id': self.test_course_1.id, 'text_search': text_search},
+            200,
+            expected_team_names,
+            user='student_masters'
+        )
 
     def test_delete_removed_from_search(self):
         team = CourseTeamFactory.create(
@@ -877,7 +915,8 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
             'country': 'CA',
             'topic_id': 'great-topic',
             'course_id': str(self.test_course_1.id),
-            'description': 'Another fantastic team'
+            'description': 'Another fantastic team',
+            'organization_protected': False,
         })
 
     @ddt.data('staff', 'course_staff', 'community_ta')

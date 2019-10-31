@@ -13,7 +13,7 @@ class CourseTeamAdmin(admin.ModelAdmin):
     """
     Admin config for course teams.
     """
-    list_display = ('course_id', 'topic_id', 'team_id', 'name', 'team_size')
+    list_display = ('course_id', 'topic_id', 'team_id', 'name', 'team_size', 'organization_protected')
     search_fields = ('course_id', 'topic_id', 'team_id', 'name', 'description')
     ordering = ('course_id', 'topic_id', 'team_id')
     readonly_fields = ('team_size',)
