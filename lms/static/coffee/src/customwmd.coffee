@@ -126,6 +126,7 @@ if Markdown?
       $elem.empty()
       _append = appended_id || ""
       wmdInputId = "wmd-input#{_append}"
+      for_label = if wmdInputId.endsWith("undefined") then gettext("Your question or idea") else gettext("Add a response:")
       $wmdPreviewContainer = $("<div>").addClass("wmd-preview-container")
           .attr("role", "region")
           .attr("aria-label", gettext("HTML preview of post"))
@@ -133,7 +134,7 @@ if Markdown?
           .append($("<div>").attr("id", "wmd-preview#{_append}").addClass("wmd-panel wmd-preview"))
       $wmdPanel = $("<div>").addClass("wmd-panel")
                  .append($("<div>").attr("id", "wmd-button-bar#{_append}"))
-                 .append($("<label>").addClass("sr").attr("for", wmdInputId).text(gettext("Post body")))
+                 .append($("<label>").addClass("sr").attr("for", wmdInputId).text(for_label))
                  .append($("<textarea>").addClass("wmd-input").attr("id", wmdInputId).html(initialText))
                  .append($wmdPreviewContainer)
       $elem.append($wmdPanel)
