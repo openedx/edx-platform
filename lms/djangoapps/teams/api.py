@@ -35,7 +35,7 @@ def is_instructor_managed_team(team):
     Return true if the team is managed by instructors.
     For now always return false, will complete the logic later.
     """
-    return True
+    return False
 
 
 def user_is_a_team_member(user, team):
