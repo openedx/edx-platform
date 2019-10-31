@@ -162,7 +162,7 @@ fs-s3fs==0.1.8
 fs==2.0.18
 funcsigs==1.0.2
 functools32==3.2.3.post2 ; python_version == "2.7"
-future==0.18.1
+future==0.18.2
 futures==3.3.0 ; python_version == "2.7"
 geoip2==2.9.0
 glob2==0.7
