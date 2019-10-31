@@ -1021,3 +1021,93 @@ class TestCourseExportImport(LibraryTestCase):
             dest_course.location,
             publish_item
         )
+
+
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
+class TestCourseExportImportProblem(CourseTestCase):
+    """
+    Tests for importing after exporting the course containing problem with pre tags from XML.
+    """
+    def setUp(self):
+        super(TestCourseExportImportProblem, self).setUp()
+        self.export_dir = tempfile.mkdtemp()
+        self.source_course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
+        self.addCleanup(shutil.rmtree, self.export_dir, ignore_errors=True)
+
+    def _setup_source_course_with_problem_content(self, publish_item=False):
+        """
+        Sets up course with problem content.
+        """
+        chapter = ItemFactory.create(
+            parent_location=self.source_course.location,
+            category='chapter',
+            display_name='Test Section'
+        )
+        sequential = ItemFactory.create(
+            parent_location=chapter.location,
+            category='sequential',
+            display_name='Test Sequential'
+        )
+        vertical = ItemFactory.create(
+            category='vertical',
+            parent_location=sequential.location,
+            display_name='Test Unit'
+        )
+
+        ItemFactory.create(
+            parent=vertical,
+            category='problem',
+            display_name='Test Problem',
+            publish_item=publish_item,
+            data='<problem><pre><code>x=10</code></pre><multiplechoiceresponse></multiplechoiceresponse></problem>',
+        )
+
+    def get_problem_content(self, block_location):
+        """
+        Get problem content of course.
+        """
+        if block_location.block_type == 'problem':
+            return self.store.get_item(block_location).data
+
+        return self.get_problem_content(self.store.get_item(block_location).children[0])
+
+    def assert_problem_definition(self, course_location):
+        """
+        Asserts that problems' data is as expected with pre-tag content maintained.
+        """
+        expected_problem_content = '<problem>\n  <pre><code>x=10</code></pre>\n' \
+                                   '  <multiplechoiceresponse/>\n</problem>\n'
+        problem_content = self.get_problem_content(course_location)
+
+        self.assertEquals(expected_problem_content, problem_content)
+
+    def test_problem_content_on_course_export_import(self):
+        """
+        Verify that problem content in destination matches expected problem content,
+        specifically concerned with pre tag data with problem.
+        """
+        self._setup_source_course_with_problem_content()
+
+        dest_course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
+
+        export_course_to_xml(
+            self.store,
+            contentstore(),
+            self.source_course.location.course_key,
+            self.export_dir,
+            'exported_source_course',
+        )
+
+        import_course_from_xml(
+            self.store,
+            self.user.id,
+            self.export_dir,
+            ['exported_source_course'],
+            static_content_store=contentstore(),
+            target_id=dest_course.location.course_key,
+            load_error_modules=False,
+            raise_on_failure=True,
+            create_if_not_present=True,
+        )
+
+        self.assert_problem_definition(dest_course.location)
