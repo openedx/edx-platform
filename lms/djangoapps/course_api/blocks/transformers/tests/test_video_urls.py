@@ -80,7 +80,8 @@ class TestVideoBlockURLTransformer(ModuleStoreTestCase):
                     'url': 'https://1234abcd.cloudfront.net/ABCD1234abcd.mp4',
                     'file_size': 0
                 }
-            }
+            },
+            'only_on_web': False
         }
         video_block_key = self.course_key.make_usage_key('video', 'sample_video')
         pre_transform_data = self.get_pre_transform_data(video_block_key)
@@ -109,7 +110,8 @@ class TestVideoBlockURLTransformer(ModuleStoreTestCase):
                     'url': 'https://1234abcd.third_part_cdn.com/ABCD1234abcd.mp4',
                     'file_size': 0
                 }
-            }
+            },
+            'only_on_web': False
         }
         video_block_key = self.course_key.make_usage_key('video', 'sample_video')
         pre_transform_data = self.get_pre_transform_data(video_block_key)
@@ -121,3 +123,18 @@ class TestVideoBlockURLTransformer(ModuleStoreTestCase):
 
         for video_format, video_url in six.iteritems(post_transform_data):
             self.assertEqual(pre_transform_data[video_format], video_url)
+
+    @mock.patch('xmodule.video_module.VideoBlock.student_view_data')
+    def test_no_rewrite_for_web_only_videos(self, mock_video_data):
+        """
+        Verify no rewrite attempt is made for the videos
+        available on web only.
+        """
+        mock_video_data.return_value = {
+            'only_on_web': True
+        }
+        video_block_key = self.course_key.make_usage_key('video', 'sample_video')
+        pre_transform_data = self.get_pre_transform_data(video_block_key)
+        self.collect_and_transform()
+        post_transform_data = self.get_post_transform_data(video_block_key)
+        self.assertDictEqual(pre_transform_data, post_transform_data)
