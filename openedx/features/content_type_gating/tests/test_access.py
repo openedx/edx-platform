@@ -48,8 +48,7 @@ from openedx.core.lib.url_utils import quote_slashes
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, CONTENT_TYPE_GATE_GROUP_IDS
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import ContentTypeGatingPartition
-from openedx.features.course_duration_limits.config import EXPERIMENT_DATA_HOLDBACK_KEY, EXPERIMENT_ID
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, FBEEnrollmentExclusion
 from student.roles import CourseInstructorRole
 from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -638,15 +637,9 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         Test that putting a user in the content gating holdback disables content gating.
         """
         user = UserFactory.create()
+        enrollment = CourseEnrollment.enroll(user, self.course.id)
         if put_user_in_holdback:
-            ExperimentData.objects.create(
-                user=user,
-                experiment_id=EXPERIMENT_ID,
-                key=EXPERIMENT_DATA_HOLDBACK_KEY,
-                value='True'
-            )
-
-        CourseEnrollment.enroll(user, self.course.id)
+            FBEEnrollmentExclusion.objects.create(enrollment=enrollment)
 
         graded, has_score, weight = True, True, 1
         block = self.graded_score_weight_blocks[(graded, has_score, weight)]

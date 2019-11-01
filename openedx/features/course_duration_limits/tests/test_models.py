@@ -75,7 +75,7 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         user = self.user
         course_key = self.course_overview.id
 
-        query_count = 7
+        query_count = 6
 
         with self.assertNumQueries(query_count):
             enabled = CourseDurationLimitConfig.enabled_for_enrollment(

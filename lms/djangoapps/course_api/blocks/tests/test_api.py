@@ -244,7 +244,7 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
             self._get_blocks(
                 course,
                 expected_mongo_queries=0,
-                expected_sql_queries=14 if with_storage_backing else 13,
+                expected_sql_queries=13 if with_storage_backing else 12,
             )
 
     @ddt.data(
@@ -261,9 +261,9 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
             clear_course_from_cache(course.id)
 
             if with_storage_backing:
-                num_sql_queries = 24
+                num_sql_queries = 23
             else:
-                num_sql_queries = 14
+                num_sql_queries = 13
 
             self._get_blocks(
                 course,
