@@ -18,6 +18,10 @@ from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings, get_current_site
+from openedx.core.djangoapps.user_api.config.waffle import (
+    ENABLE_MULTIPLE_USER_ENTERPRISES_FEATURE,
+    waffle as user_api_waffle
+)
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -214,3 +218,13 @@ def is_secondary_email_feature_enabled_for_user(user):
     # import is placed here to avoid cyclic import.
     from openedx.features.enterprise_support.utils import is_enterprise_learner
     return is_secondary_email_feature_enabled() and is_enterprise_learner(user)
+
+
+def is_multiple_user_enterprises_feature_enabled():
+    """
+    Checks to see if the django-waffle switch for enabling the multiple user enterprises feature is active
+
+    Returns:
+        Boolean value representing switch status
+    """
+    return user_api_waffle().is_enabled(ENABLE_MULTIPLE_USER_ENTERPRISES_FEATURE)
