@@ -39,6 +39,7 @@ from contentstore.course_group_config import (
 )
 from contentstore.course_info_model import delete_course_update, get_course_updates, update_course_updates
 from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
+from contentstore.permissions import EDIT_ENROLLMENT_END
 from contentstore.tasks import rerun_course as rerun_course_task
 from contentstore.utils import (
     add_instructor,
@@ -1070,7 +1071,7 @@ def settings_handler(request, course_key_string):
             )
 
             about_page_editable = not publisher_enabled
-            enrollment_end_editable = GlobalStaff().has_user(request.user) or not publisher_enabled
+            enrollment_end_editable = request.user.has_perm(EDIT_ENROLLMENT_END) or not publisher_enabled
             short_description_editable = configuration_helpers.get_value_for_org(
                 course_module.location.org,
                 'EDITABLE_SHORT_DESCRIPTION',
