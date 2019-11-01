@@ -159,12 +159,10 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
     }
 
     @patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
-    @patch('openedx.features.enterprise_support.api.get_enterprise_customer_for_learner')
-    @patch('openedx.core.djangoapps.user_api.accounts.settings_views.get_enterprise_customer_for_learner')
+    @patch('openedx.core.djangoapps.user_api.accounts.settings_views.enterprise_customer_for_request')
     def test_full_pipeline_succeeds_for_unlinking_testshib_account(
         self,
-        mock_get_enterprise_customer_for_learner_settings_view,
-        mock_get_enterprise_customer_for_learner,
+        mock_enterprise_customer_for_request_settings_view,
         mock_enterprise_customer_for_request,
     ):
 
@@ -199,8 +197,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
             'identity_provider': 'saml-default',
         }
         mock_enterprise_customer_for_request.return_value = enterprise_customer_data
-        mock_get_enterprise_customer_for_learner.return_value = enterprise_customer_data
-        mock_get_enterprise_customer_for_learner_settings_view.return_value = enterprise_customer_data
+        mock_enterprise_customer_for_request_settings_view.return_value = enterprise_customer_data
 
         # Instrument the pipeline to get to the dashboard with the full expected state.
         self.client.get(
