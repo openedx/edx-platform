@@ -375,7 +375,9 @@ def check_transcripts(request):
             except NotFoundError:
                 log.debug(u"Can't find transcripts in storage for non-youtube video_id: %s", html5_id)
             if len(html5_subs) == 2:  # check html5 transcripts for equality
-                transcripts_presence['html5_equal'] = json.loads(html5_subs[0]) == json.loads(html5_subs[1])
+                transcripts_presence['html5_equal'] = (
+                    json.loads(html5_subs[0].decode('utf-8')) == json.loads(html5_subs[1].decode('utf-8'))
+                )
 
         command, __ = _transcripts_logic(transcripts_presence, videos)
 
