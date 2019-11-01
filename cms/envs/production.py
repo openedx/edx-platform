@@ -162,6 +162,8 @@ EMAIL_HOST = ENV_TOKENS.get('EMAIL_HOST', EMAIL_HOST)
 EMAIL_PORT = ENV_TOKENS.get('EMAIL_PORT', EMAIL_PORT)
 EMAIL_USE_TLS = ENV_TOKENS.get('EMAIL_USE_TLS', EMAIL_USE_TLS)
 
+# CMS_BASE: Public domain name of Studio (should be resolvable from the end-user's browser)
+CMS_BASE = ENV_TOKENS.get('CMS_BASE')
 LMS_BASE = ENV_TOKENS.get('LMS_BASE')
 LMS_ROOT_URL = ENV_TOKENS.get('LMS_ROOT_URL')
 LMS_INTERNAL_ROOT_URL = ENV_TOKENS.get('LMS_INTERNAL_ROOT_URL', LMS_ROOT_URL)
@@ -180,7 +182,7 @@ SITE_NAME = ENV_TOKENS['SITE_NAME']
 ALLOWED_HOSTS = [
     # TODO: bbeggs remove this before prod, temp fix to get load testing running
     "*",
-    ENV_TOKENS.get('CMS_BASE')
+    CMS_BASE,
 ]
 
 LOG_DIR = ENV_TOKENS['LOG_DIR']
