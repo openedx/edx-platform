@@ -15,7 +15,7 @@ class Command(BaseCommand):
     """
     Backfill history for models using django-simple-history.
     Example usage:
-    $ ./manage.py lms backfill_history --batchsize 1000 --sleep_between 1 --settings=devstack
+    $ ./manage.py lms backfill_history --batch_size 1000 --sleep_between 1 --input_root /tmp/data/ --settings=devstack
     """
 
     help = (
@@ -57,7 +57,7 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "--size",
+            "--batch_size",
             action="store",
             default=self.DEFAULT_SIZE,
             type=int,
@@ -67,6 +67,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--input_root",
             action="store",
+            help="Path containing data files from snapshot for history backfill"
         )
 
     def chunks(self, ids, chunk_size):
@@ -78,7 +79,7 @@ class Command(BaseCommand):
         return values
 
     def handle(self, *args, **options):
-        batch_size = options['size']
+        batch_size = options['batch_size']
         sleep_between = options['sleep_between']
         input_root = options['input_root']
 
