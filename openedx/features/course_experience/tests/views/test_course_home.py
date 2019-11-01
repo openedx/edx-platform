@@ -437,7 +437,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         response = self.client.get(url)
         discount_expiration_date = get_discount_expiration_date(user, self.course).strftime(u'%B %d')
         upgrade_link = verified_upgrade_deadline_link(user=user, course=self.course)
-        bannerText = u'''<div class="first-purchase-offer-banner">
+        bannerText = u'''<div class="first-purchase-offer-banner" role="note">
              <span class="first-purchase-offer-banner-bold">
              Upgrade by {discount_expiration_date} and save {percentage}% [{strikeout_price}]</span>
              <br>Discount will be automatically applied at checkout. <a href="{upgrade_link}">Upgrade Now</a>

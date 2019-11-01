@@ -423,7 +423,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
             follow=False,
         )
 
-        banner = u'''<div class="first-purchase-offer-banner">'''
+        banner = u'''<div class="first-purchase-offer-banner" role="note">'''
         button = u'''<button type="submit" name="verified_mode">
                     <span>Pursue a Verified Certificate</span>
                     (<span class="upgrade-price-string">$8.50 USD</span>

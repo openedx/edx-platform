@@ -110,7 +110,8 @@ def get_first_purchase_offer_banner_fragment(user, course):
                 a_close=HTML('</a>'),
                 br=HTML('<br>'),
                 banner_open=HTML(
-                    '<div class="first-purchase-offer-banner"><span class="first-purchase-offer-banner-bold">'
+                    '<div class="first-purchase-offer-banner" role="note">'
+                    '<span class="first-purchase-offer-banner-bold">'
                 ),
                 discount_expiration_date=discount_expiration_date.strftime(u'%B %d'),
                 percentage=discount_percentage(course),
