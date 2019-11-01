@@ -31,7 +31,10 @@ logger = logging.getLogger(__name__)
 %></%def>
 
 <%def name='url(file, raw=False)'><%
-url = staticfiles_storage.url(file)
+try:
+    url = staticfiles_storage.url(file)
+except:
+    url = file
 ## HTML-escaping must be handled by caller
 %>${url | n, decode.utf8}${"?raw" if raw else ""}</%def>
 
