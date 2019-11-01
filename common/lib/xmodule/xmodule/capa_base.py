@@ -620,12 +620,13 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             html = warning
             try:
                 html += self.lcp.get_html()
-            except Exception:
+            except Exception as error:
                 # Couldn't do it. Give up.
                 log.exception(
-                    u"ProblemGetHtmlError: Unable to generate html from LoncapaProblem: !r, !r",
+                    u"ProblemGetHtmlError: Unable to generate html from LoncapaProblem: %r, %r, %s",
                     problem_display_name,
-                    problem_location
+                    problem_location,
+                    text_type(error)
                 )
                 raise
 
