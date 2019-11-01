@@ -25,7 +25,6 @@ from openedx.core.djangoapps.django_comment_common.models import Role
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
 from openedx.core.djangoapps.user_api.api import (
-    RegistrationFormFactory,
     get_login_session_form,
     get_password_reset_form
 )

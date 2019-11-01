@@ -36,12 +36,14 @@ from lms.djangoapps.discussion.notification_prefs.views import enable_notificati
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
-from openedx.core.djangoapps.user_api.api import RegistrationFormFactory
 from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
 from openedx.core.djangoapps.user_api.accounts.utils import generate_password
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
-from student.forms import AccountCreationForm, get_registration_extension_form
+from openedx.core.djangoapps.user_authn.views.registration_form import (
+    get_registration_extension_form, RegistrationFormFactory
+)
+from student.forms import AccountCreationForm
 from student.helpers import (
     authenticate_new_user,
     create_or_set_user_attribute_created_on_site,
