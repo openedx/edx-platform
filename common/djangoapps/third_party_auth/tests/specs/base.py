@@ -21,9 +21,9 @@ from social_django import utils as social_utils
 from social_django import views as social_views
 
 from lms.djangoapps.commerce.tests import TEST_API_URL
-from openedx.core.djangoapps.user_api.views import RegistrationView
 from openedx.core.djangoapps.user_authn.views.login import login_user
 from openedx.core.djangoapps.user_authn.views.login_form import login_and_registration_form
+from openedx.core.djangoapps.user_authn.views.register import RegistrationView
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context
 from student import models as student_models
