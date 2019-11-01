@@ -63,7 +63,7 @@ git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752
 
 # Forked to get Django 1.10+ compat that is in origin BitBucket repo, without an official build.
 # This can go away when we update auth to not use django-rest-framework-oauth
-git+https://github.com/edx/django-oauth-plus.git@66155b545b23ebc01ec438849d303077e8198dfd#egg=django-oauth-plus==2.2.9.edx-3
+git+https://github.com/edx/django-oauth-plus.git@master#egg=django-oauth-plus==2.2.9.edx-4
 
 # Why a drf-oauth fork? To add Django 1.11 compatibility to the abandoned repo.
 # This dependency will be removed by this work: https://openedx.atlassian.net/browse/PLAT-1660
@@ -81,10 +81,10 @@ git+https://github.com/edx/bridgekeeper.git@4e34894e4ac5d0467ed1901811a81fd87ee0
 # Our libraries:
 -e git+https://github.com/edx/codejail.git@33758da2609bd72c2c18efc2d4bdb93596523d5e#egg=codejail
 -e git+https://github.com/edx/acid-block.git@98aecba94ecbfa934e2d00262741c0ea9f557fc9#egg=acid-xblock
-git+https://github.com/edx/edx-ora2.git@2.3.5#egg=ora2==2.3.5
+git+https://github.com/edx/edx-ora2.git@2.3.6#egg=ora2==2.3.6
 git+https://github.com/edx/crowdsourcehinter.git@a7ffc85b134b7d8909bf1fefd23dbdb8eb28e467#egg=crowdsourcehinter-xblock==0.2
 -e git+https://github.com/edx/RateXBlock.git@2.0#egg=rate-xblock
--e git+https://github.com/edx/DoneXBlock.git@2.0#egg=done-xblock
+-e git+https://github.com/edx/DoneXBlock.git@2.0.1#egg=done-xblock
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive
 git+https://github.com/edx/xblock-lti-consumer.git@v1.2.1#egg=lti_consumer-xblock==1.2.1
 
