@@ -6,10 +6,11 @@
 #
 cffi==1.13.2              # via cryptography
 cryptography==2.8
+decorator==4.4.1          # via networkx
 enum34==1.1.6             # via cryptography
 ipaddress==1.0.23         # via cryptography
-lxml==3.8.0
-networkx==1.7
+lxml==4.4.1
+networkx==2.2
 nltk==3.4.5
 pycparser==2.19           # via cffi
 singledispatch==3.4.0.3   # via nltk
