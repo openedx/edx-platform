@@ -9,9 +9,10 @@ import logging
 from collections import OrderedDict
 from datetime import datetime
 from time import time
-
-import six
+import csv
 import unicodecsv
+import six
+
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.files.storage import DefaultStorage
@@ -140,6 +141,27 @@ def upload_proctored_exam_results_report(_xmodule_instance_args, _entry_id, cour
     return task_progress.update_task_state(extra_meta=current_step)
 
 
+def _get_csv_file_content(csv_file):
+    """
+    returns appropriate csv file content based on input and output is
+    compatible with python versions
+    """
+    if (not isinstance(csv_file, str)) and six.PY3:
+        content = csv_file.read()
+    else:
+        content = csv_file
+
+    if isinstance(content, bytes):
+        csv_content = content.decode('utf-8')
+    else:
+        csv_content = content
+
+    if six.PY3:
+        return csv_content
+    else:
+        return UniversalNewlineIterator(csv_content)
+
+
 def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, task_input, action_name):
     """
     Within a given course, cohort students in bulk, then upload the results
@@ -151,7 +173,12 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
     # Iterate through rows to get total assignments for task progress
     with DefaultStorage().open(task_input['file_name']) as f:
         total_assignments = 0
-        for _line in unicodecsv.DictReader(UniversalNewlineIterator(f)):
+        if six.PY3:
+            reader = csv.DictReader(_get_csv_file_content(f).splitlines())
+        else:
+            reader = unicodecsv.DictReader(_get_csv_file_content(f), encoding='utf-8')
+
+        for _line in reader:
             total_assignments += 1
 
     task_progress = TaskProgress(action_name, total_assignments, start_time)
@@ -166,7 +193,13 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
     cohorts_status = {}
 
     with DefaultStorage().open(task_input['file_name']) as f:
-        for row in unicodecsv.DictReader(UniversalNewlineIterator(f), encoding='utf-8'):
+
+        if six.PY3:
+            reader = csv.DictReader(_get_csv_file_content(f).splitlines())
+        else:
+            reader = unicodecsv.DictReader(_get_csv_file_content(f), encoding='utf-8')
+
+        for row in reader:
             # Try to use the 'email' field to identify the user.  If it's not present, use 'username'.
             username_or_email = row.get('email') or row.get('username')
             cohort_name = row.get('cohort') or ''
