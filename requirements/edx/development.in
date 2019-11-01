@@ -20,4 +20,6 @@ pyinotify                           # More efficient checking for runserver relo
 sphinx==1.8.5                       # Pinned because 2.0.0 release requires Python '>=3.5' but current Python is 2.7.12
 vulture                             # Detects possible dead/unused code, used in scripts/find-dead-code.sh
 modernize                           # Used to make Python 2 code more modern with the intention of eventually porting it over to Python 3.
-sphinxcontrib-openapi[markdown]
+
+# Using a github hash because the "include" feature wasn't in the latest release (0.5.0):
+git+https://github.com/sphinx-contrib/openapi.git@9306435601ae05138edea54419dd83ce9e729ad8#egg=sphinxcontrib-openapi[markdown]==0.0
