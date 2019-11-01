@@ -23,7 +23,10 @@ def is_in_holdback(user, enrollment):
             pass
 
     if enrollment is not None:
-        if FBEEnrollmentExclusion.objects.filter(enrollment=enrollment).exists():
-            return True
+        try:
+            if enrollment.fbeenrollmentexclusion:
+                return True
+        except FBEEnrollmentExclusion.DoesNotExist:
+            pass
 
     return in_holdback

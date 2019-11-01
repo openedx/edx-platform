@@ -2052,7 +2052,7 @@ class FBEEnrollmentExclusion(models.Model):
 
     .. no_pii:
     """
-    enrollment = models.ForeignKey(
+    enrollment = models.OneToOneField(
         CourseEnrollment,
         on_delete=models.DO_NOTHING,
     )
