@@ -1943,7 +1943,9 @@ def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
     def csv_response(filename, header, rows):
         """Returns a CSV http response for the given header and rows (excel/utf-8)."""
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = u'attachment; filename={0}'.format(text_type(filename).encode('utf-8'))
+        response['Content-Disposition'] = u'attachment; filename={0}'.format(
+            text_type(filename).encode('utf-8') if six.PY2 else text_type(filename)
+        )
         writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
         # In practice, there should not be non-ascii data in this query,
         # but trying to do the right thing anyway.
