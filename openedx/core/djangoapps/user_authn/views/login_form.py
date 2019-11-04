@@ -19,11 +19,11 @@ from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.user_api.api import (
-    RegistrationFormFactory,
     get_login_session_form,
     get_password_reset_form
 )
 from openedx.core.djangoapps.user_authn.cookies import are_logged_in_cookies_set
+from openedx.core.djangoapps.user_authn.views.registration_form import RegistrationFormFactory
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from openedx.features.enterprise_support.utils import (
     handle_enterprise_cookies_for_logistration,

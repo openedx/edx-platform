@@ -46,7 +46,12 @@ class VideoBlockURLTransformer(BlockStructureTransformer):
             )
             if not student_view_data:
                 return
-            encoded_videos = student_view_data['encoded_videos']
+
+            # web-only videos don't contain any video information for native clients
+            only_on_web = student_view_data.get('only_on_web')
+            if only_on_web:
+                continue
+            encoded_videos = student_view_data.get('encoded_videos')
             for video_format, video_data in six.iteritems(encoded_videos):
                 if video_format in self.VIDEO_FORMAT_EXCEPTIONS:
                     continue

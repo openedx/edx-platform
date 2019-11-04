@@ -560,17 +560,6 @@ def get_enterprise_learner_data(user):
             return enterprise_learner_data['results']
 
 
-@enterprise_is_enabled(otherwise={})
-def get_enterprise_customer_for_learner(user):
-    """
-    Return enterprise customer to whom given learner belongs.
-    """
-    enterprise_learner_data = get_enterprise_learner_data(user)
-    if enterprise_learner_data:
-        return enterprise_learner_data[0]['enterprise_customer']
-    return {}
-
-
 def get_consent_notification_data(enterprise_customer):
     """
     Returns the consent notification data from DataSharingConsentPage modal

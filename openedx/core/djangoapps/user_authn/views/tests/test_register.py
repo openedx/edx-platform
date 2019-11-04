@@ -694,7 +694,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             }
         )
 
-    @mock.patch('openedx.core.djangoapps.user_api.api._')
+    @mock.patch('openedx.core.djangoapps.user_authn.views.registration_form._')
     def test_register_form_level_of_education_translations(self, fake_gettext):
         fake_gettext.side_effect = lambda text: text + ' TRANSLATED'
 
@@ -740,7 +740,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             }
         )
 
-    @mock.patch('openedx.core.djangoapps.user_api.api._')
+    @mock.patch('openedx.core.djangoapps.user_authn.views.registration_form._')
     def test_register_form_gender_translations(self, fake_gettext):
         fake_gettext.side_effect = lambda text: text + ' TRANSLATED'
 
