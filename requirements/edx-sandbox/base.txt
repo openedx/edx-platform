@@ -6,9 +6,9 @@
 #
 common/lib/sandbox-packages
 common/lib/symmath
-backports.functools-lru-cache==1.5  # via matplotlib
+backports.functools-lru-cache==1.6.1  # via matplotlib
 git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
-cffi==1.13.1
+cffi==1.13.2
 git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
 cryptography==2.8
 cycler==0.10.0            # via matplotlib
@@ -23,7 +23,7 @@ nltk==3.4.5
 numpy==1.7.2
 pycparser==2.19
 pyparsing==2.2.0
-python-dateutil==2.8.0    # via matplotlib
+python-dateutil==2.8.1    # via matplotlib
 pytz==2019.3              # via matplotlib
 random2==1.0.1
 scipy==0.14.0
