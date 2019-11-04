@@ -25,11 +25,7 @@ class CountryField(serializers.Field):
 
     COUNTRY_CODES = list(dict(countries).keys())
 
-<<<<<<< HEAD
-    def to_representation(self, obj): # pylint: disable=arguments-differ
-=======
     def to_representation(self, obj):  # pylint: disable=arguments-differ
->>>>>>> 9946fd39180c5c9a408124845554ed3189d6d4b7
         """
         Represent the country as a 2-character unicode identifier.
         """
@@ -208,11 +204,8 @@ class BulkTeamCountTopicListSerializer(serializers.ListSerializer):  # pylint: d
     List serializer for efficiently serializing a set of topics.
     """
 
-<<<<<<< HEAD
-    def to_representation(self, obj): # pylint: disable=arguments-differ
-=======
+
     def to_representation(self, obj):  # pylint: disable=arguments-differ
->>>>>>> 9946fd39180c5c9a408124845554ed3189d6d4b7
         """Adds team_count to each topic. """
         data = super(BulkTeamCountTopicListSerializer, self).to_representation(obj)
         add_team_count(data, self.context["course_id"])
