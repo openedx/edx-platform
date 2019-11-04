@@ -272,6 +272,10 @@ class DiscussionTopicsTestCase(unittest.TestCase):
 class TeamsConfigurationTestCase(unittest.TestCase):
     """
     Tests for the configuration of teams and the helper methods for accessing them.
+
+    Also tests new configuration wrapper, `.teams_conf`.
+    Eventually the tests for the old dict-based `.teams_configuration` field
+    wil be removed (TODO MST-18).
     """
 
     def setUp(self):
@@ -299,44 +303,69 @@ class TeamsConfigurationTestCase(unittest.TestCase):
     def test_teams_enabled_new_course(self):
         # Make sure we can detect when no teams exist.
         self.assertFalse(self.course.teams_enabled)
+        self.assertFalse(self.course.teams_conf.is_enabled)
 
         # add topics
         self.add_team_configuration(max_team_size=4, topics=[self.make_topic()])
         self.assertTrue(self.course.teams_enabled)
+        self.assertTrue(self.course.teams_conf.is_enabled)
 
         # remove them again
         self.add_team_configuration(max_team_size=4, topics=[])
         self.assertFalse(self.course.teams_enabled)
+        self.assertFalse(self.course.teams_conf.is_enabled)
 
     def test_teams_enabled_max_size_only(self):
         self.add_team_configuration(max_team_size=4)
         self.assertFalse(self.course.teams_enabled)
+        self.assertFalse(self.course.teams_conf.is_enabled)
 
     def test_teams_enabled_no_max_size(self):
         self.add_team_configuration(max_team_size=None, topics=[self.make_topic()])
         self.assertTrue(self.course.teams_enabled)
+        self.assertTrue(self.course.teams_conf.is_enabled)
 
     def test_teams_max_size_no_teams_configuration(self):
         self.assertIsNone(self.course.teams_max_size)
+        self.assertIsNone(self.course.teams_conf.max_team_size)
 
     def test_teams_max_size_with_teams_configured(self):
         size = 4
         self.add_team_configuration(max_team_size=size, topics=[self.make_topic(), self.make_topic()])
         self.assertTrue(self.course.teams_enabled)
         self.assertEqual(size, self.course.teams_max_size)
+        self.assertEqual(size, self.course.teams_conf.max_team_size)
 
     def test_teams_topics_no_teams(self):
         self.assertIsNone(self.course.teams_topics)
+        self.assertEqual(self.course.teams_conf.teamsets, [])
 
     def test_teams_topics_no_topics(self):
         self.add_team_configuration(max_team_size=4)
         self.assertEqual(self.course.teams_topics, [])
+        self.assertEqual(self.course.teams_conf.teamsets, [])
 
     def test_teams_topics_with_topics(self):
         topics = [self.make_topic(), self.make_topic()]
         self.add_team_configuration(max_team_size=4, topics=topics)
         self.assertTrue(self.course.teams_enabled)
         self.assertEqual(self.course.teams_topics, topics)
+        expected_teamsets_data = [
+            teamset.cleaned_data_old_format
+            for teamset in self.course.teams_conf.teamsets
+        ]
+        self.assertEqual(expected_teamsets_data, topics)
+
+    def test_teams_conf_caching(self):
+        self.add_team_configuration(max_team_size=5, topics=[self.make_topic()])
+        cold_cache_conf = self.course.teams_conf
+        warm_cache_conf = self.course.teams_conf
+        self.add_team_configuration(max_team_size=5, topics=[self.make_topic(), self.make_topic()])
+        new_cold_cache_conf = self.course.teams_conf
+        new_warm_cache_conf = self.course.teams_conf
+        self.assertIs(cold_cache_conf, warm_cache_conf)
+        self.assertIs(new_cold_cache_conf, new_warm_cache_conf)
+        self.assertIsNot(cold_cache_conf, new_cold_cache_conf)
 
 
 class SelfPacedTestCase(unittest.TestCase):

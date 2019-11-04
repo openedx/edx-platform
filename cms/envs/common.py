@@ -315,7 +315,6 @@ FEATURES = {
     'ENABLE_GRADE_DOWNLOADS': True,
     'ENABLE_MKTG_SITE': False,
     'ENABLE_DISCUSSION_HOME_PANEL': True,
-    'ENABLE_COMBINED_LOGIN_REGISTRATION': True,
     'ENABLE_CORS_HEADERS': False,
     'ENABLE_CROSS_DOMAIN_CSRF_COOKIE': False,
     'ENABLE_COUNTRY_ACCESS': False,
@@ -505,6 +504,7 @@ FRONTEND_LOGIN_URL = LOGIN_URL
 FRONTEND_LOGOUT_URL = lambda settings: settings.LMS_ROOT_URL + '/logout'
 derived('FRONTEND_LOGOUT_URL')
 
+# Public domain name of Studio (should be resolvable from the end-user's browser)
 CMS_BASE = 'localhost:18010'
 
 LOG_DIR = '/edx/var/log/edx'

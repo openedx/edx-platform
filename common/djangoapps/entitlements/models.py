@@ -38,23 +38,23 @@ class CourseEntitlementPolicy(models.Model):
     DEFAULT_EXPIRATION_PERIOD_DAYS = 730
     DEFAULT_REFUND_PERIOD_DAYS = 60
     DEFAULT_REGAIN_PERIOD_DAYS = 14
-    MODES = Choices((None, '---------'), CourseMode.VERIFIED, CourseMode.PROFESSIONAL)
+    MODES = Choices((None, u'---------'), CourseMode.VERIFIED, CourseMode.PROFESSIONAL)
 
     # Use a DurationField to calculate time as it returns a timedelta, useful in performing operations with datetimes
     expiration_period = models.DurationField(
         default=timedelta(days=DEFAULT_EXPIRATION_PERIOD_DAYS),
-        help_text="Duration in days from when an entitlement is created until when it is expired.",
+        help_text=u"Duration in days from when an entitlement is created until when it is expired.",
         null=False
     )
     refund_period = models.DurationField(
         default=timedelta(days=DEFAULT_REFUND_PERIOD_DAYS),
-        help_text="Duration in days from when an entitlement is created until when it is no longer refundable",
+        help_text=u"Duration in days from when an entitlement is created until when it is no longer refundable",
         null=False
     )
     regain_period = models.DurationField(
         default=timedelta(days=DEFAULT_REGAIN_PERIOD_DAYS),
-        help_text=("Duration in days from when an entitlement is redeemed for a course run until "
-                   "it is no longer able to be regained by a user."),
+        help_text=(u"Duration in days from when an entitlement is redeemed for a course run until "
+                   u"it is no longer able to be regained by a user."),
         null=False
     )
     site = models.ForeignKey(Site, null=True, on_delete=models.CASCADE)
@@ -158,21 +158,21 @@ class CourseEntitlement(TimeStampedModel):
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     uuid = models.UUIDField(default=uuid_tools.uuid4, editable=False, unique=True)
-    course_uuid = models.UUIDField(help_text='UUID for the Course, not the Course Run')
+    course_uuid = models.UUIDField(help_text=u'UUID for the Course, not the Course Run')
     expired_at = models.DateTimeField(
         null=True,
-        help_text='The date that an entitlement expired, if NULL the entitlement has not expired.',
+        help_text=u'The date that an entitlement expired, if NULL the entitlement has not expired.',
         blank=True
     )
-    mode = models.CharField(max_length=100, help_text='The mode of the Course that will be applied on enroll.')
+    mode = models.CharField(max_length=100, help_text=u'The mode of the Course that will be applied on enroll.')
     enrollment_course_run = models.ForeignKey(
         'student.CourseEnrollment',
         null=True,
-        help_text='The current Course enrollment for this entitlement. If NULL the Learner has not enrolled.',
+        help_text=u'The current Course enrollment for this entitlement. If NULL the Learner has not enrolled.',
         blank=True,
         on_delete=models.CASCADE,
     )
-    order_number = models.CharField(max_length=128, null=True)
+    order_number = models.CharField(max_length=128, null=True, blank=True)
     refund_locked = models.BooleanField(default=False)
     _policy = models.ForeignKey(CourseEntitlementPolicy, null=True, blank=True, on_delete=models.CASCADE)
 
@@ -449,6 +449,14 @@ class CourseEntitlement(TimeStampedModel):
             # Force Transaction reset with an Integrity error exception, this will revert all previous transactions
             raise IntegrityError
 
+    def save(self, *args, **kwargs):
+        """
+        Null out empty strings in order_number
+        """
+        if not self.order_number:
+            self.order_number = None
+        super(CourseEntitlement, self).save(*args, **kwargs)
+
 
 @python_2_unicode_compatible
 class CourseEntitlementSupportDetail(TimeStampedModel):
@@ -458,11 +466,11 @@ class CourseEntitlementSupportDetail(TimeStampedModel):
     .. no_pii:
     """
     # Reasons deprecated
-    LEAVE_SESSION = 'LEAVE'
-    CHANGE_SESSION = 'CHANGE'
-    LEARNER_REQUEST_NEW = 'LEARNER_NEW'
-    COURSE_TEAM_REQUEST_NEW = 'COURSE_TEAM_NEW'
-    OTHER = 'OTHER'
+    LEAVE_SESSION = u'LEAVE'
+    CHANGE_SESSION = u'CHANGE'
+    LEARNER_REQUEST_NEW = u'LEARNER_NEW'
+    COURSE_TEAM_REQUEST_NEW = u'COURSE_TEAM_NEW'
+    OTHER = u'OTHER'
     ENTITLEMENT_SUPPORT_REASONS = (
         (LEAVE_SESSION, u'Learner requested leave session for expired entitlement'),
         (CHANGE_SESSION, u'Learner requested session change for expired entitlement'),
@@ -471,11 +479,11 @@ class CourseEntitlementSupportDetail(TimeStampedModel):
         (OTHER, u'Other'),
     )
 
-    REISSUE = 'REISSUE'
-    CREATE = 'CREATE'
+    REISSUE = u'REISSUE'
+    CREATE = u'CREATE'
     ENTITLEMENT_SUPPORT_ACTIONS = (
-        (REISSUE, 'Re-issue entitlement'),
-        (CREATE, 'Create new entitlement'),
+        (REISSUE, u'Re-issue entitlement'),
+        (CREATE, u'Create new entitlement'),
     )
 
     entitlement = models.ForeignKey('entitlements.CourseEntitlement', on_delete=models.CASCADE)

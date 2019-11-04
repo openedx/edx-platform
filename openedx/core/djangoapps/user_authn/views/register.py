@@ -11,15 +11,21 @@ import logging
 from django.conf import settings
 from django.contrib.auth import login as django_login
 from django.contrib.auth.models import User
+from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied
 from django.core.validators import ValidationError, validate_email
 from django.db import transaction
 from django.dispatch import Signal
+from django.http import HttpResponse, HttpResponseForbidden
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
+from django.views.decorators.debug import sensitive_post_parameters
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.utils.translation import get_language
 from django.utils.translation import ugettext as _
 from pytz import UTC
 from requests import HTTPError
 from six import text_type
+from rest_framework.views import APIView
 from social_core.exceptions import AuthAlreadyAssociated, AuthException
 from social_django import utils as social_utils
 
@@ -30,16 +36,27 @@ from lms.djangoapps.discussion.notification_prefs.views import enable_notificati
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
+from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
 from openedx.core.djangoapps.user_api.accounts.utils import generate_password
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
-from student.forms import AccountCreationForm, get_registration_extension_form
-from student.helpers import authenticate_new_user, create_or_set_user_attribute_created_on_site, do_create_account
+from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
+from openedx.core.djangoapps.user_authn.views.registration_form import (
+    get_registration_extension_form, RegistrationFormFactory
+)
+from student.forms import AccountCreationForm
+from student.helpers import (
+    authenticate_new_user,
+    create_or_set_user_attribute_created_on_site,
+    do_create_account,
+    AccountValidationError,
+)
 from student.models import RegistrationCookieConfiguration, UserAttribute, create_comments_service_user
 from student.views import compose_and_send_activation_email
 from third_party_auth import pipeline, provider
 from third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
 from track import segment
 from util.db import outer_atomic
+from util.json_request import JsonResponse
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -386,3 +403,111 @@ def _record_utm_registration_attribution(request, user):
                 REGISTRATION_UTM_CREATED_AT,
                 created_at_datetime
             )
+
+
+class RegistrationView(APIView):
+    # pylint: disable=missing-docstring
+    """HTTP end-points for creating a new user. """
+
+    # This end-point is available to anonymous users,
+    # so do not require authentication.
+    authentication_classes = []
+
+    @method_decorator(transaction.non_atomic_requests)
+    @method_decorator(sensitive_post_parameters("password"))
+    def dispatch(self, request, *args, **kwargs):
+        return super(RegistrationView, self).dispatch(request, *args, **kwargs)
+
+    @method_decorator(ensure_csrf_cookie)
+    def get(self, request):
+        return HttpResponse(RegistrationFormFactory().get_registration_form(request).to_json(),
+                            content_type="application/json")
+
+    @method_decorator(csrf_exempt)
+    def post(self, request):
+        """Create the user's account.
+
+        You must send all required form fields with the request.
+
+        You can optionally send a "course_id" param to indicate in analytics
+        events that the user registered while enrolling in a particular course.
+
+        Arguments:
+            request (HTTPRequest)
+
+        Returns:
+            HttpResponse: 200 on success
+            HttpResponse: 400 if the request is not valid.
+            HttpResponse: 409 if an account with the given username or email
+                address already exists
+            HttpResponse: 403 operation not allowed
+        """
+        data = request.POST.copy()
+        self._handle_terms_of_service(data)
+
+        response = self._handle_duplicate_email_username(data)
+        if response:
+            return response
+
+        response, user = self._create_account(request, data)
+        if response:
+            return response
+
+        response = self._create_response({}, status_code=200)
+        set_logged_in_cookies(request, response, user)
+        return response
+
+    def _handle_duplicate_email_username(self, data):
+        # TODO Verify whether this check is needed here - it may be duplicated in user_api.
+        email = data.get('email')
+        username = data.get('username')
+
+        conflicts = check_account_exists(email=email, username=username)
+        if conflicts:
+            conflict_messages = {
+                "email": accounts_settings.EMAIL_CONFLICT_MSG.format(email_address=email),  # pylint: disable=no-member
+                "username": accounts_settings.USERNAME_CONFLICT_MSG.format(username=username),  # pylint: disable=no-member
+            }
+            errors = {
+                field: [{"user_message": conflict_messages[field]}]
+                for field in conflicts
+            }
+            return self._create_response(errors, status_code=409)
+
+    def _handle_terms_of_service(self, data):
+        # Backwards compatibility: the student view expects both
+        # terms of service and honor code values.  Since we're combining
+        # these into a single checkbox, the only value we may get
+        # from the new view is "honor_code".
+        # Longer term, we will need to make this more flexible to support
+        # open source installations that may have separate checkboxes
+        # for TOS, privacy policy, etc.
+        if data.get("honor_code") and "terms_of_service" not in data:
+            data["terms_of_service"] = data["honor_code"]
+
+    def _create_account(self, request, data):
+        response, user = None, None
+        try:
+            user = create_account_with_params(request, data)
+        except AccountValidationError as err:
+            errors = {
+                err.field: [{"user_message": text_type(err)}]
+            }
+            response = self._create_response(errors, status_code=409)
+        except ValidationError as err:
+            # Should only get field errors from this exception
+            assert NON_FIELD_ERRORS not in err.message_dict
+            # Only return first error for each field
+            errors = {
+                field: [{"user_message": error} for error in error_list]
+                for field, error_list in err.message_dict.items()
+            }
+            response = self._create_response(errors, status_code=400)
+        except PermissionDenied:
+            response = HttpResponseForbidden(_("Account creation not allowed."))
+
+        return response, user
+
+    def _create_response(self, response_dict, status_code):
+        response_dict['success'] = (status_code == 200)
+        return JsonResponse(response_dict, status=status_code)

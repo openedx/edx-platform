@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 ('uuid', models.UUIDField(default=uuid.uuid4, editable=False)),
                 ('course_uuid', models.UUIDField()),
                 ('expired_at', models.DateTimeField(null=True)),
-                ('mode', models.CharField(default=b'audit', max_length=100)),
+                ('mode', models.CharField(default=u'audit', max_length=100)),
                 ('order_number', models.CharField(max_length=128, null=True)),
                 ('enrollment_course_run', models.ForeignKey(to='student.CourseEnrollment', null=True, on_delete=models.CASCADE)),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),

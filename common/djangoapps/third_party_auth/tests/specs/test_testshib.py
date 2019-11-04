@@ -22,7 +22,6 @@ from social_django.models import UserSocialAuth
 from testfixtures import LogCapture
 
 from enterprise.models import EnterpriseCustomerIdentityProvider, EnterpriseCustomerUser
-from openedx.core.djangoapps.user_authn.views.deprecated import signin_user
 from openedx.core.djangoapps.user_authn.views.login import login_user
 from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerFactory
@@ -160,12 +159,10 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
     }
 
     @patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
-    @patch('openedx.features.enterprise_support.api.get_enterprise_customer_for_learner')
-    @patch('openedx.core.djangoapps.user_api.accounts.settings_views.get_enterprise_customer_for_learner')
+    @patch('openedx.core.djangoapps.user_api.accounts.settings_views.enterprise_customer_for_request')
     def test_full_pipeline_succeeds_for_unlinking_testshib_account(
         self,
-        mock_get_enterprise_customer_for_learner_settings_view,
-        mock_get_enterprise_customer_for_learner,
+        mock_enterprise_customer_for_request_settings_view,
         mock_enterprise_customer_for_request,
     ):
 
@@ -200,8 +197,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
             'identity_provider': 'saml-default',
         }
         mock_enterprise_customer_for_request.return_value = enterprise_customer_data
-        mock_get_enterprise_customer_for_learner.return_value = enterprise_customer_data
-        mock_get_enterprise_customer_for_learner_settings_view.return_value = enterprise_customer_data
+        mock_enterprise_customer_for_request_settings_view.return_value = enterprise_customer_data
 
         # Instrument the pipeline to get to the dashboard with the full expected state.
         self.client.get(
@@ -210,7 +206,6 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
                             request=request)
 
         with self._patch_edxmako_current_request(strategy.request):
-            signin_user(strategy.request)
             login_user(strategy.request)
             actions.do_complete(request.backend, social_views._do_login, user=user,  # pylint: disable=protected-access
                                 request=request)

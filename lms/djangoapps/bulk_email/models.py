@@ -49,14 +49,14 @@ class Email(models.Model):
 
 
 # Bulk email targets - the send to options that users can select from when they send email.
-SEND_TO_MYSELF = 'myself'
-SEND_TO_STAFF = 'staff'
-SEND_TO_LEARNERS = 'learners'
-SEND_TO_COHORT = 'cohort'
-SEND_TO_TRACK = 'track'
+SEND_TO_MYSELF = u'myself'
+SEND_TO_STAFF = u'staff'
+SEND_TO_LEARNERS = u'learners'
+SEND_TO_COHORT = u'cohort'
+SEND_TO_TRACK = u'track'
 EMAIL_TARGET_CHOICES = list(zip(
     [SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS, SEND_TO_COHORT, SEND_TO_TRACK],
-    ['Myself', 'Staff and instructors', 'All students', 'Specific cohort', 'Specific course mode']
+    [u'Myself', u'Staff and instructors', u'All students', u'Specific cohort', u'Specific course mode']
 ))
 EMAIL_TARGETS = {target[0] for target in EMAIL_TARGET_CHOICES}
 
@@ -251,7 +251,7 @@ class CourseEmail(Email):
 
     course_id = CourseKeyField(max_length=255, db_index=True)
     # to_option is deprecated and unused, but dropping db columns is hard so it's still here for legacy reasons
-    to_option = models.CharField(max_length=64, choices=[("deprecated", "deprecated")])
+    to_option = models.CharField(max_length=64, choices=[(u"deprecated", u"deprecated")])
     targets = models.ManyToManyField(Target)
     template_name = models.CharField(null=True, max_length=255)
     from_addr = models.CharField(null=True, max_length=255)

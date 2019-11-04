@@ -15,11 +15,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='certificatetemplate',
             name='mode',
-            field=models.CharField(blank=True, choices=[(b'verified', b'verified'), (b'honor', b'honor'), (b'audit', b'audit'), (b'professional', b'professional'), (b'no-id-professional', b'no-id-professional'), (b'masters', b'masters')], default=b'honor', help_text='The course mode for this template.', max_length=125, null=True),
+            field=models.CharField(blank=True, choices=[(u'verified', u'verified'), (u'honor', u'honor'), (u'audit', u'audit'), (u'professional', u'professional'), (u'no-id-professional', u'no-id-professional'), (u'masters', u'masters')], default=u'honor', help_text='The course mode for this template.', max_length=125, null=True),
         ),
         migrations.AlterField(
             model_name='generatedcertificate',
             name='mode',
-            field=models.CharField(choices=[(b'verified', b'verified'), (b'honor', b'honor'), (b'audit', b'audit'), (b'professional', b'professional'), (b'no-id-professional', b'no-id-professional'), (b'masters', b'masters')], default=b'honor', max_length=32),
+            field=models.CharField(choices=[(u'verified', u'verified'), (u'honor', u'honor'), (u'audit', u'audit'), (u'professional', u'professional'), (u'no-id-professional', u'no-id-professional'), (u'masters', u'masters')], default=u'honor', max_length=32),
         ),
     ]

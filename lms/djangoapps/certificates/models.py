@@ -261,7 +261,7 @@ class GeneratedCertificate(models.Model):
     # results. Django requires us to explicitly declare this.
     objects = models.Manager()
 
-    MODES = Choices('verified', 'honor', 'audit', 'professional', 'no-id-professional', 'masters')
+    MODES = Choices(u'verified', u'honor', u'audit', u'professional', u'no-id-professional', u'masters')
 
     VERIFIED_CERTS_MODES = [CourseMode.VERIFIED, CourseMode.CREDIT_MODE, CourseMode.MASTERS]
 
@@ -273,7 +273,7 @@ class GeneratedCertificate(models.Model):
     grade = models.CharField(max_length=5, blank=True, default='')
     key = models.CharField(max_length=32, blank=True, default='')
     distinction = models.BooleanField(default=False)
-    status = models.CharField(max_length=32, default='unavailable')
+    status = models.CharField(max_length=32, default=u'unavailable')
     mode = models.CharField(max_length=32, choices=MODES, default=MODES.honor)
     name = models.CharField(blank=True, max_length=255)
     created_date = models.DateTimeField(auto_now_add=True)
@@ -766,9 +766,9 @@ class ExampleCertificate(TimeStampedModel):
         app_label = "certificates"
 
     # Statuses
-    STATUS_STARTED = 'started'
-    STATUS_SUCCESS = 'success'
-    STATUS_ERROR = 'error'
+    STATUS_STARTED = u'started'
+    STATUS_SUCCESS = u'success'
+    STATUS_ERROR = u'error'
 
     # Dummy full name for the generated certificate
     EXAMPLE_FULL_NAME = u'John Doë'
@@ -827,9 +827,9 @@ class ExampleCertificate(TimeStampedModel):
         max_length=255,
         default=STATUS_STARTED,
         choices=(
-            (STATUS_STARTED, 'Started'),
-            (STATUS_SUCCESS, 'Success'),
-            (STATUS_ERROR, 'Error')
+            (STATUS_STARTED, u'Started'),
+            (STATUS_SUCCESS, u'Success'),
+            (STATUS_ERROR, u'Error')
         ),
         help_text=_(u"The status of the example certificate.")
     )
@@ -1048,7 +1048,7 @@ class CertificateHtmlViewConfiguration(ConfigurationModel):
         app_label = "certificates"
 
     configuration = models.TextField(
-        help_text="Certificate HTML View Parameters (JSON)"
+        help_text=u"Certificate HTML View Parameters (JSON)"
     )
 
     def clean(self):

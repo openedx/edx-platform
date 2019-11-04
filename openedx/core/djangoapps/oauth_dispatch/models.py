@@ -104,7 +104,7 @@ class ApplicationOrganization(models.Model):
 
     .. no_pii:
     """
-    RELATION_TYPE_CONTENT_ORG = 'content_org'
+    RELATION_TYPE_CONTENT_ORG = u'content_org'
     RELATION_TYPES = (
         (RELATION_TYPE_CONTENT_ORG, _('Content Provider')),
     )

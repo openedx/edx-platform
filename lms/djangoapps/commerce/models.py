@@ -32,7 +32,7 @@ class CommerceConfiguration(ConfigurationModel):
 
     basket_checkout_page = models.CharField(
         max_length=255,
-        default='/basket/add/',
+        default=u'/basket/add/',
         help_text=_('Path to course(s) checkout page hosted by the E-Commerce service.')
     )
     cache_ttl = models.PositiveIntegerField(

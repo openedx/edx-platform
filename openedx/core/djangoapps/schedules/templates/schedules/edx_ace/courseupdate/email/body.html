@@ -16,10 +16,10 @@
         <td>
             <p>
                 {% blocktrans trimmed asvar tmsg %}
-                    We hope you're enjoying {start_strong}{{ course_name }}{end_strong}!
-                    We want to let you know what you can look forward to in week {{ week_num }}:
+                    We hope you're enjoying {start_strong}{course_name}{end_strong}!
+                    We want to let you know what you can look forward to in week {week_num}:
                 {% endblocktrans %}
-                {% interpolate_html tmsg start_strong='<strong>'|safe end_strong='</strong>'|safe %}
+                {% interpolate_html tmsg start_strong='<strong>'|safe end_strong='</strong>'|safe course_name=course_name|force_escape|safe week_num=week_num|force_escape|safe %}
                 <ul>
                     {% for highlight in week_highlights %}
                         <li>{{ highlight }}</li>

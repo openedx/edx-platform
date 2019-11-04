@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
             name='IDVerificationAggregate',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', model_utils.fields.StatusField(choices=[(b'created', b'created'), (b'ready', b'ready'), (b'submitted', b'submitted'), (b'must_retry', b'must_retry'), (b'approved', b'approved'), (b'denied', b'denied')], default=b'created', max_length=100, no_check_for_status=True, verbose_name='status')),
+                ('status', model_utils.fields.StatusField(choices=[(u'created', u'created'), (u'ready', u'ready'), (u'submitted', u'submitted'), (u'must_retry', u'must_retry'), (u'approved', u'approved'), (u'denied', u'denied')], default=u'created', max_length=100, no_check_for_status=True, verbose_name='status')),
                 ('status_changed', model_utils.fields.MonitorField(default=django.utils.timezone.now, monitor='status', verbose_name='status changed')),
                 ('name', models.CharField(blank=True, max_length=255)),
                 ('object_id', models.PositiveIntegerField()),

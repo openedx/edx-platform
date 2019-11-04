@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='courseentitlementpolicy',
             name='mode',
-            field=models.CharField(max_length=32, null=True, choices=[(None, b'---------'), (b'verified', b'verified'), (b'professional', b'professional')]),
+            field=models.CharField(max_length=32, null=True, choices=[(None, u'---------'), (u'verified', u'verified'), (u'professional', u'professional')]),
         ),
         migrations.AlterField(
             model_name='courseentitlementpolicy',

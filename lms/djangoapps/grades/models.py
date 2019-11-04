@@ -29,7 +29,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from simple_history.models import HistoricalRecords
 from six.moves import map
 
-from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField, UnsignedBigIntOneToOneField
+from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField
 from lms.djangoapps.grades import constants, events
 from openedx.core.lib.cache_utils import get_cache
 
@@ -232,7 +232,7 @@ class VisibleBlocks(models.Model):
         only for those that aren't already created.
         """
         cached_records = cls.bulk_read(user_id, course_key)
-        non_existent_brls = {brl.hash_value for brl in block_record_lists if brl.hash_value not in cached_records}
+        non_existent_brls = {brl for brl in block_record_lists if brl.hash_value not in cached_records}
         cls.bulk_create(user_id, course_key, non_existent_brls)
 
     @classmethod
@@ -655,7 +655,7 @@ class PersistentSubsectionGradeOverride(models.Model):
     class Meta(object):
         app_label = "grades"
 
-    grade = UnsignedBigIntOneToOneField(PersistentSubsectionGrade, related_name='override')
+    grade = models.OneToOneField(PersistentSubsectionGrade, related_name='override')
 
     # Created/modified timestamps prevent race-conditions when using with async rescoring tasks
     created = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -781,15 +781,15 @@ class PersistentSubsectionGradeOverrideHistory(models.Model):
     .. no_pii:
     """
     OVERRIDE_FEATURES = (
-        (constants.GradeOverrideFeatureEnum.proctoring, 'proctoring'),
-        (constants.GradeOverrideFeatureEnum.gradebook, 'gradebook'),
+        (constants.GradeOverrideFeatureEnum.proctoring, u'proctoring'),
+        (constants.GradeOverrideFeatureEnum.gradebook, u'gradebook'),
     )
 
-    CREATE_OR_UPDATE = 'CREATEORUPDATE'
-    DELETE = 'DELETE'
+    CREATE_OR_UPDATE = u'CREATEORUPDATE'
+    DELETE = u'DELETE'
     OVERRIDE_ACTIONS = (
-        (CREATE_OR_UPDATE, 'create_or_update'),
-        (DELETE, 'delete')
+        (CREATE_OR_UPDATE, u'create_or_update'),
+        (DELETE, u'delete')
     )
 
     class Meta(object):

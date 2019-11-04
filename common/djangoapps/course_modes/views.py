@@ -216,7 +216,7 @@ class ChooseModeView(View):
             )
             if offer_banner_fragment:
                 context['offer_banner_fragment'] = offer_banner_fragment
-                discounted_price = "{:0.2f}".format(price_before_discount * ((100.0 - discount_percentage()) / 100))
+                discounted_price = "{:0.2f}".format(price_before_discount * ((100.0 - discount_percentage(course)) / 100))
                 context["min_price"] = discounted_price
                 context["price_before_discount"] = price_before_discount
 

@@ -23,6 +23,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='target',
             name='target_type',
-            field=models.CharField(max_length=64, choices=[(b'myself', b'Myself'), (b'staff', b'Staff and instructors'), (b'learners', b'All students'), (b'cohort', b'Specific cohort'), (b'track', b'Specific course mode')]),
+            field=models.CharField(max_length=64, choices=[(u'myself', u'Myself'), (u'staff', u'Staff and instructors'), (u'learners', u'All students'), (u'cohort', u'Specific cohort'), (u'track', u'Specific course mode')]),
         ),
     ]

@@ -101,7 +101,7 @@ class IDVerificationAttempt(StatusModel):
     .. pii_types: name
     .. pii_retirement: retained
     """
-    STATUS = Choices('created', 'ready', 'submitted', 'must_retry', 'approved', 'denied')
+    STATUS = Choices(u'created', u'ready', u'submitted', u'must_retry', u'approved', u'denied')
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
 
     # They can change their name later on, so we want to copy the value here so
@@ -160,7 +160,7 @@ class ManualVerification(IDVerificationAttempt):
         max_length=255,
         blank=True,
         help_text=(
-            'Specifies the reason for manual verification of the user.'
+            u'Specifies the reason for manual verification of the user.'
         )
     )
 
@@ -190,13 +190,13 @@ class SSOVerification(IDVerificationAttempt):
     .. no_pii:
     """
 
-    OAUTH2 = 'third_party_auth.models.OAuth2ProviderConfig'
-    SAML = 'third_party_auth.models.SAMLProviderConfig'
-    LTI = 'third_party_auth.models.LTIProviderConfig'
+    OAUTH2 = u'third_party_auth.models.OAuth2ProviderConfig'
+    SAML = u'third_party_auth.models.SAMLProviderConfig'
+    LTI = u'third_party_auth.models.LTIProviderConfig'
     IDENTITY_PROVIDER_TYPE_CHOICES = (
-        (OAUTH2, 'OAuth2 Provider'),
-        (SAML, 'SAML Provider'),
-        (LTI, 'LTI Provider'),
+        (OAUTH2, u'OAuth2 Provider'),
+        (SAML, u'SAML Provider'),
+        (LTI, u'LTI Provider'),
     )
 
     identity_provider_type = models.CharField(
@@ -205,14 +205,14 @@ class SSOVerification(IDVerificationAttempt):
         choices=IDENTITY_PROVIDER_TYPE_CHOICES,
         default=SAML,
         help_text=(
-            'Specifies which type of Identity Provider this verification originated from.'
+            u'Specifies which type of Identity Provider this verification originated from.'
         )
     )
 
     identity_provider_slug = models.SlugField(
-        max_length=30, db_index=True, default='default',
+        max_length=30, db_index=True, default=u'default',
         help_text=(
-            'The slug uniquely identifying the Identity Provider this verification originated from.'
+            u'The slug uniquely identifying the Identity Provider this verification originated from.'
         ))
 
     class Meta(object):

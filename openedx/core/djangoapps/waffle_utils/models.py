@@ -20,7 +20,7 @@ class WaffleFlagCourseOverrideModel(ConfigurationModel):
 
     .. no_pii:
     """
-    OVERRIDE_CHOICES = Choices(('on', _('Force On')), ('off', _('Force Off')))
+    OVERRIDE_CHOICES = Choices((u'on', _(u'Force On')), (u'off', _(u'Force Off')))
     ALL_CHOICES = OVERRIDE_CHOICES + Choices('unset')
 
     KEY_FIELDS = ('waffle_flag', 'course_id')

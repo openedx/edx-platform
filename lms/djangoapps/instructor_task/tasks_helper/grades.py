@@ -24,6 +24,7 @@ from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.instructor_analytics.basic import list_problem_responses
 from lms.djangoapps.instructor_analytics.csvs import format_dictlist
+from lms.djangoapps.instructor_task.config.waffle import problem_grade_report_verified_only
 from lms.djangoapps.certificates.models import CertificateWhitelist, GeneratedCertificate, certificate_info_for_user
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.grades.api import context as grades_context
@@ -509,10 +510,28 @@ class ProblemGradeReport(object):
         Generate a CSV containing all students' problem grades within a given
         `course_id`.
         """
+
+        def log_task_info(message):
+            """
+            Updates the status on the celery task to the given message.
+            Also logs the update.
+            """
+            fmt = u'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
+            task_info_string = fmt.format(
+                task_id=task_id, entry_id=_entry_id, course_id=course_id, task_input=_task_input
+            )
+            TASK_LOG.info(u'%s, Task type: %s, %s, %s', task_info_string, action_name, message, task_progress.state)
+
         start_time = time()
         start_date = datetime.now(UTC)
         status_interval = 100
-        enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id, include_inactive=True)
+        task_id = _xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None
+
+        enrolled_students = CourseEnrollment.objects.users_enrolled_in(
+            course_id,
+            include_inactive=True,
+            verified_only=problem_grade_report_verified_only(course_id),
+        )
         task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 
         # This struct encapsulates both the display names of each static item in the
@@ -521,6 +540,7 @@ class ProblemGradeReport(object):
         header_row = OrderedDict([('id', 'Student ID'), ('email', 'Email'), ('username', 'Username')])
 
         course = get_course_by_id(course_id)
+        log_task_info(u'Retrieving graded scorable blocks')
         graded_scorable_blocks = cls._graded_scorable_blocks_to_header(course)
 
         # Just generate the static fields for now.
@@ -528,10 +548,10 @@ class ProblemGradeReport(object):
             list(header_row.values()) + ['Enrollment Status', 'Grade'] + _flatten(list(graded_scorable_blocks.values()))
         ]
         error_rows = [list(header_row.values()) + ['error_msg']]
-        current_step = {'step': 'Calculating Grades'}
 
         # Bulk fetch and cache enrollment states so we can efficiently determine
         # whether each user is currently enrolled in the course.
+        log_task_info(u'Fetching enrollment status')
         CourseEnrollment.bulk_fetch_enrollment_states(enrolled_students, course_id)
 
         for student, course_grade, error in CourseGradeFactory().iter(enrolled_students, course):
@@ -565,8 +585,12 @@ class ProblemGradeReport(object):
 
             task_progress.succeeded += 1
             if task_progress.attempted % status_interval == 0:
-                task_progress.update_task_state(extra_meta=current_step)
+                step = u'Calculating Grades'
+                task_progress.update_task_state(extra_meta={'step': step})
+                log_message = u'{0} {1}/{2}'.format(step, task_progress.attempted, task_progress.total)
+                log_task_info(log_message)
 
+        log_task_info('Uploading CSV to store')
         # Perform the upload if any students have been successfully graded
         if len(rows) > 1:
             upload_csv_to_report_store(rows, 'problem_grade_report', course_id, start_date)

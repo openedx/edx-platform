@@ -61,7 +61,7 @@ class CourseOverview(TimeStampedModel):
     # Course identification
     id = CourseKeyField(db_index=True, primary_key=True, max_length=255)
     _location = UsageKeyField(max_length=255)
-    org = TextField(max_length=255, default='outdated_entry')
+    org = TextField(max_length=255, default=u'outdated_entry')
     display_name = TextField(null=True)
     display_number_with_default = TextField()
     display_org_with_default = TextField()
@@ -815,8 +815,8 @@ class CourseOverviewImageSet(TimeStampedModel):
     """
     course_overview = models.OneToOneField(CourseOverview, db_index=True, related_name="image_set",
                                            on_delete=models.CASCADE)
-    small_url = models.TextField(blank=True, default="")
-    large_url = models.TextField(blank=True, default="")
+    small_url = models.TextField(blank=True, default=u"")
+    large_url = models.TextField(blank=True, default=u"")
 
     @classmethod
     def create(cls, course_overview, course=None):
@@ -935,9 +935,9 @@ class SimulateCoursePublishConfig(ConfigurationModel):
 
     arguments = models.TextField(
         blank=True,
-        help_text='Useful for manually running a Jenkins job. Specify like "--delay 10 --receivers A B C \
+        help_text=u'Useful for manually running a Jenkins job. Specify like "--delay 10 --receivers A B C \
         --courses X Y Z".',
-        default='',
+        default=u'',
     )
 
     def __str__(self):

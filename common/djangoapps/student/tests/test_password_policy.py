@@ -14,7 +14,6 @@ from django.urls import reverse
 from mock import patch
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from openedx.core.djangoapps.user_authn.views.deprecated import create_account
 from util.password_policy_validators import create_validator_config
 
 
@@ -43,7 +42,7 @@ class TestPasswordPolicy(TestCase):
         self.assertEqual(response.status_code, 400)
         obj = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
-            obj['value'],
+            obj['password'][0]['user_message'],
             "This password is too short. It must contain at least 6 characters.",
         )
 
@@ -66,7 +65,7 @@ class TestPasswordPolicy(TestCase):
         self.assertEqual(response.status_code, 400)
         obj = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
-            obj['value'],
+            obj['password'][0]['user_message'],
             "This password is too long. It must contain no more than 12 characters.",
         )
 
@@ -79,7 +78,7 @@ class TestPasswordPolicy(TestCase):
         self.assertEqual(response.status_code, 400)
         obj = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
-            obj['value'],
+            obj['password'][0]['user_message'],
             "This password must contain at least 3 uppercase letters.",
         )
 
@@ -102,7 +101,7 @@ class TestPasswordPolicy(TestCase):
         self.assertEqual(response.status_code, 400)
         obj = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
-            obj['value'],
+            obj['password'][0]['user_message'],
             "This password must contain at least 3 lowercase letters.",
         )
 
@@ -125,7 +124,7 @@ class TestPasswordPolicy(TestCase):
         self.assertEqual(response.status_code, 400)
         obj = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
-            obj['value'],
+            obj['password'][0]['user_message'],
             "This password must contain at least 3 punctuation marks.",
         )
 
@@ -149,7 +148,7 @@ class TestPasswordPolicy(TestCase):
         self.assertEqual(response.status_code, 400)
         obj = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
-            obj['value'],
+            obj['password'][0]['user_message'],
             "This password must contain at least 3 numbers.",
         )
 
@@ -173,7 +172,7 @@ class TestPasswordPolicy(TestCase):
         self.assertEqual(response.status_code, 400)
         obj = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
-            obj['value'],
+            obj['password'][0]['user_message'],
             "This password must contain at least 3 letters.",
         )
 
@@ -198,12 +197,13 @@ class TestPasswordPolicy(TestCase):
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 400)
         obj = json.loads(response.content.decode('utf-8'))
-        errstring = (
-            "This password must contain at least 3 uppercase letters. "
-            "This password must contain at least 3 numbers. "
-            "This password must contain at least 3 punctuation marks."
-        )
-        self.assertEqual(obj['value'], errstring)
+        error_strings = [
+            "This password must contain at least 3 uppercase letters.",
+            "This password must contain at least 3 numbers.",
+            "This password must contain at least 3 punctuation marks.",
+        ]
+        for i in range(3):
+            self.assertEqual(obj['password'][i]['user_message'], error_strings[i])
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         create_validator_config('util.password_policy_validators.MinimumLengthValidator', {'min_length': 3}),
@@ -228,7 +228,7 @@ class TestPasswordPolicy(TestCase):
         self.assertEqual(response.status_code, 400)
         obj = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
-            obj['value'],
+            obj['password'][0]['user_message'],
             "This password is too common.",
         )
 
@@ -280,7 +280,7 @@ class TestUsernamePasswordNonmatch(TestCase):
         self.assertEquals(response.status_code, 400)
         obj = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
-            obj['value'],
+            obj['password'][0]['user_message'],
             "The password is too similar to the username.",
         )
 

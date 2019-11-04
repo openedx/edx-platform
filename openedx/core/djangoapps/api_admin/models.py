@@ -36,9 +36,9 @@ class ApiAccessRequest(TimeStampedModel):
     .. pii_retirement: local_api
     """
 
-    PENDING = 'pending'
-    DENIED = 'denied'
-    APPROVED = 'approved'
+    PENDING = u'pending'
+    DENIED = u'denied'
+    APPROVED = u'approved'
     STATUS_CHOICES = (
         (PENDING, _('Pending')),
         (DENIED, _('Denied')),
@@ -54,8 +54,8 @@ class ApiAccessRequest(TimeStampedModel):
     )
     website = models.URLField(help_text=_('The URL of the website associated with this API user.'))
     reason = models.TextField(help_text=_('The reason this user wants to access the API.'))
-    company_name = models.CharField(max_length=255, default='')
-    company_address = models.CharField(max_length=255, default='')
+    company_name = models.CharField(max_length=255, default=u'')
+    company_address = models.CharField(max_length=255, default=u'')
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
     contacted = models.BooleanField(default=False)
 

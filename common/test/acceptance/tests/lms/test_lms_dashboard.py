@@ -5,9 +5,10 @@ End-to-end tests for the main LMS Dashboard (aka, Student Dashboard).
 from __future__ import absolute_import
 
 import datetime
-
+import re
 import six
 
+from six.moves.urllib.parse import unquote  # pylint: disable=import-error
 from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
@@ -170,18 +171,30 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         self.assertEqual(twitter_widget.attrs('title')[0], 'Share on Twitter')
         self.assertEqual(twitter_widget.attrs('data-tooltip')[0], 'Share on Twitter')
         self.assertEqual(twitter_widget.attrs('target')[0], '_blank')
-        self.assertIn(twitter_url, twitter_widget.attrs('href')[0])
-        self.assertIn(twitter_url, twitter_widget.attrs('onclick')[0])
+        self._assert_social_url(twitter_widget.attrs('href')[0], unquote(twitter_url), r"\'(.*?)\'\,")
+        self._assert_social_url(twitter_widget.attrs('onclick')[0], unquote(twitter_url), r"\'(.*?)\'\,")
 
         facebook_widget = self.dashboard_page.get_course_social_sharing_widget('facebook')
         facebook_url = ("https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fcustom%2Fcourse%2Furl%3F"
                         "utm_campaign%3Dsocial-sharing-db%26utm_medium%3Dsocial%26utm_source%3Dfacebook&"
-                        "quote=I%27m+taking+Test")
+                        "quote=I%27m+taking+Test+Course")
         self.assertEqual(facebook_widget.attrs('title')[0], 'Share on Facebook')
         self.assertEqual(facebook_widget.attrs('data-tooltip')[0], 'Share on Facebook')
         self.assertEqual(facebook_widget.attrs('target')[0], '_blank')
-        self.assertIn(facebook_url, facebook_widget.attrs('href')[0])
-        self.assertIn(facebook_url, facebook_widget.attrs('onclick')[0])
+        self._assert_social_url(facebook_widget.attrs('onclick')[0], unquote(facebook_url), r"\'(.*?);")
+        self._assert_social_url(facebook_widget.attrs('href')[0], unquote(facebook_url), r"^(.*)\;")
+
+    def _assert_social_url(self, url, expected_url, pattern):
+        """
+        will remove byte characters from specific query parameter
+        """
+        url = unquote(url)
+        social_url_search = re.search(pattern, url)
+        url_split = (social_url_search.group(1) if social_url_search else url).split('?')
+        query_parameters = url_split[2].split('&')
+        urls = url_split[:2] + query_parameters
+        for query_parameter in urls:
+            self.assertIn(query_parameter.strip("'"), expected_url)
 
     def test_ended_course_date(self):
         """
@@ -317,7 +330,6 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         self.assertEqual(course_date, expected_course_date)
 
     def test_advertised_start_date(self):
-
         """
         Scenario:
             Course Date should be advertised start date
@@ -393,7 +405,7 @@ class LmsDashboardCourseUnEnrollDialogMessageTest(BaseLmsDashboardTestMultiple):
 
         expected_track_message = u'Are you sure you want to unenroll from the verified' + \
                                  u' <span id="unenroll_cert_name">' + cert_long_name + u'</span>' + \
-                                 u' track of <span id="unenroll_course_name">' + course_name + u'</span>' +  \
+                                 u' track of <span id="unenroll_course_name">' + course_name + u'</span>' + \
                                  u' (<span id="unenroll_course_number">' + course_number + u'</span>)?'
 
         expected_refund_message = u'The refund deadline for this course has passed,so you will not receive a refund.'

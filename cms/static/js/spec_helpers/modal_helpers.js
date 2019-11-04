@@ -29,7 +29,7 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'common/js/spec_hel
 
         getModalTitle = function(modal) {
             var modalElement = getModalElement(modal);
-            return modalElement.find('.modal-window-title span.modal-button-title').text();
+            return modalElement.find('.modal-window-title').text();
         };
 
         isShowingModal = function(modal) {

@@ -4,6 +4,7 @@ Utility functions for capa.
 from __future__ import absolute_import
 
 import re
+import logging
 import six
 from cmath import isinf, isnan
 from decimal import Decimal
@@ -18,6 +19,7 @@ from openedx.core.djangolib.markup import HTML
 #
 # Utility functions used in CAPA responsetypes
 default_tolerance = '0.001%'
+log = logging.getLogger(__name__)
 
 
 def compare_with_tolerance(student_complex, instructor_complex, tolerance=default_tolerance, relative_tolerance=False):
@@ -108,6 +110,24 @@ def contextualize_text(text, context):  # private
         except UnicodeEncodeError:
             return value.encode('utf8', errors='ignore')
 
+    def replace_or_log_error(data_string, old_value, new_value):
+        """Tries to replace context variable with value and logs exception if there is an error"""
+        try:
+            data_string = data_string.replace(old_value, new_value)
+            return data_string
+        except Exception as error:
+            log.exception(
+                u'ContextualizeTextError: text(%s): %s, context_key(%s): %s, context_value(%s): %s, Error: %s',
+                type(text),
+                text,
+                type(context_key),
+                context_key,
+                type(context_value),
+                context_value,
+                six.text_type(error)
+            )
+            raise
+
     if not text:
         return text
 
@@ -121,7 +141,8 @@ def contextualize_text(text, context):  # private
         if context_key in (text.decode('utf-8') if six.PY3 and isinstance(text, bytes) else text):
             text = convert_to_str(text)
             context_value = convert_to_str(context[key])
-            text = text.replace(context_key, context_value)
+            text = replace_or_log_error(text, context_key, context_value)
+
     return text
 
 

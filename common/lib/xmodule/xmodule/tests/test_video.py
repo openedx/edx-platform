@@ -1118,7 +1118,7 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
 
         descriptor = instantiate_descriptor(data=xml_data_transcripts)
         translations = descriptor.available_translations(descriptor.get_transcripts_info())
-        self.assertEqual(translations, ['hr', 'ge'])
+        self.assertEqual(sorted(translations), sorted(['hr', 'ge']))
 
     def test_video_with_no_transcripts_translation_retrieval(self):
         """

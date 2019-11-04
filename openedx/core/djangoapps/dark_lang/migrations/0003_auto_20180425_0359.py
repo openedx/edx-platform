@@ -15,11 +15,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='darklangconfig',
             name='beta_languages',
-            field=models.TextField(blank=True, help_text=b'A comma-separated list of language codes to release to the public as beta languages.'),
+            field=models.TextField(blank=True, help_text=u'A comma-separated list of language codes to release to the public as beta languages.'),
         ),
         migrations.AddField(
             model_name='darklangconfig',
             name='enable_beta_languages',
-            field=models.BooleanField(default=False, help_text=b'Enable partially supported languages to display in language drop down.'),
+            field=models.BooleanField(default=False, help_text=u'Enable partially supported languages to display in language drop down.'),
         ),
     ]

@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('change_date', models.DateTimeField(auto_now_add=True, verbose_name='Change date')),
                 ('enabled', models.BooleanField(default=False, verbose_name='Enabled')),
-                ('known_user_agents', models.TextField(default=b'edX-downloader', help_text=b'A comma-separated list of known crawler user agents.', blank=True)),
+                ('known_user_agents', models.TextField(default=u'edX-downloader', help_text=u'A comma-separated list of known crawler user agents.', blank=True)),
                 ('changed_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, editable=False, to=settings.AUTH_USER_MODEL, null=True, verbose_name='Changed by')),
             ],
             options={

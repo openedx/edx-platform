@@ -205,7 +205,7 @@ class ForumsConfig(ConfigurationModel):
 
     connection_timeout = models.FloatField(
         default=5.0,
-        help_text="Seconds to wait when trying to connect to the comment service.",
+        help_text=u"Seconds to wait when trying to connect to the comment service.",
     )
 
     class Meta(ConfigurationModel.Meta):
@@ -239,7 +239,7 @@ class CourseDiscussionSettings(models.Model):
     discussions_id_map = JSONField(
         null=True,
         blank=True,
-        help_text="Key/value store mapping discussion IDs to discussion XBlock usage keys.",
+        help_text=u"Key/value store mapping discussion IDs to discussion XBlock usage keys.",
     )
     always_divide_inline_discussions = models.BooleanField(default=False)
     _divided_discussions = models.TextField(db_column='divided_discussions', null=True, blank=True)  # JSON list
@@ -277,7 +277,7 @@ class DiscussionsIdMapping(models.Model):
     """
     course_id = CourseKeyField(db_index=True, primary_key=True, max_length=255)
     mapping = JSONField(
-        help_text="Key/value store mapping discussion IDs to discussion XBlock usage keys.",
+        help_text=u"Key/value store mapping discussion IDs to discussion XBlock usage keys.",
     )
 
     class Meta(object):

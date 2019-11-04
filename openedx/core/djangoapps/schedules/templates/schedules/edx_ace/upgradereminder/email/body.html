@@ -44,11 +44,11 @@
                     {% interpolate_html tmsg start_strong='<strong>'|safe end_strong='</strong>'|safe %}
                 {% else %}
                     {% blocktrans trimmed asvar tmsg %}
-                        We hope you are enjoying learning with us so far in {start_strong}{{ first_course_name }}{end_strong}! A
+                        We hope you are enjoying learning with us so far in {start_strong}{first_course_name}{end_strong}! A
                         verified certificate allows you to highlight your new knowledge and skills. An
-                        {{ platform_name }} certificate is official and easily shareable.
+                        {platform_name} certificate is official and easily shareable.
                     {% endblocktrans %}
-                    {% interpolate_html tmsg start_strong='<strong>'|safe end_strong='</strong>'|safe %}
+                    {% interpolate_html tmsg start_strong='<strong>'|safe end_strong='</strong>'|safe first_course_name=first_course_name|force_escape|safe platform_name=platform_name|force_escape|safe %}
                 {% endif %}
             </p>
             <p>

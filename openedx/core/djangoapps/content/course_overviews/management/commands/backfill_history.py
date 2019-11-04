@@ -15,7 +15,7 @@ class Command(BaseCommand):
     """
     Backfill history for models using django-simple-history.
     Example usage:
-    $ ./manage.py lms backfill_history --batchsize 1000 --sleep_between 1 --settings=devstack
+    $ ./manage.py lms backfill_history --batch_size 1000 --sleep_between 1 --input_root /tmp/data/ --settings=devstack
     """
 
     help = (
@@ -57,7 +57,7 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "--size",
+            "--batch_size",
             action="store",
             default=self.DEFAULT_SIZE,
             type=int,
@@ -67,14 +67,19 @@ class Command(BaseCommand):
         parser.add_argument(
             "--input_root",
             action="store",
+            help="Path containing data files from snapshot for history backfill"
         )
 
     def chunks(self, ids, chunk_size):
         for i in xrange(0, len(ids), chunk_size):
             yield ids[i:i + chunk_size]
 
+    def replace_values(self, values, original, replacement):
+        values = [[replacement if v == original else v for v in value] for value in values]
+        return values
+
     def handle(self, *args, **options):
-        batch_size = options['size']
+        batch_size = options['batch_size']
         sleep_between = options['sleep_between']
         input_root = options['input_root']
 
@@ -135,6 +140,13 @@ class Command(BaseCommand):
                         raise Exception(u"Database count: %s does not match input count: %s" % (count, len(ids)))
 
                     values = [[row[column.upper()] for column in columns] for row in rows]
+
+                    # Replace 'NULL' with None
+                    values = self.replace_values(values, 'NULL', None)
+                    # Replace 'true' with True
+                    values = self.replace_values(values, 'true', True)
+                    # Replace 'false' with False
+                    values = self.replace_values(values, 'false', False)
                     # Add history columns data
                     for value in values:
                         value.extend([history_date, self.HISTORY_CHANGE_REASON, '+', self.HISTORY_USER_ID])

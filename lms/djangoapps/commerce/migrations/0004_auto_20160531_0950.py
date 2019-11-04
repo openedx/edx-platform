@@ -19,6 +19,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='commerceconfiguration',
             name='receipt_page',
-            field=models.CharField(default=b'/commerce/checkout/receipt/?orderNum=', help_text='Path to order receipt page.', max_length=255),
+            field=models.CharField(default=u'/commerce/checkout/receipt/?orderNum=', help_text='Path to order receipt page.', max_length=255),
         ),
     ]

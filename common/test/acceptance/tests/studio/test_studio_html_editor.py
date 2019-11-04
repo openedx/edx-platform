@@ -3,11 +3,16 @@ Acceptance tests for HTML component in studio
 """
 from __future__ import absolute_import
 
+import os
+
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.studio.container import ContainerPage, XBlockWrapper
 from common.test.acceptance.pages.studio.html_component_editor import HTMLEditorIframe, HtmlXBlockEditorView
 from common.test.acceptance.pages.studio.utils import add_component, type_in_codemirror
 from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
+
+UPLOAD_SUFFIX = 'data/uploads/studio-uploads/'
+UPLOAD_FILE_DIR = os.path.abspath(os.path.join(__file__, '../../../../', UPLOAD_SUFFIX))
 
 
 class HTMLComponentEditorTests(ContainerBase):
@@ -365,3 +370,30 @@ class HTMLComponentEditorTests(ContainerBase):
         }
         self.html_editor.open_font_dropdown()
         self.assertDictContainsSubset(EXPECTED_FONTS, self.html_editor.font_dict())
+
+    def test_image_modal(self):
+        """
+        Scenario: TinyMCE text editor allows to add multiple images.
+
+        Given I have created a Blank text editor Page.
+        I add an image in TinyMCE text editor and hit save button.
+        I edit the component again.
+        I add another image in TinyMCE text editor and hit save button again.
+            Then it is expected that both images show up on page.
+        """
+        image_file_names = [u'file-0.png', u'file-1.png']
+        self._add_component('Text')
+
+        for image in image_file_names:
+            image_path = os.path.join(UPLOAD_FILE_DIR, image)
+            self.container_page.edit()
+            self.html_editor.open_image_modal()
+            self.html_editor.upload_image(image_path)
+            self.html_editor.save_content()
+            self.html_editor.wait_for_ajax()
+
+        self.container_page.edit()
+        self.html_editor.open_raw_editor()
+        editor_value = self.html_editor.editor_value
+        number_of_images = editor_value.count(u'img')
+        self.assertEqual(number_of_images, 2)

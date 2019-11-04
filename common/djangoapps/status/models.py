@@ -26,13 +26,13 @@ class GlobalStatusMessage(ConfigurationModel):
     message = models.TextField(
         blank=True,
         null=True,
-        help_text='<p>The contents of this field will be displayed as a warning banner on all views.</p>'
-                  '<p>To override the banner message for a specific course, refer to the Course Message configuration. '
-                  'Course Messages will only work if the global status message is enabled, so if you only want to add '
-                  'a banner to specific courses without adding a global status message, you should add a global status '
-                  'message with <strong>empty</strong> message text.</p>'
-                  '<p>Finally, disable the global status message by adding another empty message with "enabled" '
-                  'unchecked.</p>')
+        help_text=u'<p>The contents of this field will be displayed as a warning banner on all views.</p>'
+                  u'<p>To override the banner message for a specific course, refer to the Course Message configuration. '
+                  u'Course Messages will only work if the global status message is enabled, so if you only want to add '
+                  u'a banner to specific courses without adding a global status message, you should add a global status '
+                  u'message with <strong>empty</strong> message text.</p>'
+                  u'<p>Finally, disable the global status message by adding another empty message with "enabled" '
+                  u'unchecked.</p>')
 
     def full_message(self, course_key):
         """ Returns the full status message, including any course-specific status messages. """

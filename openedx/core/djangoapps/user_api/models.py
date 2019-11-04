@@ -3,6 +3,8 @@ Django ORM model specifications for the User API application
 """
 from __future__ import absolute_import
 
+import logging
+
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.db import models
@@ -30,6 +32,8 @@ from student.models import (
 )
 from util.model_utils import emit_setting_changed_event, get_changed_fields_dict
 
+log = logging.getLogger(__name__)
+
 
 class RetirementStateError(Exception):
     pass
@@ -41,7 +45,7 @@ class UserPreference(models.Model):
 
     .. no_pii: Stores arbitrary key/value pairs, currently none are PII. If that changes, update this annotation.
     """
-    KEY_REGEX = r"[-_a-zA-Z0-9]+"
+    KEY_REGEX = u"[-_a-zA-Z0-9]+"
     user = models.ForeignKey(User, db_index=True, related_name="preferences", on_delete=models.CASCADE)
     key = models.CharField(max_length=255, db_index=True, validators=[RegexValidator(KEY_REGEX)])
     value = models.TextField()
@@ -96,7 +100,11 @@ def post_save_callback(sender, **kwargs):
     """
     Event changes to user preferences.
     """
+
     user_preference = kwargs["instance"]
+    if user_preference.key == u'pref-lang':
+        log.info(u"Updated the language for the user:{username} to {new}".format(
+            username=user_preference.user.username, new=user_preference.value))
     emit_setting_changed_event(
         user_preference.user, sender._meta.db_table, user_preference.key,
         user_preference._old_value, user_preference.value

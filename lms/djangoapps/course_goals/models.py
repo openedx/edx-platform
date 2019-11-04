@@ -12,10 +12,10 @@ from opaque_keys.edx.django.models import CourseKeyField
 
 # Each goal is represented by a goal key and a string description.
 GOAL_KEY_CHOICES = Choices(
-    ('certify', _('Earn a certificate')),
-    ('complete', _('Complete the course')),
-    ('explore', _('Explore the course')),
-    ('unsure', _('Not sure yet')),
+    (u'certify', _('Earn a certificate')),
+    (u'complete', _('Complete the course')),
+    (u'explore', _('Explore the course')),
+    (u'unsure', _('Not sure yet')),
 )
 
 

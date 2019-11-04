@@ -171,6 +171,30 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
         self.assertEqual(student_course_enrollment.course.id, program_course_enrollment.course_key)
         self.assertEqual(student_course_enrollment.mode, mode)
 
+    def test_update_social_auth(self):
+        """
+        Makes sure we can update a social_auth row to trigger the same program enrollments
+        """
+        program_enrollment = self._create_waiting_program_enrollment()
+        program_course_enrollments = self._create_waiting_course_enrollments(program_enrollment)
+
+        user_social_auth = UserSocialAuth.objects.create(
+            user=self.user,
+            uid='{0}:{1}'.format(self.provider_slug, 'gobbledegook')
+        )
+
+        # Not yet a thing, didn't match
+        program_enrollment.refresh_from_db()
+        self.assertIsNone(program_enrollment.user)
+
+        user_social_auth.uid = '{0}:{1}'.format(self.provider_slug, self.external_id)
+        user_social_auth.save()
+
+        # now we see the enrollments realized
+        self._assert_program_enrollment_user(program_enrollment, self.user)
+        for program_course_enrollment in program_course_enrollments:
+            self._assert_program_course_enrollment(program_course_enrollment)
+
     def test_waiting_course_enrollments_completed(self):
         program_enrollment = self._create_waiting_program_enrollment()
         program_course_enrollments = self._create_waiting_course_enrollments(program_enrollment)

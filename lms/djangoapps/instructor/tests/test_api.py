@@ -3293,6 +3293,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         self.assertTrue(
             body.endswith('"{user_id}","41","42"\n'.format(user_id=self.students[-1].id))
         )
+        self.assertIn("attachment; filename=org", response['Content-Disposition'])
 
     @patch('lms.djangoapps.instructor_task.models.logger.error')
     @patch.dict(settings.GRADES_DOWNLOAD, {'STORAGE_TYPE': 's3'})

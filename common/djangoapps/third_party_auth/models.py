@@ -95,9 +95,9 @@ class ProviderConfig(ConfigurationModel):
     icon_class = models.CharField(
         max_length=50,
         blank=True,
-        default='fa-sign-in',
+        default=u'fa-sign-in',
         help_text=(
-            'The Font Awesome (or custom) icon class to use on the login button for this provider. '
+            u'The Font Awesome (or custom) icon class to use on the login button for this provider. '
             'Examples: fa-google-plus, fa-facebook, fa-linkedin, fa-sign-in, fa-university'
         ),
     )
@@ -108,15 +108,15 @@ class ProviderConfig(ConfigurationModel):
     icon_image = models.FileField(
         blank=True,
         help_text=(
-            'If there is no Font Awesome icon available for this provider, upload a custom image. '
+            u'If there is no Font Awesome icon available for this provider, upload a custom image. '
             'SVG images are recommended as they can scale to any size.'
         ),
     )
-    name = models.CharField(max_length=50, blank=False, help_text="Name of this provider (shown to users)")
+    name = models.CharField(max_length=50, blank=False, help_text=u"Name of this provider (shown to users)")
     slug = models.SlugField(
-        max_length=30, db_index=True, default='default',
+        max_length=30, db_index=True, default=u'default',
         help_text=(
-            'A short string uniquely identifying this provider. '
+            u'A short string uniquely identifying this provider. '
             'Cannot contain spaces and should be a usable as a CSS class. Examples: "ubc", "mit-staging"'
         ))
     secondary = models.BooleanField(
@@ -186,7 +186,7 @@ class ProviderConfig(ConfigurationModel):
         null=True,
         blank=True,
         default=None,
-        verbose_name='Max session length (seconds)',
+        verbose_name=u'Max session length (seconds)',
         help_text=_(
             "If this option is set, then users logging in using this SSO provider will have "
             "their session length limited to no longer than this value. If set to 0 (zero), "
@@ -211,7 +211,7 @@ class ProviderConfig(ConfigurationModel):
     )
     enable_sso_id_verification = models.BooleanField(
         default=False,
-        help_text="Use the presence of a profile from a trusted third party as proof of identity verification.",
+        help_text=u"Use the presence of a profile from a trusted third party as proof of identity verification.",
     )
     prefix = None  # used for provider_id. Set to a string value in subclass
     backend_name = None  # Set to a field or fixed value in subclass
@@ -275,7 +275,7 @@ class ProviderConfig(ConfigurationModel):
     def get_register_form_data(cls, pipeline_kwargs):
         """Gets dict of data to display on the register form.
 
-        openedx.core.djangoapps.user_authn.views.deprecated.register_user uses this to populate
+        register_user uses this to populate
         the new account creation form with values supplied by the user's chosen
         provider, preventing duplicate data entry.
 
@@ -354,28 +354,28 @@ class OAuth2ProviderConfig(ProviderConfig):
     backend_name = models.CharField(
         max_length=50, blank=False, db_index=True,
         help_text=(
-            "Which python-social-auth OAuth2 provider backend to use. "
+            u"Which python-social-auth OAuth2 provider backend to use. "
             "The list of backend choices is determined by the THIRD_PARTY_AUTH_BACKENDS setting."
             # To be precise, it's set by AUTHENTICATION_BACKENDS
             # which production.py sets from THIRD_PARTY_AUTH_BACKENDS
         )
     )
-    key = models.TextField(blank=True, verbose_name="Client ID")
+    key = models.TextField(blank=True, verbose_name=u"Client ID")
     secret = models.TextField(
         blank=True,
-        verbose_name="Client Secret",
+        verbose_name=u"Client Secret",
         help_text=(
-            'For increased security, you can avoid storing this in your database by leaving '
+            u'For increased security, you can avoid storing this in your database by leaving '
             ' this field blank and setting '
             'SOCIAL_AUTH_OAUTH_SECRETS = {"(backend name)": "secret", ...} '  # pylint: disable=unicode-format-string
             'in your instance\'s Django settings (or lms.auth.json)'
         )
     )
-    other_settings = models.TextField(blank=True, help_text="Optional JSON object with advanced settings, if any.")
+    other_settings = models.TextField(blank=True, help_text=u"Optional JSON object with advanced settings, if any.")
 
     class Meta(object):
         app_label = "third_party_auth"
-        verbose_name = "Provider Configuration (OAuth)"
+        verbose_name = u"Provider Configuration (OAuth)"
         verbose_name_plural = verbose_name
 
     def clean(self):
@@ -419,15 +419,15 @@ class SAMLConfiguration(ConfigurationModel):
     )
     slug = models.SlugField(
         max_length=30,
-        default='default',
+        default=u'default',
         help_text=(
-            'A short string uniquely identifying this configuration. '
+            u'A short string uniquely identifying this configuration. '
             'Cannot contain spaces. Examples: "ubc", "mit-staging"'
         ),
     )
     private_key = models.TextField(
         help_text=(
-            'To generate a key pair as two files, run '
+            u'To generate a key pair as two files, run '
             '"openssl req -new -x509 -days 3652 -nodes -out saml.crt -keyout saml.key". '
             'Paste the contents of saml.key here. '
             'For increased security, you can avoid storing this in your database by leaving '
@@ -438,30 +438,30 @@ class SAMLConfiguration(ConfigurationModel):
     )
     public_key = models.TextField(
         help_text=(
-            'Public key certificate. '
+            u'Public key certificate. '
             'For increased security, you can avoid storing this in your database by leaving '
             'this field blank and setting it via the SOCIAL_AUTH_SAML_SP_PUBLIC_CERT setting '
             'in your instance\'s Django settings (or lms.auth.json).'
         ),
         blank=True,
     )
-    entity_id = models.CharField(max_length=255, default="http://saml.example.com", verbose_name="Entity ID")
+    entity_id = models.CharField(max_length=255, default="http://saml.example.com", verbose_name=u"Entity ID")
     org_info_str = models.TextField(
-        verbose_name="Organization Info",
-        default='{"en-US": {"url": "http://www.example.com", "displayname": "Example Inc.", "name": "example"}}',
-        help_text="JSON dictionary of 'url', 'displayname', and 'name' for each language",
+        verbose_name=u"Organization Info",
+        default=u'{"en-US": {"url": "http://www.example.com", "displayname": "Example Inc.", "name": "example"}}',
+        help_text=u"JSON dictionary of 'url', 'displayname', and 'name' for each language",
     )
     other_config_str = models.TextField(
-        default='{\n"SECURITY_CONFIG": {"metadataCacheDuration": 604800, "signMetadata": false}\n}',
+        default=u'{\n"SECURITY_CONFIG": {"metadataCacheDuration": 604800, "signMetadata": false}\n}',
         help_text=(
-            "JSON object defining advanced settings that are passed on to python-saml. "
+            u"JSON object defining advanced settings that are passed on to python-saml. "
             "Valid keys that can be set here include: SECURITY_CONFIG and SP_EXTRA"
         ),
     )
 
     class Meta(object):
         app_label = "third_party_auth"
-        verbose_name = "SAML Configuration"
+        verbose_name = u"SAML Configuration"
         verbose_name_plural = verbose_name
 
     def __str__(self):
@@ -553,73 +553,76 @@ class SAMLProviderConfig(ProviderConfig):
     """
     prefix = 'saml'
     backend_name = models.CharField(
-        max_length=50, default='tpa-saml', blank=False,
-        help_text="Which python-social-auth provider backend to use. 'tpa-saml' is the standard edX SAML backend.")
+        max_length=50, default=u'tpa-saml', blank=False,
+        help_text=u"Which python-social-auth provider backend to use. 'tpa-saml' is the standard edX SAML backend.")
     entity_id = models.CharField(
-        max_length=255, verbose_name="Entity ID", help_text="Example: https://idp.testshib.org/idp/shibboleth")
+        max_length=255, verbose_name=u"Entity ID", help_text=u"Example: https://idp.testshib.org/idp/shibboleth")
     metadata_source = models.CharField(
         max_length=255,
         help_text=(
-            "URL to this provider's XML metadata. Should be an HTTPS URL. "
+            u"URL to this provider's XML metadata. Should be an HTTPS URL. "
             "Example: https://www.testshib.org/metadata/testshib-providers.xml"
         ))
     attr_user_permanent_id = models.CharField(
-        max_length=128, blank=True, verbose_name="User ID Attribute",
-        help_text="URN of the SAML attribute that we can use as a unique, persistent user ID. Leave blank for default.")
+        max_length=128, blank=True, verbose_name=u"User ID Attribute",
+        help_text=(
+            u"URN of the SAML attribute that we can use as a unique, "
+            "persistent user ID. Leave blank for default."
+        ))
     attr_full_name = models.CharField(
-        max_length=128, blank=True, verbose_name="Full Name Attribute",
-        help_text="URN of SAML attribute containing the user's full name. Leave blank for default.")
+        max_length=128, blank=True, verbose_name=u"Full Name Attribute",
+        help_text=u"URN of SAML attribute containing the user's full name. Leave blank for default.")
     default_full_name = models.CharField(
-        max_length=255, blank=True, verbose_name="Default Value for Full Name",
-        help_text="Default value for full name to be used if not present in SAML response.")
+        max_length=255, blank=True, verbose_name=u"Default Value for Full Name",
+        help_text=u"Default value for full name to be used if not present in SAML response.")
     attr_first_name = models.CharField(
-        max_length=128, blank=True, verbose_name="First Name Attribute",
-        help_text="URN of SAML attribute containing the user's first name. Leave blank for default.")
+        max_length=128, blank=True, verbose_name=u"First Name Attribute",
+        help_text=u"URN of SAML attribute containing the user's first name. Leave blank for default.")
     default_first_name = models.CharField(
-        max_length=255, blank=True, verbose_name="Default Value for First Name",
-        help_text="Default value for first name to be used if not present in SAML response.")
+        max_length=255, blank=True, verbose_name=u"Default Value for First Name",
+        help_text=u"Default value for first name to be used if not present in SAML response.")
     attr_last_name = models.CharField(
-        max_length=128, blank=True, verbose_name="Last Name Attribute",
-        help_text="URN of SAML attribute containing the user's last name. Leave blank for default.")
+        max_length=128, blank=True, verbose_name=u"Last Name Attribute",
+        help_text=u"URN of SAML attribute containing the user's last name. Leave blank for default.")
     default_last_name = models.CharField(
-        max_length=255, blank=True, verbose_name="Default Value for Last Name",
-        help_text="Default value for last name to be used if not present in SAML response.")
+        max_length=255, blank=True, verbose_name=u"Default Value for Last Name",
+        help_text=u"Default value for last name to be used if not present in SAML response.")
     attr_username = models.CharField(
-        max_length=128, blank=True, verbose_name="Username Hint Attribute",
-        help_text="URN of SAML attribute to use as a suggested username for this user. Leave blank for default.")
+        max_length=128, blank=True, verbose_name=u"Username Hint Attribute",
+        help_text=u"URN of SAML attribute to use as a suggested username for this user. Leave blank for default.")
     default_username = models.CharField(
-        max_length=255, blank=True, verbose_name="Default Value for Username",
-        help_text="Default value for username to be used if not present in SAML response.")
+        max_length=255, blank=True, verbose_name=u"Default Value for Username",
+        help_text=u"Default value for username to be used if not present in SAML response.")
     attr_email = models.CharField(
-        max_length=128, blank=True, verbose_name="Email Attribute",
-        help_text="URN of SAML attribute containing the user's email address[es]. Leave blank for default.")
+        max_length=128, blank=True, verbose_name=u"Email Attribute",
+        help_text=u"URN of SAML attribute containing the user's email address[es]. Leave blank for default.")
     default_email = models.CharField(
-        max_length=255, blank=True, verbose_name="Default Value for Email",
-        help_text="Default value for email to be used if not present in SAML response.")
+        max_length=255, blank=True, verbose_name=u"Default Value for Email",
+        help_text=u"Default value for email to be used if not present in SAML response.")
     automatic_refresh_enabled = models.BooleanField(
-        default=True, verbose_name="Enable automatic metadata refresh",
-        help_text="When checked, the SAML provider's metadata will be included "
+        default=True, verbose_name=u"Enable automatic metadata refresh",
+        help_text=u"When checked, the SAML provider's metadata will be included "
                   "in the automatic refresh job, if configured."
     )
     identity_provider_type = models.CharField(
-        max_length=128, blank=False, verbose_name="Identity Provider Type", default=STANDARD_SAML_PROVIDER_KEY,
+        max_length=128, blank=False, verbose_name=u"Identity Provider Type", default=STANDARD_SAML_PROVIDER_KEY,
         choices=get_saml_idp_choices(), help_text=(
-            "Some SAML providers require special behavior. For example, SAP SuccessFactors SAML providers require an "
+            u"Some SAML providers require special behavior. For example, SAP SuccessFactors SAML providers require an "
             "additional API call to retrieve user metadata not provided in the SAML response. Select the provider type "
             "which best matches your use case. If in doubt, choose the Standard SAML Provider type."
         )
     )
     debug_mode = models.BooleanField(
-        default=False, verbose_name="Debug Mode",
+        default=False, verbose_name=u"Debug Mode",
         help_text=(
-            "In debug mode, all SAML XML requests and responses will be logged. "
+            u"In debug mode, all SAML XML requests and responses will be logged. "
             "This is helpful for testing/setup but should always be disabled before users start using this provider."
         ),
     )
     other_settings = models.TextField(
-        verbose_name="Advanced settings", blank=True,
+        verbose_name=u"Advanced settings", blank=True,
         help_text=(
-            'For advanced use cases, enter a JSON object with addtional configuration. '
+            u'For advanced use cases, enter a JSON object with addtional configuration. '
             'The tpa-saml backend supports {"requiredEntitlements": ["urn:..."]}, '  # pylint: disable=unicode-format-string
             'which can be used to require the presence of a specific eduPersonEntitlement, '
             'and {"extra_field_definitions": [{"name": "...", "urn": "..."},...]}, which can be '  # pylint: disable=unicode-format-string
@@ -644,7 +647,7 @@ class SAMLProviderConfig(ProviderConfig):
 
     class Meta(object):
         app_label = "third_party_auth"
-        verbose_name = "Provider Configuration (SAML IdP)"
+        verbose_name = u"Provider Configuration (SAML IdP)"
         verbose_name_plural = "Provider Configuration (SAML IdPs)"
 
     def get_url_params(self):
@@ -739,12 +742,12 @@ class SAMLProviderData(models.Model):
     expires_at = models.DateTimeField(db_index=True, null=True)
 
     entity_id = models.CharField(max_length=255, db_index=True)  # This is the key for lookups in this table
-    sso_url = models.URLField(verbose_name="SSO URL")
+    sso_url = models.URLField(verbose_name=u"SSO URL")
     public_key = models.TextField()
 
     class Meta(object):
         app_label = "third_party_auth"
-        verbose_name = "SAML Provider Data"
+        verbose_name = u"SAML Provider Data"
         verbose_name_plural = verbose_name
         ordering = ('-fetched_at', )
 
@@ -802,15 +805,15 @@ class LTIProviderConfig(ProviderConfig):
     lti_consumer_key = models.CharField(
         max_length=255,
         help_text=(
-            'The name that the LTI Tool Consumer will use to identify itself'
+            u'The name that the LTI Tool Consumer will use to identify itself'
         )
     )
 
     lti_hostname = models.CharField(
-        default='localhost',
+        default=u'localhost',
         max_length=255,
         help_text=(
-            'The domain that  will be acting as the LTI consumer.'
+            u'The domain that  will be acting as the LTI consumer.'
         ),
         db_index=True
     )
@@ -819,7 +822,7 @@ class LTIProviderConfig(ProviderConfig):
         default=long_token,
         max_length=255,
         help_text=(
-            'The shared secret that the LTI Tool Consumer will use to '
+            u'The shared secret that the LTI Tool Consumer will use to '
             'authenticate requests. Only this edX instance and this '
             'tool consumer instance should know this value. '
             'For increased security, you can avoid storing this in '
@@ -833,7 +836,7 @@ class LTIProviderConfig(ProviderConfig):
     lti_max_timestamp_age = models.IntegerField(
         default=10,
         help_text=(
-            'The maximum age of oauth_timestamp values, in seconds.'
+            u'The maximum age of oauth_timestamp values, in seconds.'
         )
     )
 
@@ -866,7 +869,7 @@ class LTIProviderConfig(ProviderConfig):
 
     class Meta(object):
         app_label = "third_party_auth"
-        verbose_name = "Provider Configuration (LTI)"
+        verbose_name = u"Provider Configuration (LTI)"
         verbose_name_plural = verbose_name
 
 
@@ -882,11 +885,11 @@ class ProviderApiPermissions(models.Model):
     provider_id = models.CharField(
         max_length=255,
         help_text=(
-            'Uniquely identify a provider. This is different from backend_name.'
+            u'Uniquely identify a provider. This is different from backend_name.'
         )
     )
 
     class Meta(object):
         app_label = "third_party_auth"
-        verbose_name = "Provider API Permission"
+        verbose_name = u"Provider API Permission"
         verbose_name_plural = verbose_name + 's'

@@ -24,7 +24,7 @@ class CourseAssetCacheTtlConfig(ConfigurationModel):
 
     cache_ttl = PositiveIntegerField(
         default=0,
-        help_text="The time, in seconds, to report that a course asset is allowed to be cached for."
+        help_text=u"The time, in seconds, to report that a course asset is allowed to be cached for."
     )
 
     @classmethod
@@ -51,8 +51,8 @@ class CdnUserAgentsConfig(ConfigurationModel):
         app_label = 'contentserver'
 
     cdn_user_agents = TextField(
-        default='Amazon CloudFront',
-        help_text="A newline-separated list of user agents that should be considered CDNs."
+        default=u'Amazon CloudFront',
+        help_text=u"A newline-separated list of user agents that should be considered CDNs."
     )
 
     @classmethod

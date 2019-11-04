@@ -64,7 +64,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-10-06 20:42+0000\n"
+"POT-Creation-Date: 2019-10-27 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Catalan (https://www.transifex.com/open-edx/teams/6205/ca/)\n"
@@ -719,6 +719,14 @@ msgstr "Nom de la cookie UTM"
 #: common/djangoapps/student/models.py
 msgid "Name of the affiliate cookie"
 msgstr "Nom de la cookie d'afiliació"
+
+#: common/djangoapps/student/models.py
+msgid ""
+"It expect that the data will be provided in a csv file format with"
+"                     first row being the header and columns will be as "
+"follows:                     user_id, username, email, course_id, "
+"is_verified, verification_date"
+msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Name of this user attribute."
@@ -6165,6 +6173,10 @@ msgstr ""
 msgid "Response to %(thread_title)s"
 msgstr ""
 
+#: lms/djangoapps/discussion/views.py
+msgid "Access to this discussion is restricted to team members and staff."
+msgstr ""
+
 #: lms/djangoapps/edxnotes/helpers.py
 msgid "EdxNotes Service is unavailable. Please try again in a few minutes."
 msgstr ""
@@ -8778,6 +8790,17 @@ msgid "Signed Out"
 msgstr ""
 
 #: lms/templates/logout.html
+msgid "We are signing you in."
+msgstr ""
+
+#: lms/templates/logout.html
+msgid ""
+"\n"
+"              This may take a minute. If you are not redirected, go to the home page.\n"
+"            "
+msgstr ""
+
+#: lms/templates/logout.html
 msgid "You have signed out."
 msgstr ""
 
@@ -10975,13 +10998,6 @@ msgstr "Actualitzacions"
 msgid "Reviews"
 msgstr "Revisions"
 
-#: openedx/features/course_experience/utils.py
-#, no-python-format, python-brace-format
-msgid ""
-"{banner_open}{percentage}% off your first upgrade.{span_close} Discount "
-"automatically applied.{div_close}"
-msgstr ""
-
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
 msgid "{sign_in_link} or {register_link} and then enroll in this course."
@@ -11045,6 +11061,15 @@ msgid ""
 "then that course will be Disabled only if the org that it is in is Disabled."
 msgstr ""
 
+#: openedx/features/discounts/admin.py
+msgid ""
+"These define the context to configure the percentage for the first purchase "
+"discount.If multiple contexts apply to a course (for example, if "
+"configuration is specified for the course specifically, and for the org that"
+" the course is in, then the more specific context overrides the more general"
+" context."
+msgstr ""
+
 #: openedx/features/discounts/models.py
 msgid "Disabled"
 msgstr ""
@@ -11054,6 +11079,14 @@ msgstr ""
 msgid ""
 "{s_sr}Original price: {s_op}{original_price}{e_p}, discount price: "
 "{e_sr}{formatted_discount_price}"
+msgstr ""
+
+#: openedx/features/discounts/utils.py
+#, no-python-format, python-brace-format
+msgid ""
+"{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% "
+"[{strikeout_price}]{span_close}{br}Discount will be automatically applied at"
+" checkout. {a_open}Upgrade Now{a_close}{div_close}"
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py
@@ -12212,6 +12245,16 @@ msgstr "Nou formulari de tema"
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
 msgid "Discussion thread list"
 msgstr "Llista de fil de debat"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_private_fragment.html
+msgid "Private Discussion"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_private_fragment.html
+msgid ""
+"This is a private discussion. You do not have permissions to view this "
+"discussion"
+msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/discussion/_user_profile.html
@@ -24381,6 +24424,10 @@ msgstr "Navegació del curs"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Esbós"
+
+#: cms/templates/widgets/header.html
+msgid "Publisher"
+msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Import"

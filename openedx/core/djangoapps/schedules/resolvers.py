@@ -121,6 +121,7 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
         schedules = Schedule.objects.select_related(
             'enrollment__user__profile',
             'enrollment__course',
+            'enrollment__fbeenrollmentexclusion',
         ).filter(
             Q(enrollment__course__end__isnull=True) | Q(
                 enrollment__course__end__gte=self.current_datetime

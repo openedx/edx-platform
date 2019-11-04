@@ -25,7 +25,7 @@ class AssetBaseUrlConfig(ConfigurationModel):
 
     base_url = TextField(
         blank=True,
-        help_text="The alternative hostname to serve static assets from.  Should be in the form of hostname[:port]."
+        help_text=u"The alternative hostname to serve static assets from.  Should be in the form of hostname[:port]."
     )
 
     @classmethod
@@ -52,8 +52,8 @@ class AssetExcludedExtensionsConfig(ConfigurationModel):
         app_label = 'static_replace'
 
     excluded_extensions = TextField(
-        default='html',
-        help_text='The file extensions to exclude from canonicalization.  No leading period required. ' +
+        default=u'html',
+        help_text=u'The file extensions to exclude from canonicalization.  No leading period required. ' +
         'Values should be space separated i.e. "html svg css"'
     )
 

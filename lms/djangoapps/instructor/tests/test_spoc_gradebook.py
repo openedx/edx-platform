@@ -104,11 +104,11 @@ class TestDefaultGradingPolicy(TestGradebook):
         # Users 1-10 attempted any homework (and get Fs) [10]
         # Users 4-10 scored enough to not get rounded to 0 for the class (and get Fs) [7]
         # One use at top of the page [1]
-        self.assertEqual(22, self.response.content.count(b'grade_F'))
+        self.assertEqual(23, self.response.content.count(b'grade_F'))
 
         # All other grades are None [29 categories * 11 users - 27 non-empty grades = 292]
         # One use at the top of the page [1]
-        self.assertEqual(293, self.response.content.count(b'grade_None'))
+        self.assertEqual(292, self.response.content.count(b'grade_None'))
 
 
 class TestLetterCutoffPolicy(TestGradebook):

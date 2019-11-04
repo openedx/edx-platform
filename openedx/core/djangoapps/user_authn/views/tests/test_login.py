@@ -4,6 +4,7 @@ Tests for student activation and login
 """
 from __future__ import absolute_import
 
+import datetime
 import json
 import unicodedata
 
@@ -13,7 +14,8 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
 from django.core.cache import cache
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
+from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, reverse
@@ -25,10 +27,14 @@ from openedx.core.djangoapps.password_policy.compliance import (
     NonCompliantPasswordWarning
 )
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, waffle
+from openedx.core.djangoapps.user_api.accounts import EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH
 from openedx.core.djangoapps.user_authn.cookies import jwt_cookies
+from openedx.core.djangoapps.user_authn.views.login import shim_student_view
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
+from openedx.core.lib.api.test_utils import ApiTestCase
 from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
+from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 
 
 @ddt.ddt
@@ -566,3 +572,239 @@ class LoginTest(CacheIsolationTestCase):
         format_string = args[0]
         for log_string in log_strings:
             self.assertNotIn(log_string, format_string)
+
+
+@ddt.ddt
+@skip_unless_lms
+class LoginSessionViewTest(ApiTestCase):
+    """Tests for the login end-points of the user API. """
+
+    USERNAME = "bob"
+    EMAIL = "bob@example.com"
+    PASSWORD = "password"
+
+    def setUp(self):
+        super(LoginSessionViewTest, self).setUp()
+        self.url = reverse("user_api_login_session")
+
+    @ddt.data("get", "post")
+    def test_auth_disabled(self, method):
+        self.assertAuthDisabled(method, self.url)
+
+    def test_allowed_methods(self):
+        self.assertAllowedMethods(self.url, ["GET", "POST", "HEAD", "OPTIONS"])
+
+    def test_put_not_allowed(self):
+        response = self.client.put(self.url)
+        self.assertHttpMethodNotAllowed(response)
+
+    def test_delete_not_allowed(self):
+        response = self.client.delete(self.url)
+        self.assertHttpMethodNotAllowed(response)
+
+    def test_patch_not_allowed(self):
+        response = self.client.patch(self.url)
+        self.assertHttpMethodNotAllowed(response)
+
+    def test_login_form(self):
+        # Retrieve the login form
+        response = self.client.get(self.url, content_type="application/json")
+        self.assertHttpOK(response)
+
+        # Verify that the form description matches what we expect
+        form_desc = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(form_desc["method"], "post")
+        self.assertEqual(form_desc["submit_url"], self.url)
+        self.assertEqual(form_desc["fields"], [
+            {
+                "name": "email",
+                "defaultValue": "",
+                "type": "email",
+                "required": True,
+                "label": "Email",
+                "placeholder": "username@domain.com",
+                "instructions": u"The email address you used to register with {platform_name}".format(
+                    platform_name=settings.PLATFORM_NAME
+                ),
+                "restrictions": {
+                    "min_length": EMAIL_MIN_LENGTH,
+                    "max_length": EMAIL_MAX_LENGTH
+                },
+                "errorMessages": {},
+                "supplementalText": "",
+                "supplementalLink": "",
+            },
+            {
+                "name": "password",
+                "defaultValue": "",
+                "type": "password",
+                "required": True,
+                "label": "Password",
+                "placeholder": "",
+                "instructions": "",
+                "restrictions": {
+                    "max_length": DEFAULT_MAX_PASSWORD_LENGTH,
+                },
+                "errorMessages": {},
+                "supplementalText": "",
+                "supplementalLink": "",
+            },
+        ])
+
+    def test_login(self):
+        # Create a test user
+        UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
+
+        # Login
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "password": self.PASSWORD,
+        })
+        self.assertHttpOK(response)
+
+        # Verify that we logged in successfully by accessing
+        # a page that requires authentication.
+        response = self.client.get(reverse("dashboard"))
+        self.assertHttpOK(response)
+
+    def test_session_cookie_expiry(self):
+        # Create a test user
+        UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
+
+        # Login and remember me
+        data = {
+            "email": self.EMAIL,
+            "password": self.PASSWORD,
+        }
+
+        response = self.client.post(self.url, data)
+        self.assertHttpOK(response)
+
+        # Verify that the session expiration was set correctly
+        cookie = self.client.cookies[settings.SESSION_COOKIE_NAME]
+        expected_expiry = datetime.datetime.utcnow() + datetime.timedelta(weeks=4)
+        self.assertIn(expected_expiry.strftime('%d-%b-%Y'), cookie.get('expires'))
+
+    def test_invalid_credentials(self):
+        # Create a test user
+        UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
+
+        # Invalid password
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "password": "invalid"
+        })
+        self.assertHttpForbidden(response)
+
+        # Invalid email address
+        response = self.client.post(self.url, {
+            "email": "invalid@example.com",
+            "password": self.PASSWORD,
+        })
+        self.assertHttpForbidden(response)
+
+    def test_missing_login_params(self):
+        # Create a test user
+        UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
+
+        # Missing password
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+        })
+        self.assertHttpBadRequest(response)
+
+        # Missing email
+        response = self.client.post(self.url, {
+            "password": self.PASSWORD,
+        })
+        self.assertHttpBadRequest(response)
+
+        # Missing both email and password
+        response = self.client.post(self.url, {})
+
+
+@ddt.ddt
+class StudentViewShimTest(TestCase):
+    "Tests of the student view shim."
+    def setUp(self):
+        super(StudentViewShimTest, self).setUp()
+        self.captured_request = None
+
+    def test_strip_enrollment_action(self):
+        view = self._shimmed_view(HttpResponse())
+        request = HttpRequest()
+        request.POST["enrollment_action"] = "enroll"
+        request.POST["course_id"] = "edx/101/demo"
+        view(request)
+
+        # Expect that the enrollment action and course ID
+        # were stripped out before reaching the wrapped view.
+        self.assertNotIn("enrollment_action", self.captured_request.POST)
+        self.assertNotIn("course_id", self.captured_request.POST)
+
+    def test_include_analytics_info(self):
+        view = self._shimmed_view(HttpResponse())
+        request = HttpRequest()
+        request.POST["analytics"] = json.dumps({
+            "enroll_course_id": "edX/DemoX/Fall"
+        })
+        view(request)
+
+        # Expect that the analytics course ID was passed to the view
+        self.assertEqual(self.captured_request.POST.get("course_id"), "edX/DemoX/Fall")
+
+    def test_third_party_auth_login_failure(self):
+        view = self._shimmed_view(
+            HttpResponse(status=403),
+            check_logged_in=True
+        )
+        response = view(HttpRequest())
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.content, b"third-party-auth")
+
+    def test_non_json_response(self):
+        view = self._shimmed_view(HttpResponse(content="Not a JSON dict"))
+        response = view(HttpRequest())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b"Not a JSON dict")
+
+    @ddt.data("redirect", "redirect_url")
+    def test_ignore_redirect_from_json(self, redirect_key):
+        view = self._shimmed_view(
+            HttpResponse(content=json.dumps({
+                "success": True,
+                redirect_key: "/redirect"
+            }))
+        )
+        response = view(HttpRequest())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.decode('utf-8'), "")
+
+    def test_error_from_json(self):
+        view = self._shimmed_view(
+            HttpResponse(content=json.dumps({
+                "success": False,
+                "value": "Error!"
+            }))
+        )
+        response = view(HttpRequest())
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.content, b"Error!")
+
+    def test_preserve_headers(self):
+        view_response = HttpResponse()
+        view_response["test-header"] = "test"
+        view = self._shimmed_view(view_response)
+        response = view(HttpRequest())
+        self.assertEqual(response["test-header"], "test")
+
+    def test_check_logged_in(self):
+        view = self._shimmed_view(HttpResponse(), check_logged_in=True)
+        response = view(HttpRequest())
+        self.assertEqual(response.status_code, 403)
+
+    def _shimmed_view(self, response, check_logged_in=False):
+        def stub_view(request):
+            self.captured_request = request
+            return response
+        return shim_student_view(stub_view, check_logged_in=check_logged_in)

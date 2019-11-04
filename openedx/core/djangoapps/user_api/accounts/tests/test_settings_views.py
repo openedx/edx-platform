@@ -67,8 +67,8 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
         MessageMiddleware().process_request(self.request)
         messages.error(self.request, 'Facebook is already in use.', extra_tags='Auth facebook')
 
-    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_customer_for_learner')
-    def test_context(self, mock_get_enterprise_customer_for_learner):
+    @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
+    def test_context(self, mock_enterprise_customer_for_request):
         self.request.site = SiteFactory.create()
         UserPreferenceFactory(user=self.user, key='pref-lang', value='lt-lt')
         DarkLangConfig(
@@ -78,7 +78,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
             beta_languages='lt-lt',
             enable_beta_languages=True
         ).save()
-        mock_get_enterprise_customer_for_learner.return_value = {}
+        mock_enterprise_customer_for_request.return_value = {}
 
         with override_settings(LANGUAGES=[EN, LT_LT], LANGUAGE_CODE='en'):
             context = account_settings_context(self.request)
@@ -113,17 +113,17 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
             expected_beta_language = {'code': 'lt-lt', 'name': settings.LANGUAGE_DICT.get('lt-lt')}
             self.assertEqual(context['beta_language'], expected_beta_language)
 
-    @mock.patch('openedx.core.djangoapps.user_api.accounts.settings_views.get_enterprise_customer_for_learner')
+    @mock.patch('openedx.core.djangoapps.user_api.accounts.settings_views.enterprise_customer_for_request')
     @mock.patch('openedx.features.enterprise_support.utils.third_party_auth.provider.Registry.get')
     def test_context_for_enterprise_learner(
-            self, mock_get_auth_provider, mock_get_enterprise_customer_for_learner
+            self, mock_get_auth_provider, mock_enterprise_customer_for_request
     ):
         dummy_enterprise_customer = {
             'uuid': 'real-ent-uuid',
             'name': 'Dummy Enterprise',
             'identity_provider': 'saml-ubc'
         }
-        mock_get_enterprise_customer_for_learner.return_value = dummy_enterprise_customer
+        mock_enterprise_customer_for_request.return_value = dummy_enterprise_customer
         self.request.site = SiteFactory.create()
         mock_get_auth_provider.return_value.sync_learner_profile_data = True
         context = account_settings_context(self.request)

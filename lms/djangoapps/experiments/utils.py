@@ -21,7 +21,7 @@ from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.django_comment_common.models import Role
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
-from openedx.features.course_duration_limits.access import get_user_course_expiration_date
+from openedx.features.course_duration_limits.access import get_user_course_expiration_date, get_user_course_duration
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from student.models import CourseEnrollment
 from xmodule.partitions.partitions_service import get_all_partitions_for_course, get_user_partition_groups
@@ -114,6 +114,8 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
 
     if enrollment is None:
         enrollment = CourseEnrollment.get_enrollment(user, course.id)
+        if enrollment is None:
+            return (None, None, None)
 
     if user.is_authenticated and verified_upgrade_link_is_valid(enrollment):
         return (
@@ -122,7 +124,7 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
             enrollment.course_upgrade_deadline,
         )
 
-    return (None, None, None)
+    return (None, None, enrollment.course_upgrade_deadline)
 
 
 # TODO: clean up as part of REVEM-199 (START)
@@ -322,6 +324,8 @@ def get_base_experiment_metadata_context(course, user, enrollment, user_enrollme
         user, enrollment, course
     )
 
+    deadline, duration = get_audit_access_expiration(user, course)
+
     return {
         'upgrade_link': upgrade_link,
         'upgrade_price': six.text_type(get_cosmetic_verified_display_price(course)),
@@ -331,7 +335,8 @@ def get_base_experiment_metadata_context(course, user, enrollment, user_enrollme
         'pacing_type': 'self_paced' if course.self_paced else 'instructor_paced',
         'dynamic_upgrade_deadline': dynamic_upgrade_deadline,
         'course_upgrade_deadline': course_upgrade_deadline,
-        'audit_access_deadline': get_audit_access_expiration(user, course),
+        'audit_access_deadline': deadline,
+        'course_duration': duration,
         'course_key': course.id,
         'course_start': course.start,
         'course_end': course.end,
@@ -343,12 +348,12 @@ def get_base_experiment_metadata_context(course, user, enrollment, user_enrollme
 
 def get_audit_access_expiration(user, course):
     """
-    Return the expiration date for the user's audit access to this course.
+    Return the expiration date and course duration for the user's audit access to this course.
     """
     if not CourseDurationLimitConfig.enabled_for_enrollment(user=user, course_key=course.id):
-        return None
+        return None, None
 
-    return get_user_course_expiration_date(user, course)
+    return get_user_course_expiration_date(user, course), get_user_course_duration(user, course)
 
 
 # TODO: clean up as part of REVEM-199 (START)

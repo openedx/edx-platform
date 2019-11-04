@@ -44,6 +44,7 @@ from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
 from lms.djangoapps.grades.transformer import GradesTransformer
 from lms.djangoapps.instructor_analytics.basic import UNAVAILABLE, list_problem_responses
 from lms.djangoapps.instructor_task.tasks_helper.certs import generate_students_certificates
+# from lms.djangoapps.instructor_task.config.waffle import problem_grade_report_verified_only
 from lms.djangoapps.instructor_task.tasks_helper.enrollments import (
     upload_enrollment_report,
     upload_exec_summary_report,
@@ -939,6 +940,28 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                 ]
             )))
         ])
+
+    @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
+    def test_single_problem_verified_student_only(self, _get_current_task):
+        with patch(
+            'lms.djangoapps.instructor_task.tasks_helper.grades.problem_grade_report_verified_only',
+            return_value=True,
+        ):
+            student_verified = self.create_student(u'user_verified', mode='verified')
+            vertical = ItemFactory.create(
+                parent_location=self.problem_section.location,
+                category='vertical',
+                metadata={'graded': True},
+                display_name='Problem Vertical'
+            )
+            self.define_option_problem(u'Problem1', parent=vertical)
+
+            self.submit_student_answer(self.student_1.username, u'Problem1', ['Option 1'])
+            self.submit_student_answer(student_verified.username, u'Problem1', ['Option 1'])
+            result = ProblemGradeReport.generate(None, None, self.course.id, None, 'graded')
+            self.assertDictContainsSubset(
+                {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0}, result
+            )
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
     @patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.iter')

@@ -15,7 +15,7 @@ class VideoPipelineIntegrationMixin(object):
     video_pipeline_integration_defaults = {
         'enabled': True,
         'api_url': 'https://video-pipeline.example.com/api/v1/',
-        'service_username': 'cms_video_pipeline_service_user',
+        'service_username': u'cms_video_pipeline_service_user',
         'client_name': 'video_pipeline'
     }
 

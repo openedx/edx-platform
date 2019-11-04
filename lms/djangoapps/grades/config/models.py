@@ -94,5 +94,5 @@ class ComputeGradesSetting(ConfigurationModel):
     batch_size = IntegerField(default=100)
     course_ids = TextField(
         blank=False,
-        help_text="Whitespace-separated list of course keys for which to compute grades."
+        help_text=u"Whitespace-separated list of course keys for which to compute grades."
     )

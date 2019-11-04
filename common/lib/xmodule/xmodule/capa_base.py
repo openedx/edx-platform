@@ -557,7 +557,14 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
         `err` is the Exception encountered while rendering the problem HTML.
         """
-        log.exception(text_type(err))
+        problem_display_name = self.display_name_with_default
+        problem_location = text_type(self.location)
+        log.exception(
+            u"ProblemGetHtmlError: %r, %r, %s",
+            problem_display_name,
+            problem_location,
+            text_type(err)
+        )
 
         # TODO (vshnayder): another switch on DEBUG.
         if self.runtime.DEBUG:
@@ -613,9 +620,14 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             html = warning
             try:
                 html += self.lcp.get_html()
-            except Exception:
+            except Exception as error:
                 # Couldn't do it. Give up.
-                log.exception("Unable to generate html from LoncapaProblem")
+                log.exception(
+                    u"ProblemGetHtmlError: Unable to generate html from LoncapaProblem: %r, %r, %s",
+                    problem_display_name,
+                    problem_location,
+                    text_type(error)
+                )
                 raise
 
         return html

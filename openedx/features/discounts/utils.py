@@ -52,7 +52,7 @@ def format_strikeout_price(user, course, base_price=None, check_for_discount=Tru
     original_price = format_course_price(base_price)
 
     if not check_for_discount or can_receive_discount(user, course):
-        discount_price = base_price * ((100.0 - discount_percentage()) / 100)
+        discount_price = base_price * ((100.0 - discount_percentage(course)) / 100)
         if discount_price == int(discount_price):
             discount_price = format_course_price("{:0.0f}".format(discount_price))
         else:
@@ -110,10 +110,11 @@ def get_first_purchase_offer_banner_fragment(user, course):
                 a_close=HTML('</a>'),
                 br=HTML('<br>'),
                 banner_open=HTML(
-                    '<div class="first-purchase-offer-banner"><span class="first-purchase-offer-banner-bold">'
+                    '<div class="first-purchase-offer-banner" role="note">'
+                    '<span class="first-purchase-offer-banner-bold">'
                 ),
                 discount_expiration_date=discount_expiration_date.strftime(u'%B %d'),
-                percentage=discount_percentage(),
+                percentage=discount_percentage(course),
                 span_close=HTML('</span>'),
                 div_close=HTML('</div>'),
                 strikeout_price=HTML(format_strikeout_price(user, course, check_for_discount=False)[0])
