@@ -32,7 +32,7 @@ class CustomCourseForEdX(models.Model):
     coach = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     # if not empty, this field contains a json serialized list of
     # the master course modules
-    structure_json = models.TextField(verbose_name='Structure JSON', blank=True, null=True)
+    structure_json = models.TextField(verbose_name=u'Structure JSON', blank=True, null=True)
 
     class Meta(object):
         app_label = 'ccx'
@@ -120,4 +120,4 @@ class CcxFieldOverride(models.Model):
         app_label = 'ccx'
         unique_together = (('ccx', 'location', 'field'),)
 
-    value = models.TextField(default='null')
+    value = models.TextField(default=u'null')

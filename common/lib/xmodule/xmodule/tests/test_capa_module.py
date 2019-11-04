@@ -2507,8 +2507,8 @@ class ProblemBlockXMLTest(unittest.TestCase):
         name = "Other Test Capa Problem"
         descriptor = self._create_descriptor(xml, name=name)
         self.assertEqual(descriptor.problem_types, {"multiplechoiceresponse", "optionresponse"})
-        self.assertEqual(
-            descriptor.index_dictionary(), {
+        six.assertCountEqual(
+            self, descriptor.index_dictionary(), {
                 'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ["optionresponse", "multiplechoiceresponse"],
                 'content': {
