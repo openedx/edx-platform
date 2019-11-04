@@ -8,7 +8,7 @@
 -e common/lib/capa
 -e git+https://github.com/edx/codejail.git@33758da2609bd72c2c18efc2d4bdb93596523d5e#egg=codejail
 -e git+https://github.com/edx/django-wiki.git@v0.0.23#egg=django-wiki
--e git+https://github.com/edx/DoneXBlock.git@2.0#egg=done-xblock
+-e git+https://github.com/edx/DoneXBlock.git@2.0.1#egg=done-xblock
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
 -e .
 -e git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
@@ -88,7 +88,7 @@ django-model-utils==3.0.0
 django-mptt==0.8.7
 django-multi-email-field==0.5.1
 django-mysql==2.4.1
-git+https://github.com/edx/django-oauth-plus.git@66155b545b23ebc01ec438849d303077e8198dfd#egg=django-oauth-plus==2.2.9.edx-3
+git+https://github.com/edx/django-oauth-plus.git@b9b64a3ac24fd11f471763c88462bbf3c53e46e6#egg=django-oauth-plus==2.2.9.edx-4
 django-oauth-toolkit==1.1.3
 django-object-actions==1.1.0
 django-pipeline==1.6.14
@@ -212,7 +212,7 @@ nodeenv==1.3.3
 numpy==1.16.5
 git+https://github.com/joestump/python-oauth2.git@b94f69b1ad195513547924e380d9265133e995fa#egg=oauth2
 oauthlib==2.1.0
-git+https://github.com/edx/edx-ora2.git@2.3.5#egg=ora2==2.3.5
+git+https://github.com/edx/edx-ora2.git@2.3.6#egg=ora2==2.3.6
 packaging==19.2           # via caniusepython3, tox
 path.py==8.2.1
 pathlib2==2.3.5
