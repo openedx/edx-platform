@@ -63,7 +63,7 @@ git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752
 
 # Forked to get Django 1.10+ compat that is in origin BitBucket repo, without an official build.
 # This can go away when we update auth to not use django-rest-framework-oauth
-git+https://github.com/edx/django-oauth-plus.git@master#egg=django-oauth-plus==2.2.9.edx-4
+git+https://github.com/edx/django-oauth-plus.git@b9b64a3ac24fd11f471763c88462bbf3c53e46e6#egg=django-oauth-plus==2.2.9.edx-4
 
 # Why a drf-oauth fork? To add Django 1.11 compatibility to the abandoned repo.
 # This dependency will be removed by this work: https://openedx.atlassian.net/browse/PLAT-1660

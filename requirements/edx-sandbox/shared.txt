@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-cffi==1.13.1              # via cryptography
+cffi==1.13.2              # via cryptography
 cryptography==2.8
 enum34==1.1.6             # via cryptography
 ipaddress==1.0.23         # via cryptography
