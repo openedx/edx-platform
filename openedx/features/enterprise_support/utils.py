@@ -8,6 +8,7 @@ import json
 
 import six
 
+from crum import get_current_request
 import third_party_auth
 from django.conf import settings
 from django.utils.translation import ugettext as _
@@ -258,8 +259,8 @@ def get_enterprise_readonly_account_fields(user):
     Returns a set of account fields that are read-only for enterprise users.
     """
     # TODO circular dependency between enterprise_support.api and enterprise_support.utils
-    from openedx.features.enterprise_support.api import get_enterprise_customer_for_learner
-    enterprise_customer = get_enterprise_customer_for_learner(user)
+    from openedx.features.enterprise_support.api import enterprise_customer_for_request
+    enterprise_customer = enterprise_customer_for_request(get_current_request())
 
     enterprise_readonly_account_fields = list(settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS)
 
