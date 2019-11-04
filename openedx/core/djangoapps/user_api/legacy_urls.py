@@ -36,8 +36,3 @@ urlpatterns = [
         user_api_views.CountryTimeZoneListView.as_view(),
     ),
 ]
-
-urlpatterns += [
-    url(r'^v1/account/password_reset/$', user_api_views.PasswordResetView.as_view(),
-        name="user_api_password_reset"),
-]

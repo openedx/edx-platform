@@ -28,16 +28,18 @@ from six.moves import range
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangoapps.user_api.models import UserRetirementRequest
+from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
+from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH, EMAIL_MIN_LENGTH
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
+from student.tests.test_configuration_overrides import fake_get_value
 from student.tests.test_email import mock_render_to_string
 from student.views import SETTING_CHANGE_INITIATED, password_reset, password_reset_confirm_wrapper
 from util.password_policy_validators import create_validator_config
 from util.testing import EventTestMixin
-
-from .test_configuration_overrides import fake_get_value
 
 
 @unittest.skipUnless(
@@ -53,7 +55,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
 
     ENABLED_CACHES = ['default']
 
-    def setUp(self):
+    def setUp(self):  # pylint: disable=arguments-differ
         super(ResetPasswordTests, self).setUp('student.views.management.tracker')
         self.user = UserFactory.create()
         self.user.is_active = False
@@ -219,12 +221,12 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
                 password_reset(req)
                 _, msg, _, _ = send_email.call_args[0]
 
-                reset_msg = "you requested a password reset for your user account at {}"
+                reset_msg = u"you requested a password reset for your user account at {}"
                 reset_msg = reset_msg.format(site_name)
 
                 self.assertIn(reset_msg, msg)
 
-                sign_off = "The {} Team".format(platform_name)
+                sign_off = u"The {} Team".format(platform_name)
                 self.assertIn(sign_off, msg)
 
                 self.assert_event_emitted(
@@ -257,7 +259,9 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
 
         body = bodies[body_type]
 
-        reset_msg = "you requested a password reset for your user account at {}".format(fake_get_value('PLATFORM_NAME'))
+        reset_msg = u"you requested a password reset for your user account at {}".format(
+            fake_get_value('PLATFORM_NAME')
+        )
 
         self.assertIn(reset_msg, body)
 
@@ -378,6 +382,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
                 assert not self.user.is_active
 
     def test_password_reset_normalize_password(self):
+        # pylint: disable=anomalous-unicode-escape-in-string
         """
         Tests that if we provide a not properly normalized password, it is saved using our normalization
         method of NFKC.
@@ -481,3 +486,62 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         reset_request.user = UserFactory.create()
 
         self.assertRaises(Http404, password_reset_confirm_wrapper, reset_request, self.uidb36, self.token)
+
+
+@ddt.ddt
+@skip_unless_lms
+class PasswordResetViewTest(UserAPITestCase):
+    """Tests of the user API's password reset endpoint. """
+
+    def setUp(self):
+        super(PasswordResetViewTest, self).setUp()
+        self.url = reverse("user_api_password_reset")
+
+    @ddt.data("get", "post")
+    def test_auth_disabled(self, method):
+        self.assertAuthDisabled(method, self.url)
+
+    def test_allowed_methods(self):
+        self.assertAllowedMethods(self.url, ["GET", "HEAD", "OPTIONS"])
+
+    def test_put_not_allowed(self):
+        response = self.client.put(self.url)
+        self.assertHttpMethodNotAllowed(response)
+
+    def test_delete_not_allowed(self):
+        response = self.client.delete(self.url)
+        self.assertHttpMethodNotAllowed(response)
+
+    def test_patch_not_allowed(self):
+        response = self.client.patch(self.url)
+        self.assertHttpMethodNotAllowed(response)
+
+    def test_password_reset_form(self):
+        # Retrieve the password reset form
+        response = self.client.get(self.url, content_type="application/json")
+        self.assertHttpOK(response)
+
+        # Verify that the form description matches what we expect
+        form_desc = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(form_desc["method"], "post")
+        self.assertEqual(form_desc["submit_url"], reverse("password_change_request"))
+        self.assertEqual(form_desc["fields"], [
+            {
+                "name": "email",
+                "defaultValue": "",
+                "type": "email",
+                "required": True,
+                "label": "Email",
+                "placeholder": "username@domain.com",
+                "instructions": u"The email address you used to register with {platform_name}".format(
+                    platform_name=settings.PLATFORM_NAME
+                ),
+                "restrictions": {
+                    "min_length": EMAIL_MIN_LENGTH,
+                    "max_length": EMAIL_MAX_LENGTH
+                },
+                "errorMessages": {},
+                "supplementalText": "",
+                "supplementalLink": "",
+            }
+        ])

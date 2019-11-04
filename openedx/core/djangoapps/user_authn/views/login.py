@@ -32,9 +32,9 @@ from openedx.core.djangoapps.user_api.api import get_login_session_form
 from openedx.core.djangoapps.user_authn.cookies import refresh_jwt_cookies, set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
+from openedx.core.djangoapps.user_authn.views.password_reset import send_password_reset_email_for_user
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.view_utils import require_post_params
-from student.forms import send_password_reset_email_for_user
 from student.models import LoginFailures
 from student.views import send_reactivation_email_for_user
 from third_party_auth import pipeline, provider

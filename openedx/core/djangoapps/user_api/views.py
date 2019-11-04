@@ -25,7 +25,6 @@ from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
 from openedx.core.djangoapps.user_api.api import (
     get_login_session_form,
-    get_password_reset_form
 )
 from openedx.core.lib.api.view_utils import require_post_params
 from openedx.core.djangoapps.user_api.models import UserPreference
@@ -38,18 +37,6 @@ from openedx.core.djangoapps.user_api.serializers import (
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from student.helpers import AccountValidationError
 from util.json_request import JsonResponse
-
-
-class PasswordResetView(APIView):
-    """HTTP end-point for GETting a description of the password reset form. """
-
-    # This end-point is available to anonymous users,
-    # so do not require authentication.
-    authentication_classes = []
-
-    @method_decorator(ensure_csrf_cookie)
-    def get(self, request):
-        return HttpResponse(get_password_reset_form().to_json(), content_type="application/json")
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):

@@ -566,65 +566,6 @@ class PreferenceUsersListViewTest(UserApiTestCase):
 
 @ddt.ddt
 @skip_unless_lms
-class PasswordResetViewTest(UserAPITestCase):
-    """Tests of the user API's password reset endpoint. """
-
-    def setUp(self):
-        super(PasswordResetViewTest, self).setUp()
-        self.url = reverse("user_api_password_reset")
-
-    @ddt.data("get", "post")
-    def test_auth_disabled(self, method):
-        self.assertAuthDisabled(method, self.url)
-
-    def test_allowed_methods(self):
-        self.assertAllowedMethods(self.url, ["GET", "HEAD", "OPTIONS"])
-
-    def test_put_not_allowed(self):
-        response = self.client.put(self.url)
-        self.assertHttpMethodNotAllowed(response)
-
-    def test_delete_not_allowed(self):
-        response = self.client.delete(self.url)
-        self.assertHttpMethodNotAllowed(response)
-
-    def test_patch_not_allowed(self):
-        response = self.client.patch(self.url)
-        self.assertHttpMethodNotAllowed(response)
-
-    def test_password_reset_form(self):
-        # Retrieve the password reset form
-        response = self.client.get(self.url, content_type="application/json")
-        self.assertHttpOK(response)
-
-        # Verify that the form description matches what we expect
-        form_desc = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(form_desc["method"], "post")
-        self.assertEqual(form_desc["submit_url"], reverse("password_change_request"))
-        self.assertEqual(form_desc["fields"], [
-            {
-                "name": "email",
-                "defaultValue": "",
-                "type": "email",
-                "required": True,
-                "label": "Email",
-                "placeholder": "username@domain.com",
-                "instructions": u"The email address you used to register with {platform_name}".format(
-                    platform_name=settings.PLATFORM_NAME
-                ),
-                "restrictions": {
-                    "min_length": EMAIL_MIN_LENGTH,
-                    "max_length": EMAIL_MAX_LENGTH
-                },
-                "errorMessages": {},
-                "supplementalText": "",
-                "supplementalLink": "",
-            }
-        ])
-
-
-@ddt.ddt
-@skip_unless_lms
 class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
     """Tests the UpdateEmailOptInPreference view. """
 
