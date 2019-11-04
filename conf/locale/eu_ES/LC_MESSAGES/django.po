@@ -62,7 +62,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-10-20 20:42+0000\n"
+"POT-Creation-Date: 2019-10-27 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Basque (Spain) (https://www.transifex.com/open-edx/teams/6205/eu_ES/)\n"
@@ -11169,14 +11169,6 @@ msgstr "Eguneraketak"
 msgid "Reviews"
 msgstr "Berrikusketak"
 
-#: openedx/features/course_experience/utils.py
-#, no-python-format, python-brace-format
-msgid ""
-"{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% "
-"[{strikeout_price}]{span_close}{br}Discount will be automatically applied at"
-" checkout. {a_open}Upgrade Now{a_close}{div_close}"
-msgstr ""
-
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
 msgid "{sign_in_link} or {register_link} and then enroll in this course."
@@ -11240,6 +11232,15 @@ msgid ""
 "then that course will be Disabled only if the org that it is in is Disabled."
 msgstr ""
 
+#: openedx/features/discounts/admin.py
+msgid ""
+"These define the context to configure the percentage for the first purchase "
+"discount.If multiple contexts apply to a course (for example, if "
+"configuration is specified for the course specifically, and for the org that"
+" the course is in, then the more specific context overrides the more general"
+" context."
+msgstr ""
+
 #: openedx/features/discounts/models.py
 msgid "Disabled"
 msgstr ""
@@ -11249,6 +11250,14 @@ msgstr ""
 msgid ""
 "{s_sr}Original price: {s_op}{original_price}{e_p}, discount price: "
 "{e_sr}{formatted_discount_price}"
+msgstr ""
+
+#: openedx/features/discounts/utils.py
+#, no-python-format, python-brace-format
+msgid ""
+"{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% "
+"[{strikeout_price}]{span_close}{br}Discount will be automatically applied at"
+" checkout. {a_open}Upgrade Now{a_close}{div_close}"
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py

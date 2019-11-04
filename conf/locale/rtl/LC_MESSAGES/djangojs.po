@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-10-27 20:51+0000\n"
-"PO-Revision-Date: 2019-10-27 20:51:14.653730\n"
+"POT-Creation-Date: 2019-11-03 20:51+0000\n"
+"PO-Revision-Date: 2019-11-03 20:52:10.307906\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -418,6 +418,12 @@ msgstr "فاهس حقخزمثو اشس زثثر قثسثف."
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "unsubmitted"
 msgstr "عرسعزوهففثي"
+
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+msgid ""
+"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
+msgstr ""
+"{paragraph}=ح;{preformatted}=حقث;{heading3}=ا3;{heading4}=ا4;{heading5}=ا5;{heading6}=ا6"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -4583,40 +4589,43 @@ msgid ""
 "{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read "
 "the above carefully before proceeding. This is an irreversible action, and "
 "{strongStart}you will no longer be able to use the same email on "
-"edX.{strongEnd}"
+"{platformName}.{strongEnd}"
 msgstr ""
 "{strongStart}صشقرهرل: شذذخعرف يثمثفهخر هس حثقوشرثرف.{strongEnd} حمثشسث قثشي "
 "فاث شزخدث ذشقثبعممغ زثبخقث حقخذثثيهرل. فاهس هس شر هققثدثقسهزمث شذفهخر, شري "
 "{strongStart}غخع صهمم رخ مخرلثق زث شزمث فخ عسث فاث سشوث ثوشهم خر "
-"ثيط.{strongEnd}"
-
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "We’re sorry to see you go!"
-msgstr "صث’قث سخققغ فخ سثث غخع لخ!"
+"{platformName}.{strongEnd}"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
 "Please note: Deletion of your account and personal data is permanent and "
-"cannot be undone. EdX will not be able to recover your account or the data "
-"that is deleted."
+"cannot be undone. {platformName} will not be able to recover your account or"
+" the data that is deleted."
 msgstr ""
 "حمثشسث رخفث: يثمثفهخر خب غخعق شذذخعرف شري حثقسخرشم يشفش هس حثقوشرثرف شري "
-"ذشررخف زث عريخرث. ثيط صهمم رخف زث شزمث فخ قثذخدثق غخعق شذذخعرف خق فاث يشفش "
-"فاشف هس يثمثفثي."
+"ذشررخف زث عريخرث. {platformName} صهمم رخف زث شزمث فخ قثذخدثق غخعق شذذخعرف خق"
+" فاث يشفش فاشف هس يثمثفثي."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
-"Once your account is deleted, you cannot use it to take courses on the edX "
-"app, edx.org, or any other site hosted by edX. This includes access to "
-"edx.org from your employer’s or university’s system and access to private "
-"sites offered by MIT Open Learning, Wharton Executive Education, and Harvard"
-" Medical School."
+"Once your account is deleted, you cannot use it to take courses on the "
+"{platformName} app, {siteName}, or any other site hosted by {platformName}."
 msgstr ""
-"خرذث غخعق شذذخعرف هس يثمثفثي, غخع ذشررخف عسث هف فخ فشنث ذخعقسثس خر فاث ثيط "
-"شحح, ثيط.خقل, خق شرغ خفاثق سهفث اخسفثي زغ ثيط. فاهس هرذمعيثس شذذثسس فخ "
-"ثيط.خقل بقخو غخعق ثوحمخغثق’س خق عرهدثقسهفغ’س سغسفثو شري شذذثسس فخ حقهدشفث "
-"سهفثس خببثقثي زغ وهف خحثر مثشقرهرل, صاشقفخر ثطثذعفهدث ثيعذشفهخر, شري اشقدشقي"
-" وثيهذشم سذاخخم."
+"خرذث غخعق شذذخعرف هس يثمثفثي, غخع ذشررخف عسث هف فخ فشنث ذخعقسثس خر فاث "
+"{platformName} شحح, {siteName}, خق شرغ خفاثق سهفث اخسفثي زغ {platformName}."
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"This includes access to {siteName} from your employer’s or university’s "
+"system{additionalSiteSpecificDeletionText}."
+msgstr ""
+"فاهس هرذمعيثس شذذثسس فخ {siteName} بقخو غخعق ثوحمخغثق’س خق عرهدثقسهفغ’س "
+"سغسفثو{additionalSiteSpecificDeletionText}."
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid "We’re sorry to see you go!"
+msgstr "صث’قث سخققغ فخ سثث غخع لخ!"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -4650,26 +4659,22 @@ msgstr "ش حشسسصخقي هس قثضعهقثي"
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "You have selected “Delete my account.” Deletion of your account and personal"
-" data is permanent and cannot be undone. EdX will not be able to recover "
-"your account or the data that is deleted."
+" data is permanent and cannot be undone. {platformName} will not be able to "
+"recover your account or the data that is deleted."
 msgstr ""
 "غخع اشدث سثمثذفثي “يثمثفث وغ شذذخعرف.” يثمثفهخر خب غخعق شذذخعرف شري حثقسخرشم"
-" يشفش هس حثقوشرثرف شري ذشررخف زث عريخرث. ثيط صهمم رخف زث شزمث فخ قثذخدثق "
-"غخعق شذذخعرف خق فاث يشفش فاشف هس يثمثفثي."
+" يشفش هس حثقوشرثرف شري ذشررخف زث عريخرث. {platformName} صهمم رخف زث شزمث فخ "
+"قثذخدثق غخعق شذذخعرف خق فاث يشفش فاشف هس يثمثفثي."
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "If you proceed, you will be unable to use this account to take courses on "
-"the edX app, edx.org, or any other site hosted by edX. This includes access "
-"to edx.org from your employer’s or university’s system and access to private"
-" sites offered by MIT Open Learning, Wharton Executive Education, and "
-"Harvard Medical School."
+"the {platformName} app, {siteName}, or any other site hosted by "
+"{platformName}."
 msgstr ""
 "هب غخع حقخذثثي, غخع صهمم زث عرشزمث فخ عسث فاهس شذذخعرف فخ فشنث ذخعقسثس خر "
-"فاث ثيط شحح, ثيط.خقل, خق شرغ خفاثق سهفث اخسفثي زغ ثيط. فاهس هرذمعيثس شذذثسس "
-"فخ ثيط.خقل بقخو غخعق ثوحمخغثق’س خق عرهدثقسهفغ’س سغسفثو شري شذذثسس فخ حقهدشفث"
-" سهفثس خببثقثي زغ وهف خحثر مثشقرهرل, صاشقفخر ثطثذعفهدث ثيعذشفهخر, شري "
-"اشقدشقي وثيهذشم سذاخخم."
+"فاث {platformName} شحح, {siteName}, خق شرغ خفاثق سهفث اخسفثي زغ "
+"{platformName}."
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
@@ -6355,8 +6360,8 @@ msgstr "يشفث شييثي"
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
-msgid "Editing access for: %(title)s"
-msgstr "ثيهفهرل شذذثسس بخق: %(title)s"
+msgid "Editing access for: {title}"
+msgstr "ثيهفهرل شذذثسس بخق: {title}"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
