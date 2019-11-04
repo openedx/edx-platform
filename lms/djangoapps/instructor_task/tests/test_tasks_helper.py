@@ -75,6 +75,7 @@ from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.credit.tests.factories import CreditCourseFactory
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
+from openedx.core.lib.teams_config import TeamsConfig
 from shoppingcart.models import (
     Coupon,
     CourseRegistrationCode,
@@ -94,6 +95,12 @@ from xmodule.partitions.partitions import Group, UserPartition
 
 from ..models import ReportStore
 from ..tasks_helper.utils import UPDATE_STATUS_FAILED, UPDATE_STATUS_SUCCEEDED
+
+
+_TEAMS_CONFIG = TeamsConfig({
+    'max_size': 2,
+    'topics': [{'id': 'topic', 'name': 'Topic', 'description': 'A Topic'}],
+})
 
 
 class InstructorGradeReportTestCase(TestReportMixin, InstructorTaskCourseTestCase):
@@ -403,9 +410,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
             course = CourseFactory.create(
                 cohort_config={'cohorted': True, 'auto_cohort': True, 'auto_cohort_groups': ['cohort 1', 'cohort 2']},
                 user_partitions=[experiment_partition],
-                teams_configuration={
-                    'max_size': 2, 'topics': [{'topic-id': 'topic', 'name': 'Topic', 'description': 'A Topic'}]
-                },
+                teams_configuration=_TEAMS_CONFIG,
             )
         _ = CreditCourseFactory(course_key=course.id)
 
@@ -451,9 +456,7 @@ class TestTeamGradeReport(InstructorGradeReportTestCase):
 
     def setUp(self):
         super(TestTeamGradeReport, self).setUp()
-        self.course = CourseFactory.create(teams_configuration={
-            'max_size': 2, 'topics': [{'topic-id': 'topic', 'name': 'Topic', 'description': 'A Topic'}]
-        })
+        self.course = CourseFactory.create(teams_configuration=_TEAMS_CONFIG)
         self.student1 = UserFactory.create()
         CourseEnrollment.enroll(self.student1, self.course.id)
         self.student2 = UserFactory.create()
@@ -1547,9 +1550,7 @@ class TestTeamStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
 
     def setUp(self):
         super(TestTeamStudentReport, self).setUp()
-        self.course = CourseFactory.create(teams_configuration={
-            'max_size': 2, 'topics': [{'topic-id': 'topic', 'name': 'Topic', 'description': 'A Topic'}]
-        })
+        self.course = CourseFactory.create(teams_configuration=_TEAMS_CONFIG)
         self.student1 = UserFactory.create()
         CourseEnrollment.enroll(self.student1, self.course.id)
         self.student2 = UserFactory.create()

@@ -91,14 +91,14 @@ class TeamsConfigTests(TestCase):
             },
             {
                 # Team-set should be dropped due to invalid ID.
-                "id": "Not a slug.",
-                "name": "Assignment about slugs",
+                "id": "the character & cannot be in an ID",
+                "name": "Assignment about ampersands",
             },
             {
                 # All fields invalid except ID;
                 # Team-set will exist but have all fallbacks.
-                "id": "horses",
-                "name": {"assignment", "about", "horses"},
+                "id": "_1. How quickly daft-jumping zebras vex",
+                "name": {"assignment", "about", "zebras"},
                 "description": object(),
                 "max_team_size": -1000,
                 "type": "matrix",
@@ -115,8 +115,8 @@ class TeamsConfigTests(TestCase):
         "max_team_size": None,
         "team_sets": [
             {
-                "id": "horses",
-                "name": "horses",
+                "id": "_1. How quickly daft-jumping zebras vex",
+                "name": "_1. How quickly daft-jumping zebras vex",
                 "description": "",
                 "max_team_size": None,
                 "type": "open",
@@ -202,3 +202,11 @@ class TeamsConfigTests(TestCase):
         assert '987' in config_repr
         assert 'open' in config_repr
         assert 'hedgehogs' in config_repr
+
+    def test_teamset_int_id(self):
+        """
+        Assert integer teaset IDs are treated as strings,
+        for backwards compatibility.
+        """
+        teamset = TeamsetConfig({"id": 5})
+        assert teamset.teamset_id == "5"

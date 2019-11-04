@@ -25,6 +25,7 @@ from common.test.utils import skip_signal
 from lms.djangoapps.courseware.tests.factories import StaffFactory
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
+from openedx.core.lib.teams_config import TeamsConfig
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from util.testing import EventTestMixin
@@ -46,7 +47,7 @@ class TestDashboard(SharedModuleStoreTestCase):
     def setUpClass(cls):
         super(TestDashboard, cls).setUpClass()
         cls.course = CourseFactory.create(
-            teams_configuration={
+            teams_configuration=TeamsConfig({
                 "max_team_size": 10,
                 "topics": [
                     {
@@ -56,7 +57,7 @@ class TestDashboard(SharedModuleStoreTestCase):
                     }
                     for topic_id in range(cls.NUM_TOPICS)
                 ]
-            }
+            })
         )
 
     def setUp(self):
@@ -158,7 +159,7 @@ class TestDashboard(SharedModuleStoreTestCase):
 
         # Create a course two
         course_two = CourseFactory.create(
-            teams_configuration={
+            teams_configuration=TeamsConfig({
                 "max_team_size": 1,
                 "topics": [
                     {
@@ -167,7 +168,7 @@ class TestDashboard(SharedModuleStoreTestCase):
                         "description": "Description for test topic for course two."
                     }
                 ]
-            }
+            })
         )
 
         # Login and enroll user in both course course
@@ -204,7 +205,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
     def setUpClass(cls):
         # pylint: disable=super-method-not-called
         with super(TeamAPITestCase, cls).setUpClassAndTestData():
-            teams_configuration_1 = {
+            teams_configuration_1 = TeamsConfig({
                 'topics':
                 [
                     {
@@ -213,7 +214,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                         'description': u'Description for topic {}.'.format(i)
                     } for i, name in enumerate([u'Sólar power', 'Wind Power', 'Nuclear Power', 'Coal Power'])
                 ]
-            }
+            })
             cls.test_course_1 = CourseFactory.create(
                 org='TestX',
                 course='TS101',
@@ -221,7 +222,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                 teams_configuration=teams_configuration_1
             )
 
-            teams_configuration_2 = {
+            teams_configuration_2 = TeamsConfig({
                 'topics':
                 [
                     {
@@ -241,7 +242,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                     },
                 ],
                 'max_team_size': 1
-            }
+            })
             cls.test_course_2 = CourseFactory.create(
                 org='MIT',
                 course='6.002x',

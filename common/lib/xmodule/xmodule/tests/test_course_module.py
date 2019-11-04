@@ -15,6 +15,7 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import utc
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 
+from openedx.core.lib.teams_config import TeamsConfig
 import xmodule.course_module
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 
@@ -272,25 +273,21 @@ class DiscussionTopicsTestCase(unittest.TestCase):
 class TeamsConfigurationTestCase(unittest.TestCase):
     """
     Tests for the configuration of teams and the helper methods for accessing them.
-
-    Also tests new configuration wrapper, `.teams_conf`.
-    Eventually the tests for the old dict-based `.teams_configuration` field
-    wil be removed (TODO MST-18).
     """
 
     def setUp(self):
         super(TeamsConfigurationTestCase, self).setUp()
         self.course = get_dummy_course('2012-12-02T12:00')
-        self.course.teams_configuration = dict()
+        self.course.teams_configuration = TeamsConfig(None)
         self.count = itertools.count()
 
     def add_team_configuration(self, max_team_size=3, topics=None):
         """ Add a team configuration to the course. """
-        teams_configuration = {}
-        teams_configuration["topics"] = [] if topics is None else topics
+        teams_config_data = {}
+        teams_config_data["topics"] = [] if topics is None else topics
         if max_team_size is not None:
-            teams_configuration["max_team_size"] = max_team_size
-        self.course.teams_configuration = teams_configuration
+            teams_config_data["max_team_size"] = max_team_size
+        self.course.teams_configuration = TeamsConfig(teams_config_data)
 
     def make_topic(self):
         """ Make a sample topic dictionary. """
@@ -303,66 +300,56 @@ class TeamsConfigurationTestCase(unittest.TestCase):
     def test_teams_enabled_new_course(self):
         # Make sure we can detect when no teams exist.
         self.assertFalse(self.course.teams_enabled)
-        self.assertFalse(self.course.teams_conf.is_enabled)
 
         # add topics
         self.add_team_configuration(max_team_size=4, topics=[self.make_topic()])
         self.assertTrue(self.course.teams_enabled)
-        self.assertTrue(self.course.teams_conf.is_enabled)
 
         # remove them again
         self.add_team_configuration(max_team_size=4, topics=[])
         self.assertFalse(self.course.teams_enabled)
-        self.assertFalse(self.course.teams_conf.is_enabled)
 
     def test_teams_enabled_max_size_only(self):
         self.add_team_configuration(max_team_size=4)
         self.assertFalse(self.course.teams_enabled)
-        self.assertFalse(self.course.teams_conf.is_enabled)
 
     def test_teams_enabled_no_max_size(self):
         self.add_team_configuration(max_team_size=None, topics=[self.make_topic()])
         self.assertTrue(self.course.teams_enabled)
-        self.assertTrue(self.course.teams_conf.is_enabled)
 
     def test_teams_max_size_no_teams_configuration(self):
-        self.assertIsNone(self.course.teams_max_size)
-        self.assertIsNone(self.course.teams_conf.max_team_size)
+        self.assertIsNone(self.course.teams_configuration.default_max_team_size)
 
     def test_teams_max_size_with_teams_configured(self):
         size = 4
         self.add_team_configuration(max_team_size=size, topics=[self.make_topic(), self.make_topic()])
         self.assertTrue(self.course.teams_enabled)
-        self.assertEqual(size, self.course.teams_max_size)
-        self.assertEqual(size, self.course.teams_conf.max_team_size)
+        self.assertEqual(size, self.course.teams_configuration.default_max_team_size)
 
-    def test_teams_topics_no_teams(self):
-        self.assertIsNone(self.course.teams_topics)
-        self.assertEqual(self.course.teams_conf.teamsets, [])
+    def test_teamsets_no_config(self):
+        self.assertEqual(self.course.teamsets, [])
 
-    def test_teams_topics_no_topics(self):
+    def test_teamsets_empty(self):
         self.add_team_configuration(max_team_size=4)
-        self.assertEqual(self.course.teams_topics, [])
-        self.assertEqual(self.course.teams_conf.teamsets, [])
+        self.assertEqual(self.course.teamsets, [])
 
-    def test_teams_topics_with_topics(self):
+    def test_teamsets_present(self):
         topics = [self.make_topic(), self.make_topic()]
         self.add_team_configuration(max_team_size=4, topics=topics)
         self.assertTrue(self.course.teams_enabled)
-        self.assertEqual(self.course.teams_topics, topics)
         expected_teamsets_data = [
             teamset.cleaned_data_old_format
-            for teamset in self.course.teams_conf.teamsets
+            for teamset in self.course.teamsets
         ]
         self.assertEqual(expected_teamsets_data, topics)
 
-    def test_teams_conf_caching(self):
+    def test_teams_conf_cached_by_xblock_field(self):
         self.add_team_configuration(max_team_size=5, topics=[self.make_topic()])
-        cold_cache_conf = self.course.teams_conf
-        warm_cache_conf = self.course.teams_conf
+        cold_cache_conf = self.course.teams_configuration
+        warm_cache_conf = self.course.teams_configuration
         self.add_team_configuration(max_team_size=5, topics=[self.make_topic(), self.make_topic()])
-        new_cold_cache_conf = self.course.teams_conf
-        new_warm_cache_conf = self.course.teams_conf
+        new_cold_cache_conf = self.course.teams_configuration
+        new_warm_cache_conf = self.course.teams_configuration
         self.assertIs(cold_cache_conf, warm_cache_conf)
         self.assertIs(new_cold_cache_conf, new_warm_cache_conf)
         self.assertIsNot(cold_cache_conf, new_cold_cache_conf)

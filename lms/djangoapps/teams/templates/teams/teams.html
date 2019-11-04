@@ -51,7 +51,7 @@ from openedx.core.djangolib.js_utils import (
         teamMembershipsUrl: '${team_memberships_url | n, js_escaped_string}',
         teamMembershipDetailUrl: '${team_membership_detail_url | n, js_escaped_string}',
         myTeamsUrl: '${my_teams_url | n, js_escaped_string}',
-        maxTeamSize: ${course.teams_max_size | n, dump_js_escaped_json},
+        maxTeamSize: ${course.teams_configuration.default_max_team_size | n, dump_js_escaped_json},
         languages: ${languages | n, dump_js_escaped_json},
         countries: ${countries | n, dump_js_escaped_json},
         teamsBaseUrl: '${teams_base_url | n, js_escaped_string}'

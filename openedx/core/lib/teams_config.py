@@ -41,11 +41,24 @@ class TeamsConfig(object):
         """
         Return developer-helpful string.
         """
-        return "<{} max_team_size={} teamsets=[{}]>".format(
+        return "<{} default_max_team_size={} teamsets=[{}]>".format(
             self.__class__.__name__,
-            self.max_team_size,
+            self.default_max_team_size,
             ", ".join(repr(teamset) for teamset in self.teamsets),
         )
+
+    def __eq__(self, other):
+        """
+        Define equality based on cleaned data.
+        """
+        return isinstance(other, self.__class__) and self.cleaned_data == other.cleaned_data
+
+    def __ne__(self, other):
+        """
+        Overrides default inequality to be the inverse of our custom equality.
+        Safe to remove once we're in Python 3 -- Py3 does this for us.
+        """
+        return not self.__eq__(other)
 
     @property
     def source_data(self):
@@ -60,7 +73,7 @@ class TeamsConfig(object):
         JSON-friendly dictionary containing cleaned data from this TeamsConfig.
         """
         return {
-            'max_team_size': self.max_team_size,
+            'max_team_size': self.default_max_team_size,
             'team_sets': [
                 teamset.cleaned_data for teamset in self.teamsets
             ]
@@ -72,10 +85,10 @@ class TeamsConfig(object):
         JSON-friendly dictionary containing cleaned data from this TeamsConfig,
         excluding newly added fields.
 
-        Here for backwards compatibility; to be removed (TODO MST-18).
+        Here for backwards compatibility; to be removed (TODO MST-40).
         """
         return {
-            'max_team_size': self.max_team_size,
+            'max_team_size': self.default_max_team_size,
             'topics': [
                 teamset.cleaned_data_old_format for teamset in self.teamsets
             ]
@@ -123,9 +136,11 @@ class TeamsConfig(object):
         return {teamset.teamset_id: teamset for teamset in self.teamsets}
 
     @cached_property
-    def max_team_size(self):
+    def default_max_team_size(self):
         """
         The default maximum size for teams in this course.
+
+        Can be overriden by individual team sets; see `calc_max_team_size`.
         """
         return _clean_max_team_size(self._data.get('max_team_size'))
 
@@ -147,7 +162,7 @@ class TeamsConfig(object):
             return None
         if teamset.max_team_size:
             return teamset.max_team_size
-        return self.max_team_size
+        return self.default_max_team_size
 
 
 class TeamsetConfig(object):
@@ -157,7 +172,7 @@ class TeamsetConfig(object):
     Takes in a configuration from a JSON-friendly dictionary,
     and exposes cleaned data from it.
     """
-    teamset_id_regex = re.compile(r'^[A-Za-z0-9_-]+$')
+    teamset_id_regex = re.compile(r'^[A-Za-z0-9_. -]+$')
 
     def __init__(self, data):
         """
@@ -192,6 +207,19 @@ class TeamsetConfig(object):
             ),
         )
 
+    def __eq__(self, other):
+        """
+        Define equality based on cleaned data.
+        """
+        return isinstance(other, self.__class__) and self.cleaned_data == other.cleaned_data
+
+    def __ne__(self, other):
+        """
+        Overrides default inequality to be the inverse of our custom equality.
+        Safe to remove once we're in Python 3 -- Py3 does this for us.
+        """
+        return not self.__eq__(other)
+
     @property
     def source_data(self):
         """
@@ -218,7 +246,7 @@ class TeamsetConfig(object):
         JSON-friendly dictionary containing cleaned data from this TeamsConfig,
         excluding newly added fields.
 
-        Here for backwards compatibility; to be removed (TODO MST-18).
+        Here for backwards compatibility; to be removed (TODO MST-40).
         """
         return {
             'id': self.teamset_id,
@@ -231,7 +259,8 @@ class TeamsetConfig(object):
         """
         An identifier for this team-set.
 
-        Should be a URL-slug friendly string.
+        Should be a URL-slug friendly string,
+        but for a historical reasons may contain periods and spaces.
         """
         teamset_id = _clean_string(self._data.get('id'))
         if not self.teamset_id_regex.match(teamset_id):
@@ -301,11 +330,11 @@ class TeamsetType(Enum):
 
 def _clean_string(value):
     """
-    Return `value` if it's a string, otherwise "".
+    Return `str(value)` if it's a string or int, otherwise "".
     """
-    if not isinstance(value, six.string_types):
-        return ""
-    return value
+    if isinstance(value, six.integer_types + six.string_types):
+        return six.text_type(value)
+    return ""
 
 
 def _clean_max_team_size(value):

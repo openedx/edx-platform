@@ -404,7 +404,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             result_filter.update({'membership__user__username': username})
         topic_id = request.query_params.get('topic_id', None)
         if topic_id is not None:
-            if topic_id not in [topic['id'] for topic in course_module.teams_configuration['topics']]:
+            if topic_id not in course_module.teamsets_by_id:
                 error = build_api_error(
                     ugettext_noop(u'The supplied topic id {topic_id} is not valid'),
                     topic_id=topic_id
@@ -824,7 +824,10 @@ def get_alphabetical_topics(course_module):
     Returns:
         list: a list of sorted team topics
     """
-    return sorted(course_module.teams_topics, key=lambda t: t['name'].lower())
+    return sorted(
+        course_module.teams_configuration.cleaned_data_old_format['topics'],
+        key=lambda t: t['name'].lower(),
+    )
 
 
 class TopicDetailView(APIView):
@@ -884,12 +887,14 @@ class TopicDetailView(APIView):
         if not has_team_api_access(request.user, course_id):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        topics = [t for t in course_module.teams_topics if t['id'] == topic_id]
-
-        if not topics:
+        try:
+            topic = course_module.teamsets_by_id[topic_id]
+        except KeyError:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        serializer = TopicSerializer(topics[0], context={'course_id': course_id})
+        serializer = TopicSerializer(
+            topic.cleaned_data_old_format, context={'course_id': course_id}
+        )
         return Response(serializer.data)
 
 
@@ -1112,7 +1117,9 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         course_module = modulestore().get_course(team.course_id)
-        if course_module.teams_max_size is not None and team.users.count() >= course_module.teams_max_size:
+        # This should use `calc_max_team_size` instead of `default_max_team_size` (TODO MST-32).
+        max_team_size = course_module.teams_configuration.default_max_team_size
+        if max_team_size is not None and team.users.count() >= max_team_size:
             return Response(
                 build_api_error(ugettext_noop("This team is already full.")),
                 status=status.HTTP_400_BAD_REQUEST
