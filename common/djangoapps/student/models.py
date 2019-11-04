@@ -2045,6 +2045,22 @@ class CourseEnrollment(models.Model):
         cache[(user_id, course_key)] = enrollment_state
 
 
+@python_2_unicode_compatible
+class FBEEnrollmentExclusion(models.Model):
+    """
+    Disable FBE for enrollments in this table.
+
+    .. no_pii:
+    """
+    enrollment = models.OneToOneField(
+        CourseEnrollment,
+        on_delete=models.DO_NOTHING,
+    )
+
+    def __str__(self):
+        return "[FBEEnrollmentExclusion] %s" % (self.enrollment,)
+
+
 @receiver(models.signals.post_save, sender=CourseEnrollment)
 @receiver(models.signals.post_delete, sender=CourseEnrollment)
 def invalidate_enrollment_mode_cache(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-name
