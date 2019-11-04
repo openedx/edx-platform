@@ -204,7 +204,6 @@ class BulkTeamCountTopicListSerializer(serializers.ListSerializer):  # pylint: d
     List serializer for efficiently serializing a set of topics.
     """
 
-
     def to_representation(self, obj):  # pylint: disable=arguments-differ
         """Adds team_count to each topic. """
         data = super(BulkTeamCountTopicListSerializer, self).to_representation(obj)
@@ -212,7 +211,7 @@ class BulkTeamCountTopicListSerializer(serializers.ListSerializer):  # pylint: d
         return data
 
 
-class BulkTeamCountTopicSerializer(BaseTopicSerializer):
+class BulkTeamCountTopicSerializer(BaseTopicSerializer):   # pylint: disable=abstract-method
     """
     Serializes a set of topics, adding the team_count field to each topic as a bulk operation.
     Requires that `context` is provided with a valid course_id in order to filter teams within the course.
