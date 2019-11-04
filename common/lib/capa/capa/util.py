@@ -117,14 +117,12 @@ def contextualize_text(text, context):  # private
             return data_string
         except Exception as error:
             log.exception(
-                u'ContextualizeTextError: text(%s): %s, context_key(%s): %s, context_value(%s): %s, Error: %s',
-                type(text),
-                text,
-                type(context_key),
-                context_key,
-                type(context_value),
-                context_value,
-                six.text_type(error)
+                u"ContextualizeTextError: text(%s): %s, context_key(%s), context_value(%s), Error: %s",
+                type(data_string),
+                data_string,
+                type(old_value),
+                type(new_value),
+                six.text_type(error),
             )
             raise
 
@@ -137,7 +135,7 @@ def contextualize_text(text, context):  # private
         # program, but also e.g. a reference to the numpy module.
         # Should be a separate dict of variables that should be
         # replaced.
-        context_key = '$' + key
+        context_key = convert_to_str('$' + key)
         if context_key in (text.decode('utf-8') if six.PY3 and isinstance(text, bytes) else text):
             text = convert_to_str(text)
             context_value = convert_to_str(context[key])
