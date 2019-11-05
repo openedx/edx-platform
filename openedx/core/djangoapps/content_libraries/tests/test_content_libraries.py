@@ -2,11 +2,13 @@
 """
 Tests for Blockstore-based Content Libraries
 """
-
 import unittest
 from uuid import UUID
 
+from django.contrib.auth.models import Group
+
 from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
+from student.tests.factories import UserFactory
 
 
 class ContentLibrariesTest(ContentLibrariesRestApiTest):
@@ -49,18 +51,18 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
             "has_unpublished_changes": False,
             "has_unpublished_deletes": False,
         }
-        self.assertDictContainsSubset(expected_data, lib)
+        self.assertDictContainsEntries(lib, expected_data)
         # Check that bundle_uuid looks like a valid UUID
         UUID(lib["bundle_uuid"])  # will raise an exception if not valid
 
         # Read:
         lib2 = self._get_library(lib["id"])
-        self.assertDictContainsSubset(expected_data, lib2)
+        self.assertDictContainsEntries(lib2, expected_data)
 
         # Update:
         lib3 = self._update_library(lib["id"], title="New Title")
         expected_data["title"] = "New Title"
-        self.assertDictContainsSubset(expected_data, lib3)
+        self.assertDictContainsEntries(lib3, expected_data)
 
         # Delete:
         self._delete_library(lib["id"])
@@ -94,12 +96,12 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
 
         # Add a 'problem' XBlock to the library:
         block_data = self._add_block_to_library(lib_id, "problem", "problem1")
-        self.assertDictContainsSubset({
+        self.assertDictContainsEntries(block_data, {
             "id": "lb:CL-TEST:testlib1:problem:problem1",
             "display_name": "Blank Advanced Problem",
             "block_type": "problem",
             "has_unpublished_changes": True,
-        }, block_data)
+        })
         block_id = block_data["id"]
         # Confirm that the result contains a definition key, but don't check its value,
         # which for the purposes of these tests is an implementation detail.
@@ -114,7 +116,7 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         self.assertEqual(self._get_library(lib_id)["has_unpublished_changes"], False)
         # And now the block information should also show that block has no unpublished changes:
         block_data["has_unpublished_changes"] = False
-        self.assertDictContainsSubset(block_data, self._get_library_block(block_id))
+        self.assertDictContainsEntries(self._get_library_block(block_id), block_data)
         self.assertEqual(self._get_library_blocks(lib_id), [block_data])
 
         # Now update the block's OLX:
@@ -138,10 +140,10 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         # now reading it back, we should get that exact OLX (no change to whitespace etc.):
         self.assertEqual(self._get_library_block_olx(block_id), new_olx)
         # And the display name and "unpublished changes" status of the block should be updated:
-        self.assertDictContainsSubset({
+        self.assertDictContainsEntries(self._get_library_block(block_id), {
             "display_name": "New Multi Choice Question",
             "has_unpublished_changes": True,
-        }, self._get_library_block(block_id))
+        })
 
         # Now view the XBlock's student_view (including draft changes):
         fragment = self._render_block_view(block_id, "student_view")
@@ -209,3 +211,147 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         # We cannot add a duplicate ID to the library, either at the top level or as a child:
         self._add_block_to_library(lib_id, "problem", "problem1", expect_response=400)
         self._add_block_to_library(lib_id, "problem", "problem1", parent_block=unit_block["id"], expect_response=400)
+
+    # Test that permissions are enforced for content libraries
+
+    def test_library_permissions(self):  # pylint: disable=too-many-statements
+        """
+        Test that permissions are enforced for content libraries, and that
+        permissions can be read and manipulated using the REST API (which in
+        turn tests the python API).
+
+        This is a single giant test case, because that optimizes for the fastest
+        test run time, even though it can make debugging failures harder.
+        """
+        # Create a few users to use for all of these tests:
+        admin = UserFactory.create(username="Admin", email="admin@example.com")
+        author = UserFactory.create(username="Author", email="author@example.com")
+        reader = UserFactory.create(username="Reader", email="reader@example.com")
+        group = Group.objects.create(name="group1")
+        author_group_member = UserFactory.create(username="GroupMember", email="groupmember@example.com")
+        author_group_member.groups.add(group)
+        random_user = UserFactory.create(username="Random", email="random@example.com")
+
+        # Library CRUD #########################################################
+
+        # Create a library, owned by "Admin"
+        with self.as_user(admin):
+            lib = self._create_library(slug="permtest", title="Permission Test Library", description="Testing")
+            lib_id = lib["id"]
+            # By default, "public learning" and public read access are disallowed.
+            self.assertEqual(lib["allow_public_learning"], False)
+            self.assertEqual(lib["allow_public_read"], False)
+
+            # By default, the creator of a new library is the only admin
+            data = self._get_library_team(lib_id)
+            self.assertEqual(len(data), 1)
+            self.assertDictContainsEntries(data[0], {"user_id": admin.pk, "group_name": None, "access_level": "admin"})
+
+            # Add the other users to the content library:
+            self._set_user_access_level(lib_id, author.pk, access_level="author")
+            self._set_user_access_level(lib_id, reader.pk, access_level="read")
+            self._set_group_access_level(lib_id, group.name, access_level="author")
+
+            team_response = self._get_library_team(lib_id)
+            self.assertEqual(len(team_response), 4)
+            # The response should also always be sorted in a specific order (by username and group name):
+            expected_response = [
+                {"user_id": None, "group_name": "group1", "access_level": "author"},
+                {"user_id": admin.pk, "group_name": None, "access_level": "admin"},
+                {"user_id": author.pk, "group_name": None, "access_level": "author"},
+                {"user_id": reader.pk, "group_name": None, "access_level": "read"},
+            ]
+            for entry, expected in zip(team_response, expected_response):
+                self.assertDictContainsEntries(entry, expected)
+
+        # A random user cannot get the library nor its team:
+        with self.as_user(random_user):
+            self._get_library(lib_id, expect_response=403)
+            self._get_library_team(lib_id, expect_response=403)
+
+        # But every authorized user can:
+        for user in [admin, author, author_group_member]:
+            with self.as_user(user):
+                self._get_library(lib_id)
+                data = self._get_library_team(lib_id)
+                self.assertEqual(data, team_response)
+
+        # A user with only read permission can get data about the library but not the team:
+        with self.as_user(reader):
+            self._get_library(lib_id)
+            self._get_library_team(lib_id, expect_response=403)
+
+        # Users without admin access cannot delete the library nor change its team:
+        for user in [author, reader, author_group_member, random_user]:
+            with self.as_user(user):
+                self._delete_library(lib_id, expect_response=403)
+                self._set_user_access_level(lib_id, author.pk, access_level="admin", expect_response=403)
+                self._set_user_access_level(lib_id, admin.pk, access_level=None, expect_response=403)
+                self._set_user_access_level(lib_id, random_user.pk, access_level="read", expect_response=403)
+
+        # Users with author access (or higher) can edit the library's properties:
+        with self.as_user(author):
+            self._update_library(lib_id, description="Revised description")
+        with self.as_user(author_group_member):
+            self._update_library(lib_id, title="New Library Title")
+        # But other users cannot:
+        with self.as_user(reader):
+            self._update_library(lib_id, description="Prohibited description", expect_response=403)
+        with self.as_user(random_user):
+            self._update_library(lib_id, title="I can't set this title", expect_response=403)
+        # Verify the permitted changes were made:
+        with self.as_user(admin):
+            data = self._get_library(lib_id)
+            self.assertEqual(data["description"], "Revised description")
+            self.assertEqual(data["title"], "New Library Title")
+
+        # Library XBlock editing ###############################################
+
+        # users with read permission or less cannot add blocks:
+        for user in [reader, random_user]:
+            with self.as_user(user):
+                self._add_block_to_library(lib_id, "problem", "problem1", expect_response=403)
+        # But authors and admins can:
+        with self.as_user(admin):
+            self._add_block_to_library(lib_id, "problem", "problem1")
+        with self.as_user(author):
+            self._add_block_to_library(lib_id, "problem", "problem2")
+        with self.as_user(author_group_member):
+            block3_data = self._add_block_to_library(lib_id, "problem", "problem3")
+            block3_key = block3_data["id"]
+
+        # At this point, the library contains 3 draft problem XBlocks.
+
+        # A random user cannot read OLX nor assets (this library has allow_public_read False):
+        with self.as_user(random_user):
+            self._get_library_block_olx(block3_key, expect_response=403)
+            self._get_library_block_assets(block3_key, expect_response=403)
+            self._get_library_block_asset(block3_key, file_name="whatever.png", expect_response=403)
+        # But if we grant allow_public_read, then they can:
+        with self.as_user(admin):
+            self._update_library(lib_id, allow_public_read=True)
+            self._set_library_block_asset(block3_key, "whatever.png", b"data")
+        with self.as_user(random_user):
+            self._get_library_block_olx(block3_key)
+            self._get_library_block_assets(block3_key)
+            self._get_library_block_asset(block3_key, file_name="whatever.png")
+
+        # Users without authoring permission cannot edit nor delete XBlocks (this library has allow_public_read False):
+        for user in [reader, random_user]:
+            with self.as_user(user):
+                self._set_library_block_olx(block3_key, "<problem/>", expect_response=403)
+                self._set_library_block_asset(block3_key, "test.txt", b"data", expect_response=403)
+                self._delete_library_block(block3_key, expect_response=403)
+                self._commit_library_changes(lib_id, expect_response=403)
+                self._revert_library_changes(lib_id, expect_response=403)
+
+        # But users with author permission can:
+        with self.as_user(author_group_member):
+            olx = self._get_library_block_olx(block3_key)
+            self._set_library_block_olx(block3_key, olx)
+            self._get_library_block_assets(block3_key)
+            self._set_library_block_asset(block3_key, "test.txt", b"data")
+            self._get_library_block_asset(block3_key, file_name="test.txt")
+            self._delete_library_block(block3_key)
+            self._commit_library_changes(lib_id)
+            self._revert_library_changes(lib_id)  # This is a no-op after the commit, but should still have 200 response
