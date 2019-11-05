@@ -2,6 +2,7 @@
 Module to put all pytest hooks for various
 """
 
+
 def pytest_json_modifyreport(json_report):
     """
     The function is called by pytest-json-report plugin to only output warnings in json format.
