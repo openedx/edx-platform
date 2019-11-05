@@ -40,6 +40,7 @@ git+https://github.com/nedbat/pytest-cov.git@nedbat/cov5-combine#egg=pytest-cov=
 git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0
 pytest-faulthandler       # Report on serious crashes
 pytest-django             # Django support for pytest
+pytest-json-report        # Output warnings in json format
 pytest-randomly           # pytest plugin to randomly order tests
 pytest-xdist              # Parallel execution of tests on multiple CPU cores or hosts
 radon                     # Calculates cyclomatic complexity of Python code (code quality utility)
