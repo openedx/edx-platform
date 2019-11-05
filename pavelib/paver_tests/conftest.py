@@ -10,6 +10,7 @@ from shutil import rmtree
 import pytest
 
 from pavelib.utils.envs import Env
+from openedx.core.tests.pytest_hooks import pytest_json_modifyreport
 
 
 @pytest.fixture(autouse=True, scope='session')

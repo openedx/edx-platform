@@ -10,6 +10,7 @@ import pytest
 # avoid duplicating the implementation
 
 from cms.conftest import _django_clear_site_cache, pytest_configure  # pylint: disable=unused-import
+from openedx.core.tests.pytest_hooks import pytest_json_modifyreport
 
 # When using self.assertEquals, diffs are truncated. We don't want that, always
 # show the whole diff.

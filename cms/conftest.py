@@ -13,6 +13,8 @@ import os
 import contracts
 import pytest
 
+from openedx.core.tests.pytest_hooks import pytest_json_modifyreport
+
 
 # Patch the xml libs before anything else.
 from safe_lxml import defuse_xml_libs

@@ -7,6 +7,8 @@ import pytest
 
 from safe_lxml import defuse_xml_libs
 
+from openedx.core.tests.pytest_hooks import pytest_json_modifyreport
+
 defuse_xml_libs()
 
 
