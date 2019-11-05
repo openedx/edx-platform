@@ -38,13 +38,14 @@ from course_modes.models import CourseMode
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
-from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
+from openedx.core.djangoapps.user_api.accounts.api import activate_account
 from openedx.core.djangoapps.user_api.accounts.utils import ENABLE_SECONDARY_EMAIL_FEATURE_SWITCH
 from openedx.core.djangoapps.user_api.errors import UserAPIInternalError
 from openedx.core.djangoapps.user_authn.views.login_form import login_and_registration_form
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
+from student.models import Registration
 from student.tests.factories import AccountRecoveryFactory
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
 from util.testing import UrlResetMixin
@@ -75,12 +76,27 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
 
     ENABLED_CACHES = ['default']
 
+    def _create_account(self, username, password, email):
+        # pylint: disable=missing-docstring
+        registration_url = reverse('user_api_registration')
+        resp = self.client.post(registration_url, {
+            'username': username,
+            'email': email,
+            'password': password,
+            'name': username,
+            'honor_code': 'true',
+        })
+        self.assertEqual(resp.status_code, 200)
+
     def setUp(self):
         super(UserAccountUpdateTest, self).setUp()
 
         # Create/activate a new account
-        activation_key = create_account(self.USERNAME, self.OLD_PASSWORD, self.OLD_EMAIL)
-        activate_account(activation_key)
+        self._create_account(self.USERNAME, self.OLD_PASSWORD, self.OLD_EMAIL)
+        mail.outbox = []
+        user = User.objects.get(username=self.USERNAME)
+        registration = Registration.objects.get(user=user)
+        activate_account(registration.activation_key)
 
         self.account_recovery = AccountRecoveryFactory.create(user=User.objects.get(email=self.OLD_EMAIL))
         self.enable_account_recovery_switch = Switch.objects.create(
@@ -222,7 +238,8 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         self.client.logout()
 
         # Create a second user, but do not activate it
-        create_account(self.ALTERNATE_USERNAME, self.OLD_PASSWORD, self.NEW_EMAIL)
+        self._create_account(self.ALTERNATE_USERNAME, self.OLD_PASSWORD, self.NEW_EMAIL)
+        mail.outbox = []
 
         # Send the view the email address tied to the inactive user
         response = self._change_password(email=self.NEW_EMAIL)

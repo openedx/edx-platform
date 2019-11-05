@@ -80,51 +80,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         super(RegistrationViewValidationErrorTest, self).setUp()
         self.url = reverse("user_api_registration")
 
-    @mock.patch('openedx.core.djangoapps.user_authn.views.register.check_account_exists')
-    def test_register_retired_email_validation_error(self, dummy_check_account_exists):
-        dummy_check_account_exists.return_value = []
-        # Register the first user
-        response = self.client.post(self.url, {
-            "email": self.EMAIL,
-            "name": self.NAME,
-            "username": self.USERNAME,
-            "password": self.PASSWORD,
-            "honor_code": "true",
-        })
-        self.assertHttpOK(response)
-
-        # Initiate retirement for the above user:
-        fake_requested_retirement(User.objects.get(username=self.USERNAME))
-
-        # Try to create a second user with the same email address as the retired user
-        response = self.client.post(self.url, {
-            "email": self.EMAIL,
-            "name": "Someone Else",
-            "username": "someone_else",
-            "password": self.PASSWORD,
-            "honor_code": "true",
-        })
-        self.assertEqual(response.status_code, 400)
-        response_json = json.loads(response.content.decode('utf-8'))
-        self.assertDictEqual(
-            response_json,
-            {
-                "email": [{
-                    "user_message": (
-                        u"It looks like {} belongs to an existing account. "
-                        "Try again with a different email address."
-                    ).format(
-                        self.EMAIL
-                    )
-                }]
-            }
-        )
-
-    def test_register_retired_email_validation_error_no_bypass_check_account_exists(self):
-        """
-        This test is the same as above, except it doesn't bypass check_account_exists.  Not bypassing this function
-        results in the same error message, but a 409 status code rather than 400.
-        """
+    def test_register_retired_email_validation_error(self):
         # Register the first user
         response = self.client.post(self.url, {
             "email": self.EMAIL,
@@ -178,7 +134,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
 
         with mock.patch('openedx.core.djangoapps.user_authn.views.register.do_create_account') as dummy_do_create_acct:
             # do_create_account should *not* be called - the duplicate retired username
-            # should be detected by check_account_exists before account creation is called.
+            # should be detected before account creation is called.
             dummy_do_create_acct.side_effect = Exception('do_create_account should *not* have been called!')
             # Try to create a second user with the same username.
             response = self.client.post(self.url, {
@@ -204,9 +160,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             }
         )
 
-    @mock.patch('openedx.core.djangoapps.user_authn.views.register.check_account_exists')
-    def test_register_duplicate_email_validation_error(self, dummy_check_account_exists):
-        dummy_check_account_exists.return_value = []
+    def test_register_duplicate_email_validation_error(self):
         # Register the first user
         response = self.client.post(self.url, {
             "email": self.EMAIL,
@@ -225,7 +179,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             "password": self.PASSWORD,
             "honor_code": "true",
         })
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 409)
         response_json = json.loads(response.content.decode('utf-8'))
         self.assertDictEqual(
             response_json,
@@ -241,9 +195,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             }
         )
 
-    @mock.patch('openedx.core.djangoapps.user_authn.views.register.check_account_exists')
-    def test_register_duplicate_username_account_validation_error(self, dummy_check_account_exists):
-        dummy_check_account_exists.return_value = []
+    def test_register_duplicate_username_account_validation_error(self):
         # Register the first user
         response = self.client.post(self.url, {
             "email": self.EMAIL,
@@ -267,9 +219,10 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         self.assertDictEqual(
             response_json,
             {
-                u"username": [{
-                    u"user_message": (
-                        u"An account with the Public Username '{}' already exists."
+                "username": [{
+                    "user_message": (
+                        u"It looks like {} belongs to an existing account. "
+                        "Try again with a different username."
                     ).format(
                         self.USERNAME
                     )
@@ -277,9 +230,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             }
         )
 
-    @mock.patch('openedx.core.djangoapps.user_authn.views.register.check_account_exists')
-    def test_register_duplicate_username_and_email_validation_errors(self, dummy_check_account_exists):
-        dummy_check_account_exists.return_value = []
+    def test_register_duplicate_username_and_email_validation_errors(self):
         # Register the first user
         response = self.client.post(self.url, {
             "email": self.EMAIL,
@@ -290,7 +241,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         })
         self.assertHttpOK(response)
 
-        # Try to create a second user with the same username
+        # Try to create a second user with the same username and email
         response = self.client.post(self.url, {
             "email": self.EMAIL,
             "name": "Someone Else",
@@ -298,11 +249,19 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             "password": self.PASSWORD,
             "honor_code": "true",
         })
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 409)
         response_json = json.loads(response.content.decode('utf-8'))
         self.assertDictEqual(
             response_json,
             {
+                "username": [{
+                    "user_message": (
+                        u"It looks like {} belongs to an existing account. "
+                        "Try again with a different username."
+                    ).format(
+                        self.USERNAME
+                    )
+                }],
                 "email": [{
                     "user_message": (
                         u"It looks like {} belongs to an existing account. "

@@ -36,7 +36,6 @@ from lms.djangoapps.discussion.notification_prefs.views import enable_notificati
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
-from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
 from openedx.core.djangoapps.user_api.accounts.utils import generate_password
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
@@ -50,7 +49,13 @@ from student.helpers import (
     do_create_account,
     AccountValidationError,
 )
-from student.models import RegistrationCookieConfiguration, UserAttribute, create_comments_service_user
+from student.models import (
+    RegistrationCookieConfiguration,
+    UserAttribute,
+    create_comments_service_user,
+    email_exists_or_retired,
+    username_exists_or_retired,
+)
 from student.views import compose_and_send_activation_email
 from third_party_auth import pipeline, provider
 from third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
@@ -458,20 +463,19 @@ class RegistrationView(APIView):
         return response
 
     def _handle_duplicate_email_username(self, data):
+        # pylint: disable=no-member
         # TODO Verify whether this check is needed here - it may be duplicated in user_api.
         email = data.get('email')
         username = data.get('username')
+        errors = {}
 
-        conflicts = check_account_exists(email=email, username=username)
-        if conflicts:
-            conflict_messages = {
-                "email": accounts_settings.EMAIL_CONFLICT_MSG.format(email_address=email),  # pylint: disable=no-member
-                "username": accounts_settings.USERNAME_CONFLICT_MSG.format(username=username),  # pylint: disable=no-member
-            }
-            errors = {
-                field: [{"user_message": conflict_messages[field]}]
-                for field in conflicts
-            }
+        if email is not None and email_exists_or_retired(email):
+            errors["email"] = [{"user_message": accounts_settings.EMAIL_CONFLICT_MSG.format(email_address=email)}]
+
+        if username is not None and username_exists_or_retired(username):
+            errors["username"] = [{"user_message": accounts_settings.USERNAME_CONFLICT_MSG.format(username=username)}]
+
+        if errors:
             return self._create_response(errors, status_code=409)
 
     def _handle_terms_of_service(self, data):
