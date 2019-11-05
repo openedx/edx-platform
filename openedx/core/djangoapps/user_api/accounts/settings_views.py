@@ -31,7 +31,7 @@ from openedx.core.djangoapps.user_api.accounts.toggles import (
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
-from openedx.features.enterprise_support.api import enterprise_customer_for_request
+from openedx.features.enterprise_support.api import get_enterprise_customer_for_learner
 from openedx.features.enterprise_support.utils import update_account_settings_context_for_enterprise
 from student.models import UserProfile
 from third_party_auth import pipeline
@@ -147,7 +147,7 @@ def account_settings_context(request):
         'beta_language': beta_language,
     }
 
-    enterprise_customer = enterprise_customer_for_request(request)
+    enterprise_customer = get_enterprise_customer_for_learner(user=request.user)
     update_account_settings_context_for_enterprise(context, enterprise_customer, user)
 
     if third_party_auth.is_enabled():
