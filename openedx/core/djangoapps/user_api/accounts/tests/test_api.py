@@ -90,7 +90,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
         self.staff_user = UserFactory(is_staff=True, password=self.password)
         self.reset_tracker()
 
-        enterprise_patcher = patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
+        enterprise_patcher = patch('openedx.features.enterprise_support.api.get_enterprise_customer_for_learner')
         enterprise_learner_patcher = enterprise_patcher.start()
         enterprise_learner_patcher.return_value = {}
         self.addCleanup(enterprise_learner_patcher.stop)
@@ -236,7 +236,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
         account_settings = get_account_settings(self.default_request)[0]
         self.assertEqual(level_of_education, account_settings["level_of_education"])
 
-    @patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
+    @patch('openedx.features.enterprise_support.api.get_enterprise_customer_for_learner')
     @patch('openedx.features.enterprise_support.utils.third_party_auth.provider.Registry.get')
     @ddt.data(
         *itertools.product(
