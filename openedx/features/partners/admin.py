@@ -15,7 +15,7 @@ class PartnerAdmin(admin.ModelAdmin):
         if not hasattr(Partner, 'slug'):
             return
 
-        return reverse('partner_url', kwargs={'slug': self.slug})
+        return reverse('partner_url', kwargs={'slug': obj.slug})
 
 
 admin.site.register(Partner, PartnerAdmin)
