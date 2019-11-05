@@ -28,43 +28,10 @@ from openedx.core.djangoapps.theming.helpers import get_current_site
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
+from openedx.core.djangoapps.user_authn.views.password_reset import send_password_reset_email_for_user
 from student.message_types import AccountRecovery as AccountRecoveryMessage
-from student.message_types import PasswordReset
 from student.models import AccountRecovery, CourseEnrollmentAllowed, email_exists_or_retired
 from util.password_policy_validators import validate_password
-
-
-def send_password_reset_email_for_user(user, request, preferred_email=None):
-    """
-    Send out a password reset email for the given user.
-
-    Arguments:
-        user (User): Django User object
-        request (HttpRequest): Django request object
-        preferred_email (str): Send email to this address if present, otherwise fallback to user's email address.
-    """
-    site = get_current_site()
-    message_context = get_base_template_context(site)
-    message_context.update({
-        'request': request,  # Used by google_analytics_tracking_pixel
-        # TODO: This overrides `platform_name` from `get_base_template_context` to make the tests passes
-        'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
-        'reset_link': '{protocol}://{site}{link}?track=pwreset'.format(
-            protocol='https' if request.is_secure() else 'http',
-            site=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
-            link=reverse('password_reset_confirm', kwargs={
-                'uidb36': int_to_base36(user.id),
-                'token': default_token_generator.make_token(user),
-            }),
-        )
-    })
-
-    msg = PasswordReset().personalize(
-        recipient=Recipient(user.username, preferred_email or user.email),
-        language=get_user_preference(user, LANGUAGE_KEY),
-        user_context=message_context,
-    )
-    ace.send(msg)
 
 
 def send_account_recovery_email_for_user(user, request, email=None):
