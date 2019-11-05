@@ -757,7 +757,7 @@ class CourseMode(models.Model):
         return min(mode.min_price for mode in modes if mode.currency.lower() == currency.lower())
 
     @classmethod
-    def is_eligible_for_certificate(cls, mode_slug):
+    def is_eligible_for_certificate(cls, mode_slug, status=None):
         """
         Returns whether or not the given mode_slug is eligible for a
         certificate. Currently all modes other than 'audit' grant a
@@ -769,7 +769,11 @@ class CourseMode(models.Model):
         ineligible_modes = [cls.AUDIT]
 
         if settings.FEATURES['DISABLE_HONOR_CERTIFICATES']:
-            ineligible_modes.append(cls.HONOR)
+            # Adding check so that we can regenerate the certificate for learners who have
+            # already earned the certificate using honor mode
+            from lms.djangoapps.certificates.models import CertificateStatuses
+            if mode_slug == cls.HONOR and status != CertificateStatuses.downloadable:
+                ineligible_modes.append(cls.HONOR)
 
         return mode_slug not in ineligible_modes
 
