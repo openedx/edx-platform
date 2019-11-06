@@ -116,7 +116,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_j
           removeClass('is-disabled').
           attr('aria-disabled', false).
           prop('disabled', false).
-          html(HtmlUtils.ensureHtml(content).toString());
+          html(edx.HtmlUtils.ensureHtml(content).toString());
       }
       else {
         $submitButton.
