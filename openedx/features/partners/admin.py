@@ -12,10 +12,8 @@ class PartnerAdmin(admin.ModelAdmin):
     readonly_fields = ('partner_url',)
 
     def partner_url(self, obj):
-        if not hasattr(Partner, 'slug'):
-            return
-
-        return reverse('partner_url', kwargs={'slug': obj.slug})
+        if obj.slug:
+            return reverse('partner_url', kwargs={'slug': obj.slug})
 
 
 admin.site.register(Partner, PartnerAdmin)
