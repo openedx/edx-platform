@@ -139,6 +139,9 @@ def recalculate_course_and_subsection_grades_for_user(self, **kwargs):  # pylint
     Recalculates the course grade and all subsection grades
     for the given ``user`` and ``course_key`` keyword arguments.
     """
+    if 'lms.djangoapps.grades.apps.GradesConfig' not in settings.INSTALLED_APPS:
+        # This task errors when run in-process during Studio tests, just skip it
+        return
     user_id = kwargs.get('user_id')
     course_key_str = kwargs.get('course_key')
 
