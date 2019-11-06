@@ -220,7 +220,23 @@ class VideoBlockTestBase(unittest.TestCase):
             return [child.tag for child in elem]
 
         for attr in ['tag', 'attrib', 'text', 'tail']:
-            self.assertEqual(getattr(expected, attr), getattr(xml, attr))
+            expected_attr = getattr(expected, attr)
+            actual_attr = getattr(xml, attr)
+
+            # This is to deal with a special issue in the video descriptor xml output.
+            # The value of the transcript attribute of the video tag is a serialized
+            # json string.  This can have comparison problems in python3 where the order
+            # of the dictionary output is not gauranteed to be the same. So the strings
+            # don't match equally.  We convert the parsed json instead so that the
+            # comparison can be correct.
+            if isinstance(expected_attr, dict) and \
+                    isinstance(actual_attr, dict) and \
+                    'transcripts' in expected_attr and \
+                    'transcripts' in actual_attr:
+                expected_attr['transcripts'] = json.loads(expected_attr['transcripts'])
+                actual_attr['transcripts'] = json.loads(actual_attr['transcripts'])
+
+            self.assertEqual(expected_attr, actual_attr)
         self.assertEqual(get_child_tags(expected), get_child_tags(xml))
         for left, right in zip(expected, xml):
             self.assertXmlEqual(left, right)
