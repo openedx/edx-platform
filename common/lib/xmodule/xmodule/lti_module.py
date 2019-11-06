@@ -852,7 +852,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             params=list(oauth_headers.items()),
             signature=oauth_signature
         )
-        if not oauth_body_hash in oauth_headers.get('oauth_body_hash'):
+        if oauth_body_hash not in oauth_headers.get('oauth_body_hash'):
             log.error(
                 "OAuth body hash verification failed, provided: {}, "
                 "calculated: {}, for url: {}, body is: {}".format(
