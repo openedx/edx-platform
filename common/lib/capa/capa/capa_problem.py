@@ -736,7 +736,8 @@ class LoncapaProblem(object):
         self.do_targeted_feedback(self.tree)
         html = contextualize_text(
             etree.tostring(self._extract_html(self.tree)).decode('utf-8'),
-            self.context
+            self.context,
+            six.text_type(self.capa_module.location)
         )
         return html
 

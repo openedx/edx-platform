@@ -98,7 +98,7 @@ def compare_with_tolerance(student_complex, instructor_complex, tolerance=defaul
         return abs(student_complex - instructor_complex) <= tolerance
 
 
-def contextualize_text(text, context):  # private
+def contextualize_text(text, context, problem_location=None):  # private
     """
     Takes a string with variables. E.g. $a+$b.
     Does a substitution of those variables from the context
@@ -115,17 +115,26 @@ def contextualize_text(text, context):  # private
         try:
             data_string = data_string.replace(old_value, new_value)
             return data_string
-        except Exception as error:
-            log.exception(
-                u'ContextualizeTextError: text(%s): %s, context_key(%s): %s, context_value(%s): %s, Error: %s',
-                type(text),
-                text,
-                type(context_key),
-                context_key,
-                type(context_value),
-                context_value,
-                six.text_type(error)
-            )
+        except Exception:  # pylint: disable=broad-except
+            if problem_location and problem_location == 'block-v1:MITx+CTL.SC3x+2T2019+type@problem+block@cb29c9209862423d87bef76c4ef15695':  # pylint: disable=line-too-long
+                log.error(
+                    u'ContextualizeTextError: data_string(%s), old_value(%s), new_value(%s)',
+                    type(data_string),
+                    type(old_value),
+                    type(new_value),
+                )
+                log.error(
+                    u'ContextualizeTextError: data_string: %s',
+                    data_string,
+                )
+                log.error(
+                    u'ContextualizeTextError: new_value : %s',
+                    new_value,
+                )
+                log.error(
+                    u'ContextualizeTextError: old_value: %s',
+                    old_value,
+                )
             raise
 
     if not text:
