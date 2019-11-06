@@ -541,7 +541,6 @@ class BrowseTopicsTest(TeamsTabBase):
                 ]
             }
         )
-        import pdb;pdb.set_trace()
         self.topics_page.visit()
         truncated_description = self.topics_page.topic_descriptions[0]
         self.assertLess(len(truncated_description), len(initial_description))
