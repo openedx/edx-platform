@@ -1,0 +1,27 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <p>Hello,</p>
+            <p>We were contacted by a user on LearnX @ UC San Diego. Please take a moment to review and respond.</p>
+            <p>Learner: {{name}} ({{email}})</p>
+            <p>
+                {% if course %}
+                    Course: {{course}}
+                    <br>
+                {% endif %}
+            </p>
+            <p>--------------------Request Details--------------------</p>
+            <p>Subject: {{subject}}</p>
+            <p>{{ body }}</p>
+            {% block google_analytics_pixel %}
+                <img src="{{ ga_tracking_pixel_url }}" alt="" role="presentation" aria-hidden="true" style="display: block;"/>
+            {% endblock %}
+        </td>
+    </tr>
+</table>
+{% endblock %}
