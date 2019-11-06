@@ -711,7 +711,7 @@ class VideoBlock(
             ele.set('src', self.handout)
             xml.append(ele)
 
-        transcripts = {}
+        transcripts = OrderedDict()
         if self.transcripts is not None:
             transcripts.update(self.transcripts)
 

@@ -21,6 +21,7 @@ import shutil
 import unittest
 from tempfile import mkdtemp
 from uuid import uuid4
+from collections import OrderedDict
 
 import ddt
 import six
@@ -731,7 +732,8 @@ class VideoExportTestCase(VideoBlockTestBase):
         self.descriptor.download_track = True
         self.descriptor.html5_sources = ['http://www.example.com/source.mp4', 'http://www.example.com/source1.ogg']
         self.descriptor.download_video = True
-        self.descriptor.transcripts = {'ua': 'ukrainian_translation.srt', 'ge': 'german_translation.srt'}
+        self.descriptor.transcripts = OrderedDict(
+                (('ge', 'german_translation.srt'), ('ua', 'ukrainian_translation.srt')))
         self.descriptor.edx_video_id = edx_video_id
         self.descriptor.runtime.course_id = MagicMock()
 
