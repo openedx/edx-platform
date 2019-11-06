@@ -301,6 +301,8 @@ class CreditRequirement(TimeStampedModel):
     namespace = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
     display_name = models.CharField(max_length=255, default=u"")
+
+    # TODO: delete this 'order' field in final step of field renames
     order = models.PositiveIntegerField(default=0)
     order_number = models.PositiveIntegerField(default=0)
     criteria = JSONField()
@@ -336,7 +338,6 @@ class CreditRequirement(TimeStampedModel):
                 "display_name": requirement["display_name"],
                 "criteria": requirement["criteria"],
                 "order": order,
-                "order_number": order,
                 "active": True
             }
         )

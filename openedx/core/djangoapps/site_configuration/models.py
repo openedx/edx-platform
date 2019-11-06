@@ -31,8 +31,15 @@ class SiteConfiguration(models.Model):
     """
     site = models.OneToOneField(Site, related_name='configuration', on_delete=models.CASCADE)
     enabled = models.BooleanField(default=False, verbose_name=u"Enabled")
+
+    # TODO: delete this 'values' field in final step of field renames
     values = JSONField(
         null=False,
+        blank=True,
+        load_kwargs={'object_pairs_hook': collections.OrderedDict}
+    )
+    config_values = JSONField(
+        null=True,      # TODO: revert to null=False when dropping `values` column
         blank=True,
         load_kwargs={'object_pairs_hook': collections.OrderedDict}
     )
@@ -152,8 +159,15 @@ class SiteConfigurationHistory(TimeStampedModel):
     """
     site = models.ForeignKey(Site, related_name='configuration_histories', on_delete=models.CASCADE)
     enabled = models.BooleanField(default=False, verbose_name=u"Enabled")
+
+    # TODO: delete this 'values' field in final step of field renames
     values = JSONField(
         null=False,
+        blank=True,
+        load_kwargs={'object_pairs_hook': collections.OrderedDict}
+    )
+    config_values = JSONField(
+        null=True,      # TODO: revert to null=False when dropping `values` column
         blank=True,
         load_kwargs={'object_pairs_hook': collections.OrderedDict}
     )

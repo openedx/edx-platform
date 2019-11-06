@@ -67,7 +67,9 @@ class CourseOverview(TimeStampedModel):
     display_org_with_default = TextField()
 
     # Start/end dates
+    # TODO: delete this 'start' field in final step of field renames
     start = DateTimeField(null=True)
+    course_start_date = DateTimeField(null=True)
     end = DateTimeField(null=True)
     advertised_start = TextField(null=True)
     announcement = DateTimeField(null=True)
