@@ -289,47 +289,27 @@ def _record_feedback_in_zendesk(
         custom_fields=None
 ):
     """
-    Create a new user-requested Zendesk ticket or send an email to Support Team.
+    Create a new user-requested Zendesk ticket.
 
-    Use ENABLE_EMAIL_INSTEAD_ZENDESK flag to switch between zendesk ticket or support email
-
-    In case of Zendesk ticket, once created, the ticket will be updated with a private
-    comment containing additional information from the browser and server, such as HTTP headers
-    and user state.
+    Once created, the ticket will be updated with a private comment containing
+    additional information from the browser and server, such as HTTP headers
+    and user state. Returns a boolean value indicating whether ticket creation
+    was successful, regardless of whether the private comment update succeeded.
 
     If `group_name` is provided, attaches the ticket to the matching Zendesk group.
 
-    If `require_update` is provided, this allows using the private comment to add
-    necessary information which the user will not see in followup emails from support.
+    If `require_update` is provided, returns False when the update does not
+    succeed. This allows using the private comment to add necessary information
+    which the user will not see in followup emails from support.
 
     If `custom_fields` is provided, submits data to those fields in Zendesk.
-
-    Returns: a boolean value indicating if either email was sent successfully or ticket
-    was created (regardless of whether the private comment update succeeded or not).
-
     """
+    zendesk_api = _ZendeskApi()
 
     additional_info_string = (
         u"Additional information:\n\n" +
         u"\n".join(u"%s: %s" % (key, value) for (key, value) in additional_info.items() if value is not None)
     )
-
-    if settings.FEATURES.get("ENABLE_EMAIL_INSTEAD_ZENDESK", True):
-        is_email_sent = send_notification_email_to_support(
-            subject=subject,
-            body=details,
-            name=realname,
-            email=email,
-            custom_fields=custom_fields,
-            additional_info=additional_info
-        )
-        return is_email_sent
-
-    zendesk_api = _ZendeskApi()
-
-    if not (settings.ZENDESK_URL and settings.ZENDESK_USER and settings.ZENDESK_API_KEY):
-        log.error('Zendesk is not configured. Cannot create a ticket.')
-        return False
 
     # Tag all issues with LMS to distinguish channel in Zendesk; requested by student support team
     zendesk_tags = list(tags.values()) + ["LMS"]

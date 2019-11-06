@@ -1,5 +1,6 @@
-{% extends 'base_email.html' %}
-{% block body %}
+{% load i18n %}
+
+{% block content %}
     <p><b>Requester Name:</b> {{name}}</p>
     <p><b>Requester Email:</b> {{email}}</p>
     <p>{{ body }}</p>
@@ -18,4 +19,8 @@
             <p><b>{{info_dict.0}}</b>: {{info_dict.1}}</p>
         {% endfor %}
     {% endif %}
-{% endblock body %}
+{% endblock %}
+
+{% block google_analytics_pixel %}
+<img src="{{ ga_tracking_pixel_url }}" alt="" role="presentation" aria-hidden="true" style="display: block;"/>
+{% endblock %}
