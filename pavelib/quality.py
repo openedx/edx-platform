@@ -771,7 +771,7 @@ def _extract_missing_pii_annotations(filename):
             2. A bool indicating whether the coverage is still below the threshold, and
             3. The full report as a string.
     """
-    uncovered_models = None
+    uncovered_models = 0
     pii_check_passed = True
     if os.path.isfile(filename):
         with io.open(filename, 'r') as report_file:
