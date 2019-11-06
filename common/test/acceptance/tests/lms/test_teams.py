@@ -534,8 +534,14 @@ class BrowseTopicsTest(TeamsTabBase):
         """
         initial_description = "A" + " really" * 50 + " long description"
         self.set_team_configuration(
-            {u"max_team_size": 1, u"topics": [{"name": "", "id": "", "description": initial_description}]}
+            {
+                u"max_team_size": 1,
+                u"topics": [
+                    {"id": "long-description-topic", "description": initial_description},
+                ]
+            }
         )
+        import pdb;pdb.set_trace()
         self.topics_page.visit()
         truncated_description = self.topics_page.topic_descriptions[0]
         self.assertLess(len(truncated_description), len(initial_description))
