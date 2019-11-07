@@ -124,7 +124,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==2.0.1
 edx-drf-extensions==2.4.0
-edx-enterprise==2.0.9
+edx-enterprise==2.0.13
 edx-i18n-tools==0.4.8
 edx-lint==1.3.0
 edx-milestones==0.2.5
@@ -204,9 +204,9 @@ mongoengine==0.10.0
 more-itertools==5.0.0
 moto==1.3.1
 mpmath==1.1.0
-mysqlclient==1.4.4
+mysqlclient==1.4.5
 networkx==1.7
-newrelic==5.2.1.129
+newrelic==5.2.2.130
 nltk==3.4.5
 nodeenv==1.3.3
 numpy==1.16.5
@@ -290,7 +290,7 @@ shapely==1.6.4.post2
 shortuuid==0.5.0
 simplejson==3.16.0
 singledispatch==3.4.0.3
-six==1.12.0
+six==1.13.0
 slumber==0.7.1
 social-auth-app-django==2.1.0
 social-auth-core==1.7.0
