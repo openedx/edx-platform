@@ -24,7 +24,7 @@ class CourseImageTestCase(ModuleStoreTestCase):
         """
         if not expected_url.startswith("/"):
             expected_url = "/" + expected_url
-        self.assertEquals(expected_url, actual_url)
+        self.assertEqual(expected_url, actual_url)
 
     def test_get_image_url(self):
         """Test image URL formatting."""
@@ -61,7 +61,7 @@ class CourseImageTestCase(ModuleStoreTestCase):
         `DEFAULT_COURSE_ABOUT_IMAGE_URL` defined in the settings.
         """
         course = CourseFactory.create(course_image='', default_store=default_store)
-        self.assertEquals(
+        self.assertEqual(
             'static/test.png',
             course_image_url(course),
         )

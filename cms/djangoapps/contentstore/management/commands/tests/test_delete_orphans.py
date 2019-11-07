@@ -25,7 +25,7 @@ class TestDeleteOrphan(TestOrphanBase):
             errstring = 'Error: too few arguments'
         else:
             errstring = 'Error: the following arguments are required: course_id'
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('delete_orphans')
 
     @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)

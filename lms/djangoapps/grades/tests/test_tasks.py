@@ -162,7 +162,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             side_effect=BlockStructureNotFound(self.course.location),
         ) as mock_block_structure_create:
             self._apply_recalculate_subsection_grade()
-            self.assertEquals(mock_block_structure_create.call_count, 1)
+            self.assertEqual(mock_block_structure_create.call_count, 1)
 
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, 1, 38, True),
@@ -215,7 +215,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
 
         # Make sure the signal is sent for only the 2 accessible sequentials.
         self._apply_recalculate_subsection_grade()
-        self.assertEquals(mock_subsection_signal.call_count, 2)
+        self.assertEqual(mock_subsection_signal.call_count, 2)
         sequentials_signalled = {
             args[1]['subsection_grade'].location
             for args in mock_subsection_signal.call_args_list
@@ -263,7 +263,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         self.set_up_course()
         mock_update.side_effect = [IntegrityError("WHAMMY"), None]
         self._apply_recalculate_subsection_grade()
-        self.assertEquals(mock_course_signal.call_count, 1)
+        self.assertEqual(mock_course_signal.call_count, 1)
 
     @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry')
     @patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.update')
@@ -394,7 +394,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         number of arguments.
         """
         self.assertTrue(mock_retry.called)
-        self.assertEquals(len(mock_retry.call_args[1]['kwargs']), len(self.recalculate_subsection_grade_kwargs))
+        self.assertEqual(len(mock_retry.call_args[1]['kwargs']), len(self.recalculate_subsection_grade_kwargs))
 
     def _assert_retry_not_called(self, mock_retry):
         """

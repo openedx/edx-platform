@@ -33,7 +33,7 @@ class TestArgParsingCourseExportOlx(unittest.TestCase):
             errstring = "Error: too few arguments"
         else:
             errstring = "Error: the following arguments are required: course_id"
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('export_olx')
 
 
@@ -48,7 +48,7 @@ class TestCourseExportOlx(ModuleStoreTestCase):
         Test export command with an invalid course key.
         """
         errstring = "Unparsable course_id"
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('export_olx', 'InvalidCourseID')
 
     def test_course_key_not_found(self):
@@ -56,7 +56,7 @@ class TestCourseExportOlx(ModuleStoreTestCase):
         Test export command with a valid course key that doesn't exist.
         """
         errstring = "Invalid course_id"
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('export_olx', 'x/y/z')
 
     def create_dummy_course(self, store_type):

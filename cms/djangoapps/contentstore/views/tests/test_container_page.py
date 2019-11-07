@@ -120,7 +120,7 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         """
         html = self.get_page_html(xblock)
         self.assertIn(expected_section_tag, html)
-        self.assertRegexpMatches(html, expected_breadcrumbs)
+        self.assertRegex(html, expected_breadcrumbs)
 
     def test_public_container_preview_html(self):
         """

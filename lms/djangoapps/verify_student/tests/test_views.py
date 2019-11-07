@@ -1780,7 +1780,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEqual(attempt.expiry_date.date(), expiry_date.date())
         self.assertIsNone(old_verification.expiry_date)
         self.assertIsNone(old_verification.expiry_email_date)
-        self.assertEquals(response.content.decode('utf-8'), 'OK!')
+        self.assertEqual(response.content.decode('utf-8'), 'OK!')
         self.assertEqual(len(mail.outbox), 1)
 
     @patch(
@@ -1814,7 +1814,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
         self.assertEqual(attempt.status, u'approved')
         self.assertEqual(attempt.expiry_date.date(), expiry_date.date())
-        self.assertEquals(response.content.decode('utf-8'), 'OK!')
+        self.assertEqual(response.content.decode('utf-8'), 'OK!')
         self.assertEqual(len(mail.outbox), 1)
 
     @patch(
@@ -1845,7 +1845,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEqual(attempt.status, u'denied')
         self.assertEqual(attempt.error_code, u'Your photo doesn\'t meet standards.')
         self.assertEqual(attempt.error_msg, u'[{"photoIdReasons": ["Not provided"]}]')
-        self.assertEquals(response.content.decode('utf-8'), 'OK!')
+        self.assertEqual(response.content.decode('utf-8'), 'OK!')
         self.assertEqual(len(mail.outbox), 1)
 
     @patch(
@@ -1872,7 +1872,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEqual(attempt.status, u'must_retry')
         self.assertEqual(attempt.error_code, u'You must retry the verification.')
         self.assertEqual(attempt.error_msg, u'"Memory overflow"')
-        self.assertEquals(response.content.decode('utf-8'), 'OK!')
+        self.assertEqual(response.content.decode('utf-8'), 'OK!')
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',

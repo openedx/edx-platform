@@ -36,7 +36,7 @@ class TestArgParsing(TestCase):
     def test_invalid_course(self):
         errstring = "Invalid key specified: <class 'opaque_keys.edx.locator.CourseLocator'>: invalid-course"
         setup_video_thumbnails_config(course_ids='invalid-course')
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('video_thumbnails')
 
 

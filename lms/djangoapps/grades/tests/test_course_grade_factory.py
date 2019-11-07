@@ -146,7 +146,7 @@ class TestCourseGradeFactory(GradeTestBase):
             mocked_course_blocks.return_value = self.course_structure
             with mock_get_score(1, 2):
                 grade_factory.update(self.request.user, self.course, force_update_subsections=True)
-                self.assertEquals(mocked_course_blocks.call_count, 1)
+                self.assertEqual(mocked_course_blocks.call_count, 1)
 
         with patch('lms.djangoapps.grades.course_data.get_course_blocks') as mocked_course_blocks:
             with patch('lms.djangoapps.grades.subsection_grade.get_score') as mocked_get_score:
@@ -290,7 +290,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
             wraps=BlockStructureFactory.create_from_store
         ) as mock_create_from_store:
             all_course_grades, all_errors = self._course_grades_and_errors_for(self.course, self.students)
-            self.assertEquals(mock_create_from_store.call_count, 1)
+            self.assertEqual(mock_create_from_store.call_count, 1)
 
         self.assertEqual(len(all_errors), 0)
         for course_grade in all_course_grades.values():

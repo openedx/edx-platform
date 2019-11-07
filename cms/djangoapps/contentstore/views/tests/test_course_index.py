@@ -178,7 +178,7 @@ class TestCourseIndex(CourseTestCase):
         resp = self.client.get(notification_url, HTTP_ACCEPT='application/json')
 
         # verify that we get an empty dict out
-        self.assertEquals(resp.status_code, 400)
+        self.assertEqual(resp.status_code, 400)
 
         # create a test notification
         rerun_state = CourseRerunState.objects.update_state(
@@ -200,9 +200,9 @@ class TestCourseIndex(CourseTestCase):
 
         json_response = json.loads(resp.content.decode('utf-8'))
 
-        self.assertEquals(json_response['state'], state)
-        self.assertEquals(json_response['action'], action)
-        self.assertEquals(json_response['should_display'], should_display)
+        self.assertEqual(json_response['state'], state)
+        self.assertEqual(json_response['action'], action)
+        self.assertEqual(json_response['should_display'], should_display)
 
     def test_notifications_handler_dismiss(self):
         state = CourseRerunUIStateManager.State.FAILED
@@ -230,7 +230,7 @@ class TestCourseIndex(CourseTestCase):
             'action_state_id': rerun_state.id,
         })
         resp = self.client.delete(notification_dismiss_url)
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
 
         with self.assertRaises(CourseRerunState.DoesNotExist):
             # delete nofications that are dismissed
@@ -388,7 +388,7 @@ class TestCourseIndexArchived(CourseTestCase):
         if org is not None:
             index_params['org'] = org
         index_response = self.client.get(index_url, index_params, HTTP_ACCEPT='text/html')
-        self.assertEquals(index_response.status_code, 200)
+        self.assertEqual(index_response.status_code, 200)
 
         parsed_html = lxml.html.fromstring(index_response.content)
         course_tab = parsed_html.find_class('courses')

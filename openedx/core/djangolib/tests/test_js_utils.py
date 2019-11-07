@@ -46,7 +46,7 @@ class TestJSUtils(TestCase):
         )
 
         escaped_json = dump_js_escaped_json(malicious_dict)
-        self.assertEquals(expected_escaped_json, escaped_json)
+        self.assertEqual(expected_escaped_json, escaped_json)
 
     def test_dump_js_escaped_json_with_custom_encoder_escapes_unsafe_html(self):
         """
@@ -66,7 +66,7 @@ class TestJSUtils(TestCase):
         )
 
         escaped_json = dump_js_escaped_json(malicious_dict, cls=self.SampleJSONEncoder)
-        self.assertEquals(expected_custom_escaped_json, escaped_json)
+        self.assertEqual(expected_custom_escaped_json, escaped_json)
 
     def test_js_escaped_string_escapes_unsafe_html(self):
         """
@@ -78,14 +78,14 @@ class TestJSUtils(TestCase):
             r"\u003C/script\u003E\u003Cscript\u003Ealert(\u0027hello, \u0027)\u003B\u003C/script\u003E"
         )
         escaped_string_for_js = js_escaped_string(malicious_js_string)
-        self.assertEquals(expected_escaped_string_for_js, escaped_string_for_js)
+        self.assertEqual(expected_escaped_string_for_js, escaped_string_for_js)
 
     def test_js_escaped_string_with_none(self):
         """
         Test js_escaped_string returns empty string for None
         """
         escaped_string_for_js = js_escaped_string(None)
-        self.assertEquals(u"", escaped_string_for_js)
+        self.assertEqual(u"", escaped_string_for_js)
 
     def test_mako(self):
         """

@@ -347,7 +347,7 @@ class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, Milestone
 
         response = self.api_response()
         certificate_data = response.data[0]['certificate']
-        self.assertEquals(certificate_data['url'], certificate_url)
+        self.assertEqual(certificate_data['url'], certificate_url)
 
     @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
     def test_no_certificate(self):
@@ -387,7 +387,7 @@ class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, Milestone
 
         response = self.api_response()
         certificate_data = response.data[0]['certificate']
-        self.assertRegexpMatches(
+        self.assertRegex(
             certificate_data['url'],
             r'http.*/certificates/user/{user_id}/course/{course_id}'.format(
                 user_id=self.user.id,

@@ -429,7 +429,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
             response = self.client.get(self.url)
 
-            self.assertEquals(expected_result,
+            self.assertEqual(expected_result,
                               'CCX Coaches are able to create their own Custom Courses based on this course'
                               in response.content.decode('utf-8'))
 

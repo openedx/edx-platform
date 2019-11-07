@@ -84,7 +84,7 @@ class TestThemingViews(TestCase):
 
         # Next request a page and verify that the correct theme has been chosen
         response = self.client.get(THEMING_ADMIN_URL)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertContains(
             response,
             u'<option value="{theme_name}" selected=selected>'.format(theme_name=TEST_THEME_NAME)
@@ -101,7 +101,7 @@ class TestThemingViews(TestCase):
 
         # Finally verify that the test theme is no longer selected
         response = self.client.get(THEMING_ADMIN_URL)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertContains(
             response,
             u'<option value="{theme_name}">'.format(theme_name=TEST_THEME_NAME)
