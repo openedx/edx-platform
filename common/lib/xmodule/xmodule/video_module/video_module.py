@@ -745,7 +745,7 @@ class VideoBlock(
                     xml.set('sub', '')
 
                 # Update `transcripts` attribute in the xml
-                xml.set('transcripts', json.dumps(transcripts))
+                xml.set('transcripts', json.dumps(transcripts, sort_keys=True))
 
             except edxval_api.ValVideoNotFoundError:
                 pass
