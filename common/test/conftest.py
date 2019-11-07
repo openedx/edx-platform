@@ -3,14 +3,13 @@
 # Patch the xml libs before anything else.
 from __future__ import absolute_import
 
-import openedx.core.tests.pytest_hooks as pytest_hooks # pylint: disable=unused-import
-
+import openedx.core.tests.pytest_hooks as pytest_hooks
 from safe_lxml import defuse_xml_libs
 
 defuse_xml_libs()
 
 
-class DeferPlugin:
+class DeferPlugin(object):
     """Simple plugin to defer pytest-xdist hook functions."""
 
     def pytest_json_modifyreport(self, json_report):
