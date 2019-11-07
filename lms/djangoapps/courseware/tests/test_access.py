@@ -849,7 +849,7 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
                 num_queries = 1
         elif user_attr_name == 'user_normal' and action == 'see_exists':
             if course_attr_name == 'course_started':
-                num_queries = 7
+                num_queries = 6
             else:
                 # checks staff role and enrollment data
                 num_queries = 2
