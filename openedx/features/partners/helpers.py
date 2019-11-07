@@ -6,7 +6,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 
 from custom_settings.models import CustomSettings
 
-from openedx.features.course_card.helpers import get_related_card_id
+from openedx.features.course_card.helpers import get_course_open_date, get_related_card_id
 from openedx.features.course_card.models import CourseCard
 
 
@@ -41,6 +41,7 @@ def get_partner_recommended_courses(partner_slug):
         ).order_by('start').first()
 
         if course_rerun_object:
+            course_rerun_object.start = get_course_open_date(course_rerun_object)
             recommended_courses.append(course_rerun_object)
 
     return recommended_courses
