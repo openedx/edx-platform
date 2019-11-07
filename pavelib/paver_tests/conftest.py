@@ -11,6 +11,7 @@ import pytest
 
 from pavelib.utils.envs import Env
 from openedx.core.tests.pytest_hooks import pytest_json_modifyreport  # pylint: disable=unused-import
+from openedx.core.tests.pytest_hooks import pytest_sessionfinish  # pylint: disable=unused-import
 
 
 @pytest.fixture(autouse=True, scope='session')

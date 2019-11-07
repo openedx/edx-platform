@@ -18,6 +18,10 @@ class DeferPlugin(object):
         return pytest_hooks.pytest_json_modifyreport(json_report)
 
 
+    def pytest_sessionfinish(self, session):
+        return pytest_sessionfinish(session)
+
+
 def pytest_configure(config):
     if config.pluginmanager.hasplugin("json-report"):
         config.pluginmanager.register(DeferPlugin())
