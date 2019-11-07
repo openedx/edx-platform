@@ -167,7 +167,7 @@ class DraftModuleStore(MongoModuleStore):
 
         # delete all of the db records for the course
         course_query = self._course_key_to_son(course_key)
-        self.collection.remove(course_query, multi=True)
+        self.collection.delete_many(course_query)
         self.delete_all_asset_metadata(course_key, user_id)
 
         self._emit_course_deleted_signal(course_key)
@@ -640,7 +640,7 @@ class DraftModuleStore(MongoModuleStore):
         if len(to_be_deleted) > 0:
             bulk_record = self._get_bulk_ops_record(root_usages[0].course_key)
             bulk_record.dirty = True
-            self.collection.remove({'_id': {'$in': to_be_deleted}}, safe=self.collection.safe)
+            self.collection.delete_many({'_id': {'$in': to_be_deleted}})
 
     def has_changes(self, xblock):
         """
@@ -755,7 +755,7 @@ class DraftModuleStore(MongoModuleStore):
         bulk_record = self._get_bulk_ops_record(course_key)
         if len(to_be_deleted) > 0:
             bulk_record.dirty = True
-            self.collection.remove({'_id': {'$in': to_be_deleted}})
+            self.collection.delete_many({'_id': {'$in': to_be_deleted}})
 
         self._flag_publish_event(course_key)
 

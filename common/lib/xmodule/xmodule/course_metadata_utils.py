@@ -197,7 +197,7 @@ def sorting_dates(start, advertised_start, announcement):
         start = dateutil.parser.parse(advertised_start)
         if start.tzinfo is None:
             start = start.replace(tzinfo=utc)
-    except (ValueError, AttributeError):
+    except (TypeError, ValueError, AttributeError):
         start = start
 
     now = datetime.now(utc)
