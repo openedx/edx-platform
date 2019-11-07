@@ -103,15 +103,15 @@ class TeamsTabBase(EventsTestMixin, ForumsConfigMixin, UniqueCourseTest):
         )
         return json.loads(response.text)
 
-    def set_team_configuration(self, configuration, enroll_in_course=True, global_staff=False):
+    def set_team_configuration(self, configuration_data, enroll_in_course=True, global_staff=False):
         """
         Sets team configuration on the course and calls auto-auth on the user.
         """
         #pylint: disable=attribute-defined-outside-init
         self.course_fixture = CourseFixture(**self.course_info)
-        if configuration:
+        if configuration_data:
             self.course_fixture.add_advanced_settings(
-                {u"teams_configuration": {u"value": configuration}}
+                {u"teams_configuration": {u"value": configuration_data}}
             )
         self.course_fixture.install()
 
@@ -534,7 +534,12 @@ class BrowseTopicsTest(TeamsTabBase):
         """
         initial_description = "A" + " really" * 50 + " long description"
         self.set_team_configuration(
-            {u"max_team_size": 1, u"topics": [{"name": "", "id": "", "description": initial_description}]}
+            {
+                u"max_team_size": 1,
+                u"topics": [
+                    {"id": "long-description-topic", "description": initial_description},
+                ]
+            }
         )
         self.topics_page.visit()
         truncated_description = self.topics_page.topic_descriptions[0]

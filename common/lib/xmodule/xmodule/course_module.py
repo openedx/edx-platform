@@ -271,6 +271,33 @@ def get_available_providers():
     return available_providers
 
 
+class TeamsConfigField(Dict):
+    """
+    XBlock field for teams configuration, including definitions for teamsets.
+
+    Serializes to JSON dictionary.
+    """
+    _default = TeamsConfig({})
+
+    def from_json(self, value):
+        """
+        Return a TeamsConfig instance from a dict.
+        """
+        return TeamsConfig(value)
+
+    def to_json(self, value):
+        """
+        Convert a TeamsConfig instance back to a dict.
+
+        If we have the data that was used to build the TeamsConfig instance,
+        return that instead of `value.cleaned_data`, thus preserving the
+        data in the form that the user entered it.
+        """
+        if value.source_data is not None:
+            return value.source_data
+        return value.cleaned_data
+
+
 class CourseFields(object):
     lti_passports = List(
         display_name=_("LTI Passports"),
@@ -797,7 +824,7 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
-    teams_configuration = Dict(
+    teams_configuration = TeamsConfigField(
         display_name=_("Teams Configuration"),
         # Translators: please don't translate "id".
         help=_(
@@ -808,6 +835,8 @@ class CourseFields(object):
             'For example, to specify that teams should have a maximum of 5 participants and provide a list of '
             '2 topics, enter the configuration in this format: {example_format}. '
             'In "id" values, the only supported special characters are underscore, hyphen, and period.'
+            # Note that we also support space (" "), which may have been an accident, but it's in
+            # our DB now. Let's not advertise the fact, though.
         ),
         help_format_args=dict(
             # Put the sample JSON into a format variable so that translators
@@ -1472,64 +1501,31 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         return course_metadata_utils.clean_course_key(self.location.course_key, padding_char)
 
     @property
-    def teams_conf(self):
-        """
-        Returns a TeamsConfig object wrapping the dict `teams_configuration`.
-
-        TODO: In MST-18, `teams_configuration` will be a custom field that
-        parses its input into a TeamsConfig object.
-        All references to this property will become references to
-        `.teams_configuration`.
-        """
-        # If the `teams_configuration` dict hasn't changed, return a cached
-        # `TeamsConfig` to avoid re-parsing things.
-        # If it has changed, recompute the `TeamsConfig`.
-        try:
-            cached_teams_conf, cached_teams_conf_source = (
-                self._teams_conf, self._teams_conf_source
-            )
-        except AttributeError:
-            pass
-        else:
-            if cached_teams_conf_source == self.teams_configuration:
-                return cached_teams_conf
-        self._teams_conf_source = self.teams_configuration
-        self._teams_conf = TeamsConfig(self._teams_conf_source)
-        return self._teams_conf
-
-    @property
     def teams_enabled(self):
         """
-        Returns whether or not teams has been enabled for this course.
+        Alias to `self.teams_configuration.is_enabled`, for convenience.
 
-        Currently, teams are considered enabled when at least one topic has been configured for the course.
-
-        Deprecated; please use `self.teams_conf.is_enabled` instead.
-        Will be removed (TODO MST-18).
+        Returns bool.
         """
-        if self.teams_configuration:
-            return len(self.teams_configuration.get('topics', [])) > 0
-        return False
+        return self.teams_configuration.is_enabled  # pylint: disable=no-member
 
     @property
-    def teams_max_size(self):
+    def teamsets(self):
         """
-        Returns the max size for teams if teams has been configured, else None.
+        Alias to `self.teams_configuration.teamsets`, for convenience.
 
-        Deprecated; please use `self.teams_conf.calc_max_team_size(...)` instead.
-        Will be removed (TODO MST-18).
+        Returns list[TeamsetConfig].
         """
-        return self.teams_configuration.get('max_team_size', None)
+        return self.teams_configuration.teamsets  # pylint: disable=no-member
 
     @property
-    def teams_topics(self):
+    def teamsets_by_id(self):
         """
-        Returns the topics that have been configured for teams for this course, else None.
+        Alias to `self.teams_configuration.teamsets_by_id`, for convenience.
 
-        Deprecated; please use `self.teams_conf.teamsets` instead.
-        Will be removed (TODO MST-18).
+        Returns dict[str: TeamsetConfig].
         """
-        return self.teams_configuration.get('topics', None)
+        return self.teams_configuration.teamsets_by_id
 
     def set_user_partitions_for_scheme(self, partitions, scheme):
         """

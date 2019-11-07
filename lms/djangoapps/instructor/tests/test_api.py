@@ -67,6 +67,7 @@ from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMM
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.lib.teams_config import TeamsConfig
 from openedx.core.lib.xblock_utils import grade_histogram
 from shoppingcart.models import (
     Coupon,
@@ -3033,9 +3034,9 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         has teams enabled, and does not when the course does not have teams enabled
         """
         if has_teams:
-            self.course = CourseFactory.create(teams_configuration={
-                'max_size': 2, 'topics': [{'topic-id': 'topic', 'name': 'Topic', 'description': 'A Topic'}]
-            })
+            self.course = CourseFactory.create(teams_configuration=TeamsConfig({
+                'max_size': 2, 'topics': [{'id': 'topic', 'name': 'Topic', 'description': 'A Topic'}]
+            }))
             course_instructor = InstructorFactory(course_key=self.course.id)
             self.client.login(username=course_instructor.username, password='test')
 
