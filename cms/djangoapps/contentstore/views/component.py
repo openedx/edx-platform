@@ -1,8 +1,11 @@
+"""
+Studio component views
+"""
 from __future__ import absolute_import
 
 import logging
-import six
 
+import six
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -11,17 +14,18 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
+from six.moves.urllib.parse import quote_plus  # pylint: disable=import-error
 from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xblock.exceptions import NoSuchHandlerError
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
-from contentstore.utils import get_lms_link_for_item, reverse_course_url
+from contentstore.utils import get_lms_link_for_item, get_sibling_urls, reverse_course_url
 from contentstore.views.helpers import get_parent_xblock, is_unit, xblock_type_display_name
 from contentstore.views.item import StudioEditModuleRuntime, add_container_page_publishing_info, create_xblock_info
 from edxmako.shortcuts import render_to_response
-from openedx.core.lib.xblock_utils import is_xblock_aside, get_aside_from_xblock
+from openedx.core.lib.xblock_utils import get_aside_from_xblock, is_xblock_aside
 from student.auth import has_course_author_access
 from xblock_django.api import authorable_xblocks, disabled_xblocks
 from xblock_django.models import XBlockStudioConfigurationFlag
@@ -123,11 +127,16 @@ def container_handler(request, usage_key_string):
             is_unit_page = is_unit(xblock)
             unit = xblock if is_unit_page else None
 
-            while parent and parent.category != 'course':
+            is_first = True
+            while parent:
                 if unit is None and is_unit(parent):
                     unit = parent
-                ancestor_xblocks.append(parent)
+                elif parent.category != 'sequential':
+                    current_block = {'block': parent, 'children': parent.get_children(), 'is_last': is_first}
+                    is_first = False
+                    ancestor_xblocks.append(current_block)
                 parent = get_parent_xblock(parent)
+
             ancestor_xblocks.reverse()
 
             assert unit is not None, "Could not determine unit page"
@@ -136,6 +145,13 @@ def container_handler(request, usage_key_string):
                 unit.location)
             section = get_parent_xblock(subsection)
             assert section is not None, "Could not determine ancestor section from unit " + six.text_type(unit.location)
+
+            # for the sequence navigator
+            prev_url, next_url = get_sibling_urls(subsection)
+            # these are quoted here because they'll end up in a query string on the page,
+            # and quoting with mako will trigger the xss linter...
+            prev_url = quote_plus(prev_url) if prev_url else None
+            next_url = quote_plus(next_url) if next_url else None
 
             # Fetch the XBlock info for use by the container page. Note that it includes information
             # about the block's ancestors and siblings for use by the Unit Outline.
@@ -162,6 +178,9 @@ def container_handler(request, usage_key_string):
                 'is_unit_page': is_unit_page,
                 'subsection': subsection,
                 'section': section,
+                'position': index,
+                'prev_url': prev_url,
+                'next_url': next_url,
                 'new_unit_category': 'vertical',
                 'outline_url': '{url}?format=concise'.format(url=reverse_course_url('course_handler', course.id)),
                 'ancestor_xblocks': ancestor_xblocks,
@@ -392,7 +411,7 @@ def get_component_templates(courselike, library=False):
             u"Improper format for course advanced keys! %s",
             course_advanced_keys
         )
-    if len(advanced_component_templates['templates']) > 0:
+    if advanced_component_templates['templates']:
         component_templates.insert(0, advanced_component_templates)
 
     return component_templates

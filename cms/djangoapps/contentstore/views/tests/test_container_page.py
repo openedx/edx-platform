@@ -63,13 +63,10 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
                 u'data-locator="{0}" data-course-key="{0.course_key}">'.format(self.child_container.location)
             ),
             expected_breadcrumbs=(
-                u'<a href="/course/{course}{section_parameters}" class="{classes}">\\s*Week 1\\s*</a>\\s*'
-                u'<a href="/course/{course}{subsection_parameters}" class="{classes}">\\s*Lesson 1\\s*</a>\\s*'
-                u'<a href="/container/{unit}" class="{classes}">\\s*Unit\\s*</a>'
+                u'<li class="nav-item">\\s*<a href="/course/{course}{section_parameters}">Week 1<\\/a>.*'
+                u'<a href="/course/{course}{subsection_parameters}">Lesson 1</a>'
             ).format(
                 course=re.escape(six.text_type(self.course.id)),
-                unit=re.escape(six.text_type(self.vertical.location)),
-                classes='navigation-item navigation-link navigation-parent',
                 section_parameters=re.escape(u'?show={}'.format(http.urlquote(self.chapter.location))),
                 subsection_parameters=re.escape(u'?show={}'.format(http.urlquote(self.sequential.location))),
             ),
@@ -91,15 +88,10 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
                     u'data-locator="{0}" data-course-key="{0.course_key}">'.format(draft_container.location)
                 ),
                 expected_breadcrumbs=(
-                    u'<a href="/course/{course}{section_parameters}" class="{classes}">\\s*Week 1\\s*</a>\\s*'
-                    u'<a href="/course/{course}{subsection_parameters}" class="{classes}">\\s*Lesson 1\\s*</a>\\s*'
-                    u'<a href="/container/{unit}" class="{classes}">\\s*Unit\\s*</a>\\s*'
-                    u'<a href="/container/{split_test}" class="{classes}">\\s*Split Test\\s*</a>'
+                    u'<a href="/course/{course}{section_parameters}">Week 1</a>.*'
+                    u'<a href="/course/{course}{subsection_parameters}">Lesson 1</a>.*'
                 ).format(
                     course=re.escape(six.text_type(self.course.id)),
-                    unit=re.escape(six.text_type(self.vertical.location)),
-                    split_test=re.escape(six.text_type(self.child_container.location)),
-                    classes=u'navigation-item navigation-link navigation-parent',
                     section_parameters=re.escape(u'?show={}'.format(http.urlquote(self.chapter.location))),
                     subsection_parameters=re.escape(u'?show={}'.format(http.urlquote(self.sequential.location))),
                 ),
@@ -120,7 +112,7 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         """
         html = self.get_page_html(xblock)
         self.assertIn(expected_section_tag, html)
-        self.assertRegexpMatches(html, expected_breadcrumbs)
+        self.assertRegexpMatches(html, re.compile(expected_breadcrumbs, re.DOTALL))
 
     def test_public_container_preview_html(self):
         """
