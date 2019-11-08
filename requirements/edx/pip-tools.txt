@@ -6,4 +6,4 @@
 #
 click==7.0                # via pip-tools
 pip-tools==4.2.0
-six==1.12.0
+six==1.13.0
