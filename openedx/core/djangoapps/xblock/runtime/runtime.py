@@ -25,7 +25,8 @@ from lms.djangoapps.grades.api import signals as grades_signals
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 from openedx.core.djangoapps.xblock.runtime.blockstore_field_data import BlockstoreFieldData
 from openedx.core.djangoapps.xblock.runtime.mixin import LmsBlockMixin
-from openedx.core.lib.xblock_utils import xblock_local_resource_url
+from openedx.core.lib.xblock_utils import wrap_fragment, xblock_local_resource_url
+from static_replace import process_static_urls
 from xmodule.errortracker import make_error_tracker
 from .id_managers import OpaqueKeyReader
 from .shims import RuntimeShim, XBlockShim
@@ -289,7 +290,59 @@ class XBlockRuntime(RuntimeShim, Runtime):
                     log.debug("-> Relative resource URL: %s", resource['data'])
                     resource['data'] = get_xblock_app_config().get_site_root_url() + resource['data']
             fragment = Fragment.from_dict(frag_data)
+
+        # Apply any required transforms to the fragment.
+        # We could move to doing this in wrap_xblock() and/or use an array of
+        # wrapper methods like the ConfigurableFragmentWrapper mixin does.
+        fragment = wrap_fragment(fragment, self.transform_static_paths_to_urls(block, fragment.content))
+
         return fragment
+
+    def transform_static_paths_to_urls(self, block, html_str):
+        """
+        Given an HTML string, replace any static file paths like
+            /static/foo.png
+        (which are really pointing to block-specific assets stored in blockstore)
+        with working absolute URLs like
+            https://s3.example.com/blockstore/bundle17/this-block/assets/324.png
+        See common/djangoapps/static_replace/__init__.py
+
+        This is generally done automatically for the HTML rendered by XBlocks,
+        but if an XBlock wants to have correct URLs in data returned by its
+        handlers, the XBlock must call this API directly.
+
+        Note that the paths are only replaced if they are in "quotes" such as if
+        they are an HTML attribute or JSON data value. Thus, to transform only a
+        single path string on its own, you must pass html_str=f'"{path}"'
+        """
+
+        def replace_static_url(original, prefix, quote, rest):  # pylint: disable=unused-argument
+            """
+            Replace a single matched url.
+            """
+            original_url = prefix + rest
+            # Don't mess with things that end in '?raw'
+            if rest.endswith('?raw'):
+                new_url = original_url
+            else:
+                new_url = self._lookup_asset_url(block, rest) or original_url
+            return "".join([quote, new_url, quote])
+
+        return process_static_urls(html_str, replace_static_url)
+
+    def _lookup_asset_url(self, block, asset_path):  # pylint: disable=unused-argument
+        """
+        Return an absolute URL for the specified static asset file that may
+        belong to this XBlock.
+
+        e.g. if the XBlock settings have a field value like "/static/foo.png"
+        then this method will be called with asset_path="foo.png" and should
+        return a URL like https://cdn.none/xblock/f843u89789/static/foo.png
+
+        If the asset file is not recognized, return None
+        """
+        # Subclasses should override this
+        return None
 
 
 class XBlockRuntimeSystem(object):

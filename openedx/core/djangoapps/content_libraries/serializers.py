@@ -7,6 +7,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from django.core.validators import validate_unicode_slug
 from rest_framework import serializers
 
+from openedx.core.lib import blockstore_api
+
 
 class ContentLibraryMetadataSerializer(serializers.Serializer):
     """
@@ -74,3 +76,35 @@ class LibraryXBlockOlxSerializer(serializers.Serializer):
     Serializer for representing an XBlock's OLX
     """
     olx = serializers.CharField()
+
+
+class LibraryXBlockStaticFileSerializer(serializers.Serializer):
+    """
+    Serializer representing a static file associated with an XBlock
+
+    Serializes a LibraryXBlockStaticFile (or a BundleFile)
+    """
+    path = serializers.CharField()
+    # Publicly accessible URL where the file can be downloaded.
+    # Must be an absolute URL.
+    url = serializers.URLField()
+    size = serializers.IntegerField(min_value=0)
+
+    def to_representation(self, instance):
+        """
+        Generate the serialized representation of this static asset file.
+        """
+        result = super(LibraryXBlockStaticFileSerializer, self).to_representation(instance)
+        # Make sure the URL is one that will work from the user's browser,
+        # not one that only works from within a docker container:
+        result['url'] = blockstore_api.force_browser_url(result['url'])
+        return result
+
+
+class LibraryXBlockStaticFilesSerializer(serializers.Serializer):
+    """
+    Serializer representing a static file associated with an XBlock
+
+    Serializes a LibraryXBlockStaticFile (or a BundleFile)
+    """
+    files = LibraryXBlockStaticFileSerializer(many=True)

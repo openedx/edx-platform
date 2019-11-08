@@ -4,6 +4,7 @@ XBlock field data directly from Blockstore.
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 import logging
+import os.path
 
 from lxml import etree
 from opaque_keys.edx.locator import BundleDefinitionLocator
@@ -14,7 +15,11 @@ from openedx.core.djangoapps.xblock.learning_context.manager import get_learning
 from openedx.core.djangoapps.xblock.runtime.runtime import XBlockRuntime
 from openedx.core.djangoapps.xblock.runtime.olx_parsing import parse_xblock_include
 from openedx.core.djangoapps.xblock.runtime.serializer import serialize_xblock
-from openedx.core.djangolib.blockstore_cache import BundleCache, get_bundle_file_data_with_cache
+from openedx.core.djangolib.blockstore_cache import (
+    BundleCache,
+    get_bundle_file_data_with_cache,
+    get_bundle_file_metadata_with_cache,
+)
 from openedx.core.lib import blockstore_api
 
 log = logging.getLogger(__name__)
@@ -148,12 +153,44 @@ class BlockstoreXBlockRuntime(XBlockRuntime):
         olx_path = definition_key.olx_path
         blockstore_api.write_draft_file(draft_uuid, olx_path, olx_str)
         # And the other files, if any:
+        olx_static_path = os.path.dirname(olx_path) + '/static/'
         for fh in static_files:
-            raise NotImplementedError(
-                "Need to write static file {} to blockstore but that's not yet implemented yet".format(fh.name)
-            )
+            new_path = olx_static_path + fh.name
+            blockstore_api.write_draft_file(draft_uuid, new_path, fh.data)
         # Now invalidate the blockstore data cache for the bundle:
         BundleCache(definition_key.bundle_uuid, draft_name=definition_key.draft_name).clear()
+
+    def _lookup_asset_url(self, block, asset_path):
+        """
+        Return an absolute URL for the specified static asset file that may
+        belong to this XBlock.
+
+        e.g. if the XBlock settings have a field value like "/static/foo.png"
+        then this method will be called with asset_path="foo.png" and should
+        return a URL like https://cdn.none/xblock/f843u89789/static/foo.png
+
+        If the asset file is not recognized, return None
+        """
+        if '..' in asset_path:
+            return None  # Illegal path
+        definition_key = block.scope_ids.def_id
+        # Compute the full path to the static file in the bundle,
+        # e.g. "problem/prob1/static/illustration.svg"
+        expanded_path = os.path.dirname(definition_key.olx_path) + '/static/' + asset_path
+        try:
+            metadata = get_bundle_file_metadata_with_cache(
+                bundle_uuid=definition_key.bundle_uuid,
+                path=expanded_path,
+                bundle_version=definition_key.bundle_version,
+                draft_name=definition_key.draft_name,
+            )
+        except blockstore_api.BundleFileNotFound:
+            log.warning("XBlock static file not found: %s for %s", asset_path, block.scope_ids.usage_id)
+            return None
+        # Make sure the URL is one that will work from the user's browser,
+        # not one that only works from within a docker container:
+        url = blockstore_api.force_browser_url(metadata.url)
+        return url
 
 
 def xml_for_definition(definition_key):

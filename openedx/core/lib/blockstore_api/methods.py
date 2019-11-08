@@ -390,3 +390,20 @@ def encode_str_for_draft(input_str):
     else:
         binary = input_str
     return base64.b64encode(binary)
+
+
+def force_browser_url(blockstore_file_url):
+    """
+    Ensure that the given URL Blockstore is a URL accessible from the end user's
+    browser.
+    """
+    # Hack: on some devstacks, we must necessarily use different URLs for
+    # accessing Blockstore file data from within and outside of docker
+    # containers, but Blockstore has no way of knowing which case any particular
+    # request is for. So it always returns a URL suitable for use from within
+    # the container. Only this edxapp can transform the URL at the last second,
+    # knowing that in this case it's going to the user's browser and not being
+    # read by edxapp.
+    # In production, the same S3 URLs get used for internal and external access
+    # so this hack is not necessary.
+    return blockstore_file_url.replace('http://edx.devstack.blockstore:', 'http://localhost:')

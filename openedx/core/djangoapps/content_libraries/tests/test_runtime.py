@@ -7,7 +7,6 @@ import json
 import unittest
 
 from completion.test_utils import CompletionWaffleTestMixin
-from django.conf import settings
 from django.test import TestCase
 from organizations.models import Organization
 from rest_framework.test import APIClient
@@ -16,7 +15,8 @@ from xblock import fields
 
 from lms.djangoapps.courseware.model_data import get_score
 from openedx.core.djangoapps.content_libraries import api as library_api
-from openedx.core.djangoapps.content_libraries.tests.test_content_libraries import (
+from openedx.core.djangoapps.content_libraries.tests.base import (
+    requires_blockstore,
     URL_BLOCK_RENDER_VIEW,
     URL_BLOCK_GET_HANDLER_URL,
 )
@@ -68,7 +68,7 @@ class ContentLibraryContentTestMixin(object):
         )
 
 
-@unittest.skipUnless(settings.RUN_BLOCKSTORE_TESTS, "Requires a running Blockstore server")
+@requires_blockstore
 class ContentLibraryRuntimeTest(ContentLibraryContentTestMixin, TestCase):
     """
     Basic tests of the Blockstore-based XBlock runtime using XBlocks in a
@@ -92,7 +92,7 @@ class ContentLibraryRuntimeTest(ContentLibraryContentTestMixin, TestCase):
         self.assertEqual(problem_block.has_score, True)
 
 
-@unittest.skipUnless(settings.RUN_BLOCKSTORE_TESTS, "Requires a running Blockstore server")
+@requires_blockstore
 # We can remove the line below to enable this in Studio once we implement a session-backed
 # field data store which we can use for both studio users and anonymous users
 @skip_unless_lms
@@ -264,7 +264,7 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
         self.assertEqual(sm.max_grade, 1)
 
 
-@unittest.skipUnless(settings.RUN_BLOCKSTORE_TESTS, "Requires a running Blockstore server")
+@requires_blockstore
 @skip_unless_lms  # No completion tracking in Studio
 class ContentLibraryXBlockCompletionTest(ContentLibraryContentTestMixin, CompletionWaffleTestMixin, TestCase):
     """
