@@ -13,6 +13,7 @@
                 errorMessage: gettext('An error occurred. Try again.'),
                 alreadyMemberMessage: gettext('You already belong to another team.'),
                 teamFullMessage: gettext('This team is full.'),
+                notJoinInstructorManagedTeam: gettext('Cannot join instructor managed team'),
 
                 events: {
                     'click .action-primary': 'joinTeam',
@@ -39,12 +40,17 @@
 
                         // if user is the member of current team then we wouldn't show anything
                         if (!info.memberOfCurrentTeam) {
-                            showJoinButton = !info.alreadyMember && teamHasSpace;
-
                             if (info.alreadyMember) {
+                                showJoinButton = false;
                                 message = info.memberOfCurrentTeam ? '' : view.alreadyMemberMessage;
                             } else if (!teamHasSpace) {
+                                showJoinButton = false;
                                 message = view.teamFullMessage;
+                            } else if (!info.isAdminOrStaff && info.isInstructorManagedTopic) {
+                                showJoinButton = false;
+                                message = view.notJoinInstructorManagedTeam;
+                            } else {
+                                showJoinButton = true;
                             }
                         }
 
@@ -83,10 +89,18 @@
                     var info = {
                         alreadyMember: false,
                         memberOfCurrentTeam: false,
-                        teamHasSpace: false
+                        teamHasSpace: false,
+                        isAdminOrStaff: false,
+                        isInstructorManagedTopic: false
                     };
 
                     info.memberOfCurrentTeam = TeamUtils.isUserMemberOfTeam(this.model.get('membership'), username);
+                    info.isAdminOrStaff = this.context.userInfo.privileged || this.context.userInfo.staff;
+
+                    if (this.topic.attributes.type !== undefined) {
+                        info.isInstructorManagedTopic = this.topic.attributes.type.toLowerCase() != "open";
+                    }
+
                     var teamHasSpace = this.model.get('membership').length < maxTeamSize;
 
                     if (info.memberOfCurrentTeam) {

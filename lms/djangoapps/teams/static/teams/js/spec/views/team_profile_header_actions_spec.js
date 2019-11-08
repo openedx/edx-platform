@@ -25,7 +25,7 @@ define([
             };
         };
 
-        createHeaderActionsView = function(requests, maxTeamSize, currentUsername, teamModelData, showEditButton) {
+        createHeaderActionsView = function(requests, maxTeamSize, currentUsername, teamModelData, showEditButton, isInstructorManagedTopic) {
             var model = new TeamModel(teamModelData, {parse: true}),
                 context = TeamSpecHelpers.createMockContext({
                     maxTeamSize: maxTeamSize,
@@ -40,7 +40,7 @@ define([
                     teamEvents: TeamSpecHelpers.teamEvents,
                     context: context,
                     model: model,
-                    topic: TeamSpecHelpers.createMockTopic(),
+                    topic: isInstructorManagedTopic ? TeamSpecHelpers.createMockInstructorManagedTopic() : TeamSpecHelpers.createMockTopic(),
                     showEditButton: showEditButton
                 }
             ).render();
@@ -168,6 +168,36 @@ define([
 
                 // there should be no request made
                 AjaxHelpers.expectNoRequests(requests);
+            });
+
+            it('shows not join instructor managed team message', function() {
+                var requests = AjaxHelpers.requests(this);
+                var currentUsername = 'ma1';
+                var view = createHeaderActionsView(
+                    requests,
+                    1,
+                    currentUsername,
+                    createTeamModelData('teamA', 'teamAlpha', []),
+                    false,
+                    true);
+
+                // a get request will be sent to get user membership info
+                // because current user is not member of current team
+                AjaxHelpers.expectRequest(
+                    requests,
+                    'GET',
+                    TeamSpecHelpers.testContext.teamMembershipsUrl + '?' + $.param({
+                        username: currentUsername, course_id: TeamSpecHelpers.testCourseID
+                    })
+                );
+
+                // current user is not a member of another team so we should see the correct message
+                AjaxHelpers.respondWithJson(requests, {count: 0});
+
+                // current user is a student and current team belogs to a intructor managed topic
+                // current team so we should see the correct message
+                expect(view.$('.action.action-primary').length).toEqual(0);
+                expect(view.$('.join-team-message').text().trim()).toBe(view.notJoinInstructorManagedTeam);
             });
 
             it('shows correct error message if user fails to join team', function() {

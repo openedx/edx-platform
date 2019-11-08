@@ -83,12 +83,12 @@ class TopicSerializerTestCase(SerializerTestCase):
         """
         with self.assertNumQueries(1):
             serializer = TopicSerializer(
-                self.course.teamsets[0].cleaned_data_old_format,
+                self.course.teamsets[0].cleaned_data,
                 context={'course_id': self.course.id},
             )
             self.assertEqual(
                 serializer.data,
-                {u'name': u'Tøpic', u'description': u'The bést topic!', u'id': u'0', u'team_count': 0}
+                {u'name': u'Tøpic', u'description': u'The bést topic!', u'id': u'0', u'team_count': 0, u'type': u'open'}
             )
 
     def test_topic_with_team_count(self):
@@ -101,17 +101,17 @@ class TopicSerializerTestCase(SerializerTestCase):
         )
         with self.assertNumQueries(1):
             serializer = TopicSerializer(
-                self.course.teamsets[0].cleaned_data_old_format,
+                self.course.teamsets[0].cleaned_data,
                 context={'course_id': self.course.id},
             )
             self.assertEqual(
                 serializer.data,
-                {u'name': u'Tøpic', u'description': u'The bést topic!', u'id': u'0', u'team_count': 1}
+                {u'name': u'Tøpic', u'description': u'The bést topic!', u'id': u'0', u'team_count': 1, u'type': u'open'}
             )
 
     def test_scoped_within_course(self):
         """Verify that team count is scoped within a course."""
-        duplicate_topic = self.course.teamsets[0].cleaned_data_old_format
+        duplicate_topic = self.course.teamsets[0].cleaned_data
         second_course = CourseFactory.create(
             teams_configuration=TeamsConfig({
                 "max_team_size": 10,
@@ -122,12 +122,12 @@ class TopicSerializerTestCase(SerializerTestCase):
         CourseTeamFactory.create(course_id=second_course.id, topic_id=duplicate_topic[u'id'])
         with self.assertNumQueries(1):
             serializer = TopicSerializer(
-                self.course.teamsets[0].cleaned_data_old_format,
+                self.course.teamsets[0].cleaned_data,
                 context={'course_id': self.course.id},
             )
             self.assertEqual(
                 serializer.data,
-                {u'name': u'Tøpic', u'description': u'The bést topic!', u'id': u'0', u'team_count': 1}
+                {u'name': u'Tøpic', u'description': u'The bést topic!', u'id': u'0', u'team_count': 1, u'type': u'open'}
             )
 
 
@@ -153,7 +153,7 @@ class BaseTopicSerializerTestCase(SerializerTestCase):
         created topics.
         """
         topics = [
-            {u'name': u'Tøpic {}'.format(i), u'description': u'The bést topic! {}'.format(i), u'id': six.text_type(i)}
+            {u'name': u'Tøpic {}'.format(i), u'description': u'The bést topic! {}'.format(i), u'id': six.text_type(i), u'type': u'open'}
             for i in six.moves.range(num_topics)
         ]
         for topic in topics:

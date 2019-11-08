@@ -62,6 +62,15 @@ def is_team_discussion_private(team):
     return getattr(team, 'is_discussion_private', False)
 
 
+def is_instructor_managed_team(team):
+    """
+    Return true if the team is managed by instructors.
+    For now always return false, will complete the logic later.
+    TODO MST-25
+    """
+    return False
+
+
 def user_is_a_team_member(user, team):
     """
     Return if the user is a member of the team

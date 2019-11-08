@@ -422,6 +422,7 @@
                             router: self.router,
                             context: self.context,
                             model: team,
+                            topic: topic,
                             setFocusToHeaderFunc: self.setFocusToHeader
                         });
 

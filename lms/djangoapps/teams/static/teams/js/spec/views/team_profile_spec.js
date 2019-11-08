@@ -42,7 +42,7 @@ define([
             };
         };
 
-        createTeamProfileView = function(requests, options) {
+        createTeamProfileView = function(requests, options, isInstructorManagedTopic=false) {
             teamModel = new TeamModel(createTeamModelData(options), {parse: true});
             profileView = new TeamProfileView({
                 el: $('.profile-view'),
@@ -50,6 +50,9 @@ define([
                 courseID: TeamSpecHelpers.testCourseID,
                 context: TeamSpecHelpers.testContext,
                 model: teamModel,
+                topic: isInstructorManagedTopic ?
+                    TeamSpecHelpers.createMockInstructorManagedTopic() :
+                    TeamSpecHelpers.createMockTopic(),
                 setFocusToHeaderFunc: function() {
                     $('.teams-content').focus();
                 }
@@ -184,6 +187,16 @@ define([
                     assertTeamDetails(view, 1, true);
                     clickLeaveTeam(requests, view, {cancel: false});
                     assertTeamDetails(view, 0, false);
+                });
+
+                it('student can not leave instrctor managed team', function() {
+                    var requests = AjaxHelpers.requests(this);
+
+                    var view = createTeamProfileView(
+                        requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}, true
+                    );
+
+                    assertTeamDetails(view, 1, false);
                 });
 
                 it("wouldn't do anything if user click on Cancel button on dialog", function() {

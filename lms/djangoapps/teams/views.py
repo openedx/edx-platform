@@ -34,6 +34,8 @@ from lms.djangoapps.teams.api import (
     user_organization_protection_status,
     has_specific_team_access,
     add_team_count,
+    is_instructor_managed_team,
+    _has_course_staff_privileges,
 )
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.lib.api.parsers import MergePatchParser
@@ -852,7 +854,7 @@ def get_alphabetical_topics(course_module):
         list: a list of sorted team topics
     """
     return sorted(
-        course_module.teams_configuration.cleaned_data_old_format['topics'],
+        course_module.teams_configuration.cleaned_data['team_sets'],
         key=lambda t: t['name'].lower(),
     )
 
@@ -926,7 +928,7 @@ class TopicDetailView(APIView):
 
         organization_protection_status = user_organization_protection_status(request.user, course_id)
         serializer = TopicSerializer(
-            topic.cleaned_data_old_format,
+            topic.cleaned_data,
             context={
                 'course_id': course_id,
                 'organization_protection_status': organization_protection_status
@@ -1167,6 +1169,12 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        if is_instructor_managed_team(team) and not _has_course_staff_privileges(request.user, team.course_id):
+            return Response(
+                build_api_error(ugettext_noop("You can't join an instructor managed team.")),
+                status=status.HTTP_403_FORBIDDEN
+            )
+
         try:
             membership = team.add_user(user)
             emit_team_event(
@@ -1309,6 +1317,12 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
 
         if not has_specific_team_access(request.user, team):
             return Response(status=status.HTTP_403_FORBIDDEN)
+
+        if is_instructor_managed_team(team) and not _has_course_staff_privileges(request.user, team.course_id):
+            return Response(
+                build_api_error(ugettext_noop("You can't leave an instructor managed team.")),
+                status=status.HTTP_403_FORBIDDEN
+            )
 
         membership = self.get_membership(username, team)
         removal_method = 'self_removal'

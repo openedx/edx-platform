@@ -31,6 +31,7 @@
 
                     this.countries = TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.countries);
                     this.languages = TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.languages);
+                    this.topic = options.topic;
 
                     this.listenTo(this.model, 'change', this.render);
                 },
@@ -38,7 +39,15 @@
                 render: function() {
                     var memberships = this.model.get('membership'),
                         discussionTopicID = this.model.get('discussion_topic_id'),
-                        isMember = TeamUtils.isUserMemberOfTeam(memberships, this.context.userInfo.username);
+                        isMember = TeamUtils.isUserMemberOfTeam(memberships, this.context.userInfo.username),
+                        isInstructorManagedTopic = false,
+                        isAdminOrStaff = this.context.userInfo.privileged || this.context.userInfo.staff;
+                        isInstructorManagedTopic =
+                            this.topic.attributes.type === undefined ? false :
+                            this.topic.attributes.type.toLowerCase() != "open";
+
+
+                    var showLeaveLink = isMember && (isAdminOrStaff || !isInstructorManagedTopic);
 
                     HtmlUtils.setHtml(
                         this.$el,
@@ -50,6 +59,7 @@
                             language: this.languages[this.model.get('language')],
                             membershipText: TeamUtils.teamCapacityText(memberships.length, this.context.maxTeamSize),
                             isMember: isMember,
+                            showLeaveLink: showLeaveLink,
                             hasCapacity: memberships.length < this.context.maxTeamSize,
                             hasMembers: memberships.length >= 1
                         })
