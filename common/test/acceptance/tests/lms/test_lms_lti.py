@@ -19,7 +19,7 @@ from ...pages.lms.courseware import CoursewarePage, LTIContentIframe
 from ..helpers import UniqueCourseTest, auto_auth, select_option_by_text
 
 
-class TestLTIConusmer(UniqueCourseTest):
+class TestLTIConsumer(UniqueCourseTest):
     """
     Base class for tests of LTI xblock in the LMS.
     """
@@ -29,7 +29,7 @@ class TestLTIConusmer(UniqueCourseTest):
     host = os.environ.get('BOK_CHOY_HOSTNAME', '127.0.0.1')
 
     def setUp(self):
-        super(TestLTIConusmer, self).setUp()
+        super(TestLTIConsumer, self).setUp()
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.lti_iframe = LTIContentIframe(self.browser, self.course_id)
         self.tab_nav = TabNavPage(self.browser)
