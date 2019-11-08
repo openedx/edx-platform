@@ -28,4 +28,4 @@ def register_user(request, slug):
     partner = get_object_or_404(Partner, slug=slug)
     # TODO: we need to make it generic for all partners
     if partner.slug == 'give2asia':
-        return Give2AsiaRegistrationView.as_view()(request)
+        return Give2AsiaRegistrationView.as_view()(request, partner=partner)

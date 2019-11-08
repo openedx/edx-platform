@@ -3,6 +3,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from lms.djangoapps.onboarding.models import Organization
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
 from student import forms as student_forms
@@ -14,6 +15,7 @@ class UsernameField(student_forms.UsernameField):
     """
     Inheriting UsernameField from student app. Parent class is not validating username already exists
     """
+
     def clean(self, value):
         clean_username = super(UsernameField, self).clean(value)
 
@@ -70,6 +72,19 @@ class Give2AsiaAccountCreationForm(forms.Form):
             "min_length": _NAME_TOO_SHORT_MSG,
         },
         validators=[validate_name]
+    )
+
+    def validate_organization_name(organization_name):
+        """ Check if organization associated to partner exists"""
+        organization = Organization.objects.filter(label__iexact=organization_name).first()
+        if organization is None:
+            raise forms.ValidationError("Organization associated to this partner is not found")
+
+    organization_name = forms.CharField(
+        error_messages={
+            "required": "Valid organization name associated to this partner is required",
+        },
+        validators=[validate_organization_name]
     )
 
     def __init__(

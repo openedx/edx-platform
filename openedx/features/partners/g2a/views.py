@@ -5,7 +5,6 @@ import logging
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import ValidationError
 from django.db import transaction
 from django.utils.translation import get_language
@@ -49,15 +48,15 @@ class Give2AsiaRegistrationView(RegistrationViewCustom):
     registration flow
     """
 
-    def get(self, request):
+    def get(self, request, partner):
         pass
 
-    def post(self, request):
+    def post(self, request, partner):
 
         registration_data = request.POST.copy()
 
-        # Adding basic dummy data, required to bypass onboarding flow
-        registration_data['organization_name'] = 'Give2Asia'
+        # Adding basic data, required to bypass onboarding flow
+        registration_data['organization_name'] = partner.label
         registration_data['year_of_birth'] = 2000
         registration_data['level_of_education'] = 'IWRNS'
         registration_data['partners_opt_in'] = ''
@@ -70,6 +69,8 @@ class Give2AsiaRegistrationView(RegistrationViewCustom):
         registration_data['email'] = account_creation_form.cleaned_data["email"]
         registration_data['username'] = account_creation_form.cleaned_data["username"]
         registration_data['password'] = account_creation_form.cleaned_data["password"]
+        registration_data['organization_name'] = account_creation_form.cleaned_data["organization_name"]
+
         name = account_creation_form.cleaned_data["name"]
         registration_data['name'] = name
 
@@ -150,11 +151,8 @@ def create_account_with_params_custom(request, params):
             extended_profile.is_interests_data_submitted = True
 
             # Assign Give2Asia organization to new user
+            # Give2AsiaAccountCreationForm will handle if organization not found
             organization_to_assign = Organization.objects.filter(label__iexact=params['organization_name']).first()
-            if organization_to_assign is None:
-                log.exception("Cannot associate user to organization {org}, it does not exist".format(
-                    org=params['organization_name']))
-                raise ObjectDoesNotExist()
             extended_profile.organization = organization_to_assign
             extended_profile.save()
         except Exception:  # pylint: disable=broad-except
