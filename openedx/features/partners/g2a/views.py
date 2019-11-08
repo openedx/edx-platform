@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.core.validators import ValidationError
 from django.db import transaction
+from django.http import Http404
 from django.utils.translation import get_language
 from edxmako.shortcuts import render_to_response
 from eventtracking import tracker
@@ -16,7 +17,6 @@ from lms.djangoapps.onboarding.models import (
     UserExtendedProfile
 )
 from lms.djangoapps.onboarding.models import RegistrationType
-from lms.djangoapps.philu_overrides.helpers import save_user_partner_network_consent
 from lms.djangoapps.philu_overrides.user_api.views import RegistrationViewCustom
 from notification_prefs.views import enable_notifications
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
@@ -27,7 +27,7 @@ from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER, \
     record_registration_attributions
 from openedx.features.partners.helpers import get_partner_recommended_courses
 from pytz import UTC
-from student.models import Registration, create_comments_service_user, UserProfile
+from student.models import Registration, UserProfile
 from util.json_request import JsonResponse
 
 from .forms import Give2AsiaAccountCreationForm
@@ -49,41 +49,31 @@ class Give2AsiaRegistrationView(RegistrationViewCustom):
     """
 
     def get(self, request, partner):
-        pass
+        raise Http404
 
     def post(self, request, partner):
-
         registration_data = request.POST.copy()
 
         # Adding basic data, required to bypass onboarding flow
         registration_data['organization_name'] = partner.label
         registration_data['year_of_birth'] = 2000
         registration_data['level_of_education'] = 'IWRNS'
-        registration_data['partners_opt_in'] = ''
 
         # validate data provided by end user
         account_creation_form = Give2AsiaAccountCreationForm(data=registration_data, tos_required=True)
         if not account_creation_form.is_valid():
             return JsonResponse({"Error": dict(account_creation_form.errors.items())}, status=400)
 
-        registration_data['email'] = account_creation_form.cleaned_data["email"]
-        registration_data['username'] = account_creation_form.cleaned_data["username"]
-        registration_data['password'] = account_creation_form.cleaned_data["password"]
-        registration_data['organization_name'] = account_creation_form.cleaned_data["organization_name"]
-
-        name = account_creation_form.cleaned_data["name"]
-        registration_data['name'] = name
-
-        name_split = name.split(" ", 1)
-        registration_data['first_name'] = name_split[0]
-        registration_data['last_name'] = name_split[1]
+        account_creation_form.clean_registration_data(registration_data)
+        registration_data['first_name'], registration_data['last_name'] = registration_data['name'].split(" ", 1)
 
         try:
             # Create models for user, UserProfile and UserExtendedProfile
             user = create_account_with_params_custom(request, registration_data)
             self.save_user_utm_info(user)
-            save_user_partner_network_consent(user, registration_data['partners_opt_in'])
         except Exception:
+            error_message = {"Error": {"reason": "User registration failed"}}
+            log.exception(error_message)
             return JsonResponse({"Error": {"reason": "User registration failed"}}, status=400)
 
         RegistrationType.objects.create(choice=1, user=request.user)
@@ -96,7 +86,6 @@ def create_account_with_params_custom(request, params):
     # Copy params so we can modify it; we can't just do dict(params) because if
     # params is request.POST, that results in a dict containing lists of values
     params = dict(params.items())
-
     extended_profile_fields = configuration_helpers.get_value('extended_profile_fields', [])
 
     # Perform operations within a transaction that are critical to account creation
@@ -121,7 +110,6 @@ def create_account_with_params_custom(request, params):
 
         try:
             # Update User profile
-
             profile_fields = [
                 "name", "level_of_education", "gender", "country", "year_of_birth"
             ]
@@ -144,16 +132,18 @@ def create_account_with_params_custom(request, params):
             raise
 
         try:
-            # create User Extended Profile
-            extended_profile = UserExtendedProfile.objects.create(user=user)
-            extended_profile.english_proficiency = 'IWRNS'
-            extended_profile.start_month_year = '11/2019'
-            extended_profile.is_interests_data_submitted = True
-
-            # Assign Give2Asia organization to new user
+            # Get organization so that it can be assigned to new user
             # Give2AsiaAccountCreationForm will handle if organization not found
             organization_to_assign = Organization.objects.filter(label__iexact=params['organization_name']).first()
-            extended_profile.organization = organization_to_assign
+
+            # create User Extended Profile
+            extended_profile = UserExtendedProfile.objects.create(
+                user=user, english_proficiency='IWRNS',
+                start_month_year='11/2019',
+                is_interests_data_submitted=True,
+                organization=organization_to_assign
+            )
+
             extended_profile.save()
         except Exception:  # pylint: disable=broad-except
             log.exception("User extended profile creation failed for user {id}.".format(id=user.id))
@@ -213,10 +203,8 @@ def create_account_with_params_custom(request, params):
 
     # Announce registration
     REGISTER_USER.send(sender=None, user=user, registration=registration)
-
-    create_comments_service_user(user)
-
-    registration.activate()
+    if not registration.user.is_active:
+        registration.activate()
 
     # login user immediately after a user creates an account,
     new_user = authenticate(username=user.username, password=params['password'])

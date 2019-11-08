@@ -130,3 +130,7 @@ class Give2AsiaAccountCreationForm(forms.Form):
                     .format(email=email)
             )
         return email
+
+    def clean_registration_data(self, registration_data):
+        """Once form is validated, call this function to get clean registration data"""
+        registration_data.update(self.cleaned_data)
