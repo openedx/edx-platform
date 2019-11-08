@@ -13,7 +13,7 @@ def runPythonTests() {
 }
 
 def pythonTestCleanup() {
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/**/*,test_root/log/**/*.log,**/nosetests.xml,*.log'
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/**/*,test_root/log/**/*.log,test_root/log/**/*.json,**/nosetests.xml,*.log'
     sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
     junit '**/nosetests.xml'
     sh '''source $HOME/edx-venv/bin/activate
