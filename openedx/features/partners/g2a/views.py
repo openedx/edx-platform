@@ -18,6 +18,7 @@ from lms.djangoapps.onboarding.models import (
 )
 from lms.djangoapps.onboarding.models import RegistrationType
 from lms.djangoapps.philu_overrides.user_api.views import RegistrationViewCustom
+from nodebb.helpers import update_nodebb_for_user_status
 from notification_prefs.views import enable_notifications
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -74,7 +75,7 @@ class Give2AsiaRegistrationView(RegistrationViewCustom):
         except Exception:
             error_message = {"Error": {"reason": "User registration failed"}}
             log.exception(error_message)
-            return JsonResponse({"Error": {"reason": "User registration failed"}}, status=400)
+            return JsonResponse(error_message, status=400)
 
         RegistrationType.objects.create(choice=1, user=request.user)
         response = JsonResponse({"success": True})
@@ -200,6 +201,10 @@ def create_account_with_params_custom(request, params):
                 }
             }
         )
+
+    # Since all required data corresponding to new user is saved in relevant models
+    # request NodeBB to activate registered user
+    update_nodebb_for_user_status(params['username'])
 
     # Announce registration
     REGISTER_USER.send(sender=None, user=user, registration=registration)
