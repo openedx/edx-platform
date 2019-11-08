@@ -195,10 +195,6 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     total_recipients = combined_set.count()
 
     routing_key = settings.BULK_EMAIL_ROUTING_KEY
-    # if there are few enough emails, send them through a different queue
-    # to avoid large courses blocking emails to self and staff
-    if total_recipients <= settings.BULK_EMAIL_JOB_SIZE_THRESHOLD:
-        routing_key = settings.BULK_EMAIL_ROUTING_KEY_SMALL_JOBS
 
     # Weird things happen if we allow empty querysets as input to emailing subtasks
     # The task appears to hang at "0 out of 0 completed" and never finishes.
