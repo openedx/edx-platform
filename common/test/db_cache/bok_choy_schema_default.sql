@@ -1303,6 +1303,7 @@ CREATE TABLE `cornerstone_cornerstoneenterprisecustomerconfiguration` (
   `cornerstone_base_url` varchar(255) NOT NULL,
   `enterprise_customer_id` char(32) NOT NULL,
   `channel_worker_username` varchar(255) DEFAULT NULL,
+  `catalogs_to_transmit` longtext,
   PRIMARY KEY (`id`),
   UNIQUE KEY `enterprise_customer_id` (`enterprise_customer_id`),
   CONSTRAINT `cornerstone_cornerst_enterprise_customer__5b56887b_fk_enterpris` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
@@ -1369,6 +1370,7 @@ CREATE TABLE `cornerstone_historicalcornerstoneenterprisecustomerconfiguration` 
   `enterprise_customer_id` char(32) DEFAULT NULL,
   `history_user_id` int(11) DEFAULT NULL,
   `channel_worker_username` varchar(255) DEFAULT NULL,
+  `catalogs_to_transmit` longtext,
   PRIMARY KEY (`history_id`),
   KEY `cornerstone_historic_history_user_id_1ded83c5_fk_auth_user` (`history_user_id`),
   KEY `cornerstone_historicalcorne_id_513efd93` (`id`),
@@ -2214,6 +2216,7 @@ CREATE TABLE `degreed_degreedenterprisecustomerconfiguration` (
   `degreed_user_password` varchar(255) NOT NULL,
   `provider_id` varchar(100) NOT NULL,
   `channel_worker_username` varchar(255) DEFAULT NULL,
+  `catalogs_to_transmit` longtext,
   PRIMARY KEY (`id`),
   UNIQUE KEY `enterprise_customer_id` (`enterprise_customer_id`),
   CONSTRAINT `degreed_degreedenter_enterprise_customer__86f16a0d_fk_enterpris` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
@@ -2275,6 +2278,7 @@ CREATE TABLE `degreed_historicaldegreedenterprisecustomerconfiguration` (
   `degreed_user_password` varchar(255) NOT NULL,
   `provider_id` varchar(100) NOT NULL,
   `channel_worker_username` varchar(255) DEFAULT NULL,
+  `catalogs_to_transmit` longtext,
   PRIMARY KEY (`history_id`),
   KEY `degreed_historicalde_history_user_id_5b4776d8_fk_auth_user` (`history_user_id`),
   KEY `degreed_historicaldegreeden_id_756f1445` (`id`),
@@ -2455,7 +2459,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=609 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=613 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -4817,6 +4821,7 @@ CREATE TABLE `sap_success_factors_sapsuccessfactorsenterprisecustomerconfidb8a` 
   `additional_locales` longtext NOT NULL,
   `show_course_price` tinyint(1) NOT NULL,
   `channel_worker_username` varchar(255) DEFAULT NULL,
+  `catalogs_to_transmit` longtext,
   PRIMARY KEY (`id`),
   UNIQUE KEY `enterprise_customer_id` (`enterprise_customer_id`),
   CONSTRAINT `sap_success_factors__enterprise_customer__4819a28c_fk_enterpris` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
