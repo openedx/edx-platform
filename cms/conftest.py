@@ -13,8 +13,8 @@ import os
 import contracts
 import pytest
 
-from openedx.core.tests.pytest_hooks import pytest_json_modifyreport  # pylint: disable=unused-import
-from openedx.core.tests.pytest_hooks import pytest_sessionfinish  # pylint: disable=unused-import
+from openedx.core.pytest_hooks import pytest_json_modifyreport  # pylint: disable=unused-import
+from openedx.core.pytest_hooks import pytest_sessionfinish  # pylint: disable=unused-import
 
 
 # Patch the xml libs before anything else.
