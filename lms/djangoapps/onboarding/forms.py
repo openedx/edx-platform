@@ -193,7 +193,6 @@ class UserInfoModelForm(BaseOnboardingModelForm):
         self.fields['country_of_employment'].required = False
         self.fields['city_of_employment'].required = False
 
-        # if not self.instance.organization:
         self.fields['role_in_org'].required = False
         self.fields['start_month_year'].required = False
         self.fields['hours_per_week'].required = False
@@ -277,7 +276,6 @@ class UserInfoModelForm(BaseOnboardingModelForm):
                     ugettext_noop(EMPTY_FIELD_ERROR.format('Hours per week')))
         return self.cleaned_data['hours_per_week']
 
-        return organization_name
 
     def clean_org_admin_email(self):
         org_admin_email = self.cleaned_data['org_admin_email']
