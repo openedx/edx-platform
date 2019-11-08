@@ -4,7 +4,6 @@ Module to put all pytest hooks for various
 import os
 import json
 
-TEST_SUITE = os.environ['TEST_SUITE']
 def pytest_json_modifyreport(json_report):
     """
     The function is called by pytest-json-report plugin to only output warnings in json format.
@@ -22,7 +21,9 @@ def pytest_json_modifyreport(json_report):
 
 
 def create_file_name(file_name, num=0):
-    name = file_name + "_" + os.environ['TEST_SUITE']
+    name = file_name
+    if 'TEST_SUITE' in os.environ:
+        name = name + "_" + os.environ['TEST_SUITE']
     if num != 0:
         name = name + "_" + str(num)
     return name + ".json"
