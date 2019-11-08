@@ -2,11 +2,17 @@
 Utility functions for working with discounts and discounted pricing.
 """
 
+from datetime import datetime
+
 import six
 from django.utils.translation import ugettext as _
+import pytz
+
 from course_modes.models import get_course_prices, format_course_price
 from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from experiments.models import ExperimentData
+
 from openedx.core.djangolib.markup import HTML
 from web_fragments.fragment import Fragment
 from openedx.features.discounts.applicability import (
@@ -14,6 +20,8 @@ from openedx.features.discounts.applicability import (
     get_discount_expiration_date,
     discount_percentage
 )
+
+REV1008_EXPERIMENT_ID = 15
 
 
 def offer_banner_wrapper(user, block, view, frag, context):  # pylint: disable=W0613
@@ -95,7 +103,15 @@ def get_first_purchase_offer_banner_fragment(user, course):
     which has the discount_expiration_date, price,
     discount percentage and a link to upgrade.
     """
-    if user and course:
+    if user and not user.is_anonymous and course:
+        now = datetime.now(tz=pytz.UTC).strftime(u"%Y-%m-%d %H:%M:%S%z")
+        saw_banner = ExperimentData.objects.filter(
+            user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(course)
+        )
+        if not saw_banner:
+            ExperimentData.objects.create(
+                user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(course), value=now
+            )
         discount_expiration_date = get_discount_expiration_date(user, course)
         if (discount_expiration_date and
                 can_receive_discount(user=user, course=course, discount_expiration_date=discount_expiration_date)):
