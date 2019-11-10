@@ -162,7 +162,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-10-27 20:42+0000\n"
+"POT-Creation-Date: 2019-11-03 20:42+0000\n"
 "PO-Revision-Date: 2019-09-29 20:43+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -535,6 +535,11 @@ msgstr "Este problema ha sido restablecido."
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "unsubmitted"
 msgstr "No enviado"
+
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+msgid ""
+"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -4799,39 +4804,32 @@ msgid ""
 "{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read "
 "the above carefully before proceeding. This is an irreversible action, and "
 "{strongStart}you will no longer be able to use the same email on "
-"edX.{strongEnd}"
+"{platformName}.{strongEnd}"
 msgstr ""
-"{strongStart}Warning: La eliminación de la cuenta es permanente.{strongEnd} "
-"Por favor lee la información de más arriba con atención antes de proceder. "
-"Esta es una acción irreversible, y {strongStart}no podrás volver a usar el "
-"mismo correo electrónico en edX.{strongEnd}"
-
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "We’re sorry to see you go!"
-msgstr "¡Sentimos que te vayas!"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
 "Please note: Deletion of your account and personal data is permanent and "
-"cannot be undone. EdX will not be able to recover your account or the data "
-"that is deleted."
+"cannot be undone. {platformName} will not be able to recover your account or"
+" the data that is deleted."
 msgstr ""
-"Cuidado: la eliminación de tu cuenta y datos personales es permanente e "
-"irreversible. edX no podrá recuperar ni tu cuenta ni los datos eliminados."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
-"Once your account is deleted, you cannot use it to take courses on the edX "
-"app, edx.org, or any other site hosted by edX. This includes access to "
-"edx.org from your employer’s or university’s system and access to private "
-"sites offered by MIT Open Learning, Wharton Executive Education, and Harvard"
-" Medical School."
+"Once your account is deleted, you cannot use it to take courses on the "
+"{platformName} app, {siteName}, or any other site hosted by {platformName}."
 msgstr ""
-"Una vez tu cuenta haya sido eliminada, no la podrás usar para tomar cursos "
-"en la app de edX, edx.org o en cualquier otro sitio administrado por edX. "
-"Esto incluye el acceso a edx.org desde el sistema de tu empleador o de tu "
-"universidad y el acceso a páginas privadas ofrecidas por MIT Open Learning, "
-"Wharton Online y Harvard Medical School."
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"This includes access to {siteName} from your employer’s or university’s "
+"system{additionalSiteSpecificDeletionText}."
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid "We’re sorry to see you go!"
+msgstr "¡Sentimos que te vayas!"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -4865,26 +4863,16 @@ msgstr "Se requiere una contraseña"
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "You have selected “Delete my account.” Deletion of your account and personal"
-" data is permanent and cannot be undone. EdX will not be able to recover "
-"your account or the data that is deleted."
+" data is permanent and cannot be undone. {platformName} will not be able to "
+"recover your account or the data that is deleted."
 msgstr ""
-"Has seleccionado “Eliminar mi cuenta”. La eliminación de tu cuenta y datos "
-"personales es permanente e irreversible. EdX no será capaz de recuperar tu "
-"cuenta o los datos que se hayan borrado."
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "If you proceed, you will be unable to use this account to take courses on "
-"the edX app, edx.org, or any other site hosted by edX. This includes access "
-"to edx.org from your employer’s or university’s system and access to private"
-" sites offered by MIT Open Learning, Wharton Executive Education, and "
-"Harvard Medical School."
+"the {platformName} app, {siteName}, or any other site hosted by "
+"{platformName}."
 msgstr ""
-"Si procedes, no será posible usar esta cuenta para tomar cursos ni en la "
-"aplicación móvil de edX, ni en edx.org, ni en cualquier otro sitio hospedado"
-" por edX. Esto incluye el acceso a edx.org desde el sistema de tu empleador "
-"o universidad, y el acceso a sitios privados ofrecidos por MIT Open "
-"Learning, Wharton Executive Education, y Harvard Medical School."
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
@@ -6603,8 +6591,8 @@ msgstr "Fecha de adición"
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
-msgid "Editing access for: %(title)s"
-msgstr "Editando el acceso para: %(title)s"
+msgid "Editing access for: {title}"
+msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"

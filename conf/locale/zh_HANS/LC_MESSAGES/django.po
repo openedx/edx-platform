@@ -395,7 +395,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-11-03 20:42+0000\n"
+"POT-Creation-Date: 2019-11-10 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/open-edx/teams/6205/zh_CN/)\n"
@@ -448,7 +448,8 @@ msgstr "节"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: common/lib/xmodule/xmodule/unit_block.py
-#: lms/djangoapps/instructor/views/tools.py lms/templates/ccx/schedule.html
+#: lms/djangoapps/instructor/views/tools.py lms/templates/seq_module.html
+#: lms/templates/ccx/schedule.html
 msgid "Unit"
 msgstr "单元"
 
@@ -4969,20 +4970,20 @@ msgstr "[below]创建密码后，您将可以使用此电子邮件（%(email)s�
 
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 #: common/templates/student/edx_ace/accountrecovery/email/body.txt
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
 msgid ""
 "If you didn't request this change, you can disregard this email - we have "
 "not yet reset your password."
 msgstr "如您本人并没有请求该变更，请忽略本邮件——我们尚未重置您的密码。"
 
 #: common/templates/student/edx_ace/accountrecovery/email/body.txt
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
 msgid "Thanks for using our site!"
 msgstr "谢谢您访问我们的网站！"
 
 #: common/templates/student/edx_ace/accountrecovery/email/body.txt
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
 #, python-format
 msgid "The %(platform_name)s Team"
 msgstr "%(platform_name)s 团队"
@@ -5050,45 +5051,6 @@ msgid ""
 "We keep a log of old e-mails, so if this request was unintentional, we can "
 "investigate."
 msgstr "我们保存着旧电子邮件信息的日志，所以如果该请求并非是您有意发出的，我们可以对此进行调查。"
-
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-#: lms/templates/forgot_password_modal.html
-msgid "Password Reset"
-msgstr "密码重置"
-
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
-#, python-format
-msgid ""
-"You're receiving this e-mail because you requested a password reset for your"
-" user account at %(platform_name)s."
-msgstr "您收到此邮件是因为您在%(platform_name)s申请了账号密码重置。"
-
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
-#, python-format
-msgid ""
-"However, there is currently no user account associated with your email "
-"address: %(email_address)s."
-msgstr "您的邮箱%(email_address)s当前未与任何账号相关联。"
-
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
-msgid "If you did not request this change, you can ignore this email."
-msgstr "如果您没有申请作出更改，请忽略此邮件。"
-
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-msgid "Change my Password"
-msgstr "修改密码"
-
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
-msgid "Please go to the following page and choose a new password:"
-msgstr "请到以下页面设置新的密码："
-
-#: common/templates/student/edx_ace/passwordreset/email/subject.txt
-#, python-format
-msgid "Password reset on %(platform_name)s"
-msgstr "%(platform_name)s重置密码"
 
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
 msgid "Create Recovery Email"
@@ -6892,15 +6854,16 @@ msgid "User ID"
 msgstr "用户ID"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a field on the password reset
-#. form meant to hold the user's email address.
 #. Translators: This label appears above a field on the login form
 #. meant to hold the user's email address.
+#. Translators: This label appears above a field on the password reset
+#. form meant to hold the user's email address.
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's email address.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -9987,8 +9950,6 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
-#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.html
-#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.txt
 msgid "Upgrade Now"
 msgstr "立刻升级"
 
@@ -11008,18 +10969,21 @@ msgid "Actions"
 msgstr "操作"
 
 #. Translators: This example email address is used as a placeholder in
-#. a field on the password reset form meant to hold the user's email address.
-#. Translators: This example email address is used as a placeholder in
 #. a field on the login form meant to hold the user's email address.
+#. Translators: This example email address is used as a placeholder in
+#. a field on the password reset form meant to hold the user's email address.
 #: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "username@domain.com"
 msgstr "username@domain.com"
 
-#. Translators: These instructions appear on the password reset form,
-#. immediately below a field meant to hold the user's email address.
 #. Translators: These instructions appear on the login form, immediately
 #. below a field meant to hold the user's email address.
+#. Translators: These instructions appear on the password reset form,
+#. immediately below a field meant to hold the user's email address.
+#. pylint: disable=no-member
 #: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
 #, python-brace-format
 msgid "The email address you used to register with {platform_name}"
 msgstr "您在{platform_name}上注册的邮箱"
@@ -11106,6 +11070,45 @@ msgstr "此致，%(platform_name)s"
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/subject.txt
 msgid "Your Account Has Been Queued For Deletion"
 msgstr "您的账号已进入删除队列"
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: lms/templates/forgot_password_modal.html
+msgid "Password Reset"
+msgstr "密码重置"
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
+#, python-format
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your"
+" user account at %(platform_name)s."
+msgstr "您收到此邮件是因为您在%(platform_name)s申请了账号密码重置。"
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
+#, python-format
+msgid ""
+"However, there is currently no user account associated with your email "
+"address: %(email_address)s."
+msgstr "您的邮箱%(email_address)s当前未与任何账号相关联。"
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
+msgid "If you did not request this change, you can ignore this email."
+msgstr "如果您没有申请作出更改，请忽略此邮件。"
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
+msgid "Change my Password"
+msgstr "修改密码"
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
+msgid "Please go to the following page and choose a new password:"
+msgstr "请到以下页面设置新的密码："
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/subject.txt
+#, python-format
+msgid "Password reset on %(platform_name)s"
+msgstr "%(platform_name)s重置密码"
 
 #: openedx/core/djangoapps/user_authn/views/auto_auth.py
 msgid "Superuser creation not allowed"
@@ -11508,47 +11511,6 @@ msgstr ""
 "{line_break} 在 {upgrade_deadline} 前升级，获取网站内课程的无限访问权， "
 "{a_open}现在升级{sronly_span_open} 以确保{expiration_date}前保留访问权 "
 "{span_close}{a_close}。"
-
-#: openedx/features/course_duration_limits/resolvers.py
-msgid "%b. %d, %Y"
-msgstr "%b. %d, %Y"
-
-#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.html
-#, python-format
-msgid ""
-"We hope you have enjoyed %(first_course_name)s! You lose all access to this "
-"course in %(time_until_expiration)s."
-msgstr "希望您喜欢%(first_course_name)s！在%(time_until_expiration)s之后您将无法访问此课程"
-
-#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.html
-#, python-format
-msgid ""
-"We hope you have enjoyed %(first_course_name)s! You lose all access to this "
-"course, including your progress, on %(first_course_expiration_date)s "
-"(%(time_until_expiration)s)."
-msgstr ""
-"希望您喜欢%(first_course_name)s！在%(first_course_expiration_date)s（%(time_until_expiration)s）之后您将无法访问此课程，包括您的进展。"
-
-#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.html
-msgid ""
-"Upgrade now to get unlimited access and for the chance to earn a verified "
-"certificate."
-msgstr "立即升级以获得无限制访问权并有机会获得经过验证的证书。"
-
-#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.txt
-#, python-format
-msgid ""
-"We hope you have enjoyed %(first_course_name)s! You lose all access to this "
-"course, including your progress, on %(first_course_expiration_date)s "
-"(%(time_until_expiration)s). Upgrade now to get unlimited access and for the"
-" chance to earn a verified certificate."
-msgstr ""
-"希望您喜欢%(first_course_name)s！在%(first_course_expiration_date)s（%(time_until_expiration)s）之后您将无法访问此课程，包括您的进展。立即升级以获得无限制访问权并有机会获得经过验证的证书。"
-
-#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/subject.txt
-#, python-format
-msgid "Upgrade to keep your access to %(first_course_name)s"
-msgstr "升级以保持您的%(first_course_name)s访问权限"
 
 #: openedx/features/course_experience/plugins.py
 #: cms/templates/widgets/header.html
@@ -20751,10 +20713,6 @@ msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
 "\"/jump_to_id/<location ID>\" as the URL value."
 msgstr "创建此课程HTML组件与单元的链接，请输入“/jump_to_id/<location ID>”作为URL值。"
-
-#: cms/templates/container.html
-msgid "Location in Course Outline"
-msgstr "在课程大纲中的位置"
 
 #: cms/templates/course-create-rerun.html
 msgid "Create a Course Rerun of:"
