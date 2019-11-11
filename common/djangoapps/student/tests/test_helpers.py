@@ -123,7 +123,6 @@ class TestLoginHelper(TestCase):
             validate_login()
 
 
-@patch.dict(settings.FEATURES, {'KEEP_TRUSTED_CONFIDENTIAL_CLIENT_TOKENS': True})
 class TestDestroyOAuthTokensHelper(TestCase):
     def setUp(self):
         super(TestDestroyOAuthTokensHelper, self).setUp()
@@ -153,6 +152,7 @@ class TestDestroyOAuthTokensHelper(TestCase):
             message='Tokens of a trusted confidential client should be deleted if the feature is disabled',
         )
 
+    @patch.dict(settings.FEATURES, {'KEEP_TRUSTED_CONFIDENTIAL_CLIENT_TOKENS': True})
     def test_confidential_trusted_client(self):
         """
         Tokens that have a confidential TrustedClient shouldn't be removed.
@@ -163,6 +163,7 @@ class TestDestroyOAuthTokensHelper(TestCase):
             message='Tokens of a trusted confidential client should be kept',
         )
 
+    @patch.dict(settings.FEATURES, {'KEEP_TRUSTED_CONFIDENTIAL_CLIENT_TOKENS': True})
     def test_no_trusted_client(self):
         """
         Only tokens that don't have a TrustedClient should be removed.
@@ -173,6 +174,7 @@ class TestDestroyOAuthTokensHelper(TestCase):
             message='Tokens of an untrusted client should be deleted',
         )
 
+    @patch.dict(settings.FEATURES, {'KEEP_TRUSTED_CONFIDENTIAL_CLIENT_TOKENS': True})
     def test_public_trusted_client(self):
         """
         Tokens for public clients are removed, even if they're trusted.
