@@ -73,6 +73,8 @@ class RandomUserPartitionScheme(object):
                     },
                     exc_info=True
                 )
+            except ValueError:
+                log.error(u"Bad group_id %r for user: %r", group_id, user)
 
         if group is None and assign and not course_tag_api.BulkCourseTags.is_prefetched(course_key):
             if not user_partition.groups:
