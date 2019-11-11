@@ -29,6 +29,7 @@ from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
+from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db import IntegrityError, models
@@ -2982,3 +2983,14 @@ class AccountRecovery(models.Model):
             pass
 
         return True
+
+
+class AllowedAuthUser(TimeStampedModel):
+    site = models.ForeignKey(Site, related_name='allowed_auth_users', on_delete=models.CASCADE)
+    email = models.EmailField(
+        help_text=_(
+            "An employee (a user whose email has current site's domain name) whose email exists in this model, can be "
+            "able to login from login screen through email and password. And if any employee's email doesn't exist in "
+            "this model then that employee can login via third party authentication backend only."),
+        unique=True,
+    )
