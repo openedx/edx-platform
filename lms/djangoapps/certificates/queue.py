@@ -375,7 +375,6 @@ class XQueueCertInterface(object):
         # already marked as ineligible -- we don't want to mark
         # existing audit certs as ineligible.
         cutoff = settings.AUDIT_CERT_CUTOFF_DATE
-        LOGGER.info(u"Audit certificates cutoff date {}".format(cutoff))
         if (cutoff and cert.created_date >= cutoff) and not is_eligible_for_certificate:
             cert.status = status.audit_passing if passing else status.audit_notpassing
             cert.save()
