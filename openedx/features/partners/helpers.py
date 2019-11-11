@@ -2,10 +2,9 @@ from datetime import datetime
 import pytz
 
 from course_action_state.models import CourseRerunState
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-
 from custom_settings.models import CustomSettings
 
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_card.helpers import get_course_open_date, get_related_card_id
 from openedx.features.course_card.models import CourseCard
 
@@ -14,7 +13,7 @@ def get_partner_recommended_courses(partner_slug):
     """
     get recommend courses those are tagged with partner's slug
     :param partner_slug: slug of partner with which courses are tagged
-    :return: recommended courses
+    :return: list of recommended courses
     """
     recommended_courses = []
     current_time = datetime.utcnow().replace(tzinfo=pytz.UTC)

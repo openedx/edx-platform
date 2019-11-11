@@ -7,10 +7,10 @@ class Partner(TimeStampedModel):
     """
     This model represents white-labelled partners.
     """
-    label = models.CharField(max_length=100, default=None, null=False)
-    main_logo = models.CharField(max_length=255, default=None, null=True)
-    small_logo = models.CharField(max_length=255, default=None, null=True)
-    slug = models.CharField(max_length=100, default=None, null=False, unique=True)
+    label = models.CharField(max_length=100, default=None)
+    main_logo = models.CharField(max_length=255, default=None)
+    small_logo = models.CharField(max_length=255, default=None)
+    slug = models.CharField(max_length=100, default=None, unique=True)
 
     def __unicode__(self):
         return '{}'.format(self.label)
@@ -28,7 +28,7 @@ class PartnerUser(TimeStampedModel):
     partner = models.ForeignKey(Partner, db_index=True, on_delete=models.CASCADE, related_name="partner")
 
     def __unicode__(self):
-        return '{}'.format(self.partner.name)
+        return '{partner}-{user}'.format(partner=self.partner.label, user=self.user.username)
 
     class Meta:
         unique_together = ('user', 'partner')
