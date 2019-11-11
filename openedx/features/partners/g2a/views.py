@@ -2,35 +2,32 @@ import analytics
 import datetime
 import json
 import logging
+
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-from django.core.validators import ValidationError
 from django.db import transaction
 from django.http import Http404
 from django.utils.translation import get_language
 from edxmako.shortcuts import render_to_response
 from eventtracking import tracker
-from lms.djangoapps.onboarding.models import (
-    EmailPreference,
-    Organization,
-    UserExtendedProfile
-)
-from lms.djangoapps.onboarding.models import RegistrationType
-from lms.djangoapps.philu_overrides.user_api.views import RegistrationViewCustom
-from nodebb.helpers import update_nodebb_for_user_status
 from notification_prefs.views import enable_notifications
+from pytz import UTC
+from util.json_request import JsonResponse
+
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
-from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER, \
-    record_registration_attributions
+from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER, record_registration_attributions
 from openedx.features.partners.helpers import get_partner_recommended_courses
-from pytz import UTC
-from student.models import Registration, UserProfile
-from util.json_request import JsonResponse
 
+from lms.djangoapps.philu_overrides.user_api.views import RegistrationViewCustom
+from lms.djangoapps.onboarding.models import EmailPreference, Organization, UserExtendedProfile
+from nodebb.helpers import update_nodebb_for_user_status
+from student.models import Registration, UserProfile
+
+from .constants import *
 from .forms import Give2AsiaAccountCreationForm
 
 log = logging.getLogger("edx.student")
@@ -50,15 +47,16 @@ class Give2AsiaRegistrationView(RegistrationViewCustom):
     """
 
     def get(self, request, partner):
+        # Overriding get method to suppress corresponding method of parent class
+        # TODO show registration popup
         raise Http404
 
     def post(self, request, partner):
         registration_data = request.POST.copy()
 
         # Adding basic data, required to bypass onboarding flow
-        registration_data['organization_name'] = partner.label
-        registration_data['year_of_birth'] = 2000
-        registration_data['level_of_education'] = 'IWRNS'
+        GIVE2ASIA_DEFAULT_DATA[ORGANIZATION_NAME] = partner.label
+        registration_data.update(GIVE2ASIA_DEFAULT_DATA)
 
         # validate data provided by end user
         account_creation_form = Give2AsiaAccountCreationForm(data=registration_data, tos_required=True)
@@ -66,18 +64,17 @@ class Give2AsiaRegistrationView(RegistrationViewCustom):
             return JsonResponse({"Error": dict(account_creation_form.errors.items())}, status=400)
 
         account_creation_form.clean_registration_data(registration_data)
-        registration_data['first_name'], registration_data['last_name'] = registration_data['name'].split(" ", 1)
+        GIVE2ASIA_DEFAULT_DATA[FIRST_NAME], GIVE2ASIA_DEFAULT_DATA[LAST_NAME] = registration_data['name']
 
         try:
             # Create models for user, UserProfile and UserExtendedProfile
             user = create_account_with_params_custom(request, registration_data)
             self.save_user_utm_info(user)
-        except Exception:
-            error_message = {"Error": {"reason": "User registration failed"}}
+        except Exception as err:
+            error_message = {"Error": {"reason": "User registration failed due to {}".format(err)}}
             log.exception(error_message)
             return JsonResponse(error_message, status=400)
 
-        RegistrationType.objects.create(choice=1, user=request.user)
         response = JsonResponse({"success": True})
         set_logged_in_cookies(request, response, user)
         return response
@@ -96,8 +93,8 @@ def create_account_with_params_custom(request, params):
             user = User(
                 username=params['username'],
                 email=params["email"],
-                first_name=params['first_name'],
-                last_name=params['last_name'],
+                first_name=params[FIRST_NAME],
+                last_name=params[LAST_NAME],
                 is_active=True,
             )
             user.set_password(params["password"])
@@ -105,8 +102,8 @@ def create_account_with_params_custom(request, params):
 
             user.save()
             registration.register(user)
-        except Exception:  # pylint: disable=broad-except
-            log.exception("User creation failed for user {username}.".format(username=params['username']))
+        except Exception as err:  # pylint: disable=broad-except
+            log.exception("User creation failed for user {username}".format(username=params['username']), repr(err))
             raise
 
         try:
@@ -128,8 +125,8 @@ def create_account_with_params_custom(request, params):
             if extended_profile_data:
                 profile.meta = json.dumps(extended_profile_data)
             profile.save()
-        except Exception:  # pylint: disable=broad-except
-            log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
+        except Exception as err:  # pylint: disable=broad-except
+            log.exception("UserProfile creation failed for user {id}.".format(id=user.id), repr(err))
             raise
 
         try:
@@ -139,24 +136,23 @@ def create_account_with_params_custom(request, params):
 
             # create User Extended Profile
             extended_profile = UserExtendedProfile.objects.create(
-                user=user, english_proficiency='IWRNS',
-                start_month_year='11/2019',
-                is_interests_data_submitted=True,
+                user=user, english_proficiency=params[ENGLISH_PROFICIENCY],
+                start_month_year=params[START_MONTH_YEAR],
+                is_interests_data_submitted=params[IS_INTERESTS_DATA_SUBMITTED],
                 organization=organization_to_assign
             )
 
             extended_profile.save()
-        except Exception:  # pylint: disable=broad-except
-            log.exception("User extended profile creation failed for user {id}.".format(id=user.id))
-            raise ValidationError()
+        except Exception as err:  # pylint: disable=broad-except
+            log.exception("User extended profile creation failed for user {id}.".format(id=user.id), repr(err))
+            raise
 
         try:
             user_email_preferences, created = EmailPreference.objects.get_or_create(user=user)
             user_email_preferences.opt_in = False
             user_email_preferences.save()
-        except Exception:  # pylint: disable=broad-except
-            log.exception("User email preferences creation failed for user {id}.".format(id=user.id))
-            raise ValidationError()
+        except Exception as err:  # pylint: disable=broad-except
+            log.exception("User email preferences creation failed for user {id}.".format(id=user.id), repr(err))
 
     # Perform operations that are non-critical parts of account creation
     preferences_api.set_user_preference(user, LANGUAGE_KEY, get_language())

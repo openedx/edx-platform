@@ -1,11 +1,14 @@
 import re
+
 from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+
 from lms.djangoapps.onboarding.models import Organization
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
+
 from student import forms as student_forms
 from student.models import CourseEnrollmentAllowed, email_exists_or_retired
 from util.password_policy_validators import validate_password
@@ -38,19 +41,12 @@ class Give2AsiaAccountCreationForm(forms.Form):
     _EMAIL_INVALID_MSG = "A properly formatted e-mail is required"
     _NAME_TOO_SHORT_MSG = "Your legal name must be a minimum of three characters long"
 
-    username = UsernameField()
-
-    email = forms.EmailField(
-        max_length=accounts_settings.EMAIL_MAX_LENGTH,
-        min_length=accounts_settings.EMAIL_MIN_LENGTH,
-        error_messages={
-            "required": _EMAIL_INVALID_MSG,
-            "invalid": _EMAIL_INVALID_MSG,
-            "max_length": "Email cannot be more than %(limit_value)s characters long",
-        }
-    )
-
-    password = forms.CharField()
+    def __init__(self, data=None, tos_required=True):
+        super(Give2AsiaAccountCreationForm, self).__init__(data)
+        if tos_required:
+            self.fields["terms_of_service"] = student_forms.TrueField(
+                error_messages={"required": "You must accept the terms of service."}
+            )
 
     def validate_name(name):
         """
@@ -65,39 +61,11 @@ class Give2AsiaAccountCreationForm(forms.Form):
         if len(name_split) < 2:
             raise forms.ValidationError("Full Name must include first name and last name")
 
-    name = forms.CharField(
-        min_length=_NAME_MIN_LENGTH,
-        error_messages={
-            "required": _NAME_TOO_SHORT_MSG,
-            "min_length": _NAME_TOO_SHORT_MSG,
-        },
-        validators=[validate_name]
-    )
-
     def validate_organization_name(organization_name):
         """ Check if organization associated to partner exists"""
         organization = Organization.objects.filter(label__iexact=organization_name).first()
         if organization is None:
             raise forms.ValidationError("Organization associated to this partner is not found")
-
-    organization_name = forms.CharField(
-        error_messages={
-            "required": "Valid organization name associated to this partner is required",
-        },
-        validators=[validate_organization_name]
-    )
-
-    def __init__(
-        self,
-        data=None,
-        tos_required=True
-    ):
-        super(Give2AsiaAccountCreationForm, self).__init__(data)
-
-        if tos_required:
-            self.fields["terms_of_service"] = student_forms.TrueField(
-                error_messages={"required": "You must accept the terms of service."}
-            )
 
     def clean_password(self):
         """Enforce password policies (if applicable)"""
@@ -131,6 +99,36 @@ class Give2AsiaAccountCreationForm(forms.Form):
             )
         return email
 
+    def clean_name(self):
+        """Clean name by splitting it into first name and last name"""
+        return self.cleaned_data["name"].split(" ", 1)
+
     def clean_registration_data(self, registration_data):
         """Once form is validated, call this function to get clean registration data"""
         registration_data.update(self.cleaned_data)
+
+    username = UsernameField()
+    password = forms.CharField()
+    email = forms.EmailField(
+        max_length=accounts_settings.EMAIL_MAX_LENGTH,
+        min_length=accounts_settings.EMAIL_MIN_LENGTH,
+        error_messages={
+            "required": _EMAIL_INVALID_MSG,
+            "invalid": _EMAIL_INVALID_MSG,
+            "max_length": "Email cannot be more than %(limit_value)s characters long",
+        }
+    )
+    name = forms.CharField(
+        min_length=_NAME_MIN_LENGTH,
+        error_messages={
+            "required": _NAME_TOO_SHORT_MSG,
+            "min_length": _NAME_TOO_SHORT_MSG,
+        },
+        validators=[validate_name]
+    )
+    organization_name = forms.CharField(
+        error_messages={
+            "required": "Valid organization name associated to this partner is required",
+        },
+        validators=[validate_organization_name]
+    )
