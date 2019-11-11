@@ -8,4 +8,4 @@ certifi==2019.9.11        # via requests
 chardet==3.0.4            # via requests
 idna==2.8                 # via requests
 requests==2.22.0
-urllib3==1.25.6           # via requests
+urllib3==1.25.7           # via requests
