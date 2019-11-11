@@ -33,9 +33,13 @@ from openedx.core.djangoapps.user_authn.cookies import refresh_jwt_cookies, set_
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangoapps.user_authn.views.password_reset import send_password_reset_email_for_user
+from openedx.core.djangoapps.user_authn.config.waffle import (
+    ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY,
+    waffle as authn_waffle
+)
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.view_utils import require_post_params
-from student.models import LoginFailures
+from student.models import LoginFailures, AllowedAuthUser
 from student.views import send_reactivation_email_for_user
 from third_party_auth import pipeline, provider
 import third_party_auth
@@ -186,6 +190,8 @@ def _authenticate_first_party(request, unauthenticated_user):
     # to fail and we can take advantage of the ratelimited backend
     username = unauthenticated_user.username if unauthenticated_user else ""
 
+    _check_user_auth_flow(request.site, unauthenticated_user)
+
     try:
         password = normalize_password(request.POST['password'])
         return authenticate(
@@ -270,6 +276,26 @@ def _track_user_login(user, request):
             'provider': None
         },
     )
+
+
+def _check_user_auth_flow(site, user):
+    """
+    Check if user belongs to an allowed domain and not whitelisted
+    then ask user to login through allowed domain SSO provider.
+    """
+    if user and authn_waffle.is_enabled(ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY):
+        allowed_domain = site.configuration.get_value('THIRD_PARTY_AUTH_ONLY_DOMAIN', '').lower()
+        user_domain = user.email.split('@')[1].strip().lower()
+
+        # If user belongs to allowed domain and not whitelisted then user must login through allowed domain SSO
+        if user_domain == allowed_domain and not AllowedAuthUser.objects.filter(site=site, email=user.email).exists():
+            msg = _(
+                u'As an {allowed_domain} user, You must login with your {allowed_domain} {provider} account.'
+            ).format(
+                allowed_domain=allowed_domain,
+                provider=site.configuration.get_value('THIRD_PARTY_AUTH_ONLY_PROVIDER')
+            )
+            raise AuthFailedError(msg)
 
 
 @login_required
