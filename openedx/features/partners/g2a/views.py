@@ -37,7 +37,7 @@ AUDIT_LOG = logging.getLogger("audit")
 def g2a_dashboard(request):
     # TODO: The argument must be dynamic after integration of LP-1632
     courses = get_partner_recommended_courses('give2asia')
-    return render_to_response('partners/g2a/dashboard.html', {'recommended_courses': courses})
+    return render_to_response('features/partners/g2a/dashboard.html', {'recommended_courses': courses})
 
 
 class Give2AsiaRegistrationView(RegistrationViewCustom):
