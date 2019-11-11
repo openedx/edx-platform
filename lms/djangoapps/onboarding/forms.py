@@ -242,7 +242,7 @@ class UserInfoModelForm(BaseOnboardingModelForm):
         raise forms.ValidationError(ugettext_noop('Please select language.'))
 
     def clean_organization_name(self):
-        organization_name = self.cleaned_data['organization_name']
+        organization_name = self.data.get('organization_name')
 
         if not self.data.get('is_currently_employed') and not organization_name:
             raise forms.ValidationError(ugettext_noop('Please enter Organization Name.'))
@@ -250,14 +250,14 @@ class UserInfoModelForm(BaseOnboardingModelForm):
         return organization_name
 
     def clean_role_in_org(self):
-        if self.instance.organization:
+        if self.data.get('organization_name'):
             if not self.cleaned_data['role_in_org']:
                 raise forms.ValidationError(ugettext_noop(NO_OPTION_SELECT_ERROR.format(
                     'Role in the Organization')))
         return self.cleaned_data['role_in_org']
 
     def clean_start_month_year(self):
-        if self.instance.organization:
+        if self.data.get('organization_name'):
             if not self.cleaned_data['start_month_year']:
                 raise forms.ValidationError(ugettext_noop("Please enter a valid start month/year"))
 
@@ -270,7 +270,7 @@ class UserInfoModelForm(BaseOnboardingModelForm):
         return self.cleaned_data['start_month_year']
 
     def clean_hours_per_week(self):
-        if self.instance.organization:
+        if self.data.get('organization_name'):
             if not self.cleaned_data['hours_per_week']:
                 raise forms.ValidationError(
                     ugettext_noop(EMPTY_FIELD_ERROR.format('Hours per week')))
