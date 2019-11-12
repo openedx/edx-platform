@@ -22,6 +22,8 @@ env:
   - TOXENV=pep8
   - TOXENV=py27-django111
     ARGS="-- paver run_pep8"
+  - TOXENV=py27-django111
+    ARGS="-- pytest common/djangoapps/student/tests/test_helpers.py::TestDestroyOAuthTokensHelper"
 
 script:
   - tox $ARGS
