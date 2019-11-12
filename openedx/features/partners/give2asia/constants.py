@@ -10,6 +10,7 @@ OPT_IN_KEY = 'opt_in'
 # These are minimum required fields to complete registration
 # These are the default values for Give2Asia partner
 GIVE2ASIA_DEFAULT_DATA = {
+    YEAR_OF_BIRTH_KEY: 2000,
     LEVEL_OF_EDUCATION_KEY: 'IWRNS',  # set I'd rather not say for education level
     ENGLISH_PROFICIENCY_KEY: 'IWRNS',  # set I'd rather not say for english proficiency
     START_MONTH_YEAR_KEY: '11/2019',
