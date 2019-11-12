@@ -21,13 +21,14 @@ from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER, record_registration_attributions
 from openedx.features.partners.helpers import get_partner_recommended_courses
+from openedx.features.partners.models import PartnerUser
 
 from lms.djangoapps.philu_overrides.user_api.views import RegistrationViewCustom
 from lms.djangoapps.onboarding.models import EmailPreference, Organization, UserExtendedProfile
 from nodebb.helpers import update_nodebb_for_user_status
 from student.models import Registration, UserProfile
 
-from .constants import *
+from . import constants as g2a_constants
 from .forms import Give2AsiaAccountCreationForm
 
 log = logging.getLogger("edx.student")
@@ -54,8 +55,8 @@ class Give2AsiaRegistrationView(RegistrationViewCustom):
         registration_data = request.POST.copy()
 
         # Adding basic data, required to bypass onboarding flow
-        GIVE2ASIA_DEFAULT_DATA[ORGANIZATION_NAME] = partner.label
-        registration_data.update(GIVE2ASIA_DEFAULT_DATA)
+        g2a_constants.GIVE2ASIA_DEFAULT_DATA[g2a_constants.ORGANIZATION_NAME_KEY] = partner.label
+        registration_data.update(g2a_constants.GIVE2ASIA_DEFAULT_DATA)
 
         # validate data provided by end user
         account_creation_form = Give2AsiaAccountCreationForm(data=registration_data, tos_required=True)
@@ -63,11 +64,11 @@ class Give2AsiaRegistrationView(RegistrationViewCustom):
             return JsonResponse({"Error": dict(account_creation_form.errors.items())}, status=400)
 
         account_creation_form.clean_registration_data(registration_data)
-        GIVE2ASIA_DEFAULT_DATA[FIRST_NAME], GIVE2ASIA_DEFAULT_DATA[LAST_NAME] = registration_data['name']
+        registration_data[g2a_constants.FIRST_NAME_KEY], registration_data[g2a_constants.LAST_NAME_KEY] = registration_data['name']
 
         try:
-            # Create models for user, UserProfile and UserExtendedProfile
-            user = create_account_with_params_custom(request, registration_data)
+            # Create models for user, UserProfile, UserExtendedProfile and PartnerUser
+            user = create_account_with_params_custom(request, registration_data, partner)
             self.save_user_utm_info(user)
         except Exception as err:
             error_message = {"Error": {"reason": "User registration failed due to {}".format(err)}}
@@ -79,7 +80,7 @@ class Give2AsiaRegistrationView(RegistrationViewCustom):
         return response
 
 
-def create_account_with_params_custom(request, params):
+def create_account_with_params_custom(request, params, partner):
     # Copy params so we can modify it; we can't just do dict(params) because if
     # params is request.POST, that results in a dict containing lists of values
     params = dict(params.items())
@@ -92,8 +93,8 @@ def create_account_with_params_custom(request, params):
             user = User(
                 username=params['username'],
                 email=params["email"],
-                first_name=params[FIRST_NAME],
-                last_name=params[LAST_NAME],
+                first_name=params[g2a_constants.FIRST_NAME_KEY],
+                last_name=params[g2a_constants.LAST_NAME_KEY],
                 is_active=True,
             )
             user.set_password(params["password"])
@@ -135,9 +136,9 @@ def create_account_with_params_custom(request, params):
 
             # create User Extended Profile
             extended_profile = UserExtendedProfile.objects.create(
-                user=user, english_proficiency=params[ENGLISH_PROFICIENCY],
-                start_month_year=params[START_MONTH_YEAR],
-                is_interests_data_submitted=params[IS_INTERESTS_DATA_SUBMITTED],
+                user=user, english_proficiency=params[g2a_constants.ENGLISH_PROFICIENCY_KEY],
+                start_month_year=params[g2a_constants.START_MONTH_YEAR_KEY],
+                is_interests_data_submitted=params[g2a_constants.IS_INTERESTS_DATA_SUBMITTED_KEY],
                 organization=organization_to_assign
             )
 
@@ -147,8 +148,16 @@ def create_account_with_params_custom(request, params):
             raise
 
         try:
+            # create a bridge between user and partner
+            partner_user = PartnerUser.objects.create(user=user, partner=partner)
+            partner_user.save()
+        except Exception as err:  # pylint: disable=broad-except
+            log.exception("partner_user creation failed for user {id}, partner {slug}"
+                          .format(id=user.id, slug=partner.slug), repr(err))
+
+        try:
             user_email_preferences, created = EmailPreference.objects.get_or_create(user=user)
-            user_email_preferences.opt_in = False
+            user_email_preferences.opt_in = 'no'
             user_email_preferences.save()
         except Exception as err:  # pylint: disable=broad-except
             log.exception("User email preferences creation failed for user {id}.".format(id=user.id), repr(err))
@@ -180,7 +189,16 @@ def create_account_with_params_custom(request, params):
                 'country': unicode(profile.country),
             }
         ]
+
+        if hasattr(settings, 'MAILCHIMP_NEW_USER_LIST_ID'):
+            identity_args.append({
+                "MailChimp": {
+                    "listId": settings.MAILCHIMP_NEW_USER_LIST_ID
+                }
+            })
+
         analytics.identify(*identity_args)
+
         analytics.track(
             user.id,
             "edx.bi.user.account.registered",
