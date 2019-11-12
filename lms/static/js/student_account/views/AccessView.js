@@ -16,10 +16,12 @@
         'js/student_account/views/InstitutionLoginView',
         'js/student_account/views/HintedLoginView',
         'edx-ui-toolkit/js/utils/html-utils',
+        'js/student_account/multiple_enterprise',
         'js/vendor/history'
     ],
         function($, utility, _, _s, Backbone, LoginModel, PasswordResetModel, RegisterModel, AccountRecoveryModel,
-                 LoginView, PasswordResetView, RegisterView, InstitutionLoginView, HintedLoginView, HtmlUtils) {
+                 LoginView, PasswordResetView, RegisterView, InstitutionLoginView, HintedLoginView, HtmlUtils,
+                 multipleEnterpriseInterface) {
             return Backbone.View.extend({
                 tpl: '#access-tpl',
                 events: {
@@ -43,7 +45,6 @@
                  * Underscore namespace
                  */
                     _.mixin(_s.exports());
-
                     this.tpl = $(this.tpl).html();
 
                     this.activeForm = options.initial_mode || 'login';
@@ -70,7 +71,6 @@
                         institution_login: null,
                         hinted_login: null
                     };
-
                     this.platformName = options.platform_name;
                     this.supportURL = options.support_link;
                     this.passwordResetSupportUrl = options.password_reset_support_link;
@@ -79,6 +79,8 @@
                     this.pipelineUserDetails = options.third_party_auth.pipeline_user_details;
                     this.enterpriseName = options.enterprise_name || '';
                     this.isAccountRecoveryFeatureEnabled = options.is_account_recovery_feature_enabled || false;
+                    this.isMultipleUserEnterprisesFeatureEnabled =
+                        options.is_multiple_user_enterprises_feature_enabled || false;
 
                 // The login view listens for 'sync' events from the reset model
                     this.resetModel = new PasswordResetModel({}, {
@@ -158,7 +160,11 @@
                         this.listenTo(this.subview.login, 'password-help', this.resetPassword);
 
                     // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
-                        this.listenTo(this.subview.login, 'auth-complete', this.authComplete);
+                        if (this.isMultipleUserEnterprisesFeatureEnabled === true) {
+                            this.listenTo(this.subview.login, 'auth-complete', this.loginComplete);
+                        } else {
+                            this.listenTo(this.subview.login, 'auth-complete', this.authComplete);
+                        }
                     },
 
                     reset: function(data) {
@@ -283,6 +289,20 @@
                     // Note: the third party auth URL likely contains another redirect URL embedded inside
                     } else {
                         this.redirect(this.nextUrl);
+                    }
+                },
+
+            /**
+            /**
+             * Take a learner attached to multiple enterprises to the enterprise selection page:
+             *
+             */
+                loginComplete: function() {
+                    if (this.thirdPartyAuth && this.thirdPartyAuth.finishAuthUrl) {
+                        multipleEnterpriseInterface.check(this.thirdPartyAuth.finishAuthUrl);
+                    // Note: the third party auth URL likely contains another redirect URL embedded inside
+                    } else {
+                        multipleEnterpriseInterface.check(this.nextUrl);
                     }
                 },
 
