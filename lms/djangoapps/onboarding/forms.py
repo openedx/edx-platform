@@ -25,6 +25,7 @@ from lms.djangoapps.onboarding.models import (
     OrganizationAdminHashKeys, EducationLevel, EnglishProficiency, RoleInsideOrg, OperationLevel,
     FocusArea, TotalEmployee, OrgSector, PartnerNetwork, OrganizationPartner, OrganizationMetric, Currency,
     GranteeOptIn)
+from lms.djangoapps.philu_overrides.helpers import save_user_partner_network_consent
 
 NO_OPTION_SELECT_ERROR = 'Please select an option for {}'
 EMPTY_FIELD_ERROR = 'Please enter your {}'
@@ -74,6 +75,11 @@ class UserInfoModelForm(BaseOnboardingModelForm):
 
     NO_SELECT_CHOICE = [('', ugettext_noop('- Select -'))]
 
+    IS_POC_CHOICES = (
+        (1, ugettext_noop('Yes')),
+        (0, ugettext_noop('No'))
+    )
+
     year_of_birth = forms.IntegerField(
         label="Year of Birth",
         label_suffix="*",
@@ -100,7 +106,7 @@ class UserInfoModelForm(BaseOnboardingModelForm):
         label_suffix="*",
         widget=forms.HiddenInput,
         error_messages={
-          "required": ugettext_noop(EMPTY_FIELD_ERROR.format("Country of Residence"))
+            "required": ugettext_noop(EMPTY_FIELD_ERROR.format("Country of Residence"))
         }
     )
 
@@ -111,44 +117,85 @@ class UserInfoModelForm(BaseOnboardingModelForm):
                                                    required=False)
     level_of_education = forms.ChoiceField(label=ugettext_noop('Level of Education'), label_suffix="*",
                                            error_messages={
-                                                'required': ugettext_noop(NO_OPTION_SELECT_ERROR.format(
-                                                    'Level of Education')),
+                                               'required': ugettext_noop(NO_OPTION_SELECT_ERROR.format(
+                                                   'Level of Education')),
                                            },
                                            required=True)
     english_proficiency = forms.ChoiceField(label=ugettext_noop('English Language Proficiency'), label_suffix="*",
                                             error_messages={
-                                                 'required': ugettext_noop(NO_OPTION_SELECT_ERROR.format(
-                                                     'English Language Proficiency')),
+                                                'required': ugettext_noop(NO_OPTION_SELECT_ERROR.format(
+                                                    'English Language Proficiency')),
                                             })
     role_in_org = forms.ChoiceField(label=ugettext_noop('Role in the Organization'),
                                     label_suffix="*",
                                     error_messages={
-                                         'required': ugettext_noop(NO_OPTION_SELECT_ERROR.format(
-                                             'Role in the Organization')),
+                                        'required': ugettext_noop(NO_OPTION_SELECT_ERROR.format(
+                                            'Role in the Organization')),
                                     })
 
-    def __init__(self,  *args, **kwargs):
-        super(UserInfoModelForm, self).__init__( *args, **kwargs)
+    organization_name = forms.CharField(
+        max_length=255,
+        label=ugettext_noop('Organization Name'),
+        label_suffix="*",
+        help_text=ugettext_noop("You can choose an organization from the auto-suggestion list or add a new one by "
+                                "entering the name and clicking the OK button."),
+        required=False,
+        widget=forms.TextInput(
+            attrs={'placeholder': ugettext_noop('Organization Name')}
+        ),
+        initial=ugettext_noop('Organization Name')
+    )
+
+    is_currently_employed = forms.BooleanField(
+        initial=False,
+        required=False,
+        label=ugettext_noop('Check here if you are currently unemployed or otherwise not affiliated with an '
+                            'organization.')
+    )
+
+    is_poc = forms.ChoiceField(label=ugettext_noop('Will you be the Administrator of your organization on our '
+                                                   'website?'),
+                               help_text=ugettext_noop("Your organization's Administrator is responsible for "
+                                                       "maintaining your organization's profile and inviting learners "
+                                                       "from your organization to the Philanthropy University platform."
+                                                       " An Administrator should be the most senior person in your "
+                                                       "organization responsible for organizational capacity building "
+                                                       "and learning. In a small organization with few employees, "
+                                                       "the Administrator might be the Executive Director or Chief "
+                                                       "Executive. In a larger organization, the Administrator might "
+                                                       "be the director or manager responsible for staff learning "
+                                                       "and development and organizational capacity development."),
+                               choices=IS_POC_CHOICES,
+                               widget=forms.RadioSelect)
+
+    org_admin_email = forms.CharField(
+        required=False,
+        widget=forms.EmailInput(attrs={'placeholder': 'Organization Admin email'}))
+
+    def __init__(self, *args, **kwargs):
+        super(UserInfoModelForm, self).__init__(*args, **kwargs)
 
         LEVEL_OF_EDUCATION_CHOICES = self.NO_SELECT_CHOICE + [(el.code, el.label)
-                                                         for el in EducationLevel.objects.all()]
+                                                              for el in EducationLevel.objects.all()]
         ENGLISH_PROFICIENCY_CHOICES = self.NO_SELECT_CHOICE + [(ep.code, ep.label)
-                                                          for ep in EnglishProficiency.objects.all()]
+                                                               for ep in EnglishProficiency.objects.all()]
         ROLE_IN_ORG_CHOICES = self.NO_SELECT_CHOICE + [(r.code, r.label)
-                                                  for r in RoleInsideOrg.objects.all()]
+                                                       for r in RoleInsideOrg.objects.all()]
 
         self.fields['level_of_education'].choices = LEVEL_OF_EDUCATION_CHOICES
         self.fields['english_proficiency'].choices = ENGLISH_PROFICIENCY_CHOICES
         self.fields['role_in_org'].choices = ROLE_IN_ORG_CHOICES
 
+        self.fields['organization_name'].error_messages = {
+            'required': ugettext_noop('Please select your Organization.'),
+        }
 
         self.fields['country_of_employment'].required = False
         self.fields['city_of_employment'].required = False
 
-        if not self.instance.organization:
-            self.fields['role_in_org'].required = False
-            self.fields['start_month_year'].required = False
-            self.fields['hours_per_week'].required = False
+        self.fields['role_in_org'].required = False
+        self.fields['start_month_year'].required = False
+        self.fields['hours_per_week'].required = False
 
         focus_area_choices = ((field_name, label) for field_name, label in
                               UserExtendedProfile.FUNCTIONS_LABELS.items())
@@ -194,16 +241,58 @@ class UserInfoModelForm(BaseOnboardingModelForm):
 
         raise forms.ValidationError(ugettext_noop('Please select language.'))
 
+    def clean_organization_name(self):
+        organization_name = self.data.get('organization_name')
+
+        if not self.data.get('is_currently_employed') and not organization_name:
+            raise forms.ValidationError(ugettext_noop('Please enter Organization Name.'))
+
+        return organization_name
+
+    def clean_role_in_org(self):
+        if self.data.get('organization_name'):
+            if not self.cleaned_data['role_in_org']:
+                raise forms.ValidationError(ugettext_noop(NO_OPTION_SELECT_ERROR.format(
+                    'Role in the Organization')))
+        return self.cleaned_data['role_in_org']
+
     def clean_start_month_year(self):
-        if self.instance.organization:
+        if self.data.get('organization_name'):
+            if not self.cleaned_data['start_month_year']:
+                raise forms.ValidationError(ugettext_noop("Please enter a valid start month/year"))
+
             start_month_year = datetime.strptime(
                 self.cleaned_data['start_month_year'],
                 '%m/%Y')
-
             if start_month_year > datetime.now():
                 raise forms.ValidationError(ugettext_noop("Please enter a valid start month/year"))
 
         return self.cleaned_data['start_month_year']
+
+    def clean_hours_per_week(self):
+        if self.data.get('organization_name'):
+            if not self.cleaned_data['hours_per_week']:
+                raise forms.ValidationError(
+                    ugettext_noop(EMPTY_FIELD_ERROR.format('Hours per week')))
+        return self.cleaned_data['hours_per_week']
+
+
+    def clean_org_admin_email(self):
+        org_admin_email = self.cleaned_data['org_admin_email']
+
+        already_an_admin = Organization.objects.filter(admin__email=org_admin_email).first()
+        if already_an_admin:
+            raise forms.ValidationError(ugettext_noop('%s is already admin of organization "%s"'
+                                                      % (org_admin_email, already_an_admin.label)))
+
+        already_suggested_as_admin = OrganizationAdminHashKeys.objects.filter(
+            suggested_admin_email=org_admin_email, is_hash_consumed=False).first()
+        if already_suggested_as_admin:
+            raise forms.ValidationError(ugettext_noop('%s is already suggested as admin of "%s" organization'
+                                                      % (org_admin_email,
+                                                         already_suggested_as_admin.organization.label)))
+
+        return org_admin_email
 
     class Meta:
         """
@@ -213,7 +302,8 @@ class UserInfoModelForm(BaseOnboardingModelForm):
         fields = [
             'year_of_birth', 'gender', 'not_listed_gender', 'not_listed_gender', 'level_of_education', 'language',
             'english_proficiency', 'country', 'city', 'is_emp_location_different', 'country_of_employment',
-            'city_of_employment', 'role_in_org', 'start_month_year', 'hours_per_week'
+            'city_of_employment', 'role_in_org', 'start_month_year', 'hours_per_week', 'organization_name',
+            'is_currently_employed', 'is_poc', 'org_admin_email'
         ]
 
         labels = {
@@ -243,6 +333,10 @@ class UserInfoModelForm(BaseOnboardingModelForm):
             }
         }
 
+        serialization_options = {
+            'org_admin_email': {'field_type': 'email'}
+        }
+
     def save(self, request, commit=True):
         user_info_survey = super(UserInfoModelForm, self).save(commit=False)
 
@@ -262,8 +356,80 @@ class UserInfoModelForm(BaseOnboardingModelForm):
 
         selected_function_areas = get_actual_field_names(request.POST.getlist('function_areas'))
         user_info_survey.user.extended_profile.save_user_function_areas(selected_function_areas)
+
+        is_currently_unemployed = self.cleaned_data['is_currently_employed']
+
+        user = user_info_survey.user
+        first_name = user.first_name
+        last_name = user.last_name
+
+        if not is_currently_unemployed:
+            organization_name = self.cleaned_data.get('organization_name', '').strip()
+            is_poc = self.cleaned_data['is_poc']
+            org_admin_email = self.cleaned_data['org_admin_email']
+
+        if not is_currently_unemployed and organization_name:
+            organization_to_assign = Organization.objects.filter(label__iexact=organization_name).first()
+            if not organization_to_assign:
+                organization_to_assign = Organization.objects.create(label=organization_name)
+
+            prev_org = user_info_survey.organization
+            user_info_survey.organization = organization_to_assign
+
+            if organization_to_assign.users_count() == 0:
+                user_info_survey.is_first_learner = True
+
+            # Reset organizations under my administrations if i updated my organization & ask for org details
+            if not prev_org == organization_to_assign:
+                Organization.objects.filter(admin=user).update(admin=None)
+                user_info_survey.is_organization_metrics_submitted = False
+
+            if user and is_poc == '1':
+                organization_to_assign.unclaimed_org_admin_email = None
+                organization_to_assign.admin = user
+                user_info_survey.organization = organization_to_assign
+
+            if not is_poc == '1' and org_admin_email:
+                try:
+                    hash_key = OrganizationAdminHashKeys.assign_hash(organization_to_assign, user, org_admin_email)
+                    org_id = user_info_survey.organization_id
+                    org_name = user_info_survey.organization.label
+                    organization_to_assign.unclaimed_org_admin_email = org_admin_email
+                    claimed_by_name = "{first_name} {last_name}".format(first_name=first_name, last_name=last_name)
+                    claimed_by_email = self.data["email"]
+                    send_admin_activation_email(first_name, org_id, org_name, claimed_by_name,
+                                                claimed_by_email, org_admin_email, hash_key)
+                    user_info_survey.organization = organization_to_assign
+                except Exception as ex:
+                    log.info(ex.args)
+                    pass
+
+            if not is_poc == '1':
+                if organization_to_assign.admin == user:
+                    organization_to_assign.admin = None
+                    user_info_survey.organization = organization_to_assign
+
+        elif is_currently_unemployed:
+            if user_info_survey.organization and user_info_survey.organization.admin == user:
+                user_info_survey.organization.admin = None
+                user_info_survey.organization.save()
+
+            if user_info_survey.is_first_learner:
+                user_info_survey.is_first_learner = False
+
+            user_info_survey.organization = None
+            user_info_survey.start_month_year = None
+            user_info_survey.hours_per_week = 0
+            user_info_survey.role_in_org = None
+            selected_function_areas = ""
+            user_info_survey.user.extended_profile.save_user_function_areas(selected_function_areas)
+            user_info_survey.is_organization_metrics_submitted = False
+
         if commit:
             user_info_survey.save()
+
+        partners_opt_in = request.POST.get('partners_opt_in')
+        save_user_partner_network_consent(user, partners_opt_in)
 
         return user_info_survey
 
@@ -434,10 +600,10 @@ class OrganizationInfoForm(BaseOnboardingModelForm):
 
         ORG_TYPE_CHOICES = self.NO_SELECT_CHOICE + [(os.code, os.label) for os in OrgSector.objects.all()]
         OPERATION_LEVEL_CHOICES = self.NO_SELECT_CHOICE + [(ol.code, ol.label)
-                                                      for ol in OperationLevel.objects.all()]
+                                                           for ol in OperationLevel.objects.all()]
         FOCUS_AREA_CHOICES = self.NO_SELECT_CHOICE + [(fa.code, fa.label) for fa in FocusArea.objects.all()]
         TOTAL_EMPLOYEES_CHOICES = self.NO_SELECT_CHOICE + [(ep.code, ep.label)
-                                                      for ep in TotalEmployee.objects.all()]
+                                                           for ep in TotalEmployee.objects.all()]
         PARTNER_NETWORK_CHOICES = [(pn.code, pn.label) for pn in PartnerNetwork.objects.all()]
 
         self.fields['org_type'].choices = ORG_TYPE_CHOICES
@@ -565,11 +731,6 @@ class RegModelForm(BaseOnboardingModelForm):
     Model form for extra fields in registration model
     """
 
-    IS_POC_CHOICES = (
-        (1, ugettext_noop('Yes')),
-        (0, ugettext_noop('No'))
-    )
-
     first_name = forms.CharField(
         label=ugettext_noop('First Name'),
         label_suffix="*",
@@ -586,49 +747,10 @@ class RegModelForm(BaseOnboardingModelForm):
         )
     )
 
-    organization_name = forms.CharField(
-        max_length=255,
-        label=ugettext_noop('Organization Name'),
-        label_suffix="*",
-        help_text=ugettext_noop("You can choose an organization from the auto-suggestion list or add a new one by "
-                                "entering the name and clicking the OK button."),
-        required=False,
-        widget=forms.TextInput(
-            attrs={'placeholder': ugettext_noop('Organization Name')}
-        ),
-        initial=ugettext_noop('Organization Name')
-    )
-
     confirm_password = forms.CharField(
         label=ugettext_noop('Confirm Password'),
         widget=forms.PasswordInput
     )
-
-    is_currently_employed = forms.BooleanField(
-        initial=False,
-        required=False,
-        label=ugettext_noop('Check here if you are currently unemployed or otherwise not affiliated with an '
-                            'organization.')
-    )
-
-    is_poc = forms.ChoiceField(label=ugettext_noop('Will you be the Administrator of your organization on our '
-                                                   'website?'),
-                               help_text=ugettext_noop("Your organization's Administrator is responsible for "
-                                                       "maintaining your organization's profile and inviting learners "
-                                                       "from your organization to the Philanthropy University platform."
-                                                       " An Administrator should be the most senior person in your "
-                                                       "organization responsible for organizational capacity building "
-                                                       "and learning. In a small organization with few employees, "
-                                                       "the Administrator might be the Executive Director or Chief "
-                                                       "Executive. In a larger organization, the Administrator might "
-                                                       "be the director or manager responsible for staff learning "
-                                                       "and development and organizational capacity development."),
-                               choices=IS_POC_CHOICES,
-                               widget=forms.RadioSelect)
-
-    org_admin_email = forms.CharField(
-        required=False,
-        widget=forms.EmailInput(attrs={'placeholder': 'Organization Admin email'}))
 
     opt_in = forms.BooleanField(label=ugettext_noop('Check here if you agree to receive emails from Philanthropy '
                                                     'University with details about <strong>unique funding opportunities'
@@ -647,10 +769,6 @@ class RegModelForm(BaseOnboardingModelForm):
             'required': ugettext_noop('Please enter your Last Name.'),
         }
 
-        self.fields['organization_name'].error_messages = {
-            'required': ugettext_noop('Please select your Organization.'),
-        }
-
         self.fields['confirm_password'].error_messages = {
             'required': ugettext_noop('Please enter your Confirm Password.'),
         }
@@ -660,7 +778,6 @@ class RegModelForm(BaseOnboardingModelForm):
 
         fields = (
             'confirm_password', 'first_name', 'last_name',
-            'organization_name', 'is_currently_employed', 'is_poc', 'org_admin_email',
         )
 
         labels = {
@@ -695,76 +812,17 @@ class RegModelForm(BaseOnboardingModelForm):
     def save_email_preferences(self, user, opt_in):
         user_email_preferences, created = EmailPreference.objects.get_or_create(user=user)
         if (not user_email_preferences.opt_in and opt_in in ['yes', 'no']) or (
-                user_email_preferences.opt_in in ['yes', 'no']):
+            user_email_preferences.opt_in in ['yes', 'no']):
             user_email_preferences.opt_in = opt_in
             user_email_preferences.save()
 
-    def clean_organization_name(self):
-        organization_name = self.cleaned_data['organization_name']
-
-        if self.data.get('is_currently_employed') == 'false' and not organization_name:
-            raise forms.ValidationError(ugettext_noop('Please enter Organization Name.'))
-
-        return organization_name
-
-    def clean_org_admin_email(self):
-        org_admin_email = self.cleaned_data['org_admin_email']
-
-        already_an_admin = Organization.objects.filter(admin__email=org_admin_email).first()
-        if already_an_admin:
-            raise forms.ValidationError(ugettext_noop('%s is already admin of organization "%s"'
-                                                      % (org_admin_email, already_an_admin.label)))
-
-        already_suggested_as_admin = OrganizationAdminHashKeys.objects.filter(
-            suggested_admin_email=org_admin_email, is_hash_consumed=False).first()
-        if already_suggested_as_admin:
-            raise forms.ValidationError(ugettext_noop('%s is already suggested as admin of "%s" organization'
-                                                      % (org_admin_email,
-                                                         already_suggested_as_admin.organization.label)))
-
-        return org_admin_email
-
     def save(self, user=None, commit=True, is_alquity_user=False):
-        organization_name = self.cleaned_data.get('organization_name', '').strip()
-        is_poc = self.cleaned_data['is_poc']
         opt_in = self.cleaned_data['opt_in']
-        org_admin_email = self.cleaned_data['org_admin_email']
         first_name = self.cleaned_data['first_name']
         last_name = self.cleaned_data['last_name']
-        is_currently_unemployed = self.cleaned_data['is_currently_employed']
 
         extended_profile = UserExtendedProfile.objects.create(user=user)
         extended_profile.is_alquity_user = is_alquity_user
-
-        if not is_currently_unemployed and organization_name:
-            organization_to_assign = Organization.objects.filter(label__iexact=organization_name).first()
-            if not organization_to_assign:
-                organization_to_assign = Organization.objects.create(label=organization_name)
-
-            extended_profile.organization = organization_to_assign
-
-            if organization_to_assign.users_count() == 0:
-                extended_profile.is_first_learner = True
-
-            if user and is_poc == '1':
-                organization_to_assign.unclaimed_org_admin_email = None
-                organization_to_assign.admin = user
-
-            if not is_poc == '1' and org_admin_email:
-                try:
-
-                    hash_key = OrganizationAdminHashKeys.assign_hash(organization_to_assign, user, org_admin_email)
-                    org_id = extended_profile.organization_id
-                    org_name = extended_profile.organization.label
-                    organization_to_assign.unclaimed_org_admin_email = org_admin_email
-                    claimed_by_name = "{first_name} {last_name}".format(first_name=first_name, last_name=last_name)
-                    claimed_by_email = self.data["email"]
-                    send_admin_activation_email(first_name, org_id, org_name, claimed_by_name,
-                                                claimed_by_email, org_admin_email, hash_key)
-
-                except Exception as ex:
-                    log.info(ex.args)
-                    pass
 
         user.first_name = first_name
         user.last_name = last_name
@@ -820,57 +878,13 @@ class UpdateRegModelForm(RegModelForm):
         self.fields['on_demand_emails_enable'].initial = is_nudges_enable
 
     def save(self, user=None, commit=True):
-        organization_name = self.cleaned_data.get('organization_name', '').strip()
-        is_poc = self.cleaned_data['is_poc']
         opt_in = self.cleaned_data['opt_in']
         on_demand_course = self.cleaned_data['on_demand_courses']
         on_demand_emails_enable = self.cleaned_data['on_demand_emails_enable']
         first_name = self.cleaned_data['first_name']
         last_name = self.cleaned_data['last_name']
-        is_currently_unemployed = self.cleaned_data['is_currently_employed']
 
         extended_profile = UserExtendedProfile.objects.get(user=user)
-
-        if not is_currently_unemployed and organization_name:
-            organization_to_assign = Organization.objects.filter(label__iexact=organization_name).first()
-            if not organization_to_assign:
-                organization_to_assign = Organization.objects.create(label=organization_name)
-
-            prev_org = extended_profile.organization
-            extended_profile.organization = organization_to_assign
-
-            if organization_to_assign.users_count() == 0:
-                extended_profile.is_first_learner = True
-
-            # Reset organizations under my administrations if i updated my organization & ask for org details
-            if not prev_org == organization_to_assign:
-                Organization.objects.filter(admin=user).update(admin=None)
-                extended_profile.is_organization_metrics_submitted = False
-
-            # if user check YES option on account settings page => set user as admin of selected/created organization
-            if user and is_poc == '1' and admin_not_assigned_or_me(user, organization_to_assign):
-                organization_to_assign.unclaimed_org_admin_email = None
-                organization_to_assign.admin = user
-
-            # if user check NO option on account settings page => clear my admin status if i was admin
-            if not is_poc == '1':
-                if organization_to_assign.admin == user:
-                    organization_to_assign.admin = None
-
-        elif is_currently_unemployed:
-            if extended_profile.organization and extended_profile.organization.admin == user:
-                extended_profile.organization.admin = None
-                extended_profile.organization.save()
-
-            if extended_profile.is_first_learner:
-                extended_profile.is_first_learner = False
-
-            extended_profile.role_in_org = None
-            extended_profile.start_month_year = None
-            extended_profile.hours_per_week = 0
-
-            extended_profile.organization = None
-            extended_profile.is_organization_metrics_submitted = False
 
         user.first_name = first_name
         user.last_name = last_name
@@ -878,9 +892,6 @@ class UpdateRegModelForm(RegModelForm):
         if commit:
             user.save()
             extended_profile.save()
-
-            if extended_profile.organization:
-                extended_profile.organization.save()
 
         self.save_email_preferences(user, opt_in)
         self.save_on_demand_email_preferences(user, on_demand_course, on_demand_emails_enable)
@@ -1026,7 +1037,7 @@ class OrganizationMetricModelForm(BaseOnboardingModelForm):
             raise forms.ValidationError(ugettext_noop(EMPTY_FIELD_ERROR.format("End date for Last Fiscal Year")))
 
         if last_fiscal_year_end_date and \
-                last_fiscal_year_end_date > datetime.now().date():
+            last_fiscal_year_end_date > datetime.now().date():
             raise forms.ValidationError(ugettext_noop("Please enter a valid End date for Last Fiscal Year"))
 
         return last_fiscal_year_end_date
@@ -1232,7 +1243,7 @@ class OrganizationMetricModelUpdateForm(OrganizationMetricModelForm):
             raise forms.ValidationError(ugettext_noop(EMPTY_FIELD_ERROR.format("End date for Last Fiscal Year")))
 
         if last_fiscal_year_end_date and \
-                last_fiscal_year_end_date > datetime.now().date():
+            last_fiscal_year_end_date > datetime.now().date():
             raise forms.ValidationError(ugettext_noop("Please enter a valid End date for Last Fiscal Year"))
 
         return last_fiscal_year_end_date
