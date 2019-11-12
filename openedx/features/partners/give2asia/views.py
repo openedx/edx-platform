@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.db.models.signals import post_save
 from django.http import Http404
 from django.utils.translation import get_language
 from edxmako.shortcuts import render_to_response
@@ -124,7 +125,12 @@ def create_account_with_params_custom(request, params, partner):
 
             if extended_profile_data:
                 profile.meta = json.dumps(extended_profile_data)
+
             profile.save()
+
+            # We have to manually trigger the post_save so that profile is synced on nodebb
+            post_save.send(UserProfile, instance=profile, created=False)
+
         except Exception as err:  # pylint: disable=broad-except
             log.exception("UserProfile creation failed for user {id}.".format(id=user.id), repr(err))
             raise
