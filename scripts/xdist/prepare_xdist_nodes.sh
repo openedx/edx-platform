@@ -12,7 +12,7 @@ python scripts/xdist/pytest_worker_manager.py -a up -n ${XDIST_NUM_WORKERS} \
 
 # Install the correct version of Django depending on which tox environment (if any) is in use
 if [[ -z ${TOX_ENV+x} ]] || [[ ${TOX_ENV} == 'null' ]]; then
-    DJANGO_REQUIREMENT="-r requirements/edx/django.txt"
+    DJANGO_REQUIREMENT="requirements/edx/django.txt"
 else
     DJANGO_REQUIREMENT=$(pip freeze | grep "^[Dd]jango==")
 fi
@@ -26,7 +26,7 @@ do
     rm -rf /home/jenkins/edx-venv;
     tar -C /home/jenkins -xf /home/jenkins/edx-venv_clean-${PYTHON_VERSION}.tar.gz;
     source ../edx-venv/bin/activate;
-    pip install -q ${DJANGO_REQUIREMENT} -r requirements/edx/testing.txt; mkdir reports' & "
+    pip-sync -q ${DJANGO_REQUIREMENT} requirements/edx/testing.txt; mkdir reports' & "
 
     cmd=$cmd$worker_reqs_cmd
 done

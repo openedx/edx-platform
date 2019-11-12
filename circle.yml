@@ -18,7 +18,7 @@ dependencies:
     # cache the virtualenv at that state, so that
     # the next build will not need to install them
     # from scratch again.
-    - pip install --exists-action w -r requirements/edx/testing.txt
+    - pip-sync requirements/edx/testing.txt
 
     - pip install coveralls==1.0
 
