@@ -144,7 +144,7 @@ edxval==1.1.30
 elasticsearch==1.9.0
 entrypoints==0.3          # via flake8
 enum34==1.1.6
-event-tracking==0.2.9
+event-tracking==0.3.0
 execnet==1.7.1            # via pytest-xdist
 factory_boy==2.8.1
 faker==2.0.3              # via factory-boy
