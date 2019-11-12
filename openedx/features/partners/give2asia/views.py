@@ -157,7 +157,7 @@ def create_account_with_params_custom(request, params, partner):
 
         try:
             user_email_preferences, created = EmailPreference.objects.get_or_create(user=user)
-            user_email_preferences.opt_in = 'no'
+            user_email_preferences.opt_in = g2a_constants.GIVE2ASIA_DEFAULT_DATA[g2a_constants.OPT_IN_KEY]
             user_email_preferences.save()
         except Exception as err:  # pylint: disable=broad-except
             log.exception("User email preferences creation failed for user {id}.".format(id=user.id), repr(err))
