@@ -5,6 +5,7 @@ from __future__ import absolute_import
 
 import logging
 from functools import wraps
+import traceback
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -256,9 +257,10 @@ class EnterpriseApiClient(object):
             response = endpoint().get(**querystring)
         except (HttpClientError, HttpServerError):
             LOGGER.exception(
-                u'Failed to get enterprise-learner for user [%s] with client user [%s]',
+                u'Failed to get enterprise-learner for user [%s] with client user [%s]. Caller: %s',
                 user.username,
-                self.user.username
+                self.user.username,
+                "".join(traceback.format_stack())
             )
             return None
 
