@@ -60,7 +60,7 @@ class Command(BaseCommand):
             nodebb_data = nodebb_users.get(user.username)
 
             if not nodebb_data:
-                task_create_user_on_nodebb.delay(username=user.username, user_data=edx_data)
+                task_create_user_on_nodebb.delay(username=user.username, user_data=edx_data, user=user)
                 if user.is_active:
                     task_activate_user_on_nodebb.delay(username=user.username, active=user.is_active)
                 # if user has submitted all onboarding surveys then update status on NodeBB
