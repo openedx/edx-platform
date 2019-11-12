@@ -24,14 +24,15 @@ $(document).ready(function() {
 
 
     // bind menu toggle click for later use
-    $dropdownMenuToggle.toggle(function() {
-        $dropdownMenu.addClass('expanded').find('.dropdown-menuitem').first()
-            .focus();
-        $dropdownMenuToggle.addClass('active').attr('aria-expanded', 'true');
-    }, function() {
-        $dropdownMenu.removeClass('expanded');
-        $dropdownMenuToggle.removeClass('active').attr('aria-expanded', 'false').focus();
-    });
+    $dropdownMenuToggle.on('click', function() {
+        if ($dropdownMenu.hasClass('expanded')) {
+            $dropdownMenu.removeClass('expanded');
+            $dropdownMenuToggle.removeClass('active').attr('aria-expanded', 'false').focus();
+        } else {
+            $dropdownMenu.addClass('expanded').find('.dropdown-menuitem').first().focus();
+            $dropdownMenuToggle.addClass('active').attr('aria-expanded', 'true');
+        }
+    })
 
     // catch keypresses when focused on $dropdownMenuToggle (we only care about spacebar keypresses here)
     $dropdownMenuToggle.on('keydown', function(event) {

@@ -65,7 +65,7 @@ $(document).ready(function() {
     });
 
     // Hide hamburger menu if no nav items (sign in and register pages)
-    if ($('.mobile-nav-item').size() === 0) {
+    if ($('.mobile-nav-item').length === 0) {
         $('.global-header .hamburger-menu').addClass('hidden');
     }
 
