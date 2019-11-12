@@ -168,14 +168,16 @@ def python_prereqs_installation():
     """
     Installs Python prerequisites
     """
-    for req_file in PYTHON_REQ_FILES:
-        pip_install_req_file(req_file)
+    pip_sync_req_file(PYTHON_REQ_FILES)
 
+def pip_sync_req_file(req_files):
+    pip_cmd = 'pip-sync -q'
+    sh(u"{pip_cmd} {req_files}".format(pip_cmd=pip_cmd, req_files=" ".join(req_file)))
 
 def pip_install_req_file(req_file):
     """Pip install the requirements file."""
-    pip_cmd = 'pip-sync -q'
-    sh(u"{pip_cmd} {req_file}".format(pip_cmd=pip_cmd, req_file=req_file))
+    pip_cmd = 'pip install -q --disable-pip-version-check --exists-action w'
+    sh(u"{pip_cmd} -r {req_file}".format(pip_cmd=pip_cmd, req_file=req_file))
 
 
 @task
