@@ -109,7 +109,6 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         self.assertDictEqual(
             response_json,
             {
-                "success": False,
                 "email": [{
                     "user_message": (
                         u"It looks like {} belongs to an existing account. "
@@ -152,7 +151,6 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         self.assertDictEqual(
             response_json,
             {
-                "success": False,
                 "email": [{
                     "user_message": (
                         u"It looks like {} belongs to an existing account. "
@@ -195,7 +193,6 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         self.assertDictEqual(
             response_json,
             {
-                "success": False,
                 "username": [{
                     "user_message": (
                         u"It looks like {} belongs to an existing account. "
@@ -233,7 +230,6 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         self.assertDictEqual(
             response_json,
             {
-                "success": False,
                 "email": [{
                     "user_message": (
                         u"It looks like {} belongs to an existing account. "
@@ -271,7 +267,6 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         self.assertDictEqual(
             response_json,
             {
-                u"success": False,
                 u"username": [{
                     u"user_message": (
                         u"An account with the Public Username '{}' already exists."
@@ -308,7 +303,6 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         self.assertDictEqual(
             response_json,
             {
-                "success": False,
                 "email": [{
                     "user_message": (
                         u"It looks like {} belongs to an existing account. "
@@ -1480,7 +1474,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self.assertDictEqual(
             response_json,
             {
-                "success": False,
                 "email": [{
                     "user_message": (
                         u"It looks like {} belongs to an existing account. "
@@ -1516,7 +1509,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self.assertDictEqual(
             response_json,
             {
-                "success": False,
                 "username": [{
                     "user_message": (
                         u"It looks like {} belongs to an existing account. "
@@ -1552,7 +1544,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self.assertDictEqual(
             response_json,
             {
-                "success": False,
                 "username": [{
                     "user_message": (
                         u"It looks like {} belongs to an existing account. "
@@ -1596,7 +1587,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self.assertDictEqual(
             response_json,
             {
-                u"success": False,
                 u"username": [{u"user_message": USERNAME_BAD_LENGTH_MSG}],
                 u"password": [{u"user_message": u"This field is required."}],
             }
@@ -1761,7 +1751,6 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
         self.assertDictEqual(
             response_json,
             {
-                "success": False,
                 "access_token": [{"user_message": expected_error_message}],
             }
         )
@@ -1773,7 +1762,6 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
         self.assertDictEqual(
             response_json,
             {
-                "success": False,
                 "session_expired": [{"user_message": expected_error_message}],
             }
         )

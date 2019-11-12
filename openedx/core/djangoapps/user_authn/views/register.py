@@ -509,5 +509,7 @@ class RegistrationView(APIView):
         return response, user
 
     def _create_response(self, response_dict, status_code):
-        response_dict['success'] = (status_code == 200)
+        if status_code == 200:
+            # keeping this `success` field in for now, as we have outstanding clients expecting this
+            response_dict['success'] = True
         return JsonResponse(response_dict, status=status_code)
