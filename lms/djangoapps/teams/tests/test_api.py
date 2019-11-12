@@ -13,9 +13,9 @@ from opaque_keys.edx.keys import CourseKey
 from course_modes.models import CourseMode
 from lms.djangoapps.teams import api as teams_api
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 COURSE_KEY1 = CourseKey.from_string('edx/history/1')

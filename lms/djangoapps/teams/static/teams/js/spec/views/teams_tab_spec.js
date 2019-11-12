@@ -1,14 +1,14 @@
 define([
     'jquery',
+    'underscore',
     'backbone',
     'logger',
     'edx-ui-toolkit/js/utils/spec-helpers/spec-helpers',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/spec_helpers/page_helpers',
     'teams/js/views/teams_tab',
-    'teams/js/spec_helpers/team_spec_helpers',
-    'underscore'
-], function($, Backbone, Logger, SpecHelpers, AjaxHelpers, PageHelpers, TeamsTabView, TeamSpecHelpers, _) {
+    'teams/js/spec_helpers/team_spec_helpers'
+], function($, _, Backbone, Logger, SpecHelpers, AjaxHelpers, PageHelpers, TeamsTabView, TeamSpecHelpers) {
     'use strict';
 
     describe('TeamsTab', function() {
@@ -227,6 +227,53 @@ define([
                 expect(teamsTabView.readOnlyDiscussion({
                     attributes: {membership: []}
                 })).toBe(true);
+            });
+        });
+
+        describe('Manage Tab', function() {
+            var manageTabSelector = '.page-content-nav>.nav-item[data-url=manage]';
+            var noManagedData = TeamSpecHelpers.createMockTopicData(1, 2);
+            var withManagedData = TeamSpecHelpers.createMockTopicData(1, 2);
+            var topicsNoManaged, topicsWithManaged;
+
+            topicsNoManaged = {
+                count: 2,
+                num_pages: 1,
+                current_page: 1,
+                start: 0,
+                results: noManagedData
+            };
+            withManagedData[1].type = 'public_managed';
+            topicsWithManaged = {
+                count: 2,
+                num_pages: 1,
+                current_page: 1,
+                start: 0,
+                results: withManagedData
+            };
+
+            it('is not visible to unprivileged users', function() {
+                var teamsTabView = createTeamsTabView(this, {
+                    userInfo: TeamSpecHelpers.createMockUserInfo({privileged: false}),
+                    topics: topicsNoManaged
+                });
+                expect(teamsTabView.$(manageTabSelector).length).toBe(0);
+            });
+
+            it('is not visible when there are no managed topics', function() {
+                var teamsTabView = createTeamsTabView(this, {
+                    userInfo: TeamSpecHelpers.createMockUserInfo({privileged: true}),
+                    topics: topicsNoManaged
+                });
+                expect(teamsTabView.$(manageTabSelector).length).toBe(0);
+            });
+
+            it('is visible to privileged users when there is a managed topic', function() {
+                var teamsTabView = createTeamsTabView(this, {
+                    userInfo: TeamSpecHelpers.createMockUserInfo({privileged: true}),
+                    topics: topicsWithManaged
+                });
+                expect(teamsTabView.$(manageTabSelector).length).toBe(1);
             });
         });
 

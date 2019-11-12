@@ -8,12 +8,15 @@ import logging
 import six
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, render_to_response
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
+from django.views import View
 from django_countries import countries
 from edx_rest_framework_extensions.paginators import DefaultPagination, paginate_search_results
 from opaque_keys import InvalidKeyError
@@ -28,14 +31,6 @@ from rest_framework_oauth.authentication import OAuth2Authentication
 
 from lms.djangoapps.courseware.courses import get_course_with_access, has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
-from lms.djangoapps.teams.api import (
-    OrganizationProtectionStatus,
-    has_team_api_access,
-    user_organization_protection_status,
-    has_specific_team_access,
-    add_team_count,
-    can_user_modify_team
-)
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.permissions import IsStaffOrReadOnly
@@ -50,6 +45,16 @@ from util.model_utils import truncate_fields
 from xmodule.modulestore.django import modulestore
 
 from . import is_feature_enabled
+from .api import (
+    OrganizationProtectionStatus,
+    add_team_count,
+    can_user_modify_team,
+    has_course_staff_privileges,
+    has_specific_team_access,
+    has_team_api_access,
+    user_organization_protection_status
+)
+from .csv import load_team_membership_csv
 from .errors import AlreadyOnTeamInCourse, ElasticSearchConnectionError, NotEnrolledInCourseForTeam
 from .search_indexes import CourseTeamIndexer
 from .serializers import (
@@ -183,6 +188,9 @@ class TeamsDashboardView(GenericAPIView):
             "team_memberships_url": reverse('team_membership_list', request=request),
             "my_teams_url": reverse('teams_list', request=request),
             "team_membership_detail_url": reverse('team_membership_detail', args=['team_id', user.username]),
+            "team_membership_management_url": reverse(
+                'team_membership_bulk_management', request=request, kwargs={'course_id': course_id}
+            ),
             "languages": [[lang[0], _(lang[1])] for lang in settings.ALL_LANGUAGES],  # pylint: disable=translation-of-non-string
             "countries": list(countries),
             "disable_courseware_js": True,
@@ -363,33 +371,34 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = CourseTeamSerializer
 
-    def get(self, request):  # pylint: disable=too-many-statements
+    def get(self, request):
         """GET /api/team/v0/teams/"""
         result_filter = {}
 
-        if 'course_id' in request.query_params:
-            course_id_string = request.query_params['course_id']
-            try:
-                course_key = CourseKey.from_string(course_id_string)
-                # Ensure the course exists
-                course_module = modulestore().get_course(course_key)
-                if course_module is None:
-                    return Response(status=status.HTTP_404_NOT_FOUND)
-                result_filter.update({'course_id': course_key})
-            except InvalidKeyError:
-                error = build_api_error(
-                    ugettext_noop(u"The supplied course id {course_id} is not valid."),
-                    course_id=course_id_string,
-                )
-                return Response(error, status=status.HTTP_400_BAD_REQUEST)
-
-            if not has_team_api_access(request.user, course_key):
-                return Response(status=status.HTTP_403_FORBIDDEN)
-        else:
+        if 'course_id' not in request.query_params:
             return Response(
                 build_api_error(ugettext_noop("course_id must be provided")),
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+        course_id_string = request.query_params['course_id']
+        try:
+            course_key = CourseKey.from_string(course_id_string)
+            course_module = modulestore().get_course(course_key)
+        except InvalidKeyError:
+            error = build_api_error(
+                ugettext_noop(u"The supplied course id {course_id} is not valid."),
+                course_id=course_id_string,
+            )
+            return Response(error, status=status.HTTP_400_BAD_REQUEST)
+
+        # Ensure the course exists
+        if course_module is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        result_filter.update({'course_id': course_key})
+
+        if not has_team_api_access(request.user, course_key):
+            return Response(status=status.HTTP_403_FORBIDDEN)
 
         text_search = request.query_params.get('text_search', None)
         if text_search and request.query_params.get('order_by', None):
@@ -411,13 +420,13 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 return Response(error, status=status.HTTP_400_BAD_REQUEST)
             result_filter.update({'topic_id': topic_id})
 
-        organization_protection_status = user_organization_protection_status(request.user, course_key)
-        if organization_protection_status != OrganizationProtectionStatus.protection_exempt:
-            result_filter.update(
-                {
-                    'organization_protected': organization_protection_status == OrganizationProtectionStatus.protected
-                }
-            )
+        organization_protection_status = user_organization_protection_status(
+            request.user, course_key
+        )
+        if not organization_protection_status.is_exempt:
+            result_filter.update({
+                'organization_protected': organization_protection_status.is_protected
+            })
 
         if text_search and CourseTeamIndexer.search_is_enabled():
             try:
@@ -450,33 +459,36 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
 
             page = self.paginate_queryset(paginated_results)
             serializer = self.get_serializer(page, many=True)
-            order_by_input = None
-        else:
-            queryset = CourseTeam.objects.filter(**result_filter)
-            order_by_input = request.query_params.get('order_by', 'name')
-            if order_by_input == 'name':
-                # MySQL does case-insensitive order_by.
-                queryset = queryset.order_by('name')
-            elif order_by_input == 'open_slots':
-                queryset = queryset.order_by('team_size', '-last_activity_at')
-            elif order_by_input == 'last_activity_at':
-                queryset = queryset.order_by('-last_activity_at', 'team_size')
-            else:
-                return Response({
-                    'developer_message': u"unsupported order_by value {ordering}".format(ordering=order_by_input),
+            return self.get_paginated_response(serializer.data)
+
+        ordering_schemes = {
+            'name': ('name',),  # MySQL does case-insensitive order_by
+            'open_slots': ('team_size', '-last_activity_at'),
+            'last_activity_at': ('-last_activity_at', 'team_size'),
+        }
+        queryset = CourseTeam.objects.filter(**result_filter)
+        order_by_input = request.query_params.get('order_by', 'name')
+        if order_by_input not in ordering_schemes:
+            return Response(
+                {
+                    'developer_message': u"unsupported order_by value {ordering}".format(
+                        ordering=order_by_input,
+                    ),
                     # Translators: 'ordering' is a string describing a way
                     # of ordering a list. For example, {ordering} may be
                     # 'name', indicating that the user wants to sort the
                     # list by lower case name.
-                    'user_message': _(u"The ordering {ordering} is not supported").format(ordering=order_by_input),
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-            page = self.paginate_queryset(queryset)
-            serializer = self.get_serializer(page, many=True)
-
+                    'user_message': _(u"The ordering {ordering} is not supported").format(
+                        ordering=order_by_input,
+                    ),
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        queryset = queryset.order_by(*ordering_schemes[order_by_input])
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
         response = self.get_paginated_response(serializer.data)
-        if order_by_input is not None:
-            response.data['sort_order'] = order_by_input
+        response.data['sort_order'] = order_by_input
         return response
 
     def post(self, request):
@@ -1168,7 +1180,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if not can_user_modify_team(request.user, team.course_id, team):
+        if not can_user_modify_team(request.user, team):
             return Response(
                 build_api_error(ugettext_noop("You can't join an instructor managed team.")),
                 status=status.HTTP_403_FORBIDDEN
@@ -1317,7 +1329,7 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
         if not has_specific_team_access(request.user, team):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        if not can_user_modify_team(request.user, team.course_id, team):
+        if not can_user_modify_team(request.user, team):
             return Response(
                 build_api_error(ugettext_noop("You can't leave an instructor managed team.")),
                 status=status.HTTP_403_FORBIDDEN
@@ -1338,3 +1350,59 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
             }
         )
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class MembershipBulkManagementView(View):
+    """
+    Partially-implemented view for uploading and downloading team membership CSVs.
+
+    TODO MST-31
+    """
+    def get(self, request, **_kwargs):
+        """
+        Download CSV with team membership data for given course run.
+        """
+        self.check_access()
+        response = HttpResponse(content_type='text/csv')
+        filename = "team-membership_{}_{}_{}.csv".format(
+            self.course.id.org, self.course.id.course, self.course.id.run
+        )
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+        load_team_membership_csv(self.course, response)
+        return response
+
+    def post(self, request, **_kwargs):
+        """
+        Process uploaded CSV to modify team memberships for given course run.
+        """
+        self.check_access()
+        return HttpResponse(status=status.HTTP_501_NOT_IMPLEMENTED)
+
+    def check_access(self):
+        """
+        Raises 403 if user does not have access to this endpoint.
+        """
+        if not has_course_staff_privileges(self.request.user, self.course.id):
+            raise PermissionDenied(
+                "To manage team membership of {}, you must be course staff.".format(
+                    self.course.id
+                )
+            )
+
+    @cached_property
+    def course(self):
+        """
+        Return a CourseDescriptor based on the `course_id` kwarg.
+        If invalid or not found, raise 404.
+        """
+        course_id_string = self.kwargs.get('course_id')
+        if not course_id_string:
+            raise Http404('No course key provided.')
+        try:
+            course_id = CourseKey.from_string(course_id_string)
+        except InvalidKeyError:
+            raise Http404('Invalid course key: {}'.format(course_id_string))
+        course_module = modulestore().get_course(course_id)
+        if not course_module:
+            raise Http404('Course not found: {}'.format(course_id))
+        return course_module
