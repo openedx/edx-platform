@@ -7,10 +7,10 @@ class Partner(TimeStampedModel):
     """
     This model represents white-labelled partners.
     """
-    label = models.CharField(max_length=100, default=None)
-    main_logo = models.CharField(max_length=255, default=None)
-    small_logo = models.CharField(max_length=255, default=None)
-    slug = models.CharField(max_length=100, default=None, unique=True)
+    label = models.CharField(max_length=100)
+    main_logo = models.CharField(max_length=255)
+    small_logo = models.CharField(max_length=255)
+    slug = models.CharField(max_length=100, unique=True)
 
     def __unicode__(self):
         return '{}'.format(self.label)
