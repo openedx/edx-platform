@@ -159,7 +159,7 @@ def get_file_from_s3(bucket_name, zipfile_name, path):
     """
     Get the file from s3 and save it to disk.
     """
-    print (u"Retrieving {} from bucket {}.".format(zipfile_name, bucket_name))
+    print(u"Retrieving {} from bucket {}.".format(zipfile_name, bucket_name))
     conn = boto.connect_s3(anon=True)
     bucket = conn.get_bucket(bucket_name)
     key = boto.s3.key.Key(bucket=bucket, name=zipfile_name)
@@ -194,7 +194,7 @@ def refresh_bokchoy_db_cache_from_s3(fingerprint, bucket_name, bokchoy_db_files)
         zipfile_name = '{}.tar.gz'.format(fingerprint)
         get_file_from_s3(bucket_name, zipfile_name, path)
         zipfile_path = os.path.join(path, zipfile_name)
-        print ("Extracting db cache files.")
+        print("Extracting db cache files.")
         extract_files_from_zip(bokchoy_db_files, zipfile_path, path)
         os.remove(zipfile_path)
 
