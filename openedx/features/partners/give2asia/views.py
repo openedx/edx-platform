@@ -72,7 +72,7 @@ class Give2AsiaRegistrationView(RegistrationViewCustom):
             user = create_account_with_params_custom(request, registration_data, partner)
             self.save_user_utm_info(user)
         except Exception as err:
-            error_message = {"Error": {"reason": "User registration failed due to {}".format(err)}}
+            error_message = {"Error": {"reason": "User registration failed due to {}".format(repr(err))}}
             log.exception(error_message)
             return JsonResponse(error_message, status=400)
 
