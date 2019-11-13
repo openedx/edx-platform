@@ -186,7 +186,7 @@ py2neo==3.1.2
 pycontracts==1.7.1
 pycountry==19.8.18
 pycparser==2.19
-pycryptodome==3.9.2       # via pdfminer.six
+pycryptodome==3.9.3       # via pdfminer.six
 pycryptodomex==3.4.7
 pygments==2.4.2
 pygraphviz==1.5
@@ -246,7 +246,7 @@ urllib3==1.25.7
 user-util==0.1.5
 voluptuous==0.11.7
 watchdog==0.9.0
-web-fragments==0.3.0
+web-fragments==0.3.1
 webencodings==0.5.1       # via html5lib
 webob==1.8.5              # via xblock
 wrapt==1.10.5
