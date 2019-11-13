@@ -1,0 +1,29 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <p>Hello,</p>
+            <p>LearnX was not able to process a user request, and we need to take action.</p>
+            <p>Here are the details:</p>
+            <p>Learner: {{name}} ({{email}})</p>
+            <p>
+                {% if course %}
+                    Course: {{course}}
+                    <br>
+                {% endif %}
+            </p>
+            <p>--------------------Request Details--------------------</p>
+
+            <p>{{ body }}</p>
+
+            {% block google_analytics_pixel %}
+                <img src="{{ ga_tracking_pixel_url }}" alt="" role="presentation" aria-hidden="true" style="display: block;"/>
+            {% endblock %}
+        </td>
+    </tr>
+</table>
+{% endblock %}

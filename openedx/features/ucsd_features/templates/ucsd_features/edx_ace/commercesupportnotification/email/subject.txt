@@ -1,0 +1,3 @@
+{% load i18n %}
+
+{% blocktrans %}[LearnX] Administrative Action Needed {{name}} {% endblocktrans %}{% if course %}{% blocktrans %}/ {{course}}{% endblocktrans %}{% endif %}

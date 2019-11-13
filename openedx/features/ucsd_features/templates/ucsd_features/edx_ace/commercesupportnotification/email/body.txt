@@ -1,0 +1,21 @@
+{% load i18n %}
+
+{% block content %}
+    Hello,
+    LearnX was not able to process a user request, and we need to take action.
+    Here are the details:
+    Learner: {{name}} ({{email}})
+
+        {% if course %}
+            Course: {{course}}
+        {% endif %}
+
+    --------------------Request Details--------------------
+
+    {{ body }}
+
+{% endblock %}
+
+{% block google_analytics_pixel %}
+<img src="{{ ga_tracking_pixel_url }}" alt="" role="presentation" aria-hidden="true" style="display: block;"/>
+{% endblock %}

@@ -367,6 +367,7 @@ def create_zendesk_ticket(requester_name, requester_email, subject, body, tags=N
     """
     if settings.FEATURES.get("ENABLE_EMAIL_INSTEAD_ZENDESK", True):
         is_email_sent = send_notification_email_to_support(
+            message_type='commerce_support',
             subject=subject,
             body=body,
             name=requester_name,

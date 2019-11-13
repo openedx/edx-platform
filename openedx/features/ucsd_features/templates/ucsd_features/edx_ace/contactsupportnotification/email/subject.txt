@@ -1,0 +1,3 @@
+{% load i18n %}
+
+{% blocktrans %}[LearnX] Support / Information Request {{name}}{% endblocktrans %} {% if course %}{% blocktrans %}/ {{course}}{% endblocktrans %}{% endif %}

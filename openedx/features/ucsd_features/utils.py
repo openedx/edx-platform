@@ -2,37 +2,39 @@ import json
 import logging
 
 from django.conf import settings
+
 from edx_ace import ace
 from edx_ace.recipient import Recipient
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.theming.helpers import get_current_site
-from openedx.features.ucsd_features.message_types import SupportNotification
+from openedx.features.ucsd_features.message_types import CommerceSupportNotification, ContactSupportNotification
 
 log = logging.getLogger(__name__)
 TEMPLATE_PATH = '{key}_email.html'
 
 
-def send_notification(message_type, data, subject, dest_emails):
+def send_notification(message_type, data, dest_emails):
     """
     Send an email
 
     Arguments:
         message_type - string value to select ace message object
         data - Dict containing context/data for the template
-        subject - Email subject
         dest_emails - List of destination emails
 
     Returns:
         a boolean variable indicating email response.
     """
     message_types = {
-        'support': SupportNotification,
+        'contact_support': ContactSupportNotification,
+        'commerce_support': CommerceSupportNotification
     }
     current_site = get_current_site()
     content = json.dumps(data)
     data.update(
         {
-            'subject': subject,
             'site': current_site
         }
     )
@@ -55,7 +57,7 @@ def send_notification(message_type, data, subject, dest_emails):
             )
             return_value = True
         except Exception:
-            log.error(
+            log.exception(
                 'Unable to send an email to %s for content "%s".',
                 email,
                 content
@@ -63,18 +65,30 @@ def send_notification(message_type, data, subject, dest_emails):
     return return_value
 
 
-def send_notification_email_to_support(subject, body, name, email, custom_fields=None, additional_info=None, course=None):
+def send_notification_email_to_support(subject, body, name, email, message_type, custom_fields=None):
     """
     Sending a notification-email to the Support Team.
     """
-    key = "support"
+    course = None
+    if message_type == 'contact_support':
+        course = get_course_name(custom_fields)
     dest_emails = settings.SUPPORT_DESK_EMAILS
     data = {
+        'subject': subject,
         'name': name,
         'email': email,
         'body': body,
-        'custom_fields': custom_fields,
-        'additional_info': additional_info,
+        'course': course,
+        'custom_fields': custom_fields
     }
-    email_response = send_notification(key, data, subject, dest_emails)
+    email_response = send_notification(message_type, data, dest_emails)
     return email_response
+
+
+def get_course_name(custom_fields):
+    course_key = custom_fields[0].get('value')
+    try:
+        course_name = CourseKey.from_string(course_key).course
+    except InvalidKeyError:
+        return None
+    return course_name
