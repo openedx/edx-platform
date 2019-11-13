@@ -266,6 +266,30 @@ class EnterpriseApiClient(object):
 
         return response
 
+    def post_active_enterprise_customer(self, username, enterprise_uuid, active):
+        """
+        Update learner's active enterprise
+        """
+        data = {
+            'username': username,
+            'enterprise_customer': enterprise_uuid,
+            'active': active,
+        }
+        endpoint = getattr(self.client, 'enterprise-learner')
+        try:
+            endpoint.post(data=data)
+        except (HttpClientError, HttpServerError):
+            message = (
+                u'[Enterprise Support] An error occurred while posting EnterpriseCustomerUser active status. '
+                u'Enterprise:  {enterprise_uuid}, Status: {status}, User: {username}'
+            ).format(
+                enterprise_uuid=enterprise_uuid,
+                status=active,
+                username=username,
+            )
+            LOGGER.exception(message)
+            raise EnterpriseApiException(message)
+
 
 class EnterpriseApiServiceClient(EnterpriseServiceClientMixin, EnterpriseApiClient):
     """

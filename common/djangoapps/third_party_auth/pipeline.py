@@ -885,3 +885,40 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):
     else:
         final_username = storage.user.get_username(user)
     return {'username': final_username}
+
+
+def set_learner_active_enterprise(user=None, backend=None, response=None, *args, **kwargs):
+    """
+    Check user active enterprise, if it matches to idp-enterprise then no action needed otherwise make the
+    idp enterprise active via post_learner_active_enterprise method.
+    """
+    from openedx.features.enterprise_support.api import (
+        EnterpriseApiClient,
+        EnterpriseApiException,
+        get_enterprise_learner_data,
+    )
+    if backend.name == 'tpa-saml':
+        saml_prefix = 'saml-'
+        idp_name = response['idp_name']
+        idp_name = saml_prefix + idp_name
+        enterprise_learner_data = get_enterprise_learner_data(user)
+        enterprise_learner_data_idp = enterprise_learner_data[0]['enterprise_customer']['identity_provider']
+
+        if idp_name != enterprise_learner_data_idp:
+            enterprise_learner = [enterprise_learner for enterprise_learner in enterprise_learner_data if
+                                  enterprise_learner['enterprise_customer']['identity_provider'] == idp_name]
+            if enterprise_learner:
+                uuid = enterprise_learner[0]['enterprise_customer']['uuid']
+                try:
+                    EnterpriseApiClient(user=user).post_active_enterprise_customer(user.username, uuid, True)
+                except EnterpriseApiException:
+                    message = (
+                        u'[Post Active Enterprise Customer] An error occurred while posting EnterpriseCustomerUser'
+                        u' active status. Enterprise: {enterprise_uuid}, Status: {status}, User: {username}'
+                    ).format(
+                        enterprise_uuid=uuid,
+                        status=True,
+                        username=user.username,
+                    )
+                    logger.exception(message)
+    return None
