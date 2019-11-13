@@ -90,6 +90,7 @@ urlpatterns = [
 
     # philu features
     url(r'', include('openedx.features.student_certificates.urls')),
+    url(r'', include('openedx.features.partners.urls')),
 
     # Event tracking endpoints
     url(r'', include('track.urls')),
