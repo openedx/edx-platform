@@ -111,6 +111,7 @@ def sync_organization_info_with_nodebb(sender, instance, created, **kwargs):  # 
         username=user.username, profile_data=data_to_sync)
 
 
+
 @receiver(post_save, sender=User, dispatch_uid='update_user_profile_on_nodebb')
 def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
     """
@@ -132,7 +133,8 @@ def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
             'date_joined': instance.date_joined.strftime('%d/%m/%Y'),
         }
 
-        task_create_user_on_nodebb.delay(username=instance.username, user_data=data_to_sync, user=instance)
+        task_create_user_on_nodebb.delay(
+            username=instance.username, user_data=data_to_sync)
     else:
         # This sanity blocks two extra syncs because during 'registration'
         # we sync first_name and last_name under above 'created' sanity block

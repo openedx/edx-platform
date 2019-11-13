@@ -38,13 +38,18 @@ def handle_response(caller, task_name, status_code, response, username=None):
 
 
 @task(default_retry_delay=RETRY_DELAY, max_retries=None, routing_key=settings.HIGH_PRIORITY_QUEUE)
-def task_create_user_on_nodebb(username, user_data, user):
+def task_create_user_on_nodebb(username, user_data):
     """
     Celery task to create user on NodeBB
     """
     status_code, response = NodeBBClient().users.create(username=username, user_data=user_data)
     handle_response(task_create_user_on_nodebb, 'User creation', status_code, response, username)
     if status_code == 200:
+        try:
+            user = User.objects.filter(username=username)[0]
+        except IndexError:
+            # if user does not exist then return
+            return
         if user.is_active:
             task_activate_user_on_nodebb.delay(username=username, active=True)
         # if user has completed all registration forms then update the status on NodeBB

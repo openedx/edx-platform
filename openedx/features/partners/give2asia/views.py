@@ -26,7 +26,7 @@ from openedx.features.partners.models import PartnerUser
 
 from lms.djangoapps.philu_overrides.user_api.views import RegistrationViewCustom
 from lms.djangoapps.onboarding.models import EmailPreference, Organization, UserExtendedProfile
-from nodebb.helpers import update_nodebb_for_user_status
+from nodebb.helpers import update_nodebb_for_user_status, set_user_activation_status_on_nodebb
 from student.models import Registration, UserProfile
 
 from . import constants as g2a_constants
@@ -224,6 +224,9 @@ def create_account_with_params_custom(request, params, partner):
     # Since all required data corresponding to new user is saved in relevant models
     # request NodeBB to activate registered user
     update_nodebb_for_user_status(params['username'])
+
+    # Activate user on nodebb manually
+    set_user_activation_status_on_nodebb(params['username'], True)
 
     # Announce registration
     REGISTER_USER.send(sender=None, user=user, registration=registration)
