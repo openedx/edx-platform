@@ -43,6 +43,9 @@ fi
 # Activate the Python virtualenv
 source $HOME/edx-venv/bin/activate
 
+pip install requirements/edx/pip-tools.txt
+pip-sync requirements/edx/development.txt 
+
 # add the node packages dir to PATH
 PATH=$PATH:node_modules/.bin
 
