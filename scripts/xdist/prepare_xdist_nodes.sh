@@ -26,7 +26,7 @@ do
     rm -rf /home/jenkins/edx-venv;
     tar -C /home/jenkins -xf /home/jenkins/edx-venv_clean-${PYTHON_VERSION}.tar.gz;
     source ../edx-venv/bin/activate;
-    pip-sync -q ${DJANGO_REQUIREMENT} requirements/edx/testing.txt; mkdir reports' & "
+    pip-sync ${DJANGO_REQUIREMENT} requirements/edx/testing.txt; mkdir reports' & "
 
     cmd=$cmd$worker_reqs_cmd
 done
