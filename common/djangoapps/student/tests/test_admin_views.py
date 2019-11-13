@@ -1,3 +1,4 @@
+# coding=UTF-8
 """
 Tests student admin.py
 """
@@ -324,7 +325,7 @@ class LoginFailuresAdminTest(TestCase):
         """Setup."""
         super(LoginFailuresAdminTest, self).setUp()
         self.client.login(username=self.user.username, password='test')
-        self.user2 = UserFactory.create()
+        self.user2 = UserFactory.create(username=u'Zażółć gęślą jaźń')
         LoginFailures.objects.create(user=self.user, failure_count=10, lockout_until=datetime.datetime.now())
         LoginFailures.objects.create(user=self.user2, failure_count=2)
 
@@ -338,11 +339,8 @@ class LoginFailuresAdminTest(TestCase):
         Test if `__str__` method behaves correctly for unicode username.
         It shouldn't raise `TypeError`.
         """
-        try:
-            str(LoginFailures.objects.get(user=self.user))
-            str(LoginFailures.objects.get(user=self.user2))
-        except TypeError as e:
-            self.fail("Failed executing `__str__` with unicode: {0}".format(e))
+        str(LoginFailures.objects.get(user=self.user))
+        str(LoginFailures.objects.get(user=self.user2))
 
     @ddt.data(
         reverse('admin:student_loginfailures_changelist'),

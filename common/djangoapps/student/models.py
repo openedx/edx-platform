@@ -917,11 +917,11 @@ class LoginFailures(models.Model):
 
     def __str__(self):
         """Str -> Username: count - date."""
-        return six.text_type('{username}: {count} - {date}'.format(
+        return u'{username}: {count} - {date}'.format(
             username=self.user.username,
             count=self.failure_count,
             date=self.lockout_until.isoformat() if self.lockout_until else '-'
-        ))
+        )
 
     class Meta:
         verbose_name = 'Login Failure'
