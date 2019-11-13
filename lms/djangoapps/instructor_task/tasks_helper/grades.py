@@ -14,23 +14,27 @@ import six
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from lazy import lazy
-from opaque_keys.edx.keys import UsageKey
 from pytz import UTC
 from six import text_type
 from six.moves import zip, zip_longest
 
 from course_blocks.api import get_course_blocks
+from course_modes.models import CourseMode
+from lms.djangoapps.certificates.models import CertificateWhitelist, GeneratedCertificate, certificate_info_for_user
 from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
-from lms.djangoapps.instructor_analytics.basic import list_problem_responses
-from lms.djangoapps.instructor_analytics.csvs import format_dictlist
-from lms.djangoapps.instructor_task.config.waffle import problem_grade_report_verified_only
-from lms.djangoapps.certificates.models import CertificateWhitelist, GeneratedCertificate, certificate_info_for_user
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.grades.api import context as grades_context
 from lms.djangoapps.grades.api import prefetch_course_and_subsection_grades
+from lms.djangoapps.instructor_analytics.basic import list_problem_responses
+from lms.djangoapps.instructor_analytics.csvs import format_dictlist
+from lms.djangoapps.instructor_task.config.waffle import (
+    course_grade_report_verified_only,
+    problem_grade_report_verified_only
+)
 from lms.djangoapps.teams.models import CourseTeamMembership
 from lms.djangoapps.verify_student.services import IDVerificationService
+from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.course_groups.cohorts import bulk_cache_cohorts, get_cohort, is_course_cohorted
 from openedx.core.djangoapps.user_api.course_tag.api import BulkCourseTags
@@ -307,7 +311,7 @@ class CourseGradeReport(object):
             args = [iter(iterable)] * chunk_size
             return zip_longest(*args, fillvalue=fillvalue)
 
-        def users_for_course(course_id):
+        def users_for_course(course_id, verified_only=False):
             """
             Get all the enrolled users in a course.
 
@@ -315,11 +319,15 @@ class CourseGradeReport(object):
             out-of-memory errors in large courses. This method will be removed when
             `OPTIMIZE_GET_LEARNERS_FOR_COURSE` waffle flag is removed.
             """
-            users = CourseEnrollment.objects.users_enrolled_in(course_id, include_inactive=True)
+            users = CourseEnrollment.objects.users_enrolled_in(
+                course_id,
+                include_inactive=True,
+                verified_only=verified_only,
+            )
             users = users.select_related('profile')
             return grouper(users)
 
-        def users_for_course_v2(course_id):
+        def users_for_course_v2(course_id, verified_only=False):
             """
             Get all the enrolled users in a course chunk by chunk.
 
@@ -329,6 +337,8 @@ class CourseGradeReport(object):
             filter_kwargs = {
                 'courseenrollment__course_id': course_id,
             }
+            if verified_only:
+                filter_kwargs['courseenrollment__mode'] = CourseMode.VERIFIED
 
             user_ids_list = get_user_model().objects.filter(**filter_kwargs).values_list('id', flat=True).order_by('id')
             user_chunks = grouper(user_ids_list)
@@ -343,13 +353,15 @@ class CourseGradeReport(object):
                 ).select_related('profile')
                 yield users
 
+        course_id = context.course_id
         task_log_message = u'{}, Task type: {}'.format(context.task_info_string, context.action_name)
+        verified_users_only = course_grade_report_verified_only(course_id)
         if WAFFLE_SWITCHES.is_enabled(OPTIMIZE_GET_LEARNERS_FOR_COURSE):
             TASK_LOG.info(u'%s, Creating Course Grade with optimization', task_log_message)
-            return users_for_course_v2(context.course_id)
+            return users_for_course_v2(course_id, verified_only=verified_users_only)
 
         TASK_LOG.info(u'%s, Creating Course Grade without optimization', task_log_message)
-        batch_users = users_for_course(context.course_id)
+        batch_users = users_for_course(course_id, verified_only=verified_users_only)
         return batch_users
 
     def _user_grades(self, course_grade, context):

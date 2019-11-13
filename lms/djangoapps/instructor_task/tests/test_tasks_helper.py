@@ -422,7 +422,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
 
         RequestCache.clear_all_namespaces()
 
-        expected_query_count = 49
+        expected_query_count = 51
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             with check_mongo_calls(mongo_count):
                 with self.assertNumQueries(expected_query_count):
@@ -2036,6 +2036,33 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                     },
                 ],
                 ignore_other_columns=True,
+            )
+
+    @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
+    def test_course_grade_with_verified_student_only(self, _get_current_task):
+        """
+        Tests that course grade report has expected data when it is generated only for
+        verified learners.
+        """
+        with patch(
+            'lms.djangoapps.instructor_task.tasks_helper.grades.course_grade_report_verified_only',
+            return_value=True,
+        ):
+            student_1 = self.create_student(u'user_honor')
+            student_verified = self.create_student(u'user_verified', mode='verified')
+            vertical = ItemFactory.create(
+                parent_location=self.problem_section.location,
+                category='vertical',
+                metadata={'graded': True},
+                display_name='Problem Vertical'
+            )
+            self.define_option_problem(u'Problem1', parent=vertical)
+
+            self.submit_student_answer(student_1.username, u'Problem1', ['Option 1'])
+            self.submit_student_answer(student_verified.username, u'Problem1', ['Option 1'])
+            result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
+            self.assertDictContainsSubset(
+                {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0}, result
             )
 
     @ddt.data(True, False)

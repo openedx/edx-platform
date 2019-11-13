@@ -11,6 +11,7 @@ INSTRUCTOR_TASK_WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name=u'instructor_ta
 
 # Course-specific flags
 PROBLEM_GRADE_REPORT_VERIFIED_ONLY = u'problem_grade_report_verified_only'
+COURSE_GRADE_REPORT_VERIFIED_ONLY = u'course_grade_report_verified_only'
 
 
 def waffle_flags():
@@ -23,10 +24,24 @@ def waffle_flags():
             flag_name=PROBLEM_GRADE_REPORT_VERIFIED_ONLY,
             flag_undefined_default=False,
         ),
+        COURSE_GRADE_REPORT_VERIFIED_ONLY: CourseWaffleFlag(
+            waffle_namespace=INSTRUCTOR_TASK_WAFFLE_FLAG_NAMESPACE,
+            flag_name=COURSE_GRADE_REPORT_VERIFIED_ONLY,
+            flag_undefined_default=False,
+        ),
     }
 
 
 def problem_grade_report_verified_only(course_id):
+    """
+    Returns True if problem grade reports should only
+    return rows for verified students in the given course,
+    False otherwise.
+    """
+    return waffle_flags()[PROBLEM_GRADE_REPORT_VERIFIED_ONLY].is_enabled(course_id)
+
+
+def course_grade_report_verified_only(course_id):
     """
     Returns True if problem grade reports should only
     return rows for verified students in the given course,
