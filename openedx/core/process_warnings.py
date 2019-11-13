@@ -2,6 +2,8 @@ import json
 import os
 import pprint
 import re
+import json2html
+
 pp = pprint.PrettyPrinter(indent=4,depth=2)
 
 def seperate_warnings_by_location(warnings_data):
@@ -41,12 +43,6 @@ def read_warning_data(path):
 
 def process_warnings_json(path):
     warnings_data = read_warning_data(path)
-    # pp.pprint(warnings_data)
-    #TODO(Jinder): I've hardcoded python version here, I should use a regex instead of hardcoding these things here
-    warnings_locations = {"python2.7/side-packages":"python2", "python3.5/side-packages":"python3",  "edx-platform/lms":"lms", "edx-platform/openedx":"openedx", "edx-platform/cms": "cms", "edx-platform/common":"common"}
-    warning_categories = ["other", "python2", "python3", "lms", "openedx", "cms","common"]
-    warnings_by_location = {}
-    warnings_by_type = {'deprecated':[], 'other': []}
     deprecated_warnings = []
     non_deprecated_warnings = []
     for warnings_object in warnings_data:
@@ -54,8 +50,17 @@ def process_warnings_json(path):
             deprecated_warnings.append(warnings_object)
         else:
             non_deprecated_warnings.append(warnings_object)
-    
-    pp.pprint(seperate_warnings_by_location(non_deprecated_warnings))
+    json_2_html = json2html.Json2Html()
+    deprecated_output_json = seperate_warnings_by_location(deprecated_warnings)
+    deprecated_warnings_html = json_2_html.convert(deprecated_output_json)
+    # pp.pprint(deprecated_warnings_html)
+    dir_path = os.path.expanduser(path)
+    full_path = dir_path + "/test.html"
+    print(full_path)
+    with open(full_path, "w") as write_file:
+        write_file.write(deprecated_warnings_html)
+        print("hahah")
+
 
 
 
@@ -64,9 +69,6 @@ def process_warnings_json(path):
 
 dir_path = "~/dev/edx-platform/test_root/log"
 dir_path = "~/Downloads/log"
-# data = read_warning_data(dir_path)
-# print(len(data))
-# # pp.pprint(data)
 process_warnings_json(dir_path)
 
 
