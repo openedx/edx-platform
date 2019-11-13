@@ -252,7 +252,7 @@
 
                 // update the data-attributes with latest contents only for updated problems.
                 this.content_container
-                    .html(currentTab.text())
+                    .html(currentTab.text())  // xss-lint: disable=javascript-jquery-html
                     .attr('aria-labelledby', currentTab.attr('aria-labelledby'))
                     .data('bookmarked', bookmarked);
 
@@ -326,6 +326,7 @@
                 this.render(newPosition);
             } else {
                 alertTemplate = gettext('Sequence error! Cannot navigate to %(tab_name)s in the current SequenceModule. Please contact the course staff.');  // eslint-disable-line max-len
+                // xss-lint: disable=javascript-interpolate
                 alertText = interpolate(alertTemplate, {
                     tab_name: newPosition
                 }, true);
