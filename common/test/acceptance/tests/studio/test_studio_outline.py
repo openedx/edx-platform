@@ -340,7 +340,6 @@ class WarningMessagesTest(CourseOutlineTest):
             subsection.add_unit()
             unit = ContainerPage(self.browser, None)
             unit.wait_for_page()
-            unit.set_name(name)
 
         if unit.is_staff_locked != unit_state.is_locked:
             unit.toggle_staff_lock()
