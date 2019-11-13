@@ -127,7 +127,7 @@ edx-django-release-util==0.3.2
 edx-django-sites-extensions==2.3.1
 edx-django-utils==2.0.2
 edx-drf-extensions==2.4.5
-edx-enterprise==2.0.17
+edx-enterprise==2.0.19
 edx-i18n-tools==0.4.8
 edx-lint==1.3.0
 edx-milestones==0.2.5
@@ -151,7 +151,7 @@ enum34==1.1.6
 event-tracking==0.3.0
 execnet==1.7.1
 factory_boy==2.8.1
-faker==2.0.3
+faker==2.0.4
 faulthandler==3.1 ; python_version == "2.7"
 feedparser==5.1.3
 filelock==3.0.12
@@ -215,7 +215,7 @@ moto==1.3.1
 mpmath==1.1.0
 mysqlclient==1.4.5
 networkx==1.7
-newrelic==5.2.2.130
+newrelic==5.2.3.131
 nltk==3.4.5
 nodeenv==1.3.3
 numpy==1.16.5
@@ -324,7 +324,7 @@ text-unidecode==1.3
 tincan==0.0.5
 toml==0.10.0
 tox-battery==0.5.1
-tox==3.14.0
+tox==3.14.1
 transifex-client==0.13.4
 typing==3.7.4.1
 unicodecsv==0.14.1
