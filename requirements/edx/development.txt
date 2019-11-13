@@ -243,7 +243,7 @@ pycodestyle==2.5.0
 pycontracts==1.7.1
 pycountry==19.8.18
 pycparser==2.19
-pycryptodome==3.9.2
+pycryptodome==3.9.3
 pycryptodomex==3.4.7
 pyflakes==2.1.1
 pygments==2.4.2
@@ -337,7 +337,7 @@ voluptuous==0.11.7
 vulture==1.1
 watchdog==0.9.0
 wcwidth==0.1.7
-web-fragments==0.3.0
+web-fragments==0.3.1
 webencodings==0.5.1
 webob==1.8.5
 websocket-client==0.56.0
