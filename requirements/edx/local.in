@@ -1,5 +1,5 @@
 # Python libraries to install that are local to the edx-platform repo
--e .#egg=Open-edX
+-e .
 -e common/lib/capa
 -e common/lib/safe_lxml
 -e common/lib/sandbox-packages
