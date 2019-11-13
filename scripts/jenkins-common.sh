@@ -43,6 +43,7 @@ fi
 # Activate the Python virtualenv
 source $HOME/edx-venv/bin/activate
 
+pip install --upgrade pip
 pip install -r requirements/edx/pip-tools.txt
 pip-sync requirements/edx/development.txt 
 
