@@ -10,7 +10,7 @@
 -e git+https://github.com/edx/django-wiki.git@v0.0.23#egg=django-wiki
 -e git+https://github.com/edx/DoneXBlock.git@2.0.1#egg=done-xblock
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
--e .
+-e .#egg=open-edx
 -e git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
 -e git+https://github.com/edx/RateXBlock.git@2.0#egg=rate-xblock
 -e common/lib/safe_lxml
