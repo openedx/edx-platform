@@ -168,11 +168,11 @@ def python_prereqs_installation():
     """
     Installs Python prerequisites
     """
-    pip_sync_req_file(PYTHON_REQ_FILES)
+    pip_sync_reqs(PYTHON_REQ_FILES)
 
-def pip_sync_req_file(req_files):
+def pip_sync_reqs(req_files):
     pip_cmd = 'pip-sync'
-    sh(u"{pip_cmd} {req_files}".format(pip_cmd=pip_cmd, req_files=" ".join(req_file)))
+    sh(u"{pip_cmd} {req_files}".format(pip_cmd=pip_cmd, req_files=" ".join(req_files)))
 
 def pip_install_req_file(req_file):
     """Pip install the requirements file."""
