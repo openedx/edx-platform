@@ -50,6 +50,7 @@
       this.saveImage = bind(this.saveImage, this);
       this.editImage = bind(this.editImage, this);
       this.setupTinyMCE = bind(this.setupTinyMCE, this);
+      this.cancelButton = bind(this.cancelButton, this);
       var tiny_mce_css_links;
       this.element = element;
       this.base_asset_url = this.element.find("#editor-tab").data('base-asset-url');
@@ -135,14 +136,16 @@
             "alignleft aligncenter alignright alignjustify | " +
             "bullist numlist outdent indent blockquote | link unlink " +
             ((this.new_image_modal ? 'insertImage' : 'image') + " | code"),
-          block_formats: interpolate("%(paragraph)s=p;%(preformatted)s=pre;%(heading3)s=h3;%(heading4)s=h4;%(heading5)s=h5;%(heading6)s=h6", {
-            paragraph: gettext("Paragraph"),
-            preformatted: gettext("Preformatted"),
-            heading3: gettext("Heading 3"),
-            heading4: gettext("Heading 4"),
-            heading5: gettext("Heading 5"),
-            heading6: gettext("Heading 6")
-          }, true),
+          block_formats: edx.StringUtils.interpolate(
+            gettext("{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"),
+            {
+              paragraph: gettext("Paragraph"),
+              preformatted: gettext("Preformatted"),
+              heading3: gettext("Heading 3"),
+              heading4: gettext("Heading 4"),
+              heading5: gettext("Heading 5"),
+              heading6: gettext("Heading 6")
+            }),
           width: '100%',
           height: '400px',
           menubar: false,
@@ -1227,6 +1230,7 @@
       ed.on('EditLink', this.editLink);
       ed.on('ShowCodeEditor', this.showCodeEditor);
       ed.on('SaveCodeEditor', this.saveCodeEditor);
+       $(".action-cancel").on('click', this.cancelButton)
 
       this.imageModal.on('closeModal', this.closeImageModal);
       return this.imageModal.on('submitForm', this.editImageSubmit);
@@ -1378,11 +1382,22 @@
       if (text === void 0) {
         text = this.advanced_editor.getValue();
       }
+      this.unbindSubmitEventFromImageEditor()
       return {
         data: text
       };
     };
 
+    HTMLEditingDescriptor.prototype.cancelButton = function () {
+      this.unbindSubmitEventFromImageEditor()
+    };
+
+    HTMLEditingDescriptor.prototype.unbindSubmitEventFromImageEditor = function () {
+      /*
+      Unbinds events on cancel/save button of image editor.
+       */
+      if (this.imageModal) this.imageModal.off('submitForm')
+    };
     return HTMLEditingDescriptor;
 
   })();
