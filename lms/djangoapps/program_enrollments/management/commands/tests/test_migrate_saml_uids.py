@@ -9,9 +9,11 @@ from django.test import TestCase
 from factory import LazyAttributeSequence, SubFactory
 from factory.django import DjangoModelFactory
 from lms.djangoapps.program_enrollments.management.commands import migrate_saml_uids
+from mock import mock_open, patch
 from social_django.models import UserSocialAuth
 from student.tests.factories import UserFactory
 
+_COMMAND_PATH = 'lms.djangoapps.program_enrollments.management.commands.migrate_saml_uids'
 
 class UserSocialAuthFactory(DjangoModelFactory):
     """
@@ -37,8 +39,8 @@ class TestMigrateSamlUids(TestCase):
         super(TestMigrateSamlUids, cls).setUpClass()
         cls.command = migrate_saml_uids.Command()
 
-    def _format_email_uid_pair(self, email, uid):
-        return '{email}:{uid}'.format(email=email, uid=uid)
+    def _format_single_email_uid_pair_json(self, email, uid):
+        return '[{{"email":"{email}","student_key":"{new_urn}"}}]'.format(email=email, new_urn=uid)
 
     def _format_slug_urn_pair(self, slug, urn):
         return '{slug}:{urn}'.format(slug=slug, urn=urn)
@@ -48,11 +50,15 @@ class TestMigrateSamlUids(TestCase):
         auth = UserSocialAuthFactory.create(slug=self.provider_slug)
         email = auth.user.email
         old_uid = auth.uid
-        call_command(
-            self.command,
-            uid_mapping=self._format_email_uid_pair(email, new_urn),
-            saml_provider_slug=self.provider_slug
-        )
+        with patch(
+                _COMMAND_PATH + '.open',
+                mock_open(read_data=self._format_single_email_uid_pair_json(email, new_urn))
+        ) as pat:
+            call_command(
+                self.command,
+                uid_mapping='./foo.json',
+                saml_provider_slug=self.provider_slug
+            )
 
         auth.refresh_from_db()
         assert auth.uid == self._format_slug_urn_pair(self.provider_slug, new_urn)
