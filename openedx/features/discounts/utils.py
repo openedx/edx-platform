@@ -104,13 +104,17 @@ def get_first_purchase_offer_banner_fragment(user, course):
     discount percentage and a link to upgrade.
     """
     if user and not user.is_anonymous and course:
-        now = datetime.now(tz=pytz.UTC).strftime(u"%Y-%m-%d %H:%M:%S%z")
+        now = datetime.now(tz=pytz.UTC)
+        stop_bucketing_into_discount_experiment = datetime(2019, 11, 22, 0, 0, 0, 0, pytz.UTC)
         saw_banner = ExperimentData.objects.filter(
             user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(course)
         )
-        if not saw_banner:
+        if not saw_banner and not now > stop_bucketing_into_discount_experiment:
             ExperimentData.objects.create(
-                user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(course), value=now
+                user=user,
+                experiment_id=REV1008_EXPERIMENT_ID,
+                key=str(course),
+                value=now.strftime(u"%Y-%m-%d %H:%M:%S%z")
             )
         discount_expiration_date = get_discount_expiration_date(user, course)
         if (discount_expiration_date and
