@@ -327,9 +327,13 @@ def _send_refund_notification(user, refund_ids):
 
     tags = ['auto_refund']
 
-    if theming_helpers.is_request_in_themed_site():
-        # this is not presently supported with the external service.
-        raise NotImplementedError("Unable to send refund processing emails to support teams.")
+    # [UCSD_CUSTOM] These changes are only for UCSD to send refund failure notification on unenroll
+    # We need to remove this check as by default, edX does not create zendesk ticket
+    # if site_configurations are enabled.
+
+    # if theming_helpers.is_request_in_themed_site():
+    #     # this is not presently supported with the external service.
+    #     raise NotImplementedError("Unable to send refund processing emails to support teams.")
 
     # Build the information for the ZenDesk ticket
     student = user
