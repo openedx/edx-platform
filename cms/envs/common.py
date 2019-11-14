@@ -1845,6 +1845,12 @@ ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = {}
 
 BASE_COOKIE_DOMAIN = 'localhost'
+
+# This limits the type of roles that are submittable via the `student` app's manual enrollment
+# audit API. While this isn't used in CMS, it is used via Enterprise which is installed in
+# the CMS. Without this, we get errors.
+MANUAL_ENROLLMENT_ROLE_CHOICES = ['Learner', 'Support', 'Partner']
+
 ############## Settings for the Discovery App ######################
 
 COURSE_CATALOG_API_URL = 'http://localhost:8008/api/v1'
