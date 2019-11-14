@@ -33,6 +33,7 @@ echo "archived_venv: " $ARCHIVED_VENV
 echo "home/archived_venv: " $HOME/$ARCHIVED_VENV
 echo [ -e $HOME/$ARCHIVED_VENV ]
 if [ -e $HOME/$ARCHIVED_VENV ]; then
+    echo "removing things"
     rm -rf $HOME/edx-venv
     tar -C $HOME -xf $HOME/$ARCHIVED_VENV
 fi
