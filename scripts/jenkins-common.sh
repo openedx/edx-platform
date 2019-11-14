@@ -36,6 +36,7 @@ if [ -e $HOME/$ARCHIVED_VENV ]; then
     echo "removing things"
     rm -rf $HOME/edx-venv
     tar -C $HOME -xf $HOME/$ARCHIVED_VENV
+    [ -d $HOME/edx-venv ] && echo "Directory $HOME/edx-venv exists."
 fi
 
 # Load the npm packages from the time the worker was built
