@@ -591,6 +591,11 @@ ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = ENV_TOKENS.get(
     ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER
 )
 
+# This limits the type of roles that are submittable via the `student` app's manual enrollment
+# audit API. While this isn't used in CMS, it is used via Enterprise which is installed in
+# the CMS. Without this, we get errors.
+MANUAL_ENROLLMENT_ROLE_CHOICES = ENV_TOKENS.get('MANUAL_ENROLLMENT_ROLE_CHOICES', MANUAL_ENROLLMENT_ROLE_CHOICES)
+
 ############### Settings for Retirement #####################
 RETIRED_USERNAME_PREFIX = ENV_TOKENS.get('RETIRED_USERNAME_PREFIX', RETIRED_USERNAME_PREFIX)
 RETIRED_EMAIL_PREFIX = ENV_TOKENS.get('RETIRED_EMAIL_PREFIX', RETIRED_EMAIL_PREFIX)
