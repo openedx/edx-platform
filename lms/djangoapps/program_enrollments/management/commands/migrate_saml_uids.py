@@ -48,10 +48,36 @@ class Command(BaseCommand):
             uid_mappings = json.load(f)
         slug = options['saml_provider_slug']
 
-        for pair in uid_mappings:
-            email = pair['email']
-            uid = pair['student_key']
-            user = User.objects.prefetch_related('social_auth').get(email=email)
-            auth = user.social_auth.filter(uid__startswith=slug)[0]
+        email_map = { m['email']: {'uid': m['student_key'], 'updated': False} for m in uid_mappings }
+        user_queryset = User.objects.prefetch_related('social_auth').filter(social_auth__uid__startswith=slug + ':')
+        users = [u for u in user_queryset]
+
+        missed = 0
+        updated = 0
+        for user in users:
+            email = user.email
+            try:
+                info_for_email = email_map[email]
+            except KeyError:
+                missed += 1
+                continue
+            info_for_email['updated'] = True
+            uid = info_for_email['uid']
+            auth = user.social_auth.filter(uid__startswith=slug + ':')[0]
+            # print something about the ones who have more than one social_auth from gatech
             auth.uid = '{slug}:{uid}'.format(slug=slug, uid=uid)
             auth.save()
+            updated += 1
+        not_previously_linked = reduce(lambda count, mapping: count + (not email_map[mapping['email']]['updated']), uid_mappings, 0)
+        log.info(
+            'Number of users with {slug} UserSocialAuth records for which there was no mapping in the provided file: {missed}'.format(
+                slug=slug,
+                missed=missed
+        ))
+        log.info(
+            'Number of users identified in the mapping file without {slug} UserSocialAuth records: {not_previously_linked}'.format(
+                slug=slug,
+                not_previously_linked=not_previously_linked
+        ))
+
+
