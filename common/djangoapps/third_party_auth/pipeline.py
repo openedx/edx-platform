@@ -89,7 +89,7 @@ from lms.djangoapps.verify_student.models import SSOVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
-from third_party_auth.utils import user_exists
+from third_party_auth.utils import user_exists, is_provider_saml
 from track import segment
 from util.json_request import JsonResponse
 
@@ -553,16 +553,9 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
         return (current_provider and
                 (current_provider.skip_email_verification or current_provider.send_to_registration_first))
 
-    def is_provider_saml():
-        """ Verify that the third party provider uses SAML """
-        current_provider = provider.Registry.get_from_pipeline({'backend': current_partial.backend, 'kwargs': kwargs})
-        saml_providers_list = list(provider.Registry.get_enabled_by_backend_name('tpa-saml'))
-        return (current_provider and
-                current_provider.slug in [saml_provider.slug for saml_provider in saml_providers_list])
-
     if not user:
         # Use only email for user existence check in case of saml provider
-        if is_provider_saml():
+        if is_provider_saml(current_partial.backend, kwargs):
             user_details = {'email': details.get('email')} if details else None
         else:
             user_details = details
@@ -885,40 +878,3 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):
     else:
         final_username = storage.user.get_username(user)
     return {'username': final_username}
-
-
-def set_learner_active_enterprise(user=None, backend=None, response=None, *args, **kwargs):
-    """
-    Check user active enterprise, if it matches to idp-enterprise then no action needed otherwise make the
-    idp enterprise active via post_learner_active_enterprise method.
-    """
-    from openedx.features.enterprise_support.api import (
-        EnterpriseApiClient,
-        EnterpriseApiException,
-        get_enterprise_learner_data,
-    )
-    if backend.name == 'tpa-saml':
-        saml_prefix = 'saml-'
-        idp_name = response['idp_name']
-        idp_name = saml_prefix + idp_name
-        enterprise_learner_data = get_enterprise_learner_data(user)
-        enterprise_learner_data_idp = enterprise_learner_data[0]['enterprise_customer']['identity_provider']
-
-        if idp_name != enterprise_learner_data_idp:
-            enterprise_learner = [enterprise_learner for enterprise_learner in enterprise_learner_data if
-                                  enterprise_learner['enterprise_customer']['identity_provider'] == idp_name]
-            if enterprise_learner:
-                uuid = enterprise_learner[0]['enterprise_customer']['uuid']
-                try:
-                    EnterpriseApiClient(user=user).post_active_enterprise_customer(user.username, uuid, True)
-                except EnterpriseApiException:
-                    message = (
-                        u'[Post Active Enterprise Customer] An error occurred while posting EnterpriseCustomerUser'
-                        u' active status. Enterprise: {enterprise_uuid}, Status: {status}, User: {username}'
-                    ).format(
-                        enterprise_uuid=uuid,
-                        status=True,
-                        username=user.username,
-                    )
-                    logger.exception(message)
-    return None

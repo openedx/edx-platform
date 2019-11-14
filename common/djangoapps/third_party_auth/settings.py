@@ -64,7 +64,7 @@ def apply_settings(django_settings):
         'third_party_auth.pipeline.user_details_force_sync',
         'third_party_auth.pipeline.set_id_verification_status',
         'third_party_auth.pipeline.set_logged_in_cookies',
-        'third_party_auth.pipeline.set_learner_active_enterprise',
+        'openedx.features.enterprise_support.pipeline.set_learner_active_enterprise',
         'third_party_auth.pipeline.login_analytics',
     ]
 

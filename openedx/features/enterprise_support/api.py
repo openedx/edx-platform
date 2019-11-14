@@ -266,29 +266,31 @@ class EnterpriseApiClient(object):
 
         return response
 
-    def post_active_enterprise_customer(self, username, enterprise_uuid, active):
+    def post_active_enterprise_customer(self, username, enterprise_uuid, active_status):
         """
         Update learner's active enterprise
         """
+        enterprise_status_changed = False
         data = {
             'username': username,
             'enterprise_customer': enterprise_uuid,
-            'active': active,
+            'active': active_status,
         }
         endpoint = getattr(self.client, 'enterprise-learner')
         try:
             endpoint.post(data=data)
+            enterprise_status_changed = True
         except (HttpClientError, HttpServerError):
             message = (
                 u'[Enterprise Support] An error occurred while posting EnterpriseCustomerUser active status. '
-                u'Enterprise:  {enterprise_uuid}, Status: {status}, User: {username}'
+                u'Enterprise: {enterprise_uuid}, Status: {status}, User: {username}'
             ).format(
                 enterprise_uuid=enterprise_uuid,
-                status=active,
+                status=active_status,
                 username=username,
             )
             LOGGER.exception(message)
-            raise EnterpriseApiException(message)
+        return enterprise_status_changed
 
 
 class EnterpriseApiServiceClient(EnterpriseServiceClientMixin, EnterpriseApiClient):
@@ -716,3 +718,18 @@ def unlink_enterprise_user_from_idp(request, user, idp_backend_name):
                     )
             except (EnterpriseCustomerUser.DoesNotExist, PendingEnterpriseCustomerUser.DoesNotExist):
                 pass
+
+
+@enterprise_is_enabled()
+def get_enterprise_customer_from_session(request):
+    """Check if enterprise_customer is in the session."""
+    enterprise_customer = None
+    if 'enterprise_customer' in request.session:
+        enterprise_customer = request.session.get('enterprise_customer')
+    return enterprise_customer
+
+
+@enterprise_is_enabled()
+def activate_learner_enterprise(request, enterprise_customer):
+    """Update enterprise_customer in the session."""
+    request.session['enterprise_customer'] = enterprise_customer
