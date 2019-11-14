@@ -98,7 +98,7 @@ def compare_with_tolerance(student_complex, instructor_complex, tolerance=defaul
         return abs(student_complex - instructor_complex) <= tolerance
 
 
-def contextualize_text(text, context, problem_location=None):  # private
+def contextualize_text(text, context):  # private
     """
     Takes a string with variables. E.g. $a+$b.
     Does a substitution of those variables from the context
@@ -109,33 +109,6 @@ def contextualize_text(text, context, problem_location=None):  # private
             return str(value)
         except UnicodeEncodeError:
             return value.encode('utf8', errors='ignore')
-
-    def replace_or_log_error(data_string, old_value, new_value):
-        """Tries to replace context variable with value and logs exception if there is an error"""
-        try:
-            data_string = data_string.replace(old_value, new_value)
-            return data_string
-        except Exception:  # pylint: disable=broad-except
-            if problem_location and problem_location == 'block-v1:MITx+CTL.SC3x+2T2019+type@problem+block@cb29c9209862423d87bef76c4ef15695':  # pylint: disable=line-too-long
-                log.error(
-                    u'ContextualizeTextError: data_string(%s), old_value(%s), new_value(%s)',
-                    type(data_string),
-                    type(old_value),
-                    type(new_value),
-                )
-                log.error(
-                    u'ContextualizeTextError: data_string: %s',
-                    data_string,
-                )
-                log.error(
-                    u'ContextualizeTextError: new_value : %s',
-                    new_value,
-                )
-                log.error(
-                    u'ContextualizeTextError: old_value: %s',
-                    old_value,
-                )
-            raise
 
     if not text:
         return text
@@ -150,7 +123,7 @@ def contextualize_text(text, context, problem_location=None):  # private
         if context_key in (text.decode('utf-8') if six.PY3 and isinstance(text, bytes) else text):
             text = convert_to_str(text)
             context_value = convert_to_str(context[key])
-            text = replace_or_log_error(text, context_key, context_value)
+            text = text.replace(context_key, context_value)
 
     return text
 
