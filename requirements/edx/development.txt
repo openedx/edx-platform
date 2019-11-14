@@ -118,7 +118,7 @@ django-storages==1.4.1
 django-user-tasks==0.1.5
 django-waffle==0.12.0
 django-webpack-loader==0.6.0
-django==1.11.23
+django==1.11.26
 djangorestframework-jwt==1.11.0
 djangorestframework-xml==1.3.0
 dm.xmlsec.binding==1.3.3
