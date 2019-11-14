@@ -17,6 +17,8 @@ if [ ! -z ${TARGET_BRANCH+x} ]; then
     git fetch origin $TARGET_BRANCH_WITHOUT_ORIGIN:refs/remotes/origin/$TARGET_BRANCH_WITHOUT_ORIGIN
 fi
 
+echo "python_version+x: ${PYTHON_VERSION+x}"
+echo ${PYTHON_VERSION}
 # Reset the jenkins worker's virtualenv back to the
 # state it was in when the instance was spun up.
 if [ -z ${PYTHON_VERSION+x} ] || [[ ${PYTHON_VERSION} == 'null' ]]; then
@@ -24,7 +26,8 @@ if [ -z ${PYTHON_VERSION+x} ] || [[ ${PYTHON_VERSION} == 'null' ]]; then
 else
     ARCHIVED_VENV="edx-venv_clean-$PYTHON_VERSION.tar.gz"
 fi
-
+echo "archived_venv: " $ARCHIVED_VENV
+echo "home/archived_venv: " $HOME/$ARCHIVED_VENV
 if [ -e $HOME/$ARCHIVED_VENV ]; then
     rm -rf $HOME/edx-venv
     tar -C $HOME -xf $HOME/$ARCHIVED_VENV
