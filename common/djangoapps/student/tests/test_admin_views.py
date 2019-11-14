@@ -16,6 +16,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.timezone import now
 from mock import Mock
+from pytz import UTC
 
 from student.admin import COURSE_ENROLLMENT_ADMIN_SWITCH, UserAdmin, CourseEnrollmentForm
 from student.models import CourseEnrollment, LoginFailures
@@ -318,7 +319,7 @@ class LoginFailuresAdminTest(TestCase):
     def setUpClass(cls):
         """Setup class"""
         super(LoginFailuresAdminTest, cls).setUpClass()
-        cls.user = UserFactory.create(is_staff=True, is_superuser=True)
+        cls.user = UserFactory.create(username=u'§', is_staff=True, is_superuser=True)
         cls.user.save()
 
     def setUp(self):
@@ -326,7 +327,8 @@ class LoginFailuresAdminTest(TestCase):
         super(LoginFailuresAdminTest, self).setUp()
         self.client.login(username=self.user.username, password='test')
         self.user2 = UserFactory.create(username=u'Zażółć gęślą jaźń')
-        LoginFailures.objects.create(user=self.user, failure_count=10, lockout_until=datetime.datetime.now())
+        self.user_lockout_until = datetime.datetime.now(UTC)
+        LoginFailures.objects.create(user=self.user, failure_count=10, lockout_until=self.user_lockout_until)
         LoginFailures.objects.create(user=self.user2, failure_count=2)
 
     def tearDown(self):
@@ -339,8 +341,10 @@ class LoginFailuresAdminTest(TestCase):
         Test if `__str__` method behaves correctly for unicode username.
         It shouldn't raise `TypeError`.
         """
-        str(LoginFailures.objects.get(user=self.user))
-        str(LoginFailures.objects.get(user=self.user2))
+        self.assertEqual(
+            str(LoginFailures.objects.get(user=self.user)), '§: 10 - {}'.format(self.user_lockout_until.isoformat())
+        )
+        self.assertEqual(str(LoginFailures.objects.get(user=self.user2)), 'Zażółć gęślą jaźń: 2 - -')
 
     @ddt.data(
         reverse('admin:student_loginfailures_changelist'),
