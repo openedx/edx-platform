@@ -1619,7 +1619,7 @@ FA_GOALS_LABEL = 'Tell us about your learning or professional goals. How will a 
 FA_EFFORT_LABEL = 'Tell us about your plans for this course. What steps will you take to help you complete ' \
                   'the course work and receive a certificate?'
 
-FA_SHORT_ANSWER_INSTRUCTIONS = _('Use between 250 and 500 words or so in your response.')
+FA_SHORT_ANSWER_INSTRUCTIONS = _('Use between 1250 and 2500 characters or so in your response.')
 
 
 @login_required
