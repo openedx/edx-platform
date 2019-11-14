@@ -7,7 +7,9 @@ without needing to manually re-link their account.
 """
 from __future__ import absolute_import, unicode_literals
 
+import json
 import logging
+from io import open
 from textwrap import dedent
 
 from django.contrib.auth import get_user_model
@@ -22,7 +24,7 @@ class Command(BaseCommand):
 
     Example usage:
         $ ./manage.py lms migrate_saml_uids.py \
-          --uid-mapping=change@my.uid:4045A285AF596D8589C24841657CA3D8,me@too.uid:4045A285AF596D8589C24841657CA3D9 \
+          --uid-mapping=path/to/file.json
           --saml-provider-slug=default
     """
     help = dedent(__doc__).strip()
@@ -30,7 +32,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             '--uid-mapping',
-            help='comma-separated list of email:uid mappings'
+            help='path to utf-8-encoded json file containing an array of objects with keys email and student_key'
         )
         parser.add_argument(
             '--saml-provider-slug',
@@ -42,13 +44,13 @@ class Command(BaseCommand):
         Performs the re-writing
         """
         User = get_user_model()
-        pairs = options['uid_mapping'].split(',')
+        with open(options['uid_mapping'], 'r', encoding='utf-8') as f:
+            uid_mappings = json.load(f)
         slug = options['saml_provider_slug']
 
-        for pair in pairs:
-            uid_list = pair.split(':')
-            email = uid_list[0]
-            uid = uid_list[1]
+        for pair in uid_mappings:
+            email = pair['email']
+            uid = pair['student_key']
             user = User.objects.prefetch_related('social_auth').get(email=email)
             auth = user.social_auth.filter(uid__startswith=slug)[0]
             auth.uid = '{slug}:{uid}'.format(slug=slug, uid=uid)
