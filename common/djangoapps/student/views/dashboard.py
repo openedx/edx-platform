@@ -898,5 +898,5 @@ def student_dashboard(request):
     response = render_to_response('dashboard.html', context)
     set_logged_in_cookies(request, response, user)
     response.delete_cookie(
-        ECOMMERCE_TRANSACTION_COOKIE_NAME, domain=settings.ECOMMERCE_COOKIE_DOMAIN)
+        ECOMMERCE_TRANSACTION_COOKIE_NAME, domain=settings.SESSION_COOKIE_DOMAIN)
     return response
