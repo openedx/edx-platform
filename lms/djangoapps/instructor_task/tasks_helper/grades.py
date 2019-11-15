@@ -30,6 +30,7 @@ from lms.djangoapps.instructor_analytics.basic import list_problem_responses
 from lms.djangoapps.instructor_analytics.csvs import format_dictlist
 from lms.djangoapps.instructor_task.config.waffle import (
     course_grade_report_verified_only,
+    optimize_get_learners_switch_enabled,
     problem_grade_report_verified_only
 )
 from lms.djangoapps.teams.models import CourseTeamMembership
@@ -38,7 +39,6 @@ from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.course_groups.cohorts import bulk_cache_cohorts, get_cohort, is_course_cohorted
 from openedx.core.djangoapps.user_api.course_tag.api import BulkCourseTags
-from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from student.models import CourseEnrollment
 from student.roles import BulkRoleCache
 from xmodule.modulestore.django import modulestore
@@ -47,10 +47,6 @@ from xmodule.split_test_module import get_split_user_partitions
 
 from .runner import TaskProgress
 from .utils import upload_csv_to_report_store
-
-WAFFLE_NAMESPACE = 'instructor_task'
-WAFFLE_SWITCHES = WaffleSwitchNamespace(name=WAFFLE_NAMESPACE)
-OPTIMIZE_GET_LEARNERS_FOR_COURSE = 'optimize_get_learners_for_course'
 
 TASK_LOG = logging.getLogger('edx.celery.task')
 
@@ -311,6 +307,20 @@ class CourseGradeReport(object):
             args = [iter(iterable)] * chunk_size
             return zip_longest(*args, fillvalue=fillvalue)
 
+        def get_enrolled_learners_for_course(course_id, verified_only=False):
+            """
+            Get enrolled learners in a course.
+
+            verified_only(bool): It indicates if we need only the verified
+            enrollments or all enrollments.
+            """
+            if optimize_get_learners_switch_enabled():
+                TASK_LOG.info(u'%s, Creating Course Grade with optimization', task_log_message)
+                return users_for_course_v2(course_id, verified_only=verified_only)
+
+            TASK_LOG.info(u'%s, Creating Course Grade without optimization', task_log_message)
+            return users_for_course(course_id, verified_only=verified_only)
+
         def users_for_course(course_id, verified_only=False):
             """
             Get all the enrolled users in a course.
@@ -356,13 +366,7 @@ class CourseGradeReport(object):
         course_id = context.course_id
         task_log_message = u'{}, Task type: {}'.format(context.task_info_string, context.action_name)
         verified_users_only = course_grade_report_verified_only(course_id)
-        if WAFFLE_SWITCHES.is_enabled(OPTIMIZE_GET_LEARNERS_FOR_COURSE):
-            TASK_LOG.info(u'%s, Creating Course Grade with optimization', task_log_message)
-            return users_for_course_v2(course_id, verified_only=verified_users_only)
-
-        TASK_LOG.info(u'%s, Creating Course Grade without optimization', task_log_message)
-        batch_users = users_for_course(course_id, verified_only=verified_users_only)
-        return batch_users
+        return get_enrolled_learners_for_course(course_id, verified_users_only)
 
     def _user_grades(self, course_grade, context):
         """

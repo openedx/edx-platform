@@ -4,10 +4,14 @@ waffle switches for the instructor_task app.
 """
 from __future__ import absolute_import
 
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace, WaffleSwitchNamespace
 
+WAFFLE_NAMESPACE = u'instructor_task'
+INSTRUCTOR_TASK_WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name=WAFFLE_NAMESPACE)
+WAFFLE_SWITCHES = WaffleSwitchNamespace(name=WAFFLE_NAMESPACE)
 
-INSTRUCTOR_TASK_WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name=u'instructor_task')
+# Waffle switches
+OPTIMIZE_GET_LEARNERS_FOR_COURSE = u'optimize_get_learners_for_course'
 
 # Course-specific flags
 PROBLEM_GRADE_REPORT_VERIFIED_ONLY = u'problem_grade_report_verified_only'
@@ -48,3 +52,10 @@ def course_grade_report_verified_only(course_id):
     False otherwise.
     """
     return waffle_flags()[PROBLEM_GRADE_REPORT_VERIFIED_ONLY].is_enabled(course_id)
+
+
+def optimize_get_learners_switch_enabled():
+    """
+    Returns True if optimize get learner switch is enabled, otherwise False.
+    """
+    return WAFFLE_SWITCHES.is_enabled(OPTIMIZE_GET_LEARNERS_FOR_COURSE)
