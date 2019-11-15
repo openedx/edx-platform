@@ -915,28 +915,12 @@ class LoginFailures(models.Model):
         except ObjectDoesNotExist:
             return
 
-    def __repr__(self):
-        """Repr -> LoginFailures(username, count, date)"""
-        date_str = '-'
-        if self.lockout_until is not None:
-            date_str = self.lockout_until.isoformat()
-
-        return u'LoginFailures({username}, {count}, {date})'.format(
-            username=six.text_type(self.user.username, 'utf-8'),
-            count=self.failure_count,
-            date=date_str
-        )
-
     def __str__(self):
         """Str -> Username: count - date."""
-        date_str = '-'
-        if self.lockout_until is not None:
-            date_str = self.lockout_until.isoformat()
-
         return u'{username}: {count} - {date}'.format(
-            username=six.text_type(self.user.username, 'utf-8'),
+            username=self.user.username,
             count=self.failure_count,
-            date=date_str
+            date=self.lockout_until.isoformat() if self.lockout_until else '-'
         )
 
     class Meta:
