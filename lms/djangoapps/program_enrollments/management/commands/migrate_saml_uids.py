@@ -48,7 +48,7 @@ class Command(BaseCommand):
             uid_mappings = json.load(f)
         slug = options['saml_provider_slug']
 
-        email_map = { m['email']: {'uid': m['student_key'], 'updated': False} for m in uid_mappings }
+        email_map = { m['email']: {'uid': m['student_key'], 'updated': False, 'counted': False } for m in uid_mappings }
         user_queryset = User.objects.prefetch_related('social_auth').filter(social_auth__uid__startswith=slug + ':')
         users = [u for u in user_queryset]
 
@@ -70,8 +70,16 @@ class Command(BaseCommand):
             updated += 1
 
         not_previously_linked = 0
+        updated = 0
+        duplicated_in_mapping = 0
         for mapping in uid_mappings:
-            not_previously_linked += not email_map[mapping['email']]['updated']
+            info_for_email = email_map[mapping['email']]
+            if not info_for_email['counted']:
+                not_previously_linked += not info_for_email['updated']
+                updated += info_for_email['updated']
+                info_for_email['counted'] = True
+            else:
+                duplicated_in_mapping += 1
 
         log.info(
             'Number of users with {slug} UserSocialAuth records for which there was no mapping in the provided file: {missed}'.format(
@@ -82,6 +90,9 @@ class Command(BaseCommand):
             'Number of users identified in the mapping file without {slug} UserSocialAuth records: {not_previously_linked}'.format(
                 slug=slug,
                 not_previously_linked=not_previously_linked
+        ))
+        log.info('Number of mappings in the mapping file where the identified user has already been processed: {duplicated_in_mapping}'.format(
+            duplicated_in_mapping=duplicated_in_mapping
         ))
 
 
