@@ -411,7 +411,7 @@ class UserExtendedProfile(TimeStampedModel):
     start_month_year = models.CharField(max_length=100, null=True)
     role_in_org = models.CharField(max_length=10, null=True)
     hours_per_week = models.PositiveIntegerField("Typical Number of Hours Worked per Week*", default=0,
-                                                 validators=[MaxValueValidator(168)])
+                                                 validators=[MaxValueValidator(168)], null=True)
     hear_about_philanthropy = models.CharField(max_length=255, null=True, blank=True)
     hear_about_philanthropy_other = models.CharField(max_length=255, default=None, null=True)
 

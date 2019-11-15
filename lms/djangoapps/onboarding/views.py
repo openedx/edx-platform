@@ -59,6 +59,8 @@ def user_info(request):
     are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
     userprofile = request.user.profile
     is_under_age = False
+    reset_org = False
+    is_poc = user_extended_profile.is_organization_admin
 
     template = 'onboarding/tell_us_more_survey.html'
     redirect_to_next = True
@@ -79,11 +81,18 @@ def user_info(request):
         'level_of_education': userprofile.level_of_education,
         'hours_per_week': user_extended_profile.hours_per_week if user_extended_profile.hours_per_week else '',
         'is_emp_location_different': True if user_extended_profile.country_of_employment else False,
-        "function_areas": user_extended_profile.get_user_selected_functions(_type="fields")
+        "function_areas": user_extended_profile.get_user_selected_functions(_type="fields"),
+        'organization_name': user_extended_profile.organization.label if user_extended_profile.organization else "",
+        'is_poc': "1" if user_extended_profile.is_organization_admin else "0",
+        'is_currently_employed': request.POST.get('is_currently_employed'),
+        'org_admin_email':
+            user_extended_profile.organization.unclaimed_org_admin_email if user_extended_profile.organization else "",
+        'role_in_org': user_extended_profile.role_in_org if user_extended_profile.role_in_org else ""
     }
 
     context = {
-        'are_forms_complete': are_forms_complete, 'first_name': request.user.first_name
+        'are_forms_complete': are_forms_complete, 'first_name': request.user.first_name,
+        'fields_to_disable': []
     }
 
     year_of_birth = userprofile.year_of_birth
@@ -100,9 +109,16 @@ def user_info(request):
         form = forms.UserInfoModelForm(request.POST, instance=user_extended_profile, initial=initial)
 
         if form.is_valid() and not is_under_age:
-            form.save(request)
+            custom_model = form.save(request)
+
+            if custom_model.organization:
+                custom_model.organization.save()
+
             unattended_surveys = user_extended_profile.unattended_surveys(_type='list')
             are_forms_complete = not (bool(unattended_surveys))
+
+            if len(unattended_surveys) > 0:
+                redirect_to_next = True
 
             if not are_forms_complete and redirect_to_next:
                 return redirect(unattended_surveys[0])
@@ -111,6 +127,10 @@ def user_info(request):
             # redirect user to account settings page where he come from
             if not request.path == "/myaccount/additional_information/":
                 return redirect(reverse("update_account_settings"))
+        else:
+            reset_org = True
+            is_poc = True if request.POST.get('is_poc') == '1' else False
+            initial['is_poc'] = is_poc
 
     else:
         form = forms.UserInfoModelForm(instance=user_extended_profile, initial=initial)
@@ -119,10 +139,14 @@ def user_info(request):
         'form': form,
         'is_under_age': is_under_age,
         'non_profile_organization': Organization.is_non_profit(user_extended_profile),
-        'is_poc': user_extended_profile.is_organization_admin,
+        'is_poc': is_poc,
         'is_first_user': user_extended_profile.is_first_signup_in_org \
             if user_extended_profile.organization else False,
         'google_place_api_key': settings.GOOGLE_PLACE_API_KEY,
+        'org_url': reverse('get_organizations'),
+        'reset_org': reset_org,
+        'is_employed': bool(user_extended_profile.organization),
+        'partners_opt_in': request.POST.get('partners_opt_in', '')
 
     })
 
@@ -214,6 +238,7 @@ def organization(request):
     otherwise, a form is populated form the POST request and then is
     saved. After saving the form, user is redirected to recommendations page.
     """
+
     user_extended_profile = request.user.extended_profile
     _organization = user_extended_profile.organization
     are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))

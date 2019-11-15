@@ -81,7 +81,7 @@ def task_delete_badge_info_from_nodebb(badge_data):
     """
     Celery task to delete badge info in NodeBB
     """
-    
+
     status_code, response = NodeBBClient().badges.delete(badge_id=badge_data['id'])
     handle_response(task_delete_badge_info_from_nodebb, 'Delete badge information', status_code, response)
 

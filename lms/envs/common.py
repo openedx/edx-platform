@@ -2367,6 +2367,7 @@ INSTALLED_APPS = [
 
     # Philu Features
     'openedx.features.student_certificates',
+    'openedx.features.partners',
 
     #third party surveys
     'lms.djangoapps.third_party_surveys',
