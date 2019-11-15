@@ -117,7 +117,7 @@ urlpatterns = [
     url(r'^api/commerce/', include('commerce.api.urls', namespace='commerce_api')),
     url(r'^api/credit/', include('openedx.core.djangoapps.credit.urls')),
     url(r'^rss_proxy/', include('rss_proxy.urls')),
-    url(r'^api/organizations/', include('organizations.urls', namespace='organizations')),
+    url(r'^api/organizations/', include('organization.urls', namespace='organizations')),
 
     url(r'^catalog/', include('openedx.core.djangoapps.catalog.urls', namespace='catalog')),
 
