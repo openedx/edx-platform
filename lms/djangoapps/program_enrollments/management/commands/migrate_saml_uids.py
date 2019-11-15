@@ -68,7 +68,11 @@ class Command(BaseCommand):
             auth.uid = '{slug}:{uid}'.format(slug=slug, uid=uid)
             auth.save()
             updated += 1
-        not_previously_linked = reduce(lambda count, mapping: count + (not email_map[mapping['email']]['updated']), uid_mappings, 0)
+
+        not_previously_linked = 0
+        for mapping in uid_mappings:
+            not_previously_linked += not email_map[mapping['email']]['updated']
+
         log.info(
             'Number of users with {slug} UserSocialAuth records for which there was no mapping in the provided file: {missed}'.format(
                 slug=slug,
