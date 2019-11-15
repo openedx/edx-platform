@@ -6,6 +6,7 @@ from __future__ import absolute_import
 from django.core.management import call_command
 from django.test import TestCase
 
+import six
 from factory import LazyAttributeSequence, SubFactory
 from factory.django import DjangoModelFactory
 from lms.djangoapps.program_enrollments.management.commands import migrate_saml_uids
@@ -136,3 +137,15 @@ class TestMigrateSamlUids(TestCase):
         mock_info.assert_any_call('Number of users with {slug} UserSocialAuth records for which there was no mapping in the provided file: 1'.format(
             slug=self.provider_slug
         ))
+
+    def test_several_learners(self):
+        auths = [UserSocialAuthFactory() for _ in range(5)]
+        new_urn = '9001'
+
+        self._call_command('[{}]'.format(
+            ','.join([self._format_email_uid_pair(auth.user.email, new_urn + six.text_type(ind)) for ind, auth in enumerate(auths)])
+        ))
+
+        for ind, auth in enumerate(auths):
+            auth.refresh_from_db()
+            assert auth.uid == self._format_slug_urn_pair(self.provider_slug, new_urn + six.text_type(ind))
