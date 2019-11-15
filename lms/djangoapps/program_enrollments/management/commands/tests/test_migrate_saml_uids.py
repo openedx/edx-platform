@@ -149,3 +149,16 @@ class TestMigrateSamlUids(TestCase):
         for ind, auth in enumerate(auths):
             auth.refresh_from_db()
             assert auth.uid == self._format_slug_urn_pair(self.provider_slug, new_urn + six.text_type(ind))
+
+    @patch(_COMMAND_PATH + '.log')
+    def test_learner_duplicated_in_mapping(self, mock_log):
+        auth = UserSocialAuthFactory()
+        email = auth.user.email
+        new_urn = '9001'
+
+        mock_info = mock_log.info
+
+        self._call_command('[{}]'.format(
+            ','.join([self._format_email_uid_pair(email, new_urn) for _ in range(5)])
+        ))
+        mock_info.assert_any_call('Number of mappings in the mapping file where the identified user has already been processed: 4')
