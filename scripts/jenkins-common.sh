@@ -17,26 +17,22 @@ if [ ! -z ${TARGET_BRANCH+x} ]; then
     git fetch origin $TARGET_BRANCH_WITHOUT_ORIGIN:refs/remotes/origin/$TARGET_BRANCH_WITHOUT_ORIGIN
 fi
 
-echo "python_version+x: ${PYTHON_VERSION+x}"
-echo ${PYTHON_VERSION}
-echo [ -z ${PYTHON_VERSION+x} ]
-echo [[ ${PYTHON_VERSION} == 'null' ]]
-echo [ -z ${PYTHON_VERSION+x} ] || [[ ${PYTHON_VERSION} == 'null' ]]
 # Reset the jenkins worker's virtualenv back to the
 # state it was in when the instance was spun up.
 if [ -z ${PYTHON_VERSION+x} ] || [[ ${PYTHON_VERSION} == 'null' ]]; then
     ARCHIVED_VENV="edx-venv_clean.tar.gz"
+    echo "unable to read python version, so using $ARCHIVED_VENV"
 else
     ARCHIVED_VENV="edx-venv_clean-$PYTHON_VERSION.tar.gz"
+    echo "Running in python version $PYTHON_VERSION, using $ARCHIVED_VENV"
 fi
-echo "archived_venv: " $ARCHIVED_VENV
-echo "home/archived_venv: " $HOME/$ARCHIVED_VENV
+
 echo [ -e $HOME/$ARCHIVED_VENV ]
 if [ -e $HOME/$ARCHIVED_VENV ]; then
-    echo "removing things"
+    echo "Resetting jenkins worker's virtualenv back to original state"
     rm -rf $HOME/edx-venv
     tar -C $HOME -xf $HOME/$ARCHIVED_VENV
-    [ -d $HOME/edx-venv ] && echo "Directory $HOME/edx-venv exists."
+
 fi
 
 # Load the npm packages from the time the worker was built
@@ -50,7 +46,9 @@ if [ -e $HOME/edx-npm-cache_clean.tar.gz ]; then
 fi
 
 # Activate the Python virtualenv
+echo "Sourcing v-env"
 source $HOME/edx-venv/bin/activate
+
 
 # add the node packages dir to PATH
 PATH=$PATH:node_modules/.bin

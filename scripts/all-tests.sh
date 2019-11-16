@@ -18,9 +18,11 @@ export XSSLINT_THRESHOLDS=${XSSLINT_THRESHOLDS//[[:space:]]/}
 
 doCheckVars() {
     if [ -n "$CIRCLECI" ] ; then
+        echo "Choosing circle ci script"
         SCRIPT_TO_RUN=scripts/circle-ci-tests.sh
 
     elif [ -n "$JENKINS_HOME" ] ; then
+        echo "Choosing jenkin-scommon script"
         source scripts/jenkins-common.sh
         SCRIPT_TO_RUN=scripts/generic-ci-tests.sh
     fi
@@ -31,6 +33,7 @@ doCheckVars
 
 # Run appropriate CI system script
 if [ -n "$SCRIPT_TO_RUN" ] ; then
+    echo "Running appropriate CI system script"
     $SCRIPT_TO_RUN
 
     # Exit with the exit code of the called script
