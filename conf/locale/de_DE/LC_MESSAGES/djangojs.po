@@ -17,6 +17,7 @@
 # berit.braun, 2014
 # Bert Krohn <bert.krohn@tum.de>, 2017
 # Christian Layr <Christian.Layr@unisg.ch>, 2015
+# Donna Klamma <donna@polarstern-education.com>, 2019
 # Ettore Atalan <atalanttore@googlemail.com>, 2014
 # Lars Walther <meinkraeks@gmail.com>, 2015
 # 39e62ebcacb2326f6384f8b81e0898eb, 2014
@@ -119,8 +120,8 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2019-11-10 20:42+0000\n"
-"PO-Revision-Date: 2019-09-29 20:43+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"PO-Revision-Date: 2019-11-15 09:42+0000\n"
+"Last-Translator: Donna Klamma <donna@polarstern-education.com>\n"
 "Language-Team: German (Germany) (http://www.transifex.com/open-edx/edx-platform/language/de_DE/)\n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"

@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-11-13 08:12+0000\n"
-"PO-Revision-Date: 2019-11-13 08:12:39.419941\n"
+"POT-Creation-Date: 2019-11-17 20:52+0000\n"
+"PO-Revision-Date: 2019-11-17 20:52:30.099431\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -443,6 +443,28 @@ msgstr[0] ""
 msgstr[1] ""
 "%(count)d stüdént äççöünts wéré ünlöçkéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєт#"
+
+#: common/djangoapps/student/admin.py
+#, python-brace-format
+msgid ""
+"Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' in"
+" SiteConfiguration model's values field."
+msgstr ""
+"Pléäsé ädd ä kéý/välüé 'THÌRD_PÀRTÝ_ÀÛTH_ÖNLÝ_DÖMÀÌN/{site_email_domain}' ïn"
+" SïtéÇönfïgürätïön mödél's välüés fïéld. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: common/djangoapps/student/admin.py
+#, python-brace-format
+msgid "Email doesn't have {domain_name} domain name."
+msgstr ""
+"Émäïl döésn't hävé {domain_name} dömäïn nämé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєт#"
+
+#: common/djangoapps/student/admin.py
+msgid "User with this email doesn't exist in system."
+msgstr ""
+"Ûsér wïth thïs émäïl döésn't éxïst ïn sýstém. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
 
 #: common/djangoapps/student/forms.py
 msgid ""
@@ -870,6 +892,21 @@ msgid "Secondary email address to recover linked account."
 msgstr ""
 "Séçöndärý émäïl äddréss tö réçövér lïnkéd äççöünt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/djangoapps/student/models.py
+msgid ""
+"An employee (a user whose email has current site's domain name) whose email "
+"exists in this model, can be able to login from login screen through email "
+"and password. And if any employee's email doesn't exist in this model then "
+"that employee can login via third party authentication backend only."
+msgstr ""
+"Àn émplöýéé (ä üsér whösé émäïl häs çürrént sïté's dömäïn nämé) whösé émäïl "
+"éxïsts ïn thïs mödél, çän ßé äßlé tö lögïn fröm lögïn sçréén thröügh émäïl "
+"änd pässwörd. Ànd ïf äný émplöýéé's émäïl döésn't éxïst ïn thïs mödél thén "
+"thät émplöýéé çän lögïn vïä thïrd pärtý äüthéntïçätïön ßäçkénd önlý. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ #"
 
 #: common/djangoapps/student/views/dashboard.py
 msgid " and "
