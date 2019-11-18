@@ -51,7 +51,7 @@ class TestMigrateSamlUids(TestCase):
 
     def _call_command(self, data):
         with patch(
-                _COMMAND_PATH + '.open',
+                _COMMAND_PATH + '.py3_open',
                 mock_open(read_data=data)
         ) as _:
             call_command(
@@ -121,39 +121,59 @@ class TestMigrateSamlUids(TestCase):
         mock_info = mock_log.info
 
         self._call_command(self._format_single_email_uid_pair_json(email, new_urn))
-        mock_info.assert_any_call('Number of users identified in the mapping file without {slug} UserSocialAuth records: 1'.format(
-            slug=self.provider_slug
-        ))
+        mock_info.assert_any_call(
+            u'Number of users identified in the mapping file without'
+            u' {slug} UserSocialAuth records: 1'.format(
+                slug=self.provider_slug
+            )
+        )
 
     @patch(_COMMAND_PATH + '.log')
     def test_learner_missed_by_mapping_file(self, mock_log):
         auth = UserSocialAuthFactory()
-        email = auth.user.email
+        # pylint disable required b/c this lint rule is confused about subfactories
+        email = auth.user.email  # pylint: disable=no-member
         new_urn = '9001'
 
         mock_info = mock_log.info
 
         self._call_command(self._format_single_email_uid_pair_json('different' + email, new_urn))
-        mock_info.assert_any_call('Number of users with {slug} UserSocialAuth records for which there was no mapping in the provided file: 1'.format(
-            slug=self.provider_slug
-        ))
+        mock_info.assert_any_call(
+            u'Number of users with {slug} UserSocialAuth records '
+            u'for which there was no mapping in the provided file: 1'.format(
+                slug=self.provider_slug
+            )
+        )
 
-    def test_several_learners(self):
+    @patch(_COMMAND_PATH + '.log')
+    def test_several_learners(self, mock_log):
         auths = [UserSocialAuthFactory() for _ in range(5)]
         new_urn = '9001'
 
+        mock_info = mock_log.info
+
         self._call_command('[{}]'.format(
-            ','.join([self._format_email_uid_pair(auth.user.email, new_urn + six.text_type(ind)) for ind, auth in enumerate(auths)])
+            ','.join(
+                [
+                    self._format_email_uid_pair(
+                        auth.user.email,  # pylint disable=no-member
+                        new_urn + six.text_type(ind)
+                    )
+                    for ind, auth
+                    in enumerate(auths)
+                ]
+            )
         ))
 
         for ind, auth in enumerate(auths):
             auth.refresh_from_db()
             assert auth.uid == self._format_slug_urn_pair(self.provider_slug, new_urn + six.text_type(ind))
+        mock_info.assert_any_call(u'Number of mappings in the mapping file updated: 5')
 
     @patch(_COMMAND_PATH + '.log')
     def test_learner_duplicated_in_mapping(self, mock_log):
         auth = UserSocialAuthFactory()
-        email = auth.user.email
+        email = auth.user.email  # pylint: disable=no-member
         new_urn = '9001'
 
         mock_info = mock_log.info
@@ -161,4 +181,5 @@ class TestMigrateSamlUids(TestCase):
         self._call_command('[{}]'.format(
             ','.join([self._format_email_uid_pair(email, new_urn) for _ in range(5)])
         ))
-        mock_info.assert_any_call('Number of mappings in the mapping file where the identified user has already been processed: 4')
+        mock_info.assert_any_call(u'Number of mappings in the mapping file where the '
+                                  u'identified user has already been processed: 4')
