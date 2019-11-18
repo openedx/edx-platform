@@ -57,7 +57,7 @@ from openedx.core.lib.xblock_utils import wrap_xblock
 from shoppingcart.models import Coupon, CourseRegCodeItem, PaidCourseRegistration
 from student.models import CourseEnrollment
 from student.roles import (
-    CourseDataResearcherRole, CourseFinanceAdminRole, CourseInstructorRole,
+    CourseFinanceAdminRole, CourseInstructorRole,
     CourseSalesAdminRole, CourseStaffRole
 )
 from util.json_request import JsonResponse
@@ -121,7 +121,7 @@ def instructor_dashboard_2(request, course_id):
         'sales_admin': CourseSalesAdminRole(course_key).has_user(request.user),
         'staff': bool(has_access(request.user, 'staff', course)),
         'forum_admin': has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR),
-        'data_researcher': CourseDataResearcherRole(course_key).has_user(request.user),
+        'data_researcher': request.user.has_perm('student.can_research', course_key),
     }
 
     if not access['staff']:
@@ -713,7 +713,7 @@ def _section_data_download(course, access):
         ),
         'export_ora2_data_url': reverse('export_ora2_data', kwargs={'course_id': six.text_type(course_key)}),
     }
-    if not (access.get('data_researcher') or access.get('admin')):
+    if not access.get('data_researcher'):
         section_data['is_hidden'] = True
     return section_data
 
