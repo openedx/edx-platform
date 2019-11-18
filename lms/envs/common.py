@@ -401,6 +401,18 @@ FEATURES = {
 
     # Enable feature to remove enrollments and users. Used to reset state of master's integration environments
     'ENABLE_ENROLLMENT_RESET': False,
+
+    # .. toggle_name: COURSE_DEFAULT_INVITE_ONLY
+    # .. toggle_type: feature_flag
+    # .. toggle_default: False
+    # .. toggle_description: Set this to manage the default value for INVITE_ONLY across all courses in a given deployment
+    # .. toggle_category: admin
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2019-05-16
+    # .. toggle_expiration_date: None
+    # .. toggle_tickets: https://github.com/mitodl/edx-platform/issues/123
+    # .. toggle_status: unsupported
+    'COURSE_DEFAULT_INVITE_ONLY': False,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
