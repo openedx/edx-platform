@@ -591,7 +591,9 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
     def setUp(self):
         super(DataDownloadsTest, self).setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
-        self.instructor_username, self.instructor_id, __, __ = self.log_in_as_instructor()
+        self.instructor_username, self.instructor_id, __, __ = self.log_in_as_instructor(
+            course_access_roles=['data_researcher']
+        )
         instructor_dashboard_page = self.visit_instructor_dashboard()
         self.data_download_section = instructor_dashboard_page.select_data_download()
 
