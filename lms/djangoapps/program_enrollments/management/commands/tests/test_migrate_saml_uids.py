@@ -16,6 +16,7 @@ from student.tests.factories import UserFactory
 
 _COMMAND_PATH = 'lms.djangoapps.program_enrollments.management.commands.migrate_saml_uids'
 
+
 class UserSocialAuthFactory(DjangoModelFactory):
     """
     Factory for UserSocialAuth records.
@@ -41,8 +42,7 @@ class TestMigrateSamlUids(TestCase):
         cls.command = migrate_saml_uids.Command()
 
     def _format_email_uid_pair(self, email, uid):
-       return '{{"email":"{email}","student_key":"{new_urn}"}}'.format(email=email, new_urn=uid)
-
+        return '{{"email":"{email}","student_key":"{new_urn}"}}'.format(email=email, new_urn=uid)
 
     def _format_single_email_uid_pair_json(self, email, uid):
         return '[{obj}]'.format(
