@@ -585,7 +585,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
 
         provider = self.configure_google_provider(enabled=True)
         with simulate_running_pipeline(
-            "openedx.core.djangoapps.user_api.api.third_party_auth.pipeline", "google-oauth2",
+            "openedx.core.djangoapps.user_authn.views.login_form.third_party_auth.pipeline", "google-oauth2",
             email="bob@example.com",
             fullname="Bob",
             username=input_username,
