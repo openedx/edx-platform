@@ -9,7 +9,7 @@ from __future__ import absolute_import, unicode_literals
 
 import json
 import logging
-from io import open
+from io import open as py3_open
 from textwrap import dedent
 
 from django.contrib.auth import get_user_model
@@ -39,36 +39,19 @@ class Command(BaseCommand):
             help='slug of SAMLProvider for which records should be updated'
         )
 
-    def handle(self, *args, **options):
+    def _count_results(self, email_map, uid_mappings):
         """
-        Performs the re-writing
+        Iterate over the input file to count results.
+
+        returns:
+            not_previously_linked (int): items in uid_mappings which were unnecessary,
+                                         since the learner hasn't linked their account
+            updated (int): counts items in the uid_mappings which were processed
+            duplicated_in_mapping (int): counts items in the uid_mappings with emails
+                                         that were already processed, such that the
+                                         latest-occurring one was the only one that
+                                         was processed
         """
-        User = get_user_model()
-        with open(options['uid_mapping'], 'r', encoding='utf-8') as f:
-            uid_mappings = json.load(f)
-        slug = options['saml_provider_slug']
-
-        email_map = {m['email']: {'uid': m['student_key'], 'updated': False, 'counted': False} for m in uid_mappings}
-        user_queryset = User.objects.prefetch_related('social_auth').filter(social_auth__uid__startswith=slug + ':')
-        users = [u for u in user_queryset]
-
-        missed = 0
-        updated = 0
-        for user in users:
-            email = user.email
-            try:
-                info_for_email = email_map[email]
-            except KeyError:
-                missed += 1
-                continue
-            info_for_email['updated'] = True
-            uid = info_for_email['uid']
-            auth = user.social_auth.filter(uid__startswith=slug + ':')[0]
-            # print something about the ones who have more than one social_auth from gatech
-            auth.uid = '{slug}:{uid}'.format(slug=slug, uid=uid)
-            auth.save()
-            updated += 1
-
         not_previously_linked = 0
         updated = 0
         duplicated_in_mapping = 0
@@ -80,21 +63,67 @@ class Command(BaseCommand):
                 info_for_email['counted'] = True
             else:
                 duplicated_in_mapping += 1
+        return not_previously_linked, updated, duplicated_in_mapping
+
+    def handle(self, *args, **options):
+        """
+        Performs the re-writing
+        """
+        User = get_user_model()
+        with py3_open(options['uid_mapping'], 'r', encoding='utf-8') as f:
+            uid_mappings = json.load(f)
+        slug = options['saml_provider_slug']
+
+        email_map = {m['email']: {'uid': m['student_key'], 'updated': False, 'counted': False} for m in uid_mappings}
+        users = User.objects.prefetch_related('social_auth').filter(social_auth__uid__startswith=slug + ':')
+
+        missed = 0
+        for user in users:
+            email = user.email
+            try:
+                info_for_email = email_map[email]
+            except KeyError:
+                missed += 1
+                continue
+            info_for_email['updated'] = True
+            uid = info_for_email['uid']
+            auths = user.social_auth.filter(uid__startswith=slug + ':')
+            auth = auths[0]
+            if auths.count() > 1:
+                log.info('User {email} has multiple {slug} UserSocialAuth entries, '
+                         'updating only one of them'.format(
+                             email=email,
+                             slug=slug
+                         ))
+            auth.uid = '{slug}:{uid}'.format(slug=slug, uid=uid)
+            auth.save()
+
+        not_previously_linked, updated, duplicated_in_mapping = \
+            self._count_results(email_map, uid_mappings)
 
         log.info(
-            'Number of users with {slug} UserSocialAuth records for which there was no mapping in the provided file: {missed}'.format(
+            'Number of users with {slug} UserSocialAuth records for which there was '
+            'no mapping in the provided file: {missed}'.format(
                 slug=slug,
                 missed=missed
             )
         )
         log.info(
-            'Number of users identified in the mapping file without {slug} UserSocialAuth records: {not_previously_linked}'.format(
+            'Number of users identified in the mapping file without {slug}'
+            ' UserSocialAuth records: {not_previously_linked}'.format(
                 slug=slug,
                 not_previously_linked=not_previously_linked
             )
         )
         log.info(
-            'Number of mappings in the mapping file where the identified user has already been processed: {duplicated_in_mapping}'.format(
+            'Number of mappings in the mapping file where the identified'
+            ' user has already been processed: {duplicated_in_mapping}'.format(
                 duplicated_in_mapping=duplicated_in_mapping
+            )
+        )
+        log.info(
+            'Number of mappings in the mapping file updated: '
+            '{updated}'.format(
+                updated=updated
             )
         )
