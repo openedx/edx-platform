@@ -3463,7 +3463,7 @@ CCX_MAX_STUDENTS_ALLOWED = 200
 
 # Maximum and minimum length of answers, in characters, for the
 # financial assistance form
-FINANCIAL_ASSISTANCE_MIN_LENGTH = 250
+FINANCIAL_ASSISTANCE_MIN_LENGTH = 1250
 FINANCIAL_ASSISTANCE_MAX_LENGTH = 2500
 
 #### Registration form extension. ####
