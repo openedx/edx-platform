@@ -18,7 +18,7 @@ from opaque_keys.edx.locator import CourseLocator
 
 from lms.djangoapps.verify_student.models import ManualVerification
 from openedx.core.djangoapps.django_comment_common.models import assign_role
-from openedx.core.djangoapps.user_api.accounts.utils import generate_password
+from openedx.core.djangoapps.user_authn.utils import generate_password
 from openedx.features.course_experience import course_home_url_name
 from student.forms import AccountCreationForm
 from student.helpers import (
