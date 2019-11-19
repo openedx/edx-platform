@@ -3,9 +3,13 @@ from importlib import import_module
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 
+from django.contrib.auth.models import User
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
+
+from student.views import password_change_request_handler
 
 from .models import Partner
 
@@ -21,9 +25,9 @@ def dashboard(request, slug):
         raise Http404('Your partner is not properly registered')
 
 
+@csrf_exempt
 @require_http_methods(["POST"])
 @sensitive_post_parameters('password')
-@csrf_exempt
 def register_user(request, slug):
     """
     This is general registering view, for users of all partners
@@ -38,3 +42,21 @@ def register_user(request, slug):
         return views.Give2AsiaRegistrationView.as_view()(request, partner=partner)
     except ImportError:
         raise Http404('Your partner is not properly registered')
+
+
+@csrf_exempt
+@require_http_methods(['POST'])
+def password_reset_request(request):
+    """
+    This is the basic password reset view, as per the requirements
+    of organization password reset flow. Have to send 404 id user does
+    not exist
+    :param request: The Django request.
+    :return: HTTPResponse object with success/error status code
+    """
+    email = request.POST.get('email')
+    try:
+        if User.objects.get(email=email):
+            return password_change_request_handler(request)
+    except (ValueError, User.DoesNotExist):
+        return JsonResponse({"Error": {"email": ["User is not registered"]}}, status=404)
