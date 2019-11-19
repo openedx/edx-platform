@@ -15,7 +15,7 @@ log = getLogger(__name__)
 
 class Command(BaseCommand):
     help = """
-    This command returns the course structure for all the course ids given in arguments
+    This command prints the course structure for all the course ids given in arguments
     example:
         manage.py ... fetch_course_structures course_id_1 course_id_2
     """
@@ -31,7 +31,7 @@ class Command(BaseCommand):
             try:
                 course_key = CourseKey.from_string(course_id)
             except InvalidKeyError:
-                log.error("Invalid course id provided: {}".format(course_id))
+                log.error('Invalid course id provided: {}'.format(course_id))
                 continue
 
             course_structure = generate_course_structure(course_key)
@@ -44,4 +44,4 @@ class Command(BaseCommand):
             print(json.dumps(course_structures))
             print('-'*80)
         else:
-            log.error("All course ids provided are invalid")
+            log.error('All course ids provided are invalid')
