@@ -10,6 +10,7 @@ import ddt
 from dateutil.parser import parse as parse_datetime
 from django.contrib.auth.models import User
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch
 from pytz import common_timezones, utc
 
@@ -20,7 +21,6 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ...accounts.api import create_account
 from ...errors import (
     CountryCodeError,
     PreferenceUpdateError,
@@ -336,6 +336,18 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
     PASSWORD = u'ṕáśśẃőŕd'
     EMAIL = u'claire+underwood@example.com'
 
+    def _create_account(self, username, password, email):
+        # pylint: disable=missing-docstring
+        registration_url = reverse('user_api_registration')
+        resp = self.client.post(registration_url, {
+            'username': username,
+            'email': email,
+            'password': password,
+            'name': username,
+            'honor_code': 'true',
+        })
+        self.assertEqual(resp.status_code, 200)
+
     @ddt.data(
         # Check that a 27 year old can opt-in
         (27, True, u"True"),
@@ -357,7 +369,7 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
     def test_update_email_optin(self, age, option, expected_result):
         # Create the course and account.
         course = CourseFactory.create()
-        create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
+        self._create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
 
         # Set year of birth
         user = User.objects.get(username=self.USERNAME)
@@ -374,7 +386,7 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
         # Test that the API still works if no age is specified.
         # Create the course and account.
         course = CourseFactory.create()
-        create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
+        self._create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
 
         user = User.objects.get(username=self.USERNAME)
 
@@ -407,7 +419,7 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
     def test_change_email_optin(self, age, option, second_option, expected_result):
         # Create the course and account.
         course = CourseFactory.create()
-        create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
+        self._create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
 
         # Set year of birth
         user = User.objects.get(username=self.USERNAME)
