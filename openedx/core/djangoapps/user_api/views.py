@@ -23,9 +23,6 @@ from six import text_type
 from openedx.core.djangoapps.django_comment_common.models import Role
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
-from openedx.core.djangoapps.user_api.api import (
-    get_login_session_form,
-)
 from openedx.core.lib.api.view_utils import require_post_params
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.preferences.api import get_country_time_zones, update_email_opt_in

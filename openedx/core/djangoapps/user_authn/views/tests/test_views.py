@@ -413,7 +413,6 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         self._assert_third_party_auth_data(response, None, None, [], None)
 
     @mock.patch('openedx.core.djangoapps.user_authn.views.login_form.enterprise_customer_for_request')
-    @mock.patch('openedx.core.djangoapps.user_api.api.enterprise_customer_for_request')
     @ddt.data(
         ("signin_user", None, None, None, False),
         ("register_user", None, None, None, False),
@@ -443,8 +442,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
             current_provider,
             expected_enterprise_customer_mock_attrs,
             add_user_details,
-            enterprise_customer_mock_1,
-            enterprise_customer_mock_2
+            enterprise_customer_mock,
     ):
         params = [
             ('course_id', 'course-v1:Org+Course+Run'),
@@ -468,8 +466,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         email = None
         if add_user_details:
             email = 'test@test.com'
-        enterprise_customer_mock_1.return_value = expected_ec
-        enterprise_customer_mock_2.return_value = expected_ec
+        enterprise_customer_mock.return_value = expected_ec
 
         # Simulate a running pipeline
         if current_backend is not None:
