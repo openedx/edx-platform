@@ -20,14 +20,16 @@ fi
 # Reset the jenkins worker's virtualenv back to the
 # state it was in when the instance was spun up.
 if [ -z ${PYTHON_VERSION+x} ] || [[ ${PYTHON_VERSION} == 'null' ]]; then
+    VENV_PATH="$HOME"
     ARCHIVED_VENV="edx-venv_clean.tar.gz"
 else
+    VENV_PATH="$HOME/edx-venv-$PYTHON_VERSION"
     ARCHIVED_VENV="edx-venv_clean-$PYTHON_VERSION.tar.gz"
 fi
 
 if [ -e $HOME/$ARCHIVED_VENV ]; then
-    rm -rf $HOME/edx-venv
-    tar -C $HOME -xf $HOME/$ARCHIVED_VENV
+    rm -rf $VENV_PATH/edx-venv
+    tar -C $VENV_PATH -xf $HOME/$ARCHIVED_VENV
 fi
 
 # Load the npm packages from the time the worker was built
@@ -41,7 +43,7 @@ if [ -e $HOME/edx-npm-cache_clean.tar.gz ]; then
 fi
 
 # Activate the Python virtualenv
-source $HOME/edx-venv/bin/activate
+source $VENV_PATH/edx-venv/bin/activate
 
 # add the node packages dir to PATH
 PATH=$PATH:node_modules/.bin
