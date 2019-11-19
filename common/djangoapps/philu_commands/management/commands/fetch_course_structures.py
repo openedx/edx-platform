@@ -10,7 +10,6 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
 from philu_commands.helpers import generate_course_structure
 
-
 log = getLogger(__name__)
 
 
