@@ -18,7 +18,7 @@ class Command(BaseCommand):
     help = """
     This command returns the course structure for all the course ids given in arguments
     example:
-        manage.py ... fetch_course_structures
+        manage.py ... fetch_course_structures course_id_1 course_id_2
     """
 
     def add_arguments(self, parser):
@@ -39,7 +39,10 @@ class Command(BaseCommand):
             course_structure['course_id'] = course_id
             course_structures.append(course_structure)
 
-        print('-'*80)
-        print('Course structures for given course ids: ')
-        print(json.dumps(course_structures))
-        print('-'*80)
+        if course_structures:
+            print('-'*80)
+            print('Course structures for given course ids: ')
+            print(json.dumps(course_structures))
+            print('-'*80)
+        else:
+            log.error("All course ids provided are invalid")
