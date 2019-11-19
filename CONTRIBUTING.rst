@@ -22,10 +22,9 @@ JIRA
 ----
 
 If you've got an idea for a new feature or new functionality for an existing feature,
-please start a discussion on the `edx-code`_ mailing list to get feedback from
-the community about the idea and your implementation choices.
-
-.. _edx-code: https://groups.google.com/forum/#!forum/edx-code
+please start a discussion in the `development <https://discuss.openedx.org/c/development>`__
+category of the discussion forum list to get feedback from the community about the idea
+and your implementation choices.
 
 If you then plan to contribute your code upstream, please `start a discussion on JIRA`_
 (you may first need to `create a free JIRA account`_).
@@ -33,10 +32,9 @@ Start a discussion by visiting the JIRA website and clicking the "Create" button
 top of the page. Choose the project "Open Source Pull Requests" and the issue type
 "Feature Proposal". In the description give us as much detail as you can for the feature
 or functionality you are thinking about implementing. Include a link to any relevant
-edx-code mailing list discussions about your idea. We encourage you to do this before
-you begin implementing your feature, in order to get valuable feedback from the edX
-product team early on in your journey and increase the likelihood of a successful
-pull request.
+forum discussions about your idea. We encourage you to do this before you begin
+implementing your feature, in order to get valuable feedback from the edX product team
+early on in your journey and increase the likelihood of a successful pull request.
 
 .. _start a discussion on JIRA: https://openedx.atlassian.net/secure/Dashboard.jspa
 .. _create a free JIRA account: https://openedx.atlassian.net/admin/users/sign-up
@@ -79,25 +77,6 @@ technical issues. To do so, you should instead join the `official forum <#forum>
 
 .. _Slack: https://slack.com/
 .. _Sign up for a free account: https://openedx-slack-invite.herokuapp.com/
-
-Mailing Lists
--------------
-
-For asynchronous conversation, we have several mailing lists on Google Groups:
-
-* `openedx-ops`_: everything related to *running* Open edX. This includes
-  installation issues, server management, cost analysis, and so on.
-* `openedx-translation`_: everything related to *translating* Open edX into
-  other languages. This includes volunteer translators, our internationalization
-  infrastructure, issues related to Transifex, and so on.
-* `openedx-analytics`_: everything related to *analytics* in Open edX.
-* `edx-code`_: everything related to the *code* in Open edX. This includes
-  feature requests, idea proposals, refactorings, and so on.
-
-.. _openedx-ops: https://groups.google.com/forum/#!forum/openedx-ops
-.. _openedx-translation: https://groups.google.com/forum/#!forum/openedx-translation
-.. _openedx-analytics: https://groups.google.com/forum/#!forum/openedx-analytics
-.. _edx-code: https://groups.google.com/forum/#!forum/edx-code
 
 Byte-sized Tasks & Bugs
 -----------------------
@@ -215,7 +194,7 @@ By opening up a pull request, we expect the following things:
    unable to participate in the review process.
 
 3. If you have questions, you will ask them by either commenting on the pull
-   request or asking us in Slack or on the mailing list.
+   request or asking us in the discussion forum or on Slack.
 
 4. If you do not respond to comments on your pull request within 7 days, we
    will close it. You are welcome to re-open it when you are ready to engage.
