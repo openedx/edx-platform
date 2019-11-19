@@ -71,10 +71,7 @@ def get_discount_expiration_date(user, course):
     except ExperimentData.DoesNotExist:
         pass
 
-    now = datetime.now(tz=pytz.UTC)
-    stop_bucketing_into_discount_experiment = datetime(2019, 11, 22, 0, 0, 0, 0, pytz.UTC)
-
-    if not time_limit_start and not now > stop_bucketing_into_discount_experiment:
+    if not time_limit_start:
         enrollment = course_enrollment.first()
         try:
             # Content availability date is equivalent to max(enrollment date, course start date)
