@@ -41,6 +41,24 @@ pull request.
 .. _start a discussion on JIRA: https://openedx.atlassian.net/secure/Dashboard.jspa
 .. _create a free JIRA account: https://openedx.atlassian.net/admin/users/sign-up
 
+.. _forum:
+
+Discussion forum
+----------------
+
+To ask technical questions and chat with the community, do not hesitate to join the
+`Open edX discussion forum <https://discuss.openedx.org/>`__. There are different
+categories for different topics:
+
+- `Devops <https://discuss.openedx.org/c/devops>`__ for installation help
+- `Development <https://discuss.openedx.org/c/development>`__, where Open edX developers
+  unite
+- `Community <https://discuss.openedx.org/c/community>`__ to discuss organizational
+  matters in the open source community
+- `Announcements <https://discuss.openedx.org/c/announcements>`__ where official Open edX
+  announcement are made
+- `Educators <https://discuss.openedx.org/c/educators>`__, to discuss online learning in general
+
 Slack
 -----
 
@@ -51,11 +69,13 @@ between 13:00 and 21:00 UTC (9am to 5pm US Eastern time),
 but interesting conversations can happen at any time.
 There are many different channels available for different topics, including:
 
-* ``#ops`` for installation help
 * ``#events`` for upcoming events related to Open edX
 * ``#content`` for discussions about course content and creating the best courses
 
 And lots more! You can also make your own channels to discuss new topics.
+
+Note that Slack is no longer the recommended communication channel to ask about
+technical issues. To do so, you should instead join the `official forum <#forum>`__.
 
 .. _Slack: https://slack.com/
 .. _Sign up for a free account: https://openedx-slack-invite.herokuapp.com/
