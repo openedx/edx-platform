@@ -714,21 +714,45 @@ class LoginSessionViewTest(ApiTestCase):
             },
         ])
 
-    def test_login(self):
+    @ddt.data(True, False)
+    @patch('openedx.core.djangoapps.user_authn.views.login.segment')
+    def test_login(self, include_analytics, mock_segment):
         # Create a test user
         UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
 
-        # Login
-        response = self.client.post(self.url, {
+        data = {
             "email": self.EMAIL,
             "password": self.PASSWORD,
-        })
+        }
+        if include_analytics:
+            track_label = "edX/DemoX/Fall"
+            data.update({
+                "analytics": json.dumps({"enroll_course_id": track_label})
+            })
+        else:
+            track_label = None
+
+        # Login
+        response = self.client.post(self.url, data)
         self.assertHttpOK(response)
 
         # Verify that we logged in successfully by accessing
         # a page that requires authentication.
         response = self.client.get(reverse("dashboard"))
         self.assertHttpOK(response)
+
+        # Verify events are called
+        expected_user_id = 1
+        mock_segment.identify.assert_called_once_with(
+            expected_user_id,
+            {'username': self.USERNAME, 'email': self.EMAIL},
+            {'MailChimp': False}
+        )
+        mock_segment.track.assert_called_once_with(
+            expected_user_id,
+            'edx.bi.user.account.authenticated',
+            {'category': 'conversion', 'provider': None, 'label': track_label}
+        )
 
     def test_session_cookie_expiry(self):
         # Create a test user
@@ -792,29 +816,6 @@ class StudentViewShimTest(TestCase):
     def setUp(self):
         super(StudentViewShimTest, self).setUp()
         self.captured_request = None
-
-    def test_strip_enrollment_action(self):
-        view = self._shimmed_view(HttpResponse())
-        request = HttpRequest()
-        request.POST["enrollment_action"] = "enroll"
-        request.POST["course_id"] = "edx/101/demo"
-        view(request)
-
-        # Expect that the enrollment action and course ID
-        # were stripped out before reaching the wrapped view.
-        self.assertNotIn("enrollment_action", self.captured_request.POST)
-        self.assertNotIn("course_id", self.captured_request.POST)
-
-    def test_include_analytics_info(self):
-        view = self._shimmed_view(HttpResponse())
-        request = HttpRequest()
-        request.POST["analytics"] = json.dumps({
-            "enroll_course_id": "edX/DemoX/Fall"
-        })
-        view(request)
-
-        # Expect that the analytics course ID was passed to the view
-        self.assertEqual(self.captured_request.POST.get("course_id"), "edX/DemoX/Fall")
 
     def test_third_party_auth_login_failure(self):
         view = self._shimmed_view(

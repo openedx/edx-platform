@@ -340,6 +340,8 @@ def login_user(request):
     """
     AJAX request to log in the user.
     """
+    _parse_analytics_param_for_course_id(request)
+
     third_party_auth_requested = third_party_auth.is_enabled() and pipeline.running(request)
     first_party_auth_requested = bool(request.POST.get('email')) or bool(request.POST.get('password'))
     is_user_third_party_authenticated = False
@@ -478,6 +480,32 @@ class LoginSessionView(APIView):
         return super(LoginSessionView, self).dispatch(request, *args, **kwargs)
 
 
+def _parse_analytics_param_for_course_id(request):
+    """ If analytics request param is found, parse and add course id as a new request param. """
+    # Make a copy of the current POST request to modify.
+    modified_request = request.POST.copy()
+    if isinstance(request, HttpRequest):
+        # Works for an HttpRequest but not a rest_framework.request.Request.
+        request.POST = modified_request
+    else:
+        # The request must be a rest_framework.request.Request.
+        request._data = modified_request  # pylint: disable=protected-access
+    # Include the course ID if it's specified in the analytics info
+    # so it can be included in analytics events.
+    if "analytics" in modified_request:
+        try:
+            analytics = json.loads(modified_request["analytics"])
+            if "enroll_course_id" in analytics:
+                modified_request["course_id"] = analytics.get("enroll_course_id")
+        except (ValueError, TypeError):
+            set_custom_metric('shim_analytics_course_id', 'parse-error')
+            log.error(
+                u"Could not parse analytics object sent to user API: {analytics}".format(
+                    analytics=analytics
+                )
+            )
+
+
 def shim_student_view(view_func, check_logged_in=False):
     """Create a "shim" view for a view function from the student Django app.
 
@@ -501,7 +529,8 @@ def shim_student_view(view_func, check_logged_in=False):
 
     Keyword Args:
         check_logged_in (boolean): If true, check whether the user successfully
-            authenticated and if not set the status to 403.
+            authenticated and if not set the status to 403. This argument is
+            used to test the shim by skipping this check.
 
     Returns:
         function
@@ -509,45 +538,6 @@ def shim_student_view(view_func, check_logged_in=False):
     """
     @wraps(view_func)
     def _inner(request):  # pylint: disable=missing-docstring
-        # Make a copy of the current POST request to modify.
-        modified_request = request.POST.copy()
-        if isinstance(request, HttpRequest):
-            # Works for an HttpRequest but not a rest_framework.request.Request.
-            set_custom_metric('shim_request_type', 'traditional')
-            request.POST = modified_request
-        else:
-            set_custom_metric('shim_request_type', 'drf')
-            # The request must be a rest_framework.request.Request.
-            request._data = modified_request  # pylint: disable=protected-access
-
-        # The login and registration handlers in student view try to change
-        # the user's enrollment status if these parameters are present.
-        # Since we want the JavaScript client to communicate directly with
-        # the enrollment API, we want to prevent the student views from
-        # updating enrollments.
-        if "enrollment_action" in modified_request:
-            set_custom_metric('shim_del_enrollment_action', modified_request["enrollment_action"])
-            del modified_request["enrollment_action"]
-        if "course_id" in modified_request:
-            set_custom_metric('shim_del_course_id', modified_request["course_id"])
-            del modified_request["course_id"]
-
-        # Include the course ID if it's specified in the analytics info
-        # so it can be included in analytics events.
-        if "analytics" in modified_request:
-            try:
-                analytics = json.loads(modified_request["analytics"])
-                if "enroll_course_id" in analytics:
-                    set_custom_metric('shim_analytics_course_id', analytics.get("enroll_course_id"))
-                    modified_request["course_id"] = analytics.get("enroll_course_id")
-            except (ValueError, TypeError):
-                set_custom_metric('shim_analytics_course_id', 'parse-error')
-                log.error(
-                    u"Could not parse analytics object sent to user API: {analytics}".format(
-                        analytics=analytics
-                    )
-                )
-
         # Call the original view to generate a response.
         # We can safely modify the status code or content
         # of the response, but to be safe we won't mess
