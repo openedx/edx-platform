@@ -22,6 +22,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
+from edx_django_utils.monitoring import set_custom_metric
 from ratelimitbackend.exceptions import RateLimitException
 from rest_framework.views import APIView
 
@@ -341,6 +342,9 @@ def login_user(request):
     first_party_auth_requested = bool(request.POST.get('email')) or bool(request.POST.get('password'))
     is_user_third_party_authenticated = False
 
+    set_custom_metric('login_user_enrollment_action', request.POST.get('enrollment_action'))
+    set_custom_metric('login_user_course_id', request.POST.get('course_id'))
+
     try:
         if third_party_auth_requested and not first_party_auth_requested:
             # The user has already authenticated via third-party auth and has not
@@ -462,6 +466,9 @@ class LoginSessionView(APIView):
 def shim_student_view(view_func, check_logged_in=False):
     """Create a "shim" view for a view function from the student Django app.
 
+    UPDATE: This shim is only used to wrap `login_user`, which now lives in
+    the user_authn Django app (not the student app).
+
     Specifically, we need to:
     * Strip out enrollment params, since the client for the new registration/login
         page will communicate with the enrollment API to update enrollments.
@@ -491,8 +498,10 @@ def shim_student_view(view_func, check_logged_in=False):
         modified_request = request.POST.copy()
         if isinstance(request, HttpRequest):
             # Works for an HttpRequest but not a rest_framework.request.Request.
+            set_custom_metric('shim_request_type', 'traditional')
             request.POST = modified_request
         else:
+            set_custom_metric('shim_request_type', 'drf')
             # The request must be a rest_framework.request.Request.
             request._data = modified_request  # pylint: disable=protected-access
 
@@ -502,8 +511,10 @@ def shim_student_view(view_func, check_logged_in=False):
         # the enrollment API, we want to prevent the student views from
         # updating enrollments.
         if "enrollment_action" in modified_request:
+            set_custom_metric('shim_del_enrollment_action', modified_request["enrollment_action"])
             del modified_request["enrollment_action"]
         if "course_id" in modified_request:
+            set_custom_metric('shim_del_course_id', modified_request["course_id"])
             del modified_request["course_id"]
 
         # Include the course ID if it's specified in the analytics info
@@ -512,8 +523,10 @@ def shim_student_view(view_func, check_logged_in=False):
             try:
                 analytics = json.loads(modified_request["analytics"])
                 if "enroll_course_id" in analytics:
+                    set_custom_metric('shim_analytics_course_id', analytics.get("enroll_course_id"))
                     modified_request["course_id"] = analytics.get("enroll_course_id")
             except (ValueError, TypeError):
+                set_custom_metric('shim_analytics_course_id', 'parse-error')
                 log.error(
                     u"Could not parse analytics object sent to user API: {analytics}".format(
                         analytics=analytics
@@ -550,9 +563,14 @@ def shim_student_view(view_func, check_logged_in=False):
             response_dict = json.loads(response.content.decode('utf-8'))
             msg = response_dict.get("value", u"")
             success = response_dict.get("success")
+            set_custom_metric('shim_original_response_is_json', True)
         except (ValueError, TypeError):
             msg = response.content
             success = True
+            set_custom_metric('shim_original_response_is_json', False)
+        set_custom_metric('shim_original_response_msg', msg)
+        set_custom_metric('shim_original_response_success', success)
+        set_custom_metric('shim_original_response_status', response.status_code)
 
         # If the user is not authenticated when we expect them to be
         # send the appropriate status code.
@@ -594,6 +612,8 @@ def shim_student_view(view_func, check_logged_in=False):
         else:
             response.content = msg
 
+        set_custom_metric('shim_final_response_msg', response.content)
+        set_custom_metric('shim_final_response_status', response.status_code)
         # Return the response, preserving the original headers.
         # This is really important, since the student views set cookies
         # that are used elsewhere in the system (such as the marketing site).
