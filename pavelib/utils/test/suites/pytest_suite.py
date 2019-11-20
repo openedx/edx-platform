@@ -186,7 +186,7 @@ class SystemTestSuite(PytestSuite):
                 xdist_string = u'--tx {}*ssh="jenkins@{} -o StrictHostKeyChecking=no"' \
                                '//python="source edx-venv-{}/edx-venv/bin/activate; {}; python"' \
                                '//chdir="edx-platform"' \
-                               .format(Env.PYTHON_VERSION, xdist_remote_processes, ip, env_var_cmd)
+                               .format(xdist_remote_processes, ip, Env.PYTHON_VERSION, env_var_cmd)
                 cmd.append(xdist_string)
             for rsync_dir in Env.rsync_dirs():
                 cmd.append(u'--rsyncdir {}'.format(rsync_dir))
@@ -312,7 +312,7 @@ class LibTestSuite(PytestSuite):
                 xdist_string = u'--tx {}*ssh="jenkins@{} -o StrictHostKeyChecking=no"' \
                                '//python="source edx-venv-{}/edx-venv/bin/activate; {}; python"' \
                                '//chdir="edx-platform"' \
-                               .format(Env.PYTHON_VERSION, xdist_remote_processes, ip, env_var_cmd)
+                               .format(xdist_remote_processes, ip, Env.PYTHON_VERSION, env_var_cmd)
                 cmd.append(xdist_string)
             for rsync_dir in Env.rsync_dirs():
                 cmd.append(u'--rsyncdir {}'.format(rsync_dir))
