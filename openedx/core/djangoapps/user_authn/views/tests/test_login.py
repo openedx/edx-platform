@@ -29,16 +29,22 @@ from openedx.core.djangoapps.password_policy.compliance import (
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, waffle
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH
 from openedx.core.djangoapps.user_authn.cookies import jwt_cookies
-from openedx.core.djangoapps.user_authn.views.login import shim_student_view
+from openedx.core.djangoapps.user_authn.views.login import (
+    shim_student_view,
+    AllowedAuthUser,
+    ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY,
+    authn_waffle
+)
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.lib.api.test_utils import ApiTestCase
 from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
 from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 
 
 @ddt.ddt
-class LoginTest(CacheIsolationTestCase):
+class LoginTest(SiteMixin, CacheIsolationTestCase):
     """
     Test login_user() view
     """
@@ -53,9 +59,7 @@ class LoginTest(CacheIsolationTestCase):
     def setUp(self):
         """Setup a test user along with its registration and profile"""
         super(LoginTest, self).setUp()
-        self.user = UserFactory.build(username=self.username, email=self.user_email)
-        self.user.set_password(self.password)
-        self.user.save()
+        self.user = self._create_user(self.username, self.user_email)
 
         RegistrationFactory(user=self.user)
         UserProfileFactory(user=self.user)
@@ -67,6 +71,12 @@ class LoginTest(CacheIsolationTestCase):
             self.url = reverse('login_post')
         except NoReverseMatch:
             self.url = reverse('login')
+
+    def _create_user(self, username, user_email):
+        user = UserFactory.build(username=username, email=user_email)
+        user.set_password(self.password)
+        user.save()
+        return user
 
     def test_login_success(self):
         response, mock_audit_log = self._login_response(
@@ -572,6 +582,83 @@ class LoginTest(CacheIsolationTestCase):
         format_string = args[0]
         for log_string in log_strings:
             self.assertNotIn(log_string, format_string)
+
+    @ddt.data(
+        {
+            'switch_enabled': False,
+            'whitelisted': False,
+            'allowed_domain': 'edx.org',
+            'user_domain': 'edx.org',
+            'success': True
+        },
+        {
+            'switch_enabled': False,
+            'whitelisted': True,
+            'allowed_domain': 'edx.org',
+            'user_domain': 'edx.org',
+            'success': True
+        },
+        {
+            'switch_enabled': True,
+            'whitelisted': False,
+            'allowed_domain': 'edx.org',
+            'user_domain': 'edx.org',
+            'success': False
+        },
+        {
+            'switch_enabled': True,
+            'whitelisted': False,
+            'allowed_domain': 'fake.org',
+            'user_domain': 'edx.org',
+            'success': True
+        },
+        {
+            'switch_enabled': True,
+            'whitelisted': True,
+            'allowed_domain': 'edx.org',
+            'user_domain': 'edx.org',
+            'success': True
+        },
+        {
+            'switch_enabled': True,
+            'whitelisted': False,
+            'allowed_domain': 'batman.gotham',
+            'user_domain': 'batman.gotham',
+            'success': False
+        },
+    )
+    @ddt.unpack
+    def test_login_for_user_auth_flow(self, switch_enabled, whitelisted, allowed_domain, user_domain, success):
+        """
+        Verify that `login._check_user_auth_flow` works as expected.
+        """
+        username = 'batman'
+        user_email = '{username}@{domain}'.format(username=username, domain=user_domain)
+        user = self._create_user(username, user_email)
+
+        provider = 'Google'
+        site = self.set_up_site(allowed_domain, {
+            'SITE_NAME': allowed_domain,
+            'THIRD_PARTY_AUTH_ONLY_DOMAIN': allowed_domain,
+            'THIRD_PARTY_AUTH_ONLY_PROVIDER': provider
+        })
+
+        if whitelisted:
+            AllowedAuthUser.objects.create(site=site, email=user.email)
+        else:
+            AllowedAuthUser.objects.filter(site=site, email=user.email).delete()
+
+        with authn_waffle.override(ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY, switch_enabled):
+            value = None if success else u'As an {0} user, You must login with your {0} {1} account.'.format(
+                allowed_domain,
+                provider
+            )
+            response, __ = self._login_response(user.email, self.password)
+            self._assert_response(
+                response,
+                success=success,
+                value=value,
+            )
 
 
 @ddt.ddt
