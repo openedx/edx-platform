@@ -3,7 +3,6 @@ from importlib import import_module
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 
-from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.debug import sensitive_post_parameters
@@ -12,6 +11,7 @@ from django.views.decorators.http import require_http_methods
 from student.views import password_change_request_handler
 
 from .models import Partner
+from .forms import PartnerResetPasswordForm
 
 PARTNERS_VIEW_FRMT = 'openedx.features.partners.{slug}.views'
 
@@ -55,8 +55,8 @@ def password_reset_request(request):
     :return: HTTPResponse object with success/error status code
     """
     email = request.POST.get('email')
-    try:
-        if User.objects.get(email=email):
+    reset_password_form = PartnerResetPasswordForm(data={'email': email})
+    if reset_password_form.is_valid():
             return password_change_request_handler(request)
-    except (ValueError, User.DoesNotExist):
-        return JsonResponse({"Error": {"email": ["User is not registered"]}}, status=404)
+    else:
+        return JsonResponse({"Error": dict(reset_password_form.errors.items())}, status=404)
