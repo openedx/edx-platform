@@ -30,7 +30,6 @@ from openedx.core.djangoapps.user_api.accounts import PRIVATE_VISIBILITY, USERNA
 from openedx.core.djangoapps.user_api.accounts.api import (
     activate_account,
     get_account_settings,
-    request_password_change,
     update_account_settings
 )
 from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (  # pylint: disable=unused-import
@@ -579,57 +578,6 @@ class AccountActivationAndPasswordChangeTest(CreateAccountMixin, TestCase):
         with pytest.raises(UserAPIInternalError, message=SYSTEM_MAINTENANCE_MSG):
             with waffle().override(PREVENT_AUTH_USER_WRITES, True):
                 activate_account(activation_key)
-
-    @skip_unless_lms
-    def test_request_password_change(self):
-        # Create and activate an account
-        self.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-        self.assertEqual(len(mail.outbox), 1)
-
-        user = User.objects.get(username=self.USERNAME)
-        activation_key = self.get_activation_key(user)
-        activate_account(activation_key)
-
-        request = RequestFactory().post('/password')
-        request.user = Mock()
-        request.site = SiteFactory()
-
-        with patch('crum.get_current_request', return_value=request):
-            # Request a password change
-            request_password_change(self.EMAIL, self.IS_SECURE)
-
-        # Verify that a new email message has been sent
-        self.assertEqual(len(mail.outbox), 2)
-
-        # Verify that the body of the message contains something that looks
-        # like an activation link
-        email_body = mail.outbox[0].body
-        result = re.search(r'(?P<url>https?://[^\s]+)', email_body)
-        self.assertIsNot(result, None)
-
-    @skip_unless_lms
-    def test_request_password_change_invalid_user(self):
-        with self.assertRaises(UserNotFound):
-            request_password_change(self.EMAIL, self.IS_SECURE)
-
-        # Verify that no email messages have been sent
-        self.assertEqual(len(mail.outbox), 0)
-
-    @skip_unless_lms
-    def test_request_password_change_inactive_user(self):
-        # Create an account, but do not activate it
-        self.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-        self.assertEqual(len(mail.outbox), 1)
-
-        request = RequestFactory().post('/password')
-        request.user = Mock()
-        request.site = SiteFactory()
-
-        with patch('crum.get_current_request', return_value=request):
-            request_password_change(self.EMAIL, self.IS_SECURE)
-
-        # Verify that the activation email was still sent
-        self.assertEqual(len(mail.outbox), 2)
 
     def _assert_is_datetime(self, timestamp):
         """

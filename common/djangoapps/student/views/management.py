@@ -65,7 +65,7 @@ from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.message_types import PasswordReset
 from openedx.core.djangolib.markup import HTML, Text
-from student.forms import AccountCreationForm, PasswordResetFormNoActive
+from student.forms import AccountCreationForm
 from student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info, generate_activation_email_context
 from student.message_types import EmailChange, EmailChangeConfirmation, RecoveryEmailCreate
 from student.models import (
@@ -676,7 +676,7 @@ def password_change_request_handler(request):
 
     if email:
         try:
-            from openedx.core.djangoapps.user_api.accounts.api import request_password_change
+            from openedx.core.djangoapps.user_authn.views.password_reset import request_password_change
             request_password_change(email, request.is_secure())
             user = user if user.is_authenticated else get_user_from_email(email=email)
             destroy_oauth_tokens(user)
@@ -746,6 +746,7 @@ def password_reset(request):
         AUDIT_LOG.warning("Rate limit exceeded in password_reset")
         return HttpResponseForbidden()
 
+    from openedx.core.djangoapps.user_authn.views.password_reset import PasswordResetFormNoActive
     form = PasswordResetFormNoActive(request.POST)
     if form.is_valid():
         form.save(use_https=request.is_secure(),
