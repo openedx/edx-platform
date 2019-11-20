@@ -357,7 +357,10 @@ def login_user(request):
             try:
                 user = _do_third_party_auth(request)
                 is_user_third_party_authenticated = True
+                set_custom_metric('login_user_tpa_success', True)
             except AuthFailedError as e:
+                set_custom_metric('login_user_tpa_success', False)
+                set_custom_metric('login_user_tpa_failure_msg', e.value)
                 return HttpResponse(e.value, content_type="text/plain", status=403)
         else:
             user = _get_user_by_email(request)
@@ -389,10 +392,16 @@ def login_user(request):
 
         # Ensure that the external marketing site can
         # detect that the user is logged in.
-        return set_logged_in_cookies(request, response, possibly_authenticated_user)
+        response = set_logged_in_cookies(request, response, possibly_authenticated_user)
+        set_custom_metric('login_user_auth_failed_error', False)
+        set_custom_metric('login_user_response_status', response.status_code)
+        return response
     except AuthFailedError as error:
         log.exception(error.get_response())
-        return JsonResponse(error.get_response())
+        response = JsonResponse(error.get_response())
+        set_custom_metric('login_user_auth_failed_error', True)
+        set_custom_metric('login_user_response_status', response.status_code)
+        return response
 
 
 # CSRF protection is not needed here because the only side effect
