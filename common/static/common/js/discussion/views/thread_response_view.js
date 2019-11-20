@@ -51,7 +51,8 @@
 
             ThreadResponseView.prototype.events = {
                 'click .discussion-submit-comment': 'submitComment',
-                'focus .wmd-input': 'showEditorChrome'
+                'focus .wmd-input': 'showEditorChrome',
+                'input .wmd-input': 'toggleCommentSubmitButton'
             };
 
             ThreadResponseView.prototype.$ = function(selector) {
@@ -181,6 +182,13 @@
                 return view;
             };
 
+            ThreadResponseView.prototype.toggleCommentSubmitButton = function(event) {
+              var id = event.target.id.split('-').slice(-1)[0],
+                querySelector = 'form[data-id="' + id + '"] .discussion-submit-comment',
+                commentButton = document.querySelector(querySelector);
+                commentButton.disabled = !($.trim(event.target.value).length);
+            };
+
             ThreadResponseView.prototype.submitComment = function(event) {
                 var body, comment, url, view;
                 event.preventDefault();
@@ -201,6 +209,7 @@
                 view = this.renderComment(comment);
                 this.hideEditorChrome();
                 this.trigger('comment:add', comment);
+                event.target.disabled = true;
                 return DiscussionUtil.safeAjax({
                     $elem: $(event.target),
                     url: url,
