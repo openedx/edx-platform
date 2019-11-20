@@ -416,38 +416,6 @@ class LoginTest(CacheIsolationTestCase):
         response = client1.get(url)
         self.assertEqual(response.status_code, 200)
 
-    def test_change_enrollment_400(self):
-        """
-        Tests that a 400 in change_enrollment doesn't lead to a 404
-        and in fact just logs in the user without incident
-        """
-        # add this post param to trigger a call to change_enrollment
-        extra_post_params = {"enrollment_action": "enroll"}
-        with patch('student.views.change_enrollment') as mock_change_enrollment:
-            mock_change_enrollment.return_value = HttpResponseBadRequest("I am a 400")
-            response, _ = self._login_response(
-                self.user_email, self.password, extra_post_params=extra_post_params,
-            )
-        response_content = json.loads(response.content.decode('utf-8'))
-        self.assertIsNone(response_content["redirect_url"])
-        self._assert_response(response, success=True)
-
-    def test_change_enrollment_200_no_redirect(self):
-        """
-        Tests "redirect_url" is None if change_enrollment returns a HttpResponse
-        with no content
-        """
-        # add this post param to trigger a call to change_enrollment
-        extra_post_params = {"enrollment_action": "enroll"}
-        with patch('student.views.change_enrollment') as mock_change_enrollment:
-            mock_change_enrollment.return_value = HttpResponse()
-            response, _ = self._login_response(
-                self.user_email, self.password, extra_post_params=extra_post_params,
-            )
-        response_content = json.loads(response.content.decode('utf-8'))
-        self.assertIsNone(response_content["redirect_url"])
-        self._assert_response(response, success=True)
-
     @override_settings(PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG={'ENFORCE_COMPLIANCE_ON_LOGIN': True})
     def test_check_password_policy_compliance(self):
         """
