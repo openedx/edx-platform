@@ -19,7 +19,6 @@ from .accounts.views import (
     UsernameReplacementView
 )
 from .preferences.views import PreferencesDetailView, PreferencesView
-from .validation.views import RegistrationValidationView
 from .verification_api.views import IDVerificationStatusView
 
 ME = AccountViewSet.as_view({
@@ -157,11 +156,6 @@ urlpatterns = [
         r'^v1/accounts/replace_usernames/$',
         UsernameReplacementView.as_view(),
         name='username_replacement'
-    ),
-    url(
-        r'^v1/validation/registration$',
-        RegistrationValidationView.as_view(),
-        name='registration_validation'
     ),
     url(
         r'^v1/preferences/{}$'.format(settings.USERNAME_PATTERN),
