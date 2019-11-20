@@ -243,7 +243,7 @@ pycodestyle==2.5.0
 pycontracts==1.7.1
 pycountry==19.8.18
 pycparser==2.19
-pycryptodome==3.9.3
+pycryptodome==3.9.4
 pycryptodomex==3.4.7
 pyflakes==2.1.1
 pygments==2.4.2
