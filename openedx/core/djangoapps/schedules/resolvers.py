@@ -345,9 +345,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
     course has updates.
     """
     log_prefix = 'Course Update'
-    # TODO assign 'schedule_date_field' value to new column ('start_date')
-    #  once data migration step is completed in column renames.
-    schedule_date_field = 'start'
+    schedule_date_field = 'start_date'
     num_bins = COURSE_UPDATE_NUM_BINS
     experience_filter = Q(experience__experience_type=ScheduleExperience.EXPERIENCES.course_updates)
 
