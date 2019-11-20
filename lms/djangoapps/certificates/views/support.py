@@ -25,6 +25,7 @@ from opaque_keys.edx.keys import CourseKey
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.certificates import api
 from lms.djangoapps.certificates.models import CertificateInvalidation
+from lms.djangoapps.certificates.permissions import VIEW_ALL_CERTIFICATES
 from lms.djangoapps.instructor_task.api import generate_certificates_for_students
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment, User
@@ -40,7 +41,7 @@ def require_certificate_permission(func):
     """
     @wraps(func)
     def inner(request, *args, **kwargs):
-        if has_access(request.user, "certificates", "global"):
+        if request.user.has_perm(VIEW_ALL_CERTIFICATES, 'global'):
             return func(request, *args, **kwargs)
         else:
             return HttpResponseForbidden()
