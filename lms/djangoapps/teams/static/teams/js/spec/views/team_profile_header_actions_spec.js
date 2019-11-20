@@ -191,11 +191,11 @@ define([
                     })
                 );
 
-                // current user is not a member of another team so we should see the correct message
+                // Mock the response so that current user is not a member of any team
                 AjaxHelpers.respondWithJson(requests, {count: 0});
 
-                // current user is a student and current team belogs to a intructor managed topic
-                // current team so we should see the correct message
+                // current user is a student and current team belogs to an instructor managed topic
+                // so the Join Team button is hidden and we should see the correct message
                 expect(view.$('.action.action-primary').length).toEqual(0);
                 expect(view.$('.join-team-message').text().trim()).toBe(view.notJoinInstructorManagedTeam);
             });

@@ -62,7 +62,7 @@ def is_team_discussion_private(team):
     return getattr(team, 'is_discussion_private', False)
 
 
-def is_instructor_managed_team(team):
+def is_instructor_managed_team(team):  # pylint: disable=unused-argument
     """
     Return true if the team is managed by instructors.
     For now always return false, will complete the logic later.

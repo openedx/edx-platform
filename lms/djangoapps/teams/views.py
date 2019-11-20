@@ -364,7 +364,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = CourseTeamSerializer
 
-    def get(self, request):
+    def get(self, request):  # pylint: disable=too-many-statements
         """GET /api/team/v0/teams/"""
         result_filter = {}
 

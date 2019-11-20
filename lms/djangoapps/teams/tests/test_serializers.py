@@ -153,7 +153,12 @@ class BaseTopicSerializerTestCase(SerializerTestCase):
         created topics.
         """
         topics = [
-            {u'name': u'Tøpic {}'.format(i), u'description': u'The bést topic! {}'.format(i), u'id': six.text_type(i), u'type': u'open'}
+            {
+                u'name': u'Tøpic {}'.format(i),
+                u'description': u'The bést topic! {}'.format(i),
+                u'id': six.text_type(i),
+                u'type': u'open'
+            }
             for i in six.moves.range(num_topics)
         ]
         for topic in topics:

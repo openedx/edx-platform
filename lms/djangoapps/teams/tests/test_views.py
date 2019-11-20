@@ -1417,7 +1417,7 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
         )
 
     @patch('lms.djangoapps.teams.views.is_instructor_managed_team', return_value=True)
-    def test_staff_join_instructor_managed_team(self, *arg):
+    def test_staff_join_instructor_managed_team(self, *args):  # pylint: disable=unused-argument
         self.post_create_membership(
             200,
             self.build_membership_data_raw(self.users['staff'].username, self.solar_team.team_id),
@@ -1425,7 +1425,7 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
         )
 
     @patch('lms.djangoapps.teams.views.is_instructor_managed_team', return_value=True)
-    def test_student_join_instructor_managed_team(self, *arg):
+    def test_student_join_instructor_managed_team(self, *args):  # pylint: disable=unused-argument
         self.post_create_membership(
             403,
             self.build_membership_data_raw(self.users['student_enrolled_not_on_team'].username, self.solar_team.team_id)
@@ -1593,8 +1593,9 @@ class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
         self.delete_membership(self.wind_team.team_id, self.users['student_enrolled'].username, 404)
 
     @patch('lms.djangoapps.teams.views.is_instructor_managed_team', return_value=True)
-    def test_student_leave_instructor_managed_team(self, *arg):
-        self.delete_membership(self.solar_team.team_id, self.users['student_enrolled'].username, 403, user='student_enrolled')
+    def test_student_leave_instructor_managed_team(self, *args):  # pylint: disable=unused-argument
+        self.delete_membership(
+            self.solar_team.team_id, self.users['student_enrolled'].username, 403, user='student_enrolled')
 
 class TestElasticSearchErrors(TeamAPITestCase):
     """Test that the Team API is robust to Elasticsearch connection errors."""

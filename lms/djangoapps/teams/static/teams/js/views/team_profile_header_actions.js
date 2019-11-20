@@ -96,10 +96,7 @@
 
                     info.memberOfCurrentTeam = TeamUtils.isUserMemberOfTeam(this.model.get('membership'), username);
                     info.isAdminOrStaff = this.context.userInfo.privileged || this.context.userInfo.staff;
-
-                    if (this.topic.attributes.type !== undefined) {
-                        info.isInstructorManagedTopic = this.topic.attributes.type.toLowerCase() != "open";
-                    }
+                    info.isInstructorManagedTopic = TeamUtils.isInstructorManagedTopic(this.topic.attributes.type);
 
                     var teamHasSpace = this.model.get('membership').length < maxTeamSize;
 

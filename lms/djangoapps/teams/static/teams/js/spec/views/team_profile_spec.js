@@ -189,13 +189,13 @@ define([
                     assertTeamDetails(view, 0, false);
                 });
 
-                it('student can not leave instrctor managed team', function() {
+                it('student can not leave instructor managed team', function() {
                     var requests = AjaxHelpers.requests(this);
 
                     var view = createTeamProfileView(
                         requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}, true
                     );
-
+                    // When a student is in a team of an instructor-managed topic, he can't see the leave team button.
                     assertTeamDetails(view, 1, false);
                 });
 

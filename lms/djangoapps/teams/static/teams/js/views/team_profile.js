@@ -40,12 +40,8 @@
                     var memberships = this.model.get('membership'),
                         discussionTopicID = this.model.get('discussion_topic_id'),
                         isMember = TeamUtils.isUserMemberOfTeam(memberships, this.context.userInfo.username),
-                        isInstructorManagedTopic = false,
-                        isAdminOrStaff = this.context.userInfo.privileged || this.context.userInfo.staff;
-                        isInstructorManagedTopic =
-                            this.topic.attributes.type === undefined ? false :
-                            this.topic.attributes.type.toLowerCase() != "open";
-
+                        isAdminOrStaff = this.context.userInfo.privileged || this.context.userInfo.staff,
+                        isInstructorManagedTopic = TeamUtils.isInstructorManagedTopic(this.topic.attributes.type);
 
                     var showLeaveLink = isMember && (isAdminOrStaff || !isInstructorManagedTopic);
 

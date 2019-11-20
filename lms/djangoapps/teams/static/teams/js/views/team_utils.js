@@ -65,6 +65,13 @@
                 } catch (error) {
                     this.showMessage(genericErrorMessage, type);
                 }
+            },
+
+            isInstructorManagedTopic: function(topicType) {
+                if (topicType === undefined) {
+                    return false;
+                }
+                return topicType.toLowerCase() != "open";
             }
         };
     });
