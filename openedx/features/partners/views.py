@@ -43,7 +43,7 @@ def register_user(request, slug):
 def login_user(request, slug):
     """
     This is general login view, for users of all partners
-    :param request.
+    :param request: The Django request.
     :param slug: partner slug
     :return: JsonResponse object with success/error message
     """

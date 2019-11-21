@@ -256,7 +256,6 @@ def create_account_with_params_custom(request, params, partner):
 
 
 class LoginSessionViewG2A(LoginSessionViewCustom):
-
     """
     Inherited from LoginSessionViewCustom to keep the existing flow for login
     and extend the functionality to affiliate the user with Give2Asia if not already done
@@ -275,6 +274,3 @@ class LoginSessionViewG2A(LoginSessionViewCustom):
                     user=user.username, partner=partner.slug, exp=ex.message)
                 )
         return response
-
-
-
