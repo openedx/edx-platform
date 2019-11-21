@@ -12,10 +12,11 @@ def populate_trophycase(courses, earned_badges):
     :return: dictionary containing trophycase json
     """
     trophycase_dict = OrderedDict()
+    badge_queryset = Badge.objects.all().order_by('threshold')
 
     for course_id, display_name in courses:
 
-        course_badges = get_all_badges(course_id, earned_badges)
+        course_badges = get_all_badges(course_id, earned_badges, badge_queryset)
 
         trophycase_dict[unicode(course_id)] = {
             'display_name': display_name,
@@ -25,18 +26,22 @@ def populate_trophycase(courses, earned_badges):
     return trophycase_dict
 
 
-def get_all_badges(course_id, earned_badges):
+def get_all_badges(course_id, earned_badges, badge_queryset=None):
     """
     Get all badges of a course in a hierarchy, categorised by badge type
+    :param badge_queryset: Badge queryset
     :param course_id: Course identifier
     :param earned_badges: All badges earned in a course
     :return: List of badges in a course
     """
     badges = list()
 
+    if not badge_queryset:
+        badge_queryset = Badge.objects.all().order_by('threshold')
+
     for badge_type, _ in Badge.BADGE_TYPES:
         badge_list = list(
-            Badge.objects.filter(type=badge_type).order_by('threshold').values()
+            badge_queryset.filter(type=badge_type).values()
         )
 
         add_badge_earned_date(course_id, badge_list, earned_badges)
