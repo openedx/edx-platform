@@ -3,7 +3,6 @@ from importlib import import_module
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
 
@@ -23,7 +22,6 @@ def dashboard(request, slug):
 
 @require_http_methods(["POST"])
 @sensitive_post_parameters('password')
-@csrf_exempt
 def register_user(request, slug):
     """
     This is general registering view, for users of all partners
