@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.utils.translation import ugettext as _
 
 
 class PartnerResetPasswordForm(forms.Form):
@@ -8,18 +9,16 @@ class PartnerResetPasswordForm(forms.Form):
     validation, not rendering.
     """
 
-    _EMAIL_INVALID_MSG = "A properly formatted e-mail is required"
-
-    def __init__(self, data=None):
-        super(PartnerResetPasswordForm, self).__init__(data)
-
-    def validate_user_using_email(email):
+    def clean_email(self):
+        email = self.cleaned_data['email']
         """ Check if user associated with email exists"""
-        user = User.objects.filter(email=email).first()
-        if user is None:
-            raise forms.ValidationError("We don't recognize the email: %s" % email)
+        if not User.objects.filter(email=email).exists():
+            raise forms.ValidationError(_("We don't recognize the email: {}").format(email))
+        return email
 
     email = forms.EmailField(
-        validators=[validate_user_using_email]
+        error_messages={
+            "required": "Valid email is required",
+        }
     )
 

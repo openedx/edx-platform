@@ -8,10 +8,12 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
 
+from rest_framework import status
+
 from student.views import password_change_request_handler
 
-from .models import Partner
 from .forms import PartnerResetPasswordForm
+from .models import Partner
 
 PARTNERS_VIEW_FRMT = 'openedx.features.partners.{slug}.views'
 
@@ -46,17 +48,21 @@ def register_user(request, slug):
 
 @csrf_exempt
 @require_http_methods(['POST'])
-def password_reset_request(request):
+def reset_password_view(request):
     """
     This is the basic password reset view, as per the requirements
-    of organization password reset flow. Have to send 404 id user does
+    of organization password reset flow. Have to send 404 if user does
     not exist
-    :param request: The Django request.
-    :return: HTTPResponse object with success/error status code
+    :param request: The HttpRequest request object.
+    :return: HTTPResponse/JSONResponse object with success/error status code
     """
     email = request.POST.get('email')
     reset_password_form = PartnerResetPasswordForm(data={'email': email})
     if reset_password_form.is_valid():
-            return password_change_request_handler(request)
+            response = password_change_request_handler(request)
+            if response.status_code == status.HTTP_403_FORBIDDEN:
+                return JsonResponse({"Error": {"email": [response.content]}}, status=status.HTTP_403_FORBIDDEN)
+            else:
+                return response
     else:
-        return JsonResponse({"Error": dict(reset_password_form.errors.items())}, status=404)
+        return JsonResponse({"Error": dict(reset_password_form.errors.items())}, status=status.HTTP_404_NOT_FOUND)
