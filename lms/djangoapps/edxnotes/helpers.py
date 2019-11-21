@@ -34,8 +34,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger(__name__)
-# OAuth2 Client name for edxnotes
-CLIENT_NAME = "edx-notes"
+
 DEFAULT_PAGE = 1
 DEFAULT_PAGE_SIZE = 25
 
@@ -56,10 +55,10 @@ def get_edxnotes_id_token(user):
     Returns generated ID Token for edxnotes.
     """
     try:
-        notes_application = Application.objects.get(name=CLIENT_NAME)
+        notes_application = Application.objects.get(name=settings.EDXNOTES_CLIENT_NAME)
     except Application.DoesNotExist:
         raise ImproperlyConfigured(
-            u'OAuth2 Client with name [{}] does not exist.'.format(CLIENT_NAME)
+            u'OAuth2 Client with name [{}] does not exist.'.format(settings.EDXNOTES_CLIENT_NAME)
         )
     return create_jwt_for_user(
         user, secret=notes_application.client_secret, aud=notes_application.client_id
