@@ -1369,6 +1369,7 @@ PAYMENT_REPORT_GENERATOR_GROUP = 'shoppingcart_report_access'
 # Configure the LMS to use our stub EdxNotes implementation
 EDXNOTES_PUBLIC_API = 'http://localhost:18120/api/v1'
 EDXNOTES_INTERNAL_API = 'http://localhost:18120/api/v1'
+EDXNOTES_CLIENT_NAME = "edx-notes"
 
 EDXNOTES_CONNECT_TIMEOUT = 0.5  # time in seconds
 EDXNOTES_READ_TIMEOUT = 1.5  # time in seconds
