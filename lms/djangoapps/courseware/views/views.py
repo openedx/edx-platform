@@ -1338,12 +1338,24 @@ def _course_home_redirect_enabled():
 
 @login_required
 @ensure_valid_course_key
-def submission_history(request, course_id, student_username, location):
+def submission_history(request, course_id, student_username_or_email, location):
     """Render an HTML fragment (meant for inclusion elsewhere) that renders a
     history of all state changes made by this user for this problem location.
     Right now this only works for problems because that's all
     StudentModuleHistory records.
     """
+    user = None
+    found_user_name = None
+    if '@' in student_username_or_email:
+        user = User.objects.filter(email=student_username_or_email).first()
+    if not user:
+        user = User.objects.filter(username=student_username_or_email).first()
+
+    if user:
+        found_user_name = user.username
+
+    if not found_user_name:
+        return HttpResponse(escape(_(u'User does not exist.')))
 
     course_key = CourseKey.from_string(course_id)
 
@@ -1357,15 +1369,15 @@ def submission_history(request, course_id, student_username, location):
 
     # Permission Denied if they don't have staff access and are trying to see
     # somebody else's submission history.
-    if (student_username != request.user.username) and (not staff_access):
+    if (found_user_name != request.user.username) and (not staff_access):
         raise PermissionDenied
 
     user_state_client = DjangoXBlockUserStateClient()
     try:
-        history_entries = list(user_state_client.get_history(student_username, usage_key))
+        history_entries = list(user_state_client.get_history(found_user_name, usage_key))
     except DjangoXBlockUserStateClient.DoesNotExist:
         return HttpResponse(escape(_(u'User {username} has never accessed problem {location}').format(
-            username=student_username,
+            username=found_user_name,
             location=location
         )))
 
@@ -1373,7 +1385,7 @@ def submission_history(request, course_id, student_username, location):
     # the scores instead, it will have to do.
     csm = StudentModule.objects.filter(
         module_state_key=usage_key,
-        student__username=student_username,
+        student__username=found_user_name,
         course_id=course_key)
 
     scores = BaseStudentModuleHistory.get_history(csm)
@@ -1385,7 +1397,7 @@ def submission_history(request, course_id, student_username, location):
             u"%d scores were found, and %d history entries were found. "
             u"Matching scores to history entries by date for display.",
             course_id,
-            student_username,
+            found_user_name,
             location,
             len(scores),
             len(history_entries),
@@ -1402,7 +1414,7 @@ def submission_history(request, course_id, student_username, location):
     context = {
         'history_entries': history_entries,
         'scores': scores,
-        'username': student_username,
+        'username': found_user_name,
         'location': location,
         'course_id': text_type(course_key)
     }

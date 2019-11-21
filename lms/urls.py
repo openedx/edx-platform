@@ -760,7 +760,7 @@ urlpatterns += [
 if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW'):
     urlpatterns += [
         url(
-            r'^courses/{}/submission_history/(?P<student_username>[^/]*)/(?P<location>.*?)$'.format(
+            r'^courses/{}/submission_history/(?P<student_username_or_email>[^/]*)/(?P<location>.*?)$'.format(
                 settings.COURSE_ID_PATTERN
             ),
             courseware_views.submission_history,
