@@ -27,9 +27,9 @@ def dashboard(request, slug):
         raise Http404('Your partner is not properly registered')
 
 
-@csrf_exempt
 @require_http_methods(["POST"])
 @sensitive_post_parameters('password')
+@csrf_exempt
 def register_user(request, slug):
     """
     This is general registering view, for users of all partners
@@ -58,10 +58,10 @@ def reset_password_view(request):
     email = request.POST.get('email')
     reset_password_form = PartnerResetPasswordForm(data={'email': email})
     if reset_password_form.is_valid():
-            response = password_change_request_handler(request)
-            if response.status_code == status.HTTP_403_FORBIDDEN:
-                return JsonResponse({"Error": {"email": [response.content]}}, status=status.HTTP_403_FORBIDDEN)
-            else:
-                return response
+        response = password_change_request_handler(request)
+        if response.status_code == status.HTTP_403_FORBIDDEN:
+            return JsonResponse({"Error": {"email": [response.content]}}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            return response
     else:
         return JsonResponse({"Error": dict(reset_password_form.errors.items())}, status=status.HTTP_404_NOT_FOUND)
