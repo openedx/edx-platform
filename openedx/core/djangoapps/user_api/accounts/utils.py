@@ -163,18 +163,15 @@ def retrieve_last_sitewide_block_completed(username):
     if not candidate_course:
         return
 
-    lms_root = SiteConfiguration.get_value_for_org(candidate_course.org, "LMS_ROOT_URL", settings.LMS_ROOT_URL)
-
     try:
         item = modulestore().get_item(candidate_block_key, depth=1)
     except ItemNotFoundError:
         item = None
 
-    if not (lms_root and item):
+    if not item:
         return
 
-    return u"{lms_root}/courses/{course_key}/jump_to/{location}".format(
-        lms_root=lms_root,
+    return u"/courses/{course_key}/jump_to/{location}".format(
         course_key=text_type(item.location.course_key),
         location=text_type(item.location),
     )

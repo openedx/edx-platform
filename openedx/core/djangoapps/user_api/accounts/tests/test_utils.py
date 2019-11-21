@@ -127,7 +127,8 @@ class CompletionUtilsTestCase(SharedModuleStoreTestCase, CompletionWaffleTestMix
         )
         self.assertEqual(
             block_url,
-            u'test_url:9999/courses/{org}/{course}/{run}/jump_to/i4x://{org}/{course}/vertical/{vertical_id}'.format(
+            # Appsembler: We're omitting the domain name because our users are always on a single site.
+            u'/courses/{org}/{course}/{run}/jump_to/i4x://{org}/{course}/vertical/{vertical_id}'.format(
                 org=self.course.location.course_key.org,
                 course=self.course.location.course_key.course,
                 run=self.course.location.course_key.run,
