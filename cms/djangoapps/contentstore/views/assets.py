@@ -28,6 +28,9 @@ from student.auth import has_course_author_access
 from util.date_utils import get_default_time_display
 from util.json_request import JsonResponse
 
+from openedx.core.djangoapps.appsembler.api.sites import get_site_for_course
+
+
 __all__ = ['assets_handler']
 
 REQUEST_DEFAULTS = {
@@ -572,7 +575,16 @@ def _get_asset_json(display_name, content_type, date, location, thumbnail_locati
     Helper method for formatting the asset information to send to client.
     '''
     asset_url = StaticContent.serialize_asset_key_with_slash(location)
-    external_url = settings.LMS_BASE + asset_url
+
+    domain = settings.LMS_BASE
+    site_for_course = get_site_for_course(location.course_key)
+    if site_for_course:
+        domain = site_for_course.domain
+
+    external_url = '//{domain}{asset_url}'.format(
+        domain=domain,
+        asset_url=asset_url,
+    )
     return {
         'display_name': display_name,
         'content_type': content_type,
