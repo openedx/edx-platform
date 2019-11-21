@@ -6,7 +6,7 @@
 #
 configparser==4.0.2       # via importlib-metadata
 contextlib2==0.6.0.post1  # via importlib-metadata
-coverage==5.0a6
+coverage==5.0b1
 diff-cover==0.9.8
 importlib-metadata==0.23  # via inflect
 inflect==3.0.2            # via jinja2-pluralize

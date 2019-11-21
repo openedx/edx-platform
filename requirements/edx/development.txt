@@ -61,7 +61,7 @@ contextlib2==0.6.0.post1
 cookies==2.2.1
 coreapi==2.3.3
 coreschema==0.0.4
-coverage==5.0a6
+coverage==5.0b1
 git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0
 git+https://github.com/edx/crowdsourcehinter.git@a7ffc85b134b7d8909bf1fefd23dbdb8eb28e467#egg=crowdsourcehinter-xblock==0.2
 cryptography==2.8
