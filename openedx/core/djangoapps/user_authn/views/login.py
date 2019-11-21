@@ -36,7 +36,7 @@ from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangoapps.user_authn.views.password_reset import send_password_reset_email_for_user
 from openedx.core.djangoapps.user_authn.config.waffle import (
     ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY,
-    waffle as authn_waffle
+    UPDATE_LOGIN_USER_ERROR_STATUS_CODE
 )
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.view_utils import require_post_params
@@ -284,7 +284,7 @@ def _check_user_auth_flow(site, user):
     Check if user belongs to an allowed domain and not whitelisted
     then ask user to login through allowed domain SSO provider.
     """
-    if user and authn_waffle.is_enabled(ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY):
+    if user and ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY.is_enabled():
         allowed_domain = site.configuration.get_value('THIRD_PARTY_AUTH_ONLY_DOMAIN', '').lower()
         user_domain = user.email.split('@')[1].strip().lower()
 
@@ -398,7 +398,11 @@ def login_user(request):
         return response
     except AuthFailedError as error:
         log.exception(error.get_response())
-        response = JsonResponse(error.get_response())
+        # original code returned a 200 status code with status=False for errors. This flag
+        # is used for rolling out a transition to using a 400 status code for errors, which
+        # is a breaking-change, but will hopefully be a tolerable breaking-change.
+        status = 400 if UPDATE_LOGIN_USER_ERROR_STATUS_CODE.is_enabled() else 200
+        response = JsonResponse(error.get_response(), status=status)
         set_custom_metric('login_user_auth_failed_error', True)
         set_custom_metric('login_user_response_status', response.status_code)
         return response
@@ -608,9 +612,12 @@ def shim_student_view(view_func, check_logged_in=False):
 
         # If an error condition occurs, send a status 400
         elif response.status_code != 200 or not success:
-            # The student views tend to send status 200 even when an error occurs
+            # login_user sends status 200 even when an error occurs
             # If the JSON-serialized content has a value "success" set to False,
             # then we know an error occurred.
+            # NOTE: temporary metric added so we can remove this code once the
+            # original response is 400 instead of 200.
+            set_custom_metric('shim_adjusted_status_code', bool(response.status_code == 200))
             if response.status_code == 200:
                 response.status_code = 400
             response.content = msg

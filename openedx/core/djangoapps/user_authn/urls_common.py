@@ -37,7 +37,6 @@ urlpatterns = [
     # Login
     url(r'^login_post$', login.login_user, name='login_post'),
     url(r'^login_ajax$', login.login_user, name="login"),
-    url(r'^login_ajax/(?P<error>[^/]*)$', login.login_user),
 
     # Moved from user_api/legacy_urls.py
     # `user_api` prefix is preserved for backwards compatibility.
