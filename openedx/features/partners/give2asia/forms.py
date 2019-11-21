@@ -94,8 +94,7 @@ class Give2AsiaAccountCreationForm(forms.Form):
                     raise ValidationError("Unauthorized email address.")
         if email_exists_or_retired(email):
             raise ValidationError(
-                "It looks like {email} belongs to an existing account. Try again with a different email address."
-                    .format(email=email)
+                "Looks like that email address is taken. Try a different one."
             )
         return email
 
