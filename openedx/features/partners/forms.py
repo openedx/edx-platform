@@ -10,5 +10,5 @@ class PartnerResetPasswordForm(PasswordResetFormNoActive):
     """
     def clean_email(self):
         self.error_messages['unknown'] = _("We don't recognize the email: {}").format(self.cleaned_data["email"])
-        super(PartnerResetPasswordForm, self).clean_email()
+        return super(PartnerResetPasswordForm, self).clean_email()
 
