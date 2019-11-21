@@ -546,7 +546,15 @@ def get_sibling_urls(subsection):
             break
         last_block = block
     if not prev_loc:
-        sections = section.get_parent().get_children()
+        try:
+            sections = section.get_parent().get_children()
+        except AttributeError:
+            log.error(u"Error retrieving URLs in subsection {subsection} included in section {section}".format(
+                section=section.location,
+                subsection=subsection.location
+            ))
+            raise
+
         try:
             prev_section = sections[sections.index(section) - 1]
             prev_loc = prev_section.get_children()[-1].get_children()[-1].location
