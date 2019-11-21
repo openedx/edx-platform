@@ -78,6 +78,9 @@ class Env(object):
         "lib" / "custom_a11y_rules.js"
     )
 
+    # Which Python version should be used in xdist workers?
+    PYTHON_VERSION = os.environ.get("PYTHON_VERSION", "2.7")
+
     # If set, put reports for run in "unique" directories.
     # The main purpose of this is to ensure that the reports can be 'slurped'
     # in the main jenkins flow job without overwriting the reports from other

@@ -23,9 +23,9 @@ do
     worker_reqs_cmd="ssh -o StrictHostKeyChecking=no jenkins@$ip
     'git clone --branch master --depth 1 -q https://github.com/edx/edx-platform.git; cd edx-platform;
     git fetch -fq origin ${XDIST_GIT_REFSPEC}; git checkout -q ${XDIST_GIT_BRANCH};
-    rm -rf /home/jenkins/edx-venv;
-    tar -C /home/jenkins -xf /home/jenkins/edx-venv_clean-${PYTHON_VERSION}.tar.gz;
-    source ../edx-venv/bin/activate;
+    rm -rf /home/jenkins/edx-venv-${PYTHON_VERSION}/edx-venv;
+    tar -C /home/jenkins/edx-venv-${PYTHON_VERSION} -xf /home/jenkins/edx-venv_clean-${PYTHON_VERSION}.tar.gz;
+    source ../edx-venv-${PYTHON_VERSION}/edx-venv/bin/activate;
     pip install -q ${DJANGO_REQUIREMENT} -r requirements/edx/testing.txt; mkdir reports' & "
 
     cmd=$cmd$worker_reqs_cmd
