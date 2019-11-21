@@ -46,7 +46,6 @@ def register_user(request, slug):
         raise Http404('Your partner is not properly registered')
 
 
-@csrf_exempt
 @require_http_methods(['POST'])
 def reset_password_view(request):
     """

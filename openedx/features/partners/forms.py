@@ -1,24 +1,14 @@
-from django import forms
-from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
+from student.forms import PasswordResetFormNoActive
 
-class PartnerResetPasswordForm(forms.Form):
-    """
-    A form to validate reset password data for partner users. It is currently only used for
-    validation, not rendering.
-    """
 
+class PartnerResetPasswordForm(PasswordResetFormNoActive):
+    """
+    A form to validate reset password data for partner users. This is currently only
+    being used to override an error message as per the requirements.
+    """
     def clean_email(self):
-        email = self.cleaned_data['email']
-        """ Check if user associated with email exists"""
-        if not User.objects.filter(email=email).exists():
-            raise forms.ValidationError(_("We don't recognize the email: {}").format(email))
-        return email
-
-    email = forms.EmailField(
-        error_messages={
-            "required": "Valid email is required",
-        }
-    )
+        self.error_messages['unknown'] = _("We don't recognize the email: {}").format(self.cleaned_data["email"])
+        super(PartnerResetPasswordForm, self).clean_email()
 
