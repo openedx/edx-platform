@@ -1597,6 +1597,7 @@ class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
         self.delete_membership(
             self.solar_team.team_id, self.users['student_enrolled'].username, 403, user='student_enrolled')
 
+
 class TestElasticSearchErrors(TeamAPITestCase):
     """Test that the Team API is robust to Elasticsearch connection errors."""
 

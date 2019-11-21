@@ -20,7 +20,7 @@
             },
 
             teamCapacityText: function(memberCount, maxMemberCount) {
-                return interpolate(
+                return interpolate( // xss-lint: disable=javascript-interpolate
                     // Translators: The following message displays the number of members on a team.
                     ngettext(
                         '%(memberCount)s / %(maxMemberCount)s Member',

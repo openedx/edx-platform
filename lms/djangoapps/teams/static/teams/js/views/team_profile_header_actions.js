@@ -54,7 +54,7 @@
                             }
                         }
 
-                        view.$el.html(view.template({
+                        view.$el.html(view.template({ // xss-lint: disable=javascript-jquery-html
                             showJoinButton: showJoinButton,
                             message: message,
                             showEditButton: view.showEditButton
