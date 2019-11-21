@@ -547,19 +547,21 @@ def get_sibling_urls(subsection):
         last_block = block
     if not prev_loc:
         try:
+            # section.get_parent SHOULD return the course, but for some reason, it might not
             sections = section.get_parent().get_children()
         except AttributeError:
             log.error(u"Error retrieving URLs in subsection {subsection} included in section {section}".format(
                 section=section.location,
                 subsection=subsection.location
             ))
-            raise
-
-        try:
-            prev_section = sections[sections.index(section) - 1]
-            prev_loc = prev_section.get_children()[-1].get_children()[-1].location
-        except IndexError:
-            pass
+            # This should not be a fatal error. The worst case is that the navigation on the unit page
+            # won't display a link to a previous unit.
+        else:
+            try:
+                prev_section = sections[sections.index(section) - 1]
+                prev_loc = prev_section.get_children()[-1].get_children()[-1].location
+            except IndexError:
+                pass
     if not next_loc:
         sections = section.get_parent().get_children()
         try:
