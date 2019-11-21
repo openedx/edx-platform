@@ -127,7 +127,7 @@ edx-django-release-util==0.3.2
 edx-django-sites-extensions==2.3.1
 edx-django-utils==2.0.2
 edx-drf-extensions==2.4.5
-edx-enterprise==2.0.23
+edx-enterprise==2.0.24
 edx-i18n-tools==0.4.8
 edx-lint==1.3.0
 edx-milestones==0.2.5
@@ -213,7 +213,7 @@ mongoengine==0.10.0
 more-itertools==5.0.0
 moto==1.3.1
 mpmath==1.1.0
-mysqlclient==1.4.5
+mysqlclient==1.4.6
 networkx==1.7
 newrelic==5.2.3.131
 nltk==3.4.5
@@ -297,7 +297,7 @@ sailthru-client==2.2.3
 scandir==1.10.0
 scipy==1.2.1
 selenium==3.141.0
-semantic-version==2.8.2
+semantic-version==2.8.3
 shapely==1.6.4.post2
 shortuuid==0.5.0
 simplejson==3.17.0
