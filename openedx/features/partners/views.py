@@ -15,13 +15,17 @@ from .models import Partner
 PARTNERS_VIEW_FRMT = 'openedx.features.partners.{slug}.views'
 
 
+def raise_http_404():
+    raise Http404('Your partner is not properly registered')
+
+
 def dashboard(request, slug):
     partner = get_object_or_404(Partner, slug=slug)
     try:
         views = import_module(PARTNERS_VIEW_FRMT.format(slug=partner.slug))
         return views.dashboard(request, partner.slug)
     except ImportError:
-        raise Http404('Your partner is not properly registered')
+        raise_http_404()
 
 
 @require_http_methods(["POST"])
@@ -39,7 +43,7 @@ def register_user(request, slug):
         views = import_module(PARTNERS_VIEW_FRMT.format(slug=partner.slug))
         return views.Give2AsiaRegistrationView.as_view()(request, partner=partner)
     except ImportError:
-        raise Http404('Your partner is not properly registered')
+        raise_http_404()
 
 
 @require_http_methods(["POST"])
@@ -57,7 +61,7 @@ def login_user(request, slug):
         views = import_module(PARTNERS_VIEW_FRMT.format(slug=partner.slug))
         return views.LoginSessionViewG2A.as_view()(request, partner=partner)
     except ImportError:
-        raise Http404('Your partner is not properly registered')
+        raise_http_404()
 
 
 @require_http_methods(['POST'])
