@@ -167,7 +167,7 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         assert response_dict['success']
 
     def test_password_change_failure(self):
-        with mock.patch('openedx.core.djangoapps.user_api.accounts.api.request_password_change',
+        with mock.patch('openedx.core.djangoapps.user_authn.views.password_reset.request_password_change',
                         side_effect=UserAPIInternalError):
             self._change_password()
             self.assertRaises(UserAPIInternalError)

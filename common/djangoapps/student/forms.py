@@ -8,8 +8,6 @@ from importlib import import_module
 
 from django import forms
 from django.conf import settings
-from django.contrib.auth.forms import PasswordResetForm
-from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ValidationError
@@ -28,9 +26,8 @@ from openedx.core.djangoapps.theming.helpers import get_current_site
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
-from openedx.core.djangoapps.user_authn.views.password_reset import send_password_reset_email_for_user
 from student.message_types import AccountRecovery as AccountRecoveryMessage
-from student.models import AccountRecovery, CourseEnrollmentAllowed, email_exists_or_retired
+from student.models import CourseEnrollmentAllowed, email_exists_or_retired
 from util.password_policy_validators import validate_password
 
 
@@ -65,56 +62,6 @@ def send_account_recovery_email_for_user(user, request, email=None):
         user_context=message_context,
     )
     ace.send(msg)
-
-
-class PasswordResetFormNoActive(PasswordResetForm):
-    error_messages = {
-        'unknown': _("That e-mail address doesn't have an associated "
-                     "user account. Are you sure you've registered?"),
-        'unusable': _("The user account associated with this e-mail "
-                      "address cannot reset the password."),
-    }
-
-    is_account_recovery = True
-
-    def clean_email(self):
-        """
-        This is a literal copy from Django 1.4.5's django.contrib.auth.forms.PasswordResetForm
-        Except removing the requirement of active users
-        Validates that a user exists with the given email address.
-        """
-        email = self.cleaned_data["email"]
-        #The line below contains the only change, removing is_active=True
-        self.users_cache = User.objects.filter(email__iexact=email)
-
-        if len(self.users_cache) == 0 and is_secondary_email_feature_enabled():
-            # Check if user has entered the secondary email.
-            self.users_cache = User.objects.filter(
-                id__in=AccountRecovery.objects.filter(secondary_email__iexact=email, is_active=True).values_list('user')
-            )
-            self.is_account_recovery = not bool(self.users_cache)
-
-        if not len(self.users_cache):
-            raise forms.ValidationError(self.error_messages['unknown'])
-        if any((user.password.startswith(UNUSABLE_PASSWORD_PREFIX))
-               for user in self.users_cache):
-            raise forms.ValidationError(self.error_messages['unusable'])
-        return email
-
-    def save(self,  # pylint: disable=arguments-differ
-             use_https=False,
-             token_generator=default_token_generator,
-             request=None,
-             **_kwargs):
-        """
-        Generates a one-use only link for resetting password and sends to the
-        user.
-        """
-        for user in self.users_cache:
-            if self.is_account_recovery:
-                send_password_reset_email_for_user(user, request)
-            else:
-                send_account_recovery_email_for_user(user, request, user.account_recovery.secondary_email)
 
 
 class TrueCheckbox(widgets.CheckboxInput):
