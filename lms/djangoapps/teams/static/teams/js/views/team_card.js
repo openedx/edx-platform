@@ -45,7 +45,8 @@
                     membership_message: TeamUtils.teamCapacityText(allMemberships.length, maxMemberCount),
                     memberships: displayableMemberships,
                     has_additional_memberships: displayableMemberships.length < allMemberships.length,
-                    // Translators: "and others" refers to fact that additional members of a team exist that are not displayed.
+                    /* Translators: "and others" refers to fact that additional
+                     * members of a team exist that are not displayed. */
                     sr_message: gettext('and others')
                 }));
                 return this;
@@ -83,8 +84,10 @@
                     currentLanguage = $('html').attr('lang');
                 lastActivity.locale(currentLanguage);
                 this.$el.html(
-                    interpolate(
-                        // Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see: http://momentjs.com/)
+                    interpolate( // eslint-disable-line no-undef
+                        /* Translators: 'date' is a placeholder for a fuzzy,
+                         * relative timestamp (see: http://momentjs.com/)
+                         */
                         gettext('Last activity %(date)s'),
                         {date: this.template({date: lastActivity.format('MMMM Do YYYY, h:mm:ss a')})},
                         true
@@ -119,7 +122,7 @@
             details: function() { return this.detailViews; },
             actionClass: 'action-view',
             actionContent: function() {
-                return interpolate(
+                return interpolate( // eslint-disable-line no-undef
                     gettext('View %(span_start)s %(team_name)s %(span_end)s'),
                     {span_start: '<span class="sr">', team_name: _.escape(this.model.get('name')), span_end: '</span>'},
                     true

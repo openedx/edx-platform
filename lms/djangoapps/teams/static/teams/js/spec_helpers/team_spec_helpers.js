@@ -8,6 +8,8 @@ define([
     'use strict';
     var createMockPostResponse, createMockDiscussionResponse, createAnnotatedContentInfo, createMockThreadResponse,
         createMockTopicData, createMockTopicCollection, createMockTopic, createMockInstructorManagedTopic,
+        createMockContext,
+        testContext,
         testCourseID = 'course/1',
         testUser = 'testUser',
         testTopicID = 'test-topic-1',
@@ -58,7 +60,7 @@ define([
 
     var createMockTeams = function(responseOptions, options, collectionType) {
         if (_.isUndefined(collectionType)) {
-            collectionType = TeamCollection;
+            collectionType = TeamCollection; // eslint-disable-line no-param-reassign
         }
         return new collectionType(
             createMockTeamsResponse(responseOptions),
@@ -263,7 +265,7 @@ define([
         ));
     };
 
-    var testContext = {
+    testContext = {
         courseID: testCourseID,
         topics: {
             count: 5,
@@ -284,11 +286,12 @@ define([
         userInfo: createMockUserInfo()
     };
 
-    var createMockContext = function(options) {
+    createMockContext = function(options) {
         return _.extend({}, testContext, options);
     };
 
     createMockTopicCollection = function(topicData) {
+        // eslint-disable-next-line no-param-reassign
         topicData = topicData !== undefined ? topicData : createMockTopicData(1, 5);
 
         return new TopicCollection(

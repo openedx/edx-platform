@@ -13,7 +13,8 @@
                         .done(function() {
                             TeamsView.prototype.render.call(view);
                             if (view.collection.length === 0) {
-                                view.$el.append('<p>' + gettext('You are not currently a member of any team.') + '</p>');
+                                view.$el.append(
+                                    '<p>' + gettext('You are not currently a member of any team.') + '</p>');
                             }
                         });
                     return this;

@@ -71,7 +71,7 @@
                         type: 'POST',
                         url: view.context.teamMembershipsUrl,
                         data: {username: view.context.userInfo.username, team_id: view.model.get('id')}
-                    }).done(function(data) {
+                    }).done(function() {
                         view.model.fetch()
                             .done(function() {
                                 view.teamEvents.trigger('teams:update', {
@@ -93,12 +93,11 @@
                         isAdminOrStaff: false,
                         isInstructorManagedTopic: false
                     };
+                    var teamHasSpace = this.model.get('membership').length < maxTeamSize;
 
                     info.memberOfCurrentTeam = TeamUtils.isUserMemberOfTeam(this.model.get('membership'), username);
                     info.isAdminOrStaff = this.context.userInfo.privileged || this.context.userInfo.staff;
                     info.isInstructorManagedTopic = TeamUtils.isInstructorManagedTopic(this.topic.attributes.type);
-
-                    var teamHasSpace = this.model.get('membership').length < maxTeamSize;
 
                     if (info.memberOfCurrentTeam) {
                         info.alreadyMember = true;
@@ -106,7 +105,7 @@
                         deferred.resolve(info);
                     } else {
                         if (teamHasSpace) {
-                            var view = this;
+                            var view = this; // eslint-disable-line vars-on-top
                             $.ajax({
                                 type: 'GET',
                                 url: view.context.teamMembershipsUrl,

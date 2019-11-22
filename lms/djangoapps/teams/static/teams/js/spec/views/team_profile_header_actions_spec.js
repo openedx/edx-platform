@@ -25,26 +25,29 @@ define([
             };
         };
 
-        createHeaderActionsView = function(requests, maxTeamSize, currentUsername, teamModelData, showEditButton, isInstructorManagedTopic) {
-            var model = new TeamModel(teamModelData, {parse: true}),
-                context = TeamSpecHelpers.createMockContext({
-                    maxTeamSize: maxTeamSize,
-                    userInfo: TeamSpecHelpers.createMockUserInfo({
-                        username: currentUsername
-                    })
-                });
+        createHeaderActionsView =
+            function(requests, maxTeamSize, currentUsername, teamModelData, showEditButton, isInstructorManagedTopic) {
+                var model = new TeamModel(teamModelData, {parse: true}),
+                    context = TeamSpecHelpers.createMockContext({
+                        maxTeamSize: maxTeamSize,
+                        userInfo: TeamSpecHelpers.createMockUserInfo({
+                            username: currentUsername
+                        })
+                    });
 
-            return new TeamProfileHeaderActionsView(
-                {
-                    courseID: TeamSpecHelpers.testCourseID,
-                    teamEvents: TeamSpecHelpers.teamEvents,
-                    context: context,
-                    model: model,
-                    topic: isInstructorManagedTopic ? TeamSpecHelpers.createMockInstructorManagedTopic() : TeamSpecHelpers.createMockTopic(),
-                    showEditButton: showEditButton
-                }
-            ).render();
-        };
+                return new TeamProfileHeaderActionsView(
+                    {
+                        courseID: TeamSpecHelpers.testCourseID,
+                        teamEvents: TeamSpecHelpers.teamEvents,
+                        context: context,
+                        model: model,
+                        topic: isInstructorManagedTopic ?
+                            TeamSpecHelpers.createMockInstructorManagedTopic() :
+                            TeamSpecHelpers.createMockTopic(),
+                        showEditButton: showEditButton
+                    }
+                ).render();
+            };
 
         createMembershipData = function(username) {
             return [
@@ -60,7 +63,12 @@ define([
         describe('JoinButton', function() {
             beforeEach(function() {
                 setFixtures(
-                    '<div class="teams-content"><div class="msg-content"><div class="copy"></div></div><div class="header-action-view"></div></div>'
+                    '<div class="teams-content">\n' +
+                        '<div class="msg-content">\n' +
+                            '<div class="copy"></div>\n' +
+                        '</div>\n' +
+                        '<div class="header-action-view"></div>\n' +
+                    '</div>'
                 );
             });
 
@@ -134,7 +142,9 @@ define([
             it('shows already member message', function() {
                 var requests = AjaxHelpers.requests(this);
                 var currentUsername = 'ma1';
-                var view = createHeaderActionsView(requests, 1, currentUsername, createTeamModelData('teamA', 'teamAlpha', []));
+                var view =
+                    createHeaderActionsView(
+                        requests, 1, currentUsername, createTeamModelData('teamA', 'teamAlpha', []));
 
                 // a get request will be sent to get user membership info
                 // because current user is not member of current team
@@ -271,10 +281,11 @@ define([
             });
 
             it('can navigate to correct url', function() {
-                var requests = AjaxHelpers.requests(this);
+                var requests = AjaxHelpers.requests(this),
+                    editButton;
                 spyOn(Backbone.history, 'navigate');
                 createAndAssertView(requests, true);
-                var editButton = view.$('.action-edit-team');
+                editButton = view.$('.action-edit-team');
 
                 expect(editButton.length).toEqual(1);
                 $(editButton).click();

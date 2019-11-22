@@ -78,7 +78,9 @@
                         ['topics/:topic_id/search(/)', _.bind(this.searchTeams, this)],
                         ['topics/:topic_id/create-team(/)', _.bind(this.newTeam, this)],
                         ['teams/:topic_id/:team_id(/)', _.bind(this.browseTeam, this)],
+                        // eslint-disable-next-line no-useless-escape
                         [new RegExp('^(browse)\/?$'), _.bind(this.goToTab, this)],
+                        // eslint-disable-next-line no-useless-escape
                         [new RegExp('^(my-teams)\/?$'), _.bind(this.goToTab, this)]
                     ], function(route) {
                         router.route.apply(router, route);
@@ -133,7 +135,9 @@
 
                     this.mainView = this.tabbedView = this.createViewWithHeader({
                         title: gettext('Teams'),
-                        description: gettext('See all teams in your course, organized by topic. Join a team to collaborate with other learners who are interested in the same topic as you are.'),
+                        description: gettext('See all teams in your course, organized by topic. ' +
+                            'Join a team to collaborate with other learners who are interested' +
+                            'in the same topic as you are.'),
                         mainView: new TeamsTabbedView({
                             tabs: [{
                                 title: gettext('My Team'),
@@ -235,7 +239,8 @@
                         view.mainView = view.createViewWithHeader({
                             topic: topic,
                             title: gettext('Create a New Team'),
-                            description: gettext("Create a new team if you can't find an existing team to join, or if you would like to learn with friends you know."),
+                            description: gettext("Create a new team if you can't find an existing team to join, " +
+                                'or if you would like to learn with friends you know.'),
                             breadcrumbs: view.createBreadcrumbs(topic),
                             mainView: new TeamEditView({
                                 action: 'create',
@@ -269,7 +274,8 @@
                         });
                         editViewWithHeader = self.createViewWithHeader({
                             title: gettext('Edit Team'),
-                            description: gettext('If you make significant changes, make sure you notify members of the team before making these changes.'),
+                            description: gettext('If you make significant changes, ' +
+                                'make sure you notify members of the team before making these changes.'),
                             breadcrumbs: self.createBreadcrumbs(topic, team),
                             mainView: view,
                             topic: topic,
@@ -298,7 +304,8 @@
                             mainView: view,
                             breadcrumbs: self.createBreadcrumbs(topic, team),
                             title: gettext('Membership'),
-                            description: gettext("You can remove members from this team, especially if they have not participated in the team's activity."),
+                            description: gettext('You can remove members from this team, ' +
+                                "especially if they have not participated in the team's activity."),
                             topic: topic,
                             team: team
                         }

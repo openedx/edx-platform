@@ -14,8 +14,8 @@
                 },
 
                 render: function() {
-                    var team_count = this.model.get('team_count');
-                    this.$el.html(_.escape(interpolate(
+                    var team_count = this.model.get('team_count'); // eslint-disable-line camelcase
+                    this.$el.html(_.escape(interpolate( // eslint-disable-line no-undef
                         ngettext('%(team_count)s Team', '%(team_count)s Teams', team_count),
                         {team_count: team_count},
                         true
@@ -42,7 +42,7 @@
                 details: function() { return this.detailViews; },
                 actionClass: 'action-view',
                 actionContent: function() {
-                    var screenReaderText = _.escape(interpolate(
+                    var screenReaderText = _.escape(interpolate( // eslint-disable-line no-undef
                         gettext('View Teams in the %(topic_name)s Topic'),
                         {topic_name: this.model.get('name')}, true
                     ));

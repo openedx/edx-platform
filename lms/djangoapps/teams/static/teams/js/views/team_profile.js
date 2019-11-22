@@ -93,16 +93,17 @@
 
                 leaveTeam: function(event) {
                     event.preventDefault();
-                    var view = this;
+                    var view = this; // eslint-disable-line vars-on-top
                     ViewUtils.confirmThenRunOperation(
                         gettext('Leave this team?'),
-                        gettext("If you leave, you can no longer post in this team's discussions. Your place will be available to another learner."),
+                        gettext("If you leave, you can no longer post in this team's discussions." +
+                            'Your place will be available to another learner.'),
                         gettext('Confirm'),
                         function() {
                             $.ajax({
                                 type: 'DELETE',
                                 url: view.context.teamMembershipDetailUrl.replace('team_id', view.model.get('id'))
-                            }).done(function(data) {
+                            }).done(function() {
                                 view.model.fetch()
                                     .done(function() {
                                         view.teamEvents.trigger('teams:update', {

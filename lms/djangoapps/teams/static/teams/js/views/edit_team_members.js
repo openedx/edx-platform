@@ -11,7 +11,8 @@
         'text!teams/templates/edit-team-member.underscore',
         'text!teams/templates/date.underscore'
     ],
-        function(Backbone, $, _, gettext, TeamModel, TeamUtils, ViewUtils, editTeamMemberTemplate, dateTemplate) {
+        function(
+            Backbone, $, _, gettext, TeamModel, TeamUtils, ViewUtils, editTeamMemberTemplate, dateTemplate) {
             return Backbone.View.extend({
                 dateTemplate: _.template(dateTemplate),
                 teamMemberTemplate: _.template(editTeamMemberTemplate),
@@ -48,15 +49,17 @@
                         dateJoined, lastActivity;
 
                     _.each(this.model.get('membership'), function(membership) {
-                        dateJoined = interpolate(
-                            // Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
+                        dateJoined = interpolate( // eslint-disable-line no-undef
+                            // Translators: 'date' is a placeholder for a fuzzy,
+                            // relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
                             gettext('Joined %(date)s'),
                             {date: self.dateTemplate({date: membership.date_joined})},
                             true
                         );
 
-                        lastActivity = interpolate(
-                            // Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
+                        lastActivity = interpolate( // eslint-disable-line no-undef
+                            // Translators: 'date' is a placeholder for a fuzzy,
+                            // relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
                             gettext('Last Activity %(date)s'),
                             {date: self.dateTemplate({date: membership.last_activity_at})},
                             true
@@ -81,7 +84,8 @@
 
                     ViewUtils.confirmThenRunOperation(
                         gettext('Remove this team member?'),
-                        gettext('This learner will be removed from the team, allowing another learner to take the available spot.'),
+                        gettext('This learner will be removed from the team,' +
+                            'allowing another learner to take the available spot.'),
                         gettext('Remove'),
                         function() {
                             $.ajax({

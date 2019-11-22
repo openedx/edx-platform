@@ -42,7 +42,7 @@ define([
             };
         };
 
-        createTeamProfileView = function(requests, options, isInstructorManagedTopic=false) {
+        createTeamProfileView = function(requests, options, isInstructorManagedTopic) {
             teamModel = new TeamModel(createTeamModelData(options), {parse: true});
             profileView = new TeamProfileView({
                 el: $('.profile-view'),
@@ -61,7 +61,7 @@ define([
             AjaxHelpers.expectRequest(
                 requests,
                 'GET',
-                interpolate(
+                interpolate( // eslint-disable-line no-undef
                     '/courses/%(courseID)s/discussion/forum/%(topicID)s/inline' +
                     '?page=1&sort_key=activity&sort_order=desc&ajax=1',
                     {
