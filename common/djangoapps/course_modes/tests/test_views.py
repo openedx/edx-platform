@@ -398,6 +398,40 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
 
         self.assertEquals(course_mode, expected_mode)
 
+    @patch('openedx.features.discounts.utils.can_receive_discount')
+    @patch('openedx.features.discounts.utils.discount_percentage')
+    def test_discount_on_track_selection(self, discount_percentage_mock, can_receive_discount_mock):
+        can_receive_discount_mock.return_value = True
+        discount_percentage_mock.return_value = 15
+        parameters = {
+            'mode_slug': 'verified',
+            'mode_display_name': 'Verified Certificate',
+            'min_price': 10
+        }
+
+        url = reverse('create_mode', args=[six.text_type(self.course.id)])
+        response = self.client.get(url, parameters)
+
+        CourseEnrollmentFactory(
+            is_active=True,
+            course_id=self.course.id,
+            user=self.user
+        )
+
+        response = self.client.get(
+            reverse('course_modes_choose', args=[six.text_type(self.course.id)]),
+            follow=False,
+        )
+
+        banner = u'''<div class="first-purchase-offer-banner" role="note">'''
+        button = u'''<button type="submit" name="verified_mode">
+                    <span>Pursue a Verified Certificate</span>
+                    (<span class="upgrade-price-string">$8.50 USD</span>
+                    <del> <span class="upgrade-price-string">$10 USD</span></del>)
+                    </button>'''
+        self.assertContains(response, banner)
+        self.assertContains(response, button, html=True)
+
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_multiple_mode_creation(self):
         # Create an honor mode

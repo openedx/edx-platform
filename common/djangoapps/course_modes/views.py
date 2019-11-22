@@ -211,6 +211,15 @@ class ChooseModeView(View):
             context["verified_name"] = verified_mode.name
             context["verified_description"] = verified_mode.description
 
+            offer_banner_fragment = get_first_purchase_offer_banner_fragment(
+                request.user, course
+            )
+            if offer_banner_fragment:
+                context['offer_banner_fragment'] = offer_banner_fragment
+                discounted_price = "{:0.2f}".format(price_before_discount * ((100.0 - discount_percentage(course)) / 100))
+                context["min_price"] = discounted_price
+                context["price_before_discount"] = price_before_discount
+
             if verified_mode.sku:
                 context["use_ecommerce_payment_flow"] = ecommerce_service.is_enabled(request.user)
                 context["ecommerce_payment_page"] = ecommerce_service.payment_page_url()
