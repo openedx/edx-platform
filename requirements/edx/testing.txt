@@ -223,7 +223,7 @@ pdfminer.six==20191110
 piexif==1.0.2
 pillow==6.2.1
 pkgconfig==1.5.1
-pluggy==0.13.0            # via pytest, tox
+pluggy==0.13.1            # via pytest, tox
 polib==1.1.0
 psutil==1.2.1
 py2neo==3.1.2
