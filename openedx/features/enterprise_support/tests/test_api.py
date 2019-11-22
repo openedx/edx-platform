@@ -31,11 +31,9 @@ from openedx.features.enterprise_support.api import (
     get_consent_required_courses,
     get_dashboard_consent_notification,
     get_enterprise_consent_url,
-    insert_enterprise_pipeline_elements,
-    get_enterprise_customer_from_session,
-    activate_learner_enterprise,
+    insert_enterprise_pipeline_elements
 )
-from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED, FAKE_ENTERPRISE_CUSTOMER
+from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerUserFactory
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from openedx.features.enterprise_support.utils import clear_data_consent_share_cache, get_cache_key
@@ -517,46 +515,3 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
                                     'enterprise.tpa_pipeline.handle_enterprise_logistration',
                                     'social_core.pipeline.social_auth.load_extra_data',
                                     'def'])
-
-    @httpretty.activate
-    def test_post_active_enterprise_customer(self):
-        user = UserFactory()
-        self.mock_post_learner_active_enterprise()
-        api_client = EnterpriseApiServiceClient()
-        enterprise_status_changed = api_client.post_active_enterprise_customer(user.username, 'uuid-123', True)
-        self.assertEqual(
-            httpretty.last_request().parsed_body,
-            {
-                u'username': user.username,
-                u'active': True,
-                u'enterprise_customer': u'uuid-123',
-            }
-        )
-        self.assertEqual(enterprise_status_changed, True)
-
-    @httpretty.activate
-    def test_post_active_enterprise_customer_api_fail(self):
-        user = UserFactory()
-        self.mock_post_learner_active_enterprise_api_failure()
-        api_client = EnterpriseApiServiceClient()
-        enterprise_status_changed = api_client.post_active_enterprise_customer(user.username, 'uuid-123', True)
-        self.assertEqual(enterprise_status_changed, False)
-
-    @ddt.data(
-        (FAKE_ENTERPRISE_CUSTOMER, {'enterprise_customer': FAKE_ENTERPRISE_CUSTOMER}),
-        (None, {}),
-    )
-    @ddt.unpack
-    def test_enterprise_customer_from_session(self, fake_enterprise_customer, session_enterprise_customer):
-        """
-        Check enterprise_customer in session.
-        """
-        request = mock.MagicMock(session=session_enterprise_customer, site=SiteFactory(domain="example.com"))
-        enterprise_customer = get_enterprise_customer_from_session(request)
-        self.assertEqual(fake_enterprise_customer, enterprise_customer)
-
-    def test_activate_learner_enterprise(self):
-        request = mock.MagicMock(session={'enterprise_customer': {'uuid': '1cc'}},
-                                 site=SiteFactory(domain="example.com"))
-        activate_learner_enterprise(request, FAKE_ENTERPRISE_CUSTOMER)
-        self.assertEqual(request.session.get('enterprise_customer'), FAKE_ENTERPRISE_CUSTOMER)
