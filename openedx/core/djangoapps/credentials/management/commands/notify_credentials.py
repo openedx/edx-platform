@@ -64,9 +64,10 @@ def paged_query(queryset, delay, page_size):
 
         if delay and page:
             time.sleep(delay)
-
-        for i, item in enumerate(subquery, start=1):
-            yield page_start + i, item
+        index = 0
+        for item in subquery.iterator():
+            index += 1
+            yield page_start + index, item
 
 
 class Command(BaseCommand):
