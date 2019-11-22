@@ -1,5 +1,3 @@
-from importlib import import_module
-
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.debug import sensitive_post_parameters
@@ -10,22 +8,14 @@ from rest_framework import status
 from student.views import password_change_request_handler
 
 from .forms import PartnerResetPasswordForm
+from .helpers import import_module_using_slug
 from .models import Partner
-
-PARTNERS_VIEW_FRMT = 'openedx.features.partners.{slug}.views'
-
-
-def raise_http_404():
-    raise Http404('Your partner is not properly registered')
 
 
 def dashboard(request, slug):
     partner = get_object_or_404(Partner, slug=slug)
-    try:
-        views = import_module(PARTNERS_VIEW_FRMT.format(slug=partner.slug))
-        return views.dashboard(request, partner.slug)
-    except ImportError:
-        raise_http_404()
+    views = import_module_using_slug(partner.slug)
+    return views.dashboard(request, partner.slug)
 
 
 @require_http_methods(["POST"])
@@ -38,12 +28,8 @@ def register_user(request, slug):
     :return: JsonResponse object with success/error message
     """
     partner = get_object_or_404(Partner, slug=slug)
-
-    try:
-        views = import_module(PARTNERS_VIEW_FRMT.format(slug=partner.slug))
-        return views.Give2AsiaRegistrationView.as_view()(request, partner=partner)
-    except ImportError:
-        raise_http_404()
+    views = import_module_using_slug(partner.slug)
+    return views.Give2AsiaRegistrationView.as_view()(request, partner=partner)
 
 
 @require_http_methods(["POST"])
@@ -56,12 +42,8 @@ def login_user(request, slug):
     :return: JsonResponse object with success/error message
     """
     partner = get_object_or_404(Partner, slug=slug)
-
-    try:
-        views = import_module(PARTNERS_VIEW_FRMT.format(slug=partner.slug))
-        return views.LoginSessionViewG2A.as_view()(request, partner=partner)
-    except ImportError:
-        raise_http_404()
+    views = import_module_using_slug(partner.slug)
+    return views.LoginSessionViewG2A.as_view()(request, partner=partner)
 
 
 @require_http_methods(['POST'])
