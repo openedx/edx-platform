@@ -56,7 +56,8 @@
                                 span_end: '</a>'
                             }
                             );
-                        self.$el.append(_.template(teamActionsTemplate)({message: message}));
+                        // eslint-disable-next-line max-len
+                        self.$el.append(_.template(teamActionsTemplate)({message: message})); // xss-lint: disable=javascript-jquery-append
                     }
                 });
                 return this;

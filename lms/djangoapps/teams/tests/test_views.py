@@ -1416,7 +1416,7 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
             user='staff'
         )
 
-    @patch('lms.djangoapps.teams.views.is_instructor_managed_team', return_value=True)
+    @patch('lms.djangoapps.teams.api.is_instructor_managed_team', return_value=True)
     def test_staff_join_instructor_managed_team(self, *args):  # pylint: disable=unused-argument
         self.post_create_membership(
             200,
@@ -1424,7 +1424,7 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
             user='staff'
         )
 
-    @patch('lms.djangoapps.teams.views.is_instructor_managed_team', return_value=True)
+    @patch('lms.djangoapps.teams.api.is_instructor_managed_team', return_value=True)
     def test_student_join_instructor_managed_team(self, *args):  # pylint: disable=unused-argument
         self.post_create_membership(
             403,
@@ -1592,7 +1592,7 @@ class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
     def test_missing_membership(self):
         self.delete_membership(self.wind_team.team_id, self.users['student_enrolled'].username, 404)
 
-    @patch('lms.djangoapps.teams.views.is_instructor_managed_team', return_value=True)
+    @patch('lms.djangoapps.teams.api.is_instructor_managed_team', return_value=True)
     def test_student_leave_instructor_managed_team(self, *args):  # pylint: disable=unused-argument
         self.delete_membership(
             self.solar_team.team_id, self.users['student_enrolled'].username, 403, user='student_enrolled')

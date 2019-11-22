@@ -81,7 +81,7 @@
                 },
 
                 render: function() {
-                    this.$el.html(_.template(editTeamTemplate)({
+                    this.$el.html(_.template(editTeamTemplate)({ // xss-lint: disable=javascript-jquery-html
                         primaryButtonTitle: this.primaryButtonTitle,
                         action: this.action,
                         totalMembers: _.isUndefined(this.teamModel) ? 0 : this.teamModel.get('membership').length

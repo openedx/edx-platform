@@ -34,8 +34,7 @@ from lms.djangoapps.teams.api import (
     user_organization_protection_status,
     has_specific_team_access,
     add_team_count,
-    is_instructor_managed_team,
-    _has_course_staff_privileges,
+    can_user_modify_team
 )
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.lib.api.parsers import MergePatchParser
@@ -1169,7 +1168,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if is_instructor_managed_team(team) and not _has_course_staff_privileges(request.user, team.course_id):
+        if not can_user_modify_team(request.user, team.course_id, team):
             return Response(
                 build_api_error(ugettext_noop("You can't join an instructor managed team.")),
                 status=status.HTTP_403_FORBIDDEN
@@ -1318,7 +1317,7 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
         if not has_specific_team_access(request.user, team):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        if is_instructor_managed_team(team) and not _has_course_staff_privileges(request.user, team.course_id):
+        if not can_user_modify_team(request.user, team.course_id, team):
             return Response(
                 build_api_error(ugettext_noop("You can't leave an instructor managed team.")),
                 status=status.HTTP_403_FORBIDDEN

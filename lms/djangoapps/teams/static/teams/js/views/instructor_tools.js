@@ -23,7 +23,7 @@
                 },
 
                 render: function() {
-                    this.$el.html(this.template);
+                    this.$el.html(this.template); // xss-lint: disable=javascript-jquery-html
                     return this;
                 },
 

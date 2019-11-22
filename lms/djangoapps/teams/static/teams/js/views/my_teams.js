@@ -13,8 +13,9 @@
                         .done(function() {
                             TeamsView.prototype.render.call(view);
                             if (view.collection.length === 0) {
-                                view.$el.append(
-                                    '<p>' + gettext('You are not currently a member of any team.') + '</p>');
+                                view.$el.append( // xss-lint: disable=javascript-jquery-append
+                                    // eslint-disable-next-line max-len
+                                    '<p>' + gettext('You are not currently a member of any team.') + '</p>'); // xss-lint: disable=javascript-concat-html
                             }
                         });
                     return this;

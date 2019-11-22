@@ -231,17 +231,17 @@ define([
         });
 
         describe('Search', function() {
-            var performSearch = function(requests, teamsTabView) { // eslint-disable-line no-shadow
+            var performSearch = function(reqs, teamsTabView) {
                 teamsTabView.$('.search-field').val('foo');
                 teamsTabView.$('.action-search').click();
                 verifyTeamsRequest({
                     order_by: '',
                     text_search: 'foo'
                 });
-                AjaxHelpers.respondWithJson(requests, TeamSpecHelpers.createMockTeamsResponse({results: []}));
+                AjaxHelpers.respondWithJson(reqs, TeamSpecHelpers.createMockTeamsResponse({results: []}));
 
                 // Expect exactly one search request to be fired
-                AjaxHelpers.expectNoRequests(requests);
+                AjaxHelpers.expectNoRequests(reqs);
             };
 
             it('can search teams', function() {

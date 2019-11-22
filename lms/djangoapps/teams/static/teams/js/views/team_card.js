@@ -41,7 +41,7 @@
                     }).reverse(),
                     displayableMemberships = allMemberships.slice(0, 5),
                     maxMemberCount = this.maxTeamSize;
-                this.$el.html(this.template({
+                this.$el.html(this.template({ // xss-lint: disable=javascript-jquery-html
                     membership_message: TeamUtils.teamCapacityText(allMemberships.length, maxMemberCount),
                     memberships: displayableMemberships,
                     has_additional_memberships: displayableMemberships.length < allMemberships.length,
@@ -63,7 +63,7 @@
 
             render: function() {
                 // this.$el should be the card meta div
-                this.$el.append(this.template({
+                this.$el.append(this.template({ // xss-lint: disable=javascript-jquery-append
                     country: this.countries[this.model.get('country')],
                     language: this.languages[this.model.get('language')]
                 }));
@@ -83,8 +83,9 @@
                 var lastActivity = moment(this.date),
                     currentLanguage = $('html').attr('lang');
                 lastActivity.locale(currentLanguage);
-                this.$el.html(
-                    interpolate( // eslint-disable-line no-undef
+                this.$el.html( // xss-lint: disable=javascript-jquery-html
+                    // eslint-disable-next-line no-undef
+                    interpolate( // xss-lint: disable=javascript-interpolate
                         /* Translators: 'date' is a placeholder for a fuzzy,
                          * relative timestamp (see: http://momentjs.com/)
                          */
@@ -122,7 +123,8 @@
             details: function() { return this.detailViews; },
             actionClass: 'action-view',
             actionContent: function() {
-                return interpolate( // eslint-disable-line no-undef
+                // eslint-disable-next-line no-undef
+                return interpolate( // xss-lint: disable=javascript-interpolate
                     gettext('View %(span_start)s %(team_name)s %(span_end)s'),
                     {span_start: '<span class="sr">', team_name: _.escape(this.model.get('name')), span_end: '</span>'},
                     true

@@ -14,7 +14,8 @@ define([
         assertValidationMessagesWhenFieldsEmpty,
         assertValidationMessagesWhenInvalidData,
         assertShowMessageOnError,
-        assertRedirectsToCorrectUrlOnCancel;
+        assertRedirectsToCorrectUrlOnCancel,
+        requestMethod;
 
     describe('CreateEditTeam', function() {
         var teamsUrl = '/api/team/v0/teams/',
@@ -102,7 +103,7 @@ define([
             spyOn(Backbone.history, 'navigate');
         });
 
-        assertFormRendersCorrectly = function() { // eslint-disable-line vars-on-top
+        assertFormRendersCorrectly = function() {
             var fieldClasses = [
                     '.u-field-name',
                     '.u-field-description',
@@ -127,7 +128,7 @@ define([
             }
         };
 
-        var requestMethod = function() { // eslint-disable-line vars-on-top
+        requestMethod = function() {
             return teamAction === 'create' ? 'POST' : 'PATCH';
         };
 
