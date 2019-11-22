@@ -39,6 +39,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, CourseKey
 from six import text_type
 
+from contentstore.permissions import EDIT_ACTIVE_CERTIFICATE
 from contentstore.utils import get_lms_link_for_certificate_web_view, reverse_course_url
 from contentstore.views.assets import delete_asset
 from contentstore.views.exception import AssetNotFoundException
@@ -491,7 +492,7 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
             active_certificates = CertificateManager.get_certificates(course, only_active=True)
             if int(certificate_id) in [int(certificate["id"]) for certificate in active_certificates]:
                 # Only global staff (PMs) are able to edit active certificate configuration
-                if not GlobalStaff().has_user(request.user):
+                if not request.user.has_perm(EDIT_ACTIVE_CERTIFICATE, 'global'):
                     raise PermissionDenied()
         try:
             new_certificate = CertificateManager.deserialize_certificate(course, request.body)
