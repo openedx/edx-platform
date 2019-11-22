@@ -33,11 +33,14 @@ from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRI
 from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH, EMAIL_MIN_LENGTH
+from openedx.core.djangoapps.user_authn.views.password_reset import (
+    SETTING_CHANGE_INITIATED, password_reset, password_reset_confirm_wrapper
+)
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 from student.tests.test_configuration_overrides import fake_get_value
 from student.tests.test_email import mock_render_to_string
-from student.views import SETTING_CHANGE_INITIATED, password_reset, password_reset_confirm_wrapper
+
 from util.password_policy_validators import create_validator_config
 from util.testing import EventTestMixin
 
@@ -56,7 +59,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(ResetPasswordTests, self).setUp('student.views.management.tracker')
+        super(ResetPasswordTests, self).setUp('openedx.core.djangoapps.user_authn.views.password_reset.tracker')
         self.user = UserFactory.create()
         self.user.is_active = False
         self.user.save()
@@ -68,7 +71,10 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         self.user_bad_passwd.password = UNUSABLE_PASSWORD_PREFIX
         self.user_bad_passwd.save()
 
-    @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+    @patch(
+        'openedx.core.djangoapps.user_authn.views.password_reset.render_to_string',
+        Mock(side_effect=mock_render_to_string, autospec=True)
+    )
     def test_user_bad_password_reset(self):
         """
         Tests password reset behavior for user with password marked UNUSABLE_PASSWORD_PREFIX
@@ -85,7 +91,10 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         })
         self.assert_no_events_were_emitted()
 
-    @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+    @patch(
+        'openedx.core.djangoapps.user_authn.views.password_reset.render_to_string',
+        Mock(side_effect=mock_render_to_string, autospec=True)
+    )
     def test_nonexist_email_password_reset(self):
         """
         Now test the exception cases with of reset_password called with invalid email.
@@ -104,7 +113,10 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         })
         self.assert_no_events_were_emitted()
 
-    @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+    @patch(
+        'openedx.core.djangoapps.user_authn.views.password_reset.render_to_string',
+        Mock(side_effect=mock_render_to_string, autospec=True)
+    )
     def test_password_reset_ratelimited(self):
         """
         Try (and fail) resetting password 30 times in a row on an non-existant email address
@@ -437,7 +449,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
 
         self.assertEqual(response.context_data['err_msg'], password_dict['error_message'])
 
-    @patch('student.views.management.password_reset_confirm')
+    @patch('openedx.core.djangoapps.user_authn.views.password_reset.password_reset_confirm')
     @patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_get_value)
     def test_reset_password_good_token_configuration_override(self, reset_confirm):
         """
