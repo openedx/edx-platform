@@ -105,40 +105,6 @@ class EnterpriseServiceMockMixin(object):
             status=response_code or 200,
         )
 
-    def mock_post_learner_active_enterprise(
-        self,
-        username='test_user',
-        enterprise_customer='uuid',
-        active=True
-    ):
-        """
-        Helper method to change the active enterprise_customer post API endpoint.
-        """
-        api_response = {
-            username: username,
-            enterprise_customer: enterprise_customer,
-            active: active,
-        }
-        api_response_json = json.dumps(api_response)
-        httpretty.register_uri(
-            method=httpretty.POST,
-            uri=self.get_enterprise_url('enterprise-learner'),
-            body=api_response_json,
-            content_type='application/json'
-        )
-
-    def mock_post_learner_active_enterprise_api_failure(self):  # pylint: disable=invalid-name
-        """
-        Helper method to change the active enterprise_customer post API endpoint for a failure.
-        """
-        httpretty.register_uri(
-            method=httpretty.POST,
-            uri=self.get_enterprise_url('enterprise-learner'),
-            body='{}',
-            content_type='application/json',
-            status=500
-        )
-
     def mock_consent_post(self, username, course_id, ec_uuid):
         self.mock_consent_response(
             username,

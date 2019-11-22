@@ -89,7 +89,7 @@ from lms.djangoapps.verify_student.models import SSOVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
-from third_party_auth.utils import user_exists, is_provider_saml
+from third_party_auth.utils import user_exists
 from track import segment
 from util.json_request import JsonResponse
 
@@ -553,9 +553,16 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
         return (current_provider and
                 (current_provider.skip_email_verification or current_provider.send_to_registration_first))
 
+    def is_provider_saml():
+        """ Verify that the third party provider uses SAML """
+        current_provider = provider.Registry.get_from_pipeline({'backend': current_partial.backend, 'kwargs': kwargs})
+        saml_providers_list = list(provider.Registry.get_enabled_by_backend_name('tpa-saml'))
+        return (current_provider and
+                current_provider.slug in [saml_provider.slug for saml_provider in saml_providers_list])
+
     if not user:
         # Use only email for user existence check in case of saml provider
-        if is_provider_saml(current_partial.backend, kwargs):
+        if is_provider_saml():
             user_details = {'email': details.get('email')} if details else None
         else:
             user_details = details
