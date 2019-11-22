@@ -143,7 +143,7 @@ edx-sga==0.10.0
 edx-sphinx-theme==1.5.0
 edx-submissions==3.0.1
 edx-user-state-client==1.1.2
-edx-when==0.5.1
+edx-when==0.5.2
 edxval==1.1.30
 elasticsearch==1.9.0
 entrypoints==0.3
