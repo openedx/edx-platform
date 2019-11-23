@@ -2,6 +2,9 @@ language: python
 python:
   - "2.7"
 
+services:
+  - mongodb
+
 node_js: 6
 
 cache:
@@ -20,10 +23,9 @@ install:
 
 env:
   - TOXENV=pep8
-  - TOXENV=py27-django111
-    ARGS="-- paver run_pep8"
-  - TOXENV=py27-django111
-    ARGS="-- pytest common/djangoapps/student/tests/test_helpers.py::TestDestroyOAuthTokensHelper"
+  - TOXENV=py27-paver-pep8
+  - TOXENV=py27-studio
+  - TOXENV=py27-lms
 
 script:
   - tox $ARGS

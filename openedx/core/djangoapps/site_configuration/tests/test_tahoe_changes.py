@@ -1,20 +1,18 @@
 """
 Tests for site configuration's Tahoe customizations.
 """
-from mock import patch
-import unittest
+from os import getenv
 
-from django.test import TestCase
-from django.db import IntegrityError, transaction
+from django.conf import settings
 from django.contrib.sites.models import Site
+from django.test import TestCase
 from django.test.utils import override_settings
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 
 
-# TODO: This is an integration test, try to make it less so and more of a unit-test.
 @override_settings(
-    COMPREHENSIVE_THEME_DIRS=['/edx/src/themes'],
+    COMPREHENSIVE_THEME_DIRS=[settings.REPO_ROOT / 'common/test/appsembler'],
     ENABLE_COMPREHENSIVE_THEMING=True,
     DEFAULT_SITE_THEME='edx-theme-codebase',
 )
