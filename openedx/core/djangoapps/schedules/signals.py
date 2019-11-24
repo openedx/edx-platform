@@ -196,8 +196,6 @@ def _create_schedule(enrollment, enrollment_created):
 
     schedule = Schedule.objects.create(
         enrollment=enrollment,
-        # TODO remove 'start' field in removing writes from old field step in column renaming release
-        start=content_availability_date,
         start_date=content_availability_date,
         upgrade_deadline=upgrade_deadline
     )
