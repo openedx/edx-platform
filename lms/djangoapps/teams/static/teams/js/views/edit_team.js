@@ -52,7 +52,7 @@
                         editable: 'always',
                         showMessages: false,
                         helpMessage: gettext(
-                          'A short description of the team to help other learners understand the' +
+                          'A short description of the team to help other learners understand the ' +
                           'goals or direction of the team (maximum 300 characters).')
                     });
 
