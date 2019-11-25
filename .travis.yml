@@ -22,10 +22,14 @@ install:
   - pip install tox
 
 env:
-  - TOXENV=pep8
-  - TOXENV=py27-paver-pep8
-  - TOXENV=py27-studio
-  - TOXENV=py27-lms
+  global:
+    # Avoid caching edx-platform's entry_points
+    - TRAVIS_FIXES="pip install -r requirements/edx/local.in"
+  jobs:
+    - TOXENV=pep8
+    - TOXENV=py27-paver-pep8
+    - TOXENV=py27-studio
+    - TOXENV=py27-lms
 
 script:
   - tox $ARGS
