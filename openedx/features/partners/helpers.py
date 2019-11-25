@@ -1,5 +1,9 @@
-from datetime import datetime
 import pytz
+
+from datetime import datetime
+from importlib import import_module
+
+from django.http import Http404
 
 from course_action_state.models import CourseRerunState
 from custom_settings.models import CustomSettings
@@ -7,6 +11,8 @@ from custom_settings.models import CustomSettings
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_card.helpers import get_course_open_date, get_related_card_id
 from openedx.features.course_card.models import CourseCard
+
+PARTNERS_VIEW_FRMT = 'openedx.features.partners.{slug}.views'
 
 
 def get_partner_recommended_courses(partner_slug):
@@ -44,3 +50,10 @@ def get_partner_recommended_courses(partner_slug):
             recommended_courses.append(course_rerun_object)
 
     return recommended_courses
+
+
+def import_module_using_slug(partner_slug):
+    try:
+        return import_module(PARTNERS_VIEW_FRMT.format(slug=partner_slug))
+    except ImportError:
+        raise Http404('Your partner is not properly registered')
