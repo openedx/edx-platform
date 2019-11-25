@@ -64,3 +64,12 @@ upgrade: ## update the pip requirements files to use the latest releases satisfy
 	grep "^django==" requirements/edx/base.txt > requirements/edx/django.txt
 	sed '/^[dD]jango==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
 	mv requirements/edx/testing.tmp requirements/edx/testing.txt
+
+.PHONY: docker-tox
+docker-tox:
+	docker build . -t edx-platform-tox
+	docker run edx-platform-tox
+
+.PHONY: cloudbuild
+cloudbuild:
+	gcloud builds submit --config cloudbuild.yaml .  --project=appsembler-infrastructure

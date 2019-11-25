@@ -1,0 +1,8 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/appsembler-infrastructure/edx-platform-tox', '.']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['run', 'gcr.io/appsembler-infrastructure/edx-platform-tox']
+
+images: ['gcr.io/appsembler-infrastructure/edx-platform-tox']
+timeout: 7200s
