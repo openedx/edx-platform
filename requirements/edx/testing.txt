@@ -124,7 +124,7 @@ edx-django-release-util==0.3.2
 edx-django-sites-extensions==2.3.1
 edx-django-utils==2.0.2
 edx-drf-extensions==2.4.5
-edx-enterprise==2.0.24
+edx-enterprise==2.0.25
 edx-i18n-tools==0.4.8
 edx-lint==1.3.0
 edx-milestones==0.2.5
@@ -335,4 +335,4 @@ xss-utils==0.1.2
 zipp==0.6.0
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools==42.0.0        # via caniusepython3, fs, lazy, pytest, python-levenshtein
+# setuptools==42.0.1        # via caniusepython3, fs, lazy, pytest, python-levenshtein
