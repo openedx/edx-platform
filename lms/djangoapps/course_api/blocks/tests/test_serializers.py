@@ -1,18 +1,23 @@
 """
 Tests for Course Blocks serializers
 """
+from courseware.tests.factories import InstructorFactory
+import datetime
+from django.test import RequestFactory
 
 
 import six
-from mock import MagicMock
-
+from django.urls import reverse
 from lms.djangoapps.course_blocks.api import get_course_block_access_transformers, get_course_blocks
+from mock import MagicMock
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
+from pytz import UTC
+from six import text_type
 from student.roles import CourseStaffRole
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ToyCourseFactory
+from xmodule.modulestore.tests.factories import ToyCourseFactory, CourseFactory, ItemFactory
 
 from ..serializers import BlockDictSerializer, BlockSerializer
 from ..transformers.blocks_api import BlocksAPITransformer
@@ -53,8 +58,10 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
             self.course.location,
             self.transformers,
         )
+        self.request = RequestFactory().request()
+        self.request.user = self.user
         self.serializer_context = {
-            'request': MagicMock(),
+            'request': self.request,
             'block_structure': self.block_structure,
             'requested_fields': ['type'],
         }
@@ -88,6 +95,7 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
             'student_view_data',
             'student_view_multi_device',
             'lti_url',
+            'due',
             'visible_to_staff_only',
         ])
 
@@ -237,3 +245,68 @@ class TestBlockDictSerializer(TestBlockSerializerBase):
             self.assert_extended_block(serialized_block)
             self.assert_staff_fields(serialized_block)
         self.assertEqual(len(serializer.data['blocks']), 29)
+
+
+class TestDueDateExtensionsSerializer(TestBlockSerializerBase):
+    """
+    Test data dumps for reporting.
+    """
+    def create_serializer(self, context=None):
+        """
+        creates a BlockSerializer
+        """
+        if context is None:
+            context = self.serializer_context
+        return BlockSerializer(
+            context['block_structure'], many=True, context=context,
+        )
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestDueDateExtensionsSerializer, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
+        cls.user = UserFactory.create()
+        with cls.store.bulk_operations(cls.course.id, emit_signals=False):
+            cls.week1 = ItemFactory.create(
+                due=cls.due,
+                category='chapter',
+                display_name='test_chapter_with_due_date',
+            )
+            cls.week2 = ItemFactory.create()  # No due date
+            cls.course.children = [
+                text_type(cls.week1.location),
+                text_type(cls.week2.location),
+            ]
+            cls.homework = ItemFactory.create(
+                parent_location=cls.week1.location,
+                category='sequential',
+                display_name='test chapter sequence'
+            )
+            cls.week1.children = [text_type(cls.homework.location)]
+
+    def test_date_extension(self):
+        """
+        Test fields accessed by a staff user
+        """
+        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.client.login(username=self.instructor.username, password='test')
+        url = reverse('change_due_date', kwargs={'course_id': text_type(self.course.id)})
+        response = self.client.post(url, {
+            'student': self.user.username,
+            'url': text_type(self.week1.location),
+            'due_datetime': '12/30/2040 00:00'
+        })
+
+        self.assertEqual(response.status_code, 200, response.content)
+
+        self.add_additional_requested_fields()
+        serializer = self.create_serializer()
+        for serialized_block in serializer.data:
+            if serialized_block['type'] == 'chapter':
+                if serialized_block['display_name'] == 'test_chapter_with_due_date':
+                    self.assertTrue(
+                        serialized_block['due'] == datetime.datetime(2040, 12, 30, 0, 0, tzinfo=UTC)
+                    )
+
+        self.assertEquals(len(serializer.data), 4)

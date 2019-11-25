@@ -1,10 +1,12 @@
 """
 Serializers for Course Blocks related return objects.
 """
-
+import json
 
 import six
 from django.conf import settings
+from lms.djangoapps.courseware.models import StudentFieldOverride
+from xmodule.fields import Date
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
@@ -82,6 +84,8 @@ SUPPORTED_FIELDS = [
         'completion'
     )
 ]
+
+DATE_FIELD = Date()
 
 # This lists the names of all fields that are allowed
 # to be show to users who do not have access to a particular piece
@@ -166,6 +170,21 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
                     supported_field.default_value,
                 )
                 if field_value is not None:
+                    # override due date with student extension in unit added by instructor.
+                    if supported_field.block_field_name == 'due':
+                        value = None
+                        override = StudentFieldOverride.objects.filter(
+                            course_id=block_key.course_key,
+                            student=self.context['request'].user,
+                            location=block_key,
+                            field='due'
+                        ).first()
+                        if override and override.value:
+                            value = DATE_FIELD.from_json(json.loads(override.value))
+
+                        if value:
+                            field_value = value
+
                     # only return fields that have data
                     data[supported_field.serializer_field_name] = field_value
 
