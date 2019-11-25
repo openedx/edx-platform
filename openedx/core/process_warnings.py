@@ -33,7 +33,7 @@ def seperate_warnings_by_location(warnings_data):
     """
     seperate into locations
     flow:
-     iterate through each wanring_object, see if its filename matches any regex in warning locations. 
+     iterate through each wanring_object, see if its filename matches any regex in warning locations.
      If so, add it to appropriate list in warnings_by_location
     """
     for warnings_object in warnings_data:
@@ -80,7 +80,7 @@ def read_warning_data(dir_path):
 
 def compress_similar_warnings(warnings):
     """
-        During pytest run, multiple instances of warnings are output 
+        During pytest run, multiple instances of warnings are output
         This function creates set of unique warnings(based on both warning text and filename)
         and outputs dict : {warning text:[filename:warning_object]}
         It also adds num(number of same warnings found) to keys in warning object
@@ -122,7 +122,7 @@ def process_warnings_json(dir_path):
     """
     Master function to process through all warnings and output a dict
 
-    dict structure: 
+    dict structure:
     {
         location: [{warning text: {file_name: warning object}}]
     }
