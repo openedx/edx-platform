@@ -21,6 +21,14 @@ def pytest_json_modifyreport(json_report):
 
 
 def create_file_name(dir_path, file_name_postfix, num=0):
+    """
+    Used to create file name with this given 
+    structure: TEST_SUITE + "_" + file_name_postfile + "_ " + num.json
+    The env variable TEST_SUITE is set in jenkinsfile
+
+    This was necessary cause Pytest is run multiple times and we need to make sure old pytest 
+    warning json files are not being overwritten.
+    """
     name = dir_path + "/"
     if 'TEST_SUITE' in os.environ:
         name = name + os.environ['TEST_SUITE'] + "_"
@@ -36,7 +44,7 @@ def pytest_sessionfinish(session):
     this makes sure warnings from different run are not overwritten 
     """
     dir_path = "test_root/log"
-    file_name_postfix = "warnings"
+    file_name_postfix = "pytest_warnings"
     num = 0
     # to make sure this doesn't loop forever, putting a maximum
     while os.path.isfile(create_file_name(dir_path, file_name_postfix, num)) and num < 100:

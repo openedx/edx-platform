@@ -57,12 +57,10 @@ def compress_similar_warnings(warnings):
         #removing duplicates
         count = {}
         for d in output[warning_text]:
-            pp.pprint(d["filename"])
             if d["filename"] in count:
                 count[d["filename"]]["num"] +=1
             else:
                 count[d["filename"]] = {"num": 1, "warning": d}
-        pdb.set_trace()
         for d in count:
             count[d]["warning"]["num"] = count[d]["num"]
         output[warning_text] = [count[d]["warning"] for d in count]
