@@ -9,6 +9,12 @@ pp = pprint.PrettyPrinter(indent=4, depth=2)
 
 
 def seperate_warnings_by_location(warnings_data):
+    """
+    Warnings originate from multiple locations, this function takes in list of warning objects 
+    and seperates them based on their filename location
+    """
+
+    # first create regex for each know file location
     warnings_locations = {
         ".*/python\d\.\d/site-packages/.*\.py": "python",
         ".*/edx-platform/lms/.*\.py": "lms",
@@ -16,11 +22,20 @@ def seperate_warnings_by_location(warnings_data):
         ".*/edx-platform/cms/.*\.py": "cms",
         ".*/edx-platform/common/.*\.py": "common",
     }
+
+    # create datatypes to hold location: dictionary with values that are lists(to store warning objects)
     warnings_by_location = {}
     for location in warnings_locations.values():
         warnings_by_location[location] = []
     # creating list for any warnings not covered by above locations
     warnings_by_location["other"] = []
+
+    """
+    seperate into locations
+    flow:
+     iterate through each wanring_object, see if its filename matches any regex in warning locations. 
+     If so, add it to appropriate list in warnings_by_location
+    """
     for warnings_object in warnings_data:
         warning_origin_located = False
         for key in warnings_locations:
@@ -33,18 +48,28 @@ def seperate_warnings_by_location(warnings_data):
     return warnings_by_location
 
 
-def read_warning_data(path):
-    dir_path = os.path.expanduser("~/dev/edx-platform/test_root/log")
-    dir_path = os.path.expanduser(path)
+def read_warning_data(dir_path):
+    """
+    During test runs in jenkins, multiple warning json files are output. This function finds all files
+    and aggregates the warnings in to one large list
+    """
+    dir_path = os.path.expanduser(dir_path)
+    # find all files that exist in given directory
     files_in_dir = [
         f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))
     ]
     warnings_files = []
-    warnings_file_name_regex = "warnings_?\d*\.json"
+
+    # TODO(jinder): currently this is hardcoded in, maybe create a constants file with info
+    # THINK(jinder): but creating file for one constant seems overkill
+    warnings_file_name_regex = "pytest_warnings_?\d*\.json"
+
+    # iterate through files_in_dir and see if they match our know file name pattern
     for file in files_in_dir:
         if re.search(warnings_file_name_regex, file) != None:
             warnings_files.append(file)
 
+    # go through each warning file and aggregate warnigns into warnings_data
     warnings_data = []
     for file in warnings_files:
         with open(os.path.expanduser(path + "/" + file), "r") as read_file:
@@ -54,18 +79,33 @@ def read_warning_data(path):
 
 
 def compress_similar_warnings(warnings):
+    """
+        During pytest run, multiple instances of warnings are output 
+        This function creates set of unique warnings(based on both warning text and filename)
+        and outputs dict : {warning text:[filename:warning_object]}
+        It also adds num(number of same warnings found) to keys in warning object
+    """
+
+    # first create additional data sturts to make iterating through warning objects easier
+    # list of just warning texts and index of given warning
     warnings_text = []
+    # list of all unique warning texts
     warnings_text_set = set()
     for index, dict_obj in enumerate(warnings):
         warnings_text.append((index, dict_obj["message"]))
         warnings_text_set.add(dict_obj["message"])
+    """
+    For each unique warning text, find all occurences of it in warnings. Seperate by filename
+    and count number of times warning occurs
+    POSSIBLE ERROR: Currently this assumes warning is only output in one line in file
+    """
     output = {}
     for warning_text in warnings_text_set:
         output[warning_text] = []
         for index, warning_message in warnings_text:
             if warning_message == warning_text:
                 output[warning_text].append(warnings[index])
-        # removing duplicates
+        # before removing duplcates, count number of times they occur
         count = {}
         for d in output[warning_text]:
             if d["filename"] in count:
@@ -78,8 +118,24 @@ def compress_similar_warnings(warnings):
     return output
 
 
-def process_warnings_json(path):
-    warnings_data = read_warning_data(path)
+def process_warnings_json(dir_path):
+    """
+    Master function to process through all warnings and output a dict
+
+    dict structure: 
+    {
+        location: [{warning text: {file_name: warning object}}]
+    }
+
+    flow:
+        Aggregate data from all warning files
+        Seperate warnings by deprecated vs non deprecated(has word deprecate in it)
+        Further categorize warnings
+        Return output
+    Possible Error/enchancement: there might be better ways to seperate deprecates vs
+        non-deprecated warnings
+    """
+    warnings_data = read_warning_data(dir_path)
     deprecated_warnings = []
     non_deprecated_warnings = []
     for warnings_object in warnings_data:
