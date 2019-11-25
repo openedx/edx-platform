@@ -13,6 +13,7 @@ from __future__ import absolute_import
 
 from django.conf import settings
 from django.conf.urls import url
+from django.contrib.auth.views import password_reset_complete
 
 from .views import auto_auth, login, logout, password_reset, register
 
@@ -53,8 +54,25 @@ urlpatterns = [
     url(r'^user_api/v1/account/password_reset/$', password_reset.PasswordResetView.as_view(),
         name="user_api_password_reset"),
 
+    # Password reset api views.
+    url(r'^password_reset/$', password_reset.password_reset, name='password_reset'),
+    url(
+        r'^password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
+        password_reset.password_reset_confirm_wrapper,
+        name='password_reset_confirm',
+    ),
+    url(r'^account/password$', password_reset.password_change_request_handler, name='password_change_request'),
+
 ]
 
+# password reset django views (see above for password reset views)
+urlpatterns += [
+    url(
+        r'^password_reset_complete/$',
+        password_reset_complete,
+        name='password_reset_complete',
+    ),
+]
 
 # enable automatic login
 if settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):

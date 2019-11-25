@@ -85,5 +85,5 @@ class TestRequestPasswordChange(CreateAccountMixin, TestCase):
         with patch('crum.get_current_request', return_value=request):
             request_password_change(self.EMAIL, self.IS_SECURE)
 
-        # Verify that the activation email was still sent
+        # Verify that the password change email was still sent
         self.assertEqual(len(mail.outbox), 2)
