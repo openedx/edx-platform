@@ -48,7 +48,7 @@ class ProgramsFragmentView(EdxFragmentView):
         meter = ProgramProgressMeter(request.site, user, mobile_only=mobile_only)
 
         context = {
-            'marketing_url': get_program_marketing_url(programs_config),
+            'marketing_url': get_program_marketing_url(programs_config, mobile_only),
             'programs': meter.engaged_programs,
             'progress': meter.progress()
         }
