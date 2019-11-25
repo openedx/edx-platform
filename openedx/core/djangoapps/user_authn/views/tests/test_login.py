@@ -32,8 +32,8 @@ from openedx.core.djangoapps.user_authn.cookies import jwt_cookies
 from openedx.core.djangoapps.user_authn.views.login import (
     shim_student_view,
     AllowedAuthUser,
-    ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY,
-    authn_waffle
+    UPDATE_LOGIN_USER_ERROR_STATUS_CODE,
+    ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 )
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
@@ -86,10 +86,12 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success', self.user_email])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
-    def test_login_success_no_pii(self):
-        response, mock_audit_log = self._login_response(
-            self.user_email, self.password, patched_audit_log='student.models.AUDIT_LOG'
-        )
+    @ddt.data(True, False)
+    def test_login_success_no_pii(self, is_error_status_code_enabled):
+        with UPDATE_LOGIN_USER_ERROR_STATUS_CODE.override(is_error_status_code_enabled):
+            response, mock_audit_log = self._login_response(
+                self.user_email, self.password, patched_audit_log='student.models.AUDIT_LOG'
+            )
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success'])
         self._assert_not_in_audit_log(mock_audit_log, 'info', [self.user_email])
@@ -118,13 +120,21 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             self.user.refresh_from_db()
             assert old_last_login == self.user.last_login
 
-    def test_login_fail_no_user_exists(self):
+    @ddt.data(
+        (True, 400),
+        (False, 200),
+    )
+    @ddt.unpack
+    def test_login_fail_no_user_exists(self, is_error_status_code_enabled, expected_status_code):
         nonexistent_email = u'not_a_user@edx.org'
-        response, mock_audit_log = self._login_response(
-            nonexistent_email,
-            self.password,
+        with UPDATE_LOGIN_USER_ERROR_STATUS_CODE.override(is_error_status_code_enabled):
+            response, mock_audit_log = self._login_response(
+                nonexistent_email,
+                self.password,
+            )
+        self._assert_response(
+            response, success=False, value=self.LOGIN_FAILED_WARNING, status_code=expected_status_code
         )
-        self._assert_response(response, success=False, value=self.LOGIN_FAILED_WARNING)
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', nonexistent_email])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
@@ -500,9 +510,9 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             result = self.client.post(self.url, post_params)
         return result, mock_audit_log
 
-    def _assert_response(self, response, success=None, value=None):
+    def _assert_response(self, response, success=None, value=None, status_code=None):
         """
-        Assert that the response had status 200 and returned a valid
+        Assert that the response has the expected status code and returned a valid
         JSON-parseable dict.
 
         If success is provided, assert that the response had that
@@ -511,7 +521,8 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         If value is provided, assert that the response contained that
         value for 'value' in the JSON dict.
         """
-        self.assertEqual(response.status_code, 200)
+        expected_status_code = status_code or 200
+        self.assertEqual(response.status_code, expected_status_code)
 
         try:
             response_dict = json.loads(response.content.decode('utf-8'))
@@ -616,7 +627,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         else:
             AllowedAuthUser.objects.filter(site=site, email=user.email).delete()
 
-        with authn_waffle.override(ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY, switch_enabled):
+        with ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY.override(switch_enabled):
             value = None if success else u'As an {0} user, You must login with your {0} {1} account.'.format(
                 allowed_domain,
                 provider
