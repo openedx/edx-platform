@@ -3,6 +3,7 @@ import os
 import pprint
 import re
 import pdb
+import argparse
 from write_to_html import HtmlOutlineWriter
 
 pp = pprint.PrettyPrinter(indent=4, depth=2)
@@ -53,6 +54,7 @@ def read_warning_data(dir_path):
     During test runs in jenkins, multiple warning json files are output. This function finds all files
     and aggregates the warnings in to one large list
     """
+    # pdb.set_trace()
     dir_path = os.path.expanduser(dir_path)
     # find all files that exist in given directory
     files_in_dir = [
@@ -72,9 +74,13 @@ def read_warning_data(dir_path):
     # go through each warning file and aggregate warnigns into warnings_data
     warnings_data = []
     for file in warnings_files:
-        with open(os.path.expanduser(path + "/" + file), "r") as read_file:
-            data = json.load(read_file)["warnings"]
-            warnings_data.extend(data)
+        with open(os.path.expanduser(dir_path + "/" + file), "r") as read_file:
+            json_input = json.load(read_file)
+            if "warnings" in json_input:
+                data = json_input["warnings"]
+                warnings_data.extend(data)
+            else:
+                print(file)
     return warnings_data
 
 
@@ -115,6 +121,7 @@ def compress_similar_warnings(warnings):
         for d in count:
             count[d]["warning"]["num"] = count[d]["num"]
         output[warning_text] = [count[d]["warning"] for d in count]
+        # pdb.set_trace()
     return output
 
 
@@ -150,33 +157,61 @@ def process_warnings_json(dir_path):
     return output
 
 
-def write_html_report(warnings_object):
+def sort_by_count(warnings_object):
+    count_loc = {}
+    count_warning_text = {}
+    for location in warnings_object:
+        location_sum = 0
+        location_dict = {}
+        for warning_text in warnings_object[location]:
+            warning_text_sum = 0
+            warning_text_dict = {}
+            for warning in warnings_object[location][warning_text]:
+                warning_text_sum += warning["num"]
+            warning_text_dict[warning_text] =  [
+                warning_text_sum,
+                sorted(
+                    warnings_object[location][warning_text],
+                    key= lambda warning: warning["num"],
+                ),
+            ]
+            count_warning_text[warning_text] = warning_text_sum
+            location_sum += warning_text_sum
+        location_dict[location] = sorted([[v[0], k, v[1]] for k,v in warning_text_dict.items()], key = lambda warnings: warnings[0])
+        pdb.set_trace()
+    pp.pprint(count_loc)
+    pdb.set_trace()
+    return count_loc
+
+
+def write_html_report(warnings_object, html_path):
     """warning_object structured like:
         {locations: { warning_texts:[warnings objects]}
         }
     """
-    with open("text_html.html", "w") as fout:
+    html_path = os.path.expanduser(html_path)
+    with open(html_path, "w") as fout:
         html_writer = HtmlOutlineWriter(fout)
         for location in warnings_object:
-            html = u'<span class="count">{location}:</span> '.format(location=location)
+            html = u'<span class="count">{location}</span> '.format(location=location)
             html_writer.start_section(html, klass="location")
             for warning_text in warnings_object[location]:
-                html = u'<span class="count">{warning_text}:</span> '.format(
+                html = u'<span class="count">{warning_text}</span> '.format(
                     warning_text=warning_text
                 )
                 html_writer.start_section(html, klass="warning_text")
                 # warnings_object[location][warning_text] is a list
                 for warning in warnings_object[location][warning_text]:
-                    html = u'<span class="count">{warning_file_path}:</span> '.format(
+                    html = u'<span class="count">{warning_file_path}</span> '.format(
                         warning_file_path=warning["filename"]
                     )
                     html_writer.start_section(html, klass="warning")
 
-                    html = u'<p class="lineno">lineno: {lineno}:</p> '.format(
+                    html = u'<p class="lineno">lineno: {lineno}</p> '.format(
                         lineno=warning["lineno"]
                     )
                     html_writer.write(html)
-                    html = u'<p class="num">num_occur: {num}:</p> '.format(
+                    html = u'<p class="num">num_occur: {num}</p> '.format(
                         num=warning["num"]
                     )
                     html_writer.write(html)
@@ -186,7 +221,14 @@ def write_html_report(warnings_object):
             html_writer.end_section()
 
 
-dir_path = "~/dev/edx-platform/test_root/log"
-dir_path = "~/Downloads/log"
-output = process_warnings_json(dir_path)
-write_html_report(output)
+parser = argparse.ArgumentParser(
+    description="Process and categorize pytest warnings and output html report."
+)
+parser.add_argument("--dir_path", default="test_root/log")
+parser.add_argument("--html_path", default="test_html.html")
+args = parser.parse_args()
+print(args)
+output = process_warnings_json(args.dir_path)
+sort_by_count(output)
+
+write_html_report(output, args.html_path)
