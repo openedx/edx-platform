@@ -1,8 +1,8 @@
 /*  Team utility methods*/
 (function(define) {
     'use strict';
-    define(['jquery', 'underscore'
-    ], function($, _) {
+    define(['jquery', 'underscore'],
+    function($, _) {
         return {
 
             /**
@@ -20,7 +20,8 @@
             },
 
             teamCapacityText: function(memberCount, maxMemberCount) {
-                return interpolate(
+                // eslint-disable-next-line no-undef
+                return interpolate( // xss-lint: disable=javascript-interpolate
                     // Translators: The following message displays the number of members on a team.
                     ngettext(
                         '%(memberCount)s / %(maxMemberCount)s Member',
@@ -46,7 +47,7 @@
             showMessage: function(message, type) {
                 var $messageElement = $('#teams-message');
                 if (_.isUndefined(type)) {
-                    type = 'warning';
+                    type = 'warning'; // eslint-disable-line no-param-reassign
                 }
                 $messageElement.removeClass('is-hidden').addClass(type);
                 $('.teams-content .msg-content .copy').text(message);
@@ -58,13 +59,20 @@
              */
             parseAndShowMessage: function(data, genericErrorMessage, type) {
                 try {
-                    var errors = JSON.parse(data.responseText);
+                    var errors = JSON.parse(data.responseText); // eslint-disable-line vars-on-top
                     this.showMessage(
                        _.isUndefined(errors.user_message) ? genericErrorMessage : errors.user_message, type
                    );
                 } catch (error) {
                     this.showMessage(genericErrorMessage, type);
                 }
+            },
+
+            isInstructorManagedTopic: function(topicType) {
+                if (topicType === undefined) {
+                    return false;
+                }
+                return topicType.toLowerCase() !== 'open';
             }
         };
     });

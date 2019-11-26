@@ -13,6 +13,7 @@
                 errorMessage: gettext('An error occurred. Try again.'),
                 alreadyMemberMessage: gettext('You already belong to another team.'),
                 teamFullMessage: gettext('This team is full.'),
+                notJoinInstructorManagedTeam: gettext('Cannot join instructor managed team'),
 
                 events: {
                     'click .action-primary': 'joinTeam',
@@ -39,16 +40,21 @@
 
                         // if user is the member of current team then we wouldn't show anything
                         if (!info.memberOfCurrentTeam) {
-                            showJoinButton = !info.alreadyMember && teamHasSpace;
-
                             if (info.alreadyMember) {
+                                showJoinButton = false;
                                 message = info.memberOfCurrentTeam ? '' : view.alreadyMemberMessage;
                             } else if (!teamHasSpace) {
+                                showJoinButton = false;
                                 message = view.teamFullMessage;
+                            } else if (!info.isAdminOrStaff && info.isInstructorManagedTopic) {
+                                showJoinButton = false;
+                                message = view.notJoinInstructorManagedTeam;
+                            } else {
+                                showJoinButton = true;
                             }
                         }
 
-                        view.$el.html(view.template({
+                        view.$el.html(view.template({ // xss-lint: disable=javascript-jquery-html
                             showJoinButton: showJoinButton,
                             message: message,
                             showEditButton: view.showEditButton
@@ -65,7 +71,7 @@
                         type: 'POST',
                         url: view.context.teamMembershipsUrl,
                         data: {username: view.context.userInfo.username, team_id: view.model.get('id')}
-                    }).done(function(data) {
+                    }).done(function() {
                         view.model.fetch()
                             .done(function() {
                                 view.teamEvents.trigger('teams:update', {
@@ -83,11 +89,15 @@
                     var info = {
                         alreadyMember: false,
                         memberOfCurrentTeam: false,
-                        teamHasSpace: false
+                        teamHasSpace: false,
+                        isAdminOrStaff: false,
+                        isInstructorManagedTopic: false
                     };
+                    var teamHasSpace = this.model.get('membership').length < maxTeamSize;
 
                     info.memberOfCurrentTeam = TeamUtils.isUserMemberOfTeam(this.model.get('membership'), username);
-                    var teamHasSpace = this.model.get('membership').length < maxTeamSize;
+                    info.isAdminOrStaff = this.context.userInfo.privileged || this.context.userInfo.staff;
+                    info.isInstructorManagedTopic = TeamUtils.isInstructorManagedTopic(this.topic.attributes.type);
 
                     if (info.memberOfCurrentTeam) {
                         info.alreadyMember = true;
@@ -95,7 +105,7 @@
                         deferred.resolve(info);
                     } else {
                         if (teamHasSpace) {
-                            var view = this;
+                            var view = this; // eslint-disable-line vars-on-top
                             $.ajax({
                                 type: 'GET',
                                 url: view.context.teamMembershipsUrl,

@@ -51,7 +51,9 @@
                         valueAttribute: 'description',
                         editable: 'always',
                         showMessages: false,
-                        helpMessage: gettext('A short description of the team to help other learners understand the goals or direction of the team (maximum 300 characters).')
+                        helpMessage: gettext(
+                          'A short description of the team to help other learners understand the ' +
+                          'goals or direction of the team (maximum 300 characters).')
                     });
 
                     this.teamLanguageField = new FieldViews.DropdownFieldView({
@@ -62,7 +64,8 @@
                         showMessages: false,
                         titleIconName: 'fa-comment-o',
                         options: this.context.languages,
-                        helpMessage: gettext('The language that team members primarily use to communicate with each other.')
+                        helpMessage:
+                            gettext('The language that team members primarily use to communicate with each other.')
                     });
 
                     this.teamCountryField = new FieldViews.DropdownFieldView({
@@ -78,7 +81,7 @@
                 },
 
                 render: function() {
-                    this.$el.html(_.template(editTeamTemplate)({
+                    this.$el.html(_.template(editTeamTemplate)({ // xss-lint: disable=javascript-jquery-html
                         primaryButtonTitle: this.primaryButtonTitle,
                         action: this.action,
                         totalMembers: _.isUndefined(this.teamModel) ? 0 : this.teamModel.get('membership').length
@@ -101,7 +104,7 @@
 
                 createOrUpdateTeam: function(event) {
                     event.preventDefault();
-                    var view = this,
+                    var view = this, // eslint-disable-line vars-on-top
                         teamLanguage = this.teamLanguageField.fieldValue(),
                         teamCountry = this.teamCountryField.fieldValue(),
                         data = {
@@ -122,7 +125,7 @@
                         saveOptions.contentType = 'application/merge-patch+json';
                     }
 
-                    var validationResult = this.validateTeamData(data);
+                    var validationResult = this.validateTeamData(data); // eslint-disable-line vars-on-top
                     if (validationResult.status === false) {
                         this.showMessage(validationResult.message, validationResult.srMessage);
                         return $().promise();
@@ -138,7 +141,7 @@
                                 {trigger: true}
                             );
                         })
-                        .fail(function(data) {
+                        .fail(function(data) { // eslint-disable-line no-shadow
                             var response = JSON.parse(data.responseText);
                             var message = gettext('An error occurred. Please try again.');
                             if ('user_message' in response) {
@@ -202,8 +205,8 @@
                 },
 
                 cancelAndGoBack: function(event) {
-                    event.preventDefault();
                     var url;
+                    event.preventDefault();
                     if (this.action === 'create') {
                         url = 'topics/' + this.topic.id;
                     } else if (this.action === 'edit') {

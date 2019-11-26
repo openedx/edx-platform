@@ -3,12 +3,12 @@ define(['backbone', 'URI', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/a
     function(Backbone, URI, _, AjaxHelpers, TeamSpecHelpers) {
         'use strict';
         describe('TopicCollection', function() {
-            var topicCollection;
+            var topicCollection, testRequestParam;
             beforeEach(function() {
                 topicCollection = TeamSpecHelpers.createMockTopicCollection();
             });
 
-            var testRequestParam = function(self, param, value) {
+            testRequestParam = function(self, param, value) {
                 var requests = AjaxHelpers.requests(self),
                     request,
                     url,

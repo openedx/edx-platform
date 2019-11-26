@@ -14,8 +14,9 @@
                 },
 
                 render: function() {
-                    var team_count = this.model.get('team_count');
-                    this.$el.html(_.escape(interpolate(
+                    var team_count = this.model.get('team_count'); // eslint-disable-line camelcase
+                    // eslint-disable-next-line no-undef, max-len
+                    this.$el.html(_.escape(interpolate( // xss-lint: disable=javascript-jquery-html,javascript-interpolate
                         ngettext('%(team_count)s Team', '%(team_count)s Teams', team_count),
                         {team_count: team_count},
                         true
@@ -42,11 +43,13 @@
                 details: function() { return this.detailViews; },
                 actionClass: 'action-view',
                 actionContent: function() {
-                    var screenReaderText = _.escape(interpolate(
+                    // eslint-disable-next-line no-undef
+                    var screenReaderText = _.escape(interpolate( // xss-lint: disable=javascript-interpolate
                         gettext('View Teams in the %(topic_name)s Topic'),
                         {topic_name: this.model.get('name')}, true
                     ));
-                    return '<span class="sr">' + screenReaderText + '</span><span class="icon fa fa-arrow-right" aria-hidden="true"></span>';  // eslint-disable-line max-len
+                    // eslint-disable-next-line max-len
+                    return '<span class="sr">' + screenReaderText + '</span><span class="icon fa fa-arrow-right" aria-hidden="true"></span>'; // xss-lint: disable=javascript-concat-html
                 }
             });
 

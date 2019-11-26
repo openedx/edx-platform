@@ -6,8 +6,9 @@ define([
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/spec_helpers/page_helpers',
     'teams/js/views/teams_tab',
-    'teams/js/spec_helpers/team_spec_helpers'
-], function($, Backbone, Logger, SpecHelpers, AjaxHelpers, PageHelpers, TeamsTabView, TeamSpecHelpers) {
+    'teams/js/spec_helpers/team_spec_helpers',
+    'underscore'
+], function($, Backbone, Logger, SpecHelpers, AjaxHelpers, PageHelpers, TeamsTabView, TeamSpecHelpers, _) {
     'use strict';
 
     describe('TeamsTab', function() {
@@ -170,7 +171,7 @@ define([
                     }
                 ],
                 'fires a page view event for the edit team page': [
-                    'teams/' + TeamSpecHelpers.testTopicID + '/' + 'test_team_id/edit-team',
+                    'teams/' + TeamSpecHelpers.testTopicID + '/test_team_id/edit-team',
                     {
                         page_name: 'edit-team',
                         topic_id: TeamSpecHelpers.testTopicID,
@@ -230,17 +231,17 @@ define([
         });
 
         describe('Search', function() {
-            var performSearch = function(requests, teamsTabView) {
+            var performSearch = function(reqs, teamsTabView) {
                 teamsTabView.$('.search-field').val('foo');
                 teamsTabView.$('.action-search').click();
                 verifyTeamsRequest({
                     order_by: '',
                     text_search: 'foo'
                 });
-                AjaxHelpers.respondWithJson(requests, TeamSpecHelpers.createMockTeamsResponse({results: []}));
+                AjaxHelpers.respondWithJson(reqs, TeamSpecHelpers.createMockTeamsResponse({results: []}));
 
                 // Expect exactly one search request to be fired
-                AjaxHelpers.expectNoRequests(requests);
+                AjaxHelpers.expectNoRequests(reqs);
             };
 
             it('can search teams', function() {

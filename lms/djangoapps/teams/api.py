@@ -62,6 +62,15 @@ def is_team_discussion_private(team):
     return getattr(team, 'is_discussion_private', False)
 
 
+def is_instructor_managed_team(team):  # pylint: disable=unused-argument
+    """
+    Return true if the team is managed by instructors.
+    For now always return false, will complete the logic later.
+    TODO MST-25
+    """
+    return False
+
+
 def user_is_a_team_member(user, team):
     """
     Return if the user is a member of the team
@@ -189,3 +198,7 @@ def add_team_count(topics, course_id, organization_protection_status):
     topics_to_team_count = {d['topic_id']: d['team_count'] for d in teams_per_topic}
     for topic in topics:
         topic['team_count'] = topics_to_team_count.get(topic['id'], 0)
+
+
+def can_user_modify_team(user, course_key, team):
+    return not is_instructor_managed_team(team) or _has_course_staff_privileges(user, course_key)
