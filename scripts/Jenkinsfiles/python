@@ -13,11 +13,15 @@ def runPythonTests() {
 }
 
 def pythonTestCleanup() {
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/**/*,test_root/log/**/*.log,test_root/log/*.json,**/nosetests.xml,*.log'
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.html,reports/**/*,test_root/log/**/*.log,test_root/log/*.json,**/nosetests.xml,*.log'
     sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
     junit '**/nosetests.xml'
     sh '''source $HOME/edx-venv/bin/activate
     bash scripts/xdist/terminate_xdist_nodes.sh'''
+}
+
+def createWarningsReport(){
+    sh "python openedx/core/process_warnings.py --dir_path test_root/log --html_path reports/warning_report.html"
 }
 
 def xdist_git_branch() {
@@ -95,6 +99,7 @@ pipeline {
                     post {
                         always {
                             script {
+                                createWarningsReport()
                                 pythonTestCleanup()
                             }
                         }
