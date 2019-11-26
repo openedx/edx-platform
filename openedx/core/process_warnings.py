@@ -143,6 +143,7 @@ def process_warnings_json(dir_path):
         non-deprecated warnings
     """
     warnings_data = read_warning_data(dir_path)
+    print(len(warnings_data))
     deprecated_warnings = []
     non_deprecated_warnings = []
     for warnings_object in warnings_data:
@@ -218,18 +219,18 @@ def write_html_report_sorted_warnings(sorted_warnings_object, html_path):
     with open(html_path, "w") as fout:
         html_writer = HtmlOutlineWriter(fout)
         for location in sorted_warnings_object:
-            pp.pprint(location)
+            # pp.pprint(location)
             html = u'<span class="count">{location}, count: {count}</span> '.format(location=location[0],count=location[-1])
             html_writer.start_section(html, klass="location")
             for warning_text in location[1]:
-                pp.pprint(warning_text)
+                # pp.pprint(warning_text)
                 html = u'<span class="count">{warning_text}, count: {count}</span> '.format(
                     warning_text=warning_text[0], count=warning_text[-1]
                 )
                 html_writer.start_section(html, klass="warning_text")
                 # warnings_object[location][warning_text] is a list
                 for warning in warning_text[1]:
-                    pp.pprint(warning)
+                    # pp.pprint(warning)
                     html = u'<span class="count">{warning_file_path}</span> '.format(
                         warning_file_path=warning["filename"]
                     )
@@ -255,7 +256,6 @@ parser = argparse.ArgumentParser(
 parser.add_argument("--dir_path", default="test_root/log")
 parser.add_argument("--html_path", default="test_html.html")
 args = parser.parse_args()
-print(args)
 output = process_warnings_json(args.dir_path)
 sorted_output = sort_by_count(output)
 write_html_report_sorted_warnings(sorted_output, args.html_path)
