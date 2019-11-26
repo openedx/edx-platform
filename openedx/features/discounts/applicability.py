@@ -22,29 +22,15 @@ from entitlements.models import CourseEntitlement
 from experiments.models import ExperimentData
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
+from openedx.core.djangoapps.site_configuration.helpers import get_current_site_configuration
 from openedx.features.discounts.models import DiscountPercentageConfig, DiscountRestrictionConfig
 from student.models import CourseEnrollment
 from track import segment
 
-# .. feature_toggle_name: discounts.enable_discounting
-# .. feature_toggle_type: flag
-# .. feature_toggle_default: False
-# .. feature_toggle_description: Toggle discounts always being disabled
-# .. feature_toggle_category: discounts
-# .. feature_toggle_use_cases: monitored_rollout
-# .. feature_toggle_creation_date: 2019-4-16
-# .. feature_toggle_expiration_date: None
-# .. feature_toggle_warnings: None
-# .. feature_toggle_tickets: REVEM-282
-# .. feature_toggle_status: supported
-DISCOUNT_APPLICABILITY_FLAG = WaffleFlag(
-    waffle_namespace=WaffleFlagNamespace(name=u'discounts'),
-    flag_name=u'enable_discounting',
-    flag_undefined_default=False
-)
 
 DISCOUNT_APPLICABILITY_HOLDBACK = 'first_purchase_discount_holdback'
 REV1008_EXPERIMENT_ID = 15
+DISCOUNT_APPLICABILITY_CONFIG = 'enable_discounting'
 
 
 def get_discount_expiration_date(user, course):
@@ -90,12 +76,9 @@ def can_receive_discount(user, course, discount_expiration_date=None):
     Check all the business logic about whether this combination of user and course
     can receive a discount.
     """
-    # Always disable discounts until we are ready to enable this feature
-    with impersonate(user):
-        if not DISCOUNT_APPLICABILITY_FLAG.is_enabled():
-            return False
-
-    # TODO: Add additional conditions to return False here
+    site_configuration = get_current_site_configuration()
+    if not site_configuration or not site_configuration.get_value(DISCOUNT_APPLICABILITY_CONFIG, False):
+        return False
 
     # Check if discount has expired
     if not discount_expiration_date:

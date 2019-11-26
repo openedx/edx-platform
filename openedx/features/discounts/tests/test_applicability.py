@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 import ddt
 import pytz
 from django.contrib.sites.models import Site
+from django.test.client import RequestFactory
 from django.utils.timezone import now
 from mock import Mock, patch
 
@@ -17,18 +18,18 @@ from enterprise.models import EnterpriseCustomer, EnterpriseCustomerUser
 from entitlements.tests.factories import CourseEntitlementFactory
 from experiments.models import ExperimentData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.features.discounts.models import DiscountRestrictionConfig
 from openedx.features.discounts.utils import REV1008_EXPERIMENT_ID
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..applicability import DISCOUNT_APPLICABILITY_FLAG, _is_in_holdback, can_receive_discount
+from ..applicability import DISCOUNT_APPLICABILITY_CONFIG, _is_in_holdback, can_receive_discount
 
 
 @ddt.ddt
-class TestApplicability(ModuleStoreTestCase):
+class TestApplicability(SiteMixin, ModuleStoreTestCase):
     """
     Applicability determines if this combination of user and course can receive a discount. Make
     sure that all of the business conditions work.
@@ -36,7 +37,8 @@ class TestApplicability(ModuleStoreTestCase):
 
     def setUp(self):
         super(TestApplicability, self).setUp()
-        self.site, _ = Site.objects.get_or_create(domain='example.com')
+        self.request = RequestFactory().get("foo")
+        self.request.site = self.site
         self.user = UserFactory.create()
         self.course = CourseFactory.create(run='test', display_name='test')
         CourseModeFactory.create(course_id=self.course.id, mode_slug='verified')
@@ -44,9 +46,12 @@ class TestApplicability(ModuleStoreTestCase):
         ExperimentData.objects.create(
             user=self.user, experiment_id=REV1008_EXPERIMENT_ID, key=str(self.course), value=now_time
         )
-
+        self.site.configuration.values = {DISCOUNT_APPLICABILITY_CONFIG: True}
+        self.site.configuration.save()
         holdback_patcher = patch('openedx.features.discounts.applicability._is_in_holdback', return_value=False)
         self.mock_holdback = holdback_patcher.start()
+        request_patcher = patch("crum.get_current_request", return_value=self.request)
+        request_patcher.start()
         self.addCleanup(holdback_patcher.stop)
 
     def test_can_receive_discount(self):
@@ -54,7 +59,6 @@ class TestApplicability(ModuleStoreTestCase):
         applicability = can_receive_discount(user=self.user, course=self.course)
         self.assertEqual(applicability, False)
 
-    @override_waffle_flag(DISCOUNT_APPLICABILITY_FLAG, active=True)
     def test_can_receive_discount_course_requirements(self):
         """
         Ensure first purchase offer banner only displays for courses with a non-expired verified mode
@@ -93,7 +97,6 @@ class TestApplicability(ModuleStoreTestCase):
             if mode1 != mode2
         ]
     ))
-    @override_waffle_flag(DISCOUNT_APPLICABILITY_FLAG, active=True)
     def test_can_receive_discount_previous_verified_enrollment(self, existing_enrollments):
         """
         Ensure that only users who have not already purchased courses receive the discount.
@@ -115,7 +118,6 @@ class TestApplicability(ModuleStoreTestCase):
         CourseMode.VERIFIED,
         CourseMode.PROFESSIONAL,
     )
-    @override_waffle_flag(DISCOUNT_APPLICABILITY_FLAG, active=True)
     def test_can_receive_discount_entitlement(self, entitlement_mode):
         """
         Ensure that only users who have not already purchased courses receive the discount.
@@ -132,7 +134,6 @@ class TestApplicability(ModuleStoreTestCase):
         applicability = can_receive_discount(user=self.user, course=self.course)
         assert applicability == (entitlement_mode is None)
 
-    @override_waffle_flag(DISCOUNT_APPLICABILITY_FLAG, active=True)
     def test_can_receive_discount_false_enterprise(self):
         """
         Ensure that enterprise users do not receive the discount.
@@ -149,7 +150,6 @@ class TestApplicability(ModuleStoreTestCase):
         applicability = can_receive_discount(user=self.user, course=self.course)
         self.assertEqual(applicability, False)
 
-    @override_waffle_flag(DISCOUNT_APPLICABILITY_FLAG, active=True)
     def test_holdback_denies_discount(self):
         """
         Ensure that users in the holdback do not receive the discount.
