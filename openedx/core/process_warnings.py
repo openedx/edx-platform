@@ -158,30 +158,18 @@ def process_warnings_json(dir_path):
 
 
 def sort_by_count(warnings_object):
-    count_loc = {}
-    count_warning_text = {}
+    temp_location_list = []
     for location in warnings_object:
-        location_sum = 0
-        location_dict = {}
+        temp_warning_text_list = []
         for warning_text in warnings_object[location]:
-            warning_text_sum = 0
-            warning_text_dict = {}
-            for warning in warnings_object[location][warning_text]:
-                warning_text_sum += warning["num"]
-            warning_text_dict[warning_text] =  [
-                warning_text_sum,
-                sorted(
-                    warnings_object[location][warning_text],
-                    key= lambda warning: warning["num"],
-                ),
-            ]
-            count_warning_text[warning_text] = warning_text_sum
-            location_sum += warning_text_sum
-        location_dict[location] = sorted([[v[0], k, v[1]] for k,v in warning_text_dict.items()], key = lambda warnings: warnings[0])
-        pdb.set_trace()
-    pp.pprint(count_loc)
-    pdb.set_trace()
-    return count_loc
+            sorted_warnings = sorted(warnings_object[location][warning_text], key = lambda warning: -1*warning["num"])
+            num = sum([warning["num"] for warning in sorted_warnings])
+            temp_warning_text_list.append( (warning_text, sorted_warnings, num))
+        sorted_warning_texts = sorted(temp_warning_text_list, key = lambda warning_text_object: -1 * warning_text_object[-1])
+        num = sum([warning_text_object[-1] for warning_text_object in sorted_warning_texts])
+        temp_location_list.append([location, sorted_warning_texts, num])
+    sorted_locations = sorted(temp_location_list, key= lambda location_object: -1 * location_object[-1])          
+    return sorted_locations
 
 
 def write_html_report(warnings_object, html_path):
@@ -221,6 +209,46 @@ def write_html_report(warnings_object, html_path):
             html_writer.end_section()
 
 
+def write_html_report_sorted_warnings(sorted_warnings_object, html_path):
+    """warning_object structured like:
+        {locations: { warning_texts:[warnings objects]}
+        }
+    """
+    html_path = os.path.expanduser(html_path)
+    with open(html_path, "w") as fout:
+        html_writer = HtmlOutlineWriter(fout)
+        for location in sorted_warnings_object:
+            pp.pprint(location)
+            html = u'<span class="count">{location}, count: {count}</span> '.format(location=location[0],count=location[-1])
+            html_writer.start_section(html, klass="location")
+            for warning_text in location[1]:
+                pp.pprint(warning_text)
+                html = u'<span class="count">{warning_text}, count: {count}</span> '.format(
+                    warning_text=warning_text[0], count=warning_text[-1]
+                )
+                html_writer.start_section(html, klass="warning_text")
+                # warnings_object[location][warning_text] is a list
+                for warning in warning_text[1]:
+                    pp.pprint(warning)
+                    html = u'<span class="count">{warning_file_path}</span> '.format(
+                        warning_file_path=warning["filename"]
+                    )
+                    html_writer.start_section(html, klass="warning")
+
+                    html = u'<p class="lineno">lineno: {lineno}</p> '.format(
+                        lineno=warning["lineno"]
+                    )
+                    html_writer.write(html)
+                    html = u'<p class="num">num_occur: {num}</p> '.format(
+                        num=warning["num"]
+                    )
+                    html_writer.write(html)
+
+                    html_writer.end_section()
+                html_writer.end_section()
+            html_writer.end_section()
+
+
 parser = argparse.ArgumentParser(
     description="Process and categorize pytest warnings and output html report."
 )
@@ -229,6 +257,6 @@ parser.add_argument("--html_path", default="test_html.html")
 args = parser.parse_args()
 print(args)
 output = process_warnings_json(args.dir_path)
-sort_by_count(output)
-
-write_html_report(output, args.html_path)
+sorted_output = sort_by_count(output)
+write_html_report_sorted_warnings(sorted_output, args.html_path)
+# write_html_report(output, args.html_path)
