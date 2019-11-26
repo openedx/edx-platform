@@ -43,6 +43,7 @@ from lms.djangoapps.courseware.access_utils import (
 from lms.djangoapps.courseware.masquerade import get_masquerade_role, is_masquerading_as_student
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.ccx.models import CustomCourseForEdX
+from lms.djangoapps.courseware.access_control_backends import access_control_backends
 from mobile_api.models import IgnoreMobileAvailableFlagConfig
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_duration_limits.access import check_course_expired
@@ -414,7 +415,12 @@ def _has_access_course(user, action, courselike):
         'see_about_page': can_see_about_page,
     }
 
-    return _dispatch(checkers, action, user, courselike)
+    return access_control_backends.query(
+        action='course.{action}'.format(action=action),
+        user=user,
+        resource=courselike,
+        default_has_access=_dispatch(checkers, action, user, courselike),
+    )
 
 
 def _has_access_error_desc(user, action, descriptor, course_key):

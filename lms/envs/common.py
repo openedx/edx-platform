@@ -972,6 +972,8 @@ AUTHENTICATION_BACKENDS = [
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
 
+ACCESS_CONTROL_BACKENDS = {}
+
 # Set request limits for maximum size of a request body and maximum number of GET/POST parameters. (>=Django 1.10)
 # Limits are currently disabled - but can be used for finer-grained denial-of-service protection.
 DATA_UPLOAD_MAX_MEMORY_SIZE = None

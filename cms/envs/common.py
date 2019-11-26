@@ -77,6 +77,8 @@ from lms.envs.common import (
     HEARTBEAT_CELERY_TIMEOUT,
     HEARTBEAT_CELERY_ROUTING_KEY,
 
+    ACCESS_CONTROL_BACKENDS,
+
     # Default site to use if no site exists matching request headers
     SITE_ID,
 
