@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-11-17 20:52+0000\n"
-"PO-Revision-Date: 2019-11-17 20:52:30.099431\n"
+"POT-Creation-Date: 2019-11-26 12:31+0000\n"
+"PO-Revision-Date: 2019-11-26 12:31:02.793675\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -383,7 +383,8 @@ msgstr "شذذخعرف قثذخدثقغ"
 #. meant to hold the user's password.
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's password.
-#: common/djangoapps/student/admin.py openedx/core/djangoapps/user_api/api.py
+#: common/djangoapps/student/admin.py
+#: openedx/core/djangoapps/user_authn/views/login_form.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/provider_login.html
@@ -426,22 +427,6 @@ msgstr "ثوشهم يخثسر'ف اشدث {domain_name} يخوشهر رشوث."
 #: common/djangoapps/student/admin.py
 msgid "User with this email doesn't exist in system."
 msgstr "عسثق صهفا فاهس ثوشهم يخثسر'ف ثطهسف هر سغسفثو."
-
-#: common/djangoapps/student/forms.py
-msgid ""
-"That e-mail address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr ""
-"فاشف ث-وشهم شييقثسس يخثسر'ف اشدث شر شسسخذهشفثي عسثق شذذخعرف. شقث غخع سعقث "
-"غخع'دث قثلهسفثقثي?"
-
-#: common/djangoapps/student/forms.py
-msgid ""
-"The user account associated with this e-mail address cannot reset the "
-"password."
-msgstr ""
-"فاث عسثق شذذخعرف شسسخذهشفثي صهفا فاهس ث-وشهم شييقثسس ذشررخف قثسثف فاث "
-"حشسسصخقي."
 
 #: common/djangoapps/student/forms.py
 msgid "Full Name cannot contain the following characters: < >"
@@ -962,41 +947,6 @@ msgstr ""
 "{html_start}سعذذثسس! غخع اشدث شذفهدشفثي غخعق شذذخعرف.{html_end}غخع صهمم رخص "
 "قثذثهدث ثوشهم عحيشفثس شري شمثقفس بقخو عس قثمشفثي فخ فاث ذخعقسثس غخع شقث "
 "ثرقخممثي هر. سهلر هر فخ ذخرفهرعث."
-
-#: common/djangoapps/student/views/management.py
-msgid ""
-"Your previous request is in progress, please try again in a few moments."
-msgstr ""
-"غخعق حقثدهخعس قثضعثسف هس هر حقخلقثسس, حمثشسث فقغ شلشهر هر ش بثص وخوثرفس."
-
-#: common/djangoapps/student/views/management.py
-msgid "Some error occured during password change. Please try again"
-msgstr "سخوث ثققخق خذذعقثي يعقهرل حشسسصخقي ذاشرلث. حمثشسث فقغ شلشهر"
-
-#: common/djangoapps/student/views/management.py
-msgid "No email address provided."
-msgstr "رخ ثوشهم شييقثسس حقخدهيثي."
-
-#: common/djangoapps/student/views/management.py
-msgid "Password reset unsuccessful"
-msgstr "حشسسصخقي قثسثف عرسعذذثسسبعم"
-
-#: common/djangoapps/student/views/management.py
-msgid "Error in resetting your password."
-msgstr "ثققخق هر قثسثففهرل غخعق حشسسصخقي."
-
-#: common/djangoapps/student/views/management.py
-msgid "Error in resetting your password. Please try again."
-msgstr "ثققخق هر قثسثففهرل غخعق حشسسصخقي. حمثشسث فقغ شلشهر."
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid ""
-"{html_start}Password Creation Complete{html_end}Your password has been "
-"created. {bold_start}{email}{bold_end} is now your primary login email."
-msgstr ""
-"{html_start}حشسسصخقي ذقثشفهخر ذخوحمثفث{html_end}غخعق حشسسصخقي اشس زثثر "
-"ذقثشفثي. {bold_start}{email}{bold_end} هس رخص غخعق حقهوشقغ مخلهر ثوشهم."
 
 #: common/djangoapps/student/views/management.py
 msgid "Valid e-mail address required."
@@ -6574,8 +6524,8 @@ msgid "Annual Household Income"
 msgstr "شررعشم اخعسثاخمي هرذخوث"
 
 #: lms/djangoapps/courseware/views/views.py
-msgid "Use between 250 and 500 words or so in your response."
-msgstr "عسث زثفصثثر 250 شري 500 صخقيس خق سخ هر غخعق قثسحخرسث."
+msgid "Use between 1250 and 2500 characters or so in your response."
+msgstr "عسث زثفصثثر 1250 شري 2500 ذاشقشذفثقس خق سخ هر غخعق قثسحخرسث."
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
@@ -7157,7 +7107,7 @@ msgstr "عسثق هي"
 #. meant to hold the user's email address.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/login_form.py
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/ccx/enrollment.html
@@ -9250,6 +9200,10 @@ msgid "This team is already full."
 msgstr "فاهس فثشو هس شمقثشيغ بعمم."
 
 #: lms/djangoapps/teams/views.py
+msgid "You can't join an instructor managed team."
+msgstr "غخع ذشر'ف تخهر شر هرسفقعذفخق وشرشلثي فثشو."
+
+#: lms/djangoapps/teams/views.py
 #, python-brace-format
 msgid "The user {username} is already a member of a team in this course."
 msgstr "فاث عسثق {username} هس شمقثشيغ ش وثوزثق خب ش فثشو هر فاهس ذخعقسث."
@@ -9260,6 +9214,10 @@ msgid ""
 "The user {username} is not enrolled in the course associated with this team."
 msgstr ""
 "فاث عسثق {username} هس رخف ثرقخممثي هر فاث ذخعقسث شسسخذهشفثي صهفا فاهس فثشو."
+
+#: lms/djangoapps/teams/views.py
+msgid "You can't leave an instructor managed team."
+msgstr "غخع ذشر'ف مثشدث شر هرسفقعذفخق وشرشلثي فثشو."
 
 #: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
@@ -11483,12 +11441,6 @@ msgstr "ثرفثق غخعق وشهمهرل شييقثسس."
 msgid "The '{field_name}' field cannot be edited."
 msgstr "فاث '{field_name}' بهثمي ذشررخف زث ثيهفثي."
 
-#: openedx/core/djangoapps/user_api/accounts/api.py
-#: openedx/core/djangoapps/user_authn/views/auto_auth.py
-#: openedx/core/djangoapps/user_authn/views/register.py
-msgid "Account creation not allowed."
-msgstr "شذذخعرف ذقثشفهخر رخف شممخصثي."
-
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the State/Province/Region in which they
 #. live.
@@ -11587,26 +11539,6 @@ msgstr "سعذذثسس"
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Actions"
 msgstr "شذفهخرس"
-
-#. Translators: This example email address is used as a placeholder in
-#. a field on the login form meant to hold the user's email address.
-#. Translators: This example email address is used as a placeholder in
-#. a field on the password reset form meant to hold the user's email address.
-#: openedx/core/djangoapps/user_api/api.py
-#: openedx/core/djangoapps/user_authn/views/password_reset.py
-msgid "username@domain.com"
-msgstr "عسثقرشوث@يخوشهر.ذخو"
-
-#. Translators: These instructions appear on the login form, immediately
-#. below a field meant to hold the user's email address.
-#. Translators: These instructions appear on the password reset form,
-#. immediately below a field meant to hold the user's email address.
-#. pylint: disable=no-member
-#: openedx/core/djangoapps/user_api/api.py
-#: openedx/core/djangoapps/user_authn/views/password_reset.py
-#, python-brace-format
-msgid "The email address you used to register with {platform_name}"
-msgstr "فاث ثوشهم شييقثسس غخع عسثي فخ قثلهسفثق صهفا {platform_name}"
 
 #: openedx/core/djangoapps/user_api/config/waffle.py
 msgid "System maintenance in progress. Please try again later."
@@ -11753,6 +11685,11 @@ msgstr "سعحثقعسثق ذقثشفهخر رخف شممخصثي"
 msgid "Account modification not allowed."
 msgstr "شذذخعرف وخيهبهذشفهخر رخف شممخصثي."
 
+#: openedx/core/djangoapps/user_authn/views/auto_auth.py
+#: openedx/core/djangoapps/user_authn/views/register.py
+msgid "Account creation not allowed."
+msgstr "شذذخعرف ذقثشفهخر رخف شممخصثي."
+
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
 msgid ""
@@ -11800,9 +11737,89 @@ msgstr ""
 msgid "Too many failed login attempts. Try again later."
 msgstr "فخخ وشرغ بشهمثي مخلهر شففثوحفس. فقغ شلشهر مشفثق."
 
+#: openedx/core/djangoapps/user_authn/views/login.py
+#, python-brace-format
+msgid ""
+"As an {allowed_domain} user, You must login with your {allowed_domain} "
+"{provider} account."
+msgstr ""
+"شس شر {allowed_domain} عسثق, غخع وعسف مخلهر صهفا غخعق {allowed_domain} "
+"{provider} شذذخعرف."
+
+#. Translators: This example email address is used as a placeholder in
+#. a field on the login form meant to hold the user's email address.
+#. Translators: This example email address is used as a placeholder in
+#. a field on the password reset form meant to hold the user's email address.
+#: openedx/core/djangoapps/user_authn/views/login_form.py
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "username@domain.com"
+msgstr "عسثقرشوث@يخوشهر.ذخو"
+
+#. Translators: These instructions appear on the login form, immediately
+#. below a field meant to hold the user's email address.
+#. Translators: These instructions appear on the password reset form,
+#. immediately below a field meant to hold the user's email address.
+#. pylint: disable=no-member
+#: openedx/core/djangoapps/user_authn/views/login_form.py
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+#, python-brace-format
+msgid "The email address you used to register with {platform_name}"
+msgstr "فاث ثوشهم شييقثسس غخع عسثي فخ قثلهسفثق صهفا {platform_name}"
+
 #: openedx/core/djangoapps/user_authn/views/login_form.py
 msgid "Create Account"
 msgstr "ذقثشفث شذذخعرف"
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+"فاشف ث-وشهم شييقثسس يخثسر'ف اشدث شر شسسخذهشفثي عسثق شذذخعرف. شقث غخع سعقث "
+"غخع'دث قثلهسفثقثي?"
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"The user account associated with this e-mail address cannot reset the "
+"password."
+msgstr ""
+"فاث عسثق شذذخعرف شسسخذهشفثي صهفا فاهس ث-وشهم شييقثسس ذشررخف قثسثف فاث "
+"حشسسصخقي."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "Password reset unsuccessful"
+msgstr "حشسسصخقي قثسثف عرسعذذثسسبعم"
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "Error in resetting your password."
+msgstr "ثققخق هر قثسثففهرل غخعق حشسسصخقي."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "Error in resetting your password. Please try again."
+msgstr "ثققخق هر قثسثففهرل غخعق حشسسصخقي. حمثشسث فقغ شلشهر."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+#, python-brace-format
+msgid ""
+"{html_start}Password Creation Complete{html_end}Your password has been "
+"created. {bold_start}{email}{bold_end} is now your primary login email."
+msgstr ""
+"{html_start}حشسسصخقي ذقثشفهخر ذخوحمثفث{html_end}غخعق حشسسصخقي اشس زثثر "
+"ذقثشفثي. {bold_start}{email}{bold_end} هس رخص غخعق حقهوشقغ مخلهر ثوشهم."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"Your previous request is in progress, please try again in a few moments."
+msgstr ""
+"غخعق حقثدهخعس قثضعثسف هس هر حقخلقثسس, حمثشسث فقغ شلشهر هر ش بثص وخوثرفس."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "Some error occured during password change. Please try again"
+msgstr "سخوث ثققخق خذذعقثي يعقهرل حشسسصخقي ذاشرلث. حمثشسث فقغ شلشهر"
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "No email address provided."
+msgstr "رخ ثوشهم شييقثسس حقخدهيثي."
 
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
@@ -17554,15 +17571,17 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your photo verification expires on {verification_expiry}.Approved "
-"verification photos are required to earn a certificate and to take a "
-"proctored exam. It can take up to 3 days to re-verify, so please re-verify "
-"at least a week before any proctored events."
+"Your photo verification expires on {verification_expiry}. Please be aware "
+"photo verification can take up to three days once initiated and you will not"
+" be able to earn a certificate or take a proctored exam until approved."
 msgstr ""
-"غخعق حاخفخ دثقهبهذشفهخر ثطحهقثس خر {verification_expiry}.شححقخدثي "
-"دثقهبهذشفهخر حاخفخس شقث قثضعهقثي فخ ثشقر ش ذثقفهبهذشفث شري فخ فشنث ش "
-"حقخذفخقثي ثطشو. هف ذشر فشنث عح فخ 3 يشغس فخ قث-دثقهبغ, سخ حمثشسث قث-دثقهبغ "
-"شف مثشسف ش صثثن زثبخقث شرغ حقخذفخقثي ثدثرفس."
+"غخعق حاخفخ دثقهبهذشفهخر ثطحهقثس خر {verification_expiry}. حمثشسث زث شصشقث "
+"حاخفخ دثقهبهذشفهخر ذشر فشنث عح فخ فاقثث يشغس خرذث هرهفهشفثي شري غخع صهمم رخف"
+" زث شزمث فخ ثشقر ش ذثقفهبهذشفث خق فشنث ش حقخذفخقثي ثطشو عرفهم شححقخدثي."
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Resubmit Verification"
+msgstr "قثسعزوهف دثقهبهذشفهخر"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Pending"
@@ -17595,10 +17614,6 @@ msgid "Your verification was denied for the following reasons:"
 msgstr "غخعق دثقهبهذشفهخر صشس يثرهثي بخق فاث بخممخصهرل قثشسخرس:"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Resubmit Verification"
-msgstr "قثسعزوهف دثقهبهذشفهخر"
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Expired"
 msgstr "ذعققثرف دثقهبهذشفهخر سفشفعس: ثطحهقثي"
 
@@ -17614,13 +17629,13 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Approved verification photos are required to earn a certificate and to take "
-"a proctored exam. It can take up to 3 days to re-verify, so please re-verify"
-" at least a week before any proctored events."
+" Please be aware photo verification can take up to three days once initiated"
+" and you will not be able to earn a certificate or take a proctored exam "
+"until approved."
 msgstr ""
-"شححقخدثي دثقهبهذشفهخر حاخفخس شقث قثضعهقثي فخ ثشقر ش ذثقفهبهذشفث شري فخ فشنث "
-"ش حقخذفخقثي ثطشو. هف ذشر فشنث عح فخ 3 يشغس فخ قث-دثقهبغ, سخ حمثشسث قث-دثقهبغ"
-" شف مثشسف ش صثثن زثبخقث شرغ حقخذفخقثي ثدثرفس."
+" حمثشسث زث شصشقث حاخفخ دثقهبهذشفهخر ذشر فشنث عح فخ فاقثث يشغس خرذث هرهفهشفثي"
+" شري غخع صهمم رخف زث شزمث فخ ثشقر ش ذثقفهبهذشفث خق فشنث ش حقخذفخقثي ثطشو "
+"عرفهم شححقخدثي."
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
 msgid "Could Not Link Accounts"
