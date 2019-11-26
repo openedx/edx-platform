@@ -37,7 +37,7 @@
 #
 # Translators:
 # Abel Camacho <abelcama@gmail.com>, 2015-2016
-# Abel Camacho <abelcama@gmail.com>, 2017
+# Abel Camacho <abelcama@gmail.com>, 2017,2019
 # Abel Camacho <abelcama@gmail.com>, 2015
 # Pedro Lonbide <plonbide@gmail.com>, 2015
 # Waheed Ahmed <waheed@edx.org>, 2019
@@ -63,7 +63,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-11-10 20:42+0000\n"
+"POT-Creation-Date: 2019-11-24 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Abel Camacho <abelcama@gmail.com>, 2019\n"
 "Language-Team: Basque (Spain) (https://www.transifex.com/open-edx/teams/6205/eu_ES/)\n"
@@ -130,7 +130,7 @@ msgstr "Hutsik"
 #: common/lib/xmodule/xmodule/video_module/video_handlers.py
 #, python-brace-format
 msgid "The following parameters are required: {missing}."
-msgstr ""
+msgstr "Ondoko parametroak beharrezkoak dira: {missing}."
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: common/lib/xmodule/xmodule/video_module/video_handlers.py
@@ -390,7 +390,8 @@ msgstr ""
 #. meant to hold the user's password.
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's password.
-#: common/djangoapps/student/admin.py openedx/core/djangoapps/user_api/api.py
+#: common/djangoapps/student/admin.py
+#: openedx/core/djangoapps/user_authn/views/login_form.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/provider_login.html
@@ -414,16 +415,20 @@ msgid_plural "%(count)d student accounts were unlocked."
 msgstr[0] ""
 msgstr[1] ""
 
-#: common/djangoapps/student/forms.py
+#: common/djangoapps/student/admin.py
+#, python-brace-format
 msgid ""
-"That e-mail address doesn't have an associated user account. Are you sure "
-"you've registered?"
+"Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' in"
+" SiteConfiguration model's values field."
 msgstr ""
 
-#: common/djangoapps/student/forms.py
-msgid ""
-"The user account associated with this e-mail address cannot reset the "
-"password."
+#: common/djangoapps/student/admin.py
+#, python-brace-format
+msgid "Email doesn't have {domain_name} domain name."
+msgstr ""
+
+#: common/djangoapps/student/admin.py
+msgid "User with this email doesn't exist in system."
 msgstr ""
 
 #: common/djangoapps/student/forms.py
@@ -753,6 +758,14 @@ msgstr ""
 msgid "Secondary email address to recover linked account."
 msgstr ""
 
+#: common/djangoapps/student/models.py
+msgid ""
+"An employee (a user whose email has current site's domain name) whose email "
+"exists in this model, can be able to login from login screen through email "
+"and password. And if any employee's email doesn't exist in this model then "
+"that employee can login via third party authentication backend only."
+msgstr ""
+
 #: common/djangoapps/student/views/dashboard.py
 msgid " and "
 msgstr "eta"
@@ -779,7 +792,7 @@ msgstr ""
 
 #: common/djangoapps/student/views/dashboard.py
 msgid "Name on ID does not match name on account"
-msgstr ""
+msgstr "Izena edo IDa ez dator bat kontuaren izenarekin"
 
 #: common/djangoapps/student/views/dashboard.py
 msgid "Learner photo not provided"
@@ -3400,7 +3413,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable Subsection Prerequisites"
-msgstr ""
+msgstr "Gaitu azpiatalaren aurrebaldintzak"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -3715,7 +3728,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Custom Parameters"
-msgstr ""
+msgstr "Pertsonalizatu parametroak"
 
 #: common/lib/xmodule/xmodule/lti_module.py
 #, python-brace-format
@@ -4652,7 +4665,7 @@ msgstr ""
 
 #: common/templates/admin/student/loginfailures/change_form_template.html
 msgid "Unlock Account"
-msgstr ""
+msgstr "Desblokeatu kontua"
 
 #. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a control to allow users to exit out of this modal
@@ -4759,7 +4772,7 @@ msgstr ""
 #: common/templates/student/edx_ace/emailchange/email/subject.txt
 #, python-format
 msgid "Request to change %(platform_name)s account e-mail"
-msgstr ""
+msgstr "%(platform_name)s-ko kontuaren e-posta aldatzeko eskaria"
 
 #: common/templates/student/edx_ace/emailchangeconfirmation/email/body.html
 #: common/templates/student/edx_ace/emailchangeconfirmation/email/subject.txt
@@ -6033,7 +6046,7 @@ msgid "Annual Household Income"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
-msgid "Use between 250 and 500 words or so in your response."
+msgid "Use between 1250 and 2500 characters or so in your response."
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
@@ -6591,7 +6604,7 @@ msgstr "Erabiltzailearen IDa"
 #. meant to hold the user's email address.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/login_form.py
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/ccx/enrollment.html
@@ -8361,7 +8374,7 @@ msgstr ""
 
 #: lms/djangoapps/support/views/index.py
 msgid "Disable User Account"
-msgstr ""
+msgstr "Desgaitu erabiltzailearen kontua"
 
 #: lms/djangoapps/support/views/index.py
 #: lms/templates/support/entitlement.html
@@ -9548,7 +9561,7 @@ msgstr "Bi berrikusketaren arteko elkarketa aurreikusten:"
 #: lms/templates/wiki/preview_inline.html
 #: wiki/templates/wiki/preview_inline.html
 msgid "This revision has been deleted."
-msgstr "Berriskuketa ezabatu egin da."
+msgstr "Berrikusketa ezabatu egin da."
 
 #: lms/templates/wiki/preview_inline.html
 #: wiki/templates/wiki/preview_inline.html
@@ -9557,7 +9570,7 @@ msgstr ""
 
 #: lms/urls.py
 msgid "LMS Administration"
-msgstr ""
+msgstr "LMSaren kudeaketa"
 
 #: openedx/core/djangoapps/ace_common/apps.py
 msgid "ACE Common"
@@ -9609,7 +9622,7 @@ msgstr ""
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Download the iOS app on the Apple Store"
-msgstr ""
+msgstr "Deskargatu IOS aplikazioa App Store-tik"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
@@ -9623,7 +9636,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_head.html
 msgid "edX Email"
-msgstr ""
+msgstr "edX e-posta"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
@@ -9637,7 +9650,7 @@ msgstr ""
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
 msgid "Upgrade Now"
-msgstr ""
+msgstr "Eguneratu orain"
 
 #: openedx/core/djangoapps/api_admin/admin.py
 #, python-brace-format
@@ -9657,11 +9670,11 @@ msgstr "Erakundearen helbidea"
 
 #: openedx/core/djangoapps/api_admin/forms.py
 msgid "Describe what your application does."
-msgstr ""
+msgstr "Deskribatu aplikazioak zer egiten duen."
 
 #: openedx/core/djangoapps/api_admin/forms.py
 msgid "The URL of your organization's website."
-msgstr ""
+msgstr "Erakundearen webgunearen URLa"
 
 #: openedx/core/djangoapps/api_admin/forms.py
 msgid "The name of your organization."
@@ -9711,10 +9724,8 @@ msgstr ""
 #: openedx/core/djangoapps/bookmarks/apps.py
 #: openedx/features/course_bookmarks/plugins.py
 #: openedx/features/course_bookmarks/views/course_bookmarks.py
-#: lms/templates/courseware/courseware.html
-#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
 msgid "Bookmarks"
-msgstr ""
+msgstr "Laster-markak"
 
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "An error has occurred. Please try again."
@@ -9722,11 +9733,11 @@ msgstr "Errorea gertatu da. Mesedez, saiatu berriz."
 
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "No data provided."
-msgstr ""
+msgstr "Ez da daturik eman."
 
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "Parameter usage_id not provided."
-msgstr ""
+msgstr "Ez da usage_id parametroa eman."
 
 #: openedx/core/djangoapps/bookmarks/views.py
 #, python-brace-format
@@ -10556,12 +10567,6 @@ msgstr ""
 msgid "The '{field_name}' field cannot be edited."
 msgstr "'{field_name}' eremua ezin da editatu."
 
-#: openedx/core/djangoapps/user_api/accounts/api.py
-#: openedx/core/djangoapps/user_authn/views/auto_auth.py
-#: openedx/core/djangoapps/user_authn/views/register.py
-msgid "Account creation not allowed."
-msgstr ""
-
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the State/Province/Region in which they
 #. live.
@@ -10657,27 +10662,6 @@ msgstr "Ondo"
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Actions"
 msgstr "Ekintzak"
-
-#. Translators: This example email address is used as a placeholder in
-#. a field on the login form meant to hold the user's email address.
-#. Translators: This example email address is used as a placeholder in
-#. a field on the password reset form meant to hold the user's email address.
-#: openedx/core/djangoapps/user_api/api.py
-#: openedx/core/djangoapps/user_authn/views/password_reset.py
-msgid "username@domain.com"
-msgstr "erabiltzaile-izena@domeinua.com"
-
-#. Translators: These instructions appear on the login form, immediately
-#. below a field meant to hold the user's email address.
-#. Translators: These instructions appear on the password reset form,
-#. immediately below a field meant to hold the user's email address.
-#. pylint: disable=no-member
-#: openedx/core/djangoapps/user_api/api.py
-#: openedx/core/djangoapps/user_authn/views/password_reset.py
-#, python-brace-format
-msgid "The email address you used to register with {platform_name}"
-msgstr ""
-"{platform_name} plataforman erregistratzeko erabili duzun e-posta helbidea"
 
 #: openedx/core/djangoapps/user_api/config/waffle.py
 msgid "System maintenance in progress. Please try again later."
@@ -10808,6 +10792,11 @@ msgstr ""
 msgid "Account modification not allowed."
 msgstr ""
 
+#: openedx/core/djangoapps/user_authn/views/auto_auth.py
+#: openedx/core/djangoapps/user_authn/views/register.py
+msgid "Account creation not allowed."
+msgstr "Ez dago baimenduta kontua sortzea."
+
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
 msgid ""
@@ -10847,8 +10836,48 @@ msgstr ""
 msgid "Too many failed login attempts. Try again later."
 msgstr "Saioa hasteko saiakera oker gehiegi. Saiatu berriz beranduago."
 
+#: openedx/core/djangoapps/user_authn/views/login.py
+#, python-brace-format
+msgid ""
+"As an {allowed_domain} user, You must login with your {allowed_domain} "
+"{provider} account."
+msgstr ""
+
+#. Translators: This example email address is used as a placeholder in
+#. a field on the login form meant to hold the user's email address.
+#. Translators: This example email address is used as a placeholder in
+#. a field on the password reset form meant to hold the user's email address.
+#: openedx/core/djangoapps/user_authn/views/login_form.py
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "username@domain.com"
+msgstr "erabiltzaile-izena@domeinua.com"
+
+#. Translators: These instructions appear on the login form, immediately
+#. below a field meant to hold the user's email address.
+#. Translators: These instructions appear on the password reset form,
+#. immediately below a field meant to hold the user's email address.
+#. pylint: disable=no-member
+#: openedx/core/djangoapps/user_authn/views/login_form.py
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+#, python-brace-format
+msgid "The email address you used to register with {platform_name}"
+msgstr ""
+"{platform_name} plataforman erregistratzeko erabili duzun e-posta helbidea"
+
 #: openedx/core/djangoapps/user_authn/views/login_form.py
 msgid "Create Account"
+msgstr "Sortu kontua"
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"The user account associated with this e-mail address cannot reset the "
+"password."
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/register.py
@@ -10984,7 +11013,7 @@ msgstr ""
 #: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
 #: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
 msgid "Dismiss"
-msgstr ""
+msgstr "Baztertu"
 
 #: openedx/core/djangoapps/verified_track_content/models.py
 msgid "The course key for the course we would like to be auto-cohorted."
@@ -12114,7 +12143,7 @@ msgstr "Ikastaro-zenbakia"
 #: cms/templates/index.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Run:"
-msgstr ""
+msgstr "Ikastaroa ematea:"
 
 #: cms/templates/index.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -12171,7 +12200,7 @@ msgstr "Pasahitza ahaztu zaizu?"
 #: cms/templates/register.html lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "example: Jane Doe"
-msgstr "adibidea: Jane Doe"
+msgstr "adibidea: Itziar Urrutia"
 
 #. Translators: This is the placeholder text for a field that asks the user to
 #. pick a username
@@ -12180,7 +12209,7 @@ msgstr "adibidea: Jane Doe"
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: JaneDoe"
-msgstr "adibidea: JaneDoe"
+msgstr "adibidea: ItziarUrrutia"
 
 #: cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
@@ -12328,7 +12357,7 @@ msgstr "Erabiltzailearen menua"
 
 #: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Usermenu dropdown"
-msgstr ""
+msgstr "Zabaltzen den erabiltzailearen menua "
 
 #: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
 #: lms/templates/header/user_dropdown.html
@@ -12418,8 +12447,8 @@ msgstr ""
 #, python-format
 msgid "%s discussion started"
 msgid_plural "%s discussions started"
-msgstr[0] "Eztabaida %s hasia"
-msgstr[1] "%s eztabaida hasia"
+msgstr[0] "Eztabaida %s hasita"
+msgstr[1] "%s eztabaida hasita"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/discussion/_user_profile.html
@@ -12431,7 +12460,7 @@ msgstr[1] "%s iruzkin"
 
 #: lms/djangoapps/discussion/templates/discussion/maintenance_fragment.html
 msgid "Discussion unavailable"
-msgstr ""
+msgstr "Eztabaida ez dago eskuragarri"
 
 #: lms/djangoapps/discussion/templates/discussion/maintenance_fragment.html
 msgid ""
@@ -12451,7 +12480,7 @@ msgstr ""
 
 #: lms/templates/_gated_content.html
 msgid "Go to Prerequisite Section"
-msgstr ""
+msgstr "Joan aurrebaldintzen atalera"
 
 #: lms/templates/annotatable.html
 msgid "Collapse Instructions"
@@ -12467,11 +12496,11 @@ msgstr "Ezkutatu oharpenak"
 
 #: lms/templates/bookmark_button.html lms/templates/seq_module.html
 msgid "Bookmarked"
-msgstr ""
+msgstr "Gogokotzat markatua"
 
 #: lms/templates/bookmark_button.html
 msgid "Bookmark this page"
-msgstr ""
+msgstr "Markatu orri hau gogokotzat"
 
 #: lms/templates/conditional_module.html
 msgid "You do not have access to this dependency module."
@@ -12539,7 +12568,7 @@ msgstr "Garbitu bilaketa"
 
 #: lms/templates/dashboard.html
 msgid "Skip to list of announcements"
-msgstr ""
+msgstr "Egin jauzi iragarki-zerrrendara"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Account Status Info"
@@ -12946,7 +12975,7 @@ msgstr "Datu gordinak:"
 
 #: lms/templates/preview_menu.html
 msgid "Course View"
-msgstr ""
+msgstr "Ikastaroaren ikuspegia"
 
 #: lms/templates/preview_menu.html
 msgid "View this course as:"
@@ -12958,11 +12987,11 @@ msgstr "Ikaslea"
 
 #: lms/templates/preview_menu.html
 msgid "Specific learner"
-msgstr ""
+msgstr "Ikasle jakin bat"
 
 #: lms/templates/preview_menu.html
 msgid "Learner in {content_group}"
-msgstr ""
+msgstr "Ikaslea hemen: {content_group}"
 
 #: lms/templates/preview_menu.html
 msgid "Username or email:"
@@ -12970,7 +12999,7 @@ msgstr "Erabiltzaie-izena edo e-posta:"
 
 #: lms/templates/preview_menu.html
 msgid "Set preview mode"
-msgstr ""
+msgstr "Ezarri aurreikusteko modua"
 
 #: lms/templates/preview_menu.html
 msgid "You are now viewing the course as {i_start}{user_name}{i_end}."
@@ -13329,7 +13358,7 @@ msgstr "adib. Zure Izena (ziurtagirietarako)"
 
 #: lms/templates/signup_modal.html
 msgid "{start_li}Welcome{end_li} {name}"
-msgstr ""
+msgstr "{start_li}Ongi etorri{end_li} {name}"
 
 #: lms/templates/signup_modal.html
 msgid "Full Name *"
@@ -13692,7 +13721,7 @@ msgstr ""
 
 #: lms/templates/video.html
 msgid "Download video file"
-msgstr ""
+msgstr "Deskargatu bideoaren fitxategia"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -14493,7 +14522,7 @@ msgstr ""
 #: lms/templates/ccx/coach_dashboard.html
 #: lms/templates/ccx/grading_policy.html
 msgid "Grading Policy"
-msgstr "Kalifikazio-politika"
+msgstr "Kalifikazio-estrategia"
 
 #: lms/templates/ccx/coach_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -14597,7 +14626,7 @@ msgstr ""
 
 #: lms/templates/ccx/grading_policy.html
 msgid "Save Grading Policy"
-msgstr "Gorde kalifikazio-politika"
+msgstr "Gorde kalifikazio-estrategia"
 
 #. Translators: This explains to people using a screen reader how to interpret
 #. the format of YYYY-MM-DD
@@ -14745,7 +14774,7 @@ msgstr ""
 
 #: lms/templates/certificates/invalid.html
 msgid "Cannot Find Certificate"
-msgstr "Ezin da ziurtagiria bilatu"
+msgstr "Ezin da ziurtagiria aurkitu"
 
 #: lms/templates/certificates/invalid.html
 msgid ""
@@ -15275,7 +15304,7 @@ msgstr "Apunteen nabigazioa"
 #: lms/templates/courseware/info.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Course Tools"
-msgstr ""
+msgstr "Ikastaroko tresnak"
 
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
@@ -15311,7 +15340,7 @@ msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Start Learning"
-msgstr ""
+msgstr "Hasi Ikasten"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Play"
@@ -15403,7 +15432,7 @@ msgstr "{course_number} aurrerapena"
 
 #: lms/templates/courseware/progress.html
 msgid "View Grading in studio"
-msgstr "Ikusi ebaluazioa studion"
+msgstr "Ikusi kalifikazioa Studio-n"
 
 #: lms/templates/courseware/progress.html
 msgid "Course Progress for '{username}' ({email})"
@@ -15724,11 +15753,11 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Started - {date}"
-msgstr ""
+msgstr "Hasita - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Starts - {date}"
-msgstr ""
+msgstr "Hasiera - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "for {course_display_name}"
@@ -15740,7 +15769,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You must select a session to access the course."
-msgstr ""
+msgstr "Saio bat aukeratu behar duzu ikastaroan sartzeko."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Change or Leave Session"
@@ -15987,10 +16016,13 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your photo verification expires on {verification_expiry}.Approved "
-"verification photos are required to earn a certificate and to take a "
-"proctored exam. It can take up to 3 days to re-verify, so please re-verify "
-"at least a week before any proctored events."
+"Your photo verification expires on {verification_expiry}. Please be aware "
+"photo verification can take up to three days once initiated and you will not"
+" be able to earn a certificate or take a proctored exam until approved."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Resubmit Verification"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
@@ -16019,10 +16051,6 @@ msgid "Your verification was denied for the following reasons:"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Resubmit Verification"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Expired"
 msgstr ""
 
@@ -16035,9 +16063,9 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Approved verification photos are required to earn a certificate and to take "
-"a proctored exam. It can take up to 3 days to re-verify, so please re-verify"
-" at least a week before any proctored events."
+" Please be aware photo verification can take up to three days once initiated"
+" and you will not be able to earn a certificate or take a proctored exam "
+"until approved."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
@@ -16236,17 +16264,17 @@ msgstr "Ordenatu:"
 #. Translators: This is a menu option for sorting forum threads
 #: lms/templates/discussion/_thread_list_template.html
 msgid "by recent activity"
-msgstr "duela gutxikoak"
+msgstr "duela gutxiko jarduera dutenak"
 
 #. Translators: This is a menu option for sorting forum threads
 #: lms/templates/discussion/_thread_list_template.html
 msgid "by most activity"
-msgstr "jarduera gehien"
+msgstr "jarduera gehien dutenak"
 
 #. Translators: This is a menu option for sorting forum threads
 #: lms/templates/discussion/_thread_list_template.html
 msgid "by most votes"
-msgstr "Bozka gehien"
+msgstr "bozka gehien dutenak"
 
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Student Notes"
@@ -17934,7 +17962,7 @@ msgstr "Matrikulazio-kodea"
 
 #: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
 msgid "Find Enrollment Code"
-msgstr ""
+msgstr "Bilatu matrikulazio-kodea"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -19487,12 +19515,12 @@ msgstr ""
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
 msgid "Search the course"
-msgstr ""
+msgstr "Bilatu ikastaroa"
 
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Start Course"
-msgstr ""
+msgstr "Hasi ikastaroa"
 
 #: lms/templates/verify_student/_verification_help.html
 msgid "Have questions?"
@@ -19619,7 +19647,7 @@ msgstr "Gehitu artikulua"
 
 #: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
 msgid "Preview Language Setting"
-msgstr ""
+msgstr "Aurreikusi hizkuntza-ezarpenak"
 
 #: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
 msgid "Language Code"
@@ -19631,7 +19659,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
 msgid "Preview Theme"
-msgstr ""
+msgstr "Aurreikusi itxura"
 
 #: openedx/core/lib/license/templates/license.html
 msgid "All Rights Reserved"
@@ -19663,7 +19691,7 @@ msgstr "Zenbait eskubide erreserbatuta"
 
 #: openedx/features/course_experience/templates/course_experience/course-dates-fragment.html
 msgid "Important Course Dates"
-msgstr ""
+msgstr "Ikastaroaren data garrantzitsuak"
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Goal: "
@@ -20394,11 +20422,11 @@ msgstr ""
 
 #: cms/templates/course-create-rerun.html
 msgid "Create a Course Rerun of:"
-msgstr ""
+msgstr "Sortu ondoko ikastaroaren beste edizio bat:"
 
 #: cms/templates/course-create-rerun.html
 msgid "Create a re-run of a course"
-msgstr ""
+msgstr "Sortu ikastaroaren beste edizio bat"
 
 #: cms/templates/course-create-rerun.html
 msgid "You are creating a re-run from:"
@@ -20488,7 +20516,7 @@ msgstr ""
 
 #: cms/templates/course-create-rerun.html
 msgid "Create Re-run"
-msgstr ""
+msgstr "Sortu ikastaroaren beste edizio bat"
 
 #: cms/templates/course-create-rerun.html
 msgid "When will my course re-run start?"
@@ -20610,11 +20638,11 @@ msgstr ""
 
 #: cms/templates/course_outline.html cms/templates/edit-tabs.html
 msgid "View Live"
-msgstr ""
+msgstr "Ikusi zuzenean"
 
 #: cms/templates/course_outline.html
 msgid "Creating your course organization"
-msgstr ""
+msgstr "Sortu zure ikastaroaren antolamendua"
 
 #: cms/templates/course_outline.html
 msgid "You add sections, subsections, and units directly in the outline."
@@ -20628,7 +20656,7 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid "Reorganizing your course"
-msgstr ""
+msgstr "Zure ikastaroa berrantolatzen"
 
 #: cms/templates/course_outline.html
 msgid "Drag sections, subsections, and units to new locations in the outline."
@@ -20933,7 +20961,7 @@ msgstr "Ikastaroaren edukia (atal, azpiatal eta unitate guztiak)"
 
 #: cms/templates/export.html
 msgid "Course Structure"
-msgstr "Ikastaro-egitura"
+msgstr "Ikastaroaren egitura"
 
 #: cms/templates/export.html
 msgid "Individual Problems"
@@ -20941,7 +20969,7 @@ msgstr ""
 
 #: cms/templates/export.html
 msgid "Course Assets"
-msgstr ""
+msgstr "Ikastaroaren baliabideak"
 
 #: cms/templates/export.html
 msgid "Course Settings"
@@ -20957,7 +20985,7 @@ msgstr "Erabiltzailearen datuak"
 
 #: cms/templates/export.html
 msgid "Course Team Data"
-msgstr ""
+msgstr "ikastaroko taldearen datuak"
 
 #: cms/templates/export.html
 msgid "Forum/discussion Data"
@@ -21017,7 +21045,7 @@ msgstr ""
 
 #: cms/templates/export.html cms/templates/import.html
 msgid "Course dates"
-msgstr ""
+msgstr "Ikastaroko datak"
 
 #: cms/templates/export.html cms/templates/import.html
 msgid "Grading policy"
@@ -21044,7 +21072,7 @@ msgstr ""
 
 #: cms/templates/export.html cms/templates/import.html
 msgid "The course team"
-msgstr ""
+msgstr "Ikastaroko taldea"
 
 #. Translators: ".tar.gz" is a file extension, and should not be translated
 #: cms/templates/export.html
@@ -22833,7 +22861,7 @@ msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Set Access"
-msgstr ""
+msgstr "Ezarri sarbidea"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
@@ -22948,7 +22976,7 @@ msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid "Select a group type"
-msgstr ""
+msgstr "Aukeratu talde-mota"
 
 #: cms/templates/visibility_editor.html
 msgid "All Learners and Staff"
@@ -22956,7 +22984,7 @@ msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid "Select one or more groups:"
-msgstr ""
+msgstr "Aukera talde bat edo gehiago"
 
 #: cms/templates/visibility_editor.html
 msgid ""
