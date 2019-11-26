@@ -6,8 +6,9 @@
         'underscore',
         'gettext',
         'teams/js/views/team_utils',
-        'text!teams/templates/team-profile-header-actions.underscore'],
-        function(Backbone, $, _, gettext, TeamUtils, teamProfileHeaderActionsTemplate) {
+        'text!teams/templates/team-profile-header-actions.underscore',
+        'edx-ui-toolkit/js/utils/html-utils'],
+        function(Backbone, $, _, gettext, TeamUtils, teamProfileHeaderActionsTemplate, HtmlUtils) {
             return Backbone.View.extend({
 
                 errorMessage: gettext('An error occurred. Try again.'),
@@ -53,12 +54,14 @@
                                 showJoinButton = true;
                             }
                         }
-
-                        view.$el.html(view.template({ // xss-lint: disable=javascript-jquery-html
-                            showJoinButton: showJoinButton,
-                            message: message,
-                            showEditButton: view.showEditButton
-                        }));
+                        HtmlUtils.setHtml(
+                            view.$el,
+                            HtmlUtils.template(teamProfileHeaderActionsTemplate)({
+                                showJoinButton: showJoinButton,
+                                message: message,
+                                showEditButton: view.showEditButton
+                            })
+                        );
                     });
                     return view;
                 },

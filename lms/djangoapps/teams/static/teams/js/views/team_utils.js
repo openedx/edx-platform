@@ -1,8 +1,8 @@
 /*  Team utility methods*/
 (function(define) {
     'use strict';
-    define(['jquery', 'underscore'],
-    function($, _) {
+    define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/string-utils'],
+    function($, _, StringUtils) {
         return {
 
             /**
@@ -20,12 +20,11 @@
             },
 
             teamCapacityText: function(memberCount, maxMemberCount) {
-                // eslint-disable-next-line no-undef
-                return interpolate( // xss-lint: disable=javascript-interpolate
+                return StringUtils.interpolate(
                     // Translators: The following message displays the number of members on a team.
                     ngettext(
-                        '%(memberCount)s / %(maxMemberCount)s Member',
-                        '%(memberCount)s / %(maxMemberCount)s Members',
+                        '{memberCount} / {maxMemberCount} Member',
+                        '{memberCount} / {maxMemberCount} Members',
                         maxMemberCount
                     ),
                     {memberCount: memberCount, maxMemberCount: maxMemberCount}, true

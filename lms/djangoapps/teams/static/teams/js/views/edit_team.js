@@ -7,8 +7,9 @@
         'js/views/fields',
         'teams/js/models/team',
         'common/js/components/utils/view_utils',
-        'text!teams/templates/edit-team.underscore'],
-        function(Backbone, _, gettext, FieldViews, TeamModel, ViewUtils, editTeamTemplate) {
+        'text!teams/templates/edit-team.underscore',
+        'edx-ui-toolkit/js/utils/html-utils'],
+        function(Backbone, _, gettext, FieldViews, TeamModel, ViewUtils, editTeamTemplate, HtmlUtils) {
             return Backbone.View.extend({
 
                 maxTeamNameLength: 255,
@@ -81,11 +82,14 @@
                 },
 
                 render: function() {
-                    this.$el.html(_.template(editTeamTemplate)({ // xss-lint: disable=javascript-jquery-html
-                        primaryButtonTitle: this.primaryButtonTitle,
-                        action: this.action,
-                        totalMembers: _.isUndefined(this.teamModel) ? 0 : this.teamModel.get('membership').length
-                    }));
+                    HtmlUtils.setHtml(
+                        this.$el,
+                        HtmlUtils.template(editTeamTemplate)({
+                            primaryButtonTitle: this.primaryButtonTitle,
+                            action: this.action,
+                            totalMembers: _.isUndefined(this.teamModel) ? 0 : this.teamModel.get('membership').length
+                        })
+                    );
                     this.set(this.teamNameField, '.team-required-fields');
                     this.set(this.teamDescriptionField, '.team-required-fields');
                     this.set(this.teamLanguageField, '.team-optional-fields');

@@ -7,8 +7,9 @@
         'edx-ui-toolkit/js/utils/string-utils',
         'teams/js/views/team_utils',
         'common/js/components/utils/view_utils',
-        'text!teams/templates/instructor-tools.underscore'],
-        function(Backbone, _, gettext, StringUtils, TeamUtils, ViewUtils, instructorToolbarTemplate) {
+        'text!teams/templates/instructor-tools.underscore',
+        'edx-ui-toolkit/js/utils/html-utils'],
+        function(Backbone, _, gettext, StringUtils, TeamUtils, ViewUtils, instructorToolbarTemplate, HtmlUtils) {
             return Backbone.View.extend({
 
                 events: {
@@ -17,13 +18,12 @@
                 },
 
                 initialize: function(options) {
-                    this.template = _.template(instructorToolbarTemplate);
                     this.team = options.team;
                     this.teamEvents = options.teamEvents;
                 },
 
                 render: function() {
-                    this.$el.html(this.template); // xss-lint: disable=javascript-jquery-html
+                    HtmlUtils.setHtml(this.$el, HtmlUtils.template(instructorToolbarTemplate)({}));
                     return this;
                 },
 
