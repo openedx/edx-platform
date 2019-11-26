@@ -99,7 +99,6 @@ pipeline {
                     post {
                         always {
                             script {
-                                createWarningsReport()
                                 pythonTestCleanup()
                             }
                         }
@@ -144,6 +143,13 @@ pipeline {
                             }
                         }
                     }
+                }
+            }
+        }
+        post {
+            always {
+                script {
+                    createWarningsReport()
                 }
             }
         }
