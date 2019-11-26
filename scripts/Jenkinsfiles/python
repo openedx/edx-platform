@@ -145,14 +145,15 @@ pipeline {
                     }
                 }
             }
-        }
-        post {
-            always {
-                script {
-                    createWarningsReport()
+            post {
+                always {
+                    script {
+                        createWarningsReport()
+                    }
                 }
             }
         }
+        
         stage('Run coverage') {
             environment {
                 CODE_COV_TOKEN = credentials('CODE_COV_TOKEN')
