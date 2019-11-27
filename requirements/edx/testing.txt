@@ -124,7 +124,7 @@ edx-django-release-util==0.3.2
 edx-django-sites-extensions==2.3.1
 edx-django-utils==2.0.2
 edx-drf-extensions==2.4.5
-edx-enterprise==2.0.26
+edx-enterprise==2.0.27
 edx-i18n-tools==0.4.8
 edx-lint==1.3.0
 edx-milestones==0.2.5
@@ -206,7 +206,7 @@ moto==1.3.1
 mpmath==1.1.0
 mysqlclient==1.4.6
 networkx==1.7
-newrelic==5.2.3.131
+newrelic==5.4.0.132
 nltk==3.4.5
 nodeenv==1.3.3
 numpy==1.16.5
@@ -236,7 +236,7 @@ pycparser==2.19
 pycryptodome==3.9.4
 pycryptodomex==3.4.7
 pyflakes==2.1.1           # via flake8
-pygments==2.4.2
+pygments==2.5.1
 pygraphviz==1.5
 pyjwkest==1.3.2
 pyjwt==1.5.2
@@ -335,4 +335,4 @@ xss-utils==0.1.2
 zipp==0.6.0
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools==42.0.1        # via caniusepython3, fs, lazy, pytest, python-levenshtein
+# setuptools
