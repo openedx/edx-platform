@@ -16,24 +16,6 @@ from .transformers import SUPPORTED_FIELDS
 
 DATE_FIELD = Date()
 
-# This lists the names of all fields that are allowed
-# to be show to users who do not have access to a particular piece
-# of content
-FIELDS_ALLOWED_IN_AUTH_DENIED_CONTENT = [
-    "display_name",
-    "block_id",
-    "student_view_url",
-    "student_view_multi_device",
-    "lms_web_url",
-    "type",
-    "id",
-    "block_counts",
-    "graded",
-    "descendants",
-    "authorization_denial_reason",
-    "authorization_denial_message",
-]
-
 
 class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
