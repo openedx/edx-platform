@@ -355,7 +355,7 @@ def jump_to(_request, course_id, location):
     except InvalidKeyError:
         raise Http404(u"Invalid course_key or usage_key")
     try:
-        redirect_url = get_redirect_url(course_key, usage_key)
+        redirect_url = get_redirect_url(course_key, usage_key, _request)
     except ItemNotFoundError:
         raise Http404(u"No data at this location: {0}".format(usage_key))
     except NoPathToItem:
