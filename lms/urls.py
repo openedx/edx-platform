@@ -155,6 +155,7 @@ if settings.FEATURES.get('ENABLE_OPENBADGES'):
 
 urlpatterns += [
     url(r'^openassessment/fileupload/', include('openassessment.fileupload.urls')),
+    url(r'^openassessment/pusher/', include('openassessment.pusher.urls')),
 ]
 
 
