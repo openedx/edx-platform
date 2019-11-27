@@ -4,6 +4,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext_lazy as _
 
 from lms.djangoapps.onboarding.models import Organization
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
@@ -94,8 +95,7 @@ class Give2AsiaAccountCreationForm(forms.Form):
                     raise ValidationError("Unauthorized email address.")
         if email_exists_or_retired(email):
             raise ValidationError(
-                "It looks like {email} belongs to an existing account. Try again with a different email address."
-                    .format(email=email)
+                _("Looks like that email address is taken. Try a different one.")
             )
         return email
 

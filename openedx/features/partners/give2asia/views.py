@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models.signals import post_save
 from django.http import Http404
+from rest_framework import status
 from django.utils.translation import get_language
 from edxmako.shortcuts import render_to_response
 from eventtracking import tracker
@@ -26,6 +27,7 @@ from openedx.features.partners.models import PartnerUser
 
 from lms.djangoapps.philu_overrides.user_api.views import RegistrationViewCustom
 from lms.djangoapps.onboarding.models import EmailPreference, Organization, UserExtendedProfile
+from philu_overrides.user_api.views import LoginSessionViewCustom
 from nodebb.helpers import update_nodebb_for_user_status, set_user_activation_status_on_nodebb
 from student.models import Registration, UserProfile
 
@@ -38,7 +40,8 @@ AUDIT_LOG = logging.getLogger("audit")
 
 def dashboard(request, partner_slug):
     courses = get_partner_recommended_courses(partner_slug)
-    return render_to_response('features/partners/g2a/dashboard.html', {'recommended_courses': courses})
+    return render_to_response('features/partners/g2a/dashboard.html', {'recommended_courses': courses,
+                                                                       'slug': partner_slug})
 
 
 class Give2AsiaRegistrationView(RegistrationViewCustom):
@@ -250,3 +253,24 @@ def create_account_with_params_custom(request, params, partner):
         AUDIT_LOG.info(u"Login success on new account creation - {0}".format(new_user.username))
 
     return new_user
+
+
+class LoginSessionViewG2A(LoginSessionViewCustom):
+    """
+    Inherited from LoginSessionViewCustom to keep the existing flow for login
+    and extend the functionality to affiliate the user with Give2Asia if not already done
+    """
+
+    def post(self, request, partner):
+
+        response = super(LoginSessionViewG2A, self).post(request)
+
+        if response.status_code == status.HTTP_200_OK:
+            user = request.user
+            try:
+                PartnerUser.objects.get_or_create(partner=partner, user=user)
+            except Exception as ex:
+                log.error("Failed to affiliate {user} with {partner} due to exception {exp}".format(
+                    user=user.username, partner=partner.slug, exp=ex.message)
+                )
+        return response

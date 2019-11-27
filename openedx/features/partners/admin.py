@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import reverse
 
-from .models import Partner
+from .models import Partner, PartnerUser
 
 
 class PartnerAdmin(admin.ModelAdmin):
@@ -17,4 +17,9 @@ class PartnerAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Partner, PartnerAdmin)
+
+"""
+Django admin model to verify if user is affiliated with partner or not after login or registration  
+"""
+admin.site.register(PartnerUser)
 

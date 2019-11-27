@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from lms.djangoapps.teams.models import CourseTeamMembership
+from lms.djangoapps.teams.models import CourseTeamMembership, CourseTeam
 from nodebb.constants import (
     COMMUNITY_ID_SPLIT_INDEX,
     TEAM_PLAYER_ENTRY_INDEX,
@@ -131,9 +131,14 @@ class UserBadge(models.Model):
         if is_team_badge:
             team = TeamGroupChat.objects.filter(room_id=community_id).exclude(slug='').first()
 
-            if(not team):
+            if not team:
                 raise Exception('No discussion community or team with id {}'.format(community_id))
 
+            course_id_dict = CourseTeam.objects.filter(id=team.team_id).values('course_id').first()
+            if not course_id_dict:
+                raise Exception('Cannot assign badge {} for team {} in unknown course'.format(badge_id, community_id))
+
+            course_id = course_id_dict['course_id']
             all_team_members = CourseTeamMembership.objects.filter(team_id=team.team_id)
 
             for member in all_team_members:
