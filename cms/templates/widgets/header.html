@@ -21,7 +21,7 @@
       % if context_course:
       <%
             course_key = context_course.id
-            url_encoded_course_key = quote(six.text_type(course_key), safe='')
+            url_encoded_course_key = quote(six.text_type(course_key).encode('utf-8'), safe='')
             index_url = reverse('course_handler', kwargs={'course_key_string': six.text_type(course_key)})
             course_team_url = reverse('course_team_handler', kwargs={'course_key_string': six.text_type(course_key)})
             assets_url = reverse('assets_handler', kwargs={'course_key_string': six.text_type(course_key)})
