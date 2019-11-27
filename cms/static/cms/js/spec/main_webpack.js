@@ -22,7 +22,6 @@ window.edx.StringUtils = StringUtils;
 import './xblock/cms.runtime.v1_spec.js';
 import '../../../js/spec/factories/xblock_validation_spec.js';
 import '../../../js/spec/views/container_spec.js';
-import '../../../js/spec/views/login_studio_spec.js';
 import '../../../js/spec/views/modals/edit_xblock_spec.js';
 import '../../../js/spec/views/module_edit_spec.js';
 import '../../../js/spec/views/move_xblock_spec.js';

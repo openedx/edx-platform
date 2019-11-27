@@ -506,7 +506,10 @@ ENABLE_COMPREHENSIVE_THEMING = True
 
 LMS_ROOT_URL = "http://localhost:8000"
 
-FRONTEND_LOGOUT_URL = LMS_ROOT_URL + '/logout'
+# Needed for derived settings used by cms only.
+FRONTEND_LOGIN_URL = '/login'
+FRONTEND_LOGOUT_URL = '/logout'
+FRONTEND_REGISTER_URL = '/register'
 
 ECOMMERCE_API_URL = 'https://ecommerce.example.com/api/v2/'
 ECOMMERCE_PUBLIC_URL_ROOT = None

@@ -92,11 +92,12 @@ class MaintenanceViewAccessTests(MaintenanceViewTestCase):
 
         # Expect a redirect to the login page
         redirect_url = '{login_url}?next={original_url}'.format(
-            login_url=reverse('login'),
+            login_url=settings.LOGIN_URL,
             original_url=url,
         )
 
-        self.assertRedirects(response, redirect_url)
+        # Studio login redirects to LMS login
+        self.assertRedirects(response, redirect_url, target_status_code=302)
 
     @ddt.data(*MAINTENANCE_URLS)
     def test_global_staff_access(self, url):
