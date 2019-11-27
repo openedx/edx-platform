@@ -450,9 +450,7 @@ def enterprise_customer_for_request(request):
     if 'enterprise_customer' in request.session:
         return enterprise_customer_from_cache(request=request)
     else:
-        enterprise_customer = enterprise_customer_from_api(request)
-        request.session['enterprise_customer'] = enterprise_customer
-        return enterprise_customer
+        return enterprise_customer_from_api(request)
 
 
 @enterprise_is_enabled(otherwise=False)
