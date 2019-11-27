@@ -83,17 +83,6 @@ class ProgramListingPageTest(ProgramPageBase):
 
         self.listing_page = ProgramListingPage(self.browser)
 
-    def test_no_enrollments(self):
-        """Verify that no cards appear when the user has no enrollments."""
-        self.auth(enroll=False)
-        self.stub_catalog_api(self.programs, self.pathways)
-        self.cache_programs()
-
-        self.listing_page.visit()
-
-        self.assertTrue(self.listing_page.is_sidebar_present)
-        self.assertFalse(self.listing_page.are_cards_present)
-
     def test_no_programs(self):
         """
         Verify that no cards appear when the user has enrollments
