@@ -12,7 +12,7 @@ from django.conf import settings
 from django.contrib.auth import login as django_login
 from django.contrib.auth.models import User
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied
-from django.core.validators import ValidationError, validate_email
+from django.core.validators import ValidationError
 from django.db import transaction
 from django.dispatch import Signal
 from django.http import HttpResponse, HttpResponseForbidden
@@ -53,9 +53,10 @@ from openedx.core.djangoapps.user_authn.utils import generate_password
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.views.registration_form import (
-    get_registration_extension_form, RegistrationFormFactory
+    get_registration_extension_form,
+    AccountCreationForm,
+    RegistrationFormFactory
 )
-from student.forms import AccountCreationForm
 from student.helpers import (
     authenticate_new_user,
     create_or_set_user_attribute_created_on_site,

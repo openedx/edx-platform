@@ -64,7 +64,6 @@ from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.message_types import PasswordReset
 from openedx.core.djangolib.markup import HTML, Text
-from student.forms import AccountCreationForm
 from student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info, generate_activation_email_context
 from student.message_types import AccountActivation, EmailChange, EmailChangeConfirmation, RecoveryEmailCreate
 from student.models import (
