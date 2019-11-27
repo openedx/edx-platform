@@ -144,7 +144,6 @@ class EnterpriseServiceMockMixin(object):
 
     def mock_enterprise_learner_api(
             self,
-            catalog_id=1,
             entitlement_id=1,
             learner_id=1,
             enterprise_customer_uuid='cf246b88-d5f6-4908-a522-fc307e0b0c59',
@@ -163,7 +162,6 @@ class EnterpriseServiceMockMixin(object):
                     'enterprise_customer': {
                         'uuid': enterprise_customer_uuid,
                         'name': 'TestShib',
-                        'catalog': catalog_id,
                         'active': True,
                         'site': {
                             'domain': 'example.com',

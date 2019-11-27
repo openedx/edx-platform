@@ -6,12 +6,12 @@ from __future__ import absolute_import, unicode_literals
 from datetime import datetime, timedelta
 
 import ddt
+from django.conf import settings
 from mock import patch
 from pytz import UTC
 
 from course_modes.models import CourseMode
 from course_modes.signals import _listen_for_course_publish
-from django.conf import settings
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

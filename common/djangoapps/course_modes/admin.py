@@ -181,6 +181,8 @@ class CourseModeAdmin(admin.ModelAdmin):
     """Admin for course modes"""
     form = CourseModeForm
 
+    raw_id_fields = ['course']
+
     fields = (
         'course',
         'mode_slug',

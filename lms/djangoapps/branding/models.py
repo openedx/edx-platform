@@ -5,6 +5,8 @@ Includes:
     BrandingInfoConfig: A ConfigurationModel for managing how Video Module will
         use Branding.
 """
+from __future__ import absolute_import
+
 import json
 
 from config_models.models import ConfigurationModel
@@ -31,7 +33,7 @@ class BrandingInfoConfig(ConfigurationModel):
         app_label = "branding"
 
     configuration = TextField(
-        help_text="JSON data of Configuration for Video Branding."
+        help_text=u"JSON data of Configuration for Video Branding."
     )
 
     def clean(self):

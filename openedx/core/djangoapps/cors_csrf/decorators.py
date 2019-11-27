@@ -1,4 +1,6 @@
 """Decorators for cross-domain CSRF. """
+from __future__ import absolute_import
+
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 

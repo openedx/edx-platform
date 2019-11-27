@@ -1,35 +1,40 @@
 """
 Declaration of CourseOverview model
 """
+from __future__ import absolute_import
+
 import json
 import logging
-from urlparse import urlparse, urlunparse
 
+import six
+from ccx_keys.locator import CCXLocator
+from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.db import models, transaction
-from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField, IntegerField
+from django.db.models.fields import BooleanField, DateTimeField, DecimalField, FloatField, IntegerField, TextField
 from django.db.utils import IntegrityError
 from django.template import defaultfilters
-
-from ccx_keys.locator import CCXLocator
+from django.utils.encoding import python_2_unicode_compatible
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
-from six import text_type
+from six import text_type  # pylint: disable=ungrouped-imports
+from six.moves.urllib.parse import urlparse, urlunparse  # pylint: disable=import-error
+from simple_history.models import HistoricalRecords
 
-from config_models.models import ConfigurationModel
 from lms.djangoapps.discussion import django_comment_client
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from static_replace.models import AssetBaseUrlConfig
-from xmodule import course_metadata_utils, block_metadata_utils
-from xmodule.course_module import CourseDescriptor, DEFAULT_START_DATE
+from xmodule import block_metadata_utils, course_metadata_utils
+from xmodule.course_module import DEFAULT_START_DATE, CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
 
+@python_2_unicode_compatible
 class CourseOverview(TimeStampedModel):
     """
     Model for storing and caching basic information about a course.
@@ -56,7 +61,7 @@ class CourseOverview(TimeStampedModel):
     # Course identification
     id = CourseKeyField(db_index=True, primary_key=True, max_length=255)
     _location = UsageKeyField(max_length=255)
-    org = TextField(max_length=255, default='outdated_entry')
+    org = TextField(max_length=255, default=u'outdated_entry')
     display_name = TextField(null=True)
     display_number_with_default = TextField()
     display_org_with_default = TextField()
@@ -108,6 +113,8 @@ class CourseOverview(TimeStampedModel):
 
     language = TextField(null=True)
 
+    history = HistoricalRecords()
+
     @classmethod
     def _create_or_update(cls, course):
         """
@@ -149,10 +156,10 @@ class CourseOverview(TimeStampedModel):
 
         course_overview = cls.objects.filter(id=course.id)
         if course_overview.exists():
-            log.info(u'Updating course overview for %s.', unicode(course.id))
+            log.info(u'Updating course overview for %s.', six.text_type(course.id))
             course_overview = course_overview.first()
         else:
-            log.info(u'Creating course overview for %s.', unicode(course.id))
+            log.info(u'Creating course overview for %s.', six.text_type(course.id))
             course_overview = cls()
 
         course_overview.version = cls.VERSION
@@ -260,11 +267,30 @@ class CourseOverview(TimeStampedModel):
             elif course is not None:
                 raise IOError(
                     u"Error while loading course {} from the module store: {}",
-                    unicode(course_id),
-                    course.error_msg if isinstance(course, ErrorDescriptor) else unicode(course)
+                    six.text_type(course_id),
+                    course.error_msg if isinstance(course, ErrorDescriptor) else six.text_type(course)
                 )
             else:
                 raise cls.DoesNotExist()
+
+    @classmethod
+    def course_exists(cls, course_id):
+        """
+        Check whether a course run exists (in CourseOverviews _or_ modulestore).
+
+        Checks the CourseOverview table first.
+        If it is not there, check the modulestore.
+        Equivalent to, but more efficient than:
+            bool(CourseOverview.get_from_id(course_id))
+
+        Arguments:
+            course_id (CourseKey)
+
+        Returns: bool
+        """
+        if cls.objects.filter(id=course_id).exists():
+            return True
+        return modulestore().has_course(course_id)
 
     @classmethod
     def get_from_id(cls, course_id):
@@ -554,7 +580,7 @@ class CourseOverview(TimeStampedModel):
             except Exception as ex:  # pylint: disable=broad-except
                 log.exception(
                     u'An error occurred while generating course overview for %s: %s',
-                    unicode(course_key),
+                    six.text_type(course_key),
                     text_type(ex),
                 )
 
@@ -579,7 +605,7 @@ class CourseOverview(TimeStampedModel):
             # In rare cases, courses belonging to the same org may be accidentally assigned
             # an org code with a different casing (e.g., Harvardx as opposed to HarvardX).
             # Case-insensitive matching allows us to deal with this kind of dirty data.
-            course_overviews = course_overviews.filter(org__iregex=r'(' + '|'.join(orgs) + ')')
+            course_overviews = course_overviews.filter(org__iregex=r'(^' + '$|^'.join(orgs) + '$)')
 
         if filter_:
             course_overviews = course_overviews.filter(**filter_)
@@ -699,11 +725,11 @@ class CourseOverview(TimeStampedModel):
         if netloc:
             return url
 
-        return urlunparse((None, base_url, path, params, query, fragment))
+        return urlunparse(('', base_url, path, params, query, fragment))
 
-    def __unicode__(self):
+    def __str__(self):
         """Represent ourselves with the course key."""
-        return unicode(self.id)
+        return six.text_type(self.id)
 
 
 class CourseOverviewTab(models.Model):
@@ -716,6 +742,7 @@ class CourseOverviewTab(models.Model):
     course_overview = models.ForeignKey(CourseOverview, db_index=True, related_name="tabs", on_delete=models.CASCADE)
 
 
+@python_2_unicode_compatible
 class CourseOverviewImageSet(TimeStampedModel):
     """
     Model for Course overview images. Each column is an image type/size.
@@ -788,8 +815,8 @@ class CourseOverviewImageSet(TimeStampedModel):
     """
     course_overview = models.OneToOneField(CourseOverview, db_index=True, related_name="image_set",
                                            on_delete=models.CASCADE)
-    small_url = models.TextField(blank=True, default="")
-    large_url = models.TextField(blank=True, default="")
+    small_url = models.TextField(blank=True, default=u"")
+    large_url = models.TextField(blank=True, default=u"")
 
     @classmethod
     def create(cls, course_overview, course=None):
@@ -852,12 +879,13 @@ class CourseOverviewImageSet(TimeStampedModel):
             #          to unsaved related object 'course_overview'.")
             pass
 
-    def __unicode__(self):
+    def __str__(self):
         return u"CourseOverviewImageSet({}, small_url={}, large_url={})".format(
             self.course_overview_id, self.small_url, self.large_url
         )
 
 
+@python_2_unicode_compatible
 class CourseOverviewImageConfig(ConfigurationModel):
     """
     This sets the size of the thumbnail images that Course Overviews will generate
@@ -887,7 +915,30 @@ class CourseOverviewImageConfig(ConfigurationModel):
         """Tuple for large image dimensions in pixels -- (width, height)"""
         return (self.large_width, self.large_height)
 
-    def __unicode__(self):
+    def __str__(self):
         return u"CourseOverviewImageConfig(enabled={}, small={}, large={})".format(
             self.enabled, self.small, self.large
         )
+
+
+@python_2_unicode_compatible
+class SimulateCoursePublishConfig(ConfigurationModel):
+    """
+    Manages configuration for a run of the simulate_publish management command.
+
+    .. no_pii:
+    """
+
+    class Meta(object):
+        app_label = 'course_overviews'
+        verbose_name = 'simulate_publish argument'
+
+    arguments = models.TextField(
+        blank=True,
+        help_text=u'Useful for manually running a Jenkins job. Specify like "--delay 10 --receivers A B C \
+        --courses X Y Z".',
+        default=u'',
+    )
+
+    def __str__(self):
+        return six.text_type(self.arguments)

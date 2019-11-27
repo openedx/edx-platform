@@ -859,7 +859,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         course_key = self.fill_in_run(course_key)
         parent_cache = self._get_parent_cache(self.get_branch_setting())
 
-        while to_process and depth is None or depth >= 0:
+        while to_process and (depth is None or depth >= 0):
             children = []
             for item in to_process:
                 self._clean_item_data(item)

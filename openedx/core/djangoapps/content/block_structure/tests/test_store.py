@@ -87,6 +87,6 @@ class TestBlockStructureStore(UsageKeyFactoryMixin, ChildrenMapTestMixin, CacheI
         else:
             timeout = BlockStructureConfiguration.DEFAULT_CACHE_TIMEOUT_IN_SECONDS
 
-        self.assertEquals(self.mock_cache.timeout_from_last_call, 0)
+        assert self.mock_cache.timeout_from_last_call == 0
         self.store.add(self.block_structure)
-        self.assertEquals(self.mock_cache.timeout_from_last_call, timeout)
+        assert self.mock_cache.timeout_from_last_call == timeout

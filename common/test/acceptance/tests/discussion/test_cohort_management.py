@@ -3,11 +3,17 @@
 End-to-end tests related to the cohort management on the LMS Instructor Dashboard
 """
 
+from __future__ import absolute_import
+
 import os
+import os.path
 import uuid
+import csv
+import unicodecsv
+import six
+
 from datetime import datetime
 
-import unicodecsv
 from bok_choy.promise import EmptyPromise
 from pytz import UTC, utc
 
@@ -319,7 +325,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         """
         filename = self.instructor_dashboard_page.get_asset_path(filename)
         with open(filename, 'w+') as csv_file:
-            writer = unicodecsv.writer(csv_file)
+            writer = csv.writer(csv_file) if six.PY3 else unicodecsv.writer(csv_file)
             for line in csv_text_as_lists:
                 writer.writerow(line)
         self.addCleanup(os.remove, filename)
@@ -331,21 +337,6 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         unique_username = 'user' + str(uuid.uuid4().hex)[:12]
         unique_email = unique_username + "@example.com"
         return unique_username, unique_email
-
-    def test_add_new_cohort(self):
-        """
-        Scenario: A new manual cohort can be created, and a student assigned to it.
-
-        Given I have a course with a user in the course
-        When I add a new manual cohort to the course via the LMS instructor dashboard
-        Then the new cohort is displayed and has no users in it
-        And assignment type of displayed cohort to "manual" because this is the default
-        And when I add the user to the new cohort
-        Then the cohort has 1 user
-        And appropriate events have been emitted
-        """
-        cohort_name = str(uuid.uuid4().get_hex()[0:20])
-        self._verify_cohort_settings(cohort_name=cohort_name, assignment_type=None)
 
     def test_add_new_cohort_with_manual_assignment_type(self):
         """
@@ -359,7 +350,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         Then the cohort has 1 user
         And appropriate events have been emitted
         """
-        cohort_name = str(uuid.uuid4().get_hex()[0:20])
+        cohort_name = str(uuid.uuid4().hex[0:20])
         self._verify_cohort_settings(cohort_name=cohort_name, assignment_type='manual')
 
     def test_add_new_cohort_with_random_assignment_type(self):
@@ -374,7 +365,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         Then the cohort has 1 user
         And appropriate events have been emitted
         """
-        cohort_name = str(uuid.uuid4().get_hex()[0:20])
+        cohort_name = str(uuid.uuid4().hex[0:20])
         self._verify_cohort_settings(cohort_name=cohort_name, assignment_type='random')
 
     def test_update_existing_cohort_settings(self):
@@ -394,7 +385,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         And cohort with new name is present in cohorts dropdown list
         And cohort assignment type should be "manual"
         """
-        cohort_name = str(uuid.uuid4().get_hex()[0:20])
+        cohort_name = str(uuid.uuid4().hex[0:20])
         new_cohort_name = '{old}__NEW'.format(old=cohort_name)
         self._verify_cohort_settings(
             cohort_name=cohort_name,
@@ -420,7 +411,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         And I click on Save button
         Then I should see an error message
         """
-        cohort_name = str(uuid.uuid4().get_hex()[0:20])
+        cohort_name = str(uuid.uuid4().hex[0:20])
         new_cohort_name = ''
         self._verify_cohort_settings(
             cohort_name=cohort_name,

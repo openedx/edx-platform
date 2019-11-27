@@ -1,19 +1,23 @@
 """
 Tests for course_overviews app.
 """
-from cStringIO import StringIO
+from __future__ import absolute_import
+
 import datetime
-import ddt
 import itertools
 import math
+from six import BytesIO
+
+import ddt
 import mock
 import pytz
-
+import six
 from django.conf import settings
 from django.db.utils import IntegrityError
 from django.test.utils import override_settings
 from django.utils import timezone
 from PIL import Image
+from six.moves import range  # pylint: disable=ungrouped-imports
 
 from lms.djangoapps.certificates.api import get_active_web_certificate
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
@@ -23,13 +27,13 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.lib.courses import course_image_url
 from static_replace.models import AssetBaseUrlConfig
 from xmodule.assetstore.assetmgr import AssetManager
-from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 from xmodule.course_module import (
-    CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
     CATALOG_VISIBILITY_ABOUT,
-    CATALOG_VISIBILITY_NONE,
+    CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
+    CATALOG_VISIBILITY_NONE
 )
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
@@ -37,7 +41,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 
-from ..models import CourseOverview, CourseOverviewImageSet, CourseOverviewImageConfig
+from ..models import CourseOverview, CourseOverviewImageConfig, CourseOverviewImageSet
 from .factories import CourseOverviewFactory
 
 
@@ -318,6 +322,37 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         with self.assertRaises(CourseOverview.DoesNotExist):
             CourseOverview.get_from_id(store.make_course_key('Non', 'Existent', 'Course'))
 
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_course_with_course_overview_exists(self, modulestore_type):
+        """
+        Tests that calling course_exists on an existent course
+        that is cached in CourseOverview table returns True.
+        """
+        course = CourseFactory.create(default_store=modulestore_type)
+        CourseOverview.get_from_id(course.id)  # Ensure course in cached in CourseOverviews
+        self.assertTrue(CourseOverview.objects.filter(id=course.id).exists())
+        self.assertTrue(CourseOverview.course_exists(course.id))
+
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_course_without_overview_exists(self, modulestore_type):
+        """
+        Tests that calling course_exists on an existent course
+        that is NOT cached in CourseOverview table returns True.
+        """
+        course = CourseFactory.create(default_store=modulestore_type)
+        CourseOverview.objects.filter(id=course.id).delete()
+        self.assertTrue(CourseOverview.course_exists(course.id))
+        self.assertFalse(CourseOverview.objects.filter(id=course.id).exists())
+
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_nonexistent_course_does_not_exists(self, modulestore_type):
+        """
+        Tests that calling course_exists on an non-existent course returns False.
+        """
+        store = modulestore()._get_modulestore_by_type(modulestore_type)  # pylint: disable=protected-access
+        course_id = store.make_course_key('Non', 'Existent', 'Course')
+        self.assertFalse(CourseOverview.course_exists(course_id))
+
     def test_get_errored_course(self):
         """
         Test that getting an ErrorDescriptor back from the module store causes
@@ -472,7 +507,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         org_courses = []  # list of lists of courses
         for index in range(3):
             org_courses.append([
-                CourseFactory.create(org='test_org_' + unicode(index), emit_signals=True)
+                CourseFactory.create(org='test_org_' + six.text_type(index), emit_signals=True)
                 for __ in range(3)
             ])
 
@@ -575,7 +610,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
         """
         # Create a source image...
         image = Image.new('RGB', (800, 400), 'blue')
-        image_buff = StringIO()
+        image_buff = BytesIO()
         image.save(image_buff, format='PNG')
         image_buff.seek(0)
 
@@ -808,7 +843,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
         """
         # Create a real (oversized) image...
         image = Image.new("RGB", (800, 400), "blue")
-        image_buff = StringIO()
+        image_buff = BytesIO()
         image.save(image_buff, format="JPEG")
         image_buff.seek(0)
         image_name = "big_course_image.jpeg"
@@ -853,7 +888,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
             for image_url, expected_size in [(image_urls['small'], config.small), (image_urls['large'], config.large)]:
                 image_key = StaticContent.get_location_from_path(image_url)
                 image_content = AssetManager.find(image_key)
-                image = Image.open(StringIO(image_content.data))
+                image = Image.open(BytesIO(image_content.data))
                 self.assertEqual(image.size, expected_size)
 
     @ddt.data(
@@ -885,7 +920,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
         """
         # Create a source image...
         image = Image.new("RGB", src_dimensions, "blue")
-        image_buff = StringIO()
+        image_buff = BytesIO()
         image.save(image_buff, format="PNG")
         image_buff.seek(0)
         image_name = "src_course_image.png"
@@ -905,7 +940,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
         for image_url, target in [(image_urls['small'], config.small), (image_urls['large'], config.large)]:
             image_key = StaticContent.get_location_from_path(image_url)
             image_content = AssetManager.find(image_key)
-            image = Image.open(StringIO(image_content.data))
+            image = Image.open(BytesIO(image_content.data))
 
             # Naming convention for thumbnail
             self.assertTrue(image_url.endswith('src_course_image-png-{}x{}.jpg'.format(*target)))

@@ -1,6 +1,7 @@
 """
 Base integration test for provider implementations.
 """
+from __future__ import absolute_import
 
 import json
 import unittest
@@ -20,8 +21,9 @@ from social_django import utils as social_utils
 from social_django import views as social_views
 
 from lms.djangoapps.commerce.tests import TEST_API_URL
-from openedx.core.djangoapps.user_authn.views.deprecated import signin_user, create_account, register_user
 from openedx.core.djangoapps.user_authn.views.login import login_user
+from openedx.core.djangoapps.user_authn.views.login_form import login_and_registration_form
+from openedx.core.djangoapps.user_authn.views.register import RegistrationView
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context
 from student import models as student_models
@@ -29,6 +31,10 @@ from student.tests.factories import UserFactory
 
 from third_party_auth import middleware, pipeline
 from third_party_auth.tests import testutil
+
+
+def create_account(request):
+    return RegistrationView().post(request)
 
 
 class HelperMixin(object):
@@ -61,18 +67,21 @@ class HelperMixin(object):
         assertions based on the provider's implementation; if you want more
         assertions in your test, override this method.
         """
-        self.assertEqual(200, response.status_code)
         # Check that the correct provider was selected.
-        self.assertIn(
-            u'successfully signed in with <strong>%s</strong>' % self.provider.name,
-            response.content.decode(response.charset)
+        self.assertContains(
+            response,
+            u'"errorMessage": null'
+        )
+        self.assertContains(
+            response,
+            u'"currentProvider": "{}"'.format(self.provider.name),
         )
         # Expect that each truthy value we've prepopulated the register form
         # with is actually present.
         form_field_data = self.provider.get_register_form_data(pipeline_kwargs)
         for prepopulated_form_data in form_field_data:
             if prepopulated_form_data in required_fields:
-                self.assertIn(form_field_data[prepopulated_form_data], response.content.decode('utf-8'))
+                self.assertContains(response, form_field_data[prepopulated_form_data])
 
     # pylint: disable=invalid-name
     def assert_account_settings_context_looks_correct(self, context, duplicate=False, linked=None):
@@ -115,39 +124,39 @@ class HelperMixin(object):
     def assert_json_failure_response_is_inactive_account(self, response):
         """Asserts failure on /login for inactive account looks right."""
         self.assertEqual(200, response.status_code)  # Yes, it's a 200 even though it's a failure.
-        payload = json.loads(response.content)
+        payload = json.loads(response.content.decode('utf-8'))
         self.assertFalse(payload.get('success'))
         self.assertIn('In order to sign in, you need to activate your account.', payload.get('value'))
 
     def assert_json_failure_response_is_missing_social_auth(self, response):
         """Asserts failure on /login for missing social auth looks right."""
-        self.assertEqual(403, response.status_code)
-        self.assertIn(
+        self.assertContains(
+            response,
             u"successfully signed in to your %s account, but this account isn&#39;t linked" % self.provider.name,
-            response.content.decode(response.charset)
+            status_code=403,
         )
 
     def assert_json_failure_response_is_username_collision(self, response):
         """Asserts the json response indicates a username collision."""
-        self.assertEqual(400, response.status_code)
-        payload = json.loads(response.content)
+        self.assertEqual(409, response.status_code)
+        payload = json.loads(response.content.decode('utf-8'))
         self.assertFalse(payload.get('success'))
-        self.assertIn('belongs to an existing account', payload.get('value'))
+        self.assertIn('belongs to an existing account', payload['username'][0]['user_message'])
 
-    def assert_json_success_response_looks_correct(self, response):
+    def assert_json_success_response_looks_correct(self, response, verify_redirect_url):
         """Asserts the json response indicates success and redirection."""
         self.assertEqual(200, response.status_code)
-        payload = json.loads(response.content)
+        payload = json.loads(response.content.decode('utf-8'))
         self.assertTrue(payload.get('success'))
-        self.assertEqual(pipeline.get_complete_url(self.provider.backend_name), payload.get('redirect_url'))
+        if verify_redirect_url:
+            self.assertEqual(pipeline.get_complete_url(self.provider.backend_name), payload.get('redirect_url'))
 
     def assert_login_response_before_pipeline_looks_correct(self, response):
         """Asserts a GET of /login not in the pipeline looks correct."""
-        self.assertEqual(200, response.status_code)
         # The combined login/registration page dynamically generates the login button,
         # but we can still check that the provider name is passed in the data attribute
         # for the container element.
-        self.assertIn(self.provider.name, response.content)
+        self.assertContains(response, self.provider.name)
 
     def assert_login_response_in_pipeline_looks_correct(self, response):
         """Asserts a GET of /login in the pipeline looks correct."""
@@ -185,11 +194,10 @@ class HelperMixin(object):
 
     def assert_register_response_before_pipeline_looks_correct(self, response):
         """Asserts a GET of /register not in the pipeline looks correct."""
-        self.assertEqual(200, response.status_code)
         # The combined login/registration page dynamically generates the register button,
         # but we can still check that the provider name is passed in the data attribute
         # for the container element.
-        self.assertIn(self.provider.name, response.content)
+        self.assertContains(response, self.provider.name)
 
     def assert_social_auth_does_not_exist_for_user(self, user, strategy):
         """Asserts a user does not have an auth with the expected provider."""
@@ -287,7 +295,6 @@ class HelperMixin(object):
         """Creates user, profile, registration, and (usually) social auth.
 
         This synthesizes what happens during /register.
-        See student.views.register and student.helpers.do_create_account.
         """
         response_data = self.get_response_data()
         uid = strategy.request.backend.get_user_id(response_data, response_data)
@@ -488,8 +495,7 @@ class IntegrationTestMixin(testutil.TestCase, test.TestCase, HelperMixin):
     def _check_login_or_register_page(self, url, url_to_return):
         """ Shared logic for _check_login_page() and _check_register_page() """
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(self.PROVIDER_NAME, response.content)
+        self.assertContains(response, self.PROVIDER_NAME)
         context_data = response.context['data']['third_party_auth']
         provider_urls = {provider['id']: provider[url_to_return] for provider in context_data['providers']}
         self.assertIn(self.PROVIDER_ID, provider_urls)
@@ -544,7 +550,6 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         actions.do_complete(request.backend, social_views._do_login,  # pylint: disable=protected-access
                             request=request)
 
-        signin_user(strategy.request)
         login_user(strategy.request)
         actions.do_complete(request.backend, social_views._do_login,  # pylint: disable=protected-access
                             request=request)
@@ -601,7 +606,6 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
                             request=request)
 
         with self._patch_edxmako_current_request(strategy.request):
-            signin_user(strategy.request)
             login_user(strategy.request)
             actions.do_complete(request.backend, social_views._do_login, user=user,  # pylint: disable=protected-access
                                 request=request)
@@ -668,7 +672,6 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
                             request=request)
 
         with self._patch_edxmako_current_request(strategy.request):
-            signin_user(strategy.request)
             login_user(strategy.request)
             actions.do_complete(request.backend, social_views._do_login,  # pylint: disable=protected-access
                                 user=user, request=request)
@@ -713,12 +716,12 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         # At this point we know the pipeline has resumed correctly. Next we
         # fire off the view that displays the login form and posts it via JS.
         with self._patch_edxmako_current_request(strategy.request):
-            self.assert_login_response_in_pipeline_looks_correct(signin_user(strategy.request))
+            self.assert_login_response_in_pipeline_looks_correct(login_user(strategy.request))
 
         # Next, we invoke the view that handles the POST, and expect it
         # redirects to /auth/complete. In the browser ajax handlers will
         # redirect the user to the dashboard; we invoke it manually here.
-        self.assert_json_success_response_looks_correct(login_user(strategy.request))
+        self.assert_json_success_response_looks_correct(login_user(strategy.request), verify_redirect_url=True)
 
         # We should be redirected back to the complete page, setting
         # the "logged in" cookie for the marketing site.
@@ -809,7 +812,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         # fire off the view that displays the registration form.
         with self._patch_edxmako_current_request(request):
             self.assert_register_response_in_pipeline_looks_correct(
-                register_user(strategy.request),
+                login_and_registration_form(strategy.request, initial_mode='register'),
                 pipeline.get(request)['kwargs'],
                 ['name', 'username', 'email']
             )
@@ -831,7 +834,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         # ...but when we invoke create_account the existing edX view will make
         # it, but not social auths. The pipeline creates those later.
         with self._patch_edxmako_current_request(strategy.request):
-            self.assert_json_success_response_looks_correct(create_account(strategy.request))
+            self.assert_json_success_response_looks_correct(create_account(strategy.request), verify_redirect_url=False)
         # We've overridden the user's password, so authenticate() with the old
         # value won't work:
         created_user = self.get_user_by_email(strategy, email)
@@ -884,7 +887,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
 
         with self._patch_edxmako_current_request(request):
             self.assert_register_response_in_pipeline_looks_correct(
-                register_user(strategy.request),
+                login_and_registration_form(strategy.request, initial_mode='register'),
                 pipeline.get(request)['kwargs'],
                 ['name', 'username', 'email']
             )
@@ -934,7 +937,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
             strategy.request.POST['password'] = 'bad_' + password if success is False else password
 
         self.assert_pipeline_running(strategy.request)
-        payload = json.loads(login_user(strategy.request).content)
+        payload = json.loads(login_user(strategy.request).content.decode('utf-8'))
 
         if success is None:
             # Request malformed -- just one of email/password given.

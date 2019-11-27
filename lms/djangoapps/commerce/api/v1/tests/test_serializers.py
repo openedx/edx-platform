@@ -1,4 +1,6 @@
 """ Commerce API v1 serializer tests. """
+from __future__ import absolute_import
+
 from django.test import TestCase
 
 from ..serializers import serializers, validate_course_id

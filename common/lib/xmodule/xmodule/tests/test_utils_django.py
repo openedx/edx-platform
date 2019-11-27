@@ -1,6 +1,9 @@
 """Tests for methods defined in util/django.py"""
-from xmodule.util.xmodule_django import get_current_request, get_current_request_hostname
+from __future__ import absolute_import
+
 from unittest import TestCase
+
+from xmodule.util.xmodule_django import get_current_request, get_current_request_hostname
 
 
 class UtilDjangoTests(TestCase):

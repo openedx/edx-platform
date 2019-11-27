@@ -7,6 +7,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from collections import namedtuple
 import json
+import six
 
 import ddt
 from fs.memoryfs import MemoryFS
@@ -113,7 +114,7 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         Assert content has/hasn't all the bookmark info.
         """
         assertion('bookmark_id', content)
-        assertion('{},{}'.format(self.username, unicode(self.vertical.location)), content)
+        assertion('{},{}'.format(self.username, six.text_type(self.vertical.location)), content)
         assertion('bookmarked', content)
         assertion('show_bookmark_button', content)
 

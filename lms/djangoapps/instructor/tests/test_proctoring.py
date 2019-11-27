@@ -2,15 +2,17 @@
 Unit tests for Edx Proctoring feature flag in new instructor dashboard.
 """
 
+from __future__ import absolute_import
+
+import ddt
 from django.apps import apps
 from django.conf import settings
 from django.urls import reverse
+from edx_proctoring.api import create_exam
+from edx_proctoring.backends.tests.test_backend import TestBackendProvider
 from mock import patch
 from six import text_type
 
-import ddt
-from edx_proctoring.api import create_exam
-from edx_proctoring.backends.tests.test_backend import TestBackendProvider
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -133,7 +135,7 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         self.setup_course(True, True)
         response = self.client.get(self.url)
         # the default backend does not support the review dashboard
-        self.assertNotIn('Review Dashboard', response.content)
+        self.assertNotContains(response, 'Review Dashboard')
 
         backend = TestBackendProvider()
         config = apps.get_app_config('edx_proctoring')
@@ -146,7 +148,7 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
                 backend='test',
             )
             response = self.client.get(self.url)
-            self.assertIn('Review Dashboard', response.content)
+            self.assertContains(response, 'Review Dashboard')
 
     def _assert_proctoring_tab_available(self, available):
         """
@@ -154,5 +156,5 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         """
         func = self.assertIn if available else self.assertNotIn
         response = self.client.get(self.url)
-        func(self.proctoring_link, response.content)
-        func('proctoring-wrapper', response.content)
+        func(self.proctoring_link, response.content.decode('utf-8'))
+        func('proctoring-wrapper', response.content.decode('utf-8'))

@@ -2,10 +2,13 @@
 """
 End-to-end tests for the courseware unit bookmarks.
 """
+from __future__ import absolute_import
+
 import json
 from unittest import skip
 
 import requests
+from six.moves import range
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common import BASE_URL

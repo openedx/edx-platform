@@ -1,7 +1,7 @@
 """
 Tests for the course grading API view
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import json
 from collections import OrderedDict, namedtuple
@@ -18,6 +18,7 @@ from rest_framework.test import APITestCase
 from six import text_type
 
 from course_modes.models import CourseMode
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory
 from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
 from lms.djangoapps.grades.constants import GradeOverrideFeatureEnum
@@ -28,14 +29,10 @@ from lms.djangoapps.grades.models import (
     BlockRecordList,
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride,
-    PersistentSubsectionGradeOverrideHistory,
+    PersistentCourseGrade,
 )
 from lms.djangoapps.grades.rest_api.v1.tests.mixins import GradeViewTestMixin
 from lms.djangoapps.grades.rest_api.v1.views import CourseEnrollmentPagination
-from lms.djangoapps.certificates.models import (
-    GeneratedCertificate,
-    CertificateStatuses,
-)
 from lms.djangoapps.grades.subsection_grade import ReadSubsectionGrade
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
@@ -199,6 +196,7 @@ class CourseGradingViewTest(SharedModuleStoreTestCase, APITestCase):
                 },
             ],
             'grades_frozen': False,
+            'can_see_bulk_management': False,
         }
 
     def test_student_fails(self):
@@ -389,15 +387,15 @@ class GradebookViewTest(GradebookViewTestBase):
             ),
         }
 
-    def get_url(self, course_key=None, username=None, username_contains=None):  # pylint: disable=arguments-differ
+    def get_url(self, course_key=None, username=None, user_contains=None):  # pylint: disable=arguments-differ
         """
         Helper function to create the course gradebook API read url.
         """
         base_url = super(GradebookViewTest, self).get_url(course_key)
         if username:
             return "{0}?username={1}".format(base_url, username)
-        if username_contains:
-            return "{0}?username_contains={1}".format(base_url, username_contains)
+        if user_contains:
+            return "{0}?user_contains={1}".format(base_url, user_contains)
         return base_url
 
     @staticmethod
@@ -468,22 +466,32 @@ class GradebookViewTest(GradebookViewTestBase):
 
     def _assert_data_all_users(self, response):
         """
-        Helper method to assert that self.student and self.other_student
-        have the expected gradebook data.
+        Helper method to assert that self.student, self.other_student, and
+        self.program_student have the expected gradebook data.
         """
         expected_results = [
             OrderedDict([
                 ('user_id', self.student.id),
                 ('username', self.student.username),
+                ('email', ''),
                 ('percent', 0.85),
                 ('section_breakdown', self.expected_subsection_grades()),
             ]),
             OrderedDict([
                 ('user_id', self.other_student.id),
                 ('username', self.other_student.username),
+                ('email', ''),
                 ('percent', 0.45),
                 ('section_breakdown', self.expected_subsection_grades()),
             ]),
+            OrderedDict([
+                ('user_id', self.program_student.id),
+                ('username', self.program_student.username),
+                ('email', ''),
+                ('external_user_key', 'program_user_key_0'),
+                ('percent', 0.75),
+                ('section_breakdown', self.expected_subsection_grades()),
+            ])
         ]
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
@@ -569,6 +577,7 @@ class GradebookViewTest(GradebookViewTestBase):
             mock_grade.side_effect = [
                 self.mock_course_grade(self.student, passed=True, percent=0.85),
                 self.mock_course_grade(self.other_student, passed=False, percent=0.45),
+                self.mock_course_grade(self.program_student, passed=True, percent=0.75)
             ]
 
             with override_waffle_flag(self.waffle_flag, active=True):
@@ -595,6 +604,7 @@ class GradebookViewTest(GradebookViewTestBase):
                 expected_results = OrderedDict([
                     ('user_id', self.student.id),
                     ('username', self.student.username),
+                    ('email', ''),
                     ('percent', 0.85),
                     ('section_breakdown', self.expected_subsection_grades()),
                 ])
@@ -677,6 +687,7 @@ class GradebookViewTest(GradebookViewTestBase):
                 expected_results = OrderedDict([
                     ('user_id', self.student.id),
                     ('username', self.student.username),
+                    ('email', ''),
                     ('percent', 0.85),
                     ('section_breakdown', self.expected_subsection_grades()),
                 ])
@@ -686,11 +697,107 @@ class GradebookViewTest(GradebookViewTestBase):
                 self.assertEqual(expected_results, actual_data)
 
     @ddt.data(
-        'login_staff',
-        'login_course_admin',
-        'login_course_staff',
+        ['login_staff', 4],
+        ['login_course_admin', 5],
+        ['login_course_staff', 5]
     )
-    def test_gradebook_data_filter_username_contains(self, login_method):
+    @ddt.unpack
+    def test_gradebook_data_filter_username_contains(self, login_method, num_enrollments):
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
+            mock_grade.return_value = self.mock_course_grade(
+                self.program_student, passed=True, percent=0.75
+            )
+
+            with override_waffle_flag(self.waffle_flag, active=True):
+                getattr(self, login_method)()
+
+                # check username contains "program"
+                resp = self.client.get(
+                    self.get_url(course_key=self.course.id, user_contains='program')
+                )
+                expected_results = [
+                    OrderedDict([
+                        ('user_id', self.program_student.id),
+                        ('username', self.program_student.username),
+                        ('email', ''),
+                        ('external_user_key', 'program_user_key_0'),
+                        ('percent', 0.75),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ]),
+                    OrderedDict([
+                        ('user_id', self.program_masters_student.id),
+                        ('username', self.program_masters_student.username),
+                        ('email', self.program_masters_student.email),
+                        ('external_user_key', 'program_user_key_0'),
+                        ('percent', 0.75),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ]),
+                ]
+
+                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                actual_data = dict(resp.data)
+                self.assertIsNone(actual_data['next'])
+                self.assertIsNone(actual_data['previous'])
+                self.assertEqual(expected_results, actual_data['results'])
+
+                self.assertEqual(actual_data['total_users_count'], num_enrollments)
+                self.assertEqual(actual_data['filtered_users_count'], 2)
+
+    @ddt.data(
+        ['login_staff', 4],
+        ['login_course_admin', 5],
+        ['login_course_staff', 5]
+    )
+    @ddt.unpack
+    def test_gradebook_data_filter_masters_track_username_contains(self, login_method, num_enrollments):
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
+            mock_grade.return_value = self.mock_course_grade(
+                self.program_masters_student, passed=True, percent=0.75
+            )
+
+            # need to create a masters track enrollment, which should return email
+            with override_waffle_flag(self.waffle_flag, active=True):
+                getattr(self, login_method)()
+
+                # check username contains "program"
+                resp = self.client.get(
+                    self.get_url(course_key=self.course.id, user_contains='program')
+                )
+                expected_results = [
+                    OrderedDict([
+                        ('user_id', self.program_student.id),
+                        ('username', self.program_student.username),
+                        ('email', ''),
+                        ('external_user_key', 'program_user_key_0'),
+                        ('percent', 0.75),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ]),
+                    OrderedDict([
+                        ('user_id', self.program_masters_student.id),
+                        ('username', self.program_masters_student.username),
+                        ('email', self.program_masters_student.email),
+                        ('external_user_key', 'program_user_key_0'),
+                        ('percent', 0.75),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ]),
+                ]
+
+                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                actual_data = dict(resp.data)
+                self.assertIsNone(actual_data['next'])
+                self.assertIsNone(actual_data['previous'])
+                self.assertEqual(expected_results, actual_data['results'])
+
+                self.assertEqual(actual_data['total_users_count'], num_enrollments)
+                self.assertEqual(actual_data['filtered_users_count'], 2)
+
+    @ddt.data(
+        ['login_staff', 4],
+        ['login_course_admin', 5],
+        ['login_course_staff', 5]
+    )
+    @ddt.unpack
+    def test_gradebook_data_filter_email_contains(self, login_method, num_enrollments):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
             mock_grade.return_value = self.mock_course_grade(
                 self.other_student, passed=True, percent=0.85
@@ -698,13 +805,16 @@ class GradebookViewTest(GradebookViewTestBase):
 
             with override_waffle_flag(self.waffle_flag, active=True):
                 getattr(self, login_method)()
+
+                # check email contains "like"
                 resp = self.client.get(
-                    self.get_url(course_key=self.course.id, username_contains='other')
+                    self.get_url(course_key=self.course.id, user_contains='like')
                 )
                 expected_results = [
                     OrderedDict([
                         ('user_id', self.other_student.id),
                         ('username', self.other_student.username),
+                        ('email', ''),
                         ('percent', 0.85),
                         ('section_breakdown', self.expected_subsection_grades()),
                     ]),
@@ -716,12 +826,62 @@ class GradebookViewTest(GradebookViewTestBase):
                 self.assertIsNone(actual_data['previous'])
                 self.assertEqual(expected_results, actual_data['results'])
 
+                self.assertEqual(actual_data['total_users_count'], num_enrollments)
+                self.assertEqual(actual_data['filtered_users_count'], 1)
+
+    @ddt.data(
+        ['login_staff', 4],
+        ['login_course_admin', 5],
+        ['login_course_staff', 5]
+    )
+    @ddt.unpack
+    def test_gradebook_data_filter_external_user_key_contains(self, login_method, num_enrollments):
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
+            mock_grade.return_value = self.mock_course_grade(
+                self.program_student, passed=True, percent=0.75
+            )
+
+            with override_waffle_flag(self.waffle_flag, active=True):
+                getattr(self, login_method)()
+
+                # check external user key contains "key"
+                resp = self.client.get(
+                    self.get_url(course_key=self.course.id, user_contains='key')
+                )
+
+                expected_results = [
+                    OrderedDict([
+                        ('user_id', self.program_student.id),
+                        ('username', self.program_student.username),
+                        ('email', ''),
+                        ('external_user_key', 'program_user_key_0'),
+                        ('percent', 0.75),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ]),
+                    OrderedDict([
+                        ('user_id', self.program_masters_student.id),
+                        ('username', self.program_masters_student.username),
+                        ('email', self.program_masters_student.email),
+                        ('external_user_key', 'program_user_key_0'),
+                        ('percent', 0.75),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ]),
+                ]
+
+                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                actual_data = dict(resp.data)
+                self.assertIsNone(actual_data['next'])
+                self.assertIsNone(actual_data['previous'])
+                self.assertEqual(expected_results, actual_data['results'])
+                self.assertEqual(actual_data['total_users_count'], num_enrollments)
+                self.assertEqual(actual_data['filtered_users_count'], 2)
+
     @ddt.data(
         'login_staff',
         'login_course_admin',
         'login_course_staff',
     )
-    def test_gradebook_data_filter_username_contains_no_match(self, login_method):
+    def test_gradebook_data_filter_user_contains_no_match(self, login_method):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
             mock_grade.return_value = self.mock_course_grade(
                 self.other_student, passed=True, percent=0.85
@@ -730,16 +890,17 @@ class GradebookViewTest(GradebookViewTestBase):
             with override_waffle_flag(self.waffle_flag, active=True):
                 getattr(self, login_method)()
                 resp = self.client.get(
-                    self.get_url(course_key=self.course.id, username_contains='fooooooooooooooooo')
+                    self.get_url(course_key=self.course.id, user_contains='fooooooooooooooooo')
                 )
                 self._assert_empty_response(resp)
 
     @ddt.data(
-        'login_staff',
-        'login_course_admin',
-        'login_course_staff',
+        ['login_staff', 4],
+        ['login_course_admin', 5],
+        ['login_course_staff', 5]
     )
-    def test_filter_cohort_id_and_enrollment_mode(self, login_method):
+    @ddt.unpack
+    def test_filter_cohort_id_and_enrollment_mode(self, login_method, num_enrollments):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
             mock_grade.return_value = self.mock_course_grade(self.student, passed=True, percent=0.85)
 
@@ -757,6 +918,7 @@ class GradebookViewTest(GradebookViewTestBase):
                     OrderedDict([
                         ('user_id', self.student.id),
                         ('username', self.student.username),
+                        ('email', ''),
                         ('percent', 0.85),
                         ('section_breakdown', self.expected_subsection_grades()),
                     ]),
@@ -767,6 +929,8 @@ class GradebookViewTest(GradebookViewTestBase):
                 self.assertIsNone(actual_data['next'])
                 self.assertIsNone(actual_data['previous'])
                 self.assertEqual(expected_results, actual_data['results'])
+                self.assertEqual(actual_data['total_users_count'], num_enrollments)
+                self.assertEqual(actual_data['filtered_users_count'], 1)
 
     @ddt.data(
         'login_staff',
@@ -786,15 +950,17 @@ class GradebookViewTest(GradebookViewTestBase):
                 self._assert_empty_response(resp)
 
     @ddt.data(
-        'login_staff',
-        'login_course_admin',
-        'login_course_staff',
+        ['login_staff', 5, 3],
+        ['login_course_admin', 6, 4],
+        ['login_course_staff', 6, 4],
     )
-    def test_filter_enrollment_mode(self, login_method):
+    @ddt.unpack
+    def test_filter_enrollment_mode(self, login_method, num_enrollments, num_filtered_enrollments):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
             mock_grade.side_effect = [
                 self.mock_course_grade(self.student, passed=True, percent=0.85),
                 self.mock_course_grade(self.other_student, passed=False, percent=0.45),
+                self.mock_course_grade(self.program_student, passed=True, percent=0.75),
             ]
 
             # Enroll a verified student, for whom data should not be returned.
@@ -812,6 +978,10 @@ class GradebookViewTest(GradebookViewTestBase):
                 )
 
                 self._assert_data_all_users(resp)
+                actual_data = dict(resp.data)
+
+                self.assertEqual(actual_data['total_users_count'], num_enrollments)
+                self.assertEqual(actual_data['filtered_users_count'], num_filtered_enrollments)
 
     @ddt.data(
         'login_staff',
@@ -823,6 +993,7 @@ class GradebookViewTest(GradebookViewTestBase):
             mock_grade.side_effect = [
                 self.mock_course_grade(self.student, passed=True, percent=0.85),
                 self.mock_course_grade(self.other_student, passed=False, percent=0.45),
+                self.mock_course_grade(self.program_student, passed=True, percent=0.75),
             ]
 
             with override_waffle_flag(self.waffle_flag, active=True):
@@ -860,6 +1031,248 @@ class GradebookViewTest(GradebookViewTestBase):
                 if expected_page_size > user_size:
                     expected_page_size = user_size
                 self.assertEqual(len(actual_data['results']), expected_page_size)
+
+    @ddt.data(
+        ['login_staff', 4],
+        ['login_course_admin', 5],
+        ['login_course_staff', 5]
+    )
+    @ddt.unpack
+    def test_filter_course_grade_min(self, login_method, num_enrollments):
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
+            # even though we're creating actual PersistentCourseGrades below, we still need
+            # mocked subsection grades
+            mock_grade.side_effect = [
+                self.mock_course_grade(self.student, passed=True, percent=0.85),
+                self.mock_course_grade(self.program_student, passed=True, percent=0.75),
+            ]
+
+            PersistentCourseGrade(
+                user_id=self.student.id,
+                course_id=self.course_key,
+                percent_grade=0.85
+            ).save()
+            PersistentCourseGrade(
+                user_id=self.other_student.id,
+                course_id=self.course_key,
+                percent_grade=0.45
+            ).save()
+            PersistentCourseGrade(
+                user_id=self.program_student.id,
+                course_id=self.course_key,
+                percent_grade=0.75
+            ).save()
+
+            with override_waffle_flag(self.waffle_flag, active=True):
+                getattr(self, login_method)()
+                resp = self.client.get(
+                    self.get_url(course_key=self.course.id) + '?course_grade_min=50'
+                )
+
+                expected_results = [
+                    OrderedDict([
+                        ('user_id', self.student.id),
+                        ('username', self.student.username),
+                        ('email', ''),
+                        ('percent', 0.85),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ]),
+                    OrderedDict([
+                        ('user_id', self.program_student.id),
+                        ('username', self.program_student.username),
+                        ('email', ''),
+                        ('external_user_key', 'program_user_key_0'),
+                        ('percent', 0.75),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ])
+                ]
+
+                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                actual_data = dict(resp.data)
+                self.assertEqual(expected_results, actual_data['results'])
+                self.assertEqual(actual_data['total_users_count'], num_enrollments)
+                self.assertEqual(actual_data['filtered_users_count'], 2)
+
+    @ddt.data(
+        ['login_staff', 4],
+        ['login_course_admin', 5],
+        ['login_course_staff', 5]
+    )
+    @ddt.unpack
+    def test_filter_course_grade_min_and_max(self, login_method, num_enrollments):
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
+            # even though we're creating actual PersistentCourseGrades below, we still need
+            # mocked subsection grades
+            mock_grade.side_effect = [
+                self.mock_course_grade(self.program_student, passed=True, percent=0.75),
+            ]
+
+            PersistentCourseGrade(
+                user_id=self.student.id,
+                course_id=self.course_key,
+                percent_grade=0.85
+            ).save()
+            PersistentCourseGrade(
+                user_id=self.other_student.id,
+                course_id=self.course_key,
+                percent_grade=0.45
+            ).save()
+            PersistentCourseGrade(
+                user_id=self.program_student.id,
+                course_id=self.course_key,
+                percent_grade=0.75
+            ).save()
+
+            with override_waffle_flag(self.waffle_flag, active=True):
+                getattr(self, login_method)()
+                resp = self.client.get(
+                    self.get_url(course_key=self.course.id) + '?course_grade_min=50&course_grade_max=80'
+                )
+
+                expected_results = [
+                    OrderedDict([
+                        ('user_id', self.program_student.id),
+                        ('username', self.program_student.username),
+                        ('email', ''),
+                        ('external_user_key', 'program_user_key_0'),
+                        ('percent', 0.75),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ]),
+                ]
+
+                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                actual_data = dict(resp.data)
+                self.assertEqual(expected_results, actual_data['results'])
+                self.assertEqual(actual_data['total_users_count'], num_enrollments)
+                self.assertEqual(actual_data['filtered_users_count'], 1)
+
+    @ddt.data(
+        ['login_staff', 4],
+        ['login_course_admin', 5],
+        ['login_course_staff', 5]
+    )
+    @ddt.unpack
+    def test_filter_course_grade_absent_with_min(self, login_method, num_enrollments):
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
+            # even though we're creating actual PersistentCourseGrades below, we still need
+            # mocked subsection grades
+            mock_grade.side_effect = [
+                self.mock_course_grade(self.student, passed=True, percent=0.0),
+                self.mock_course_grade(self.other_student, passed=False, percent=0.45),
+                self.mock_course_grade(self.program_student, passed=True, percent=0.75),
+            ]
+
+            PersistentCourseGrade(
+                user_id=self.other_student.id,
+                course_id=self.course_key,
+                percent_grade=0.45
+            ).save()
+            PersistentCourseGrade(
+                user_id=self.program_student.id,
+                course_id=self.course_key,
+                percent_grade=0.75
+            ).save()
+
+            with override_waffle_flag(self.waffle_flag, active=True):
+                getattr(self, login_method)()
+                resp = self.client.get(
+                    self.get_url(course_key=self.course.id) + '?course_grade_min=0'
+                )
+
+                expected_results = [
+                    OrderedDict([
+                        ('user_id', self.student.id),
+                        ('username', self.student.username),
+                        ('email', ''),
+                        ('percent', 0.0),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ]),
+                    OrderedDict([
+                        ('user_id', self.other_student.id),
+                        ('username', self.other_student.username),
+                        ('email', ''),
+                        ('percent', 0.45),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ]),
+                    OrderedDict([
+                        ('user_id', self.program_student.id),
+                        ('username', self.program_student.username),
+                        ('email', ''),
+                        ('external_user_key', 'program_user_key_0'),
+                        ('percent', 0.75),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ])
+                ]
+
+                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                actual_data = dict(resp.data)
+                self.assertEqual(expected_results, actual_data['results'])
+                self.assertEqual(actual_data['total_users_count'], num_enrollments)
+                self.assertEqual(actual_data['filtered_users_count'], num_enrollments)
+
+    @ddt.data(
+        ['login_staff', 4],
+        ['login_course_admin', 5],
+        ['login_course_staff', 5]
+    )
+    @ddt.unpack
+    def test_filter_course_grade_absent_without_min(self, login_method, num_enrollments):
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
+            # even though we're creating actual PersistentCourseGrades below, we still need
+            # mocked subsection grades
+            mock_grade.side_effect = [
+                self.mock_course_grade(self.student, passed=True, percent=0.0),
+                self.mock_course_grade(self.other_student, passed=False, percent=0.45),
+                self.mock_course_grade(self.program_student, passed=True, percent=0.75),
+            ]
+
+            PersistentCourseGrade(
+                user_id=self.other_student.id,
+                course_id=self.course_key,
+                percent_grade=0.45
+            ).save()
+            PersistentCourseGrade(
+                user_id=self.program_student.id,
+                course_id=self.course_key,
+                percent_grade=0.75
+            ).save()
+
+            with override_waffle_flag(self.waffle_flag, active=True):
+                getattr(self, login_method)()
+                resp = self.client.get(
+                    self.get_url(course_key=self.course.id) + '?course_grade_max=80'
+                )
+
+                expected_results = [
+                    OrderedDict([
+                        ('user_id', self.student.id),
+                        ('username', self.student.username),
+                        ('email', ''),
+                        ('percent', 0.0),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ]),
+                    OrderedDict([
+                        ('user_id', self.other_student.id),
+                        ('username', self.other_student.username),
+                        ('email', ''),
+                        ('percent', 0.45),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ]),
+                    OrderedDict([
+                        ('user_id', self.program_student.id),
+                        ('username', self.program_student.username),
+                        ('email', ''),
+                        ('external_user_key', 'program_user_key_0'),
+                        ('percent', 0.75),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ])
+                ]
+
+                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                actual_data = dict(resp.data)
+                self.assertEqual(expected_results, actual_data['results'])
+                self.assertEqual(actual_data['total_users_count'], num_enrollments)
+                self.assertEqual(actual_data['filtered_users_count'], num_enrollments)
 
 
 @ddt.ddt
@@ -1167,14 +1580,6 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
                     expected_value = getattr(expected_grades, field_name)
                     self.assertEqual(expected_value, getattr(grade, field_name))
 
-            update_records = PersistentSubsectionGradeOverrideHistory.objects.filter(user=request_user)
-            self.assertEqual(update_records.count(), 3)
-            for audit_item in update_records:
-                self.assertEqual(audit_item.user, request_user)
-                self.assertIsNotNone(audit_item.created)
-                self.assertEqual(audit_item.feature, GradeOverrideFeatureEnum.gradebook)
-                self.assertEqual(audit_item.action, PersistentSubsectionGradeOverrideHistory.CREATE_OR_UPDATE)
-
     def test_update_failing_grade(self):
         """
         Test that when we update a user's grade to failing, their certificate is marked notpassing
@@ -1239,7 +1644,8 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         cls.record_b = BlockRecord(locator=cls.locator_b, weight=1, raw_possible=10, graded=True)
         cls.block_records = BlockRecordList([cls.record_a, cls.record_b], cls.course_key)
         cls.usage_key = cls.subsections[cls.chapter_1.location][0].location
-        cls.user_id = 12345
+        cls.user = UserFactory.create()
+        cls.user_id = cls.user.id
         cls.params = {
             "user_id": cls.user_id,
             "usage_key": cls.usage_key,
@@ -1266,6 +1672,54 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         )
         return "{0}?user_id={1}".format(base_url, user_id or self.user_id)
 
+    @patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.create')
+    @ddt.data(
+        'login_staff',
+        'login_course_admin',
+        'login_course_staff',
+    )
+    def test_no_grade(self, login_method, mocked_factory):
+        getattr(self, login_method)()
+        user_no_grade = UserFactory.create()
+        all_total_mock = MagicMock(
+            earned=1,
+            possible=2,
+        )
+        graded_total_mock = MagicMock(
+            earned=3,
+            possible=4,
+        )
+        mock_return_value = MagicMock(
+            all_total=all_total_mock,
+            graded_total=graded_total_mock
+        )
+        mocked_factory.return_value = mock_return_value
+        with self.assertRaises(PersistentSubsectionGrade.DoesNotExist):
+            PersistentSubsectionGrade.objects.get(
+                user_id=user_no_grade.id,
+                course_id=self.usage_key.course_key,
+                usage_key=self.usage_key
+            )
+
+        resp = self.client.get(
+            self.get_url(subsection_id=self.usage_key, user_id=user_no_grade.id)
+        )
+
+        expected_data = {
+            'original_grade': OrderedDict([
+                ('earned_all', 1.0),
+                ('possible_all', 2.0),
+                ('earned_graded', 3.0),
+                ('possible_graded', 4.0)
+            ]),
+            'user_id': user_no_grade.id,
+            'override': None,
+            'course_id': text_type(self.usage_key.course_key),
+            'subsection_id': text_type(self.usage_key),
+            'history': []
+        }
+        self.assertEqual(expected_data, resp.data)
+
     @ddt.data(
         'login_staff',
         'login_course_admin',
@@ -1285,7 +1739,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
                 ('earned_graded', 6.0),
                 ('possible_graded', 8.0)
             ]),
-            'user_id': 12345,
+            'user_id': self.user_id,
             'override': None,
             'course_id': text_type(self.course_key),
             'subsection_id': text_type(self.usage_key),
@@ -1299,7 +1753,8 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         'login_course_admin',
         'login_course_staff',
     )
-    def test_with_override_no_history(self, login_method):
+    @freeze_time('2019-01-01')
+    def test_with_override_no_modification(self, login_method):
         getattr(self, login_method)()
 
         override = PersistentSubsectionGradeOverride.objects.create(
@@ -1321,7 +1776,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
                 ('earned_graded', 6.0),
                 ('possible_graded', 8.0)
             ]),
-            'user_id': 12345,
+            'user_id': self.user_id,
             'override': OrderedDict([
                 ('earned_all_override', 0.0),
                 ('possible_all_override', 12.0),
@@ -1330,10 +1785,25 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
             ]),
             'course_id': text_type(self.course_key),
             'subsection_id': text_type(self.usage_key),
-            'history': []
+            'history': [OrderedDict([
+                ('created', '2019-01-01T00:00:00Z'),
+                ('grade_id', 1),
+                ('history_id', 1),
+                ('earned_all_override', 0.0),
+                ('earned_graded_override', 0.0),
+                ('override_reason', None),
+                ('system', None),
+                ('history_date', '2019-01-01T00:00:00Z'),
+                ('history_type', u'+'),
+                ('history_user', None),
+                ('history_user_id', None),
+                ('id', 1),
+                ('possible_all_override', 12.0),
+                ('possible_graded_override', 8.0),
+            ])],
         }
 
-        self.assertEqual(expected_data, resp.data)
+        assert expected_data == resp.data
 
     @ddt.data(
         'login_staff',
@@ -1363,7 +1833,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
                 ('earned_graded', 6.0),
                 ('possible_graded', 8.0)
             ]),
-            'user_id': 12345,
+            'user_id': self.user_id,
             'override': OrderedDict([
                 ('earned_all_override', 0.0),
                 ('possible_all_override', 12.0),
@@ -1372,16 +1842,46 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
             ]),
             'course_id': text_type(self.course_key),
             'subsection_id': text_type(self.usage_key),
-            'history': [{
-                'user': self.global_staff.username,
-                'comments': None,
-                'created': '2019-01-01T00:00:00Z',
-                'feature': 'GRADEBOOK',
-                'action': 'CREATEORUPDATE'
-            }]
+            'history': [OrderedDict([
+                ('created', '2019-01-01T00:00:00Z'),
+                ('grade_id', 1),
+                ('history_id', 1),
+                ('earned_all_override', 0.0),
+                ('earned_graded_override', 0.0),
+                ('override_reason', None),
+                ('system', None),
+                ('history_date', '2019-01-01T00:00:00Z'),
+                ('history_type', u'+'),
+                ('history_user', self.global_staff.username),
+                ('history_user_id', self.global_staff.id),
+                ('id', 1),
+                ('possible_all_override', 12.0),
+                ('possible_graded_override', 8.0),
+            ])],
         }
 
-        self.assertEqual(expected_data, resp.data)
+        assert expected_data == resp.data
+
+    def test_comment_appears(self):
+        """
+        Test that comments passed (e.g. from proctoring) appear in the history rows
+        """
+        proctoring_failure_fake_comment = "Failed Test Proctoring"
+        self.login_course_staff()
+        override = PersistentSubsectionGradeOverride.update_or_create_override(
+            requesting_user=self.global_staff,
+            subsection_grade_model=self.grade,
+            earned_all_override=0.0,
+            earned_graded_override=0.0,
+            feature=GradeOverrideFeatureEnum.proctoring,
+            comment=proctoring_failure_fake_comment
+        )
+
+        resp = self.client.get(
+            self.get_url(subsection_id=self.usage_key)
+        )
+
+        assert resp.data['history'][0]['override_reason'] == proctoring_failure_fake_comment
 
     @ddt.data(
         'login_staff',
@@ -1423,15 +1923,20 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
             feature=GradeOverrideFeatureEnum.gradebook,
         )
 
+        other_user = UserFactory.create()
         resp = self.client.get(
-            self.get_url(subsection_id=self.usage_key, user_id=6789)
+            self.get_url(subsection_id=self.usage_key, user_id=other_user.id)
         )
-
         expected_data = {
-            'original_grade': None,
-            'user_id': 6789,
+            'original_grade': OrderedDict([
+                ('earned_all', 0.0),
+                ('possible_all', 0.0),
+                ('earned_graded', 0.0),
+                ('possible_graded', 0.0)
+            ]),
+            'user_id': other_user.id,
             'override': None,
-            'course_id': None,
+            'course_id': text_type(self.usage_key.course_key),
             'subsection_id': text_type(self.usage_key),
             'history': []
         }

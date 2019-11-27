@@ -3,6 +3,8 @@ Common utilities for the course experience, including course outline.
 """
 from __future__ import absolute_import
 
+import logging
+
 from completion.models import BlockCompletion
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import CourseKey
@@ -11,10 +13,18 @@ from web_fragments.fragment import Fragment
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
+from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
 from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.cache_utils import request_cached
-from openedx.features.course_experience import FIRST_PURCHASE_OFFER_BANNER_DISPLAY
+from openedx.features.discounts.applicability import (
+    can_receive_discount,
+    get_discount_expiration_date,
+    discount_percentage
+)
+from openedx.features.discounts.utils import format_strikeout_price
 from xmodule.modulestore.django import modulestore
+
+log = logging.getLogger(__name__)
 
 
 @request_cached()
@@ -38,7 +48,16 @@ def get_course_outline_block_tree(request, course_id, user=None):
 
         for i in range(len(children)):
             child_id = block['children'][i]
-            child_detail = populate_children(all_blocks[child_id], all_blocks)
+            try:
+                child_detail = populate_children(all_blocks[child_id], all_blocks)
+            except TypeError:
+                if u"MITx+6.002x+MITx_2012_Alumni" in course_outline_root_block[id]:
+                    log.info(u"PopulateChildrenError for Child: {child} in block:{block} at index:{index}".format(
+                        child=child_id,
+                        block=block['id'],
+                        index=i
+                    ))
+                raise
             block['children'][i] = child_detail
 
         return block
@@ -63,7 +82,7 @@ def get_course_outline_block_tree(request, course_id, user=None):
         if last_completed_child_position:
             # Mutex w/ NOT 'course_block_completions'
             recurse_mark_complete(
-                course_block_completions=BlockCompletion.get_course_completions(user, course_key),
+                course_block_completions=BlockCompletion.get_learning_context_completions(user, course_key),
                 latest_completion=last_completed_child_position,
                 block=block
             )
@@ -125,6 +144,35 @@ def get_course_outline_block_tree(request, course_id, user=None):
                 # we'll use the last child.
                 block['children'][-1]['resume_block'] = True
 
+    def recurse_mark_scored(block):
+        """
+        Mark this block as 'scored' if any of its descendents are 'scored' (that is, 'has_score' and 'weight' > 0).
+        """
+        is_scored = block.get('has_score', False) and block.get('weight', 1) > 0
+        # Use a list comprehension to force the recursion over all children, rather than just stopping
+        # at the first child that is scored.
+        children_scored = any([recurse_mark_scored(child) for child in block.get('children', [])])
+        if is_scored or children_scored:
+            block['scored'] = True
+            return True
+        else:
+            block['scored'] = False
+            return False
+
+    def recurse_mark_auth_denial(block):
+        """
+        Mark this block as 'scored' if any of its descendents are 'scored' (that is, 'has_score' and 'weight' > 0).
+        """
+        own_denial_reason = {block['authorization_denial_reason']} if 'authorization_denial_reason' in block else set()
+        # Use a list comprehension to force the recursion over all children, rather than just stopping
+        # at the first child that is scored.
+        child_denial_reasons = own_denial_reason.union(
+            *(recurse_mark_auth_denial(child) for child in block.get('children', []))
+        )
+        if child_denial_reasons:
+            block['all_denial_reasons'] = child_denial_reasons
+        return child_denial_reasons
+
     course_key = CourseKey.from_string(course_id)
     course_usage_key = modulestore().make_course_usage_key(course_key)
 
@@ -154,6 +202,8 @@ def get_course_outline_block_tree(request, course_id, user=None):
             'type',
             'due',
             'graded',
+            'has_score',
+            'weight',
             'special_exam_info',
             'show_gated_sections',
             'format'
@@ -164,6 +214,8 @@ def get_course_outline_block_tree(request, course_id, user=None):
     course_outline_root_block = all_blocks['blocks'].get(all_blocks['root'], None)
     if course_outline_root_block:
         populate_children(course_outline_root_block, all_blocks['blocks'])
+        recurse_mark_scored(course_outline_root_block)
+        recurse_mark_auth_denial(course_outline_root_block)
         if user:
             set_last_accessed_default(course_outline_root_block)
             mark_blocks_completed(
@@ -189,17 +241,3 @@ def get_resume_block(block):
         if resume_block:
             return resume_block
     return block
-
-
-def get_first_purchase_offer_banner_fragment(user, course):
-    if FIRST_PURCHASE_OFFER_BANNER_DISPLAY.is_enabled() and user and course:
-        # Translator: xgettext:no-python-format
-        offer_message = _(u'{banner_open}15% off your first upgrade.{span_close}'
-                          u' Discount automatically applied.{div_close}')
-        return Fragment(HTML(offer_message).format(
-            banner_open=HTML(
-                '<div class="first-purchase-offer-banner"><span class="first-purchase-offer-banner-bold">'
-            ),
-            span_close=HTML('</span>'),
-            div_close=HTML('</div>')
-        ))

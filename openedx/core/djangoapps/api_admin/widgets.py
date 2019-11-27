@@ -34,7 +34,9 @@ class TermsOfServiceCheckboxInput(CheckboxInput):
             u'I, and my organization, accept the {link_start}{platform_name} API Terms of Service{link_end}.'
         )).format(
             platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
-            link_start=HTML(u'<a href="{url}" target="_blank">').format(url=reverse('api_admin:api-tos')),
+            link_start=HTML(u'<a href="{url}" rel="noopener" target="_blank">').format(
+                url=reverse('api_admin:api-tos')
+            ),
             link_end=HTML('</a>'),
         )
 

@@ -1,6 +1,8 @@
 """
 Tests for class dashboard (Metrics tab in instructor dashboard)
 """
+from __future__ import absolute_import
+
 import json
 
 from django.test.client import RequestFactory
@@ -34,7 +36,7 @@ class TestViews(ModuleStoreTestCase):
         has_access.return_value = True
         response = views.all_problem_grade_distribution(self.request, 'test/test/test')
 
-        self.assertEqual(json.dumps(self.simple_data), response.content)
+        self.assertEqual(json.dumps(self.simple_data), response.content.decode('utf-8'))
 
     @patch('class_dashboard.views.has_instructor_access_for_class')
     def test_all_problem_grade_distribution_no_access(self, has_access):
@@ -44,7 +46,10 @@ class TestViews(ModuleStoreTestCase):
         has_access.return_value = False
         response = views.all_problem_grade_distribution(self.request, 'test/test/test')
 
-        self.assertEqual("{\"error\": \"Access Denied: User does not have access to this course\'s data\"}", response.content)
+        self.assertEqual(
+            "{\"error\": \"Access Denied: User does not have access to this course\'s data\"}",
+            response.content.decode('utf-8')
+        )
 
     @patch('class_dashboard.views.has_instructor_access_for_class')
     def test_all_sequential_open_distribution_has_access(self, has_access):
@@ -54,7 +59,7 @@ class TestViews(ModuleStoreTestCase):
         has_access.return_value = True
         response = views.all_sequential_open_distrib(self.request, 'test/test/test')
 
-        self.assertEqual(json.dumps(self.simple_data), response.content)
+        self.assertEqual(json.dumps(self.simple_data), response.content.decode('utf-8'))
 
     @patch('class_dashboard.views.has_instructor_access_for_class')
     def test_all_sequential_open_distribution_no_access(self, has_access):
@@ -64,7 +69,10 @@ class TestViews(ModuleStoreTestCase):
         has_access.return_value = False
         response = views.all_sequential_open_distrib(self.request, 'test/test/test')
 
-        self.assertEqual("{\"error\": \"Access Denied: User does not have access to this course\'s data\"}", response.content)
+        self.assertEqual(
+            "{\"error\": \"Access Denied: User does not have access to this course\'s data\"}",
+            response.content.decode('utf-8')
+        )
 
     @patch('class_dashboard.views.has_instructor_access_for_class')
     def test_section_problem_grade_distribution_has_access(self, has_access):
@@ -74,7 +82,7 @@ class TestViews(ModuleStoreTestCase):
         has_access.return_value = True
         response = views.section_problem_grade_distrib(self.request, 'test/test/test', '1')
 
-        self.assertEqual(json.dumps(self.simple_data), response.content)
+        self.assertEqual(json.dumps(self.simple_data), response.content.decode('utf-8'))
 
     @patch('class_dashboard.views.has_instructor_access_for_class')
     def test_section_problem_grade_distribution_no_access(self, has_access):
@@ -84,7 +92,10 @@ class TestViews(ModuleStoreTestCase):
         has_access.return_value = False
         response = views.section_problem_grade_distrib(self.request, 'test/test/test', '1')
 
-        self.assertEqual("{\"error\": \"Access Denied: User does not have access to this course\'s data\"}", response.content)
+        self.assertEqual(
+            "{\"error\": \"Access Denied: User does not have access to this course\'s data\"}",
+            response.content.decode('utf-8')
+        )
 
     def test_sending_deprecated_id(self):
 
@@ -93,10 +104,10 @@ class TestViews(ModuleStoreTestCase):
         self.request.user = instructor
 
         response = views.all_sequential_open_distrib(self.request, text_type(course.id))
-        self.assertEqual('[]', response.content)
+        self.assertEqual('[]', response.content.decode('utf-8'))
 
         response = views.all_problem_grade_distribution(self.request, text_type(course.id))
-        self.assertEqual('[]', response.content)
+        self.assertEqual('[]', response.content.decode('utf-8'))
 
         response = views.section_problem_grade_distrib(self.request, text_type(course.id), 'no section')
-        self.assertEqual('{"error": "error"}', response.content)
+        self.assertEqual('{"error": "error"}', response.content.decode('utf-8'))

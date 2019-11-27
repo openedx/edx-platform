@@ -11,7 +11,7 @@ from xmodule.partitions.partitions_service import get_all_partitions_for_course
 %>
 
 <%
-show_preview_menu = course and staff_access and supports_preview_menu
+show_preview_menu = course and can_masquerade and supports_preview_menu
 %>
 
 % if show_preview_menu:

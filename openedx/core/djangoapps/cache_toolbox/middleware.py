@@ -78,6 +78,8 @@ choice for most environments but you may be happy with the trade-offs of the
 
 """
 
+from __future__ import absolute_import
+
 from logging import getLogger
 
 from django.conf import settings

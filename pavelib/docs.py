@@ -2,7 +2,7 @@
 Open edX Documentation Builder
 Ties into Sphinx to generate files at the specified location(s)
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import sys
 
@@ -22,7 +22,7 @@ def valid_doc_types():
     """
     Return a comma-separated string of valid doc types.
     """
-    return ", ".join(DOC_PATHS.keys())
+    return ", ".join(list(DOC_PATHS.keys()))
 
 
 def doc_path(options, allow_default=True):

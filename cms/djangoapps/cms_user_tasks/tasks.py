@@ -2,6 +2,8 @@
 Celery tasks used by cms_user_tasks
 """
 
+from __future__ import absolute_import
+
 from boto.exception import NoAuthHandlerFound
 from celery.exceptions import MaxRetriesExceededError
 from celery.task import task

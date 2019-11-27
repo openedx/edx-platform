@@ -2,6 +2,8 @@
 Mixin class that provides authoring capabilities for XBlocks.
 """
 
+from __future__ import absolute_import
+
 import logging
 
 from django.conf import settings

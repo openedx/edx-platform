@@ -1,6 +1,9 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%page expression_filter="h"/>
+<%! from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
 <%
-nothing_to_grade_message = _(
+nothing_to_grade_message = Text(_(
 """
 {p_tag}You currently do not have any peer grading to do.  In order to have peer grading to do:
 {ul_tag}
@@ -10,7 +13,9 @@ criteria.{end_li_tag}
 {li_tag}There must be submissions that are waiting for grading.{end_li_tag}
 {end_ul_tag}
 {end_p_tag}
-""").format(p_tag="<p>", end_p_tag="</p>", ul_tag="<ul>", end_ul_tag="</ul>", li_tag="<li>", end_li_tag="</li>")
+""")).format(p_tag=HTML("<p>"), end_p_tag=HTML("</p>"),
+            ul_tag=HTML("<ul>"), end_ul_tag=HTML("</ul>"),
+            li_tag=HTML("<li>"), end_li_tag=HTML("</li>"))
 %>
 <section class="container peer-grading-container">
     <div class="peer-grading" data-ajax-url="${ajax_url}" data-use-single-location="${use_single_location}">
@@ -41,7 +46,7 @@ criteria.{end_li_tag}
                             %if problem['closed']:
                                 ${problem['problem_name']}
                             %else:
-                                <a href="#problem" data-location="${problem['location'] | h}" class="problem-button">${problem['problem_name']}</a>
+                                <a href="#problem" data-location="${problem['location']}" class="problem-button">${problem['problem_name']}</a>
                             %endif
                         </td>
                         <td>

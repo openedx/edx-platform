@@ -5,8 +5,9 @@
         'teams/js/views/topic_card',
         'teams/js/views/team_utils',
         'common/js/components/views/paging_header',
-        'common/js/components/views/paginated_view'
-    ], function(gettext, TopicCardView, TeamUtils, PagingHeader, PaginatedView) {
+        'common/js/components/views/paginated_view',
+        'underscore'
+    ], function(gettext, TopicCardView, TeamUtils, PagingHeader, PaginatedView, _) {
         var TopicsView = PaginatedView.extend({
             type: 'topics',
 

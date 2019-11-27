@@ -1,6 +1,9 @@
 """
 Course API Forms
 """
+from __future__ import absolute_import
+
+import six
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.forms import CharField, ChoiceField, Form, IntegerField
@@ -73,7 +76,7 @@ class BlockListGetForm(Form):
         try:
             usage_key = UsageKey.from_string(usage_key)
         except InvalidKeyError:
-            raise ValidationError(u"'{}' is not a valid usage key.".format(unicode(usage_key)))
+            raise ValidationError(u"'{}' is not a valid usage key.".format(six.text_type(usage_key)))
 
         return usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
 
@@ -131,7 +134,7 @@ class BlockListGetForm(Form):
         if not permissions.can_access_all_blocks(requesting_user, course_key):
             raise PermissionDenied(
                 u"'{requesting_username}' does not have permission to access all blocks in '{course_key}'."
-                .format(requesting_username=requesting_user.username, course_key=unicode(course_key))
+                .format(requesting_username=requesting_user.username, course_key=six.text_type(course_key))
             )
 
         # return None for user

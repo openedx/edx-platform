@@ -1,30 +1,33 @@
 """ Tests for views related to account settings. """
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 import mock
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.messages.middleware import MessageMiddleware
-from django.urls import reverse
 from django.http import HttpRequest
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.urls import reverse
 from edx_rest_api_client import exceptions
 
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.tests import factories
 from lms.djangoapps.commerce.tests.mocks import mock_get_orders
-from openedx.core.djangoapps.user_api.accounts.toggles import REDIRECT_TO_ACCOUNT_MICROFRONTEND
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref.tests.test_api import EN, LT_LT
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
-from openedx.core.djangoapps.user_api.tests.factories import UserPreferenceFactory
-from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context, get_user_orders
+from openedx.core.djangoapps.user_api.accounts.toggles import REDIRECT_TO_ACCOUNT_MICROFRONTEND
+from openedx.core.djangoapps.user_api.tests.factories import UserPreferenceFactory
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
+from openedx.features.enterprise_support.utils import get_enterprise_readonly_account_fields
 
 
 @skip_unless_lms
@@ -64,8 +67,8 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
         MessageMiddleware().process_request(self.request)
         messages.error(self.request, 'Facebook is already in use.', extra_tags='Auth facebook')
 
-    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_customer_for_learner')
-    def test_context(self, mock_get_enterprise_customer_for_learner):
+    @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
+    def test_context(self, mock_enterprise_customer_for_request):
         self.request.site = SiteFactory.create()
         UserPreferenceFactory(user=self.user, key='pref-lang', value='lt-lt')
         DarkLangConfig(
@@ -75,7 +78,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
             beta_languages='lt-lt',
             enable_beta_languages=True
         ).save()
-        mock_get_enterprise_customer_for_learner.return_value = {}
+        mock_enterprise_customer_for_request.return_value = {}
 
         with override_settings(LANGUAGES=[EN, LT_LT], LANGUAGE_CODE='en'):
             context = account_settings_context(self.request)
@@ -104,22 +107,23 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
             self.assertEqual(context['edx_support_url'], settings.SUPPORT_SITE_LINK)
             self.assertEqual(context['enterprise_name'], None)
             self.assertEqual(
-                context['enterprise_readonly_account_fields'], {'fields': settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS}
+                context['enterprise_readonly_account_fields'],
+                {'fields': list(get_enterprise_readonly_account_fields(self.user))}
             )
             expected_beta_language = {'code': 'lt-lt', 'name': settings.LANGUAGE_DICT.get('lt-lt')}
             self.assertEqual(context['beta_language'], expected_beta_language)
 
-    @mock.patch('openedx.core.djangoapps.user_api.accounts.settings_views.get_enterprise_customer_for_learner')
+    @mock.patch('openedx.core.djangoapps.user_api.accounts.settings_views.enterprise_customer_for_request')
     @mock.patch('openedx.features.enterprise_support.utils.third_party_auth.provider.Registry.get')
     def test_context_for_enterprise_learner(
-            self, mock_get_auth_provider, mock_get_enterprise_customer_for_learner
+            self, mock_get_auth_provider, mock_enterprise_customer_for_request
     ):
         dummy_enterprise_customer = {
             'uuid': 'real-ent-uuid',
             'name': 'Dummy Enterprise',
             'identity_provider': 'saml-ubc'
         }
-        mock_get_enterprise_customer_for_learner.return_value = dummy_enterprise_customer
+        mock_enterprise_customer_for_request.return_value = dummy_enterprise_customer
         self.request.site = SiteFactory.create()
         mock_get_auth_provider.return_value.sync_learner_profile_data = True
         context = account_settings_context(self.request)
@@ -150,7 +154,8 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
         self.assertEqual(context['edx_support_url'], settings.SUPPORT_SITE_LINK)
         self.assertEqual(context['enterprise_name'], dummy_enterprise_customer['name'])
         self.assertEqual(
-            context['enterprise_readonly_account_fields'], {'fields': settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS}
+            context['enterprise_readonly_account_fields'],
+            {'fields': list(get_enterprise_readonly_account_fields(self.user))}
         )
 
     def test_view(self):
@@ -161,7 +166,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
         response = self.client.get(path=view_path)
 
         for attribute in self.FIELDS:
-            self.assertIn(attribute, response.content)
+            self.assertContains(response, attribute)
 
     def test_header_with_programs_listing_enabled(self):
         """
@@ -254,7 +259,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
             # Test with waffle flag active and site setting disabled, does not redirect
             response = self.client.get(path=old_url_path)
             for attribute in self.FIELDS:
-                self.assertIn(attribute, response.content)
+                self.assertContains(response, attribute)
 
             # Test with waffle flag active and site setting enabled, redirects to microfrontend
             site_domain = 'othersite.example.com'

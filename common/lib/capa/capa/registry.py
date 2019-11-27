@@ -50,7 +50,7 @@ class TagRegistry(object):
         """
         Get a list of all the tags that have been registered.
         """
-        return self._mapping.keys()
+        return list(self._mapping.keys())
 
     def get_class_for_tag(self, tag):
         """

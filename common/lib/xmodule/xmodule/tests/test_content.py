@@ -1,16 +1,18 @@
 """Tests for contents"""
 
+from __future__ import absolute_import
+
 import os
 import unittest
+
 import ddt
 from mock import Mock, patch
-from path import Path as path
-
-from xmodule.contentstore.content import StaticContent, StaticContentStream
-from xmodule.contentstore.content import ContentStore
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import AssetLocator, CourseLocator
-from xmodule.static_content import _write_js, _list_descriptors
+from path import Path as path
+
+from xmodule.contentstore.content import ContentStore, StaticContent, StaticContentStream
+from xmodule.static_content import _list_descriptors, _write_js
 
 SAMPLE_STRING = """
 This is a sample string with more than 1024 bytes, the default STREAM_DATA_CHUNK_SIZE
@@ -138,7 +140,7 @@ class ContentTest(unittest.TestCase):
         content_store = ContentStore()
         content = Content(AssetLocator(CourseLocator(u'mitX', u'800', u'ignore_run'), u'asset', "monsters.jpg"),
                           "image/jpeg")
-        content.data = 'mock data'
+        content.data = b'mock data'
         content_store.generate_thumbnail(content)
         self.assertTrue(image_class_mock.open.called, "Image.open not called")
         self.assertTrue(mock_image.close.called, "mock_image.close not called")
@@ -151,7 +153,7 @@ class ContentTest(unittest.TestCase):
         thumbnail_filename = u'test.svg'
         content = Content(AssetLocator(CourseLocator(u'mitX', u'800', u'ignore_run'), u'asset', u'test.svg'),
                           'image/svg+xml')
-        content.data = 'mock svg file'
+        content.data = b'mock svg file'
         (thumbnail_content, thumbnail_file_location) = content_store.generate_thumbnail(content)
         self.assertEqual(thumbnail_content.data.read(), b'mock svg file')
         self.assertEqual(
@@ -221,6 +223,6 @@ class ContentTest(unittest.TestCase):
         """
         output_root = path(u'common/static/xmodule/descriptors/js')
         file_owners = _write_js(output_root, _list_descriptors(), 'get_studio_view_js')
-        js_file_paths = set(file_path for file_path in sum(file_owners.values(), []) if os.path.basename(file_path).startswith('000-'))
+        js_file_paths = set(file_path for file_path in sum(list(file_owners.values()), []) if os.path.basename(file_path).startswith('000-'))
         self.assertEqual(len(js_file_paths), 1)
         self.assertIn("XModule.Descriptor = (function() {", open(js_file_paths.pop()).read())

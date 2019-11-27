@@ -2,6 +2,8 @@
 Base test classes for LMS instructor-initiated background tasks
 
 """
+from __future__ import absolute_import
+
 import json
 # pylint: disable=attribute-defined-outside-init
 import os
@@ -9,18 +11,19 @@ import shutil
 from tempfile import mkdtemp
 from uuid import uuid4
 
+import six
 import unicodecsv
 from celery.states import FAILURE, SUCCESS
 from django.contrib.auth.models import User
 from django.urls import reverse
 from mock import Mock, patch
-from opaque_keys.edx.locations import Location
 from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import Location
 from six import text_type
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
-from courseware.model_data import StudentModule
-from courseware.tests.tests import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.model_data import StudentModule
+from lms.djangoapps.courseware.tests.tests import LoginEnrollmentTestCase
 from lms.djangoapps.instructor_task.api_helper import encode_problem_and_student_input
 from lms.djangoapps.instructor_task.models import PROGRESS, QUEUING, ReportStore
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
@@ -184,7 +187,7 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
         mock_request = Mock()
         mock_request.GET = mock_request.POST = {'task_id': task_id}
         response = instructor_task_status(mock_request)
-        status = json.loads(response.content)
+        status = json.loads(response.content.decode('utf-8'))
         return status
 
     def create_task_request(self, requester_username):
@@ -367,8 +370,8 @@ class TestReportMixin(object):
                 self.assertEqual(csv_rows, expected_rows)
                 self.assertEqual(numeric_csv_rows, numeric_expected_rows)
             else:
-                self.assertItemsEqual(csv_rows, expected_rows)
-                self.assertItemsEqual(numeric_csv_rows, numeric_expected_rows)
+                six.assertCountEqual(self, csv_rows, expected_rows)
+                six.assertCountEqual(self, numeric_csv_rows, numeric_expected_rows)
 
     @staticmethod
     def _extract_and_round_numeric_items(dictionary):
@@ -380,9 +383,9 @@ class TestReportMixin(object):
         to four decimal places.
         """
         extracted = {}
-        for key, value in dictionary.items():
+        for key in list(dictionary):
             try:
-                float(value)
+                float(dictionary[key])
                 extracted[key] = round(float(dictionary.pop(key)), 4)
             except ValueError:
                 pass
@@ -397,4 +400,4 @@ class TestReportMixin(object):
         report_path = report_store.path_to(self.course.id, report_csv_filename)
         with report_store.storage.open(report_path) as csv_file:
             rows = unicodecsv.reader(csv_file, encoding='utf-8-sig')
-            return rows.next()
+            return next(rows)

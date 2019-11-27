@@ -6,7 +6,7 @@ from collections import Sequence
 from functools import wraps
 
 from django.core.exceptions import NON_FIELD_ERRORS, ObjectDoesNotExist, ValidationError
-from django.http import Http404
+from django.http import Http404, HttpResponseBadRequest
 from django.utils.translation import ugettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -223,7 +223,7 @@ class LazySequence(Sequence):
     It is immutable, and accepts an estimated length in order to support __len__
     without exhausting the underlying sequence
     """
-    def __init__(self, iterable, est_len=None):  # pylint: disable=super-init-not-called
+    def __init__(self, iterable, est_len=None):
         self.iterable = iterable
         self.est_len = est_len
         self._data = []
@@ -337,12 +337,40 @@ class PaginatedAPIView(APIView):
             return None
         return self.paginator.paginate_queryset(queryset, self.request, view=self)
 
-    def get_paginated_response(self, data):
+    def get_paginated_response(self, data, *args, **kwargs):
         """
         Return a paginated style `Response` object for the given output data.
         """
         assert self.paginator is not None
-        return self.paginator.get_paginated_response(data)
+        return self.paginator.get_paginated_response(data, *args, **kwargs)
+
+
+def require_post_params(required_params):
+    """
+    View decorator that ensures the required POST params are
+    present.  If not, returns an HTTP response with status 400.
+
+    Args:
+        required_params (list): The required parameter keys.
+
+    Returns:
+        HttpResponse
+
+    """
+    def _decorator(func):  # pylint: disable=missing-docstring
+        @wraps(func)
+        def _wrapped(*args, **_kwargs):
+            request = args[0]
+            missing_params = set(required_params) - set(request.POST.keys())
+            if missing_params:
+                msg = u"Missing POST parameters: {missing}".format(
+                    missing=", ".join(missing_params)
+                )
+                return HttpResponseBadRequest(msg)
+            else:
+                return func(request)
+        return _wrapped
+    return _decorator
 
 
 def get_course_key(request, course_id=None):

@@ -1,6 +1,8 @@
 """
 Support tool for changing and granting course entitlements
 """
+from __future__ import absolute_import
+
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 

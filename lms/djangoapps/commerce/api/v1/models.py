@@ -1,7 +1,10 @@
 """ API v1 models. """
+from __future__ import absolute_import
+
 import logging
 from itertools import groupby
 
+import six
 from django.db import transaction
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -22,7 +25,7 @@ class Course(object):
     _deleted_modes = None
 
     def __init__(self, id, modes, **kwargs):  # pylint: disable=redefined-builtin
-        self.id = CourseKey.from_string(unicode(id))  # pylint: disable=invalid-name
+        self.id = CourseKey.from_string(six.text_type(id))  # pylint: disable=invalid-name
         self.modes = list(modes)
         self.verification_deadline = UNDEFINED
         if 'verification_deadline' in kwargs:
@@ -32,7 +35,7 @@ class Course(object):
     @property
     def name(self):
         """ Return course name. """
-        course_id = CourseKey.from_string(unicode(self.id))
+        course_id = CourseKey.from_string(six.text_type(self.id))
 
         try:
             return CourseOverview.get_from_id(course_id).display_name
@@ -104,15 +107,27 @@ class Course(object):
             merged_modes.add(merged_mode)
             merged_mode_keys.add(merged_mode.mode_slug)
 
-        deleted_modes = set(existing_modes.keys()) - merged_mode_keys
-        self._deleted_modes = [existing_modes[mode] for mode in deleted_modes]
+        # Masters degrees are not sold through the eCommerce site.
+        # So, Masters course modes are not included in PUT calls to this API,
+        # and their omission which would normally cause them to be deleted.
+        # We don't want that to happen, but for the time being,
+        # we cannot include in Masters modes in the PUT calls from eCommerce.
+        # So, here's hack to handle Masters course modes, along with any other
+        # modes that end up in that boat.
+        MODES_TO_NOT_DELETE = {
+            CourseMode.MASTERS,
+        }
+
+        modes_to_delete = set(existing_modes.keys()) - merged_mode_keys
+        modes_to_delete -= MODES_TO_NOT_DELETE
+        self._deleted_modes = [existing_modes[mode] for mode in modes_to_delete]
         self.modes = list(merged_modes)
 
     @classmethod
     def get(cls, course_id):
         """ Retrieve a single course. """
         try:
-            course_id = CourseKey.from_string(unicode(course_id))
+            course_id = CourseKey.from_string(six.text_type(course_id))
         except InvalidKeyError:
             log.debug(u'[%s] is not a valid course key.', course_id)
             raise ValueError

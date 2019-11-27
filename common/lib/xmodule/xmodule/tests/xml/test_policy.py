@@ -2,10 +2,12 @@
 Tests that policy json files import correctly when loading XML
 """
 
+from __future__ import absolute_import
+
 import pytest
 
-from xmodule.tests.xml.factories import CourseFactory
 from xmodule.tests.xml import XModuleXmlImportTest
+from xmodule.tests.xml.factories import CourseFactory
 
 
 class TestPolicy(XModuleXmlImportTest):

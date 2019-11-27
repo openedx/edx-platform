@@ -1,6 +1,8 @@
 """
 Slightly customized python-social-auth backend for SAML 2.0 support
 """
+from __future__ import absolute_import
+
 import logging
 from copy import deepcopy
 
@@ -13,17 +15,12 @@ from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from six import text_type
 from social_core.backends.saml import OID_EDU_PERSON_ENTITLEMENT, SAMLAuth, SAMLIdentityProvider
 from social_core.exceptions import AuthForbidden
-from enterprise.models import (
-    EnterpriseCustomerUser,
-    EnterpriseCustomerIdentityProvider,
-    PendingEnterpriseCustomerUser
-)
 
-from third_party_auth.exceptions import IncorrectConfigurationException
 from openedx.core.djangoapps.theming.helpers import get_current_request
+from third_party_auth.exceptions import IncorrectConfigurationException
 
-STANDARD_SAML_PROVIDER_KEY = 'standard_saml_provider'
-SAP_SUCCESSFACTORS_SAML_KEY = 'sap_success_factors'
+STANDARD_SAML_PROVIDER_KEY = u'standard_saml_provider'
+SAP_SUCCESSFACTORS_SAML_KEY = u'sap_success_factors'
 log = logging.getLogger(__name__)
 
 
@@ -96,7 +93,8 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
             return super(SAMLAuthBackend, self).get_user_id(details, response)
         except KeyError as ex:
             log.warning(
-                u"Error in SAML authentication flow of IdP '{idp_name}': {message}".format(
+                u'[THIRD_PARTY_AUTH] Error in SAML authentication flow. '
+                u'Provider: {idp_name}, Message: {message}'.format(
                     message=ex.message,
                     idp_name=response.get('idp_name')
                 )
@@ -126,7 +124,7 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         raise Http404 if SAML authentication is disabled.
         """
         if not self._config.enabled:
-            log.error('SAML authentication is not enabled')
+            log.error('[THIRD_PARTY_AUTH] SAML authentication is not enabled')
             raise Http404
 
         return super(SAMLAuthBackend, self).auth_url()
@@ -135,28 +133,9 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         """
         Override of SAMLAuth.disconnect to unlink the learner from enterprise customer if associated.
         """
-        from . import pipeline, provider
-        running_pipeline = pipeline.get(self.strategy.request)
-        provider_id = provider.Registry.get_from_pipeline(running_pipeline).provider_id
-        try:
-            user_email = kwargs.get('user').email
-        except AttributeError:
-            user_email = None
-
-        try:
-            enterprise_customer_idp = EnterpriseCustomerIdentityProvider.objects.get(provider_id=provider_id)
-        except EnterpriseCustomerIdentityProvider.DoesNotExist:
-            enterprise_customer_idp = None
-
-        if enterprise_customer_idp and user_email:
-            try:
-                # Unlink user email from Enterprise Customer.
-                EnterpriseCustomerUser.objects.unlink_user(
-                    enterprise_customer=enterprise_customer_idp.enterprise_customer, user_email=user_email
-                )
-            except (EnterpriseCustomerUser.DoesNotExist, PendingEnterpriseCustomerUser.DoesNotExist):
-                pass
-
+        from openedx.features.enterprise_support.api import unlink_enterprise_user_from_idp
+        user = kwargs.get('user', None)
+        unlink_enterprise_user_from_idp(self.strategy.request, user, self.name)
         return super(SAMLAuthBackend, self).disconnect(*args, **kwargs)
 
     def _check_entitlements(self, idp, attributes):
@@ -171,7 +150,11 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
             for expected in idp.conf['requiredEntitlements']:
                 if expected not in entitlements:
                     log.warning(
-                        u"SAML user from IdP %s rejected due to missing eduPersonEntitlement %s", idp.name, expected)
+                        u'[THIRD_PARTY_AUTH] SAML user rejected due to missing eduPersonEntitlement. '
+                        u'Provider: {provider}, Entitlement: {entitlement}'.format(
+                            provider=idp.name,
+                            entitlement=expected)
+                    )
                     raise AuthForbidden(self)
 
     def _create_saml_auth(self, idp):
@@ -239,7 +222,8 @@ class EdXSAMLIdentityProvider(SAMLIdentityProvider):
             try:
                 return attributes[key][0]
             except IndexError:
-                log.warning(u'SAML attribute "%s" value not found.', key)
+                log.warning(u'[THIRD_PARTY_AUTH] SAML attribute value not found. '
+                            u'SamlAttribute: {attribute}'.format(attribute=key))
         return self.conf['attr_defaults'].get(conf_key) or None
 
     @property
@@ -383,9 +367,10 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         if not all(var in self.conf for var in self.required_variables):
             missing = [var for var in self.required_variables if var not in self.conf]
             log.warning(
-                u"To retrieve rich user data for an SAP SuccessFactors identity provider, the following keys in "
-                u"'other_settings' are required, but were missing: %s",
-                missing
+                u'[THIRD_PARTY_AUTH] To retrieve rich user data for a SAP SuccessFactors identity provider, '
+                u'the following keys in other_settings are required, but were missing. MissingKeys: {keys}'.format(
+                    keys=missing
+                )
             )
             return missing
 
@@ -564,7 +549,7 @@ def get_saml_idp_class(idp_identifier_string):
     }
     if idp_identifier_string not in choices:
         log.error(
-            u'%s is not a valid EdXSAMLIdentityProvider subclass; using EdXSAMLIdentityProvider base class.',
-            idp_identifier_string
+            u'[THIRD_PARTY_AUTH] Invalid EdXSAMLIdentityProvider subclass--'
+            u'using EdXSAMLIdentityProvider base class. Provider: {provider}'.format(provider=idp_identifier_string)
         )
     return choices.get(idp_identifier_string, EdXSAMLIdentityProvider)

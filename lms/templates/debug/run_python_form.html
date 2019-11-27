@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%! from django.utils.translation import ugettext as _ %>
 <html><body>
 <div>
@@ -5,7 +6,7 @@
 <form method='post'>
     <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
     <div>
-        <textarea name='code' rows='20' cols='80'>${code|h}</textarea>
+        <textarea name='code' rows='20' cols='80'>${code}</textarea>
     </div>
     <input type='submit' value='Run it!'/>
 </form>
@@ -14,7 +15,7 @@
 <div>
     <p>${_("Results:")}</p>
     <pre>
-${results|h}
+${results}
 </pre>
 </div>
 %endif

@@ -1,16 +1,18 @@
 """
 This file contains celery tasks related to course content gating.
 """
+from __future__ import absolute_import
+
 import logging
 
+import six
 from celery import task
 from django.contrib.auth.models import User
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from gating import api as gating_api
 from lms.djangoapps.course_blocks.api import get_course_blocks
-from opaque_keys.edx.keys import CourseKey, UsageKey
 from xmodule.modulestore.django import modulestore
-
 
 log = logging.getLogger(__name__)
 
@@ -41,7 +43,7 @@ def task_evaluate_subsection_completion_milestones(course_id, block_id, user_id)
                 subsection = course_structure[subsection_block]
                 log.debug(
                     u"Gating: Evaluating completion milestone for subsection [%s] and user [%s]",
-                    unicode(subsection.location), user.id
+                    six.text_type(subsection.location), user.id
                 )
                 gating_api.evaluate_prerequisite(course, subsection, user)
             except KeyError:

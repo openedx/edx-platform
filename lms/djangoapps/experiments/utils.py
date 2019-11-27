@@ -2,23 +2,32 @@
 Utilities to facilitate experimentation
 """
 
-import hashlib
-import re
+from __future__ import absolute_import
+
 import logging
 from decimal import Decimal
-from student.models import CourseEnrollment
+
+import six
 from django.utils.timezone import now
-from lms.djangoapps.commerce.utils import EcommerceService
-from course_modes.models import get_cosmetic_verified_display_price, format_course_price
-from courseware.access import has_staff_access_to_preview_mode
-from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
-from xmodule.partitions.partitions_service import get_user_partition_groups, get_all_partitions_for_course
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+
+from course_modes.models import format_course_price, get_cosmetic_verified_display_price, CourseMode
+from lms.djangoapps.courseware.access import has_staff_access_to_preview_mode
+from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
+from entitlements.models import CourseEntitlement
+from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.django_comment_common.models import Role
+from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
+from openedx.features.course_duration_limits.access import get_user_course_expiration_date, get_user_course_duration
+from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from student.models import CourseEnrollment
+from xmodule.partitions.partitions_service import get_all_partitions_for_course, get_user_partition_groups
 
+# Import this for backwards compatibility (so that anyone importing this function from here doesn't break)
+from .stable_bucketing import stable_bucketing_hash_group  # pylint: disable=unused-import
 
 logger = logging.getLogger(__name__)
 
@@ -27,8 +36,8 @@ logger = logging.getLogger(__name__)
 experiments_namespace = WaffleFlagNamespace(name=u'experiments')
 
 # .. toggle_name: experiments.add_programs
-# .. toggle_type: feature_flag
-# .. toggle_default: True
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
 # .. toggle_description: Toggle for adding the current course's program information to user metadata
 # .. toggle_category: experiments
 # .. toggle_use_cases: monitored_rollout
@@ -40,12 +49,12 @@ experiments_namespace = WaffleFlagNamespace(name=u'experiments')
 PROGRAM_INFO_FLAG = WaffleFlag(
     waffle_namespace=experiments_namespace,
     flag_name=u'add_programs',
-    flag_undefined_default=True
+    flag_undefined_default=False
 )
 
 # .. toggle_name: experiments.add_dashboard_info
-# .. toggle_type: feature_flag
-# .. toggle_default: True
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
 # .. toggle_description: Toggle for adding info about each course to the dashboard metadata
 # .. toggle_category: experiments
 # .. toggle_use_cases: monitored_rollout
@@ -56,7 +65,7 @@ PROGRAM_INFO_FLAG = WaffleFlag(
 # .. toggle_status: supported
 DASHBOARD_INFO_FLAG = WaffleFlag(experiments_namespace,
                                  u'add_dashboard_info',
-                                 flag_undefined_default=True)
+                                 flag_undefined_default=False)
 # TODO END: clean up as part of REVEM-199 (End)
 
 
@@ -71,7 +80,7 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
     """
     if enrollment is None and course is None:
         logger.warn(u'Must specify either an enrollment or a course')
-        return (None, None)
+        return (None, None, None)
 
     if enrollment:
         if course is None:
@@ -89,7 +98,7 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
                                 course.id.deprecated
                                 )
                         )
-            return (None, None)
+            return (None, None, None)
 
         if enrollment.user_id != user.id:
             logger.warn(u'{} refers to a different user than {} which was supplied. Enrollment user id={}, repr={!r}. '
@@ -101,18 +110,21 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
                                                          user.id,
                                                          )
                         )
-            return (None, None)
+            return (None, None, None)
 
     if enrollment is None:
         enrollment = CourseEnrollment.get_enrollment(user, course.id)
+        if enrollment is None:
+            return (None, None, None)
 
     if user.is_authenticated and verified_upgrade_link_is_valid(enrollment):
         return (
             verified_upgrade_deadline_link(user, course),
-            enrollment.upgrade_deadline
+            enrollment.upgrade_deadline,
+            enrollment.course_upgrade_deadline,
         )
 
-    return (None, None)
+    return (None, None, enrollment.course_upgrade_deadline)
 
 
 # TODO: clean up as part of REVEM-199 (START)
@@ -134,7 +146,7 @@ def get_program_price_and_skus(courses):
         skus = None
     else:
         program_price = format_course_price(program_price)
-        program_price = unicode(program_price)
+        program_price = six.text_type(program_price)
 
     return program_price, skus
 
@@ -230,14 +242,12 @@ def get_dashboard_course_info(user, dashboard_enrollments):
     if DASHBOARD_INFO_FLAG.is_enabled():
         # Get the enrollments here since the dashboard filters out those with completed entitlements
         user_enrollments = CourseEnrollment.objects.select_related('course').filter(user_id=user.id)
-        audit_enrollments = user_enrollments.filter(mode='audit')
 
         course_info = {
             str(dashboard_enrollment.course): get_base_experiment_metadata_context(dashboard_enrollment.course,
                                                                                    user,
                                                                                    dashboard_enrollment,
-                                                                                   user_enrollments,
-                                                                                   audit_enrollments)
+                                                                                   user_enrollments)
             for dashboard_enrollment in dashboard_enrollments
         }
     return course_info
@@ -248,82 +258,26 @@ def get_experiment_user_metadata_context(course, user):
     """
     Return a context dictionary with the keys used by the user_metadata.html.
     """
-    # TODO: call get_base_experiment_metadata_context(), and then add in the bits that are only needed by user_metadata
-    enrollment_mode = None
-    enrollment_time = None
     enrollment = None
     # TODO: clean up as part of REVO-28 (START)
-    has_non_audit_enrollments = None
-    # TODO: clean up as part of REVO-28 (END)
-    # TODO: clean up as part of REVEM-199 (START)
-    program_key = None
-    # TODO: clean up as part of REVEM-199 (END)
+    user_enrollments = None
+    audit_enrollments = None
+    has_non_audit_enrollments = False
     try:
-        # TODO: clean up as part of REVO-28 (START)
-        user_enrollments = CourseEnrollment.objects.select_related('course').filter(user_id=user.id)
-        audit_enrollments = user_enrollments.filter(mode='audit')
-        has_non_audit_enrollments = (len(audit_enrollments) != len(user_enrollments))
+        user_enrollments = CourseEnrollment.objects.select_related('course', 'schedule').filter(user_id=user.id)
+        has_non_audit_enrollments = user_enrollments.exclude(mode__in=CourseMode.UPSELL_TO_VERIFIED_MODES).exists()
         # TODO: clean up as part of REVO-28 (END)
-        # TODO: clean up as part of REVEM-199 (START)
-        if PROGRAM_INFO_FLAG.is_enabled():
-            programs = get_programs(course=course.id)
-            if programs:
-                # A course can be in multiple programs, but we're just grabbing the first one
-                program = programs[0]
-                complete_enrollment = False
-                has_courses_left_to_purchase = False
-                total_courses = None
-                courses = program.get('courses')
-                courses_left_to_purchase_price = None
-                courses_left_to_purchase_url = None
-                program_uuid = program.get('uuid')
-                status = None
-                is_eligible_for_one_click_purchase = None
-                if courses is not None:
-                    total_courses = len(courses)
-                    complete_enrollment = is_enrolled_in_all_courses(courses, user_enrollments)
-                    status = program.get('status')
-                    is_eligible_for_one_click_purchase = program.get('is_program_eligible_for_one_click_purchase')
-                    # Get the price and purchase URL of the program courses the user has yet to purchase. Say a
-                    # program has 3 courses (A, B and C), and the user previously purchased a certificate for A.
-                    # The user is enrolled in audit mode for B. The "left to purchase price" should be the price of
-                    # B+C.
-                    non_audit_enrollments = [en for en in user_enrollments if en not in
-                                             audit_enrollments]
-                    courses_left_to_purchase = get_unenrolled_courses(courses, non_audit_enrollments)
-                    if courses_left_to_purchase:
-                        has_courses_left_to_purchase = True
-                        if is_eligible_for_one_click_purchase:
-                            courses_left_to_purchase_price, courses_left_to_purchase_skus = \
-                                get_program_price_and_skus(courses_left_to_purchase)
-                            if courses_left_to_purchase_skus:
-                                courses_left_to_purchase_url = EcommerceService().get_checkout_page_url(
-                                    *courses_left_to_purchase_skus, program_uuid=program_uuid)
-
-                program_key = {
-                    'uuid': program_uuid,
-                    'title': program.get('title'),
-                    'marketing_url': program.get('marketing_url'),
-                    'status': status,
-                    'is_eligible_for_one_click_purchase': is_eligible_for_one_click_purchase,
-                    'total_courses': total_courses,
-                    'complete_enrollment': complete_enrollment,
-                    'has_courses_left_to_purchase': has_courses_left_to_purchase,
-                    'courses_left_to_purchase_price': courses_left_to_purchase_price,
-                    'courses_left_to_purchase_url': courses_left_to_purchase_url,
-                }
-        # TODO: clean up as part of REVEM-199 (END)
         enrollment = CourseEnrollment.objects.select_related(
-            'course'
+            'course', 'schedule'
         ).get(user_id=user.id, course_id=course.id)
-        if enrollment.is_active:
-            enrollment_mode = enrollment.mode
-            enrollment_time = enrollment.created
     except CourseEnrollment.DoesNotExist:
-        pass  # Not enrolled, used the default None values
+        pass  # Not enrolled, use the default values
 
-    # upgrade_link and upgrade_date should be None if user has passed their dynamic pacing deadline.
-    upgrade_link, upgrade_date = check_and_get_upgrade_link_and_date(user, enrollment, course)
+    has_entitlements = False
+    if user.is_authenticated():
+        has_entitlements = CourseEntitlement.objects.filter(user=user).exists()
+
+    context = get_base_experiment_metadata_context(course, user, enrollment, user_enrollments)
     has_staff_access = has_staff_access_to_preview_mode(user, course.id)
     forum_roles = []
     if user.is_authenticated:
@@ -336,51 +290,53 @@ def get_experiment_user_metadata_context(course, user):
     else:
         user_partitions = {}
 
-    return {
-        'upgrade_link': upgrade_link,
-        'upgrade_price': unicode(get_cosmetic_verified_display_price(course)),
-        'enrollment_mode': enrollment_mode,
-        'enrollment_time': enrollment_time,
-        'pacing_type': 'self_paced' if course.self_paced else 'instructor_paced',
-        'upgrade_deadline': upgrade_date,
-        'course_key': course.id,
-        'course_start': course.start,
-        'course_end': course.end,
-        'has_staff_access': has_staff_access,
-        'forum_roles': forum_roles,
-        'partition_groups': user_partitions,
-        # TODO: clean up as part of REVO-28 (START)
-        'has_non_audit_enrollments': has_non_audit_enrollments,
-        # TODO: clean up as part of REVO-28 (END)
-        # TODO: clean up as part of REVEM-199 (START)
-        'program_key_fields': program_key,
-        # TODO: clean up as part of REVEM-199 (END)
-    }
+    # TODO: clean up as part of REVO-28 (START)
+    context['has_non_audit_enrollments'] = has_non_audit_enrollments or has_entitlements
+    # TODO: clean up as part of REVO-28 (END)
+    context['has_staff_access'] = has_staff_access
+    context['forum_roles'] = forum_roles
+    context['partition_groups'] = user_partitions
+    return context
 
 
-def get_base_experiment_metadata_context(course, user, enrollment, user_enrollments, audit_enrollments):
+def get_base_experiment_metadata_context(course, user, enrollment, user_enrollments):
     """
-    Return a context dictionary with the keys used by dashboard_metadata.html.
+    Return a context dictionary with the keys used by dashboard_metadata.html and user_metadata.html
     """
     enrollment_mode = None
     enrollment_time = None
     # TODO: clean up as part of REVEM-199 (START)
-    program_key = get_program_context(course, user_enrollments, audit_enrollments)
+    program_key = get_program_context(course, user_enrollments)
     # TODO: clean up as part of REVEM-199 (END)
-    if enrollment.is_active:
+    schedule_start = None
+    if enrollment and enrollment.is_active:
         enrollment_mode = enrollment.mode
         enrollment_time = enrollment.created
 
-    # upgrade_link and upgrade_date should be None if user has passed their dynamic pacing deadline.
-    upgrade_link, upgrade_date = check_and_get_upgrade_link_and_date(user, enrollment, course)
+        try:
+            schedule_start = enrollment.schedule.start
+        except Schedule.DoesNotExist:
+            pass
+
+    # upgrade_link, dynamic_upgrade_deadline and course_upgrade_deadline should be None
+    # if user has passed their dynamic pacing deadline.
+    upgrade_link, dynamic_upgrade_deadline, course_upgrade_deadline = check_and_get_upgrade_link_and_date(
+        user, enrollment, course
+    )
+
+    deadline, duration = get_audit_access_expiration(user, course)
 
     return {
         'upgrade_link': upgrade_link,
-        'upgrade_price': unicode(get_cosmetic_verified_display_price(course)),
+        'upgrade_price': six.text_type(get_cosmetic_verified_display_price(course)),
         'enrollment_mode': enrollment_mode,
         'enrollment_time': enrollment_time,
+        'schedule_start': schedule_start,
         'pacing_type': 'self_paced' if course.self_paced else 'instructor_paced',
-        'upgrade_deadline': upgrade_date,
+        'dynamic_upgrade_deadline': dynamic_upgrade_deadline,
+        'course_upgrade_deadline': course_upgrade_deadline,
+        'audit_access_deadline': deadline,
+        'course_duration': duration,
         'course_key': course.id,
         'course_start': course.start,
         'course_end': course.end,
@@ -390,12 +346,24 @@ def get_base_experiment_metadata_context(course, user, enrollment, user_enrollme
     }
 
 
+def get_audit_access_expiration(user, course):
+    """
+    Return the expiration date and course duration for the user's audit access to this course.
+    """
+    if not CourseDurationLimitConfig.enabled_for_enrollment(user=user, course_key=course.id):
+        return None, None
+
+    return get_user_course_expiration_date(user, course), get_user_course_duration(user, course)
+
+
 # TODO: clean up as part of REVEM-199 (START)
-def get_program_context(course, user_enrollments, audit_enrollments):
+def get_program_context(course, user_enrollments):
     """
     Return a context dictionary with program information.
     """
     program_key = None
+    non_audit_enrollments = user_enrollments.exclude(mode__in=CourseMode.UPSELL_TO_VERIFIED_MODES)
+
     if PROGRAM_INFO_FLAG.is_enabled():
         programs = get_programs(course=course.id)
         if programs:
@@ -417,7 +385,6 @@ def get_program_context(course, user_enrollments, audit_enrollments):
                 # program has 3 courses (A, B and C), and the user previously purchased a certificate for A.
                 # The user is enrolled in audit mode for B. The "left to purchase price" should be the price of
                 # B+C.
-                non_audit_enrollments = [en for en in user_enrollments if en not in audit_enrollments]
                 courses_left_to_purchase = get_unenrolled_courses(courses, non_audit_enrollments)
                 if courses_left_to_purchase:
                     has_courses_left_to_purchase = True
@@ -442,35 +409,3 @@ def get_program_context(course, user_enrollments, audit_enrollments):
             }
     return program_key
 # TODO: clean up as part of REVEM-199 (START)
-
-
-# TODO START: Clean up REVEM-205
-def get_experiment_dashboard_metadata_context(enrollments):
-    """
-    Given a list of enrollments return a dict of course ids with their prices.
-    Utility function for experimental metadata. See experiments/dashboard_metadata.html.
-    :param enrollments:
-    :return: dict of courses: course price for dashboard metadata
-    """
-    return {str(enrollment.course): enrollment.course_price for enrollment in enrollments}
-# TODO END: Clean up REVEM-205
-
-
-def stable_bucketing_hash_group(group_name, group_count, username):
-    """
-    Return the bucket that a user should be in for a given stable bucketing assignment.
-
-    This function has been verified to return the same values as the stable bucketing
-    functions in javascript and the master experiments table.
-
-    Arguments:
-        group_name: The name of the grouping/experiment.
-        group_count: How many groups to bucket users into.
-        username: The username of the user being bucketed.
-    """
-    hasher = hashlib.md5()
-    hasher.update(group_name.encode('utf-8'))
-    hasher.update(username.encode('utf-8'))
-    hash_str = hasher.hexdigest()
-
-    return int(re.sub('[8-9a-f]', '1', re.sub('[0-7]', '0', hash_str)), 2) % group_count

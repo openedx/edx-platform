@@ -1,14 +1,19 @@
-from __future__ import print_function
+"""
+Contains functions that handle XML course data
+"""
+
+from __future__ import absolute_import, print_function
 
 import os
 import sys
 import traceback
 
 import lxml.etree
-
 from django.core.management.base import BaseCommand
 from fs.osfs import OSFS
 from path import Path as path
+from six.moves import map
+
 from xmodule.modulestore.xml import XMLModuleStore
 
 

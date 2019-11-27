@@ -266,8 +266,8 @@ class StubLtiHandler(StubHttpRequestHandler):
 
         # Calculate and encode body hash. See http://oauth.googlecode.com/svn/spec/ext/body_hash/1.0/oauth-bodyhash.html
         sha1 = hashlib.sha1()
-        sha1.update(body)
-        oauth_body_hash = six.text_type(base64.b64encode(sha1.digest()))
+        sha1.update(body.encode('utf-8'))
+        oauth_body_hash = base64.b64encode(sha1.digest()).decode('utf-8')
         mock_request = mock.Mock(
             uri=six.text_type(six.moves.urllib.parse.unquote(url)),
             headers=headers,

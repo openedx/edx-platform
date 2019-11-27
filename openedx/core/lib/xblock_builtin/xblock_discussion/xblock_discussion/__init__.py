@@ -263,6 +263,8 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):
         """
         Attempt to load definition XML from "discussion" folder in OLX, than parse it and update block fields
         """
+        if node.get('url_name') is None:
+            return  # Newer/XBlock XML format - no need to load an additional file.
         try:
             definition_xml, _ = cls.load_definition_xml(node, runtime, block.scope_ids.def_id)
         except Exception as err:  # pylint: disable=broad-except

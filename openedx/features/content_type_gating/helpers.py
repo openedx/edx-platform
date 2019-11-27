@@ -1,10 +1,12 @@
 """
 Helper functions used by both content_type_gating and course_duration_limits.
 """
+from __future__ import absolute_import
+
 import logging
 
-from xmodule.partitions.partitions import Group
 from course_modes.models import CourseMode
+from xmodule.partitions.partitions import Group
 
 # Studio generates partition IDs starting at 100. There is already a manually generated
 # partition for Enrollment Track that uses ID 50, so we'll use 51.

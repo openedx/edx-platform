@@ -1,30 +1,31 @@
 """
 Factories for use in tests of XBlocks.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import datetime
 import functools
-import pymongo.message
-import pytz
 import threading
 import traceback
 from collections import defaultdict
 from contextlib import contextmanager
 from uuid import uuid4
 
-from factory import Factory, Sequence, lazy_attribute_sequence, lazy_attribute
+import pymongo.message
+import pytz
+import six
+from factory import Factory, Sequence, lazy_attribute, lazy_attribute_sequence
 from factory.errors import CyclicDefinitionError
 from mock import patch
-
-from opaque_keys.edx.locator import BlockUsageLocator
 from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import BlockUsageLocator
 from xblock.core import XBlock
-from xmodule.modulestore import prefer_xmodules, ModuleStoreEnum
-from xmodule.modulestore.tests.sample_courses import default_block_info_tree, TOY_BLOCK_INFO_TREE
+
+from xmodule.course_module import Textbook
+from xmodule.modulestore import ModuleStoreEnum, prefer_xmodules
+from xmodule.modulestore.tests.sample_courses import TOY_BLOCK_INFO_TREE, default_block_info_tree
 from xmodule.tabs import CourseTab
 from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
-from xmodule.course_module import Textbook
 
 
 class Dummy(object):
@@ -283,9 +284,14 @@ class ItemFactory(XModuleFactory):
     category = 'chapter'
     parent = None
 
+    descriptive_tag = None
+
     @lazy_attribute_sequence
     def display_name(self, n):
-        return "{} {}".format(self.category, n)
+        if self.descriptive_tag:
+            return "{} {} - {}".format(self.category, n, self.descriptive_tag)
+        else:
+            return "{} {}".format(self.category, n)
 
     @lazy_attribute
     def location(self):
@@ -354,6 +360,10 @@ class ItemFactory(XModuleFactory):
         user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
         publish_item = kwargs.pop('publish_item', True)
 
+        # Remove the descriptive_tag, it's just for generating display_name,
+        # and doesn't need to be passed into the object constructor
+        kwargs.pop('descriptive_tag')
+
         assert isinstance(location, UsageKey)
         assert location != parent_location
 
@@ -361,6 +371,9 @@ class ItemFactory(XModuleFactory):
 
         # This code was based off that in cms/djangoapps/contentstore/views.py
         parent = kwargs.pop('parent', None) or store.get_item(parent_location)
+
+        if isinstance(data, (bytes, bytearray)):  # data appears as bytes and
+            data = data.decode('utf-8')
 
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
 
@@ -370,7 +383,7 @@ class ItemFactory(XModuleFactory):
                 template = clz.get_template(template_id)
                 assert template is not None
                 metadata.update(template.get('metadata', {}))
-                if not isinstance(data, basestring):
+                if not isinstance(data, six.string_types):
                     data.update(template.get('data'))
 
             # replace the display name with an optional parameter passed in from the caller
@@ -462,7 +475,7 @@ class StackTraceCounter(object):
         """
         # pylint: disable=broad-except
 
-        stack = traceback.extract_stack()[:-2]
+        stack = [tuple(item) for item in traceback.extract_stack()[:-2]]
 
         if self._top_of_stack in stack:
             stack = stack[stack.index(self._top_of_stack):]
@@ -474,7 +487,6 @@ class StackTraceCounter(object):
                     safe_args.append(repr(arg))
                 except Exception as exc:
                     safe_args.append('<un-repr-able value: {}'.format(exc))
-
             safe_kwargs = {}
             for key, kwarg in kwargs.items():
                 try:
@@ -506,7 +518,7 @@ class StackTraceCounter(object):
         """
         Iterate over all unique captured stacks.
         """
-        return iter(sorted(self._stacks.keys(), key=lambda stack: (self.stack_calls(stack), stack), reverse=True))
+        return iter(sorted(list(self._stacks.keys()), key=lambda stack: (self.stack_calls(stack), stack), reverse=True))
 
     def __getitem__(self, stack):
         """

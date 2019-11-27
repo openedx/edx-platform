@@ -8,11 +8,12 @@ required by server-side events.
 To use, call "from track import segment", then call segment.track() or segment.identify().
 
 """
-from urlparse import urlunsplit
+from __future__ import absolute_import
 
 import analytics
 from django.conf import settings
 from eventtracking import tracker
+from six.moves.urllib.parse import urlunsplit
 
 
 def track(user_id, event_name, properties=None, context=None):

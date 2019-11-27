@@ -2,8 +2,11 @@
 Decorators related to edXNotes.
 """
 
+from __future__ import absolute_import
+
 import json
 
+import six
 from django.conf import settings
 
 from edxmako.shortcuts import render_to_string
@@ -21,8 +24,13 @@ def edxnotes(cls):
         """
         # Import is placed here to avoid model import at project startup.
         from edxnotes.helpers import generate_uid, get_edxnotes_id_token, get_public_endpoint, get_token_url, is_feature_enabled
+
+        runtime = getattr(self, 'descriptor', self).runtime
+        if not hasattr(runtime, 'modulestore'):
+            return original_get_html(self, *args, **kwargs)
+
         is_studio = getattr(self.system, "is_author_mode", False)
-        course = self.descriptor.runtime.modulestore.get_course(self.runtime.course_id)
+        course = getattr(self, 'descriptor', self).runtime.modulestore.get_course(self.runtime.course_id)
 
         # Must be disabled when:
         # - in Studio
@@ -42,8 +50,8 @@ def edxnotes(cls):
                 ),
                 "params": {
                     # Use camelCase to name keys.
-                    "usageId": unicode(self.scope_ids.usage_id).encode("utf-8"),
-                    "courseId": unicode(self.runtime.course_id).encode("utf-8"),
+                    "usageId": six.text_type(self.scope_ids.usage_id),
+                    "courseId": six.text_type(self.runtime.course_id),
                     "token": get_edxnotes_id_token(user),
                     "tokenUrl": get_token_url(self.runtime.course_id),
                     "endpoint": get_public_endpoint(),

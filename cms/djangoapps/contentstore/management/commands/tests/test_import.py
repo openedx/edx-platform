@@ -2,10 +2,13 @@
 Unittests for importing a course via management command
 """
 
+from __future__ import absolute_import
+
 import os
 import shutil
 import tempfile
 
+import six
 from django.core.management import call_command
 from path import Path as path
 
@@ -91,4 +94,4 @@ class TestImport(ModuleStoreTestCase):
             course = modulestore().get_course(self.base_course_key)
             # With the bug, this fails because the chapter's course_key is the split mongo form,
             # while the course's course_key is the old mongo form.
-            self.assertEqual(unicode(course.location.course_key), unicode(course.children[0].course_key))
+            self.assertEqual(six.text_type(course.location.course_key), six.text_type(course.children[0].course_key))

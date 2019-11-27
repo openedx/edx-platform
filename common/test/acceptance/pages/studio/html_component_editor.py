@@ -1,9 +1,13 @@
 """
 HTML component editor in studio
 """
-from common.test.acceptance.pages.studio.utils import type_in_codemirror, get_codemirror_value
-from common.test.acceptance.pages.studio.xblock_editor import XBlockEditorView
+from __future__ import absolute_import
+
+from six.moves import zip
+
 from common.test.acceptance.pages.common.utils import click_css
+from common.test.acceptance.pages.studio.utils import get_codemirror_value, type_in_codemirror
+from common.test.acceptance.pages.studio.xblock_editor import XBlockEditorView
 
 
 class HtmlXBlockEditorView(XBlockEditorView):
@@ -68,7 +72,7 @@ class HtmlXBlockEditorView(XBlockEditorView):
             font = font.replace('font-family: ', '').replace(';', '')
             font_families[index] = font.split(',')
             font_families[index] = [x.lstrip() for x in font_families[index]]
-        font_dict = dict(zip(font_labels, font_families))
+        font_dict = dict(list(zip(font_labels, font_families)))
         return font_dict
 
     def set_content_and_save(self, content, raw=False):
@@ -233,6 +237,27 @@ class HtmlXBlockEditorView(XBlockEditorView):
         Click save button
         """
         click_css(self, '.action-save')
+
+    def open_image_modal(self):
+        """
+        Clicks and in insert image button
+        """
+        click_css(self, 'div i[class="mce-ico mce-i-image"]')
+
+    def upload_image(self, file_name):
+        """
+        Upload image and add description and click save to upload image via TinyMCE editor.
+        """
+        file_input_css = "[type='file']"
+
+        # select file input element and change visibility to add file.
+        self.browser.execute_script('$("{}").css("display","block");'.format(file_input_css))
+        self.wait_for_element_visibility(file_input_css, "Input is visible")
+        self.q(css=file_input_css).results[0].send_keys(file_name)
+        self.wait_for_element_visibility('#imageDescription', 'Upload form is visible.')
+
+        self.q(css='#imageDescription').results[0].send_keys('test image')
+        click_css(self, '.modal-footer .btn-primary')
 
 
 class HTMLEditorIframe(XBlockEditorView):

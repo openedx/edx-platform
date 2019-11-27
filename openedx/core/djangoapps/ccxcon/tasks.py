@@ -2,6 +2,8 @@
 This file contains celery tasks for ccxcon
 """
 
+from __future__ import absolute_import
+
 from celery.task import task
 from celery.utils.log import get_task_logger
 from opaque_keys.edx.keys import CourseKey
@@ -12,7 +14,7 @@ from openedx.core.djangoapps.ccxcon import api
 log = get_task_logger(__name__)
 
 
-@task()
+@task(name='openedx.core.djangoapps.ccxcon.tasks.update_ccxcon')
 def update_ccxcon(course_id, cur_retry=0):
     """
     Pass through function to update course information on CCXCon.

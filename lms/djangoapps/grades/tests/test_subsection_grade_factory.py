@@ -1,19 +1,18 @@
 """
 Tests for the SubsectionGradeFactory class.
 """
-import ddt
-from mock import patch
-from django.conf import settings
+from __future__ import absolute_import
 
-from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
+import ddt
+from django.conf import settings
+from mock import patch
+
+from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 from student.tests.factories import UserFactory
 
 from ..constants import GradeOverrideFeatureEnum
-from ..models import (
-    PersistentSubsectionGrade,
-    PersistentSubsectionGradeOverride,
-)
+from ..models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
 from ..subsection_grade_factory import ZeroSubsectionGrade
 from .base import GradeTestBase
 from .utils import mock_get_score
@@ -74,6 +73,22 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
             self.subsection_grade_factory.update(self.sequence, score_deleted=True)
         # ensure a grade has been persisted
         self.assertEqual(1, len(PersistentSubsectionGrade.objects.all()))
+
+    def test_update_if_higher_zero_denominator(self):
+        """
+        Test that we get an updated score of 0, and not a ZeroDivisionError,
+        when dealing with an invalid score like 0/0.
+        """
+        # This will create a PersistentSubsectionGrade with a score of 0/0.
+        with mock_get_score(0, 0):
+            grade = self.subsection_grade_factory.update(self.sequence)
+        self.assert_grade(grade, 0, 0)
+
+        # Ensure that previously storing a possible score of 0
+        # does not raise a ZeroDivisionError when updating the grade.
+        with mock_get_score(2, 2):
+            grade = self.subsection_grade_factory.update(self.sequence, only_if_higher=True)
+        self.assert_grade(grade, 2, 2)
 
     def test_update_if_higher(self):
         def verify_update_if_higher(mock_score, expected_grade):

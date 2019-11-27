@@ -1,7 +1,8 @@
 """
 Script for force publishing a course
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -11,7 +12,6 @@ from xmodule.modulestore.django import modulestore
 
 from .prompt import query_yes_no
 from .utils import get_course_versions
-
 
 # To run from command line: ./manage.py cms force_publish course-v1:org+course+run
 

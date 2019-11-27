@@ -1,0 +1,25 @@
+<%page args="content_gating_enabled, course_duration_limit_enabled, min_price, price_before_discount" expression_filter="h"/>
+
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<%namespace name='static' file='../static_content.html'/>
+
+<li class="action action-select">
+    <input type="hidden" name="contribution" value="${price_before_discount or min_price}" />
+    % if content_gating_enabled or course_duration_limit_enabled:
+        <button type="submit" name="verified_mode">
+            <span>${_('Pursue the Verified Track')}</span>
+    % else:
+        <button type="submit" name="verified_mode">
+            <span>${_('Pursue a Verified Certificate')}</span>
+    % endif
+        % if price_before_discount:
+        (<span class="upgrade-price-string">$${min_price} USD</span> <del> <span class="upgrade-price-string">${Text('${price} USD').format(price=price_before_discount)}</span></del>)
+        % else:
+        (<span class="upgrade-price-string">$${min_price} USD</span>)
+        % endif
+        </button>
+</li>

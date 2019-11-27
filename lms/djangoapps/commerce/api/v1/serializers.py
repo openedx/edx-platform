@@ -1,7 +1,10 @@
 """ API v1 serializers. """
+from __future__ import absolute_import
+
 from datetime import datetime
 
 import pytz
+import six
 from django.utils.translation import ugettext as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -10,7 +13,7 @@ from rest_framework import serializers
 from course_modes.models import CourseMode
 from xmodule.modulestore.django import modulestore
 
-from .models import Course, UNDEFINED
+from .models import UNDEFINED, Course
 
 
 class CourseModeSerializer(serializers.ModelSerializer):
@@ -33,6 +36,8 @@ class CourseModeSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = CourseMode
         fields = ('name', 'currency', 'price', 'sku', 'bulk_sku', 'expires')
+        # For disambiguating within the drf-yasg swagger schema
+        ref_name = 'commerce.CourseMode'
 
 
 def validate_course_id(course_id):
@@ -40,7 +45,7 @@ def validate_course_id(course_id):
     Check that course id is valid and exists in modulestore.
     """
     try:
-        course_key = CourseKey.from_string(unicode(course_id))
+        course_key = CourseKey.from_string(six.text_type(course_id))
     except InvalidKeyError:
         raise serializers.ValidationError(
             _(u"{course_id} is not a valid course key.").format(
@@ -73,6 +78,10 @@ class CourseSerializer(serializers.Serializer):
     name = serializers.CharField(read_only=True)
     verification_deadline = PossiblyUndefinedDateTimeField(format=None, allow_null=True, required=False)
     modes = CourseModeSerializer(many=True)
+
+    class Meta(object):
+        # For disambiguating within the drf-yasg swagger schema
+        ref_name = 'commerce.Course'
 
     def validate(self, attrs):
         """ Ensure the verification deadline occurs AFTER the course mode enrollment deadlines. """

@@ -89,36 +89,8 @@
         };
 
         DiscussionSpecHelper.setUnderscoreFixtures = function() {
-            var templateFixture, templateName, templateNames, templateNamesNoTrailingTemplate, i, j, len;
-            templateNames = [
-                'thread', 'thread-show', 'thread-edit', 'thread-response', 'thread-response-show',
-                'thread-response-edit', 'response-comment-show', 'response-comment-edit', 'thread-list-item',
-                'search-alert', 'new-post', 'thread-type', 'new-post-menu-entry', 'new-post-alert',
-                'new-post-menu-category', 'topic', 'post-user-display', 'inline-discussion', 'pagination',
-                'profile-thread', 'customwmd-prompt', 'nav-loading', 'new-post-visibility'
-            ];
-            templateNamesNoTrailingTemplate = [
-                'forum-action-endorse', 'forum-action-answer', 'forum-action-follow', 'forum-action-vote',
-                'forum-action-report', 'forum-action-pin', 'forum-action-close', 'forum-action-edit',
-                'forum-action-delete', 'forum-actions', 'alert-popup', 'nav-load-more-link'
-            ];
-            for (i = 0, len = templateNames.length; i < len; i++) {
-                templateName = templateNames[i];
-                templateFixture = readFixtures('common/templates/discussion/' + templateName + '.underscore');
-                appendSetFixtures($('<script>', {
-                    id: templateName + '-template',
-                    type: 'text/template'
-                }).text(templateFixture));
-            }
-            for (j = 0, len = templateNamesNoTrailingTemplate.length; j < len; j++) {
-                templateName = templateNamesNoTrailingTemplate[j];
-                templateFixture = readFixtures('common/templates/discussion/' + templateName + '.underscore');
-                appendSetFixtures($('<script>', {
-                    id: templateName,
-                    type: 'text/template'
-                }).text(templateFixture));
-            }
-
+            var templateFixtures = readFixtures('common/templates/discussion/templates.underscore');
+            appendSetFixtures(templateFixtures);
             appendSetFixtures(
                 '<script type="text/template" id="thread-list-template">' +
                 '    <div class="forum-nav-header">' +

@@ -1,8 +1,10 @@
 """
 Utilities for determining whether or not a survey needs to be completed.
 """
-from courseware.access import has_access
-from survey.models import SurveyForm, SurveyAnswer
+from __future__ import absolute_import
+
+from lms.djangoapps.courseware.access import has_access
+from survey.models import SurveyAnswer, SurveyForm
 
 
 def is_survey_required_for_course(course_descriptor):

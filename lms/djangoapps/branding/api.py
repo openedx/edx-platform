@@ -12,9 +12,11 @@ are consistent across the LMS and other sites (such as
 the marketing site and blog).
 
 """
-import logging
-import urlparse
+from __future__ import absolute_import
 
+import logging
+
+import six
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse
@@ -22,8 +24,9 @@ from django.utils.translation import ugettext as _
 
 from branding.models import BrandingApiConfig
 from edxmako.shortcuts import marketing_link
-
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
+
 
 log = logging.getLogger("edx.footer")
 EMPTY_URL = '#'
@@ -107,7 +110,10 @@ def get_footer(is_secure=True, language=settings.LANGUAGE_CODE):
         "navigation_links": _footer_navigation_links(language),
         "legal_links": _footer_legal_links(language),
         "edx_org_link": {
-            "url": "https://www.edx.org/?utm_medium=affiliate_partner&utm_source=opensource-partner&utm_content=open-edx-partner-footer-link&utm_campaign=open-edx-footer",
+            "url": "https://www.edx.org/?utm_medium=affiliate_partner"
+                   "&utm_source=opensource-partner"
+                   "&utm_content=open-edx-partner-footer-link"
+                   "&utm_campaign=open-edx-footer",
             "text": _("Take free online courses at edX.org"),
         },
     }
@@ -120,11 +126,11 @@ def _footer_copyright():
 
     """
     return _(
-        # Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
+        # Translators: 'edX' and 'Open edX' are trademarks of 'edX Inc.'.
         # Please do not translate any of these trademarks and company names.
         u"\u00A9 {org_name}.  All rights reserved except where noted.  "
-        u"EdX, Open edX and their respective logos are trademarks "
-        u"or registered trademarks of edX Inc."
+        u"edX, Open edX and their respective logos are "
+        u"registered trademarks of edX Inc."
     ).format(org_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME))
 
 
@@ -137,7 +143,7 @@ def _footer_openedx_link():
     Returns: dict
 
     """
-    # Translators: 'Open edX' is a brand, please keep this untranslated.
+    # Translators: 'Open edX' is a trademark, please keep this untranslated.
     # See http://openedx.org for more information.
     title = _("Powered by Open edX")
     return {
@@ -161,10 +167,10 @@ def _footer_social_links():
         links.append(
             {
                 "name": social_name,
-                "title": unicode(display.get("title", "")),
+                "title": six.text_type(display.get("title", "")),
                 "url": settings.SOCIAL_MEDIA_FOOTER_URLS.get(social_name, "#"),
                 "icon-class": display.get("icon", ""),
-                "action": unicode(display.get("action", "")).format(platform_name=platform_name),
+                "action": six.text_type(display.get("action", "")).format(platform_name=platform_name),
             }
         )
     return links
@@ -216,12 +222,32 @@ def _build_support_form_url(full_path=False):
     return contact_us_page
 
 
+def _build_help_center_url(language):
+    """
+    Return the help-center URL based on the language selected on the homepage.
+
+    :param language: selected language
+    :return: help-center URL
+    """
+    support_url = settings.SUPPORT_SITE_LINK
+    # Changing the site url only for the Edx.org and not for OpenEdx.
+    if support_url and 'support.edx.org' in support_url:
+        enabled_languages = {
+            'en': 'hc/en-us',
+            'es-419': 'hc/es-419'
+        }
+        if language in enabled_languages:
+            support_url = urljoin(support_url, enabled_languages[language])
+
+    return support_url
+
+
 def _footer_connect_links(language=settings.LANGUAGE_CODE):
     """Return the connect links to display in the footer. """
     links = [
         ("blog", (marketing_link("BLOG"), _("Blog"))),
         ("contact", (_build_support_form_url(full_path=True), _("Contact Us"))),
-        ("help-center", (settings.SUPPORT_SITE_LINK, _("Help Center"))),
+        ("help-center", (_build_help_center_url(language), _("Help Center"))),
     ]
 
     if language == settings.LANGUAGE_CODE:
@@ -256,7 +282,7 @@ def _footer_navigation_links(language=settings.LANGUAGE_CODE):
             _(u"{platform_name} for Business").format(platform_name=platform_name)
         )),
         ("blog", (marketing_link("BLOG"), _("Blog"))),
-        ("help-center", (settings.SUPPORT_SITE_LINK, _("Help Center"))),
+        ("help-center", (_build_help_center_url(language), _("Help Center"))),
         ("contact", (_build_support_form_url(), _("Contact"))),
         ("careers", (marketing_link("CAREERS"), _("Careers"))),
         ("donate", (marketing_link("DONATE"), _("Donate"))),
@@ -311,13 +337,24 @@ def _footer_legal_links(language=settings.LANGUAGE_CODE):
     ]
 
 
+def _add_enterprise_marketing_footer_query_params(url):
+    """Add query params to url if they exist in the settings"""
+    params = settings.ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS
+    if params:
+        return "{url}/?{params}".format(
+            url=url,
+            params=six.moves.urllib.parse.urlencode(params),
+        )
+    return url
+
+
 def _footer_business_links(language=settings.LANGUAGE_CODE):
     """Return the business links to display in the footer. """
     platform_name = configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
     links = [
         ("about", (marketing_link("ABOUT"), _("About"))),
         ("enterprise", (
-            marketing_link("ENTERPRISE"),
+            _add_enterprise_marketing_footer_query_params(marketing_link("ENTERPRISE")),
             _(u"{platform_name} for Business").format(platform_name=platform_name)
         )),
     ]
@@ -459,7 +496,7 @@ def _absolute_url(is_secure, url_path):
     """
     site_name = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
     parts = ("https" if is_secure else "http", site_name, url_path, '', '', '')
-    return urlparse.urlunparse(parts)
+    return six.moves.urllib.parse.urlunparse(parts)  # pylint: disable=too-many-function-args
 
 
 def _absolute_url_staticfile(is_secure, name):
@@ -478,7 +515,7 @@ def _absolute_url_staticfile(is_secure, name):
     # In production, the static files URL will be an absolute
     # URL pointing to a CDN.  If this happens, we can just
     # return the URL.
-    if urlparse.urlparse(url_path).netloc:
+    if six.moves.urllib.parse.urlparse(url_path).netloc:
         return url_path
 
     # For local development, the returned URL will be relative,
@@ -574,12 +611,6 @@ def get_about_url():
 
 def get_home_url():
     """
-    Lookup and return home page url, lookup is performed in the following order
-
-    1. return marketing root URL, If marketing is enabled
-    2. Otherwise return dashboard URL.
+    Return Dashboard page url
     """
-    if settings.FEATURES.get('ENABLE_MKTG_SITE', False):
-        return marketing_link('ROOT')
-
     return reverse('dashboard')

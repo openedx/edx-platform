@@ -7,6 +7,8 @@ Language setting page.
 This middleware must be placed before the LocaleMiddleware, but after
 the SessionMiddleware.
 """
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.utils.translation.trans_real import parse_accept_lang_header

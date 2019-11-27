@@ -2,12 +2,13 @@
 """
 Unit tests for instructor.enrollment methods.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import json
 from abc import ABCMeta
 
 import ddt
+import six
 from ccx_keys.locator import CCXLocator
 from crum import set_current_request
 from django.conf import settings
@@ -19,7 +20,7 @@ from six import text_type
 from submissions import api as sub_api
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 from grades.subsection_grade_factory import SubsectionGradeFactory
 from grades.tests.utils import answer_problem
 from lms.djangoapps.ccx.tests.factories import CcxFactory
@@ -64,7 +65,7 @@ class TestSettableEnrollmentState(CacheIsolationTestCase):
         self.assertEqual(mes, ees)
 
 
-class TestEnrollmentChangeBase(CacheIsolationTestCase):
+class TestEnrollmentChangeBase(six.with_metaclass(ABCMeta, CacheIsolationTestCase)):
     """
     Test instructor enrollment administration against database effects.
 
@@ -72,8 +73,6 @@ class TestEnrollmentChangeBase(CacheIsolationTestCase):
     `action` is a function which is run
     the test will pass if `action` mutates state from `before_ideal` to `after_ideal`
     """
-
-    __metaclass__ = ABCMeta
 
     def setUp(self):
         super(TestEnrollmentChangeBase, self).setUp()
@@ -398,9 +397,7 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
     # Disable the score change signal to prevent other components from being
     # pulled into tests.
     @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
-    @patch('lms.djangoapps.grades.signals.handlers.submissions_score_set_handler')
-    @patch('lms.djangoapps.grades.signals.handlers.submissions_score_reset_handler')
-    def test_delete_submission_scores(self, _mock_send_signal, mock_set_receiver, mock_reset_receiver):
+    def test_delete_submission_scores(self, mock_send_signal):
         user = UserFactory()
         problem_location = self.course_key.make_usage_key('dummy', 'module')
 
@@ -423,6 +420,7 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
         sub_api.set_score(submission['uuid'], 1, 2)
 
         # Delete student state using the instructor dash
+        mock_send_signal.reset_mock()
         reset_student_attempts(
             self.course_key, user, problem_location,
             requesting_user=user,
@@ -430,8 +428,8 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
         )
 
         # Make sure our grades signal receivers handled the reset properly
-        mock_set_receiver.assert_not_called()
-        mock_reset_receiver.assert_called_once()
+        mock_send_signal.assert_called_once()
+        assert mock_send_signal.call_args[1]['weighted_earned'] == 0
 
         # Verify that the student's scores have been reset in the submissions API
         score = sub_api.get_score(student_item)

@@ -17,7 +17,10 @@ var optimizedConfig = Merge.smart(commonConfig, {
     devtool: false,
     plugins: [
         new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify('production')
+            'process.env.NODE_ENV': JSON.stringify('production'),
+            'process.env.LMS_ROOT_URL': JSON.stringify(process.env.LMS_ROOT_URL),
+            'process.env.JWT_AUTH_COOKIE_HEADER_PAYLOAD': JSON.stringify(process.env.JWT_AUTH_COOKIE_HEADER_PAYLOAD),
+            'process.env.EDXMKTG_USER_INFO_COOKIE_NAME': JSON.stringify(process.env.EDXMKTG_USER_INFO_COOKIE_NAME)
         }),
         new webpack.LoaderOptionsPlugin({  // This may not be needed; legacy option for loaders written for webpack 1
             minimize: true

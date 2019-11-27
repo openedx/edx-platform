@@ -11,7 +11,7 @@ from django.contrib.auth.models import Group, User
 from django.core.management import CommandError, call_command
 from django.test import TestCase
 
-from openedx.core.djangoapps.user_api.accounts.utils import generate_password
+from openedx.core.djangoapps.user_authn.utils import generate_password
 
 TEST_EMAIL = 'test@example.com'
 TEST_USERNAME = 'test-user'

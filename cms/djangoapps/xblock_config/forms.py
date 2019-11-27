@@ -1,6 +1,8 @@
 """
 Defines a form for providing validation of LTI consumer course-specific configuration.
 """
+from __future__ import absolute_import
+
 import logging
 
 from django import forms

@@ -1,11 +1,12 @@
 """
 Common utility functions useful throughout the contentstore
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import logging
 from datetime import datetime
 
+import six
 from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import ugettext as _
@@ -150,7 +151,7 @@ def get_lms_link_for_certificate_web_view(user_id, course_key, mode):
     return u"//{certificate_web_base}/certificates/user/{user_id}/course/{course_id}?preview={mode}".format(
         certificate_web_base=lms_base,
         user_id=user_id,
-        course_id=unicode(course_key),
+        course_id=six.text_type(course_key),
         mode=mode
     )
 
@@ -274,7 +275,7 @@ def reverse_url(handler_name, key_name=None, key_value=None, kwargs=None):
     Creates the URL for the given handler.
     The optional key_name and key_value are passed in as kwargs to the handler.
     """
-    kwargs_for_reverse = {key_name: unicode(key_value)} if key_name else None
+    kwargs_for_reverse = {key_name: six.text_type(key_value)} if key_name else None
     if kwargs:
         kwargs_for_reverse.update(kwargs)
     return reverse(handler_name, kwargs=kwargs_for_reverse)
@@ -427,7 +428,7 @@ def get_user_partition_info(xblock, schemes=None, course=None):
             # Put together the entire partition dictionary
             partitions.append({
                 "id": p.id,
-                "name": unicode(p.name),  # Convert into a string in case ugettext_lazy was used
+                "name": six.text_type(p.name),  # Convert into a string in case ugettext_lazy was used
                 "scheme": p.scheme.name,
                 "groups": groups,
             })
@@ -517,3 +518,66 @@ def is_self_paced(course):
     Returns True if course is self-paced, False otherwise.
     """
     return course and course.self_paced
+
+
+def get_sibling_urls(subsection):
+    """
+    Given a subsection, returns the urls for the next and previous units.
+
+    (the first unit of the next subsection or section, and
+    the last unit of the previous subsection/section)
+    """
+    section = subsection.get_parent()
+    prev_url = next_url = ''
+    prev_loc = next_loc = None
+    last_block = None
+    siblings = list(section.get_children())
+    for i, block in enumerate(siblings):
+        if block.location == subsection.location:
+            if last_block:
+                try:
+                    prev_loc = last_block.get_children()[0].location
+                except IndexError:
+                    pass
+            try:
+                next_loc = siblings[i + 1].get_children()[0].location
+            except IndexError:
+                pass
+            break
+        last_block = block
+    if not prev_loc:
+        try:
+            # section.get_parent SHOULD return the course, but for some reason, it might not
+            sections = section.get_parent().get_children()
+        except AttributeError:
+            log.error(u"URL Retrieval Error # 1: subsection {subsection} included in section {section}".format(
+                section=section.location,
+                subsection=subsection.location
+            ))
+            # This should not be a fatal error. The worst case is that the navigation on the unit page
+            # won't display a link to a previous unit.
+        else:
+            try:
+                prev_section = sections[sections.index(section) - 1]
+                prev_loc = prev_section.get_children()[-1].get_children()[-1].location
+            except IndexError:
+                pass
+    if not next_loc:
+        try:
+            sections = section.get_parent().get_children()
+        except AttributeError:
+            log.error(u"URL Retrieval Error # 2: subsection {subsection} included in section {section}".format(
+                section=section.location,
+                subsection=subsection.location
+            ))
+        else:
+            try:
+                next_section = sections[sections.index(section) + 1]
+                next_loc = next_section.get_children()[0].get_children()[0].location
+            except IndexError:
+                pass
+    if prev_loc:
+        prev_url = reverse_usage_url('container_handler', prev_loc)
+    if next_loc:
+        next_url = reverse_usage_url('container_handler', next_loc)
+    return prev_url, next_url

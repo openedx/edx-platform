@@ -1,6 +1,8 @@
 """
 This file contains the exception used in courseware access
 """
+from __future__ import absolute_import
+
 from django.http import Http404
 
 

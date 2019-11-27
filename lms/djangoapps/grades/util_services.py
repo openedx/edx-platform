@@ -1,7 +1,7 @@
 "A light weight interface to grading helper functions"
+from __future__ import absolute_import
 
-
-from .grade_utils import are_grades_frozen
+from . import grade_utils
 
 
 class GradesUtilService(object):
@@ -14,4 +14,4 @@ class GradesUtilService(object):
 
     def are_grades_frozen(self):
         "Check if grades are frozen for given course key"
-        return are_grades_frozen(self.course_id)
+        return grade_utils.are_grades_frozen(self.course_id)

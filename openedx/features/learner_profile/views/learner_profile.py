@@ -1,5 +1,6 @@
 """ Views for a student's profile information. """
 
+from __future__ import absolute_import
 from badges.utils import badges_enabled
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -21,7 +22,6 @@ from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.learner_profile.toggles import should_redirect_to_profile_microfrontend
 from openedx.features.learner_profile.views.learner_achievements import LearnerAchievementsFragmentView
-from openedx.features.journals.api import journals_enabled
 from student.models import User
 
 
@@ -82,15 +82,8 @@ def learner_profile_context(request, profile_username, user_is_staff):
 
     preferences_data = get_user_preferences(profile_user, profile_username)
 
-    achievements_fragment = LearnerAchievementsFragmentView().render_to_fragment(
-        request,
-        username=profile_user.username,
-        own_profile=own_profile,
-    )
-
     context = {
         'own_profile': own_profile,
-        'achievements_fragment': achievements_fragment,
         'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
         'data': {
             'profile_user_id': profile_user.id,
@@ -117,12 +110,19 @@ def learner_profile_context(request, profile_username, user_is_staff):
             'social_platforms': settings.SOCIAL_PLATFORMS,
         },
         'show_program_listing': ProgramsApiConfig.is_enabled(),
-        'show_journal_listing': journals_enabled(),
         'show_dashboard_tabs': True,
         'disable_courseware_js': True,
         'nav_hidden': True,
         'records_url': get_credentials_records_url(),
     }
+
+    if own_profile or user_is_staff:
+        achievements_fragment = LearnerAchievementsFragmentView().render_to_fragment(
+            request,
+            username=profile_user.username,
+            own_profile=own_profile,
+        )
+        context['achievements_fragment'] = achievements_fragment
 
     if badges_enabled():
         context['data']['badges_api_url'] = reverse("badges_api:user_assertions", kwargs={'username': profile_username})

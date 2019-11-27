@@ -1,5 +1,7 @@
 # Factories are self documenting
 # pylint: disable=missing-docstring
+from __future__ import absolute_import
+
 from uuid import uuid4
 
 from factory.django import DjangoModelFactory
@@ -76,13 +78,6 @@ class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):
             "xseries": {
                 "certificate_title": "XSeries Certificate of Achievement",
                 "certificate_type": "XSeries"
-            },
-            "microsites": {
-                "test-site": {
-                    "company_about_url": "http://www.test-site.org/about-us",
-                    "company_privacy_url": "http://www.test-site.org/edx-privacy-policy",
-                    "company_tos_url": "http://www.test-site.org/edx-terms-service"
-                }
             }
         }"""
 

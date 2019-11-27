@@ -3,8 +3,11 @@
 End-to-end tests for the LMS Instructor Dashboard.
 """
 
+from __future__ import absolute_import
+
 import ddt
 from bok_choy.promise import EmptyPromise
+from six.moves import range
 
 from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc

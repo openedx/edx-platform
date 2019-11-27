@@ -1,6 +1,8 @@
 """
 Defines a form for providing validation of CourseEmail templates.
 """
+from __future__ import absolute_import
+
 import logging
 
 from django import forms

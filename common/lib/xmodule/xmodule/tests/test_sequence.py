@@ -2,17 +2,24 @@
 Tests for sequence module.
 """
 # pylint: disable=no-member
-import json
+from __future__ import absolute_import
 
+import ast
+import json
 from datetime import timedelta
+
 import ddt
+import six
 from django.utils.timezone import now
 from freezegun import freeze_time
 from mock import Mock, patch
+from six.moves import range
+
 from xmodule.seq_module import SequenceModule
 from xmodule.tests import get_test_system
 from xmodule.tests.helpers import StubUserService
-from xmodule.tests.xml import factories as xml, XModuleXmlImportTest
+from xmodule.tests.xml import XModuleXmlImportTest
+from xmodule.tests.xml import factories as xml
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
 TODAY = now()
@@ -136,7 +143,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
             view=view
         )
         self._assert_view_at_position(html, expected_position=1)
-        self.assertIn(unicode(self.sequence_3_1.location), html)
+        self.assertIn(six.text_type(self.sequence_3_1.location), html)
         self.assertIn("'gated': False", html)
         self.assertIn("'next_url': 'NextSequential'", html)
         self.assertIn("'prev_url': 'PrevSequential'", html)
@@ -189,10 +196,10 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
                 extra_context=dict(specific_masquerade=True),
             )
             self.assertIn("seq_module.html", html)
-            self.assertIn(
-                "'banner_text': u'Because the due date has passed, "
-                "this assignment is hidden from the learner.'",
-                html
+            html = self.get_context_dict_from_string(html)
+            self.assertEqual(
+                'Because the due date has passed, this assignment is hidden from the learner.',
+                html['banner_text']
             )
 
     def test_hidden_content_self_paced_past_due_before_end(self):
@@ -217,31 +224,35 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         Assert sequence content is gated
         """
         self.assertIn("seq_module.html", html)
-        self.assertIn("'banner_text': None", html)
-        self.assertIn("'items': []", html)
-        self.assertIn("'gated': True", html)
-        self.assertIn("'prereq_url': 'PrereqUrl'", html)
-        self.assertIn("'prereq_section_name': 'PrereqSectionName'", html)
-        self.assertIn("'gated_section_name': u'{}'".format(unicode(sequence.display_name)), html)
-        self.assertIn("'next_url': 'NextSequential'", html)
-        self.assertIn("'prev_url': 'PrevSequential'", html)
+        html = self.get_context_dict_from_string(html)
+        self.assertIsNone(html['banner_text'])
+        self.assertEqual([], html['items'])
+        self.assertTrue(html['gated_content']['gated'])
+        self.assertEqual('PrereqUrl', html['gated_content']['prereq_url'])
+        self.assertEqual('PrereqSectionName', html['gated_content']['prereq_section_name'])
+        self.assertIn(
+            six.text_type(sequence.display_name),
+            html['gated_content']['gated_section_name']
+        )
+        self.assertEqual('NextSequential', html['next_url'])
+        self.assertEqual('PrevSequential', html['prev_url'])
 
     def _assert_prereq(self, html, sequence):
         """
         Assert sequence is a prerequisite with unfulfilled gates
         """
         self.assertIn("seq_module.html", html)
-        self.assertIn(
-            "'banner_text': u'This section is a prerequisite. "
-            "You must complete this section in order to unlock additional content.'",
-            html
+        html = self.get_context_dict_from_string(html)
+        self.assertEqual(
+            "This section is a prerequisite. You must complete this section in order to unlock additional content.",
+            html['banner_text']
         )
-        self.assertIn("'gated': False", html)
-        self.assertIn(unicode(sequence.location), html)
-        self.assertIn("'prereq_url': None", html)
-        self.assertIn("'prereq_section_name': None", html)
-        self.assertIn("'next_url': 'NextSequential'", html)
-        self.assertIn("'prev_url': 'PrevSequential'", html)
+        self.assertFalse(html['gated_content']['gated'])
+        self.assertEqual(six.text_type(sequence.location), html['item_id'])
+        self.assertIsNone(html['gated_content']['prereq_url'])
+        self.assertIsNone(html['gated_content']['prereq_section_name'])
+        self.assertEqual('NextSequential', html['next_url'])
+        self.assertEqual('PrevSequential', html['prev_url'])
 
     def _assert_ungated(self, html, sequence):
         """
@@ -250,7 +261,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         self.assertIn("seq_module.html", html)
         self.assertIn("'banner_text': None", html)
         self.assertIn("'gated': False", html)
-        self.assertIn(unicode(sequence.location), html)
+        self.assertIn(six.text_type(sequence.location), html)
         self.assertIn("'prereq_url': None", html)
         self.assertIn("'prereq_section_name': None", html)
         self.assertIn("'next_url': 'NextSequential'", html)
@@ -289,7 +300,6 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
             self.sequence_1_2,
             extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
         )
-
         # assert that content and preq banner is shown
         self._assert_prereq(html, self.sequence_1_2)
 
@@ -312,7 +322,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         targeted vertical through ajax call
         """
         for child in self.sequence_3_1.get_children():
-            usage_key = unicode(child.location)
+            usage_key = six.text_type(child.location)
             completion_return = json.loads(self.sequence_3_1.handle_ajax(
                 'get_completion',
                 {'usage_key': usage_key}
@@ -332,3 +342,11 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
             {'usage_key': usage_key}
         )
         self.assertIs(completion_return, None)
+
+    def get_context_dict_from_string(self, data):
+        """
+        Retrieve dictionary from string.
+        """
+        # Replace tuple and un-necessary info from inside string and get the dictionary.
+        cleaned_data = data.replace("(('seq_module.html',\n", '').replace("),\n {})", '').strip()
+        return ast.literal_eval(cleaned_data)

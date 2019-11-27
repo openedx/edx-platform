@@ -2,6 +2,8 @@
 Tests of the pavelib.utils.timer module.
 """
 
+from __future__ import absolute_import
+
 from datetime import datetime, timedelta
 from unittest import TestCase
 

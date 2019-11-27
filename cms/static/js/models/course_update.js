@@ -3,9 +3,7 @@ define(['backbone', 'jquery', 'jquery.ui'], function(Backbone, $) {
     var CourseUpdate = Backbone.Model.extend({
         defaults: {
             date: $.datepicker.formatDate('MM d, yy', new Date()),
-            content: '',
-            push_notification_enabled: false,
-            push_notification_selected: false
+            content: ''
         },
         validate: function(attrs) {
             var date_exists = (attrs.date !== null && attrs.date !== '');

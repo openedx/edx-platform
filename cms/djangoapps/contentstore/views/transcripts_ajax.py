@@ -5,6 +5,8 @@ Actions manager for transcripts ajax calls.
 Module do not support rollback (pressing "Cancel" button in Studio)
 All user changes are saved immediately.
 """
+from __future__ import absolute_import
+
 import copy
 import json
 import logging
@@ -17,10 +19,12 @@ from django.core.exceptions import PermissionDenied
 from django.core.files.base import ContentFile
 from django.http import Http404, HttpResponse
 from django.utils.translation import ugettext as _
+from edxval.api import create_external_video, create_or_update_video_transcript
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from six import text_type
-from edxval.api import create_or_update_video_transcript, create_external_video
+
+from cms.djangoapps.contentstore.views.videos import TranscriptProvider
 from student.auth import has_course_author_access
 from util.json_request import JsonResponse
 from xmodule.contentstore.content import StaticContent
@@ -29,20 +33,18 @@ from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.video_module.transcripts_utils import (
+    GetTranscriptsFromYouTubeException,
+    Transcript,
+    TranscriptsGenerationException,
+    TranscriptsRequestValidationException,
     clean_video_id,
     download_youtube_subs,
-    GetTranscriptsFromYouTubeException,
-    get_transcript_for_video,
-    get_transcripts_from_youtube,
-    Transcript,
-    TranscriptsRequestValidationException,
-    TranscriptsGenerationException,
-    youtube_video_transcript_name,
     get_transcript,
+    get_transcript_for_video,
     get_transcript_from_val,
+    get_transcripts_from_youtube,
+    youtube_video_transcript_name
 )
-
-from cms.djangoapps.contentstore.views.videos import TranscriptProvider
 
 __all__ = [
     'upload_transcripts',
@@ -217,7 +219,7 @@ def upload_transcripts(request):
             # Convert 'srt' transcript into the 'sjson' and upload it to
             # configured transcript storage. For example, S3.
             sjson_subs = Transcript.convert(
-                content=transcript_file.read(),
+                content=transcript_file.read().decode('utf-8'),
                 input_format=Transcript.SRT,
                 output_format=Transcript.SJSON
             )
@@ -320,7 +322,7 @@ def check_transcripts(request):
         filename = 'subs_{0}.srt.sjson'.format(item.sub)
         content_location = StaticContent.compute_location(item.location.course_key, filename)
         try:
-            local_transcripts = contentstore().find(content_location).data
+            local_transcripts = contentstore().find(content_location).data.decode('utf-8')
             transcripts_presence['current_item_subs'] = item.sub
         except NotFoundError:
             pass
@@ -334,7 +336,7 @@ def check_transcripts(request):
             filename = 'subs_{0}.srt.sjson'.format(youtube_id)
             content_location = StaticContent.compute_location(item.location.course_key, filename)
             try:
-                local_transcripts = contentstore().find(content_location).data
+                local_transcripts = contentstore().find(content_location).data.decode('utf-8')
                 transcripts_presence['youtube_local'] = True
             except NotFoundError:
                 log.debug(u"Can't find transcripts in storage for youtube id: %s", youtube_id)
@@ -373,7 +375,9 @@ def check_transcripts(request):
             except NotFoundError:
                 log.debug(u"Can't find transcripts in storage for non-youtube video_id: %s", html5_id)
             if len(html5_subs) == 2:  # check html5 transcripts for equality
-                transcripts_presence['html5_equal'] = json.loads(html5_subs[0]) == json.loads(html5_subs[1])
+                transcripts_presence['html5_equal'] = (
+                    json.loads(html5_subs[0].decode('utf-8')) == json.loads(html5_subs[1].decode('utf-8'))
+                )
 
         command, __ = _transcripts_logic(transcripts_presence, videos)
 

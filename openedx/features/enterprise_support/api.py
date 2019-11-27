@@ -5,9 +5,11 @@ from __future__ import absolute_import
 
 import logging
 from functools import wraps
+import traceback
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
@@ -24,7 +26,12 @@ from third_party_auth.pipeline import get as get_partial_pipeline
 from third_party_auth.provider import Registry
 
 try:
-    from enterprise.models import EnterpriseCustomer, EnterpriseCustomerUser
+    from enterprise.models import (
+        EnterpriseCustomer,
+        EnterpriseCustomerIdentityProvider,
+        EnterpriseCustomerUser,
+        PendingEnterpriseCustomerUser
+    )
     from consent.models import DataSharingConsent, DataSharingConsentTextOverrides
 except ImportError:
     pass
@@ -187,7 +194,6 @@ class EnterpriseApiClient(object):
                         "enterprise_customer": {
                             "uuid": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
                             "name": "TestShib",
-                            "catalog": 2,
                             "active": true,
                             "site": {
                                 "domain": "example.com",
@@ -251,9 +257,10 @@ class EnterpriseApiClient(object):
             response = endpoint().get(**querystring)
         except (HttpClientError, HttpServerError):
             LOGGER.exception(
-                u'Failed to get enterprise-learner for user [%s] with client user [%s]',
+                u'Failed to get enterprise-learner for user [%s] with client user [%s]. Caller: %s',
                 user.username,
-                self.user.username
+                self.user.username,
+                "".join(traceback.format_stack())
             )
             return None
 
@@ -443,7 +450,9 @@ def enterprise_customer_for_request(request):
     if 'enterprise_customer' in request.session:
         return enterprise_customer_from_cache(request=request)
     else:
-        return enterprise_customer_from_api(request)
+        enterprise_customer = enterprise_customer_from_api(request)
+        request.session['enterprise_customer'] = enterprise_customer
+        return enterprise_customer
 
 
 @enterprise_is_enabled(otherwise=False)
@@ -463,7 +472,8 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
     else:
         client = ConsentApiClient(user=request.user)
         consent_needed = any(
-            client.consent_required(
+            Site.objects.get(domain=learner['enterprise_customer']['site']['domain']) == request.site
+            and client.consent_required(
                 username=user.username,
                 course_id=course_id,
                 enterprise_customer_uuid=learner['enterprise_customer']['uuid'],
@@ -552,17 +562,6 @@ def get_enterprise_learner_data(user):
         enterprise_learner_data = EnterpriseApiClient(user=user).fetch_enterprise_learner_data(user)
         if enterprise_learner_data:
             return enterprise_learner_data['results']
-
-
-@enterprise_is_enabled(otherwise={})
-def get_enterprise_customer_for_learner(user):
-    """
-    Return enterprise customer to whom given learner belongs.
-    """
-    enterprise_learner_data = get_enterprise_learner_data(user)
-    if enterprise_learner_data:
-        return enterprise_learner_data[0]['enterprise_customer']
-    return {}
 
 
 def get_consent_notification_data(enterprise_customer):
@@ -663,3 +662,35 @@ def insert_enterprise_pipeline_elements(pipeline):
     insert_point = pipeline.index('social_core.pipeline.social_auth.load_extra_data')
     for index, element in enumerate(additional_elements):
         pipeline.insert(insert_point + index, element)
+
+
+@enterprise_is_enabled()
+def unlink_enterprise_user_from_idp(request, user, idp_backend_name):
+    """
+    Un-links learner from their enterprise identity provider
+    Args:
+        request (wsgi request): request object
+        user (User): user who initiated disconnect request
+        idp_backend_name (str): Name of identity provider's backend
+
+    Returns: None
+
+    """
+    enterprise_customer = enterprise_customer_for_request(request)
+    if user and enterprise_customer:
+        enabled_providers = Registry.get_enabled_by_backend_name(idp_backend_name)
+        provider_ids = [enabled_provider.provider_id for enabled_provider in enabled_providers]
+        enterprise_customer_idps = EnterpriseCustomerIdentityProvider.objects.filter(
+            enterprise_customer__uuid=enterprise_customer['uuid'],
+            provider_id__in=provider_ids
+        )
+
+        if enterprise_customer_idps:
+            try:
+                # Unlink user email from each Enterprise Customer.
+                for enterprise_customer_idp in enterprise_customer_idps:
+                    EnterpriseCustomerUser.objects.unlink_user(
+                        enterprise_customer=enterprise_customer_idp.enterprise_customer, user_email=user.email
+                    )
+            except (EnterpriseCustomerUser.DoesNotExist, PendingEnterpriseCustomerUser.DoesNotExist):
+                pass

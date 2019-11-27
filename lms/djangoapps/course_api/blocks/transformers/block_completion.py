@@ -2,8 +2,10 @@
 Block Completion Transformer
 """
 
-from xblock.completable import XBlockCompletionMode as CompletionMode
+from __future__ import absolute_import
+
 from completion.models import BlockCompletion
+from xblock.completable import XBlockCompletionMode as CompletionMode
 
 from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 
@@ -59,7 +61,7 @@ class BlockCompletionTransformer(BlockStructureTransformer):
 
         completions = BlockCompletion.objects.filter(
             user=usage_info.user,
-            course_key=usage_info.course_key,
+            context_key=usage_info.course_key,
         ).values_list(
             'block_key',
             'completion',

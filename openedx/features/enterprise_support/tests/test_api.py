@@ -8,6 +8,8 @@ import mock
 
 import ddt
 import httpretty
+from six.moves.urllib.parse import parse_qs  # pylint: disable=import-error
+
 from consent.models import DataSharingConsent
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -15,6 +17,7 @@ from django.core.cache import cache
 from django.http import HttpResponseRedirect
 from django.test.utils import override_settings
 from django.urls import reverse
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.features.enterprise_support.api import (
     ConsentApiClient,
@@ -169,7 +172,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
     @httpretty.activate
     def test_consent_needed_for_course(self):
         user = UserFactory(username='janedoe')
-        request = mock.MagicMock(session={}, user=user)
+        request = mock.MagicMock(session={}, user=user, site=SiteFactory(domain="example.com"))
         ec_uuid = 'cf246b88-d5f6-4908-a522-fc307e0b0c59'
         course_id = 'fake-course'
         self.mock_enterprise_learner_api()
@@ -250,6 +253,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
         # Verify that the method `enterprise_customer_for_request` returns no
         # enterprise customer if the enterprise customer API throws 404.
+        del dummy_request.session['enterprise_customer']
         self.mock_get_enterprise_customer('real-ent-uuid', {'detail': 'Not found.'}, 404)
         enterprise_customer = enterprise_customer_for_request(dummy_request)
         self.assertIsNone(enterprise_customer)
@@ -284,6 +288,36 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             mock.MagicMock(GET={}, COOKIES={}, user=self.user, site=1)
         )
         self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
+
+    def test_enterprise_customer_for_request_with_session(self):
+        """
+        Verify enterprise_customer_for_request stores and retrieves data from session appropriately
+        """
+        dummy_request = mock.MagicMock(session={}, user=self.user)
+        enterprise_data = {'name': 'dummy-enterprise-customer', 'uuid': '8dc65e66-27c9-447b-87ff-ede6d66e3a5d'}
+
+        # Verify enterprise customer data fetched from API when it is not available in session
+        with mock.patch(
+                'openedx.features.enterprise_support.api.enterprise_customer_from_api',
+                return_value=enterprise_data
+        ):
+            self.assertEqual(dummy_request.session.get('enterprise_customer'), None)
+            enterprise_customer = enterprise_customer_for_request(dummy_request)
+            self.assertEqual(enterprise_customer, enterprise_data)
+            self.assertEqual(dummy_request.session.get('enterprise_customer'), enterprise_data)
+
+        # Verify enterprise customer data fetched from session for subsequent calls
+        with mock.patch(
+                'openedx.features.enterprise_support.api.enterprise_customer_from_api',
+                return_value=enterprise_data
+        ) as mock_enterprise_customer_from_api, mock.patch(
+                'openedx.features.enterprise_support.api.enterprise_customer_from_cache',
+                return_value=enterprise_data
+        ) as mock_enterprise_customer_from_cache:
+            enterprise_customer = enterprise_customer_for_request(dummy_request)
+            self.assertEqual(enterprise_customer, enterprise_data)
+            self.assertEqual(mock_enterprise_customer_from_api.called, False)
+            self.assertEqual(mock_enterprise_customer_from_cache.called, True)
 
     def check_data_sharing_consent(self, consent_required=False, consent_url=None):
         """
@@ -363,8 +397,6 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         self.check_data_sharing_consent(consent_required=True, consent_url=consent_url)
 
         mock_get_consent_url.assert_called_once()
-        mock_enterprise_enabled.assert_called_once()
-        mock_consent_necessary.assert_called_once()
 
     @httpretty.activate
     @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_uuid_for_request')
@@ -396,15 +428,16 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         course_id = 'course-v1:edX+DemoX+Demo_Course'
         return_to = 'info'
 
-        expected_url = (
-            '/enterprise/grant_data_sharing_permissions?course_id=course-v1%3AedX%2BDemoX%2BDemo_'
-            'Course&failure_url=http%3A%2F%2Flocalhost%3A8000%2Fdashboard%3Fconsent_failed%3Dcou'
-            'rse-v1%253AedX%252BDemoX%252BDemo_Course&enterprise_customer_uuid=cf246b88-d5f6-4908'
-            '-a522-fc307e0b0c59&next=http%3A%2F%2Flocalhost%3A8000%2Fcourses%2Fcourse-v1%3AedX%2B'
-            'DemoX%2BDemo_Course%2Finfo'
-        )
+        expected_url_args = {
+            'course_id': ['course-v1:edX+DemoX+Demo_Course'],
+            'failure_url': ['http://localhost:8000/dashboard?consent_failed=course-v1%3AedX%2BDemoX%2BDemo_Course'],
+            'enterprise_customer_uuid': ['cf246b88-d5f6-4908-a522-fc307e0b0c59'],
+            'next': ['http://localhost:8000/courses/course-v1:edX+DemoX+Demo_Course/info']
+        }
+
         actual_url = get_enterprise_consent_url(request_mock, course_id, return_to=return_to)
-        self.assertEqual(actual_url, expected_url)
+        actual_url_args = parse_qs(actual_url.split('/enterprise/grant_data_sharing_permissions?')[1])
+        self.assertEqual(actual_url_args, expected_url_args)
 
     @ddt.data(
         (False, {'real': 'enterprise', 'uuid': ''}, 'course', [], [], "", ""),

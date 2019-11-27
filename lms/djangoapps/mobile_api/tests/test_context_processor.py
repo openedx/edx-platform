@@ -1,6 +1,8 @@
 """
 Tests for Django template context processors.
 """
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.test import TestCase
 from django.test.client import RequestFactory

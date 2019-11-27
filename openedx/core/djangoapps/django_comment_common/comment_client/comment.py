@@ -1,4 +1,6 @@
 # pylint: disable=missing-docstring,protected-access
+from __future__ import absolute_import
+
 from openedx.core.djangoapps.django_comment_common.comment_client import models, settings
 
 from .thread import Thread, _url_for_flag_abuse_thread, _url_for_unflag_abuse_thread

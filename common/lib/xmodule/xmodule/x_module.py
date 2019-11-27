@@ -1,44 +1,49 @@
+from __future__ import absolute_import
+
 import logging
 import os
 import sys
 import time
-import yaml
-
-from contracts import contract, new_contract
-from functools import partial
-from lxml import etree
 from collections import namedtuple
-from pkg_resources import (
-    resource_exists,
-    resource_listdir,
-    resource_string,
-    resource_isdir,
-)
+from functools import partial
+
+from pkg_resources import resource_exists, resource_isdir, resource_listdir, resource_string
+
+import six
+import yaml
+from contracts import contract, new_contract
+from django.utils.encoding import python_2_unicode_compatible
+from lazy import lazy
+from lxml import etree
+from opaque_keys.edx.asides import AsideDefinitionKeyV2, AsideUsageKeyV2
+from opaque_keys.edx.keys import UsageKey
+from openedx.core.djangolib.markup import HTML
 from six import text_type
+from six.moves import map
 from web_fragments.fragment import Fragment
 from webob import Response
 from webob.multidict import MultiDict
-from lazy import lazy
-
 from xblock.core import XBlock, XBlockAside
 from xblock.fields import (
-    Scope, Integer, Float, List,
-    String, Dict, ScopeIds, Reference, ReferenceList,
-    ReferenceValueDict, UserScope
+    Dict,
+    Float,
+    Integer,
+    List,
+    Reference,
+    ReferenceList,
+    ReferenceValueDict,
+    Scope,
+    ScopeIds,
+    String,
+    UserScope
 )
-
-from xblock.runtime import Runtime, IdReader, IdGenerator
+from xblock.runtime import IdGenerator, IdReader, Runtime
 from xmodule import block_metadata_utils
-from xmodule.fields import RelativeTime
 from xmodule.errortracker import exc_info_to_str
+from xmodule.exceptions import UndefinedContext
+from xmodule.fields import RelativeTime
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.xmodule_django import add_webpack_to_fragment
-
-from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.asides import AsideUsageKeyV2, AsideDefinitionKeyV2
-from xmodule.exceptions import UndefinedContext
-
-from openedx.core.djangolib.markup import HTML
 
 log = logging.getLogger(__name__)
 
@@ -908,15 +913,16 @@ class XModuleToXBlockMixin(object):
         # WebOb requests have multiple entries for uploaded files.  handle_ajax
         # expects a single entry as a list.
         request_post = MultiDict(request.POST)
-        for key in set(request.POST.iterkeys()):
+        for key in set(six.iterkeys(request.POST)):
             if hasattr(request.POST[key], "file"):
-                request_post[key] = map(FileObjForWebobFiles, request.POST.getall(key))
+                request_post[key] = list(map(FileObjForWebobFiles, request.POST.getall(key)))
 
         response_data = self.handle_ajax(suffix, request_post)
         return Response(response_data, content_type='application/json', charset='UTF-8')
 
 
 @XBlock.needs("i18n")
+@python_2_unicode_compatible
 class XModule(XModuleToXBlockMixin, HTMLSnippet, XModuleMixin):
     """ Implements a generic learning module.
 
@@ -961,7 +967,7 @@ class XModule(XModuleToXBlockMixin, HTMLSnippet, XModuleMixin):
     def runtime(self, value):  # pylint: disable=arguments-differ
         self._runtime = value
 
-    def __unicode__(self):
+    def __str__(self):
         # xss-lint: disable=python-wrap-html
         return u'<x_module(id={0})>'.format(self.id)
 
@@ -1117,9 +1123,20 @@ class XModuleDescriptorToXBlockMixin(object):
         Interpret the parsed XML in `node`, creating an XModuleDescriptor.
         """
         # It'd be great to not reserialize and deserialize the xml
-        xml = etree.tostring(node)
+        xml = etree.tostring(node).decode('utf-8')
         block = cls.from_xml(xml, runtime, id_generator)
         return block
+
+    @classmethod
+    def parse_xml_new_runtime(cls, node, runtime, keys):
+        """
+        This XML lives within Blockstore and the new runtime doesn't need this
+        legacy XModule code. Use the "normal" XBlock parsing code.
+        """
+        try:
+            return super(XModuleDescriptorToXBlockMixin, cls).parse_xml_new_runtime(node, runtime, keys)
+        except AttributeError:
+            return super(XModuleDescriptorToXBlockMixin, cls).parse_xml(node, runtime, keys, id_generator=None)
 
     @classmethod
     def from_xml(cls, xml_data, system, id_generator):
@@ -1237,9 +1254,12 @@ class XModuleDescriptor(XModuleDescriptorToXBlockMixin, HTMLSnippet, ResourceTem
 
     # =============================== BUILTIN METHODS ==========================
     def __eq__(self, other):
+        """
+        Is this XModule effectively equal to the other instance?
+        """
         return (hasattr(other, 'scope_ids') and
                 self.scope_ids == other.scope_ids and
-                self.fields.keys() == other.fields.keys() and
+                list(self.fields.keys()) == list(other.fields.keys()) and
                 all(getattr(self, field.name) == getattr(other, field.name)
                     for field in self.fields.values()))
 
@@ -1465,30 +1485,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
             Used for example to get a list of all non-fatal problems on course
             load, and display them to the user.
 
-            A function of (error_msg). errortracker.py provides a
-            handy make_error_tracker() function.
-
-            Patterns for using the error handler:
-               try:
-                  x = access_some_resource()
-                  check_some_format(x)
-               except SomeProblem as err:
-                  msg = 'Grommet {0} is broken: {1}'.format(x, str(err))
-                  log.warning(msg)  # don't rely on tracker to log
-                        # NOTE: we generally don't want content errors logged as errors
-                  self.system.error_tracker(msg)
-                  # work around
-                  return 'Oops, couldn't load grommet'
-
-               OR, if not in an exception context:
-
-               if not check_something(thingy):
-                  msg = "thingy {0} is broken".format(thingy)
-                  log.critical(msg)
-                  self.system.error_tracker(msg)
-
-               NOTE: To avoid duplication, do not call the tracker on errors
-               that you're about to re-raise---let the caller track them.
+            See errortracker.py for more documentation
 
         get_policy: a function that takes a usage id and returns a dict of
             policy to apply.
@@ -1718,7 +1715,7 @@ class XMLParsingSystem(DescriptorSystem):
         """
         course_key = xblock.scope_ids.usage_id.course_key
 
-        for field in xblock.fields.itervalues():
+        for field in six.itervalues(xblock.fields):
             if field.is_set_on(xblock):
                 field_value = getattr(xblock, field.name)
                 if field_value is None:
@@ -1728,8 +1725,8 @@ class XMLParsingSystem(DescriptorSystem):
                 elif isinstance(field, ReferenceList):
                     setattr(xblock, field.name, [self._make_usage_key(course_key, ele) for ele in field_value])
                 elif isinstance(field, ReferenceValueDict):
-                    for key, subvalue in field_value.iteritems():
-                        assert isinstance(subvalue, basestring)
+                    for key, subvalue in six.iteritems(field_value):
+                        assert isinstance(subvalue, six.string_types)
                         field_value[key] = self._make_usage_key(course_key, subvalue)
                     setattr(xblock, field.name, field_value)
 

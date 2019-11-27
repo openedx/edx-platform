@@ -5,7 +5,7 @@ from __future__ import absolute_import
 
 import logging
 
-from courseware.masquerade import (
+from lms.djangoapps.courseware.masquerade import (
     get_course_masquerade,
     get_masquerading_user_group,
     is_masquerading_as_specific_student

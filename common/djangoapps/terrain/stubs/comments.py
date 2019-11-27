@@ -5,6 +5,7 @@ Stub implementation of cs_comments_service for acceptance tests
 from __future__ import absolute_import
 
 import re
+from collections import OrderedDict
 
 import six.moves.urllib.parse  # pylint: disable=import-error
 
@@ -18,15 +19,15 @@ class StubCommentsServiceHandler(StubHttpRequestHandler):
         return six.moves.urllib.parse.parse_qs(six.moves.urllib.parse.urlparse(self.path).query)
 
     def do_GET(self):
-        pattern_handlers = {
-            "/api/v1/users/(?P<user_id>\\d+)/active_threads$": self.do_user_profile,
-            "/api/v1/users/(?P<user_id>\\d+)$": self.do_user,
-            "/api/v1/search/threads$": self.do_search_threads,
-            "/api/v1/threads$": self.do_threads,
-            "/api/v1/threads/(?P<thread_id>\\w+)$": self.do_thread,
-            "/api/v1/comments/(?P<comment_id>\\w+)$": self.do_comment,
-            "/api/v1/(?P<commentable_id>\\w+)/threads$": self.do_commentable,
-        }
+        pattern_handlers = OrderedDict([
+            ("/api/v1/users/(?P<user_id>\\d+)/active_threads$", self.do_user_profile),
+            ("/api/v1/users/(?P<user_id>\\d+)$", self.do_user),
+            ("/api/v1/search/threads$", self.do_search_threads),
+            ("/api/v1/threads$", self.do_threads),
+            ("/api/v1/threads/(?P<thread_id>\\w+)$", self.do_thread),
+            ("/api/v1/comments/(?P<comment_id>\\w+)$", self.do_comment),
+            ("/api/v1/(?P<commentable_id>\\w+)/threads$", self.do_commentable),
+        ])
         if self.match_pattern(pattern_handlers):
             return
 

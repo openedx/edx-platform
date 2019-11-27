@@ -3,10 +3,12 @@ Provides a function for importing a git repository into the lms
 instance when using a mongo modulestore
 """
 
+from __future__ import absolute_import
+
 import logging
 import os
 import re
-import StringIO
+from six import StringIO
 import subprocess
 
 import mongoengine
@@ -15,10 +17,10 @@ from django.core import management
 from django.core.management.base import CommandError
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from xmodule.util.sandboxing import DEFAULT_PYTHON_LIB_FILENAME
 from opaque_keys.edx.locator import CourseLocator
 
 from dashboard.models import CourseImportLog
+from xmodule.util.sandboxing import DEFAULT_PYTHON_LIB_FILENAME
 
 log = logging.getLogger(__name__)
 
@@ -57,7 +59,7 @@ class GitImportErrorUrlBad(GitImportError):
     """
     MESSAGE = _(
         'Non usable git url provided. Expecting something like:'
-        ' git@github.com:mitocw/edx4edx_lite.git'
+        ' git@github.com:edx/edx4edx_lite.git'
     )
 
 
@@ -115,7 +117,7 @@ def cmd_log(cmd, cwd):
     used along with the output. Will raise subprocess.CalledProcessError if
     command doesn't return 0, and returns the command's output.
     """
-    output = subprocess.check_output(cmd, cwd=cwd, stderr=subprocess.STDOUT)
+    output = subprocess.check_output(cmd, cwd=cwd, stderr=subprocess.STDOUT).decode('utf-8')
 
     log.debug(u'Command was: %r. Working directory was: %r', ' '.join(cmd), cwd)
     log.debug(u'Command output was: %r', output)
@@ -259,7 +261,7 @@ def add_repo(repo, rdir_in, branch=None):
     ret_git += u'{0}Branch: {1}'.format('   \n', branch)
 
     # Get XML logging logger and capture debug to parse results
-    output = StringIO.StringIO()
+    output = StringIO()
     import_log_handler = logging.StreamHandler(output)
     import_log_handler.setLevel(logging.DEBUG)
 

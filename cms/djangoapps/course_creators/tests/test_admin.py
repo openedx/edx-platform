@@ -2,12 +2,15 @@
 Tests course_creators.admin.py.
 """
 
+from __future__ import absolute_import
+
 import mock
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
 from django.core import mail
 from django.http import HttpRequest
 from django.test import TestCase
+from six.moves import range
 
 from course_creators.admin import CourseCreatorAdmin
 from course_creators.models import CourseCreator
@@ -166,7 +169,7 @@ class CourseCreatorAdminTest(TestCase):
             post_params = {'username': self.user.username, 'password': 'wrong_password'}
             # try logging in 30 times, the default limit in the number of failed
             # login attempts in one 5 minute period before the rate gets limited
-            for _ in xrange(30):
+            for _ in range(30):
                 response = self.client.post('/admin/login/', post_params)
                 self.assertEquals(response.status_code, 200)
 

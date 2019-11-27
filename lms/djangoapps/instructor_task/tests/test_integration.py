@@ -5,21 +5,25 @@ Runs tasks on answers to course problems to validate that code
 paths actually work.
 
 """
+from __future__ import absolute_import
+
 import json
 import logging
 import textwrap
 from collections import namedtuple
 
 import ddt
+import six
 from celery.states import FAILURE, SUCCESS
 from django.contrib.auth.models import User
 from django.urls import reverse
 from mock import patch
 from six import text_type
+from six.moves import range
 
 from capa.responsetypes import StudentInputError
 from capa.tests.response_xml_factory import CodeResponseXMLFactory, CustomResponseXMLFactory
-from courseware.model_data import StudentModule
+from lms.djangoapps.courseware.model_data import StudentModule
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.instructor_task.api import (
     submit_delete_problem_state_for_all_students,
@@ -401,7 +405,7 @@ class TestRescoringTask(TestIntegrationTask):
             correct_map = state['correct_map']
             log.info(u"Correct Map: %s", correct_map)
             # only one response, so pull it out:
-            answer = correct_map.values()[0]['msg']
+            answer = list(correct_map.values())[0]['msg']
             self.submit_student_answer(user.username, problem_url_name, [answer, answer])
             # we should now get the problem right, with a second attempt:
             self.check_state(user, descriptor, 1, 1, expected_attempts=2)
@@ -484,7 +488,7 @@ class TestResetAttemptsTask(TestIntegrationTask):
         self.submit_student_answer('u1', problem_url_name, [OPTION_1, OPTION_1])
 
         expected_message = "bad things happened"
-        with patch('courseware.models.StudentModule.save') as mock_save:
+        with patch('lms.djangoapps.courseware.models.StudentModule.save') as mock_save:
             mock_save.side_effect = ZeroDivisionError(expected_message)
             instructor_task = self.reset_problem_attempts('instructor', location)
         self._assert_task_failure(instructor_task.id, 'reset_problem_attempts', problem_url_name, expected_message)
@@ -546,7 +550,7 @@ class TestDeleteProblemTask(TestIntegrationTask):
         self.submit_student_answer('u1', problem_url_name, [OPTION_1, OPTION_1])
 
         expected_message = "bad things happened"
-        with patch('courseware.models.StudentModule.delete') as mock_delete:
+        with patch('lms.djangoapps.courseware.models.StudentModule.delete') as mock_delete:
             mock_delete.side_effect = ZeroDivisionError(expected_message)
             instructor_task = self.delete_problem_state('instructor', location)
         self._assert_task_failure(instructor_task.id, 'delete_problem_state', problem_url_name, expected_message)
@@ -609,7 +613,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
                     grades,
                     user_partition_group(student)
                 )
-                for student_grades in students_grades for student, grades in student_grades.iteritems()
+                for student_grades in students_grades for student, grades in six.iteritems(student_grades)
             ],
             ignore_other_columns=ignore_other_columns,
         )

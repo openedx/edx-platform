@@ -2,9 +2,11 @@
 API entry point to the course_blocks app with top-level
 get_course_blocks function.
 """
-from django.conf import settings
+from __future__ import absolute_import
 
+from django.conf import settings
 from edx_when import field_data
+
 from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from openedx.features.content_type_gating.block_transformers import ContentTypeGateTransformer
@@ -37,7 +39,6 @@ def get_course_block_access_transformers(user):
     """
     course_block_access_transformers = [
         library_content.ContentLibraryTransformer(),
-        library_content.ContentLibraryOrderTransformer(),
         start_date.StartDateTransformer(),
         ContentTypeGateTransformer(),
         user_partitions.UserPartitionTransformer(),

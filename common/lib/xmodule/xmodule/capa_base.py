@@ -1,4 +1,6 @@
 """Implements basics of Capa, including class CapaModule."""
+from __future__ import absolute_import
+
 import copy
 import datetime
 import hashlib
@@ -10,25 +12,25 @@ import struct
 import sys
 import traceback
 
+import six
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from pytz import utc
 from django.utils.encoding import smart_text
 from django.utils.functional import cached_property
+from pytz import utc
 from six import text_type
+from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString
+from xblock.scorable import ScorableXBlockMixin, Score
 
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
 from capa.inputtypes import Status
-from capa.responsetypes import StudentInputError, ResponseError, LoncapaProblemError
+from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
 from capa.util import convert_files_to_filenames, get_inner_html_from_xpath
-from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString
-
 from openedx.core.djangolib.markup import HTML, Text
-from xblock.fields import String
-from xblock.scorable import ScorableXBlockMixin, Score
 from xmodule.exceptions import NotFoundError
 from xmodule.graders import ShowCorrectness
-from .fields import Date, Timedelta, ScoreField
+
+from .fields import Date, ScoreField, Timedelta
 from .progress import Progress
 
 log = logging.getLogger("edx.courseware")
@@ -83,8 +85,8 @@ def randomization_bin(seed, problem_id):
     we'll combine the system's per-student seed with the problem id in picking the bin.
     """
     r_hash = hashlib.sha1()
-    r_hash.update(str(seed))
-    r_hash.update(str(problem_id))
+    r_hash.update(six.b(str(seed)))
+    r_hash.update(six.b(str(problem_id)))
     # get the first few digits of the hash, convert to an int, then mod.
     return int(r_hash.hexdigest()[:7], 16) % NUM_RANDOMIZATION_BINS
 
@@ -188,14 +190,12 @@ class CapaFields(object):
         scope=Scope.settings,
         default=False
     )
-    reset_key = "DEFAULT_SHOW_RESET_BUTTON"
-    default_reset_button = getattr(settings, reset_key) if hasattr(settings, reset_key) else False
     show_reset_button = Boolean(
         display_name=_("Show Reset Button"),
         help=_("Determines whether a 'Reset' button is shown so the user may reset their answer. "
                "A default value can be set in Advanced Settings."),
         scope=Scope.settings,
-        default=default_reset_button
+        default=False
     )
     rerandomize = Randomization(
         display_name=_("Randomization"),
@@ -294,7 +294,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         except Exception as err:  # pylint: disable=broad-except
             msg = u'cannot create LoncapaProblem {loc}: {err}'.format(
                 loc=text_type(self.location), err=err)
-            raise Exception(msg), None, sys.exc_info()[2]
+            six.reraise(Exception, Exception(msg), sys.exc_info()[2])
 
         if self.score is None:
             self.set_score(self.score_from_lcp(lcp))
@@ -310,7 +310,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             self.seed = 1
         elif self.rerandomize == RANDOMIZATION.PER_STUDENT and hasattr(self.runtime, 'seed'):
             # see comment on randomization_bin
-            self.seed = randomization_bin(self.runtime.seed, unicode(self.location).encode('utf-8'))
+            self.seed = randomization_bin(self.runtime.seed, six.text_type(self.location).encode('utf-8'))
         else:
             self.seed = struct.unpack('i', os.urandom(4))[0]
 
@@ -385,8 +385,11 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         """
         For now, just return weighted earned / weighted possible
         """
-        raw_earned = self.score.raw_earned
-        raw_possible = self.score.raw_possible
+        if self.score:
+            raw_earned = self.score.raw_earned
+            raw_possible = self.score.raw_possible
+        else:
+            raw_earned = raw_possible = 0
 
         if raw_possible > 0:
             if self.weight is not None:
@@ -436,6 +439,18 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             'content': self.get_problem_html(encapsulate=False),
             'graded': self.graded,
         })
+
+    def handle_fatal_lcp_error(self, error):
+        if error:
+            return(
+                HTML(u'<p>Error formatting HTML for problem:</p><p><pre style="color:red">{msg}</pre></p>').format(
+                    msg=text_type(error))
+            )
+        else:
+            return HTML(
+                u'<p>Could not format HTML for problem. '
+                u'Contact course staff in the discussion forum for assistance.</p>'
+            )
 
     def submit_button_name(self):
         """
@@ -542,13 +557,20 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
         `err` is the Exception encountered while rendering the problem HTML.
         """
-        log.exception(text_type(err))
+        problem_display_name = self.display_name_with_default
+        problem_location = text_type(self.location)
+        log.exception(
+            u"ProblemGetHtmlError: %r, %r, %s",
+            problem_display_name,
+            problem_location,
+            text_type(err)
+        )
 
         # TODO (vshnayder): another switch on DEBUG.
         if self.runtime.DEBUG:
             msg = HTML(
-                u'[courseware.capa.capa_module] <font size="+1" color="red">'
-                u'Failed to generate HTML for problem {url}</font>'
+                u'[courseware.capa.capa_module] '
+                u'Failed to generate HTML for problem {url}'
             ).format(
                 url=text_type(self.location)
             )
@@ -562,8 +584,9 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
             # Presumably, student submission has corrupted LoncapaProblem HTML.
             #   First, pull down all student answers
+
             student_answers = self.lcp.student_answers
-            answer_ids = student_answers.keys()
+            answer_ids = list(student_answers.keys())
 
             # Some inputtypes, such as dynamath, have additional "hidden" state that
             #   is not exposed to the student. Keep those hidden
@@ -597,9 +620,14 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             html = warning
             try:
                 html += self.lcp.get_html()
-            except Exception:
+            except Exception as error:
                 # Couldn't do it. Give up.
-                log.exception("Unable to generate html from LoncapaProblem")
+                log.exception(
+                    u"ProblemGetHtmlError: Unable to generate html from LoncapaProblem: %r, %r, %s",
+                    problem_display_name,
+                    problem_location,
+                    text_type(error)
+                )
                 raise
 
         return html
@@ -771,7 +799,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
         if render_notifications:
             progress = self.get_progress()
-            id_list = self.lcp.correct_map.keys()
+            id_list = list(self.lcp.correct_map.keys())
 
             # Show only a generic message if hiding correctness
             if not self.correctness_available():
@@ -1024,6 +1052,8 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         for answer_id in answers:
             try:
                 answer_content = self.runtime.replace_urls(answers[answer_id])
+                if self.runtime.replace_course_urls:
+                    answer_content = self.runtime.replace_course_urls(answer_content)
                 if self.runtime.replace_jump_to_id_urls:
                     answer_content = self.runtime.replace_jump_to_id_urls(answer_content)
                 new_answer = {answer_id: answer_content}
@@ -1416,14 +1446,14 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         strings ''.
         """
         input_metadata = {}
-        for input_id, internal_answer in answers.iteritems():
+        for input_id, internal_answer in six.iteritems(answers):
             answer_input = self.lcp.inputs.get(input_id)
 
             if answer_input is None:
                 log.warning('Input id %s is not mapped to an input type.', input_id)
 
             answer_response = None
-            for responder in self.lcp.responders.itervalues():
+            for responder in six.itervalues(self.lcp.responders):
                 if input_id in responder.answer_ids:
                     answer_response = responder
 

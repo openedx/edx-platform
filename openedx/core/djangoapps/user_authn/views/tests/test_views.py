@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 """ Tests for user authn views. """
 
-from http.cookies import SimpleCookie
+from __future__ import absolute_import
+
+import json
 import logging
 import re
+from http.cookies import SimpleCookie
 from unittest import skipUnless
-from urllib import urlencode
 
 import ddt
 import mock
@@ -17,30 +19,33 @@ from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.urls import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory, RefreshTokenFactory
 from oauth2_provider.models import AccessToken as dot_access_token
 from oauth2_provider.models import RefreshToken as dot_refresh_token
 from provider.oauth2.models import AccessToken as dop_access_token
 from provider.oauth2.models import RefreshToken as dop_refresh_token
+from six.moves import range
+from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
 from testfixtures import LogCapture
 from waffle.models import Switch
 
 from course_modes.models import CourseMode
-from openedx.core.djangoapps.user_authn.views.login_form import login_and_registration_form
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
-from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
-from openedx.core.djangoapps.user_api.errors import UserAPIInternalError
+from openedx.core.djangoapps.user_api.accounts.api import activate_account
 from openedx.core.djangoapps.user_api.accounts.utils import ENABLE_SECONDARY_EMAIL_FEATURE_SWITCH
+from openedx.core.djangoapps.user_api.errors import UserAPIInternalError
+from openedx.core.djangoapps.user_authn.views.login_form import login_and_registration_form
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
+from student.models import Registration
 from student.tests.factories import AccountRecoveryFactory
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
 from util.testing import UrlResetMixin
@@ -65,19 +70,33 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
     OLD_EMAIL = u"walter@graymattertech.com"
     NEW_EMAIL = u"walt@savewalterwhite.com"
 
-    INVALID_ATTEMPTS = 100
     INVALID_KEY = u"123abc"
 
     URLCONF_MODULES = ['student_accounts.urls']
 
     ENABLED_CACHES = ['default']
 
+    def _create_account(self, username, password, email):
+        # pylint: disable=missing-docstring
+        registration_url = reverse('user_api_registration')
+        resp = self.client.post(registration_url, {
+            'username': username,
+            'email': email,
+            'password': password,
+            'name': username,
+            'honor_code': 'true',
+        })
+        self.assertEqual(resp.status_code, 200)
+
     def setUp(self):
         super(UserAccountUpdateTest, self).setUp()
 
         # Create/activate a new account
-        activation_key = create_account(self.USERNAME, self.OLD_PASSWORD, self.OLD_EMAIL)
-        activate_account(activation_key)
+        self._create_account(self.USERNAME, self.OLD_PASSWORD, self.OLD_EMAIL)
+        mail.outbox = []
+        user = User.objects.get(username=self.USERNAME)
+        registration = Registration.objects.get(user=user)
+        activate_account(registration.activation_key)
 
         self.account_recovery = AccountRecoveryFactory.create(user=User.objects.get(email=self.OLD_EMAIL))
         self.enable_account_recovery_switch = Switch.objects.create(
@@ -123,8 +142,11 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         self.client.logout()
 
         # Verify that the new password can be used to log in
-        result = self.client.login(username=self.USERNAME, password=self.NEW_PASSWORD)
-        self.assertTrue(result)
+        login_url = reverse('login_post')
+        response = self.client.post(login_url, {'email': self.OLD_EMAIL, 'password': self.NEW_PASSWORD})
+        assert response.status_code == 200
+        response_dict = json.loads(response.content.decode('utf-8'))
+        assert response_dict['success']
 
         # Try reusing the activation link to change the password again
         # Visit the activation link again.
@@ -139,11 +161,13 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         self.assertFalse(result)
 
         # Verify that the new password continues to be valid
-        result = self.client.login(username=self.USERNAME, password=self.NEW_PASSWORD)
-        self.assertTrue(result)
+        response = self.client.post(login_url, {'email': self.OLD_EMAIL, 'password': self.NEW_PASSWORD})
+        assert response.status_code == 200
+        response_dict = json.loads(response.content.decode('utf-8'))
+        assert response_dict['success']
 
     def test_password_change_failure(self):
-        with mock.patch('openedx.core.djangoapps.user_api.accounts.api.request_password_change',
+        with mock.patch('openedx.core.djangoapps.user_authn.views.password_reset.request_password_change',
                         side_effect=UserAPIInternalError):
             self._change_password()
             self.assertRaises(UserAPIInternalError)
@@ -214,7 +238,8 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         self.client.logout()
 
         # Create a second user, but do not activate it
-        create_account(self.ALTERNATE_USERNAME, self.OLD_PASSWORD, self.NEW_EMAIL)
+        self._create_account(self.ALTERNATE_USERNAME, self.OLD_PASSWORD, self.NEW_EMAIL)
+        mail.outbox = []
 
         # Send the view the email address tied to the inactive user
         response = self._change_password(email=self.NEW_EMAIL)
@@ -235,17 +260,23 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
             logger.check((LOGGER_NAME, 'INFO', 'Invalid password reset attempt'))
 
     def test_password_change_rate_limited(self):
+        """
+        Tests that consective password reset requests are rate limited.
+        """
         # Log out the user created during test setup, to prevent the view from
         # selecting the logged-in user's email address over the email provided
         # in the POST data
         self.client.logout()
+        for status in [200, 403]:
+            response = self._change_password(email=self.NEW_EMAIL)
+            self.assertEqual(response.status_code, status)
 
-        # Make many consecutive bad requests in an attempt to trigger the rate limiter
-        for __ in xrange(self.INVALID_ATTEMPTS):
-            self._change_password(email=self.NEW_EMAIL)
-
-        response = self._change_password(email=self.NEW_EMAIL)
-        self.assertEqual(response.status_code, 403)
+        with mock.patch(
+            'util.request_rate_limiter.PasswordResetEmailRateLimiter.is_rate_limit_exceeded',
+            return_value=False
+        ):
+            response = self._change_password(email=self.NEW_EMAIL)
+            self.assertEqual(response.status_code, 200)
 
     @ddt.data(
         ('post', 'password_change_request', []),
@@ -315,7 +346,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
             visible=True,
             enabled=True,
             icon_class='',
-            icon_image=SimpleUploadedFile('icon.svg', '<svg><rect width="50" height="100"/></svg>'),
+            icon_image=SimpleUploadedFile('icon.svg', b'<svg><rect width="50" height="100"/></svg>'),
         )
         self.hidden_enabled_provider = self.configure_linkedin_provider(
             visible=False,
@@ -399,7 +430,6 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         self._assert_third_party_auth_data(response, None, None, [], None)
 
     @mock.patch('openedx.core.djangoapps.user_authn.views.login_form.enterprise_customer_for_request')
-    @mock.patch('openedx.core.djangoapps.user_api.api.enterprise_customer_for_request')
     @ddt.data(
         ("signin_user", None, None, None, False),
         ("register_user", None, None, None, False),
@@ -429,8 +459,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
             current_provider,
             expected_enterprise_customer_mock_attrs,
             add_user_details,
-            enterprise_customer_mock_1,
-            enterprise_customer_mock_2
+            enterprise_customer_mock,
     ):
         params = [
             ('course_id', 'course-v1:Org+Course+Run'),
@@ -454,8 +483,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         email = None
         if add_user_details:
             email = 'test@test.com'
-        enterprise_customer_mock_1.return_value = expected_ec
-        enterprise_customer_mock_2.return_value = expected_ec
+        enterprise_customer_mock.return_value = expected_ec
 
         # Simulate a running pipeline
         if current_backend is not None:
@@ -598,7 +626,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         tpa_hint = self.hidden_disabled_provider.provider_id
         params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
         response = self.client.get(reverse('signin_user'), params, HTTP_ACCEPT="text/html")
-        self.assertNotIn(response.content, tpa_hint)
+        self.assertNotIn(response.content.decode('utf-8'), tpa_hint)
 
     @ddt.data(
         ('signin_user', 'login'),
@@ -642,7 +670,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         tpa_hint = self.hidden_disabled_provider.provider_id
         params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
         response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
-        self.assertNotIn(response.content, tpa_hint)
+        self.assertNotIn(response.content.decode('utf-8'), tpa_hint)
 
     @override_settings(FEATURES=dict(settings.FEATURES, THIRD_PARTY_AUTH_HINT='oa2-google-oauth2'))
     @ddt.data(
@@ -702,7 +730,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
                 line_break=HTML('<br/>'),
                 enterprise_name=ec_name,
                 platform_name=settings.PLATFORM_NAME,
-                privacy_policy_link_start=HTML(u"<a href='{pp_url}' target='_blank'>").format(
+                privacy_policy_link_start=HTML(u"<a href='{pp_url}' rel='noopener' target='_blank'>").format(
                     pp_url=settings.MKTG_URLS.get('PRIVACY', 'https://www.edx.org/edx-privacy-policy')
                 ),
                 privacy_policy_link_end=HTML("</a>"),
@@ -864,5 +892,4 @@ class AccountCreationTestCaseWithSiteOverrides(SiteMixin, TestCase):
         ALLOW_PUBLIC_ACCOUNT_CREATION flag is turned off
         """
         response = self.client.get(reverse('signin_user'))
-        self.assertNotIn(u'<a class="btn-neutral" href="/register?next=%2Fdashboard">Register</a>',
-                         response.content.decode(response.charset))
+        self.assertNotContains(response, u'<a class="btn-neutral" href="/register?next=%2Fdashboard">Register</a>')

@@ -4,6 +4,7 @@ Functions that can are used to modify XBlock fragments for use in the LMS and St
 
 from __future__ import absolute_import
 import datetime
+import hashlib
 import json
 import logging
 import re
@@ -56,7 +57,7 @@ def request_token(request):
     """
     # pylint: disable=protected-access
     if not hasattr(request, '_xblock_token'):
-        request._xblock_token = uuid.uuid1().get_hex()
+        request._xblock_token = uuid.uuid1().hex
 
     return request._xblock_token
 
@@ -434,7 +435,7 @@ def get_course_update_items(course_updates, provided_index=0):
             content = html_parsed[0].tail
         else:
             content = html_parsed[0].tail if html_parsed[0].tail is not None else ""
-            content += "\n".join([html.tostring(ele) for ele in html_parsed[1:]])
+            content += "\n".join([html.tostring(ele).decode('utf-8') for ele in html_parsed[1:]])
         return content
 
     if course_updates and getattr(course_updates, "items", None):
@@ -485,7 +486,7 @@ def xblock_local_resource_url(block, uri):
     as a static asset which will use a CDN in production.
     """
     xblock_class = getattr(block.__class__, 'unmixed_class', block.__class__)
-    if settings.PIPELINE_ENABLED or not settings.REQUIRE_DEBUG:
+    if settings.PIPELINE['PIPELINE_ENABLED'] or not settings.REQUIRE_DEBUG:
         return staticfiles_storage.url('xblock/resources/{package_name}/{path}'.format(
             package_name=xblock_resource_pkg(xblock_class),
             path=uri
@@ -550,3 +551,20 @@ def get_aside_from_xblock(xblock, aside_type):
         xblock.core.XBlockAside: Instance of an xblock aside
     """
     return xblock.runtime.get_aside_of_type(xblock, aside_type)
+
+
+def hash_resource(resource):
+    """
+    Hash a :class:`web_fragments.fragment.FragmentResource
+    Those hash values are used to avoid loading the resources
+    multiple times.
+    """
+    md5 = hashlib.md5()
+    for data in resource:
+        if isinstance(data, bytes):
+            md5.update(data)
+        elif isinstance(data, six.string_types):
+            md5.update(data.encode('utf-8'))
+        else:
+            md5.update(repr(data).encode('utf-8'))
+    return md5.hexdigest()

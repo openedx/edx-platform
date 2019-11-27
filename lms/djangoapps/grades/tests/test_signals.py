@@ -1,6 +1,8 @@
 """
 Tests for the score change signals defined in the courseware models module.
 """
+from __future__ import absolute_import
+
 import re
 from datetime import datetime
 
@@ -8,8 +10,8 @@ import ddt
 import pytz
 from django.test import TestCase
 from mock import MagicMock, patch
-
 from submissions.models import score_reset, score_set
+
 from util.date_utils import to_timestamp
 
 from ..constants import ScoreDatabaseTableEnum
@@ -17,7 +19,7 @@ from ..signals.handlers import (
     disconnect_submissions_signal_receiver,
     problem_raw_score_changed_handler,
     submissions_score_reset_handler,
-    submissions_score_set_handler,
+    submissions_score_set_handler
 )
 from ..signals.signals import PROBLEM_RAW_SCORE_CHANGED
 
@@ -216,23 +218,26 @@ class ScoreChangedSignalRelayTest(TestCase):
         self.signal_mock.assert_called_with(**expected_set_kwargs)
 
     @ddt.data(
-        ['score_set', 'lms.djangoapps.grades.signals.handlers.submissions_score_set_handler',
+        ['score_set', SUBMISSION_KWARGS[SUBMISSION_SET_KWARGS]['points_earned'],
          SUBMISSION_SET_KWARGS],
-        ['score_reset', 'lms.djangoapps.grades.signals.handlers.submissions_score_reset_handler',
+        ['score_reset', 0,
          SUBMISSION_RESET_KWARGS]
     )
     @ddt.unpack
-    def test_disconnect_manager(self, signal_name, handler, kwargs):
+    def test_disconnect_manager(self, signal_name, weighted_earned, kwargs):
         """
         Tests to confirm the disconnect_submissions_signal_receiver context manager is working correctly.
         """
         signal = self.SIGNALS[signal_name]
         kwargs = SUBMISSION_KWARGS[kwargs].copy()
-        handler_mock = self.setup_patch(handler, None)
+        handler_mock = self.setup_patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send',
+                                        None)
 
         # Receiver connected before we start
         signal.send(None, **kwargs)
         handler_mock.assert_called_once()
+        # Make sure the correct handler was called
+        assert handler_mock.call_args[1]['weighted_earned'] == weighted_earned
         handler_mock.reset_mock()
 
         # Disconnect is functioning
@@ -244,6 +249,7 @@ class ScoreChangedSignalRelayTest(TestCase):
         # And we reconnect properly afterwards
         signal.send(None, **kwargs)
         handler_mock.assert_called_once()
+        assert handler_mock.call_args[1]['weighted_earned'] == weighted_earned
 
     def test_disconnect_manager_bad_arg(self):
         """
