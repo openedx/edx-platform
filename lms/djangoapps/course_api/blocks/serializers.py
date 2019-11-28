@@ -100,7 +100,7 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
                 )
                 if field_value is not None:
                     # override due date with student extension in unit added by instructor.
-                    if supported_field.block_field_name is 'due':
+                    if supported_field.block_field_name == 'due':
                         value = None
                         override = StudentFieldOverride.objects.filter(
                             course_id=block_key.course_key,
