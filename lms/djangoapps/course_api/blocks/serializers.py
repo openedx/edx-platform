@@ -1,12 +1,11 @@
 """
 Serializers for Course Blocks related return objects.
 """
-import json
-from courseware.models import StudentFieldOverride
-
 from __future__ import absolute_import
 
+import json
 import six
+from courseware.models import StudentFieldOverride
 from django.conf import settings
 from rest_framework import serializers
 from rest_framework.reverse import reverse
