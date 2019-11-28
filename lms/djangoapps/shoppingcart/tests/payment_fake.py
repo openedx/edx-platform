@@ -13,6 +13,8 @@ request to the view with param "success"
 set to "success" or "failure".  The view defaults to payment success.
 """
 
+from __future__ import absolute_import
+
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import View
@@ -75,7 +77,7 @@ class PaymentFakeView(View):
         Accepts one POST param "status" that can be either "success"
         or "failure".
         """
-        new_status = request.body
+        new_status = request.body.decode('utf-8')
 
         if new_status not in ["success", "failure", "decline"]:
             return HttpResponseBadRequest()

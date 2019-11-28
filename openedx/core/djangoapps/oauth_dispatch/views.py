@@ -3,7 +3,7 @@ Views that dispatch processing of OAuth requests to django-oauth2-provider or
 django-oauth-toolkit as appropriate.
 """
 
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import json
 
@@ -96,10 +96,11 @@ class AccessTokenView(RatelimitMixin, _DispatchingView):
     ratelimit_block = True
     ratelimit_method = ALL
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):  # pylint: disable=arguments-differ
         response = super(AccessTokenView, self).dispatch(request, *args, **kwargs)
 
-        token_type = request.POST.get('token_type', 'no_token_type_supplied').lower()
+        token_type = request.POST.get('token_type',
+                                      request.META.get('HTTP_X_TOKEN_TYPE', 'no_token_type_supplied')).lower()
         monitoring_utils.set_custom_metric('oauth_token_type', token_type)
         monitoring_utils.set_custom_metric('oauth_grant_type', request.POST.get('grant_type', ''))
 
@@ -110,7 +111,7 @@ class AccessTokenView(RatelimitMixin, _DispatchingView):
 
     def _build_jwt_response_from_access_token_response(self, request, response):
         """ Builds the content of the response, including the JWT token. """
-        token_dict = json.loads(response.content)
+        token_dict = json.loads(response.content.decode('utf-8'))
         jwt = create_jwt_from_token(token_dict, self.get_adapter(request))
         token_dict.update({
             'access_token': jwt,

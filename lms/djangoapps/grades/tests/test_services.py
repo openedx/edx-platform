@@ -1,18 +1,22 @@
 """
 Grades Service Tests
 """
+from __future__ import absolute_import
+
 from datetime import datetime
+
 import ddt
 import pytz
+import six
 from freezegun import freeze_time
+from mock import call, patch
+
 from lms.djangoapps.grades.constants import GradeOverrideFeatureEnum
 from lms.djangoapps.grades.models import (
     PersistentSubsectionGrade,
-    PersistentSubsectionGradeOverride,
-    PersistentSubsectionGradeOverrideHistory,
+    PersistentSubsectionGradeOverride
 )
 from lms.djangoapps.grades.services import GradesService
-from mock import patch, call
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -63,12 +67,12 @@ class GradesServiceTests(ModuleStoreTestCase):
         )
         self.signal_patcher = patch('lms.djangoapps.grades.signals.signals.SUBSECTION_OVERRIDE_CHANGED.send')
         self.mock_signal = self.signal_patcher.start()
-        self.id_patcher = patch('lms.djangoapps.grades.services.create_new_event_transaction_id')
+        self.id_patcher = patch('lms.djangoapps.grades.api.create_new_event_transaction_id')
         self.mock_create_id = self.id_patcher.start()
         self.mock_create_id.return_value = 1
-        self.type_patcher = patch('lms.djangoapps.grades.services.set_event_transaction_type')
+        self.type_patcher = patch('lms.djangoapps.grades.api.set_event_transaction_type')
         self.mock_set_type = self.type_patcher.start()
-        self.flag_patcher = patch('lms.djangoapps.grades.services.waffle_flags')
+        self.flag_patcher = patch('lms.djangoapps.grades.config.waffle.waffle_flags')
         self.mock_waffle_flags = self.flag_patcher.start()
         self.mock_waffle_flags.return_value = {
             REJECTED_EXAM_OVERRIDES_GRADE: MockWaffleFlag(True)
@@ -107,8 +111,8 @@ class GradesServiceTests(ModuleStoreTestCase):
         # test with id strings as parameters instead
         self.assertDictEqual(self.subsection_grade_to_dict(self.service.get_subsection_grade(
             user_id=self.user.id,
-            course_key_or_id=unicode(self.course.id),
-            usage_key_or_id=unicode(self.subsection.location)
+            course_key_or_id=six.text_type(self.course.id),
+            usage_key_or_id=six.text_type(self.subsection.location)
         )), {
             'earned_all': 6.0,
             'earned_graded': 5.0
@@ -136,18 +140,12 @@ class GradesServiceTests(ModuleStoreTestCase):
         # test with course key parameter as string instead
         self.assertDictEqual(self.subsection_grade_override_to_dict(self.service.get_subsection_grade_override(
             user_id=self.user.id,
-            course_key_or_id=unicode(self.course.id),
+            course_key_or_id=six.text_type(self.course.id),
             usage_key_or_id=self.subsection.location
         )), {
             'earned_all_override': override.earned_all_override,
             'earned_graded_override': override.earned_graded_override
         })
-
-    def _verify_override_history(self, override_history, history_action):
-        self.assertIsNone(override_history.user)
-        self.assertIsNotNone(override_history.created)
-        self.assertEqual(override_history.feature, GradeOverrideFeatureEnum.proctoring)
-        self.assertEqual(override_history.action, history_action)
 
     @ddt.data(
         {
@@ -190,16 +188,14 @@ class GradesServiceTests(ModuleStoreTestCase):
             call(
                 sender=None,
                 user_id=self.user.id,
-                course_id=unicode(self.course.id),
-                usage_id=unicode(self.subsection.location),
+                course_id=six.text_type(self.course.id),
+                usage_id=six.text_type(self.subsection.location),
                 only_if_higher=False,
                 modified=override_obj.modified,
                 score_deleted=False,
                 score_db_table=ScoreDatabaseTableEnum.overrides
             )
         )
-        override_history = PersistentSubsectionGradeOverrideHistory.objects.filter(override_id=override_obj.id).first()
-        self._verify_override_history(override_history, PersistentSubsectionGradeOverrideHistory.CREATE_OR_UPDATE)
 
     def test_override_subsection_grade_no_psg(self):
         """
@@ -241,20 +237,21 @@ class GradesServiceTests(ModuleStoreTestCase):
             call(
                 sender=None,
                 user_id=self.user.id,
-                course_id=unicode(self.course.id),
-                usage_id=unicode(self.subsection_without_grade.location),
+                course_id=six.text_type(self.course.id),
+                usage_id=six.text_type(self.subsection_without_grade.location),
                 only_if_higher=False,
                 modified=override_obj.modified,
                 score_deleted=False,
                 score_db_table=ScoreDatabaseTableEnum.overrides
             )
         )
-        override_history = PersistentSubsectionGradeOverrideHistory.objects.filter(override_id=override_obj.id).first()
-        self._verify_override_history(override_history, PersistentSubsectionGradeOverrideHistory.CREATE_OR_UPDATE)
 
     @freeze_time('2017-01-01')
     def test_undo_override_subsection_grade(self):
-        override, _ = PersistentSubsectionGradeOverride.objects.update_or_create(grade=self.grade)
+        override, _ = PersistentSubsectionGradeOverride.objects.update_or_create(
+            grade=self.grade,
+            system=GradeOverrideFeatureEnum.proctoring
+        )
         override_id = override.id
         self.service.undo_override_subsection_grade(
             user_id=self.user.id,
@@ -270,16 +267,34 @@ class GradesServiceTests(ModuleStoreTestCase):
             call(
                 sender=None,
                 user_id=self.user.id,
-                course_id=unicode(self.course.id),
-                usage_id=unicode(self.subsection.location),
+                course_id=six.text_type(self.course.id),
+                usage_id=six.text_type(self.subsection.location),
                 only_if_higher=False,
                 modified=datetime.now().replace(tzinfo=pytz.UTC),
                 score_deleted=True,
                 score_db_table=ScoreDatabaseTableEnum.overrides
             )
         )
-        override_history = PersistentSubsectionGradeOverrideHistory.objects.filter(override_id=override_id).first()
-        self._verify_override_history(override_history, PersistentSubsectionGradeOverrideHistory.DELETE)
+
+    def test_undo_override_subsection_grade_across_features(self):
+        """
+        Test that deletion of subsection grade overrides requested by
+        one feature doesn't delete overrides created by another
+        feature.
+        """
+        override, _ = PersistentSubsectionGradeOverride.objects.update_or_create(
+            grade=self.grade,
+            system=GradeOverrideFeatureEnum.gradebook
+        )
+        self.service.undo_override_subsection_grade(
+            user_id=self.user.id,
+            course_key_or_id=self.course.id,
+            usage_key_or_id=self.subsection.location,
+            feature=GradeOverrideFeatureEnum.proctoring,
+        )
+
+        override = self.service.get_subsection_grade_override(self.user.id, self.course.id, self.subsection.location)
+        self.assertIsNotNone(override)
 
     @freeze_time('2018-01-01')
     def test_undo_override_subsection_grade_without_grade(self):

@@ -1,10 +1,13 @@
 """
 Tests for contentstore.views.preview.py
 """
+from __future__ import absolute_import
+
 import re
 
 import ddt
 import mock
+import six
 from django.test.client import Client, RequestFactory
 from xblock.core import XBlock, XBlockAside
 
@@ -56,7 +59,9 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
         html = get_preview_fragment(request, html, context).content
 
         # Verify student view html is returned, and the usage ID is as expected.
-        html_pattern = re.escape(unicode(course.id.make_usage_key('html', 'replaceme'))).replace('replaceme', r'html_[0-9]*')
+        html_pattern = re.escape(
+            six.text_type(course.id.make_usage_key('html', 'replaceme'))
+        ).replace('replaceme', r'html_[0-9]*')
         self.assertRegexpMatches(
             html,
             'data-usage-id="{}"'.format(html_pattern)

@@ -2,8 +2,13 @@
 Module for the Storage of BlockStructure objects.
 """
 # pylint: disable=protected-access
+from __future__ import absolute_import
+
 from logging import getLogger
 
+import six
+
+from django.utils.encoding import python_2_unicode_compatible
 from openedx.core.lib.cache_utils import zpickle, zunpickle
 
 from . import config
@@ -13,10 +18,10 @@ from .factory import BlockStructureFactory
 from .models import BlockStructureModel
 from .transformer_registry import TransformerRegistry
 
-
 logger = getLogger(__name__)  # pylint: disable=C0103
 
 
+@python_2_unicode_compatible
 class StubModel(object):
     """
     Stub model to use when storage backing is disabled.
@@ -26,8 +31,8 @@ class StubModel(object):
     def __init__(self, root_block_usage_key):
         self.data_usage_key = root_block_usage_key
 
-    def __unicode__(self):
-        return unicode(self.data_usage_key)
+    def __str__(self):
+        return six.text_type(self.data_usage_key)
 
     def delete(self):
         """
@@ -217,12 +222,12 @@ class BlockStructureStore(object):
         BlockStructureModel or StubModel.
         """
         if _is_storage_backing_enabled():
-            return unicode(bs_model)
+            return six.text_type(bs_model)
 
         else:
             return "v{version}.root.key.{root_usage_key}".format(
-                version=unicode(BlockStructureBlockData.VERSION),
-                root_usage_key=unicode(bs_model.data_usage_key),
+                version=six.text_type(BlockStructureBlockData.VERSION),
+                root_usage_key=six.text_type(bs_model.data_usage_key),
             )
 
     @staticmethod
@@ -235,7 +240,7 @@ class BlockStructureStore(object):
             data_version=getattr(root_block, 'course_version', None),
             data_edit_timestamp=getattr(root_block, 'subtree_edited_on', None),
             transformers_schema_version=TransformerRegistry.get_write_version_hash(),
-            block_structure_schema_version=unicode(BlockStructureBlockData.VERSION),
+            block_structure_schema_version=six.text_type(BlockStructureBlockData.VERSION),
         )
 
     @staticmethod

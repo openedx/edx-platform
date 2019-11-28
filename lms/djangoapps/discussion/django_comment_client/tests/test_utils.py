@@ -1,37 +1,42 @@
 # pylint: skip-file
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 import datetime
 import json
 
 import ddt
 import mock
-
-from django.urls import reverse
+import six
 from django.test import RequestFactory, TestCase
+from django.urls import reverse
 from edx_django_utils.cache import RequestCache
 from mock import Mock, patch
 from pytz import UTC
 from six import text_type
 
+import lms.djangoapps.discussion.django_comment_client.utils as utils
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.tabs import get_course_tab_list
-from courseware.tests.factories import InstructorFactory
+from lms.djangoapps.courseware.tabs import get_course_tab_list
+from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from lms.djangoapps.discussion.django_comment_client.tests.unicode import UnicodeTestMixin
 from lms.djangoapps.discussion.django_comment_client.tests.utils import config_course_discussions, topic_name_to_id
-import lms.djangoapps.discussion.django_comment_client.utils as utils
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, config_course_cohorts
-from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientMaintenanceError, perform_request
+from openedx.core.djangoapps.django_comment_common.comment_client.utils import (
+    CommentClientMaintenanceError,
+    perform_request
+)
 from openedx.core.djangoapps.django_comment_common.models import (
     CourseDiscussionSettings,
-    ForumsConfig,
-    assign_role,
     DiscussionsIdMapping,
+    ForumsConfig,
+    assign_role
 )
 from openedx.core.djangoapps.django_comment_common.utils import (
     get_course_discussion_settings,
@@ -354,6 +359,7 @@ class CategoryMapTestMixin(object):
         Call `get_discussion_category_map`, and verify that it returns
         what is expected.
         """
+
         self.assertEqual(
             utils.get_discussion_category_map(self.course, requesting_user or self.user),
             expected
@@ -1015,7 +1021,8 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             "Topic B": {"id": "Topic_B"},
             "Topic C": {"id": "Topic_C"}
         }
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             utils.get_discussion_categories_ids(self.course, self.user),
             ["Topic_A", "Topic_B", "Topic_C"]
         )
@@ -1027,7 +1034,8 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion")
         self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion")
         self.create_discussion("Chapter 3 / Section 1", "Discussion")
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             utils.get_discussion_categories_ids(self.course, self.user),
             ["discussion1", "discussion2", "discussion3", "discussion4", "discussion5", "discussion6"]
         )
@@ -1041,7 +1049,8 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter 1", "Discussion 1")
         self.create_discussion("Chapter 2", "Discussion")
         self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion")
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             utils.get_discussion_categories_ids(self.course, self.user),
             ["Topic_A", "Topic_B", "Topic_C", "discussion1", "discussion2", "discussion3"]
         )
@@ -1143,38 +1152,43 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
         Verify that the beta user can access the beta and global
         discussion topics.
         """
-        self.assert_category_map_equals(
-            {
-                'subcategories': {
-                    'Week 1': {
-                        'subcategories': {},
-                        'children': [
-                            ('Visible to Beta', 'entry'),
-                            ('Visible to Everyone', 'entry')
-                        ],
-                        'entries': {
-                            'Visible to Beta': {
-                                'sort_key': None,
-                                'is_divided': False,
-                                'id': 'beta_group_discussion'
-                            },
-                            'Visible to Everyone': {
-                                'sort_key': None,
-                                'is_divided': False,
-                                'id': 'global_group_discussion'
-                            }
+
+        children = [('Visible to Beta', 'entry'), ('Visible to Everyone', 'entry')]
+
+        if six.PY3:
+            children = [('Visible to Everyone', 'entry'), ('Visible to Beta', 'entry')]
+
+        expected = {
+            'subcategories': {
+                'Week 1': {
+                    'subcategories': {},
+                    'children': children,
+                    'entries': {
+                        'Visible to Beta': {
+                            'sort_key': None,
+                            'is_divided': False,
+                            'id': 'beta_group_discussion'
+                        },
+                        'Visible to Everyone': {
+                            'sort_key': None,
+                            'is_divided': False,
+                            'id': 'global_group_discussion'
                         }
-                    }
-                },
-                'children': [('General', 'entry'), ('Week 1', 'subcategory')],
-                'entries': {
-                    'General': {
-                        'sort_key': 'General',
-                        'is_divided': False,
-                        'id': 'i4x-org-number-course-run'
                     }
                 }
             },
+            'children': [('General', 'entry'), ('Week 1', 'subcategory')],
+            'entries': {
+                'General': {
+                    'sort_key': 'General',
+                    'is_divided': False,
+                    'id': 'i4x-org-number-course-run'
+                }
+            }
+        }
+
+        self.assert_category_map_equals(
+            expected,
             requesting_user=self.beta_user
         )
 
@@ -1216,7 +1230,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
 class JsonResponseTestCase(TestCase, UnicodeTestMixin):
     def _test_unicode_data(self, text):
         response = utils.JsonResponse(text)
-        reparsed = json.loads(response.content)
+        reparsed = json.loads(response.content.decode('utf-8'))
         self.assertEqual(reparsed, text)
 
 
@@ -1680,14 +1694,8 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
         # Create course, seed permissions roles, and create team
         self.course = CourseFactory.create()
         seed_permissions_roles(self.course.id)
-        verified_coursemode = CourseModeFactory.create(
-            course_id=self.course.id,
-            mode_slug=CourseMode.VERIFIED
-        )
-        audit_coursemode = CourseModeFactory.create(
-            course_id=self.course.id,
-            mode_slug=CourseMode.AUDIT
-        )
+        verified_coursemode = CourseMode.VERIFIED
+        audit_coursemode = CourseMode.AUDIT
 
         # Create four users: group_moderator (who is within the verified enrollment track and in the cohort),
         # verified_user (who is in the verified enrollment track but not the cohort),
@@ -1773,18 +1781,6 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
         set_discussion_division_settings(self.course.id, enable_cohorts=True,
                                          division_scheme=CourseDiscussionSettings.COHORT)
         content = {'user_id': self.cohorted_user.id, 'type': 'thread', 'username': self.cohorted_user.username}
-        self.assertEqual(utils.get_ability(self.course.id, content, self.group_moderator), {
-            'editable': True,
-            'can_reply': True,
-            'can_delete': True,
-            'can_openclose': True,
-            'can_vote': True,
-            'can_report': True
-        })
-        RequestCache.clear_all_namespaces()
-
-        set_discussion_division_settings(self.course.id, division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK)
-        content = {'user_id': self.verified_user.id, 'type': 'thread', 'username': self.verified_user.username}
         self.assertEqual(utils.get_ability(self.course.id, content, self.group_moderator), {
             'editable': True,
             'can_reply': True,

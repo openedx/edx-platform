@@ -1,6 +1,9 @@
 """
 Tests for Course Blocks serializers
 """
+from __future__ import absolute_import
+
+import six
 from mock import MagicMock
 
 from lms.djangoapps.course_blocks.api import get_course_block_access_transformers, get_course_blocks
@@ -66,7 +69,7 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
             serialized_block['type'],
         )
         self.assertEquals(
-            set(serialized_block.iterkeys()),
+            set(six.iterkeys(serialized_block)),
             {'id', 'block_id', 'type', 'lms_web_url', 'student_view_url'},
         )
 
@@ -100,7 +103,7 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
                 'lti_url',
                 'visible_to_staff_only',
             },
-            set(serialized_block.iterkeys()),
+            set(six.iterkeys(serialized_block)),
         )
 
         # video blocks should have student_view_data
@@ -142,7 +145,7 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
         """
         Test fields accessed by a staff user
         """
-        if serialized_block['id'] == unicode(self.html_block.location):
+        if serialized_block['id'] == six.text_type(self.html_block.location):
             self.assertTrue(serialized_block['visible_to_staff_only'])
         else:
             self.assertFalse(serialized_block['visible_to_staff_only'])
@@ -208,10 +211,10 @@ class TestBlockDictSerializer(TestBlockSerializerBase):
         serializer = self.create_serializer()
 
         # verify root
-        self.assertEquals(serializer.data['root'], unicode(self.block_structure.root_block_usage_key))
+        self.assertEquals(serializer.data['root'], six.text_type(self.block_structure.root_block_usage_key))
 
         # verify blocks
-        for block_key_string, serialized_block in serializer.data['blocks'].iteritems():
+        for block_key_string, serialized_block in six.iteritems(serializer.data['blocks']):
             self.assertEquals(serialized_block['id'], block_key_string)
             self.assert_basic_block(block_key_string, serialized_block)
         self.assertEquals(len(serializer.data['blocks']), 28)
@@ -219,7 +222,7 @@ class TestBlockDictSerializer(TestBlockSerializerBase):
     def test_additional_requested_fields(self):
         self.add_additional_requested_fields()
         serializer = self.create_serializer()
-        for serialized_block in serializer.data['blocks'].itervalues():
+        for serialized_block in six.itervalues(serializer.data['blocks']):
             self.assert_extended_block(serialized_block)
         self.assertEquals(len(serializer.data['blocks']), 28)
 
@@ -230,7 +233,7 @@ class TestBlockDictSerializer(TestBlockSerializerBase):
         context = self.create_staff_context()
         self.add_additional_requested_fields(context)
         serializer = self.create_serializer(context)
-        for serialized_block in serializer.data['blocks'].itervalues():
+        for serialized_block in six.itervalues(serializer.data['blocks']):
             self.assert_extended_block(serialized_block)
             self.assert_staff_fields(serialized_block)
         self.assertEquals(len(serializer.data['blocks']), 29)

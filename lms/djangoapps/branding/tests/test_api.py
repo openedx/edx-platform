@@ -1,19 +1,15 @@
 # encoding: utf-8
 """Tests of Branding API """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import mock
 from django.conf import settings
-from django.urls import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.urls import reverse
 
-from branding.api import get_footer, get_home_url, get_logo_url
-from edxmako.shortcuts import marketing_link
-
-from openedx.core.djangoapps.site_configuration.tests.test_util import (
-    with_site_configuration,
-)
+from branding.api import _footer_business_links, get_footer, get_home_url, get_logo_url
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 
 test_config_disabled_contact_us = {   # pylint: disable=invalid-name
     "CONTACT_US_ENABLE": False,
@@ -40,22 +36,31 @@ class TestHeader(TestCase):
 
         self.assertEqual(logo_url, cdn_url)
 
-    def test_home_url_with_mktg_disabled(self):
+    def test_home_url(self):
         expected_url = get_home_url()
         self.assertEqual(reverse('dashboard'), expected_url)
+
+
+class TestFooter(TestCase):
+    """Test retrieving the footer. """
+    maxDiff = None
 
     @mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True})
     @mock.patch.dict('django.conf.settings.MKTG_URLS', {
         "ROOT": "https://edx.org",
+        "ENTERPRISE": "/enterprise"
     })
-    def test_home_url_with_mktg_enabled(self):
-        expected_url = get_home_url()
-        self.assertEqual(marketing_link('ROOT'), expected_url)
+    @override_settings(ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS={}, PLATFORM_NAME='\xe9dX')
+    def test_footer_business_links_no_marketing_query_params(self):
+        """
+        Enterprise marketing page values returned should be a concatenation of ROOT and
+        ENTERPRISE marketing url values when ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS
+        is not set.
+        """
 
+        business_links = _footer_business_links()
+        assert business_links[0]['url'] == 'https://edx.org/enterprise'
 
-class TestFooter(TestCase):
-    maxDiff = None
-    """Test retrieving the footer. """
     @mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True})
     @mock.patch.dict('django.conf.settings.MKTG_URLS', {
         "ROOT": "https://edx.org",
@@ -74,28 +79,29 @@ class TestFooter(TestCase):
         "ACCESSIBILITY": "/accessibility",
         "AFFILIATES": '/affiliate-program',
         "MEDIA_KIT": "/media-kit",
-        "ENTERPRISE": "/enterprise"
+        "ENTERPRISE": "https://business.edx.org"
     })
     @override_settings(PLATFORM_NAME='\xe9dX')
     def test_get_footer(self):
         actual_footer = get_footer(is_secure=True)
+        business_url = 'https://business.edx.org/?utm_campaign=edX.org+Referral&utm_source=edX.org&utm_medium=Footer'
         expected_footer = {
             'copyright': '\xa9 \xe9dX.  All rights reserved except where noted. '
-                         ' EdX, Open edX and their respective logos are '
-                         'trademarks or registered trademarks of edX Inc.',
+                         ' edX, Open edX and their respective logos are '
+                         'registered trademarks of edX Inc.',
             'navigation_links': [
                 {'url': 'https://edx.org/about-us', 'name': 'about', 'title': 'About'},
-                {'url': 'https://edx.org/enterprise', 'name': 'enterprise', 'title': '\xe9dX for Business'},
+                {'url': 'https://business.edx.org', 'name': 'enterprise', 'title': '\xe9dX for Business'},
                 {'url': 'https://edx.org/edx-blog', 'name': 'blog', 'title': 'Blog'},
                 {'url': 'https://edx.org/news-announcements', 'name': 'news', 'title': 'News'},
-                {'url': 'https://support.example.com', 'name': 'help-center', 'title': 'Help Center'},
+                {'url': 'https://example.support.edx.org/hc/en-us', 'name': 'help-center', 'title': 'Help Center'},
                 {'url': '/support/contact_us', 'name': 'contact', 'title': 'Contact'},
                 {'url': 'https://edx.org/careers', 'name': 'careers', 'title': 'Careers'},
                 {'url': 'https://edx.org/donate', 'name': 'donate', 'title': 'Donate'}
             ],
             'business_links': [
                 {'url': 'https://edx.org/about-us', 'name': 'about', 'title': 'About'},
-                {'url': 'https://edx.org/enterprise', 'name': 'enterprise', 'title': '\xe9dX for Business'},
+                {'url': business_url, 'name': 'enterprise', 'title': '\xe9dX for Business'},
                 {'url': 'https://edx.org/affiliate-program', 'name': 'affiliates', 'title': 'Affiliates'},
                 {'url': 'http://open.edx.org', 'name': 'openedx', 'title': 'Open edX'},
                 {'url': 'https://edx.org/careers', 'name': 'careers', 'title': 'Careers'},
@@ -118,7 +124,7 @@ class TestFooter(TestCase):
                 {'url': 'https://edx.org/edx-blog', 'name': 'blog', 'title': 'Blog'},
                 # pylint: disable=line-too-long
                 {'url': '{base_url}/support/contact_us'.format(base_url=settings.LMS_ROOT_URL), 'name': 'contact', 'title': 'Contact Us'},
-                {'url': 'https://support.example.com', 'name': 'help-center', 'title': 'Help Center'},
+                {'url': 'https://example.support.edx.org/hc/en-us', 'name': 'help-center', 'title': 'Help Center'},
                 {'url': 'https://edx.org/media-kit', 'name': 'media_kit', 'title': 'Media Kit'},
                 {'url': 'https://edx.org/donate', 'name': 'donate', 'title': 'Donate'}
             ],
@@ -140,8 +146,6 @@ class TestFooter(TestCase):
                  'icon-class': 'fa-facebook-square', 'title': 'Facebook'},
                 {'url': '#', 'action': 'Follow \xe9dX on Twitter', 'name': 'twitter',
                  'icon-class': 'fa-twitter-square', 'title': 'Twitter'},
-                {'url': '#', 'action': 'Subscribe to the \xe9dX YouTube channel',
-                 'name': 'youtube', 'icon-class': 'fa-youtube-square', 'title': 'Youtube'},
                 {'url': '#', 'action': 'Follow \xe9dX on LinkedIn', 'name': 'linkedin',
                  'icon-class': 'fa-linkedin-square', 'title': 'LinkedIn'},
                 {'url': '#', 'action': 'Follow \xe9dX on Google+', 'name': 'google_plus',
@@ -157,7 +161,11 @@ class TestFooter(TestCase):
                 'title': 'Powered by Open edX'
             },
             'edx_org_link': {
-                'url': 'https://www.edx.org/?utm_medium=affiliate_partner&utm_source=opensource-partner&utm_content=open-edx-partner-footer-link&utm_campaign=open-edx-footer',
+                'url': 'https://www.edx.org/?'
+                       'utm_medium=affiliate_partner'
+                       '&utm_source=opensource-partner'
+                       '&utm_content=open-edx-partner-footer-link'
+                       '&utm_campaign=open-edx-footer',
                 'text': 'Take free online courses at edX.org',
             },
         }

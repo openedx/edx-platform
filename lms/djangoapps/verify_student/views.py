@@ -2,12 +2,18 @@
 Views for the verification flow
 """
 
+from __future__ import absolute_import
+
 import datetime
 import decimal
 import json
 import logging
-import urllib
 
+import six
+import six.moves.urllib.error  # pylint: disable=import-error
+import six.moves.urllib.parse  # pylint: disable=import-error
+import six.moves.urllib.request  # pylint: disable=import-error
+from course_modes.models import CourseMode
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -24,13 +30,18 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic.base import View
 from edx_rest_api_client.exceptions import SlumberBaseException
-from eventtracking import tracker
+from edxmako.shortcuts import render_to_response, render_to_string
 from ipware.ip import get_ip
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from shoppingcart.models import CertificateItem, Order
+from shoppingcart.processors import get_purchase_endpoint, get_signed_purchase_params
+from student.models import CourseEnrollment
+from track import segment
+from util.db import outer_atomic
+from util.json_request import JsonResponse
+from xmodule.modulestore.django import modulestore
 
-from course_modes.models import CourseMode
-from edxmako.shortcuts import render_to_response, render_to_string
 from lms.djangoapps.commerce.utils import EcommerceService, is_account_activation_requirement_disabled
 from lms.djangoapps.verify_student.image import InvalidImageData, decode_image_data
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
@@ -45,13 +56,6 @@ from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
 from openedx.core.djangoapps.user_api.accounts.api import update_account_settings
 from openedx.core.djangoapps.user_api.errors import AccountValidationError, UserNotFound
 from openedx.core.lib.log_utils import audit_log
-from shoppingcart.models import CertificateItem, Order
-from shoppingcart.processors import get_purchase_endpoint, get_signed_purchase_params
-from student.models import CourseEnrollment
-from track import segment
-from util.db import outer_atomic
-from util.json_request import JsonResponse
-from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -379,7 +383,7 @@ class PayAndVerifyView(View):
         if not course.start or course.start < now():
             courseware_url = reverse(
                 'course_root',
-                kwargs={'course_id': unicode(course_key)}
+                kwargs={'course_id': six.text_type(course_key)}
             )
 
         full_name = (
@@ -392,7 +396,7 @@ class PayAndVerifyView(View):
         # use that amount to pre-fill the price selection form.
         contribution_amount = request.session.get(
             'donation_for_course', {}
-        ).get(unicode(course_key), '')
+        ).get(six.text_type(course_key), '')
 
         # Remember whether the user is upgrading
         # so we can fire an analytics event upon payment.
@@ -413,7 +417,7 @@ class PayAndVerifyView(View):
         context = {
             'contribution_amount': contribution_amount,
             'course': course,
-            'course_key': unicode(course_key),
+            'course_key': six.text_type(course_key),
             'checkpoint_location': request.GET.get('checkpoint'),
             'course_mode': relevant_course_mode,
             'courseware_url': courseware_url,
@@ -441,10 +445,10 @@ class PayAndVerifyView(View):
         # utm_params is [(u'utm_content', u'course-v1:IDBx IDB20.1x 1T2017'),...
         utm_params = [item for item in self.request.GET.items() if 'utm_' in item[0]]
         # utm_params is utm_content=course-v1%3AIDBx+IDB20.1x+1T2017&...
-        utm_params = urllib.urlencode(utm_params, True)
+        utm_params = six.moves.urllib.parse.urlencode(utm_params, True)  # pylint: disable=too-many-function-args
         # utm_params is utm_content=course-v1:IDBx+IDB20.1x+1T2017&...
         # (course-keys do not have url encoding)
-        utm_params = urllib.unquote(utm_params)
+        utm_params = six.moves.urllib.parse.unquote(utm_params)  # pylint: disable=too-many-function-args
         if utm_params:
             if '?' in url:
                 url = url + '&' + utm_params
@@ -453,8 +457,8 @@ class PayAndVerifyView(View):
         return url
 
     def _redirect_if_necessary(
-            self, message, already_verified, already_paid, is_enrolled, course_key,
-            user_is_trying_to_pay, user, sku
+        self, message, already_verified, already_paid, is_enrolled, course_key,
+        user_is_trying_to_pay, user, sku
     ):
         """Redirect the user to a more appropriate page if necessary.
 
@@ -488,7 +492,7 @@ class PayAndVerifyView(View):
 
         """
         url = None
-        course_kwargs = {'course_id': unicode(course_key)}
+        course_kwargs = {'course_id': six.text_type(course_key)}
 
         if already_verified and already_paid:
             # If they've already paid and verified, there's nothing else to do,
@@ -597,7 +601,7 @@ class PayAndVerifyView(View):
         return [
             {
                 'name': step,
-                'title': unicode(self.STEP_TITLES[step]),
+                'title': six.text_type(self.STEP_TITLES[step]),
             }
             for step in display_steps
             if step not in remove_steps
@@ -631,7 +635,7 @@ class PayAndVerifyView(View):
 
         display_steps = set(step['name'] for step in display_steps)
 
-        for step, step_requirements in self.STEP_REQUIREMENTS.iteritems():
+        for step, step_requirements in six.iteritems(self.STEP_REQUIREMENTS):
             if step in display_steps:
                 for requirement in step_requirements:
                     all_requirements[requirement] = True
@@ -729,7 +733,7 @@ class PayAndVerifyView(View):
 
 def checkout_with_ecommerce_service(user, course_key, course_mode, processor):
     """ Create a new basket and trigger immediate checkout, using the E-Commerce API. """
-    course_id = unicode(course_key)
+    course_id = six.text_type(course_key)
     try:
         api = ecommerce_api_client(user)
         # Make an API call to create the order and retrieve the results
@@ -781,7 +785,7 @@ def checkout_with_shoppingcart(request, user, course_key, course_mode, amount):
         'payment_form_data': get_signed_purchase_params(
             cart,
             callback_url=callback_url,
-            extra_data=[unicode(course_key), course_mode.slug]
+            extra_data=[six.text_type(course_key), course_mode.slug]
         ),
     }
     return payment_data
@@ -798,7 +802,7 @@ def create_order(request):
     course_id = request.POST['course_id']
     course_id = CourseKey.from_string(course_id)
     donation_for_course = request.session.get('donation_for_course', {})
-    contribution = request.POST.get("contribution", donation_for_course.get(unicode(course_id), 0))
+    contribution = request.POST.get("contribution", donation_for_course.get(six.text_type(course_id), 0))
     try:
         amount = decimal.Decimal(contribution).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)
     except decimal.InvalidOperation:
@@ -993,7 +997,7 @@ class SubmitPhotosView(View):
             return HttpResponseBadRequest(_("No profile found for user"))
         except AccountValidationError:
             msg = _(
-                u"Name must be at least {min_length} characters long."
+                u"Name must be at least {min_length} character long."
             ).format(min_length=NAME_MIN_LENGTH)
             return HttpResponseBadRequest(msg)
 
@@ -1109,7 +1113,7 @@ def results_callback(request):
     body = request.body
 
     try:
-        body_dict = json.loads(body)
+        body_dict = json.loads(body.decode('utf-8'))
     except ValueError:
         log.exception(u"Invalid JSON received from Software Secure:\n\n{}\n".format(body))
         return HttpResponseBadRequest(u"Invalid JSON. Received:\n\n{}".format(body))
@@ -1135,7 +1139,7 @@ def results_callback(request):
     access_key = access_key_and_sig.split(":")[0]
 
     # This is what we should be doing...
-    #if not sig_valid:
+    # if not sig_valid:
     #    return HttpResponseBadRequest("Signature is invalid")
 
     # This is what we're doing until we can figure out why we disagree on sigs
@@ -1237,6 +1241,7 @@ class ReverifyView(View):
     the user submitted during initial verification.
 
     """
+
     @method_decorator(login_required)
     def get(self, request):
         """

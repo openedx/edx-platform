@@ -73,4 +73,5 @@ def safetar_extractall(tar_file, path=".", members=None):  # pylint: disable=unu
     """
     Safe version of `tar_file.extractall()`.
     """
+    path = str(path)
     return tar_file.extractall(path, safemembers(tar_file, path))

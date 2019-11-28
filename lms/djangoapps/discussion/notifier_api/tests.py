@@ -1,8 +1,11 @@
 # pylint: disable=missing-docstring
 from __future__ import absolute_import
+
 import itertools
 
 import ddt
+import six
+from six.moves import range
 from django.conf import settings
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
@@ -20,8 +23,6 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-import six
-from six.moves import range
 
 
 @ddt.ddt
@@ -233,7 +234,7 @@ class NotifierUsersViewSetTest(UrlResetMixin, ModuleStoreTestCase):
             users.append(new_user)
             UserPreferenceFactory(user=new_user, key=NOTIFICATION_PREF_KEY)
 
-        num_pages = (num_users - 1) / page_size + 1
+        num_pages = (num_users - 1) // page_size + 1
         result_list = []
         for i in range(1, num_pages + 1):
             result_list.extend(self._get_list(page=i, page_size=page_size))

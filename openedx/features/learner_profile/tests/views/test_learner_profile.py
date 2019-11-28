@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """ Tests for student profile views. """
 
+from __future__ import absolute_import
 import datetime
 import ddt
 import mock
@@ -114,7 +115,7 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
         response = self.client.get(path=profile_path)
 
         for attribute in self.CONTEXT_DATA:
-            self.assertIn(attribute, response.content)
+            self.assertContains(response, attribute)
 
     def test_redirect_view(self):
         with override_waffle_flag(REDIRECT_TO_PROFILE_MICROFRONTEND, active=True):
@@ -123,7 +124,7 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
             # Test with waffle flag active and site setting disabled, does not redirect
             response = self.client.get(path=profile_path)
             for attribute in self.CONTEXT_DATA:
-                self.assertIn(attribute, response.content)
+                self.assertContains(response, attribute)
 
             # Test with waffle flag active and site setting enabled, redirects to microfrontend
             site_domain = 'othersite.example.com'
@@ -247,3 +248,24 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
         response = self.client.get('/u/{username}'.format(username=self.user.username))
 
         self.assertNotContains(response, u'card certificate-card mode-{cert_mode}'.format(cert_mode=cert.mode))
+
+    def test_certificates_visible_only_for_staff_and_profile_user(self):
+        """
+        Verify that certificates data are passed to template only in case of staff user
+        and profile user.
+        """
+        request = RequestFactory().get('/url')
+        request.user = self.user
+        profile_username = self.other_user.username
+        user_is_staff = True
+        context = learner_profile_context(request, profile_username, user_is_staff)
+
+        self.assertIn('achievements_fragment', context)
+
+        user_is_staff = False
+        context = learner_profile_context(request, profile_username, user_is_staff)
+        self.assertNotIn('achievements_fragment', context)
+
+        profile_username = self.user.username
+        context = learner_profile_context(request, profile_username, user_is_staff)
+        self.assertIn('achievements_fragment', context)

@@ -3,51 +3,47 @@
 """
 Programmatic integration point for User API Accounts sub-application
 """
+from __future__ import absolute_import
+
 import datetime
-from pytz import UTC
 
-from django.utils.translation import override as override_language, ugettext as _
-from django.db import transaction, IntegrityError
-from django.core.exceptions import ObjectDoesNotExist
+import six
 from django.conf import settings
-from django.core.validators import validate_email, ValidationError
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.validators import ValidationError, validate_email
+from django.db import IntegrityError, transaction
 from django.http import HttpResponseForbidden
-from openedx.core.djangoapps.theming.helpers import get_current_request
-from six import text_type
-
-from student.models import (
-    AccountRecovery,
-    User,
-    UserProfile,
-    Registration,
-    email_exists_or_retired,
-    username_exists_or_retired
-)
-from student import forms as student_forms
-from student import views as student_views
-from util.model_utils import emit_setting_changed_event
-from util.password_policy_validators import validate_password, normalize_password
+from django.utils.translation import override as override_language
+from django.utils.translation import ugettext as _
+from pytz import UTC
+from six import text_type  # pylint: disable=ungrouped-imports
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_api import errors, accounts, forms, helpers
-from openedx.core.djangoapps.user_api.config.waffle import (
-    PREVENT_AUTH_USER_WRITES,
-    SYSTEM_MAINTENANCE_MSG,
-    waffle,
-)
+from openedx.core.djangoapps.theming.helpers import get_current_request
+from openedx.core.djangoapps.user_api import accounts, errors, helpers
+from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangoapps.user_api.errors import (
     AccountUpdateError,
     AccountValidationError,
-    PreferenceValidationError,
+    PreferenceValidationError
 )
 from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
 from openedx.core.lib.api.view_utils import add_serializer_errors
 from openedx.features.enterprise_support.utils import get_enterprise_readonly_account_fields
-
-from .serializers import (
-    AccountLegacyProfileSerializer, AccountUserSerializer,
-    UserReadOnlySerializer, _visible_fields  # pylint: disable=invalid-name
+from student import forms as student_forms
+from student import views as student_views
+from student.models import (
+    AccountRecovery,
+    Registration,
+    User,
+    UserProfile,
+    email_exists_or_retired,
+    username_exists_or_retired
 )
+from util.model_utils import emit_setting_changed_event
+from util.password_policy_validators import normalize_password, validate_password
+
+from .serializers import AccountLegacyProfileSerializer, AccountUserSerializer, UserReadOnlySerializer, _visible_fields
 
 # Public access point for this function.
 visible_fields = _visible_fields
@@ -339,115 +335,6 @@ def _send_email_change_requests_if_needed(data, user):
 
 
 @helpers.intercept_errors(errors.UserAPIInternalError, ignore_errors=[errors.UserAPIRequestError])
-@transaction.atomic
-def create_account(username, password, email):
-    """Create a new user account.
-
-    This will implicitly create an empty profile for the user.
-
-    WARNING: This function does NOT yet implement all the features
-    in `student/views.py`.  Until it does, please use this method
-    ONLY for tests of the account API, not in production code.
-    In particular, these are currently missing:
-
-    * 3rd party auth
-    * External auth (shibboleth)
-
-    In addition, we assume that some functionality is handled
-    at higher layers:
-
-    * Analytics events
-    * Activation email
-    * Terms of service / honor code checking
-    * Recording demographic info (use profile API)
-    * Auto-enrollment in courses (if invited via instructor dash)
-
-    Args:
-        username (unicode): The username for the new account.
-        password (unicode): The user's password.
-        email (unicode): The email address associated with the account.
-
-    Returns:
-        unicode: an activation key for the account.
-
-    Raises:
-        errors.AccountUserAlreadyExists
-        errors.AccountUsernameInvalid
-        errors.AccountEmailInvalid
-        errors.AccountPasswordInvalid
-        errors.UserAPIInternalError: the operation failed due to an unexpected error.
-
-    """
-    # Check if ALLOW_PUBLIC_ACCOUNT_CREATION flag turned off to restrict user account creation
-    if not configuration_helpers.get_value(
-            'ALLOW_PUBLIC_ACCOUNT_CREATION',
-            settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION', True)
-    ):
-        return HttpResponseForbidden(_("Account creation not allowed."))
-
-    if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
-        raise errors.UserAPIInternalError(SYSTEM_MAINTENANCE_MSG)
-
-    # Validate the username, password, and email
-    # This will raise an exception if any of these are not in a valid format.
-    _validate_username(username)
-    _validate_password(password, username, email)
-    _validate_email(email)
-
-    # Create the user account, setting them to "inactive" until they activate their account.
-    user = User(username=username, email=email, is_active=False)
-    password = normalize_password(password)
-    user.set_password(password)
-
-    try:
-        user.save()
-    except IntegrityError:
-        raise errors.AccountUserAlreadyExists
-
-    # Create a registration to track the activation process
-    # This implicitly saves the registration.
-    registration = Registration()
-    registration.register(user)
-
-    # Create an empty user profile with default values
-    UserProfile(user=user).save()
-
-    # Return the activation key, which the caller should send to the user
-    return registration.activation_key
-
-
-def check_account_exists(username=None, email=None):
-    """Check whether an account with a particular username or email already exists.
-
-    Keyword Arguments:
-        username (unicode)
-        email (unicode)
-
-    Returns:
-        list of conflicting fields
-
-    Example Usage:
-        >>> account_api.check_account_exists(username="bob")
-        []
-        >>> account_api.check_account_exists(username="ted", email="ted@example.com")
-        ["email", "username"]
-
-    """
-    conflicts = []
-
-    try:
-        _validate_email_doesnt_exist(email)
-    except errors.AccountEmailAlreadyExists:
-        conflicts.append("email")
-    try:
-        _validate_username_doesnt_exist(username)
-    except errors.AccountUsernameAlreadyExists:
-        conflicts.append("username")
-
-    return conflicts
-
-
-@helpers.intercept_errors(errors.UserAPIInternalError, ignore_errors=[errors.UserAPIRequestError])
 def activate_account(activation_key):
     """Activate a user's account.
 
@@ -471,44 +358,6 @@ def activate_account(activation_key):
     else:
         # This implicitly saves the registration
         registration.activate()
-
-
-@helpers.intercept_errors(errors.UserAPIInternalError, ignore_errors=[errors.UserAPIRequestError])
-def request_password_change(email, is_secure):
-    """Email a single-use link for performing a password reset.
-
-    Users must confirm the password change before we update their information.
-
-    Args:
-        email (str): An email address
-        orig_host (str): An originating host, extracted from a request with get_host
-        is_secure (bool): Whether the request was made with HTTPS
-
-    Returns:
-        None
-
-    Raises:
-        errors.UserNotFound
-        AccountRequestError
-        errors.UserAPIInternalError: the operation failed due to an unexpected error.
-
-    """
-    # Binding data to a form requires that the data be passed as a dictionary
-    # to the Form class constructor.
-    form = forms.PasswordResetFormNoActive({'email': email})
-
-    # Validate that a user exists with the given email address.
-    if form.is_valid():
-        # Generate a single-use link for performing a password reset
-        # and email it to the user.
-        form.save(
-            from_email=configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
-            use_https=is_secure,
-            request=get_current_request(),
-        )
-    else:
-        # No user with the provided email address exists.
-        raise errors.UserNotFound
 
 
 def get_name_validation_error(name):
@@ -679,7 +528,7 @@ def _validate_username(username):
     """
     try:
         _validate_unicode(username)
-        _validate_type(username, basestring, accounts.USERNAME_BAD_TYPE_MSG)
+        _validate_type(username, six.string_types, accounts.USERNAME_BAD_TYPE_MSG)
         _validate_length(
             username,
             accounts.USERNAME_MIN_LENGTH,
@@ -711,7 +560,7 @@ def _validate_email(email):
     """
     try:
         _validate_unicode(email)
-        _validate_type(email, basestring, accounts.EMAIL_BAD_TYPE_MSG)
+        _validate_type(email, six.string_types, accounts.EMAIL_BAD_TYPE_MSG)
         _validate_length(email, accounts.EMAIL_MIN_LENGTH, accounts.EMAIL_MAX_LENGTH, accounts.EMAIL_BAD_LENGTH_MSG)
         validate_email.message = accounts.EMAIL_INVALID_MSG.format(email=email)
         validate_email(email)
@@ -753,7 +602,7 @@ def _validate_password(password, username=None, email=None):
 
     """
     try:
-        _validate_type(password, basestring, accounts.PASSWORD_BAD_TYPE_MSG)
+        _validate_type(password, six.string_types, accounts.PASSWORD_BAD_TYPE_MSG)
         temp_user = User(username=username, email=email) if username else None
         validate_password(password, user=temp_user)
     except errors.AccountDataBadType as invalid_password_err:
@@ -870,9 +719,9 @@ def _validate_unicode(data, err=u"Input not valid unicode"):
 
     """
     try:
-        if not isinstance(data, str) and not isinstance(data, unicode):
+        if not isinstance(data, str) and not isinstance(data, six.text_type):
             raise UnicodeError(err)
         # In some cases we pass the above, but it's still inappropriate utf-8.
-        unicode(data)
+        six.text_type(data)
     except UnicodeError:
         raise UnicodeError(err)

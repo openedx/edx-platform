@@ -3,6 +3,8 @@ Management command `manage_user` is used to idempotently create or remove
 Django users, set/unset permission bits, and associate groups by name.
 """
 
+from __future__ import absolute_import
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import is_password_usable
 from django.contrib.auth.models import Group
@@ -10,7 +12,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.utils.translation import gettext as _
 
-from openedx.core.djangoapps.user_api.accounts.utils import generate_password
+from openedx.core.djangoapps.user_authn.utils import generate_password
 from student.models import UserProfile
 
 

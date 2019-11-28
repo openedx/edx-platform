@@ -2,13 +2,16 @@
 """
 End-to-end tests for the Account Settings page.
 """
+from __future__ import absolute_import
+
 from datetime import datetime
 from unittest import skip
 
+import six
 from bok_choy.page_object import XSS_INJECTION
 from pytz import timezone, utc
 
-from common.test.acceptance.pages.common.auto_auth import AutoAuthPage, FULL_NAME
+from common.test.acceptance.pages.common.auto_auth import FULL_NAME, AutoAuthPage
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.tests.helpers import AcceptanceTest, EventsTestMixin
@@ -192,11 +195,11 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             },
             {
                 'title': 'Social Media Links',
-                'fields': [
+                'fields': sorted([
                     'Twitter Link',
                     'Facebook Link',
                     'LinkedIn Link',
-                ]
+                ])
             },
             {
                 'title': 'Delete My Account',
@@ -204,7 +207,9 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             },
         ]
 
-        self.assertEqual(self.account_settings_page.sections_structure(), expected_sections_structure)
+        sections_structure = self.account_settings_page.sections_structure()
+        sections_structure[2]['fields'] = sorted(sections_structure[2]['fields'])
+        self.assertEqual(sections_structure, expected_sections_structure)
 
     def _test_readonly_field(self, field_id, title, value):
         """
@@ -289,7 +294,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             u'name',
             u'Full Name',
             self.full_name,
-            u'@',
+            u' ',
             [u'<h1>another name<h1>', u'<script>'],
             'Full Name cannot contain the following characters: < >',
             False
@@ -362,26 +367,6 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             reloads_on_save=True,
         )
 
-    def test_gender_field(self):
-        """
-        Test behaviour of "Gender" field.
-        """
-        self._test_dropdown_field(
-            u'gender',
-            u'Gender',
-            u'',
-            [u'Female', u''],
-        )
-
-        actual_events = self.wait_for_events(event_filter=self.settings_changed_event_filter, number_of_matches=2)
-        self.assert_events_match(
-            [
-                self.expected_settings_changed_event('gender', None, 'f'),
-                self.expected_settings_changed_event('gender', 'f', None),
-            ],
-            actual_events
-        )
-
     def test_country_field(self):
         """
         Test behaviour of "Country or Region" field.
@@ -423,12 +408,18 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         """
         Test behaviour of one of the social media links field.
         """
+        first_social_media_link = self.account_settings_page.get_social_first_element()
+
+        valid_value = six.u('https://www.twitter.com/edX')
+        if 'face' in first_social_media_link.lower():
+            valid_value = six.u('https://www.facebook.com/edX')
+
         self._test_text_field(
-            u'social_links',
-            u'Twitter Link',
+            six.u('social_links'),
+            first_social_media_link,
             self.social_link,
-            u'www.google.com/invalidlink',
-            [u'https://www.twitter.com/edX', self.social_link],
+            six.u('www.google.com/invalidlink)'),
+            [valid_value, self.social_link],
         )
 
     def test_linked_accounts(self):
@@ -468,12 +459,12 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             'price': 'Cost:\n$100.00',
         }
 
-        for field_name, value in expected_order_data_first_row.iteritems():
+        for field_name, value in six.iteritems(expected_order_data_first_row):
             self.assertEqual(
                 self.account_settings_page.get_value_of_order_history_row_item('order-Edx-123', field_name)[0], value
             )
 
-        for field_name, value in expected_order_data_second_row.iteritems():
+        for field_name, value in six.iteritems(expected_order_data_second_row):
             self.assertEqual(
                 self.account_settings_page.get_value_of_order_history_row_item('order-Edx-123', field_name)[1], value
             )

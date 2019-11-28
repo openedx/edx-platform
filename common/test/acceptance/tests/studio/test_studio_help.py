@@ -3,7 +3,11 @@
 Test the Studio help links.
 """
 
+from __future__ import absolute_import
+
 from unittest import skip
+
+from six.moves import zip
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage

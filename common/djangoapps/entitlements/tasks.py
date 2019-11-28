@@ -2,12 +2,13 @@
 This file contains celery tasks for entitlements-related functionality.
 """
 
+from __future__ import absolute_import
+
 from celery import task
 from celery.utils.log import get_task_logger
 from django.conf import settings
 
 from entitlements.models import CourseEntitlement
-
 
 LOGGER = get_task_logger(__name__)
 # Under cms the following setting is not defined, leading to errors during tests.

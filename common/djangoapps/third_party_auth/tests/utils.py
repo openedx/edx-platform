@@ -1,14 +1,16 @@
 """Common utility for testing third party oauth2 features."""
+from __future__ import absolute_import
+
 import json
 from base64 import b64encode
 
 import httpretty
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
-
 from provider.constants import PUBLIC
 from provider.oauth2.models import Client
-from social_core.backends.facebook import FacebookOAuth2, API_VERSION as FACEBOOK_API_VERSION
-from social_django.models import UserSocialAuth, Partial
+from social_core.backends.facebook import API_VERSION as FACEBOOK_API_VERSION
+from social_core.backends.facebook import FacebookOAuth2
+from social_django.models import Partial, UserSocialAuth
 
 from student.tests.factories import UserFactory
 
@@ -133,7 +135,7 @@ def prepare_saml_response_from_xml(xml, relay_state='testshib'):
     Returns:
          (str): Base64 and URL encoded XML.
     """
-    b64encoded_xml = b64encode(xml)
+    b64encoded_xml = b64encode(xml.encode())
     return 'RelayState={relay_state}&SAMLResponse={saml_response}'.format(
         relay_state=OneLogin_Saml2_Utils.escape_url(relay_state),
         saml_response=OneLogin_Saml2_Utils.escape_url(b64encoded_xml)

@@ -1,11 +1,13 @@
 """Tests for classes defined in fields.py."""
 
+from __future__ import absolute_import
+
 import datetime
 import unittest
 
 from pytz import UTC
 
-from xmodule.fields import Date, Timedelta, RelativeTime
+from xmodule.fields import Date, RelativeTime, Timedelta
 from xmodule.timeinfo import TimeInfo
 
 

@@ -1,6 +1,6 @@
 # .coveragerc for edx-platform
 [run]
-data_file = reports/.coverage
+data_file = reports/${TEST_SUITE}.coverage
 source =
     cms
     common/djangoapps
@@ -49,4 +49,4 @@ output = reports/coverage.xml
 jenkins_source =
     /home/jenkins/workspace/$JOB_NAME
     /home/jenkins/workspace/$SUBSET_JOB
-    /edx/app/edxapp/edx-platform
+    /home/jenkins/edx-platform

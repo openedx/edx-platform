@@ -1,14 +1,18 @@
 """ Views related to logout. """
-import urllib
-from urlparse import parse_qs, urlsplit, urlunsplit
+from __future__ import absolute_import
+
+import re
 
 import edx_oauth2_provider
+import six.moves.urllib.parse as parse  # pylint: disable=import-error
 from django.conf import settings
 from django.contrib.auth import logout
 from django.shortcuts import redirect
 from django.utils.http import urlencode
 from django.views.generic import TemplateView
 from provider.oauth2.models import Client
+from six.moves.urllib.parse import parse_qs, urlsplit, urlunsplit  # pylint: disable=import-error
+
 from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 
@@ -53,7 +57,7 @@ class LogoutView(TemplateView):
         #  >> /courses/course-v1:ARTS+D1+2018_T/course/
         #  to handle this scenario we need to encode our URL using quote_plus and then unquote it again.
         if target_url:
-            target_url = urllib.unquote(urllib.quote_plus(target_url))
+            target_url = parse.unquote(parse.quote_plus(target_url))
 
         if target_url and is_safe_login_or_logout_redirect(self.request, target_url):
             return target_url
@@ -96,6 +100,15 @@ class LogoutView(TemplateView):
         new_query_string = urlencode(query_params, doseq=True)
         return urlunsplit((scheme, netloc, path, new_query_string, fragment))
 
+    def _is_enterprise_target(self, url):
+        """
+        Check if url belongs to enterprise app
+
+        Args: url(str): url path
+        """
+        unquoted_url = parse.unquote_plus(parse.quote(url))
+        return bool(re.match(r'^/enterprise/[a-z0-9\-]+/course', unquoted_url))
+
     def get_context_data(self, **kwargs):
         context = super(LogoutView, self).get_context_data(**kwargs)
 
@@ -120,9 +133,11 @@ class LogoutView(TemplateView):
             if not referrer or (referrer and not uri.startswith(referrer)):
                 logout_uris.append(self._build_logout_url(uri))
 
+        target = self.target
         context.update({
-            'target': self.target,
+            'target': target,
             'logout_uris': logout_uris,
+            'enterprise_target': self._is_enterprise_target(target),
         })
 
         return context

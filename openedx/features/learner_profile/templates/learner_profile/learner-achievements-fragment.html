@@ -35,7 +35,7 @@ from openedx.core.djangolib.markup import HTML, Text
                 )
                 %>
                 % if certificate_url:
-                    <a href="${certificate_url}" target="_blank">
+                    <a href="${certificate_url}" rel="noopener" target="_blank">
                         <div class="card certificate-card mode-${certificate['type']}">
                             <div class="card-logo">
                                 <h4 class="sr-only">

@@ -1,9 +1,13 @@
 """
 Studio Problem Editor
 """
-from common.test.acceptance.pages.studio.xblock_editor import XBlockEditorView
-from common.test.acceptance.pages.common.utils import click_css
+from __future__ import absolute_import
+
 from selenium.webdriver.support.ui import Select
+from six.moves import range
+
+from common.test.acceptance.pages.common.utils import click_css
+from common.test.acceptance.pages.studio.xblock_editor import XBlockEditorView
 
 
 class ProblemXBlockEditorView(XBlockEditorView):
@@ -24,7 +28,7 @@ class ProblemXBlockEditorView(XBlockEditorView):
         """
         If editing, set the value of a field.
         """
-        selector = u'.xblock-studio_view li.field label:contains("{}") + input'.format(field_display_name)
+        selector = u'.metadata_edit li.field label:contains("{}") + input'.format(field_display_name)
         script = "$(arguments[0]).val(arguments[1]).change();"
         self.browser.execute_script(script, selector, field_value)
 

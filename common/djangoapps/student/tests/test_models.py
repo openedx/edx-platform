@@ -1,5 +1,7 @@
 # pylint: disable=missing-docstring
 
+from __future__ import absolute_import
+
 import datetime
 import hashlib
 
@@ -10,28 +12,28 @@ from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache
 from django.db.models import signals
 from django.db.models.functions import Lower
+from django.test import TestCase
+from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.models import DynamicUpgradeDeadlineConfiguration
-from opaque_keys.edx.keys import CourseKey
+from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.models import (
+    ALLOWEDTOENROLL_TO_ENROLLED,
+    AccountRecovery,
     CourseEnrollment,
     CourseEnrollmentAllowed,
-    PendingEmailChange,
     ManualEnrollmentAudit,
-    ALLOWEDTOENROLL_TO_ENROLLED,
-    PendingNameChange,
-    AccountRecovery
+    PendingEmailChange,
+    PendingNameChange
 )
-from student.tests.factories import CourseEnrollmentFactory, UserFactory, AccountRecoveryFactory
+from student.tests.factories import AccountRecoveryFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from django.test import TestCase
 
 
 @ddt.ddt
@@ -61,7 +63,7 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):
         self.assertIsNone(CourseEnrollment.generate_enrollment_status_hash(AnonymousUser()))
 
         # No enrollments
-        expected = hashlib.md5(self.user.username).hexdigest()
+        expected = hashlib.md5(self.user.username.encode('utf-8')).hexdigest()
         self.assertEqual(CourseEnrollment.generate_enrollment_status_hash(self.user), expected)
         self.assert_enrollment_status_hash_cached(self.user, expected)
 
@@ -79,7 +81,7 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):
         expected = '{username}&{course_id}={mode}'.format(
             username=self.user.username, course_id=str(course_id).lower(), mode=enrollment_mode.lower()
         )
-        expected = hashlib.md5(expected).hexdigest()
+        expected = hashlib.md5(expected.encode('utf-8')).hexdigest()
         self.assertEqual(CourseEnrollment.generate_enrollment_status_hash(self.user), expected)
         self.assert_enrollment_status_hash_cached(self.user, expected)
 
@@ -90,7 +92,7 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):
         hash_elements += [
             '{course_id}={mode}'.format(course_id=str(enrollment.course_id).lower(), mode=enrollment.mode.lower()) for
             enrollment in enrollments]
-        expected = hashlib.md5('&'.join(hash_elements)).hexdigest()
+        expected = hashlib.md5('&'.join(hash_elements).encode('utf-8')).hexdigest()
         self.assertEqual(CourseEnrollment.generate_enrollment_status_hash(self.user), expected)
         self.assert_enrollment_status_hash_cached(self.user, expected)
 

@@ -3,6 +3,8 @@
 Code to manage fetching and storing the metadata of IdPs.
 """
 
+from __future__ import absolute_import
+
 import datetime
 import logging
 
@@ -16,8 +18,8 @@ from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from requests import exceptions
 from six import text_type
 
-from third_party_auth.models import SAMLConfiguration, SAMLProviderConfig, SAMLProviderData
 from openedx.core.djangolib.markup import Text
+from third_party_auth.models import SAMLConfiguration, SAMLProviderConfig, SAMLProviderData
 
 log = logging.getLogger(__name__)
 

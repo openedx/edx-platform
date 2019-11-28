@@ -5,10 +5,14 @@ Utility functions related to urls.
 from __future__ import absolute_import
 
 import sys
+import six
 from importlib import import_module
 
 from django.conf import settings
 from django.urls import set_urlconf
+
+if six.PY3:
+    from importlib import reload  # pylint: disable=no-name-in-module,redefined-builtin
 
 
 def reload_django_url_config():

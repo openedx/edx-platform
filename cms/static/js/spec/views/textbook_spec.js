@@ -168,6 +168,12 @@ define(["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
                     expect(this.model.save).not.toHaveBeenCalled();
                 });
 
+                it("does not re-render on cancel", function() {
+                    this.view.render();
+                    this.view.$(".action-cancel").click();
+                    expect(this.view.render.calls.count()).toEqual(1);
+                });
+
                 it("should be possible to correct validation errors", function() {
                     this.view.render();
                     this.view.$("input[name=textbook-name]").val("");
@@ -247,6 +253,23 @@ define(["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
                 //           expect($inputEl).toBeFocused()
                 //           expect($inputEl.find(':focus').length).toEqual(1)
                 expect(jQuery.fn.focus).toHaveBeenCalledOnJQueryObject($inputEl);
+            });
+
+            it("should re-render when new textbook added", function() {
+                spyOn(this.view, 'render').and.callThrough();
+                this.view.$(".new-button").click();
+                expect(this.view.render.calls.count()).toEqual(1);
+            });
+
+            it("should remove textbook html section on model.destroy", function() {
+                    this.model = new Textbook({name: "Life Sciences", id: "0life-sciences"});
+                    this.collection.add(this.model);
+                    this.view.render();
+                    CMS.URL.TEXTBOOKS = "/textbooks"; // for AJAX
+                    expect(this.view.$el.find('section').length).toEqual(1);
+                    this.model.destroy();
+                    expect(this.view.$el.find('section').length).toEqual(0);
+                    delete CMS.URL.TEXTBOOKS;
             });
         });
 

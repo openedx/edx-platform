@@ -1,29 +1,36 @@
 """Implements basics of Capa, including class CapaModule."""
+from __future__ import absolute_import
+
 import json
 import logging
 import re
 import sys
 
+import six
 from lxml import etree
 from pkg_resources import resource_string
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 
 from capa import responsetypes
+from xmodule.contentstore.django import contentstore
 from xmodule.editing_module import EditingMixin
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.raw_module import RawMixin
-from xmodule.contentstore.django import contentstore
 from xmodule.util.misc import escape_html_characters
 from xmodule.util.sandboxing import get_python_lib_zip
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import (
-    HTMLSnippet, ResourceTemplates, shim_xmodule_js,
-    XModuleMixin, XModuleToXBlockMixin, XModuleDescriptorToXBlockMixin,
+    HTMLSnippet,
+    ResourceTemplates,
+    XModuleDescriptorToXBlockMixin,
+    XModuleMixin,
+    XModuleToXBlockMixin,
+    shim_xmodule_js
 )
 from xmodule.xml_module import XmlMixin
 
-from .capa_base import _, CapaMixin, ComplexEncoder
+from .capa_base import CapaMixin, ComplexEncoder, _
 
 log = logging.getLogger("edx.courseware")
 
@@ -96,13 +103,18 @@ class ProblemBlock(
         if 'lcp' in self.__dict__:
             del self.__dict__['lcp']
 
-    def student_view(self, _context):
+    def student_view(self, _context, show_detailed_errors=False):
         """
         Return the student view.
         """
         # self.score is initialized in self.lcp but in this method is accessed before self.lcp so just call it first.
-        self.lcp
-        fragment = Fragment(self.get_html())
+        try:
+            self.lcp
+        except Exception as err:
+            html = self.handle_fatal_lcp_error(err if show_detailed_errors else None)
+        else:
+            html = self.get_html()
+        fragment = Fragment(html)
         add_webpack_to_fragment(fragment, 'ProblemBlockPreview')
         shim_xmodule_js(fragment, 'Problem')
         return fragment
@@ -111,7 +123,7 @@ class ProblemBlock(
         """
         Renders the Studio preview view.
         """
-        return self.student_view(context)
+        return self.student_view(context, show_detailed_errors=True)
 
     def studio_view(self, _context):
         """
@@ -178,7 +190,7 @@ class ProblemBlock(
                 self.scope_ids.user_id
             )
             _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
-            raise ProcessingError(not_found_error_message), None, traceback_obj
+            six.reraise(ProcessingError, ProcessingError(not_found_error_message), traceback_obj)
 
         except Exception:
             log.exception(
@@ -188,7 +200,7 @@ class ProblemBlock(
                 self.scope_ids.user_id
             )
             _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
-            raise ProcessingError(generic_error_message), None, traceback_obj
+            six.reraise(ProcessingError, ProcessingError(generic_error_message), traceback_obj)
 
         after = self.get_progress()
         after_attempts = self.attempts

@@ -3,17 +3,19 @@ This module provides date summary blocks for the Course Info
 page. Each block gives information about a particular
 course-run-specific date which will be displayed to the user.
 """
-import crum
+from __future__ import absolute_import
+
 import datetime
 
+import crum
 from babel.dates import format_timedelta
-
 from django.conf import settings
 from django.urls import reverse
 from django.utils.formats import date_format
 from django.utils.functional import cached_property
-from django.utils.translation import get_language, to_locale, ugettext_lazy
+from django.utils.translation import get_language, to_locale
 from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy
 from lazy import lazy
 from pytz import utc
 
@@ -23,7 +25,7 @@ from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.certificates.api import can_show_certificate_available_date_field
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.features.course_experience import CourseHomeMessages, UPGRADE_DEADLINE_MESSAGE
+from openedx.features.course_experience import UPGRADE_DEADLINE_MESSAGE, CourseHomeMessages
 from student.models import CourseEnrollment
 
 from .context_processor import user_timezone_locale_prefs

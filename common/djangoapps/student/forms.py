@@ -8,8 +8,6 @@ from importlib import import_module
 
 from django import forms
 from django.conf import settings
-from django.contrib.auth.forms import PasswordResetForm
-from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ValidationError
@@ -29,42 +27,8 @@ from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from student.message_types import AccountRecovery as AccountRecoveryMessage
-from student.message_types import PasswordReset
-from student.models import AccountRecovery, CourseEnrollmentAllowed, email_exists_or_retired
+from student.models import CourseEnrollmentAllowed, email_exists_or_retired
 from util.password_policy_validators import validate_password
-
-
-def send_password_reset_email_for_user(user, request, preferred_email=None):
-    """
-    Send out a password reset email for the given user.
-
-    Arguments:
-        user (User): Django User object
-        request (HttpRequest): Django request object
-        preferred_email (str): Send email to this address if present, otherwise fallback to user's email address.
-    """
-    site = get_current_site()
-    message_context = get_base_template_context(site)
-    message_context.update({
-        'request': request,  # Used by google_analytics_tracking_pixel
-        # TODO: This overrides `platform_name` from `get_base_template_context` to make the tests passes
-        'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
-        'reset_link': '{protocol}://{site}{link}'.format(
-            protocol='https' if request.is_secure() else 'http',
-            site=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
-            link=reverse('password_reset_confirm', kwargs={
-                'uidb36': int_to_base36(user.id),
-                'token': default_token_generator.make_token(user),
-            }),
-        )
-    })
-
-    msg = PasswordReset().personalize(
-        recipient=Recipient(user.username, preferred_email or user.email),
-        language=get_user_preference(user, LANGUAGE_KEY),
-        user_context=message_context,
-    )
-    ace.send(msg)
 
 
 def send_account_recovery_email_for_user(user, request, email=None):
@@ -98,56 +62,6 @@ def send_account_recovery_email_for_user(user, request, email=None):
         user_context=message_context,
     )
     ace.send(msg)
-
-
-class PasswordResetFormNoActive(PasswordResetForm):
-    error_messages = {
-        'unknown': _("That e-mail address doesn't have an associated "
-                     "user account. Are you sure you've registered?"),
-        'unusable': _("The user account associated with this e-mail "
-                      "address cannot reset the password."),
-    }
-
-    is_account_recovery = True
-
-    def clean_email(self):
-        """
-        This is a literal copy from Django 1.4.5's django.contrib.auth.forms.PasswordResetForm
-        Except removing the requirement of active users
-        Validates that a user exists with the given email address.
-        """
-        email = self.cleaned_data["email"]
-        #The line below contains the only change, removing is_active=True
-        self.users_cache = User.objects.filter(email__iexact=email)
-
-        if len(self.users_cache) == 0 and is_secondary_email_feature_enabled():
-            # Check if user has entered the secondary email.
-            self.users_cache = User.objects.filter(
-                id__in=AccountRecovery.objects.filter(secondary_email__iexact=email, is_active=True).values_list('user')
-            )
-            self.is_account_recovery = not bool(self.users_cache)
-
-        if not len(self.users_cache):
-            raise forms.ValidationError(self.error_messages['unknown'])
-        if any((user.password.startswith(UNUSABLE_PASSWORD_PREFIX))
-               for user in self.users_cache):
-            raise forms.ValidationError(self.error_messages['unusable'])
-        return email
-
-    def save(self,  # pylint: disable=arguments-differ
-             use_https=False,
-             token_generator=default_token_generator,
-             request=None,
-             **_kwargs):
-        """
-        Generates a one-use only link for resetting password and sends to the
-        user.
-        """
-        for user in self.users_cache:
-            if self.is_account_recovery:
-                send_password_reset_email_for_user(user, request)
-            else:
-                send_account_recovery_email_for_user(user, request, user.account_recovery.secondary_email)
 
 
 class TrueCheckbox(widgets.CheckboxInput):
@@ -248,7 +162,7 @@ class AccountCreationForm(forms.Form):
     """
 
     _EMAIL_INVALID_MSG = _("A properly formatted e-mail is required")
-    _NAME_TOO_SHORT_MSG = _("Your legal name must be a minimum of two characters long")
+    _NAME_TOO_SHORT_MSG = _("Your legal name must be a minimum of one character long")
 
     # TODO: Resolve repetition
 
@@ -387,18 +301,3 @@ class AccountCreationForm(forms.Form):
             for key, value in self.cleaned_data.items()
             if key in self.extended_profile_fields and value is not None
         }
-
-
-def get_registration_extension_form(*args, **kwargs):
-    """
-    Convenience function for getting the custom form set in settings.REGISTRATION_EXTENSION_FORM.
-
-    An example form app for this can be found at http://github.com/open-craft/custom-form-app
-    """
-    if not settings.FEATURES.get("ENABLE_COMBINED_LOGIN_REGISTRATION"):
-        return None
-    if not getattr(settings, 'REGISTRATION_EXTENSION_FORM', None):
-        return None
-    module, klass = settings.REGISTRATION_EXTENSION_FORM.rsplit('.', 1)
-    module = import_module(module)
-    return getattr(module, klass)(*args, **kwargs)

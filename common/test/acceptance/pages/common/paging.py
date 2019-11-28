@@ -3,6 +3,9 @@ Common mixin for paginated UIs.
 """
 
 
+from __future__ import absolute_import
+
+import six
 from selenium.webdriver.common.keys import Keys
 
 
@@ -39,7 +42,7 @@ class PaginatedUIMixin(object):
 
     def go_to_page(self, page_number):
         """Go to the given page_number in the paginated list results."""
-        self.q(css=self.PAGE_NUMBER_INPUT_CSS).results[0].send_keys(unicode(page_number), Keys.ENTER)
+        self.q(css=self.PAGE_NUMBER_INPUT_CSS).results[0].send_keys(six.text_type(page_number), Keys.ENTER)
         self.wait_for_ajax()
 
     def press_next_page_button(self):

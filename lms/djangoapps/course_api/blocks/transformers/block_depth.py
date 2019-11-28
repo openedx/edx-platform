@@ -1,6 +1,8 @@
 """
 Block Depth Transformer
 """
+from __future__ import absolute_import
+
 from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 
 

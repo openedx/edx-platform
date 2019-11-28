@@ -2,10 +2,12 @@
 Signal handlers for the bulk_email app
 """
 
+from __future__ import absolute_import
+
 from django.dispatch import receiver
 
-from student.models import CourseEnrollment
 from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_MAILINGS
+from student.models import CourseEnrollment
 
 from .models import Optout
 

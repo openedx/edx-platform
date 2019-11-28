@@ -1,8 +1,12 @@
 """
 Tests for CourseData utility class.
 """
-from lms.djangoapps.course_blocks.api import get_course_blocks
+from __future__ import absolute_import
+
+import six
 from mock import patch
+
+from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
@@ -73,7 +77,7 @@ class CourseDataTest(ModuleStoreTestCase):
             self.assertEquals(course_data.course.id, self.course.id)
             self.assertEquals(course_data.version, self.course.course_version)
             self.assertEquals(course_data.edited_on, expected_edited_on)
-            self.assertIn(u'Course: course_key', unicode(course_data))
+            self.assertIn(u'Course: course_key', six.text_type(course_data))
             self.assertIn(u'Course: course_key', course_data.full_string())
 
     def test_no_data(self):

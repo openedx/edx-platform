@@ -39,7 +39,7 @@ def _random_string():
     """
     Generates random string
     """
-    return ''.join(random.choice(string.lowercase, ) for _ in range(12))
+    return ''.join(random.choice(string.ascii_lowercase, ) for _ in range(12))
 
 
 def _make_attribute_test_cases():

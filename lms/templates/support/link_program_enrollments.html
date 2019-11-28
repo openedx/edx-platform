@@ -1,0 +1,37 @@
+<%page expression_filter="h"/>
+
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import js_escaped_string
+%>
+
+## Override the default styles_version to use Bootstrap
+<%! main_css = "css/bootstrap/lms-main.css" %>
+
+<%namespace name='static' file='../static_content.html'/>
+
+<%inherit file="../main.html" />
+
+<%block name="js_extra">
+</%block>
+
+<%block name="pagetitle">
+	${_("Link Program Enrollments")}
+</%block>
+
+<%block name="content">
+	<section class="container outside-app">
+        <h3> Link Program Enrollments </h3>
+            ${static.renderReact(
+                component="LinkProgramEnrollmentsSupportPage",
+                id="entitlement-support-page",
+                props={
+                    'successes': successes,
+                    'errors': errors,
+                    'text': text,
+                    'programUUID': program_uuid
+                }
+            )
+            }
+	</section>
+</%block>

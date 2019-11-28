@@ -2,16 +2,20 @@
 Tests for bulk operations in Split Modulestore.
 """
 # pylint: disable=protected-access
+from __future__ import absolute_import
+
 import copy
-import ddt
 import unittest
+
+import six
+import ddt
 from bson.objectid import ObjectId
 from mock import MagicMock, Mock, call
-from xmodule.modulestore.split_mongo.split import SplitBulkWriteMixin
-from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
-
 from opaque_keys.edx.locator import CourseLocator
+from six.moves import range
 
+from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
+from xmodule.modulestore.split_mongo.split import SplitBulkWriteMixin
 
 VERSION_GUID_DICT = {
     'SAMPLE_VERSION_GUID': 'deadbeef1234' * 2,
@@ -166,7 +170,8 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.bulk.update_structure(self.course_key.replace(branch='b'), other_structure)
         self.assertConnCalls()
         self.bulk._end_bulk_operation(self.course_key)
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             [
                 call.insert_structure(self.structure, self.course_key),
                 call.insert_structure(other_structure, self.course_key)
@@ -202,7 +207,8 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.bulk.update_definition(self.course_key.replace(branch='b'), other_definition)
         self.bulk.insert_course_index(self.course_key, {'versions': {'a': self.definition['_id'], 'b': other_definition['_id']}})
         self.bulk._end_bulk_operation(self.course_key)
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             [
                 call.insert_definition(self.definition, self.course_key),
                 call.insert_definition(other_definition, self.course_key),
@@ -233,7 +239,8 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.bulk.update_definition(self.course_key.replace(branch='b'), other_definition)
         self.assertConnCalls()
         self.bulk._end_bulk_operation(self.course_key)
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             [
                 call.insert_definition(self.definition, self.course_key),
                 call.insert_definition(other_definition, self.course_key)
@@ -269,7 +276,8 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.bulk.update_structure(self.course_key.replace(branch='b'), other_structure)
         self.bulk.insert_course_index(self.course_key, {'versions': {'a': self.structure['_id'], 'b': other_structure['_id']}})
         self.bulk._end_bulk_operation(self.course_key)
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             [
                 call.insert_structure(self.structure, self.course_key),
                 call.insert_structure(other_structure, self.course_key),
@@ -389,7 +397,7 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
         expected = matching + db_indexes
         self.conn.find_matching_course_indexes.return_value = db_indexes
         result = self.bulk.find_matching_course_indexes(branch, search_targets)
-        self.assertItemsEqual(result, expected)
+        six.assertCountEqual(self, result, expected)
         for item in unmatching:
             self.assertNotIn(item, result)
 
@@ -577,7 +585,7 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
         self.conn.find_ancestor_structures.return_value = db_match + db_unmatch
         results = self.bulk.find_ancestor_structures(original_version, block_id)
         self.conn.find_ancestor_structures.assert_called_once_with(original_version, block_id)
-        self.assertItemsEqual(active_match + db_match, results)
+        six.assertCountEqual(self, active_match + db_match, results)
 
 
 @ddt.ddt
@@ -605,7 +613,7 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
         # Reading the same structure multiple times shouldn't hit the database
         # more than once
         version_guid = VERSION_GUID_DICT[version_guid_name]
-        for _ in xrange(2):
+        for _ in range(2):
             result = self.bulk.get_structure(self.course_key, version_guid)
             self.assertEquals(self.conn.get_structure.call_count, 1)
             self.assertEqual(result, self.conn.get_structure.return_value)
@@ -648,7 +656,7 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
         # Reading the same definition multiple times shouldn't hit the database
         # more than once
         version_guid = VERSION_GUID_DICT[version_guid_name]
-        for _ in xrange(2):
+        for _ in range(2):
             result = self.bulk.get_definition(self.course_key, version_guid)
             self.assertEquals(self.conn.get_definition.call_count, 1)
             self.assertEqual(result, self.conn.get_definition.return_value)
@@ -687,7 +695,7 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
     def test_read_index_without_write_only_reads_once(self, ignore_case):
         # Reading the index multiple times should only result in one read from
         # the database
-        for _ in xrange(2):
+        for _ in range(2):
             result = self.bulk.get_course_index(self.course_key, ignore_case=ignore_case)
             self.assertEquals(self.conn.get_course_index.call_count, 1)
             self.assertEquals(self.conn.get_course_index.return_value, result)

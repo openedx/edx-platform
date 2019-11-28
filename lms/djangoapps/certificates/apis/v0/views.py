@@ -1,22 +1,26 @@
 """ API v0 views. """
+from __future__ import absolute_import
+
 import logging
 
+import six
 from django.contrib.auth import get_user_model
+from edx_rest_framework_extensions import permissions
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 from rest_condition import C
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from edx_rest_framework_extensions import permissions
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from lms.djangoapps.certificates.api import get_certificate_for_user, get_certificates_for_user
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.user_api.accounts.api import visible_fields
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core import apidocs
 
 
 log = logging.getLogger(__name__)
@@ -118,7 +122,7 @@ class CertificatesDetailView(GenericAPIView):
         return Response(
             {
                 "username": user_cert.get('username'),
-                "course_id": unicode(user_cert.get('course_key')),
+                "course_id": six.text_type(user_cert.get('course_key')),
                 "certificate_type": user_cert.get('type'),
                 "created_date": user_cert.get('created'),
                 "status": user_cert.get('status'),
@@ -130,20 +134,43 @@ class CertificatesDetailView(GenericAPIView):
 
 
 class CertificatesListView(GenericAPIView):
-    """
+    """REST API endpoints for listing certificates."""
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+
+    permission_classes = (
+        C(IsAuthenticated) & (
+            C(permissions.NotJwtRestrictedApplication) |
+            (
+                C(permissions.JwtRestrictedApplication) &
+                permissions.JwtHasScope &
+                permissions.JwtHasUserFilterForRequestedUser
+            )
+        ),
+    )
+
+    required_scopes = ['certificates:read']
+
+    @apidocs.schema(parameters=[
+        apidocs.string_parameter(
+            'username',
+            apidocs.ParameterLocation.PATH,
+            description="The users to get certificates for",
+        )
+    ])
+    def get(self, request, username):
+        """Get a paginated list of bookmarks for a user.
+
         **Use Case**
 
-            * Get the list of viewable course certificates for a specific user.
+        Get the list of viewable course certificates for a specific user.
 
         **Example Request**
 
-            GET /api/certificates/v0/certificates/{username}
-
-        **GET Parameters**
-
-            A GET request must include the following parameters.
-
-            * username: A string representation of an user's username.
+        GET /api/certificates/v0/certificates/{username}
 
         **GET Response Values**
 
@@ -185,44 +212,13 @@ class CertificatesListView(GenericAPIView):
                 "download_url": "http://www.example.com/cert.pdf",
                 "grade": "0.98"
             }]
-    """
-
-    authentication_classes = (
-        JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
-        SessionAuthenticationAllowInactiveUser,
-    )
-
-    permission_classes = (
-        C(IsAuthenticated) & (
-            C(permissions.NotJwtRestrictedApplication) |
-            (
-                C(permissions.JwtRestrictedApplication) &
-                permissions.JwtHasScope &
-                permissions.JwtHasUserFilterForRequestedUser
-            )
-        ),
-    )
-
-    required_scopes = ['certificates:read']
-
-    def get(self, request, username):
-        """
-        Gets the list of viewable course certificates for a specific user.
-
-        Args:
-            request (Request): Django request object.
-            username (string): URI element specifying the user's username.
-
-        Return:
-            A JSON serialized representation of the list of certificates.
         """
         user_certs = []
         if self._viewable_by_requestor(request, username):
             for user_cert in self._get_certificates_for_user(username):
                 user_certs.append({
                     'username': user_cert.get('username'),
-                    'course_id': unicode(user_cert.get('course_key')),
+                    'course_id': six.text_type(user_cert.get('course_key')),
                     'course_display_name': user_cert.get('course_display_name'),
                     'course_organization': user_cert.get('course_organization'),
                     'certificate_type': user_cert.get('type'),
@@ -263,7 +259,9 @@ class CertificatesListView(GenericAPIView):
                 passing_certificates[course_key] = course_certificate
 
         viewable_certificates = []
-        for course_key, course_overview in CourseOverview.get_from_ids_if_exists(passing_certificates.keys()).items():
+        for course_key, course_overview in CourseOverview.get_from_ids_if_exists(
+            list(passing_certificates.keys())
+        ).items():
             if certificates_viewable_for_course(course_overview):
                 course_certificate = passing_certificates[course_key]
                 course_certificate['course_display_name'] = course_overview.display_name_with_default

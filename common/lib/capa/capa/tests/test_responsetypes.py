@@ -5,13 +5,14 @@ Tests of responsetypes
 
 from __future__ import absolute_import
 
+import io
 import json
 import os
-import random
+import random2 as random
 import textwrap
 import unittest
 import zipfile
-from cStringIO import StringIO
+from six import StringIO
 from datetime import datetime
 
 import mock
@@ -699,18 +700,18 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-docstring
             b) regexp is saved to xml and is read in python as repr of that string
             So  a\d in front-end editor will become a\\\\d in xml,  so it will match a1 as student answer.
         """
-        problem = self.build_problem(answer=ur"5\\æ", case_sensitive=False, regexp=True)
-        self.assert_grade(problem, ur"5\æ", "correct")
+        problem = self.build_problem(answer=u"5\\\\æ", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, u"5\\æ", "correct")
 
         problem = self.build_problem(answer=u"5\\\\æ", case_sensitive=False, regexp=True)
-        self.assert_grade(problem, ur"5\æ", "correct")
+        self.assert_grade(problem, u"5\\æ", "correct")
 
     def test_backslash(self):
         problem = self.build_problem(answer=u"a\\\\c1", case_sensitive=False, regexp=True)
-        self.assert_grade(problem, ur"a\c1", "correct")
+        self.assert_grade(problem, u"a\\c1", "correct")
 
     def test_special_chars(self):
-        problem = self.build_problem(answer=ur"a \s1", case_sensitive=False, regexp=True)
+        problem = self.build_problem(answer=u"a \\s1", case_sensitive=False, regexp=True)
         self.assert_grade(problem, u"a  1", "correct")
 
     def test_case_sensitive(self):
@@ -1588,6 +1589,8 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-docstring
                 if text == "There was a problem with the staff answer to this problem.":
                     text = "TRANSLATED!"
                 return text
+            gettext = ugettext
+
         problem.capa_system.i18n = FakeTranslations()
 
         with self.assertRaisesRegexp(StudentInputError, "TRANSLATED!"):
@@ -2294,7 +2297,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         # Prove that we can import code from a zipfile passed down to us.
 
         # Make a zipfile with one module in it with one function.
-        zipstring = StringIO()
+        zipstring = io.BytesIO()
         zipf = zipfile.ZipFile(zipstring, "w")
         zipf.writestr("my_helper.py", textwrap.dedent("""\
             def seventeen():

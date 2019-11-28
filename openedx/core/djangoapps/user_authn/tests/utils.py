@@ -1,12 +1,14 @@
 """ Common utilities for tests in the user_authn app. """
+from __future__ import absolute_import
+
 from datetime import datetime, timedelta
 from enum import Enum
 from itertools import product
 
 import ddt
 import pytz
-from mock import patch
 from django.conf import settings
+from mock import patch
 from oauth2_provider import models as dot_models
 from rest_framework import status
 

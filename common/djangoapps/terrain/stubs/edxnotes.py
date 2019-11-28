@@ -121,7 +121,7 @@ class StubEdxNotesServiceHandler(StubHttpRequestHandler):
         }
         if status_code < 400 and content:
             headers["Content-Type"] = "application/json"
-            content = json.dumps(content)
+            content = json.dumps(content).encode('utf-8')
         else:
             headers["Content-Type"] = "text/html"
 
@@ -131,7 +131,7 @@ class StubEdxNotesServiceHandler(StubHttpRequestHandler):
         """
         Create a note, assign id, annotator_schema_version, created and updated dates.
         """
-        note = json.loads(self.request_content)
+        note = json.loads(self.request_content.decode('utf-8'))
         note.update({
             "id": uuid4().hex,
             "annotator_schema_version": "v1.0",
@@ -146,7 +146,7 @@ class StubEdxNotesServiceHandler(StubHttpRequestHandler):
         The same as self._create, but it works a list of notes.
         """
         try:
-            notes = json.loads(self.request_content)
+            notes = json.loads(self.request_content.decode('utf-8'))
         except ValueError:
             self.respond(400, "Bad Request")
             return
@@ -181,7 +181,7 @@ class StubEdxNotesServiceHandler(StubHttpRequestHandler):
         """
         Update the note by note id.
         """
-        note = self.server.update_note(note_id, json.loads(self.request_content))
+        note = self.server.update_note(note_id, json.loads(self.request_content.decode('utf-8')))
         if note:
             self.respond(content=note)
         else:

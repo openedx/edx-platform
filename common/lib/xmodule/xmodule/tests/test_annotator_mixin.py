@@ -2,10 +2,13 @@
 This test will run for annotator_mixin.py
 """
 
+from __future__ import absolute_import
+
 import unittest
+
 from lxml import etree
 
-from xmodule.annotator_mixin import get_instructions, get_extension, html_to_text
+from xmodule.annotator_mixin import get_extension, get_instructions, html_to_text
 
 
 class HelperFunctionTest(unittest.TestCase):

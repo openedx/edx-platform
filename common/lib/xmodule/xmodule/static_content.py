@@ -4,6 +4,8 @@ This module has utility functions for gathering up the static content
 that is defined by XModules and XModuleDescriptors (javascript and css)
 """
 
+from __future__ import absolute_import
+
 import errno
 import hashlib
 import json
@@ -12,22 +14,62 @@ import os
 import sys
 import textwrap
 from collections import defaultdict
+from pkg_resources import resource_string
 
 import django
+import six
 from docopt import docopt
 from path import Path as path
 
-from xmodule.x_module import XModuleDescriptor
-from capa_module import ProblemBlock
-
+from xmodule.capa_module import ProblemBlock
+from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
+from xmodule.x_module import XModuleDescriptor, HTMLSnippet
 
 LOG = logging.getLogger(__name__)
+
+
+class VideoBlock(HTMLSnippet):
+    """
+    Static assets for VideoBlock.
+    Kept here because importing VideoBlock code requires Django to be setup.
+    """
+
+    preview_view_js = {
+        'js': [
+            resource_string(__name__, 'js/src/video/10_main.js'),
+        ],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js')
+    }
+    preview_view_css = {
+        'scss': [
+            resource_string(__name__, 'css/video/display.scss'),
+            resource_string(__name__, 'css/video/accessible_menu.scss'),
+        ],
+    }
+
+    studio_view_js = {
+        'js': [
+            resource_string(__name__, 'js/src/tabs/tabs-aggregator.js'),
+        ],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+    }
+
+    studio_view_css = {
+        'scss': [
+            resource_string(__name__, 'css/tabs/tabs.scss'),
+        ]
+    }
 
 
 # List of XBlocks which use this static content setup.
 # Should only be used for XModules being converted to XBlocks.
 XBLOCK_CLASSES = [
+    AboutBlock,
+    CourseInfoBlock,
+    HtmlBlock,
     ProblemBlock,
+    StaticTabBlock,
+    VideoBlock,
 ]
 
 
@@ -183,10 +225,16 @@ def _write_files(output_root, contents, generated_suffix_map=None):
     for extra_file in to_delete:
         (output_root / extra_file).remove_p()
 
-    for filename, file_content in contents.iteritems():
+    for filename, file_content in six.iteritems(contents):
         output_file = output_root / filename
 
         not_file = not output_file.isfile()
+
+        # Sometimes content is already unicode and sometimes it's not
+        # so we add this conditional here to make sure that below we're
+        # always working with streams of bytes.
+        if not isinstance(file_content, six.binary_type):
+            file_content = file_content.encode('utf-8')
 
         # not_file is included to short-circuit this check, because
         # read_md5 depends on the file already existing
@@ -209,7 +257,7 @@ def write_webpack(output_file, module_files, descriptor_files):
     config = {
         'entry': {}
     }
-    for (owner, files) in module_files.items() + descriptor_files.items():
+    for (owner, files) in list(module_files.items()) + list(descriptor_files.items()):
         unique_files = sorted(set('./{}'.format(file) for file in files))
         if len(unique_files) == 1:
             unique_files = unique_files[0]

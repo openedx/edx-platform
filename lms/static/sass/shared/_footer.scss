@@ -138,7 +138,7 @@
         display: inline-block;
         font-size: em(11);
 
-        &:not(:first-child) a::before {
+        &:not(:first-child)::before {
           margin-right: ($baseline/4);
           content: "-";
         }

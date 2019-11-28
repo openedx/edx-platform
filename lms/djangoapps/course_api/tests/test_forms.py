@@ -2,10 +2,13 @@
 Tests for Course API forms.
 """
 
+from __future__ import absolute_import
+
 from itertools import product
-from urllib import urlencode
 
 import ddt
+import six
+from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
 from django.contrib.auth.models import AnonymousUser
 from django.http import QueryDict
 
@@ -66,6 +69,7 @@ class TestCourseListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreT
         self.cleaned_data = {
             'username': user.username,
             'org': '',
+            'role': set([]),
             'mobile': None,
             'search_term': '',
             'filter_': None,
@@ -125,7 +129,7 @@ class TestCourseDetailGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStor
         self.form_data = QueryDict(
             urlencode({
                 'username': user.username,
-                'course_key': unicode(self.course.id),
+                'course_key': six.text_type(self.course.id),
             }),
             mutable=True,
         )

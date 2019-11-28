@@ -1,12 +1,13 @@
-from datetime import timedelta, datetime
+from __future__ import absolute_import
+
 import itertools
+from datetime import datetime, timedelta
 
 import ddt
-from django.utils import timezone
-from mock import Mock
 import pytz
-
+from django.utils import timezone
 from edx_django_utils.cache import RequestCache
+from mock import Mock
 from opaque_keys.edx.locator import CourseLocator
 
 from course_modes.tests.factories import CourseModeFactory
@@ -32,18 +33,15 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
         super(TestContentTypeGatingConfig, self).setUp()
 
     @ddt.data(
-        (True, True, True),
-        (True, True, False),
-        (True, False, True),
-        (True, False, False),
-        (False, False, True),
-        (False, False, False),
+        (True, True),
+        (True, False),
+        (False, True),
+        (False, False),
     )
     @ddt.unpack
     def test_enabled_for_enrollment(
         self,
         already_enrolled,
-        pass_enrollment,
         enrolled_before_enabled,
     ):
 
@@ -68,22 +66,14 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
         else:
             existing_enrollment = None
 
-        if pass_enrollment:
-            enrollment = existing_enrollment
-            user = None
-            course_key = None
-        else:
-            enrollment = None
-            user = self.user
-            course_key = self.course_overview.id
+        enrollment = None
+        user = self.user
+        course_key = self.course_overview.id
 
         query_count = 7
-        if not already_enrolled or not pass_enrollment and already_enrolled:
-            query_count = 8
 
         with self.assertNumQueries(query_count):
             enabled = ContentTypeGatingConfig.enabled_for_enrollment(
-                enrollment=enrollment,
                 user=user,
                 course_key=course_key,
             )
@@ -91,11 +81,11 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
 
     def test_enabled_for_enrollment_failure(self):
         with self.assertRaises(ValueError):
-            ContentTypeGatingConfig.enabled_for_enrollment(None, None, None)
+            ContentTypeGatingConfig.enabled_for_enrollment(None, None)
         with self.assertRaises(ValueError):
-            ContentTypeGatingConfig.enabled_for_enrollment(Mock(name='enrollment'), Mock(name='user'), None)
+            ContentTypeGatingConfig.enabled_for_enrollment(Mock(name='user'), None)
         with self.assertRaises(ValueError):
-            ContentTypeGatingConfig.enabled_for_enrollment(Mock(name='enrollment'), None, Mock(name='course_key'))
+            ContentTypeGatingConfig.enabled_for_enrollment(None, Mock(name='course_key'))
 
     @ddt.data(True, False)
     def test_enabled_for_course(
@@ -206,7 +196,7 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
             all_configs[CourseLocator('7-True', 'test_course', 'run-None')],
             {
                 'enabled': (True, Provenance.org),
-                'enabled_as_of': (datetime(2018, 1, 1, 5, tzinfo=pytz.UTC), Provenance.run),
+                'enabled_as_of': (datetime(2018, 1, 1, 0, tzinfo=pytz.UTC), Provenance.run),
                 'studio_override_enabled': (None, Provenance.default),
             }
         )
@@ -214,7 +204,7 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
             all_configs[CourseLocator('7-True', 'test_course', 'run-False')],
             {
                 'enabled': (False, Provenance.run),
-                'enabled_as_of': (datetime(2018, 1, 1, 5, tzinfo=pytz.UTC), Provenance.run),
+                'enabled_as_of': (datetime(2018, 1, 1, 0, tzinfo=pytz.UTC), Provenance.run),
                 'studio_override_enabled': (None, Provenance.default),
             }
         )
@@ -222,7 +212,7 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
             all_configs[CourseLocator('7-None', 'test_course', 'run-None')],
             {
                 'enabled': (True, Provenance.site),
-                'enabled_as_of': (datetime(2018, 1, 1, 5, tzinfo=pytz.UTC), Provenance.run),
+                'enabled_as_of': (datetime(2018, 1, 1, 0, tzinfo=pytz.UTC), Provenance.run),
                 'studio_override_enabled': (None, Provenance.default),
             }
         )

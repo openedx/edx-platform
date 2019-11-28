@@ -1,6 +1,8 @@
 """
 This module contains signals needed for email integration
 """
+from __future__ import absolute_import
+
 import datetime
 import logging
 from random import randint
@@ -16,8 +18,8 @@ import third_party_auth
 from course_modes.models import CourseMode
 from email_marketing.models import EmailMarketingConfiguration
 from lms.djangoapps.email_marketing.tasks import get_email_cookies_via_sailthru, update_user, update_user_email
-from openedx.core.djangoapps.user_authn.cookies import CREATE_LOGON_COOKIE
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.user_authn.cookies import CREATE_LOGON_COOKIE
 from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from student.signals import SAILTHRU_AUDIT_PURCHASE
@@ -50,7 +52,7 @@ def update_sailthru(sender, user, mode, course_id, **kwargs):  # pylint: disable
         None
     """
     if WAFFLE_SWITCHES.is_enabled(SAILTHRU_AUDIT_PURCHASE_ENABLED) and mode in CourseMode.AUDIT_MODES:
-        email = str(user.email)
+        email = user.email.encode('utf-8')
         update_course_enrollment.delay(email, course_id, mode, site=_get_current_site())
 
 

@@ -2,6 +2,7 @@
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
 <%!
+import six
 from django.utils.translation import ugettext as _
 from django.urls import reverse
 from django.utils import html
@@ -23,7 +24,7 @@ from openedx.core.djangolib.markup import Text, HTML
       <input type="hidden" name="_redirect_url" value="${redirect_url}" />
 
       % if course:
-        <input type="hidden" name="course_id" value="${unicode(course.id)}" />
+        <input type="hidden" name="course_id" value="${six.text_type(course.id)}" />
 
         <div class="header-survey">
           <h4 class="course-info">

@@ -1,6 +1,6 @@
 ## mako
 <%page expression_filter="h"/>
-<%namespace name='static' file='static_content.html'/>
+<%namespace name='static' file='../static_content.html'/>
 
 <%!
 from django.conf import settings
@@ -22,6 +22,12 @@ resume_block = retrieve_last_sitewide_block_completed(self.real_user)
 displayname = get_enterprise_learner_generic_name(request) or username
 %>
 
+<%static:webpack entry="CustomUserMenuLinks">
+    $(document).ready(function() {
+        CustomUserMenuLinks();
+    });
+</%static:webpack>
+
 <div class="nav-item hidden-mobile">
     <a href="${reverse('dashboard')}" class="menu-title">
         <img class="user-image-frame" src="${profile_image_url}" alt="">
@@ -37,7 +43,7 @@ displayname = get_enterprise_learner_generic_name(request) or username
         % if resume_block:
             <div class="mobile-nav-item dropdown-item dropdown-nav-item"><a href="${resume_block}" role="menuitem">${_("Resume your last course")}</a></div>
         % endif
-        <div class="mobile-nav-item dropdown-item dropdown-nav-item"><a href="${reverse('dashboard')}" role="menuitem">${_("Dashboard")}</a></div>
+        <div class="mobile-nav-item dropdown-item dropdown-nav-item dashboard"><a href="${reverse('dashboard')}" role="menuitem">${_("Dashboard")}</a></div>
         <div class="mobile-nav-item dropdown-item dropdown-nav-item"><a href="${reverse('learner_profile', kwargs={'username': username})}" role="menuitem">${_("Profile")}</a></div>
         <div class="mobile-nav-item dropdown-item dropdown-nav-item"><a href="${reverse('account_settings')}" role="menuitem">${_("Account")}</a></div>
         % if should_redirect_to_order_history_microfrontend():

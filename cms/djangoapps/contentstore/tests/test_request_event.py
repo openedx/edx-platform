@@ -1,7 +1,10 @@
 """Tests for CMS's requests to logs"""
+from __future__ import absolute_import
+
 import mock
-from django.urls import reverse
 from django.test import TestCase
+from django.urls import reverse
+from six import unichr  # pylint: disable=W0622
 
 from contentstore.views.helpers import event as cms_user_track
 

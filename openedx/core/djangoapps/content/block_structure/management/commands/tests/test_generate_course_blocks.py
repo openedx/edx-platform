@@ -1,18 +1,24 @@
 """
 Tests for generate_course_blocks management command.
 """
+from __future__ import absolute_import
+
+import itertools
+
 import ddt
 from django.core.management.base import CommandError
-import itertools
 from mock import patch
+import six
+from six.moves import range
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-from .. import generate_course_blocks
 from openedx.core.djangoapps.content.block_structure.tests.helpers import (
     is_course_in_block_structure_cache,
-    is_course_in_block_structure_storage,
+    is_course_in_block_structure_storage
 )
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+
+from .. import generate_course_blocks
 
 
 @ddt.ddt
@@ -82,13 +88,13 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
 
     def test_one_course(self):
         self._assert_courses_not_in_block_cache(*self.course_keys)
-        self.command.handle(courses=[unicode(self.course_keys[0])])
+        self.command.handle(courses=[six.text_type(self.course_keys[0])])
         self._assert_courses_in_block_cache(self.course_keys[0])
         self._assert_courses_not_in_block_cache(*self.course_keys[1:])
         self._assert_courses_not_in_block_storage(*self.course_keys)
 
     def test_with_storage(self):
-        self.command.handle(with_storage=True, courses=[unicode(self.course_keys[0])])
+        self.command.handle(with_storage=True, courses=[six.text_type(self.course_keys[0])])
         self._assert_courses_in_block_cache(self.course_keys[0])
         self._assert_courses_in_block_storage(self.course_keys[0])
         self._assert_courses_not_in_block_storage(*self.course_keys[1:])

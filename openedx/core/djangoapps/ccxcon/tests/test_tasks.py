@@ -2,11 +2,12 @@
 Tests for the CCXCon celery tasks
 """
 
+from __future__ import absolute_import
+
 import mock
-
 from django.test import TestCase
-
 from opaque_keys.edx.keys import CourseKey
+
 from openedx.core.djangoapps.ccxcon import api, tasks
 
 

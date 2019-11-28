@@ -2,11 +2,11 @@
 Content Type Gate Transformer implementation.
 Limits access for certain users to certain types of content.
 """
+from __future__ import absolute_import
+
 from django.conf import settings
 
-from openedx.core.djangoapps.content.block_structure.transformer import (
-    BlockStructureTransformer,
-)
+from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 

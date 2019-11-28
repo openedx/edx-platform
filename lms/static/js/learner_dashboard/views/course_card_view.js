@@ -31,7 +31,7 @@ class CourseCardView extends Backbone.View {
       this.model.updateCourseRunWithHighestGrade(this.context.courseData.grades);
     }
     this.grade = this.context.courseData.grades[this.model.get('course_run_key')];
-    this.grade = this.grade * 100;
+    this.grade = Math.round(this.grade * 100);
     this.collectionCourseStatus = this.context.collectionCourseStatus || '';
     this.entitlement = this.model.get('user_entitlement');
 

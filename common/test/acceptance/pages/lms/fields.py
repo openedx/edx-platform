@@ -4,6 +4,7 @@ Mixins for fields.
 """
 from __future__ import absolute_import
 
+import six
 from bok_choy.promise import EmptyPromise
 
 from common.test.acceptance.tests.helpers import get_selected_option_text, select_option_by_text
@@ -69,8 +70,8 @@ class FieldsMixin(object):
         Return the title of a field.
         """
         self.wait_for_field(field_id)
-
-        query = self.q(css=u'.u-field-{} .u-field-title'.format(field_id))
+        # pylint: disable=unicode-format-string
+        query = self.q(css=six.u('.u-field-{} .u-field-title').format(field_id))
         return query.text[0] if query.present else None
 
     def message_for_field(self, field_id):
@@ -78,8 +79,8 @@ class FieldsMixin(object):
         Return the current message in a field.
         """
         self.wait_for_field(field_id)
-
-        query = self.q(css=u'.u-field-{} .u-field-message'.format(field_id))
+        # pylint: disable=unicode-format-string
+        query = self.q(css=six.u('.u-field-{} .u-field-message'.format(field_id)))
         return query.text[0] if query.present else None
 
     def message_for_textarea_field(self, field_id):
@@ -158,8 +159,8 @@ class FieldsMixin(object):
         Get or set the value of a text field.
         """
         self.wait_for_field(field_id)
-
-        query = self.q(css=u'.u-field-{} input'.format(field_id))
+        # pylint: disable=unicode-format-string
+        query = self.q(css=six.u('.u-field-{} input'.format(field_id)))
         if not query.present:
             return None
 
@@ -248,3 +249,10 @@ class FieldsMixin(object):
         """
         query = self.q(css=u'.u-field-{}.error'.format(field_id))
         return True if query.present else False
+
+    def get_social_first_element(self):
+        """
+        Returns the title of first social media link.
+        """
+        query = self.q(css=six.u('.u-field-social_links > .field > .field-label'))
+        return query[0].text

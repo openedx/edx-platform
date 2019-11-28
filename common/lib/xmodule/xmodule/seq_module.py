@@ -3,14 +3,19 @@ xModule implementation of a learning sequence
 """
 
 # pylint: disable=abstract-method
+from __future__ import absolute_import
+
 import collections
 import json
 import logging
 from datetime import datetime
+from functools import reduce
 
+from pkg_resources import resource_string
+
+import six
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
-from pkg_resources import resource_string
 from pytz import UTC
 from six import text_type
 from web_fragments.fragment import Fragment
@@ -22,7 +27,7 @@ from .exceptions import NotFoundError
 from .fields import Date
 from .mako_module import MakoModuleDescriptor
 from .progress import Progress
-from .x_module import STUDENT_VIEW, PUBLIC_VIEW, XModule
+from .x_module import AUTHOR_VIEW, PUBLIC_VIEW, STUDENT_VIEW, XModule
 from .xml_module import XmlDescriptor
 
 log = logging.getLogger(__name__)
@@ -281,6 +286,13 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             prereq_met, prereq_meta_info = self._compute_is_prereq_met(True)
         return self._student_or_public_view(context or {}, prereq_met, prereq_meta_info, None, PUBLIC_VIEW)
 
+    def author_view(self, context):
+        context = context or {}
+        context['exclude_units'] = True
+        if 'position' in context:
+            context['position'] = int(context['position'])
+        return self._student_or_public_view(context, True, {}, view=AUTHOR_VIEW)
+
     def _special_exam_student_view(self):
         """
         Checks whether this sequential is a special exam.  If so, returns
@@ -362,7 +374,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             'banner_text': banner_text,
             'save_position': view != PUBLIC_VIEW,
             'show_completion': view != PUBLIC_VIEW,
-            'gated_content': self._get_gated_content_info(prereq_met, prereq_meta_info)
+            'gated_content': self._get_gated_content_info(prereq_met, prereq_meta_info),
+            'exclude_units': context.get('exclude_units', False)
         }
         fragment.add_content(self.system.render_template("seq_module.html", params))
 
@@ -459,9 +472,13 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         display_items.  Returns a list of dict objects with information about
         the given display_items.
         """
+        render_items = not context.get('exclude_units', False)
         is_user_authenticated = self.is_user_authenticated(context)
-        bookmarks_service = self.runtime.service(self, 'bookmarks')
-        completion_service = self.runtime.service(self, 'completion')
+        if render_items:
+            bookmarks_service = self.runtime.service(self, 'bookmarks')
+            completion_service = self.runtime.service(self, 'completion')
+        else:
+            bookmarks_service = completion_service = None
         context['username'] = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(
             'edx-platform.username')
         display_names = [
@@ -484,18 +501,21 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             show_bookmark_button = False
             is_bookmarked = False
 
-            if is_user_authenticated:
+            if is_user_authenticated and render_items:
                 show_bookmark_button = True
                 is_bookmarked = bookmarks_service.is_bookmarked(usage_key=usage_id)
 
             context['show_bookmark_button'] = show_bookmark_button
             context['bookmarked'] = is_bookmarked
 
-            rendered_item = item.render(view, context)
-            fragment.add_fragment_resources(rendered_item)
-
+            if render_items:
+                rendered_item = item.render(view, context)
+                fragment.add_fragment_resources(rendered_item)
+                content = rendered_item.content
+            else:
+                content = ''
             iteminfo = {
-                'content': rendered_item.content,
+                'content': content,
                 'page_title': getattr(item, 'tooltip_title', ''),
                 'type': item_type,
                 'id': text_type(usage_id),
@@ -503,8 +523,11 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 'path': " > ".join(display_names + [item.display_name_with_default]),
                 'graded': item.graded
             }
-
-            if is_user_authenticated:
+            if not render_items:
+                # The item url format can be defined in the template context like so:
+                # context['item_url'] = '/my/item/path/{usage_key}/whatever'
+                iteminfo['href'] = context.get('item_url', '').format(usage_key=usage_id)
+            if is_user_authenticated and render_items:
                 if item.location.block_type == 'vertical':
                     if completion_service:
                         iteminfo['complete'] = completion_service.vertical_is_complete(item)
@@ -536,7 +559,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         """
         if not newrelic:
             return
-        newrelic.agent.add_custom_parameter('seq.block_id', unicode(self.location))
+        newrelic.agent.add_custom_parameter('seq.block_id', six.text_type(self.location))
         newrelic.agent.add_custom_parameter('seq.display_name', self.display_name or '')
         newrelic.agent.add_custom_parameter('seq.position', self.position)
         newrelic.agent.add_custom_parameter('seq.is_time_limited', self.is_time_limited)
@@ -575,7 +598,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         if 1 <= self.position <= len(display_items):
             # Basic info about the Unit...
             current = display_items[self.position - 1]
-            newrelic.agent.add_custom_parameter('seq.current.block_id', unicode(current.location))
+            newrelic.agent.add_custom_parameter('seq.current.block_id', six.text_type(current.location))
             newrelic.agent.add_custom_parameter('seq.current.display_name', current.display_name or '')
 
             # Examining all items inside the Unit (or split_test, conditional, etc.)
@@ -620,7 +643,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 ),
                 'is_practice_exam': self.is_practice_exam,
                 'allow_proctoring_opt_out': self.allow_proctoring_opt_out,
-                'due_date': self.due
+                'due_date': self.due,
+                'grace_period': self.graceperiod,
             }
 
             # inject the user's credit requirements and fulfillments
@@ -673,6 +697,7 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule
     resources_dir = None
+    has_author_view = True
 
     show_in_read_only_mode = True
 

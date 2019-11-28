@@ -5,6 +5,7 @@
 <%namespace name='static' file='../static_content.html'/>
 
 <%!
+import json
 from datetime import date
 
 from django.utils.translation import ugettext as _
@@ -14,6 +15,7 @@ from openedx.core.djangolib.markup import HTML, Text
 
 <%
 course_sections = blocks.get('children')
+self_paced = context.get('self_paced', False)
 %>
 <main role="main" class="course-outline" id="main" tabindex="-1">
     % if course_sections is not None:
@@ -30,8 +32,9 @@ course_sections = blocks.get('children')
         % for section in course_sections:
             <%
             section_is_auto_opened = section.get('resume_block') is True
+            scored = 'scored' if section.get('scored', False) else ''
             %>
-                <li class="outline-item section">
+                <li class="outline-item section ${scored}">
                     <button class="section-name accordion-trigger"
                             aria-expanded="${ 'true' if section_is_auto_opened else 'false' }"
                             aria-controls="${ section['id'] }_contents"
@@ -39,7 +42,8 @@ course_sections = blocks.get('children')
                         <span class="fa fa-chevron-right ${ 'fa-rotate-90' if section_is_auto_opened else '' }" aria-hidden="true"></span>
                         <h3 class="section-title">${ section['display_name'] }</h3>
             % if section.get('complete'):
-                            <span class="complete-checkmark fa fa-check"></span>
+                            <span class="complete-checkmark fa fa-check" aria-hidden="true"></span>
+                            <span class="sr">${_("Completed")}</span>
             % endif
                     </button>
                     <ol class="outline-item accordion-panel ${ '' if section_is_auto_opened else 'is-hidden' }"
@@ -50,8 +54,10 @@ course_sections = blocks.get('children')
                 gated_subsection = subsection['id'] in gated_content
                 completed_prereqs = gated_content[subsection['id']]['completed_prereqs'] if gated_subsection else False
                 subsection_is_auto_opened = subsection.get('resume_block') is True
+                scored = 'scored' if subsection.get('scored', False) else ''
+                graded = 'graded' if subsection.get('graded') else ''
                 %>
-                      <li class="subsection accordion ${ 'current' if subsection.get('resume_block') else '' }">
+                      <li class="subsection accordion ${ 'current' if subsection.get('resume_block') else '' } ${graded} ${scored}">
                 % if gated_subsection and not completed_prereqs:
                                 <a href="${ subsection['lms_web_url'] }">
                                     <button class="subsection-text prerequisite-button"
@@ -81,7 +87,8 @@ course_sections = blocks.get('children')
                                             ${ subsection['display_name'] }
                                         </h4>
                     % if subsection.get('complete'):
-                                        <span class="complete-checkmark fa fa-check"></span>
+                                        <span class="complete-checkmark fa fa-check" aria-hidden="true"></span>
+                                        <span class="sr">${_("Completed")}</span>
                     % endif
                 % endif
                                         <div class="details">
@@ -91,14 +98,16 @@ course_sections = blocks.get('children')
                 ##
                 ## Exam subsections expose exam status message field as well as a status icon
                 <%
-                if subsection.get('due') is None:
+                if subsection.get('due') is None or self_paced:
                     # examples: Homework, Lab, etc.
                     data_string = subsection.get('format')
+                    data_datetime = ""
                 else:
                     if 'special_exam_info' in subsection:
                         data_string = _('due {date}')
                     else:
                         data_string = _("{subsection_format} due {{date}}").format(subsection_format=subsection.get('format'))
+                    data_datetime = subsection.get('due')
                 %>
                 % if subsection.get('format') or 'special_exam_info' in subsection:
                                             <span class="subtitle">
@@ -117,7 +126,7 @@ course_sections = blocks.get('children')
                         % if not subsection['special_exam_info'].get('in_completed_state', False):
                                                         <span
                                                             class="localized-datetime subtitle-name"
-                                                            data-datetime="${subsection.get('due')}"
+                                                            data-datetime="${data_datetime}"
                                                             data-string="${data_string}"
                                                             data-timezone="${user_timezone}"
                                                             data-language="${user_language}"
@@ -128,14 +137,14 @@ course_sections = blocks.get('children')
                                                     ## this is the standard case in edx-platform
                                                     <span
                                                         class="localized-datetime subtitle-name"
-                                                        data-datetime="${subsection.get('due')}"
+                                                        data-datetime="${data_datetime}"
                                                         data-string="${data_string}"
                                                         data-timezone="${user_timezone}"
                                                         data-language="${user_language}"
                                                     ></span>
 
                         % if subsection.get('graded'):
-                                                        <span class="sr">&nbsp;${_("This content is graded")}</span>
+                                                <span class="sr">&nbsp;${_("This content is graded")}</span>
                         % endif
                     % endif
                                             </span>
@@ -155,8 +164,10 @@ course_sections = blocks.get('children')
                         vertical_is_access_denied = vertical.get('authorization_denial_reason')
                         if vertical_is_access_denied:
                             continue
+                        scored = 'scored' if vertical.get('scored', False) else ''
+                        access_restricted = list(vertical.get('all_denial_reasons', []))
                         %>
-                                    <li class="vertical outline-item focusable">
+                                    <li class="vertical outline-item focusable ${scored}" data-access-denied="${json.dumps(access_restricted)}">
                                         <a class="outline-item focusable"
                                             % if enable_links:
                                                 href="${ vertical['lms_web_url'] }"
@@ -170,7 +181,9 @@ course_sections = blocks.get('children')
                                               </div>
                                             </div>
                         % if vertical.get('complete'):
-                                                <span class="complete-checkmark fa fa-check"></span>
+                                                <span class="complete-checkmark fa fa-check" aria-hidden="true"></span>
+                                                <span class="sr">${_("Completed")}</span>
+
                         % endif
                                         </a>
                                     </li>

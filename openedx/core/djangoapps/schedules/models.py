@@ -18,8 +18,16 @@ class Schedule(TimeStampedModel):
         default=True,
         help_text=_('Indicates if this schedule is actively used')
     )
+    # TODO Delete this field during last stage of rolling out field renames
     start = models.DateTimeField(
         db_index=True,
+        help_text=_('Date this schedule went into effect')
+    )
+    start_date = models.DateTimeField(
+        # TODO remove blank=True and null=True once data migration is complete in column rename release.
+        blank=True,
+        db_index=True,
+        null=True,
         help_text=_('Date this schedule went into effect')
     )
     upgrade_deadline = models.DateTimeField(
@@ -62,8 +70,8 @@ class ScheduleExperience(models.Model):
     .. no_pii:
     """
     EXPERIENCES = Choices(
-        (0, 'default', 'Recurring Nudge and Upgrade Reminder'),
-        (1, 'course_updates', 'Course Updates')
+        (0, 'default', u'Recurring Nudge and Upgrade Reminder'),
+        (1, 'course_updates', u'Course Updates')
     )
 
     schedule = models.OneToOneField(Schedule, related_name='experience', on_delete=models.CASCADE)

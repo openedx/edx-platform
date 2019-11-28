@@ -1,11 +1,12 @@
 """
 Acceptance tests for Studio.
 """
+from __future__ import absolute_import
+
 import uuid
 
 from selenium.webdriver.common.keys import Keys
 
-from base_studio_test import StudioCourseTest
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio import LMS_URL
@@ -13,7 +14,7 @@ from common.test.acceptance.pages.studio.asset_index import AssetIndexPageStudio
 from common.test.acceptance.pages.studio.course_info import CourseUpdatesPage
 from common.test.acceptance.pages.studio.edit_tabs import PagesPage
 from common.test.acceptance.pages.studio.import_export import ExportCoursePage, ImportCoursePage
-from common.test.acceptance.pages.studio.index import DashboardPage, HomePage, IndexPage, AccessibilityPage
+from common.test.acceptance.pages.studio.index import AccessibilityPage, DashboardPage, HomePage, IndexPage
 from common.test.acceptance.pages.studio.login import CourseOutlineSignInRedirectPage, LoginPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 from common.test.acceptance.pages.studio.settings import SettingsPage
@@ -23,6 +24,8 @@ from common.test.acceptance.pages.studio.signup import SignupPage
 from common.test.acceptance.pages.studio.textbook_upload import TextbookUploadPage
 from common.test.acceptance.pages.studio.users import CourseTeamPage
 from common.test.acceptance.tests.helpers import AcceptanceTest, UniqueCourseTest
+
+from .base_studio_test import StudioCourseTest
 
 
 class LoggedOutTest(AcceptanceTest):

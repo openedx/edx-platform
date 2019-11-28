@@ -3,10 +3,14 @@
 End-to-end tests for the LMS.
 """
 
+from __future__ import absolute_import
+
 import json
 from datetime import datetime, timedelta
 
 import ddt
+import six
+from six.moves import range
 
 from openedx.core.lib.tests import attr
 
@@ -152,6 +156,9 @@ class ProctoredExamTest(UniqueCourseTest):
         )
         course_fix.add_advanced_settings({
             "enable_proctored_exams": {"value": "true"}
+        })
+        course_fix.add_advanced_settings({
+            "show_review_rules": {"value": "true"}
         })
 
         course_fix.add_children(
@@ -332,7 +339,6 @@ class ProctoredExamTest(UniqueCourseTest):
 
         self.studio_course_outline.select_proctored_exam()
         self.assertTrue(self.studio_course_outline.time_allotted_field_visible())
-        self.assertTrue(self.studio_course_outline.exam_review_rules_field_visible())
 
         self.studio_course_outline.select_practice_exam()
         self.assertTrue(self.studio_course_outline.time_allotted_field_visible())
@@ -934,4 +940,4 @@ class WordCloudTests(UniqueCourseTest):
         self.assertTrue(self.courseware_page.is_word_cloud_rendered)
         self.courseware_page.input_word_cloud('test_wordcloud')
         self.courseware_page.save_word_cloud()
-        self.assertItemsEqual(expected_data, self.courseware_page.word_cloud_answer_list)
+        six.assertCountEqual(self, expected_data, self.courseware_page.word_cloud_answer_list)

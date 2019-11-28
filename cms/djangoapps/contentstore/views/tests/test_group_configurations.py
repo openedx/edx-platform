@@ -3,22 +3,26 @@
 """
 Group Configuration Tests.
 """
+from __future__ import absolute_import
+
 import json
 from operator import itemgetter
 
 import ddt
+import six
 from mock import patch
+from six.moves import range
 
-from contentstore.utils import reverse_course_url, reverse_usage_url
-from contentstore.course_group_config import GroupConfiguration, CONTENT_GROUP_CONFIGURATION_NAME, ENROLLMENT_SCHEME
+from contentstore.course_group_config import CONTENT_GROUP_CONFIGURATION_NAME, ENROLLMENT_SCHEME, GroupConfiguration
 from contentstore.tests.utils import CourseTestCase
+from contentstore.utils import reverse_course_url, reverse_usage_url
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
-from xmodule.partitions.partitions import Group, UserPartition, ENROLLMENT_TRACK_PARTITION_ID
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.validation import StudioValidation, StudioValidationMessage
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, Group, UserPartition
+from xmodule.validation import StudioValidation, StudioValidationMessage
 
 GROUP_CONFIGURATION_JSON = {
     u'name': u'Test name',
@@ -160,7 +164,7 @@ class HelperMethods(object):
                 i, 'Name ' + str(i), 'Description ' + str(i),
                 [Group(0, 'Group A'), Group(1, 'Group B'), Group(2, 'Group C')],
                 scheme=None, scheme_id=scheme_id
-            ) for i in xrange(count)
+            ) for i in range(count)
         ]
         self.course.user_partitions = partitions
         self.save_course()
@@ -217,7 +221,7 @@ class GroupConfigurationsBaseTestCase(object):
             )
             self.assertEqual(response.status_code, 400)
             self.assertNotIn("Location", response)
-            content = json.loads(response.content)
+            content = json.loads(response.content.decode('utf-8'))
             self.assertIn("error", content)
 
     def test_invalid_json(self):
@@ -236,7 +240,7 @@ class GroupConfigurationsBaseTestCase(object):
         )
         self.assertEqual(response.status_code, 400)
         self.assertNotIn("Location", response)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertIn("error", content)
 
 
@@ -305,7 +309,7 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         )
         self.assertEqual(response.status_code, 201)
         self.assertIn("Location", response)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         configuration_id, group_ids = self._remove_ids(content)  # pylint: disable=unused-variable
         self.assertEqual(content, expected)
         # IDs are unique
@@ -338,7 +342,7 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         """
         group_config = dict(GROUP_CONFIGURATION_JSON)
         group_config['scheme'] = scheme_id
-        group_config.setdefault('parameters', {})['course_id'] = unicode(self.course.id)
+        group_config.setdefault('parameters', {})['course_id'] = six.text_type(self.course.id)
         response = self.client.ajax_post(
             self._url(),
             data=group_config
@@ -388,7 +392,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(content, expected)
         self.reload_course()
@@ -429,7 +433,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(content, expected)
         self.reload_course()
 
@@ -481,7 +485,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 400)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertTrue(content['error'])
         self.reload_course()
         # Verify that user_partitions and groups are still the same.
@@ -534,7 +538,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(content, expected)
         self.reload_course()
         # Verify that user_partitions in the course contains the new group configuration.
@@ -575,7 +579,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(content, expected)
         self.reload_course()
 
@@ -623,7 +627,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 400)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertTrue(content['error'])
         self.reload_course()
         # Verify that user_partitions is still the same.
@@ -655,7 +659,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         """
         group_config = dict(GROUP_CONFIGURATION_JSON)
         group_config['scheme'] = scheme_id
-        group_config.setdefault('parameters', {})['course_id'] = unicode(self.course.id)
+        group_config.setdefault('parameters', {})['course_id'] = six.text_type(self.course.id)
         response = self.client.ajax_post(
             self._url(),
             data=group_config
@@ -673,7 +677,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         """
         group_config = dict(GROUP_CONFIGURATION_JSON)
         group_config['scheme'] = scheme_id
-        group_config.setdefault('parameters', {})['course_id'] = unicode(self.course.id)
+        group_config.setdefault('parameters', {})['course_id'] = six.text_type(self.course.id)
         response = self.client.put(
             self._url(cid=partition_id),
             data=json.dumps(group_config),
@@ -1112,10 +1116,10 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         # This used to cause an exception since the code assumed that
         # only one partition would be available.
         actual = GroupConfiguration.get_partitions_usage_info(self.store, self.course)
-        self.assertEqual(actual.keys(), [0])
+        self.assertEqual(list(actual.keys()), [0])
 
         actual = GroupConfiguration.get_content_groups_items_usage_info(self.store, self.course)
-        self.assertEqual(actual.keys(), [0])
+        self.assertEqual(list(actual.keys()), [0])
 
     def test_can_handle_duplicate_group_ids(self):
         # Create the user partitions
@@ -1150,14 +1154,14 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         # This used to cause an exception since the code assumed that
         # only one partition would be available.
         actual = GroupConfiguration.get_partitions_usage_info(self.store, self.course)
-        self.assertEqual(actual.keys(), [0, 1])
-        self.assertEqual(actual[0].keys(), [2])
-        self.assertEqual(actual[1].keys(), [3])
+        self.assertEqual(list(actual.keys()), [0, 1])
+        self.assertEqual(list(actual[0].keys()), [2])
+        self.assertEqual(list(actual[1].keys()), [3])
 
         actual = GroupConfiguration.get_content_groups_items_usage_info(self.store, self.course)
-        self.assertEqual(actual.keys(), [0, 1])
-        self.assertEqual(actual[0].keys(), [2])
-        self.assertEqual(actual[1].keys(), [3])
+        self.assertEqual(list(actual.keys()), [0, 1])
+        self.assertEqual(list(actual[0].keys()), [2])
+        self.assertEqual(list(actual[1].keys()), [3])
 
 
 class GroupConfigurationsValidationTestCase(CourseTestCase, HelperMethods):

@@ -1,6 +1,7 @@
+<%page expression_filter="h"/>
 <%namespace name='static' file='../static_content.html'/>
 <%!
-import urllib
+import six
 
 from django.utils.translation import ugettext as _
 from django.urls import reverse
@@ -24,35 +25,34 @@ from six import text_type
         ## Twitter account. {url} should appear at the end of the text.
         tweet_text = _("I just enrolled in {number} {title} through {account}: {url}").format(
             number=course.number,
-            title=course.display_name_with_default_escaped,
+            title=course.display_name_with_default,
             account=static.get_value('course_about_twitter_account', settings.PLATFORM_TWITTER_ACCOUNT),
             url=u"{protocol}://{domain}{path}".format(
                 protocol=site_protocol,
                 domain=site_domain,
-                path=urllib.quote_plus(
-                    reverse('about_course', args=[text_type(course.id)])
-                )
+                path=reverse('about_course', args=[text_type(course.id)])
             )
         ).replace(u" ", u"+")
-        tweet_action = u"http://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=tweet_text)
+        tweet_action = u"http://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=six.moves.urllib.parse.quote_plus(tweet_text.encode('UTF-8')))
 
         facebook_link = static.get_value('course_about_facebook_link', settings.PLATFORM_FACEBOOK_ACCOUNT)
 
-        email_subject = u"mailto:?subject={subject}&body={body}".format(
-            subject=_("Take a course with {platform} online").format(platform=platform_name),
-            body=_("I just enrolled in {number} {title} through {platform} {url}").format(
+        email_body = _("I just enrolled in {number} {title} through {platform} {url}").format(
                 number=course.number,
-                title=course.display_name_with_default_escaped,
+                title=course.display_name_with_default,
                 platform=platform_name,
                 url=u"{protocol}://{domain}{path}".format(
                     protocol=site_protocol,
                     domain=site_domain,
-                    path=urllib.quote_plus(
-                        reverse('about_course', args=[text_type(course.id)]),
-                    )
+                    path=reverse('about_course', args=[text_type(course.id)]),
                 )
-            )
         ).replace(u" ", u"%20")
+
+        email_subject = _("Take a course with {platform} online").format(platform=platform_name)
+        email_link = u"mailto:?subject={subject}&body={body}".format(
+            subject=six.moves.urllib.parse.quote_plus(email_subject.encode('UTF-8')),
+            body=six.moves.urllib.parse.quote_plus(email_body.encode('UTF-8'))
+        )
       %>
       <a href="${tweet_action}" class="share">
         <span class="icon fa fa-twitter" aria-hidden="true"></span><span class="sr">${_("Tweet that you've enrolled in this course")}</span>
@@ -60,7 +60,7 @@ from six import text_type
       <a href="${facebook_link}" class="share">
         <span class="icon fa fa-thumbs-up" aria-hidden="true"></span><span class="sr">${_("Post a Facebook message to say you've enrolled in this course")}</span>
       </a>
-      <a href="${email_subject}" class="share">
+      <a href="${email_link}" class="share">
         <span class="icon fa fa-envelope" aria-hidden="true"></span><span class="sr">${_("Email someone to say you've enrolled in this course")}</span>
       </a>
   </div>

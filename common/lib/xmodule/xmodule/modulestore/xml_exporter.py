@@ -2,24 +2,27 @@
 Methods for exporting course data to XML
 """
 
+from __future__ import absolute_import
+
 import logging
+import os
 from abc import abstractmethod
-from six import text_type
+from json import dumps
+
 import lxml.etree
-from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
+import six
+from fs.osfs import OSFS
+from opaque_keys.edx.locator import CourseLocator, LibraryLocator
+from six import text_type
+from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope
+
+from xmodule.assetstore import AssetMetadata
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
-from xmodule.assetstore import AssetMetadata
-from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
+from xmodule.modulestore import LIBRARY_ROOT, EdxJSONEncoder, ModuleStoreEnum
+from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.store_utilities import draft_node_constructor, get_draft_subtree_roots
-from xmodule.modulestore import LIBRARY_ROOT
-from fs.osfs import OSFS
-from json import dumps
-import os
-
-from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
-from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 
 DRAFT_DIR = "drafts"
 PUBLISHED_DIR = "published"
@@ -355,7 +358,7 @@ def adapt_references(subtree, destination_course_key, export_fs):
     Map every reference in the subtree into destination_course_key and set it back into the xblock fields
     """
     subtree.runtime.export_fs = export_fs  # ensure everything knows where it's going!
-    for field_name, field in subtree.fields.iteritems():
+    for field_name, field in six.iteritems(subtree.fields):
         if field.is_set_on(subtree):
             if isinstance(field, Reference):
                 value = field.read_from(subtree)
@@ -372,7 +375,7 @@ def adapt_references(subtree, destination_course_key, export_fs):
             elif isinstance(field, ReferenceValueDict):
                 field.write_to(
                     subtree, {
-                        key: ele.map_into_course(destination_course_key) for key, ele in field.read_from(subtree).iteritems()
+                        key: ele.map_into_course(destination_course_key) for key, ele in six.iteritems(field.read_from(subtree))
                     }
                 )
 

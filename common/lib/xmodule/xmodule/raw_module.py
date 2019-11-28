@@ -1,13 +1,18 @@
+from __future__ import absolute_import
+
 import logging
-from exceptions import SerializationError
+import re
 
 from lxml import etree
 from xblock.fields import Scope, String
-
 from xmodule.editing_module import XMLEditingDescriptor
 from xmodule.xml_module import XmlDescriptor
 
+from .exceptions import SerializationError
+
 log = logging.getLogger(__name__)
+
+PRE_TAG_REGEX = re.compile(r'<pre>[\s\S]*?</pre>')
 
 
 class RawMixin(object):
@@ -20,7 +25,12 @@ class RawMixin(object):
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
-        return {'data': etree.tostring(xml_object, pretty_print=True, encoding='unicode')}, []
+        pre_tag_data = [etree.tostring(pre_tag_info) for pre_tag_info in xml_object.findall('pre')]
+        data = etree.tostring(xml_object, pretty_print=True, encoding='unicode')
+        if pre_tag_data:
+            for index, pre_tag in enumerate(re.findall(PRE_TAG_REGEX, data)):
+                data = re.sub(re.escape(pre_tag), pre_tag_data[index].decode(), data)
+        return {'data': data}, []
 
     def definition_to_xml(self, resource_fs):
         """
@@ -58,6 +68,28 @@ class RawMixin(object):
             )
             raise SerializationError(self.location, msg)
 
+    @classmethod
+    def parse_xml_new_runtime(cls, node, runtime, keys):
+        """
+        Interpret the parsed XML in `node`, creating a new instance of this
+        module.
+        """
+        # In the new/blockstore-based runtime, XModule parsing (from
+        # XmlMixin) is disabled, so definition_from_xml will not be
+        # called, and instead the "normal" XBlock parse_xml will be used.
+        # However, it's not compatible with RawMixin, so we implement
+        # support here.
+        data_field_value = cls.definition_from_xml(node, None)[0]["data"]
+        for child in node.getchildren():
+            node.remove(child)
+        # Get attributes, if any, via normal parse_xml.
+        try:
+            block = super(RawMixin, cls).parse_xml_new_runtime(node, runtime, keys)
+        except AttributeError:
+            block = super(RawMixin, cls).parse_xml(node, runtime, keys, id_generator=None)
+        block.data = data_field_value
+        return block
+
 
 class RawDescriptor(RawMixin, XmlDescriptor, XMLEditingDescriptor):
     """
@@ -67,10 +99,9 @@ class RawDescriptor(RawMixin, XmlDescriptor, XMLEditingDescriptor):
     pass
 
 
-class EmptyDataRawDescriptor(XmlDescriptor, XMLEditingDescriptor):
+class EmptyDataRawMixin(object):
     """
-    Version of RawDescriptor for modules which may have no XML data,
-    but use XMLEditingDescriptor for import/export handling.
+    Common code between EmptyDataRawDescriptor and XBlocks converted from XModules.
     """
     resources_dir = None
 
@@ -78,7 +109,7 @@ class EmptyDataRawDescriptor(XmlDescriptor, XMLEditingDescriptor):
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
-        if len(xml_object) == 0 and len(xml_object.items()) == 0:
+        if len(xml_object) == 0 and len(list(xml_object.items())) == 0:
             return {'data': ''}, []
         return {'data': etree.tostring(xml_object, pretty_print=True, encoding='unicode')}, []
 
@@ -86,3 +117,11 @@ class EmptyDataRawDescriptor(XmlDescriptor, XMLEditingDescriptor):
         if self.data:
             return etree.fromstring(self.data)
         return etree.Element(self.category)
+
+
+class EmptyDataRawDescriptor(EmptyDataRawMixin, XmlDescriptor, XMLEditingDescriptor):
+    """
+    Version of RawDescriptor for modules which may have no XML data,
+    but use XMLEditingDescriptor for import/export handling.
+    """
+    pass

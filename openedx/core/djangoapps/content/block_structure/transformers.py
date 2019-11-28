@@ -1,13 +1,14 @@
 """
 Module for a collection of BlockStructureTransformers.
 """
+from __future__ import absolute_import
+
 import functools
 from logging import getLogger
 
-from .exceptions import TransformerException, TransformerDataIncompatible
+from .exceptions import TransformerDataIncompatible, TransformerException
 from .transformer import FilteringTransformerMixin
 from .transformer_registry import TransformerRegistry
-
 
 logger = getLogger(__name__)  # pylint: disable=C0103
 

@@ -13,7 +13,7 @@ from edx_ace.utils.date import serialize
 from freezegun import freeze_time
 from mock import PropertyMock, patch
 
-from courseware.models import DynamicUpgradeDeadlineConfiguration
+from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 
 
 @ddt.ddt

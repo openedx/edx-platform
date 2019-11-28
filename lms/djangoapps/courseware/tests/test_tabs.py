@@ -1,16 +1,20 @@
 """
 Test cases for tabs.
 """
+from __future__ import absolute_import
+
+import six
+from crum import set_current_request
 from django.contrib.auth.models import AnonymousUser
-from django.urls import reverse
 from django.http import Http404
+from django.urls import reverse
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import MagicMock, Mock, patch
 from six import text_type
-from crum import set_current_request
+from six.moves import range
 
-from courseware.courses import get_course_by_id
-from courseware.tabs import (
+from lms.djangoapps.courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.tabs import (
     CourseInfoTab,
     CoursewareTab,
     ExternalDiscussionCourseTab,
@@ -18,9 +22,9 @@ from courseware.tabs import (
     ProgressTab,
     get_course_tab_list
 )
-from courseware.tests.factories import InstructorFactory, StaffFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.views.views import StaticCourseTabView, get_static_tab_fragment
+from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.views.views import StaticCourseTabView, get_static_tab_fragment
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
@@ -249,14 +253,12 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         self.setup_user()
         url = reverse('static_tab', args=[text_type(self.course.id), 'new_tab'])
         resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 200)
-        self.assertIn("OOGIE BLOOGIE", resp.content)
+        self.assertContains(resp, "OOGIE BLOOGIE")
 
     def test_anonymous_user(self):
         url = reverse('static_tab', args=[text_type(self.course.id), 'new_tab'])
         resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 200)
-        self.assertIn("OOGIE BLOOGIE", resp.content)
+        self.assertContains(resp, "OOGIE BLOOGIE")
 
     def test_invalid_course_key(self):
         self.setup_user()
@@ -278,7 +280,7 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         self.assertIn('static_tab', tab_content)
 
         # Test when render raises an exception
-        with patch('courseware.views.views.get_module') as mock_module_render:
+        with patch('lms.djangoapps.courseware.views.views.get_module') as mock_module_render:
             mock_module_render.return_value = MagicMock(
                 render=Mock(side_effect=Exception('Render failed!'))
             )
@@ -324,15 +326,13 @@ class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.setup_user()
         url = reverse('static_tab', args=[text_type(self.xml_course_key), self.xml_url])
         resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 200)
-        self.assertIn(self.xml_data, resp.content)
+        self.assertContains(resp, self.xml_data)
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_anonymous_user_xml(self):
         url = reverse('static_tab', args=[text_type(self.xml_course_key), self.xml_url])
         resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 200)
-        self.assertIn(self.xml_data, resp.content)
+        self.assertContains(resp, self.xml_data)
 
 
 @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True})
@@ -381,22 +381,22 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
         )
         milestone = {
             'name': 'Test Milestone',
-            'namespace': '{}.entrance_exams'.format(unicode(self.course.id)),
+            'namespace': '{}.entrance_exams'.format(six.text_type(self.course.id)),
             'description': 'Testing Courseware Tabs'
         }
         self.user.is_staff = False
         request = get_mock_request(self.user)
         self.course.entrance_exam_enabled = True
-        self.course.entrance_exam_id = unicode(entrance_exam.location)
+        self.course.entrance_exam_id = six.text_type(entrance_exam.location)
         milestone = add_milestone(milestone)
         add_course_milestone(
-            unicode(self.course.id),
+            six.text_type(self.course.id),
             self.relationship_types['REQUIRES'],
             milestone
         )
         add_course_content_milestone(
-            unicode(self.course.id),
-            unicode(entrance_exam.location),
+            six.text_type(self.course.id),
+            six.text_type(entrance_exam.location),
             self.relationship_types['FULFILLS'],
             milestone
         )
@@ -416,7 +416,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
         self.client.logout()
         self.client.login(username=instructor.username, password='test')
 
-        url = reverse('mark_student_can_skip_entrance_exam', kwargs={'course_id': unicode(self.course.id)})
+        url = reverse('mark_student_can_skip_entrance_exam', kwargs={'course_id': six.text_type(self.course.id)})
         response = self.client.post(url, {
             'unique_student_identifier': student.email,
         })
@@ -640,7 +640,6 @@ class CourseTabListTestCase(TabListTestCase):
     @patch.dict("django.conf.settings.FEATURES", {
         "ENABLE_TEXTBOOK": True,
         "ENABLE_DISCUSSION_SERVICE": True,
-        "ENABLE_STUDENT_NOTES": True,
         "ENABLE_EDXNOTES": True,
     })
     def test_iterate_displayable(self):
@@ -816,7 +815,7 @@ class DiscussionLinkTestCase(TabTestCase):
         """Custom reverse function"""
         def reverse_discussion_link(viewname, args):
             """reverse lookup for discussion link"""
-            if viewname == "forum_form_discussion" and args == [unicode(course.id)]:
+            if viewname == "forum_form_discussion" and args == [six.text_type(course.id)]:
                 return "default_discussion_link"
         return reverse_discussion_link
 

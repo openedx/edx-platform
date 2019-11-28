@@ -2,6 +2,8 @@
 PageObjects related to the AcidBlock
 """
 
+from __future__ import absolute_import
+
 from bok_choy.page_object import PageObject
 from bok_choy.promise import BrokenPromise, EmptyPromise
 
@@ -22,8 +24,6 @@ class AcidView(PageObject):
                 is on the page.
         """
         super(AcidView, self).__init__(browser)
-        if isinstance(context_selector, unicode):
-            context_selector = context_selector.encode('utf-8')
         self.context_selector = context_selector
 
     def is_browser_on_page(self):

@@ -1,4 +1,8 @@
+# -*- coding: utf-8 -*-
+
 """Tests of email marketing signal handlers."""
+from __future__ import absolute_import
+
 import datetime
 import logging
 
@@ -13,6 +17,7 @@ from mock import ANY, Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from sailthru.sailthru_error import SailthruClientError
 from sailthru.sailthru_response import SailthruResponse
+import six
 from testfixtures import LogCapture
 
 from email_marketing.models import EmailMarketingConfiguration
@@ -26,14 +31,14 @@ from email_marketing.tasks import (
     _create_user_list,
     _get_list_from_email_marketing_provider,
     _get_or_create_user_list,
-    update_user,
-    update_user_email,
     get_email_cookies_via_sailthru,
     update_course_enrollment,
+    update_user,
+    update_user_email
 )
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from student.models import Registration
-from student.tests.factories import UserFactory, UserProfileFactory, CourseEnrollmentFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory, UserProfileFactory
 from util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
@@ -112,7 +117,7 @@ class EmailMarketingTests(TestCase):
                     'Started at {start} and ended at {end}, time spent:{delta} milliseconds'.format(
                         start=datetime.datetime.now().isoformat(' '),
                         end=datetime.datetime.now().isoformat(' '),
-                        delta=0)
+                        delta=0 if six.PY2 else 0.0)
                  ),
                 (LOGGER_NAME, 'INFO',
                     'sailthru_hid cookie:{cookies[cookie]} successfully retrieved for user {user}'.format(
@@ -675,3 +680,14 @@ class SailthruTests(TestCase):
         switch.return_value = True
         update_sailthru(None, self.user, 'verified', self.course_id)
         self.assertFalse(mock_sailthru_purchase.called)
+
+    @patch('openedx.core.djangoapps.waffle_utils.WaffleSwitchNamespace.is_enabled')
+    @patch('sailthru.sailthru_client.SailthruClient.purchase')
+    def test_encoding_is_working_for_email_contains_unicode(self, mock_sailthru_purchase, switch):
+        """Make sure encoding is working for emails contains unicode characters
+        while sending it to sail through.
+        """
+        switch.return_value = True
+        self.user.email = u'tèst@edx.org'
+        update_sailthru(None, self.user, 'audit', self.course_id)
+        self.assertTrue(mock_sailthru_purchase.called)

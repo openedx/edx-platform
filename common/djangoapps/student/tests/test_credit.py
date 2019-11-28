@@ -1,14 +1,16 @@
 """
 Tests for credit courses on the student dashboard.
 """
+from __future__ import absolute_import
+
 import datetime
 import unittest
 
 import ddt
 import pytz
 from django.conf import settings
-from django.urls import reverse
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch
 
 from openedx.core.djangoapps.credit import api as credit_api

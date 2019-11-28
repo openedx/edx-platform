@@ -2,6 +2,8 @@
 Comprehensive Theming support for Django's collectstatic functionality.
 See https://docs.djangoproject.com/en/1.8/ref/contrib/staticfiles/
 """
+from __future__ import absolute_import
+
 import os.path
 import posixpath
 import re
@@ -275,7 +277,7 @@ class ThemePipelineMixin(PipelineMixin):
         themes = get_themes()
 
         for theme in themes:
-            css_packages = self.get_themed_packages(theme.theme_dir_name, settings.PIPELINE_CSS)
+            css_packages = self.get_themed_packages(theme.theme_dir_name, settings.PIPELINE['STYLESHEETS'])
 
             from pipeline.packager import Packager
             packager = Packager(storage=self, css_packages=css_packages)

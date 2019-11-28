@@ -8,7 +8,7 @@
     %>
     <div class='exam-text js-exam-text' data-show-long="true">
         <% // xss-lint: disable=underscore-not-escaped %>
-        <%= interpolate_text('You are taking "{exam_link}" as {exam_type}. ', {exam_link: "<a href='" + exam_url_path + "'>"+gtLtEscape(exam_display_name)+"</a>", exam_type: (!_.isUndefined(arguments[0].exam_type)) ? exam_type : gettext('a timed exam')}) %>
+        <%= interpolate_text(gettext('You are taking "{exam_link}" as {exam_type}. '), {exam_link: "<a href='" + exam_url_path + "'>"+gtLtEscape(exam_display_name)+"</a>", exam_type: (!_.isUndefined(arguments[0].exam_type)) ? exam_type : gettext('a timed exam')}) %>
         <span class="js-exam-additional-text" aria-hidden="false">
             <%- gettext('The timer on the right shows the time remaining in the exam.') %>
             <%- gettext('To receive credit for problems, you must select "Submit" for each problem before you select "End My Exam".') %>

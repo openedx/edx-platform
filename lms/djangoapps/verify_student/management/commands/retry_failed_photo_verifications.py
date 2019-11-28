@@ -1,7 +1,7 @@
 """
 Django admin commands related to verify_student
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 from django.core.management.base import BaseCommand
 

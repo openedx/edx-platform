@@ -39,7 +39,7 @@ class ClientCredentialsTest(mixins.AccessTokenMixin, TestCase):
         response = self.client.post(reverse('oauth2:access_token'), data)
         self.assertEqual(response.status_code, 200)
 
-        access_token = json.loads(response.content)['access_token']
+        access_token = json.loads(response.content.decode('utf-8'))['access_token']
         expected = AccessToken.objects.filter(client=oauth_client, user=self.user).first().token
         self.assertEqual(access_token, expected)
 
@@ -70,7 +70,7 @@ class ClientCredentialsTest(mixins.AccessTokenMixin, TestCase):
         response = self.client.post(reverse('access_token'), data)
         self.assertEqual(response.status_code, 200)
 
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         access_token = content['access_token']
         self.assertEqual(content['scope'], data['scope'])
         self.assert_valid_jwt_access_token(access_token, self.user, scopes)

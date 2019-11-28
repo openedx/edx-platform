@@ -153,7 +153,12 @@ class TestPreferencesAPI(UserAPITestCase):
             expected_status=204
         )
         response = self.send_get(self.client)
-        self.assertEqual({u"dict_pref": u"{u'int_key': 10}", u"string_pref": u"value"}, response.data)
+        if six.PY2:
+            pref_dict = {u"dict_pref": u"{u'int_key': 10}", u"string_pref": u"value"}
+        else:
+            # pylint: disable=unicode-format-string
+            pref_dict = {"dict_pref": "{'int_key': 10}", "string_pref": "value"}
+        self.assertEqual(pref_dict, response.data)
 
     @ddt.data(
         ("different_client", "different_user"),

@@ -1,9 +1,12 @@
 """
 Tests for the Certificate REST APIs.
 """
+from __future__ import absolute_import
+
 from itertools import product
 
 import ddt
+import six
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
@@ -18,7 +21,7 @@ from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFact
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.oauth_dispatch.toggles import ENFORCE_JWT_SCOPES
 from openedx.core.djangoapps.user_api.tests.factories import UserPreferenceFactory
-from openedx.core.djangoapps.user_authn.tests.utils import AuthType, AuthAndScopesTestMixin, JWT_AUTH_TYPES
+from openedx.core.djangoapps.user_authn.tests.utils import JWT_AUTH_TYPES, AuthAndScopesTestMixin, AuthType
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -80,7 +83,7 @@ class CertificatesDetailRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTes
                 'grade': '0.88',
                 'download_url': 'www.google.com',
                 'certificate_type': CourseMode.VERIFIED,
-                'course_id': unicode(self.course.id),
+                'course_id': six.text_type(self.course.id),
                 'created_date': self.now,
             }
         )
@@ -158,7 +161,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             response.data,
             [{
                 'username': self.student.username,
-                'course_id': unicode(self.course.id),
+                'course_id': six.text_type(self.course.id),
                 'course_display_name': self.course.display_name,
                 'course_organization': self.course.org,
                 'certificate_type': CourseMode.VERIFIED,

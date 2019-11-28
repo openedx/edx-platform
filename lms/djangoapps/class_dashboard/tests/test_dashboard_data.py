@@ -2,12 +2,15 @@
 Tests for class dashboard (Metrics tab in instructor dashboard)
 """
 
+from __future__ import absolute_import
+
 import json
 
-from django.urls import reverse
 from django.test.client import RequestFactory
+from django.urls import reverse
 from mock import patch
 from six import text_type
+from six.moves import range
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from class_dashboard.dashboard_data import (
@@ -23,7 +26,7 @@ from class_dashboard.dashboard_data import (
     get_students_problem_grades
 )
 from class_dashboard.views import has_instructor_access_for_class
-from courseware.tests.factories import StudentModuleFactory
+from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -60,7 +63,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
                 display_name=u"test unit omega \u03a9",
             )
             cls.items = []
-            for i in xrange(USER_COUNT - 1):
+            for i in range(USER_COUNT - 1):
                 item = ItemFactory.create(
                     parent_location=cls.unit.location,
                     category="problem",
@@ -80,7 +83,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
         self.attempts = 3
         self.users = [
             UserFactory.create(username="metric" + str(__))
-            for __ in xrange(USER_COUNT)
+            for __ in range(USER_COUNT)
         ]
 
         for user in self.users:
@@ -173,8 +176,8 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
         request = self.request_factory.get(reverse('get_students_problem_grades') + attributes)
 
         response = get_students_problem_grades(request)
-        response_content = json.loads(response.content)['results']
-        response_max_exceeded = json.loads(response.content)['max_exceeded']
+        response_content = json.loads(response.content.decode('utf-8'))['results']
+        response_max_exceeded = json.loads(response.content.decode('utf-8'))['max_exceeded']
 
         self.assertEquals(USER_COUNT, len(response_content))
         self.assertEquals(False, response_max_exceeded)
@@ -191,8 +194,8 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
             request = self.request_factory.get(reverse('get_students_problem_grades') + attributes)
 
             response = get_students_problem_grades(request)
-            response_results = json.loads(response.content)['results']
-            response_max_exceeded = json.loads(response.content)['max_exceeded']
+            response_results = json.loads(response.content.decode('utf-8'))['results']
+            response_max_exceeded = json.loads(response.content.decode('utf-8'))['max_exceeded']
 
             # Only 2 students in the list and response_max_exceeded is True
             self.assertEquals(2, len(response_results))
@@ -225,8 +228,8 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
         request = self.request_factory.get(reverse('get_students_opened_subsection') + attributes)
 
         response = get_students_opened_subsection(request)
-        response_results = json.loads(response.content)['results']
-        response_max_exceeded = json.loads(response.content)['max_exceeded']
+        response_results = json.loads(response.content.decode('utf-8'))['results']
+        response_max_exceeded = json.loads(response.content.decode('utf-8'))['max_exceeded']
         self.assertEquals(USER_COUNT, len(response_results))
         self.assertEquals(False, response_max_exceeded)
 
@@ -238,8 +241,8 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
             request = self.request_factory.get(reverse('get_students_opened_subsection') + attributes)
 
             response = get_students_opened_subsection(request)
-            response_results = json.loads(response.content)['results']
-            response_max_exceeded = json.loads(response.content)['max_exceeded']
+            response_results = json.loads(response.content.decode('utf-8'))['results']
+            response_max_exceeded = json.loads(response.content.decode('utf-8'))['max_exceeded']
 
             # Only 2 students in the list and response_max_exceeded is True
             self.assertEquals(2, len(response_results))

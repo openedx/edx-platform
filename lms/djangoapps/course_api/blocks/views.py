@@ -1,6 +1,9 @@
 """
 CourseBlocks API views
 """
+from __future__ import absolute_import
+
+import six
 from django.core.exceptions import ValidationError
 from django.http import Http404
 from opaque_keys import InvalidKeyError
@@ -280,5 +283,5 @@ class BlocksInCourseView(BlocksView):
             course_key = CourseKey.from_string(course_key_string)
             course_usage_key = modulestore().make_course_usage_key(course_key)
         except InvalidKeyError:
-            raise ValidationError(u"'{}' is not a valid course key.".format(unicode(course_key_string)))
+            raise ValidationError(u"'{}' is not a valid course key.".format(six.text_type(course_key_string)))
         return super(BlocksInCourseView, self).list(request, course_usage_key, hide_access_denials=hide_access_denials)

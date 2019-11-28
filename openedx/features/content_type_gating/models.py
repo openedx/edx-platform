@@ -3,20 +3,20 @@ Content Type Gating Configuration Models
 """
 
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
-from django.utils import timezone
 
 from course_modes.models import CourseMode
 from lms.djangoapps.courseware.masquerade import (
     get_course_masquerade,
     get_masquerading_user_group,
-    is_masquerading_as_specific_student,
+    is_masquerading_as_specific_student
 )
 from openedx.core.djangoapps.config_model_utils.models import StackedConfigurationModel
 from openedx.core.djangoapps.config_model_utils.utils import is_in_holdback
@@ -86,7 +86,7 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
                 return False
 
     @classmethod
-    def enabled_for_enrollment(cls, enrollment=None, user=None, course_key=None, user_partition=None):
+    def enabled_for_enrollment(cls, user=None, course_key=None, user_partition=None):
         """
         Return whether Content Type Gating is enabled for this enrollment.
 
@@ -95,27 +95,15 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
         such as the org, site, or globally), and if the configuration is specified to be
         ``enabled_as_of`` before the enrollment was created.
 
-        Only one of enrollment and (user, course_key) may be specified at a time.
-
         Arguments:
             enrollment: The enrollment being queried.
             user: The user being queried.
             course_key: The CourseKey of the course being queried.
         """
-        if enrollment is not None and (user is not None or course_key is not None):
-            raise ValueError('Specify enrollment or user/course_key, but not both')
-
-        if enrollment is None and (user is None or course_key is None):
+        if user is None or course_key is None:
             raise ValueError('Both user and course_key must be specified if no enrollment is provided')
 
-        if enrollment is None and user is None and course_key is None:
-            raise ValueError('At least one of enrollment or user and course_key must be specified')
-
-        if course_key is None:
-            course_key = enrollment.course_id
-
-        if enrollment is None:
-            enrollment = CourseEnrollment.get_enrollment(user, course_key)
+        enrollment = CourseEnrollment.get_enrollment(user, course_key, ['fbeenrollmentexclusion'])
 
         if user is None and enrollment is not None:
             user = enrollment.user
@@ -134,7 +122,7 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
             return False
 
         # check if user is in holdback
-        if user_variable_represents_correct_user and is_in_holdback(user):
+        if user_variable_represents_correct_user and is_in_holdback(user, enrollment):
             return False
 
         if not correct_modes_for_fbe(course_key, enrollment, user):

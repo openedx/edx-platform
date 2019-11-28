@@ -1,14 +1,18 @@
 """
 Bok choy acceptance and a11y tests for problem types in the LMS
 """
+from __future__ import absolute_import
+
 import random
 import textwrap
 from abc import ABCMeta, abstractmethod
 
 import ddt
 import pytest
-from selenium.webdriver import ActionChains
+import six
 from bok_choy.promise import BrokenPromise
+from selenium.webdriver import ActionChains
+from six.moves import range
 
 from capa.tests.response_xml_factory import (
     AnnotationResponseXMLFactory,
@@ -62,7 +66,7 @@ class ProblemTypeTestBaseMeta(ABCMeta):
         return obj
 
 
-class ProblemTypeTestBase(ProblemsTest, EventsTestMixin):
+class ProblemTypeTestBase(six.with_metaclass(ProblemTypeTestBaseMeta, ProblemsTest, EventsTestMixin)):
     """
     Base class for testing assesment problem types in bok choy.
 
@@ -78,7 +82,6 @@ class ProblemTypeTestBase(ProblemsTest, EventsTestMixin):
     Additionally, the default values for factory_kwargs and status_indicators
     may need to be overridden for some problem types.
     """
-    __metaclass__ = ProblemTypeTestBaseMeta
 
     problem_name = None
     problem_type = None
@@ -783,7 +786,7 @@ class MultipleChoiceProblemTypeTest(MultipleChoiceProblemTypeBase, ProblemTypeTe
 
         # After submit, the answer should be marked as correct.
         self.problem_page.click_submit()
-        self.assertTrue(self.problem_page.is_correct_choice_highlighted(correct_choices=[3]))
+        self.assertTrue(self.problem_page.is_correct_choice_highlighted(correct_choices=[3], show_answer=False))
 
         # Switch to an incorrect answer. This will hide the correctness indicator.
         self.answer_problem('incorrect')
