@@ -109,7 +109,7 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
                             field='due'
                         ).first()
 
-                        if override:
+                        if override and override.value:
                             value = DATE_FIELD.from_json(json.loads(override.value))
                         if value:
                             field_value = value
