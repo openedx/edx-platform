@@ -101,6 +101,7 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
                 if field_value is not None:
                     # override due date with student extension in unit added by instructor.
                     if supported_field.block_field_name is 'due':
+                        value = None
                         override = StudentFieldOverride.objects.filter(
                             course_id=block_key.course_key,
                             student=self.context['request'].user,
@@ -108,7 +109,8 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
                             field='due'
                         ).first()
 
-                        value = DATE_FIELD.from_json(json.loads(override.value))
+                        if override:
+                            value = DATE_FIELD.from_json(json.loads(override.value))
                         if value:
                             field_value = value
 
