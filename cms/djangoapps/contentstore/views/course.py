@@ -56,7 +56,9 @@ from common.djangoapps.util.milestones_helpers import (
     is_prerequisite_courses_enabled,
     is_valid_course_key,
     remove_prerequisite_course,
-    set_prerequisite_courses
+    set_prerequisite_courses,
+    get_namespace_choices,
+    generate_milestone_namespace
 )
 from common.djangoapps.util.string_utils import _has_non_ascii_characters
 from common.djangoapps.xblock_django.api import deprecated_xblocks
@@ -1254,7 +1256,12 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
                         # None is chosen, so remove the course prerequisites
                         course_milestones = milestones_api.get_course_milestones(course_key=course_key, relationship="requires")  # lint-amnesty, pylint: disable=line-too-long
                         for milestone in course_milestones:
-                            remove_prerequisite_course(course_key, milestone)
+                            ee_milestone_namespace = generate_milestone_namespace(
+                                get_namespace_choices().get('ENTRANCE_EXAM'),
+                                course_key
+                            )
+                            if not milestone["namespace"] == ee_milestone_namespace:
+                                remove_prerequisite_course(course_key, milestone)
 
                 # If the entrance exams feature has been enabled, we'll need to check for some
                 # feature-specific settings and handle them accordingly
