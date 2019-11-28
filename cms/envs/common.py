@@ -1302,7 +1302,10 @@ INSTALLED_APPS = [
     'course_wiki',  # Our customizations
     'mptt',
     'sekizai',
+
+    # User API
     'openedx.core.djangoapps.user_api',
+    'openedx.core.djangoapps.groups_api.apps.GroupsApiConfig',
 
     # Country embargo support
     'openedx.core.djangoapps.embargo',

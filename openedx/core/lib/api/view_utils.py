@@ -109,6 +109,14 @@ class ExpandableFieldViewMixin(object):
         return result
 
 
+# The standard authentication methods that most Open edX APIs should support
+standard_auth_classes = (
+    JwtAuthentication,
+    OAuth2AuthenticationAllowInactiveUser,
+    SessionAuthenticationAllowInactiveUser
+)
+
+
 def view_auth_classes(is_user=False, is_authenticated=True):
     """
     Function and class decorator that abstracts the authentication and permission checks for api views.
@@ -118,11 +126,7 @@ def view_auth_classes(is_user=False, is_authenticated=True):
         Requires either OAuth2 or Session-based authentication.
         If is_user is True, also requires username in URL matches the request user.
         """
-        func_or_class.authentication_classes = (
-            JwtAuthentication,
-            OAuth2AuthenticationAllowInactiveUser,
-            SessionAuthenticationAllowInactiveUser
-        )
+        func_or_class.authentication_classes = standard_auth_classes
         func_or_class.permission_classes = ()
         if is_authenticated:
             func_or_class.permission_classes += (IsAuthenticated,)

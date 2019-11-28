@@ -69,6 +69,7 @@ urlpatterns = [
 
     # User API endpoints
     url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
+    url(r'^api/groups/', include('openedx.core.djangoapps.groups_api.urls')),
 
     # Update session view
     url(r'^lang_pref/session_language',
