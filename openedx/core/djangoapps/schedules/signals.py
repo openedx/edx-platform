@@ -1,4 +1,6 @@
-
+"""
+CourseEnrollment related signal handlers.
+"""
 
 import datetime
 import logging
@@ -173,10 +175,6 @@ def _create_schedule(enrollment, enrollment_created):
         not CREATE_SCHEDULE_WAFFLE_FLAG.is_enabled(enrollment.course_id)
     ):
         log.debug('Schedules: Creation not enabled for this course or for this site')
-        return
-
-    if not enrollment.course_overview.self_paced:
-        log.debug('Schedules: Creation only enabled for self-paced courses')
         return
 
     # This represents the first date at which the learner can access the content. This will be the latter of
