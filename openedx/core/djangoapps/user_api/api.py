@@ -845,7 +845,9 @@ class RegistrationFormFactory(object):
             # Translators: This is a legal document users must agree to
             # in order to register a new account.
             terms_label = _(u"Terms of Service and Honor Code")
-            terms_link = marketing_link("HONOR")
+            # [UCSD_CUSTOM] we want to use "tos" page as "HONOR" page
+            # so we will use "/tos" url instead of "/honor"
+            terms_link = marketing_link("TOS")
 
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
