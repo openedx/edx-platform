@@ -17,6 +17,26 @@ from lms.djangoapps.grades.tasks import recalculate_course_and_subsection_grades
 from openedx.core.lib.command_utils import get_mutually_exclusive_required_option, parse_course_keys
 from xmodule.modulestore.django import modulestore
 
+
+# FIXME implement this in a clean way, or remove the requirement of passsing a request object
+class FakeRequestWithUser:
+    user = None
+    META = {}
+
+    def __init__(self, user):
+        self.user = user
+        self.META['SERVER_NAME'] = 'afakehostname'
+        self.META['HTTP_X_FORWARDED_PROTO'] = 'https'
+        self.META['REMOTE_ADDR'] = '127.0.0.1'
+
+    def is_secure(self):
+        # yes, very
+        return True
+
+    def get_host(self):
+        return "afakehostname"
+
+
 class Command(BaseCommand):
     """
     FIXME: write.
@@ -40,21 +60,11 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        user = User.objects.get(username='edx')  # FIXME
+        user = User.objects.get(username='daniel')  # FIXME
         for course_key in self._get_course_keys(options):
             print("Generating report", course_key)
-
-            # FIXME implement this in a clean way, or remove the requirement of passsing a request object
-            class FakeRequestWithUser:
-                user = None
-                META = {}
-                def __init__(self, user):
-                    self.user = user
-                    self.META['REMOTE_ADDR'] = '127.0.0.1'
-
             request = FakeRequestWithUser(user=user)
             lms.djangoapps.instructor_task.api.submit_calculate_grades_csv(request, course_key)
-
 
     def _get_course_keys(self, options):
         """
@@ -66,4 +76,3 @@ class Command(BaseCommand):
         elif courses_mode == 'courses':
             course_keys = parse_course_keys(options['courses'])
         return course_keys
-
