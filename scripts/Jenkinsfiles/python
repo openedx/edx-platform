@@ -165,13 +165,6 @@ pipeline {
                     }
                 }
             }
-            post {
-                always {
-                    script {
-                        createWarningsReport2()
-                    }
-                }
-            }
         }    
         
         
