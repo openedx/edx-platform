@@ -208,21 +208,13 @@ def verify_certificate(request, key):
     """
 
     certificate_verification_key_obj = get_object_or_404(CertificateVerificationKey, verification_key=key)
-    certificate_uuid = certificate_verification_key_obj.generated_certificate.verify_uuid
-
-    try:
-        certificate = GeneratedCertificate.eligible_certificates.get(
-            verify_uuid=certificate_uuid,
-            status=CertificateStatuses.downloadable
-        )
-    except GeneratedCertificate.DoesNotExist:
-        raise Http404
+    certificate = certificate_verification_key_obj.generated_certificate
 
     context = {
-        'achieved_by': certificate.user.first_name + ' ' + certificate.user.last_name,
+        'achieved_by': certificate.user.get_full_name(),
         'achieved_at': certificate.created_date.strftime("%B %d, %Y"),
         'course_name': get_course(certificate.course_id).display_name, 
-        'image': get_certificate_image_url(certificate)
+        'certificate_image': get_certificate_image_url(certificate)
     }
 
     return render_to_response('verify_certificate.html', context)
