@@ -1,9 +1,11 @@
+from django.http import Http404
 from django.views.decorators.http import require_GET
 from util.json_request import JsonResponse
 
+from opaque_keys.edx.keys import CourseKey
 from student.models import CourseEnrollment
 
-from .helpers import populate_trophycase
+from .helpers import populate_trophycase, get_course_badges
 from .models import UserBadge
 
 
@@ -18,6 +20,23 @@ def trophycase(request):
         UserBadge.objects.filter(user=request.user)
     )
 
-    trophycase_dict = populate_trophycase(enrolled_courses_data, earned_user_badges)
+    trophycase_dict = populate_trophycase(request.user, enrolled_courses_data, earned_user_badges)
 
     return JsonResponse(trophycase_dict)
+
+
+@require_GET
+def my_badges(request, course_id):
+    course_key = CourseKey.from_string(unicode(course_id))
+
+    if not CourseEnrollment.is_enrolled(request.user, course_key):
+        raise Http404
+
+    # list of badges earned by user
+    earned_user_badges = list(
+        UserBadge.objects.filter(user=request.user, course_id=course_key)
+    )
+
+    badges = get_course_badges(request.user, course_key, earned_user_badges)
+
+    return JsonResponse(badges)
