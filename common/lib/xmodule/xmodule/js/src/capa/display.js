@@ -286,7 +286,7 @@
                     possible: totalScore
                 }, true
             );
-            
+
             if (showGrades) {
                 return this.$('.problem-progress').text(progress);
             } else {
@@ -657,6 +657,11 @@
                         that.el.trigger('contentChanged', [that.id, response.contents, response]);
                         that.saveNotification.hide();
                         that.custom_alert("Answer submitted successfully");
+                    }
+                    if (window.recordCompetencyAssessmentAttempt) {
+                      // This function is defined in'features/philu_courseware/competency-assessments.js(philu-edx-theme)'
+                      // which is included in courseware.html 'lms/templates/courseware/courseware.html(philu-edx-theme)'
+                      recordCompetencyAssessmentAttempt(that,response)
                     }
 
                     break;
