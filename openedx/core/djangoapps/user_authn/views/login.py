@@ -19,6 +19,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.http import HttpResponse, HttpResponseForbidden
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
@@ -387,6 +388,8 @@ def login_user(request):
 
     set_custom_metric('login_user_course_id', request.POST.get('course_id'))
 
+    if not third_party_auth_requested:
+        return HttpResponseForbidden("First party login not supported")
     try:
         if third_party_auth_requested and not first_party_auth_requested:
             # The user has already authenticated via third-party auth and has not

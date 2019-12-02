@@ -30,9 +30,15 @@ from openedx.core.djangoapps.user_api.serializers import (
     UserSerializer
 )
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
+from third_party_auth import pipeline
 from student.helpers import AccountValidationError
 from util.json_request import JsonResponse
 
+
+
+        if not pipeline.running(request):
+            # if request is not running a third-party auth pipeline
+            return HttpResponseForbidden("Not allowed to register")
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
