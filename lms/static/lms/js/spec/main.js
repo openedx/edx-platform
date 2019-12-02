@@ -819,6 +819,7 @@
         'teams/js/spec/views/edit_team_members_spec.js',
         'teams/js/spec/views/edit_team_spec.js',
         'teams/js/spec/views/instructor_tools_spec.js',
+        'teams/js/spec/views/manage_spec.js',
         'teams/js/spec/views/my_teams_spec.js',
         'teams/js/spec/views/team_card_spec.js',
         'teams/js/spec/views/team_discussion_spec.js',

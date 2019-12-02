@@ -1642,3 +1642,52 @@ class TestElasticSearchErrors(TeamAPITestCase):
             data={'description': 'new description'},
             user='staff'
         )
+
+
+@ddt.ddt
+class TestBulkMembershipManagement(TeamAPITestCase):
+    """
+    Test that CSVs can be uploaded and downloaded to manage course membership.
+
+    This test case will be expanded when the view is fully
+    implemented (TODO MST-31).
+    """
+    good_course_id = 'TestX/TS101/Test_Course'
+    fake_course_id = 'TestX/TS101/Non_Existent_Course'
+
+    allow_username = 'course_staff'
+    deny_username = 'student_enrolled'
+
+    @ddt.data(
+        ('GET', good_course_id, deny_username, 403),
+        ('GET', fake_course_id, allow_username, 404),
+        ('GET', fake_course_id, deny_username, 404),
+        ('POST', good_course_id, allow_username, 501),  # TODO MST-31
+        ('POST', good_course_id, deny_username, 403),
+        ('POST', fake_course_id, allow_username, 404),
+        ('POST', fake_course_id, deny_username, 404),
+    )
+    @ddt.unpack
+    def test_error_statuses(self, method, course_id, username, expected_status):
+        url = self.get_url(course_id)
+        self.login(username)
+        response = self.client.generic(method, url)
+        assert response.status_code == expected_status
+
+    def test_download_csv(self):
+        url = self.get_url(self.good_course_id)
+        self.login(self.allow_username)
+        response = self.client.get(url)
+        assert response.status_code == 200
+        assert response['Content-Type'] == 'text/csv'
+        assert response['Content-Disposition'] == (
+            'attachment; filename="team-membership_TestX_TS101_Test_Course.csv"'
+        )
+        # For now, just assert that the file is non-empty.
+        # Eventually, we will test contents (TODO MST-31).
+        assert response.content
+
+    @staticmethod
+    def get_url(course_id):
+        # This strategy allows us to test with invalid course IDs
+        return reverse('team_membership_bulk_management', args=[course_id])

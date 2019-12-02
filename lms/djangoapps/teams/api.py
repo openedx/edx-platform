@@ -32,6 +32,14 @@ class OrganizationProtectionStatus(Enum):
     protection_exempt = 'org_protection_exempt'
     unprotected = 'org_unprotected'
 
+    @property
+    def is_protected(self):
+        return self == self.protected
+
+    @property
+    def is_exempt(self):
+        return self == self.protection_exempt
+
 
 ORGANIZATION_PROTECTED_MODES = (
     CourseMode.MASTERS,
@@ -93,13 +101,15 @@ def discussion_visible_by_user(discussion_id, user):
     return not is_team_discussion_private(team) or user_is_a_team_member(user, team)
 
 
-def _has_course_staff_privileges(user, course_key):
+def has_course_staff_privileges(user, course_key):
     """
     Returns True if the user is an admin for the course, else returns False
     """
     if user.is_staff:
         return True
-    if CourseStaffRole(course_key).has_user(user) or CourseInstructorRole(course_key).has_user(user):
+    if CourseStaffRole(course_key).has_user(user):
+        return True
+    if CourseInstructorRole(course_key).has_user(user):
         return True
     return False
 
@@ -117,7 +127,7 @@ def has_team_api_access(user, course_key, access_username=None):
     Returns:
       bool: True if the user has access, False otherwise.
     """
-    if _has_course_staff_privileges(user, course_key):
+    if has_course_staff_privileges(user, course_key):
         return True
     if has_discussion_privileges(user, course_key):
         return True
@@ -133,7 +143,7 @@ def user_organization_protection_status(user, course_key):
     If the user is a staff of the course, we return the protection_exempt status
     else, we return the unprotected status
     """
-    if _has_course_staff_privileges(user, course_key):
+    if has_course_staff_privileges(user, course_key):
         return OrganizationProtectionStatus.protection_exempt
     enrollment = CourseEnrollment.get_enrollment(user, course_key)
     if enrollment and enrollment.is_active:
@@ -200,5 +210,13 @@ def add_team_count(topics, course_id, organization_protection_status):
         topic['team_count'] = topics_to_team_count.get(topic['id'], 0)
 
 
-def can_user_modify_team(user, course_key, team):
-    return not is_instructor_managed_team(team) or _has_course_staff_privileges(user, course_key)
+def can_user_modify_team(user, team):
+    """
+    Returns whether a User has permission to modify the membership of a CourseTeam.
+
+    Assumes that user is enrolled in course run.
+    """
+    return (
+        (not is_instructor_managed_team(team)) or
+        has_course_staff_privileges(user, team.course_id)
+    )

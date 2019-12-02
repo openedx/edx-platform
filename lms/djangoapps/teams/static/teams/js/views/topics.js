@@ -1,13 +1,13 @@
 (function(define) {
     'use strict';
     define([
+        'underscore',
         'gettext',
         'teams/js/views/topic_card',
         'teams/js/views/team_utils',
         'common/js/components/views/paging_header',
-        'common/js/components/views/paginated_view',
-        'underscore'
-    ], function(gettext, TopicCardView, TeamUtils, PagingHeader, PaginatedView, _) {
+        'common/js/components/views/paginated_view'
+    ], function(_, gettext, TopicCardView, TeamUtils, PagingHeader, PaginatedView) {
         var TopicsView = PaginatedView.extend({
             type: 'topics',
 
