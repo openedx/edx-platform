@@ -1511,9 +1511,6 @@ MIDDLEWARE_CLASSES = [
 
     'waffle.middleware.WaffleMiddleware',
 
-    # Inserts Enterprise content.
-    'openedx.features.enterprise_support.middleware.EnterpriseMiddleware',
-
     # Enables force_django_cache_miss functionality for TieredCache.
     'edx_django_utils.cache.middleware.TieredCacheMiddleware',
 
