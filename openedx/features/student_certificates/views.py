@@ -195,6 +195,34 @@ def download_certificate_pdf(request, certificate_uuid):
 
 
 def verify_certificate(request, key):
+    """
+    Provides verify certificate page
+
+    Arguments:
+        request: The request object.
+        key: Verification key of certificate.
+
+    Returns:
+        The verify certificate response.
+
+    """
+
     certificate_verification_key_obj = get_object_or_404(CertificateVerificationKey, verification_key=key)
     certificate_uuid = certificate_verification_key_obj.generated_certificate.verify_uuid
-    return redirect(reverse('shared_achievements', kwargs={'certificate_uuid': certificate_uuid}))
+
+    try:
+        certificate = GeneratedCertificate.eligible_certificates.get(
+            verify_uuid=certificate_uuid,
+            status=CertificateStatuses.downloadable
+        )
+    except GeneratedCertificate.DoesNotExist:
+        raise Http404
+
+    context = {
+        'achieved_by': certificate.user.first_name + ' ' + certificate.user.last_name,
+        'achieved_at': certificate.created_date.strftime("%B %d, %Y"),
+        'course_name': get_course(certificate.course_id).display_name, 
+        'image': get_certificate_image_url(certificate)
+    }
+
+    return render_to_response('verify_certificate.html', context)
