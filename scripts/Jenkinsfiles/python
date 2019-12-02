@@ -32,6 +32,18 @@ def createWarningsReport(){
     archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.html'
 }
 
+def createWarningsReport2(){
+    sh '''source $HOME/edx-venv/bin/activate'''
+    sh ''' ls -l'''
+    sh ''' cd test_root
+    ls -l
+    cd log
+    ls -l
+    cd'''
+    sh '''python openedx/core/process_warnings.py --dir_path test_root/log --html_path reports/warning_report.html'''
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.html'
+}
+
 def xdist_git_branch() {
     if (env.ghprbActualCommit) {
         return "${ghprbActualCommit}"
@@ -153,7 +165,15 @@ pipeline {
                     }
                 }
             }
-        }
+            post {
+                always {
+                    script {
+                        createWarningsReport2()
+                    }
+                }
+            }
+        }    
+        
         
         stage('Run coverage') {
             environment {
