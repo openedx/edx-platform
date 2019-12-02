@@ -22,6 +22,7 @@ def pythonTestCleanup() {
 
 def createWarningsReport(){
     sh "python openedx/core/process_warnings.py --dir_path test_root/log --html_path reports/warning_report.html"
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.html
 }
 
 def xdist_git_branch() {
