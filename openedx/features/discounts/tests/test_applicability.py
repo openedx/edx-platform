@@ -25,7 +25,13 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..applicability import DISCOUNT_APPLICABILITY_CONFIG, _is_in_holdback, can_receive_discount
+from ..applicability import (
+    DISCOUNT_APPLICABILITY_CONFIG,
+    DISCOUNT_TIME_LIMIT_CONFIG,
+    _is_in_holdback,
+    can_receive_discount,
+    get_discount_expiration_date
+)
 
 
 @ddt.ddt
@@ -175,3 +181,16 @@ class TestApplicability(SiteMixin, ModuleStoreTestCase):
                 Mock(now=Mock(return_value=datetime(2020, 8, 1, 0, 1, tzinfo=pytz.UTC)), wraps=datetime),
             ):
                 assert not _is_in_holdback(self.user)
+
+    def test_expiration_date_config(self):
+        CourseEnrollmentFactory(
+            is_active=True,
+            course_id=self.course.id,
+            user=self.user
+        )
+        discount_expiration_date = get_discount_expiration_date(user=self.user, course=self.course)
+        assert discount_expiration_date.date() == datetime.now(tz=pytz.UTC).date() + timedelta(hours=168)
+        self.site.configuration.values = {DISCOUNT_TIME_LIMIT_CONFIG: 48}
+        self.site.configuration.save()
+        discount_expiration_date = get_discount_expiration_date(user=self.user, course=self.course)
+        assert discount_expiration_date.date() == datetime.now(tz=pytz.UTC).date() + timedelta(hours=48)

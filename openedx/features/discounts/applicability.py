@@ -31,6 +31,7 @@ from track import segment
 DISCOUNT_APPLICABILITY_HOLDBACK = 'first_purchase_discount_holdback'
 REV1008_EXPERIMENT_ID = 15
 DISCOUNT_APPLICABILITY_CONFIG = 'enable_discounting'
+DISCOUNT_TIME_LIMIT_CONFIG = 'discount_time_limit'
 
 
 def get_discount_expiration_date(user, course):
@@ -57,7 +58,12 @@ def get_discount_expiration_date(user, course):
     except ExperimentData.DoesNotExist:
         return None
 
-    discount_expiration_date = time_limit_start + timedelta(weeks=1)
+    site_configuration = get_current_site_configuration()
+    if site_configuration:
+        discount_expiration_hours = site_configuration.get_value(DISCOUNT_TIME_LIMIT_CONFIG, 168)
+    else:
+        discount_expiration_hours = 168
+    discount_expiration_date = time_limit_start + timedelta(hours=discount_expiration_hours)
 
     # If the course has an upgrade deadline and discount time limit would put the discount expiration date
     # after the deadline, then change the expiration date to be the upgrade deadline
