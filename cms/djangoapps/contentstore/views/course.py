@@ -626,7 +626,7 @@ def course_index(request, course_key):
         reindex_link = None
         if settings.FEATURES.get('ENABLE_COURSEWARE_INDEX', False):
             if GlobalStaff().has_user(request.user):
-                reindex_link = "/course/{course_id}/search_reindex".format(course_id=unicode(course_key))
+                reindex_link = "/course/{course_id}/search_reindex".format(course_id=six.text_type(course_key))
         sections = course_module.get_children()
         course_structure = _course_outline_json(request, course_module)
         locator_to_show = request.GET.get('show', None)
