@@ -21,7 +21,9 @@ def pythonTestCleanup() {
 }
 
 def createWarningsReport(){
-    sh "python openedx/core/process_warnings.py --dir_path test_root/log --html_path reports/warning_report.html"
+    sh '''source $HOME/edx-venv/bin/activate'''
+    sh '''python openedx/core/process_warnings.py 
+    --dir_path test_root/log --html_path reports/warning_report.html'''
     archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.html'
 }
 
@@ -192,6 +194,10 @@ pipeline {
                 always {
                     script {
                         archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.coverage'
+                        createWarningsReport()
+                        publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
+                            reportDir: 'reports', reportFiles: 'warning_report.html',
+                            reportName: 'Warnings Report', reportTitles: ''])
                         sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
                         publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
                             reportDir: 'reports/cover', reportFiles: 'index.html',
@@ -210,7 +216,6 @@ pipeline {
     post {
         always {
             script {
-                createWarningsReport()
                 if (env.ghprbPullId != null) {
                     // For PR jobs, run the edx-platform-test-notifier for PR reporting
                     build job: 'edx-platform-test-notifier', parameters: [string(name: 'REPO', value: "${REPO_NAME}"), string(name: 'PR_NUMBER', value: "${ghprbPullId}")], wait: false
