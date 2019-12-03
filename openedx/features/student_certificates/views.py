@@ -197,14 +197,11 @@ def download_certificate_pdf(request, certificate_uuid):
 def verify_certificate(request, key):
     """
     Provides verify certificate page
-
     Arguments:
         request: The request object.
         key: Verification key of certificate.
-
     Returns:
         The verify certificate response.
-
     """
 
     certificate_verification_key_obj = get_object_or_404(CertificateVerificationKey, verification_key=key)
@@ -212,7 +209,7 @@ def verify_certificate(request, key):
 
     context = {
         'achieved_by': certificate.user.get_full_name(),
-        'achieved_at': certificate.created_date.strftime("%B %d, %Y"),
+        'achieved_at': certificate.created_date.strftime('%B %d, %Y'),
         'course_name': get_course(certificate.course_id).display_name, 
         'certificate_image': get_certificate_image_url(certificate)
     }
