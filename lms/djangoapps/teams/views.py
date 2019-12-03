@@ -49,6 +49,7 @@ from .api import (
     OrganizationProtectionStatus,
     add_team_count,
     can_user_modify_team,
+    can_user_create_team_in_topic,
     has_course_staff_privileges,
     has_specific_team_access,
     has_team_api_access,
@@ -524,6 +525,13 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
 
         if course_key and not has_team_api_access(request.user, course_key):
             return Response(status=status.HTTP_403_FORBIDDEN)
+
+        topic_id = request.data.get('topic_id')
+        if not can_user_create_team_in_topic(request.user, course_id, topic_id):
+            return Response(
+                build_api_error(ugettext_noop("You can't create a team in an instructor managed topic.")),
+                status=status.HTTP_403_FORBIDDEN
+            )
 
         data = request.data.copy()
         data['course_id'] = six.text_type(course_key)

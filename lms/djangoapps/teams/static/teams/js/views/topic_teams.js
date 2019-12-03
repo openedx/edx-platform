@@ -7,8 +7,9 @@
         'edx-ui-toolkit/js/utils/html-utils',
         'teams/js/views/teams',
         'common/js/components/views/paging_header',
-        'text!teams/templates/team-actions.underscore'
-    ], function(_, Backbone, gettext, HtmlUtils, TeamsView, PagingHeader, teamActionsTemplate) {
+        'text!teams/templates/team-actions.underscore',
+        'teams/js/views/team_utils'
+    ], function(_, Backbone, gettext, HtmlUtils, TeamsView, PagingHeader, teamActionsTemplate, TeamUtils) {
         var TopicTeamsView = TeamsView.extend({
             events: {
                 'click a.browse-teams': 'browseTeams',
@@ -29,7 +30,10 @@
                     // that they create. This means that if multiple team membership is
                     // disabled that they cannot create a new team when they already
                     // belong to one.
-                return this.context.staff || this.context.privileged || this.myTeamsCollection.length === 0;
+                return this.context.staff
+                    || this.context.privileged
+                    || (!TeamUtils.isInstructorManagedTopic(this.model.attributes.type)
+                        && this.myTeamsCollection.length === 0);
             },
 
             render: function() {

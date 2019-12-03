@@ -7,13 +7,13 @@ define([
 ], function(Backbone, _, TopicTeamsView, TeamSpecHelpers, PageHelpers) {
     'use strict';
     describe('Topic Teams View', function() {
-        var createTopicTeamsView = function(options) {
+        var createTopicTeamsView = function(options, isInstructorManagedTopic) {
             var myTeamsCollection;
             options = options || {}; // eslint-disable-line no-param-reassign
             myTeamsCollection = options.myTeamsCollection || TeamSpecHelpers.createMockTeams({results: []});
             return new TopicTeamsView({
                 el: '.teams-container',
-                model: TeamSpecHelpers.createMockTopic(),
+                model: isInstructorManagedTopic ? TeamSpecHelpers.createMockInstructorManagedTopic() : TeamSpecHelpers.createMockTopic(),
                 collection: options.teams || TeamSpecHelpers.createMockTeams(),
                 myTeamsCollection: myTeamsCollection,
                 showActions: true,
@@ -86,6 +86,11 @@ define([
 
         it('does not show actions for a user already in a team', function() {
             var teamsView = createTopicTeamsView({myTeamsCollection: TeamSpecHelpers.createMockTeams()});
+            verifyActions(teamsView, {showActions: false});
+        });
+
+        it('does not show actions for a student in an instructor managed topic', function() {
+            var teamsView = createTopicTeamsView({privileged: false}, true);
             verifyActions(teamsView, {showActions: false});
         });
 

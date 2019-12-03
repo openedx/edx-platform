@@ -79,6 +79,15 @@ def is_instructor_managed_team(team):  # pylint: disable=unused-argument
     return False
 
 
+def is_instructor_managed_topic(topic):  # pylint: disable=unused-argument
+    """
+    Return true if the topic is managed by instructors.
+    For now always return false, will complete the logic later.
+    TODO MST-25
+    """
+    return False
+
+
 def user_is_a_team_member(user, team):
     """
     Return if the user is a member of the team
@@ -219,4 +228,16 @@ def can_user_modify_team(user, team):
     return (
         (not is_instructor_managed_team(team)) or
         has_course_staff_privileges(user, team.course_id)
+    )
+
+
+def can_user_create_team_in_topic(user, course_id, topic_id):
+    """
+    Returns whether a User has permission to create a team in the given topic.
+
+    Assumes that user is enrolled in course run.
+    """
+    return (
+        (not is_instructor_managed_topic(topic_id)) or
+        has_course_staff_privileges(user, course_id)
     )
