@@ -5,7 +5,7 @@
 #    make upgrade
 #
 argh==0.26.2              # via watchdog
-certifi==2019.9.11        # via requests
+certifi==2019.11.28       # via requests
 chardet==3.0.4            # via requests
 edx-opaque-keys==2.0.1
 funcsigs==1.0.2           # via mock
@@ -21,7 +21,7 @@ pbr==5.4.4                # via stevedore
 psutil==1.2.1
 pymongo==2.9.1
 python-memcached==1.59
-pyyaml==5.1.2             # via watchdog
+pyyaml==5.2               # via watchdog
 requests==2.22.0
 six==1.13.0               # via edx-opaque-keys, libsass, mock, paver, python-memcached, stevedore
 stevedore==1.31.0
