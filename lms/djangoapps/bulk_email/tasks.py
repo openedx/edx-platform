@@ -501,10 +501,11 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
     # If you don't want the from_addr to be dynamically generated, this uses
     # the configured default from address if the flag is set to True in settings
     if settings.EMAIL_USE_DEFAULT_FROM_FOR_BULK:
-        from_addr = settings.DEFAULT_FROM_EMAIL
+        from_addr = "{} course team <{}>".format(course_title, settings.DEFAULT_FROM_EMAIL)
     else:
         # use the email from address in the CourseEmail, if it is present, otherwise compute it
-        from_addr = course_email.from_addr if course_email.from_addr else \
+        from_addr = "{} course team <{}>".format(course_title, course_email.from_addr) \
+            if course_email.from_addr else \
             _get_source_address(course_email.course_id, course_title, course_language)
 
     # use the CourseEmailTemplate that was associated with the CourseEmail
