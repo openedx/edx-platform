@@ -4,6 +4,7 @@ import os
 import re
 import six
 import sys
+import pdb
 import textwrap
 from xml.sax.saxutils import escape
 
@@ -11,7 +12,7 @@ from xml.sax.saxutils import escape
 
 
 class HtmlOutlineWriter(object):
-    HEAD = textwrap.dedent(r"""
+    HEAD = six.u(textwrap.dedent(r"""
         <!DOCTYPE html>
         <html>
         <head>
@@ -69,7 +70,7 @@ class HtmlOutlineWriter(object):
         
         </style>
         <body>
-    """)
+    """))
 
     SECTION_START = textwrap.dedent(u"""\
         <div class="{klass}">
@@ -78,7 +79,7 @@ class HtmlOutlineWriter(object):
         <div>
     """)
 
-    SECTION_END = "</div></div>"
+    SECTION_END = six.u("</div></div>")
 
     def __init__(self, fout):
         self.fout = fout
