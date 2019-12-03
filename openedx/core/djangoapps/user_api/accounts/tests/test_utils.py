@@ -5,7 +5,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import ddt
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import patch
+from mock import patch, Mock
 
 from completion import models
 from completion.test_utils import CompletionWaffleTestMixin
@@ -15,6 +15,8 @@ from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+
+from openedx.core.djangolib.testing.utils import FilteredQueryCountMixin
 
 from ..utils import format_social_link, validate_social_link, generate_password
 
@@ -65,7 +67,7 @@ class UserAccountSettingsTest(TestCase):
 
 
 @ddt.ddt
-class CompletionUtilsTestCase(SharedModuleStoreTestCase, CompletionWaffleTestMixin, TestCase):
+class CompletionUtilsTestCase(SharedModuleStoreTestCase, FilteredQueryCountMixin, CompletionWaffleTestMixin, TestCase):
     """
     Test completion utility functions
     """
@@ -113,21 +115,35 @@ class CompletionUtilsTestCase(SharedModuleStoreTestCase, CompletionWaffleTestMix
             )
 
     @override_settings(LMS_ROOT_URL='test_url:9999')
-    @ddt.data(True, False)
-    def test_retrieve_last_sitewide_block_completed(self, use_username):
+    @ddt.unpack
+    @ddt.data({
+        'use_username': True,
+        'engaged_queries': 3,
+        'cruft_queries': 2,
+    }, {
+        'use_username': False,
+        'engaged_queries': 2,
+        'cruft_queries': 1,
+    })
+    def test_retrieve_last_sitewide_block_completed(self, use_username, engaged_queries, cruft_queries):
         """
         Test that the method returns a URL for the "last completed" block
         when sending a user object
         """
-        block_url = retrieve_last_sitewide_block_completed(
-            self.engaged_user.username if use_username else self.engaged_user
-        )
-        empty_block_url = retrieve_last_sitewide_block_completed(
-            self.cruft_user.username if use_username else self.cruft_user
-        )
+        with self.assertNumQueries(engaged_queries):
+            block_url = retrieve_last_sitewide_block_completed(
+                self.engaged_user.username if use_username else self.engaged_user
+            )
+
+        with self.assertNumQueries(cruft_queries):
+            empty_block_url = retrieve_last_sitewide_block_completed(
+                self.cruft_user.username if use_username else self.cruft_user
+            )
+
         self.assertEqual(
             block_url,
-            u'test_url:9999/courses/{org}/{course}/{run}/jump_to/i4x://{org}/{course}/vertical/{vertical_id}'.format(
+            # Appsembler: We're omitting the domain name because our users are always on a single site.
+            u'/courses/{org}/{course}/{run}/jump_to/i4x://{org}/{course}/vertical/{vertical_id}'.format(
                 org=self.course.location.course_key.org,
                 course=self.course.location.course_key.course,
                 run=self.course.location.course_key.run,
@@ -135,6 +151,33 @@ class CompletionUtilsTestCase(SharedModuleStoreTestCase, CompletionWaffleTestMix
             )
         )
         self.assertEqual(empty_block_url, None)
+
+    @override_settings(LMS_ROOT_URL='test_url:9999')
+    def test_retrieve_last_sitewide_block_performance_with_site(self):
+        """
+        Ensures that the `SiteConfiguration.objects.all()` is not called when a specific site was found.
+        """
+        expected_queries_with_site = 1
+        with self.assertNumQueries(expected_queries_with_site):
+            function_path = 'openedx.core.djangoapps.user_api.accounts.utils.get_config_value_from_site_or_settings'
+            with patch(function_path, Mock(return_value=self.course.location.course_key.org)):
+                assert retrieve_last_sitewide_block_completed(self.engaged_user).startswith('/')
+
+        with self.assertNumQueries(expected_queries_with_site):
+            assert retrieve_last_sitewide_block_completed(self.cruft_user) is None
+
+    @override_settings(LMS_ROOT_URL='test_url:9999')
+    def test_retrieve_last_sitewide_block_performance_multi_course(self):
+        """
+        Ensures that the `SiteConfiguration.objects.all()` is called only once when no site was found.
+        """
+        self.course = self.create_test_course()  # create another course.
+        self.submit_faux_completions()  # Test submission for another course
+        expected_queries_mutli_course_site_wide = 2
+        with self.assertNumQueries(expected_queries_mutli_course_site_wide):
+            function_path = 'openedx.core.djangoapps.user_api.accounts.utils.get_config_value_from_site_or_settings'
+            with patch(function_path, Mock(return_value=None)):  # Pretend that no sites are matching the courses
+                assert retrieve_last_sitewide_block_completed(self.engaged_user).startswith('/')
 
 
 class GeneratePasswordTest(TestCase):

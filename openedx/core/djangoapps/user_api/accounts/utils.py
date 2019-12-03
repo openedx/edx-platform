@@ -121,15 +121,11 @@ def retrieve_last_sitewide_block_completed(username):
         userobj = username
     latest_completions_by_course = BlockCompletion.latest_blocks_completed_all_courses(userobj)
 
-    known_site_configs = [
-        other_site_config.get_value('course_org_filter') for other_site_config in SiteConfiguration.objects.all()
-        if other_site_config.get_value('course_org_filter')
-    ]
-
     current_site_configuration = get_config_value_from_site_or_settings(
         name='course_org_filter',
         site=get_current_site()
     )
+    known_site_configs = None
 
     # courses.edx.org has no 'course_org_filter'
     # however the courses within DO, but those entries are not found in
@@ -143,6 +139,12 @@ def retrieve_last_sitewide_block_completed(username):
     for course, [modified_date, block_key] in latest_completions_by_course.items():
         if not current_site_configuration:
             # This is a edx.org
+            if known_site_configs is None:  # Avoid running the query twice
+                known_site_configs = [
+                    other_site_config.get_value('course_org_filter')
+                    for other_site_config in SiteConfiguration.objects.all()
+                    if other_site_config.get_value('course_org_filter')
+                ]
             if course.org in known_site_configs:
                 continue
             if not latest_date or modified_date > latest_date:
@@ -163,18 +165,15 @@ def retrieve_last_sitewide_block_completed(username):
     if not candidate_course:
         return
 
-    lms_root = SiteConfiguration.get_value_for_org(candidate_course.org, "LMS_ROOT_URL", settings.LMS_ROOT_URL)
-
     try:
         item = modulestore().get_item(candidate_block_key, depth=1)
     except ItemNotFoundError:
         item = None
 
-    if not (lms_root and item):
+    if not item:
         return
 
-    return u"{lms_root}/courses/{course_key}/jump_to/{location}".format(
-        lms_root=lms_root,
+    return u"/courses/{course_key}/jump_to/{location}".format(
         course_key=text_type(item.location.course_key),
         location=text_type(item.location),
     )
