@@ -7,9 +7,13 @@ from lms.djangoapps.teams import is_feature_enabled as is_teams_feature_enabled
 from lms.djangoapps.teams.models import CourseTeam
 from nodebb.constants import TEAM_PLAYER_ENTRY_INDEX
 from nodebb.models import TeamGroupChat
-from openedx.features.badging.constants import TEAM_PLAYER
 
-from .constants import BADGES_KEY, FILTER_BADGES_ERROR
+from .constants import (
+    BADGES_KEY,
+    COURSE_ERROR,
+    FILTER_BADGES_ERROR,
+    TEAM_PLAYER
+)
 from .models import Badge
 
 log = logging.getLogger('edx.badging')
@@ -59,14 +63,20 @@ def get_course_badges(user, course_id, earned_badges, badge_queryset=None):
 
         if badge_type == TEAM_PLAYER[TEAM_PLAYER_ENTRY_INDEX]:
             course = get_course_by_id(course_id)
-            if course and not is_teams_feature_enabled(course):
+
+            if not course:
+                error = COURSE_ERROR.format(course_id=course_id)
+                log.exception(error)
+                raise Exception(error)
+
+            if not is_teams_feature_enabled(course):
                 # do not show team badges, for course, if teams are either not enabled or not configured
                 continue
-            else:
-                course_team, earned_badges = filter_earned_badge_by_joined_team(user, course, earned_badges)
-                if not course_team:
-                    # user has not joined any team
-                    badges['team_joined'] = False
+
+            course_team, earned_badges = filter_earned_badge_by_joined_team(user, course, earned_badges)
+            if not course_team:
+                # user has not joined any team
+                badges['team_joined'] = False
 
         badge_list = list(
             badge_queryset.filter(type=badge_type).values()
