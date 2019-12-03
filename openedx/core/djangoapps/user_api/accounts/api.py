@@ -29,8 +29,8 @@ from openedx.core.djangoapps.user_api.errors import (
 )
 from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
 from openedx.core.lib.api.view_utils import add_serializer_errors
+from openedx.core.djangoapps.user_authn.views.registration_form import validate_name, validate_username
 from openedx.features.enterprise_support.utils import get_enterprise_readonly_account_fields
-from student import forms as student_forms
 from student import views as student_views
 from student.models import (
     AccountRecovery,
@@ -245,7 +245,7 @@ def _validate_name_change(user_profile, data, field_errors):
 
     old_name = user_profile.name
     try:
-        student_forms.validate_name(data['name'])
+        validate_name(data['name'])
     except ValidationError as err:
         field_errors["name"] = {
             "developer_message": u"Error thrown from validate_name: '{}'".format(err.message),
@@ -538,7 +538,7 @@ def _validate_username(username):
         with override_language('en'):
             # `validate_username` provides a proper localized message, however the API needs only the English
             # message by convention.
-            student_forms.validate_username(username)
+            validate_username(username)
     except (UnicodeError, errors.AccountDataBadType, errors.AccountDataBadLength) as username_err:
         raise errors.AccountUsernameInvalid(text_type(username_err))
     except ValidationError as validation_err:

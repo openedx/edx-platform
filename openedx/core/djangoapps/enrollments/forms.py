@@ -8,7 +8,7 @@ from django.forms import CharField, Form
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from student import forms as student_forms
+from openedx.core.djangoapps.user_authn.views.registration_form import validate_username
 
 
 class CourseEnrollmentsApiListForm(Form):
@@ -46,6 +46,6 @@ class CourseEnrollmentsApiListForm(Form):
                     )
                 )
             for username in usernames:
-                student_forms.validate_username(username)
+                validate_username(username)
             return usernames
         return usernames_csv_string
