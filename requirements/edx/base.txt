@@ -226,7 +226,7 @@ singledispatch==3.4.0.3
 six==1.11.0
 slumber==0.7.1            # via edx-rest-api-client
 social-auth-app-django==2.1.0
-social-auth-core==1.7.0
+social-auth-core==3.2.0
 sorl-thumbnail==12.3
 sortedcontainers==0.9.2
 soupsieve==1.7.1          # via beautifulsoup4
