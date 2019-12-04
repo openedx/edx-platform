@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.views.decorators.http import require_GET
 from util.json_request import JsonResponse
@@ -11,32 +12,36 @@ from .models import UserBadge
 
 @require_GET
 def trophycase(request):
+    user = request.user
+
     # Get course id and course name of courses user is enrolled in
-    enrolled_courses_data = CourseEnrollment.enrollments_for_user(request.user).order_by(
+    enrolled_courses_data = CourseEnrollment.enrollments_for_user(user).order_by(
         'course__display_name').values_list('course_id', 'course__display_name')
 
     # list of badges earned by user
     earned_user_badges = list(
-        UserBadge.objects.filter(user=request.user)
+        UserBadge.objects.filter(user=user)
     )
 
-    trophycase_dict = populate_trophycase(request.user, enrolled_courses_data, earned_user_badges)
+    trophycase_dict = populate_trophycase(user, enrolled_courses_data, earned_user_badges)
 
     return JsonResponse(trophycase_dict)
 
 
 @require_GET
+@login_required
 def my_badges(request, course_id):
-    course_key = CourseKey.from_string(unicode(course_id))
+    user = request.user
 
-    if not CourseEnrollment.is_enrolled(request.user, course_key):
+    course_key = CourseKey.from_string(unicode(course_id))
+    if not CourseEnrollment.is_enrolled(user, course_key):
         raise Http404
 
     # list of badges earned by user
     earned_user_badges = list(
-        UserBadge.objects.filter(user=request.user, course_id=course_key)
+        UserBadge.objects.filter(user=user, course_id=course_key)
     )
 
-    badges = get_course_badges(request.user, course_key, earned_user_badges)
+    badges = get_course_badges(user, course_key, earned_user_badges)
 
     return JsonResponse(badges)
