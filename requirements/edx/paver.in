@@ -24,3 +24,5 @@ requests                            # Simple interface for making HTTP requests
 stevedore                           # Support for runtime plugins, used for XBlocks and edx-platform Django app plugins
 watchdog                            # Used in paver watch_assets
 wrapt==1.10.5                       # Decorator utilities used in the @timed paver task decorator
+certifi==2019.9.11
+pyyaml==5.1.2
