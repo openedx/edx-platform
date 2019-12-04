@@ -113,6 +113,7 @@ class ProblemBlock(
         except Exception as err:
             html = self.handle_fatal_lcp_error(err if show_detailed_errors else None)
         else:
+            self.set_score(self.score_from_lcp(self.lcp))
             html = self.get_html()
         fragment = Fragment(html)
         add_webpack_to_fragment(fragment, 'ProblemBlockPreview')
