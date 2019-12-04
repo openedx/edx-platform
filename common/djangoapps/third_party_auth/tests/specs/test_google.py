@@ -106,7 +106,7 @@ class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):
         # Now our custom registration form creates or logs in the user:
         email, password = data_parsed['user_details']['email'], 'random_password'
         created_user = UserFactory(email=email, password=password)
-        login_response = self.client.post(reverse('login'), {'email': email, 'password': password})
+        login_response = self.client.post(reverse('login_api'), {'email': email, 'password': password})
         self.assertEqual(login_response.status_code, 200)
 
         # Now our custom login/registration page must resume the pipeline:

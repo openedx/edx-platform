@@ -11,15 +11,12 @@ import six
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import ValidationError, validate_email
-from django.db import IntegrityError, transaction
-from django.http import HttpResponseForbidden
 from django.utils.translation import override as override_language
 from django.utils.translation import ugettext as _
+from edx_django_utils.monitoring import set_custom_metric
 from pytz import UTC
 from six import text_type  # pylint: disable=ungrouped-imports
 
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.theming.helpers import get_current_request
 from openedx.core.djangoapps.user_api import accounts, errors, helpers
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangoapps.user_api.errors import (
@@ -349,6 +346,9 @@ def activate_account(activation_key):
         errors.UserAPIInternalError: the operation failed due to an unexpected error.
 
     """
+    # TODO: Confirm this `activate_account` is only used for tests. If so, this should not be used for tests, and we
+    # should instead use the `activate_account` used for /activate.
+    set_custom_metric('user_api_activate_account', 'True')
     if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
         raise errors.UserAPIInternalError(SYSTEM_MAINTENANCE_MSG)
     try:

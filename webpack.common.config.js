@@ -72,7 +72,6 @@ module.exports = Merge.smart({
             // Studio
             Import: './cms/static/js/features/import/factories/import.js',
             CourseOrLibraryListing: './cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx',
-            'js/factories/login': './cms/static/js/factories/login.js',
             'js/factories/textbooks': './cms/static/js/factories/textbooks.js',
             'js/factories/container': './cms/static/js/factories/container.js',
             'js/factories/context_course': './cms/static/js/factories/context_course.js',

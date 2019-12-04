@@ -67,10 +67,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         self.client = Client()
         cache.clear()
 
-        try:
-            self.url = reverse('login_post')
-        except NoReverseMatch:
-            self.url = reverse('login')
+        self.url = reverse('login_api')
 
     def _create_user(self, username, user_email):
         user = UserFactory.build(username=username, email=user_email)

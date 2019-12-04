@@ -142,8 +142,8 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         self.client.logout()
 
         # Verify that the new password can be used to log in
-        login_url = reverse('login_post')
-        response = self.client.post(login_url, {'email': self.OLD_EMAIL, 'password': self.NEW_PASSWORD})
+        login_api_url = reverse('login_api')
+        response = self.client.post(login_api_url, {'email': self.OLD_EMAIL, 'password': self.NEW_PASSWORD})
         assert response.status_code == 200
         response_dict = json.loads(response.content.decode('utf-8'))
         assert response_dict['success']
@@ -161,7 +161,7 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         self.assertFalse(result)
 
         # Verify that the new password continues to be valid
-        response = self.client.post(login_url, {'email': self.OLD_EMAIL, 'password': self.NEW_PASSWORD})
+        response = self.client.post(login_api_url, {'email': self.OLD_EMAIL, 'password': self.NEW_PASSWORD})
         assert response.status_code == 200
         response_dict = json.loads(response.content.decode('utf-8'))
         assert response_dict['success']

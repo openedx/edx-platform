@@ -35,9 +35,7 @@ urlpatterns = [
         name='registration_validation'
     ),
 
-    # Login
-    url(r'^login_post$', login.login_user, name='login_post'),
-    url(r'^login_ajax$', login.login_user, name="login"),
+    url(r'^login_ajax$', login.login_user, name="login_api"),
 
     # Moved from user_api/legacy_urls.py
     # `user_api` prefix is preserved for backwards compatibility.
@@ -63,6 +61,13 @@ urlpatterns = [
     url(r'^account/password$', password_reset.password_change_request_handler, name='password_change_request'),
 
 ]
+
+if not getattr(settings, 'DISABLE_DEPRECATED_LOGIN_POST', False):
+    # TODO: Remove login_post once it no longer has real traffic.
+    #   It was only used by old Studio sign-in and some miscellaneous callers, which should no longer be in use.
+    urlpatterns += [
+        url(r'^login_post$', login.login_user, name='login_post'),
+    ]
 
 # password reset django views (see above for password reset views)
 urlpatterns += [
