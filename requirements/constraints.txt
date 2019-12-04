@@ -83,5 +83,5 @@ more-itertools==5.0.0
 # Constraining this Gunicorn requires Python 3.x >= 3.4.
 gunicorn<20.0.0
 
-# Contraining this due to contraint in moto==1.3.1(which is contrained in testing.in)
-python-dateutil<2.7.0
+# moving constraint from base.in to constraints.txt
+python-dateutil==2.4.0
