@@ -2222,6 +2222,17 @@ class CourseAccessRole(models.Model):
     class Meta(object):
         unique_together = ('user', 'org', 'course_id', 'role')
 
+    @classmethod
+    def get_assignments(cls, user):
+        """
+        Return an iterator of course role and course id for the given user.
+        This method works with edx-rbac to automatically add role information
+        to the authenticated user's JWT.
+        To enable, add 'student.CourseAccessRole' to settings.SYSTEM_WIDE_ROLE_CLASSES
+        """
+        for obj in cls.objects.filter(user=user):
+            yield obj.role, obj.course_id or obj.org
+
     @property
     def _key(self):
         """
