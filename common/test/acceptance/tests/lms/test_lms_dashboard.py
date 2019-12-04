@@ -7,11 +7,13 @@ from __future__ import absolute_import
 import datetime
 import re
 import six
-
 from six.moves.urllib.parse import unquote  # pylint: disable=import-error
-from common.test.acceptance.fixtures.course import CourseFixture
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
+from common.test.acceptance.pages.lms.problem import ProblemPage
+from common.test.acceptance.pages.lms.staff_view import StaffPreviewPage
 from common.test.acceptance.tests.helpers import UniqueCourseTest, generate_course_key
 
 DEFAULT_SHORT_DATE_FORMAT = u'{dt:%b} {dt.day}, {dt.year}'
@@ -125,8 +127,24 @@ class BaseLmsDashboardTestMultiple(UniqueCourseTest):
                 u"social_sharing_url": {u"value": "http://custom/course/url"},
                 u"cert_name_long": {u"value": value['cert_name_long']}
             })
-
-            course_fixture.install()
+            course_fixture.add_children(
+                XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
+                    XBlockFixtureDesc('sequential', 'Test Subsection 1,1').add_children(
+                        XBlockFixtureDesc('problem', 'Test Problem 1', data='<problem>problem 1 dummy body</problem>'),
+                        XBlockFixtureDesc('html', 'html 1', data="<html>html 1 dummy body</html>"),
+                        XBlockFixtureDesc('problem', 'Test Problem 2', data="<problem>problem 2 dummy body</problem>"),
+                        XBlockFixtureDesc('html', 'html 2', data="<html>html 2 dummy body</html>"),
+                    ),
+                    XBlockFixtureDesc('sequential', 'Test Subsection 1,2').add_children(
+                        XBlockFixtureDesc('problem', 'Test Problem 3', data='<problem>problem 3 dummy body</problem>'),
+                    ),
+                    XBlockFixtureDesc(
+                        'sequential', 'Test HIDDEN Subsection', metadata={'visible_to_staff_only': True}
+                    ).add_children(
+                        XBlockFixtureDesc('problem', 'Test HIDDEN Problem', data='<problem>hidden problem</problem>'),
+                    ),
+                )
+            ).install()
 
             self.course_keys[key] = course_key
             self.course_fixtures[key] = course_fixture
@@ -201,7 +219,6 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         Scenario:
             Course Date should have the format 'Ended - Sep 23, 2015'
             if the course on student dashboard has ended.
-
         As a Student,
         Given that I have enrolled to a course
         And the course has ended in the past
@@ -233,7 +250,6 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         Scenario:
             Course Date should have the format 'Started - Sep 23, 2015'
             if the course on student dashboard is running.
-
         As a Student,
         Given that I have enrolled to a course
         And the course has started
@@ -266,7 +282,6 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         Scenario:
             Course Date should have the format 'Starts - Sep 23, 2015'
             if the course on student dashboard starts in future.
-
         As a Student,
         Given that I have enrolled to a course
         And the course starts in future
@@ -300,7 +315,6 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         Scenario:
             Course Date should have the format 'Starts - Wednesday at 5am UTC'
             if the course on student dashboard starts within 5 days.
-
         As a Student,
         Given that I have enrolled to a course
         And the course starts within 5 days
@@ -436,3 +450,49 @@ class LmsDashboardA11yTest(BaseLmsDashboardTestMultiple):
         course_listings = self.dashboard_page.get_courses()
         self.assertEqual(len(course_listings), 3)
         self.dashboard_page.a11y_audit.check_for_accessibility_errors()
+
+
+class TestMasqueradeAndSwitchCourse(BaseLmsDashboardTestMultiple):
+    """
+    Class to test lms dashboard accessibility of courses when masquerading as learner.
+    """
+
+    def test_masquerade_and_switch_course(self):
+        """
+        Scenario:
+            Staff user should be able to access other courses after
+            masquerading as student in one course
+
+        As Staff user, Select a course
+        When I click to change view from Staff to Learner
+        Then the first subsection from course outline should be visible as Learner
+        When I click to select a different course
+        Then the first subsection from new course outline should be visible as Staff
+        """
+        AutoAuthPage(
+            self.browser,
+            username=self.username,
+            email=self.email,
+            staff=True
+        ).visit()
+        self.dashboard_page.visit()
+
+        section_title = 'Test Section 1'
+        subsection_title = 'Test Subsection 1,1'
+        course_page = CourseHomePage(self.browser, str(self.course_keys['A']))
+        course_page.visit()
+
+        problem_name = u'Test Problem 1'
+
+        staff_page = StaffPreviewPage(self.browser)
+        staff_page.set_staff_view_mode('Learner')
+
+        course_page.outline.go_to_section(section_title, subsection_title)
+        self.assertEqual(staff_page.staff_view_mode, 'Learner')
+        self.assertEqual(ProblemPage(self.browser).problem_name, problem_name)
+
+        course_page.course_id = str(self.course_keys['B'])
+        course_page.visit()
+        course_page.outline.go_to_section(section_title, subsection_title)
+        self.assertNotEqual(staff_page.staff_view_mode, 'Learner')
+        self.assertEqual(ProblemPage(self.browser).problem_name, problem_name)

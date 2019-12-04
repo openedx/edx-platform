@@ -69,26 +69,7 @@ def get_discount_expiration_date(user, course):
         saw_banner = ExperimentData.objects.get(user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(course))
         time_limit_start = parse_datetime(saw_banner.value)
     except ExperimentData.DoesNotExist:
-        pass
-
-    if not time_limit_start:
-        enrollment = course_enrollment.first()
-        try:
-            # Content availability date is equivalent to max(enrollment date, course start date)
-            # for most people. Using the schedule date will provide flexibility to deal with
-            # more complex business rules in the future.
-            content_availability_date = enrollment.schedule.start
-            # We have anecdotally observed a case where the schedule.start was
-            # equal to the course start, but should have been equal to the enrollment start
-            # https://openedx.atlassian.net/browse/PROD-58
-            # This section is meant to address that case
-            if enrollment.created and course.start:
-                if (content_availability_date.date() == course.start.date() and
-                   course.start < enrollment.created < timezone.now()):
-                    content_availability_date = enrollment.created
-        except CourseEnrollment.schedule.RelatedObjectDoesNotExist:
-            content_availability_date = max(enrollment.created, course.start)
-        time_limit_start = content_availability_date
+        return None
 
     discount_expiration_date = time_limit_start + timedelta(weeks=1)
 

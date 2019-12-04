@@ -128,7 +128,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-11-17 20:42+0000\n"
+"POT-Creation-Date: 2019-11-24 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -470,7 +470,8 @@ msgstr "Hesap kurtarma"
 #. meant to hold the user's password.
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's password.
-#: common/djangoapps/student/admin.py openedx/core/djangoapps/user_api/api.py
+#: common/djangoapps/student/admin.py
+#: openedx/core/djangoapps/user_authn/views/login_form.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/provider_login.html
@@ -511,22 +512,6 @@ msgstr ""
 #: common/djangoapps/student/admin.py
 msgid "User with this email doesn't exist in system."
 msgstr ""
-
-#: common/djangoapps/student/forms.py
-msgid ""
-"That e-mail address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr ""
-"Bu e-posta adresi ile ilişkili bir kullanıcı hesabı yok. Kayıt olduğunuza "
-"emin misiniz?"
-
-#: common/djangoapps/student/forms.py
-msgid ""
-"The user account associated with this e-mail address cannot reset the "
-"password."
-msgstr ""
-"Bu e-posta adresi ile ilişkili kullanıcı hesabı parolasını sıfırlamak mümkün"
-" değil."
 
 #: common/djangoapps/student/forms.py
 msgid "Full Name cannot contain the following characters: < >"
@@ -6594,8 +6579,8 @@ msgid "Annual Household Income"
 msgstr "Yıllık Hanehalkı Geliri"
 
 #: lms/djangoapps/courseware/views/views.py
-msgid "Use between 250 and 500 words or so in your response."
-msgstr "Cevabınızı yaklaşık 250-500 kelime arasında olacak şekilde yazın."
+msgid "Use between 1250 and 2500 characters or so in your response."
+msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
@@ -7173,7 +7158,7 @@ msgstr "Kullanıcı No"
 #. meant to hold the user's email address.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/login_form.py
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/ccx/enrollment.html
@@ -11424,12 +11409,6 @@ msgstr "E-posta adresinizi girin."
 msgid "The '{field_name}' field cannot be edited."
 msgstr "'{field_name}' alanı düzenlenemez."
 
-#: openedx/core/djangoapps/user_api/accounts/api.py
-#: openedx/core/djangoapps/user_authn/views/auto_auth.py
-#: openedx/core/djangoapps/user_authn/views/register.py
-msgid "Account creation not allowed."
-msgstr "Hesap oluşturmaya izin verilmiyor."
-
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the State/Province/Region in which they
 #. live.
@@ -11525,27 +11504,6 @@ msgstr "Başarı"
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Actions"
 msgstr "Eylemler"
-
-#. Translators: This example email address is used as a placeholder in
-#. a field on the login form meant to hold the user's email address.
-#. Translators: This example email address is used as a placeholder in
-#. a field on the password reset form meant to hold the user's email address.
-#: openedx/core/djangoapps/user_api/api.py
-#: openedx/core/djangoapps/user_authn/views/password_reset.py
-msgid "username@domain.com"
-msgstr "mehmet@siteadi.com"
-
-#. Translators: These instructions appear on the login form, immediately
-#. below a field meant to hold the user's email address.
-#. Translators: These instructions appear on the password reset form,
-#. immediately below a field meant to hold the user's email address.
-#. pylint: disable=no-member
-#: openedx/core/djangoapps/user_api/api.py
-#: openedx/core/djangoapps/user_authn/views/password_reset.py
-#, python-brace-format
-msgid "The email address you used to register with {platform_name}"
-msgstr ""
-" {platform_name} sistemine kayıt olurken kullandığınız e-posta adresidir."
 
 #: openedx/core/djangoapps/user_api/config/waffle.py
 msgid "System maintenance in progress. Please try again later."
@@ -11692,6 +11650,11 @@ msgstr "Süperkullanıcı oluşturmaya izin verilmiyor"
 msgid "Account modification not allowed."
 msgstr "Hesap düzenlemesine izin verilmiyor."
 
+#: openedx/core/djangoapps/user_authn/views/auto_auth.py
+#: openedx/core/djangoapps/user_authn/views/register.py
+msgid "Account creation not allowed."
+msgstr "Hesap oluşturmaya izin verilmiyor."
+
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
 msgid ""
@@ -11730,9 +11693,53 @@ msgstr ""
 msgid "Too many failed login attempts. Try again later."
 msgstr "Fazla sayıda hatalı giriş. Lütfen daha sonra tekrar deneyin."
 
+#: openedx/core/djangoapps/user_authn/views/login.py
+#, python-brace-format
+msgid ""
+"As an {allowed_domain} user, You must login with your {allowed_domain} "
+"{provider} account."
+msgstr ""
+
+#. Translators: This example email address is used as a placeholder in
+#. a field on the login form meant to hold the user's email address.
+#. Translators: This example email address is used as a placeholder in
+#. a field on the password reset form meant to hold the user's email address.
+#: openedx/core/djangoapps/user_authn/views/login_form.py
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "username@domain.com"
+msgstr "mehmet@siteadi.com"
+
+#. Translators: These instructions appear on the login form, immediately
+#. below a field meant to hold the user's email address.
+#. Translators: These instructions appear on the password reset form,
+#. immediately below a field meant to hold the user's email address.
+#. pylint: disable=no-member
+#: openedx/core/djangoapps/user_authn/views/login_form.py
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+#, python-brace-format
+msgid "The email address you used to register with {platform_name}"
+msgstr ""
+" {platform_name} sistemine kayıt olurken kullandığınız e-posta adresidir."
+
 #: openedx/core/djangoapps/user_authn/views/login_form.py
 msgid "Create Account"
 msgstr "Hesap Oluştur"
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+"Bu e-posta adresi ile ilişkili bir kullanıcı hesabı yok. Kayıt olduğunuza "
+"emin misiniz?"
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"The user account associated with this e-mail address cannot reset the "
+"password."
+msgstr ""
+"Bu e-posta adresi ile ilişkili kullanıcı hesabı parolasını sıfırlamak mümkün"
+" değil."
 
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
@@ -17136,11 +17143,14 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your photo verification expires on {verification_expiry}.Approved "
-"verification photos are required to earn a certificate and to take a "
-"proctored exam. It can take up to 3 days to re-verify, so please re-verify "
-"at least a week before any proctored events."
+"Your photo verification expires on {verification_expiry}. Please be aware "
+"photo verification can take up to three days once initiated and you will not"
+" be able to earn a certificate or take a proctored exam until approved."
 msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Resubmit Verification"
+msgstr "Doğrulamayı Tekrar Yükle"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Pending"
@@ -17173,10 +17183,6 @@ msgid "Your verification was denied for the following reasons:"
 msgstr "Doğrulamanız aşağıdaki nedenlerle reddedildi:"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Resubmit Verification"
-msgstr "Doğrulamayı Tekrar Yükle"
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Expired"
 msgstr "Kimlik Doğrulama Durumu: Süresi Doldu"
 
@@ -17192,9 +17198,9 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Approved verification photos are required to earn a certificate and to take "
-"a proctored exam. It can take up to 3 days to re-verify, so please re-verify"
-" at least a week before any proctored events."
+" Please be aware photo verification can take up to three days once initiated"
+" and you will not be able to earn a certificate or take a proctored exam "
+"until approved."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html

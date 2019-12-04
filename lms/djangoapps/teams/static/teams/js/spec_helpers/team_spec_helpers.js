@@ -7,10 +7,13 @@ define([
 ], function(Backbone, _, TeamCollection, TopicCollection, TopicModel) {
     'use strict';
     var createMockPostResponse, createMockDiscussionResponse, createAnnotatedContentInfo, createMockThreadResponse,
-        createMockTopicData, createMockTopicCollection, createMockTopic,
+        createMockTopicData, createMockTopicCollection, createMockTopic, createMockInstructorManagedTopic,
+        createMockContext,
+        testContext,
         testCourseID = 'course/1',
         testUser = 'testUser',
         testTopicID = 'test-topic-1',
+        testInstructorManagedTopicID = 'test-instructor-managed-topic-1',
         testTeamDiscussionID = '12345',
         teamEvents = _.clone(Backbone.Events),
         testCountries = [
@@ -57,7 +60,7 @@ define([
 
     var createMockTeams = function(responseOptions, options, collectionType) {
         if (_.isUndefined(collectionType)) {
-            collectionType = TeamCollection;
+            collectionType = TeamCollection; // eslint-disable-line no-param-reassign
         }
         return new collectionType(
             createMockTeamsResponse(responseOptions),
@@ -243,13 +246,26 @@ define([
             {
                 id: testTopicID,
                 name: 'Test Topic 1',
-                description: 'Test description 1'
+                description: 'Test description 1',
+                type: 'open'
             },
             options
         ));
     };
 
-    var testContext = {
+    createMockInstructorManagedTopic = function(options) {
+        return new TopicModel(_.extend(
+            {
+                id: testInstructorManagedTopicID,
+                name: 'Test Instructor Managed Topic 1',
+                description: 'Test instructor managed topic description 1',
+                type: 'public_managed'
+            },
+            options
+        ));
+    };
+
+    testContext = {
         courseID: testCourseID,
         topics: {
             count: 5,
@@ -270,11 +286,12 @@ define([
         userInfo: createMockUserInfo()
     };
 
-    var createMockContext = function(options) {
+    createMockContext = function(options) {
         return _.extend({}, testContext, options);
     };
 
     createMockTopicCollection = function(topicData) {
+        // eslint-disable-next-line no-param-reassign
         topicData = topicData !== undefined ? topicData : createMockTopicData(1, 5);
 
         return new TopicCollection(
@@ -310,6 +327,7 @@ define([
         createMockUserInfo: createMockUserInfo,
         createMockContext: createMockContext,
         createMockTopic: createMockTopic,
+        createMockInstructorManagedTopic: createMockInstructorManagedTopic,
         createMockPostResponse: createMockPostResponse,
         createMockDiscussionResponse: createMockDiscussionResponse,
         createAnnotatedContentInfo: createAnnotatedContentInfo,

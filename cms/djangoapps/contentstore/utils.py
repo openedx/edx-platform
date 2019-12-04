@@ -546,19 +546,36 @@ def get_sibling_urls(subsection):
             break
         last_block = block
     if not prev_loc:
-        sections = section.get_parent().get_children()
         try:
-            prev_section = sections[sections.index(section) - 1]
-            prev_loc = prev_section.get_children()[-1].get_children()[-1].location
-        except IndexError:
-            pass
+            # section.get_parent SHOULD return the course, but for some reason, it might not
+            sections = section.get_parent().get_children()
+        except AttributeError:
+            log.error(u"URL Retrieval Error # 1: subsection {subsection} included in section {section}".format(
+                section=section.location,
+                subsection=subsection.location
+            ))
+            # This should not be a fatal error. The worst case is that the navigation on the unit page
+            # won't display a link to a previous unit.
+        else:
+            try:
+                prev_section = sections[sections.index(section) - 1]
+                prev_loc = prev_section.get_children()[-1].get_children()[-1].location
+            except IndexError:
+                pass
     if not next_loc:
-        sections = section.get_parent().get_children()
         try:
-            next_section = sections[sections.index(section) + 1]
-            next_loc = next_section.get_children()[0].get_children()[0].location
-        except IndexError:
-            pass
+            sections = section.get_parent().get_children()
+        except AttributeError:
+            log.error(u"URL Retrieval Error # 2: subsection {subsection} included in section {section}".format(
+                section=section.location,
+                subsection=subsection.location
+            ))
+        else:
+            try:
+                next_section = sections[sections.index(section) + 1]
+                next_loc = next_section.get_children()[0].get_children()[0].location
+            except IndexError:
+                pass
     if prev_loc:
         prev_url = reverse_usage_url('container_handler', prev_loc)
     if next_loc:

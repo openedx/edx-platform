@@ -36,7 +36,7 @@ from lms.djangoapps.courseware.tests.factories import (
 )
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from openedx.features.discounts.applicability import get_discount_expiration_date
-from openedx.features.discounts.utils import format_strikeout_price
+from openedx.features.discounts.utils import format_strikeout_price, REV1008_EXPERIMENT_ID
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.django_comment_common.models import (
@@ -431,6 +431,10 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         can_receive_discount_mock.return_value = applicability
         discount_percentage_mock.return_value = percentage
         user = self.create_user_for_course(self.course, CourseUserType.ENROLLED)
+        now_time = datetime.now(tz=UTC).strftime(u"%Y-%m-%d %H:%M:%S%z")
+        ExperimentData.objects.create(
+            user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(self.course), value=now_time
+        )
         self.client.login(username=user.username, password=self.TEST_PASSWORD)
         url = course_home_url(self.course)
         response = self.client.get(url)

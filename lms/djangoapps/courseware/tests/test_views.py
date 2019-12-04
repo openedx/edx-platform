@@ -25,7 +25,6 @@ from freezegun import freeze_time
 from markupsafe import escape
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import MagicMock, PropertyMock, create_autospec, patch
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC
 from six import text_type
@@ -62,6 +61,7 @@ from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
 from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
 from lms.djangoapps.verify_student.services import IDVerificationService
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -104,6 +104,7 @@ FEATURES_WITH_DISABLE_HONOR_CERTIFICATE = settings.FEATURES.copy()
 FEATURES_WITH_DISABLE_HONOR_CERTIFICATE['DISABLE_HONOR_CERTIFICATES'] = True
 
 
+@ddt.ddt
 class TestJumpTo(ModuleStoreTestCase):
     """
     Check the jumpto link for a course.
@@ -191,7 +192,6 @@ class TestJumpTo(ModuleStoreTestCase):
         module2 = ItemFactory.create(category='html', parent_location=nested_vertical2.location)
 
         # internal position of module2 will be 1_2 (2nd item withing 1st item)
-
         expected = '/courses/{course_id}/courseware/{chapter_id}/{section_id}/1?{activate_block_id}'.format(
             course_id=six.text_type(course.id),
             chapter_id=chapter.url_name,
@@ -214,6 +214,41 @@ class TestJumpTo(ModuleStoreTestCase):
                                                      six.text_type(location))
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)
+
+    @ddt.data(
+        (False, '1'),
+        (True, '2')
+    )
+    @ddt.unpack
+    def test_jump_to_for_learner_with_staff_only_content(self, is_staff_user, position):
+        """
+        Test for checking correct position in redirect_url for learner when a course has staff-only units.
+        """
+        course = CourseFactory.create()
+        request = RequestFactory().get('/')
+        request.user = UserFactory(is_staff=is_staff_user, username="staff")
+        request.session = {}
+        course_key = CourseKey.from_string(six.text_type(course.id))
+        chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+        section = ItemFactory.create(category='sequential', parent_location=chapter.location)
+        __ = ItemFactory.create(category='vertical', parent_location=section.location)
+        staff_only_vertical = ItemFactory.create(category='vertical', parent_location=section.location,
+                                                 metadata=dict(visible_to_staff_only=True))
+        __ = ItemFactory.create(category='vertical', parent_location=section.location)
+
+        usage_key = UsageKey.from_string(six.text_type(staff_only_vertical.location)).replace(course_key=course_key)
+        expected_url = reverse(
+            'courseware_position',
+            kwargs={
+                'course_id': six.text_type(course.id),
+                'chapter': chapter.url_name,
+                'section': section.url_name,
+                'position': position,
+            }
+        )
+        expected_url += "?{}".format(urlencode({'activate_block_id': six.text_type(staff_only_vertical.location)}))
+
+        self.assertEqual(expected_url, get_redirect_url(course_key, usage_key, request))
 
 
 @ddt.ddt

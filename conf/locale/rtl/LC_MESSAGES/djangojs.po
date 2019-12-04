@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-11-17 20:52+0000\n"
-"PO-Revision-Date: 2019-11-17 20:52:30.791403\n"
+"POT-Creation-Date: 2019-11-26 12:30+0000\n"
+"PO-Revision-Date: 2019-11-26 12:31:02.888850\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2651,14 +2651,14 @@ msgstr "شر ثققخق خذذعققثي صاهمث قثوخدهرل فاث وث
 msgid "This team does not have any members."
 msgstr "فاهس فثشو يخثس رخف اشدث شرغ وثوزثقس."
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Joined %(date)s"
 msgstr "تخهرثي %(date)s"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Last Activity %(date)s"
 msgstr "مشسف شذفهدهفغ %(date)s"
@@ -2669,11 +2669,11 @@ msgstr "قثوخدث فاهس فثشو وثوزثق?"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid ""
-"This learner will be removed from the team, allowing another learner to take"
-" the available spot."
+"This learner will be removed from the team,allowing another learner to take "
+"the available spot."
 msgstr ""
-"فاهس مثشقرثق صهمم زث قثوخدثي بقخو فاث فثشو, شممخصهرل شرخفاثق مثشقرثق فخ فشنث"
-" فاث شدشهمشزمث سحخف."
+"فاهس مثشقرثق صهمم زث قثوخدثي بقخو فاث فثشو,شممخصهرل شرخفاثق مثشقرثق فخ فشنث "
+"فاث شدشهمشزمث سحخف."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Delete this team?"
@@ -2681,10 +2681,10 @@ msgstr "يثمثفث فاهس فثشو?"
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid ""
-"Deleting a team is permanent and cannot be undone. All members are removed "
+"Deleting a team is permanent and cannot be undone.All members are removed "
 "from the team, and team discussions can no longer be accessed."
 msgstr ""
-"يثمثفهرل ش فثشو هس حثقوشرثرف شري ذشررخف زث عريخرث. شمم وثوزثقس شقث قثوخدثي "
+"يثمثفهرل ش فثشو هس حثقوشرثرف شري ذشررخف زث عريخرث.شمم وثوزثقس شقث قثوخدثي "
 "بقخو فاث فثشو, شري فثشو يهسذعسسهخرس ذشر رخ مخرلثق زث شذذثسسثي."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
@@ -2695,14 +2695,14 @@ msgstr "فثشو \"{team}\" سعذذثسسبعممغ يثمثفثي."
 msgid "You are not currently a member of any team."
 msgstr "غخع شقث رخف ذعققثرفمغ ش وثوزثق خب شرغ فثشو."
 
-#. Translators: "and others" refers to fact that additional members of a team
-#. exist that are not displayed.
+#. Translators: "and others" refers to fact that additional
+#. * members of a team exist that are not displayed.
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "and others"
 msgstr "شري خفاثقس"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. http://momentjs.com/)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: http://momentjs.com/)
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "Last activity %(date)s"
 msgstr "مشسف شذفهدهفغ %(date)s"
@@ -2722,10 +2722,10 @@ msgstr "مثشدث فاهس فثشو?"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 msgid ""
-"If you leave, you can no longer post in this team's discussions. Your place "
+"If you leave, you can no longer post in this team's discussions.Your place "
 "will be available to another learner."
 msgstr ""
-"هب غخع مثشدث, غخع ذشر رخ مخرلثق حخسف هر فاهس فثشو'س يهسذعسسهخرس. غخعق حمشذث "
+"هب غخع مثشدث, غخع ذشر رخ مخرلثق حخسف هر فاهس فثشو'س يهسذعسسهخرس.غخعق حمشذث "
 "صهمم زث شدشهمشزمث فخ شرخفاثق مثشقرثق."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
@@ -2741,6 +2741,10 @@ msgstr "غخع شمقثشيغ زثمخرل فخ شرخفاثق فثشو."
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "This team is full."
 msgstr "فاهس فثشو هس بعمم."
+
+#: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
+msgid "Cannot join instructor managed team"
+msgstr "ذشررخف تخهر هرسفقعذفخق وشرشلثي فثشو"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
 msgid "%(memberCount)s / %(maxMemberCount)s Member"
@@ -2763,10 +2767,10 @@ msgstr "فخحهذس"
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
 "See all teams in your course, organized by topic. Join a team to collaborate"
-" with other learners who are interested in the same topic as you are."
+" with other learners who are interestedin the same topic as you are."
 msgstr ""
 "سثث شمم فثشوس هر غخعق ذخعقسث, خقلشرهظثي زغ فخحهذ. تخهر ش فثشو فخ ذخممشزخقشفث"
-" صهفا خفاثق مثشقرثقس صاخ شقث هرفثقثسفثي هر فاث سشوث فخحهذ شس غخع شقث."
+" صهفا خفاثق مثشقرثقس صاخ شقث هرفثقثسفثيهر فاث سشوث فخحهذ شس غخع شقث."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "My Team"

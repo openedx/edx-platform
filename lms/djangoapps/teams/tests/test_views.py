@@ -1416,6 +1416,21 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
             user='staff'
         )
 
+    @patch('lms.djangoapps.teams.api.is_instructor_managed_team', return_value=True)
+    def test_staff_join_instructor_managed_team(self, *args):  # pylint: disable=unused-argument
+        self.post_create_membership(
+            200,
+            self.build_membership_data_raw(self.users['staff'].username, self.solar_team.team_id),
+            user='staff'
+        )
+
+    @patch('lms.djangoapps.teams.api.is_instructor_managed_team', return_value=True)
+    def test_student_join_instructor_managed_team(self, *args):  # pylint: disable=unused-argument
+        self.post_create_membership(
+            403,
+            self.build_membership_data_raw(self.users['student_enrolled_not_on_team'].username, self.solar_team.team_id)
+        )
+
     @ddt.data('student_enrolled', 'staff', 'course_staff')
     def test_join_twice(self, user):
         response = self.post_create_membership(
@@ -1577,6 +1592,11 @@ class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
     def test_missing_membership(self):
         self.delete_membership(self.wind_team.team_id, self.users['student_enrolled'].username, 404)
 
+    @patch('lms.djangoapps.teams.api.is_instructor_managed_team', return_value=True)
+    def test_student_leave_instructor_managed_team(self, *args):  # pylint: disable=unused-argument
+        self.delete_membership(
+            self.solar_team.team_id, self.users['student_enrolled'].username, 403, user='student_enrolled')
+
 
 class TestElasticSearchErrors(TeamAPITestCase):
     """Test that the Team API is robust to Elasticsearch connection errors."""
@@ -1622,3 +1642,52 @@ class TestElasticSearchErrors(TeamAPITestCase):
             data={'description': 'new description'},
             user='staff'
         )
+
+
+@ddt.ddt
+class TestBulkMembershipManagement(TeamAPITestCase):
+    """
+    Test that CSVs can be uploaded and downloaded to manage course membership.
+
+    This test case will be expanded when the view is fully
+    implemented (TODO MST-31).
+    """
+    good_course_id = 'TestX/TS101/Test_Course'
+    fake_course_id = 'TestX/TS101/Non_Existent_Course'
+
+    allow_username = 'course_staff'
+    deny_username = 'student_enrolled'
+
+    @ddt.data(
+        ('GET', good_course_id, deny_username, 403),
+        ('GET', fake_course_id, allow_username, 404),
+        ('GET', fake_course_id, deny_username, 404),
+        ('POST', good_course_id, allow_username, 501),  # TODO MST-31
+        ('POST', good_course_id, deny_username, 403),
+        ('POST', fake_course_id, allow_username, 404),
+        ('POST', fake_course_id, deny_username, 404),
+    )
+    @ddt.unpack
+    def test_error_statuses(self, method, course_id, username, expected_status):
+        url = self.get_url(course_id)
+        self.login(username)
+        response = self.client.generic(method, url)
+        assert response.status_code == expected_status
+
+    def test_download_csv(self):
+        url = self.get_url(self.good_course_id)
+        self.login(self.allow_username)
+        response = self.client.get(url)
+        assert response.status_code == 200
+        assert response['Content-Type'] == 'text/csv'
+        assert response['Content-Disposition'] == (
+            'attachment; filename="team-membership_TestX_TS101_Test_Course.csv"'
+        )
+        # For now, just assert that the file is non-empty.
+        # Eventually, we will test contents (TODO MST-31).
+        assert response.content
+
+    @staticmethod
+    def get_url(course_id):
+        # This strategy allows us to test with invalid course IDs
+        return reverse('team_membership_bulk_management', args=[course_id])

@@ -16,7 +16,7 @@ def pythonTestCleanup() {
     archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/**/*,test_root/log/**/*.log,**/nosetests.xml,*.log'
     sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
     junit '**/nosetests.xml'
-    sh '''source $HOME/edx-venv/bin/activate
+    sh '''source $HOME/edx-venv-$PYTHON_VERSION/edx-venv/bin/activate
     bash scripts/xdist/terminate_xdist_nodes.sh'''
 }
 

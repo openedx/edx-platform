@@ -20,7 +20,7 @@ from six import text_type  # pylint: disable=ungrouped-imports
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_request
-from openedx.core.djangoapps.user_api import accounts, errors, forms, helpers
+from openedx.core.djangoapps.user_api import accounts, errors, helpers
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangoapps.user_api.errors import (
     AccountUpdateError,
@@ -29,8 +29,8 @@ from openedx.core.djangoapps.user_api.errors import (
 )
 from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
 from openedx.core.lib.api.view_utils import add_serializer_errors
+from openedx.core.djangoapps.user_authn.views.registration_form import validate_name, validate_username
 from openedx.features.enterprise_support.utils import get_enterprise_readonly_account_fields
-from student import forms as student_forms
 from student import views as student_views
 from student.models import (
     AccountRecovery,
@@ -245,7 +245,7 @@ def _validate_name_change(user_profile, data, field_errors):
 
     old_name = user_profile.name
     try:
-        student_forms.validate_name(data['name'])
+        validate_name(data['name'])
     except ValidationError as err:
         field_errors["name"] = {
             "developer_message": u"Error thrown from validate_name: '{}'".format(err.message),
@@ -358,44 +358,6 @@ def activate_account(activation_key):
     else:
         # This implicitly saves the registration
         registration.activate()
-
-
-@helpers.intercept_errors(errors.UserAPIInternalError, ignore_errors=[errors.UserAPIRequestError])
-def request_password_change(email, is_secure):
-    """Email a single-use link for performing a password reset.
-
-    Users must confirm the password change before we update their information.
-
-    Args:
-        email (str): An email address
-        orig_host (str): An originating host, extracted from a request with get_host
-        is_secure (bool): Whether the request was made with HTTPS
-
-    Returns:
-        None
-
-    Raises:
-        errors.UserNotFound
-        AccountRequestError
-        errors.UserAPIInternalError: the operation failed due to an unexpected error.
-
-    """
-    # Binding data to a form requires that the data be passed as a dictionary
-    # to the Form class constructor.
-    form = forms.PasswordResetFormNoActive({'email': email})
-
-    # Validate that a user exists with the given email address.
-    if form.is_valid():
-        # Generate a single-use link for performing a password reset
-        # and email it to the user.
-        form.save(
-            from_email=configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
-            use_https=is_secure,
-            request=get_current_request(),
-        )
-    else:
-        # No user with the provided email address exists.
-        raise errors.UserNotFound
 
 
 def get_name_validation_error(name):
@@ -576,7 +538,7 @@ def _validate_username(username):
         with override_language('en'):
             # `validate_username` provides a proper localized message, however the API needs only the English
             # message by convention.
-            student_forms.validate_username(username)
+            validate_username(username)
     except (UnicodeError, errors.AccountDataBadType, errors.AccountDataBadLength) as username_err:
         raise errors.AccountUsernameInvalid(text_type(username_err))
     except ValidationError as validation_err:

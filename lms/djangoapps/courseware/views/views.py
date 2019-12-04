@@ -355,7 +355,7 @@ def jump_to(_request, course_id, location):
     except InvalidKeyError:
         raise Http404(u"Invalid course_key or usage_key")
     try:
-        redirect_url = get_redirect_url(course_key, usage_key)
+        redirect_url = get_redirect_url(course_key, usage_key, _request)
     except ItemNotFoundError:
         raise Http404(u"No data at this location: {0}".format(usage_key))
     except NoPathToItem:
@@ -905,15 +905,18 @@ def course_about(request, course_id):
         ecommerce_checkout = ecomm_service.is_enabled(request.user)
         ecommerce_checkout_link = ''
         ecommerce_bulk_checkout_link = ''
-        professional_mode = None
-        is_professional_mode = CourseMode.PROFESSIONAL in modes or CourseMode.NO_ID_PROFESSIONAL_MODE in modes
-        if ecommerce_checkout and is_professional_mode:
-            professional_mode = modes.get(CourseMode.PROFESSIONAL, '') or \
-                modes.get(CourseMode.NO_ID_PROFESSIONAL_MODE, '')
-            if professional_mode.sku:
-                ecommerce_checkout_link = ecomm_service.get_checkout_page_url(professional_mode.sku)
-            if professional_mode.bulk_sku:
-                ecommerce_bulk_checkout_link = ecomm_service.get_checkout_page_url(professional_mode.bulk_sku)
+        single_paid_mode = None
+        if ecommerce_checkout:
+            if len(modes) == 1 and list(modes.values())[0].min_price:
+                single_paid_mode = list(modes.values())[0]
+            else:
+                # have professional ignore other modes for historical reasons
+                single_paid_mode = modes.get(CourseMode.PROFESSIONAL)
+
+            if single_paid_mode and single_paid_mode.sku:
+                ecommerce_checkout_link = ecomm_service.get_checkout_page_url(single_paid_mode.sku)
+            if single_paid_mode and single_paid_mode.bulk_sku:
+                ecommerce_bulk_checkout_link = ecomm_service.get_checkout_page_url(single_paid_mode.bulk_sku)
 
         registration_price, course_price = get_course_prices(course)
 
@@ -964,7 +967,7 @@ def course_about(request, course_id):
             'ecommerce_checkout': ecommerce_checkout,
             'ecommerce_checkout_link': ecommerce_checkout_link,
             'ecommerce_bulk_checkout_link': ecommerce_bulk_checkout_link,
-            'professional_mode': professional_mode,
+            'single_paid_mode': single_paid_mode,
             'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
             'show_courseware_link': show_courseware_link,
             'is_course_full': is_course_full,

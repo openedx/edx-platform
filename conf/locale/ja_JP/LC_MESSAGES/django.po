@@ -113,7 +113,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-11-10 20:42+0000\n"
+"POT-Creation-Date: 2019-11-24 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Japanese (Japan) (https://www.transifex.com/open-edx/teams/6205/ja_JP/)\n"
@@ -444,7 +444,8 @@ msgstr ""
 #. meant to hold the user's password.
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's password.
-#: common/djangoapps/student/admin.py openedx/core/djangoapps/user_api/api.py
+#: common/djangoapps/student/admin.py
+#: openedx/core/djangoapps/user_authn/views/login_form.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/provider_login.html
@@ -467,17 +468,21 @@ msgid "%(count)d student account was unlocked."
 msgid_plural "%(count)d student accounts were unlocked."
 msgstr[0] ""
 
-#: common/djangoapps/student/forms.py
+#: common/djangoapps/student/admin.py
+#, python-brace-format
 msgid ""
-"That e-mail address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr "このメールアドレスが登録されたユーザーアカウントがありません。アカウント登録しているかどうか確認してください。"
+"Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' in"
+" SiteConfiguration model's values field."
+msgstr ""
 
-#: common/djangoapps/student/forms.py
-msgid ""
-"The user account associated with this e-mail address cannot reset the "
-"password."
-msgstr "このメールアドレスが登録されたユーザーアカウントでは、パスワードの変更ができません。"
+#: common/djangoapps/student/admin.py
+#, python-brace-format
+msgid "Email doesn't have {domain_name} domain name."
+msgstr ""
+
+#: common/djangoapps/student/admin.py
+msgid "User with this email doesn't exist in system."
+msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid "Full Name cannot contain the following characters: < >"
@@ -802,6 +807,14 @@ msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Secondary email address to recover linked account."
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid ""
+"An employee (a user whose email has current site's domain name) whose email "
+"exists in this model, can be able to login from login screen through email "
+"and password. And if any employee's email doesn't exist in this model then "
+"that employee can login via third party authentication backend only."
 msgstr ""
 
 #: common/djangoapps/student/views/dashboard.py
@@ -6039,8 +6052,8 @@ msgid "Annual Household Income"
 msgstr "年間の世帯収入"
 
 #: lms/djangoapps/courseware/views/views.py
-msgid "Use between 250 and 500 words or so in your response."
-msgstr "回答は 250～500語としてください。"
+msgid "Use between 1250 and 2500 characters or so in your response."
+msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
@@ -6592,7 +6605,7 @@ msgstr "ユーザーID"
 #. meant to hold the user's email address.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/login_form.py
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/ccx/enrollment.html
@@ -10547,12 +10560,6 @@ msgstr "住所を入力してください。"
 msgid "The '{field_name}' field cannot be edited."
 msgstr "'{field_name}' 欄は編集できません。"
 
-#: openedx/core/djangoapps/user_api/accounts/api.py
-#: openedx/core/djangoapps/user_authn/views/auto_auth.py
-#: openedx/core/djangoapps/user_authn/views/register.py
-msgid "Account creation not allowed."
-msgstr "アカウント作成は許可されていません。"
-
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the State/Province/Region in which they
 #. live.
@@ -10644,26 +10651,6 @@ msgstr "成功"
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Actions"
 msgstr "アクション"
-
-#. Translators: This example email address is used as a placeholder in
-#. a field on the login form meant to hold the user's email address.
-#. Translators: This example email address is used as a placeholder in
-#. a field on the password reset form meant to hold the user's email address.
-#: openedx/core/djangoapps/user_api/api.py
-#: openedx/core/djangoapps/user_authn/views/password_reset.py
-msgid "username@domain.com"
-msgstr "username@domain.com"
-
-#. Translators: These instructions appear on the login form, immediately
-#. below a field meant to hold the user's email address.
-#. Translators: These instructions appear on the password reset form,
-#. immediately below a field meant to hold the user's email address.
-#. pylint: disable=no-member
-#: openedx/core/djangoapps/user_api/api.py
-#: openedx/core/djangoapps/user_authn/views/password_reset.py
-#, python-brace-format
-msgid "The email address you used to register with {platform_name}"
-msgstr "{platform_name}で登録に使用したメールアドレス"
 
 #: openedx/core/djangoapps/user_api/config/waffle.py
 msgid "System maintenance in progress. Please try again later."
@@ -10793,6 +10780,11 @@ msgstr ""
 msgid "Account modification not allowed."
 msgstr ""
 
+#: openedx/core/djangoapps/user_authn/views/auto_auth.py
+#: openedx/core/djangoapps/user_authn/views/register.py
+msgid "Account creation not allowed."
+msgstr "アカウント作成は許可されていません。"
+
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
 msgid ""
@@ -10829,9 +10821,48 @@ msgstr ""
 msgid "Too many failed login attempts. Try again later."
 msgstr "何度もログイン試行に失敗しました。しばらく時間をおいて再操作してください。"
 
+#: openedx/core/djangoapps/user_authn/views/login.py
+#, python-brace-format
+msgid ""
+"As an {allowed_domain} user, You must login with your {allowed_domain} "
+"{provider} account."
+msgstr ""
+
+#. Translators: This example email address is used as a placeholder in
+#. a field on the login form meant to hold the user's email address.
+#. Translators: This example email address is used as a placeholder in
+#. a field on the password reset form meant to hold the user's email address.
+#: openedx/core/djangoapps/user_authn/views/login_form.py
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "username@domain.com"
+msgstr "username@domain.com"
+
+#. Translators: These instructions appear on the login form, immediately
+#. below a field meant to hold the user's email address.
+#. Translators: These instructions appear on the password reset form,
+#. immediately below a field meant to hold the user's email address.
+#. pylint: disable=no-member
+#: openedx/core/djangoapps/user_authn/views/login_form.py
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+#, python-brace-format
+msgid "The email address you used to register with {platform_name}"
+msgstr "{platform_name}で登録に使用したメールアドレス"
+
 #: openedx/core/djangoapps/user_authn/views/login_form.py
 msgid "Create Account"
 msgstr "アカウント作成"
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr "このメールアドレスが登録されたユーザーアカウントがありません。アカウント登録しているかどうか確認してください。"
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"The user account associated with this e-mail address cannot reset the "
+"password."
+msgstr "このメールアドレスが登録されたユーザーアカウントでは、パスワードの変更ができません。"
 
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
@@ -15982,11 +16013,14 @@ msgstr "あなたの本人認証が承認されました。ご提出頂いてか
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your photo verification expires on {verification_expiry}.Approved "
-"verification photos are required to earn a certificate and to take a "
-"proctored exam. It can take up to 3 days to re-verify, so please re-verify "
-"at least a week before any proctored events."
+"Your photo verification expires on {verification_expiry}. Please be aware "
+"photo verification can take up to three days once initiated and you will not"
+" be able to earn a certificate or take a proctored exam until approved."
 msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Resubmit Verification"
+msgstr "認証を再提出"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Pending"
@@ -16015,10 +16049,6 @@ msgid "Your verification was denied for the following reasons:"
 msgstr "あなたの認証は次の理由で拒否されました: "
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Resubmit Verification"
-msgstr "認証を再提出"
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Expired"
 msgstr "現在の認証ステータス: 期限切れ"
 
@@ -16032,9 +16062,9 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Approved verification photos are required to earn a certificate and to take "
-"a proctored exam. It can take up to 3 days to re-verify, so please re-verify"
-" at least a week before any proctored events."
+" Please be aware photo verification can take up to three days once initiated"
+" and you will not be able to earn a certificate or take a proctored exam "
+"until approved."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html

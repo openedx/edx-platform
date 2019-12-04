@@ -175,6 +175,7 @@ class BaseTopicSerializer(serializers.Serializer):  # pylint: disable=abstract-m
     description = serializers.CharField()
     name = serializers.CharField()
     id = serializers.CharField()  # pylint: disable=invalid-name
+    type = serializers.CharField()
 
 
 class TopicSerializer(BaseTopicSerializer):  # pylint: disable=abstract-method
