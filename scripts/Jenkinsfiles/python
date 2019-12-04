@@ -22,7 +22,6 @@ def pythonTestCleanup() {
 
 def createWarningsReport(){
     sh '''source $HOME/edx-venv-$PYTHON_VERSION/edx-venv/bin/activate
-    pip install pandas==0.24.2
     pip list
     python openedx/core/process_warnings.py --dir_path test_root/log --html_path reports/warning_report.html'''
     archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.html'
