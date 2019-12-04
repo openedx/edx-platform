@@ -301,9 +301,13 @@ class CreditRequirement(TimeStampedModel):
     namespace = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
     display_name = models.CharField(max_length=255, default=u"")
-    order = models.PositiveIntegerField(default=0)
     criteria = JSONField()
     active = models.BooleanField(default=True)
+    sort_value = models.PositiveIntegerField(default=0)
+
+    # TODO: Delete this deprecated field during the later stages of the rollout
+    # which renames `order` to `sort_value`.
+    order = models.PositiveIntegerField(default=0)
 
     CACHE_NAMESPACE = u"credit.CreditRequirement.cache."
 
@@ -315,7 +319,7 @@ class CreditRequirement(TimeStampedModel):
         return u'{course_id} - {name}'.format(course_id=self.course.course_key, name=self.display_name)
 
     @classmethod
-    def add_or_update_course_requirement(cls, credit_course, requirement, order):
+    def add_or_update_course_requirement(cls, credit_course, requirement, sort_value):
         """
         Add requirement to a given course.
 
@@ -334,14 +338,18 @@ class CreditRequirement(TimeStampedModel):
             defaults={
                 "display_name": requirement["display_name"],
                 "criteria": requirement["criteria"],
-                "order": order,
+                # TODO: remove this deprecated field key during later stages of the order->sort_value rename.
+                "order": sort_value,
+                "sort_value": sort_value,
                 "active": True
             }
         )
         if not created:
             credit_requirement.criteria = requirement["criteria"]
             credit_requirement.active = True
-            credit_requirement.order = order
+            # TODO: remove this deprecated field key during later stages of the order->sort_value rename.
+            credit_requirement.order = sort_value
+            credit_requirement.sort_value = sort_value
             credit_requirement.display_name = requirement["display_name"]
             credit_requirement.save()
 
