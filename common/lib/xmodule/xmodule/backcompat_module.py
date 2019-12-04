@@ -1,6 +1,8 @@
 """
 These modules exist to translate old format XML into newer, semantic forms
 """
+from __future__ import absolute_import
+
 import logging
 import traceback
 from functools import wraps

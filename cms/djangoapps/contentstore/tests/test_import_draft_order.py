@@ -1,6 +1,8 @@
 """
 Tests Draft import order.
 """
+from __future__ import absolute_import
+
 from django.conf import settings
 
 from xmodule.modulestore.django import modulestore

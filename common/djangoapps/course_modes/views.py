@@ -5,6 +5,7 @@ from __future__ import absolute_import, unicode_literals
 
 import decimal
 import json
+import logging
 
 import six
 import six.moves.urllib.error
@@ -21,22 +22,28 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import get_language, to_locale
 from django.utils.translation import ugettext as _
 from django.views.generic.base import View
+from edx_django_utils.monitoring.utils import increment
 from ipware.ip import get_ip
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
 from course_modes.models import CourseMode
-from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from openedx.core.djangoapps.catalog.utils import get_currency_data
 from openedx.core.djangoapps.embargo import api as embargo_api
+from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from openedx.features.discounts.utils import get_first_purchase_offer_banner_fragment
+from openedx.features.discounts.applicability import discount_percentage
 from student.models import CourseEnrollment
 from util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
+
+
+LOG = logging.getLogger(__name__)
 
 
 class ChooseModeView(View):
@@ -92,6 +99,13 @@ class ChooseModeView(View):
             return redirect(embargo_redirect)
 
         enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(request.user, course_key)
+
+        increment('track-selection.{}.{}'.format(enrollment_mode, 'active' if is_active else 'inactive'))
+        increment('track-selection.views')
+
+        if enrollment_mode is None:
+            LOG.info('Rendering track selection for unenrolled user, referred by %s', request.META.get('HTTP_REFERER'))
+
         modes = CourseMode.modes_for_course_dict(course_key)
         ecommerce_service = EcommerceService()
 
@@ -136,7 +150,7 @@ class ChooseModeView(View):
         # When a credit mode is available, students will be given the option
         # to upgrade from a verified mode to a credit mode at the end of the course.
         # This allows students who have completed photo verification to be eligible
-        # for univerity credit.
+        # for university credit.
         # Since credit isn't one of the selectable options on the track selection page,
         # we need to check *all* available course modes in order to determine whether
         # a credit mode is available.  If so, then we show slightly different messaging
@@ -190,8 +204,10 @@ class ChooseModeView(View):
                 for x in verified_mode.suggested_prices.split(",")
                 if x.strip()
             ]
+            price_before_discount = verified_mode.min_price
+
             context["currency"] = verified_mode.currency.upper()
-            context["min_price"] = verified_mode.min_price
+            context["min_price"] = price_before_discount
             context["verified_name"] = verified_mode.name
             context["verified_description"] = verified_mode.description
 
@@ -234,7 +250,7 @@ class ChooseModeView(View):
         # This is a bit redundant with logic in student.views.change_enrollment,
         # but I don't really have the time to refactor it more nicely and test.
         course = modulestore().get_course(course_key)
-        if not has_access(user, 'enroll', course):
+        if not user.has_perm(ENROLL_IN_COURSE, course):
             error_msg = _("Enrollment is closed")
             return self.get(request, course_id, error=error_msg)
 

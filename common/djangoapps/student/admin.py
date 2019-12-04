@@ -26,6 +26,7 @@ from openedx.core.lib.courses import clean_course_id
 from student import STUDENT_WAFFLE_NAMESPACE
 from student.models import (
     AccountRecovery,
+    AllowedAuthUser,
     CourseAccessRole,
     CourseEnrollment,
     CourseEnrollmentAllowed,
@@ -37,7 +38,8 @@ from student.models import (
     RegistrationCookieConfiguration,
     UserAttribute,
     UserProfile,
-    UserTestGroup
+    UserTestGroup,
+    BulkUnenrollConfiguration
 )
 from student.roles import REGISTERED_ACCESS_ROLES
 from xmodule.modulestore.django import modulestore
@@ -159,7 +161,6 @@ class LinkedInAddToProfileConfigurationAdmin(admin.ModelAdmin):
 
 
 class CourseEnrollmentForm(forms.ModelForm):
-
     def __init__(self, *args, **kwargs):
         # If args is a QueryDict, then the ModelForm addition request came in as a POST with a course ID string.
         # Change the course ID string to a CourseLocator object by copying the QueryDict to make it mutable.
@@ -194,6 +195,15 @@ class CourseEnrollmentForm(forms.ModelForm):
 
         return course_key
 
+    def save(self, *args, **kwargs):
+        course_enrollment = super(CourseEnrollmentForm, self).save(commit=False)
+        user = self.cleaned_data['user']
+        course_overview = self.cleaned_data['course']
+        enrollment = CourseEnrollment.get_or_create_enrollment(user, course_overview.id)
+        course_enrollment.id = enrollment.id
+        course_enrollment.created = enrollment.created
+        return course_enrollment
+
     class Meta:
         model = CourseEnrollment
         fields = '__all__'
@@ -204,7 +214,7 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
     """ Admin interface for the CourseEnrollment model. """
     list_display = ('id', 'course_id', 'mode', 'user', 'is_active',)
     list_filter = ('mode', 'is_active',)
-    raw_id_fields = ('user',)
+    raw_id_fields = ('user', 'course')
     search_fields = ('course__id', 'mode', 'user__username',)
     form = CourseEnrollmentForm
 
@@ -432,11 +442,54 @@ class LoginFailuresAdmin(admin.ModelAdmin):
         self.model.clear_lockout_counter(obj.user)
 
 
+class AllowedAuthUserForm(forms.ModelForm):
+    """Model Form for AllowedAuthUser model's admin interface."""
+
+    class Meta(object):
+        model = AllowedAuthUser
+        fields = ('site', 'email', )
+
+    def clean_email(self):
+        """
+        Validate the email field.
+        """
+        email = self.cleaned_data['email']
+        email_domain = email.split('@')[-1]
+        allowed_site_email_domain = self.cleaned_data['site'].configuration.get_value('THIRD_PARTY_AUTH_ONLY_DOMAIN')
+
+        if not allowed_site_email_domain:
+            raise forms.ValidationError(
+                _("Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' in SiteConfiguration "
+                  "model's values field.")
+            )
+        elif email_domain != allowed_site_email_domain:
+            raise forms.ValidationError(
+                _("Email doesn't have {domain_name} domain name.".format(domain_name=allowed_site_email_domain))
+            )
+        elif not User.objects.filter(email=email).exists():
+            raise forms.ValidationError(_("User with this email doesn't exist in system."))
+        else:
+            return email
+
+
+@admin.register(AllowedAuthUser)
+class AllowedAuthUserAdmin(admin.ModelAdmin):
+    """ Admin interface for the AllowedAuthUser model. """
+    form = AllowedAuthUserForm
+    list_display = ('email', 'site',)
+    search_fields = ('email',)
+    ordering = ('-created',)
+
+    class Meta(object):
+        model = AllowedAuthUser
+
+
 admin.site.register(UserTestGroup)
 admin.site.register(Registration)
 admin.site.register(PendingNameChange)
 admin.site.register(DashboardConfiguration, ConfigurationModelAdmin)
 admin.site.register(RegistrationCookieConfiguration, ConfigurationModelAdmin)
+admin.site.register(BulkUnenrollConfiguration, ConfigurationModelAdmin)
 
 
 # We must first un-register the User model since it may also be registered by the auth app.

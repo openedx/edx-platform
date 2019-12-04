@@ -1,12 +1,13 @@
 """
 Models for the custom course feature
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import json
 import logging
 from datetime import datetime
 
+import six
 from ccx_keys.locator import CCXLocator
 from django.contrib.auth.models import User
 from django.db import models
@@ -31,7 +32,7 @@ class CustomCourseForEdX(models.Model):
     coach = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     # if not empty, this field contains a json serialized list of
     # the master course modules
-    structure_json = models.TextField(verbose_name='Structure JSON', blank=True, null=True)
+    structure_json = models.TextField(verbose_name=u'Structure JSON', blank=True, null=True)
 
     class Meta(object):
         app_label = 'ccx'
@@ -102,7 +103,7 @@ class CustomCourseForEdX(models.Model):
         Returns:
             The CCXLocator corresponding to this CCX.
         """
-        return CCXLocator.from_course_locator(self.course_id, unicode(self.id))
+        return CCXLocator.from_course_locator(self.course_id, six.text_type(self.id))
 
 
 class CcxFieldOverride(models.Model):
@@ -119,4 +120,4 @@ class CcxFieldOverride(models.Model):
         app_label = 'ccx'
         unique_together = (('ccx', 'location', 'field'),)
 
-    value = models.TextField(default='null')
+    value = models.TextField(default=u'null')

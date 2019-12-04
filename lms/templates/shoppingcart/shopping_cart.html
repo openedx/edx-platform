@@ -1,10 +1,13 @@
+<%page expression_filter="h"/>
 <%inherit file="shopping_cart_flow.html" />
 <%block name="review_highlight">class="active"</%block>
 
 <%!
+from openedx.core.djangolib.js_utils import js_escaped_string
 from django.urls import reverse
 from edxmako.shortcuts import marketing_link
 from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
 from django.utils.translation import ungettext
 from openedx.core.lib.courses import course_image_url
 %>
@@ -66,7 +69,7 @@ from openedx.core.lib.courses import course_image_url
         <div class="clearfix">
         <div class="image">
           <img class="item-image" src="${course_image_url(course)}"
-              alt="${course.display_number_with_default | h} ${course.display_name_with_default_escaped} ${_('Cover Image')}" />
+              alt="${course.display_number_with_default} ${course.display_name_with_default} ${_('Cover Image')}" />
         </div>
         <div class="data-input">
           ## Translators: "Registration for:" is followed by a course name
@@ -169,17 +172,19 @@ from openedx.core.lib.courses import course_image_url
                   </div>
                    <div name="payment" class="hidden">
                     <div id="processor_form" aria-describedby="payment_business_helper_text">
-                      ${form_html}
+                      ${form_html | n, decode.utf8}
                     </div>
                     <p id="payment_business_helper_text">
-                        ${_('After this purchase is complete, {username} will be enrolled in this course.').format(username=u'<br/><b>{username}</b>'.format(username=order.user.username))}
+                         ${Text(_('After this purchase is complete, {username} will be enrolled in this course.')).format( \
+                        username=HTML(u'<br/><b>{username}</b>').format(username=order.user.username))}
                     </p>
                   </div>
                % else:
                   <div name="payment" aria-describedby="payment_helper_text">
-                    ${form_html}
+                    ${form_html | n, decode.utf8}
                     <p id="payment_helper_text">
-                        ${_('After this purchase is complete, {username} will be enrolled in this course.').format(username=u'<br/><b>{username}</b>'.format(username=order.user.username))}
+                       ${Text(_('After this purchase is complete, {username} will be enrolled in this course.')).format( \
+                        username=HTML(u'<br/><b>{username}</b>').format(username=order.user.username))}
                     </p>
                   </div>
                   <div name="billing" class="hidden">
@@ -235,7 +240,7 @@ from openedx.core.lib.courses import course_image_url
 
       $('button.btn-remove').click(function(event) {
       event.preventDefault();
-      var post_url = "${reverse('shoppingcart.views.remove_item')}";
+      var post_url = "${reverse('shoppingcart.views.remove_item') | n, js_escaped_string}";
       $.post(post_url, {id:$(this).data('item-id')})
         .always(function(data){
         location.reload(true);
@@ -244,7 +249,7 @@ from openedx.core.lib.courses import course_image_url
 
    $('#submit-code').click(function(event){
       event.preventDefault();
-      var post_url = "${reverse('shoppingcart.views.use_code')}";
+      var post_url = "${reverse('shoppingcart.views.use_code') | n, js_escaped_string}";
       if($('#input_code').val() == "") {
         showErrorMsgs('Must enter a valid code','code');
         return;
@@ -273,7 +278,7 @@ from openedx.core.lib.courses import course_image_url
 
    $('#submit-reset-redemption').click(function(event){
        event.preventDefault();
-       var post_url = "${reverse('shoppingcart.views.reset_code_redemption')}";
+       var post_url = "${reverse('shoppingcart.views.reset_code_redemption') | n, js_escaped_string}";
        $.post(post_url)
        .success(function(data) {
                    location.reload(true);
@@ -297,7 +302,7 @@ from openedx.core.lib.courses import course_image_url
           return false;
        }
        event.preventDefault();
-       location.href = "${reverse('billing_details')}";
+       location.href = "${reverse('billing_details') | n, js_escaped_string}";
    });
 
 
@@ -353,7 +358,7 @@ from openedx.core.lib.courses import course_image_url
   function showErrorMsgs(msg, msg_area){
 
       $( "span.error-text#"+ msg_area +"" ).removeClass("hidden");
-      $( "span.error-text#"+ msg_area +"" ).html(msg).show();
+      $( "span.error-text#"+ msg_area +"" ).text(msg).show();
 
       if(msg_area=='code'){
         $("#input_code").addClass('error');
@@ -375,11 +380,11 @@ from openedx.core.lib.courses import course_image_url
 
   function update_user_cart(ItemId, newQty, prevQty, unit_cost, wasbusinessType, isbusinessType){
 
-      var post_url = "${reverse('shoppingcart.views.update_user_cart')}";
+      var post_url = "${reverse('shoppingcart.views.update_user_cart') | n, js_escaped_string}";
       var typeChanged = false;
       var prevTotal = $('#total-amount').data('amount');
       var newTotal = getNewTotal(prevQty, newQty, unit_cost, prevTotal);
-      $('#total-amount').html('$'+newTotal.toFixed(2)+' USD');
+      $('#total-amount').text('$'+newTotal.toFixed(2)+' USD');
       $('#total-amount').data('amount', newTotal);
 
       if(isbusinessType != wasbusinessType){
@@ -401,7 +406,7 @@ from openedx.core.lib.courses import course_image_url
                   var prevTotal = data['total_cost'];
                   $('html').css({'cursor':'default'});
                   $(".button").css({'cursor':'default'});
-                  $("#processor_form").html(data['form_html']);
+                  $("#processor_form").html(edx.HtmlUtils.HTML(data['form_html']).toString());
                   if(typeChanged){
                       var submit_button = $('.col-2.relative').find("button[type='submit']");
                       submit_button.removeAttr('disabled');

@@ -1,7 +1,11 @@
+# pylint: disable=missing-docstring
+from __future__ import absolute_import
+
 import ddt
+import six
+from crum import set_current_request
 from django.conf import settings
 from mock import patch
-from crum import set_current_request
 
 from openedx.core.djangolib.testing.utils import get_mock_request
 from student.models import CourseEnrollment
@@ -35,7 +39,7 @@ class ZeroGradeTest(GradeTestBase):
             chapter_grades = ZeroCourseGrade(self.request.user, course_data).chapter_grades
             for chapter in chapter_grades:
                 for section in chapter_grades[chapter]['sections']:
-                    for score in section.problem_scores.itervalues():
+                    for score in six.itervalues(section.problem_scores):
                         self.assertEqual(score.earned, 0)
                         self.assertEqual(score.first_attempted, None)
                     self.assertEqual(section.all_total.earned, 0)

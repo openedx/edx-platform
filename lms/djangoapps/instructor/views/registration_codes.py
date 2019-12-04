@@ -1,15 +1,18 @@
 """
 E-commerce Tab Instructor Dashboard Query Registration Code Status.
 """
+from __future__ import absolute_import
+
 import logging
 
+import six
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_GET, require_POST
 from opaque_keys.edx.locator import CourseKey
 
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.instructor.enrollment import get_email_params, send_mail_to_student
 from lms.djangoapps.instructor.views.api import require_level
 from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption
@@ -44,7 +47,7 @@ def look_up_registration_code(request, course_id):
 
     reg_code_already_redeemed = RegistrationCodeRedemption.is_registration_code_redeemed(code)
 
-    registration_code_detail_url = reverse('registration_code_details', kwargs={'course_id': unicode(course_id)})
+    registration_code_detail_url = reverse('registration_code_details', kwargs={'course_id': six.text_type(course_id)})
 
     return JsonResponse({
         'is_registration_code_exists': True,

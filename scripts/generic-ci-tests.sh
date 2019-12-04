@@ -175,6 +175,12 @@ case "$TEST_SUITE" in
     "bok-choy")
 
         PAVER_ARGS="-n $NUMBER_OF_BOKCHOY_THREADS"
+        if [[ -n "$FILTER_WHO_TESTS_WHAT" ]]; then
+            PAVER_ARGS="$PAVER_ARGS --with-wtw=origin/master"
+        fi
+        if [[ -n "$COLLECT_WHO_TESTS_WHAT" ]]; then
+            PAVER_ARGS="$PAVER_ARGS --pytest-remote-contexts --coveragerc=common/test/acceptance/.coveragerc"
+        fi
         export BOKCHOY_HEADLESS=true
 
         case "$SHARD" in
@@ -188,7 +194,7 @@ case "$TEST_SUITE" in
                 ;;
 
             25|"noshard")
-                $TOX paver test_bokchoy --eval-attr="(shard>=$SHARD or not shard) and not a11y" $PAVER_ARGS
+                $TOX paver test_bokchoy --eval-attr="(not shard or shard>=$SHARD) and not a11y" $PAVER_ARGS
                 ;;
 
             # Default case because if we later define another bok-choy shard on Jenkins

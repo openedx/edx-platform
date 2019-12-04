@@ -1,10 +1,14 @@
 """
 Test LMS Notes
 """
+from __future__ import absolute_import
+
 import random
 from datetime import datetime
 from unittest import skip
 from uuid import uuid4
+
+from six.moves import range
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.fixtures.edxnotes import EdxNotesFixture, Note, Range
@@ -166,12 +170,12 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
 
     def assert_text_in_notes(self, notes):
         actual = [note.text for note in notes]
-        expected = [u"TEST TEXT {}".format(i) for i in xrange(len(notes))]
+        expected = [u"TEST TEXT {}".format(i) for i in range(len(notes))]
         self.assertEqual(expected, actual)
 
     def assert_tags_in_notes(self, notes, expected_tags):
         actual = [note.tags for note in notes]
-        expected = [expected_tags[i] for i in xrange(len(notes))]
+        expected = [expected_tags[i] for i in range(len(notes))]
         self.assertEqual(expected, actual)
 
     def test_can_create_notes(self):

@@ -11,21 +11,22 @@ This management command will emit the SignalHandler.course_published signal for
 some subset of courses and signal listeners, and then rely on existing listener
 behavior to trigger the necessary data updates.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
 import copy
 import logging
 import os
+import sys
 import textwrap
 import time
-import sys
 
-from django.core.management.base import BaseCommand
+import six
+from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-
+from openedx.core.djangoapps.content.course_overviews.models import SimulateCoursePublishConfig
 from lms.djangoapps.ccx.tasks import course_published_handler as ccx_receiver_fn
-from xmodule.modulestore.django import modulestore, SignalHandler
-
+from xmodule.modulestore.django import SignalHandler, modulestore
 
 log = logging.getLogger('simulate_publish')
 
@@ -41,10 +42,10 @@ class Command(BaseCommand):
     $ ./manage.py lms --settings=devstack_docker simulate_publish --delay 10
 
     # Find all available listeners
-    $ ./manage.py lms --settings=devstack_docker simulate_publish --show_listeners
+    $ ./manage.py lms --settings=devstack_docker simulate_publish --show_receivers
 
     # Send the publish signal to two courses and two listeners
-    $ ./manage.py lms --settings=devstack_docker simulate_publish --listeners \
+    $ ./manage.py lms --settings=devstack_docker simulate_publish --receivers \
     openedx.core.djangoapps.content.course_overviews.signals._listen_for_course_publish \
     openedx.core.djangoapps.bookmarks.signals.trigger_update_xblocks_cache_task \
     --courses course-v1:edX+DemoX+Demo_Course edX/MODULESTORE_100/2018
@@ -156,8 +157,30 @@ class Command(BaseCommand):
                 u"with this flag, so that CCX receivers are omitted."
             )
         ),
+        parser.add_argument(
+            '--args-from-database',
+            action='store_true',
+            help='Use arguments from the SimulateCoursePublishConfig model instead of the command line.',
+        ),
+
+    def get_args_from_database(self):
+        """ Returns an options dictionary from the current SimulateCoursePublishConfig model. """
+
+        config = SimulateCoursePublishConfig.current()
+        if not config.enabled:
+            raise CommandError('SimulateCourseConfigPublish is disabled, but --args-from-database was requested.')
+
+        # We don't need fancy shell-style whitespace/quote handling - none of our arguments are complicated
+        argv = config.arguments.split()
+
+        parser = self.create_parser('manage.py', 'simulate_publish')
+        return parser.parse_args(argv).__dict__   # we want a dictionary, not a non-iterable Namespace object
 
     def handle(self, *args, **options):
+
+        if options['args_from_database']:
+            options = self.get_args_from_database()
+
         if options['show_receivers']:
             return self.print_show_receivers()
 
@@ -173,7 +196,7 @@ class Command(BaseCommand):
             else:
                 log.fatal(
                     u"simulate_publish should be run as a CMS (Studio) " +
-                    u"command, not %s (override with --force-lms).",  # pylint: disable=unicode-format-string
+                    u"command, not %s (override with --force-lms).",
                     os.environ.get('SERVICE_VARIANT')
                 )
                 sys.exit(1)
@@ -253,7 +276,7 @@ class Command(BaseCommand):
             log.info("No courses specified, reading all courses from modulestore...")
             course_keys = sorted(
                 (course.id for course in modulestore().get_course_summaries()),
-                key=unicode  # Different types of CourseKeys can't be compared without this.
+                key=six.text_type  # Different types of CourseKeys can't be compared without this.
             )
             log.info(u"%d courses read from modulestore.", len(course_keys))
 

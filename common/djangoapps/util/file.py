@@ -146,7 +146,9 @@ class UniversalNewlineIterator(object):
         """
         Replace CR and CRLF with LF within `string`.
         """
-        return string.replace('\r\n', '\n').replace('\r', '\n')
+        if six.PY2:
+            return string.replace('\r\n', '\n').replace('\r', '\n')
+        return string.replace('\r\n', '\n').replace('\r', '\n').encode('utf-8')
 
     def generate_lines(self):
         """
@@ -166,7 +168,7 @@ class UniversalNewlineIterator(object):
                     line = char
                     yield self.sanitize(last_line)
                 else:
-                    line += char
+                    line += six.text_type(char) if isinstance(char, int) else char
             buf = self.original_file.read(self.buffer_size)
             if not buf and line:
                 yield self.sanitize(line)

@@ -1,7 +1,10 @@
 """
 Tests for the course import API views
 """
+from __future__ import absolute_import
+
 from datetime import datetime
+
 from django.core.urlresolvers import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase

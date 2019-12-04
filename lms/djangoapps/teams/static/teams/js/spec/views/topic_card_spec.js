@@ -3,6 +3,8 @@ define(['jquery',
     'teams/js/views/topic_card',
     'teams/js/models/topic'],
     function($, _, TopicCardView, Topic) {
+        'use strict';
+
         describe('Topic card view', function() {
             var createTopicCardView = function() {
                 return new TopicCardView({

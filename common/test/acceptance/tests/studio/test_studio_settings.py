@@ -2,18 +2,19 @@
 """
 Acceptance tests for Studio's Setting pages
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
+import json
 import os
 import random
 import string
-import json
 from textwrap import dedent
 
+import six
 from bok_choy.promise import EmptyPromise
 from mock import patch
+from six.moves import range
 
-from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.common.utils import add_enrollment_course_modes
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
@@ -23,6 +24,7 @@ from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettin
 from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
 from common.test.acceptance.pages.studio.utils import get_input_value, type_in_codemirror
 from common.test.acceptance.tests.helpers import create_user_partition_json, element_has_text
+from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
 from openedx.core.lib.tests import attr
 from xmodule.partitions.partitions import Group
 
@@ -548,7 +550,7 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         self.check_modal_shows_correct_contents(self.type_fields)
         self.advanced_settings.refresh_and_wait_for_load()
 
-        for key, val in original_values_map.iteritems():
+        for key, val in six.iteritems(original_values_map):
             self.assertEquals(
                 self.advanced_settings.get(key),
                 val,
@@ -571,7 +573,7 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         self.advanced_settings.undo_changes_via_modal()
 
         # Check that changes are undone
-        for key, val in original_values_map.iteritems():
+        for key, val in six.iteritems(original_values_map):
             self.assertEquals(
                 self.advanced_settings.get(key),
                 val,
@@ -597,7 +599,7 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         self.assertFalse(self.advanced_settings.is_validation_modal_present())
 
         # Iterate through the wrong values and make sure they're still displayed
-        for key, val in inputs.iteritems():
+        for key, val in six.iteritems(inputs):
             self.assertEquals(
                 str(self.advanced_settings.get(key)),
                 str(val),

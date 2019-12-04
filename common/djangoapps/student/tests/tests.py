@@ -2,32 +2,36 @@
 """
 Miscellaneous tests for the student app.
 """
+from __future__ import absolute_import
+
 import logging
 import unittest
 from datetime import datetime, timedelta
-from urllib import quote
 
 import ddt
 import pytz
+import six
 from config_models.models import cache
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User
-from django.urls import reverse
 from django.test import TestCase, override_settings
 from django.test.client import Client
+from django.urls import reverse
 from markupsafe import escape
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import CourseLocator
 from pyquery import PyQuery as pq
 from six import text_type
+from six.moves import range
+from six.moves.urllib.parse import quote
 
 import shoppingcart  # pylint: disable=import-error
 from bulk_email.models import Optout  # pylint: disable=import-error
-from lms.djangoapps.certificates.models import CertificateStatuses  # pylint: disable=import-error
-from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.certificates.models import CertificateStatuses  # pylint: disable=import-error
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory, generate_course_run_key
@@ -230,7 +234,7 @@ class CourseEndingTest(TestCase):
         Tests that the higher of the persisted grade and the grade
         from the certs table is used on the learner dashboard.
         """
-        expected_grade = max(persisted_grade, cert_grade)
+        expected_grade = max(filter(lambda x: x is not None, [persisted_grade, cert_grade]))
         user = Mock(username="fred", id="1")
         survey_url = "http://a_survey.com"
         course = Mock(
@@ -240,7 +244,7 @@ class CourseEndingTest(TestCase):
         )
 
         if cert_grade is not None:
-            cert_status = {'status': 'generating', 'grade': unicode(cert_grade), 'mode': 'honor'}
+            cert_status = {'status': 'generating', 'grade': six.text_type(cert_grade), 'mode': 'honor'}
         else:
             cert_status = {'status': 'generating', 'mode': 'honor'}
 
@@ -252,7 +256,7 @@ class CourseEndingTest(TestCase):
                     'status': 'generating',
                     'show_survey_button': True,
                     'survey_url': survey_url,
-                    'grade': unicode(expected_grade),
+                    'grade': six.text_type(expected_grade),
                     'mode': 'honor',
                     'linked_in_url': None,
                     'can_unenroll': False,
@@ -391,7 +395,7 @@ class DashboardTest(ModuleStoreTestCase):
         self.assertIsNone(course_mode_info['days_for_upsell'])
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    @patch('courseware.views.index.log.warning')
+    @patch('lms.djangoapps.courseware.views.index.log.warning')
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_blocked_course_scenario(self, log_warning):
 
@@ -429,13 +433,13 @@ class DashboardTest(ModuleStoreTestCase):
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content)
+        self.assertContains(response, 'Activate Course Enrollment')
 
         #now activate the user by enrolling him/her to the course
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
         response = self.client.get(reverse('dashboard'))
-        self.assertIn('You can no longer access this course because payment has not yet been received', response.content)
+        self.assertContains(response, 'You can no longer access this course because payment has not yet been received')
         optout_object = Optout.objects.filter(user=self.user, course_id=self.course.id)
         self.assertEqual(len(optout_object), 1)
 
@@ -453,7 +457,10 @@ class DashboardTest(ModuleStoreTestCase):
         invoice.save()
 
         response = self.client.get(reverse('dashboard'))
-        self.assertNotIn('You can no longer access this course because payment has not yet been received', response.content)
+        self.assertNotContains(
+            response,
+            'You can no longer access this course because payment has not yet been received',
+        )
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_linked_in_add_to_profile_btn_not_appearing_without_config(self):
@@ -486,7 +493,7 @@ class DashboardTest(ModuleStoreTestCase):
         response = self.client.get(reverse('dashboard'))
 
         self.assertEquals(response.status_code, 200)
-        self.assertNotIn('Add Certificate to LinkedIn', response.content)
+        self.assertNotContains(response, 'Add Certificate to LinkedIn')
 
         response_url = 'http://www.linkedin.com/profile/add?_ed='
         self.assertNotContains(response, escape(response_url))
@@ -530,7 +537,7 @@ class DashboardTest(ModuleStoreTestCase):
         response = self.client.get(reverse('dashboard'))
 
         self.assertEquals(response.status_code, 200)
-        self.assertIn('Add Certificate to LinkedIn', response.content)
+        self.assertContains(response, 'Add Certificate to LinkedIn')
 
         expected_url = (
             u'http://www.linkedin.com/profile/add'
@@ -1086,7 +1093,7 @@ class RelatedProgramsTests(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         self.create_programs_config()
         self.client.login(username=self.user.username, password=self.password)
 
-        course_run = CourseRunFactory(key=unicode(self.course.id))  # pylint: disable=no-member
+        course_run = CourseRunFactory(key=six.text_type(self.course.id))  # pylint: disable=no-member
         course = CatalogCourseFactory(course_runs=[course_run])
         self.programs = [ProgramFactory(courses=[course]) for __ in range(2)]
 
@@ -1160,4 +1167,4 @@ class UserAttributeTests(TestCase):
     def test_unicode(self):
         UserAttribute.set_user_attribute(self.user, self.name, self.value)
         for field in (self.name, self.value, self.user.username):
-            self.assertIn(field, unicode(UserAttribute.objects.get(user=self.user)))
+            self.assertIn(field, six.text_type(UserAttribute.objects.get(user=self.user)))

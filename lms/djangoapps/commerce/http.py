@@ -1,5 +1,7 @@
 """ HTTP-related entities. """
 
+from __future__ import absolute_import
+
 from rest_framework.status import HTTP_200_OK, HTTP_500_INTERNAL_SERVER_ERROR
 
 from util.json_request import JsonResponse

@@ -1,20 +1,22 @@
 # -*- coding: utf-8 -*-
 """Tests for course home page date summary blocks."""
+from __future__ import absolute_import
+
 from datetime import datetime, timedelta
 
 import ddt
 import waffle
 from django.contrib.messages.middleware import MessageMiddleware
-from django.urls import reverse
 from django.test import RequestFactory
+from django.urls import reverse
 from freezegun import freeze_time
 from mock import patch
 from pytz import utc
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.courses import get_course_date_blocks
-from courseware.date_summary import (
+from lms.djangoapps.courseware.courses import get_course_date_blocks
+from lms.djangoapps.courseware.date_summary import (
     CertificateAvailableDate,
     CourseEndDate,
     CourseStartDate,
@@ -22,7 +24,7 @@ from courseware.date_summary import (
     VerificationDeadlineDate,
     VerifiedUpgradeDeadlineDate
 )
-from courseware.models import (
+from lms.djangoapps.courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
     DynamicUpgradeDeadlineConfiguration,
     OrgDynamicUpgradeDeadlineConfiguration
@@ -59,7 +61,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.client.login(username=user.username, password=TEST_PASSWORD)
         url = reverse('info', args=(course.id,))
         response = self.client.get(url)
-        self.assertNotIn('date-summary', response.content)
+        self.assertNotContains(response, 'date-summary', status_code=302)
 
     def test_course_home_logged_out(self):
         course = create_course_run()

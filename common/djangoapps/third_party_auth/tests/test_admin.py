@@ -1,12 +1,14 @@
 """
 Tests third_party_auth admin views
 """
+from __future__ import absolute_import
+
 import unittest
 
 from django.contrib.admin.sites import AdminSite
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.urls import reverse
 from django.forms import models
+from django.urls import reverse
 
 from student.tests.factories import UserFactory
 from third_party_auth.admin import OAuth2ProviderConfigAdmin
@@ -48,7 +50,7 @@ class Oauth2ProviderConfigAdminTest(testutil.TestCase):
         provider1 = self.configure_dummy_provider(
             enabled=True,
             icon_class='',
-            icon_image=SimpleUploadedFile('icon.svg', '<svg><rect width="50" height="100"/></svg>'),
+            icon_image=SimpleUploadedFile('icon.svg', b'<svg><rect width="50" height="100"/></svg>'),
         )
 
         # Get the provider instance with active flag

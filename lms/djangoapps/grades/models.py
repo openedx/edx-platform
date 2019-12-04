@@ -8,24 +8,30 @@ a student's score or the course grading policy changes. As they are
 persisted, course grades are also immune to changes in course content.
 """
 
+from __future__ import absolute_import
+
 import json
 import logging
 from base64 import b64encode
 from collections import defaultdict, namedtuple
 from hashlib import sha1
 
+import six
+from django.apps import apps
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from lazy import lazy
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from simple_history.models import HistoricalRecords
+from six.moves import map
 
-from coursewarehistoryextended.fields import UnsignedBigIntAutoField, UnsignedBigIntOneToOneField
-from lms.djangoapps.grades import events, constants
+from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField
+from lms.djangoapps.grades import constants, events
 from openedx.core.lib.cache_utils import get_cache
-
 
 log = logging.getLogger(__name__)
 
@@ -74,7 +80,7 @@ class BlockRecordList(object):
         supported by adding a label indicated which algorithm was used, e.g.,
         "sha256$j0NDRmSPa5bfid2pAcUXaxCm2Dlh3TwayItZstwyeqQ=".
         """
-        return b64encode(sha1(self.json_value).digest())
+        return b64encode(sha1(self.json_value.encode('utf-8')).digest()).decode('utf-8')
 
     @lazy
     def json_value(self):
@@ -84,10 +90,10 @@ class BlockRecordList(object):
         """
         list_of_block_dicts = [block._asdict() for block in self.blocks]
         for block_dict in list_of_block_dicts:
-            block_dict['locator'] = unicode(block_dict['locator'])  # BlockUsageLocator is not json-serializable
+            block_dict['locator'] = six.text_type(block_dict['locator'])  # BlockUsageLocator is not json-serializable
         data = {
             u'blocks': list_of_block_dicts,
-            u'course_key': unicode(self.course_key),
+            u'course_key': six.text_type(self.course_key),
             u'version': self.version,
         }
         return json.dumps(
@@ -123,6 +129,7 @@ class BlockRecordList(object):
         return cls(blocks, course_key)
 
 
+@python_2_unicode_compatible
 class VisibleBlocks(models.Model):
     """
     A django model used to track the state of a set of visible blocks under a
@@ -143,7 +150,7 @@ class VisibleBlocks(models.Model):
     class Meta(object):
         app_label = "grades"
 
-    def __unicode__(self):
+    def __str__(self):
         """
         String representation of this model.
         """
@@ -225,7 +232,7 @@ class VisibleBlocks(models.Model):
         only for those that aren't already created.
         """
         cached_records = cls.bulk_read(user_id, course_key)
-        non_existent_brls = {brl.hash_value for brl in block_record_lists if brl.hash_value not in cached_records}
+        non_existent_brls = {brl for brl in block_record_lists if brl.hash_value not in cached_records}
         cls.bulk_create(user_id, course_key, non_existent_brls)
 
     @classmethod
@@ -258,6 +265,7 @@ class VisibleBlocks(models.Model):
         return u"visible_blocks_cache.{}.{}".format(course_key, user_id)
 
 
+@python_2_unicode_compatible
 class PersistentSubsectionGrade(TimeStampedModel):
     """
     A django model tracking persistent grades at the subsection level.
@@ -329,7 +337,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
         else:
             return self.usage_key
 
-    def __unicode__(self):
+    def __str__(self):
         """
         Returns a string representation of this model.
         """
@@ -431,6 +439,13 @@ class PersistentSubsectionGrade(TimeStampedModel):
             usage_key=usage_key,
             defaults=params,
         )
+
+        # TODO: Remove as part of EDUCATOR-4602.
+        if str(usage_key.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+            log.info(u'Created/updated grade ***{}*** for user ***{}*** in course ***{}***'
+                     u'for subsection ***{}*** with default params ***{}***'
+                     .format(grade, user_id, usage_key.course_key, usage_key, params))
+
         grade.override = PersistentSubsectionGradeOverride.get_override(user_id, usage_key)
         if first_attempted is not None and grade.first_attempted is None:
             grade.first_attempted = first_attempted
@@ -449,11 +464,11 @@ class PersistentSubsectionGrade(TimeStampedModel):
 
         PersistentSubsectionGradeOverride.prefetch(user_id, course_key)
 
-        map(cls._prepare_params, grade_params_iter)
+        list(map(cls._prepare_params, grade_params_iter))
         VisibleBlocks.bulk_get_or_create(
             user_id, course_key, [params['visible_blocks'] for params in grade_params_iter]
         )
-        map(cls._prepare_params_visible_blocks_id, grade_params_iter)
+        list(map(cls._prepare_params_visible_blocks_id, grade_params_iter))
 
         grades = [PersistentSubsectionGrade(**params) for params in grade_params_iter]
         grades = cls.objects.bulk_create(grades)
@@ -493,6 +508,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
         return u"subsection_grades_cache.{}".format(course_id)
 
 
+@python_2_unicode_compatible
 class PersistentCourseGrade(TimeStampedModel):
     """
     A django model tracking persistent course grades.
@@ -536,7 +552,7 @@ class PersistentCourseGrade(TimeStampedModel):
 
     _CACHE_NAMESPACE = u"grades.models.PersistentCourseGrade"
 
-    def __unicode__(self):
+    def __str__(self):
         """
         Returns a string representation of this model.
         """
@@ -629,6 +645,7 @@ class PersistentCourseGrade(TimeStampedModel):
         events.course_grade_calculated(grade)
 
 
+@python_2_unicode_compatible
 class PersistentSubsectionGradeOverride(models.Model):
     """
     A django model tracking persistent grades overrides at the subsection level.
@@ -638,7 +655,7 @@ class PersistentSubsectionGradeOverride(models.Model):
     class Meta(object):
         app_label = "grades"
 
-    grade = UnsignedBigIntOneToOneField(PersistentSubsectionGrade, related_name='override')
+    grade = models.OneToOneField(PersistentSubsectionGrade, related_name='override')
 
     # Created/modified timestamps prevent race-conditions when using with async rescoring tasks
     created = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -650,10 +667,21 @@ class PersistentSubsectionGradeOverride(models.Model):
     possible_all_override = models.FloatField(null=True, blank=True)
     earned_graded_override = models.FloatField(null=True, blank=True)
     possible_graded_override = models.FloatField(null=True, blank=True)
+    # store the source of the system that caused the override
+    system = models.CharField(max_length=100, blank=True, null=True)
+    # store the reason for the override
+    override_reason = models.CharField(max_length=300, blank=True, null=True)
 
     _CACHE_NAMESPACE = u"grades.models.PersistentSubsectionGradeOverride"
 
-    def __unicode__(self):
+    # This is necessary because CMS does not install the grades app, but it
+    # imports this models code. Simple History will attempt to connect to the installed
+    # model in the grades app, which will fail.
+    if 'grades' in apps.app_configs:
+        history = HistoricalRecords()
+        _history_user = None
+
+    def __str__(self):
         return u', '.join([
             u"{}".format(type(self).__name__),
             u"earned_all_override: {}".format(self.earned_all_override),
@@ -663,7 +691,7 @@ class PersistentSubsectionGradeOverride(models.Model):
         ])
 
     def get_history(self):
-        return PersistentSubsectionGradeOverrideHistory.get_override_history(self.id)
+        return self.history.all()  # pylint: disable=no-member
 
     @classmethod
     def prefetch(cls, user_id, course_key):
@@ -694,24 +722,32 @@ class PersistentSubsectionGradeOverride(models.Model):
         """
         Creates or updates an override object for the given PersistentSubsectionGrade.
         Args:
-            requesting_user: The user that is creating the override (so we can record this action in
-            a PersistentSubsectionGradeOverrideHistory record).
+            requesting_user: The user that is creating the override.
             subsection_grade_model: The PersistentSubsectionGrade object associated with this override.
             override_data: The parameters of score values used to create the override record.
         """
-        override, _ = PersistentSubsectionGradeOverride.objects.update_or_create(
-            grade=subsection_grade_model,
-            defaults=cls._prepare_override_params(subsection_grade_model, override_data),
-        )
+        grade_defaults = cls._prepare_override_params(subsection_grade_model, override_data)
+        grade_defaults['override_reason'] = override_data['comment'] if 'comment' in override_data else None
+        grade_defaults['system'] = override_data['system'] if 'system' in override_data else None
 
-        action = action or PersistentSubsectionGradeOverrideHistory.CREATE_OR_UPDATE
+        # TODO: Remove as part of EDUCATOR-4602.
+        if str(subsection_grade_model.course_id) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+            log.info(u'Creating override for user ***{}*** for PersistentSubsectionGrade'
+                     u'***{}*** with override data ***{}*** and derived grade_defaults ***{}***.'
+                     .format(requesting_user, subsection_grade_model, override_data, grade_defaults))
+        try:
+            override = PersistentSubsectionGradeOverride.objects.get(grade=subsection_grade_model)
+            for key, value in six.iteritems(grade_defaults):
+                setattr(override, key, value)
+        except PersistentSubsectionGradeOverride.DoesNotExist:
+            override = PersistentSubsectionGradeOverride(grade=subsection_grade_model, **grade_defaults)
+        if requesting_user:
+            # setting this on a non-field attribute which simple
+            # history reads from to determine which user to attach to
+            # the history row
+            override._history_user = requesting_user  # pylint: disable=protected-access
+        override.save()
 
-        PersistentSubsectionGradeOverrideHistory.objects.create(
-            override_id=override.id,
-            user=requesting_user,
-            feature=feature,
-            action=action,
-        )
         return override
 
     @staticmethod
@@ -737,6 +773,7 @@ class PersistentSubsectionGradeOverride(models.Model):
         return cleaned_data
 
 
+@python_2_unicode_compatible
 class PersistentSubsectionGradeOverrideHistory(models.Model):
     """
     A django model tracking persistent grades override audit records.
@@ -744,15 +781,15 @@ class PersistentSubsectionGradeOverrideHistory(models.Model):
     .. no_pii:
     """
     OVERRIDE_FEATURES = (
-        (constants.GradeOverrideFeatureEnum.proctoring, 'proctoring'),
-        (constants.GradeOverrideFeatureEnum.gradebook, 'gradebook'),
+        (constants.GradeOverrideFeatureEnum.proctoring, u'proctoring'),
+        (constants.GradeOverrideFeatureEnum.gradebook, u'gradebook'),
     )
 
-    CREATE_OR_UPDATE = 'CREATEORUPDATE'
-    DELETE = 'DELETE'
+    CREATE_OR_UPDATE = u'CREATEORUPDATE'
+    DELETE = u'DELETE'
     OVERRIDE_ACTIONS = (
-        (CREATE_OR_UPDATE, 'create_or_update'),
-        (DELETE, 'delete')
+        (CREATE_OR_UPDATE, u'create_or_update'),
+        (DELETE, u'delete')
     )
 
     class Meta(object):
@@ -773,7 +810,7 @@ class PersistentSubsectionGradeOverrideHistory(models.Model):
     comments = models.CharField(max_length=300, blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True, db_index=True)
 
-    def __unicode__(self):
+    def __str__(self):
         """
         String representation of this model.
         """

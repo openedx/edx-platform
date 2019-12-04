@@ -719,3 +719,24 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
             """
         )
         self.assertEquals(problem.find_answer_text('1_2_1', 'hide'), 'hide')
+
+    def test_get_question_answer(self):
+        problem = new_loncapa_problem(
+            """
+            <problem>
+                <optionresponse>
+                    <optioninput options="('yellow','blue','green')" correct="blue" label="Color_1"/>
+                </optionresponse>
+                <solution>
+                    <div class="detailed-solution">
+                        <p>Explanation</p>
+                        <p>Blue is the answer.</p>
+                    </div>
+                </solution>
+            </problem>
+            """
+        )
+
+        # Ensure that the answer is a string so that the dict returned from this
+        # function can eventualy be serialized to json without issues.
+        self.assertIsInstance(problem.get_question_answers()['1_solution_1'], six.text_type)

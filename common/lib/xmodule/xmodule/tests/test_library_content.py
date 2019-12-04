@@ -4,21 +4,24 @@ Basic unit tests for LibraryContentModule
 
 Higher-level tests are in `cms/djangoapps/contentstore/tests/test_libraries.py`.
 """
+from __future__ import absolute_import
+
+import six
 from bson.objectid import ObjectId
 from mock import Mock, patch
-
+from search.search_engine_base import SearchEngine
+from six.moves import range
 from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
 
 from xmodule.library_content_module import ANY_CAPA_TYPE_VALUE, LibraryContentDescriptor
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.factories import LibraryFactory, CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 from xmodule.tests import get_test_system
 from xmodule.validation import StudioValidationMessage
 from xmodule.x_module import AUTHOR_VIEW
-from search.search_engine_base import SearchEngine
 
 dummy_render = lambda block, _: Fragment(block.data)  # pylint: disable=invalid-name
 
@@ -44,7 +47,7 @@ class LibraryContentTest(MixedSplitTestCase):
             "library_content",
             self.vertical,
             max_count=1,
-            source_library_id=unicode(self.library.location.library_key)
+            source_library_id=six.text_type(self.library.location.library_key)
         )
 
     def _bind_course_module(self, module):
@@ -149,7 +152,7 @@ class LibraryContentModuleTestMixin(object):
         self.assertIn("invalid", result.summary.text)
 
         # When source_library_id is set but the block needs to be updated, the summary should say so:
-        self.lc_block.source_library_id = unicode(self.library.location.library_key)
+        self.lc_block.source_library_id = six.text_type(self.library.location.library_key)
         result = self.lc_block.validate()
         self.assertFalse(result)  # Validation fails due to at least one warning/message
         self.assertTrue(result.summary)
@@ -269,8 +272,9 @@ class LibraryContentModuleTestMixin(object):
         Helper method that changes the max_count of self.lc_block, refreshes
         children, and asserts that the number of selected children equals the count provided.
         """
-        # Construct the XModule for the descriptor, if not present already present pylint: disable=protected-access
-        self.lc_block._xmodule
+        # Clear the cache (only needed because we skip saving/re-loading the block) pylint: disable=protected-access
+        if hasattr(self.lc_block._xmodule, '_selected_set'):
+            del self.lc_block._xmodule._selected_set
         self.lc_block.max_count = count
         selected = self.lc_block.get_child_descriptors()
         self.assertEqual(len(selected), count)
@@ -316,7 +320,7 @@ class TestLibraryContentModuleWithSearchIndex(LibraryContentModuleTestMixin, Lib
 @patch(
     'xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render
 )
-@patch('xmodule.html_module.HtmlModule.author_view', dummy_render, create=True)
+@patch('xmodule.html_module.HtmlBlock.author_view', dummy_render, create=True)
 @patch('xmodule.x_module.DescriptorSystem.applicable_aside_types', lambda self, block: [])
 class TestLibraryContentRender(LibraryContentTest):
     """
@@ -364,7 +368,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         self.assertTrue(len(self.publisher.call_args[0]), 3)
         _, event_name, event_data = self.publisher.call_args[0]
         self.assertEqual(event_name, "edx.librarycontentblock.content.{}".format(event_type))
-        self.assertEqual(event_data["location"], unicode(self.lc_block.location))
+        self.assertEqual(event_data["location"], six.text_type(self.lc_block.location))
         return event_data
 
     def test_assigned_event(self):
@@ -377,13 +381,13 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         self.assertIsInstance(child_lib_version, ObjectId)
         event_data = self._assert_event_was_published("assigned")
         block_info = {
-            "usage_key": unicode(child.location),
-            "original_usage_key": unicode(child_lib_location),
-            "original_usage_version": unicode(child_lib_version),
+            "usage_key": six.text_type(child.location),
+            "original_usage_key": six.text_type(child_lib_location),
+            "original_usage_version": six.text_type(child_lib_version),
             "descendants": [],
         }
         self.assertEqual(event_data, {
-            "location": unicode(self.lc_block.location),
+            "location": six.text_type(self.lc_block.location),
             "added": [block_info],
             "result": [block_info],
             "previous_count": 0,
@@ -393,11 +397,13 @@ class TestLibraryContentAnalytics(LibraryContentTest):
 
         # Now increase max_count so that one more child will be added:
         self.lc_block.max_count = 2
+        # Clear the cache (only needed because we skip saving/re-loading the block) pylint: disable=protected-access
+        del self.lc_block._xmodule._selected_set
         children = self.lc_block.get_child_descriptors()
         self.assertEqual(len(children), 2)
         child, new_child = children if children[0].location == child.location else reversed(children)
         event_data = self._assert_event_was_published("assigned")
-        self.assertEqual(event_data["added"][0]["usage_key"], unicode(new_child.location))
+        self.assertEqual(event_data["added"][0]["usage_key"], six.text_type(new_child.location))
         self.assertEqual(len(event_data["result"]), 2)
         self.assertEqual(event_data["previous_count"], 1)
         self.assertEqual(event_data["max_count"], 2)
@@ -444,7 +450,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
 
         for block_list in (event_data["added"], event_data["result"]):
             self.assertEqual(len(block_list), 1)  # main_vertical is the only root block added, and is the only result.
-            self.assertEqual(block_list[0]["usage_key"], unicode(course_usage_main_vertical))
+            self.assertEqual(block_list[0]["usage_key"], six.text_type(course_usage_main_vertical))
 
             # Check that "descendants" is a flat, unordered list of all of main_vertical's descendants:
             descendants_expected = (
@@ -454,10 +460,10 @@ class TestLibraryContentAnalytics(LibraryContentTest):
             )
             descendant_data_expected = {}
             for lib_key, course_usage_key in descendants_expected:
-                descendant_data_expected[unicode(course_usage_key)] = {
-                    "usage_key": unicode(course_usage_key),
-                    "original_usage_key": unicode(lib_key),
-                    "original_usage_version": unicode(self.store.get_block_original_usage(course_usage_key)[1]),
+                descendant_data_expected[six.text_type(course_usage_key)] = {
+                    "usage_key": six.text_type(course_usage_key),
+                    "original_usage_key": six.text_type(lib_key),
+                    "original_usage_version": six.text_type(self.store.get_block_original_usage(course_usage_key)[1]),
                 }
             self.assertEqual(len(block_list[0]["descendants"]), len(descendant_data_expected))
             for descendant in block_list[0]["descendants"]:
@@ -472,6 +478,8 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         self.lc_block.get_child_descriptors()  # This line is needed in the test environment or the change has no effect
         self.publisher.reset_mock()  # Clear the "assigned" event that was just published.
         self.lc_block.max_count = 0
+        # Clear the cache (only needed because we skip saving/re-loading the block) pylint: disable=protected-access
+        del self.lc_block._xmodule._selected_set
 
         # Check that the event says that one block was removed, leaving no blocks left:
         children = self.lc_block.get_child_descriptors()
@@ -489,6 +497,8 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         # Start by assigning two blocks to the student:
         self.lc_block.get_child_descriptors()  # This line is needed in the test environment or the change has no effect
         self.lc_block.max_count = 2
+        # Clear the cache (only needed because we skip saving/re-loading the block) pylint: disable=protected-access
+        del self.lc_block._xmodule._selected_set
         initial_blocks_assigned = self.lc_block.get_child_descriptors()
         self.assertEqual(len(initial_blocks_assigned), 2)
         self.publisher.reset_mock()  # Clear the "assigned" event that was just published.
@@ -502,22 +512,24 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         self.library.children = [keep_block_lib_usage_key]
         self.store.update_item(self.library, self.user_id)
         self.lc_block.refresh_children()
+        # Clear the cache (only needed because we skip saving/re-loading the block) pylint: disable=protected-access
+        del self.lc_block._xmodule._selected_set
 
         # Check that the event says that one block was removed, leaving one block left:
         children = self.lc_block.get_child_descriptors()
         self.assertEqual(len(children), 1)
         event_data = self._assert_event_was_published("removed")
         self.assertEqual(event_data["removed"], [{
-            "usage_key": unicode(deleted_block_key),
+            "usage_key": six.text_type(deleted_block_key),
             "original_usage_key": None,  # Note: original_usage_key info is sadly unavailable because the block has been
                                          # deleted so that info can no longer be retrieved
             "original_usage_version": None,
             "descendants": [],
         }])
         self.assertEqual(event_data["result"], [{
-            "usage_key": unicode(keep_block_key),
-            "original_usage_key": unicode(keep_block_lib_usage_key),
-            "original_usage_version": unicode(keep_block_lib_version),
+            "usage_key": six.text_type(keep_block_key),
+            "original_usage_key": six.text_type(keep_block_lib_usage_key),
+            "original_usage_version": six.text_type(keep_block_lib_version),
             "descendants": [],
         }])
         self.assertEqual(event_data["reason"], "invalid")

@@ -9,7 +9,7 @@ from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sites.models import Site
 from django.test import TestCase
 
-from courseware.tests.factories import GlobalStaffFactory
+from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from openedx.core.djangoapps.theming.middleware import CurrentSiteThemeMiddleware
 from student.tests.factories import UserFactory
 
@@ -46,12 +46,15 @@ class TestThemingViews(TestCase):
         """
         # Anonymous users get redirected to the login page
         response = self.client.get(THEMING_ADMIN_URL)
+        # Studio login redirects to LMS login
+        expected_target_status_code = 200 if settings.ROOT_URLCONF == 'lms.urls' else 302
         self.assertRedirects(
             response,
             '{login_url}?next={url}'.format(
                 login_url=settings.LOGIN_URL,
                 url=THEMING_ADMIN_URL,
-            )
+            ),
+            target_status_code=expected_target_status_code
         )
 
         # Logged in non-global staff get a 404

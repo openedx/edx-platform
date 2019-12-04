@@ -22,10 +22,11 @@ Decisions
   to determine, for a given course key, whether subsection and course grades should now be
   frozen for that course.
 * The fixed period of time after course end at which grades will be frozen is 30 days.
-* We'll freeze grades after 30 days for all courses, unless course waffle flag override is
-  enabled.  An enabled override causes grades to not be frozen (after any amount of time)
+* By default, we'll freeze grades 30 days after the course end date for all courses,
+  unless a ``CourseWaffleFlag`` is present for the course. An existing, but *disabled*,
+  Waffle flag course override causes grades to not be frozen (after any amount of time)
   for that particular course.
-* Any grades celery task that can update grades will now check if grades are frozen
+* Any grading celery task that can update grades will now check if grades are frozen
   before taking any action.  If grades for the course are frozen, the task will simply
   return without taking any further action.
 

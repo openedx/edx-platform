@@ -1,3 +1,8 @@
+"""
+Experimentation models
+"""
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.db import models
 from model_utils.models import TimeStampedModel
@@ -11,7 +16,7 @@ class ExperimentData(TimeStampedModel):
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     experiment_id = models.PositiveSmallIntegerField(
-        null=False, blank=False, db_index=True, verbose_name='Experiment ID'
+        null=False, blank=False, db_index=True, verbose_name=u'Experiment ID'
     )
     key = models.CharField(null=False, blank=False, max_length=255)
     value = models.TextField()
@@ -34,7 +39,7 @@ class ExperimentKeyValue(TimeStampedModel):
     .. no_pii:
     """
     experiment_id = models.PositiveSmallIntegerField(
-        null=False, blank=False, db_index=True, verbose_name='Experiment ID'
+        null=False, blank=False, db_index=True, verbose_name=u'Experiment ID'
     )
     key = models.CharField(null=False, blank=False, max_length=255)
     value = models.TextField()

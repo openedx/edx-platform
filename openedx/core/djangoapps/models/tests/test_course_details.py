@@ -2,15 +2,17 @@
 Tests for CourseDetails
 """
 
+from __future__ import absolute_import
+
 import datetime
+
 import ddt
 from pytz import UTC
 
+from openedx.core.djangoapps.models.course_details import ABOUT_ATTRIBUTES, CourseDetails
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-from openedx.core.djangoapps.models.course_details import CourseDetails, ABOUT_ATTRIBUTES
 
 
 @ddt.ddt

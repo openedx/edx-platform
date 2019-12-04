@@ -83,6 +83,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    DateUtils.setupDatePicker('certificate_available_date', this);
                    DateUtils.setupDatePicker('enrollment_start', this);
                    DateUtils.setupDatePicker('enrollment_end', this);
+                   DateUtils.setupDatePicker('upgrade_deadline', this);
 
                    this.$el.find('#' + this.fieldToSelectorMap.overview).val(this.model.get('overview'));
                    this.codeMirrorize(null, $('#course-overview')[0]);
@@ -162,6 +163,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    end_date: 'course-end',
                    enrollment_start: 'enrollment-start',
                    enrollment_end: 'enrollment-end',
+                   upgrade_deadline: 'upgrade-deadline',
                    certificate_available_date: 'certificate-available',
                    overview: 'course-overview',
                    title: 'course-title',

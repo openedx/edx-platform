@@ -477,7 +477,8 @@ def get_subsection_completion_percentage(subsection_usage_key, user):
             if not completable_blocks:
                 return 100
             subsection_completion_total = 0
-            course_block_completions = BlockCompletion.get_course_completions(user, subsection_usage_key.course_key)
+            course_key = subsection_usage_key.course_key
+            course_block_completions = BlockCompletion.get_learning_context_completions(user, course_key)
             for block in completable_blocks:
                 if course_block_completions.get(block):
                     subsection_completion_total += course_block_completions.get(block)

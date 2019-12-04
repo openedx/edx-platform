@@ -1,4 +1,6 @@
 """ Management command to update courses' search index """
+from __future__ import absolute_import
+
 import logging
 from textwrap import dedent
 
@@ -8,6 +10,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from search.search_engine_base import SearchEngine
+from six.moves import map
 
 from contentstore.courseware_index import CoursewareSearchIndexer
 from xmodule.modulestore.django import modulestore
@@ -101,7 +104,7 @@ class Command(BaseCommand):
                 return
         else:
             # in case course keys are provided as arguments
-            course_keys = map(self._parse_course_key, course_ids)
+            course_keys = list(map(self._parse_course_key, course_ids))
 
         for course_key in course_keys:
             CoursewareSearchIndexer.do_course_reindex(store, course_key)

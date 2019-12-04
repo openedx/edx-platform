@@ -2,20 +2,23 @@
 """
 Test cases to cover Accounts-related behaviors of the User API application
 """
-from copy import deepcopy
+from __future__ import absolute_import
+
 import datetime
 import hashlib
 import json
+from copy import deepcopy
 
 import ddt
+import mock
+import pytz
+import six
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
-
-import mock
-import pytz
 from rest_framework.test import APIClient, APITestCase
+from six.moves import range
 
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KEY
@@ -25,8 +28,7 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_un
 from student.models import PendingEmailChange, UserProfile
 from student.tests.factories import TEST_PASSWORD, UserFactory
 
-from .. import ALL_USERS_VISIBILITY, PRIVATE_VISIBILITY, CUSTOM_VISIBILITY
-
+from .. import ALL_USERS_VISIBILITY, CUSTOM_VISIBILITY, PRIVATE_VISIBILITY
 
 TEST_PROFILE_IMAGE_UPLOADED_AT = datetime.datetime(2002, 1, 9, 15, 43, 1, tzinfo=pytz.UTC)
 
@@ -124,7 +126,7 @@ class UserAPITestCase(APITestCase):
         template = '{root}/{filename}_{{size}}.{extension}'
         if has_profile_image:
             url_root = 'http://example-storage.com/profile-images'
-            filename = hashlib.md5('secret' + self.user.username).hexdigest()
+            filename = hashlib.md5(('secret' + self.user.username).encode('utf-8')).hexdigest()
             file_extension = 'jpg'
             template += '?v={}'.format(TEST_PROFILE_IMAGE_UPLOADED_AT.strftime("%s"))
         else:
@@ -550,8 +552,8 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         ("level_of_education", "none", u"ȻħȺɍłɇs", u'"ȻħȺɍłɇs" is not a valid choice.'),
         ("country", "GB", "XY", u'"XY" is not a valid choice.'),
         ("year_of_birth", 2009, "not_an_int", u"A valid integer is required."),
-        ("name", "bob", "z" * 256, u"Ensure this value has at most 255 characters (it has 256)."),
-        ("name", u"ȻħȺɍłɇs", "z   ", u"The name field must be at least 2 characters long."),
+        ("name", "bob", "z" * 256, u"Ensure this field has no more than 255 characters."),
+        ("name", u"ȻħȺɍłɇs", "   ", u"The name field must be at least 1 character long."),
         ("goals", "Smell the roses"),
         ("mailing_address", "Sesame Street"),
         # Note that we store the raw data, so it is up to client to escape the HTML.
@@ -622,7 +624,8 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
                 "This field is not editable via this API", data["field_errors"][field_name]["developer_message"]
             )
             self.assertEqual(
-                u"The '{0}' field cannot be edited.".format(field_name), data["field_errors"][field_name]["user_message"]
+                u"The '{0}' field cannot be edited.".format(field_name),
+                data["field_errors"][field_name]["user_message"]
             )
 
         for field_name in ["username", "date_joined", "is_active", "profile_image", "requires_parental_consent"]:
@@ -788,7 +791,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         # than django model id.
         for proficiencies in ([{"code": "en"}, {"code": "fr"}, {"code": "es"}], [{"code": "fr"}], [{"code": "aa"}], []):
             response = self.send_patch(client, {"language_proficiencies": proficiencies})
-            self.assertItemsEqual(response.data["language_proficiencies"], proficiencies)
+            six.assertCountEqual(self, response.data["language_proficiencies"], proficiencies)
 
     @ddt.data(
         (
@@ -818,6 +821,9 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         Verify we handle error cases when patching the language_proficiencies
         field.
         """
+        if six.PY3:
+            expected_error_message = six.text_type(expected_error_message).replace('unicode', 'str')
+
         client = self.login_client("client", "user")
         response = self.send_patch(client, {"language_proficiencies": patch_value}, expected_status=400)
         self.assertEqual(

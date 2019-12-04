@@ -4,7 +4,7 @@
 {% get_current_language as LANGUAGE_CODE %}
 <title lang="{{ LANGUAGE_CODE|default:"en" }}">
   {% block title %}
-  {% trans "edX Email" %}
+  {% trans "edX Email" as tmsg %}{{ tmsg | force_escape }}
   {% endblock %}
 </title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>

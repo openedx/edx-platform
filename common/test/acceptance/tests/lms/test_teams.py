@@ -1,6 +1,8 @@
 """
 Acceptance tests for the teams feature.
 """
+from __future__ import absolute_import
+
 import json
 import random
 import time
@@ -9,6 +11,7 @@ from uuid import uuid4
 import ddt
 from dateutil.parser import parse
 from selenium.common.exceptions import TimeoutException
+from six.moves import map, range
 
 from common.test.acceptance.fixtures import LMS_BASE_URL
 from common.test.acceptance.fixtures.course import CourseFixture
@@ -47,12 +50,12 @@ class TeamsTabBase(EventsTestMixin, ForumsConfigMixin, UniqueCourseTest):
 
     def create_topics(self, num_topics):
         """Create `num_topics` test topics."""
-        return [{u"description": i, u"name": i, u"id": i} for i in map(str, xrange(num_topics))]
+        return [{u"description": i, u"name": i, u"id": i} for i in map(str, range(num_topics))]
 
     def create_teams(self, topic, num_teams, time_between_creation=0):
         """Create `num_teams` teams belonging to `topic`."""
         teams = []
-        for i in xrange(num_teams):
+        for i in range(num_teams):
             team = {
                 'course_id': self.course_id,
                 'topic_id': topic['id'],
@@ -83,7 +86,7 @@ class TeamsTabBase(EventsTestMixin, ForumsConfigMixin, UniqueCourseTest):
         """Create `num_memberships` users and assign them to `team_id`. The
         last user created becomes the current user."""
         memberships = []
-        for __ in xrange(num_memberships):
+        for __ in range(num_memberships):
             user_info = AutoAuthPage(self.browser, course_id=self.course_id).visit().user_info
             memberships.append(user_info)
             self.create_membership(user_info['username'], team_id)
@@ -100,15 +103,15 @@ class TeamsTabBase(EventsTestMixin, ForumsConfigMixin, UniqueCourseTest):
         )
         return json.loads(response.text)
 
-    def set_team_configuration(self, configuration, enroll_in_course=True, global_staff=False):
+    def set_team_configuration(self, configuration_data, enroll_in_course=True, global_staff=False):
         """
         Sets team configuration on the course and calls auto-auth on the user.
         """
         #pylint: disable=attribute-defined-outside-init
         self.course_fixture = CourseFixture(**self.course_info)
-        if configuration:
+        if configuration_data:
             self.course_fixture.add_advanced_settings(
-                {u"teams_configuration": {u"value": configuration}}
+                {u"teams_configuration": {u"value": configuration_data}}
             )
         self.course_fixture.install()
 
@@ -142,7 +145,7 @@ class TeamsTabBase(EventsTestMixin, ForumsConfigMixin, UniqueCourseTest):
 
         team_card_names = page.team_names
         team_card_descriptions = page.team_descriptions
-        map(assert_team_equal, expected_teams, team_card_names, team_card_descriptions)
+        list(map(assert_team_equal, expected_teams, team_card_names, team_card_descriptions))
 
     def verify_my_team_count(self, expected_number_of_teams):
         """ Verify the number of teams shown on "My Team". """
@@ -531,7 +534,12 @@ class BrowseTopicsTest(TeamsTabBase):
         """
         initial_description = "A" + " really" * 50 + " long description"
         self.set_team_configuration(
-            {u"max_team_size": 1, u"topics": [{"name": "", "id": "", "description": initial_description}]}
+            {
+                u"max_team_size": 1,
+                u"topics": [
+                    {"id": "long-description-topic", "description": initial_description},
+                ]
+            }
         )
         self.topics_page.visit()
         truncated_description = self.topics_page.topic_descriptions[0]

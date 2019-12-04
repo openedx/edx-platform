@@ -118,6 +118,9 @@ def update_user_preferences(requesting_user, update, user=None):
     # First validate each preference setting
     errors = {}
     serializers = {}
+    if u'pref-lang' in update.keys():
+        log.info(u"Updating site language to {pref_lang} for the user: {username}"
+                 .format(pref_lang=update['pref-lang'], username=user))
     for preference_key in update.keys():
         preference_value = update[preference_key]
         if preference_value is not None:
@@ -147,6 +150,7 @@ def update_user_preferences(requesting_user, update, user=None):
             except Exception as error:
                 raise _create_preference_update_error(preference_key, preference_value, error)
         else:
+            log.info(u"Deleting language preference  for the user: {username}".format(username=user))
             delete_user_preference(requesting_user, preference_key)
 
 

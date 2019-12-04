@@ -1,26 +1,32 @@
 """
 Tests for Discussion API views
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import json
 from datetime import datetime
-from urlparse import urlparse
 
 import ddt
 import httpretty
 import mock
 from django.urls import reverse
-from edx_oauth2_provider.tests.factories import ClientFactory, AccessTokenFactory
+from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient, APITestCase
 from six import text_type
+from six.moves import range
+from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
 from common.test.utils import disable_signal
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.discussion.django_comment_client.tests.utils import (
+    ForumsEnableMixin,
+    config_course_discussions,
+    topic_name_to_id
+)
 from lms.djangoapps.discussion.rest_api import api
 from lms.djangoapps.discussion.rest_api.tests.utils import (
     CommentsServiceMockMixin,
@@ -29,17 +35,14 @@ from lms.djangoapps.discussion.rest_api.tests.utils import (
     make_minimal_cs_thread,
     make_paginated_api_response
 )
-from lms.djangoapps.discussion.django_comment_client.tests.utils import (
-    ForumsEnableMixin, config_course_discussions, topic_name_to_id,
-)
+from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
-from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
 from student.models import get_retired_username_by_username
-from student.tests.factories import CourseEnrollmentFactory, UserFactory, SuperuserFactory
+from student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
 from util.testing import PatchMediaTypeMixin, UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -80,7 +83,7 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, Ur
         Assert that the response has the given status code and parsed content
         """
         self.assertEqual(response.status_code, expected_status)
-        parsed_content = json.loads(response.content)
+        parsed_content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(parsed_content, expected_content)
 
     def register_thread(self, overrides=None):
@@ -190,7 +193,7 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(response.status_code, expected_status)
 
         if expected_content:
-            self.assertEqual(text_type(response.content), expected_content)
+            self.assertEqual(response.content.decode('utf-8'), expected_content)
 
     def build_jwt_headers(self, user):
         """
@@ -208,7 +211,7 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         headers = self.build_jwt_headers(self.superuser)
         data = {'username': self.user.username}
         response = self.client.post(self.url, data, **headers)
-        self.assert_response_correct(response, 204, "")
+        self.assert_response_correct(response, 204, b"")
 
     def test_downstream_forums_error(self):
         """
@@ -796,7 +799,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             {"course_id": text_type(self.course.id), "requested_fields": "profile_image"},
         )
         self.assertEqual(response.status_code, 200)
-        response_threads = json.loads(response.content)['results']
+        response_threads = json.loads(response.content.decode('utf-8'))['results']
 
         for response_thread in response_threads:
             expected_profile_data = self.get_expected_user_profile(response_thread['author'])
@@ -821,7 +824,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             {"course_id": text_type(self.course.id), "requested_fields": "profile_image"},
         )
         self.assertEqual(response.status_code, 200)
-        response_thread = json.loads(response.content)['results'][0]
+        response_thread = json.loads(response.content.decode('utf-8'))['results'][0]
         self.assertIsNone(response_thread['author'])
         self.assertEqual({}, response_thread['users'])
 
@@ -856,7 +859,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             content_type="application/json"
         )
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response_data, self.expected_thread_data({"read": True}))
         self.assertEqual(
             httpretty.last_request().parsed_body,
@@ -886,7 +889,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "field_errors": {"course_id": {"developer_message": "This field is required."}}
         }
         self.assertEqual(response.status_code, 400)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response_data, expected_response_data)
 
 
@@ -912,7 +915,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         request_data = {"raw_body": "Edited body"}
         response = self.request_patch(request_data)
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             response_data,
             self.expected_thread_data({
@@ -954,7 +957,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             "field_errors": {"title": {"developer_message": "This field may not be blank."}}
         }
         self.assertEqual(response.status_code, 400)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response_data, expected_response_data)
 
     @ddt.data(
@@ -969,7 +972,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         request_data = {field: value}
         response = self.request_patch(request_data)
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             response_data,
             self.expected_thread_data({
@@ -1004,7 +1007,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
 
         response = self.request_patch(request_data)
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             response_data,
             self.expected_thread_data({
@@ -1032,7 +1035,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         request_data = {"read": True}
         response = self.request_patch(request_data)
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             response_data,
             self.expected_thread_data({
@@ -1069,7 +1072,7 @@ class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.register_delete_thread_response(self.thread_id)
         response = self.client.delete(self.url)
         self.assertEqual(response.status_code, 204)
-        self.assertEqual(response.content, "")
+        self.assertEqual(response.content, b"")
         self.assertEqual(
             urlparse(httpretty.last_request().path).path,
             "/api/v1/threads/{}".format(self.thread_id)
@@ -1273,7 +1276,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             "thread_id": thread["id"],
             "endorsed": endorsed,
         })
-        parsed_content = json.loads(response.content)
+        parsed_content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(parsed_content["results"][0]["id"], comment_id)
 
     def test_question_invalid_endorsed(self):
@@ -1372,7 +1375,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
 
         response = self.client.get(self.url, {"thread_id": self.thread_id, "requested_fields": "profile_image"})
         self.assertEqual(response.status_code, 200)
-        response_comments = json.loads(response.content)['results']
+        response_comments = json.loads(response.content.decode('utf-8'))['results']
         for response_comment in response_comments:
             expected_profile_data = self.get_expected_user_profile(response_comment['author'])
             response_users = response_comment['users']
@@ -1415,7 +1418,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             "requested_fields": "profile_image",
         })
         self.assertEqual(response.status_code, 200)
-        response_comments = json.loads(response.content)['results']
+        response_comments = json.loads(response.content.decode('utf-8'))['results']
         for response_comment in response_comments:
             expected_author_profile_data = self.get_expected_user_profile(response_comment['author'])
             expected_endorser_profile_data = self.get_expected_user_profile(response_comment['endorsed_by'])
@@ -1448,7 +1451,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             "requested_fields": "profile_image",
         })
         self.assertEqual(response.status_code, 200)
-        response_comments = json.loads(response.content)['results']
+        response_comments = json.loads(response.content.decode('utf-8'))['results']
         for response_comment in response_comments:
             expected_author_profile_data = self.get_expected_user_profile(response_comment['author'])
             response_users = response_comment['users']
@@ -1485,7 +1488,7 @@ class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.register_delete_comment_response(self.comment_id)
         response = self.client.delete(self.url)
         self.assertEqual(response.status_code, 204)
-        self.assertEqual(response.content, "")
+        self.assertEqual(response.content, b"")
         self.assertEqual(
             urlparse(httpretty.last_request().path).path,
             "/api/v1/comments/{}".format(self.comment_id)
@@ -1542,7 +1545,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             content_type="application/json"
         )
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response_data, expected_response_data)
         self.assertEqual(
             urlparse(httpretty.last_request().path).path,
@@ -1567,7 +1570,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "field_errors": {"thread_id": {"developer_message": "This field is required."}}
         }
         self.assertEqual(response.status_code, 400)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response_data, expected_response_data)
 
     def test_closed_thread(self):
@@ -1635,7 +1638,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
         request_data = {"raw_body": "Edited body"}
         response = self.request_patch(request_data)
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             response_data,
             self.expected_response_data({
@@ -1667,7 +1670,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
             "field_errors": {"raw_body": {"developer_message": "This field may not be blank."}}
         }
         self.assertEqual(response.status_code, 400)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response_data, expected_response_data)
 
     @ddt.data(
@@ -1682,7 +1685,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
         request_data = {field: value}
         response = self.request_patch(request_data)
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             response_data,
             self.expected_response_data({
@@ -1728,7 +1731,10 @@ class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase,
         self.register_get_thread_response(cs_thread)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content), self.expected_thread_data({"unread_comment_count": 1}))
+        self.assertEqual(
+            json.loads(response.content.decode('utf-8')),
+            self.expected_thread_data({"unread_comment_count": 1})
+        )
         self.assertEqual(httpretty.last_request().method, "GET")
 
     def test_retrieve_nonexistent_thread(self):
@@ -1752,7 +1758,7 @@ class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase,
         response = self.client.get(self.url, {"requested_fields": "profile_image"})
         self.assertEqual(response.status_code, 200)
         expected_profile_data = self.get_expected_user_profile(self.user.username)
-        response_users = json.loads(response.content)['users']
+        response_users = json.loads(response.content.decode('utf-8'))['users']
         self.assertEqual(expected_profile_data, response_users[self.user.username])
 
 
@@ -1820,7 +1826,7 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content)['results'][0], expected_response_data)
+        self.assertEqual(json.loads(response.content.decode('utf-8'))['results'][0], expected_response_data)
 
     def test_retrieve_nonexistent_comment(self):
         self.register_get_comment_error_response(self.comment_id, 404)
@@ -1871,7 +1877,7 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
 
         response = self.client.get(self.url, {'requested_fields': 'profile_image'})
         self.assertEqual(response.status_code, 200)
-        response_comments = json.loads(response.content)['results']
+        response_comments = json.loads(response.content.decode('utf-8'))['results']
 
         for response_comment in response_comments:
             expected_profile_data = self.get_expected_user_profile(response_comment['author'])
@@ -1954,7 +1960,7 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
         """Validate the current discussion settings against the expected response."""
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, 200)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(content, expected_response)
 
     def _assert_patched_settings(self, data, expected_response):
@@ -2012,7 +2018,7 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
         expected_response['divided_inline_discussions'] = [
             topic_name_to_id(self.course, name) for name in divided_inline_discussions
         ]
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(content, expected_response)
 
     def test_available_schemes(self):
@@ -2255,7 +2261,7 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
 
         self.assertEqual(response.status_code, 200)
 
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(content['course_id'], 'x/y/z')
         self.assertEqual(len(content['results']), count)
         expected_fields = ('username', 'email', 'first_name', 'last_name', 'group_name')
@@ -2304,6 +2310,6 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
 
         response = self.post(role, user.username, action)
         self.assertEqual(response.status_code, 200)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         assertion = self.assertTrue if action == 'allow' else self.assertFalse
         assertion(any(user.username in x['username'] for x in content['results']))

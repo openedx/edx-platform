@@ -1,9 +1,12 @@
 # pylint: disable=missing-docstring,unused-argument,broad-except
 """" Common utilities for comment client wrapper """
+from __future__ import absolute_import
+
 import logging
 from uuid import uuid4
 
 import requests
+import six
 from django.utils.translation import get_language
 
 from .settings import SERVICE_HOST as COMMENTS_SERVICE
@@ -12,13 +15,13 @@ log = logging.getLogger(__name__)
 
 
 def strip_none(dic):
-    return dict([(k, v) for k, v in dic.iteritems() if v is not None])
+    return dict([(k, v) for k, v in six.iteritems(dic) if v is not None])
 
 
 def strip_blank(dic):
     def _is_blank(v):
         return isinstance(v, str) and len(v.strip()) == 0
-    return dict([(k, v) for k, v in dic.iteritems() if not _is_blank(v)])
+    return dict([(k, v) for k, v in six.iteritems(dic) if not _is_blank(v)])
 
 
 def extract(dic, keys):
@@ -70,17 +73,18 @@ def perform_request(method, url, data_or_params=None, raw=False,
     )
 
     metric_tags.append(u'status_code:{}'.format(response.status_code))
-    if response.status_code > 200:
+    status_code = int(response.status_code)
+    if status_code > 200:
         metric_tags.append(u'result:failure')
     else:
         metric_tags.append(u'result:success')
 
-    if 200 < response.status_code < 500:
+    if 200 < status_code < 500:
         raise CommentClientRequestError(response.text, response.status_code)
     # Heroku returns a 503 when an application is in maintenance mode
-    elif response.status_code == 503:
+    elif status_code == 503:
         raise CommentClientMaintenanceError(response.text)
-    elif response.status_code == 500:
+    elif status_code == 500:
         raise CommentClient500Error(response.text)
     else:
         if raw:
@@ -151,4 +155,4 @@ def check_forum_heartbeat():
         else:
             return 'forum', False, res.get('check', 'Forum heartbeat failed')
     except Exception as fail:
-        return 'forum', False, unicode(fail)
+        return 'forum', False, six.text_type(fail)

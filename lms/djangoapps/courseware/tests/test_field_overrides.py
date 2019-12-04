@@ -2,6 +2,8 @@
 Tests for `field_overrides` module.
 """
 # pylint: disable=missing-docstring
+from __future__ import absolute_import
+
 import unittest
 
 from django.test.utils import override_settings
@@ -131,7 +133,7 @@ class OverrideFieldDataTests(OverrideFieldBase):
 
 
 @override_settings(
-    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['courseware.tests.test_field_overrides.TestOverrideProvider']
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['lms.djangoapps.courseware.tests.test_field_overrides.TestOverrideProvider']
 )
 class OverrideModulestoreFieldDataTests(FieldOverrideTestMixin, OverrideFieldDataTests):
     def make_one(self):

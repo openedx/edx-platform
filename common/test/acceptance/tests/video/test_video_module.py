@@ -248,7 +248,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.show_captions()
 
         # Verify that we see "好 各位同学" text in the transcript
-        unicode_text = "好 各位同学".decode('utf-8')
+        unicode_text = u"好 各位同学"
         self.assertIn(unicode_text, self.video.captions_text)
 
     def test_cc_button(self):
@@ -333,7 +333,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         # check if we can download transcript in "srt" format that has text "好 各位同学"
-        unicode_text = "好 各位同学".decode('utf-8')
+        unicode_text = u"好 各位同学"
         self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
 
     def test_download_button_two_transcript_languages(self):
@@ -364,11 +364,11 @@ class YouTubeVideoTest(VideoBaseTest):
         self.assertTrue(self.video.select_language('zh'))
 
         # check if we see "好 各位同学" text in the captions
-        unicode_text = "好 各位同学".decode('utf-8')
+        unicode_text = u"好 各位同学"
         self.assertIn(unicode_text, self.video.captions_text)
 
         # check if we can download transcript in "srt" format that has text "好 各位同学"
-        unicode_text = "好 各位同学".decode('utf-8')
+        unicode_text = u"好 各位同学"
         self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
 
     def test_fullscreen_video_alignment_on_transcript_toggle(self):
@@ -600,7 +600,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self._verify_closed_caption_text('Welcome to edX.')
 
         self.video.select_language('zh')
-        unicode_text = "我们今天要讲的题目是".decode('utf-8')
+        unicode_text = u"我们今天要讲的题目是"
         self.video.click_transcript_line(line_no=1)
         self._verify_closed_caption_text(unicode_text)
 
@@ -752,11 +752,10 @@ class YouTubeVideoTest(VideoBaseTest):
         self.assets.extend(['simplified_chinese.srt', 'traditional_chinese.srt'])
         self.navigate_to_video()
 
-        langs = {'zh_HANS': '在线学习是革', 'zh_HANT': '在線學習是革'}
-        for lang_code, text in langs.items():
+        langs = {'zh_HANS': u'在线学习是革', 'zh_HANT': u'在線學習是革'}
+        for lang_code, unicode_text in langs.items():
             self.video.scroll_to_button("transcript_button")
             self.assertTrue(self.video.select_language(lang_code))
-            unicode_text = text.decode('utf-8')
             self.assertIn(unicode_text, self.video.captions_text)
             self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
 
@@ -836,11 +835,11 @@ class Html5VideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         # check if we see "好 各位同学" text in the captions
-        unicode_text = "好 各位同学".decode('utf-8')
+        unicode_text = u"好 各位同学"
         self.assertIn(unicode_text, self.video.captions_text)
 
         # check if we can download transcript in "srt" format that has text "好 各位同学"
-        unicode_text = "好 各位同学".decode('utf-8')
+        unicode_text = u"好 各位同学"
         self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
 
     def test_download_button_two_transcript_languages(self):
@@ -873,39 +872,13 @@ class Html5VideoTest(VideoBaseTest):
         self.assertTrue(self.video.select_language('zh'))
 
         # check if we see "好 各位同学" text in the captions
-        unicode_text = "好 各位同学".decode('utf-8')
+        unicode_text = u"好 各位同学"
 
         self.assertIn(unicode_text, self.video.captions_text)
 
         # Then I can download transcript in "srt" format that has text "好 各位同学"
-        unicode_text = "好 各位同学".decode('utf-8')
+        unicode_text = u"好 各位同学"
         self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
-
-    def test_full_screen_video_alignment_with_transcript_visible(self):
-        """
-        Scenario: Video is aligned correctly with transcript enabled in fullscreen mode
-        Given the course has a Video component in "HTML5" mode
-        And I have uploaded a .srt.sjson file to assets
-        And I have defined subtitles for the video
-        When I show the captions
-        And I view the video at fullscreen
-        Then the video with the transcript enabled is aligned correctly
-        """
-        self.assets.append('subs_3_yD_cEKoCk.srt.sjson')
-        data = {'sub': '3_yD_cEKoCk'}
-        self.metadata = self.metadata_for_mode('html5', additional_data=data)
-
-        # go to video
-        self.navigate_to_video()
-
-        # make sure captions are opened
-        self.video.show_captions()
-
-        # click video button "fullscreen"
-        self.video.click_player_button('fullscreen')
-
-        # check if video aligned correctly with enabled transcript
-        self.assertTrue(self.video.is_aligned(True))
 
     def test_cc_button_with_english_transcript(self):
         """
@@ -947,7 +920,7 @@ class Html5VideoTest(VideoBaseTest):
         self.video.show_captions()
 
         # check if we see "好 各位同学" text in the captions
-        unicode_text = "好 各位同学".decode('utf-8')
+        unicode_text = u"好 各位同学"
         self.assertIn(unicode_text, self.video.captions_text)
 
     def test_video_rendering(self):
@@ -1013,7 +986,7 @@ class YouTubeQualityTest(VideoBaseTest):
 
 
 @attr('a11y')
-class LMSVideoModuleA11yTest(VideoBaseTest):
+class LMSVideoBlockA11yTest(VideoBaseTest):
     """
     LMS Video Accessibility Test Class
     """
@@ -1030,7 +1003,7 @@ class LMSVideoModuleA11yTest(VideoBaseTest):
             browser = 'firefox'
 
         with patch.dict(os.environ, {'SELENIUM_BROWSER': browser}):
-            super(LMSVideoModuleA11yTest, self).setUp()
+            super(LMSVideoBlockA11yTest, self).setUp()
 
     def test_video_player_a11y(self):
         # load transcripts so we can test skipping to

@@ -1,14 +1,14 @@
 """
 Unit tests for the ProgramEnrollment admin classes.
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
+import mock
 from django.contrib.admin.sites import AdminSite
 from django.test import TestCase
-import mock
 
-from lms.djangoapps.program_enrollments.admin import ProgramEnrollmentAdmin, ProgramCourseEnrollmentAdmin
-from lms.djangoapps.program_enrollments.models import ProgramEnrollment, ProgramCourseEnrollment
+from lms.djangoapps.program_enrollments.admin import ProgramCourseEnrollmentAdmin, ProgramEnrollmentAdmin
+from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 
 
 class ProgramEnrollmentAdminTests(TestCase):
@@ -25,7 +25,9 @@ class ProgramEnrollmentAdminTests(TestCase):
     def test_program_enrollment_admin(self):
         request = mock.Mock()
 
-        expected_list_display = ('id', 'user', 'external_user_key', 'program_uuid', 'curriculum_uuid', 'status')
+        expected_list_display = (
+            'id', 'user', 'external_user_key', 'program_uuid', 'curriculum_uuid', 'status'
+        )
         assert expected_list_display == self.program_admin.get_list_display(request)
         expected_raw_id_fields = ('user',)
         assert expected_raw_id_fields == self.program_admin.raw_id_fields
@@ -33,7 +35,9 @@ class ProgramEnrollmentAdminTests(TestCase):
     def test_program_course_enrollment_admin(self):
         request = mock.Mock()
 
-        expected_list_display = ('id', 'program_enrollment', 'course_enrollment', 'course_key', 'status')
+        expected_list_display = (
+            'id', 'program_enrollment', 'course_enrollment', 'course_key', 'status'
+        )
         assert expected_list_display == self.program_course_admin.get_list_display(request)
         expected_raw_id_fields = ('program_enrollment', 'course_enrollment')
         assert expected_raw_id_fields == self.program_course_admin.raw_id_fields

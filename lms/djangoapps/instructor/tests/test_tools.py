@@ -15,7 +15,7 @@ from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from edx_when import signals, api
+from edx_when import api, signals
 from edx_when.field_data import DateLookupFieldData
 from student.tests.factories import UserFactory
 from xmodule.fields import Date
@@ -33,7 +33,7 @@ class TestDashboardError(unittest.TestCase):
     """
     def test_response(self):
         error = tools.DashboardError(u'Oh noes!')
-        response = json.loads(error.response().content)
+        response = json.loads(error.response().content.decode('utf-8'))
         self.assertEqual(response, {'error': 'Oh noes!'})
 
 
@@ -50,7 +50,7 @@ class TestHandleDashboardError(unittest.TestCase):
             """
             raise tools.DashboardError("Oh noes!")
 
-        response = json.loads(view(None, None).content)
+        response = json.loads(view(None, None).content.decode('utf-8'))
         self.assertEqual(response, {'error': 'Oh noes!'})
 
     def test_no_error(self):

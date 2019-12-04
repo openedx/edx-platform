@@ -1,3 +1,7 @@
+""" Upload file handler to help test progress bars in uploads. """
+
+from __future__ import absolute_import
+
 import time
 
 from django.core.files.uploadhandler import FileUploadHandler

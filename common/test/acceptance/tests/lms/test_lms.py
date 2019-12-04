@@ -2,12 +2,14 @@
 """
 End-to-end tests for the LMS.
 """
-import json
+from __future__ import absolute_import
 
+import json
 from datetime import datetime, timedelta
 from textwrap import dedent
 
 import pytz
+from six.moves import range
 
 from common.test.acceptance.fixtures.course import CourseFixture, CourseUpdateDesc, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -15,6 +17,7 @@ from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.common.utils import enroll_user_track
 from common.test.acceptance.pages.lms import BASE_URL
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
+from common.test.acceptance.pages.lms.course_about import CourseAboutPage
 from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.course_wiki import (
     CourseWikiChildrenPage,
@@ -25,14 +28,13 @@ from common.test.acceptance.pages.lms.course_wiki import (
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
+from common.test.acceptance.pages.lms.discovery import CourseDiscoveryPage
 from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage, ResetPasswordPage
 from common.test.acceptance.pages.lms.pay_and_verify import FakePaymentPage, PaymentAndVerificationFlow
 from common.test.acceptance.pages.lms.problem import ProblemPage
 from common.test.acceptance.pages.lms.progress import ProgressPage
 from common.test.acceptance.pages.lms.tab_nav import TabNavPage
 from common.test.acceptance.pages.lms.video.video import VideoPage
-from common.test.acceptance.pages.lms.discovery import CourseDiscoveryPage
-from common.test.acceptance.pages.lms.course_about import CourseAboutPage
 from common.test.acceptance.pages.studio.settings import SettingsPage
 from common.test.acceptance.tests.helpers import (
     EventsTestMixin,
@@ -40,8 +42,8 @@ from common.test.acceptance.tests.helpers import (
     element_has_text,
     get_selected_option_text,
     load_data_str,
-    select_option_by_text,
-    remove_file
+    remove_file,
+    select_option_by_text
 )
 from openedx.core.lib.tests import attr
 
@@ -972,7 +974,7 @@ class EntranceExamTest(UniqueCourseTest):
         """
         # visit the course outline and make sure there is no "Entrance Exam" section.
         self.course_home_page.visit()
-        self.assertFalse('Entrance Exam' in self.course_home_page.outline.sections.keys())
+        self.assertNotIn('Entrance Exam', list(self.course_home_page.outline.sections.keys()))
 
         # Logout and login as a staff.
         LogoutPage(self.browser).visit()
@@ -989,7 +991,7 @@ class EntranceExamTest(UniqueCourseTest):
 
         # visit the course outline and make sure there is an "Entrance Exam" section.
         self.course_home_page.visit()
-        self.assertTrue('Entrance Exam' in self.course_home_page.outline.sections.keys())
+        self.assertIn('Entrance Exam', list(self.course_home_page.outline.sections.keys()))
 
     # TODO: TNL-6546: Remove test
     def test_entrance_exam_section_2(self):

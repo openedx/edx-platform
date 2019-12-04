@@ -2,6 +2,8 @@
 Entitlements related signal handlers.
 """
 
+from __future__ import absolute_import
+
 from django.dispatch import receiver
 
 from entitlements.models import CourseEntitlement

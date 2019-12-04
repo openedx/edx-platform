@@ -117,11 +117,20 @@ class IPFilterFormTest(TestCase):
         form = IPFilterForm(data=form_data)
         self.assertFalse(form.is_valid())
 
-        wmsg = "Invalid IP Address(es): [u'.0.0.1', u':dead:beef:::', u'1.0.0.0/55']" \
-               " Please fix the error(s) and try again."
+        if six.PY2:
+            wmsg = "Invalid IP Address(es): [u'.0.0.1', u':dead:beef:::', u'1.0.0.0/55']" \
+                   " Please fix the error(s) and try again."
+        else:
+            wmsg = "Invalid IP Address(es): ['.0.0.1', ':dead:beef:::', '1.0.0.0/55']" \
+                   " Please fix the error(s) and try again."
         self.assertEquals(wmsg, form._errors['whitelist'][0])  # pylint: disable=protected-access
-        bmsg = "Invalid IP Address(es): [u'18.244.*', u'999999:c0a8:101::42', u'1.0.0.0/']" \
-               " Please fix the error(s) and try again."
+
+        if six.PY2:
+            bmsg = "Invalid IP Address(es): [u'18.244.*', u'999999:c0a8:101::42', u'1.0.0.0/']" \
+                   " Please fix the error(s) and try again."
+        else:
+            bmsg = "Invalid IP Address(es): ['18.244.*', '999999:c0a8:101::42', '1.0.0.0/']" \
+                   " Please fix the error(s) and try again."
         self.assertEquals(bmsg, form._errors['blacklist'][0])  # pylint: disable=protected-access
 
         with self.assertRaisesRegexp(ValueError, "The IPFilter could not be created because the data didn't validate."):

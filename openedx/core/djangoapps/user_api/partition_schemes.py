@@ -1,13 +1,15 @@
 """
 Provides partition support to the user service.
 """
+from __future__ import absolute_import
+
 import logging
 import random
-import course_tag.api as course_tag_api
 
 from eventtracking import tracker
 
-from xmodule.partitions.partitions import UserPartitionError, NoSuchUserPartitionGroupError
+import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
+from xmodule.partitions.partitions import NoSuchUserPartitionGroupError, UserPartitionError
 
 log = logging.getLogger(__name__)
 
@@ -71,6 +73,8 @@ class RandomUserPartitionScheme(object):
                     },
                     exc_info=True
                 )
+            except ValueError:
+                log.error(u"Bad group_id %r for user: %r", group_id, user)
 
         if group is None and assign and not course_tag_api.BulkCourseTags.is_prefetched(course_key):
             if not user_partition.groups:

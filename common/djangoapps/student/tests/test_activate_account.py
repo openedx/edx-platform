@@ -1,10 +1,12 @@
 """Tests for account activation"""
+from __future__ import absolute_import
+
 import unittest
 from uuid import uuid4
 
 from django.conf import settings
-from django.urls import reverse
 from django.test import TestCase, override_settings
+from django.urls import reverse
 from mock import patch
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -67,49 +69,6 @@ class TestActivateAccount(TestCase):
         self.registration.activate()
         self.assertTrue(self.user.is_active)
         self.assertFalse(mock_segment_identify.called)
-
-    @override_settings(
-        LMS_SEGMENT_KEY="testkey",
-        MAILCHIMP_NEW_USER_LIST_ID="listid"
-    )
-    @patch('student.models.segment.identify')
-    def test_activation_with_keys(self, mock_segment_identify):
-        expected_segment_payload = {
-            'email': self.email,
-            'username': self.username,
-            'activated': 1,
-        }
-        expected_segment_mailchimp_list = {
-            "MailChimp": {
-                "listId": settings.MAILCHIMP_NEW_USER_LIST_ID
-            }
-        }
-
-        # Ensure that the user starts inactive
-        self.assertFalse(self.user.is_active)
-
-        # Until you explicitly activate it
-        self.registration.activate()
-        self.assertTrue(self.user.is_active)
-        mock_segment_identify.assert_called_with(
-            self.user.id,
-            expected_segment_payload,
-            expected_segment_mailchimp_list
-        )
-
-    @override_settings(LMS_SEGMENT_KEY="testkey")
-    @patch('student.models.segment.identify')
-    def test_activation_without_mailchimp_key(self, mock_segment_identify):
-        self.assert_no_tracking(mock_segment_identify)
-
-    @override_settings(MAILCHIMP_NEW_USER_LIST_ID="listid")
-    @patch('student.models.segment.identify')
-    def test_activation_without_segment_key(self, mock_segment_identify):
-        self.assert_no_tracking(mock_segment_identify)
-
-    @patch('student.models.segment.identify')
-    def test_activation_without_keys(self, mock_segment_identify):
-        self.assert_no_tracking(mock_segment_identify)
 
     def test_account_activation_message(self):
         """

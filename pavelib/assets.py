@@ -2,7 +2,7 @@
 Asset compilation and collection.
 """
 
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import argparse
 import glob
@@ -12,11 +12,12 @@ from datetime import datetime
 from functools import wraps
 from threading import Timer
 
+import six
 from paver import tasks
 from paver.easy import call_task, cmdopts, consume_args, needs, no_help, path, sh, task
 from watchdog.events import PatternMatchingEventHandler
-from watchdog.observers.api import DEFAULT_OBSERVER_TIMEOUT
 from watchdog.observers import Observer
+from watchdog.observers.api import DEFAULT_OBSERVER_TIMEOUT
 
 from openedx.core.djangoapps.theming.paver_helpers import get_theme_paths
 
@@ -110,7 +111,9 @@ def get_sass_directories(system, theme_dir=None):
     :param theme_dir: absolute path of theme for which to compile sass files.
     """
     if system not in SYSTEMS:
-        raise ValueError(u"'system' must be one of ({allowed_values})".format(allowed_values=', '.join(SYSTEMS.keys())))
+        raise ValueError(u"'system' must be one of ({allowed_values})".format(
+            allowed_values=', '.join(list(SYSTEMS.keys())))
+        )
     system = SYSTEMS[system]
 
     applicable_directories = list()
@@ -764,12 +767,28 @@ def webpack(options):
     settings = getattr(options, 'settings', Env.DEVSTACK_SETTINGS)
     static_root_lms = Env.get_django_setting("STATIC_ROOT", "lms", settings=settings)
     static_root_cms = Env.get_django_setting("STATIC_ROOT", "cms", settings=settings)
-    config_path = Env.get_django_setting("WEBPACK_CONFIG_PATH", "lms", settings=settings)
-    environment = u'NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms}'.format(
-        node_env="development" if config_path == 'webpack.dev.config.js' else "production",
-        static_root_lms=static_root_lms,
-        static_root_cms=static_root_cms
+    lms_root_url = Env.get_django_setting("LMS_ROOT_URL", "lms", settings=settings)
+    jwt_auth_cookie_header_payload_name = Env.get_nested_django_setting(
+        "JWT_AUTH",
+        "JWT_AUTH_COOKIE_HEADER_PAYLOAD",
+        "lms",
+        settings=settings,
     )
+    user_info_cookie_name = Env.get_django_setting("EDXMKTG_USER_INFO_COOKIE_NAME", "lms", settings=settings)
+    config_path = Env.get_django_setting("WEBPACK_CONFIG_PATH", "lms", settings=settings)
+    environment = u"NODE_ENV={node_env} " \
+                  u"STATIC_ROOT_LMS={static_root_lms} " \
+                  u"STATIC_ROOT_CMS={static_root_cms} " \
+                  u"LMS_ROOT_URL={lms_root_url} " \
+                  u"JWT_AUTH_COOKIE_HEADER_PAYLOAD={jwt_auth_cookie_header_payload_name} " \
+                  u"EDXMKTG_USER_INFO_COOKIE_NAME={user_info_cookie_name}".format(
+                      node_env="development" if config_path == 'webpack.dev.config.js' else "production",
+                      static_root_lms=static_root_lms,
+                      static_root_cms=static_root_cms,
+                      lms_root_url=lms_root_url,
+                      jwt_auth_cookie_header_payload_name=jwt_auth_cookie_header_payload_name,
+                      user_info_cookie_name=user_info_cookie_name,
+                  )
     sh(
         cmd(
             u'{environment} $(npm bin)/webpack --config={config_path}'.format(
@@ -822,7 +841,7 @@ def listfy(data):
         data: data structure to be converted.
     """
 
-    if isinstance(data, basestring):
+    if isinstance(data, six.string_types):
         data = data.split(',')
     elif not isinstance(data, list):
         data = [data]
@@ -852,7 +871,7 @@ def watch_assets(options):
     themes = get_parsed_option(options, 'themes')
     theme_dirs = get_parsed_option(options, 'theme_dirs', [])
 
-    default_wait = [unicode(DEFAULT_OBSERVER_TIMEOUT)]
+    default_wait = [six.text_type(DEFAULT_OBSERVER_TIMEOUT)]
     wait = float(get_parsed_option(options, 'wait', default_wait)[0])
 
     if not theme_dirs and themes:

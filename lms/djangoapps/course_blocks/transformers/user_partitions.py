@@ -1,6 +1,10 @@
 """
 User Partitions Transformer
 """
+from __future__ import absolute_import
+
+import six
+
 from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.content.block_structure.transformer import (
     BlockStructureTransformer,
@@ -249,7 +253,7 @@ class _MergedGroupAccess(object):
         Returns:
             bool: Which partition is denying access
         """
-        for partition_id, allowed_group_ids in self._access.iteritems():
+        for partition_id, allowed_group_ids in six.iteritems(self._access):
             # If the user is not assigned to a group for this partition,
             # return partition that would deny access.
             if partition_id not in user_groups:

@@ -70,10 +70,11 @@
 @import 'features/bookmarks-v1';
 @import "features/announcements";
 @import 'features/learner-profile';
-@import 'features/journals';
 @import 'features/_unsupported-browser-alert';
 @import 'features/content-type-gating';
 @import 'features/course-duration-limits';
+@import 'features/enterprise-learner-portal-banner';
+@import 'features/first-purchase-banner';
 
 // search
 @import 'search/search';

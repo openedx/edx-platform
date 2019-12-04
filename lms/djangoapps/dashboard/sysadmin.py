@@ -3,14 +3,15 @@ This module creates a sysadmin dashboard for managing and viewing
 courses.
 """
 from __future__ import absolute_import
-import unicodecsv as csv
+
 import json
 import logging
 import os
-import StringIO
+from six import StringIO
 import subprocess
 
 import mongoengine
+import unicodecsv as csv
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -30,7 +31,7 @@ from six import text_type
 
 import dashboard.git_import as git_import
 import track.views
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 from dashboard.git_import import GitImportError
 from dashboard.models import CourseImportLog
 from edxmako.shortcuts import render_to_response
@@ -77,7 +78,7 @@ class SysadminDashboardView(TemplateView):
         data should be iterable and is used to stream object over http
         """
 
-        csv_file = StringIO.StringIO()
+        csv_file = StringIO()
         writer = csv.writer(csv_file, dialect='excel', quotechar='"',
                             quoting=csv.QUOTE_ALL)
 
@@ -173,24 +174,30 @@ class Users(SysadminDashboardView):
         user.delete()
         return _(u'Deleted user {username}').format(username=uname)
 
-    def make_common_context(self):
-        """Returns the datatable used for this view"""
-
-        self.datatable = {}
-
-        self.datatable = dict(header=[_('Statistic'), _('Value')],
-                              title=_('Site statistics'))
-        self.datatable['data'] = [[_('Total number of users'),
-                                   User.objects.all().count()]]
+    def make_datatable(self):
+        """
+        Build the datatable for this view
+        """
+        datatable = {
+            'header': [
+                _('Statistic'),
+                _('Value'),
+            ],
+            'title': _('Site statistics'),
+            'data': [
+                [
+                    _('Total number of users'),
+                    User.objects.all().count(),
+                ],
+            ],
+        }
+        return datatable
 
     def get(self, request):
-
         if not request.user.is_staff:
             raise Http404
-        self.make_common_context()
-
         context = {
-            'datatable': self.datatable,
+            'datatable': self.make_datatable(),
             'msg': self.msg,
             'djangopid': os.getpid(),
             'modeflag': {'users': 'active-section'},
@@ -202,9 +209,6 @@ class Users(SysadminDashboardView):
 
         if not request.user.is_staff:
             raise Http404
-
-        self.make_common_context()
-
         action = request.POST.get('action', '')
         track.views.server_track(request, action, {}, page='user_sysdashboard')
 
@@ -225,9 +229,8 @@ class Users(SysadminDashboardView):
             uname = request.POST.get('student_uname', '').strip()
             self.msg = HTML(u'<h4>{0}</h4><p>{1}</p><hr />{2}').format(
                 _('Delete User Results'), self.delete_user(uname), self.msg)
-
         context = {
-            'datatable': self.datatable,
+            'datatable': self.make_datatable(),
             'msg': self.msg,
             'djangopid': os.getpid(),
             'modeflag': {'users': 'active-section'},
@@ -258,7 +261,7 @@ class Courses(SysadminDashboardView):
         cmd = ['git', 'log', '-1',
                u'--format=format:{ "commit": "%H", "author": "%an %ae", "date": "%ad"}', ]
         try:
-            output_json = json.loads(subprocess.check_output(cmd, cwd=gdir))
+            output_json = json.loads(subprocess.check_output(cmd, cwd=gdir).decode('utf-8'))
             info = [output_json['commit'],
                     output_json['date'],
                     output_json['author'], ]
@@ -290,7 +293,7 @@ class Courses(SysadminDashboardView):
         log.debug(u'Adding course using git repo %s', gitloc)
 
         # Grab logging output for debugging imports
-        output = StringIO.StringIO()
+        output = StringIO()
         import_log_handler = logging.StreamHandler(output)
         import_log_handler.setLevel(logging.DEBUG)
 
@@ -406,7 +409,7 @@ class Courses(SysadminDashboardView):
                         _('Deleted'), text_type(course.location), text_type(course.id), course.display_name)
 
         context = {
-            'datatable': self.make_datatable(courses.values()),
+            'datatable': self.make_datatable(list(courses.values())),
             'msg': self.msg,
             'djangopid': os.getpid(),
             'modeflag': {'courses': 'active-section'},

@@ -51,7 +51,12 @@ from models.settings.course_grading import CourseGradingModel
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.waffle_utils import WaffleSwitch
 from openedx.core.lib.gating import api as gating_api
-from openedx.core.lib.xblock_utils import request_token, wrap_xblock, wrap_xblock_aside
+from openedx.core.lib.xblock_utils import (
+    hash_resource,
+    request_token,
+    wrap_xblock,
+    wrap_xblock_aside,
+)
 from static_replace import replace_static_urls
 from student.auth import has_studio_read_access, has_studio_write_access
 from util.date_utils import get_default_time_display
@@ -67,8 +72,9 @@ from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundErr
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.services import ConfigurationService, SettingsService
 from xmodule.tabs import CourseTabList
-from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW
+from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW
 from edx_proctoring.api import get_exam_configuration_dashboard_url, does_backend_support_onboarding
+from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 
 __all__ = [
     'orphan_handler', 'xblock_handler', 'xblock_view_handler', 'xblock_outline_handler', 'xblock_container_handler'
@@ -84,15 +90,6 @@ ALWAYS = lambda x: True
 
 
 highlights_setting = WaffleSwitch(u'dynamic_pacing', u'studio_course_update')
-
-
-def hash_resource(resource):
-    """
-    Hash a :class:`web_fragments.fragment.FragmentResource`.
-    """
-    md5 = hashlib.md5()
-    md5.update(repr(resource))
-    return md5.hexdigest()
 
 
 def _filter_entrance_exam_grader(graders):
@@ -224,7 +221,10 @@ def xblock_handler(request, usage_key_string):
                 request.user,
                 request.json.get('display_name'),
             )
-            return JsonResponse({'locator': unicode(dest_usage_key), 'courseKey': unicode(dest_usage_key.course_key)})
+            return JsonResponse({
+                'locator': text_type(dest_usage_key),
+                'courseKey': text_type(dest_usage_key.course_key)
+            })
         else:
             return _create_item(request)
     elif request.method == 'PATCH':
@@ -273,6 +273,7 @@ class StudioEditModuleRuntime(object):
     (i.e. whenever we're not using PreviewModuleSystem.) This is required to make information
     about the current user (especially permissions) available via services as needed.
     """
+
     def __init__(self, user):
         self._user = user
 
@@ -322,14 +323,14 @@ def xblock_view_handler(request, usage_key_string, view_name):
         xblock.runtime.wrappers.append(partial(
             wrap_xblock,
             'StudioRuntime',
-            usage_id_serializer=unicode,
+            usage_id_serializer=text_type,
             request_token=request_token(request),
         ))
 
         xblock.runtime.wrappers_asides.append(partial(
             wrap_xblock_aside,
             'StudioRuntime',
-            usage_id_serializer=unicode,
+            usage_id_serializer=text_type,
             request_token=request_token(request),
             extra_classes=['wrapper-comp-plugins']
         ))
@@ -381,16 +382,18 @@ def xblock_view_handler(request, usage_key_string, view_name):
             force_render = request.GET.get('force_render', None)
 
             # Set up the context to be passed to each XBlock's render method.
-            context = {
-                'is_pages_view': is_pages_view,     # This setting disables the recursive wrapping of xblocks
+            context = request.GET.dict()
+            context.update({
+                # This setting disables the recursive wrapping of xblocks
+                'is_pages_view': is_pages_view or view_name == AUTHOR_VIEW,
                 'is_unit_page': is_unit(xblock),
                 'can_edit': can_edit,
                 'root_xblock': xblock if (view_name == 'container_preview') else None,
                 'reorderable_items': reorderable_items,
                 'paging': paging,
                 'force_render': force_render,
-            }
-
+                'item_url': '/container/{usage_key}',
+            })
             fragment = get_preview_fragment(request, xblock, context)
 
             # Note that the container view recursively adds headers into the preview fragment,
@@ -412,7 +415,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
         return JsonResponse({
             'html': fragment.content,
-            'resources': hashed_resources.items()
+            'resources': list(hashed_resources.items())
         })
 
     else:
@@ -507,7 +510,7 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
             store.revert_to_published(xblock.location, user.id)
             # Returning the same sort of result that we do for other save operations. In the future,
             # we may want to return the full XBlockInfo.
-            return JsonResponse({'id': unicode(xblock.location)})
+            return JsonResponse({'id': text_type(xblock.location)})
 
         old_metadata = own_metadata(xblock)
         old_content = xblock.get_explicitly_set_fields_by_scope(Scope.content)
@@ -614,7 +617,7 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
                     store.update_item(course, user.id)
 
         result = {
-            'id': unicode(xblock.location),
+            'id': text_type(xblock.location),
             'data': data,
             'metadata': own_metadata(xblock)
         }
@@ -691,7 +694,7 @@ def _create_item(request):
     )
 
     return JsonResponse(
-        {'locator': unicode(created_block.location), 'courseKey': unicode(created_block.location.course_key)}
+        {'locator': text_type(created_block.location), 'courseKey': text_type(created_block.location.course_key)}
     )
 
 
@@ -723,7 +726,7 @@ def is_source_item_in_target_parents(source_item, target_parent):
     """
     target_ancestors = _create_xblock_ancestor_info(target_parent, is_concise=True)['ancestors']
     for target_ancestor in target_ancestors:
-        if unicode(source_item.location) == target_ancestor['id']:
+        if text_type(source_item.location) == target_ancestor['id']:
             return True
     return False
 
@@ -781,15 +784,15 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
             error = _('You can not move an item directly into content experiment.')
         elif source_index is None:
             error = _(u'{source_usage_key} not found in {parent_usage_key}.').format(
-                source_usage_key=unicode(source_usage_key),
-                parent_usage_key=unicode(source_parent.location)
+                source_usage_key=text_type(source_usage_key),
+                parent_usage_key=text_type(source_parent.location)
             )
         else:
             try:
                 target_index = int(target_index) if target_index is not None else None
-                if len(target_parent.children) < target_index:
+                if target_index is not None and len(target_parent.children) < target_index:
                     error = _(u'You can not move {source_usage_key} at an invalid index ({target_index}).').format(
-                        source_usage_key=unicode(source_usage_key),
+                        source_usage_key=text_type(source_usage_key),
                         target_index=target_index
                     )
             except ValueError:
@@ -812,15 +815,15 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
 
         log.info(
             u'MOVE: %s moved from %s to %s at %d index',
-            unicode(source_usage_key),
-            unicode(source_parent.location),
-            unicode(target_parent_usage_key),
+            text_type(source_usage_key),
+            text_type(source_parent.location),
+            text_type(target_parent_usage_key),
             insert_at
         )
 
         context = {
-            'move_source_locator': unicode(source_usage_key),
-            'parent_locator': unicode(target_parent_usage_key),
+            'move_source_locator': text_type(source_usage_key),
+            'parent_locator': text_type(target_parent_usage_key),
             'source_index': target_index if target_index is not None else source_index
         }
         return JsonResponse(context)
@@ -955,7 +958,7 @@ def orphan_handler(request, course_key_string):
     course_usage_key = CourseKey.from_string(course_key_string)
     if request.method == 'GET':
         if has_studio_read_access(request.user, course_usage_key):
-            return JsonResponse([unicode(item) for item in modulestore().get_orphans(course_usage_key)])
+            return JsonResponse([text_type(item) for item in modulestore().get_orphans(course_usage_key)])
         else:
             raise PermissionDenied()
     if request.method == 'DELETE':
@@ -983,7 +986,7 @@ def _delete_orphans(course_usage_key, user_id, commit=False):
                 if branch == ModuleStoreEnum.BranchName.published:
                     revision = ModuleStoreEnum.RevisionOption.published_only
                 store.delete_item(itemloc, user_id, revision=revision)
-    return [unicode(item) for item in items]
+    return [text_type(item) for item in items]
 
 
 def _get_xblock(usage_key, user):
@@ -998,12 +1001,16 @@ def _get_xblock(usage_key, user):
         except ItemNotFoundError:
             if usage_key.block_type in CREATE_IF_NOT_FOUND:
                 # Create a new one for certain categories only. Used for course info handouts.
-                return store.create_item(user.id, usage_key.course_key, usage_key.block_type, block_id=usage_key.block_id)
+                return store.create_item(
+                    user.id,
+                    usage_key.course_key,
+                    usage_key.block_type,
+                    block_id=usage_key.block_id)
             else:
                 raise
         except InvalidLocationError:
             log.error("Can't find item by location.")
-            return JsonResponse({"error": "Can't find item by location: " + unicode(usage_key)}, 404)
+            return JsonResponse({"error": "Can't find item by location: " + text_type(usage_key)}, 404)
 
 
 def _get_module_info(xblock, rewrite_static_links=True, include_ancestor_info=False, include_publishing_info=False):
@@ -1052,10 +1059,10 @@ def _get_gating_info(course, xblock):
         if not hasattr(course, 'gating_prerequisites'):
             # Cache gating prerequisites on course module so that we are not
             # hitting the database for every xblock in the course
-            setattr(course, 'gating_prerequisites', gating_api.get_prerequisites(course.id))
+            course.gating_prerequisites = gating_api.get_prerequisites(course.id)
         info["is_prereq"] = gating_api.is_prerequisite(course.id, xblock.location)
         info["prereqs"] = [
-            p for p in course.gating_prerequisites if unicode(xblock.location) not in p['namespace']
+            p for p in course.gating_prerequisites if text_type(xblock.location) not in p['namespace']
         ]
         prereq, prereq_min_score, prereq_min_completion = gating_api.get_required_content(
             course.id,
@@ -1157,13 +1164,13 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
             pct_sign=_('%'))
 
     xblock_info = {
-        'id': unicode(xblock.location),
+        'id': text_type(xblock.location),
         'display_name': xblock.display_name_with_default,
         'category': xblock.category,
         'has_children': xblock.has_children
     }
     if is_concise:
-        if child_info and len(child_info.get('children', [])) > 0:
+        if child_info and child_info.get('children', []):
             xblock_info['child_info'] = child_info
         # Groups are labelled with their internal ids, rather than with the group name. Replace id with display name.
         group_display_name = get_split_group_display_name(xblock, course)
@@ -1218,7 +1225,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                 xblock_info.update({
                     'enable_proctored_exams': xblock.enable_proctored_exams,
                     'create_zendesk_tickets': xblock.create_zendesk_tickets,
-                    'enable_timed_exams': xblock.enable_timed_exams
+                    'enable_timed_exams': xblock.enable_timed_exams,
                 })
             elif xblock.category == 'sequential':
                 rules_url = settings.PROCTORING_SETTINGS.get('LINK_URLS', {}).get('online_proctoring_rules', "")
@@ -1228,6 +1235,11 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                 if xblock.is_proctored_exam:
                     proctoring_exam_configuration_link = get_exam_configuration_dashboard_url(
                         course.id, xblock_info['id'])
+
+                if course.proctoring_provider == 'proctortrack':
+                    show_review_rules = SHOW_REVIEW_RULES_FLAG.is_enabled(xblock.location.course_key)
+                else:
+                    show_review_rules = True
 
                 xblock_info.update({
                     'is_proctored_exam': xblock.is_proctored_exam,
@@ -1239,6 +1251,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                     'default_time_limit_minutes': xblock.default_time_limit_minutes,
                     'proctoring_exam_configuration_link': proctoring_exam_configuration_link,
                     'supports_onboarding': supports_onboarding,
+                    'show_review_rules': show_review_rules
                 })
 
         # Update with gating info
@@ -1328,7 +1341,8 @@ class VisibilityState(object):
       unscheduled - the block and all of its descendants have no release date (excluding staff only items)
         Note: it is valid for items to be published with no release date in which case they are still unscheduled.
 
-      needs_attention - the block or its descendants are not fully live, ready or unscheduled (excluding staff only items)
+      needs_attention - the block or its descendants are not fully live, ready or unscheduled
+        (excluding staff only items)
         For example: one subsection has draft content, or there's both unreleased and released content in one section.
 
       staff_only - all of the block's content is to be shown to staff only

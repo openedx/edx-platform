@@ -5,6 +5,8 @@ Runs tasks on answers to course problems to validate that code
 paths actually work.
 """
 
+from __future__ import absolute_import
+
 import json
 from functools import partial
 from uuid import uuid4
@@ -14,19 +16,20 @@ from celery.states import FAILURE, SUCCESS
 from django.utils.translation import ugettext_noop
 from mock import MagicMock, Mock, patch
 from opaque_keys.edx.locations import i4xEncoder
+from six.moves import range
 
 from course_modes.models import CourseMode
-from courseware.models import StudentModule
-from courseware.tests.factories import StudentModuleFactory
+from lms.djangoapps.courseware.models import StudentModule
+from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.instructor_task.exceptions import UpdateProblemModuleStateError
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.tasks import (
     delete_problem_state,
     export_ora2_data,
     generate_certificates,
+    override_problem_score,
     rescore_problem,
-    reset_problem_attempts,
-    override_problem_score
+    reset_problem_attempts
 )
 from lms.djangoapps.instructor_task.tasks_helper.misc import upload_ora2_data
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
@@ -167,7 +170,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         """Create & enroll students for testing"""
         return [
             self.create_student(username='robot%d' % i, email='robot+test+%d@edx.org' % i, mode=mode)
-            for i in xrange(num_students)
+            for i in range(num_students)
         ]
 
     def _create_students_with_no_state(self, num_students):
@@ -341,6 +344,8 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
                 'lms.djangoapps.instructor_task.tasks_helper.module_state.get_module_for_descriptor_internal'
         ) as mock_get_module:
             mock_get_module.return_value = mock_instance
+            mock_instance.max_score = MagicMock(return_value=99999.0)
+            mock_instance.weight = 99999.0
             self._run_task_with_mock_celery(override_problem_score, task_entry.id, task_entry.task_id)
 
         self.assert_task_output(
@@ -673,8 +678,10 @@ class TestOra2ResponsesInstructorTask(TestInstructorTasks):
 
         with patch('lms.djangoapps.instructor_task.tasks.run_main_task') as mock_main_task:
             export_ora2_data(task_entry.id, task_xmodule_args)
-
             action_name = ugettext_noop('generated')
-            task_fn = partial(upload_ora2_data, task_xmodule_args)
 
-            mock_main_task.assert_called_once_with_args(task_entry.id, task_fn, action_name)
+            assert mock_main_task.call_count == 1
+            args = mock_main_task.call_args[0]
+            assert args[0] == task_entry.id
+            assert callable(args[1])
+            assert args[2] == action_name

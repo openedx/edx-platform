@@ -1,13 +1,17 @@
 """
 Test for LMS instructor background task queue management
 """
+from __future__ import absolute_import
+
 import ddt
+from celery.states import FAILURE
 from mock import MagicMock, Mock, patch
+from six.moves import range
 
 from bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail
-from lms.djangoapps.certificates.models import CertificateGenerationHistory, CertificateStatuses
 from common.test.utils import normalize_repr
-from courseware.tests.factories import UserFactory
+from lms.djangoapps.courseware.tests.factories import UserFactory
+from lms.djangoapps.certificates.models import CertificateGenerationHistory, CertificateStatuses
 from lms.djangoapps.instructor_task.api import (
     SpecificStudentIdMissingError,
     generate_certificates_for_students,
@@ -43,7 +47,6 @@ from lms.djangoapps.instructor_task.tests.test_base import (
     TestReportMixin
 )
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from celery.states import FAILURE
 
 
 class InstructorTaskReportTest(InstructorTaskTestCase):
@@ -122,28 +125,6 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
             submit_rescore_problem_for_student(request, problem_url, self.student)
         with self.assertRaises(NotImplementedError):
             submit_rescore_problem_for_all_students(request, problem_url)
-
-    def _test_submit_with_long_url(self, task_function, student=None):
-        problem_url_name = 'x' * 255
-        self.define_option_problem(problem_url_name)
-        location = InstructorTaskModuleTestCase.problem_location(problem_url_name)
-        with self.assertRaises(ValueError):
-            if student is not None:
-                task_function(self.create_task_request(self.instructor), location, student)
-            else:
-                task_function(self.create_task_request(self.instructor), location)
-
-    def test_submit_rescore_all_with_long_url(self):
-        self._test_submit_with_long_url(submit_rescore_problem_for_all_students)
-
-    def test_submit_rescore_student_with_long_url(self):
-        self._test_submit_with_long_url(submit_rescore_problem_for_student, self.student)
-
-    def test_submit_reset_all_with_long_url(self):
-        self._test_submit_with_long_url(submit_reset_problem_attempts_for_all_students)
-
-    def test_submit_delete_all_with_long_url(self):
-        self._test_submit_with_long_url(submit_delete_problem_state_for_all_students)
 
     @ddt.data(
         (normalize_repr(submit_rescore_problem_for_all_students), 'rescore_problem'),

@@ -1,5 +1,8 @@
+<%page expression_filter="h" />
 <%inherit file="main.html" />
-<%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
 
 <section class="container activation">
 
@@ -12,6 +15,6 @@
       <li>${_("Did your e-mail client break the URL into two lines?")}
       <li>${_("The keys are valid for a limited amount of time. Has the key expired?")}
     </ul>
-    <p>${_('Go back to the {link_start}home page{link_end}.').format(link_start='<a href="/">', link_end='</a>')}</p>
+    <p>${Text(_('Go back to the {link_start}home page{link_end}.')).format(link_start=HTML('<a href="/">'), link_end=HTML('</a>'))}</p>
   </section>
 </section>

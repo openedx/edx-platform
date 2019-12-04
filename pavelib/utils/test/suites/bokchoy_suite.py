@@ -2,29 +2,27 @@
 """
 Class used for defining and running Bok Choy acceptance test suite
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
 import os
 from time import sleep
-from textwrap import dedent
+
+from paver.easy import call_task, cmdopts, dry, might_call, needs, sh, task
 
 from common.test.acceptance.fixtures.course import CourseFixture, FixtureError
-
-from path import Path as path
-from paver.easy import sh, cmdopts, task, needs, might_call, call_task, dry
-from pavelib.utils.test.suites.suite import TestSuite
-from pavelib.utils.envs import Env
-from pavelib.utils.test.bokchoy_utils import (
-    clear_mongo, start_servers, check_services, wait_for_test_servers
-)
-from pavelib.utils.test.bokchoy_options import (
-    BOKCHOY_IMPORTS_DIR, BOKCHOY_IMPORTS_DIR_DEPR,
-    BOKCHOY_DEFAULT_STORE, BOKCHOY_DEFAULT_STORE_DEPR,
-    BOKCHOY_FASTTEST,
-    PA11Y_FETCH_COURSE
-)
-from pavelib.utils.test import utils as test_utils
-from pavelib.utils.timer import timed
 from pavelib.database import update_local_bokchoy_db_from_s3
+from pavelib.utils.envs import Env
+from pavelib.utils.test import utils as test_utils
+from pavelib.utils.test.bokchoy_options import (
+    BOKCHOY_DEFAULT_STORE,
+    BOKCHOY_DEFAULT_STORE_DEPR,
+    BOKCHOY_FASTTEST,
+    BOKCHOY_IMPORTS_DIR,
+    BOKCHOY_IMPORTS_DIR_DEPR
+)
+from pavelib.utils.test.bokchoy_utils import check_services, clear_mongo, start_servers, wait_for_test_servers
+from pavelib.utils.test.suites.suite import TestSuite
+from pavelib.utils.timer import timed
 
 try:
     from pygments.console import colorize
@@ -35,9 +33,6 @@ __test__ = False  # do not collect
 
 DEFAULT_NUM_PROCESSES = 1
 DEFAULT_VERBOSITY = 2
-
-DEMO_COURSE_TAR_GZ = "https://github.com/edx/demo-test-course/archive/master.tar.gz"
-DEMO_COURSE_IMPORT_DIR = path('test_root/courses/')
 
 
 @task
@@ -103,49 +98,6 @@ def update_fixtures():
     sh(
         u" ./manage.py lms --settings={settings} update_fixtures".format(
             settings=Env.SETTINGS
-        )
-    )
-
-
-@task
-@cmdopts([BOKCHOY_IMPORTS_DIR, BOKCHOY_IMPORTS_DIR_DEPR, PA11Y_FETCH_COURSE])
-@timed
-def get_test_course(options):
-    """
-    Fetches the test course.
-    """
-
-    if options.get('imports_dir'):
-        print(colorize("green", "--imports-dir specified, skipping fetch of test course"))
-        return
-
-    if not options.get('should_fetch_course', False):
-        print(colorize("green", "--skip-fetch specified, skipping fetch of test course"))
-        return
-
-    # Set the imports_dir for use by other tasks
-    options.imports_dir = DEMO_COURSE_IMPORT_DIR
-
-    options.imports_dir.makedirs_p()
-    zipped_course = options.imports_dir + 'demo_course.tar.gz'
-
-    msg = colorize('green', "Fetching the test course from github...")
-    print(msg)
-
-    sh(
-        u'wget {tar_gz_file} -O {zipped_course}'.format(
-            tar_gz_file=DEMO_COURSE_TAR_GZ,
-            zipped_course=zipped_course,
-        )
-    )
-
-    msg = colorize('green', "Uncompressing the test course...")
-    print(msg)
-
-    sh(
-        u'tar zxf {zipped_course} -C {courses_dir}'.format(
-            zipped_course=zipped_course,
-            courses_dir=options.imports_dir,
         )
     )
 
@@ -252,7 +204,7 @@ class BokChoyTestSuite(TestSuite):
         check_services()
 
         if not self.testsonly:
-            call_task('prepare_bokchoy_run', options={'log_dir': self.log_dir})
+            call_task('prepare_bokchoy_run', options={'log_dir': self.log_dir, 'coveragerc': self.coveragerc})
         else:
             # load data in db_fixtures
             load_bok_choy_data()  # pylint: disable=no-value-for-parameter
@@ -348,6 +300,7 @@ class BokChoyTestSuite(TestSuite):
         # screenshots and XUnit XML reports
         cmd = [
             "DEFAULT_STORE={}".format(self.default_store),
+            "SAVED_SOURCE_DIR='{}'".format(self.log_dir),
             "SCREENSHOT_DIR='{}'".format(self.log_dir),
             "BOK_CHOY_HAR_DIR='{}'".format(self.har_dir),
             "BOKCHOY_A11Y_CUSTOM_RULES_FILE='{}'".format(self.a11y_file),
@@ -370,90 +323,16 @@ class BokChoyTestSuite(TestSuite):
         cmd += [
             "-m",
             "pytest",
-            test_spec,
-        ] + self.verbosity_processes_command
+        ]
+        if self.coveragerc:
+            cmd.extend([
+                '-p',
+                'openedx.testing.coverage_context_listener.pytest_plugin',
+            ])
+        cmd.append(test_spec)
+        cmd.extend(self.verbosity_processes_command)
         if self.extra_args:
             cmd.append(self.extra_args)
         cmd.extend(self.passthrough_options)
 
         return cmd
-
-
-class Pa11yCrawler(BokChoyTestSuite):
-    """
-    Sets up test environment with mega-course loaded, and runs pa11ycralwer
-    against it.
-    """
-
-    def __init__(self, *args, **kwargs):
-        super(Pa11yCrawler, self).__init__(*args, **kwargs)
-        self.course_key = kwargs.get('course_key')
-        self.single_url = kwargs.get('single_url', False)
-        self.ensure_scrapy_cfg()
-
-    def ensure_scrapy_cfg(self):
-        """
-        Scrapy requires a few configuration settings in order to run:
-        http://doc.scrapy.org/en/1.1/topics/commands.html#configuration-settings
-        This method ensures they are correctly written to the filesystem
-        in a location where Scrapy knows to look for them.
-
-        Returns True if the file was created, or False if the file already
-        exists (in which case it was not modified.)
-        """
-        cfg_file = path("~/.config/scrapy.cfg").expand()
-        if cfg_file.isfile():
-            return False
-        cfg_file.parent.makedirs_p()
-        content = dedent("""
-            [settings]
-            default = pa11ycrawler.settings
-
-            [deploy]
-            project = pa11ycrawler
-        """)
-        cfg_file.write_text(content)
-        return True
-
-    def generate_html_reports(self):
-        """
-        Runs pa11ycrawler-html
-        """
-        command = [
-            'pa11ycrawler-html',
-            '--data-dir',
-            os.path.join(self.report_dir, 'data'),
-            '--output-dir',
-            os.path.join(self.report_dir, 'html'),
-        ]
-        sh(command)
-
-    @property
-    def cmd(self):
-        """
-        Runs pa11ycrawler as staff user against the test course.
-        """
-        data_dir = os.path.join(self.report_dir, 'data')
-        url = "https://raw.githubusercontent.com/edx/pa11ycrawler-ignore/master/ignore.yaml"
-
-        command = [
-            "scrapy",
-            "crawl",
-            "edx",
-            "-a",
-            "port=8003",
-            "-a",
-            "course_key={key}".format(key=self.course_key),
-            "-a",
-            "pa11y_ignore_rules_url={url}".format(url=url),
-            "-a",
-            "data_dir={dir}".format(dir=data_dir),
-        ]
-
-        if self.single_url:
-            command = command + [
-                "-a",
-                "single_url={url}".format(url=self.single_url),
-            ]
-
-        return command

@@ -1,19 +1,20 @@
 """
 Asynchronous tasks related to the Course Blocks sub-application.
 """
+from __future__ import absolute_import
+
 import logging
 
-from capa.responsetypes import LoncapaProblemError
 from celery.task import task
 from django.conf import settings
-from lxml.etree import XMLSyntaxError
-
 from edxval.api import ValInternalError
+from lxml.etree import XMLSyntaxError
 from opaque_keys.edx.keys import CourseKey
 
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from capa.responsetypes import LoncapaProblemError
 from openedx.core.djangoapps.content.block_structure import api
 from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, waffle
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger('edx.celery.task')
 

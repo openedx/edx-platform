@@ -2,9 +2,13 @@
 Specialized models for oauth_dispatch djangoapp
 """
 
+from __future__ import absolute_import
+
 from datetime import datetime
 
+import six
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from django_mysql.models import ListCharField
 from oauth2_provider.settings import oauth2_settings
@@ -16,6 +20,7 @@ from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.request_utils import get_request_or_stub
 
 
+@python_2_unicode_compatible
 class RestrictedApplication(models.Model):
     """
     This model lists which django-oauth-toolkit Applications are considered 'restricted'
@@ -32,7 +37,7 @@ class RestrictedApplication(models.Model):
     class Meta:
         app_label = 'oauth_dispatch'
 
-    def __unicode__(self):
+    def __str__(self):
         """
         Return a unicode representation of this object
         """
@@ -56,6 +61,7 @@ class RestrictedApplication(models.Model):
         return access_token.expires == datetime(1970, 1, 1, tzinfo=utc)
 
 
+@python_2_unicode_compatible
 class ApplicationAccess(models.Model):
     """
     Specifies access control information for the associated Application.
@@ -78,7 +84,7 @@ class ApplicationAccess(models.Model):
     def get_scopes(cls, application):
         return cls.objects.get(application=application).scopes
 
-    def __unicode__(self):
+    def __str__(self):
         """
         Return a unicode representation of this object.
         """
@@ -88,6 +94,7 @@ class ApplicationAccess(models.Model):
         )
 
 
+@python_2_unicode_compatible
 class ApplicationOrganization(models.Model):
     """
     Associates a DOT Application to an Organization.
@@ -97,7 +104,7 @@ class ApplicationOrganization(models.Model):
 
     .. no_pii:
     """
-    RELATION_TYPE_CONTENT_ORG = 'content_org'
+    RELATION_TYPE_CONTENT_ORG = u'content_org'
     RELATION_TYPES = (
         (RELATION_TYPE_CONTENT_ORG, _('Content Provider')),
     )
@@ -126,7 +133,7 @@ class ApplicationOrganization(models.Model):
             queryset = queryset.filter(relation_type=relation_type)
         return [r.organization.name for r in queryset]
 
-    def __unicode__(self):
+    def __str__(self):
         """
         Return a unicode representation of this object.
         """
@@ -140,4 +147,4 @@ class ApplicationOrganization(models.Model):
         """
         Serialize for use in JWT filter claim.
         """
-        return unicode(':'.join([self.relation_type, self.organization.short_name]))
+        return six.text_type(':'.join([self.relation_type, self.organization.short_name]))

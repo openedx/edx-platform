@@ -102,7 +102,7 @@ class ResponseXMLFactory(six.with_metaclass(ABCMeta, object)):
                 explanation_div.set("class", "detailed-solution")
                 explanation_div.text = explanation_text
 
-        return etree.tostring(root)
+        return etree.tostring(root).decode('utf-8')
 
     @staticmethod
     def textline_input_xml(**kwargs):

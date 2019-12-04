@@ -12,7 +12,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
-from courseware.courses import get_course_with_access
+from lms.djangoapps.courseware.courses import get_course_with_access
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.user_api.course_tag.api import get_course_tag, set_course_tag
 

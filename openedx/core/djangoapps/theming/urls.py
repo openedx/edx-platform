@@ -2,11 +2,12 @@
 Defines URLs for theming views.
 """
 
+from __future__ import absolute_import
+
 from django.conf.urls import url
 
 from .helpers import is_comprehensive_theming_enabled
 from .views import ThemingAdministrationFragmentView
-
 
 if is_comprehensive_theming_enabled():
     urlpatterns = [

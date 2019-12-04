@@ -2,12 +2,14 @@
 from __future__ import absolute_import
 
 from unittest import TestCase
+from pytest import mark
 
 from celery.task import task
 from django.test.utils import override_settings
 from edx_django_utils.cache import RequestCache
 
 
+@mark.django_db
 class TestClearRequestCache(TestCase):
     """
     Tests _clear_request_cache is called after celery task is run.

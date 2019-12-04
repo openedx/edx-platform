@@ -1,9 +1,13 @@
 """
 Acceptance tests for course creation.
 """
-import uuid
+from __future__ import absolute_import
+
 import random
 import string
+import uuid
+
+from six.moves import range
 
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.index import DashboardPage
@@ -27,7 +31,7 @@ class CreateCourseTest(AcceptanceTest):
         self.dashboard_page = DashboardPage(self.browser)
         self.course_name = "New Course Name"
         self.course_org = "orgX"
-        self.course_number = str(uuid.uuid4().get_hex().upper()[0:6])
+        self.course_number = str(uuid.uuid4().hex.upper()[0:6])
         self.course_run = "2015_T2"
 
     def test_create_course_with_non_existing_org(self):

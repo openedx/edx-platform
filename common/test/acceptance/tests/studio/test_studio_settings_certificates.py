@@ -1,6 +1,8 @@
 """
 Acceptance tests for Studio's Setting pages
 """
+from __future__ import absolute_import
+
 import re
 
 from common.test.acceptance.pages.lms.create_mode import ModeCreationPage

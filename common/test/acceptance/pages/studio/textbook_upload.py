@@ -2,6 +2,8 @@
 Course Textbooks page.
 """
 
+from __future__ import absolute_import
+
 import requests
 from path import Path as path
 

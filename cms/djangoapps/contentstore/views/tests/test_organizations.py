@@ -1,8 +1,10 @@
 """Tests covering the Organizations listing on the Studio home."""
+from __future__ import absolute_import
+
 import json
 
-from django.urls import reverse
 from django.test import TestCase
+from django.urls import reverse
 from mock import patch
 
 from student.tests.factories import UserFactory
@@ -30,5 +32,5 @@ class TestOrganizationListing(TestCase):
         """Verify that the organization names list api returns list of organization short names."""
         response = self.client.get(self.org_names_listing_url, HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, 200)
-        org_names = json.loads(response.content)
+        org_names = json.loads(response.content.decode('utf-8'))
         self.assertEqual(org_names, self.org_short_names)

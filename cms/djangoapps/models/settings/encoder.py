@@ -1,6 +1,8 @@
 """
 CourseSettingsEncoder
 """
+from __future__ import absolute_import
+
 import datetime
 import json
 from json.encoder import JSONEncoder

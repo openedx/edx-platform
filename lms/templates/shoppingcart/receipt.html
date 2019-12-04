@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%namespace name='static' file='/static_content.html'/>
 
 <%inherit file="shopping_cart_flow.html" />
@@ -289,20 +290,20 @@ from openedx.core.djangolib.markup import HTML, Text
     % endif
 
     % for item, course in shoppingcart_items:
-      % if loop.index > 0 :
+      % if loop.index > 0:
         <hr>
       %endif
       <div class="user-data">
         <div class="clearfix">
           <div class="image">
             <img class="item-image" src="${course_image_url(course)}"
-                 alt="${course.display_number_with_default | h} ${course.display_name_with_default | h} Image"/>
+                 alt="${course.display_number_with_default} ${course.display_name_with_default} Image"/>
           </div>
           <div class="data-input">
 
             <h3 class="course-title-info" id="course-title">
               <span class="course-registration-title">${_('Registration for:')}</span>
-              <span class="course-display-name">${ course.display_name | h }</span>
+              <span class="course-display-name">${course.display_name}</span>
             </h3>
             <hr>
             <div class="three-col">

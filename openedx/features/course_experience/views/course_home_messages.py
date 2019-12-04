@@ -17,7 +17,7 @@ from pytz import UTC
 from web_fragments.fragment import Fragment
 
 from course_modes.models import CourseMode
-from courseware.courses import get_course_date_blocks, get_course_with_access
+from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_with_access
 from lms.djangoapps.course_goals.api import (
     get_course_goal,
     get_course_goal_options,

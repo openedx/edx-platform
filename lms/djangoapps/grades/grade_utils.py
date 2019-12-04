@@ -1,10 +1,18 @@
 """
 This module contains utility functions for grading.
 """
+from __future__ import absolute_import, unicode_literals
+
+import logging
 from datetime import timedelta
+
 from django.utils import timezone
+
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+
 from .config.waffle import ENFORCE_FREEZE_GRADE_AFTER_COURSE_END, waffle_flags
+
+log = logging.getLogger(__name__)
 
 
 def are_grades_frozen(course_key):

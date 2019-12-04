@@ -1,4 +1,6 @@
 # pylint: disable=missing-docstring,unused-argument
+from __future__ import absolute_import
+
 import logging
 
 from .utils import CommentClientRequestError, extract, perform_request

@@ -3,11 +3,15 @@
 This module contains celery task functions for handling the sending of bulk email
 to a course.
 """
+from __future__ import absolute_import
+
 import json
 import logging
 import random
 import re
+import time
 from collections import Counter
+from datetime import datetime
 from smtplib import SMTPConnectError, SMTPDataError, SMTPException, SMTPServerDisconnected
 from time import sleep
 
@@ -23,23 +27,21 @@ from boto.ses.exceptions import (
     SESLocalAddressCharacterError,
     SESMaxSendingRateExceededError
 )
-from util.string_utils import _has_non_ascii_characters
-
 from celery import current_task, task
 from celery.exceptions import RetryTaskError
 from celery.states import FAILURE, RETRY, SUCCESS
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.mail.message import forbid_multi_line_headers
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.translation import override as override_language
 from django.utils.translation import ugettext as _
 from markupsafe import escape
 from six import text_type
 
 from bulk_email.models import CourseEmail, Optout
-from courseware.courses import get_course
+from lms.djangoapps.courseware.courses import get_course
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.subtasks import (
     SubtaskStatus,
@@ -50,6 +52,7 @@ from lms.djangoapps.instructor_task.subtasks import (
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.courses import course_image_url
 from util.date_utils import get_default_time_display
+from util.string_utils import _has_non_ascii_characters
 
 log = logging.getLogger('edx.celery.task')
 
@@ -118,6 +121,7 @@ def _get_course_email_context(course):
         'account_settings_url': '{}{}'.format(settings.LMS_ROOT_URL, reverse('account_settings')),
         'email_settings_url': '{}{}'.format(settings.LMS_ROOT_URL, reverse('dashboard')),
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        'year': timezone.now().year,
     }
     return email_context
 
@@ -191,10 +195,6 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     total_recipients = combined_set.count()
 
     routing_key = settings.BULK_EMAIL_ROUTING_KEY
-    # if there are few enough emails, send them through a different queue
-    # to avoid large courses blocking emails to self and staff
-    if total_recipients <= settings.BULK_EMAIL_JOB_SIZE_THRESHOLD:
-        routing_key = settings.BULK_EMAIL_ROUTING_KEY_SMALL_JOBS
 
     # Weird things happen if we allow empty querysets as input to emailing subtasks
     # The task appears to hang at "0 out of 0 completed" and never finishes.
@@ -276,8 +276,8 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
     current_task_id = subtask_status.task_id
     num_to_send = len(to_list)
     log.info((u"Preparing to send email %s to %d recipients as subtask %s "
-              u"for instructor task %d: context = %s, status=%s"),
-             email_id, num_to_send, current_task_id, entry_id, global_email_context, subtask_status)
+              u"for instructor task %d: context = %s, status=%s, time=%s"),
+             email_id, num_to_send, current_task_id, entry_id, global_email_context, subtask_status, datetime.now())
 
     # Check that the requested subtask is actually known to the current InstructorTask entry.
     # If this fails, it throws an exception, which should fail this subtask immediately.
@@ -294,12 +294,19 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
     new_subtask_status = None
     try:
         course_title = global_email_context['course_title']
+        start_time = time.time()
         new_subtask_status, send_exception = _send_course_email(
             entry_id,
             email_id,
             to_list,
             global_email_context,
             subtask_status,
+        )
+        log.info(
+            u"BulkEmail ==> _send_course_email completed in : %s for task : %s with recipient count: %s",
+            time.time() - start_time,
+            subtask_status.task_id,
+            len(to_list)
         )
     except Exception:
         # Unexpected exception. Try to write out the failure to the entry before failing.
@@ -503,6 +510,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
         email_context = {'name': '', 'email': ''}
         email_context.update(global_email_context)
 
+        start_time = time.time()
         while to_list:
             # Update context with user-specific values from the user at the end of the list.
             # At the end of processing this user, they will be popped off of the to_list.
@@ -639,14 +647,15 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
 
         log.info(
             u"BulkEmail ==> Task: %s, SubTask: %s, EmailId: %s, Total Successful Recipients: %s/%s, \
-            Failed Recipients: %s/%s",
+            Failed Recipients: %s/%s, Time Taken: %s",
             parent_task_id,
             task_id,
             email_id,
             total_recipients_successful,
             total_recipients,
             total_recipients_failed,
-            total_recipients
+            total_recipients,
+            time.time() - start_time
         )
         duplicate_recipients = [u"{0} ({1})".format(email, repetition)
                                 for email, repetition in recipients_info.most_common() if repetition > 1]

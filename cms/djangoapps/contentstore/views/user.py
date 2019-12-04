@@ -1,3 +1,7 @@
+"""Views for users"""
+
+from __future__ import absolute_import
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
@@ -41,7 +45,8 @@ def course_team_handler(request, course_key_string=None, email=None):
         html: return html page for managing course team
         json: return json representation of a particular course team member (email is required).
     POST or PUT
-        json: modify the permissions for a particular course team member (email is required, as well as role in the payload).
+        json: modify the permissions for a particular course team member (email is required, as well as role in the
+         payload).
     DELETE:
         json: remove a particular course team member from the course team (email is required).
     """
@@ -111,7 +116,7 @@ def _course_team_user(request, course_key, email):
 
     try:
         user = User.objects.get(email=email)
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         msg = {
             "error": _(u"Could not find user by email address '{email}'.").format(email=email),
         }

@@ -3,8 +3,8 @@ from __future__ import absolute_import
 import logging
 import os
 import re
-import StringIO
 import uuid
+from io import BytesIO
 
 import six
 from opaque_keys import InvalidKeyError
@@ -270,7 +270,7 @@ class StaticContent(object):
             if query_val.startswith("/static/"):
                 new_val = StaticContent.get_canonicalized_asset_path(
                     course_key, query_val, base_url, excluded_exts, encode=False)
-                updated_query_params.append((query_name, new_val))
+                updated_query_params.append((query_name, new_val.encode('utf-8')))
             else:
                 # Make sure we're encoding Unicode strings down to their byte string
                 # representation so that `urlencode` can handle it.
@@ -286,11 +286,11 @@ class StaticContent(object):
 
         # Only encode this if told to.  Important so that we don't double encode
         # when working with paths that are in query parameters.
-        asset_path = asset_path.encode('utf-8')
         if encode:
+            asset_path = asset_path.encode('utf-8')
             asset_path = quote_plus(asset_path, '/:+@')
 
-        return urlunparse((None, base_url.encode('utf-8'), asset_path, params, urlencode(updated_query_params), None))
+        return urlunparse(('', base_url, asset_path, params, urlencode(updated_query_params), ''))
 
     def stream_data(self):
         yield self._data
@@ -418,10 +418,10 @@ class ContentStore(object):
                 # for svg simply store the provided svg file, since vector graphics should be good enough
                 # for downscaling client-side
                 if tempfile_path is None:
-                    thumbnail_file = StringIO.StringIO(content.data)
+                    thumbnail_file = BytesIO(content.data)
                 else:
                     with open(tempfile_path) as f:
-                        thumbnail_file = StringIO.StringIO(f.read())
+                        thumbnail_file = BytesIO(f.read())
                 thumbnail_content = StaticContent(thumbnail_file_location, thumbnail_name,
                                                   'image/svg+xml', thumbnail_file)
                 self.save(thumbnail_content)
@@ -431,13 +431,13 @@ class ContentStore(object):
                 # the max-height/width to be whatever you pass in as 'size'
                 # @todo: move the thumbnail size to a configuration setting?!?
                 if tempfile_path is None:
-                    source = StringIO.StringIO(content.data)
+                    source = BytesIO(content.data)
                 else:
                     source = tempfile_path
 
                 # We use the context manager here to avoid leaking the inner file descriptor
                 # of the Image object -- this way it gets closed after we're done with using it.
-                thumbnail_file = StringIO.StringIO()
+                thumbnail_file = BytesIO()
                 with Image.open(source) as image:
                     # I've seen some exceptions from the PIL library when trying to save palletted
                     # PNG files to JPEG. Per the google-universe, they suggest converting to RGB first.

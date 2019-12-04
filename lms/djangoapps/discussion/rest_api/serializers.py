@@ -1,36 +1,39 @@
 """
 Discussion API serializers
 """
-from urllib import urlencode
-from urlparse import urlunparse
+from __future__ import absolute_import
 
 from django.contrib.auth.models import User as DjangoUser
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from rest_framework import serializers
+from six.moves.urllib.parse import urlencode, urlunparse  # pylint: disable=import-error
 
-from openedx.core.djangoapps.django_comment_common.models import (
-    FORUM_ROLE_ADMINISTRATOR,
-    FORUM_ROLE_COMMUNITY_TA,
-    FORUM_ROLE_MODERATOR,
-    Role,
+from lms.djangoapps.discussion.django_comment_client.utils import (
+    course_discussion_division_enabled,
+    get_group_id_for_user,
+    get_group_name,
+    get_group_names_by_id,
+    is_comment_too_deep
 )
+from lms.djangoapps.discussion.rest_api.permissions import (
+    NON_UPDATABLE_COMMENT_FIELDS,
+    NON_UPDATABLE_THREAD_FIELDS,
+    get_editable_fields
+)
+from lms.djangoapps.discussion.rest_api.render import render_body
+from lms.djangoapps.discussion.views import get_divided_discussions
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.django_comment_common.comment_client.user import User as CommentClientUser
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientRequestError
+from openedx.core.djangoapps.django_comment_common.models import (
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_MODERATOR,
+    Role
+)
 from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
-from lms.djangoapps.discussion.django_comment_client.utils import (
-    is_comment_too_deep, get_group_id_for_user, get_group_name,
-)
-from lms.djangoapps.discussion.rest_api.permissions import (
-    NON_UPDATABLE_COMMENT_FIELDS, NON_UPDATABLE_THREAD_FIELDS, get_editable_fields,
-)
-from lms.djangoapps.discussion.rest_api.render import render_body
-from lms.djangoapps.discussion.views import get_divided_discussions
-from lms.djangoapps.discussion.django_comment_client.utils import (
-    course_discussion_division_enabled, get_group_names_by_id,
-)
 from student.models import get_user_by_username_or_email
 
 

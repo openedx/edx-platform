@@ -1,9 +1,0 @@
-<div class="edit-post-form">
-    <h<%- startHeader %>><%- gettext("Editing response") %></h<%- startHeader %>>
-    <ul class="edit-post-form-errors"></ul>
-    <div class="form-row">
-        <div class="edit-post-body" name="body" data-id="<%- id %>"><%- body %></div>
-    </div>
-    <button type="submit" id="edit-response-submit"class="btn btn-primary post-update"><%- gettext("Update response") %></button>
-    <button class="btn btn-outline-primary post-cancel"><%- gettext("Cancel") %></button>
-</div>

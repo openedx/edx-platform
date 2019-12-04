@@ -1,7 +1,8 @@
 """
 Verify the structure of courseware as to it's suitability for import
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
 from argparse import REMAINDER
 
 from django.core.management.base import BaseCommand

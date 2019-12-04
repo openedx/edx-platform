@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('new_secondary_email', models.CharField(blank=True, db_index=True, max_length=255)),
-                ('activation_key', models.CharField(db_index=True, max_length=32, unique=True, verbose_name=b'activation key')),
+                ('activation_key', models.CharField(db_index=True, max_length=32, unique=True, verbose_name=u'activation key')),
                 ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             bases=(openedx.core.djangolib.model_mixins.DeletableByUserValue, models.Model),

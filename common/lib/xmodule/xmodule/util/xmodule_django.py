@@ -4,9 +4,11 @@ NOTE: This file should only be imported into 'django-safe' code, i.e. known that
 runtime environment with the djangoapps in common configured to load
 """
 
+from __future__ import absolute_import
+
+import webpack_loader
 # NOTE: we are importing this method so that any module that imports us has access to get_current_request
 from crum import get_current_request
-import webpack_loader
 
 
 def get_current_request_hostname():

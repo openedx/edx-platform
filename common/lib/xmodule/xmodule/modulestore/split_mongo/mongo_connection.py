@@ -239,7 +239,10 @@ class CourseStructureCache(object):
             pickled_data = zlib.decompress(compressed_pickled_data)
             tagger.measure('uncompressed_size', len(pickled_data))
 
-            return pickle.loads(pickled_data)
+            if six.PY2:
+                return pickle.loads(pickled_data)
+            else:
+                return pickle.loads(pickled_data, encoding='latin-1')
 
     def set(self, key, structure, course_context=None):
         """Given a structure, will pickle, compress, and write to cache."""
@@ -247,7 +250,7 @@ class CourseStructureCache(object):
             return None
 
         with TIMER.timer("CourseStructureCache.set", course_context) as tagger:
-            pickled_data = pickle.dumps(structure, pickle.HIGHEST_PROTOCOL)
+            pickled_data = pickle.dumps(structure, 2)  # Protocol can't be incremented until cache is cleared
             tagger.measure('uncompressed_size', len(pickled_data))
 
             # 1 = Fastest (slightly larger results)

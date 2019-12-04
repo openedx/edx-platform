@@ -9,7 +9,7 @@ need to be configurable by open source partners and modifying the
 with a variety of unpleasant follow-on effects for the partner when
 upgrading the model at a later date.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import copy
 import logging
@@ -19,7 +19,6 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db.models import F
 
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
-
 
 LOGGER = logging.getLogger(__name__)
 

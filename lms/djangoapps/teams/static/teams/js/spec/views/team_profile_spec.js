@@ -42,7 +42,7 @@ define([
             };
         };
 
-        createTeamProfileView = function(requests, options) {
+        createTeamProfileView = function(requests, options, isInstructorManagedTopic) {
             teamModel = new TeamModel(createTeamModelData(options), {parse: true});
             profileView = new TeamProfileView({
                 el: $('.profile-view'),
@@ -50,6 +50,9 @@ define([
                 courseID: TeamSpecHelpers.testCourseID,
                 context: TeamSpecHelpers.testContext,
                 model: teamModel,
+                topic: isInstructorManagedTopic ?
+                    TeamSpecHelpers.createMockInstructorManagedTopic() :
+                    TeamSpecHelpers.createMockTopic(),
                 setFocusToHeaderFunc: function() {
                     $('.teams-content').focus();
                 }
@@ -58,7 +61,7 @@ define([
             AjaxHelpers.expectRequest(
                 requests,
                 'GET',
-                interpolate(
+                interpolate( // eslint-disable-line no-undef
                     '/courses/%(courseID)s/discussion/forum/%(topicID)s/inline' +
                     '?page=1&sort_key=activity&sort_order=desc&ajax=1',
                     {
@@ -184,6 +187,16 @@ define([
                     assertTeamDetails(view, 1, true);
                     clickLeaveTeam(requests, view, {cancel: false});
                     assertTeamDetails(view, 0, false);
+                });
+
+                it('student can not leave instructor managed team', function() {
+                    var requests = AjaxHelpers.requests(this);
+
+                    var view = createTeamProfileView(
+                        requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}, true
+                    );
+                    // When a student is in a team of an instructor-managed topic, he can't see the leave team button.
+                    assertTeamDetails(view, 1, false);
                 });
 
                 it("wouldn't do anything if user click on Cancel button on dialog", function() {

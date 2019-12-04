@@ -4,14 +4,17 @@
 Tests for Django management commands
 """
 
-import json
-from StringIO import StringIO
+from __future__ import absolute_import
 
-from six import text_type
+import json
+from six import StringIO
 
 import factory
+import six
 from django.conf import settings
 from django.core.management import call_command
+from six import text_type
+
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
@@ -85,7 +88,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
 
     def test_dump_course_ids(self):
         output = self.call_command('dump_course_ids')
-        dumped_courses = output.decode('utf-8').strip().split('\n')
+        dumped_courses = output.strip().split('\n')
         course_ids = {text_type(course_id) for course_id in self.loaded_courses}
         dumped_ids = set(dumped_courses)
         self.assertEqual(course_ids, dumped_ids)
@@ -101,7 +104,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
             self.fail(exception)
 
         dump = json.loads(output)
-        self.assertGreater(len(dump.values()), 0)
+        self.assertGreater(len(list(dump.values())), 0)
 
     def test_dump_course_structure(self):
         args = [text_type(self.test_course_key)]
@@ -112,7 +115,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
 
         # check that all elements in the course structure have metadata,
         # but not inherited metadata:
-        for element in dump.itervalues():
+        for element in six.itervalues(dump):
             self.assertIn('metadata', element)
             self.assertIn('children', element)
             self.assertIn('category', element)
@@ -130,11 +133,12 @@ class CommandsTestBase(SharedModuleStoreTestCase):
 
         video_id = text_type(test_course_key.make_usage_key('video', 'Welcome'))
         self.assertEqual(dump[video_id]['category'], 'video')
-        course_metadata = dump[video_id]['metadata']
-        course_metadata.pop('edx_video_id', None)
-        self.assertItemsEqual(
-            course_metadata.keys(),
-            ['download_video', 'youtube_id_0_75', 'youtube_id_1_0', 'youtube_id_1_25', 'youtube_id_1_5']
+        video_metadata = dump[video_id]['metadata']
+        video_metadata.pop('edx_video_id', None)
+        six.assertCountEqual(
+            self,
+            list(video_metadata.keys()),
+            ['youtube_id_0_75', 'youtube_id_1_0', 'youtube_id_1_25', 'youtube_id_1_5']
         )
         self.assertIn('youtube_id_1_0', dump[video_id]['metadata'])
 
@@ -149,7 +153,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
         dump = json.loads(output)
         # check that all elements in the course structure have inherited metadata,
         # and that it contains a particular value as well:
-        for element in dump.itervalues():
+        for element in six.itervalues(dump):
             self.assertIn('metadata', element)
             self.assertIn('children', element)
             self.assertIn('category', element)
@@ -164,7 +168,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
         dump = json.loads(output)
         # check that all elements in the course structure have inherited metadata,
         # and that it contains a particular value as well:
-        for element in dump.itervalues():
+        for element in six.itervalues(dump):
             self.assertIn('metadata', element)
             self.assertIn('children', element)
             self.assertIn('category', element)

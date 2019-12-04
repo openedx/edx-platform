@@ -1,39 +1,38 @@
 # coding=utf-8
-import ddt
+from __future__ import absolute_import
+
 import json
 import unittest
 
+import ddt
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
-from django.urls import reverse
 from django.db import transaction
 from django.http import HttpResponse
-from django.test import override_settings, TransactionTestCase
+from django.test import TransactionTestCase, override_settings
 from django.test.client import RequestFactory
+from django.urls import reverse
 from mock import Mock, patch
 from six import text_type
 
-from edxmako.shortcuts import render_to_string, marketing_link
+from edxmako.shortcuts import marketing_link, render_to_string
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, CacheIsolationMixin
-from student.models import (
-    PendingEmailChange,
-    Registration,
-    UserProfile,
-)
+from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase
 from openedx.core.lib.request_utils import safe_get_host
-from student.tests.factories import PendingEmailChangeFactory, RegistrationFactory, UserFactory
+from student.models import PendingEmailChange, Registration, UserProfile
+from student.tests.factories import PendingEmailChangeFactory, UserFactory
 from student.views import (
     SETTING_CHANGE_INITIATED,
     confirm_email_change,
     do_email_change_request,
+    generate_activation_email_context,
     validate_new_email
 )
-from student.views import generate_activation_email_context, send_reactivation_email_for_user
 from third_party_auth.views import inactive_user_view
 from util.testing import EventTestMixin
 
@@ -49,7 +48,7 @@ def mock_render_to_string(template_name, context):
     """
     Return a string that encodes template_name and context
     """
-    return str((template_name, sorted(context.iteritems())))
+    return str((template_name, sorted(six.iteritems(context))))
 
 
 def mock_render_to_response(template_name, context):
@@ -91,8 +90,9 @@ class EmailTestMixin(object):
         self.addCleanup(settings.ALLOWED_HOSTS.pop)
 
 
+@ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class ActivationEmailTests(CacheIsolationTestCase):
+class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
     """
     Test sending of the activation email.
     """
@@ -102,22 +102,36 @@ class ActivationEmailTests(CacheIsolationTestCase):
     # Text fragments we expect in the body of an email
     # sent from an OpenEdX installation.
     OPENEDX_FRAGMENTS = [
-        u"high-quality {platform} courses".format(platform=settings.PLATFORM_NAME),
-        "http://edx.org/activate/",
         (
-            u"please use our web form at "
-            u"{support_url} ".format(support_url=settings.SUPPORT_SITE_LINK)
-        )
+            u"Use the link below to activate your account to access engaging, "
+            u"high-quality {platform_name} courses. Note that you will not be able to log back into your "
+            u"account until you have activated it.".format(
+                platform_name=settings.PLATFORM_NAME
+            )
+        ),
+        u"{}/activate/".format(settings.LMS_ROOT_URL),
+        u"If you need help, please use our web form at ", (
+            settings.ACTIVATION_EMAIL_SUPPORT_LINK or settings.SUPPORT_SITE_LINK
+        ),
+        settings.CONTACT_EMAIL,
+        u"This email message was automatically sent by ",
+        settings.LMS_ROOT_URL,
+        u" because someone attempted to create an account on {platform_name}".format(
+            platform_name=settings.PLATFORM_NAME
+        ),
+        u" using this email address."
     ]
 
-    def test_activation_email(self):
+    @ddt.data('plain_text', 'html')
+    def test_activation_email(self, test_body_type):
         self._create_account()
-        self._assert_activation_email(self.ACTIVATION_SUBJECT, self.OPENEDX_FRAGMENTS)
+        self._assert_activation_email(self.ACTIVATION_SUBJECT, self.OPENEDX_FRAGMENTS, test_body_type)
 
     @with_comprehensive_theme("edx.org")
-    def test_activation_email_edx_domain(self):
+    @ddt.data('plain_text', 'html')
+    def test_activation_email_edx_domain(self, test_body_type):
         self._create_account()
-        self._assert_activation_email(self.ACTIVATION_SUBJECT, self.OPENEDX_FRAGMENTS)
+        self._assert_activation_email(self.ACTIVATION_SUBJECT, self.OPENEDX_FRAGMENTS, test_body_type)
 
     def _create_account(self):
         """
@@ -141,15 +155,23 @@ class ActivationEmailTests(CacheIsolationTestCase):
             )
         )
 
-    def _assert_activation_email(self, subject, body_fragments):
+    def _assert_activation_email(self, subject, body_fragments, test_body_type):
         """
         Verify that the activation email was sent.
         """
         self.assertEqual(len(mail.outbox), 1)
         msg = mail.outbox[0]
         self.assertEqual(msg.subject, subject)
+
+        body_text = {
+            'plain_text': msg.body,
+            'html': msg.alternatives[0][0]
+        }
+        assert test_body_type in body_text
+        body_to_be_tested = body_text[test_body_type]
+
         for fragment in body_fragments:
-            self.assertIn(fragment, msg.body)
+            self.assertIn(fragment, body_to_be_tested)
 
     def test_do_not_send_email_and_do_activate(self):
         """
@@ -195,85 +217,6 @@ class ActivationEmailTests(CacheIsolationTestCase):
                         user_email=inactive_user.email
                     )
                 )
-
-
-@patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
-@patch('django.contrib.auth.models.User.email_user')
-class ReactivationEmailTests(EmailTestMixin, CacheIsolationTestCase):
-    """
-    Test sending a reactivation email to a user
-    """
-
-    def setUp(self):
-        super(ReactivationEmailTests, self).setUp()
-        self.user = UserFactory.create()
-        self.unregisteredUser = UserFactory.create()
-        self.registration = RegistrationFactory.create(user=self.user)
-
-    def reactivation_email(self, user):
-        """
-        Send the reactivation email to the specified user,
-        and return the response as json data.
-        """
-        return json.loads(send_reactivation_email_for_user(user).content)
-
-    def assertReactivateEmailSent(self, email_user):
-        """
-        Assert that the correct reactivation email has been sent
-        """
-        context = generate_activation_email_context(self.user, self.registration)
-
-        self.assertEmailUser(
-            email_user,
-            'emails/activation_email_subject.txt',
-            context,
-            'emails/activation_email.txt',
-            context
-        )
-
-        # Thorough tests for safe_get_host are elsewhere; here we just want a quick URL sanity check
-        request = RequestFactory().post('unused_url')
-        request.user = self.user
-        request.META['HTTP_HOST'] = "aGenericValidHostName"
-        self.append_allowed_hosts("aGenericValidHostName")
-
-        with patch('edxmako.request_context.get_current_request', return_value=request):
-            body = render_to_string('emails/activation_email.txt', context)
-            host = safe_get_host(request)
-
-        self.assertIn(host, body)
-
-    def test_reactivation_email_failure(self, email_user):
-        self.user.email_user.side_effect = Exception
-        response_data = self.reactivation_email(self.user)
-
-        self.assertReactivateEmailSent(email_user)
-        self.assertFalse(response_data['success'])
-
-    def test_reactivation_for_unregistered_user(self, email_user):  # pylint: disable=unused-argument
-        """
-        Test that trying to send a reactivation email to an unregistered
-        user fails without throwing a 500 error.
-        """
-        response_data = self.reactivation_email(self.unregisteredUser)
-
-        self.assertFalse(response_data['success'])
-
-    def test_reactivation_for_no_user_profile(self, email_user):  # pylint: disable=unused-argument
-        """
-        Test that trying to send a reactivation email to a user without
-        user profile fails without throwing 500 error.
-        """
-        user = UserFactory.build(username='test_user', email='test_user@test.com')
-        user.save()
-        response_data = self.reactivation_email(user)
-        self.assertFalse(response_data['success'])
-
-    def test_reactivation_email_success(self, email_user):
-        response_data = self.reactivation_email(self.user)
-
-        self.assertReactivateEmailSent(email_user)
-        self.assertTrue(response_data['success'])
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
@@ -380,8 +323,6 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
                 ),
                 u'If this is correct, please confirm your new e-mail address by visiting:',
                 u'http://edx.org/email_confirm/{key}'.format(key=registration_key),
-                u'If you didn\'t request this, you don\'t need to do anything;',
-                u'you won\'t receive any more email from us.',
                 u'Please do not reply to this e-mail; if you require assistance,',
                 u'check the help section of the édX web site.',
             ],
@@ -403,7 +344,6 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
         html = message.alternatives[0][0]
 
         assert message.subject == subject
-
         for body in text, html:
             for fragment in body_fragments:
                 assert fragment in body
@@ -482,8 +422,8 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
         response = confirm_email_change(self.request, self.key)
         self.assertEqual(response.status_code, 200)
         self.assertEquals(
-            mock_render_to_response(expected_template, expected_context).content,
-            response.content
+            mock_render_to_response(expected_template, expected_context).content.decode('utf-8'),
+            response.content.decode('utf-8')
         )
 
     def assertChangeEmailSent(self, test_body_type):

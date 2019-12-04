@@ -6,6 +6,7 @@ from __future__ import absolute_import, unicode_literals
 import uuid
 
 import ddt
+from django.conf import settings
 from django.test.client import RequestFactory
 from mock import patch
 from web_fragments.fragment import Fragment
@@ -107,7 +108,7 @@ class TestXblockUtils(SharedModuleStoreTestCase):
             frag=fragment,
             context={"wrap_xblock_data": {"custom-attribute": "custom-value"}},
             usage_id_serializer=lambda usage_id: quote_slashes(six.text_type(usage_id)),
-            request_token=uuid.uuid1().get_hex()
+            request_token=uuid.uuid1().hex
         )
         self.assertIsInstance(test_wrap_output, Fragment)
         self.assertIn('xblock-baseview', test_wrap_output.content)
@@ -194,13 +195,15 @@ class TestXblockUtils(SharedModuleStoreTestCase):
         """
         Verify that `get_css_dependencies` returns correct list of files.
         """
-        pipeline_css = {
+        pipeline = settings.PIPELINE.copy()
+        pipeline['PIPELINE_ENABLED'] = pipeline_enabled
+        pipeline['STYLESHEETS'] = {
             'style-group': {
                 'source_filenames': ["a.css", "b.css", "c.css"],
                 'output_filename': "combined.css"
             }
         }
-        with self.settings(PIPELINE_ENABLED=pipeline_enabled, PIPELINE_CSS=pipeline_css):
+        with self.settings(PIPELINE=pipeline):
             css_dependencies = get_css_dependencies("style-group")
             self.assertEqual(css_dependencies, expected_css_dependencies)
 
@@ -213,13 +216,15 @@ class TestXblockUtils(SharedModuleStoreTestCase):
         """
         Verify that `get_js_dependencies` returns correct list of files.
         """
-        pipeline_js = {
+        pipeline = settings.PIPELINE.copy()
+        pipeline['PIPELINE_ENABLED'] = pipeline_enabled
+        pipeline['JAVASCRIPT'] = {
             'js-group': {
                 'source_filenames': ["a.js", "b.js", "c.js"],
                 'output_filename': "combined.js"
             }
         }
-        with self.settings(PIPELINE_ENABLED=pipeline_enabled, PIPELINE_JS=pipeline_js):
+        with self.settings(PIPELINE=pipeline):
             js_dependencies = get_js_dependencies("js-group")
             self.assertEqual(js_dependencies, expected_js_dependencies)
 

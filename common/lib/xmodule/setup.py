@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from setuptools import find_packages, setup
 
 XMODULES = [
@@ -7,7 +9,6 @@ XMODULES = [
     "course = xmodule.course_module:CourseDescriptor",
     "customtag = xmodule.template_module:CustomTagDescriptor",
     "discuss = xmodule.backcompat_module:TranslateCustomTagDescriptor",
-    "html = xmodule.html_module:HtmlDescriptor",
     "image = xmodule.backcompat_module:TranslateCustomTagDescriptor",
     "library_content = xmodule.library_content_module:LibraryContentDescriptor",
     "error = xmodule.error_module:ErrorDescriptor",
@@ -18,14 +19,9 @@ XMODULES = [
     "section = xmodule.backcompat_module:SemanticSectionDescriptor",
     "sequential = xmodule.seq_module:SequenceDescriptor",
     "slides = xmodule.backcompat_module:TranslateCustomTagDescriptor",
-    "video = xmodule.video_module:VideoDescriptor",
-    "videoalpha = xmodule.video_module:VideoDescriptor",
     "videodev = xmodule.backcompat_module:TranslateCustomTagDescriptor",
     "videosequence = xmodule.seq_module:SequenceDescriptor",
-    "course_info = xmodule.html_module:CourseInfoDescriptor",
-    "static_tab = xmodule.html_module:StaticTabDescriptor",
     "custom_tag_template = xmodule.raw_module:RawDescriptor",
-    "about = xmodule.html_module:AboutDescriptor",
     "annotatable = xmodule.annotatable_module:AnnotatableDescriptor",
     "word_cloud = xmodule.word_cloud_module:WordCloudDescriptor",
     "hidden = xmodule.hidden_module:HiddenDescriptor",
@@ -33,9 +29,16 @@ XMODULES = [
     "lti = xmodule.lti_module:LTIDescriptor",
 ]
 XBLOCKS = [
+    "about = xmodule.html_module:AboutBlock",
+    "course_info = xmodule.html_module:CourseInfoBlock",
+    "html = xmodule.html_module:HtmlBlock",
     "library = xmodule.library_root_xblock:LibraryRoot",
     "problem = xmodule.capa_module:ProblemBlock",
+    "static_tab = xmodule.html_module:StaticTabBlock",
+    "unit = xmodule.unit_block:UnitBlock",
     "vertical = xmodule.vertical_block:VerticalBlock",
+    "video = xmodule.video_module:VideoBlock",
+    "videoalpha = xmodule.video_module:VideoBlock",
     "wrapper = xmodule.wrapper_module:WrapperBlock",
 ]
 XBLOCKS_ASIDES = [
@@ -44,7 +47,7 @@ XBLOCKS_ASIDES = [
 
 setup(
     name="XModule",
-    version="0.1.1",
+    version="0.1.2",
     packages=find_packages(exclude=["tests"]),
     install_requires=[
         'setuptools',
@@ -52,7 +55,7 @@ setup(
         'capa',
         'path.py',
         'webob',
-        'edx-opaque-keys>=0.4.0,<1.0.0',
+        'edx-opaque-keys>=0.4.0',
     ],
     package_data={
         'xmodule': ['js/module/*'],

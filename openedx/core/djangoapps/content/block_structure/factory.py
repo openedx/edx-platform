@@ -1,7 +1,7 @@
 """
 Module for factory class for BlockStructure objects.
 """
-from .block_structure import BlockStructureModulestoreData, BlockStructureBlockData
+from .block_structure import BlockStructureBlockData, BlockStructureModulestoreData
 
 
 class BlockStructureFactory(object):

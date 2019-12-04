@@ -1,14 +1,17 @@
 """Management command for backpopulating missing program credentials."""
+from __future__ import absolute_import
+
 import logging
 from collections import namedtuple
+from functools import reduce  # pylint: disable=redefined-builtin
 
 from django.contrib.sites.models import Site
 from django.core.management import BaseCommand
 from django.db.models import Q
 from opaque_keys.edx.keys import CourseKey
 
-from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from course_modes.models import CourseMode
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.programs.tasks.v1.tasks import award_program_certificates
 

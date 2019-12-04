@@ -1,18 +1,20 @@
 """
 Django module for Course Metadata class -- manages advanced settings and related parameters
 """
+from __future__ import absolute_import
+
+import six
+from crum import get_current_user
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from six import text_type
 from xblock.fields import Scope
-from crum import get_current_user
 
+from cms.djangoapps.contentstore.config.waffle import ENABLE_PROCTORING_PROVIDER_OVERRIDES
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
+from student.roles import GlobalStaff
 from xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.modulestore.django import modulestore
-from student.roles import GlobalStaff
-
-from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
-from cms.djangoapps.contentstore.config.waffle import ENABLE_PROCTORING_PROVIDER_OVERRIDES
 
 
 class CourseMetadata(object):
@@ -151,7 +153,7 @@ class CourseMetadata(object):
         metadata = cls.fetch_all(descriptor)
         black_list_of_fields = cls.get_blacklist_of_fields(descriptor.id)
 
-        for key, value in metadata.iteritems():
+        for key, value in six.iteritems(metadata):
             if key in black_list_of_fields:
                 continue
             result[key] = value
@@ -176,7 +178,8 @@ class CourseMetadata(object):
                 'value': field.read_json(descriptor),
                 'display_name': _(field.display_name),
                 'help': field_help,
-                'deprecated': field.runtime_options.get('deprecated', False)
+                'deprecated': field.runtime_options.get('deprecated', False),
+                'hide_on_enabled_publisher': field.runtime_options.get('hide_on_enabled_publisher', False)
             }
         return result
 
@@ -195,7 +198,7 @@ class CourseMetadata(object):
         # Validate the values before actually setting them.
         key_values = {}
 
-        for key, model in jsondict.iteritems():
+        for key, model in six.iteritems(jsondict):
             # should it be an error if one of the filtered list items is in the payload?
             if key in blacklist_of_fields:
                 continue
@@ -228,13 +231,13 @@ class CourseMetadata(object):
         if not filter_tabs:
             blacklist_of_fields.remove("tabs")
 
-        filtered_dict = dict((k, v) for k, v in jsondict.iteritems() if k not in blacklist_of_fields)
+        filtered_dict = dict((k, v) for k, v in six.iteritems(jsondict) if k not in blacklist_of_fields)
         did_validate = True
         errors = []
         key_values = {}
         updated_data = None
 
-        for key, model in filtered_dict.iteritems():
+        for key, model in six.iteritems(filtered_dict):
             try:
                 val = model['value']
                 if hasattr(descriptor, key) and getattr(descriptor, key) != val:
@@ -254,7 +257,7 @@ class CourseMetadata(object):
         """
         Update metadata descriptor from key_values. Saves to modulestore if save is true.
         """
-        for key, value in key_values.iteritems():
+        for key, value in six.iteritems(key_values):
             setattr(descriptor, key, value)
 
         if save and key_values:

@@ -1,6 +1,8 @@
 """
 Index view for the support app.
 """
+from __future__ import absolute_import
+
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
@@ -40,6 +42,11 @@ SUPPORT_INDEX_URLS = [
         "url": reverse_lazy("support:feature_based_enrollments"),
         "name": _("Feature Based Enrollments"),
         "description": _("View feature based enrollment settings"),
+    },
+    {
+        "url": reverse_lazy("support:link_program_enrollments"),
+        "name": _("Link Program Enrollments"),
+        "description": _("Link LMS users to program enrollments"),
     },
 ]
 

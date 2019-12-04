@@ -15,7 +15,7 @@ from pytz import UTC
 from waffle.models import Switch
 from web_fragments.fragment import Fragment
 
-from courseware.courses import get_course_overview_with_access
+from lms.djangoapps.courseware.courses import get_course_overview_with_access
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from student.models import CourseEnrollment
 from util.milestones_helpers import get_course_content_milestones
@@ -66,6 +66,10 @@ class CourseOutlineFragmentView(EdxFragmentView):
 
         context['gated_content'] = gated_content
         context['xblock_display_names'] = xblock_display_names
+
+        page_context = kwargs.get('page_context', None)
+        if page_context:
+            context['self_paced'] = page_context.get('pacing_type', 'instructor_paced') == 'self_paced'
 
         html = render_to_string('course_experience/course-outline-fragment.html', context)
         return Fragment(html)
