@@ -3843,7 +3843,7 @@ BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
 XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
 
 ########################## LEARNER PORTAL ##############################
-LEARNER_PORTAL_URL_ROOT = 'https://learner-portal-localhost:18000'
+LEARNER_PORTAL_URL_ROOT = 'http://localhost:8734'
 
 ######################### MICROSITE ###############################
 MICROSITE_ROOT_DIR = '/edx/app/edxapp/edx-microsite'
