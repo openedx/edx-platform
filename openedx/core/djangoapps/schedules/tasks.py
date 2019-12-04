@@ -48,7 +48,9 @@ def update_course_schedules(self, **kwargs):
 
     try:
         Schedule.objects.filter(enrollment__course_id=course_key).update(
+            # TODO remove 'start' field in removing writes from old field step in column renaming release
             start=new_start_date,
+            start_date=new_start_date,
             upgrade_deadline=new_upgrade_deadline
         )
     except Exception as exc:

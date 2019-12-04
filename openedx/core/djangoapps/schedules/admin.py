@@ -122,7 +122,9 @@ class CourseIdFilter(admin.SimpleListFilter):
 
 @admin.register(models.Schedule)
 class ScheduleAdmin(admin.ModelAdmin):
+    # Replace 'start' with 'start_date' once data migration is complete, in removing writes from old field step.
     list_display = ('username', 'course_id', 'active', 'start', 'upgrade_deadline', 'experience_display')
+    # Replace 'start' with 'start_date' once data migration is complete, in removing writes from old field step.
     list_display_links = ('start', 'upgrade_deadline', 'experience_display')
     list_filter = (
         CourseIdFilter,
