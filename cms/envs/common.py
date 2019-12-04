@@ -475,6 +475,8 @@ AWS_S3_CUSTOM_DOMAIN = 'SET-ME-PLEASE (ex. bucket-name.s3.amazonaws.com)'
 ##############################################################################
 
 EDX_ROOT_URL = ''
+LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/home/'
+LOGIN_URL = reverse_lazy('login_redirect_to_lms')
 
 # use the ratelimit backend to prevent brute force attacks
 AUTHENTICATION_BACKENDS = [
@@ -494,21 +496,13 @@ LOGGING_ENV = 'sandbox'
 LMS_BASE = 'localhost:18000'
 LMS_ROOT_URL = "https://localhost:18000"
 LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
-
-LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/home/'
-# TODO: Determine if LOGIN_URL could be set to the FRONTEND_LOGIN_URL value instead.
-LOGIN_URL = reverse_lazy('login_redirect_to_lms')
-FRONTEND_LOGIN_URL = lambda settings: settings.LMS_ROOT_URL + '/login'
-derived('FRONTEND_LOGIN_URL')
-FRONTEND_LOGOUT_URL = lambda settings: settings.LMS_ROOT_URL + '/logout'
-derived('FRONTEND_LOGOUT_URL')
-FRONTEND_REGISTER_URL = lambda settings: settings.LMS_ROOT_URL + '/register'
-derived('FRONTEND_REGISTER_URL')
-
 LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
 ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
 ENTERPRISE_CONSENT_API_URL = LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
+FRONTEND_LOGIN_URL = LOGIN_URL
+FRONTEND_LOGOUT_URL = lambda settings: settings.LMS_ROOT_URL + '/logout'
+derived('FRONTEND_LOGOUT_URL')
 
 # Public domain name of Studio (should be resolvable from the end-user's browser)
 CMS_BASE = 'localhost:18010'
@@ -2128,44 +2122,3 @@ REGISTRATION_EXTRA_FIELDS = {
     'country': 'hidden',
 }
 EDXAPP_PARSE_KEYS = {}
-
-###################### DEPRECATED URLS ##########################
-
-# .. toggle_name: DISABLE_DEPRECATED_SIGNIN_URL
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Toggle for removing the deprecated /signin url.
-# .. toggle_category: n/a
-# .. toggle_use_cases: incremental_release
-# .. toggle_creation_date: 2019-12-02
-# .. toggle_expiration_date: 2020-06-01
-# .. toggle_warnings: This url can be removed once it no longer has any real traffic.
-# .. toggle_tickets: ARCH-1253
-# .. toggle_status: supported
-DISABLE_DEPRECATED_SIGNIN_URL = False
-
-# .. toggle_name: DISABLE_DEPRECATED_SIGNUP_URL
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Toggle for removing the deprecated /signup url.
-# .. toggle_category: n/a
-# .. toggle_use_cases: incremental_release
-# .. toggle_creation_date: 2019-12-02
-# .. toggle_expiration_date: 2020-06-01
-# .. toggle_warnings: This url can be removed once it no longer has any real traffic.
-# .. toggle_tickets: ARCH-1253
-# .. toggle_status: supported
-DISABLE_DEPRECATED_SIGNUP_URL = False
-
-# .. toggle_name: DISABLE_DEPRECATED_LOGIN_POST
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Toggle for removing the deprecated /login_post url.
-# .. toggle_category: n/a
-# .. toggle_use_cases: incremental_release
-# .. toggle_creation_date: 2019-12-02
-# .. toggle_expiration_date: 2020-06-01
-# .. toggle_warnings: This url can be removed once it no longer has any real traffic. Note: We have permission to remove for traffic from user_agent including `mitx-quantum`.
-# .. toggle_tickets: ARCH-1253
-# .. toggle_status: supported
-DISABLE_DEPRECATED_LOGIN_POST = False

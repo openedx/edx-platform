@@ -19,6 +19,7 @@ from .common import *
 import os
 from uuid import uuid4
 
+
 from django.utils.translation import ugettext_lazy
 from path import Path as path
 
@@ -141,6 +142,8 @@ if os.environ.get('DISABLE_MIGRATIONS'):
 LMS_BASE = "localhost:8000"
 LMS_ROOT_URL = "http://{}".format(LMS_BASE)
 FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost"
+LOGIN_URL = EDX_ROOT_URL + '/signin'
+
 
 CACHES = {
     # This is the cache used for most things. Askbot will not work without a

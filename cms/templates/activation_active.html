@@ -1,0 +1,37 @@
+<%page expression_filter="h"/>
+<%! from django.utils.translation import ugettext as _ %>
+<%inherit file="base.html" />
+
+<%block name="content">
+<div class="wrapper-mast wrapper sr">
+  <header class="mast">
+    <h1 class="page-header">
+      ${_("{studio_name} Account Activation").format(studio_name=settings.STUDIO_SHORT_NAME)}
+    </h1>
+  </header>
+</div>
+
+<div class="wrapper-content wrapper">
+  <section class="content activation is-active">
+    <article class="content-primary" role="main">
+    </article>
+
+    <div class="notice notice-incontext notice-instruction has-actions">
+      <div class="msg">
+        <h2 class="title">${_("Your account is already active")}</h2>
+        <div class="copy">
+          <p>${_("This account, set up using {email}, has already been activated. Please sign in to start working within {studio_name}.".format(email=user.email, studio_name=settings.STUDIO_NAME))}</p>
+        </div>
+      </div>
+
+      <ul class="list-actions">
+        <li class="action-item">
+          <a href="/signin" class="action-primary action-signin">
+            ${_("Sign into {studio_name}").format(studio_name=settings.STUDIO_SHORT_NAME)}
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+</div>
+</%block>

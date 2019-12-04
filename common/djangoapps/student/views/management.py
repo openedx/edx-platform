@@ -14,7 +14,10 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.views import password_reset_confirm
 from django.contrib.sites.models import Site
+from django.core import mail
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import ValidationError, validate_email
 from django.db import transaction
 from django.db.models.signals import post_save
@@ -22,7 +25,10 @@ from django.dispatch import Signal, receiver
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect
 from django.template.context_processors import csrf
+from django.template.response import TemplateResponse
 from django.urls import reverse
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import base36_to_int, urlsafe_base64_encode
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
@@ -47,11 +53,16 @@ from openedx.core.djangoapps.ace_common.template_context import get_base_templat
 from openedx.core.djangoapps.catalog.utils import get_programs_with_type
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.oauth_dispatch.api import destroy_oauth_tokens
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
+from openedx.core.djangoapps.theming.helpers import get_current_site
+from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
+from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
+from openedx.core.djangoapps.user_authn.message_types import PasswordReset
 from openedx.core.djangolib.markup import HTML, Text
 from student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info, generate_activation_email_context
 from student.message_types import AccountActivation, EmailChange, EmailChangeConfirmation, RecoveryEmailCreate
@@ -72,8 +83,10 @@ from student.models import (
 from student.signals import REFUND_ORDER
 from student.tasks import send_activation_email
 from student.text_me_the_app import TextMeTheAppFragmentView
+from util.request_rate_limiter import BadRequestRateLimiter, PasswordResetEmailRateLimiter
 from util.db import outer_atomic
 from util.json_request import JsonResponse
+from util.password_policy_validators import normalize_password, validate_password
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.student")
@@ -506,12 +519,8 @@ def activate_account(request, key):
     """
     # If request is in Studio call the appropriate view
     if theming_helpers.get_project_root_name().lower() == u'cms':
-        monitoring_utils.set_custom_metric('student_activate_account', 'cms')
         return activate_account_studio(request, key)
 
-    # TODO: Use metric to determine if there are any `activate_account` calls for cms in Production.
-    # If not, the templates wouldn't be needed for cms, but we still need a way to activate for cms tests.
-    monitoring_utils.set_custom_metric('student_activate_account', 'lms')
     try:
         registration = Registration.objects.get(activation_key=key)
     except (Registration.DoesNotExist, Registration.MultipleObjectsReturned):

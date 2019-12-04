@@ -2186,12 +2186,10 @@ class EntryPageTestCase(TestCase):
         self._test_page("/howitworks")
 
     def test_signup(self):
-        # deprecated signup url redirects to LMS register.
-        self._test_page("/signup", 301)
+        self._test_page("/signup")
 
     def test_login(self):
-        # deprecated signin url redirects to LMS login.
-        self._test_page("/signin", 302)
+        self._test_page("/signin")
 
     def test_logout(self):
         # Logout redirects.
@@ -2202,6 +2200,36 @@ class EntryPageTestCase(TestCase):
         active=True)
     def test_accessibility(self):
         self._test_page('/accessibility')
+
+
+class SigninPageTestCase(TestCase):
+    """
+    Tests that the CSRF token is directly included in the signin form. This is
+    important to make sure that the script is functional independently of any
+    other script.
+    """
+
+    def test_csrf_token_is_present_in_form(self):
+        # Expected html:
+        # <form>
+        #   ...
+        #   <fieldset>
+        #       ...
+        #       <input name="csrfmiddlewaretoken" value="...">
+        #       ...
+        #       </fieldset>
+        #       ...
+        # </form>
+        response = self.client.get("/signin")
+        csrf_token = response.cookies.get("csrftoken")
+        form = lxml.html.fromstring(response.content).get_element_by_id("login_form")
+        csrf_input_field = form.find(".//input[@name='csrfmiddlewaretoken']")
+
+        self.assertIsNotNone(csrf_token)
+        self.assertIsNotNone(csrf_token.value)
+        self.assertIsNotNone(csrf_input_field)
+
+        self.assertTrue(_compare_salted_tokens(csrf_token.value, csrf_input_field.attrib["value"]))
 
 
 def _create_course(test, course_key, course_data):

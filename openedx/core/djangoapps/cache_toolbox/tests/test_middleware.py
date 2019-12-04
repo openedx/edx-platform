@@ -1,7 +1,6 @@
 """Tests for cached authentication middleware."""
 from __future__ import absolute_import
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.test import TestCase
@@ -20,7 +19,7 @@ class CachedAuthMiddlewareTestCase(TestCase):
         self.user = UserFactory(password=password)
         self.client.login(username=self.user.username, password=password)
 
-    def _test_change_session_hash(self, test_url, redirect_url, target_status_code=200):
+    def _test_change_session_hash(self, test_url, redirect_url):
         """
         Verify that if a user's session auth hash and the request's hash
         differ, the user is logged out. The URL to test and the
@@ -32,7 +31,7 @@ class CachedAuthMiddlewareTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         with patch.object(User, 'get_session_auth_hash', return_value='abc123'):
             response = self.client.get(test_url)
-            self.assertRedirects(response, redirect_url, target_status_code=target_status_code)
+            self.assertRedirects(response, redirect_url)
 
     @skip_unless_lms
     def test_session_change_lms(self):
@@ -44,5 +43,4 @@ class CachedAuthMiddlewareTestCase(TestCase):
     def test_session_change_cms(self):
         """Test session verification with CMS-specific URLs."""
         home_url = reverse('home')
-        # Studio login redirects to LMS login
-        self._test_change_session_hash(home_url, settings.LOGIN_URL + '?next=' + home_url, target_status_code=302)
+        self._test_change_session_hash(home_url, reverse('login') + '?next=' + home_url)

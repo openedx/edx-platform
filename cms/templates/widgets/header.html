@@ -237,6 +237,9 @@
       </nav>
 
     % else:
+      <%
+        register_url = settings.LMS_ROOT_URL + '/register'
+      %>
       <nav class="nav-not-signedin nav-pitch" aria-label="${_('Account')}">
         <h2 class="sr-only">${_("Account Navigation")}</h2>
         <ol>
@@ -245,11 +248,11 @@
           </li>
           % if static.get_value('ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION')):
               <li class="nav-item nav-not-signedin-signup">
-                <a class="action action-signup" href="${settings.FRONTEND_REGISTER_URL}?next=${current_url}">${_("Sign Up")}</a>
+                <a class="action action-signup" href="${register_url}?next=${current_url}">${_("Sign Up")}</a>
               </li>
           % endif
           <li class="nav-item nav-not-signedin-signin">
-            <a class="action action-signin" href="${settings.LOGIN_URL}?next=${current_url}">${_("Sign In")}</a>
+            <a class="action action-signin" href="${settings.FRONTEND_LOGIN_URL}?next=${current_url}">${_("Sign In")}</a>
           </li>
         </ol>
       </nav>
