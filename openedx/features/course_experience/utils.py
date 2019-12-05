@@ -51,7 +51,7 @@ def get_course_outline_block_tree(request, course_id, user=None):
             try:
                 child_detail = populate_children(all_blocks[child_id], all_blocks)
             except TypeError:
-                if u"MITx+6.002x+MITx_2012_Alumni" in course_outline_root_block[id]:
+                if u"MITx+6.002x+MITx_2012_Alumni" in course_outline_root_block['id']:
                     log.info(u"PopulateChildrenError for Child: {child} in block:{block} at index:{index}".format(
                         child=child_id,
                         block=block['id'],
