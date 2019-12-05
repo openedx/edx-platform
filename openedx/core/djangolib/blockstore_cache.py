@@ -167,7 +167,7 @@ def get_bundle_draft_files_cached(bundle_uuid, draft_name):
     cache_key = ('bundle_draft_files', )
     result = bundle_cache.get(cache_key)
     if result is None:
-        result = blockstore_api.get_bundle_files(bundle_uuid, use_draft=draft_name)
+        result = list(blockstore_api.get_bundle_files(bundle_uuid, use_draft=draft_name))
         bundle_cache.set(cache_key, result)
     return result
 

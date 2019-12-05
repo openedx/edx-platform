@@ -76,8 +76,8 @@ class RuntimeShim(object):
         # class in opaque-keys that accepts either old CourseKeys or new
         # LearningContextKeys.
         hasher = hashlib.md5()
-        hasher.update(settings.SECRET_KEY)
-        hasher.update(six.text_type(self.user_id))
+        hasher.update(settings.SECRET_KEY.encode('utf-8'))
+        hasher.update(six.text_type(self.user_id).encode('utf-8'))
         digest = hasher.hexdigest()
         return digest
 

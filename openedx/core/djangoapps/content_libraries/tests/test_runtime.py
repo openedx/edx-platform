@@ -235,7 +235,7 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
 
         submit_result = client.post(problem_check_url, data={problem_key: "choice_3"})
         self.assertEqual(submit_result.status_code, 200)
-        submit_data = json.loads(submit_result.content)
+        submit_data = json.loads(submit_result.content.decode('utf-8'))
         self.assertDictContainsSubset({
             "current_score": 0,
             "total_possible": 1,
@@ -251,7 +251,7 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
         # And submit a correct answer:
         submit_result = client.post(problem_check_url, data={problem_key: "choice_1"})
         self.assertEqual(submit_result.status_code, 200)
-        submit_data = json.loads(submit_result.content)
+        submit_data = json.loads(submit_result.content.decode('utf-8'))
         self.assertDictContainsSubset({
             "current_score": 1,
             "total_possible": 1,

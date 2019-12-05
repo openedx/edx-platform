@@ -152,7 +152,7 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         handler_url = self._get_block_handler_url(block_id, "xmodule_handler") + "problem_get"
         problem_get_response = self.client.get(handler_url)
         self.assertEqual(problem_get_response.status_code, 200)
-        self.assertIn("You have used 0 of 5 attempts", problem_get_response.content)
+        self.assertIn("You have used 0 of 5 attempts", problem_get_response.content.decode('utf-8'))
 
         # Now delete the block:
         self.assertEqual(self._get_library(lib_id)["has_unpublished_deletes"], False)

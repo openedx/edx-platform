@@ -46,11 +46,11 @@ def convert_exceptions(fn):
             log.exception("XBlock not found in content library")
             raise NotFound
         except api.LibraryBlockAlreadyExists as exc:
-            log.exception(exc.message)
-            raise ValidationError(exc.message)
+            log.exception(str(exc))
+            raise ValidationError(str(exc))
         except api.InvalidNameError as exc:
-            log.exception(exc.message)
-            raise ValidationError(exc.message)
+            log.exception(str(exc))
+            raise ValidationError(str(exc))
     return wrapped_fn
 
 
