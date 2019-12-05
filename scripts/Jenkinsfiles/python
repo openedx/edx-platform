@@ -29,8 +29,8 @@ def createWarningsReport(fileExtension){
     python openedx/core/process_warnings.py --dir_path test_root/log --html_path reports/${warning_filename}"""
 
     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
-                            reportDir: 'reports', reportFiles: warning_filename,
-                            reportName: 'Warnings Report', reportTitles: ''])
+                            reportDir: 'reports', reportFiles: "${warning_filename}",
+                            reportName: "${warning_filename}", reportTitles: ''])
     archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.html'
 }
 
