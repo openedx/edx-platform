@@ -297,7 +297,7 @@ def get_bundle_files_dict(bundle_uuid, use_draft=None):
 
 def get_bundle_files(bundle_uuid, use_draft=None):
     """
-    Get a flat list of all the files in the specified bundle or draft.
+    Get an iterator over all the files in the specified bundle or draft.
     """
     return get_bundle_files_dict(bundle_uuid, use_draft).values()
 
