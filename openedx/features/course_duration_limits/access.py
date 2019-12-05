@@ -11,6 +11,7 @@ import six
 from django.utils import timezone
 from django.utils.translation import get_language
 from django.utils.translation import ugettext as _
+from edx_django_utils.cache import RequestCache
 from web_fragments.fragment import Fragment
 
 from course_modes.models import CourseMode
@@ -229,9 +230,40 @@ def generate_course_expired_message(user, course):
 def generate_course_expired_fragment(user, course):
     message = generate_course_expired_message(user, course)
     if message:
-        return Fragment(HTML(u"""\
+        return generate_fragment_from_message(message)
+
+
+def generate_fragment_from_message(message):
+    return Fragment(HTML(u"""\
             <div class="course-expiration-message">{}</div>
         """).format(message))
+
+
+def generate_course_expired_fragment_from_key(user, course_key):
+    """
+    Like `generate_course_expired_fragment`, but using a CourseKey instead of
+    a CourseOverview and using request-level caching.
+
+    Either returns WebFragment to inject XBlock content into, or None if we
+    shouldn't show a course expired message for this user.
+    """
+    request_cache = RequestCache('generate_course_expired_fragment_from_key')
+    cache_key = u'message:{},{}'.format(user.id, course_key)
+    cache_response = request_cache.get_cached_response(cache_key)
+    if cache_response.is_found:
+        cached_message = cache_response.value
+        # In this case, there is no message to display.
+        if cached_message is None:
+            return None
+        return generate_fragment_from_message(cached_message)
+
+    course = CourseOverview.get_from_id(course_key)
+    message = generate_course_expired_message(user, course)
+    request_cache.set(cache_key, message)
+    if message is None:
+        return None
+
+    return generate_fragment_from_message(message)
 
 
 def course_expiration_wrapper(user, block, view, frag, context):  # pylint: disable=W0613
@@ -242,9 +274,9 @@ def course_expiration_wrapper(user, block, view, frag, context):  # pylint: disa
     if block.category != "vertical":
         return frag
 
-    course = CourseOverview.get_from_id(block.course_id)
-    course_expiration_fragment = generate_course_expired_fragment(user, course)
-
+    course_expiration_fragment = generate_course_expired_fragment_from_key(
+        user, block.course_id
+    )
     if not course_expiration_fragment:
         return frag
 
