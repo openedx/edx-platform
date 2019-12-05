@@ -11,7 +11,7 @@ from openedx.core.lib.request_utils import get_request_or_stub
 
 
 @contextmanager
-def emulate_http_request(site=None, user=None, middleware_classes=None):
+def emulate_http_request(site=None, user=None, MIDDLEWARE=None):
     """
     Generate a fake HTTP request and run selected middleware on it.
 
@@ -26,19 +26,19 @@ def emulate_http_request(site=None, user=None, middleware_classes=None):
     Arguments:
         site (Site): The site that this request should emulate. Defaults to None.
         user (User): The user that initiated this fake request. Defaults to None
-        middleware_classes (list): A list of classes that implement Django's middleware interface.
+        MIDDLEWARE (list): A list of classes that implement Django's middleware interface.
             Defaults to [CurrentRequestUserMiddleware, CurrentSiteThemeMiddleware] if None.
     """
     request = get_request_or_stub()
     request.site = site
     request.user = user
 
-    # TODO: define the default middleware_classes in settings.py
-    middleware_classes = middleware_classes or [
+    # TODO: define the default MIDDLEWARE in settings.py
+    MIDDLEWARE = MIDDLEWARE or [
         CurrentRequestUserMiddleware,
         CurrentSiteThemeMiddleware,
     ]
-    middleware_instances = [klass() for klass in middleware_classes]
+    middleware_instances = [klass() for klass in MIDDLEWARE]
     response = HttpResponse()
 
     for middleware in middleware_instances:
