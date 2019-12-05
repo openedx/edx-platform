@@ -21,12 +21,12 @@ def pythonTestCleanup() {
 }
 
 def createWarningsReport(fileExtension){
-    warning_filename="warning_report_${fileExtension}.html"
-    sh '''source $HOME/edx-venv-$PYTHON_VERSION/edx-venv/bin/activate
+    warning_filename = "warning_report_${fileExtension}.html"
+    sh """Source $HOME/edx-venv-$PYTHON_VERSION/edx-venv/bin/activate
     pip show pandas
     pip install pandas==0.24.2
     pip list
-    python openedx/core/process_warnings.py --dir_path test_root/log --html_path reports/${warning_filename}'''
+    python openedx/core/process_warnings.py --dir_path test_root/log --html_path reports/${warning_filename}"""
 
     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
                             reportDir: 'reports', reportFiles: warning_filename,
