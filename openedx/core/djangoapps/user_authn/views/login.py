@@ -34,10 +34,7 @@ from openedx.core.djangoapps.user_authn.cookies import refresh_jwt_cookies, set_
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangoapps.user_authn.views.password_reset import send_password_reset_email_for_user
-from openedx.core.djangoapps.user_authn.config.waffle import (
-    ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY,
-    UPDATE_LOGIN_USER_ERROR_STATUS_CODE
-)
+from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.view_utils import require_post_params
 from student.models import LoginFailures, AllowedAuthUser, UserProfile
@@ -406,11 +403,7 @@ def login_user(request):
         return response
     except AuthFailedError as error:
         log.exception(error.get_response())
-        # original code returned a 200 status code with status=False for errors. This flag
-        # is used for rolling out a transition to using a 400 status code for errors, which
-        # is a breaking-change, but will hopefully be a tolerable breaking-change.
-        status = 400 if UPDATE_LOGIN_USER_ERROR_STATUS_CODE.is_enabled() else 200
-        response = JsonResponse(error.get_response(), status=status)
+        response = JsonResponse(error.get_response(), status=400)
         set_custom_metric('login_user_auth_failed_error', True)
         set_custom_metric('login_user_response_status', response.status_code)
         return response

@@ -123,7 +123,7 @@ class HelperMixin(object):
 
     def assert_json_failure_response_is_inactive_account(self, response):
         """Asserts failure on /login for inactive account looks right."""
-        self.assertEqual(200, response.status_code)  # Yes, it's a 200 even though it's a failure.
+        self.assertEqual(400, response.status_code)
         payload = json.loads(response.content.decode('utf-8'))
         self.assertFalse(payload.get('success'))
         self.assertIn('In order to sign in, you need to activate your account.', payload.get('value'))
