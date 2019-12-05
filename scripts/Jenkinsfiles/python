@@ -21,11 +21,16 @@ def pythonTestCleanup() {
 }
 
 def createWarningsReport(fileExtension){
+    warning_filename="warning_report_${fileExtension}.html"
     sh '''source $HOME/edx-venv-$PYTHON_VERSION/edx-venv/bin/activate
-    pip list
+    pip show pandas
     pip install pandas==0.24.2
     pip list
-    python openedx/core/process_warnings.py --dir_path test_root/log --html_path reports/warning_report_$fileExtension.html'''
+    python openedx/core/process_warnings.py --dir_path test_root/log --html_path reports/${warning_filename}'''
+
+    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
+                            reportDir: 'reports', reportFiles: warning_filename,
+                            reportName: 'Warnings Report', reportTitles: ''])
     archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.html'
 }
 
@@ -195,9 +200,6 @@ pipeline {
                 always {
                     script {
                         archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.coverage,reports/*.html'
-                        publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
-                            reportDir: 'reports', reportFiles: 'warning_report.html',
-                            reportName: 'Warnings Report', reportTitles: ''])
                         sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
                         publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
                             reportDir: 'reports/cover', reportFiles: 'index.html',
