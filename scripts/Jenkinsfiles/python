@@ -20,10 +20,12 @@ def pythonTestCleanup() {
     bash scripts/xdist/terminate_xdist_nodes.sh'''
 }
 
-def createWarningsReport(){
+def createWarningsReport(fileExtension){
     sh '''source $HOME/edx-venv-$PYTHON_VERSION/edx-venv/bin/activate
     pip list
-    python openedx/core/process_warnings.py --dir_path test_root/log --html_path reports/warning_report.html'''
+    pip install pandas==0.24.2
+    pip list
+    python openedx/core/process_warnings.py --dir_path test_root/log --html_path reports/warning_report_$fileExtension.html'''
     archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.html'
 }
 
@@ -98,6 +100,7 @@ pipeline {
                     steps {
                         script {
                             runPythonTests()
+                            createWarningsReport("lms")
                         }
                     }
                     post {
@@ -118,6 +121,7 @@ pipeline {
                     steps {
                         script {
                             runPythonTests()
+                            createWarningsReport("cms")
                         }
                     }
                     post {
@@ -138,6 +142,7 @@ pipeline {
                     steps {
                         script {
                             runPythonTests()
+                            createWarningsReport("common")
                         }
                     }
                     post {
@@ -182,7 +187,7 @@ pipeline {
                         sh """export CI_BRANCH=$ci_branch
                         export TARGET_BRANCH=$target_branch
                         ./scripts/jenkins-report.sh"""
-                        createWarningsReport()
+                        createWarningsReport("all")
                     }
                 }
             }
