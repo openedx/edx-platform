@@ -365,7 +365,11 @@ def login_user(request):
             except AuthFailedError as e:
                 set_custom_metric('login_user_tpa_success', False)
                 set_custom_metric('login_user_tpa_failure_msg', e.value)
-                return HttpResponse(e.value, content_type="text/plain", status=403)
+
+                # user successfully authenticated with a third party provider, but has no linked Open edX account
+                response_content = e.get_response()
+                response_content['error_code'] = 'third-party-auth-with-no-linked-account'
+                return JsonResponse(response_content, status=403)
         else:
             user = _get_user_by_email(request)
 

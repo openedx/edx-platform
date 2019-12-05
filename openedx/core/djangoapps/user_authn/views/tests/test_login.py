@@ -40,6 +40,7 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_un
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.lib.api.test_utils import ApiTestCase
 from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
+from util.json_request import JsonResponse
 from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 
 
@@ -818,8 +819,13 @@ class StudentViewShimTest(TestCase):
         self.captured_request = None
 
     def test_third_party_auth_login_failure(self):
+        mocked_response_content = {
+            "success": False,
+            "error_code": "third-party-auth-with-no-linked-account",
+            "value": "Test message."
+        }
         view = self._shimmed_view(
-            HttpResponse(status=403),
+            JsonResponse(mocked_response_content, status=403),
             check_logged_in=True
         )
         response = view(HttpRequest())
