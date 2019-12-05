@@ -84,6 +84,6 @@ more-itertools==5.0.0
 gunicorn<20.0.0
 
 # moving constraint from base.in to constraints.txt
-python-dateutil==2.4.0
+python-dateutil<2.6.0
 
 pandas<0.25.0
