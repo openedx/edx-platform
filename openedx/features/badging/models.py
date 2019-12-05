@@ -125,22 +125,22 @@ class UserBadge(models.Model):
             raise Exception(error)
 
         if badge_type == badge_constants.TEAM_PLAYER[TEAM_PLAYER_ENTRY_INDEX]:
-            team_group_chat = TeamGroupChat.objects.filter(room_id=community_id).exclude(slug='').first()
+            team_group_chat = TeamGroupChat.objects.filter(
+                room_id=community_id).exclude(slug='').values('team_id', 'team__course_id').first()
 
             if not team_group_chat:
                 error = badge_constants.INVALID_TEAM_ERROR.format(badge_id=badge_id, community_id=community_id)
                 log.exception(error)
                 raise Exception(error)
 
-            course_id_dict = CourseTeam.objects.filter(id=team_group_chat.team_id).values('course_id').first()
-            course_id = course_id_dict['course_id']
+            course_id = team_group_chat['team__course_id']
 
             if not course_id or course_id == CourseKeyField.Empty:
                 error = badge_constants.UNKNOWN_COURSE_ERROR.format(badge_id=badge_id, community_id=community_id)
                 log.exception(error)
                 raise Exception(error)
 
-            all_team_members = CourseTeamMembership.objects.filter(team_id=team_group_chat.team_id)
+            all_team_members = CourseTeamMembership.objects.filter(team_id=team_group_chat['team_id'])
             for member in all_team_members:
                 UserBadge.objects.get_or_create(
                     user_id=member.user_id,
