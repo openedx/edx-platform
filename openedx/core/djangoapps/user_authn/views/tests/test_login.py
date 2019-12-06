@@ -719,7 +719,7 @@ class LoginSessionViewTest(ApiTestCase):
     @patch('openedx.core.djangoapps.user_authn.views.login.segment')
     def test_login(self, include_analytics, mock_segment):
         # Create a test user
-        UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
+        user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
 
         data = {
             "email": self.EMAIL,
@@ -743,7 +743,7 @@ class LoginSessionViewTest(ApiTestCase):
         self.assertHttpOK(response)
 
         # Verify events are called
-        expected_user_id = 1
+        expected_user_id = user.id
         mock_segment.identify.assert_called_once_with(
             expected_user_id,
             {'username': self.USERNAME, 'email': self.EMAIL},
