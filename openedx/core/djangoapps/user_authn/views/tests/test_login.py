@@ -666,10 +666,14 @@ class LoginSessionViewTest(ApiTestCase):
         response = self.client.get(self.url, content_type="application/json")
         self.assertHttpOK(response)
 
+        # TODO: ARCH-1253: LoginSession GET temporarily will set the `submit_url` to `login_api`, rather than using
+        # `self.url`, until we complete the roll-out/transition to `login_user` from `self.url` (without the shim).
+        submit_url = reverse("login_api")
+
         # Verify that the form description matches what we expect
         form_desc = json.loads(response.content.decode('utf-8'))
         self.assertEqual(form_desc["method"], "post")
-        self.assertEqual(form_desc["submit_url"], self.url)
+        self.assertEqual(form_desc["submit_url"], submit_url)
         self.assertEqual(form_desc["fields"], [
             {
                 "name": "email",
