@@ -409,6 +409,10 @@ class CoursewareIndex(View):
         """
         course_url_name = default_course_url_name(self.course.id)
         course_url = reverse(course_url_name, kwargs={'course_id': six.text_type(self.course.id)})
+        show_search = (
+            settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH') or
+            (settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF') and self.is_staff)
+        )
 
         courseware_context = {
             'csrf': csrf(self.request)['csrf_token'],
@@ -430,6 +434,7 @@ class CoursewareIndex(View):
             'section_title': None,
             'sequence_title': None,
             'disable_accordion': COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id),
+            'show_search': show_search,
         }
         courseware_context.update(
             get_experiment_user_metadata_context(

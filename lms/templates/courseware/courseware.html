@@ -74,7 +74,7 @@ from openedx.features.course_experience import course_home_page_title, COURSE_OU
   <%static:js group='courseware'/>
   <%include file="/mathjax_include.html" args="disable_fast_preview=True"/>
 
-  % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+  % if show_search:
     <%static:require_module module_name="course_search/js/course_search_factory" class_name="CourseSearchFactory">
         var courseId = $('.courseware-results').data('courseId');
         CourseSearchFactory({
@@ -136,7 +136,7 @@ ${HTML(fragment.foot_html())}
               </a>
           </div>
 
-          % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+          % if show_search:
             <div id="courseware-search-bar" class="search-bar courseware-search-bar" role="search" aria-label="Course">
               <form class="search-form">
                 <label for="course-search-input" class="sr">${_('Course Search')}</label>
