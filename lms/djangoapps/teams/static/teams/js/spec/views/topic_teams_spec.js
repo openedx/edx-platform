@@ -13,7 +13,8 @@ define([
             myTeamsCollection = options.myTeamsCollection || TeamSpecHelpers.createMockTeams({results: []});
             return new TopicTeamsView({
                 el: '.teams-container',
-                model: isInstructorManagedTopic ? TeamSpecHelpers.createMockInstructorManagedTopic() : TeamSpecHelpers.createMockTopic(),
+                model: isInstructorManagedTopic ?
+                    TeamSpecHelpers.createMockInstructorManagedTopic() : TeamSpecHelpers.createMockTopic(),
                 collection: options.teams || TeamSpecHelpers.createMockTeams(),
                 myTeamsCollection: myTeamsCollection,
                 showActions: true,

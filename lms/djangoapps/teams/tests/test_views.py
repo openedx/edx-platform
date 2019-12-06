@@ -835,7 +835,7 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
         )
 
     @patch('lms.djangoapps.teams.views.can_user_create_team_in_topic', return_value=False)
-    def test_student_create_team_instructor_managed_topic(self, *args):
+    def test_student_create_team_instructor_managed_topic(self, *args):  # pylint: disable=unused-argument
         response = self.post_create_team(
             403,
             data=self.build_team_data(
