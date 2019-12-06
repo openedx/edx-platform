@@ -58,14 +58,15 @@ def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=No
         if cached:
             try:
                 cached_response = zunpickle(cached)
-                if fields:
-                    cached_response = get_fields(fields, cached_response)
-
-                return cached_response
             except Exception:
                 # Data is corrupt in some way.
                 log.warning("Data for cache is corrupt for cache key %s", cache_key)
                 cache.delete(cache_key)
+            else:
+                if fields:
+                    cached_response = get_fields(fields, cached_response)
+
+                return cached_response
 
     try:
         endpoint = getattr(api, resource)

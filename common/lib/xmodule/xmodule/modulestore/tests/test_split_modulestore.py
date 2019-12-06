@@ -981,8 +981,10 @@ class TestCourseStructureCache(SplitModuleTest):
         cache_key = self.new_course.id.version_guid
         self.cache.set(cache_key, b"bad_data")
         with check_mongo_calls(1):
-            not_cached_structure = self._get_structure(self.new_course)
+            not_corrupt_structure = self._get_structure(self.new_course)
 
+        # now make sure that you get the same structure
+        self.assertEqual(not_corrupt_structure, not_cached_structure)
 
     @patch('xmodule.modulestore.split_mongo.mongo_connection.get_cache')
     def test_course_structure_cache_no_cache_configured(self, mock_get_cache):
