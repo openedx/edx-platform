@@ -21,7 +21,7 @@ def pythonTestCleanup() {
 }
 
 def createWarningsReport(fileExtension){
-    println "JINDER ECHO"
+    println "Creating warnings report for ${fileExtension}"
     warning_filename = "warning_report_${fileExtension}.html"
     sh """source $HOME/edx-venv-$PYTHON_VERSION/edx-venv/bin/activate
     pip list
