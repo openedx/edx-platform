@@ -834,6 +834,23 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
             json.loads(response.content.decode('utf-8'))["user_message"]
         )
 
+    @patch('lms.djangoapps.teams.views.can_user_create_team_in_topic', return_value=False)
+    def test_student_create_team_instructor_managed_topic(self, *args):  # pylint: disable=unused-argument
+        response = self.post_create_team(
+            403,
+            data=self.build_team_data(
+                name="student create team in instructor managed topic",
+                course=self.test_course_1,
+                description="student cannot create team in instructor-managed topic",
+                topic_id='great-topic'
+            ),
+            user='student_enrolled_not_on_team'
+        )
+        self.assertEqual(
+            "You can't create a team in an instructor managed topic.",
+            json.loads(response.content.decode('utf-8'))["user_message"]
+        )
+
     @ddt.data('staff', 'course_staff', 'community_ta')
     def test_privileged_create_multiple_teams(self, user):
         """ Privileged users can create multiple teams, even if they are already in one. """
