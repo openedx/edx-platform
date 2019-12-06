@@ -97,9 +97,6 @@
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
 -e git+https://github.com/edx/xblock-lti-consumer.git@v1.1.8#egg=lti_consumer-xblock==1.1.8
 
-# Edly libraries:
--e git+ssh://git@github.com/edly-io/edly-panel-edx-app.git@master#egg=edly-panel-app
-
 # Third Party XBlocks
 
 -e git+https://github.com/mitodl/edx-sga.git@3828ba9e413080a81b907a3381e5ffa05e063f81#egg=edx-sga==0.8.3
