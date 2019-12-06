@@ -24,12 +24,14 @@ from openedx.core.djangolib.markup import HTML, Text
         </label>
     </div>
 
-    <label>
-        ${_("Enter the reason why the students are to be manually enrolled or unenrolled.")}
-        ${_("This cannot be left blank and will be recorded and presented in Enrollment Reports.")}
-        ${_("Therefore, please give enough detail to account for this action.")}
-        <textarea rows="2" id="reason-field-id" name="reason-field" placeholder="${_('Reason')}" spellcheck="false"></textarea>
-    </label>
+    % if section_data['is_reason_field_enabled']:
+        <label>
+            ${_("Enter the reason why the students are to be manually enrolled or unenrolled.")}
+            ${_("This cannot be left blank and will be recorded and presented in Enrollment Reports.")}
+            ${_("Therefore, please give enough detail to account for this action.")}
+            <textarea rows="2" id="reason-field-id" name="reason-field" placeholder="${_('Reason')}" spellcheck="false"></textarea>
+        </label>
+    %endif
     <div class="enroll-option">
         <label class="has-hint">
             <input type="checkbox" name="auto-enroll" id="auto-enroll" value="Auto-Enroll" checked="yes" aria-describedby="heading-batch-enrollment">
