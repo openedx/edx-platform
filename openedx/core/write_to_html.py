@@ -12,7 +12,7 @@ from xml.sax.saxutils import escape
 
 
 class HtmlOutlineWriter(object):
-    HEAD = six.u(textwrap.dedent(r"""
+    HEAD = textwrap.dedent(u"""
         <!DOCTYPE html>
         <html>
         <head>
@@ -27,14 +27,8 @@ class HtmlOutlineWriter(object):
         }
         .toggle-box + label:before {
             color: #888;
-            content: "\25B8";
             width: 10px;
         }
-
-        .toggle-box:checked + label:before {
-            content: "\25BE";
-        }
-
 
         .toggle-box:checked + label + div {
             margin-left: 3%;
@@ -51,7 +45,7 @@ class HtmlOutlineWriter(object):
         background-color: #edcca9
         }
 
-        .category {
+        body {
         background-color: cornsilk
         }
 
@@ -74,7 +68,7 @@ class HtmlOutlineWriter(object):
         
         </style>
         <body>
-    """))
+    """)
 
     SECTION_START = textwrap.dedent(u"""\
         <div class="{klass}">
