@@ -125,6 +125,7 @@ pipeline {
                     }
                     steps {
                         script {
+                        Random= 'yes'
                         //  runPythonTests()
                           //  createWarningsReport("cms")
                         }
@@ -132,6 +133,7 @@ pipeline {
                     post {
                         always {
                             script {
+                            Random= 'yes'
                               //  pythonTestCleanup()
                             }
                         }
@@ -146,6 +148,7 @@ pipeline {
                     }
                     steps {
                         script {
+                        Random= 'yes'
                            // runPythonTests()
                            // createWarningsReport("common")
                         }
@@ -153,6 +156,7 @@ pipeline {
                     post {
                         always {
                             script {
+                            Random= 'yes'
                               //  pythonTestCleanup()
                             }
                         }
