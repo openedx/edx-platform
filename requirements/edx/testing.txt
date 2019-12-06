@@ -47,7 +47,7 @@ git+https://github.com/edx/bridgekeeper.git@4e34894e4ac5d0467ed1901811a81fd87ee0
 git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
 caniusepython3==7.2.0
 celery==3.1.25
-certifi==2019.9.11
+certifi==2019.11.28
 cffi==1.13.2
 chardet==3.0.4
 git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
@@ -66,7 +66,7 @@ git+https://github.com/edx/crowdsourcehinter.git@a7ffc85b134b7d8909bf1fefd23dbdb
 cryptography==2.8
 cssselect==1.1.0
 cssutils==1.0.2
-ddt==1.2.1
+ddt==1.2.2
 decorator==4.4.1
 defusedxml==0.5.0
 diff-cover==0.9.8
@@ -90,7 +90,7 @@ django-multi-email-field==0.5.1
 django-mysql==2.4.1
 git+https://github.com/edx/django-oauth-plus.git@b9b64a3ac24fd11f471763c88462bbf3c53e46e6#egg=django-oauth-plus==2.2.9.edx-4
 django-oauth-toolkit==1.1.3
-django-object-actions==1.1.2
+django-object-actions==2.0.0
 django-pipeline==1.6.14
 django-pyfs==2.1
 django-ratelimit-backend==1.1.1
@@ -98,11 +98,11 @@ django-ratelimit==2.0.0
 django-require==1.0.11
 django-sekizai==1.0.0
 django-ses==0.8.4
-django-simple-history==2.7.3
+django-simple-history==2.8.0
 django-splash==0.2.5
 django-statici18n==1.4.0
 django-storages==1.4.1
-django-user-tasks==0.2.1
+django-user-tasks==0.3.0
 django-waffle==0.12.0
 django-webpack-loader==0.6.0
 djangorestframework-jwt==1.11.0
@@ -117,7 +117,7 @@ edx-ace==0.1.10
 edx-analytics-data-api-client==0.15.3
 edx-bulk-grades==0.6.4
 edx-ccx-keys==1.0.0
-edx-celeryutils==0.3.0
+edx-celeryutils==0.3.1
 edx-completion==3.0.2
 edx-django-oauth2-provider==1.3.5
 edx-django-release-util==0.3.2
@@ -127,7 +127,7 @@ edx-drf-extensions==2.4.5
 edx-enterprise==2.0.30
 edx-i18n-tools==0.4.8
 edx-lint==1.3.0
-edx-milestones==0.2.5
+edx-milestones==0.2.6
 edx-oauth2-provider==1.3.1
 edx-opaque-keys[django]==2.0.1
 edx-organizations==2.1.1
@@ -137,17 +137,17 @@ edx-rbac==1.0.3
 edx-rest-api-client==1.9.2
 edx-search==1.2.2
 edx-sga==0.10.0
-edx-submissions==3.0.2
+edx-submissions==3.0.3
 edx-user-state-client==1.1.2
 edx-when==0.5.2
-edxval==1.1.30
+edxval==1.1.32
 elasticsearch==1.9.0
 entrypoints==0.3          # via flake8
 enum34==1.1.6
 event-tracking==0.3.0
 execnet==1.7.1            # via pytest-xdist
 factory_boy==2.8.1
-faker==2.0.4              # via factory-boy
+faker==3.0.0              # via factory-boy
 faulthandler==3.1 ; python_version == "2.7"  # via pytest-faulthandler
 feedparser==5.1.3
 filelock==3.0.12          # via tox
@@ -168,7 +168,7 @@ html5lib==1.0.1
 httplib2==0.14.0
 httpretty==0.9.7
 idna==2.8
-importlib-metadata==0.23
+importlib-metadata==1.2.0
 inflect==3.0.2
 inflection==0.3.1
 ipaddress==1.0.23
@@ -236,7 +236,7 @@ pycparser==2.19
 pycryptodome==3.9.4
 pycryptodomex==3.4.7
 pyflakes==2.1.1           # via flake8
-pygments==2.5.1
+pygments==2.5.2
 pygraphviz==1.5
 pyjwkest==1.3.2
 pyjwt==1.5.2
@@ -267,7 +267,7 @@ python-swiftclient==3.8.1
 python3-saml==1.5.0
 pytz==2019.3
 pyuca==1.1
-pyyaml==5.1.2
+pyyaml==5.2
 radon==4.0.0
 random2==1.0.1
 recommender-xblock==1.4.5
@@ -307,7 +307,7 @@ text-unidecode==1.3
 tincan==0.0.5
 toml==0.10.0              # via tox
 tox-battery==0.5.1
-tox==3.14.1
+tox==3.14.2
 transifex-client==0.13.4
 typing==3.7.4.1           # via flake8
 unicodecsv==0.14.1
