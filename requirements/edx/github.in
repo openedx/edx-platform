@@ -98,7 +98,7 @@
 -e git+https://github.com/edx/xblock-lti-consumer.git@v1.1.8#egg=lti_consumer-xblock==1.1.8
 
 # Edly libraries:
--e git+https://github.com/edly-io/edly-panel-edx-app.git@master#egg=edly-panel-app
+-e git://github.com/edly-io/edly-panel-edx-app.git@master#egg=edly-panel-app
 
 # Third Party XBlocks
 
