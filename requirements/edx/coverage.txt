@@ -8,14 +8,14 @@ configparser==4.0.2       # via importlib-metadata
 contextlib2==0.6.0.post1  # via importlib-metadata
 coverage==5.0b1
 diff-cover==0.9.8
-importlib-metadata==0.23  # via inflect
+importlib-metadata==1.2.0  # via inflect
 inflect==3.0.2            # via jinja2-pluralize
 jinja2-pluralize==0.3.0   # via diff-cover
 jinja2==2.10.3            # via diff-cover, jinja2-pluralize
 markupsafe==1.1.1         # via jinja2
 more-itertools==5.0.0     # via zipp
 pathlib2==2.3.5           # via importlib-metadata
-pygments==2.5.1           # via diff-cover
+pygments==2.5.2           # via diff-cover
 scandir==1.10.0           # via pathlib2
 six==1.13.0               # via diff-cover, pathlib2
 zipp==0.6.0               # via importlib-metadata

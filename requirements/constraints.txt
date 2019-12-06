@@ -82,3 +82,8 @@ more-itertools==5.0.0
 
 # Constraining this Gunicorn requires Python 3.x >= 3.4.
 gunicorn<20.0.0
+
+
+# Upgrading to django-object-actions <=1.1.2 requires support for Python 3. In newer versions Python 2 support is
+# dropped.  This constraint can be removed once we have Python 3.
+django-object-actions==1.1.2
