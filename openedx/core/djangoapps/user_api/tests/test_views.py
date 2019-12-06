@@ -108,6 +108,7 @@ class UserAPITestCase(ApiTestCase):
         self.assertUserIsValid(pref["user"])
 
 
+@skip_unless_lms
 class EmptyUserTestCase(UserAPITestCase):
     """
     Test that the endpoint supports empty user result sets
@@ -120,6 +121,7 @@ class EmptyUserTestCase(UserAPITestCase):
         self.assertEqual(result["results"], [])
 
 
+@skip_unless_lms
 class EmptyRoleTestCase(UserAPITestCase):
     """Test that the endpoint supports empty result sets"""
     course_id = CourseKey.from_string("org/course/run")
@@ -154,6 +156,7 @@ class UserApiTestCase(UserAPITestCase):
         ]
 
 
+@skip_unless_lms
 class RoleTestCase(UserApiTestCase):
     """
     Test cases covering Role-related views and their behaviors
@@ -243,6 +246,7 @@ class RoleTestCase(UserApiTestCase):
         self.assertEqual(len(set(all_user_uris)), 5)
 
 
+@skip_unless_lms
 class UserViewSetTest(UserApiTestCase):
     """
     Test cases covering the User DRF view set class and its various behaviors
@@ -360,6 +364,7 @@ class UserViewSetTest(UserApiTestCase):
         )
 
 
+@skip_unless_lms
 class UserPreferenceViewSetTest(CacheIsolationTestCase, UserApiTestCase):
     """
     Test cases covering the User Preference DRF view class and its various behaviors
@@ -505,6 +510,7 @@ class UserPreferenceViewSetTest(CacheIsolationTestCase, UserApiTestCase):
         )
 
 
+@skip_unless_lms
 class PreferenceUsersListViewTest(UserApiTestCase):
     """
     Test cases covering the list viewing behavior for user preferences
@@ -666,6 +672,7 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
 
 
 @ddt.ddt
+@skip_unless_lms
 class CountryTimeZoneListViewTest(UserApiTestCase):
     """
     Test cases covering the list viewing behavior for country time zones

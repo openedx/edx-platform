@@ -83,10 +83,6 @@ urlpatterns = [
 
     url(r'^heartbeat', include('openedx.core.djangoapps.heartbeat.urls')),
 
-    # Note: these are older versions of the User API that will eventually be
-    # subsumed by api/user listed below.
-    url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
-
     url(r'^notifier_api/', include('lms.djangoapps.discussion.notifier_api.urls')),
     url(r'^/api/notifier/', include('lms.djangoapps.discussion.notifier_api.urls')),
 
@@ -106,6 +102,10 @@ urlpatterns = [
 
     # User API endpoints
     url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
+    # Note: these are older versions of the User API that will eventually be
+    # subsumed by api/user listed above.
+    url(r'', include('openedx.core.djangoapps.user_api.legacy_urls')),
+
 
     # Profile Images API endpoints
     url(r'^api/profile_images/', include('openedx.core.djangoapps.profile_images.urls')),
