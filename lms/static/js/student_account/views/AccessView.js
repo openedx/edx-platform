@@ -138,6 +138,8 @@
                             method: data.method,
                             url: data.submit_url
                         });
+                        var isTpaSaml = this.thirdPartyAuth && this.thirdPartyAuth.finishAuthUrl ?
+                          this.thirdPartyAuth.finishAuthUrl.indexOf('tpa-saml') >= 0 : false;
 
                         this.subview.login = new LoginView({
                             fields: data.fields,
@@ -160,7 +162,7 @@
                         this.listenTo(this.subview.login, 'password-help', this.resetPassword);
 
                     // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
-                        if (this.isMultipleUserEnterprisesFeatureEnabled === true) {
+                        if (this.isMultipleUserEnterprisesFeatureEnabled === true && !isTpaSaml) {
                             this.listenTo(this.subview.login, 'auth-complete', this.loginComplete);
                         } else {
                             this.listenTo(this.subview.login, 'auth-complete', this.authComplete);
