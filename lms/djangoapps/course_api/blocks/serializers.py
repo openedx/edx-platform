@@ -5,7 +5,7 @@ import json
 
 import six
 from django.conf import settings
-from lms.djangoapps.courseware.models import StudentFieldOverride
+from courseware.models import StudentFieldOverride
 from xmodule.fields import Date
 from rest_framework import serializers
 from rest_framework.reverse import reverse
