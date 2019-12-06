@@ -34,6 +34,7 @@ from openedx.core.djangoapps.user_authn.views.login import (
     AllowedAuthUser,
     ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 )
+from openedx.core.djangoapps.user_authn.views.login_form import ENABLE_LOGIN_POST_WITHOUT_SHIM
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
@@ -661,15 +662,26 @@ class LoginSessionViewTest(ApiTestCase):
         response = self.client.patch(self.url)
         self.assertHttpMethodNotAllowed(response)
 
-    def test_login_form(self):
-        # Retrieve the login form
-        response = self.client.get(self.url, content_type="application/json")
-        self.assertHttpOK(response)
+    @ddt.data(
+        {ENABLE_LOGIN_POST_WITHOUT_SHIM: True},
+        {ENABLE_LOGIN_POST_WITHOUT_SHIM: False},
+        {},
+    )
+    def test_login_form(self, features_setting):
+        with patch.dict("django.conf.settings.FEATURES", features_setting):
+            # Retrieve the login form
+            response = self.client.get(self.url, content_type="application/json")
+            self.assertHttpOK(response)
+
+        if ENABLE_LOGIN_POST_WITHOUT_SHIM in features_setting and features_setting[ENABLE_LOGIN_POST_WITHOUT_SHIM]:
+            submit_url = reverse("login_api")
+        else:
+            submit_url = reverse("user_api_login_session")
 
         # Verify that the form description matches what we expect
         form_desc = json.loads(response.content.decode('utf-8'))
         self.assertEqual(form_desc["method"], "post")
-        self.assertEqual(form_desc["submit_url"], self.url)
+        self.assertEqual(form_desc["submit_url"], submit_url)
         self.assertEqual(form_desc["fields"], [
             {
                 "name": "email",

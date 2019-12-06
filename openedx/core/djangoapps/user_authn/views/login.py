@@ -400,6 +400,7 @@ def login_user(request):
         response = set_logged_in_cookies(request, response, possibly_authenticated_user)
         set_custom_metric('login_user_auth_failed_error', False)
         set_custom_metric('login_user_response_status', response.status_code)
+        set_custom_metric('login_user_redirect_url', redirect_url)
         return response
     except AuthFailedError as error:
         log.exception(error.get_response())
@@ -483,10 +484,15 @@ def _parse_analytics_param_for_course_id(request):
     modified_request = request.POST.copy()
     if isinstance(request, HttpRequest):
         # Works for an HttpRequest but not a rest_framework.request.Request.
+        # Note: This case seems to be used for tests only.
         request.POST = modified_request
+        set_custom_metric('login_user_request_type', 'django')
     else:
         # The request must be a rest_framework.request.Request.
+        # Note: Only DRF seems to be used in Production.
         request._data = modified_request  # pylint: disable=protected-access
+        set_custom_metric('login_user_request_type', 'drf')
+
     # Include the course ID if it's specified in the analytics info
     # so it can be included in analytics events.
     if "analytics" in modified_request:
@@ -566,6 +572,8 @@ def shim_student_view(view_func, check_logged_in=False):
             msg = response_dict.get("value", u"")
             success = response_dict.get("success")
             set_custom_metric('shim_original_response_is_json', True)
+            set_custom_metric('shim_original_redirect_url', response_dict.get("redirect_url"))
+            set_custom_metric('shim_original_redirect', response_dict.get("redirect"))
         except (ValueError, TypeError):
             msg = response.content
             success = True
