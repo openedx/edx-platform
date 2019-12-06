@@ -14,6 +14,7 @@ jinja2-pluralize==0.3.0   # via diff-cover
 jinja2==2.10.3            # via diff-cover, jinja2-pluralize
 markupsafe==1.1.1         # via jinja2
 more-itertools==5.0.0     # via zipp
+pandas==0.24.2
 pathlib2==2.3.5           # via importlib-metadata
 pygments==2.5.2           # via diff-cover
 scandir==1.10.0           # via pathlib2
