@@ -27,13 +27,13 @@ def is_course_valid_for_certificate_auto_generation(course):
 
 class Command(BaseCommand):
     help = """
-    The purpose of this command is to automatically generate certificates for 
-    all passed users (that do not have a certificate yet) in all currently 
-    running courses that have "certificate_display_behavior" set as 
+    The purpose of this command is to automatically generate certificates for
+    all passed users (that do not have a certificate yet) in all currently
+    running courses that have "certificate_display_behavior" set as
     "early_no_info" or "early_with_info"
-     
+
     example:
-        manage.py ... generate_certificates_for_early_no_info
+        manage.py ... auto_generate_certificates_for_open_courses
     """
 
     def handle(self, *args, **options):
