@@ -378,6 +378,8 @@ SSL_AUTH_DN_FORMAT_STRING = ENV_TOKENS.get(
     "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}"
 )
 
+ACCESS_CONTROL_BACKENDS = ENV_TOKENS.get('ACCESS_CONTROL_BACKENDS', {})
+
 # Django CAS external authentication settings
 CAS_EXTRA_LOGIN_PARAMS = ENV_TOKENS.get("CAS_EXTRA_LOGIN_PARAMS", None)
 if FEATURES.get('AUTH_USE_CAS'):
