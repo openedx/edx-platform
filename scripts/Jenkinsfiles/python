@@ -126,16 +126,14 @@ pipeline {
                     }
                     steps {
                         script {
-                        jinder_random= 'yes'
-                        //  runPythonTests()
+                          runPythonTests()
                           createWarningsReport("cms")
                         }
                     }
                     post {
                         always {
                             script {
-                            jinder_random= 'yes'
-                              //  pythonTestCleanup()
+                            pythonTestCleanup()
                             }
                         }
                     }
@@ -150,15 +148,14 @@ pipeline {
                     steps {
                         script {
                         jinder_random= 'yes'
-                           // runPythonTests()
-                           // createWarningsReport("common")
+                           runPythonTests()
+                           createWarningsReport("common")
                         }
                     }
                     post {
                         always {
                             script {
-                            jinder_random= 'yes'
-                              //  pythonTestCleanup()
+                            pythonTestCleanup()
                             }
                         }
                     }
