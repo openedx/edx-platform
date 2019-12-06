@@ -47,6 +47,16 @@ def render(request, template):
 
     url(r'^jobs$', 'static_template_view.views.render', {'template': 'jobs.html'}, name="jobs")
     """
+    link_map = settings.MKTG_URL_LINK_MAP
+    redirect_url_keys = {
+        'honor.html': 'HONOR',
+        'privacy.html': 'PRIVACY',
+        'tos.html': 'TOS'
+    }
+    link_map_key = redirect_url_keys.get(template)
+    marketing_url = link_map.get(link_map_key)
+    if marketing_url and 'http' in marketing_url:
+        return redirect(marketing_url)
 
     # Guess content type from file extension
     content_type, __ = mimetypes.guess_type(template)
