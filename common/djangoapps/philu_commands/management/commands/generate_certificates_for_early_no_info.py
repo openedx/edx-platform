@@ -1,6 +1,7 @@
 """
 Django management command to auto generate certificates for all users
 enrolled in currently running courses with early_no_info or early_with_info set
+in the certificate_display_behavior setting in course advanced settings
 """
 import json
 from logging import getLogger
@@ -14,6 +15,10 @@ from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
 log = getLogger(__name__)
+
+CERT_GENERATION_RESPONSE_MESSAGE = 'Certificate generation {} for user with ' \
+                                   'username: {} and user_id: {} with ' \
+                                   'generation status: {}'
 
 
 def is_course_valid_for_certificate_auto_generation(course):
@@ -44,12 +49,12 @@ class Command(BaseCommand):
                     continue
 
                 status = generate_user_certificates(user, course.id, course=course)
-                message_f = 'Certificate generation {} for user with username: ' \
-                            '{} and user_id: {} with generation status: {}'
 
                 if status:
-                    log.info(message_f.format('passed', user.username, user.id, status))
+                    log.info(CERT_GENERATION_RESPONSE_MESSAGE.format(
+                        'passed', user.username, user.id, status))
                     # TODO: Send mail to user. Remove when story LP-1674 is completed
 
                 else:
-                    log.error(message_f.format('failed', user.username, user.id, status))
+                    log.error(CERT_GENERATION_RESPONSE_MESSAGE.format(
+                        'failed', user.username, user.id, status))
