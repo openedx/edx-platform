@@ -21,6 +21,7 @@ def pythonTestCleanup() {
 }
 
 def createWarningsReport(fileExtension){
+    println "JINDER ECHO"
     warning_filename = "warning_report_${fileExtension}.html"
     sh """source $HOME/edx-venv-$PYTHON_VERSION/edx-venv/bin/activate
     pip show pandas
@@ -127,7 +128,7 @@ pipeline {
                         script {
                         jinder_random= 'yes'
                         //  runPythonTests()
-                          //  createWarningsReport("cms")
+                          createWarningsReport("cms")
                         }
                     }
                     post {
