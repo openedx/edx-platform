@@ -22,7 +22,7 @@ def pythonTestCleanup() {
 
 def createWarningsReport(fileExtension){
     warning_filename = "warning_report_${fileExtension}.html"
-    sh """Source $HOME/edx-venv-$PYTHON_VERSION/edx-venv/bin/activate
+    sh """source $HOME/edx-venv-$PYTHON_VERSION/edx-venv/bin/activate
     pip show pandas
     pip install pandas==0.24.2
     pip list
@@ -125,14 +125,14 @@ pipeline {
                     }
                     steps {
                         script {
-                            runPythonTests()
-                            createWarningsReport("cms")
+                        //  runPythonTests()
+                          //  createWarningsReport("cms")
                         }
                     }
                     post {
                         always {
                             script {
-                                pythonTestCleanup()
+                              //  pythonTestCleanup()
                             }
                         }
                     }
@@ -146,14 +146,14 @@ pipeline {
                     }
                     steps {
                         script {
-                            runPythonTests()
-                            createWarningsReport("common")
+                           // runPythonTests()
+                           // createWarningsReport("common")
                         }
                     }
                     post {
                         always {
                             script {
-                                pythonTestCleanup()
+                              //  pythonTestCleanup()
                             }
                         }
                     }
