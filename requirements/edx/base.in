@@ -69,6 +69,7 @@ djangorestframework-jwt
 drf-yasg                            # Replacement for django-rest-swagger
 edx-ace==0.1.10
 edx-analytics-data-api-client
+edx-bulk-grades                     # LMS REST API for managing bulk grading operations
 edx-ccx-keys
 edx-celeryutils
 edx-completion
@@ -158,4 +159,3 @@ XBlock                              # Courseware component architecture
 xblock-utils                        # Provides utilities used by the Discussion XBlock
 xss-utils                           # https://github.com/edx/edx-platform/pull/20633 Fix XSS via Translations
 geoip2==2.9.0                       # Python API for the GeoIP web services and databases
-edx-bulk-grades                     # LMS REST API for managing bulk grading operations
