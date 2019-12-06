@@ -15,19 +15,19 @@ from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 
 from .constants import COMP_ASSESS_RECORD_SUCCESS_MSG
-from .helpers import get_pre_post_assessments_score
+from .helpers import get_competency_assessments_score
 from .serializers import CompetencyAssessmentRecordSerializer
 
 
 @api_view()
 @view_auth_classes(is_authenticated=True)
 @renderer_classes([JSONRenderer, BrowsableAPIRenderer])
-def pre_post_assessments_score_view(request, course_id, chapter_id):
+def competency_assessments_score_view(request, course_id, chapter_id):
     """
-    API View to fetch pre and post assessments score.
+    API View to fetch competency assessments score.
     """
     try:
-        score_dict = get_pre_post_assessments_score(request.user, course_id, chapter_id)
+        score_dict = get_competency_assessments_score(request.user, course_id, chapter_id)
         return Response(score_dict, status=status.HTTP_200_OK)
     except (CourseAccessRedirect, CoursewareAccessException):
         return Response({
