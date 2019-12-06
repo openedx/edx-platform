@@ -148,37 +148,42 @@ def write_html_report(warnings_dataframe, html_path):
     html_path = os.path.expanduser(html_path)
     with io.open(html_path, "w") as fout:
         html_writer = HtmlOutlineWriter(fout)
-        locations_sorted_by_count = group_and_sort_by_sumof(warnings_dataframe, "high_location", "num")
+        category_sorted_by_count = group_and_sort_by_sumof(warnings_dataframe, "category", "num")
+        for category, group_in_category, category_count in category_sorted_by_count:
+            html = u'<span class="count">{category}, count: {count}</span> '.format(category=category,count=category_count)
+            html_writer.start_section(html, klass=u"category")
+            locations_sorted_by_count = group_and_sort_by_sumof(group_in_category, "high_location", "num")
 
-        for location, group_in_location, location_count in locations_sorted_by_count:
-            # pp.pprint(location)
-            html = u'<span class="count">{location}, count: {count}</span> '.format(location=location,count=location_count)
-            html_writer.start_section(html, klass=u"location")
-            message_group_sorted_by_count = group_and_sort_by_sumof(warnings_dataframe, "message", "num")
-            # pdb.set_trace()
-            for message, message_group, message_count in message_group_sorted_by_count:
-                # pp.pprint(warning_text)
-                html = u'<span class="count">{warning_text}, count: {count}</span> '.format(
-                    warning_text=message, count=message_count
-                )
-                html_writer.start_section(html, klass=u"warning_text")
-                # warnings_object[location][warning_text] is a list
-                for index, warning in message_group.iterrows():
-                    # pp.pprint(warning)
-                    html = u'<span class="count">{warning_file_path}</span> '.format(
-                        warning_file_path=warning["filename"]
+            for location, group_in_location, location_count in locations_sorted_by_count:
+                # pp.pprint(location)
+                html = u'<span class="count">{location}, count: {count}</span> '.format(location=location,count=location_count)
+                html_writer.start_section(html, klass=u"location")
+                message_group_sorted_by_count = group_and_sort_by_sumof(group_in_location, "message", "num")
+                # pdb.set_trace()
+                for message, message_group, message_count in message_group_sorted_by_count:
+                    # pp.pprint(warning_text)
+                    html = u'<span class="count">{warning_text}, count: {count}</span> '.format(
+                        warning_text=message, count=message_count
                     )
-                    html_writer.start_section(html, klass=u"warning")
+                    html_writer.start_section(html, klass=u"warning_text")
+                    # warnings_object[location][warning_text] is a list
+                    for index, warning in message_group.iterrows():
+                        # pp.pprint(warning)
+                        html = u'<span class="count">{warning_file_path}</span> '.format(
+                            warning_file_path=warning["filename"]
+                        )
+                        html_writer.start_section(html, klass=u"warning")
 
-                    html = u'<p class="lineno">lineno: {lineno}</p> '.format(
-                        lineno=warning["lineno"]
-                    )
-                    html_writer.write(html)
-                    html = u'<p class="num">num_occur: {num}</p> '.format(
-                        num=warning["num"]
-                    )
-                    html_writer.write(html)
+                        html = u'<p class="lineno">lineno: {lineno}</p> '.format(
+                            lineno=warning["lineno"]
+                        )
+                        html_writer.write(html)
+                        html = u'<p class="num">num_occur: {num}</p> '.format(
+                            num=warning["num"]
+                        )
+                        html_writer.write(html)
 
+                        html_writer.end_section()
                     html_writer.end_section()
                 html_writer.end_section()
             html_writer.end_section()

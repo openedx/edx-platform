@@ -51,6 +51,10 @@ class HtmlOutlineWriter(object):
         background-color: #edcca9
         }
 
+        .category {
+        background-color: cornsilk
+        }
+
         .warning_text {
         background-color: #d5b593
         }
