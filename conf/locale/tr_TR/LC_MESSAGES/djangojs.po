@@ -107,9 +107,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-11-24 20:42+0000\n"
-"PO-Revision-Date: 2019-09-29 20:43+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2019-12-08 20:42+0000\n"
+"PO-Revision-Date: 2019-12-04 19:20+0000\n"
+"Last-Translator: Ali Işıngör <ali@artistanbul.io>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
 "Language: tr_TR\n"
 "MIME-Version: 1.0\n"
@@ -137,6 +137,21 @@ msgstr "Kaydediliyor"
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/show_textbook.js
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
+#: cms/templates/js/content-group-editor.underscore
+#: cms/templates/js/course-instructor-details.underscore
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/course-settings-learning-fields.underscore
+#: cms/templates/js/course_grade_policy.underscore
+#: cms/templates/js/course_info_update.underscore
+#: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/partition-group-details.underscore
+#: cms/templates/js/show-textbook.underscore
+#: cms/templates/js/signatory-editor.underscore
+#: cms/templates/js/video-transcripts.underscore
+#: cms/templates/js/xblock-outline.underscore
 msgid "Delete"
 msgstr "Sil"
 
@@ -843,9 +858,18 @@ msgstr "Belge özellikleri"
 msgid "Edit HTML"
 msgstr "HTML düzenle"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/course_info_handouts.underscore
+#: cms/templates/js/course_info_update.underscore
+#: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/partition-group-details.underscore
+#: cms/templates/js/show-textbook.underscore
+#: cms/templates/js/signatory-details.underscore
+#: cms/templates/js/xblock-string-field-editor.underscore
 msgid "Edit"
 msgstr "Düzenle"
 
@@ -1591,9 +1615,12 @@ msgstr ""
 "Girdiğiniz URL harici bağlantı gibi görünüyor. Gerekli http:// önekini "
 "eklemek ister misiniz?"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/course-instructor-details.underscore
+#: cms/templates/js/signatory-details.underscore
 msgid "Title"
 msgstr "Başlık"
 
@@ -2715,14 +2742,14 @@ msgstr "Takımdan üyeyi çıkartırken bir hata oluştu. Tekrar deneyin."
 msgid "This team does not have any members."
 msgstr "Bu takımda hiç üye yok."
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Joined %(date)s"
 msgstr "Katıldı %(date)s"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Last Activity %(date)s"
 msgstr "Son Faaliyet %(date)s"
@@ -2733,11 +2760,9 @@ msgstr "Bu takım üyesini çıkart?"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid ""
-"This learner will be removed from the team, allowing another learner to take"
-" the available spot."
+"This learner will be removed from the team,allowing another learner to take "
+"the available spot."
 msgstr ""
-"Takımdan bu öğrenci çıkartılacak, başka bir öğrencinin uygun boşluğu "
-"almasına izin veriniz."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Delete this team?"
@@ -2745,35 +2770,38 @@ msgstr "Bu takımı sil?"
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid ""
-"Deleting a team is permanent and cannot be undone. All members are removed "
+"Deleting a team is permanent and cannot be undone.All members are removed "
 "from the team, and team discussions can no longer be accessed."
 msgstr ""
-"Bir takım silmek kalıcıdır ve geri alınamaz. Takımdan tüm üyeler "
-"çıkartılacak, ve takım tartışmaları artık erişilebilir olmayacak."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Team \"{team}\" successfully deleted."
 msgstr "\"{team}\" takımı başarıyla silindi."
 
+#: lms/djangoapps/teams/static/teams/js/views/manage.js
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Manage"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
 msgstr "Şu anda herhangi bir takıma üye değilsiniz."
 
-#. Translators: "and others" refers to fact that additional members of a team
-#. exist that are not displayed.
+#. Translators: "and others" refers to fact that additional
+#. * members of a team exist that are not displayed.
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "and others"
 msgstr "ve diğerleri"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. http://momentjs.com/)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: http://momentjs.com/)
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "Last activity %(date)s"
-msgstr "Son Faaliyet %(date)s"
+msgid "Last activity {date}"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "View %(span_start)s %(team_name)s %(span_end)s"
-msgstr "%(span_start)s %(team_name)s %(span_end)s görüntüle"
+msgid "View {span_start} {team_name} {span_end}"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
@@ -2786,11 +2814,9 @@ msgstr "Bu takımdan ayrıl?"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 msgid ""
-"If you leave, you can no longer post in this team's discussions. Your place "
+"If you leave, you can no longer post in this team's discussions.Your place "
 "will be available to another learner."
 msgstr ""
-"Eğer ayrılırsanız, artık bu takımın tartışmalarına ileti "
-"gönderemeyeceksiniz. Sizin yeriniz başka bir öğrenci için uygun olacak."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/static/js/verify_student/views/reverify_view.js
@@ -2806,11 +2832,15 @@ msgstr "Şu anda başka bir takıma ait görünüyorsunuz."
 msgid "This team is full."
 msgstr "Bu takım dolu."
 
+#: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
+msgid "Cannot join instructor managed team"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
-msgid "%(memberCount)s / %(maxMemberCount)s Member"
-msgid_plural "%(memberCount)s / %(maxMemberCount)s Members"
+msgid "{memberCount} / {maxMemberCount} Member"
+msgid_plural "{memberCount} / {maxMemberCount} Members"
 msgstr[0] ""
-msgstr[1] "%(memberCount)s / %(maxMemberCount)s Üyeler"
+msgstr[1] ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "All teams"
@@ -2825,15 +2855,6 @@ msgid "Topics"
 msgstr "Konular"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid ""
-"See all teams in your course, organized by topic. Join a team to collaborate"
-" with other learners who are interested in the same topic as you are."
-msgstr ""
-"Dersinizdeki konu etrafında şekillenen tüm takımları görün. Sizinle aynı "
-"konuyla ilgilenen diğer öğrencilerle işbirliği yapmak için bir takıma "
-"katılın."
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "My Team"
 msgstr "Takımım"
 
@@ -2841,6 +2862,12 @@ msgstr "Takımım"
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Browse"
 msgstr "Göz at"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"See all teams in your course, organized by topic. Join a team to collaborate"
+" with other learners who are interested in the same topic as you are."
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Your request could not be completed. Reload the page and try again."
@@ -2923,27 +2950,19 @@ msgid "The team \"{team}\" could not be found."
 msgstr "\"{team}\" takımı bulunamadı."
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "%(team_count)s Team"
-msgid_plural "%(team_count)s Teams"
+msgid "{team_count} Team"
+msgid_plural "{team_count} Teams"
 msgstr[0] ""
-msgstr[1] "%(team_count)s Takım"
+msgstr[1] ""
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "Topic"
 msgstr "Konu"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "View Teams in the %(topic_name)s Topic"
-msgstr "%(topic_name)s Başlığı altındaki Takımları Görüntüle"
+msgid "View Teams in the {topic_name} Topic"
+msgstr ""
 
-#. Translators: this string is shown at the bottom of the teams page
-#. to find a team to join or else to create a new one. There are three
-#. links that need to be included in the message:
-#. 1. Browse teams in other topics
-#. 2. search teams
-#. 3. create a new team
-#. Be careful to start each link with the appropriate start indicator
-#. (e.g. {browse_span_start} for #1) and finish it with {span_end}.
 #: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
 msgid ""
 "{browse_span_start}Browse teams in other topics{span_end} or "
@@ -7307,6 +7326,22 @@ msgstr "Takımı Sil"
 #: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
 msgid "Edit Membership"
 msgstr "Üyelikleri Düzenle"
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "View Current Team Memberships"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Download Memberships"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Assign Team Memberships"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Upload Memberships"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
 msgid "Are you having trouble finding a team to join?"

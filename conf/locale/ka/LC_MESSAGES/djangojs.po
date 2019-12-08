@@ -56,7 +56,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-11-24 20:42+0000\n"
+"POT-Creation-Date: 2019-12-01 20:42+0000\n"
 "PO-Revision-Date: 2019-09-29 20:43+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/)\n"
@@ -2550,14 +2550,14 @@ msgstr "გუნდიდან წევრის ამოშლისას 
 msgid "This team does not have any members."
 msgstr "ამ გუნდს წევრები არ ჰყავს."
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Joined %(date)s"
 msgstr "შეუერთდა %(date)s"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Last Activity %(date)s"
 msgstr "ბოლო აქტივობა %(date)s"
@@ -2568,11 +2568,9 @@ msgstr "წავშალოთ გუნდის ეს წევრი?"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid ""
-"This learner will be removed from the team, allowing another learner to take"
-" the available spot."
+"This learner will be removed from the team,allowing another learner to take "
+"the available spot."
 msgstr ""
-"ეს მსმენელი მოცემული გუნდიდან წაიშლება, რაც სხვა მსმენელს თავისუფალი ადგილის"
-" დაკავების საშუალებას მისცემს."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Delete this team?"
@@ -2580,11 +2578,9 @@ msgstr "წავშალოთ ეს გუნდი?"
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid ""
-"Deleting a team is permanent and cannot be undone. All members are removed "
+"Deleting a team is permanent and cannot be undone.All members are removed "
 "from the team, and team discussions can no longer be accessed."
 msgstr ""
-"გუნდი საბოლოოდ წაიშლება და ბრძანების გაუქმება შეუძლებელი იქნება. გუნდიდან "
-"წაიძლება ყველა წევრი და გუნდის დისკუსიები ხელმისაწვდომი აღარ იქნება."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Team \"{team}\" successfully deleted."
@@ -2594,21 +2590,21 @@ msgstr "„{team}“ გუნდის წაშლა წარმატებ
 msgid "You are not currently a member of any team."
 msgstr "ამჟამად თქვენ არცერთი გუნდის წევრი არ ხართ."
 
-#. Translators: "and others" refers to fact that additional members of a team
-#. exist that are not displayed.
+#. Translators: "and others" refers to fact that additional
+#. * members of a team exist that are not displayed.
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "and others"
 msgstr "და სხვები"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. http://momentjs.com/)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: http://momentjs.com/)
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "Last activity %(date)s"
-msgstr "ბოლო აქტივობა %(date)s"
+msgid "Last activity {date}"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "View %(span_start)s %(team_name)s %(span_end)s"
-msgstr "%(span_start)s %(team_name)s %(span_end)s ნახვა"
+msgid "View {span_start} {team_name} {span_end}"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
@@ -2621,11 +2617,9 @@ msgstr "ტოვებთ ამ გუნდს?"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 msgid ""
-"If you leave, you can no longer post in this team's discussions. Your place "
+"If you leave, you can no longer post in this team's discussions.Your place "
 "will be available to another learner."
 msgstr ""
-"თუ წახვალთ, გუნდის განხილვებში ვეღარ გამოაქვეყნებთ. თქვენი ადგილი სხვა "
-"მსმენელისთვის იქნება ხელმისაწვდომი."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/static/js/verify_student/views/reverify_view.js
@@ -2641,11 +2635,15 @@ msgstr "თქვენ უკვე სხვა გუნდს მიეკ�
 msgid "This team is full."
 msgstr "ეს გუნდი შევსებულია."
 
+#: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
+msgid "Cannot join instructor managed team"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
-msgid "%(memberCount)s / %(maxMemberCount)s Member"
-msgid_plural "%(memberCount)s / %(maxMemberCount)s Members"
-msgstr[0] "%(memberCount)s / %(maxMemberCount)s წევრი"
-msgstr[1] "%(memberCount)s / %(maxMemberCount)s წევრი"
+msgid "{memberCount} / {maxMemberCount} Member"
+msgid_plural "{memberCount} / {maxMemberCount} Members"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "All teams"
@@ -2662,11 +2660,8 @@ msgstr "თემები"
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
 "See all teams in your course, organized by topic. Join a team to collaborate"
-" with other learners who are interested in the same topic as you are."
+" with other learners who are interestedin the same topic as you are."
 msgstr ""
-"იხილეთ თემების მიხედვით დაწყობილი ყველა გუნდი თქვენს კურსში. შეუერთდით გუნდს"
-" რათა ითანამშრომლოთ იმ მსმენელებთან, რომლებიც იგივე თემით არიან "
-"დაინტერესებულნი რითაც თქვენ. "
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "My Team"
@@ -2755,18 +2750,18 @@ msgid "The team \"{team}\" could not be found."
 msgstr "გუნდი „{team}“ ვერ მოიძებნა."
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "%(team_count)s Team"
-msgid_plural "%(team_count)s Teams"
-msgstr[0] "%(team_count)s გუნდი"
-msgstr[1] "%(team_count)s გუნდი"
+msgid "{team_count} Team"
+msgid_plural "{team_count} Teams"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "Topic"
 msgstr "თემა"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "View Teams in the %(topic_name)s Topic"
-msgstr "გუნდების ნახვა %(topic_name)s თემაში"
+msgid "View Teams in the {topic_name} Topic"
+msgstr ""
 
 #. Translators: this string is shown at the bottom of the teams page
 #. to find a team to join or else to create a new one. There are three

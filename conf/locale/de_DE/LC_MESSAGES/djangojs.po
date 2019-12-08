@@ -17,7 +17,7 @@
 # berit.braun, 2014
 # Bert Krohn <bert.krohn@tum.de>, 2017
 # Christian Layr <Christian.Layr@unisg.ch>, 2015
-# Donna Klamma <donna@polarstern-education.com>, 2019
+# Donna Kl <donna@polarstern-education.com>, 2019
 # Ettore Atalan <atalanttore@googlemail.com>, 2014
 # Lars Walther <meinkraeks@gmail.com>, 2015
 # 39e62ebcacb2326f6384f8b81e0898eb, 2014
@@ -48,7 +48,7 @@
 # Alexander Gropmann <alexander.gropmann@charite.de>, 2018
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2014
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2016-2017
-# Donna Klamma <donna@polarstern-education.com>, 2019
+# Donna Kl <donna@polarstern-education.com>, 2019
 # Ettore Atalan <atalanttore@googlemail.com>, 2014,2016
 # Jana Uhlik <janauhlik@gmail.com>, 2015
 # Kai Warendorf <kai.warendorf@proversity.org>, 2015
@@ -89,7 +89,7 @@
 # OberstK <Benjamin.Kurczyk@gmail.com>, 2015
 # Bert Krohn <bert.krohn@tum.de>, 2018
 # Christian Layr <Christian.Layr@unisg.ch>, 2014
-# Donna Klamma <donna@polarstern-education.com>, 2019
+# Donna Kl <donna@polarstern-education.com>, 2019
 # Ettore Atalan <atalanttore@googlemail.com>, 2014
 # Franziska Hahn, 2015
 # trajan, 2014
@@ -113,6 +113,7 @@
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2014
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2016-2017
 # Christian Layr <Christian.Layr@unisg.ch>, 2015
+# Donna Kl <donna@polarstern-education.com>, 2019
 # Ettore Atalan <atalanttore@googlemail.com>, 2014,2016
 # Max Vogl <mail@max-vogl.de>, 2014
 # mc <marc.mannsfeld@phil.hhu.de>, 2015-2016
@@ -123,9 +124,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-11-24 20:42+0000\n"
-"PO-Revision-Date: 2019-11-22 15:51+0000\n"
-"Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>\n"
+"POT-Creation-Date: 2019-12-01 20:42+0000\n"
+"PO-Revision-Date: 2019-12-02 10:39+0000\n"
+"Last-Translator: Donna Kl <donna@polarstern-education.com>\n"
 "Language-Team: German (Germany) (http://www.transifex.com/open-edx/edx-platform/language/de_DE/)\n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"
@@ -2789,14 +2790,14 @@ msgstr ""
 msgid "This team does not have any members."
 msgstr "Dieses Team hat noch keine Mitglieder."
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Joined %(date)s"
 msgstr "Beigetreten am %(date)s"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Last Activity %(date)s"
 msgstr "Letzte Aktivität %(date)s"
@@ -2807,11 +2808,9 @@ msgstr "Dieses Teammitglied entfernen?"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid ""
-"This learner will be removed from the team, allowing another learner to take"
-" the available spot."
+"This learner will be removed from the team,allowing another learner to take "
+"the available spot."
 msgstr ""
-"Dieser Teilnehmer wir aus dem Team entfernt. Gleichzeitig können Sie den "
-"freien Platz an einen anderen Teilnehmer vergeben."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Delete this team?"
@@ -2819,12 +2818,9 @@ msgstr "Dieses Team löschen?"
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid ""
-"Deleting a team is permanent and cannot be undone. All members are removed "
+"Deleting a team is permanent and cannot be undone.All members are removed "
 "from the team, and team discussions can no longer be accessed."
 msgstr ""
-"Das Löschen eines Teams ist dauerhaft und kann nicht rückgängig gemacht "
-"werden. Alle Mitglieder werden aus dem Team entfernt, und Teambesprechungen "
-"können nicht mehr abgerufen werden."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Team \"{team}\" successfully deleted."
@@ -2834,21 +2830,21 @@ msgstr "Team \"{team}\" wurde erfolgreich gelöscht."
 msgid "You are not currently a member of any team."
 msgstr "Du bist aktuell kein Mitgied eines Teams."
 
-#. Translators: "and others" refers to fact that additional members of a team
-#. exist that are not displayed.
+#. Translators: "and others" refers to fact that additional
+#. * members of a team exist that are not displayed.
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "and others"
 msgstr "und andere"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. http://momentjs.com/)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: http://momentjs.com/)
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "Last activity %(date)s"
-msgstr "Letzte Aktivität %(date)s"
+msgid "Last activity {date}"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "View %(span_start)s %(team_name)s %(span_end)s"
-msgstr "%(span_start)s%(team_name)s%(span_end)s ansehen"
+msgid "View {span_start} {team_name} {span_end}"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
@@ -2861,11 +2857,9 @@ msgstr "Dieses Team verlassen?"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 msgid ""
-"If you leave, you can no longer post in this team's discussions. Your place "
+"If you leave, you can no longer post in this team's discussions.Your place "
 "will be available to another learner."
 msgstr ""
-"Wenn du gehst, kannst du nicht mehr in den Diskussionen dieses Teams posten."
-" Dein Platz steht einem anderen Lernenden zur Verfügung."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/static/js/verify_student/views/reverify_view.js
@@ -2881,11 +2875,15 @@ msgstr "Sie gehören bereits zu einem anderen Team."
 msgid "This team is full."
 msgstr "Dieses Team ist voll."
 
+#: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
+msgid "Cannot join instructor managed team"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
-msgid "%(memberCount)s / %(maxMemberCount)s Member"
-msgid_plural "%(memberCount)s / %(maxMemberCount)s Members"
-msgstr[0] "%(memberCount)s/%(maxMemberCount)s Mitglied"
-msgstr[1] "%(memberCount)s/%(maxMemberCount)s Mitglieder"
+msgid "{memberCount} / {maxMemberCount} Member"
+msgid_plural "{memberCount} / {maxMemberCount} Members"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "All teams"
@@ -2902,11 +2900,8 @@ msgstr "Themen"
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
 "See all teams in your course, organized by topic. Join a team to collaborate"
-" with other learners who are interested in the same topic as you are."
+" with other learners who are interestedin the same topic as you are."
 msgstr ""
-"Sehen Sie alle Teams in Ihrem Kurs, organisiert nach Themen. Werden Sie Teil"
-" eines Teams, um mit anderen Lernenden zusammenzuarbeiten, die an demselben "
-"Thema interessiert sind wie Sie."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "My Team"
@@ -3000,18 +2995,18 @@ msgid "The team \"{team}\" could not be found."
 msgstr "Das Team \"{team}\" konnte nicht gefunden werden."
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "%(team_count)s Team"
-msgid_plural "%(team_count)s Teams"
-msgstr[0] "%(team_count)s Team"
-msgstr[1] "%(team_count)s Teams"
+msgid "{team_count} Team"
+msgid_plural "{team_count} Teams"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "Topic"
 msgstr "Thema"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "View Teams in the %(topic_name)s Topic"
-msgstr "Teams im %(topic_name)s ansehen."
+msgid "View Teams in the {topic_name} Topic"
+msgstr ""
 
 #. Translators: this string is shown at the bottom of the teams page
 #. to find a team to join or else to create a new one. There are three
@@ -7712,6 +7707,8 @@ msgid ""
 "You still need to visit the %(display_name)s website to complete the credit "
 "process."
 msgstr ""
+"Sie müssen noch die Website %(display_name)s besuchen, um den Credit-Prozess"
+" abzuschließen."
 
 #: lms/templates/commerce/provider.underscore
 #, python-format
@@ -7719,6 +7716,8 @@ msgid ""
 "To finalize course credit, %(display_name)s requires %(platform_name)s "
 "learners to submit a credit request."
 msgstr ""
+"Um den Credit-Prozess abzuschließen, %(display_name)s müssen die Lernenden "
+"von %(platform_name)s einen Kreditantrag stellen."
 
 #: lms/templates/commerce/provider.underscore
 msgid "Get Credit"
@@ -7904,7 +7903,7 @@ msgstr "Bestellnummer"
 
 #: lms/templates/fields/field_order_history.underscore
 msgid "Date Placed"
-msgstr ""
+msgstr "Datum der Einreichung"
 
 #: lms/templates/fields/field_order_history.underscore
 msgid "Cost"
@@ -8156,7 +8155,7 @@ msgstr "Name des Kohort"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Cohort Assignment Method"
-msgstr ""
+msgstr "Zuweisungsmethode der Cohorte"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Automatic"
@@ -8275,6 +8274,10 @@ msgid ""
 "file, download course profile information or cohort results on the "
 "{link_start}Data Download{link_end} page."
 msgstr ""
+"Um die Kohortenzuordnungen der Lernenden zu überprüfen oder die Ergebnisse "
+"des Hochladens einer CSV-Datei zu sehen, laden Sie Kursprofilinformationen "
+"oder Kohortenergebnisse auf der Seite {link_start}Daten-Download{link_end} "
+"herunter."
 
 #: lms/templates/instructor/instructor_dashboard_2/discussions.underscore
 msgid "Specify whether discussion topics are divided"
@@ -8662,6 +8665,8 @@ msgid ""
 "You can view your information or unlink from {enterprise_name} anytime in "
 "your Account Settings."
 msgstr ""
+"Sie können Ihre Informationen oder den Link von {enterprise_name} jederzeit "
+"in Ihren Kontoeinstellungen einsehen."
 
 #: lms/templates/student_account/login.underscore
 msgid "To continue learning with this account, sign in below."

@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-11-26 12:31+0000\n"
-"PO-Revision-Date: 2019-11-26 12:31:02.793675\n"
+"POT-Creation-Date: 2019-12-08 20:52+0000\n"
+"PO-Revision-Date: 2019-12-08 20:52:13.683378\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -417,11 +417,8 @@ msgstr "Àççöünt réçövérý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α
 #: common/djangoapps/student/admin.py
 #: openedx/core/djangoapps/user_authn/views/login_form.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: cms/templates/login.html cms/templates/register.html
-#: lms/templates/login.html lms/templates/provider_login.html
-#: lms/templates/register-form.html lms/templates/signup_modal.html
+#: lms/templates/provider_login.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
-#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "Pässwörd Ⱡ'σяєм ιρѕυм ∂#"
@@ -466,95 +463,6 @@ msgid "User with this email doesn't exist in system."
 msgstr ""
 "Ûsér wïth thïs émäïl döésn't éxïst ïn sýstém. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
-
-#: common/djangoapps/student/forms.py
-msgid "Full Name cannot contain the following characters: < >"
-msgstr ""
-"Füll Nämé çännöt çöntäïn thé föllöwïng çhäräçtérs: < > Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/djangoapps/student/forms.py
-msgid "A properly formatted e-mail is required"
-msgstr ""
-"À pröpérlý förmättéd é-mäïl ïs réqüïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: common/djangoapps/student/forms.py
-msgid "Your legal name must be a minimum of one character long"
-msgstr ""
-"Ýöür légäl nämé müst ßé ä mïnïmüm öf öné çhäräçtér löng Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/djangoapps/student/forms.py
-#, python-format
-msgid "Email cannot be more than %(limit_value)s characters long"
-msgstr ""
-"Émäïl çännöt ßé möré thän %(limit_value)s çhäräçtérs löng Ⱡ'σяєм ιρѕυм ∂σłσя"
-" ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: common/djangoapps/student/forms.py
-msgid "You must accept the terms of service."
-msgstr ""
-"Ýöü müst äççépt thé térms öf sérvïçé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
-
-#: common/djangoapps/student/forms.py
-msgid "A level of education is required"
-msgstr ""
-"À lévél öf édüçätïön ïs réqüïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: common/djangoapps/student/forms.py
-msgid "Your gender is required"
-msgstr "Ýöür géndér ïs réqüïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: common/djangoapps/student/forms.py
-msgid "Your year of birth is required"
-msgstr "Ýöür ýéär öf ßïrth ïs réqüïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: common/djangoapps/student/forms.py
-msgid "Your mailing address is required"
-msgstr ""
-"Ýöür mäïlïng äddréss ïs réqüïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: common/djangoapps/student/forms.py
-msgid "A description of your goals is required"
-msgstr ""
-"À désçrïptïön öf ýöür göäls ïs réqüïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: common/djangoapps/student/forms.py
-msgid "A city is required"
-msgstr "À çïtý ïs réqüïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: common/djangoapps/student/forms.py
-msgid "A country is required"
-msgstr "À çöüntrý ïs réqüïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: common/djangoapps/student/forms.py
-msgid "To enroll, you must follow the honor code."
-msgstr ""
-"Tö énröll, ýöü müst föllöw thé hönör çödé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: common/djangoapps/student/forms.py
-msgid "You are missing one or more required fields"
-msgstr ""
-"Ýöü äré mïssïng öné ör möré réqüïréd fïélds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: common/djangoapps/student/forms.py
-msgid "Unauthorized email address."
-msgstr "Ûnäüthörïzéd émäïl äddréss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
-
-#: common/djangoapps/student/forms.py
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid ""
-"It looks like {email} belongs to an existing account. Try again with a "
-"different email address."
-msgstr ""
-"Ìt lööks lïké {email} ßélöngs tö än éxïstïng äççöünt. Trý ägäïn wïth ä "
-"dïfférént émäïl äddréss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: common/djangoapps/student/helpers.py
 #, python-brace-format
@@ -974,17 +882,6 @@ msgstr ""
 " ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: common/djangoapps/student/views/management.py
-msgid "No inactive user with this e-mail exists"
-msgstr ""
-"Nö ïnäçtïvé üsér wïth thïs é-mäïl éxïsts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: common/djangoapps/student/views/management.py
-msgid "Unable to send reactivation email"
-msgstr ""
-"Ûnäßlé tö sénd réäçtïvätïön émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: common/djangoapps/student/views/management.py
 msgid "Course id not specified"
 msgstr "Çöürsé ïd nöt spéçïfïéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
@@ -1100,6 +997,16 @@ msgid "Cannot be same as your sign in email address."
 msgstr ""
 "Çännöt ßé sämé äs ýöür sïgn ïn émäïl äddréss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
+
+#: common/djangoapps/student/views/management.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid ""
+"It looks like {email} belongs to an existing account. Try again with a "
+"different email address."
+msgstr ""
+"Ìt lööks lïké {email} ßélöngs tö än éxïstïng äççöünt. Trý ägäïn wïth ä "
+"dïfférént émäïl äddréss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: common/djangoapps/student/views/management.py
 msgid "Unable to send email activation link. Please try again later."
@@ -2301,8 +2208,8 @@ msgstr ""
 #. Translators: this is the last choice of a number of choices of how to log
 #. in
 #. to the site.
-#: common/lib/capa/capa/responsetypes.py lms/templates/login.html
-#: lms/templates/register-form.html lms/templates/course_modes/choose.html
+#: common/lib/capa/capa/responsetypes.py
+#: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "or"
@@ -2762,7 +2669,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
 #: cms/templates/index.html cms/templates/videos_index_pagination.html
-#: lms/templates/manage_user_standing.html lms/templates/register-shib.html
+#: lms/templates/manage_user_standing.html
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
@@ -5863,6 +5770,88 @@ msgstr "Ûnlöçk Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 msgid "Close"
 msgstr "Çlösé Ⱡ'σяєм ιρѕ#"
 
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#, python-format
+msgid ""
+"This is a routed Account Activation email for %(routed_user)s "
+"(%(routed_user_email)s): %(routed_profile_name)s"
+msgstr ""
+"Thïs ïs ä röütéd Àççöünt Àçtïvätïön émäïl för %(routed_user)s "
+"(%(routed_user_email)s): %(routed_profile_name)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+msgid "Account Activation"
+msgstr "Àççöünt Àçtïvätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#: common/templates/student/edx_ace/accountactivation/email/body.txt
+#, python-format
+msgid ""
+"You're almost there! Use the link below to activate your account to access "
+"engaging, high-quality %(platform_name)s courses. Note that you will not be "
+"able to log back into your account until you have activated it."
+msgstr ""
+"Ýöü'ré älmöst théré! Ûsé thé lïnk ßélöw tö äçtïväté ýöür äççöünt tö äççéss "
+"éngägïng, hïgh-qüälïtý %(platform_name)s çöürsés. Nöté thät ýöü wïll nöt ßé "
+"äßlé tö lög ßäçk ïntö ýöür äççöünt üntïl ýöü hävé äçtïvätéd ït. Ⱡ'σяєм ιρѕυм"
+" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт#"
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+msgid "Activate Your Account"
+msgstr "Àçtïväté Ýöür Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#: common/templates/student/edx_ace/accountactivation/email/body.txt
+#, python-format
+msgid "Enjoy learning with %(platform_name)s."
+msgstr ""
+"Énjöý léärnïng wïth %(platform_name)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#, python-format, python-brace-format
+msgid ""
+"If you need help, please use our web form at "
+"{start_anchor_web}%(support_url)s{end_anchor} or email "
+"{start_anchor_email}%(support_email)s{end_anchor}."
+msgstr ""
+"Ìf ýöü nééd hélp, pléäsé üsé öür wéß förm ät "
+"{start_anchor_web}%(support_url)s{end_anchor} ör émäïl "
+"{start_anchor_email}%(support_email)s{end_anchor}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυ#"
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#: common/templates/student/edx_ace/accountactivation/email/body.txt
+#, python-format
+msgid ""
+"This email message was automatically sent by %(lms_url)s because someone "
+"attempted to create an account on %(platform_name)s using this email "
+"address."
+msgstr ""
+"Thïs émäïl méssägé wäs äütömätïçällý sént ßý %(lms_url)s ßéçäüsé söméöné "
+"ättémptéd tö çréäté än äççöünt ön %(platform_name)s üsïng thïs émäïl "
+"äddréss. Ⱡ'σя#"
+
+#: common/templates/student/edx_ace/accountactivation/email/body.txt
+#, python-format
+msgid ""
+"If you need help, please use our web form at %(support_url)s or email "
+"%(support_email)s."
+msgstr ""
+"Ìf ýöü nééd hélp, pléäsé üsé öür wéß förm ät %(support_url)s ör émäïl "
+"%(support_email)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/templates/student/edx_ace/accountactivation/email/subject.txt
+#, python-format
+msgid "Action Required: Activate your %(platform_name)s account"
+msgstr ""
+"Àçtïön Réqüïréd: Àçtïväté ýöür %(platform_name)s äççöünt Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 msgid "Create Password"
 msgstr "Çréäté Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
@@ -8278,7 +8267,7 @@ msgstr "Bïrth Ýéär Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: lms/templates/register-form.html lms/templates/signup_modal.html
+#: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Gender"
 msgstr "Géndér Ⱡ'σяєм ιρѕυ#"
@@ -8290,7 +8279,6 @@ msgstr "Lévél öf Édüçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт �
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Mailing Address"
 msgstr "Mäïlïng Àddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
@@ -8323,7 +8311,6 @@ msgstr "Téäm Ⱡ'σяєм ι#"
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -8332,7 +8319,6 @@ msgstr "Çïtý Ⱡ'σяєм ι#"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -9005,9 +8991,7 @@ msgstr ""
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: lms/templates/sysadmin_dashboard.html
+#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
@@ -9188,7 +9172,6 @@ msgid "Title"
 msgstr "Tïtlé Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Year of Birth"
 msgstr "Ýéär öf Bïrth Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
@@ -10590,15 +10573,15 @@ msgid "Teams"
 msgstr "Téäms Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/teams/views.py
+msgid "course_id must be provided"
+msgstr "çöürsé_ïd müst ßé prövïdéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/djangoapps/teams/views.py
 #, python-brace-format
 msgid "The supplied course id {course_id} is not valid."
 msgstr ""
 "Thé süpplïéd çöürsé ïd {course_id} ïs nöt välïd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя#"
-
-#: lms/djangoapps/teams/views.py
-msgid "course_id must be provided"
-msgstr "çöürsé_ïd müst ßé prövïdéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/djangoapps/teams/views.py
 msgid "text_search and order_by cannot be provided together"
@@ -10641,6 +10624,12 @@ msgid "You are already in a team in this course."
 msgstr ""
 "Ýöü äré älréädý ïn ä téäm ïn thïs çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
+
+#: lms/djangoapps/teams/views.py
+msgid "You can't create a team in an instructor managed topic."
+msgstr ""
+"Ýöü çän't çréäté ä téäm ïn än ïnstrüçtör mänägéd töpïç. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/djangoapps/teams/views.py
 msgid "username or team_id must be specified."
@@ -11938,8 +11927,7 @@ msgstr "Gö tö %(platform_name)s Hömé Pägé Ⱡ'σяєм ιρѕυм ∂σł�
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: cms/templates/login.html cms/templates/widgets/header.html
-#: themes/red-theme/cms/templates/login.html
+#: cms/templates/widgets/header.html
 msgid "Sign In"
 msgstr "Sïgn Ìn Ⱡ'σяєм ιρѕυм #"
 
@@ -13559,7 +13547,6 @@ msgstr ""
 "ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, q#"
 
 #: openedx/core/djangoapps/user_authn/views/login.py
-#: lms/templates/register-form.html
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
@@ -13715,6 +13702,85 @@ msgstr ""
 "Thé prövïdéd äççéss_tökén ïs nöt välïd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Full Name cannot contain the following characters: < >"
+msgstr ""
+"Füll Nämé çännöt çöntäïn thé föllöwïng çhäräçtérs: < > Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A properly formatted e-mail is required"
+msgstr ""
+"À pröpérlý förmättéd é-mäïl ïs réqüïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your legal name must be a minimum of one character long"
+msgstr ""
+"Ýöür légäl nämé müst ßé ä mïnïmüm öf öné çhäräçtér löng Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-format
+msgid "Email cannot be more than %(limit_value)s characters long"
+msgstr ""
+"Émäïl çännöt ßé möré thän %(limit_value)s çhäräçtérs löng Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "You must accept the terms of service."
+msgstr ""
+"Ýöü müst äççépt thé térms öf sérvïçé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A level of education is required"
+msgstr ""
+"À lévél öf édüçätïön ïs réqüïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your gender is required"
+msgstr "Ýöür géndér ïs réqüïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your year of birth is required"
+msgstr "Ýöür ýéär öf ßïrth ïs réqüïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your mailing address is required"
+msgstr ""
+"Ýöür mäïlïng äddréss ïs réqüïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A description of your goals is required"
+msgstr ""
+"À désçrïptïön öf ýöür göäls ïs réqüïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A city is required"
+msgstr "À çïtý ïs réqüïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A country is required"
+msgstr "À çöüntrý ïs réqüïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "To enroll, you must follow the honor code."
+msgstr ""
+"Tö énröll, ýöü müst föllöw thé hönör çödé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "You are missing one or more required fields"
+msgstr ""
+"Ýöü äré mïssïng öné ör möré réqüïréd fïélds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Unauthorized email address."
+msgstr "Ûnäüthörïzéd émäïl äddréss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's email address.
@@ -13736,8 +13802,7 @@ msgstr ""
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's public username.
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
+#: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Public Username"
@@ -15285,63 +15350,11 @@ msgstr "Çöürsé Rün: Ⱡ'σяєм ιρѕυм ∂σłσя #"
 msgid "Courses"
 msgstr "Çöürsés Ⱡ'σяєм ιρѕυм #"
 
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Sign In to {studio_name}"
-msgstr "Sïgn Ìn tö {studio_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr ""
-"Dön't hävé ä {studio_name} Àççöünt? Sïgn üp! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєт#"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Required Information to Sign In to {studio_name}"
-msgstr ""
-"Réqüïréd Ìnförmätïön tö Sïgn Ìn tö {studio_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя#"
-
-#: cms/templates/login.html cms/templates/register.html
-#: lms/templates/login.html lms/templates/provider_login.html
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/signup_modal.html themes/red-theme/cms/templates/login.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "E-mail"
-msgstr "É-mäïl Ⱡ'σяєм ιρѕυ#"
-
-#. Translators: This is the placeholder text for a field that requests an
-#. email
-#. address.
-#: cms/templates/login.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html cms/templates/register.html
-#: lms/templates/login.html lms/templates/register-form.html
-#: lms/templates/register-shib.html themes/red-theme/cms/templates/login.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr "éxämplé: üsérnämé@dömäïn.çöm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: cms/templates/login.html lms/templates/login.html
-#: themes/red-theme/cms/templates/login.html
-msgid "Forgot password?"
-msgstr "Förgöt pässwörd? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#. Translators: This is the placeholder text for a field that requests the
-#. user's full name.
-#: cms/templates/register.html lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "example: Jane Doe"
-msgstr "éxämplé: Jäné Döé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#. Translators: This is the placeholder text for a field that asks the user to
-#. pick a username
-#: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "example: JaneDoe"
-msgstr "éxämplé: JänéDöé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
@@ -15858,8 +15871,7 @@ msgstr ""
 "Pléäsé éntér ýöür é-mäïl äddréss ßélöw, änd wé wïll é-mäïl ïnstrüçtïöns för "
 "séttïng ä néw pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
-#: lms/templates/forgot_password_modal.html lms/templates/login.html
-#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/forgot_password_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -15874,7 +15886,7 @@ msgstr "Réqüïréd Ìnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт
 msgid "Your E-mail Address"
 msgstr "Ýöür É-mäïl Àddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
-#: lms/templates/forgot_password_modal.html lms/templates/login.html
+#: lms/templates/forgot_password_modal.html
 msgid "This is the e-mail address you used to register with {platform}"
 msgstr ""
 "Thïs ïs thé é-mäïl äddréss ýöü üséd tö régïstér wïth {platform} Ⱡ'σяєм ιρѕυм"
@@ -15935,7 +15947,7 @@ msgstr ""
 msgid "Search for a course"
 msgstr "Séärçh för ä çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
-#: lms/templates/index_overlay.html lms/templates/register-sidebar.html
+#: lms/templates/index_overlay.html
 msgid "Welcome to {platform_name}"
 msgstr "Wélçömé tö {platform_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
@@ -16006,105 +16018,6 @@ msgstr[1] ""
 " єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ "
 "єѕт łαвσяυ#"
-
-#: lms/templates/login-sidebar.html
-msgid "Helpful Information"
-msgstr "Hélpfül Ìnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/templates/login-sidebar.html
-msgid "Not Enrolled?"
-msgstr "Nöt Énrölléd? Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: lms/templates/login-sidebar.html
-msgid "Sign up for {platform_name} today!"
-msgstr "Sïgn üp för {platform_name} tödäý! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Need Help?"
-msgstr "Nééd Hélp? Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: lms/templates/login-sidebar.html
-msgid "Looking for help signing in or with your {platform_name} account?"
-msgstr ""
-"Löökïng för hélp sïgnïng ïn ör wïth ýöür {platform_name} äççöünt? Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/login-sidebar.html
-msgid "View our help section for answers to commonly asked questions."
-msgstr ""
-"Vïéw öür hélp séçtïön för änswérs tö çömmönlý äskéd qüéstïöns. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/login.html
-msgid "Log into your {platform_name} Account"
-msgstr ""
-"Lög ïntö ýöür {platform_name} Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/templates/login.html
-msgid "Log into My {platform_name} Account"
-msgstr "Lög ïntö Mý {platform_name} Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: lms/templates/login.html
-msgid "Access My Courses"
-msgstr "Àççéss Mý Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/templates/login.html lms/templates/register-shib.html
-#: lms/templates/register.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Processing your account information"
-msgstr ""
-"Pröçéssïng ýöür äççöünt ïnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: lms/templates/login.html wiki/templates/wiki/accounts/login.html
-msgid "Please log in"
-msgstr "Pléäsé lög ïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: lms/templates/login.html
-msgid "to access your account and courses"
-msgstr ""
-"tö äççéss ýöür äççöünt änd çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: lms/templates/login.html
-msgid "We're Sorry, {platform_name} accounts are unavailable currently"
-msgstr ""
-"Wé'ré Sörrý, {platform_name} äççöünts äré ünäväïläßlé çürréntlý Ⱡ'σяєм ιρѕυм"
-" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/login.html
-msgid "We couldn't log you in."
-msgstr "Wé çöüldn't lög ýöü ïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: lms/templates/login.html
-msgid "Your email or password is incorrect"
-msgstr ""
-"Ýöür émäïl ör pässwörd ïs ïnçörréçt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: lms/templates/login.html
-msgid "An error occurred when signing you in to {platform_name}."
-msgstr ""
-"Àn érrör öççürréd whén sïgnïng ýöü ïn tö {platform_name}. Ⱡ'σяєм ιρѕυм ∂σłσя"
-" ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/templates/login.html
-msgid ""
-"Please provide the following information to log into your {platform_name} "
-"account. Required fields are noted by {strong_start}bold text and an "
-"asterisk (*){strong_end}."
-msgstr ""
-"Pléäsé prövïdé thé föllöwïng ïnförmätïön tö lög ïntö ýöür {platform_name} "
-"äççöünt. Réqüïréd fïélds äré nötéd ßý {strong_start}ßöld téxt änd än "
-"ästérïsk (*){strong_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
-" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
-"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
-"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
-"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι "
-"σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσя#"
-
-#: lms/templates/login.html
-msgid "Sign in with {provider_name}"
-msgstr "Sïgn ïn wïth {provider_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #. Translators:  "External resource" means that this learning module is hosted
 #. on a platform external to the edX LMS
@@ -16327,293 +16240,16 @@ msgstr ""
 "ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι "
 "σƒƒ#"
 
+#: lms/templates/provider_login.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "E-mail"
+msgstr "É-mäïl Ⱡ'σяєм ιρѕυ#"
+
 #: lms/templates/provider_login.html
 #, python-format
 msgid "Return To %s"
 msgstr "Rétürn Tö %s Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid ""
-"We're sorry, but this version of your browser is not supported. Try again "
-"using a different browser or a newer version of your browser."
-msgstr ""
-"Wé'ré sörrý, ßüt thïs vérsïön öf ýöür ßröwsér ïs nöt süppörtéd. Trý ägäïn "
-"üsïng ä dïfférént ßröwsér ör ä néwér vérsïön öf ýöür ßröwsér. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσяυ#"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "The following errors occurred while processing your registration:"
-msgstr ""
-"Thé föllöwïng érrörs öççürréd whïlé pröçéssïng ýöür régïsträtïön: Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Sign up with {provider_name}"
-msgstr "Sïgn üp wïth {provider_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Create your own {platform_name} account below"
-msgstr ""
-"Çréäté ýöür öwn {platform_name} äççöünt ßélöw Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тє#"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-msgid ""
-"Required fields are noted by {strong_start}bold text and an asterisk "
-"(*){strong_end}."
-msgstr ""
-"Réqüïréd fïélds äré nötéd ßý {strong_start}ßöld téxt änd än ästérïsk "
-"(*){strong_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#. Translators: selected_provider is the name of an external, third-party user
-#. authentication service (like Google or LinkedIn).
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "You've successfully signed in with {selected_provider}."
-msgstr ""
-"Ýöü'vé süççéssfüllý sïgnéd ïn wïth {selected_provider}. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid ""
-"We just need a little more information before you start learning with "
-"{platform_name}."
-msgstr ""
-"Wé jüst nééd ä lïttlé möré ïnförmätïön ßéföré ýöü stärt léärnïng wïth "
-"{platform_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Please complete the following fields to register for an account. "
-msgstr ""
-"Pléäsé çömplété thé föllöwïng fïélds tö régïstér för än äççöünt.  Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Your legal name, used for any certificates you earn."
-msgstr ""
-"Ýöür légäl nämé, üséd för äný çértïfïçätés ýöü éärn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Will be shown in any discussions or forums you participate in"
-msgstr ""
-"Wïll ßé shöwn ïn äný dïsçüssïöns ör förüms ýöü pärtïçïpäté ïn Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "cannot be changed later"
-msgstr "çännöt ßé çhängéd lätér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Welcome {username}"
-msgstr "Wélçömé {username} Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Enter a Public Display Name:"
-msgstr "Éntér ä Püßlïç Dïspläý Nämé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Public Display Name"
-msgstr "Püßlïç Dïspläý Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Additional Personal Information"
-msgstr "Àddïtïönäl Pérsönäl Ìnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "example: New York"
-msgstr "éxämplé: Néw Ýörk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Highest Level of Education Completed"
-msgstr ""
-"Hïghést Lévél öf Édüçätïön Çömplétéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Please share with us your reasons for registering with {platform_name}"
-msgstr ""
-"Pléäsé shäré wïth üs ýöür réäsöns för régïstérïng wïth {platform_name} "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Account Acknowledgements"
-msgstr "Àççöünt Àçknöwlédgéménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "I agree to the {link_start}Terms of Service{link_end}"
-msgstr ""
-"Ì ägréé tö thé {link_start}Térms öf Sérvïçé{link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
-" αмєт, ¢σηѕє¢тєтυ#"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "I agree to the {link_start}Honor Code{link_end}"
-msgstr ""
-"Ì ägréé tö thé {link_start}Hönör Çödé{link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
-" ¢σηѕє¢т#"
-
-#: lms/templates/register-form.html lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Create My Account"
-msgstr "Çréäté Mý Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Preferences for {platform_name}"
-msgstr "Préférénçés för {platform_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Update my {platform_name} Account"
-msgstr "Ûpdäté mý {platform_name} Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Welcome {username}!  Please set your preferences below"
-msgstr ""
-"Wélçömé {username}!  Pléäsé sét ýöür préférénçés ßélöw Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Enter a public username:"
-msgstr "Éntér ä püßlïç üsérnämé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Update My Account"
-msgstr "Ûpdäté Mý Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Registration Help"
-msgstr "Régïsträtïön Hélp Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Already registered?"
-msgstr "Àlréädý régïstéréd? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-#: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
-#: wiki/templates/wiki/accounts/signup.html
-msgid "Log in"
-msgstr "Lög ïn Ⱡ'σяєм ιρѕυ#"
-
-#: lms/templates/register-sidebar.html
-msgid ""
-"Registering with {platform_name} gives you access to all of our current and "
-"future free courses. Not ready to take a course just yet? Registering puts "
-"you on our mailing list - we will update you as courses are added."
-msgstr ""
-"Régïstérïng wïth {platform_name} gïvés ýöü äççéss tö äll öf öür çürrént änd "
-"fütüré fréé çöürsés. Nöt réädý tö täké ä çöürsé jüst ýét? Régïstérïng püts "
-"ýöü ön öür mäïlïng lïst - wé wïll üpdäté ýöü äs çöürsés äré äddéd. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт #"
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Next Steps"
-msgstr "Néxt Stéps Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: lms/templates/register-sidebar.html
-msgid ""
-"As part of joining {platform_name}, you will receive an email message with "
-"instructions for activating your account. Don't see the email? Check your "
-"spam folder and mark {platform_name} emails as 'not spam'. At "
-"{platform_name}, we communicate mostly through email."
-msgstr ""
-"Às pärt öf jöïnïng {platform_name}, ýöü wïll réçéïvé än émäïl méssägé wïth "
-"ïnstrüçtïöns för äçtïvätïng ýöür äççöünt. Dön't séé thé émäïl? Çhéçk ýöür "
-"späm földér änd märk {platform_name} émäïls äs 'nöt späm'. Àt "
-"{platform_name}, wé çömmünïçäté möstlý thröügh émäïl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
-" αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
-"łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
-"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
-"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ #"
-
-#: lms/templates/register-sidebar.html
-msgid "Need help registering with {platform_name}?"
-msgstr ""
-"Nééd hélp régïstérïng wïth {platform_name}? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢т#"
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "View our FAQs for answers to commonly asked questions."
-msgstr ""
-"Vïéw öür FÀQs för änswérs tö çömmönlý äskéd qüéstïöns. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/register-sidebar.html
-msgid ""
-"You can find the answers to most of your questions in our list of FAQs. "
-"After you enroll in a course, you can also find answers in the course "
-"discussions."
-msgstr ""
-"Ýöü çän fïnd thé änswérs tö möst öf ýöür qüéstïöns ïn öür lïst öf FÀQs. "
-"Àftér ýöü énröll ïn ä çöürsé, ýöü çän älsö fïnd änswérs ïn thé çöürsé "
-"dïsçüssïöns. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
-"∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
-"мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ "
-"єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
-"νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
-"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłł#"
-
-#: lms/templates/register.html
-msgid "Register for {platform_name}"
-msgstr "Régïstér för {platform_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: lms/templates/register.html
-msgid "Create My {platform_name} Account"
-msgstr "Çréäté Mý {platform_name} Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/templates/register.html
-msgid "Welcome!"
-msgstr "Wélçömé! Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/templates/register.html
-msgid "Register below to create your {platform_name} account"
-msgstr ""
-"Régïstér ßélöw tö çréäté ýöür {platform_name} äççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
-" αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
@@ -16699,6 +16335,11 @@ msgid "{start_li}Welcome{end_li} {name}"
 msgstr "{start_li}Wélçömé{end_li} {name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Enter a public username:"
+msgstr "Éntér ä püßlïç üsérnämé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: lms/templates/signup_modal.html
 msgid "Full Name *"
 msgstr "Füll Nämé * Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
@@ -16710,6 +16351,27 @@ msgstr "Éd. Çömplétéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 msgid "Goals in signing up for {platform_name}"
 msgstr ""
 "Göäls ïn sïgnïng üp för {platform_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "I agree to the {link_start}Terms of Service{link_end}"
+msgstr ""
+"Ì ägréé tö thé {link_start}Térms öf Sérvïçé{link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "I agree to the {link_start}Honor Code{link_end}"
+msgstr ""
+"Ì ägréé tö thé {link_start}Hönör Çödé{link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" ¢σηѕє¢т#"
+
+#: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Create My Account"
+msgstr "Çréäté Mý Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/signup_modal.html
 msgid "Already have an account?"
@@ -19614,7 +19276,6 @@ msgstr ""
 "{platform_name} çöürsés! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
-#: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "The {platform_name} Team"
 msgstr "Thé {platform_name} Téäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -20541,49 +20202,6 @@ msgstr "Hïdé nötés Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #: lms/templates/edxnotes/toggle_notes.html
 msgid "Show notes"
 msgstr "Shöw nötés Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"You're almost there! Use the link to activate your account to access "
-"engaging, high-quality {platform_name} courses. Note that you will not be "
-"able to log back into your account until you have activated it."
-msgstr ""
-"Ýöü'ré älmöst théré! Ûsé thé lïnk tö äçtïväté ýöür äççöünt tö äççéss "
-"éngägïng, hïgh-qüälïtý {platform_name} çöürsés. Nöté thät ýöü wïll nöt ßé "
-"äßlé tö lög ßäçk ïntö ýöür äççöünt üntïl ýöü hävé äçtïvätéd ït. Ⱡ'σяєм ιρѕυм"
-" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт#"
-
-#: lms/templates/emails/activation_email.txt
-msgid "Enjoy learning with {platform_name}."
-msgstr ""
-"Énjöý léärnïng wïth {platform_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"If you need help, please use our web form at {support_url} or email "
-"{support_email}."
-msgstr ""
-"Ìf ýöü nééd hélp, pléäsé üsé öür wéß förm ät {support_url} ör émäïl "
-"{support_email}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"This email message was automatically sent by {lms_url} because someone "
-"attempted to create an account on {platform_name} using this email address."
-msgstr ""
-"Thïs émäïl méssägé wäs äütömätïçällý sént ßý {lms_url} ßéçäüsé söméöné "
-"ättémptéd tö çréäté än äççöünt ön {platform_name} üsïng thïs émäïl äddréss. "
-"Ⱡ'σя#"
-
-#: lms/templates/emails/activation_email_subject.txt
-msgid "Action Required: Activate your {platform_name} account"
-msgstr ""
-"Àçtïön Réqüïréd: Àçtïväté ýöür {platform_name} äççöünt Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Thank you for your purchase of "
@@ -25145,12 +24763,146 @@ msgid "For anyone, anywhere, anytime"
 msgstr "För änýöné, änýwhéré, änýtïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid ""
+"We're sorry, but this version of your browser is not supported. Try again "
+"using a different browser or a newer version of your browser."
+msgstr ""
+"Wé'ré sörrý, ßüt thïs vérsïön öf ýöür ßröwsér ïs nöt süppörtéd. Trý ägäïn "
+"üsïng ä dïfférént ßröwsér ör ä néwér vérsïön öf ýöür ßröwsér. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσяυ#"
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "The following errors occurred while processing your registration:"
+msgstr ""
+"Thé föllöwïng érrörs öççürréd whïlé pröçéssïng ýöür régïsträtïön: Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Sign up with {provider_name}"
+msgstr "Sïgn üp wïth {provider_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Create your own {platform_name} account below"
+msgstr ""
+"Çréäté ýöür öwn {platform_name} äççöünt ßélöw Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тє#"
+
+#: themes/stanford-style/lms/templates/register-form.html
 msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
 msgstr ""
 "Réqüïréd fïélds äré nötéd ßý <strong class=\"indicator\">ßöld téxt änd än "
 "ästérïsk (*)</strong>. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "You've successfully signed in with {selected_provider}."
+msgstr ""
+"Ýöü'vé süççéssfüllý sïgnéd ïn wïth {selected_provider}. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid ""
+"We just need a little more information before you start learning with "
+"{platform_name}."
+msgstr ""
+"Wé jüst nééd ä lïttlé möré ïnförmätïön ßéföré ýöü stärt léärnïng wïth "
+"{platform_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Please complete the following fields to register for an account. "
+msgstr ""
+"Pléäsé çömplété thé föllöwïng fïélds tö régïstér för än äççöünt.  Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "example: Jane Doe"
+msgstr "éxämplé: Jäné Döé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Your legal name, used for any certificates you earn."
+msgstr ""
+"Ýöür légäl nämé, üséd för äný çértïfïçätés ýöü éärn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "example: JaneDoe"
+msgstr "éxämplé: JänéDöé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Will be shown in any discussions or forums you participate in"
+msgstr ""
+"Wïll ßé shöwn ïn äný dïsçüssïöns ör förüms ýöü pärtïçïpäté ïn Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "cannot be changed later"
+msgstr "çännöt ßé çhängéd lätér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Welcome {username}"
+msgstr "Wélçömé {username} Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Enter a Public Display Name:"
+msgstr "Éntér ä Püßlïç Dïspläý Nämé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Public Display Name"
+msgstr "Püßlïç Dïspläý Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Additional Personal Information"
+msgstr "Àddïtïönäl Pérsönäl Ìnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "example: New York"
+msgstr "éxämplé: Néw Ýörk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Highest Level of Education Completed"
+msgstr ""
+"Hïghést Lévél öf Édüçätïön Çömplétéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Please share with us your reasons for registering with {platform_name}"
+msgstr ""
+"Pléäsé shäré wïth üs ýöür réäsöns för régïstérïng wïth {platform_name} "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Account Acknowledgements"
+msgstr "Àççöünt Àçknöwlédgéménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Preferences for {platform_name}"
+msgstr "Préférénçés för {platform_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Update my {platform_name} Account"
+msgstr "Ûpdäté mý {platform_name} Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Processing your account information"
+msgstr ""
+"Pröçéssïng ýöür äççöünt ïnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Welcome {username}!  Please set your preferences below"
+msgstr ""
+"Wélçömé {username}!  Pléäsé sét ýöür préférénçés ßélöw Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
@@ -25159,6 +24911,28 @@ msgid ""
 msgstr ""
 "Réqüïréd fïélds äré nötéd ßý {strong_indicator}ßöld téxt änd än ästérïsk "
 "(*).{strong_close} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Update My Account"
+msgstr "Ûpdäté Mý Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Registration Help"
+msgstr "Régïsträtïön Hélp Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Already registered?"
+msgstr "Àlréädý régïstéréd? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+#: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
+#: wiki/templates/wiki/accounts/signup.html
+msgid "Log in"
+msgstr "Lög ïn Ⱡ'σяєм ιρѕυ#"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Next Steps"
+msgstr "Néxt Stéps Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
@@ -25176,10 +24950,20 @@ msgstr ""
 "υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυ#"
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Need Help?"
+msgstr "Nééd Hélp? Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Need help in registering with {platform_name}?"
 msgstr ""
 "Nééd hélp ïn régïstérïng wïth {platform_name}? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєт#"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "View our FAQs for answers to commonly asked questions."
+msgstr ""
+"Vïéw öür FÀQs för änswérs tö çömmönlý äskéd qüéstïöns. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
@@ -25339,70 +25123,6 @@ msgstr ""
 #: cms/templates/accessibility.html
 msgid "Studio Accessibility Policy"
 msgstr "Stüdïö Àççéssïßïlïtý Pölïçý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
-
-#: cms/templates/activation_active.html cms/templates/activation_complete.html
-#: cms/templates/activation_invalid.html
-msgid "{studio_name} Account Activation"
-msgstr "{studio_name} Àççöünt Àçtïvätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: cms/templates/activation_active.html
-msgid "Your account is already active"
-msgstr "Ýöür äççöünt ïs älréädý äçtïvé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: cms/templates/activation_active.html
-msgid ""
-"This account, set up using {email}, has already been activated. Please sign "
-"in to start working within {studio_name}."
-msgstr ""
-"Thïs äççöünt, sét üp üsïng {email}, häs älréädý ßéén äçtïvätéd. Pléäsé sïgn "
-"ïn tö stärt wörkïng wïthïn {studio_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: cms/templates/activation_active.html cms/templates/activation_complete.html
-msgid "Sign into {studio_name}"
-msgstr "Sïgn ïntö {studio_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: cms/templates/activation_complete.html
-msgid "Your account activation is complete!"
-msgstr ""
-"Ýöür äççöünt äçtïvätïön ïs çömplété! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
-
-#: cms/templates/activation_complete.html
-msgid ""
-"Thank you for activating your account. You may now sign in and start using "
-"{studio_name} to author courses."
-msgstr ""
-"Thänk ýöü för äçtïvätïng ýöür äççöünt. Ýöü mäý nöw sïgn ïn änd stärt üsïng "
-"{studio_name} tö äüthör çöürsés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: cms/templates/activation_invalid.html
-msgid "Your account activation is invalid"
-msgstr ""
-"Ýöür äççöünt äçtïvätïön ïs ïnvälïd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: cms/templates/activation_invalid.html
-msgid ""
-"We're sorry. Something went wrong with your activation. Check to make sure "
-"the URL you went to was correct, as e-mail programs will sometimes split it "
-"into two lines."
-msgstr ""
-"Wé'ré sörrý. Söméthïng wént wröng wïth ýöür äçtïvätïön. Çhéçk tö mäké süré "
-"thé ÛRL ýöü wént tö wäs çörréçt, äs é-mäïl prögräms wïll sömétïmés splït ït "
-"ïntö twö lïnés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, "
-"ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
-"α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ "
-"єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
-" νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
-"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ι#"
-
-#: cms/templates/activation_invalid.html
-msgid ""
-"If you still have issues, contact {platform_name} Support. In the meantime, "
-"you can also return to {link_start}the {studio_name} homepage.{link_end}"
-msgstr ""
-"Ìf ýöü stïll hävé ïssüés, çöntäçt {platform_name} Süppört. Ìn thé méäntïmé, "
-"ýöü çän älsö rétürn tö {link_start}thé {studio_name} hömépägé.{link_end} "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
 msgid "Files & Uploads"
@@ -28129,131 +27849,6 @@ msgstr ""
 " єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт #"
 
-#: cms/templates/register.html cms/templates/widgets/header.html
-msgid "Sign Up"
-msgstr "Sïgn Ûp Ⱡ'σяєм ιρѕυм #"
-
-#: cms/templates/register.html
-msgid "Sign Up for {studio_name}"
-msgstr "Sïgn Ûp för {studio_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: cms/templates/register.html
-msgid "Already have a {studio_name} Account? Sign in"
-msgstr ""
-"Àlréädý hävé ä {studio_name} Àççöünt? Sïgn ïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєт#"
-
-#: cms/templates/register.html
-msgid ""
-"Ready to start creating online courses? Sign up below and start creating "
-"your first {platform_name} course today."
-msgstr ""
-"Réädý tö stärt çréätïng önlïné çöürsés? Sïgn üp ßélöw änd stärt çréätïng "
-"ýöür fïrst {platform_name} çöürsé tödäý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: cms/templates/register.html
-msgid "Required Information to Sign Up for {studio_name}"
-msgstr ""
-"Réqüïréd Ìnförmätïön tö Sïgn Ûp för {studio_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя#"
-
-#: cms/templates/register.html
-msgid ""
-"This will be used in public discussions with your courses and in our edX101 "
-"support forums"
-msgstr ""
-"Thïs wïll ßé üséd ïn püßlïç dïsçüssïöns wïth ýöür çöürsés änd ïn öür édX101 "
-"süppört förüms Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: cms/templates/register.html
-msgid "Your Location"
-msgstr "Ýöür Löçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: cms/templates/register.html
-msgid "Preferred Language"
-msgstr "Préférréd Längüägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: cms/templates/register.html
-msgid "I agree to the {a_start} Terms of Service {a_end}"
-msgstr ""
-"Ì ägréé tö thé {a_start} Térms öf Sérvïçé {a_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя#"
-
-#: cms/templates/register.html
-msgid "Create My Account &amp; Start Authoring Courses"
-msgstr ""
-"Çréäté Mý Àççöünt &amp; Stärt Àüthörïng Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
-" ¢σηѕє¢тєтυя #"
-
-#: cms/templates/register.html
-msgid "Common {studio_name} Questions"
-msgstr "Çömmön {studio_name} Qüéstïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: cms/templates/register.html
-msgid "Who is {studio_name} for?"
-msgstr "Whö ïs {studio_name} för? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: cms/templates/register.html
-msgid ""
-"{studio_name} is for anyone that wants to create online courses that "
-"leverage the global {platform_name} platform. Our users are often faculty "
-"members, teaching assistants and course staff, and members of instructional "
-"technology groups."
-msgstr ""
-"{studio_name} ïs för änýöné thät wänts tö çréäté önlïné çöürsés thät "
-"lévérägé thé glößäl {platform_name} plätförm. Öür üsérs äré öftén fäçültý "
-"mémßérs, téäçhïng ässïstänts änd çöürsé stäff, änd mémßérs öf ïnstrüçtïönäl "
-"téçhnölögý gröüps. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
-"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
-"єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
-"αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
-"νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя.#"
-
-#: cms/templates/register.html
-msgid ""
-"How technically savvy do I need to be to create courses in {studio_name}?"
-msgstr ""
-"Höw téçhnïçällý sävvý dö Ì nééd tö ßé tö çréäté çöürsés ïn {studio_name}? "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: cms/templates/register.html
-msgid ""
-"{studio_name} is designed to be easy to use by almost anyone familiar with "
-"common web-based authoring environments (Wordpress, Moodle, etc.). No "
-"programming knowledge is required, but for some of the more advanced "
-"features, a technical background would be helpful. As always, we are here to"
-" help, so don't hesitate to dive right in."
-msgstr ""
-"{studio_name} ïs désïgnéd tö ßé éäsý tö üsé ßý älmöst änýöné fämïlïär wïth "
-"çömmön wéß-ßäséd äüthörïng énvïrönménts (Wördpréss, Möödlé, étç.). Nö "
-"prögrämmïng knöwlédgé ïs réqüïréd, ßüt för sömé öf thé möré ädvänçéd "
-"féätürés, ä téçhnïçäl ßäçkgröünd wöüld ßé hélpfül. Às älwäýs, wé äré héré tö"
-" hélp, sö dön't hésïtäté tö dïvé rïght ïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
-"∂σłσяє мαgηα αłιqυα#"
-
-#: cms/templates/register.html
-msgid "I've never authored a course online before. Is there help?"
-msgstr ""
-"Ì'vé névér äüthöréd ä çöürsé önlïné ßéföré. Ìs théré hélp? Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: cms/templates/register.html
-msgid ""
-"Absolutely. We have created an online course, edX101, that describes some "
-"best practices: from filming video, creating exercises, to the basics of "
-"running an online course. Additionally, we're always here to help, just drop"
-" us a note."
-msgstr ""
-"Àßsölütélý. Wé hävé çréätéd än önlïné çöürsé, édX101, thät désçrïßés sömé "
-"ßést präçtïçés: fröm fïlmïng vïdéö, çréätïng éxérçïsés, tö thé ßäsïçs öf "
-"rünnïng än önlïné çöürsé. Àddïtïönällý, wé'ré älwäýs héré tö hélp, jüst dröp"
-" üs ä nöté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
-"∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
-"мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ "
-"єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
-"νєłιт єѕѕє ¢ιłłυм#"
-
 #: cms/templates/settings.html
 msgid "Schedule & Details Settings"
 msgstr "Sçhédülé & Détäïls Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
@@ -29258,33 +28853,6 @@ msgstr ""
 "Thïs gröüp nö löngér éxïsts.  Çhöösé änöthér gröüp ör rémövé thé äççéss "
 "réstrïçtïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
-#: cms/templates/emails/activation_email.txt
-msgid ""
-"Thank you for signing up for {studio_name}! To activate your account, please"
-" copy and paste this address into your web browser's address bar:"
-msgstr ""
-"Thänk ýöü för sïgnïng üp för {studio_name}! Tö äçtïväté ýöür äççöünt, pléäsé"
-" çöpý änd pästé thïs äddréss ïntö ýöür wéß ßröwsér's äddréss ßär: Ⱡ#"
-
-#: cms/templates/emails/activation_email.txt
-msgid ""
-"If you didn't request this, you don't need to do anything; you won't receive"
-" any more email from us. Please do not reply to this e-mail; if you require "
-"assistance, check the help section of the {studio_name} web site."
-msgstr ""
-"Ìf ýöü dïdn't réqüést thïs, ýöü dön't nééd tö dö änýthïng; ýöü wön't réçéïvé"
-" äný möré émäïl fröm üs. Pléäsé dö nöt réplý tö thïs é-mäïl; ïf ýöü réqüïré "
-"ässïstänçé, çhéçk thé hélp séçtïön öf thé {studio_name} wéß sïté. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕι#"
-
-#: cms/templates/emails/activation_email_subject.txt
-msgid "Your account for {studio_name}"
-msgstr "Ýöür äççöünt för {studio_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
 #: cms/templates/emails/course_creator_admin_subject.txt
 msgid "{email} has requested {studio_name} course creator privileges on edge"
 msgstr ""
@@ -29448,14 +29016,6 @@ msgstr ""
 "Rétürn tö thé {link_start}hömé pägé{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢т#"
 
-#: cms/templates/registration/reg_complete.html
-msgid ""
-"We've sent an email message to {email} with instructions for activating your"
-" account."
-msgstr ""
-"Wé'vé sént än émäïl méssägé tö {email} wïth ïnstrüçtïöns för äçtïvätïng ýöür"
-" äççöünt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
 #: cms/templates/widgets/footer.html
 msgid "Policies"
 msgstr "Pölïçïés Ⱡ'σяєм ιρѕυм ∂#"
@@ -29508,6 +29068,10 @@ msgstr "Àççöünt Nävïgätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт 
 #: cms/templates/widgets/header.html
 msgid "Contextual Online Help"
 msgstr "Çöntéxtüäl Önlïné Hélp Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: cms/templates/widgets/header.html
+msgid "Sign Up"
+msgstr "Sïgn Ûp Ⱡ'σяєм ιρѕυм #"
 
 #: cms/templates/widgets/metadata-edit.html
 msgid "Launch Latex Source Compiler"
@@ -30688,6 +30252,10 @@ msgid "This article is currently locked for editing."
 msgstr ""
 "Thïs ärtïçlé ïs çürréntlý löçkéd för édïtïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
+
+#: wiki/templates/wiki/accounts/login.html
+msgid "Please log in"
+msgstr "Pléäsé lög ïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: wiki/templates/wiki/accounts/login.html
 msgid "Log me in..."

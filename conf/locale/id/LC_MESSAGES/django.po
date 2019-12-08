@@ -99,7 +99,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-11-24 20:42+0000\n"
+"POT-Creation-Date: 2019-12-01 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019\n"
 "Language-Team: Indonesian (https://www.transifex.com/open-edx/teams/6205/id/)\n"
@@ -443,8 +443,7 @@ msgstr "Pemulihan Akun"
 #: openedx/core/djangoapps/user_authn/views/login_form.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: cms/templates/login.html cms/templates/register.html
-#: lms/templates/login.html lms/templates/provider_login.html
-#: lms/templates/register-form.html lms/templates/signup_modal.html
+#: lms/templates/provider_login.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
 #: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -903,14 +902,6 @@ msgid "The course you are looking for is closed for enrollment as of {date}."
 msgstr "Kursus yang Anda dicari tidak menerima siswa baru sejak {date}."
 
 #: common/djangoapps/student/views/management.py
-msgid "No inactive user with this e-mail exists"
-msgstr "Tidak ada pengguna non aktif dengan email ini"
-
-#: common/djangoapps/student/views/management.py
-msgid "Unable to send reactivation email"
-msgstr "Tidak dapat mengirim email aktivasi"
-
-#: common/djangoapps/student/views/management.py
 msgid "Course id not specified"
 msgstr "Id kursus belum ditentukan"
 
@@ -994,40 +985,6 @@ msgstr ""
 "{html_start} Berhasil! Anda telah mengaktifkan akun Anda. {html_end} "
 "Sekarang Anda akan menerima email pembaruan dan peringatan dari kami terkait"
 " dengan kursus yang Anda ikuti. Sign In untuk melanjutkan."
-
-#: common/djangoapps/student/views/management.py
-msgid ""
-"Your previous request is in progress, please try again in a few moments."
-msgstr ""
-
-#: common/djangoapps/student/views/management.py
-msgid "Some error occured during password change. Please try again"
-msgstr "Terjadi kesalahan saat mengubah sandi. Silakan coba kembali."
-
-#: common/djangoapps/student/views/management.py
-msgid "No email address provided."
-msgstr "Email belum dimasukkan."
-
-#: common/djangoapps/student/views/management.py
-msgid "Password reset unsuccessful"
-msgstr "Reset Kata sandi tidak berhasil"
-
-#: common/djangoapps/student/views/management.py
-msgid "Error in resetting your password."
-msgstr "Gagal mereset password anda."
-
-#: common/djangoapps/student/views/management.py
-msgid "Error in resetting your password. Please try again."
-msgstr "Eror terjadi saat pengaturan ulang kata sandi. Silahkan coba lagi."
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid ""
-"{html_start}Password Creation Complete{html_end}Your password has been "
-"created. {bold_start}{email}{bold_end} is now your primary login email."
-msgstr ""
-"{html_start}Sandi Anda telah Dibuat{html_end}Sandi Anda telah dibuat. "
-"{bold_start}{email}{bold_end} adalah email login utama Anda."
 
 #: common/djangoapps/student/views/management.py
 msgid "Valid e-mail address required."
@@ -2069,8 +2026,8 @@ msgstr ""
 #. Translators: this is the last choice of a number of choices of how to log
 #. in
 #. to the site.
-#: common/lib/capa/capa/responsetypes.py lms/templates/login.html
-#: lms/templates/register-form.html lms/templates/course_modes/choose.html
+#: common/lib/capa/capa/responsetypes.py
+#: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "or"
@@ -2488,7 +2445,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
 #: cms/templates/index.html cms/templates/videos_index_pagination.html
-#: lms/templates/manage_user_standing.html lms/templates/register-shib.html
+#: lms/templates/manage_user_standing.html
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
@@ -5112,6 +5069,65 @@ msgstr "Buka Kunci Akun"
 msgid "Close"
 msgstr "Tutup"
 
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#, python-format
+msgid ""
+"This is a routed Account Activation email for %(routed_user)s "
+"(%(routed_user_email)s): %(routed_profile_name)s"
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+msgid "Account Activation"
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#: common/templates/student/edx_ace/accountactivation/email/body.txt
+#, python-format
+msgid ""
+"You're almost there! Use the link below to activate your account to access "
+"engaging, high-quality %(platform_name)s courses. Note that you will not be "
+"able to log back into your account until you have activated it."
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+msgid "Activate Your Account"
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#: common/templates/student/edx_ace/accountactivation/email/body.txt
+#, python-format
+msgid "Enjoy learning with %(platform_name)s."
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#, python-format, python-brace-format
+msgid ""
+"If you need help, please use our web form at "
+"{start_anchor_web}%(support_url)s{end_anchor} or email "
+"{start_anchor_email}%(support_email)s{end_anchor}."
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#: common/templates/student/edx_ace/accountactivation/email/body.txt
+#, python-format
+msgid ""
+"This email message was automatically sent by %(lms_url)s because someone "
+"attempted to create an account on %(platform_name)s using this email "
+"address."
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.txt
+#, python-format
+msgid ""
+"If you need help, please use our web form at %(support_url)s or email "
+"%(support_email)s."
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/subject.txt
+#, python-format
+msgid "Action Required: Activate your %(platform_name)s account"
+msgstr ""
+
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 msgid "Create Password"
 msgstr "Buka Sandi"
@@ -7222,7 +7238,7 @@ msgstr "Tahun Lahir"
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: lms/templates/register-form.html lms/templates/signup_modal.html
+#: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Gender"
 msgstr "Jenis Kelamin"
@@ -7234,7 +7250,6 @@ msgstr "Level Pendidikan"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Mailing Address"
 msgstr "Alamat Surat"
@@ -7267,7 +7282,6 @@ msgstr "Tim"
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -7276,7 +7290,6 @@ msgstr "Kota"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -7849,8 +7862,7 @@ msgstr "Batas waktu perpanjangan harus lebih lama dari pada batas waktu asli."
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
+#: cms/templates/register.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -8012,7 +8024,6 @@ msgid "Title"
 msgstr "Judul"
 
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Year of Birth"
 msgstr "Tahun Lahir"
@@ -9154,6 +9165,10 @@ msgid "This team is already full."
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
+msgid "You can't join an instructor managed team."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
 #, python-brace-format
 msgid "The user {username} is already a member of a team in this course."
 msgstr ""
@@ -9162,6 +9177,10 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "The user {username} is not enrolled in the course associated with this team."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "You can't leave an instructor managed team."
 msgstr ""
 
 #: lms/djangoapps/verify_student/models.py
@@ -11526,7 +11545,6 @@ msgstr ""
 "{register_label_strong} di bagian atas halaman.."
 
 #: openedx/core/djangoapps/user_authn/views/login.py
-#: lms/templates/register-form.html
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
@@ -11598,6 +11616,40 @@ msgstr ""
 "Akun pengguna terasosiasi dengan alamat e-mail ini tidak dapat mengatur "
 "ulang kata sandi."
 
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "Password reset unsuccessful"
+msgstr "Reset Kata sandi tidak berhasil"
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "Error in resetting your password."
+msgstr "Gagal mereset password anda."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "Error in resetting your password. Please try again."
+msgstr "Eror terjadi saat pengaturan ulang kata sandi. Silahkan coba lagi."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+#, python-brace-format
+msgid ""
+"{html_start}Password Creation Complete{html_end}Your password has been "
+"created. {bold_start}{email}{bold_end} is now your primary login email."
+msgstr ""
+"{html_start}Sandi Anda telah Dibuat{html_end}Sandi Anda telah dibuat. "
+"{bold_start}{email}{bold_end} adalah email login utama Anda."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"Your previous request is in progress, please try again in a few moments."
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "Some error occured during password change. Please try again"
+msgstr "Terjadi kesalahan saat mengubah sandi. Silakan coba kembali."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "No email address provided."
+msgstr "Email belum dimasukkan."
+
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
 msgid "Registration using {provider} has timed out."
@@ -11633,8 +11685,7 @@ msgstr "Nama resmi anda, digunakan untuk setiap sertifikat yang anda peroleh"
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's public username.
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
+#: cms/templates/register.html lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Public Username"
@@ -12914,9 +12965,8 @@ msgid "Required Information to Sign In to {studio_name}"
 msgstr "Informasi Yang Dibutuhkan untuk Daftar di {studio_name}"
 
 #: cms/templates/login.html cms/templates/register.html
-#: lms/templates/login.html lms/templates/provider_login.html
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/signup_modal.html themes/red-theme/cms/templates/login.html
+#: lms/templates/provider_login.html lms/templates/signup_modal.html
+#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "E-mail"
@@ -12927,29 +12977,26 @@ msgstr "Email"
 #. address.
 #: cms/templates/login.html cms/templates/manage_users.html
 #: cms/templates/manage_users_lib.html cms/templates/register.html
-#: lms/templates/login.html lms/templates/register-form.html
-#: lms/templates/register-shib.html themes/red-theme/cms/templates/login.html
+#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr "contoh: namapengguna@domain.com"
 
-#: cms/templates/login.html lms/templates/login.html
-#: themes/red-theme/cms/templates/login.html
+#: cms/templates/login.html themes/red-theme/cms/templates/login.html
 msgid "Forgot password?"
 msgstr "Lupa sandi?"
 
 #. Translators: This is the placeholder text for a field that requests the
 #. user's full name.
-#: cms/templates/register.html lms/templates/register-form.html
+#: cms/templates/register.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "example: Jane Doe"
 msgstr "contoh: Budi Raharjo"
 
 #. Translators: This is the placeholder text for a field that asks the user to
 #. pick a username
-#: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/register-shib.html
+#: cms/templates/register.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: JaneDoe"
@@ -13441,8 +13488,7 @@ msgstr ""
 "Harap masukkan alamat email Anda di bawah, dan kami akan meng-email "
 "instruksi untuk menyetel sandi yang baru."
 
-#: lms/templates/forgot_password_modal.html lms/templates/login.html
-#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/forgot_password_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -13457,7 +13503,7 @@ msgstr "Informasi yang Dibutuhkan"
 msgid "Your E-mail Address"
 msgstr "Alamat Email Anda"
 
-#: lms/templates/forgot_password_modal.html lms/templates/login.html
+#: lms/templates/forgot_password_modal.html
 msgid "This is the e-mail address you used to register with {platform}"
 msgstr "Ini adalah alamat email yang digunakan saat mendaftar {platform}"
 
@@ -13502,7 +13548,7 @@ msgstr ""
 msgid "Search for a course"
 msgstr "Cari kursus"
 
-#: lms/templates/index_overlay.html lms/templates/register-sidebar.html
+#: lms/templates/index_overlay.html
 msgid "Welcome to {platform_name}"
 msgstr "Selamat datang di {platform_name}"
 
@@ -13550,89 +13596,6 @@ msgstr[0] ""
 "Menampilkan semua konten yang cocok dan memenuhi syarat untuk ditambahkan ke"
 " dalam {display_name}. Setiap siswa akan ditugaskan  {max_count} komponen "
 "yang diambil secara acak dari daftar ini."
-
-#: lms/templates/login-sidebar.html
-msgid "Helpful Information"
-msgstr "Informasi Berguna"
-
-#: lms/templates/login-sidebar.html
-msgid "Not Enrolled?"
-msgstr "Belum Terdaftar?"
-
-#: lms/templates/login-sidebar.html
-msgid "Sign up for {platform_name} today!"
-msgstr "Daftar {platform_name} hari ini!"
-
-#: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Need Help?"
-msgstr "Butuh Bantuan?"
-
-#: lms/templates/login-sidebar.html
-msgid "Looking for help signing in or with your {platform_name} account?"
-msgstr ""
-"Apakah Anda mencari bantuan untuk mendaftar atau dengan akun {platform_name}"
-" Anda?"
-
-#: lms/templates/login-sidebar.html
-msgid "View our help section for answers to commonly asked questions."
-msgstr "Lihat bagian bantuan untuk menjawab pertanyaan sering ditanyakan."
-
-#: lms/templates/login.html
-msgid "Log into your {platform_name} Account"
-msgstr "Masuk ke Akun {platform_name} Anda"
-
-#: lms/templates/login.html
-msgid "Log into My {platform_name} Account"
-msgstr "Masuk ke Akun {platform_name} Saya"
-
-#: lms/templates/login.html
-msgid "Access My Courses"
-msgstr "Akses Kursus Saya"
-
-#: lms/templates/login.html lms/templates/register-shib.html
-#: lms/templates/register.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Processing your account information"
-msgstr "Memproses informasi akun anda"
-
-#: lms/templates/login.html wiki/templates/wiki/accounts/login.html
-msgid "Please log in"
-msgstr "Harap masuk"
-
-#: lms/templates/login.html
-msgid "to access your account and courses"
-msgstr "untuk mengakses akun dan kursus Anda"
-
-#: lms/templates/login.html
-msgid "We're Sorry, {platform_name} accounts are unavailable currently"
-msgstr "Kami mohon maaf, akun-akun {platform_name} saat ini tidak tersedia"
-
-#: lms/templates/login.html
-msgid "We couldn't log you in."
-msgstr "Kami tidak dapat memasukkan Anda."
-
-#: lms/templates/login.html
-msgid "Your email or password is incorrect"
-msgstr "Email atau sandi Anda salah"
-
-#: lms/templates/login.html
-msgid "An error occurred when signing you in to {platform_name}."
-msgstr "Sebuah kesalahan terjadi ketika Anda masuk {platform_name}."
-
-#: lms/templates/login.html
-msgid ""
-"Please provide the following information to log into your {platform_name} "
-"account. Required fields are noted by {strong_start}bold text and an "
-"asterisk (*){strong_end}."
-msgstr ""
-"Harap berikan informasi berikut untuk masuk ke akun {platform_name}. Isian "
-"yang dibutuhkan ditandai dengan {strong_start} teks tebal dan tanda bintang "
-"(*){strong_end}."
-
-#: lms/templates/login.html
-msgid "Sign in with {provider_name}"
-msgstr "Masuk dengan {provider_name}"
 
 #. Translators:  "External resource" means that this learning module is hosted
 #. on a platform external to the edX LMS
@@ -13831,243 +13794,6 @@ msgstr ""
 msgid "Return To %s"
 msgstr "Kembali ke %s"
 
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid ""
-"We're sorry, but this version of your browser is not supported. Try again "
-"using a different browser or a newer version of your browser."
-msgstr ""
-"Maaf, versi browser Anda tidak didukung. Coba lagi menggunakan browser yang "
-"berbeda atau versi yang lebih baru dari browser Anda."
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "The following errors occurred while processing your registration:"
-msgstr "Terjadi kesalahan saat memproses pendaftaran Anda:"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Sign up with {provider_name}"
-msgstr "Daftar menggunakan {provider_name}"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Create your own {platform_name} account below"
-msgstr "Buat akun anda {platform_name} di bawah"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-msgid ""
-"Required fields are noted by {strong_start}bold text and an asterisk "
-"(*){strong_end}."
-msgstr ""
-"Kolom yang wajib diisi ditandai dengan {strong_start} teks tebal dan tanda "
-"bintang (*){strong_end}."
-
-#. Translators: selected_provider is the name of an external, third-party user
-#. authentication service (like Google or LinkedIn).
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "You've successfully signed in with {selected_provider}."
-msgstr "Anda telah berhasil masuk dengan {selected_provider}."
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid ""
-"We just need a little more information before you start learning with "
-"{platform_name}."
-msgstr ""
-"Kami hanya membutuhkan sedikit informasi sebelum anda mulai mempelajari "
-"dengan {platform_name}."
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Please complete the following fields to register for an account. "
-msgstr "Harap lengkapi kolom berikut untuk membuat akun."
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Your legal name, used for any certificates you earn."
-msgstr "Nama resmi anda, digunakan untuk setiap sertifikat yang anda peroleh"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Will be shown in any discussions or forums you participate in"
-msgstr "Akan ditampilkan pada diskusi atau forum yang Anda ikuti"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "cannot be changed later"
-msgstr "tidak dapat diubah"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Welcome {username}"
-msgstr "Selamat Datang {username}"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Enter a Public Display Name:"
-msgstr "Masukkan Nama Publik"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Public Display Name"
-msgstr "Nama Publik"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Additional Personal Information"
-msgstr "Tambahan Informasi Pribadi"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "example: New York"
-msgstr "Contoh: Jakarta"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Highest Level of Education Completed"
-msgstr "Jenjang Pendidikan Paling Tinggi yang Diselesaikan"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Please share with us your reasons for registering with {platform_name}"
-msgstr "Beri tahu kami alasan Anda mendaftar {platform_name}"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Account Acknowledgements"
-msgstr "Ucapan terima kasih akun"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "I agree to the {link_start}Terms of Service{link_end}"
-msgstr "Saya setuju dengan {link_start}Ketentuan Layanan{link_end}"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "I agree to the {link_start}Honor Code{link_end}"
-msgstr "Saya setuju dengan {link_start}Kode Etik{link_end}"
-
-#: lms/templates/register-form.html lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Create My Account"
-msgstr "Buat Akun Saya"
-
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Preferences for {platform_name}"
-msgstr "Pilihan {platform_name}"
-
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Update my {platform_name} Account"
-msgstr "Perbaharui Akun {platform_name} saya"
-
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Welcome {username}!  Please set your preferences below"
-msgstr "Selamat datang {username}! Harap tentukan pilihan Anda di bawah"
-
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Enter a public username:"
-msgstr "Masukkan nama publik:"
-
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Update My Account"
-msgstr "Perbaharui Akun Saya"
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Registration Help"
-msgstr "Bantuan Pendaftaran"
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Already registered?"
-msgstr "Sudah terdaftar?"
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-#: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
-#: wiki/templates/wiki/accounts/signup.html
-msgid "Log in"
-msgstr "Masuk"
-
-#: lms/templates/register-sidebar.html
-msgid ""
-"Registering with {platform_name} gives you access to all of our current and "
-"future free courses. Not ready to take a course just yet? Registering puts "
-"you on our mailing list - we will update you as courses are added."
-msgstr ""
-"Mendaftar di {platform_name} memberikan Anda akses ke semua kursus gratis "
-"kami saat ini dan nanti. Belum siap untuk mengikuti kursus? Mendaftar "
-"menyertakan anda pada mailing list kami - kami akan memberi tahu Anda begitu"
-" kursus-kursus baru ditambahkan."
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Next Steps"
-msgstr "Langkah Berikutnya"
-
-#: lms/templates/register-sidebar.html
-msgid ""
-"As part of joining {platform_name}, you will receive an email message with "
-"instructions for activating your account. Don't see the email? Check your "
-"spam folder and mark {platform_name} emails as 'not spam'. At "
-"{platform_name}, we communicate mostly through email."
-msgstr ""
-"Sebagai bagian dari bergabungnya Anda dengan {platform_name}, Anda akan "
-"menerima pesan email berisi petunjuk untuk pegaktifan akun Anda. Apakah "
-"tidak mendapatkan emailnya? Periksa folder spam Anda dan tandai "
-"{platform_name} email tersebut sebagai 'bukan spam'. Di {platform_name}, "
-"kami berkomunikasi sebagian besar melalui email."
-
-#: lms/templates/register-sidebar.html
-msgid "Need help registering with {platform_name}?"
-msgstr "Butuh bantuan untuk mendaftar dengan {platform_name}?"
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "View our FAQs for answers to commonly asked questions."
-msgstr "Lihat PSD untuk jawaban atas pertanyaan yang sering ditanyakan."
-
-#: lms/templates/register-sidebar.html
-msgid ""
-"You can find the answers to most of your questions in our list of FAQs. "
-"After you enroll in a course, you can also find answers in the course "
-"discussions."
-msgstr ""
-"Anda dapat menemukan jawaban atas sebagian besar pertanyaan dalam daftar FAQ"
-" kami. Setelah terdaftar dalam pelatihan, Anda juga bisa menemukan jawaban "
-"dalam sesi diskusi."
-
-#: lms/templates/register.html
-msgid "Register for {platform_name}"
-msgstr "Daftar {platform_name}"
-
-#: lms/templates/register.html
-msgid "Create My {platform_name} Account"
-msgstr "Buat Akun {platform_name} saya"
-
-#: lms/templates/register.html
-msgid "Welcome!"
-msgstr "Selamat Datang!"
-
-#: lms/templates/register.html
-msgid "Register below to create your {platform_name} account"
-msgstr "Daftar di bawah untuk membuat akun {platform_name} Anda"
-
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
 msgstr "Kembali Berlangganan Berhasil!"
@@ -14147,6 +13873,11 @@ msgid "{start_li}Welcome{end_li} {name}"
 msgstr "{start_li}Selamat Datang{end_li} {name}"
 
 #: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Enter a public username:"
+msgstr "Masukkan nama publik:"
+
+#: lms/templates/signup_modal.html
 msgid "Full Name *"
 msgstr "Nama Lengkap *"
 
@@ -14157,6 +13888,23 @@ msgstr "Pend. yang Diselesaikan"
 #: lms/templates/signup_modal.html
 msgid "Goals in signing up for {platform_name}"
 msgstr "Tujuan mendaftar di {platform_name}"
+
+#: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "I agree to the {link_start}Terms of Service{link_end}"
+msgstr "Saya setuju dengan {link_start}Ketentuan Layanan{link_end}"
+
+#: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "I agree to the {link_start}Honor Code{link_end}"
+msgstr "Saya setuju dengan {link_start}Kode Etik{link_end}"
+
+#: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Create My Account"
+msgstr "Buat Akun Saya"
 
 #: lms/templates/signup_modal.html
 msgid "Already have an account?"
@@ -16829,7 +16577,6 @@ msgstr ""
 "kembali dengan Anda di pelatihan {platform_name} berikutnya!"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
-#: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "The {platform_name} Team"
 msgstr "Tim {platform_name}"
@@ -17627,41 +17374,6 @@ msgstr "Sembunyikan catatan"
 #: lms/templates/edxnotes/toggle_notes.html
 msgid "Show notes"
 msgstr "Tampilkan catatan"
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"You're almost there! Use the link to activate your account to access "
-"engaging, high-quality {platform_name} courses. Note that you will not be "
-"able to log back into your account until you have activated it."
-msgstr ""
-"Kamu hampir sampai! Gunakan tautan tersebut untuk mengaktifkan akun Anda "
-"untuk mengakses pelatihan {platform_name} berkualitas tinggi. Perhatikan "
-"bahwa Anda tidak akan bisa masuk kembali ke akun Anda sampai Anda "
-"mengaktifkannya."
-
-#: lms/templates/emails/activation_email.txt
-msgid "Enjoy learning with {platform_name}."
-msgstr "Nikmati belajar dengan {platform_name}."
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"If you need help, please use our web form at {support_url} or email "
-"{support_email}."
-msgstr ""
-"Jika Anda butuh bantuan, silahkan gunakan formulir web kami di {support_url}"
-" atau email {support_email}."
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"This email message was automatically sent by {lms_url} because someone "
-"attempted to create an account on {platform_name} using this email address."
-msgstr ""
-"Pesan email ini secara otomatis dikirim oleh {lms_url} karena seseorang "
-"berusaha membuat akun di {platform_name} menggunakan alamat email ini."
-
-#: lms/templates/emails/activation_email_subject.txt
-msgid "Action Required: Activate your {platform_name} account"
-msgstr "Diperlukan Tindakan: Aktifkan akun {platform_name} Anda"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Thank you for your purchase of "
@@ -21677,6 +21389,28 @@ msgid "For anyone, anywhere, anytime"
 msgstr "Untuk siapa saja, di mana saja, kapan saja"
 
 #: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid ""
+"We're sorry, but this version of your browser is not supported. Try again "
+"using a different browser or a newer version of your browser."
+msgstr ""
+"Maaf, versi browser Anda tidak didukung. Coba lagi menggunakan browser yang "
+"berbeda atau versi yang lebih baru dari browser Anda."
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "The following errors occurred while processing your registration:"
+msgstr "Terjadi kesalahan saat memproses pendaftaran Anda:"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Sign up with {provider_name}"
+msgstr "Daftar menggunakan {provider_name}"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Create your own {platform_name} account below"
+msgstr "Buat akun anda {platform_name} di bawah"
+
+#: themes/stanford-style/lms/templates/register-form.html
 msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
@@ -21684,11 +21418,111 @@ msgstr ""
 "Isian yang wajib ditandai dengan <strong class=\"indicator\">teks tebal dan "
 "tanda bintang (*)</strong>."
 
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "You've successfully signed in with {selected_provider}."
+msgstr "Anda telah berhasil masuk dengan {selected_provider}."
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid ""
+"We just need a little more information before you start learning with "
+"{platform_name}."
+msgstr ""
+"Kami hanya membutuhkan sedikit informasi sebelum anda mulai mempelajari "
+"dengan {platform_name}."
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Please complete the following fields to register for an account. "
+msgstr "Harap lengkapi kolom berikut untuk membuat akun."
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Your legal name, used for any certificates you earn."
+msgstr "Nama resmi anda, digunakan untuk setiap sertifikat yang anda peroleh"
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Will be shown in any discussions or forums you participate in"
+msgstr "Akan ditampilkan pada diskusi atau forum yang Anda ikuti"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "cannot be changed later"
+msgstr "tidak dapat diubah"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Welcome {username}"
+msgstr "Selamat Datang {username}"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Enter a Public Display Name:"
+msgstr "Masukkan Nama Publik"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Public Display Name"
+msgstr "Nama Publik"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Additional Personal Information"
+msgstr "Tambahan Informasi Pribadi"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "example: New York"
+msgstr "Contoh: Jakarta"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Highest Level of Education Completed"
+msgstr "Jenjang Pendidikan Paling Tinggi yang Diselesaikan"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Please share with us your reasons for registering with {platform_name}"
+msgstr "Beri tahu kami alasan Anda mendaftar {platform_name}"
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Account Acknowledgements"
+msgstr "Ucapan terima kasih akun"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Preferences for {platform_name}"
+msgstr "Pilihan {platform_name}"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Update my {platform_name} Account"
+msgstr "Perbaharui Akun {platform_name} saya"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Processing your account information"
+msgstr "Memproses informasi akun anda"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Welcome {username}!  Please set your preferences below"
+msgstr "Selamat datang {username}! Harap tentukan pilihan Anda di bawah"
+
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
 "Required fields are noted by {strong_indicator}bold text and an asterisk "
 "(*).{strong_close}"
 msgstr ""
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Update My Account"
+msgstr "Perbaharui Akun Saya"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Registration Help"
+msgstr "Bantuan Pendaftaran"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Already registered?"
+msgstr "Sudah terdaftar?"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+#: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
+#: wiki/templates/wiki/accounts/signup.html
+msgid "Log in"
+msgstr "Masuk"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Next Steps"
+msgstr "Langkah Berikutnya"
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
@@ -21703,8 +21537,16 @@ msgstr ""
 " ingin bisa menerima email dari kursus Anda."
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Need Help?"
+msgstr "Butuh Bantuan?"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Need help in registering with {platform_name}?"
 msgstr "Butuh bantuan dalam mendaftar di {platform_name}?"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "View our FAQs for answers to commonly asked questions."
+msgstr "Lihat PSD untuk jawaban atas pertanyaan yang sering ditanyakan."
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
@@ -24733,23 +24575,6 @@ msgid ""
 "restriction."
 msgstr ""
 
-#: cms/templates/emails/activation_email.txt
-msgid ""
-"Thank you for signing up for {studio_name}! To activate your account, please"
-" copy and paste this address into your web browser's address bar:"
-msgstr ""
-
-#: cms/templates/emails/activation_email.txt
-msgid ""
-"If you didn't request this, you don't need to do anything; you won't receive"
-" any more email from us. Please do not reply to this e-mail; if you require "
-"assistance, check the help section of the {studio_name} web site."
-msgstr ""
-
-#: cms/templates/emails/activation_email_subject.txt
-msgid "Your account for {studio_name}"
-msgstr ""
-
 #: cms/templates/emails/course_creator_admin_subject.txt
 msgid "{email} has requested {studio_name} course creator privileges on edge"
 msgstr ""
@@ -26000,6 +25825,10 @@ msgstr "Sumber dari"
 #: wiki/templates/wiki/source.html
 msgid "This article is currently locked for editing."
 msgstr "Artikel ini sedang dikunci untuk pengeditan"
+
+#: wiki/templates/wiki/accounts/login.html
+msgid "Please log in"
+msgstr "Harap masuk"
 
 #: wiki/templates/wiki/accounts/login.html
 msgid "Log me in..."

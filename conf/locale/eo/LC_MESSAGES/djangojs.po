@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-11-26 12:30+0000\n"
-"PO-Revision-Date: 2019-11-26 12:31:02.888850\n"
+"POT-Creation-Date: 2019-12-08 20:51+0000\n"
+"PO-Revision-Date: 2019-12-08 20:52:13.760494\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -2864,6 +2864,11 @@ msgid "Team \"{team}\" successfully deleted."
 msgstr ""
 "Téäm \"{team}\" süççéssfüllý délétéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
+#: lms/djangoapps/teams/static/teams/js/views/manage.js
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Manage"
+msgstr "Mänägé Ⱡ'σяєм ιρѕυ#"
+
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
 msgstr ""
@@ -2879,13 +2884,12 @@ msgstr "änd öthérs Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #. Translators: 'date' is a placeholder for a fuzzy,
 #. * relative timestamp (see: http://momentjs.com/)
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "Last activity %(date)s"
-msgstr "Läst äçtïvïtý %(date)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+msgid "Last activity {date}"
+msgstr "Läst äçtïvïtý {date} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "View %(span_start)s %(team_name)s %(span_end)s"
-msgstr ""
-"Vïéw %(span_start)s %(team_name)s %(span_end)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+msgid "View {span_start} {team_name} {span_end}"
+msgstr "Vïéw {span_start} {team_name} {span_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
@@ -2925,12 +2929,11 @@ msgstr ""
 "Çännöt jöïn ïnstrüçtör mänägéd téäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
-msgid "%(memberCount)s / %(maxMemberCount)s Member"
-msgid_plural "%(memberCount)s / %(maxMemberCount)s Members"
-msgstr[0] ""
-"%(memberCount)s / %(maxMemberCount)s Mémßér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+msgid "{memberCount} / {maxMemberCount} Member"
+msgid_plural "{memberCount} / {maxMemberCount} Members"
+msgstr[0] "{memberCount} / {maxMemberCount} Mémßér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 msgstr[1] ""
-"%(memberCount)s / %(maxMemberCount)s Mémßérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+"{memberCount} / {maxMemberCount} Mémßérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "All teams"
@@ -2945,20 +2948,6 @@ msgid "Topics"
 msgstr "Töpïçs Ⱡ'σяєм ιρѕυ#"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid ""
-"See all teams in your course, organized by topic. Join a team to collaborate"
-" with other learners who are interestedin the same topic as you are."
-msgstr ""
-"Séé äll téäms ïn ýöür çöürsé, örgänïzéd ßý töpïç. Jöïn ä téäm tö çölläßöräté"
-" wïth öthér léärnérs whö äré ïntéréstédïn thé sämé töpïç äs ýöü äré. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ є#"
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "My Team"
 msgstr "Mý Téäm Ⱡ'σяєм ιρѕυм #"
 
@@ -2966,6 +2955,20 @@ msgstr "Mý Téäm Ⱡ'σяєм ιρѕυм #"
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Browse"
 msgstr "Bröwsé Ⱡ'σяєм ιρѕυ#"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"See all teams in your course, organized by topic. Join a team to collaborate"
+" with other learners who are interested in the same topic as you are."
+msgstr ""
+"Séé äll téäms ïn ýöür çöürsé, örgänïzéd ßý töpïç. Jöïn ä téäm tö çölläßöräté"
+" wïth öthér léärnérs whö äré ïntéréstéd ïn thé sämé töpïç äs ýöü äré. Ⱡ'σяєм"
+" ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂#"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Your request could not be completed. Reload the page and try again."
@@ -3061,28 +3064,20 @@ msgstr ""
 "¢σηѕє¢тєт#"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "%(team_count)s Team"
-msgid_plural "%(team_count)s Teams"
-msgstr[0] "%(team_count)s Téäm Ⱡ'σяєм ιρѕυм ∂#"
-msgstr[1] "%(team_count)s Téäms Ⱡ'σяєм ιρѕυм ∂σł#"
+msgid "{team_count} Team"
+msgid_plural "{team_count} Teams"
+msgstr[0] "{team_count} Téäm Ⱡ'σяєм ιρѕυм ∂#"
+msgstr[1] "{team_count} Téäms Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "Topic"
 msgstr "Töpïç Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "View Teams in the %(topic_name)s Topic"
+msgid "View Teams in the {topic_name} Topic"
 msgstr ""
-"Vïéw Téäms ïn thé %(topic_name)s Töpïç Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+"Vïéw Téäms ïn thé {topic_name} Töpïç Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
-#. Translators: this string is shown at the bottom of the teams page
-#. to find a team to join or else to create a new one. There are three
-#. links that need to be included in the message:
-#. 1. Browse teams in other topics
-#. 2. search teams
-#. 3. create a new team
-#. Be careful to start each link with the appropriate start indicator
-#. (e.g. {browse_span_start} for #1) and finish it with {span_end}.
 #: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
 msgid ""
 "{browse_span_start}Browse teams in other topics{span_end} or "
@@ -8211,6 +8206,22 @@ msgstr "Délété Téäm Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
 msgid "Edit Membership"
 msgstr "Édït Mémßérshïp Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "View Current Team Memberships"
+msgstr "Vïéw Çürrént Téäm Mémßérshïps Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Download Memberships"
+msgstr "Döwnlöäd Mémßérshïps Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Assign Team Memberships"
+msgstr "Àssïgn Téäm Mémßérshïps Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Upload Memberships"
+msgstr "Ûplöäd Mémßérshïps Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
 msgid "Are you having trouble finding a team to join?"

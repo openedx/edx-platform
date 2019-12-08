@@ -163,7 +163,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-11-24 20:42+0000\n"
+"POT-Creation-Date: 2019-12-01 20:42+0000\n"
 "PO-Revision-Date: 2019-09-29 20:43+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -2783,14 +2783,14 @@ msgstr ""
 msgid "This team does not have any members."
 msgstr "Este equipo no tiene todavía ningún miembro."
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Joined %(date)s"
 msgstr "Vinculado %(date)s"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Last Activity %(date)s"
 msgstr "Última Actividad %(date)s"
@@ -2801,11 +2801,9 @@ msgstr "¿Remover este miembro del equipo?"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid ""
-"This learner will be removed from the team, allowing another learner to take"
-" the available spot."
+"This learner will be removed from the team,allowing another learner to take "
+"the available spot."
 msgstr ""
-"Este estudiante será removido del equipo, permitiendo que otro usuario tome "
-"el lugar disponible."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Delete this team?"
@@ -2813,12 +2811,9 @@ msgstr "¿Borrar este equipo?"
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid ""
-"Deleting a team is permanent and cannot be undone. All members are removed "
+"Deleting a team is permanent and cannot be undone.All members are removed "
 "from the team, and team discussions can no longer be accessed."
 msgstr ""
-"El borrar un equipo es una acción permanente y no puede ser reversada. Todos"
-" los miembros serán removidos del equipo y las discusiones no podrán volver "
-"a ser accesadas."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Team \"{team}\" successfully deleted."
@@ -2828,21 +2823,21 @@ msgstr "Equipo \"{team}\" eliminado exitosamente."
 msgid "You are not currently a member of any team."
 msgstr "No pertenece actualmente a ningún equipo."
 
-#. Translators: "and others" refers to fact that additional members of a team
-#. exist that are not displayed.
+#. Translators: "and others" refers to fact that additional
+#. * members of a team exist that are not displayed.
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "and others"
 msgstr "y otros"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. http://momentjs.com/)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: http://momentjs.com/)
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "Last activity %(date)s"
-msgstr "Última Actividad %(date)s"
+msgid "Last activity {date}"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "View %(span_start)s %(team_name)s %(span_end)s"
-msgstr "Ver %(span_start)s %(team_name)s %(span_end)s"
+msgid "View {span_start} {team_name} {span_end}"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
@@ -2855,11 +2850,9 @@ msgstr "¿Deseas abandonar este equipo?"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 msgid ""
-"If you leave, you can no longer post in this team's discussions. Your place "
+"If you leave, you can no longer post in this team's discussions.Your place "
 "will be available to another learner."
 msgstr ""
-"Si abandonas este equipo, no podrás escribir en las discusiones de este "
-"equipo. Tu lugar estará disponible para otro estudiante."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/static/js/verify_student/views/reverify_view.js
@@ -2875,11 +2868,15 @@ msgstr "Tu ya perteneces a otro equipo."
 msgid "This team is full."
 msgstr "Este equipo está lleno."
 
+#: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
+msgid "Cannot join instructor managed team"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
-msgid "%(memberCount)s / %(maxMemberCount)s Member"
-msgid_plural "%(memberCount)s / %(maxMemberCount)s Members"
-msgstr[0] "%(memberCount)s / %(maxMemberCount)s Miembro"
-msgstr[1] "%(memberCount)s / %(maxMemberCount)s Miembros"
+msgid "{memberCount} / {maxMemberCount} Member"
+msgid_plural "{memberCount} / {maxMemberCount} Members"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "All teams"
@@ -2896,11 +2893,8 @@ msgstr "Temas"
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
 "See all teams in your course, organized by topic. Join a team to collaborate"
-" with other learners who are interested in the same topic as you are."
+" with other learners who are interestedin the same topic as you are."
 msgstr ""
-"Observe todos los equipos de su curso organizados por tema. Únase a un "
-"equipo para colaborar con otros estudiantes que estén interesados en los "
-"mismos temas que usted."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "My Team"
@@ -2993,18 +2987,18 @@ msgid "The team \"{team}\" could not be found."
 msgstr "El equipo \"{team}\" no pudo ser encontrado."
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "%(team_count)s Team"
-msgid_plural "%(team_count)s Teams"
-msgstr[0] "%(team_count)s Equipo"
-msgstr[1] "%(team_count)s Equipos"
+msgid "{team_count} Team"
+msgid_plural "{team_count} Teams"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "Topic"
 msgstr "Tema"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "View Teams in the %(topic_name)s Topic"
-msgstr "Ver equipos en el tema %(topic_name)s"
+msgid "View Teams in the {topic_name} Topic"
+msgstr ""
 
 #. Translators: this string is shown at the bottom of the teams page
 #. to find a team to join or else to create a new one. There are three
