@@ -38,7 +38,6 @@ from course_modes.models import CourseMode
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
-from openedx.core.djangoapps.user_api.accounts.api import activate_account
 from openedx.core.djangoapps.user_api.accounts.utils import ENABLE_SECONDARY_EMAIL_FEATURE_SWITCH
 from openedx.core.djangoapps.user_api.errors import UserAPIInternalError
 from openedx.core.djangoapps.user_authn.views.login_form import login_and_registration_form
@@ -61,7 +60,7 @@ FEATURES_WITH_FAILED_PASSWORD_RESET_EMAIL['ENABLE_PASSWORD_RESET_FAILURE_EMAIL']
 @skip_unless_lms
 @ddt.ddt
 class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
-    """ Tests for views that update the user's account information. """
+    """ Tests for views that change the user's password. """
 
     USERNAME = u"heisenberg"
     ALTERNATE_USERNAME = u"walt"
@@ -91,22 +90,10 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
     def setUp(self):
         super(UserAccountUpdateTest, self).setUp()
 
-        # Create/activate a new account
         self._create_account(self.USERNAME, self.OLD_PASSWORD, self.OLD_EMAIL)
-        mail.outbox = []
-        user = User.objects.get(username=self.USERNAME)
-        registration = Registration.objects.get(user=user)
-        activate_account(registration.activation_key)
-
-        self.account_recovery = AccountRecoveryFactory.create(user=User.objects.get(email=self.OLD_EMAIL))
-        self.enable_account_recovery_switch = Switch.objects.create(
-            name=ENABLE_SECONDARY_EMAIL_FEATURE_SWITCH,
-            active=True
-        )
-
-        # Login
         result = self.client.login(username=self.USERNAME, password=self.OLD_PASSWORD)
         self.assertTrue(result)
+        mail.outbox = []
 
     @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
     def test_password_change(self):
@@ -223,7 +210,7 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         self._create_dot_tokens(user)
         response = self._change_password(email=self.OLD_EMAIL)
         self.assertEqual(response.status_code, 200)
-        self.assert_access_token_destroyed(user)
+        self._assert_access_token_destroyed(user)
 
     def test_access_token_invalidation_logged_in(self):
         user = User.objects.get(email=self.OLD_EMAIL)
@@ -231,7 +218,7 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         self._create_dot_tokens(user)
         response = self._change_password()
         self.assertEqual(response.status_code, 200)
-        self.assert_access_token_destroyed(user)
+        self._assert_access_token_destroyed(user)
 
     def test_password_change_inactive_user(self):
         # Log out the user created during test setup
@@ -309,7 +296,7 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         RefreshTokenFactory(user=user, client=client, access_token=access_token)
 
     def _create_dot_tokens(self, user=None):
-        """Create dop access token for given user if user provided else for default user."""
+        """Create dot access token for given user if user provided else for default user."""
         if not user:
             user = User.objects.get(email=self.OLD_EMAIL)
 
@@ -317,7 +304,7 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         access_token = dot_factories.AccessTokenFactory(user=user, application=application)
         dot_factories.RefreshTokenFactory(user=user, application=application, access_token=access_token)
 
-    def assert_access_token_destroyed(self, user):
+    def _assert_access_token_destroyed(self, user):
         """Assert all access tokens are destroyed."""
         self.assertFalse(dot_access_token.objects.filter(user=user).exists())
         self.assertFalse(dot_refresh_token.objects.filter(user=user).exists())
@@ -328,7 +315,7 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
 @skip_unless_lms
 @ddt.ddt
 class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase):
-    """ Tests for the student account views that update the user's account information. """
+    """ Tests for Login and Registration. """
     USERNAME = "bob"
     EMAIL = "bob@example.com"
     PASSWORD = u"password"

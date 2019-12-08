@@ -12,9 +12,6 @@ from django.test.client import RequestFactory
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.accounts.tests.test_api import CreateAccountMixin
-from openedx.core.djangoapps.user_api.accounts.api import (
-    activate_account,
-)
 from openedx.core.djangoapps.user_api.errors import UserNotFound
 from openedx.core.djangoapps.user_authn.views.password_reset import request_password_change
 from openedx.core.djangolib.testing.utils import skip_unless_lms
@@ -33,19 +30,11 @@ class TestRequestPasswordChange(CreateAccountMixin, TestCase):
 
     IS_SECURE = False
 
-    def get_activation_key(self, user):
-        registration = Registration.objects.get(user=user)
-        return registration.activation_key
-
     @skip_unless_lms
     def test_request_password_change(self):
         # Create and activate an account
         self.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
         self.assertEqual(len(mail.outbox), 1)
-
-        user = User.objects.get(username=self.USERNAME)
-        activation_key = self.get_activation_key(user)
-        activate_account(activation_key)
 
         request = RequestFactory().post('/password')
         request.user = Mock()
