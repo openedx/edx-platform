@@ -128,7 +128,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-11-24 20:42+0000\n"
+"POT-Creation-Date: 2019-12-08 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -473,11 +473,8 @@ msgstr "Hesap kurtarma"
 #: common/djangoapps/student/admin.py
 #: openedx/core/djangoapps/user_authn/views/login_form.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: cms/templates/login.html cms/templates/register.html
-#: lms/templates/login.html lms/templates/provider_login.html
-#: lms/templates/register-form.html lms/templates/signup_modal.html
+#: lms/templates/provider_login.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
-#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "Parola"
@@ -512,77 +509,7 @@ msgstr ""
 #: common/djangoapps/student/admin.py
 msgid "User with this email doesn't exist in system."
 msgstr ""
-
-#: common/djangoapps/student/forms.py
-msgid "Full Name cannot contain the following characters: < >"
-msgstr "Tam isim şu karakterleri içeremez: < >"
-
-#: common/djangoapps/student/forms.py
-msgid "A properly formatted e-mail is required"
-msgstr "Geçerli biçimde e-posta adresi gerekiyor"
-
-#: common/djangoapps/student/forms.py
-msgid "Your legal name must be a minimum of one character long"
-msgstr "En az bir harften oluşan ve kimliğinizde yazan isminiz gerekiyor"
-
-#: common/djangoapps/student/forms.py
-#, python-format
-msgid "Email cannot be more than %(limit_value)s characters long"
-msgstr "E-posta adresi %(limit_value)s karakterden fazla olamaz."
-
-#: common/djangoapps/student/forms.py
-msgid "You must accept the terms of service."
-msgstr "Hizmet koşullarını kabul etmelisiniz."
-
-#: common/djangoapps/student/forms.py
-msgid "A level of education is required"
-msgstr "En son eğitim seviyesinin girilmesi gerekiyor"
-
-#: common/djangoapps/student/forms.py
-msgid "Your gender is required"
-msgstr "Cinsiyetiniz gerekiyor"
-
-#: common/djangoapps/student/forms.py
-msgid "Your year of birth is required"
-msgstr "Doğum yılınız gerekiyor"
-
-#: common/djangoapps/student/forms.py
-msgid "Your mailing address is required"
-msgstr "E-posta adresiniz gerekiyor"
-
-#: common/djangoapps/student/forms.py
-msgid "A description of your goals is required"
-msgstr "Hedeflerinizin tanımı gerekiyor"
-
-#: common/djangoapps/student/forms.py
-msgid "A city is required"
-msgstr "Bir şehir gerekiyor"
-
-#: common/djangoapps/student/forms.py
-msgid "A country is required"
-msgstr "Bir ülke gerekiyor"
-
-#: common/djangoapps/student/forms.py
-msgid "To enroll, you must follow the honor code."
-msgstr "Kaydolmak için etik kurallarını kabul etmeniz gerekmektedir. "
-
-#: common/djangoapps/student/forms.py
-msgid "You are missing one or more required fields"
-msgstr "Bir veya daha fazla doldurulması gereken alanı boş bıraktınız"
-
-#: common/djangoapps/student/forms.py
-msgid "Unauthorized email address."
-msgstr "Yetkisiz e-posta adresi."
-
-#: common/djangoapps/student/forms.py
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid ""
-"It looks like {email} belongs to an existing account. Try again with a "
-"different email address."
-msgstr ""
-"Görünüşe göre {email} varolan bir hesaba ait. Farklı bir e-posta adresiyle "
-"tekrar deneyin."
+"Bu e-posta adresiyle kayıtlı herhangi bir kullanıcı sistemde bulunmuyor."
 
 #: common/djangoapps/student/helpers.py
 #, python-brace-format
@@ -935,14 +862,6 @@ msgstr ""
 "Aradığınız eğitim {date} tarihi itibariyle kayıtlara kapatılmış durumda."
 
 #: common/djangoapps/student/views/management.py
-msgid "No inactive user with this e-mail exists"
-msgstr "Bu e-posta ile kayıtlı etkinleşmemiş kullanıcı bulunmuyor."
-
-#: common/djangoapps/student/views/management.py
-msgid "Unable to send reactivation email"
-msgstr "Yeniden etkinleştirme e-postası gönderilemiyor"
-
-#: common/djangoapps/student/views/management.py
 msgid "Course id not specified"
 msgstr "Ders no belirtilmedi"
 
@@ -1028,43 +947,6 @@ msgstr ""
 "düşmeye başlayacak. Devam etmek için lütfen giriş yapın."
 
 #: common/djangoapps/student/views/management.py
-msgid ""
-"Your previous request is in progress, please try again in a few moments."
-msgstr ""
-
-#: common/djangoapps/student/views/management.py
-msgid "Some error occured during password change. Please try again"
-msgstr ""
-"Parola değişimi sırasında birtakım hatalar gerçekleşti. Lütfen tekrar "
-"deneyin"
-
-#: common/djangoapps/student/views/management.py
-msgid "No email address provided."
-msgstr "Hiç bir e-posta adresi verilmedi."
-
-#: common/djangoapps/student/views/management.py
-msgid "Password reset unsuccessful"
-msgstr "Parola sıfırlama işlemi başarısız"
-
-#: common/djangoapps/student/views/management.py
-msgid "Error in resetting your password."
-msgstr "Parolanızı sıfırlama işleminde hata."
-
-#: common/djangoapps/student/views/management.py
-msgid "Error in resetting your password. Please try again."
-msgstr "Parolanızı sıfırlama işleminde hata. Lütfen tekrar deneyin."
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid ""
-"{html_start}Password Creation Complete{html_end}Your password has been "
-"created. {bold_start}{email}{bold_end} is now your primary login email."
-msgstr ""
-"{html_start}Parola Oluşturma Tamamlandı{html_end}Parolanız "
-"oluşturuldu.{bold_start}{email}{bold_end} artık birincil giriş e-posta "
-"adresiniz."
-
-#: common/djangoapps/student/views/management.py
 msgid "Valid e-mail address required."
 msgstr "Geçerli bir e-posta adresi gerekmektedir."
 
@@ -1075,6 +957,16 @@ msgstr "Eski e-posta adresi yenisiyle aynıdır."
 #: common/djangoapps/student/views/management.py
 msgid "Cannot be same as your sign in email address."
 msgstr "Giriş e-postası adresinizle aynı olamaz"
+
+#: common/djangoapps/student/views/management.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid ""
+"It looks like {email} belongs to an existing account. Try again with a "
+"different email address."
+msgstr ""
+"Görünüşe göre {email} varolan bir hesaba ait. Farklı bir e-posta adresiyle "
+"tekrar deneyin."
 
 #: common/djangoapps/student/views/management.py
 msgid "Unable to send email activation link. Please try again later."
@@ -1788,7 +1680,7 @@ msgstr ""
 
 #: common/djangoapps/xblock_django/models.py
 msgid "show deprecation messaging in Studio"
-msgstr ""
+msgstr "Studio'da önemsiz mesajları da göster"
 
 #: common/djangoapps/xblock_django/models.py
 msgid "Fully Supported"
@@ -2097,8 +1989,8 @@ msgstr "Çalışanların bu soruya cevap vermesinde sorun yaşandı: boş sını
 #. Translators: this is the last choice of a number of choices of how to log
 #. in
 #. to the site.
-#: common/lib/capa/capa/responsetypes.py lms/templates/login.html
-#: lms/templates/register-form.html lms/templates/course_modes/choose.html
+#: common/lib/capa/capa/responsetypes.py
+#: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "or"
@@ -2510,7 +2402,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
 #: cms/templates/index.html cms/templates/videos_index_pagination.html
-#: lms/templates/manage_user_standing.html lms/templates/register-shib.html
+#: lms/templates/manage_user_standing.html
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
@@ -5118,6 +5010,65 @@ msgstr "Hesap Kilidini Aç"
 msgid "Close"
 msgstr "Kapa"
 
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#, python-format
+msgid ""
+"This is a routed Account Activation email for %(routed_user)s "
+"(%(routed_user_email)s): %(routed_profile_name)s"
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+msgid "Account Activation"
+msgstr "Hesap Etkinleştirme"
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#: common/templates/student/edx_ace/accountactivation/email/body.txt
+#, python-format
+msgid ""
+"You're almost there! Use the link below to activate your account to access "
+"engaging, high-quality %(platform_name)s courses. Note that you will not be "
+"able to log back into your account until you have activated it."
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+msgid "Activate Your Account"
+msgstr "Hesabınızı Etkinleştirin"
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#: common/templates/student/edx_ace/accountactivation/email/body.txt
+#, python-format
+msgid "Enjoy learning with %(platform_name)s."
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#, python-format, python-brace-format
+msgid ""
+"If you need help, please use our web form at "
+"{start_anchor_web}%(support_url)s{end_anchor} or email "
+"{start_anchor_email}%(support_email)s{end_anchor}."
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#: common/templates/student/edx_ace/accountactivation/email/body.txt
+#, python-format
+msgid ""
+"This email message was automatically sent by %(lms_url)s because someone "
+"attempted to create an account on %(platform_name)s using this email "
+"address."
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.txt
+#, python-format
+msgid ""
+"If you need help, please use our web form at %(support_url)s or email "
+"%(support_email)s."
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/subject.txt
+#, python-format
+msgid "Action Required: Activate your %(platform_name)s account"
+msgstr ""
+
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 msgid "Create Password"
 msgstr "Parola Oluştur"
@@ -7185,7 +7136,7 @@ msgstr "Doğum Yılı"
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: lms/templates/register-form.html lms/templates/signup_modal.html
+#: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Gender"
 msgstr "Cinsiyet"
@@ -7197,7 +7148,6 @@ msgstr "Eğitim Seviyesi"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Mailing Address"
 msgstr "Adres"
@@ -7230,7 +7180,6 @@ msgstr "Takım"
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -7239,7 +7188,6 @@ msgstr "Şehir"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -7810,9 +7758,7 @@ msgstr "Uzatılmış bitiş tarihi esas bitiş tarihinden daha sonra olmalıdır
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: lms/templates/sysadmin_dashboard.html
+#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
@@ -7971,7 +7917,6 @@ msgid "Title"
 msgstr "Başlık"
 
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Year of Birth"
 msgstr "Doğum Yılı"
@@ -9122,9 +9067,8 @@ msgid "View feature based enrollment settings"
 msgstr "Bedava tur kayıtlanma ayarlarını görüntüle"
 
 #: lms/djangoapps/support/views/index.py
-#: lms/templates/support/link_program_enrollments.html
 msgid "Link Program Enrollments"
-msgstr ""
+msgstr "Program Kayıtlanma Bağlantısı"
 
 #: lms/djangoapps/support/views/index.py
 msgid "Link LMS users to program enrollments"
@@ -9203,13 +9147,13 @@ msgid "Teams"
 msgstr "Takımlar"
 
 #: lms/djangoapps/teams/views.py
+msgid "course_id must be provided"
+msgstr "ders_kimliği sağlanmalı"
+
+#: lms/djangoapps/teams/views.py
 #, python-brace-format
 msgid "The supplied course id {course_id} is not valid."
 msgstr "Belirtilen ders kimliği {course_id} geçersiz."
-
-#: lms/djangoapps/teams/views.py
-msgid "course_id must be provided"
-msgstr "ders_kimliği sağlanmalı"
 
 #: lms/djangoapps/teams/views.py
 msgid "text_search and order_by cannot be provided together"
@@ -9243,6 +9187,10 @@ msgid "You are already in a team in this course."
 msgstr "Bu derste zaten bir takıma üyesiniz."
 
 #: lms/djangoapps/teams/views.py
+msgid "You can't create a team in an instructor managed topic."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
 msgid "username or team_id must be specified."
 msgstr "kullanıcı adı veya takım_kimliği belirtilmelidir."
 
@@ -9259,6 +9207,10 @@ msgid "This team is already full."
 msgstr "Bu takım dolu gözüküyor."
 
 #: lms/djangoapps/teams/views.py
+msgid "You can't join an instructor managed team."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
 #, python-brace-format
 msgid "The user {username} is already a member of a team in this course."
 msgstr ""
@@ -9269,6 +9221,10 @@ msgstr ""
 msgid ""
 "The user {username} is not enrolled in the course associated with this team."
 msgstr "Kullanıcı {username} bu takımla ilgili olan derse kayıtlı değil."
+
+#: lms/djangoapps/teams/views.py
+msgid "You can't leave an instructor managed team."
+msgstr ""
 
 #: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
@@ -9755,7 +9711,7 @@ msgstr "Çıkış Yapıldı"
 
 #: lms/templates/logout.html
 msgid "We are signing you in."
-msgstr ""
+msgstr "Oturumunuzu açıyoruz."
 
 #: lms/templates/logout.html
 msgid ""
@@ -9825,7 +9781,7 @@ msgstr "Hata"
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
 msgid "Expired ID Verification"
-msgstr ""
+msgstr "Süresi Geçmiş Kimlik Doğrulama"
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
@@ -9868,7 +9824,7 @@ msgstr ""
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
 msgid "ID verification FAQ : %(help_center_link)s "
-msgstr ""
+msgstr "Kimlik Doğrulama SSS: %(help_center_link)s "
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
@@ -10376,8 +10332,6 @@ msgstr "%(platform_name)s Ana Sayfasına Git"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: cms/templates/login.html cms/templates/widgets/header.html
-#: themes/red-theme/cms/templates/login.html
 msgid "Sign In"
 msgstr "Giriş"
 
@@ -10656,7 +10610,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "Read-only"
-msgstr ""
+msgstr "Salt-okunur"
 
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
@@ -11667,7 +11621,6 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
-#: lms/templates/register-form.html
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
@@ -11741,6 +11694,43 @@ msgstr ""
 "Bu e-posta adresi ile ilişkili kullanıcı hesabı parolasını sıfırlamak mümkün"
 " değil."
 
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "Password reset unsuccessful"
+msgstr "Parola sıfırlama işlemi başarısız"
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "Error in resetting your password."
+msgstr "Parolanızı sıfırlama işleminde hata."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "Error in resetting your password. Please try again."
+msgstr "Parolanızı sıfırlama işleminde hata. Lütfen tekrar deneyin."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+#, python-brace-format
+msgid ""
+"{html_start}Password Creation Complete{html_end}Your password has been "
+"created. {bold_start}{email}{bold_end} is now your primary login email."
+msgstr ""
+"{html_start}Parola Oluşturma Tamamlandı{html_end}Parolanız "
+"oluşturuldu.{bold_start}{email}{bold_end} artık birincil giriş e-posta "
+"adresiniz."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"Your previous request is in progress, please try again in a few moments."
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "Some error occured during password change. Please try again"
+msgstr ""
+"Parola değişimi sırasında birtakım hatalar gerçekleşti. Lütfen tekrar "
+"deneyin"
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "No email address provided."
+msgstr "Hiç bir e-posta adresi verilmedi."
+
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
 msgid "Registration using {provider} has timed out."
@@ -11760,6 +11750,67 @@ msgstr ""
 msgid "The provided access_token is not valid."
 msgstr "Sağlanan erişim belirteci geçerli değildir."
 
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Full Name cannot contain the following characters: < >"
+msgstr "Tam isim şu karakterleri içeremez: < >"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A properly formatted e-mail is required"
+msgstr "Geçerli biçimde e-posta adresi gerekiyor"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your legal name must be a minimum of one character long"
+msgstr "En az bir harften oluşan ve kimliğinizde yazan isminiz gerekiyor"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-format
+msgid "Email cannot be more than %(limit_value)s characters long"
+msgstr "E-posta adresi %(limit_value)s karakterden fazla olamaz."
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "You must accept the terms of service."
+msgstr "Hizmet koşullarını kabul etmelisiniz."
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A level of education is required"
+msgstr "En son eğitim seviyesinin girilmesi gerekiyor"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your gender is required"
+msgstr "Cinsiyetiniz gerekiyor"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your year of birth is required"
+msgstr "Doğum yılınız gerekiyor"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your mailing address is required"
+msgstr "E-posta adresiniz gerekiyor"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A description of your goals is required"
+msgstr "Hedeflerinizin tanımı gerekiyor"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A city is required"
+msgstr "Bir şehir gerekiyor"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A country is required"
+msgstr "Bir ülke gerekiyor"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "To enroll, you must follow the honor code."
+msgstr "Kaydolmak için etik kurallarını kabul etmeniz gerekmektedir. "
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "You are missing one or more required fields"
+msgstr "Bir veya daha fazla doldurulması gereken alanı boş bıraktınız"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Unauthorized email address."
+msgstr "Yetkisiz e-posta adresi."
+
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's email address.
@@ -11778,8 +11829,7 @@ msgstr "Bu isim kazanacağınız sertifikalarda kullanılacak."
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's public username.
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
+#: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Public Username"
@@ -13098,59 +13148,11 @@ msgstr "Ders Zamanı:"
 msgid "Courses"
 msgstr "Dersler"
 
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Sign In to {studio_name}"
-msgstr "{studio_name} platformuna kaydol"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr "{studio_name}  Hesabınız yok mu? Kaydolun!"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Required Information to Sign In to {studio_name}"
-msgstr "{studio_name} Platformuna Kaydolmak İçin Gerekli Bilgiler"
-
-#: cms/templates/login.html cms/templates/register.html
-#: lms/templates/login.html lms/templates/provider_login.html
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/signup_modal.html themes/red-theme/cms/templates/login.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "E-mail"
-msgstr "E-posta"
-
-#. Translators: This is the placeholder text for a field that requests an
-#. email
-#. address.
-#: cms/templates/login.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html cms/templates/register.html
-#: lms/templates/login.html lms/templates/register-form.html
-#: lms/templates/register-shib.html themes/red-theme/cms/templates/login.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr "örnek: mehmet@siteadi.com"
-
-#: cms/templates/login.html lms/templates/login.html
-#: themes/red-theme/cms/templates/login.html
-msgid "Forgot password?"
-msgstr "Parolanızı mı unuttunuz?"
-
-#. Translators: This is the placeholder text for a field that requests the
-#. user's full name.
-#: cms/templates/register.html lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "example: Jane Doe"
-msgstr "örnek: Mehmet Can"
-
-#. Translators: This is the placeholder text for a field that asks the user to
-#. pick a username
-#: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "example: JaneDoe"
-msgstr "örnek: MehmetCan"
 
 #: cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
@@ -13636,8 +13638,7 @@ msgstr ""
 "Lütfen e-posta adresinizi girin ve size yeni parola oluşturmak için "
 "direktifleri yollayalım."
 
-#: lms/templates/forgot_password_modal.html lms/templates/login.html
-#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/forgot_password_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -13652,7 +13653,7 @@ msgstr "Gerekli Bilgiler"
 msgid "Your E-mail Address"
 msgstr "E-posta Adresiniz"
 
-#: lms/templates/forgot_password_modal.html lms/templates/login.html
+#: lms/templates/forgot_password_modal.html
 msgid "This is the e-mail address you used to register with {platform}"
 msgstr "{platform}'e kayıt yaparken kullandığınız e-posta adresi şudur:"
 
@@ -13697,7 +13698,7 @@ msgstr ""
 msgid "Search for a course"
 msgstr "Bir ders ara"
 
-#: lms/templates/index_overlay.html lms/templates/register-sidebar.html
+#: lms/templates/index_overlay.html
 msgid "Welcome to {platform_name}"
 msgstr "{platform_name} platformuna hoş geldiniz"
 
@@ -13745,86 +13746,6 @@ msgstr[1] ""
 "Tüm eşleşen içeriklerin {display_name} içine eklenmeye uygun olduğu "
 "gösterilmektedir. Her bir öğrenci bu listeden rastgele çizilmiş {max_count} "
 "bileşene atanacaktır."
-
-#: lms/templates/login-sidebar.html
-msgid "Helpful Information"
-msgstr "Yararlı Bilgiler"
-
-#: lms/templates/login-sidebar.html
-msgid "Not Enrolled?"
-msgstr "Kayıtlı Değil misiniz?"
-
-#: lms/templates/login-sidebar.html
-msgid "Sign up for {platform_name} today!"
-msgstr "Bugün {platform_name} platformuna kaydolun!"
-
-#: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Need Help?"
-msgstr "Yardım?"
-
-#: lms/templates/login-sidebar.html
-msgid "Looking for help signing in or with your {platform_name} account?"
-msgstr ""
-"{platform_name} hesabına kayıt veya giriş yapmada yardıma mı ihtiyacınız "
-"var?"
-
-#: lms/templates/login-sidebar.html
-msgid "View our help section for answers to commonly asked questions."
-msgstr "Sık sorulan sorular için yardım bölümümüze bakın."
-
-#: lms/templates/login.html
-msgid "Log into your {platform_name} Account"
-msgstr "{platform_name}  hesabına giriş yap"
-
-#: lms/templates/login.html
-msgid "Log into My {platform_name} Account"
-msgstr " {platform_name} Hesabıma Giriş Yap"
-
-#: lms/templates/login.html
-msgid "Access My Courses"
-msgstr "Derslerime Ulaş"
-
-#: lms/templates/login.html lms/templates/register-shib.html
-#: lms/templates/register.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Processing your account information"
-msgstr "Hesap bilgileriniz işleniyor"
-
-#: lms/templates/login.html wiki/templates/wiki/accounts/login.html
-msgid "Please log in"
-msgstr "Lütfen giriş yapınız"
-
-#: lms/templates/login.html
-msgid "to access your account and courses"
-msgstr "hesabınıza ve derslerinize erişebilmeniz için"
-
-#: lms/templates/login.html
-msgid "We're Sorry, {platform_name} accounts are unavailable currently"
-msgstr "Üzgünüz, {platform_name} hesapları ülkenizden ulaşılabilir değil"
-
-#: lms/templates/login.html
-msgid "We couldn't log you in."
-msgstr "Oturumunuzu açamadık."
-
-#: lms/templates/login.html
-msgid "Your email or password is incorrect"
-msgstr "E-posta veya şifreniz yanlış"
-
-#: lms/templates/login.html
-msgid "An error occurred when signing you in to {platform_name}."
-msgstr "{platform_name} ortamında oturum açarken hata oluştu."
-
-#: lms/templates/login.html
-msgid ""
-"Please provide the following information to log into your {platform_name} "
-"account. Required fields are noted by {strong_start}bold text and an "
-"asterisk (*){strong_end}."
-msgstr ""
-
-#: lms/templates/login.html
-msgid "Sign in with {provider_name}"
-msgstr "{provider_name} hesabıyla oturum aç"
 
 #. Translators:  "External resource" means that this learning module is hosted
 #. on a platform external to the edX LMS
@@ -14021,244 +13942,16 @@ msgstr ""
 "gönderilecek, toplanan ve kullanılan bu bilgi servis koşulları ve gizlilik "
 "politikası tarafından yönetilecek."
 
+#: lms/templates/provider_login.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "E-mail"
+msgstr "E-posta"
+
 #: lms/templates/provider_login.html
 #, python-format
 msgid "Return To %s"
 msgstr "%s e Geri Dön"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid ""
-"We're sorry, but this version of your browser is not supported. Try again "
-"using a different browser or a newer version of your browser."
-msgstr ""
-"Üzgünüz ama web tarayıcınızın bu sürümü desteklenmiyor. Farklı bir tarayıcı "
-"veya tarayıcınızın daha yeni sürümüyle tekrar deneyin."
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "The following errors occurred while processing your registration:"
-msgstr "Kaydınızı işlerden aşağıdaki hatalar oldu:"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Sign up with {provider_name}"
-msgstr "{provider_name} ile kayıt ol"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Create your own {platform_name} account below"
-msgstr "Kendi {platform_name} hesabınızı oluşturun "
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-msgid ""
-"Required fields are noted by {strong_start}bold text and an asterisk "
-"(*){strong_end}."
-msgstr ""
-
-#. Translators: selected_provider is the name of an external, third-party user
-#. authentication service (like Google or LinkedIn).
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "You've successfully signed in with {selected_provider}."
-msgstr "{selected_provider} oturumunuz başarıyla açıldı."
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid ""
-"We just need a little more information before you start learning with "
-"{platform_name}."
-msgstr ""
-"{platform_name} ile öğrenmeye başlamadan önce biraz daha bilgiye ihtiyacımız"
-" var."
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Please complete the following fields to register for an account. "
-msgstr "Kayıt olmak için lütfen aşağıdaki gerekli alanları tamamlayın."
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Your legal name, used for any certificates you earn."
-msgstr "Kazandığınız her sertifikalar için kullanılan hukuki adınız."
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Will be shown in any discussions or forums you participate in"
-msgstr "İçinde olduğunuz forumlarda ve tartışmalarda gözükecek olan"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "cannot be changed later"
-msgstr "daha sonra değiştirilemez"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Welcome {username}"
-msgstr "Hoş geldin {username}"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Enter a Public Display Name:"
-msgstr "Görüntülenecek İsminizi Giriniz:"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Public Display Name"
-msgstr "Halka Açık Görüntülenen İsim"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Additional Personal Information"
-msgstr "Ek Kişisel Bilgi"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "example: New York"
-msgstr "örnek: İstanbul"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Highest Level of Education Completed"
-msgstr "Bitirdiğiniz En Yüksek Okul Seviyesi"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Please share with us your reasons for registering with {platform_name}"
-msgstr "Lütfen {platform_name}a kaydolma sebeplerinizi bizimle paylaşın"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Account Acknowledgements"
-msgstr "Hesap Onayları"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "I agree to the {link_start}Terms of Service{link_end}"
-msgstr "{link_start}Hizmet Koşullarını{link_end} kabul ediyorum"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "I agree to the {link_start}Honor Code{link_end}"
-msgstr " {link_start}Onur Kodu Şartlarını{link_end} kabul ediyorum"
-
-#: lms/templates/register-form.html lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Create My Account"
-msgstr "Hesabımı Oluştur"
-
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Preferences for {platform_name}"
-msgstr "{platform_name} için Tercihler"
-
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Update my {platform_name} Account"
-msgstr " {platform_name} Hesabımı Güncelleyin"
-
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Welcome {username}!  Please set your preferences below"
-msgstr "Hoş geldin, {username}! Lütfen tercihlerinizi aşağıda işaretleyin"
-
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Enter a public username:"
-msgstr "Genel kullanıcı adı girin:"
-
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Update My Account"
-msgstr "Hesabımı Güncelle"
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Registration Help"
-msgstr "Kayıt yardım"
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Already registered?"
-msgstr "Zaten kayıtlı mısın?"
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-#: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
-#: wiki/templates/wiki/accounts/signup.html
-msgid "Log in"
-msgstr "Giriş yap"
-
-#: lms/templates/register-sidebar.html
-msgid ""
-"Registering with {platform_name} gives you access to all of our current and "
-"future free courses. Not ready to take a course just yet? Registering puts "
-"you on our mailing list - we will update you as courses are added."
-msgstr ""
-"{platform_name}'e kayıt olmak size tüm ücretsiz derslere ulaşma olanağını "
-"verir. Henüz ders almadınız mı? Kayıt olduğunuzda e-posta listemize "
-"eklenirsiniz ve yeni bir ders açıldığında size haber verilir."
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Next Steps"
-msgstr "Sonraki Adımlar"
-
-#: lms/templates/register-sidebar.html
-msgid ""
-"As part of joining {platform_name}, you will receive an email message with "
-"instructions for activating your account. Don't see the email? Check your "
-"spam folder and mark {platform_name} emails as 'not spam'. At "
-"{platform_name}, we communicate mostly through email."
-msgstr ""
-"{platform_name} platformuna katıldığınızda hesabınızı etkinleştirme "
-"bağlantısını içeren bir e-posta alacaksınız. E-postayı görmediniz mi? Spam "
-"klasörünüzü kontrol edin ve {platform_name} e-postalarını 'spam değil' "
-"olarak işaretleyin. {platform_name} platformunda, iletişim kurmak için "
-"çoğunlukla e-posta kullanırız."
-
-#: lms/templates/register-sidebar.html
-msgid "Need help registering with {platform_name}?"
-msgstr "{platform_name} platformuna kayıt için yardıma mı ihtiyacınız var?"
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "View our FAQs for answers to commonly asked questions."
-msgstr "Sorunlarınız için sık sorulan soruları ziyaret edin."
-
-#: lms/templates/register-sidebar.html
-msgid ""
-"You can find the answers to most of your questions in our list of FAQs. "
-"After you enroll in a course, you can also find answers in the course "
-"discussions."
-msgstr ""
-"Pek çok sorunuzun cevabını SSS listemizde bulabılirsiniz. Bir derse "
-"kaydolduktan sonra, ders tartışmalarında da aradığınız cevaplara "
-"kavuşabilirsiniz."
-
-#: lms/templates/register.html
-msgid "Register for {platform_name}"
-msgstr "{platform_name} için kayıt ol"
-
-#: lms/templates/register.html
-msgid "Create My {platform_name} Account"
-msgstr "{platform_name} Hesabımı Oluşturun"
-
-#: lms/templates/register.html
-msgid "Welcome!"
-msgstr "Hoş geldiniz!"
-
-#: lms/templates/register.html
-msgid "Register below to create your {platform_name} account"
-msgstr "{platform_name} hesabınızı oluşturmak için aşağıda kaydolun"
 
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
@@ -14338,6 +14031,11 @@ msgid "{start_li}Welcome{end_li} {name}"
 msgstr "{start_li}Hoş geldin{end_li} {name}"
 
 #: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Enter a public username:"
+msgstr "Genel kullanıcı adı girin:"
+
+#: lms/templates/signup_modal.html
 msgid "Full Name *"
 msgstr "Tam İsim *"
 
@@ -14348,6 +14046,23 @@ msgstr "Ed. Tamamlandı"
 #: lms/templates/signup_modal.html
 msgid "Goals in signing up for {platform_name}"
 msgstr "{platform_name} platformuna kaydolmanın amaçları"
+
+#: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "I agree to the {link_start}Terms of Service{link_end}"
+msgstr "{link_start}Hizmet Koşullarını{link_end} kabul ediyorum"
+
+#: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "I agree to the {link_start}Honor Code{link_end}"
+msgstr " {link_start}Onur Kodu Şartlarını{link_end} kabul ediyorum"
+
+#: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Create My Account"
+msgstr "Hesabımı Oluştur"
 
 #: lms/templates/signup_modal.html
 msgid "Already have an account?"
@@ -16693,7 +16408,6 @@ msgstr ""
 "görmeyi umuyoruz!"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
-#: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "The {platform_name} Team"
 msgstr "{platform_name} Takımı"
@@ -17477,40 +17191,6 @@ msgstr "Notları gizle"
 #: lms/templates/edxnotes/toggle_notes.html
 msgid "Show notes"
 msgstr "Notları göster"
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"You're almost there! Use the link to activate your account to access "
-"engaging, high-quality {platform_name} courses. Note that you will not be "
-"able to log back into your account until you have activated it."
-msgstr ""
-"Neredeyse bitti! Yüksek kaliteli {platform_name} derslerine erişim için "
-"hesabınızı etkinleştirme bağlantısını kullanmanız gerekiyor. Etkinleştirmeyi"
-" yapmadığınız sürece hesabınıza giriş yapamayacağınızı unutmayın."
-
-#: lms/templates/emails/activation_email.txt
-msgid "Enjoy learning with {platform_name}."
-msgstr "{platform_name} ile öğrenmenin keyfini çıkarın."
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"If you need help, please use our web form at {support_url} or email "
-"{support_email}."
-msgstr ""
-"Eğer yardıma ihtiyacınız olursa, lütfen {support_url} içindeki web formumuzu"
-" ya da {support_email} e-posta adresini kullanın."
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"This email message was automatically sent by {lms_url} because someone "
-"attempted to create an account on {platform_name} using this email address."
-msgstr ""
-"Bu e-posta otomatik olarak {lms_url} tarafından gönderildi çünkü birisi bu "
-"e-posta adresini kullanarak {platform_name} hesabı açmayı denedi. "
-
-#: lms/templates/emails/activation_email_subject.txt
-msgid "Action Required: Activate your {platform_name} account"
-msgstr "İşlem Bekleniyor: {platform_name} hesabınızı etkinleştirin"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Thank you for your purchase of "
@@ -21440,6 +21120,28 @@ msgid "For anyone, anywhere, anytime"
 msgstr "Herkes için, her zaman, her yerde"
 
 #: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid ""
+"We're sorry, but this version of your browser is not supported. Try again "
+"using a different browser or a newer version of your browser."
+msgstr ""
+"Üzgünüz ama web tarayıcınızın bu sürümü desteklenmiyor. Farklı bir tarayıcı "
+"veya tarayıcınızın daha yeni sürümüyle tekrar deneyin."
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "The following errors occurred while processing your registration:"
+msgstr "Kaydınızı işlerden aşağıdaki hatalar oldu:"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Sign up with {provider_name}"
+msgstr "{provider_name} ile kayıt ol"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Create your own {platform_name} account below"
+msgstr "Kendi {platform_name} hesabınızı oluşturun "
+
+#: themes/stanford-style/lms/templates/register-form.html
 msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
@@ -21447,11 +21149,120 @@ msgstr ""
 "Gerekli kısımlar <strong class=\"indicator\">(*) yıldızla ve "
 "kalınlaştırılarak</strong> vurgulanmıştır."
 
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "You've successfully signed in with {selected_provider}."
+msgstr "{selected_provider} oturumunuz başarıyla açıldı."
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid ""
+"We just need a little more information before you start learning with "
+"{platform_name}."
+msgstr ""
+"{platform_name} ile öğrenmeye başlamadan önce biraz daha bilgiye ihtiyacımız"
+" var."
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Please complete the following fields to register for an account. "
+msgstr "Kayıt olmak için lütfen aşağıdaki gerekli alanları tamamlayın."
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "example: Jane Doe"
+msgstr "örnek: Mehmet Can"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Your legal name, used for any certificates you earn."
+msgstr "Kazandığınız her sertifikalar için kullanılan hukuki adınız."
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "example: JaneDoe"
+msgstr "örnek: MehmetCan"
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Will be shown in any discussions or forums you participate in"
+msgstr "İçinde olduğunuz forumlarda ve tartışmalarda gözükecek olan"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "cannot be changed later"
+msgstr "daha sonra değiştirilemez"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Welcome {username}"
+msgstr "Hoş geldin {username}"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Enter a Public Display Name:"
+msgstr "Görüntülenecek İsminizi Giriniz:"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Public Display Name"
+msgstr "Halka Açık Görüntülenen İsim"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Additional Personal Information"
+msgstr "Ek Kişisel Bilgi"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "example: New York"
+msgstr "örnek: İstanbul"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Highest Level of Education Completed"
+msgstr "Bitirdiğiniz En Yüksek Okul Seviyesi"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Please share with us your reasons for registering with {platform_name}"
+msgstr "Lütfen {platform_name}a kaydolma sebeplerinizi bizimle paylaşın"
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Account Acknowledgements"
+msgstr "Hesap Onayları"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Preferences for {platform_name}"
+msgstr "{platform_name} için Tercihler"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Update my {platform_name} Account"
+msgstr " {platform_name} Hesabımı Güncelleyin"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Processing your account information"
+msgstr "Hesap bilgileriniz işleniyor"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Welcome {username}!  Please set your preferences below"
+msgstr "Hoş geldin, {username}! Lütfen tercihlerinizi aşağıda işaretleyin"
+
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
 "Required fields are noted by {strong_indicator}bold text and an asterisk "
 "(*).{strong_close}"
 msgstr ""
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Update My Account"
+msgstr "Hesabımı Güncelle"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Registration Help"
+msgstr "Kayıt yardım"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Already registered?"
+msgstr "Zaten kayıtlı mısın?"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+#: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
+#: wiki/templates/wiki/accounts/signup.html
+msgid "Log in"
+msgstr "Giriş yap"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Next Steps"
+msgstr "Sonraki Adımlar"
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
@@ -21466,8 +21277,16 @@ msgstr ""
 "işaretleyiniz, çünkü derslerinizden e-posta alabilmelisiniz."
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Need Help?"
+msgstr "Yardım?"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Need help in registering with {platform_name}?"
 msgstr "{platform_name}e kayıt için yardıma mı ihtiyacınız var?"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "View our FAQs for answers to commonly asked questions."
+msgstr "Sorunlarınız için sık sorulan soruları ziyaret edin."
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
@@ -21591,61 +21410,6 @@ msgstr "Eğer sorun tekrar ederse, {email_link} adresine e-posta atınız."
 #: cms/templates/accessibility.html
 msgid "Studio Accessibility Policy"
 msgstr "Studio Erişilebilirlik Politikası"
-
-#: cms/templates/activation_active.html cms/templates/activation_complete.html
-#: cms/templates/activation_invalid.html
-msgid "{studio_name} Account Activation"
-msgstr "{studio_name} Hesap Etkinleştirme"
-
-#: cms/templates/activation_active.html
-msgid "Your account is already active"
-msgstr "Hesabınız zaten etkinleştirilmiş durumda"
-
-#: cms/templates/activation_active.html
-msgid ""
-"This account, set up using {email}, has already been activated. Please sign "
-"in to start working within {studio_name}."
-msgstr ""
-"{email} Bu e-posta ile oluşturulmuş hesap zaten doğrulanmış. Lütfen e-posta "
-"adresiniz ve parolanız ile {studio_name} eğitimine giriş yapın."
-
-#: cms/templates/activation_active.html cms/templates/activation_complete.html
-msgid "Sign into {studio_name}"
-msgstr "{studio_name} platformunda oturum aç"
-
-#: cms/templates/activation_complete.html
-msgid "Your account activation is complete!"
-msgstr "Hesap etkinleştirmeniz tamamlandı!"
-
-#: cms/templates/activation_complete.html
-msgid ""
-"Thank you for activating your account. You may now sign in and start using "
-"{studio_name} to author courses."
-msgstr ""
-"Hesabınızı etkinleştirdiğiniz için teşekkür ederiz. Giriş yaptıktan sonra "
-"{studio_name} içinde dersleri yönetebilirsiniz."
-
-#: cms/templates/activation_invalid.html
-msgid "Your account activation is invalid"
-msgstr "Hesap etkinleştirmeniz geçersiz"
-
-#: cms/templates/activation_invalid.html
-msgid ""
-"We're sorry. Something went wrong with your activation. Check to make sure "
-"the URL you went to was correct, as e-mail programs will sometimes split it "
-"into two lines."
-msgstr ""
-"Üzgünüz! Etkinleştirme esnasında bir hata oluştu. Lütfen etkinleştirme için "
-"gönderilen URL'yi kontrol edin, e-posta istemcileri bazen adresleri iki "
-"satıra bölebiliyor."
-
-#: cms/templates/activation_invalid.html
-msgid ""
-"If you still have issues, contact {platform_name} Support. In the meantime, "
-"you can also return to {link_start}the {studio_name} homepage.{link_end}"
-msgstr ""
-"Hâlâ sorunlarınız varsa, {platform_name} desteğiyle bağlantı kurun. Bu "
-"arada, {link_start}{studio_name} anasayfasına dönebilirsiniz.{link_end}"
 
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
 msgid "Files & Uploads"
@@ -23915,111 +23679,6 @@ msgstr ""
 "üyelerini ekleyebilir ya da çıkarabilir. Kütüphanede Yönetici olarak en az "
 "bir kullanıcı bulunmalıdır."
 
-#: cms/templates/register.html cms/templates/widgets/header.html
-msgid "Sign Up"
-msgstr "Kayıt ol"
-
-#: cms/templates/register.html
-msgid "Sign Up for {studio_name}"
-msgstr " {studio_name} için Oturum Aç!"
-
-#: cms/templates/register.html
-msgid "Already have a {studio_name} Account? Sign in"
-msgstr "Zaten bir {studio_name} hesabınız var mı? Giriş yap"
-
-#: cms/templates/register.html
-msgid ""
-"Ready to start creating online courses? Sign up below and start creating "
-"your first {platform_name} course today."
-msgstr ""
-"Çevrimiçi ders açmaya hazır mısın? Hemen aşağıdan kayıt ol ve bugün ilk "
-"{platform_name} dersini oluşturmaya başla."
-
-#: cms/templates/register.html
-msgid "Required Information to Sign Up for {studio_name}"
-msgstr "{studio_name} e kaydolmak için gerekli bilgi"
-
-#: cms/templates/register.html
-msgid ""
-"This will be used in public discussions with your courses and in our edX101 "
-"support forums"
-msgstr ""
-"Bu veri, ders içinde yer alan genel tartışmalar kısmında ve edX101 destek "
-"forumlarında kullanılacak."
-
-#: cms/templates/register.html
-msgid "Your Location"
-msgstr " Bulunduğunuz Yer"
-
-#: cms/templates/register.html
-msgid "Preferred Language"
-msgstr "Tercih Edilen Dil"
-
-#: cms/templates/register.html
-msgid "I agree to the {a_start} Terms of Service {a_end}"
-msgstr "{a_start}Kullanım Koşulları{a_end}'nı kabul ediyorum"
-
-#: cms/templates/register.html
-msgid "Create My Account &amp; Start Authoring Courses"
-msgstr "Hesap Aç &amp; Dersleri Oluşturmaya Başla"
-
-#: cms/templates/register.html
-msgid "Common {studio_name} Questions"
-msgstr "{studio_name} Sıkça Sorulan Soruları"
-
-#: cms/templates/register.html
-msgid "Who is {studio_name} for?"
-msgstr "{studio_name} kimin için?"
-
-#: cms/templates/register.html
-msgid ""
-"{studio_name} is for anyone that wants to create online courses that "
-"leverage the global {platform_name} platform. Our users are often faculty "
-"members, teaching assistants and course staff, and members of instructional "
-"technology groups."
-msgstr ""
-"{studio_name} çevrimiçi ders açmak isteyen herkesi hedefleyen, global bir "
-"{platform_name} platformudur. Kullanıcılarımız genellikle fakülte "
-"çalışanları, öğretim üyeleri ve eğitim teknoloji gruplarından oluşur."
-
-#: cms/templates/register.html
-msgid ""
-"How technically savvy do I need to be to create courses in {studio_name}?"
-msgstr ""
-"{studio_name} içinde dersler oluşturmak için teknik olarak neler bilmeliyim?"
-
-#: cms/templates/register.html
-msgid ""
-"{studio_name} is designed to be easy to use by almost anyone familiar with "
-"common web-based authoring environments (Wordpress, Moodle, etc.). No "
-"programming knowledge is required, but for some of the more advanced "
-"features, a technical background would be helpful. As always, we are here to"
-" help, so don't hesitate to dive right in."
-msgstr ""
-"{studio_name}, web temelli sayfa üretim ortamlarına (WordPress, Moodle, vb) "
-"alışık olan herkesin kullanabileceği kadar kolay olması için tasarlanmıştır."
-" Programlama bilgisine gerek duyulmaz, ama bazı gelişmiş özelliklerin "
-"kullanılabilmesi için teknik bilginin yardımı olabilir. Her zaman olduğu "
-"gibi, yardım etmek için buradayız ve lütfen soru sormaktan çekinmeyin."
-
-#: cms/templates/register.html
-msgid "I've never authored a course online before. Is there help?"
-msgstr ""
-"Ben daha önce hiç çevrimiçi ders açmadım. Bana yardım edebilir misiniz?"
-
-#: cms/templates/register.html
-msgid ""
-"Absolutely. We have created an online course, edX101, that describes some "
-"best practices: from filming video, creating exercises, to the basics of "
-"running an online course. Additionally, we're always here to help, just drop"
-" us a note."
-msgstr ""
-"Elbette. edX101 adında çevrimiçi bir dersimiz var ve pek çok faydalı ipucu "
-"ve tüyoları içeriyor: Video çekiminden öğrencilere egzersiz oluşturmaya, "
-"hatta çevrimiçi ders oluşturmanın temel kavramlarına dek pek çok başlığa "
-"değiniyor. Ayrıca yardım için sürekli buradayız, bize bir not bırakmanız "
-"yeterli. "
-
 #: cms/templates/settings.html
 msgid "Schedule & Details Settings"
 msgstr "Takvim & Detaylar Ayarları"
@@ -24877,30 +24536,6 @@ msgstr ""
 "Bu grup artık mevcut değil. Başka bir grup seçin ya da erişim kısıtını "
 "kaldırın."
 
-#: cms/templates/emails/activation_email.txt
-msgid ""
-"Thank you for signing up for {studio_name}! To activate your account, please"
-" copy and paste this address into your web browser's address bar:"
-msgstr ""
-"{studio_name} portalına kayıt yaptığınız için teşekkürler! Hesabınızı "
-"etkinleştirmek için lütfen aşağıdaki bağlantıyı tarayıcınızın adres çubuğuna"
-" yapıştırın:"
-
-#: cms/templates/emails/activation_email.txt
-msgid ""
-"If you didn't request this, you don't need to do anything; you won't receive"
-" any more email from us. Please do not reply to this e-mail; if you require "
-"assistance, check the help section of the {studio_name} web site."
-msgstr ""
-"Eğer bunu talep etmediyseniz, hiçbir şey yapmaya ihtiyacınız yok; bizden "
-"daha fazla e-posta almayacaksınız. Lütfen bu e-postayı cevaplamayın; eğer "
-"yardıma ihtiyaç duyarsanız, {studio_name} websitesinin yardım bölümünü "
-"kontrol edin."
-
-#: cms/templates/emails/activation_email_subject.txt
-msgid "Your account for {studio_name}"
-msgstr "{studio_name} için hesabınız"
-
 #: cms/templates/emails/course_creator_admin_subject.txt
 msgid "{email} has requested {studio_name} course creator privileges on edge"
 msgstr ""
@@ -25042,14 +24677,6 @@ msgstr ""
 msgid "Return to the {link_start}home page{link_end}."
 msgstr "{link_start}Ana sayfaya{link_end} geri dön."
 
-#: cms/templates/registration/reg_complete.html
-msgid ""
-"We've sent an email message to {email} with instructions for activating your"
-" account."
-msgstr ""
-"Hesabınızı etkinleştirmek için gerekli direktiflere birlikte {email} "
-"adresine bir e-posta gönderdik."
-
 #: cms/templates/widgets/footer.html
 msgid "Policies"
 msgstr "Politikalar"
@@ -25101,6 +24728,10 @@ msgstr "Hesap Navigasyonu"
 #: cms/templates/widgets/header.html
 msgid "Contextual Online Help"
 msgstr "İçerik Hakkında Çevrimiçi Yardım"
+
+#: cms/templates/widgets/header.html
+msgid "Sign Up"
+msgstr "Kayıt ol"
 
 #: cms/templates/widgets/metadata-edit.html
 msgid "Launch Latex Source Compiler"
@@ -26145,6 +25776,10 @@ msgstr "Kaynağı"
 #: wiki/templates/wiki/source.html
 msgid "This article is currently locked for editing."
 msgstr "Bu madde düzenlenmemesi için kilitlenmiştir."
+
+#: wiki/templates/wiki/accounts/login.html
+msgid "Please log in"
+msgstr "Lütfen giriş yapınız"
 
 #: wiki/templates/wiki/accounts/login.html
 msgid "Log me in..."
