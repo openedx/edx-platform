@@ -32,7 +32,6 @@ from openedx.core.djangoapps.user_authn.cookies import jwt_cookies
 from openedx.core.djangoapps.user_authn.views.login import (
     shim_student_view,
     AllowedAuthUser,
-    UPDATE_LOGIN_USER_ERROR_STATUS_CODE,
     ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 )
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
@@ -84,12 +83,10 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success', self.user_email])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
-    @ddt.data(True, False)
-    def test_login_success_no_pii(self, is_error_status_code_enabled):
-        with UPDATE_LOGIN_USER_ERROR_STATUS_CODE.override(is_error_status_code_enabled):
-            response, mock_audit_log = self._login_response(
-                self.user_email, self.password, patched_audit_log='student.models.AUDIT_LOG'
-            )
+    def test_login_success_no_pii(self):
+        response, mock_audit_log = self._login_response(
+            self.user_email, self.password, patched_audit_log='student.models.AUDIT_LOG'
+        )
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success'])
         self._assert_not_in_audit_log(mock_audit_log, 'info', [self.user_email])
@@ -118,20 +115,14 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             self.user.refresh_from_db()
             assert old_last_login == self.user.last_login
 
-    @ddt.data(
-        (True, 400),
-        (False, 200),
-    )
-    @ddt.unpack
-    def test_login_fail_no_user_exists(self, is_error_status_code_enabled, expected_status_code):
+    def test_login_fail_no_user_exists(self):
         nonexistent_email = u'not_a_user@edx.org'
-        with UPDATE_LOGIN_USER_ERROR_STATUS_CODE.override(is_error_status_code_enabled):
-            response, mock_audit_log = self._login_response(
-                nonexistent_email,
-                self.password,
-            )
+        response, mock_audit_log = self._login_response(
+            nonexistent_email,
+            self.password,
+        )
         self._assert_response(
-            response, success=False, value=self.LOGIN_FAILED_WARNING, status_code=expected_status_code
+            response, success=False, value=self.LOGIN_FAILED_WARNING, status_code=400
         )
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', nonexistent_email])
 
@@ -519,7 +510,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         If value is provided, assert that the response contained that
         value for 'value' in the JSON dict.
         """
-        expected_status_code = status_code or 200
+        expected_status_code = status_code or (400 if success is False else 200)
         self.assertEqual(response.status_code, expected_status_code)
 
         try:
