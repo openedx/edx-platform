@@ -54,7 +54,7 @@ git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2
 click-log==0.3.2          # via edx-lint
 click==7.0
 code-annotations==0.3.2
-colorama==0.4.1           # via radon
+colorama==0.4.3           # via radon
 configparser==4.0.2
 contextlib2==0.6.0.post1
 cookies==2.2.1            # via moto
@@ -228,7 +228,7 @@ polib==1.1.0
 psutil==1.2.1
 py2neo==3.1.2
 py==1.8.0                 # via pytest, tox
-pyaml==19.4.1             # via moto
+pyaml==19.12.0            # via moto
 pycodestyle==2.5.0
 pycontracts==1.7.1
 pycountry==19.8.18
