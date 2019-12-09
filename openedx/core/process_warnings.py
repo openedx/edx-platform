@@ -9,7 +9,7 @@ import pandas as pd
 from write_to_html import HtmlOutlineWriter
 from collections import Counter
 
-columns =  ['message', 'category', 'filename', 'lineno', 'high_location', 'label', 'num','deprecated']
+columns = ['message', 'category', 'filename', 'lineno', 'high_location', 'label', 'num', 'deprecated']
 columns_index_dict = {key: index for index, key in enumerate(columns)}
 
 
@@ -18,17 +18,17 @@ pp = pprint.PrettyPrinter(indent=4, depth=2)
 
 def seperate_warnings_by_location(warnings_data):
     """
-    Warnings originate from multiple locations, this function takes in list of warning objects 
+    Warnings originate from multiple locations, this function takes in list of warning objects
     and seperates them based on their filename location
     """
 
     # first create regex for each know file location
     warnings_locations = {
-        ".*/python\d\.\d/site-packages/.*\.py": "python",
-        ".*/edx-platform/lms/.*\.py": "lms",
-        ".*/edx-platform/openedx/.*\.py": "openedx",
-        ".*/edx-platform/cms/.*\.py": "cms",
-        ".*/edx-platform/common/.*\.py": "common",
+        ".*/python\d\.\d/site-packages/.*\.py": "python", # noqa
+        ".*/edx-platform/lms/.*\.py": "lms", # noqa
+        ".*/edx-platform/openedx/.*\.py": "openedx", # noqa
+        ".*/edx-platform/cms/.*\.py": "cms", # noqa
+        ".*/edx-platform/common/.*\.py": "common", # noqa
     }
 
     """
@@ -40,13 +40,14 @@ def seperate_warnings_by_location(warnings_data):
     for warnings_object in warnings_data:
         warning_origin_located = False
         for key in warnings_locations:
-            if re.search(key, warnings_object[columns_index_dict["filename"]]) != None:
+            if re.search(key, warnings_object[columns_index_dict["filename"]]) is not None:
                 warnings_object[columns_index_dict["high_location"]] = warnings_locations[key]
                 warning_origin_located = True
                 break
         if not warning_origin_located:
             warnings_object[columns_index_dict["high_location"]] = "other"
     return warnings_data
+
 
 def convert_warning_dict_to_list(warning_dict):
     #namedtuple('message', 'category', 'filename', 'lineno', 'high_location', 'label', 'num')
@@ -78,11 +79,11 @@ def read_warning_data(dir_path):
 
     # TODO(jinder): currently this is hardcoded in, maybe create a constants file with info
     # THINK(jinder): but creating file for one constant seems overkill
-    warnings_file_name_regex = "pytest_warnings_?\d*\.json"
+    warnings_file_name_regex = "pytest_warnings_?\d*\.json" # noqa
 
     # iterate through files_in_dir and see if they match our know file name pattern
     for file in files_in_dir:
-        if re.search(warnings_file_name_regex, file) != None:
+        if re.search(warnings_file_name_regex, file) is not None:
             warnings_files.append(file)
 
     # go through each warning file and aggregate warnigns into warnings_data
@@ -91,11 +92,12 @@ def read_warning_data(dir_path):
         with open(os.path.expanduser(dir_path + "/" + file), "r") as read_file:
             json_input = json.load(read_file)
             if "warnings" in json_input:
-                data =[convert_warning_dict_to_list(warning_dict) for warning_dict in json_input["warnings"]]
+                data = [convert_warning_dict_to_list(warning_dict) for warning_dict in json_input["warnings"]]
                 warnings_data.extend(data)
             else:
                 print(file)
     return warnings_data
+
 
 def compress_similar_warnings(warnings_data):
     tupled_data = [tuple(data) for data in warnings_data]
@@ -104,7 +106,6 @@ def compress_similar_warnings(warnings_data):
     for data_object in output:
         data_object[columns_index_dict["num"]] = test_counter[tuple(data_object)]
     return output
-
 
 
 def process_warnings_json(dir_path):
@@ -135,12 +136,12 @@ def process_warnings_json(dir_path):
     return compressed_warnings_data
 
 
-
 def group_and_sort_by_sumof(dataframe, group, sort_by):
     groups_by = dataframe.groupby(group)
-    temp_list_to_sort = [(key,value,value[sort_by].sum()) for key, value in groups_by]
-        #sort by count
-    return sorted(temp_list_to_sort, key = lambda x: -x[2])
+    temp_list_to_sort = [(key, value, value[sort_by].sum()) for key, value in groups_by]
+    # sort by count
+    return sorted(temp_list_to_sort, key=lambda x: -x[2])
+
 
 def write_html_report(warnings_dataframe, html_path):
     """
@@ -150,13 +151,13 @@ def write_html_report(warnings_dataframe, html_path):
         html_writer = HtmlOutlineWriter(fout)
         category_sorted_by_count = group_and_sort_by_sumof(warnings_dataframe, "category", "num")
         for category, group_in_category, category_count in category_sorted_by_count:
-            html = u'<span class="count">{category}, count: {count}</span> '.format(category=category,count=category_count)
+            html = u'<span class="count">{category}, count: {count}</span> '.format(category=category, count=category_count)
             html_writer.start_section(html, klass=u"category")
             locations_sorted_by_count = group_and_sort_by_sumof(group_in_category, "high_location", "num")
 
             for location, group_in_location, location_count in locations_sorted_by_count:
                 # pp.pprint(location)
-                html = u'<span class="count">{location}, count: {count}</span> '.format(location=location,count=location_count)
+                html = u'<span class="count">{location}, count: {count}</span> '.format(location=location, count=location_count)
                 html_writer.start_section(html, klass=u"location")
                 message_group_sorted_by_count = group_and_sort_by_sumof(group_in_location, "message", "num")
                 # pdb.set_trace()
@@ -195,6 +196,5 @@ parser.add_argument("--dir_path", default="test_root/log")
 parser.add_argument("--html_path", default="test_html.html")
 args = parser.parse_args()
 output = process_warnings_json(args.dir_path)
-warnings_dataframe = pd.DataFrame(data = output, columns=columns)
+warnings_dataframe = pd.DataFrame(data=output, columns=columns)
 write_html_report(warnings_dataframe, args.html_path)
-

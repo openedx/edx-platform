@@ -4,11 +4,14 @@ Module to put all pytest hooks for various
 import os
 import json
 
+
 def pytest_json_modifyreport(json_report):
     """
-    The function is called by pytest-json-report plugin to only output warnings in json format.
-    Everything else is removed due to it already being saved by junitxml
-    The json warning outputs are meant to be read by jenkins
+    * The function is called by pytest-json-report plugin to only output warnings in json format.
+    * Everything else is removed due to it already being saved by junitxml
+    * --json-omit flag in does not allow us to remove everything but the warnings
+    * (the environment metadata is one example of unremoveable data)
+    * The json warning outputs are meant to be read by jenkins
     """
     warnings_flag = 'warnings'
     if warnings_flag in json_report:

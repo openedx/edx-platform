@@ -9,8 +9,6 @@ import textwrap
 from xml.sax.saxutils import escape
 
 
-
-
 class HtmlOutlineWriter(object):
     HEAD = textwrap.dedent(u"""
         <!DOCTYPE html>
@@ -65,7 +63,7 @@ class HtmlOutlineWriter(object):
 
         }
 
-        
+
         </style>
         <body>
     """)
@@ -95,4 +93,3 @@ class HtmlOutlineWriter(object):
 
     def write(self, html):
         self.fout.write(html)
-
