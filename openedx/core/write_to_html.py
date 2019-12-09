@@ -1,18 +1,16 @@
-import collections
-import csv
-import os
-import re
-import six
-import sys
-import pdb
+"""
+Class used to write pytest warning data  into html format
+"""
 import textwrap
-from xml.sax.saxutils import escape
-
-
+import six
 
 
 class HtmlOutlineWriter(object):
-    HEAD = textwrap.dedent(u"""
+    """
+    writer to handle html writing
+    """
+    HEAD = textwrap.dedent(
+        u"""
         <!DOCTYPE html>
         <html>
         <head>
@@ -65,17 +63,20 @@ class HtmlOutlineWriter(object):
 
         }
 
-        
+
         </style>
         <body>
-    """)
+    """
+    )
 
-    SECTION_START = textwrap.dedent(u"""\
+    SECTION_START = textwrap.dedent(
+        u"""\
         <div class="{klass}">
         <input class="toggle-box {klass}" id="sect_{id:05d}" type="checkbox">
         <label for="sect_{id:05d}">{html}</label>
         <div>
-    """)
+    """
+    )
 
     SECTION_END = six.u("</div></div>")
 
@@ -85,9 +86,9 @@ class HtmlOutlineWriter(object):
         self.fout.write(self.HEAD)
 
     def start_section(self, html, klass=None):
-        self.fout.write(self.SECTION_START.format(
-            id=self.section_id, html=html, klass=klass or "",
-        ))
+        self.fout.write(
+            self.SECTION_START.format(id=self.section_id, html=html, klass=klass or "",)
+        )
         self.section_id += 1
 
     def end_section(self):
@@ -95,4 +96,3 @@ class HtmlOutlineWriter(object):
 
     def write(self, html):
         self.fout.write(html)
-
