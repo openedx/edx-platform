@@ -658,6 +658,13 @@
                         that.saveNotification.hide();
                         that.custom_alert("Answer submitted successfully");
                     }
+
+                    if (window.fetchCompetencyAssessmentsScore) {
+                        // This function is defined in'features/philu_courseware/competency-assessments.js(philu-edx-theme)'
+                        // which is included in courseware.html 'lms/templates/courseware/courseware.html(philu-edx-theme)'
+                        fetchCompetencyAssessmentsScore()
+                    }
+
                     if (window.recordCompetencyAssessmentAttempt) {
                       // This function is defined in'features/philu_courseware/competency-assessments.js(philu-edx-theme)'
                       // which is included in courseware.html 'lms/templates/courseware/courseware.html(philu-edx-theme)'
