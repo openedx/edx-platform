@@ -198,4 +198,3 @@ args = parser.parse_args()
 output = process_warnings_json(args.dir_path)
 warnings_dataframe = pd.DataFrame(data=output, columns=columns)
 write_html_report(warnings_dataframe, args.html_path)
-
