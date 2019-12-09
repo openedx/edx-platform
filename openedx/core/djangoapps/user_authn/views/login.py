@@ -184,7 +184,7 @@ def _log_and_raise_inactive_user_auth_error(unauthenticated_user):
     raise AuthFailedError(_generate_not_activated_message(unauthenticated_user))
 
 
-def _authenticate_first_party(request, unauthenticated_user):
+def _authenticate_first_party(request, unauthenticated_user, third_party_auth_requested):
     """
     Use Django authentication on the given request, using rate limiting if configured
     """
@@ -193,7 +193,11 @@ def _authenticate_first_party(request, unauthenticated_user):
     # to fail and we can take advantage of the ratelimited backend
     username = unauthenticated_user.username if unauthenticated_user else ""
 
-    _check_user_auth_flow(request.site, unauthenticated_user)
+    # First time when a user login through third_party_auth account then user needs to link
+    # third_party account with the platform account by login through email and password that's
+    # why we need to by-pass this check when user is already authenticated by third_party_auth.
+    if not third_party_auth_requested:
+        _check_user_auth_flow(request.site, unauthenticated_user)
 
     try:
         password = normalize_password(request.POST['password'])
@@ -372,7 +376,7 @@ def login_user(request):
         possibly_authenticated_user = user
 
         if not is_user_third_party_authenticated:
-            possibly_authenticated_user = _authenticate_first_party(request, user)
+            possibly_authenticated_user = _authenticate_first_party(request, user, third_party_auth_requested)
             if possibly_authenticated_user and password_policy_compliance.should_enforce_compliance_on_login():
                 # Important: This call must be made AFTER the user was successfully authenticated.
                 _enforce_password_policy_compliance(request, possibly_authenticated_user)
