@@ -122,13 +122,13 @@ pipeline {
                     }
                     steps {
                         script {
-                          runPythonTests()
+                            runPythonTests()
                         }
                     }
                     post {
                         always {
                             script {
-                            pythonTestCleanup()
+                                pythonTestCleanup()
                             }
                         }
                     }
@@ -142,20 +142,19 @@ pipeline {
                     }
                     steps {
                         script {
-                        jinder_random= 'yes'
                            runPythonTests()
                         }
                     }
                     post {
                         always {
                             script {
-                            pythonTestCleanup()
+                                pythonTestCleanup()
                             }
                         }
                     }
                 }
             }
-        }    
+        }
         
         
         stage('Run coverage') {
