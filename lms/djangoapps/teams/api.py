@@ -241,3 +241,7 @@ def can_user_create_team_in_topic(user, course_id, topic_id):
         (not is_instructor_managed_topic(topic_id)) or
         has_course_staff_privileges(user, course_id)
     )
+
+
+def echo(thing):
+    return thing

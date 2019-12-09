@@ -8,6 +8,8 @@ import inspect
 from config_models.models import ConfigurationModel
 from django.conf import settings
 
+from xmodule.modulestore.django import modulestore
+
 
 class SettingsService(object):
     """
@@ -95,3 +97,13 @@ class ConfigurationService(object):
             )
 
         self.configuration = configuration_model
+
+
+class TeamsConfigurationService(object):
+    def __init__(self):
+        self._course = None
+
+    def teams_configuration(self, course_key):
+        if not self._course:
+            self._course = modulestore().get_course(course_key)
+        return self._course.teams_configuration

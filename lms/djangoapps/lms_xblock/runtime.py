@@ -13,6 +13,7 @@ from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
 from badges.service import BadgingService
 from badges.utils import badges_enabled
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
+from lms.djangoapps.teams.services import TeamsService
 from openedx.core.djangoapps.user_api.course_tag import api as user_course_tag_api
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_utils import wrap_xblock_aside, xblock_local_resource_url
@@ -155,6 +156,7 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         if badges_enabled():
             services['badging'] = BadgingService(course_id=kwargs.get('course_id'), modulestore=store)
         self.request_token = kwargs.pop('request_token', None)
+        services['teams'] = TeamsService()
         super(LmsModuleSystem, self).__init__(**kwargs)
 
     def handler_url(self, *args, **kwargs):

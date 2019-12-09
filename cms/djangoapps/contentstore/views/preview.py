@@ -22,6 +22,7 @@ from contentstore.utils import get_visibility_partition_info
 from contentstore.views.access import get_user_role
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
+from lms.djangoapps.teams.services import TeamsService
 from openedx.core.lib.license import wrap_with_license
 from openedx.core.lib.xblock_utils import (
     replace_static_urls,
@@ -218,7 +219,8 @@ def _preview_module_system(request, descriptor, field_data):
             "i18n": ModuleI18nService,
             "settings": SettingsService(),
             "user": DjangoXBlockUserService(request.user),
-            "partitions": StudioPartitionService(course_id=course_id)
+            "partitions": StudioPartitionService(course_id=course_id),
+            "teams": TeamsService(),
         },
     )
 
