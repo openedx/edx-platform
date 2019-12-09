@@ -25,11 +25,11 @@ def pytest_json_modifyreport(json_report):
 
 def create_file_name(dir_path, file_name_postfix, num=0):
     """
-    Used to create file name with this given 
+    Used to create file name with this given
     structure: TEST_SUITE + "_" + file_name_postfile + "_ " + num.json
     The env variable TEST_SUITE is set in jenkinsfile
 
-    This was necessary cause Pytest is run multiple times and we need to make sure old pytest 
+    This was necessary cause Pytest is run multiple times and we need to make sure old pytest
     warning json files are not being overwritten.
     """
     name = dir_path + "/"
@@ -43,8 +43,8 @@ def create_file_name(dir_path, file_name_postfix, num=0):
 
 def pytest_sessionfinish(session):
     """
-    Since multiple pytests are running, 
-    this makes sure warnings from different run are not overwritten 
+    Since multiple pytests are running,
+    this makes sure warnings from different run are not overwritten
     """
     dir_path = "test_root/log"
     file_name_postfix = "pytest_warnings"

@@ -24,11 +24,11 @@ def seperate_warnings_by_location(warnings_data):
 
     # first create regex for each know file location
     warnings_locations = {
-        ".*/python\d\.\d/site-packages/.*\.py": "python", # noqa
-        ".*/edx-platform/lms/.*\.py": "lms", # noqa
-        ".*/edx-platform/openedx/.*\.py": "openedx", # noqa
-        ".*/edx-platform/cms/.*\.py": "cms", # noqa
-        ".*/edx-platform/common/.*\.py": "common", # noqa
+        ".*/python\d\.\d/site-packages/.*\.py": "python",  # noqa
+        ".*/edx-platform/lms/.*\.py": "lms",  # noqa
+        ".*/edx-platform/openedx/.*\.py": "openedx",  # noqa
+        ".*/edx-platform/cms/.*\.py": "cms",  # noqa
+        ".*/edx-platform/common/.*\.py": "common",  # noqa
     }
 
     """
@@ -79,7 +79,7 @@ def read_warning_data(dir_path):
 
     # TODO(jinder): currently this is hardcoded in, maybe create a constants file with info
     # THINK(jinder): but creating file for one constant seems overkill
-    warnings_file_name_regex = "pytest_warnings_?\d*\.json" # noqa
+    warnings_file_name_regex = "pytest_warnings_?\d*\.json"  # noqa
 
     # iterate through files_in_dir and see if they match our know file name pattern
     for file in files_in_dir:
@@ -198,3 +198,4 @@ args = parser.parse_args()
 output = process_warnings_json(args.dir_path)
 warnings_dataframe = pd.DataFrame(data=output, columns=columns)
 write_html_report(warnings_dataframe, args.html_path)
+
