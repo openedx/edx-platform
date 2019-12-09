@@ -41,7 +41,7 @@ class Command(BaseCommand):
             if not is_course_valid_for_certificate_auto_generation(course):
                 continue
 
-            for user_course_enrollment in CourseEnrollment.objects.filter(course=course.id).all():
+            for user_course_enrollment in CourseEnrollment.objects.filter(course=course.id, is_active=True).all():
                 user = user_course_enrollment.user
                 cert_data = _get_cert_data(user, course, user_course_enrollment.mode)
 
