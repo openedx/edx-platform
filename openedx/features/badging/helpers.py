@@ -111,7 +111,8 @@ def filter_earned_badge_by_joined_team(user, course, earned_badges):
     course_team = CourseTeam.objects.filter(course_id=course.id, users=user).values('team__room_id').first()
 
     if not course_team:
-        return course_team, earned_badges
+        # if user has not joined any team, return empty list for earned badges
+        return course_team, list()
 
     if not course_team['team__room_id']:
         error = FILTER_BADGES_ERROR.format(team_id=course_team['id'])
