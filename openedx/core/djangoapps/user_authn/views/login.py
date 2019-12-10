@@ -400,6 +400,7 @@ def login_user(request):
         response = set_logged_in_cookies(request, response, possibly_authenticated_user)
         set_custom_metric('login_user_auth_failed_error', False)
         set_custom_metric('login_user_response_status', response.status_code)
+        set_custom_metric('login_user_redirect_url', redirect_url)
         return response
     except AuthFailedError as error:
         log.exception(error.get_response())
@@ -480,13 +481,23 @@ class LoginSessionView(APIView):
 def _parse_analytics_param_for_course_id(request):
     """ If analytics request param is found, parse and add course id as a new request param. """
     # Make a copy of the current POST request to modify.
+    set_custom_metric('login_user_enrollment_action_in_before', bool("enrollment_action" in request.POST))
+
     modified_request = request.POST.copy()
     if isinstance(request, HttpRequest):
         # Works for an HttpRequest but not a rest_framework.request.Request.
         request.POST = modified_request
+        set_custom_metric('login_user_request_type', 'traditional')
     else:
         # The request must be a rest_framework.request.Request.
         request._data = modified_request  # pylint: disable=protected-access
+        set_custom_metric('login_user_request_type', 'drf')
+
+    set_custom_metric('login_user_enrollment_action_in_after', bool("enrollment_action" in request.POST))
+    set_custom_metric('deprecated_shim_del_enrollment_action', bool("enrollment_action" in modified_request))
+    set_custom_metric('deprecated_shim_del_enrollment_action_value', modified_request.get("enrollment_action"))
+    set_custom_metric('login_user_enrollment_action_value', request.POST.get('enrollment_action'))
+
     # Include the course ID if it's specified in the analytics info
     # so it can be included in analytics events.
     if "analytics" in modified_request:
@@ -566,6 +577,8 @@ def shim_student_view(view_func, check_logged_in=False):
             msg = response_dict.get("value", u"")
             success = response_dict.get("success")
             set_custom_metric('shim_original_response_is_json', True)
+            set_custom_metric('shim_original_redirect_url', response_dict.get("redirect_url"))
+            set_custom_metric('shim_original_redirect', response_dict.get("redirect"))
         except (ValueError, TypeError):
             msg = response.content
             success = True
