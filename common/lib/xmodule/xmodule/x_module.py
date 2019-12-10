@@ -1259,7 +1259,7 @@ class XModuleDescriptor(XModuleDescriptorToXBlockMixin, HTMLSnippet, ResourceTem
         """
         return (hasattr(other, 'scope_ids') and
                 self.scope_ids == other.scope_ids and
-                list(self.fields.keys()) == list(other.fields.keys()) and
+                set(self.fields.keys()) == set(other.fields.keys()) and
                 all(getattr(self, field.name) == getattr(other, field.name)
                     for field in self.fields.values()))
 
