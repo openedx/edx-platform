@@ -294,9 +294,9 @@ def yt_video_metadata(request):
             status_code = res.status_code
             if res.status_code == 200:
                 try:
-                    res = res.json()
-                    if res.get('items', []):
-                        response = res
+                    res_json = res.json()
+                    if res_json.get('items', []):
+                        response = res_json
                     else:
                         logging.warning(u'Unable to find the items in response. Following response '
                                         u'was received: {res}'.format(res=res.text))
