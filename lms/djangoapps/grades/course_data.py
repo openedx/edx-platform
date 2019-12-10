@@ -8,6 +8,7 @@ from django.utils.encoding import python_2_unicode_compatible
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
+from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from xmodule.modulestore.django import modulestore
 
 from .transformer import GradesTransformer
@@ -63,6 +64,7 @@ class CourseData(object):
             self._structure = get_course_blocks(
                 self.user,
                 self.location,
+                transformers=BlockStructureTransformers(transformers=None),
                 collected_block_structure=self._collected_block_structure,
             )
         return self._structure
