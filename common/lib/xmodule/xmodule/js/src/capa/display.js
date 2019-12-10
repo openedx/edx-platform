@@ -659,16 +659,18 @@
                         that.custom_alert("Answer submitted successfully");
                     }
 
-                    if (window.fetchCompetencyAssessmentsScore) {
+                    /*
+                    * CORE CHANGE:
+                    * For competency assessments, on successful attempt of a question IN
+                    * pre and post assessments we've to
+                    *  1. fetch scores of pre-assessment and post-assessment to show feedback popups.
+                    *  2. we've to record each and every attempt of the learner.
+                    * Both are done in `competencyAssessmentHandler`
+                    * */
+                    if (window.competencyAssessmentHandler) {
                         // This function is defined in'features/philu_courseware/competency-assessments.js(philu-edx-theme)'
                         // which is included in courseware.html 'lms/templates/courseware/courseware.html(philu-edx-theme)'
-                        fetchCompetencyAssessmentsScore()
-                    }
-
-                    if (window.recordCompetencyAssessmentAttempt) {
-                      // This function is defined in'features/philu_courseware/competency-assessments.js(philu-edx-theme)'
-                      // which is included in courseware.html 'lms/templates/courseware/courseware.html(philu-edx-theme)'
-                      recordCompetencyAssessmentAttempt(that,response)
+                        competencyAssessmentHandler(that,response);
                     }
 
                     break;
