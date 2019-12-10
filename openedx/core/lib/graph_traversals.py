@@ -127,7 +127,7 @@ def traverse_topologically(
     used to limit which nodes are actually yielded.
 
     Arguments:
-        start_node (any hashable type) - The starting node for the
+        start_node (any type) - The starting node for the
         traversal.
 
         get_parents (node->[node]) - Function that returns a list of
@@ -204,7 +204,7 @@ def traverse_post_order(start_node, get_children, filter_func=None):
     stack = deque([_Node(start_node, get_children)])
 
     # Keep track of which nodes have been visited.
-    visited = set()
+    visited = []
 
     while stack:
         # Peek at the current node at the top of the stack.
@@ -226,7 +226,7 @@ def traverse_post_order(start_node, get_children, filter_func=None):
             # Since there are no children left, visit the node and
             # remove it from the stack.
             yield current.node
-            visited.add(current.node)
+            visited.append(current.node)
             stack.pop()
 
         else:
@@ -264,7 +264,8 @@ def _traverse_generic(
 
     # Keep track of which nodes have been visited and whether they
     # were in fact yielded.
-    yield_results = {}  # dict(node:boolean)
+    visited = []  # nodes
+    yield_results = []  # booleans
 
     # While there are more nodes on the stack...
     while stack:
@@ -280,16 +281,17 @@ def _traverse_generic(
             parents = get_parents(current_node)
 
             # If all of the parents have not yet been visited, continue.
-            if not all(parent in yield_results for parent in parents):
+            if not all(parent in visited for parent in parents):
                 continue
 
             # If none of the parents have yielded, continue, unless
             # specified otherwise (via yield_descendants_of_unyielded).
-            elif not yield_descendants_of_unyielded and not any(yield_results[parent] for parent in parents):
+            elif not yield_descendants_of_unyielded and not any(
+                    yield_results[visited.index(parent)] for parent in parents):
                 continue
 
         # If the current node has already been visited, continue.
-        if current_node not in yield_results:
+        if current_node not in visited:
 
             # For a topological sort, it's important that we visit
             # the children even if the parent isn't yielded, in case
@@ -316,7 +318,7 @@ def _traverse_generic(
                 unvisited_children = list(
                     child
                     for child in get_children(current_node)
-                    if child not in yield_results
+                    if child not in visited
                 )
 
             # Add the node's unvisited children to the stack in reverse
@@ -332,4 +334,5 @@ def _traverse_generic(
 
             # Keep track of whether or not the node was yielded so we
             # know whether or not to yield its children.
-            yield_results[current_node] = should_yield_node
+            visited.append(current_node)
+            yield_results.append(should_yield_node)
