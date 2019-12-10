@@ -71,11 +71,6 @@ BROKER_CONNECTION_TIMEOUT = 1
 # For the Result Store, use the django cache named 'celery'
 CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
 
-# When the broker is behind an ELB, use a heartbeat to refresh the
-# connection and to detect if it has been dropped.
-BROKER_HEARTBEAT = ENV_TOKENS.get('BROKER_HEARTBEAT', 60.0)
-BROKER_HEARTBEAT_CHECKRATE = ENV_TOKENS.get('BROKER_HEARTBEAT_CHECKRATE', 2)
-
 # Each worker should only fetch one message at a time
 CELERYD_PREFETCH_MULTIPLIER = 1
 
@@ -106,6 +101,11 @@ CELERYBEAT_SCHEDULE = {}  # For scheduling tasks, entries can be added to this d
 
 with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
     ENV_TOKENS = json.load(env_file)
+
+# When the broker is behind an ELB, use a heartbeat to refresh the
+# connection and to detect if it has been dropped.
+BROKER_HEARTBEAT = ENV_TOKENS.get('BROKER_HEARTBEAT', 60.0)
+BROKER_HEARTBEAT_CHECKRATE = ENV_TOKENS.get('BROKER_HEARTBEAT_CHECKRATE', 2)
 
 # STATIC_ROOT specifies the directory where static files are
 # collected
