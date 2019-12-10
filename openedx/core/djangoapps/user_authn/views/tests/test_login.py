@@ -638,29 +638,29 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         """
         Verify that `login._check_user_auth_flow` works as expected.
         """
-        provider = 'Google'
         username = 'batman'
         user_email = '{username}@{domain}'.format(username=username, domain=user_domain)
         user = self._create_user(username, user_email)
-        default_site_configuration_values = {
+
+        provider = 'Google'
+        default_site_configuration = {
             'SITE_NAME': allowed_domain,
             'THIRD_PARTY_AUTH_ONLY_DOMAIN': allowed_domain,
             'THIRD_PARTY_AUTH_ONLY_PROVIDER': provider,
         }
+        site = self.set_up_site(allowed_domain, default_site_configuration)
+
+        if whitelisted:
+            AllowedAuthUser.objects.create(site=site, email=user.email)
+        else:
+            AllowedAuthUser.objects.filter(site=site, email=user.email).delete()
 
         with ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY.override(switch_enabled):
+            value = None if success else u'As an {0} user, You must login with your {0} {1} account.'.format(
+                allowed_domain,
+                provider
+            )
             if not is_third_party_authenticated:
-                site = self.set_up_site(allowed_domain, default_site_configuration_values)
-
-                if whitelisted:
-                    AllowedAuthUser.objects.create(site=site, email=user.email)
-                else:
-                    AllowedAuthUser.objects.filter(site=site, email=user.email).delete()
-
-                value = None if success else u'As an {0} user, You must login with your {0} {1} account.'.format(
-                    allowed_domain,
-                    provider
-                )
                 response, __ = self._login_response(user.email, self.password)
                 self._assert_response(
                     response,
@@ -668,8 +668,9 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
                     value=value,
                 )
             else:
-                default_site_configuration_values.update({'ENABLE_THIRD_PARTY_AUTH': True})
-                self.set_up_site(allowed_domain, default_site_configuration_values)
+                default_site_configuration.update({'ENABLE_THIRD_PARTY_AUTH': True})
+                site.configuration.values = default_site_configuration
+                site.configuration.save()
                 with patch('openedx.core.djangoapps.user_authn.views.login.pipeline'):
                     with patch(
                         'openedx.core.djangoapps.user_authn.views.login._check_user_auth_flow'
