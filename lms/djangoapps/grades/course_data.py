@@ -9,9 +9,11 @@ from django.utils.encoding import python_2_unicode_compatible
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
+from openedx.features.content_type_gating.block_transformers import ContentTypeGateTransformer
 from xmodule.modulestore.django import modulestore
 
 from .transformer import GradesTransformer
+from course_blocks.transformers import library_content, load_override_data, start_date, user_partitions, visibility
 
 
 @python_2_unicode_compatible
@@ -61,10 +63,15 @@ class CourseData(object):
     @property
     def structure(self):
         if self._structure is None:
+            transformers = [
+                library_content.ContentLibraryTransformer(),
+                ContentTypeGateTransformer(),
+                user_partitions.UserPartitionTransformer(),
+            ]
             self._structure = get_course_blocks(
                 self.user,
                 self.location,
-                transformers=BlockStructureTransformers(transformers=None),
+                transformers=BlockStructureTransformers(transformers=transformers),
                 collected_block_structure=self._collected_block_structure,
             )
         return self._structure
