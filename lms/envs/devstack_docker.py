@@ -43,9 +43,10 @@ JWT_AUTH.update({
 
 FEATURES.update({
     'AUTOMATIC_AUTH_FOR_TESTING': True,
-    'ENABLE_COURSEWARE_SEARCH': False,
-    'ENABLE_COURSE_DISCOVERY': False,
-    'ENABLE_DASHBOARD_SEARCH': False,
+    # Appsembler: Hack to allow overriding those values from lms.env.json
+    # 'ENABLE_COURSEWARE_SEARCH': True,
+    # 'ENABLE_COURSE_DISCOVERY': True,
+    # 'ENABLE_DASHBOARD_SEARCH': True,
     'ENABLE_DISCUSSION_SERVICE': True,
     'SHOW_HEADER_LANGUAGE_SELECTOR': True,
     'ENABLE_ENTERPRISE_INTEGRATION': False,
