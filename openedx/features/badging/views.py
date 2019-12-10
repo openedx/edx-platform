@@ -3,6 +3,7 @@ from django.http import Http404
 from django.views.decorators.http import require_GET
 from util.json_request import JsonResponse
 
+from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.keys import CourseKey
 from student.models import CourseEnrollment
 
@@ -25,7 +26,15 @@ def trophycase(request):
 
     trophycase_dict = populate_trophycase(user, enrolled_courses_data, earned_user_badges)
 
-    return JsonResponse(trophycase_dict)
+    if request.GET.get('json'):
+        return JsonResponse(trophycase_dict)
+
+    return render_to_response(
+            "features/badging/trophy_case.html",
+            {
+                'course_badges': []
+            }
+        )
 
 
 @require_GET
