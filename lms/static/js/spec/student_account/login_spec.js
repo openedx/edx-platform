@@ -43,7 +43,7 @@
                     },
                     FORM_DESCRIPTION = {
                         method: 'post',
-                        submit_url: '/login_ajax',
+                        submit_url: '/user_api/v1/account/login_session/',
                         fields: [
                             {
                                 placeholder: 'username@domain.com',

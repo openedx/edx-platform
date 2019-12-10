@@ -189,6 +189,14 @@
             },
 
             saveError: function(error) {
+                if (this.model.urlRoot.includes('/login_ajax')) {
+                    this.saveErrorWithoutShim(error);
+                } else {
+                    this.saveErrorWithShim(error);
+                }
+            },
+
+            saveErrorWithoutShim: function(error) {
                 var errorCode;
                 var msg;
                 if (error.status === 0) {
@@ -218,6 +226,41 @@
                     if (!this.hideAuthWarnings) {
                         this.clearFormErrors();
                         this.renderThirdPartyAuthWarning();
+                    }
+                } else {
+                    this.renderErrors(this.defaultFormErrorsTitle, this.errors);
+                }
+                this.toggleDisableButton(false);
+            },
+
+            saveErrorWithShim: function(error) {
+                var msg = error.responseText;
+                if (error.status === 0) {
+                    msg = gettext('An error has occurred. Check your Internet connection and try again.');
+                } else if (error.status === 500) {
+                    msg = gettext('An error has occurred. Try refreshing the page, or check your Internet connection.'); // eslint-disable-line max-len
+                }
+                this.errors = [
+                    StringUtils.interpolate(
+                        '<li>{msg}</li>', {
+                            msg: msg
+                        }
+                    )
+                ];
+                this.clearPasswordResetSuccess();
+
+            /* If we've gotten a 403 error, it means that we've successfully
+             * authenticated with a third-party provider, but we haven't
+             * linked the account to an EdX account.  In this case,
+             * we need to prompt the user to enter a little more information
+             * to complete the registration process.
+             */
+                if (error.status === 403 &&
+                 error.responseText === 'third-party-auth' &&
+                 this.currentProvider) {
+                    if (!this.hideAuthWarnings) {
+                        this.clearFormErrors();
+                        this.renderAuthWarning();
                     }
                 } else {
                     this.renderErrors(this.defaultFormErrorsTitle, this.errors);
