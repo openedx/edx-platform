@@ -194,7 +194,7 @@ lazy==1.1
 lepl==5.1.3
 libsass==0.10.0
 loremipsum==1.0.5
-git+https://github.com/edx/xblock-lti-consumer.git@v1.2.1#egg=lti_consumer-xblock==1.2.1
+git+https://github.com/edx/xblock-lti-consumer.git@v1.2.2#egg=lti_consumer-xblock==1.2.2
 lxml==3.8.0
 m2r==0.2.1
 mailsnake==1.6.4
