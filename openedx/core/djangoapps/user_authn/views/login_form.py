@@ -85,7 +85,7 @@ def _apply_third_party_auth_overrides(request, form_desc):
 # .. toggle_use_cases: incremental_release
 # .. toggle_creation_date: 2019-12-10
 # .. toggle_expiration_date: 2020-06-01
-# .. toggle_warnings: n/a
+# .. toggle_warnings: Although shim was removed, toggle must be removed in follow-up due to green-blue deployment.
 # .. toggle_tickets: ARCH-1253
 # .. toggle_status: supported
 ENABLE_LOGIN_POST_WITHOUT_SHIM = 'ENABLE_LOGIN_POST_WITHOUT_SHIM'
