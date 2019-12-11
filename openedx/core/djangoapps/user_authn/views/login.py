@@ -333,6 +333,7 @@ def finish_auth(request):  # pylint: disable=unused-argument
 
 
 @ensure_csrf_cookie
+@require_http_methods(['POST'])
 def login_user(request):
     """
     AJAX request to log in the user.

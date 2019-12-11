@@ -273,6 +273,28 @@ class HelperMixin(object):
 
         return request, strategy
 
+    def _get_login_post_request(self, strategy):
+        """
+        Gets the login post request given a strategy with a completed pipeline.
+
+        Arguments:
+            strategy: A strategy created using `get_request_and_strategy`.
+        """
+        request = self.request_factory.post(reverse('login_api'))
+
+        # Note: This is a hacked way to reuse the strategy and pipeline from the earlier request.
+        # There could be a more correct way to do this. However, the earlier code just reused the
+        # initial request for all test requests, and this started failing when login_user required
+        # a POST request, so this method gets a login POST request and keeps the rest of what was
+        # available off the original request.
+        request.site = strategy.request.site
+        request.social_strategy = strategy.request.social_strateg
+        request.user = strategy.request.user
+        request.session = strategy.request.session
+        request.backend = strategy.request.backend
+
+        return request
+
     @contextmanager
     def _patch_edxmako_current_request(self, request):
         """Make ``request`` be the current request for edxmako template rendering."""
@@ -552,9 +574,10 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         actions.do_complete(request.backend, social_views._do_login,  # pylint: disable=protected-access
                             request=request)
 
-        login_user(strategy.request)
-        actions.do_complete(request.backend, social_views._do_login,  # pylint: disable=protected-access
-                            request=request)
+        login_post_request = self._get_login_post_request(strategy)
+        login_user(login_post_request)
+        actions.do_complete(login_post_request.backend, social_views._do_login,  # pylint: disable=protected-access, no-member
+                            request=login_post_request)
 
         # First we expect that we're in the unlinked state, and that there
         # really is no association in the backend.
@@ -597,10 +620,14 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         actions.do_complete(request.backend, social_views._do_login,  # pylint: disable=protected-access
                             request=request)
 
-        with self._patch_edxmako_current_request(strategy.request):
-            login_user(strategy.request)
-            actions.do_complete(request.backend, social_views._do_login, user=user,  # pylint: disable=protected-access
-                                request=request)
+        login_post_request = self._get_login_post_request(strategy)
+        with self._patch_edxmako_current_request(login_post_request):
+            login_user(login_post_request)
+            actions.do_complete(login_post_request.backend, social_views._do_login, user=user,  # pylint: disable=protected-access, no-member
+                                request=login_post_request)
+
+        # The logged in user from the earlier login_post_request is required
+        request.user = login_post_request.user
 
         # First we expect that we're in the linked state, with a backend entry.
         self.assert_account_settings_context_looks_correct(account_settings_context(request), linked=True)
@@ -663,19 +690,20 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         actions.do_complete(request.backend, social_views._do_login,  # pylint: disable=protected-access
                             request=request)
 
-        with self._patch_edxmako_current_request(strategy.request):
-            login_user(strategy.request)
-            actions.do_complete(request.backend, social_views._do_login,  # pylint: disable=protected-access
-                                user=user, request=request)
+        login_post_request = self._get_login_post_request(strategy)
+        with self._patch_edxmako_current_request(login_post_request):
+            login_user(login_post_request)
+            actions.do_complete(login_post_request.backend, social_views._do_login,  # pylint: disable=protected-access, no-member
+                                user=user, request=login_post_request)
 
         # Monkey-patch storage for messaging; pylint: disable=protected-access
-        request._messages = fallback.FallbackStorage(request)
+        login_post_request._messages = fallback.FallbackStorage(login_post_request)
         middleware.ExceptionMiddleware().process_exception(
-            request,
+            login_post_request,
             exceptions.AuthAlreadyAssociated(self.provider.backend_name, 'account is already in use.'))
 
         self.assert_account_settings_context_looks_correct(
-            account_settings_context(request), duplicate=True, linked=True)
+            account_settings_context(login_post_request), duplicate=True, linked=True)
 
     @mock.patch('third_party_auth.pipeline.segment.track')
     def test_full_pipeline_succeeds_for_signing_in_to_existing_active_account(self, _mock_segment_track):
@@ -711,22 +739,26 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         # At this point we know the pipeline has resumed correctly. Next we
         # fire off the view that displays the login form and posts it via JS.
         with self._patch_edxmako_current_request(strategy.request):
-            self.assert_login_response_in_pipeline_looks_correct(login_user(strategy.request))
+            self.assert_login_response_in_pipeline_looks_correct(login_and_registration_form(strategy.request))
 
         # Next, we invoke the view that handles the POST, and expect it
         # redirects to /auth/complete. In the browser ajax handlers will
         # redirect the user to the dashboard; we invoke it manually here.
-        self.assert_json_success_response_looks_correct(login_user(strategy.request), verify_redirect_url=True)
+        login_post_request = self._get_login_post_request(strategy)
+        self.assert_json_success_response_looks_correct(login_user(login_post_request), verify_redirect_url=True)
 
         # We should be redirected back to the complete page, setting
         # the "logged in" cookie for the marketing site.
         self.assert_logged_in_cookie_redirect(actions.do_complete(
-            request.backend, social_views._do_login, request.user, None,  # pylint: disable=protected-access
-            redirect_field_name=auth.REDIRECT_FIELD_NAME, request=request
+            login_post_request.backend, social_views._do_login, login_post_request.user, None,  # pylint: disable=protected-access, no-member
+            redirect_field_name=auth.REDIRECT_FIELD_NAME, request=login_post_request
         ))
 
         # Set the cookie and try again
         self.set_logged_in_cookies(request)
+
+        # The logged in user from the earlier login_post_request is required
+        request.user = login_post_request.user
 
         self.assert_redirect_after_pipeline_completes(
             self.do_complete(strategy, request, partial_pipeline_token, partial_data, user)
@@ -743,8 +775,9 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         user.is_active = False
         user.save()
 
-        with self._patch_edxmako_current_request(strategy.request):
-            self.assert_json_failure_response_is_inactive_account(login_user(strategy.request))
+        login_post_request = self._get_login_post_request(strategy)
+        with self._patch_edxmako_current_request(login_post_request):
+            self.assert_json_failure_response_is_inactive_account(login_user(login_post_request))
 
     def test_signin_fails_if_no_account_associated(self):
         _, strategy = self.get_request_and_strategy(
@@ -753,7 +786,8 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         self.create_user_models_for_existing_account(
             strategy, 'user@example.com', 'password', self.get_username(), skip_social_auth=True)
 
-        self.assert_json_failure_response_is_missing_social_auth(login_user(strategy.request))
+        login_post_request = self._get_login_post_request(strategy)
+        self.assert_json_failure_response_is_missing_social_auth(login_user(login_post_request))
 
     def test_first_party_auth_trumps_third_party_auth_but_is_invalid_when_only_email_in_request(self):
         self.assert_first_party_auth_trumps_third_party_auth(email='user@example.com')
@@ -925,15 +959,16 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         self.create_user_models_for_existing_account(
             strategy, email, password, self.get_username(), skip_social_auth=True)
 
-        strategy.request.POST = dict(strategy.request.POST)
+        login_post_request = self._get_login_post_request(strategy)
+        login_post_request.POST = dict(login_post_request.POST)
 
         if email:
-            strategy.request.POST['email'] = email
+            login_post_request.POST['email'] = email
         if password:
-            strategy.request.POST['password'] = 'bad_' + password if success is False else password
+            login_post_request.POST['password'] = 'bad_' + password if success is False else password
 
-        self.assert_pipeline_running(strategy.request)
-        payload = json.loads(login_user(strategy.request).content.decode('utf-8'))
+        self.assert_pipeline_running(login_post_request)
+        payload = json.loads(login_user(login_post_request).content.decode('utf-8'))
 
         if success is None:
             # Request malformed -- just one of email/password given.
