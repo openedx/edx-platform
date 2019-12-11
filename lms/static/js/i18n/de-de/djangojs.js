@@ -52,6 +52,7 @@
     "Criterion Deleted": "Kriterium gel\u00f6scht", 
     "December": "Dezember", 
     "Describe ": "Beschreibe", 
+    "You have been logged out of your edX account. Click Okay to log in again now. Click Cancel to stay on this page (you must log in again to save your work)": "Sie wurden aus Ihrem close2real-Konto ausgeloggt. Klicken Sie bitte auf 'OK', um sich erneut anzumelden. Klicken Sie auf 'Abbrechen', um weiterhin auf der Seite zu bleiben.  Achtung: Um mit dem Kurs fortzufahren und Ihre bisherigen Ergebnisse zu speichern, müssen Sie sich hier erneut anmelden",
     "Do you want to upload your file before submitting?": "M\u00f6chten Sie die Datei hochladen, bevor Sie Ihre Antwort einreichen?", 
     "Error": "Fehler", 
     "Error getting the number of ungraded responses": "Fehler bei der Abfrage der Anzahl der unbenoteten Antworten", 
