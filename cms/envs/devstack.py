@@ -120,8 +120,8 @@ FEATURES['LICENSING'] = True
 XBLOCK_SETTINGS.update({'VideoDescriptor': {'licensing_enabled': True}})
 
 ################################ SEARCH INDEX ################################
-FEATURES['ENABLE_COURSEWARE_INDEX'] = True
-FEATURES['ENABLE_LIBRARY_INDEX'] = True
+FEATURES['ENABLE_COURSEWARE_INDEX'] = FEATURES.get('ENABLE_COURSEWARE_INDEX', True)
+FEATURES['ENABLE_LIBRARY_INDEX'] = FEATURES.get('ENABLE_LIBRARY_INDEX', True)
 SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
 
 ########################## Certificates Web/HTML View #######################
