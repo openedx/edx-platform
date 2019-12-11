@@ -30,7 +30,6 @@ from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRI
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH
 from openedx.core.djangoapps.user_authn.cookies import jwt_cookies
 from openedx.core.djangoapps.user_authn.views.login import (
-    shim_student_view,
     AllowedAuthUser,
     ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 )
@@ -785,14 +784,14 @@ class LoginSessionViewTest(ApiTestCase):
             "email": self.EMAIL,
             "password": "invalid"
         })
-        self.assertHttpForbidden(response)
+        self.assertHttpBadRequest(response)
 
         # Invalid email address
         response = self.client.post(self.url, {
             "email": "invalid@example.com",
             "password": self.PASSWORD,
         })
-        self.assertHttpForbidden(response)
+        self.assertHttpBadRequest(response)
 
     def test_missing_login_params(self):
         # Create a test user
@@ -812,72 +811,3 @@ class LoginSessionViewTest(ApiTestCase):
 
         # Missing both email and password
         response = self.client.post(self.url, {})
-
-
-@ddt.ddt
-class StudentViewShimTest(TestCase):
-    "Tests of the student view shim."
-    def setUp(self):
-        super(StudentViewShimTest, self).setUp()
-        self.captured_request = None
-
-    def test_third_party_auth_login_failure(self):
-        mocked_response_content = {
-            "success": False,
-            "error_code": "third-party-auth-with-no-linked-account",
-            "value": "Test message."
-        }
-        view = self._shimmed_view(
-            JsonResponse(mocked_response_content, status=403),
-            check_logged_in=True
-        )
-        response = view(HttpRequest())
-        self.assertEqual(response.status_code, 403)
-        self.assertEqual(response.content, b"third-party-auth")
-
-    def test_non_json_response(self):
-        view = self._shimmed_view(HttpResponse(content="Not a JSON dict"))
-        response = view(HttpRequest())
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, b"Not a JSON dict")
-
-    @ddt.data("redirect", "redirect_url")
-    def test_ignore_redirect_from_json(self, redirect_key):
-        view = self._shimmed_view(
-            HttpResponse(content=json.dumps({
-                "success": True,
-                redirect_key: "/redirect"
-            }))
-        )
-        response = view(HttpRequest())
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content.decode('utf-8'), "")
-
-    def test_error_from_json(self):
-        view = self._shimmed_view(
-            HttpResponse(content=json.dumps({
-                "success": False,
-                "value": "Error!"
-            }))
-        )
-        response = view(HttpRequest())
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.content, b"Error!")
-
-    def test_preserve_headers(self):
-        view_response = HttpResponse()
-        view_response["test-header"] = "test"
-        view = self._shimmed_view(view_response)
-        response = view(HttpRequest())
-        self.assertEqual(response["test-header"], "test")
-
-    def test_check_logged_in(self):
-        view = self._shimmed_view(HttpResponse(), check_logged_in=True)
-        response = view(HttpRequest())
-        self.assertEqual(response.status_code, 403)
-
-    def _shimmed_view(self, response, check_logged_in=False):
-        def stub_view(request):
-            self.captured_request = request
-            return response
-        return shim_student_view(stub_view, check_logged_in=check_logged_in)
