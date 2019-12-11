@@ -77,20 +77,6 @@ def _apply_third_party_auth_overrides(request, form_desc):
                 )
 
 
-# .. toggle_name: FEATURES[ENABLE_LOGIN_POST_WITHOUT_SHIM]
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Toggle for enabling login post without shim_student_view (using `login_api`).
-# .. toggle_category: n/a
-# .. toggle_use_cases: incremental_release
-# .. toggle_creation_date: 2019-12-10
-# .. toggle_expiration_date: 2020-06-01
-# .. toggle_warnings: n/a
-# .. toggle_tickets: ARCH-1253
-# .. toggle_status: supported
-ENABLE_LOGIN_POST_WITHOUT_SHIM = 'ENABLE_LOGIN_POST_WITHOUT_SHIM'
-
-
 def get_login_session_form(request):
     """Return a description of the login form.
 
@@ -105,12 +91,7 @@ def get_login_session_form(request):
         HttpResponse
 
     """
-    if settings.FEATURES.get(ENABLE_LOGIN_POST_WITHOUT_SHIM):
-        submit_url = reverse("login_api")
-    else:
-        submit_url = reverse("user_api_login_session")
-
-    form_desc = FormDescription("post", submit_url)
+    form_desc = FormDescription("post", reverse("user_api_login_session"))
     _apply_third_party_auth_overrides(request, form_desc)
 
     # Translators: This label appears above a field on the login form
