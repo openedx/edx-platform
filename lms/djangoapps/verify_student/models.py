@@ -16,13 +16,14 @@ import functools
 import json
 import logging
 import os.path
-import simplejson
 import uuid
 from datetime import timedelta
 from email.utils import formatdate
 
 import requests
+import simplejson
 import six
+from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
@@ -44,6 +45,7 @@ from lms.djangoapps.verify_student.ssencrypt import (
 )
 from openedx.core.djangoapps.signals.signals import LEARNER_NOW_VERIFIED
 from openedx.core.storage import get_storage
+
 from .utils import earliest_allowed_verification_date
 
 log = logging.getLogger(__name__)
@@ -1108,3 +1110,23 @@ class VerificationDeadline(TimeStampedModel):
             return deadline.deadline
         except cls.DoesNotExist:
             return None
+
+
+class SSPVerificationRetryConfig(ConfigurationModel):  # pylint: disable=model-missing-unicode, useless-suppression
+    """
+        SSPVerificationRetryConfig used to inject arguments
+        to retry_failed_photo_verifications management command
+    """
+
+    class Meta(object):
+        app_label = 'verify_student'
+        verbose_name = 'sspv retry student argument'
+
+    arguments = models.TextField(
+        blank=True,
+        help_text='Useful for manually running a Jenkins job. Specify like --verification-ids 1 2 3',
+        default=''
+    )
+
+    def __str__(self):
+        return six.text_type(self.arguments)

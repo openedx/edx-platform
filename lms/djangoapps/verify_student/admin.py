@@ -7,7 +7,9 @@ from __future__ import absolute_import
 
 from django.contrib import admin
 
-from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
+from lms.djangoapps.verify_student.models import (
+    ManualVerification, SoftwareSecurePhotoVerification, SSOVerification,
+    SSPVerificationRetryConfig)
 
 
 @admin.register(SoftwareSecurePhotoVerification)
@@ -39,3 +41,11 @@ class ManualVerificationAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'status', 'reason', 'created_at', 'updated_at',)
     raw_id_fields = ('user',)
     search_fields = ('user__username', 'reason',)
+
+
+@admin.register(SSPVerificationRetryConfig)
+class SSPVerificationRetryAdmin(admin.ModelAdmin):
+    """
+    Admin for the SSPVerificationRetryConfig table.
+    """
+    pass
