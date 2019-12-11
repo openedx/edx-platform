@@ -344,7 +344,7 @@ websocket-client==0.56.0
 werkzeug==0.16.0
 wrapt==1.10.5
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.6#egg=xblock-drag-and-drop-v2==2.2.6
-git+https://github.com/open-craft/xblock-poll@6894592402fd180db864bfce539f17bac6443866#egg=xblock-poll==1.9.0
+git+https://github.com/open-craft/xblock-poll@8e78663fdd3c1d79571eb753d1c601729e9a9325#egg=xblock-poll==1.9.0
 xblock-utils==1.2.2
 xblock==1.2.9
 xmlsec==1.3.3
