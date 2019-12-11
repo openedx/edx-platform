@@ -897,7 +897,7 @@ class LoncapaProblem(object):
             except Exception as err:
                 log.exception("Error while execing script code: " + all_code)
                 msg = Text("Error while executing script code: %s" % str(err))
-                six.reraise(responsetypes.LoncapaProblemError, responsetypes.LoncapaProblemError(msg))
+                raise responsetypes.LoncapaProblemError(msg)
 
         # Store code source in context, along with the Python path needed to run it correctly.
         context['script_code'] = all_code
