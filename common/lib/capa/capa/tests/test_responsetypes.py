@@ -10,11 +10,9 @@ import json
 import os
 import random2 as random
 import textwrap
-import unittest
 import zipfile
-from six import StringIO
 from datetime import datetime
-
+from django.test import TestCase
 import mock
 import pyparsing
 import requests
@@ -46,7 +44,7 @@ from capa.util import convert_files_to_filenames
 from capa.xqueue_interface import dateformat
 
 
-class ResponseTest(unittest.TestCase):
+class ResponseTest(TestCase):
     """Base class for tests of capa responses."""
 
     xml_factory_class = None

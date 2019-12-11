@@ -3,16 +3,17 @@ Utility functions for capa.
 """
 from __future__ import absolute_import
 
-import re
 import logging
-import six
+import re
 from cmath import isinf, isnan
 from decimal import Decimal
+
+import six
 
 import bleach
 from calc import evaluator
 from lxml import etree
-
+from openedx.core.djangoapps.waffle_utils import WaffleSwitch
 from openedx.core.djangolib.markup import HTML
 
 #-----------------------------------------------------------------------------
@@ -20,6 +21,8 @@ from openedx.core.djangolib.markup import HTML
 # Utility functions used in CAPA responsetypes
 default_tolerance = '0.001%'
 log = logging.getLogger(__name__)
+
+enabled_contextualize_text_v2 = WaffleSwitch(u'capa', u'enable_contextualize_text_v2')
 
 
 def compare_with_tolerance(student_complex, instructor_complex, tolerance=default_tolerance, relative_tolerance=False):
@@ -98,20 +101,67 @@ def compare_with_tolerance(student_complex, instructor_complex, tolerance=defaul
         return abs(student_complex - instructor_complex) <= tolerance
 
 
-def contextualize_text(text, context):  # private
+def contextualize_text_v2(text, context):
     """
     Takes a string with variables. E.g. $a+$b.
-    Does a substitution of those variables from the context
+    Does a substitution of those variables from the context.
+    In this method we are typecasting the values explicitly so that we do not
+    run into UnicodeErrors by implicit typecasting.
     """
-    def convert_to_str(value):
+    if not text:
+        return text
+
+    def format_context_key(_context_key):
+        """Formats a string with the dollar sign"""
+        return convert_to_bytes('$' + _context_key)
+
+    def convert_to_bytes(value):
         """The method tries to convert unicode/non-ascii values into string"""
         try:
             return str(value)
         except UnicodeEncodeError:
             return value.encode('utf8', errors='ignore')
 
+    def replace_or_log_error(data_string, old_value, new_value):
+        """Tries to replace context variable with value and logs exception if there is an error"""
+        try:
+            data_string = data_string.replace(old_value, new_value)
+            return data_string
+        except Exception:  # pylint: disable=broad-except
+            log.exception(
+                'ContextualizeTextError: text(%s): %s, context_key(%s): %s, context_value(%s): %s, Error: %s',
+                data_string,
+                old_value,
+                new_value,
+            )
+            raise
+
+    for key in sorted(context, key=len, reverse=True):
+        context_key = format_context_key(key)
+        if context_key in text:
+            text = convert_to_bytes(text)
+            context_value = convert_to_bytes(context[key])
+            text = replace_or_log_error(text, context_key, context_value)
+    return text
+
+
+def contextualize_text(text, context):  # private
+    """
+    Takes a string with variables. E.g. $a+$b.
+    Does a substitution of those variables from the context
+    """
+    if enabled_contextualize_text_v2.is_enabled():
+        return contextualize_text_v2(text, context)
+
     if not text:
         return text
+
+    def convert_to_str(value):
+        """The method tries to convert unicode/non-ascii values into string"""
+        try:
+            return str(value)
+        except UnicodeEncodeError:
+            return value.encode('utf8', errors='ignore')
 
     for key in sorted(context, key=len, reverse=True):
         # TODO (vshnayder): This whole replacement thing is a big hack

@@ -11,8 +11,7 @@ from __future__ import absolute_import
 
 import datetime
 import textwrap
-import unittest
-
+from django.test import TestCase
 from mock import Mock
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC
@@ -120,7 +119,7 @@ class CapaFactoryWithDelay(object):
         return module
 
 
-class XModuleQuizAttemptsDelayTest(unittest.TestCase):
+class XModuleQuizAttemptsDelayTest(TestCase):
     """
     Class to test delay between quiz attempts.
     """

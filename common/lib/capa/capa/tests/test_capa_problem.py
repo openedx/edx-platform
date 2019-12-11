@@ -4,7 +4,7 @@ Test capa problem.
 from __future__ import absolute_import
 
 import textwrap
-import unittest
+from django.test import TestCase
 
 import ddt
 import six
@@ -17,7 +17,7 @@ from openedx.core.djangolib.markup import HTML
 
 
 @ddt.ddt
-class CAPAProblemTest(unittest.TestCase):
+class CAPAProblemTest(TestCase):
     """ CAPA problem related tests"""
 
     @ddt.unpack
@@ -462,7 +462,7 @@ class CAPAProblemTest(unittest.TestCase):
 
 
 @ddt.ddt
-class CAPAMultiInputProblemTest(unittest.TestCase):
+class CAPAMultiInputProblemTest(TestCase):
     """ TestCase for CAPA problems with multiple inputtypes """
 
     def capa_problem(self, xml):
@@ -606,7 +606,7 @@ class CAPAMultiInputProblemTest(unittest.TestCase):
 
 
 @ddt.ddt
-class CAPAProblemReportHelpersTest(unittest.TestCase):
+class CAPAProblemReportHelpersTest(TestCase):
     """ TestCase for CAPA methods for finding question labels and answer text """
 
     @ddt.data(
@@ -738,5 +738,5 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
         )
 
         # Ensure that the answer is a string so that the dict returned from this
-        # function can eventualy be serialized to json without issues.
+        # function can eventually be serialized to json without issues.
         self.assertIsInstance(problem.get_question_answers()['1_solution_1'], six.text_type)

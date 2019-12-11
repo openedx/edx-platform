@@ -5,7 +5,7 @@ from __future__ import absolute_import
 
 import os
 import textwrap
-import unittest
+from django.test import TestCase
 
 import ddt
 import mock
@@ -20,7 +20,7 @@ from .response_xml_factory import CustomResponseXMLFactory, StringResponseXMLFac
 
 
 @ddt.ddt
-class CapaHtmlRenderTest(unittest.TestCase):
+class CapaHtmlRenderTest(TestCase):
     """
     CAPA HTML rendering tests class.
     """

@@ -2,13 +2,13 @@
 from __future__ import absolute_import, print_function
 
 import textwrap
-import unittest
+from django.test import TestCase
 
 from capa.responsetypes import LoncapaProblemError
 from capa.tests.helpers import new_loncapa_problem, test_capa_system
 
 
-class CapaShuffleTest(unittest.TestCase):
+class CapaShuffleTest(TestCase):
     """Capa problem tests for shuffling and choice-name masking."""
 
     def setUp(self):

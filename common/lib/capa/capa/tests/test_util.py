@@ -4,7 +4,7 @@ Tests capa util
 """
 from __future__ import absolute_import
 
-import unittest
+from django.test import TestCase
 
 import ddt
 from lxml import etree
@@ -17,10 +17,11 @@ from capa.util import (
     remove_markup,
     sanitize_html
 )
+from waffle.testutils import override_switch, override_flag, override_sample
 
 
 @ddt.ddt
-class UtilTest(unittest.TestCase):
+class UtilTest(TestCase):
     """Tests for util"""
 
     def setUp(self):
@@ -158,14 +159,25 @@ class UtilTest(unittest.TestCase):
         key = 'answer0'
         text = '$answer0'
         context = {key: context_value}
-        contextual_text = contextualize_text(text, context)
-        self.assertEqual(context_value, contextual_text)
+
+        with override_switch('capa.enable_contextualize_text_v2', active=False):
+            contextual_text = contextualize_text(text, context)
+            self.assertEqual(context_value, contextual_text)
+
+        with override_switch('capa.enable_contextualize_text_v2', active=True):
+            contextual_text = contextualize_text(text, context)
+            self.assertEqual(context_value, contextual_text)
 
     def test_contextualize_text_with_non_ascii_context(self):
         """Verify that variable substitution works as intended with non-ascii characters."""
-        key = u'あなた$a $b'
-        text = '$' + key
+        text = u'$あなた$a $b'
         context = {'a': u'あなたあなたあなた', 'b': u'あなたhi'}
         expected_text = '$あなたあなたあなたあなた あなたhi'
-        contextual_text = contextualize_text(text, context)
-        self.assertEqual(expected_text, contextual_text)
+
+        with override_switch('capa.enable_contextualize_text_v2', active=False):
+            contextual_text = contextualize_text(text, context)
+            self.assertEqual(expected_text, contextual_text)
+
+        with override_switch('capa.enable_contextualize_text_v2', active=True):
+            contextual_text = contextualize_text(text, context)
+            self.assertEqual(expected_text, contextual_text)

@@ -19,7 +19,6 @@ import inspect
 import json
 import logging
 import numbers
-import random2 as random
 import re
 import sys
 import textwrap
@@ -29,26 +28,27 @@ from collections import namedtuple
 from datetime import datetime
 from sys import float_info
 
-import html5lib
-import numpy
 import requests
 import six
-# specific library imports
-from calc import UndefinedVariable, UnmatchedParenthesis, evaluator
 from django.utils.encoding import python_2_unicode_compatible
-from lxml import etree
-from lxml.html.soupparser import fromstring as fromstring_bs  # uses Beautiful Soup!!! FIXME?
-from pyparsing import ParseException
 from pytz import UTC
-from shapely.geometry import MultiPoint, Point
 from six import text_type
 from six.moves import map, range, zip
 
 import capa.safe_exec as safe_exec
 import capa.xqueue_interface as xqueue_interface
+import html5lib
+import numpy
+import random2 as random
+# specific library imports
+from calc import UndefinedVariable, UnmatchedParenthesis, evaluator
+from lxml import etree
+from lxml.html.soupparser import fromstring as fromstring_bs  # uses Beautiful Soup!!! FIXME?
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib import edx_six
 from openedx.core.lib.grade_utils import round_away_from_zero
+from pyparsing import ParseException
+from shapely.geometry import MultiPoint, Point
 
 from . import correctmap
 from .registry import TagRegistry
@@ -3010,7 +3010,7 @@ class ExternalResponse(LoncapaResponse):
             rxml = self.do_external_request('get_answers', {})
             exans = json.loads(rxml.find('expected').text)
         except Exception as err:  # pylint: disable=broad-except
-            log.error('Error %s', err)
+            log.error('ProblemGetAnswer: Error %s', err)
             if self.capa_system.DEBUG:
                 msg = HTML('<span class="inline-error">{}</span>').format(err)
                 exans = [''] * len(self.answer_ids)

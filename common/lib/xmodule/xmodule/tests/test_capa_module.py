@@ -13,7 +13,7 @@ import os
 import random
 import textwrap
 import unittest
-
+from django.test import TestCase
 import ddt
 import requests
 import six
@@ -180,7 +180,7 @@ if submission[0] == '':
 
 
 @ddt.ddt
-class ProblemBlockTest(unittest.TestCase):
+class ProblemBlockTest(TestCase):
 
     def setUp(self):
         super(ProblemBlockTest, self).setUp()
@@ -2079,7 +2079,7 @@ class ProblemBlockTest(unittest.TestCase):
 
 
 @ddt.ddt
-class ProblemBlockXMLTest(unittest.TestCase):
+class ProblemBlockXMLTest(TestCase):
     sample_checkbox_problem_xml = textwrap.dedent("""
         <problem>
             <p>Title</p>
@@ -2873,7 +2873,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
             self._create_descriptor(sample_invalid_xml, name="Invalid XML")
 
 
-class ComplexEncoderTest(unittest.TestCase):
+class ComplexEncoderTest(TestCase):
 
     def test_default(self):
         """
@@ -2885,7 +2885,7 @@ class ComplexEncoderTest(unittest.TestCase):
         self.assertEqual(expected_str, json_str[1:-1])  # ignore quotes
 
 
-class ProblemCheckTrackingTest(unittest.TestCase):
+class ProblemCheckTrackingTest(TestCase):
     """
     Ensure correct tracking information is included in events emitted during problem checks.
     """
@@ -3208,7 +3208,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
         self.assertTrue(problem.runtime.replace_jump_to_id_urls.called)
 
 
-class ProblemBlockReportGenerationTest(unittest.TestCase):
+class ProblemBlockReportGenerationTest(TestCase):
     """
     Ensure that Capa report generation works correctly
     """

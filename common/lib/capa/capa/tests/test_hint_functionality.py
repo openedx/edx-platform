@@ -5,7 +5,7 @@ Tests of extended hints
 
 from __future__ import absolute_import
 
-import unittest
+from django.test import TestCase
 
 from ddt import data, ddt, unpack
 
@@ -18,7 +18,7 @@ from capa.tests.helpers import load_fixture, new_loncapa_problem
 # For out many ddt data cases, prefer a compact form of { .. }
 
 
-class HintTest(unittest.TestCase):
+class HintTest(TestCase):
     """Base class for tests of extended hinting functionality."""
 
     def correctness(self, problem_id, choice):
@@ -44,8 +44,10 @@ class TextInputHintsTest(HintTest):
     """
     Test Text Input Hints Test
     """
-    xml = load_fixture('extended_hints_text_input.xml')
-    problem = new_loncapa_problem(xml)
+    def setUp(self):
+        super(TextInputHintsTest, self).setUp()
+        xml = load_fixture('extended_hints_text_input.xml')
+        self.problem = new_loncapa_problem(xml)
 
     def test_tracking_log(self):
         """Test that the tracking log comes out right."""
@@ -96,8 +98,10 @@ class TextInputHintsTest(HintTest):
 @ddt
 class TextInputExtendedHintsCaseInsensitive(HintTest):
     """Test Text Input Extended hints Case Insensitive"""
-    xml = load_fixture('extended_hints_text_input.xml')
-    problem = new_loncapa_problem(xml)
+    def setUp(self):
+        super(TextInputExtendedHintsCaseInsensitive, self).setUp()
+        xml = load_fixture('extended_hints_text_input.xml')
+        self.problem = new_loncapa_problem(xml)
 
     @data(
         {'problem_id': u'1_5_1', 'choice': 'abc', 'expected_string': ''},  # wrong answer yielding no hint
@@ -128,8 +132,11 @@ class TextInputExtendedHintsCaseInsensitive(HintTest):
 @ddt
 class TextInputExtendedHintsCaseSensitive(HintTest):
     """Sometimes the semantics can be encoded in the class name."""
-    xml = load_fixture('extended_hints_text_input.xml')
-    problem = new_loncapa_problem(xml)
+
+    def setUp(self):
+        super(TextInputExtendedHintsCaseSensitive, self).setUp()
+        xml = load_fixture('extended_hints_text_input.xml')
+        self.problem = new_loncapa_problem(xml)
 
     @data(
         {'problem_id': u'1_6_1', 'choice': 'abc', 'expected_string': ''},
@@ -158,8 +165,10 @@ class TextInputExtendedHintsCompatible(HintTest):
     """
     Compatibility test with mixed old and new style additional_answer tags.
     """
-    xml = load_fixture('extended_hints_text_input.xml')
-    problem = new_loncapa_problem(xml)
+    def setUp(self):
+        super(TextInputExtendedHintsCompatible, self).setUp()
+        xml = load_fixture('extended_hints_text_input.xml')
+        self.problem = new_loncapa_problem(xml)
 
     @data(
         {'problem_id': u'1_7_1', 'choice': 'A', 'correct': 'correct',
@@ -183,8 +192,10 @@ class TextInputExtendedHintsRegex(HintTest):
     """
     Extended hints where the answer is regex mode.
     """
-    xml = load_fixture('extended_hints_text_input.xml')
-    problem = new_loncapa_problem(xml)
+    def setUp(self):
+        super(TextInputExtendedHintsRegex, self).setUp()
+        xml = load_fixture('extended_hints_text_input.xml')
+        self.problem = new_loncapa_problem(xml)
 
     @data(
         {'problem_id': u'1_8_1', 'choice': 'ABwrong', 'correct': 'incorrect', 'expected_string': ''},
@@ -219,8 +230,10 @@ class NumericInputHintsTest(HintTest):
     """
     This class consists of a suite of test cases to be run on the numeric input problem represented by the XML below.
     """
-    xml = load_fixture('extended_hints_numeric_input.xml')
-    problem = new_loncapa_problem(xml)          # this problem is properly constructed
+    def setUp(self):
+        super(NumericInputHintsTest, self).setUp()
+        xml = load_fixture('extended_hints_numeric_input.xml')
+        self.problem = new_loncapa_problem(xml)          # this problem is properly constructed
 
     def test_tracking_log(self):
         self.get_hint(u'1_2_1', u'1.141')
@@ -259,8 +272,10 @@ class CheckboxHintsTest(HintTest):
     """
     This class consists of a suite of test cases to be run on the checkbox problem represented by the XML below.
     """
-    xml = load_fixture('extended_hints_checkbox.xml')
-    problem = new_loncapa_problem(xml)          # this problem is properly constructed
+    def setUp(self):
+        super(CheckboxHintsTest, self).setUp()
+        xml = load_fixture('extended_hints_checkbox.xml')
+        self.problem = new_loncapa_problem(xml)          # this problem is properly constructed
 
     @data(
         {'problem_id': u'1_2_1', 'choice': [u'choice_0'],
@@ -356,7 +371,10 @@ class CheckboxHintsTestTracking(HintTest):
         </choiceresponse>
     </problem>
     """
-    problem = new_loncapa_problem(xml)
+
+    def setUp(self):
+        super(CheckboxHintsTestTracking, self).setUp()
+        self.problem = new_loncapa_problem(self.xml)
 
     def test_tracking_log(self):
         """Test checkbox tracking log - by far the most complicated case"""
@@ -419,8 +437,9 @@ class MultpleChoiceHintsTest(HintTest):
     """
     This class consists of a suite of test cases to be run on the multiple choice problem represented by the XML below.
     """
-    xml = load_fixture('extended_hints_multiple_choice.xml')
-    problem = new_loncapa_problem(xml)
+    def setUp(self):
+        xml = load_fixture('extended_hints_multiple_choice.xml')
+        self.problem = new_loncapa_problem(xml)
 
     def test_tracking_log(self):
         """Test that the tracking log comes out right."""
@@ -459,8 +478,9 @@ class MultpleChoiceHintsWithHtmlTest(HintTest):
     This class consists of a suite of test cases to be run on the multiple choice problem represented by the XML below.
 
     """
-    xml = load_fixture('extended_hints_multiple_choice_with_html.xml')
-    problem = new_loncapa_problem(xml)
+    def setUp(self):
+        xml = load_fixture('extended_hints_multiple_choice_with_html.xml')
+        self.problem = new_loncapa_problem(xml)
 
     def test_tracking_log(self):
         """Test that the tracking log comes out right."""
@@ -492,8 +512,9 @@ class DropdownHintsTest(HintTest):
     """
     This class consists of a suite of test cases to be run on the drop down problem represented by the XML below.
     """
-    xml = load_fixture('extended_hints_dropdown.xml')
-    problem = new_loncapa_problem(xml)
+    def setUp(self):
+        xml = load_fixture('extended_hints_dropdown.xml')
+        self.problem = new_loncapa_problem(xml)
 
     def test_tracking_log(self):
         """Test that the tracking log comes out right."""

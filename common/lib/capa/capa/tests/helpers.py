@@ -1,7 +1,6 @@
 """Tools for helping with testing capa."""
 
 from __future__ import absolute_import
-
 import gettext
 import io
 import os

@@ -6,14 +6,14 @@ i.e. those with the <multiplechoiceresponse> element
 from __future__ import absolute_import
 
 import textwrap
-import unittest
+from django.test import TestCase
 
 # Changes formatting of empty elements; import here to avoid test order dependence
 import xmodule.modulestore.xml  # pylint: disable=unused-import
 from capa.tests.helpers import load_fixture, new_loncapa_problem, test_capa_system
 
 
-class CapaTargetedFeedbackTest(unittest.TestCase):
+class CapaTargetedFeedbackTest(TestCase):
     '''
     Testing class
     '''

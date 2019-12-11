@@ -6,13 +6,13 @@ Tests the logic of the "answer-pool" attribute, e.g.
 from __future__ import absolute_import
 
 import textwrap
-import unittest
+from django.test import TestCase
 
 from capa.responsetypes import LoncapaProblemError
 from capa.tests.helpers import new_loncapa_problem, test_capa_system
 
 
-class CapaAnswerPoolTest(unittest.TestCase):
+class CapaAnswerPoolTest(TestCase):
     """Capa Answer Pool Test"""
     def setUp(self):
         super(CapaAnswerPoolTest, self).setUp()
