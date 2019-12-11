@@ -331,35 +331,6 @@ def _send_email_change_requests_if_needed(data, user):
             )
 
 
-@helpers.intercept_errors(errors.UserAPIInternalError, ignore_errors=[errors.UserAPIRequestError])
-def activate_account(activation_key):
-    """Activate a user's account.
-
-    Args:
-        activation_key (unicode): The activation key the user received via email.
-
-    Returns:
-        None
-
-    Raises:
-        errors.UserNotAuthorized
-        errors.UserAPIInternalError: the operation failed due to an unexpected error.
-
-    """
-    # TODO: Confirm this `activate_account` is only used for tests. If so, this should not be used for tests, and we
-    # should instead use the `activate_account` used for /activate.
-    set_custom_metric('user_api_activate_account', 'True')
-    if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
-        raise errors.UserAPIInternalError(SYSTEM_MAINTENANCE_MSG)
-    try:
-        registration = Registration.objects.get(activation_key=activation_key)
-    except Registration.DoesNotExist:
-        raise errors.UserNotAuthorized
-    else:
-        # This implicitly saves the registration
-        registration.activate()
-
-
 def get_name_validation_error(name):
     """Get the built-in validation error message for when
     the user's real name is invalid in some way (we wonder how).

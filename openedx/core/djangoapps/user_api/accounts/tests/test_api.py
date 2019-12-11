@@ -28,7 +28,6 @@ from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixi
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.accounts import PRIVATE_VISIBILITY, USERNAME_MAX_LENGTH
 from openedx.core.djangoapps.user_api.accounts.api import (
-    activate_account,
     get_account_settings,
     update_account_settings
 )
@@ -530,64 +529,3 @@ class AccountSettingsOnCreationTest(CreateAccountMixin, TestCase):
 
         expected_user_password = make_password(unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'), salt_val)
         self.assertEqual(expected_user_password, user.password)
-
-
-@ddt.ddt
-class AccountActivationAndPasswordChangeTest(CreateAccountMixin, TestCase):
-    """
-    Test cases to cover the account initialization workflow
-    """
-    USERNAME = u'claire-underwood'
-    PASSWORD = u'ṕáśśẃőŕd'
-    EMAIL = u'claire+underwood@example.com'
-
-    IS_SECURE = False
-
-    def get_activation_key(self, user):
-        registration = Registration.objects.get(user=user)
-        return registration.activation_key
-
-    @skip_unless_lms
-    def test_activate_account(self):
-        # Create the account, which is initially inactive
-        self.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-        user = User.objects.get(username=self.USERNAME)
-        activation_key = self.get_activation_key(user)
-
-        request = RequestFactory().get("/api/user/v1/accounts/")
-        request.user = user
-        account = get_account_settings(request)[0]
-        self.assertEqual(self.USERNAME, account["username"])
-        self.assertEqual(self.EMAIL, account["email"])
-        self.assertFalse(account["is_active"])
-
-        # Activate the account and verify that it is now active
-        activate_account(activation_key)
-        account = get_account_settings(request)[0]
-        self.assertTrue(account['is_active'])
-
-    def test_activate_account_invalid_key(self):
-        with pytest.raises(UserNotAuthorized):
-            activate_account(u'invalid')
-
-    def test_activate_account_prevent_auth_user_writes(self):
-        self.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-        user = User.objects.get(username=self.USERNAME)
-        activation_key = self.get_activation_key(user)
-
-        with pytest.raises(UserAPIInternalError, message=SYSTEM_MAINTENANCE_MSG):
-            with waffle().override(PREVENT_AUTH_USER_WRITES, True):
-                activate_account(activation_key)
-
-    def _assert_is_datetime(self, timestamp):
-        """
-        Internal helper to validate the type of the provided timestamp
-        """
-        if not timestamp:
-            return False
-        try:
-            parse_datetime(timestamp)
-        except ValueError:
-            return False
-        else:
-            return True
