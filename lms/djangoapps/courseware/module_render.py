@@ -57,6 +57,7 @@ from lms.djangoapps.courseware.masquerade import (
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
+from lms.djangoapps.courseware.services import UserStateService
 from lms.djangoapps.grades.api import GradesUtilService
 from lms.djangoapps.grades.api import signals as grades_signals
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
@@ -819,6 +820,7 @@ def get_module_system_for_user(
             'bookmarks': BookmarksService(user=user),
             'gating': GatingService(),
             'grade_utils': GradesUtilService(course_id=course_id),
+            'user_state': UserStateService(),
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
