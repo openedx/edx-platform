@@ -9,6 +9,8 @@ import pandas as pd
 from write_to_html import HtmlOutlineWriter
 from collections import Counter
 
+from openedx.core.djangolib.markup import HTML, Text
+
 columns = ['message', 'category', 'filename', 'lineno', 'high_location', 'label', 'num', 'deprecated']
 columns_index_dict = {key: index for index, key in enumerate(columns)}
 
@@ -151,36 +153,36 @@ def write_html_report(warnings_dataframe, html_path):
         html_writer = HtmlOutlineWriter(fout)
         category_sorted_by_count = group_and_sort_by_sumof(warnings_dataframe, "category", "num")
         for category, group_in_category, category_count in category_sorted_by_count:
-            html = u'<span class="count">{category}, count: {count}</span> '.format(category=category, count=category_count)
+            html = Text(_(u'<span class="count">{category}, count: {count}</span> ')).format(category=HTML(category), count=HTML(category_count))
             html_writer.start_section(html, klass=u"category")
             locations_sorted_by_count = group_and_sort_by_sumof(group_in_category, "high_location", "num")
 
             for location, group_in_location, location_count in locations_sorted_by_count:
                 # pp.pprint(location)
-                html = u'<span class="count">{location}, count: {count}</span> '.format(location=location, count=location_count)
+                html = Text(_(u'<span class="count">{location}, count: {count}</span> ')).format(location=HTML(location), count=HTML(location_count))
                 html_writer.start_section(html, klass=u"location")
                 message_group_sorted_by_count = group_and_sort_by_sumof(group_in_location, "message", "num")
                 # pdb.set_trace()
                 for message, message_group, message_count in message_group_sorted_by_count:
                     # pp.pprint(warning_text)
-                    html = u'<span class="count">{warning_text}, count: {count}</span> '.format(
-                        warning_text=message, count=message_count
+                    html = Text(_(u'<span class="count">{warning_text}, count: {count}</span> ')).format(
+                        warning_text=HTML(message), count=HTML(message_count)
                     )
                     html_writer.start_section(html, klass=u"warning_text")
                     # warnings_object[location][warning_text] is a list
                     for index, warning in message_group.iterrows():
                         # pp.pprint(warning)
-                        html = u'<span class="count">{warning_file_path}</span> '.format(
-                            warning_file_path=warning["filename"]
+                        html = Text(_(u'<span class="count">{warning_file_path}</span> ')).format(
+                            warning_file_path=HTML(warning["filename"])
                         )
                         html_writer.start_section(html, klass=u"warning")
 
-                        html = u'<p class="lineno">lineno: {lineno}</p> '.format(
-                            lineno=warning["lineno"]
+                        html = Text(_(u'<p class="lineno">lineno: {lineno}</p> ')).format(
+                            lineno=HTML(warning["lineno"])
                         )
                         html_writer.write(html)
-                        html = u'<p class="num">num_occur: {num}</p> '.format(
-                            num=warning["num"]
+                        html = Text(_(u'<p class="num">num_occur: {num}</p> ')).format(
+                            num=HTML(warning["num"])
                         )
                         html_writer.write(html)
 
