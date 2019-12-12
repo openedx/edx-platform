@@ -11,7 +11,7 @@ from student.models import CourseEnrollment
 
 from xmodule.modulestore.django import modulestore
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.features.courseware.helpers import get_nth_chapter_link
+from openedx.features.philu_courseware.helpers import get_nth_chapter_link
 from openedx.features.ondemand_email_preferences.helpers import get_my_account_link
 from lms.djangoapps.onboarding.helpers import get_email_pref_on_demand_course, get_user_anonymous_id
 

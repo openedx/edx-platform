@@ -1,9 +1,10 @@
+import logging
+
 from django.contrib.auth.models import User
 from django.db import models
 
 from lms.djangoapps.teams.models import CourseTeamMembership, CourseTeam
 from nodebb.constants import (
-    COMMUNITY_ID_SPLIT_INDEX,
     TEAM_PLAYER_ENTRY_INDEX,
     CONVERSATIONALIST_ENTRY_INDEX
 )
@@ -11,13 +12,15 @@ from nodebb.helpers import get_course_id_by_community_id
 from nodebb.models import TeamGroupChat
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
-from .constants import CONVERSATIONALIST, TEAM_PLAYER
+from . import constants as badge_constants
+
+log = logging.getLogger('edx.badging')
 
 
 class Badge(models.Model):
     BADGE_TYPES = (
-        CONVERSATIONALIST,
-        TEAM_PLAYER
+        badge_constants.CONVERSATIONALIST,
+        badge_constants.TEAM_PLAYER
     )
 
     name = models.CharField(max_length=255, blank=False, null=False)
@@ -86,7 +89,7 @@ class UserBadge(models.Model):
     """
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     badge = models.ForeignKey(Badge, on_delete=models.CASCADE)
-    course_id = CourseKeyField(max_length=255, db_index=True, db_column='course_id', null=False)
+    course_id = CourseKeyField(blank=False, max_length=255, db_index=True, db_column='course_id', null=False)
     community_id = models.IntegerField(blank=False, null=False, db_column='community_id')
     date_earned = models.DateTimeField(auto_now=True)
 
@@ -101,7 +104,6 @@ class UserBadge(models.Model):
         """ Save an entry in the UserBadge table specifying a
             specific badge assignment to a user badge in community
 
-
             Parameters
             ----------
             user_id : long
@@ -115,32 +117,30 @@ class UserBadge(models.Model):
             -------
             None
         """
-        course_id = get_course_id_by_community_id(community_id)
-        is_team_badge = True if course_id is CourseKeyField.Empty else False
-
         try:
             badge_type = Badge.objects.get(id=badge_id).type
         except:
-            raise Exception('There exists no badge with id {}'.format(badge_id))
+            error = badge_constants.BADGE_NOT_FOUND_ERROR.format(badge_id=badge_id)
+            log.exception(error)
+            raise Exception(error)
 
-        # Check if the right badge is being awarded in the right community
-        if badge_type == CONVERSATIONALIST[CONVERSATIONALIST_ENTRY_INDEX] and is_team_badge or \
-           badge_type == TEAM_PLAYER[TEAM_PLAYER_ENTRY_INDEX] and not is_team_badge:
-            raise Exception('Badge {} is a {} badge, wrong community'.format(badge_id, badge_type))
+        if badge_type == badge_constants.TEAM_PLAYER[TEAM_PLAYER_ENTRY_INDEX]:
+            team_group_chat = TeamGroupChat.objects.filter(
+                room_id=community_id).exclude(slug='').values('team_id', 'team__course_id').first()
 
-        if is_team_badge:
-            team = TeamGroupChat.objects.filter(room_id=community_id).exclude(slug='').first()
+            if not team_group_chat:
+                error = badge_constants.INVALID_TEAM_ERROR.format(badge_id=badge_id, community_id=community_id)
+                log.exception(error)
+                raise Exception(error)
 
-            if not team:
-                raise Exception('No discussion community or team with id {}'.format(community_id))
+            course_id = team_group_chat['team__course_id']
 
-            course_id_dict = CourseTeam.objects.filter(id=team.team_id).values('course_id').first()
-            if not course_id_dict:
-                raise Exception('Cannot assign badge {} for team {} in unknown course'.format(badge_id, community_id))
+            if not course_id or course_id == CourseKeyField.Empty:
+                error = badge_constants.UNKNOWN_COURSE_ERROR.format(badge_id=badge_id, community_id=community_id)
+                log.exception(error)
+                raise Exception(error)
 
-            course_id = course_id_dict['course_id']
-            all_team_members = CourseTeamMembership.objects.filter(team_id=team.team_id)
-
+            all_team_members = CourseTeamMembership.objects.filter(team_id=team_group_chat['team_id'])
             for member in all_team_members:
                 UserBadge.objects.get_or_create(
                     user_id=member.user_id,
@@ -148,10 +148,21 @@ class UserBadge(models.Model):
                     course_id=course_id,
                     community_id=community_id
                 )
-        else:
+        elif badge_type == badge_constants.CONVERSATIONALIST[CONVERSATIONALIST_ENTRY_INDEX]:
+            course_id = get_course_id_by_community_id(community_id)
+
+            if not course_id or course_id == CourseKeyField.Empty:
+                error = badge_constants.INVALID_COMMUNITY_ERROR.format(badge_id=badge_id, community_id=community_id)
+                log.exception(error)
+                raise Exception(error)
+
             UserBadge.objects.get_or_create(
                 user_id=user_id,
                 badge_id=badge_id,
                 course_id=course_id,
                 community_id=community_id
             )
+        else:
+            error = badge_constants.BADGE_TYPE_ERROR.format(badge_id=badge_id, badge_type=badge_type)
+            log.exception(error)
+            raise Exception(error)
