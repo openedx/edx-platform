@@ -1443,6 +1443,10 @@ MIDDLEWARE_CLASSES = [
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'lms.djangoapps.discussion.django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
+
+    # Debugging Middleware. Remove once Python 3 has been deployed.
+    'track.middleware.ResponseLoggingMiddleware',
+
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
     'edx_rest_framework_extensions.auth.jwt.middleware.JwtAuthCookieMiddleware',
 

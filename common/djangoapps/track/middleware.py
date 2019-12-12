@@ -36,6 +36,28 @@ META_KEY_TO_CONTEXT_KEY = {
 }
 
 
+class ResponseLoggingMiddleware(object):
+    """
+    A debugging middleware for the purpose of understanding what the current state of the response
+    is at this point in the stack.
+    """
+
+    def process_response(self, _request, response):
+        """
+        Logs the response at the current point in the middleware stack for debugging purposes.
+        """
+        try:
+            log.info('Logging response for debugging purposes: %r', response)
+            log.info('Response container data: %r', response._container)  # pylint: disable=protected-access
+            log.info('Container types: %r', [type(el) for el in response._container])  # pylint: disable=protected-access
+
+        except:  # pylint: disable=bare-except
+            # If this causes an error, we don't want it to bubble up since this is just for logging.
+            log.exception('Error logging response object')
+
+        return response
+
+
 class TrackMiddleware(object):
     """
     Tracks all requests made, as well as setting up context for other server
