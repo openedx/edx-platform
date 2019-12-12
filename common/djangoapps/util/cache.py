@@ -79,7 +79,7 @@ def cache_if_anonymous(*get_parameters):
 
                 if response:
                     # A hack to ensure that the response data is a valid text type for both Python 2 and 3.
-                    response_content = response._container.copy()  # pylint: disable=protected-member
+                    response_content = list(response._container)  # pylint: disable=protected-member
                     response.content = b''
                     for item in response_content:
                         response.write(item)
