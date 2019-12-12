@@ -7,13 +7,18 @@ from __future__ import absolute_import
 from django.utils.encoding import python_2_unicode_compatible
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
+from lms.djangoapps.course_blocks.transformers import (
+    library_content,
+    # start_date,
+    user_partitions,
+    visibility,
+)
 from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from openedx.features.content_type_gating.block_transformers import ContentTypeGateTransformer
 from xmodule.modulestore.django import modulestore
 
 from .transformer import GradesTransformer
-from course_blocks.transformers import library_content, load_override_data, start_date, user_partitions, visibility
 
 
 @python_2_unicode_compatible
@@ -65,8 +70,11 @@ class CourseData(object):
         if self._structure is None:
             transformers = [
                 library_content.ContentLibraryTransformer(),
+                library_content.ContentLibraryOrderTransformer(),
+                # start_date.StartDateTransformer(),
                 ContentTypeGateTransformer(),
                 user_partitions.UserPartitionTransformer(),
+                visibility.VisibilityTransformer(),
             ]
             self._structure = get_course_blocks(
                 self.user,
