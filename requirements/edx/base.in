@@ -66,9 +66,9 @@ django-waffle==0.18.0
 django-webpack-loader               # Used to wire webpack bundles into the django asset pipeline
 djangorestframework==3.9.4
 djangorestframework-jwt
-drf-yasg                            # Replacement for django-rest-swagger
 edx-ace
 edx-analytics-data-api-client
+edx-api-doc-tools
 edx-bulk-grades                     # LMS REST API for managing bulk grading operations
 edx-ccx-keys
 edx-celeryutils
