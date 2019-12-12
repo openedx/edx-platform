@@ -77,13 +77,13 @@ def cache_if_anonymous(*get_parameters):
 
                 response = cache.get(cache_key)  # pylint: disable=maybe-no-member
 
-                # A hack to ensure that the response data is a valid text type for both Python 2 and 3.
-                response_content = response._container.copy()  # pylint: disable=protected-member
-                response.content = b''
-                for item in response_content:
-                    response.write(item)
-
-                if not response:
+                if response:
+                    # A hack to ensure that the response data is a valid text type for both Python 2 and 3.
+                    response_content = response._container.copy()  # pylint: disable=protected-member
+                    response.content = b''
+                    for item in response_content:
+                        response.write(item)
+                else:
                     response = view_func(request, *args, **kwargs)
                     cache.set(cache_key, response, 60 * 3)  # pylint: disable=maybe-no-member
 
