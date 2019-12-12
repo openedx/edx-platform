@@ -104,12 +104,12 @@ class PythonAPITests(SharedModuleStoreTestCase):
 
     def test_get_team_invalid_course(self):
         invalid_course_id = 'lol!()#^$&course'
-        message ='The supplied course id lol!()#^$&course is not valid'
+        message = 'The supplied course id lol!()#^$&course is not valid'
         with self.assertRaisesMessage(ValueError, message):
             teams_api.get_team_for_user_and_course(self.user1, invalid_course_id)
 
     def test_get_team_course_not_found(self):
-        message ='The supplied course ' + str(COURSE_KEY1) + ' was not found'
+        message = 'The supplied course ' + str(COURSE_KEY1) + ' was not found'
         with self.assertRaisesMessage(ValueError, message):
             teams_api.get_team_for_user_and_course(self.user1, str(COURSE_KEY1))
 

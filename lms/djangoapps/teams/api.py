@@ -245,6 +245,7 @@ def can_user_create_team_in_topic(user, course_id, topic_id):
         has_course_staff_privileges(user, course_id)
     )
 
+
 def get_team_for_user_and_course(user, course_id):
     """
     Returns the team that the given user is on in the course, or None
