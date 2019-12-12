@@ -1,6 +1,9 @@
 import ddt
-from django.test.utils import override_settings
 from mock import MagicMock, patch
+
+from django.conf import settings
+from django.test.utils import override_settings
+from rest_framework import status
 
 from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
 from openedx.core.lib.api.test_utils import ApiTestCase
@@ -56,3 +59,57 @@ class TestUtils(ApiTestCase):
                 body=self.request_data['body'],
             )
             self.assertEqual(status_code, 500)
+
+    @patch('openedx.core.djangoapps.zendesk_proxy.utils.send_notification_email_to_support', return_value=True)
+    def test_send_email_instead_zendesk_ticket_successfully(self, mocked_send_notification):
+        """
+        Test that email is sent for notification instead of creating a ticket on zendesk when
+        `ENABLE_EMAIL_INSTEAD_ZENDESK` feature flag is set to `True`. If email is send successfully
+        return 201 status code.
+        """
+        notification_message_type = 'contact_support'
+
+        features = settings.FEATURES.copy()
+        features['ENABLE_EMAIL_INSTEAD_ZENDESK'] = True
+
+        with override_settings(FEATURES=features):
+            return_value = create_zendesk_ticket(
+                requester_name=self.request_data['name'],
+                requester_email=self.request_data['email'],
+                subject=self.request_data['subject'],
+                body=self.request_data['body'],
+            )
+
+            self.assertTrue(mocked_send_notification.called)
+            self.assertEqual(
+                mocked_send_notification.call_args[1]['message_type'],
+                notification_message_type
+            )
+            self.assertEqual(return_value, status.HTTP_201_CREATED)
+
+    @patch('openedx.core.djangoapps.zendesk_proxy.utils.send_notification_email_to_support', return_value=False)
+    def test_send_email_instead_zendesk_ticket_failed(self, mocked_send_notification):
+        """
+        Test that email is sent for notification instead of creating a ticket on zendesk when
+        `ENABLE_EMAIL_INSTEAD_ZENDESK` feature flag is set to `True`. If email is not sent successfully,
+        return 503 status code.
+        """
+        notification_message_type = 'contact_support'
+
+        features = settings.FEATURES.copy()
+        features['ENABLE_EMAIL_INSTEAD_ZENDESK'] = True
+
+        with override_settings(FEATURES=features):
+            return_value = create_zendesk_ticket(
+                requester_name=self.request_data['name'],
+                requester_email=self.request_data['email'],
+                subject=self.request_data['subject'],
+                body=self.request_data['body'],
+            )
+
+            self.assertTrue(mocked_send_notification.called)
+            self.assertEqual(
+                mocked_send_notification.call_args[1]['message_type'],
+                notification_message_type
+            )
+            self.assertEqual(return_value, status.HTTP_503_SERVICE_UNAVAILABLE)
