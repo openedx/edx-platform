@@ -12,6 +12,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import RedirectView
 from ratelimitbackend import admin
 
+from edx_api_doc_tools import make_docs_urls
+
 from branding import views as branding_views
 from lms.djangoapps.courseware.masquerade import handle_ajax as courseware_masquerade_handle_ajax
 from lms.djangoapps.courseware.module_render import (
@@ -44,7 +46,7 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.verified_track_content import views as verified_track_content_views
-from openedx.core.apidocs import schema_view
+from openedx.core.apidocs import api_info
 from openedx.features.enterprise_support.api import enterprise_enabled
 from static_template_view import views as static_template_view_views
 from staticbook import views as staticbook_views
@@ -959,18 +961,7 @@ if settings.BRANCH_IO_KEY:
     ]
 
 # API docs.
-urlpatterns += [
-    url(
-        r'^swagger(?P<format>\.json|\.yaml)$',
-        schema_view.without_ui(cache_timeout=settings.OPENAPI_CACHE_TIMEOUT), name='schema-json',
-    ),
-    url(
-        r'^swagger/$',
-        schema_view.with_ui('swagger', cache_timeout=settings.OPENAPI_CACHE_TIMEOUT),
-        name='schema-swagger-ui',
-    ),
-    url(r'^api-docs/$', schema_view.with_ui('swagger', cache_timeout=settings.OPENAPI_CACHE_TIMEOUT)),
-]
+urlpatterns += make_docs_urls(api_info)
 
 # edx-drf-extensions csrf app
 urlpatterns += [

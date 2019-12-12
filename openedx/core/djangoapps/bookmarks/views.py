@@ -13,6 +13,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
+import edx_api_doc_tools as apidocs
 from edx_rest_framework_extensions.paginators import DefaultPagination
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -26,7 +27,6 @@ from rest_framework_oauth.authentication import OAuth2Authentication
 from openedx.core.djangoapps.bookmarks.api import BookmarksLimitReachedError
 from openedx.core.lib.api.permissions import IsUserInUrl
 from openedx.core.lib.url_utils import unquote_slashes
-from openedx.core import apidocs
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from . import DEFAULT_FIELDS, OPTIONAL_FIELDS, api
