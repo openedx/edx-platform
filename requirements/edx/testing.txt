@@ -54,7 +54,7 @@ git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2
 click-log==0.3.2          # via edx-lint
 click==7.0
 code-annotations==0.3.2
-colorama==0.4.1           # via radon
+colorama==0.4.3           # via radon
 configparser==4.0.2
 contextlib2==0.6.0.post1
 cookies==2.2.1            # via moto
@@ -124,7 +124,7 @@ edx-django-release-util==0.3.2
 edx-django-sites-extensions==2.3.1
 edx-django-utils==2.0.2
 edx-drf-extensions==2.4.5
-edx-enterprise==2.0.30
+edx-enterprise==2.0.31
 edx-i18n-tools==0.4.8
 edx-lint==1.3.0
 edx-milestones==0.2.6
@@ -140,7 +140,7 @@ edx-sga==0.10.0
 edx-submissions==3.0.3
 edx-user-state-client==1.1.2
 edx-when==0.5.2
-edxval==1.1.32
+edxval==1.1.33
 elasticsearch==1.9.0
 entrypoints==0.3          # via flake8
 enum34==1.1.6
@@ -168,7 +168,7 @@ html5lib==1.0.1
 httplib2==0.14.0
 httpretty==0.9.7
 idna==2.8
-importlib-metadata==1.2.0
+importlib-metadata==1.3.0
 inflect==3.0.2
 inflection==0.3.1
 ipaddress==1.0.23
@@ -228,7 +228,7 @@ polib==1.1.0
 psutil==1.2.1
 py2neo==3.1.2
 py==1.8.0                 # via pytest, tox
-pyaml==19.4.1             # via moto
+pyaml==19.12.0            # via moto
 pycodestyle==2.5.0
 pycontracts==1.7.1
 pycountry==19.8.18
@@ -292,8 +292,8 @@ simplejson==3.17.0
 singledispatch==3.4.0.3
 six==1.13.0
 slumber==0.7.1
-social-auth-app-django==2.1.0
-social-auth-core==1.7.0
+social-auth-app-django==3.1.0
+social-auth-core==3.2.0
 sorl-thumbnail==12.3
 sortedcontainers==2.1.0
 soupsieve==1.9.5
@@ -327,7 +327,7 @@ werkzeug==0.16.0          # via moto
 wrapt==1.10.5
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.6#egg=xblock-drag-and-drop-v2==2.2.6
 git+https://github.com/jmbowman/xblock-poll@8e78663fdd3c1d79571eb753d1c601729e9a9325#egg=xblock-poll==1.9.0
-xblock-utils==1.2.2
+xblock-utils==1.2.3
 xblock==1.2.9
 xmlsec==1.3.3
 xmltodict==0.12.0         # via moto

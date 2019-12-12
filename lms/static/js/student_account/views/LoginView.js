@@ -189,6 +189,51 @@
             },
 
             saveError: function(error) {
+                if (error.responseJSON !== undefined) {
+                    this.saveErrorWithoutShim(error);
+                } else {
+                    this.saveErrorWithShim(error);
+                }
+            },
+
+            saveErrorWithoutShim: function(error) {
+                var errorCode;
+                var msg;
+                if (error.status === 0) {
+                    msg = gettext('An error has occurred. Check your Internet connection and try again.');
+                } else if (error.status === 500) {
+                    msg = gettext('An error has occurred. Try refreshing the page, or check your Internet connection.'); // eslint-disable-line max-len
+                } else if (error.responseJSON !== undefined) {
+                    msg = error.responseJSON.value;
+                    errorCode = error.responseJSON.error_code;
+                } else {
+                    msg = gettext('An unexpected error has occurred.');
+                }
+
+                this.errors = [
+                    StringUtils.interpolate(
+                        '<li>{msg}</li>', {
+                            msg: msg
+                        }
+                    )
+                ];
+                this.clearPasswordResetSuccess();
+
+                /* If the user successfully authenticated with a third-party provider, but they haven't
+                 * linked the accounts, instruct the user on how to link the accounts.
+                 */
+                if (errorCode === 'third-party-auth-with-no-linked-account' && this.currentProvider) {
+                    if (!this.hideAuthWarnings) {
+                        this.clearFormErrors();
+                        this.renderThirdPartyAuthWarning();
+                    }
+                } else {
+                    this.renderErrors(this.defaultFormErrorsTitle, this.errors);
+                }
+                this.toggleDisableButton(false);
+            },
+
+            saveErrorWithShim: function(error) {
                 var msg = error.responseText;
                 if (error.status === 0) {
                     msg = gettext('An error has occurred. Check your Internet connection and try again.');
@@ -215,7 +260,7 @@
                  this.currentProvider) {
                     if (!this.hideAuthWarnings) {
                         this.clearFormErrors();
-                        this.renderAuthWarning();
+                        this.renderThirdPartyAuthWarning();
                     }
                 } else {
                     this.renderErrors(this.defaultFormErrorsTitle, this.errors);
@@ -223,7 +268,7 @@
                 this.toggleDisableButton(false);
             },
 
-            renderAuthWarning: function() {
+            renderThirdPartyAuthWarning: function() {
                 var message = _.sprintf(
                     gettext('You have successfully signed into %(currentProvider)s, but your %(currentProvider)s' +
                             ' account does not have a linked %(platformName)s account. To link your accounts,' +

@@ -468,24 +468,6 @@ def disable_account_ajax(request):
     return JsonResponse(context)
 
 
-@login_required
-@ensure_csrf_cookie
-def change_setting(request):
-    """
-    JSON call to change a profile setting: Right now, location
-    """
-    # TODO (vshnayder): location is no longer used
-    u_prof = UserProfile.objects.get(user=request.user)  # request.user.profile_cache
-    if 'location' in request.POST:
-        u_prof.location = request.POST['location']
-    u_prof.save()
-
-    return JsonResponse({
-        "success": True,
-        "location": u_prof.location,
-    })
-
-
 @receiver(post_save, sender=User)
 def user_signup_handler(sender, **kwargs):  # pylint: disable=unused-argument
     """
