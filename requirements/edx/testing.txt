@@ -49,8 +49,8 @@ click==7.0
 code-annotations==0.3.3
 colorama==0.4.3           # via radon
 contextlib2==0.6.0.post1
-coreapi==2.3.3
-coreschema==0.0.4
+coreapi==2.3.3            # via drf-yasg
+coreschema==0.0.4         # via coreapi, drf-yasg
 coverage==5.0.3
 git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0
 git+https://github.com/edx/crowdsourcehinter.git@a7ffc85b134b7d8909bf1fefd23dbdb8eb28e467#egg=crowdsourcehinter-xblock==0.2
@@ -105,6 +105,7 @@ docutils==0.16
 drf-yasg==1.16
 edx-ace==0.1.13
 edx-analytics-data-api-client==0.15.3
+edx-api-doc-tools==1.0.2
 edx-bulk-grades==0.6.6
 edx-ccx-keys==1.0.0
 edx-celeryutils==0.3.1
@@ -156,11 +157,11 @@ httpretty==0.9.7
 idna==2.8
 importlib-metadata==1.4.0
 inflect==3.0.2
-inflection==0.3.1
+inflection==0.3.1         # via drf-yasg
 ipaddress==1.0.23
 isodate==0.6.0
 isort==4.3.21
-itypes==1.1.0
+itypes==1.1.0             # via coreapi
 jinja2-pluralize==0.3.0
 jinja2==2.10.3
 jmespath==0.9.4
@@ -258,8 +259,8 @@ requests-oauthlib==1.1.0
 requests==2.22.0
 rest-condition==1.0.3
 rfc6266-parser==0.0.6
-ruamel.yaml.clib==0.2.0
-ruamel.yaml==0.16.5
+ruamel.yaml.clib==0.2.0   # via ruamel.yaml
+ruamel.yaml==0.16.5       # via drf-yasg
 rules==2.2
 s3transfer==0.1.13
 sailthru-client==2.2.3
@@ -289,7 +290,7 @@ tox==3.14.3
 transifex-client==0.13.4
 unicodecsv==0.14.1
 unidiff==0.5.5
-uritemplate==3.0.1
+uritemplate==3.0.1        # via coreapi, drf-yasg
 urllib3==1.25.7
 user-util==0.1.5
 virtualenv==16.7.9        # via tox
