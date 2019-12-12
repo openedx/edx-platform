@@ -7,6 +7,9 @@ import logging
 from enum import Enum
 
 from django.db.models import Count
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore.django import modulestore
 
 from course_modes.models import CourseMode
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
@@ -241,3 +244,26 @@ def can_user_create_team_in_topic(user, course_id, topic_id):
         (not is_instructor_managed_topic(topic_id)) or
         has_course_staff_privileges(user, course_id)
     )
+
+def get_team_for_user_and_course(user, course_id):
+    """
+    Returns the team that the given user is on in the course, or None
+
+    If course_id does not exist, a ValueError is raised
+    """
+    try:
+        course_key = CourseKey.from_string(course_id)
+        course_module = modulestore().get_course(course_key)
+    except InvalidKeyError:
+        raise ValueError(u"The supplied course id {course_id} is not valid.".format(
+            course_id=course_id
+        ))
+    if course_module is None:
+        raise ValueError(u"The supplied course {course_id} was not found.".format(
+            course_id=course_id
+        ))
+
+    return CourseTeam.objects.filter(
+        course_id=course_key,
+        membership__user__username=user.username,
+    ).first()
