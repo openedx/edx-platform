@@ -234,7 +234,7 @@ pycontracts==1.7.1
 pycountry==19.8.18
 pycparser==2.19
 pycryptodome==3.9.4
-pycryptodomex==3.4.7
+pycryptodomex==3.9.4
 pyflakes==2.1.1           # via flake8
 pygments==2.5.2
 pygraphviz==1.5
