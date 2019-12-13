@@ -12,30 +12,19 @@ from datetime import datetime, timedelta
 import ddt
 import six
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
+from course_modes.models import CourseMode
 from django.conf import settings
-from django.test import RequestFactory, TestCase
+from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.timezone import now
+from entitlements.tests.factories import CourseEntitlementFactory
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pyquery import PyQuery as pq
 from six.moves import range
-
-from course_modes.models import CourseMode
-from entitlements.tests.factories import CourseEntitlementFactory
-from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
-from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
-from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
-from openedx.core.djangoapps.user_authn.cookies import _get_user_info_cookie_data
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from student.helpers import DISABLE_UNENROLL_CERT_STATES
 from student.models import CourseEnrollment, UserProfile
 from student.signals import REFUND_ORDER
@@ -45,6 +34,17 @@ from util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
+from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from openedx.features.course_experience.tests.views.helpers import add_course_mode
 
 PASSWORD = 'test'
 
@@ -221,6 +221,33 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         UserProfile.objects.get(user=self.user).delete()
         response = self.client.get(self.path)
         self.assertRedirects(response, reverse('account_settings'))
+
+    def test_grade_doesnt_appears_before_course_end_date(self):
+        """
+        Verify that learners are not able to see their final grade before the end
+        of course in the learner dashboard
+        """
+        self.course = CourseFactory.create(end=self.TOMORROW, emit_signals=True)
+        self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
+        GeneratedCertificateFactory(status='notpassing', course_id=self.course.id, user=self.user, grade=0.45)
+
+        response = self.client.get(reverse('dashboard'))
+        # The final grade does not appear before the course has ended
+        self.assertNotContains(response, 'Your final grade:')
+        self.assertNotContains(response, '<span class="grade-value">45%</span>')
+
+    def test_grade_appears_after_course_has_ended(self):
+        """
+        Verify that learners are able to see their final grade of the course in
+        the learner dashboard after the course had ended
+        """
+        self.course = CourseFactory.create(end=self.THREE_YEARS_AGO, emit_signals=True)
+        self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
+        GeneratedCertificateFactory(status='notpassing', course_id=self.course.id, user=self.user, grade=0.45)
+
+        response = self.client.get(reverse('dashboard'))
+        self.assertContains(response, 'Your final grade:')
+        self.assertContains(response, '<span class="grade-value">45%</span>')
 
     @patch.multiple('django.conf.settings', **MOCK_SETTINGS)
     @ddt.data(

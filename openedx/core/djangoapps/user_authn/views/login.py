@@ -34,10 +34,7 @@ from openedx.core.djangoapps.user_authn.cookies import refresh_jwt_cookies, set_
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangoapps.user_authn.views.password_reset import send_password_reset_email_for_user
-from openedx.core.djangoapps.user_authn.config.waffle import (
-    ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY,
-    UPDATE_LOGIN_USER_ERROR_STATUS_CODE
-)
+from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.view_utils import require_post_params
 from student.models import LoginFailures, AllowedAuthUser, UserProfile
@@ -403,14 +400,11 @@ def login_user(request):
         response = set_logged_in_cookies(request, response, possibly_authenticated_user)
         set_custom_metric('login_user_auth_failed_error', False)
         set_custom_metric('login_user_response_status', response.status_code)
+        set_custom_metric('login_user_redirect_url', redirect_url)
         return response
     except AuthFailedError as error:
         log.exception(error.get_response())
-        # original code returned a 200 status code with status=False for errors. This flag
-        # is used for rolling out a transition to using a 400 status code for errors, which
-        # is a breaking-change, but will hopefully be a tolerable breaking-change.
-        status = 400 if UPDATE_LOGIN_USER_ERROR_STATUS_CODE.is_enabled() else 200
-        response = JsonResponse(error.get_response(), status=status)
+        response = JsonResponse(error.get_response(), status=400)
         set_custom_metric('login_user_auth_failed_error', True)
         set_custom_metric('login_user_response_status', response.status_code)
         return response
@@ -490,10 +484,15 @@ def _parse_analytics_param_for_course_id(request):
     modified_request = request.POST.copy()
     if isinstance(request, HttpRequest):
         # Works for an HttpRequest but not a rest_framework.request.Request.
+        # Note: This case seems to be used for tests only.
         request.POST = modified_request
+        set_custom_metric('login_user_request_type', 'django')
     else:
         # The request must be a rest_framework.request.Request.
+        # Note: Only DRF seems to be used in Production.
         request._data = modified_request  # pylint: disable=protected-access
+        set_custom_metric('login_user_request_type', 'drf')
+
     # Include the course ID if it's specified in the analytics info
     # so it can be included in analytics events.
     if "analytics" in modified_request:
@@ -573,6 +572,8 @@ def shim_student_view(view_func, check_logged_in=False):
             msg = response_dict.get("value", u"")
             success = response_dict.get("success")
             set_custom_metric('shim_original_response_is_json', True)
+            set_custom_metric('shim_original_redirect_url', response_dict.get("redirect_url"))
+            set_custom_metric('shim_original_redirect', response_dict.get("redirect"))
         except (ValueError, TypeError):
             msg = response.content
             success = True

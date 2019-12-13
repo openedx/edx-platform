@@ -550,7 +550,8 @@ def _section_membership(course, access):
             'update_forum_role_membership',
             kwargs={'course_id': six.text_type(course_key)}
         ),
-        'enrollment_role_choices': enrollment_role_choices
+        'enrollment_role_choices': enrollment_role_choices,
+        'is_reason_field_enabled': configuration_helpers.get_value('ENABLE_MANUAL_ENROLLMENT_REASON_FIELD', False)
     }
     return section_data
 

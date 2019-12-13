@@ -18,7 +18,6 @@ urlpatterns = [
     url(r'^accounts/disable_account_ajax$', views.disable_account_ajax, name="disable_account_ajax"),
     url(r'^accounts/manage_user_standing', views.manage_user_standing, name='manage_user_standing'),
 
-    url(r'^change_setting$', views.change_setting, name='change_setting'),
     url(r'^change_email_settings$', views.change_email_settings, name='change_email_settings'),
 
     url(r'^course_run/{}/refund_status$'.format(settings.COURSE_ID_PATTERN),
