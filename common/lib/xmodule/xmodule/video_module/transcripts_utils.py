@@ -652,17 +652,16 @@ class Transcript(object):
             return content
 
         if input_format == 'srt':
+            # Standardize content into bytes for later decoding.
+            if isinstance(content, text_type):
+                content = content.encode('utf-8')
 
             if output_format == 'txt':
-                text = SubRipFile.from_string(content).text
+                text = SubRipFile.from_string(content.decode('utf-8')).text
                 return HTMLParser().unescape(text)
 
             elif output_format == 'sjson':
                 try:
-                    # With error handling (set to 'ERROR_RAISE'), we will be getting
-                    # the exception if something went wrong in parsing the transcript.
-                    if isinstance(content, text_type):
-                        content = content.encode('utf-8')
                     srt_subs = SubRipFile.from_string(
                         # Skip byte order mark(BOM) character
                         content.decode('utf-8-sig'),
