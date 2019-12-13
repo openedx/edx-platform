@@ -158,6 +158,31 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             content('#field-course-organization b').contents()[0].strip()
         )
 
+    @ddt.data(True, False)
+    def test_membership_reason_field_visibility(self, enbale_reason_field):
+        """
+        Verify that reason field is enabled by site configuration flag 'ENABLE_MANUAL_ENROLLMENT_REASON_FIELD'
+        """
+
+        configuration_values = {
+            "ENABLE_MANUAL_ENROLLMENT_REASON_FIELD": enbale_reason_field
+        }
+        site = Site.objects.first()
+        SiteConfiguration.objects.create(site=site, values=configuration_values, enabled=True)
+
+        url = reverse(
+            'instructor_dashboard',
+            kwargs={
+                'course_id': six.text_type(self.course_info.id)
+            }
+        )
+        response = self.client.get(url)
+        reason_field = '<textarea rows="2" id="reason-field-id" name="reason-field" placeholder="Reason" spellcheck="false"></textarea>'  # pylint: disable=line-too-long
+        if enbale_reason_field:
+            self.assertContains(response, reason_field)
+        else:
+            self.assertNotContains(response, reason_field)
+
     def test_membership_site_configuration_role(self):
         """
         Verify that the role choices set via site configuration are loaded in the membership tab
