@@ -99,7 +99,7 @@ django-ratelimit-backend==1.1.1
 django-ratelimit==2.0.0
 django-require==1.0.11
 django-sekizai==1.0.0
-django-ses==0.8.4
+django-ses==0.8.13
 django-simple-history==2.8.0
 django-splash==0.2.5
 django-statici18n==1.4.0

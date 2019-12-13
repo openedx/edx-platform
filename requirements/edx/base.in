@@ -56,7 +56,7 @@ django-ratelimit
 django-ratelimit-backend==1.1.1
 django-require
 django-sekizai
-django-ses==0.8.4
+django-ses
 django-simple-history
 django-splash
 django-statici18n==1.4.0
