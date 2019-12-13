@@ -62,13 +62,6 @@ urlpatterns = [
 
 ]
 
-if not getattr(settings, 'DISABLE_DEPRECATED_LOGIN_POST', False):
-    # TODO: Remove login_post once it no longer has real traffic.
-    #   It was only used by old Studio sign-in and some miscellaneous callers, which should no longer be in use.
-    urlpatterns += [
-        url(r'^login_post$', login.login_user, name='login_post'),
-    ]
-
 # password reset django views (see above for password reset views)
 urlpatterns += [
     url(

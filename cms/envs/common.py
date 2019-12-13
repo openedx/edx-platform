@@ -2156,16 +2156,3 @@ DISABLE_DEPRECATED_SIGNIN_URL = False
 # .. toggle_tickets: ARCH-1253
 # .. toggle_status: supported
 DISABLE_DEPRECATED_SIGNUP_URL = False
-
-# .. toggle_name: DISABLE_DEPRECATED_LOGIN_POST
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Toggle for removing the deprecated /login_post url.
-# .. toggle_category: n/a
-# .. toggle_use_cases: incremental_release
-# .. toggle_creation_date: 2019-12-02
-# .. toggle_expiration_date: 2020-06-01
-# .. toggle_warnings: This url can be removed once it no longer has any real traffic. Note: We have permission to remove for traffic from user_agent including `mitx-quantum`.
-# .. toggle_tickets: ARCH-1253
-# .. toggle_status: supported
-DISABLE_DEPRECATED_LOGIN_POST = False
