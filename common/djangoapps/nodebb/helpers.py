@@ -7,8 +7,7 @@ from courseware.tabs import get_course_tab_list
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from nodebb.models import DiscussionCommunity, TeamGroupChat
-from nodebb.tasks import task_update_onboarding_surveys_status, task_archive_community_on_nodebb, \
-    task_activate_user_on_nodebb
+from nodebb.tasks import task_update_onboarding_surveys_status, task_archive_community_on_nodebb
 
 from logging import getLogger
 log = getLogger(__name__)
@@ -119,13 +118,6 @@ def update_nodebb_for_user_status(username):
     Call nodebb client to update NodeBB for survey status update
     """
     task_update_onboarding_surveys_status.delay(username=username)
-
-
-def set_user_activation_status_on_nodebb(username, is_active):
-    """
-    Call nodebb client to update NodeBB for user's activation status
-    """
-    task_activate_user_on_nodebb.delay(username=username, active=is_active)
 
 
 def archive_course_community(course_id):
