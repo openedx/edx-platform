@@ -1259,9 +1259,20 @@ class XModuleDescriptor(XModuleDescriptorToXBlockMixin, HTMLSnippet, ResourceTem
         """
         return (hasattr(other, 'scope_ids') and
                 self.scope_ids == other.scope_ids and
-                list(self.fields.keys()) == list(other.fields.keys()) and
+                set(self.fields.keys()) == set(other.fields.keys()) and
                 all(getattr(self, field.name) == getattr(other, field.name)
                     for field in self.fields.values()))
+
+    def __hash__(self):  # pylint: disable=useless-super-delegation
+        """
+        This isn't technically appropriate since descriptors are actually mutable,
+        but in practice we rarely modify them after creation or instantiate two
+        equivalent descriptors in the same process.  And we perform graph
+        operations on large collections of XBlocks that have simply unacceptable
+        performance if we have to rely on lists and equality rather than sets,
+        dictionaries, and identity-based hash functions.
+        """
+        return super(XModuleDescriptor, self).__hash__()
 
     def __repr__(self):
         return (
