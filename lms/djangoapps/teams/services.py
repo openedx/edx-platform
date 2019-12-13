@@ -5,6 +5,7 @@ from django.urls import reverse
 
 
 class TeamsService(object):
+    """ Functions to provide teams functionality to XBlocks"""
     def get_team(self, user, course_id):
         from . import api
         return api.get_team_for_user_and_course(user, course_id)
