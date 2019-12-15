@@ -10,6 +10,7 @@ from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory
 from lms.djangoapps.teams.services import TeamsService
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 
+
 class TeamsServiceTests(ModuleStoreTestCase):
     """ Tests for the TeamsService """
 
@@ -34,5 +35,3 @@ class TeamsServiceTests(ModuleStoreTestCase):
                 self.team.team_id,
             ]
         )
-        
-
