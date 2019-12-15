@@ -11,6 +11,7 @@ class TeamsService(object):
         return api.get_team_for_user_and_course(user, course_id)
 
     def get_team_detail_url(self, team):
+        """ Returns the url to the detail view for the given team """
         teams_dashboard_url = reverse('teams_dashboard', kwargs={'course_id': team.course_id})
         # Unfortunately required since this URL resolution is done in a Backbone view
         return "{teams_dashboard_url}#teams/{topic_id}/{team_id}".format(

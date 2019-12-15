@@ -109,9 +109,8 @@ class PythonAPITests(SharedModuleStoreTestCase):
             teams_api.get_team_for_user_and_course(self.user1, invalid_course_id)
 
     def test_get_team_course_not_found(self):
-        message = 'The supplied course ' + str(COURSE_KEY1) + ' was not found'
-        with self.assertRaisesMessage(ValueError, message):
-            teams_api.get_team_for_user_and_course(self.user1, str(COURSE_KEY1))
+        team = teams_api.get_team_for_user_and_course(self.user1, 'nonsense/garbage/nonexistant')
+        self.assertIsNone(team)
 
 
 @ddt.ddt
