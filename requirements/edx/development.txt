@@ -54,14 +54,14 @@ chardet==3.0.4
 git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
 click-log==0.3.2
 click==7.0
-code-annotations==0.3.2
+code-annotations==0.3.3
 colorama==0.4.3
 configparser==4.0.2
 contextlib2==0.6.0.post1
 cookies==2.2.1
 coreapi==2.3.3
 coreschema==0.0.4
-coverage==5.0b1
+coverage==5.0
 git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0
 git+https://github.com/edx/crowdsourcehinter.git@a7ffc85b134b7d8909bf1fefd23dbdb8eb28e467#egg=crowdsourcehinter-xblock==0.2
 cryptography==2.8
@@ -70,7 +70,7 @@ cssutils==1.0.2
 ddt==1.2.2
 decorator==4.4.1
 defusedxml==0.5.0
-diff-cover==0.9.8
+diff-cover==2.5.0
 distlib==0.3.0
 django-appconf==1.0.3
 django-babel-underscore==0.5.2

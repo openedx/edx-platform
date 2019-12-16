@@ -12,5 +12,5 @@
 
 -c ../constraints.txt
 
-coverage==5.0b1                     # Code coverage testing for Python
-diff-cover==0.9.8                   # Automatically find diff lines that need test coverage
+coverage                            # Code coverage testing for Python
+diff-cover                          # Automatically find diff lines that need test coverage
