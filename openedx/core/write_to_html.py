@@ -1,15 +1,13 @@
-import collections
-import csv
-import os
-import re
-import six
-import sys
-import pdb
+"""
+Class used to write pytest warning data  into html format
+"""
 import textwrap
-from xml.sax.saxutils import escape
-
+import six
 
 class HtmlOutlineWriter(object):
+    """
+    writer to handle html writing
+    """
     HEAD = textwrap.dedent(
         u"""
         <!DOCTYPE html>

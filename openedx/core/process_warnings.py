@@ -1,14 +1,16 @@
+"""
+Script to process pytest warnings output by pytest-json-report plugin and output it as a html
+"""
 from __future__ import absolute_import
 import json
 import os
 import io
 import pprint
 import re
-import pdb
 import argparse
+from collections import Counter
 import pandas as pd
 from write_to_html import HtmlOutlineWriter
-from collections import Counter
 from djangolib.markup import HTML, Text
 
 columns = [
@@ -35,16 +37,15 @@ def seperate_warnings_by_location(warnings_data):
 
     # first create regex for each know file location
     warnings_locations = {
-        ".*/python\d\.\d/site-packages/.*\.py": "python",  # noqa
-        ".*/edx-platform/lms/.*\.py": "lms",  # noqa
-        ".*/edx-platform/openedx/.*\.py": "openedx",  # noqa
-        ".*/edx-platform/cms/.*\.py": "cms",  # noqa
-        ".*/edx-platform/common/.*\.py": "common",  # noqa
+        ".*/python\d\.\d/site-packages/.*\.py": "python",  # noqa pylint: disable=W1401
+        ".*/edx-platform/lms/.*\.py": "lms",  # noqa pylint: disable=W1401
+        ".*/edx-platform/openedx/.*\.py": "openedx",  # noqa pylint: disable=W1401
+        ".*/edx-platform/cms/.*\.py": "cms",  # noqa pylint: disable=W1401
+        ".*/edx-platform/common/.*\.py": "common",  # noqa pylint: disable=W1401
     }
 
     """
-    seperate into locations
-    flow:
+    seperate into locations flow:
      iterate through each wanring_object, see if its filename matches any regex in warning locations.
      If so, change high_location index on warnings_object to location name
     """
@@ -66,9 +67,11 @@ def seperate_warnings_by_location(warnings_data):
 
 
 def convert_warning_dict_to_list(warning_dict):
-    # namedtuple('message', 'category', 'filename', 'lineno', 'high_location', 'label', 'num')
+    """
+    converts our data dict into our defined list based on columns defined at top of this file
+    """
     output = []
-    for index, column in enumerate(columns):
+    for column in columns:
         if column in warning_dict:
             if column == "message" and "unclosed" in warning_dict[column]:
                 None
@@ -95,7 +98,9 @@ def read_warning_data(dir_path):
 
     # TODO(jinder): currently this is hardcoded in, maybe create a constants file with info
     # THINK(jinder): but creating file for one constant seems overkill
-    warnings_file_name_regex = "pytest_warnings_?\d*\.json"  # noqa
+    warnings_file_name_regex = (
+        "pytest_warnings_?\d*\.json"  # noqa pylint: disable=W1401
+    )
 
     # iterate through files_in_dir and see if they match our know file name pattern
     for file in files_in_dir:
@@ -119,6 +124,9 @@ def read_warning_data(dir_path):
 
 
 def compress_similar_warnings(warnings_data):
+    """
+    find all warnings that are exactly the same, count them, and return set with count added to each warning
+    """
     tupled_data = [tuple(data) for data in warnings_data]
     test_counter = Counter(tupled_data)
     output = [list(value) for value in test_counter.keys()]
@@ -146,10 +154,9 @@ def process_warnings_json(dir_path):
     """
     warnings_data = read_warning_data(dir_path)
     for warnings_object in warnings_data:
-        if "deprecated" in warnings_object[columns_index_dict["message"]]:
-            warnings_object[columns_index_dict["deprecated"]] = True
-        else:
-            warnings_object[columns_index_dict["deprecated"]] = False
+        warnings_object[columns_index_dict["deprecated"]] = bool(
+            "deprecated" in warnings_object[columns_index_dict["message"]]
+        )
     warnings_data = seperate_warnings_by_location(warnings_data)
     compressed_warnings_data = compress_similar_warnings(warnings_data)
     return compressed_warnings_data
@@ -206,7 +213,7 @@ def write_html_report(warnings_dataframe, html_path):
                     ).format(warning_text=HTML(message), count=HTML(message_count))
                     html_writer.start_section(html, klass=u"warning_text")
                     # warnings_object[location][warning_text] is a list
-                    for index, warning in message_group.iterrows():
+                    for _, warning in message_group.iterrows():
                         # pp.pprint(warning)
                         html = Text(
                             u'<span class="count">{warning_file_path}</span> '
@@ -234,6 +241,6 @@ parser = argparse.ArgumentParser(
 parser.add_argument("--dir_path", default="test_root/log")
 parser.add_argument("--html_path", default="test_html.html")
 args = parser.parse_args()
-output = process_warnings_json(args.dir_path)
-warnings_dataframe = pd.DataFrame(data=output, columns=columns)
-write_html_report(warnings_dataframe, args.html_path)
+data_output = process_warnings_json(args.dir_path)
+data_dataframe = pd.DataFrame(data=data_output, columns=columns)
+write_html_report(data_dataframe, args.html_path)
