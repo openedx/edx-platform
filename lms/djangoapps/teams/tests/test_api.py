@@ -83,24 +83,23 @@ class PythonAPITests(SharedModuleStoreTestCase):
         self.assertTrue(teams_api.discussion_visible_by_user('DO_NOT_EXISTS', self.user3))
 
     def test_get_team(self):
-        with patch('lms.djangoapps.teams.api.modulestore'):
-            # Course 1
-            user1_team = teams_api.get_team_for_user_and_course(self.user1, str(COURSE_KEY1))
-            user2_team = teams_api.get_team_for_user_and_course(self.user2, str(COURSE_KEY1))
-            user3_team = teams_api.get_team_for_user_and_course(self.user3, str(COURSE_KEY1))
+        # Course 1
+        user1_team = teams_api.get_team_for_user_and_course(self.user1, str(COURSE_KEY1))
+        user2_team = teams_api.get_team_for_user_and_course(self.user2, str(COURSE_KEY1))
+        user3_team = teams_api.get_team_for_user_and_course(self.user3, str(COURSE_KEY1))
 
-            self.assertEqual(user1_team, self.team1)
-            self.assertEqual(user2_team, self.team1)
-            self.assertEqual(user3_team, None)
+        self.assertEqual(user1_team, self.team1)
+        self.assertEqual(user2_team, self.team1)
+        self.assertEqual(user3_team, None)
 
-            # Course 2
-            user1_team = teams_api.get_team_for_user_and_course(self.user1, str(COURSE_KEY2))
-            user2_team = teams_api.get_team_for_user_and_course(self.user2, str(COURSE_KEY2))
-            user3_team = teams_api.get_team_for_user_and_course(self.user3, str(COURSE_KEY2))
+        # Course 2
+        user1_team = teams_api.get_team_for_user_and_course(self.user1, str(COURSE_KEY2))
+        user2_team = teams_api.get_team_for_user_and_course(self.user2, str(COURSE_KEY2))
+        user3_team = teams_api.get_team_for_user_and_course(self.user3, str(COURSE_KEY2))
 
-            self.assertEqual(user1_team, None)
-            self.assertEqual(user2_team, None)
-            self.assertEqual(user3_team, self.team2)
+        self.assertEqual(user1_team, None)
+        self.assertEqual(user2_team, None)
+        self.assertEqual(user3_team, self.team2)
 
     def test_get_team_invalid_course(self):
         invalid_course_id = 'lol!()#^$&course'
