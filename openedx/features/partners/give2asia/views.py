@@ -28,6 +28,7 @@ from openedx.features.partners.models import PartnerUser
 from lms.djangoapps.philu_overrides.user_api.views import RegistrationViewCustom
 from lms.djangoapps.onboarding.models import EmailPreference, Organization, PartnerNetwork, UserExtendedProfile
 from philu_overrides.user_api.views import LoginSessionViewCustom
+from nodebb.helpers import update_nodebb_for_user_status
 from student.models import Registration, UserProfile
 
 from . import constants as g2a_constants
