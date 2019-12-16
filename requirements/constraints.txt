@@ -92,5 +92,10 @@ django-object-actions==1.1.2
 # Constraining this since the newer versions require Python 3
 django-debug-toolbar<2.0          # A set of panels that display debug information about the current request/response
 
+
 # Constraining this since the newer versions require Python 3
 django-model-utils<4.0.0
+
+
+# Constraining this since the newer versions require Python 3
+django-mysql<3.0.0
