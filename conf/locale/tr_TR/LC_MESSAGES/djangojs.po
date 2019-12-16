@@ -107,7 +107,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-12-08 20:42+0000\n"
+"POT-Creation-Date: 2019-12-15 20:42+0000\n"
 "PO-Revision-Date: 2019-12-04 19:20+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
@@ -325,7 +325,7 @@ msgstr "Değişiklikleriniz kaydedildi."
 #: cms/static/js/views/xblock_validation.js
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Warning"
-msgstr ""
+msgstr "Uyarı"
 
 #. Translators: This message will be added to the front of messages of type
 #. error,
@@ -2511,7 +2511,7 @@ msgstr "Hesap Ayarları"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Billing/Payment Options"
-msgstr ""
+msgstr "Faturalandırma/Ödeme Seçenekleri"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Certificates"
@@ -2523,15 +2523,15 @@ msgstr "Ders İçeriği"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Deadlines"
-msgstr ""
+msgstr "Son tarihler"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Errors/Technical Issues"
-msgstr ""
+msgstr "Hatalar/Teknik Sorunlar"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Financial Aid"
-msgstr ""
+msgstr "Mâli Yardım"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Masters"
@@ -2539,11 +2539,11 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Photo Verification"
-msgstr ""
+msgstr "Fotoğraf Doğrulama"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Proctoring"
-msgstr ""
+msgstr "Gözetmenli"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: cms/templates/js/asset-library.underscore
@@ -2781,7 +2781,7 @@ msgstr "\"{team}\" takımı başarıyla silindi."
 #: lms/djangoapps/teams/static/teams/js/views/manage.js
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Manage"
-msgstr ""
+msgstr "Yönet"
 
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
@@ -2797,7 +2797,7 @@ msgstr "ve diğerleri"
 #. * relative timestamp (see: http://momentjs.com/)
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "Last activity {date}"
-msgstr ""
+msgstr "Son faaliyet {date}"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "View {span_start} {team_name} {span_end}"
@@ -2868,6 +2868,9 @@ msgid ""
 "See all teams in your course, organized by topic. Join a team to collaborate"
 " with other learners who are interested in the same topic as you are."
 msgstr ""
+"Dersinizdeki konu etrafında şekillenen tüm takımları görün. Sizinle aynı "
+"konuyla ilgilenen diğer öğrencilerle işbirliği yapmak için bir takıma "
+"katılın."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Your request could not be completed. Reload the page and try again."
@@ -2952,8 +2955,8 @@ msgstr "\"{team}\" takımı bulunamadı."
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "{team_count} Team"
 msgid_plural "{team_count} Teams"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{team_count} Takım"
+msgstr[1] "{team_count} Takım"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "Topic"
@@ -4807,6 +4810,10 @@ msgid ""
 msgstr ""
 "Bir hata meydana geldi. Sayfayı yenilemeyi deneyin veya internet "
 "bağlantınızı kontrol edin."
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid "An unexpected error has occurred."
+msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""

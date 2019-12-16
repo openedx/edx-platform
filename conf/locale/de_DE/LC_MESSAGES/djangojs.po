@@ -18,6 +18,7 @@
 # Bert Krohn <bert.krohn@tum.de>, 2017
 # Christian Layr <Christian.Layr@unisg.ch>, 2015
 # Donna Kl <donna@polarstern-education.com>, 2019
+# Donna Kl <donna@polarstern-education.com>, 2019
 # Ettore Atalan <atalanttore@googlemail.com>, 2014
 # Lars Walther <meinkraeks@gmail.com>, 2015
 # 39e62ebcacb2326f6384f8b81e0898eb, 2014
@@ -114,19 +115,21 @@
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2016-2017
 # Christian Layr <Christian.Layr@unisg.ch>, 2015
 # Donna Kl <donna@polarstern-education.com>, 2019
+# Donna Kl <donna@polarstern-education.com>, 2019
 # Ettore Atalan <atalanttore@googlemail.com>, 2014,2016
 # Max Vogl <mail@max-vogl.de>, 2014
 # mc <marc.mannsfeld@phil.hhu.de>, 2015-2016
 # Ron Lucke <ronlucke@googlemail.com>, 2014
 # Ron Lucke <ronlucke@googlemail.com>, 2014
 # Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2018-2019
+# Waheed Ahmed <waheed@edx.org>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-12-01 20:42+0000\n"
-"PO-Revision-Date: 2019-12-02 10:39+0000\n"
-"Last-Translator: Donna Kl <donna@polarstern-education.com>\n"
+"POT-Creation-Date: 2019-12-15 20:42+0000\n"
+"PO-Revision-Date: 2019-12-16 10:03+0000\n"
+"Last-Translator: Waheed Ahmed <waheed@edx.org>\n"
 "Language-Team: German (Germany) (http://www.transifex.com/open-edx/edx-platform/language/de_DE/)\n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"
@@ -2811,6 +2814,8 @@ msgid ""
 "This learner will be removed from the team,allowing another learner to take "
 "the available spot."
 msgstr ""
+"Dieser Lernende wird aus dem Team entfernt, so dass ein anderer Lernender "
+"den verfügbaren Platz einnehmen kann. "
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Delete this team?"
@@ -2821,10 +2826,18 @@ msgid ""
 "Deleting a team is permanent and cannot be undone.All members are removed "
 "from the team, and team discussions can no longer be accessed."
 msgstr ""
+"Das Löschen eines Teams ist dauerhaft und kann nicht rückgängig gemacht "
+"werden. Alle Mitglieder werden aus dem Team entfernt, und Teambesprechungen "
+"können nicht mehr abgerufen werden."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Team \"{team}\" successfully deleted."
 msgstr "Team \"{team}\" wurde erfolgreich gelöscht."
+
+#: lms/djangoapps/teams/static/teams/js/views/manage.js
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Manage"
+msgstr "Verwalten"
 
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
@@ -2840,11 +2853,11 @@ msgstr "und andere"
 #. * relative timestamp (see: http://momentjs.com/)
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "Last activity {date}"
-msgstr ""
+msgstr "Letzte Aktivität {date}"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "View {span_start} {team_name} {span_end}"
-msgstr ""
+msgstr "{span_start} {team_name} {span_end} ansehen"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
@@ -2860,6 +2873,8 @@ msgid ""
 "If you leave, you can no longer post in this team's discussions.Your place "
 "will be available to another learner."
 msgstr ""
+"Wenn Sie gehen, können Sie nicht mehr an den Diskussionen dieses Teams "
+"teilnehmen. Ihr Platz steht dann einem anderen Lernenden zur Verfügung."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/static/js/verify_student/views/reverify_view.js
@@ -2898,12 +2913,6 @@ msgid "Topics"
 msgstr "Themen"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid ""
-"See all teams in your course, organized by topic. Join a team to collaborate"
-" with other learners who are interestedin the same topic as you are."
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "My Team"
 msgstr "Mein Team"
 
@@ -2911,6 +2920,15 @@ msgstr "Mein Team"
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Browse"
 msgstr "Durchsuchen"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"See all teams in your course, organized by topic. Join a team to collaborate"
+" with other learners who are interested in the same topic as you are."
+msgstr ""
+"Sehen Sie alle Teams in Ihrem Kurs, organisiert nach Themen. Werden Sie Teil"
+" eines Teams, um mit anderen Lernenden zusammenzuarbeiten, die an demselben "
+"Thema interessiert sind wie Sie."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Your request could not be completed. Reload the page and try again."
@@ -3006,16 +3024,8 @@ msgstr "Thema"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the {topic_name} Topic"
-msgstr ""
+msgstr "Teams im {topic_name}  ansehen."
 
-#. Translators: this string is shown at the bottom of the teams page
-#. to find a team to join or else to create a new one. There are three
-#. links that need to be included in the message:
-#. 1. Browse teams in other topics
-#. 2. search teams
-#. 3. create a new team
-#. Be careful to start each link with the appropriate start indicator
-#. (e.g. {browse_span_start} for #1) and finish it with {span_end}.
 #: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
 msgid ""
 "{browse_span_start}Browse teams in other topics{span_end} or "
@@ -5009,6 +5019,10 @@ msgid ""
 msgstr ""
 "Es ist ein Fehler aufgetreten. Versuchen Sie, die Seite zu aktualisieren "
 "oder überprüfen Sie Ihre Internetverbindung."
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid "An unexpected error has occurred."
+msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -7606,6 +7620,22 @@ msgstr "Lösche Team"
 msgid "Edit Membership"
 msgstr "Editiere Mitgliedschaft"
 
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "View Current Team Memberships"
+msgstr "Aktuelle Team-Mitgliedschaft sehen "
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Download Memberships"
+msgstr "Mitgliedschaft herunterladen"
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Assign Team Memberships"
+msgstr "Team-Mitgliedschaft zuweisen"
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Upload Memberships"
+msgstr "Mitgliedschaft hochladen"
+
 #: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
 msgid "Are you having trouble finding a team to join?"
 msgstr "Hast Du Probleme ein Team zum Beitreten zu finden?"
@@ -9444,6 +9474,10 @@ msgid ""
 "minimum completion percentage to limit access to this subsection. Allowed "
 "values are 0-100"
 msgstr ""
+"Wählen Sie einen vorausgesetzten Unterabschnitt aus und geben Sie einen "
+"Mindestpunktzahlanteil und einen Mindestprozentsatz der Vollständigkeit ein,"
+" um den Zugang zu diesem Unterabschnitt einzuschränken. Erlaubte Werte sind "
+"0-100"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Prerequisite:"
@@ -9764,12 +9798,18 @@ msgid ""
 "After the course\\'s end date has passed, learners can no longer access "
 "subsection content. The subsection remains included in grade calculations."
 msgstr ""
+"Nach Ablauf des Enddatums des Kurses können die Lernenden nicht mehr auf die"
+" Inhalte des Unterabschnitts zugreifen. Der Unterabschnitt bleibt in der "
+"Notenberechnung einbezogen."
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid ""
 "After the subsection\\'s due date has passed, learners can no longer access "
 "its content. The subsection remains included in grade calculations."
 msgstr ""
+"Nach Ablauf der Fälligkeit des Unterabschnitts können die Lernenden nicht "
+"mehr auf den Inhalt zugreifen. Der Unterabschnitt bleibt in der "
+"Notenberechnung einbezogen."
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid "Hide entire subsection"
@@ -9780,6 +9820,8 @@ msgid ""
 "Learners do not see the subsection in the course outline. The subsection is "
 "not included in grade calculations."
 msgstr ""
+"Die Lernenden sehen den Unterabschnitt nicht in der Kursübersicht. Der "
+"Unterabschnitt ist nicht in der Notenberechnung einbezogen."
 
 #: cms/templates/js/content-visibility-editor.underscore
 #, python-format
@@ -9788,10 +9830,13 @@ msgid ""
 "this subsection become available to learners unless they are explicitly "
 "hidden."
 msgstr ""
+"Wenn Sie eine andere Option als \"%(hide_label)s\" wählen, werden die in "
+"diesem Unterabschnitt veröffentlichten Einheiten den Lernenden zugänglich, "
+"es sei denn, sie werden explizit ausgeblendet."
 
 #: cms/templates/js/copy-clipboard-button.underscore
 msgid "Copy Component Location"
-msgstr ""
+msgstr "Komponentenposition kopieren"
 
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Weekly Highlight Emails"
@@ -9895,12 +9940,15 @@ msgstr ""
 #: cms/templates/js/course-outline.underscore
 msgid "Access to this unit is restricted to: {selectedGroupsLabel}"
 msgstr ""
+"Der Zugriff auf dieses Gerät ist beschränkt auf: {selectedGroupsLabel}"
 
 #: cms/templates/js/course-outline.underscore
 msgid ""
 "Access to some content in this unit is restricted to specific groups of "
 "learners"
 msgstr ""
+"Der Zugang zu einigen Inhalten in dieser Lektion ist auf bestimmte Gruppen "
+"von Lernenden beschränkt."
 
 #: cms/templates/js/course-outline.underscore
 msgid "Ungraded"
@@ -9966,7 +10014,7 @@ msgstr "Terminiert:"
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/highlights-editor.underscore
 msgid "Section Highlights"
-msgstr ""
+msgstr "Highlights des Abschnitts"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Graded as:"
@@ -10127,6 +10175,7 @@ msgid ""
 "The number of subsections in the course that contain problems of this "
 "assignment type."
 msgstr ""
+"Anzahl der Unterabschnitte im Kurs, die Aufgaben dieses typs enthalten."
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Number of Droppable"
@@ -10137,6 +10186,8 @@ msgid ""
 "The number of assignments of this type that will be dropped. The lowest "
 "scoring assignments are dropped first."
 msgstr ""
+"Anzahl der Aufgaben dieses typs, welche wegfallen. Die mit der niedrigsten "
+"Punktezahl werden zuerst gelöscht."
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"
@@ -10189,7 +10240,7 @@ msgstr "Objekt des Kapitels"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "path/to/introductionToCookieBaking-CH{order}.pdf"
-msgstr ""
+msgstr "path/to/introductionToCookieBaking-CH{order}.pdf"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "upload a PDF file or provide the path to a Studio asset file"
@@ -10234,7 +10285,7 @@ msgstr "Kapitel hinzufügen"
 
 #: cms/templates/js/edit-title-button.underscore
 msgid "Edit Title"
-msgstr ""
+msgstr "Titel bearbeiten"
 
 #: cms/templates/js/grading-editor.underscore
 msgid "Grading"
@@ -10263,6 +10314,9 @@ msgid ""
 "This Group Configuration is not in use. Start by adding a content experiment"
 " to any Unit via the {linkStart}Course Outline{linkEnd}."
 msgstr ""
+"Diese Gruppenkonfiguration wird nicht verwendet. Beginnen Sie, indem Sie ein"
+" Testinhalt zu einer beliebigen Lerneinheit über die "
+"{linkStart}Kursübersicht{linkEnd} hinzufügen."
 
 #: cms/templates/js/group-configuration-editor.underscore
 msgid "Group Configuration information"
@@ -10327,12 +10381,18 @@ msgid ""
 "This feature is currently in testing. Course teams can enter highlights, but"
 " learners will not receive email messages."
 msgstr ""
+"Diese Funktion befindet sich derzeit im Testslauf. Kursteams können "
+"Highlights eingeben, aber die Lernenden erhalten keine E-Mail-"
+"Benachrichtigung."
 
 #: cms/templates/js/highlights-editor.underscore
 msgid ""
 "Enter 3-5 highlights to include in the email message that learners receive "
 "for this section (250 character limit)."
 msgstr ""
+"Geben Sie 3-5 Highlights ein, die in die E-Mail-Nachricht aufgenommen werden"
+" sollen, die die Lernenden für diesen Abschnitt erhalten (maximal 250 "
+"Zeichen)."
 
 #: cms/templates/js/highlights-editor.underscore
 msgid "Highlight {highlight_index}"
@@ -10344,7 +10404,7 @@ msgstr "Ein Highlight, auf das Sie sich diese Woche freuen können."
 
 #: cms/templates/js/license-selector.underscore
 msgid "License Type"
-msgstr ""
+msgstr "Lizenztyp"
 
 #: cms/templates/js/license-selector.underscore
 msgid "Learn more about {license_name}"
@@ -10356,11 +10416,11 @@ msgstr "Optionen für {license_name}"
 
 #: cms/templates/js/license-selector.underscore
 msgid "The following options are available for the {license_name} license."
-msgstr ""
+msgstr "Die folgenden Optionen sind für die {license_name} Lizenz verfügbar."
 
 #: cms/templates/js/license-selector.underscore
 msgid "License Display"
-msgstr ""
+msgstr "Lizenzanzeige"
 
 #: cms/templates/js/license-selector.underscore
 msgid ""
@@ -10413,7 +10473,7 @@ msgstr "Download"
 
 #: cms/templates/js/move-xblock-list.underscore
 msgid "{categoryText} in {parentDisplayname}"
-msgstr ""
+msgstr "{categoryText} in {parentDisplayname}"
 
 #: cms/templates/js/move-xblock-list.underscore
 msgid "Current location"
@@ -10433,13 +10493,15 @@ msgstr "Sie haben Ihr erstes Lehrbuch hinzugefügt"
 
 #: cms/templates/js/partition-group-details.underscore
 msgid "This group controls access to:"
-msgstr ""
+msgstr "Diese Gruppe kontrolliert den Zugang zu:"
 
 #: cms/templates/js/partition-group-details.underscore
 msgid ""
 "In the {linkStart}Course Outline{linkEnd}, use this group to control access "
 "to a component."
 msgstr ""
+"Verwenden Sie diese Funktion in der {linkStart}Kursübersicht{linkEnd}, um "
+"den Zugriff auf eine Komponente zu steuern."
 
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Previous Uploads"
@@ -10447,7 +10509,7 @@ msgstr "Vorherige Hochladevorgänge"
 
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Download available encodings (.csv)"
-msgstr ""
+msgstr "Verfügbare Verschlüsselungen herunterladen (.csv)"
 
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Thumbnail"
@@ -10521,12 +10583,17 @@ msgid ""
 "Draft saved on {lastSavedStart}{editedOn}{lastSavedEnd} by "
 "{editedByStart}{editedBy}{editedByEnd}"
 msgstr ""
+"Entwurf gespeichert auf {lastSavedStart}{editedOn}{lastSavedEnd} von "
+"{editedByStart}{editedBy}{editedByEnd}"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid ""
 "Last published {lastPublishedStart}{publishedOn}{lastPublishedEnd} by "
 "{publishedByStart}{publishedBy}{publishedByEnd}"
 msgstr ""
+"Zuletzt veröffentlichte Version "
+"{lastPublishedStart}{publishedOn}{lastPublishedEnd} von "
+"{publishedByStart}{publishedBy}{publishedByEnd}"
 
 #: cms/templates/js/publish-xblock.underscore
 #, python-format
@@ -10562,6 +10629,8 @@ msgstr "Vor Lernenden verbergen"
 #: cms/templates/js/publish-xblock.underscore
 msgid "Note: Do not hide graded assignments after they have been released."
 msgstr ""
+"Hinweis: Blenden Sie benotete Aufgaben nicht aus, nachdem sie freigegeben "
+"wurden."
 
 #: cms/templates/js/release-date-editor.underscore
 msgid "Release Date and Time"
@@ -10642,6 +10711,8 @@ msgid ""
 "If the subsection does not have a due date, learners always see their scores"
 " when they submit answers to assessments."
 msgstr ""
+"Wenn der Unterabschnitt kein Fälligkeitsdatum hat, sehen die Lernenden immer"
+" ihre Ergebnisse, wenn sie Antworten zur Bewertung abgeben."
 
 #: cms/templates/js/show-textbook.underscore
 msgid "PDF Chapters"
@@ -10730,6 +10801,9 @@ msgid ""
 "If the unit was previously published and released to learners, any changes "
 "you made to the unit when it was hidden will now be visible to learners."
 msgstr ""
+"Wenn die Lerneinheit zuvor veröffentlicht und an die Lernenden freigegeben "
+"wurde, sind alle Änderungen, die Sie an der Lerneinheit vorgenommen haben, "
+"als sie noch ausgeblendet war, nun für alle Lernenden sichtbar."
 
 #: cms/templates/js/staff-lock-editor.underscore
 #, python-format
@@ -10739,6 +10813,11 @@ msgid ""
 "the unit. Only units that are explicitly hidden from learners will remain "
 "hidden after you clear this option for the %(xblockType)s."
 msgstr ""
+"Wenn Sie diesen %(xblockType)s für die Lernenden sichtbar machen, können die"
+" Lernenden den Inhalt sehen, nachdem das Freigabedatum erreicht ist und Sie "
+"die Einheit veröffentlicht haben. Nur Lerneinheiten, die explizit vor den "
+"Lernenden verborgen sind, bleiben verborgen, nachdem Sie diese Option für "
+"%(xblockType)s deaktiviert haben  ."
 
 #: cms/templates/js/team-member.underscore
 msgid "Current Role:"
@@ -10804,6 +10883,10 @@ msgid ""
 "exam. The videos are then reviewed to ensure that learners follow all "
 "examination rules."
 msgstr ""
+"Beaufsichtigte Prüfungen werden zeitlich begrenzt und es werden Videos von "
+"jedem Lernenden aufgezeichnet, der die Prüfung ablegt. Die Videos werden "
+"dann überprüft, um sicherzustellen, dass die Lernenden alle Prüfungsregeln "
+"einhalten."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Onboarding"
@@ -10816,6 +10899,11 @@ msgid ""
 "profile step prior to taking a proctored exam. Profile reviews take 2+ "
 "business days."
 msgstr ""
+"Verwenden Sie die Onboarding-Funktion, um die Lernenden an das "
+"Aufsichtssystem heranzuführen, ihre Identität zu überprüfen und ein "
+"Onboarding-Profil zu erstellen. Die Lernenden müssen den Schritt des "
+"Onboarding-Profils absolvieren, bevor sie eine beaufsichtigte Prüfung "
+"ablegen können. Profilbewertungen dauern mehr als 2 Werktage."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Practice Proctored"
@@ -10826,6 +10914,9 @@ msgid ""
 "Use a practice proctored exam to introduce learners to the proctoring tools "
 "and processes. Results of a practice exam do not affect a learner's grade."
 msgstr ""
+"Verwenden Sie eine beaufsichtigte Übungsprüfung, um die Lernenden an die "
+"Werkzeuge und Prozesse des Aufsichtssystems heranzuführen. Die Ergebnisse "
+"einer Übungsprüfung haben keinen Einfluss auf die Note des Lernenden."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Time Allotted (HH:MM):"
@@ -10837,6 +10928,10 @@ msgid ""
 "amount of time. You can grant individual learners extra time to complete the"
 " exam through the Instructor Dashboard."
 msgstr ""
+"Wählen Sie eine Zeitzuteilung für die Prüfung aus. Wenn es mehr als 24 "
+"Stunden sind, geben Sie die Zeitspanne ein. Sie können einzelnen Lernenden "
+"über das Lehrer-Dashboard zusätzliche Zeit geben, um die Prüfung "
+"abzuschließen."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Review Rules"
@@ -10850,6 +10945,11 @@ msgid ""
 "before the learners start the exam, along with the {linkStart}general "
 "proctored exam rules{linkEnd}."
 msgstr ""
+"Geben Sie alle Regeln oder Regelausnahmen an, die das Prüferteam bei der "
+"Überprüfung der Videos beachten sollte. Sie können beispielsweise festlegen,"
+" dass Taschenrechner erlaubt sind. Diese festgelegten Regeln sind für die "
+"Lernenden sichtbar, bevor diese mit der Prüfung beginnen, zusammen mit den "
+"{linkStart}allgemein anerkannten Prüfungsregeln {linkEnd}."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "General Proctored Exam Rules"
@@ -10871,22 +10971,24 @@ msgstr "Benutzerkonto"
 msgid ""
 "This action updates the {provider} information for your entire organization."
 msgstr ""
+"Diese Aktion aktualisiert die {provider} Informationen für Ihre gesamte "
+"Organisation."
 
 #: cms/templates/js/transcript-organization-credentials.underscore
 msgid "Enter the account information for your organization."
-msgstr ""
+msgstr "Geben Sie die Kontoinformationen für Ihre Organisation ein."
 
 #: cms/templates/js/transcript-organization-credentials.underscore
 msgid "API Key"
-msgstr ""
+msgstr "API Schlüssel"
 
 #: cms/templates/js/transcript-organization-credentials.underscore
 msgid "API Secret"
-msgstr ""
+msgstr "API Geheimnis"
 
 #: cms/templates/js/unit-access-editor.underscore
 msgid "Unit Access"
-msgstr ""
+msgstr "Zugang zur Lerneinheit"
 
 #: cms/templates/js/unit-access-editor.underscore
 msgid "Restrict access to:"
@@ -10909,6 +11011,8 @@ msgid ""
 "This group no longer exists. Choose another group or do not restrict access "
 "to this unit."
 msgstr ""
+"Diese Gruppe existiert nicht mehr. Wählen Sie eine andere Gruppe oder "
+"beschränken Sie den Zugriff auf diese Lerneinheit nicht."
 
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"
@@ -10940,12 +11044,18 @@ msgid ""
 "the content in this unit. Learners who do not require verification see this "
 "content by default."
 msgstr ""
+"Lernende, die eine Verifizierung benötigen, müssen den ausgewählten "
+"Checkpoint durchlaufen, um den Inhalt dieser Lehreinheit zu sehen. Lernende,"
+" die keine Verifizierung benötigen, sehen diesen Inhalt standardmäßig."
 
 #: cms/templates/js/video-thumbnail.underscore
 msgid ""
 "Recommended image resolution is {imageResolution}, maximum image file size "
 "should be {maxFileSize} and format must be one of {supportedImageFormats}."
 msgstr ""
+"Empfohlene Bildauflösung ist {imageResolution}, maximale Bilddateigröße "
+"sollte {maxFileSize} sein und das Format muss eines von "
+"{supportedImageFormats} sein."
 
 #: cms/templates/js/video-transcript-upload-status.underscore
 msgid "Read more"
@@ -10979,6 +11089,8 @@ msgid ""
 "The published branch version, {published}, was reset to the draft branch "
 "version, {draft}."
 msgstr ""
+"Die veröffentlichte Branch-Version, {published}, wurde auf den Entwurf der "
+"Branch-Version, {draft}, zurückgesetzt."
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid "Add URLs for additional versions"
@@ -11026,7 +11138,7 @@ msgstr "Fehler."
 #: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
 #, python-format
 msgid "Timed Transcript from %(filename)s"
-msgstr ""
+msgstr "Zeitbehaftetes Transkript von %(filename)s"
 
 #: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
 msgid "Timed Transcript Found"
@@ -11072,6 +11184,9 @@ msgid ""
 " transcript on YouTube. You can import the YouTube transcript or upload your"
 " own .srt transcript file."
 msgstr ""
+"EdX hat für dieses Video in Studio kein zeitgesteuertes Transkript, aber in "
+"YouTube wurde ein Transkript gefunden. Sie können das YouTube-Transkript "
+"importieren oder Ihre eigene .srt-Transkriptdatei hochladen."
 
 #: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
 msgid "Import YouTube Transcript"

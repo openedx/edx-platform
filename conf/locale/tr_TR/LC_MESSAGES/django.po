@@ -128,7 +128,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-12-08 20:42+0000\n"
+"POT-Creation-Date: 2019-12-15 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -7166,6 +7166,14 @@ msgid "Verification Status"
 msgstr "Doğrulama Durumu"
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Last Login"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Date Joined"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
 msgstr "Topluluk"
 
@@ -9763,9 +9771,6 @@ msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
 #: openedx/core/djangoapps/user_api/admin.py
-#: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: cms/templates/videos_index_pagination.html
 msgid "Cancel"
 msgstr "İptal"
 
@@ -10332,6 +10337,7 @@ msgstr "%(platform_name)s Ana Sayfasına Git"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: cms/templates/widgets/header.html
 msgid "Sign In"
 msgstr "Giriş"
 
@@ -10379,6 +10385,10 @@ msgstr "Google Play Mağazası'ndan Android uygulamasını indir"
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr "E-posta adresimiz şöyle: "
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+msgid "Unsubscribe from these emails."
+msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_head.html
 msgid "edX Email"
@@ -15076,6 +15086,34 @@ msgstr "Katalog Ara"
 #: lms/templates/api_admin/catalogs/search.html
 msgid "Enter a username to view catalogs belonging to that user."
 msgstr "Bu kullanıcıya ait katalogları görmek için kullanıcı adını girin."
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Unsubscribe Successful"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Unsubscribe Cancelled"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Confirm Unsubscribe"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "You have been unsubscribed from emails for {course}."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "You have not been unsubscribed from emails for {course}."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Do you want to unsubscribe from emails for {course}?"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Unsubscribe"
+msgstr ""
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Open Calculator"
@@ -23879,15 +23917,15 @@ msgstr "Kayıt Bitiş Tarihi"
 
 #: cms/templates/settings.html
 msgid "Upgrade Deadline Date"
-msgstr ""
+msgstr "Yükseltme İçin Son Tarih"
 
 #: cms/templates/settings.html
 msgid "Last day students can upgrade to a verified enrollment."
-msgstr ""
+msgstr "Doğrulanmış bir öğrenci kaydı için son yükseltme tarihi."
 
 #: cms/templates/settings.html
 msgid "Upgrade Deadline Time"
-msgstr ""
+msgstr "Yükseltme için Son Zaman"
 
 #: cms/templates/settings.html
 msgid "Course Details"
@@ -24703,7 +24741,7 @@ msgstr "Taslak"
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"
-msgstr ""
+msgstr "Yayımcı"
 
 #: cms/templates/widgets/header.html
 msgid "Import"
@@ -24779,7 +24817,7 @@ msgstr "Gelişmiş Düzenleyici"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Markdown Help"
-msgstr ""
+msgstr "Markdown İşaretleme Dili Yardımı"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Label"

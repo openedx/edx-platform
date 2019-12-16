@@ -99,7 +99,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-12-01 20:42+0000\n"
+"POT-Creation-Date: 2019-12-15 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019\n"
 "Language-Team: Indonesian (https://www.transifex.com/open-edx/teams/6205/id/)\n"
@@ -442,10 +442,8 @@ msgstr "Pemulihan Akun"
 #: common/djangoapps/student/admin.py
 #: openedx/core/djangoapps/user_authn/views/login_form.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: cms/templates/login.html cms/templates/register.html
 #: lms/templates/provider_login.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
-#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "Sandi"
@@ -478,77 +476,6 @@ msgstr ""
 #: common/djangoapps/student/admin.py
 msgid "User with this email doesn't exist in system."
 msgstr ""
-
-#: common/djangoapps/student/forms.py
-msgid "Full Name cannot contain the following characters: < >"
-msgstr "Nama Lengkap tidak dapat mengandung karakter berikut: < >"
-
-#: common/djangoapps/student/forms.py
-msgid "A properly formatted e-mail is required"
-msgstr "E-mail dengan format yang benar dibutuhkan"
-
-#: common/djangoapps/student/forms.py
-msgid "Your legal name must be a minimum of one character long"
-msgstr ""
-
-#: common/djangoapps/student/forms.py
-#, python-format
-msgid "Email cannot be more than %(limit_value)s characters long"
-msgstr "Email tidak boleh lebih panjang dari %(limit_value)s karakter"
-
-#: common/djangoapps/student/forms.py
-msgid "You must accept the terms of service."
-msgstr "Anda harus menerima kondisi layanan."
-
-#: common/djangoapps/student/forms.py
-msgid "A level of education is required"
-msgstr "Level edukasi dibutuhkan"
-
-#: common/djangoapps/student/forms.py
-msgid "Your gender is required"
-msgstr "Jenis kelamin dibutuhkan"
-
-#: common/djangoapps/student/forms.py
-msgid "Your year of birth is required"
-msgstr "Tahun lahir Anda dibutuhkan"
-
-#: common/djangoapps/student/forms.py
-msgid "Your mailing address is required"
-msgstr "Alamat surat Anda dibutuhkan"
-
-#: common/djangoapps/student/forms.py
-msgid "A description of your goals is required"
-msgstr "Uraian tentang keinginan pencapaian Anda dibutuhkan"
-
-#: common/djangoapps/student/forms.py
-msgid "A city is required"
-msgstr "Kota dibutuhkan"
-
-#: common/djangoapps/student/forms.py
-msgid "A country is required"
-msgstr "Negara dibutuhkan"
-
-#: common/djangoapps/student/forms.py
-msgid "To enroll, you must follow the honor code."
-msgstr "Untuk mendaftar, Anda harus mengikuti kode kehormatan."
-
-#: common/djangoapps/student/forms.py
-msgid "You are missing one or more required fields"
-msgstr "Terdapat satu field atau lebih yang belum diisi"
-
-#: common/djangoapps/student/forms.py
-msgid "Unauthorized email address."
-msgstr "Alamat email tidak dizinkan."
-
-#: common/djangoapps/student/forms.py
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid ""
-"It looks like {email} belongs to an existing account. Try again with a "
-"different email address."
-msgstr ""
-"Tampaknya {email} sudah terhubung dengan salah satu akun. Coba lagi dengan "
-"alamat email yang berbeda."
 
 #: common/djangoapps/student/helpers.py
 #, python-brace-format
@@ -997,6 +924,16 @@ msgstr "Email lama sama dengan email baru."
 #: common/djangoapps/student/views/management.py
 msgid "Cannot be same as your sign in email address."
 msgstr "Tidak boleh sama dengan alamat email sign in Anda."
+
+#: common/djangoapps/student/views/management.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid ""
+"It looks like {email} belongs to an existing account. Try again with a "
+"different email address."
+msgstr ""
+"Tampaknya {email} sudah terhubung dengan salah satu akun. Coba lagi dengan "
+"alamat email yang berbeda."
 
 #: common/djangoapps/student/views/management.py
 msgid "Unable to send email activation link. Please try again later."
@@ -7268,6 +7205,14 @@ msgid "Verification Status"
 msgstr "Status Verifikasi"
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Last Login"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Date Joined"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
 msgstr "Kohort"
 
@@ -7862,8 +7807,7 @@ msgstr "Batas waktu perpanjangan harus lebih lama dari pada batas waktu asli."
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: cms/templates/register.html lms/templates/signup_modal.html
-#: lms/templates/sysadmin_dashboard.html
+#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
@@ -9109,12 +9053,12 @@ msgid "Teams"
 msgstr "Tim"
 
 #: lms/djangoapps/teams/views.py
-#, python-brace-format
-msgid "The supplied course id {course_id} is not valid."
+msgid "course_id must be provided"
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
-msgid "course_id must be provided"
+#, python-brace-format
+msgid "The supplied course id {course_id} is not valid."
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
@@ -9146,6 +9090,10 @@ msgstr ""
 
 #: lms/djangoapps/teams/views.py
 msgid "You are already in a team in this course."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "You can't create a team in an instructor managed topic."
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
@@ -9707,9 +9655,6 @@ msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
 #: openedx/core/djangoapps/user_api/admin.py
-#: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: cms/templates/videos_index_pagination.html
 msgid "Cancel"
 msgstr "Batalkan"
 
@@ -10272,8 +10217,6 @@ msgstr "Ke Beranda %(platform_name)s"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: cms/templates/login.html cms/templates/widgets/header.html
-#: themes/red-theme/cms/templates/login.html
 msgid "Sign In"
 msgstr "Masuk"
 
@@ -10321,6 +10264,10 @@ msgstr "Unduh aplikasi Android di Google Play Store"
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr "Alamat kami"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+msgid "Unsubscribe from these emails."
+msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_head.html
 msgid "edX Email"
@@ -11667,6 +11614,67 @@ msgstr "Access_token yang disediakan sudah dihubungkan dengan pengguna lain."
 msgid "The provided access_token is not valid."
 msgstr "Access_token yang disediakan tidak valid."
 
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Full Name cannot contain the following characters: < >"
+msgstr "Nama Lengkap tidak dapat mengandung karakter berikut: < >"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A properly formatted e-mail is required"
+msgstr "E-mail dengan format yang benar dibutuhkan"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your legal name must be a minimum of one character long"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-format
+msgid "Email cannot be more than %(limit_value)s characters long"
+msgstr "Email tidak boleh lebih panjang dari %(limit_value)s karakter"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "You must accept the terms of service."
+msgstr "Anda harus menerima kondisi layanan."
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A level of education is required"
+msgstr "Level edukasi dibutuhkan"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your gender is required"
+msgstr "Jenis kelamin dibutuhkan"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your year of birth is required"
+msgstr "Tahun lahir Anda dibutuhkan"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your mailing address is required"
+msgstr "Alamat surat Anda dibutuhkan"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A description of your goals is required"
+msgstr "Uraian tentang keinginan pencapaian Anda dibutuhkan"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A city is required"
+msgstr "Kota dibutuhkan"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A country is required"
+msgstr "Negara dibutuhkan"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "To enroll, you must follow the honor code."
+msgstr "Untuk mendaftar, Anda harus mengikuti kode kehormatan."
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "You are missing one or more required fields"
+msgstr "Terdapat satu field atau lebih yang belum diisi"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Unauthorized email address."
+msgstr "Alamat email tidak dizinkan."
+
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's email address.
@@ -11685,7 +11693,7 @@ msgstr "Nama resmi anda, digunakan untuk setiap sertifikat yang anda peroleh"
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's public username.
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: cms/templates/register.html lms/templates/signup_modal.html
+#: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Public Username"
@@ -12952,55 +12960,11 @@ msgstr "Course Run:"
 msgid "Courses"
 msgstr "Kursus"
 
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Sign In to {studio_name}"
-msgstr "Masuk ke {studio_name}"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr "Tidak punya akun {studio_name}? Daftar!"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Required Information to Sign In to {studio_name}"
-msgstr "Informasi Yang Dibutuhkan untuk Daftar di {studio_name}"
-
-#: cms/templates/login.html cms/templates/register.html
-#: lms/templates/provider_login.html lms/templates/signup_modal.html
-#: themes/red-theme/cms/templates/login.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "E-mail"
-msgstr "Email"
-
-#. Translators: This is the placeholder text for a field that requests an
-#. email
-#. address.
-#: cms/templates/login.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html cms/templates/register.html
-#: themes/red-theme/cms/templates/login.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr "contoh: namapengguna@domain.com"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Forgot password?"
-msgstr "Lupa sandi?"
-
-#. Translators: This is the placeholder text for a field that requests the
-#. user's full name.
-#: cms/templates/register.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "example: Jane Doe"
-msgstr "contoh: Budi Raharjo"
-
-#. Translators: This is the placeholder text for a field that asks the user to
-#. pick a username
-#: cms/templates/register.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "example: JaneDoe"
-msgstr "contoh: BudiRaharjo"
 
 #: cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
@@ -13788,6 +13752,12 @@ msgstr ""
 "Nama pengguna, email, dan nama lengkap Anda akan dikirim ke {destination}, "
 "dimana pengumpulan dan penggunaan informasi ini akan diatur oleh persyaratan"
 " layanan dan kebijakan privasi mereka."
+
+#: lms/templates/provider_login.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "E-mail"
+msgstr "Email"
 
 #: lms/templates/provider_login.html
 #, python-format
@@ -15184,6 +15154,34 @@ msgstr "Pencarian katalog"
 #: lms/templates/api_admin/catalogs/search.html
 msgid "Enter a username to view catalogs belonging to that user."
 msgstr "Masukkan username untuk melihat katalog milik pengguna tersebut"
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Unsubscribe Successful"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Unsubscribe Cancelled"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Confirm Unsubscribe"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "You have been unsubscribed from emails for {course}."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "You have not been unsubscribed from emails for {course}."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Do you want to unsubscribe from emails for {course}?"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Unsubscribe"
+msgstr ""
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Open Calculator"
@@ -21435,8 +21433,17 @@ msgid "Please complete the following fields to register for an account. "
 msgstr "Harap lengkapi kolom berikut untuk membuat akun."
 
 #: themes/stanford-style/lms/templates/register-form.html
+msgid "example: Jane Doe"
+msgstr "contoh: Budi Raharjo"
+
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Your legal name, used for any certificates you earn."
 msgstr "Nama resmi anda, digunakan untuk setiap sertifikat yang anda peroleh"
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "example: JaneDoe"
+msgstr "contoh: BudiRaharjo"
 
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -21667,54 +21674,6 @@ msgstr "Jika permasalahan tetap terjadi, email kami di {email_link}"
 
 #: cms/templates/accessibility.html
 msgid "Studio Accessibility Policy"
-msgstr ""
-
-#: cms/templates/activation_active.html cms/templates/activation_complete.html
-#: cms/templates/activation_invalid.html
-msgid "{studio_name} Account Activation"
-msgstr ""
-
-#: cms/templates/activation_active.html
-msgid "Your account is already active"
-msgstr "Akun Anda telah aktif"
-
-#: cms/templates/activation_active.html
-msgid ""
-"This account, set up using {email}, has already been activated. Please sign "
-"in to start working within {studio_name}."
-msgstr ""
-
-#: cms/templates/activation_active.html cms/templates/activation_complete.html
-msgid "Sign into {studio_name}"
-msgstr "Masuk ke {studio_name}"
-
-#: cms/templates/activation_complete.html
-msgid "Your account activation is complete!"
-msgstr "Aktivasi akun anda telah selesai!"
-
-#: cms/templates/activation_complete.html
-msgid ""
-"Thank you for activating your account. You may now sign in and start using "
-"{studio_name} to author courses."
-msgstr ""
-"Terima kasih sudah mengaktifkan akun Anda. Sekarang Anda dapat masuk dan "
-"mulai menggunakan {studio_name} untuk menulis kursus."
-
-#: cms/templates/activation_invalid.html
-msgid "Your account activation is invalid"
-msgstr "Aktivasi akun Anda tidak valid"
-
-#: cms/templates/activation_invalid.html
-msgid ""
-"We're sorry. Something went wrong with your activation. Check to make sure "
-"the URL you went to was correct, as e-mail programs will sometimes split it "
-"into two lines."
-msgstr ""
-
-#: cms/templates/activation_invalid.html
-msgid ""
-"If you still have issues, contact {platform_name} Support. In the meantime, "
-"you can also return to {link_start}the {studio_name} homepage.{link_end}"
 msgstr ""
 
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
@@ -23684,98 +23643,6 @@ msgid ""
 " library."
 msgstr ""
 
-#: cms/templates/register.html cms/templates/widgets/header.html
-msgid "Sign Up"
-msgstr "Daftar"
-
-#: cms/templates/register.html
-msgid "Sign Up for {studio_name}"
-msgstr ""
-
-#: cms/templates/register.html
-msgid "Already have a {studio_name} Account? Sign in"
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"Ready to start creating online courses? Sign up below and start creating "
-"your first {platform_name} course today."
-msgstr ""
-
-#: cms/templates/register.html
-msgid "Required Information to Sign Up for {studio_name}"
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"This will be used in public discussions with your courses and in our edX101 "
-"support forums"
-msgstr ""
-"Akan digunakan dalam diskusi umum dengan kursus Anda dan dalam forum bantuan"
-" edX101."
-
-#: cms/templates/register.html
-msgid "Your Location"
-msgstr "Lokasi Anda"
-
-#: cms/templates/register.html
-msgid "Preferred Language"
-msgstr "Bahasa Pilihan"
-
-#: cms/templates/register.html
-msgid "I agree to the {a_start} Terms of Service {a_end}"
-msgstr "Saya menyetujui {a_start} Syarat Penggunaan {a_end}"
-
-#: cms/templates/register.html
-msgid "Create My Account &amp; Start Authoring Courses"
-msgstr "Buat Akun Saya &amp; Mulai Buat Kursus"
-
-#: cms/templates/register.html
-msgid "Common {studio_name} Questions"
-msgstr ""
-
-#: cms/templates/register.html
-msgid "Who is {studio_name} for?"
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"{studio_name} is for anyone that wants to create online courses that "
-"leverage the global {platform_name} platform. Our users are often faculty "
-"members, teaching assistants and course staff, and members of instructional "
-"technology groups."
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"How technically savvy do I need to be to create courses in {studio_name}?"
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"{studio_name} is designed to be easy to use by almost anyone familiar with "
-"common web-based authoring environments (Wordpress, Moodle, etc.). No "
-"programming knowledge is required, but for some of the more advanced "
-"features, a technical background would be helpful. As always, we are here to"
-" help, so don't hesitate to dive right in."
-msgstr ""
-
-#: cms/templates/register.html
-msgid "I've never authored a course online before. Is there help?"
-msgstr "Saya sebelumnya tidak pernah membuat kursus online. Adakah bantuan? "
-
-#: cms/templates/register.html
-msgid ""
-"Absolutely. We have created an online course, edX101, that describes some "
-"best practices: from filming video, creating exercises, to the basics of "
-"running an online course. Additionally, we're always here to help, just drop"
-" us a note."
-msgstr ""
-"Tentu saja. Kami telah membuat kuliah online, edX101, yang menjelaskan "
-"sebagian praktek terbaik: dari memfilmkan video, membuat latihan, hingga "
-"dasar-dasar menjalankan kuliah online. Sebagai tambahan, kami selalu di sini"
-" untuk membantu, tanya saja."
-
 #: cms/templates/settings.html
 msgid "Schedule & Details Settings"
 msgstr ""
@@ -24698,12 +24565,6 @@ msgstr ""
 msgid "Return to the {link_start}home page{link_end}."
 msgstr ""
 
-#: cms/templates/registration/reg_complete.html
-msgid ""
-"We've sent an email message to {email} with instructions for activating your"
-" account."
-msgstr ""
-
 #: cms/templates/widgets/footer.html
 msgid "Policies"
 msgstr ""
@@ -24755,6 +24616,10 @@ msgstr "Navigasi Akun"
 #: cms/templates/widgets/header.html
 msgid "Contextual Online Help"
 msgstr "Bantuan Online Kontekstual"
+
+#: cms/templates/widgets/header.html
+msgid "Sign Up"
+msgstr "Daftar"
 
 #: cms/templates/widgets/metadata-edit.html
 msgid "Launch Latex Source Compiler"

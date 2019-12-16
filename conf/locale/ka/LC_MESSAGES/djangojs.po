@@ -56,7 +56,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-12-01 20:42+0000\n"
+"POT-Creation-Date: 2019-12-15 20:42+0000\n"
 "PO-Revision-Date: 2019-09-29 20:43+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/)\n"
@@ -2586,6 +2586,11 @@ msgstr ""
 msgid "Team \"{team}\" successfully deleted."
 msgstr "„{team}“ გუნდის წაშლა წარმატებით განხორციელდა."
 
+#: lms/djangoapps/teams/static/teams/js/views/manage.js
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Manage"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
 msgstr "ამჟამად თქვენ არცერთი გუნდის წევრი არ ხართ."
@@ -2658,12 +2663,6 @@ msgid "Topics"
 msgstr "თემები"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid ""
-"See all teams in your course, organized by topic. Join a team to collaborate"
-" with other learners who are interestedin the same topic as you are."
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "My Team"
 msgstr "ჩემი გუნდი"
 
@@ -2671,6 +2670,12 @@ msgstr "ჩემი გუნდი"
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Browse"
 msgstr "დათვალიერება"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"See all teams in your course, organized by topic. Join a team to collaborate"
+" with other learners who are interested in the same topic as you are."
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Your request could not be completed. Reload the page and try again."
@@ -2763,14 +2768,6 @@ msgstr "თემა"
 msgid "View Teams in the {topic_name} Topic"
 msgstr ""
 
-#. Translators: this string is shown at the bottom of the teams page
-#. to find a team to join or else to create a new one. There are three
-#. links that need to be included in the message:
-#. 1. Browse teams in other topics
-#. 2. search teams
-#. 3. create a new team
-#. Be careful to start each link with the appropriate start indicator
-#. (e.g. {browse_span_start} for #1) and finish it with {span_end}.
 #: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
 msgid ""
 "{browse_span_start}Browse teams in other topics{span_end} or "
@@ -4602,6 +4599,10 @@ msgid ""
 msgstr ""
 "დაფიქსირდა შეცდომა. სცადეთ გვერდის განახლება ან შეამოწმეთ თქვენი ინტერნეტ "
 "კავშირი."
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid "An unexpected error has occurred."
+msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -7034,6 +7035,22 @@ msgstr "გუნდის წაშლა"
 #: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
 msgid "Edit Membership"
 msgstr "წევრობის რედაქტირება"
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "View Current Team Memberships"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Download Memberships"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Assign Team Memberships"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Upload Memberships"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
 msgid "Are you having trouble finding a team to join?"

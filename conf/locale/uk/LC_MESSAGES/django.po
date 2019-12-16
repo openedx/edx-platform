@@ -121,7 +121,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-12-08 20:42+0000\n"
+"POT-Creation-Date: 2019-12-15 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Ukrainian (https://www.transifex.com/open-edx/teams/6205/uk/)\n"
@@ -7292,6 +7292,14 @@ msgid "Verification Status"
 msgstr "Статус перевірки"
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Last Login"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Date Joined"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
 msgstr "Когорта"
 
@@ -10444,6 +10452,10 @@ msgstr "Завантажте Android додаток у Google Play Store"
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr "Наша поштова адреса - "
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+msgid "Unsubscribe from these emails."
+msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_head.html
 msgid "edX Email"
@@ -15119,6 +15131,34 @@ msgstr ""
 
 #: lms/templates/api_admin/catalogs/search.html
 msgid "Enter a username to view catalogs belonging to that user."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Unsubscribe Successful"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Unsubscribe Cancelled"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Confirm Unsubscribe"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "You have been unsubscribed from emails for {course}."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "You have not been unsubscribed from emails for {course}."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Do you want to unsubscribe from emails for {course}?"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Unsubscribe"
 msgstr ""
 
 #: lms/templates/calculator/toggle_calculator.html

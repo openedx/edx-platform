@@ -15,6 +15,7 @@
 # Arno <transifex@senlogik.de>, 2013
 # Bert Krohn <bert.krohn@tum.de>, 2018
 # Donna Kl <donna@polarstern-education.com>, 2019
+# Donna Kl <donna@polarstern-education.com>, 2019
 # Ettore Atalan <atalanttore@googlemail.com>, 2014,2016
 # Frank Neumann <transifex@3dmotion.de>, 2017
 # trajan, 2014
@@ -119,6 +120,7 @@
 # dabang <inactive+dabang@transifex.com>, 2014
 # Bert Krohn <bert.krohn@tum.de>, 2018
 # Donna Kl <donna@polarstern-education.com>, 2019
+# Donna Kl <donna@polarstern-education.com>, 2019
 # Ettore Atalan <atalanttore@googlemail.com>, 2014-2016
 # kalei, 2014
 # 39e62ebcacb2326f6384f8b81e0898eb, 2014
@@ -167,7 +169,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-12-01 20:42+0000\n"
+"POT-Creation-Date: 2019-12-15 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019\n"
 "Language-Team: German (Germany) (https://www.transifex.com/open-edx/teams/6205/de_DE/)\n"
@@ -516,10 +518,8 @@ msgstr "Wiederherstellung des Kontos"
 #: common/djangoapps/student/admin.py
 #: openedx/core/djangoapps/user_authn/views/login_form.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: cms/templates/login.html cms/templates/register.html
 #: lms/templates/provider_login.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
-#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "Passwort"
@@ -536,8 +536,8 @@ msgstr ""
 #, python-format
 msgid "%(count)d student account was unlocked."
 msgid_plural "%(count)d student accounts were unlocked."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(count)d Teilnehmerkonto wurde entsperrt."
+msgstr[1] "%(count)d Teilnehmerkonten wurden entsperrt."
 
 #: common/djangoapps/student/admin.py
 #, python-brace-format
@@ -556,78 +556,6 @@ msgstr "Die E-Mail hat keinen {domain_name} Domainnamen."
 #: common/djangoapps/student/admin.py
 msgid "User with this email doesn't exist in system."
 msgstr "Benutzer mit dieser E-Mail existiert nicht im System."
-
-#: common/djangoapps/student/forms.py
-msgid "Full Name cannot contain the following characters: < >"
-msgstr "Der vollständige Name darf folgende Zeichen nicht enthalten: < >"
-
-#: common/djangoapps/student/forms.py
-msgid "A properly formatted e-mail is required"
-msgstr "Eine korrekt formatierte E-Mail-Adresse ist nötig."
-
-#: common/djangoapps/student/forms.py
-msgid "Your legal name must be a minimum of one character long"
-msgstr "Dein Name muss mindestens ein Zeichen lang sein."
-
-#: common/djangoapps/student/forms.py
-#, python-format
-msgid "Email cannot be more than %(limit_value)s characters long"
-msgstr ""
-"Die E-Mail Adresse darf nicht länger als %(limit_value)s Zeichen sein."
-
-#: common/djangoapps/student/forms.py
-msgid "You must accept the terms of service."
-msgstr "Es ist erforderlich, dass Sie die Nutzungsbedingungen akzeptieren."
-
-#: common/djangoapps/student/forms.py
-msgid "A level of education is required"
-msgstr "Die Angabe des Bildungsstands ist nötig"
-
-#: common/djangoapps/student/forms.py
-msgid "Your gender is required"
-msgstr "Die Angabe Ihres Geschlechts ist erforderlich"
-
-#: common/djangoapps/student/forms.py
-msgid "Your year of birth is required"
-msgstr "Ihr Geburtsjahr ist erforderlich"
-
-#: common/djangoapps/student/forms.py
-msgid "Your mailing address is required"
-msgstr "Ihre Postanschrift ist erforderlich"
-
-#: common/djangoapps/student/forms.py
-msgid "A description of your goals is required"
-msgstr "Eine Beschreibung Ihrer Ziele ist nötig"
-
-#: common/djangoapps/student/forms.py
-msgid "A city is required"
-msgstr "Eine Angabe zu Stadt ist erforderlich"
-
-#: common/djangoapps/student/forms.py
-msgid "A country is required"
-msgstr "Ein Angabe zu Land ist notwendig"
-
-#: common/djangoapps/student/forms.py
-msgid "To enroll, you must follow the honor code."
-msgstr "Um sich einzuschreiben, müssen Sie den Verhaltenskodex befolgen."
-
-#: common/djangoapps/student/forms.py
-msgid "You are missing one or more required fields"
-msgstr "Du hast ein oder mehrere benötigte Felder ausgelassen"
-
-#: common/djangoapps/student/forms.py
-msgid "Unauthorized email address."
-msgstr "Unautorisierte E-Mail-Adresse."
-
-#: common/djangoapps/student/forms.py
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid ""
-"It looks like {email} belongs to an existing account. Try again with a "
-"different email address."
-msgstr ""
-"Es scheint, dass {email} bereits einem anderen Konto zugeordnet ist. "
-"Versuchen Sie ein mit einer anderen E-Mail-Adresse noch einmal."
 
 #: common/djangoapps/student/helpers.py
 #, python-brace-format
@@ -1095,6 +1023,16 @@ msgstr "Die alte E-Mail-Adresse ist identisch mit der neuen."
 #: common/djangoapps/student/views/management.py
 msgid "Cannot be same as your sign in email address."
 msgstr "Kann nicht die gleiche sein, wie Ihre Anmelde-E-Mail-Adresse."
+
+#: common/djangoapps/student/views/management.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid ""
+"It looks like {email} belongs to an existing account. Try again with a "
+"different email address."
+msgstr ""
+"Es scheint, dass {email} bereits einem anderen Konto zugeordnet ist. "
+"Versuchen Sie ein mit einer anderen E-Mail-Adresse noch einmal."
 
 #: common/djangoapps/student/views/management.py
 msgid "Unable to send email activation link. Please try again later."
@@ -1596,8 +1534,8 @@ msgstr "Dezember"
 msgid "The file must end with the extension '{file_types}'."
 msgid_plural ""
 "The file must end with one of the following extensions: '{file_types}'."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Die Dateiendung muss folgende sein: '{file_types}'."
+msgstr[1] "Die Dateiendungen müssen folgende sein: '{file_types}'."
 
 #: common/djangoapps/util/file.py
 #, python-brace-format
@@ -3158,7 +3096,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Video Upload Credentials"
-msgstr ""
+msgstr "Daten des hochgeladenen Videos"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -5378,7 +5316,7 @@ msgstr ""
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
 msgid "Account Activation"
-msgstr ""
+msgstr "Kontoaktivierung"
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
 #: common/templates/student/edx_ace/accountactivation/email/body.txt
@@ -5388,16 +5326,20 @@ msgid ""
 "engaging, high-quality %(platform_name)s courses. Note that you will not be "
 "able to log back into your account until you have activated it."
 msgstr ""
+"Fast geschafft! Nutzen Sie den nachfolgenden Link, um Ihr Benutzerkonto zu "
+"aktivieren und die qualitativ hochwertigen Kurse der %(platform_name)s zu "
+"belegen. Bitte beachten Sie, dass Sie sich erst in die Plattform einloggen "
+"können, nachdem Sie Ihr Benutzerkonto erfolgreich aktiviert haben."
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
 msgid "Activate Your Account"
-msgstr ""
+msgstr "Aktivieren Sie Ihr Konto"
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
 #: common/templates/student/edx_ace/accountactivation/email/body.txt
 #, python-format
 msgid "Enjoy learning with %(platform_name)s."
-msgstr ""
+msgstr "Viel Spaß beim Lernen mit %(platform_name)s."
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
 #, python-format, python-brace-format
@@ -5406,6 +5348,9 @@ msgid ""
 "{start_anchor_web}%(support_url)s{end_anchor} or email "
 "{start_anchor_email}%(support_email)s{end_anchor}."
 msgstr ""
+"Wenn Sie Hilfe benötigen, verwenden Sie bitte unser Webformular auf "
+"{start_anchor_web}%(support_url)s{end_anchor} oder senden Sie eine E-Mail an"
+" {start_anchor_email}%(support_email)s{end_anchor}."
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
 #: common/templates/student/edx_ace/accountactivation/email/body.txt
@@ -5415,6 +5360,9 @@ msgid ""
 "attempted to create an account on %(platform_name)s using this email "
 "address."
 msgstr ""
+"Diese E-Mail-Nachricht wurde automatisch von %(lms_url)s gesendet, weil "
+"jemand versucht hat, ein %(platform_name)s Konto mit dieser E-Mail-Adresse "
+"zu erstellen."
 
 #: common/templates/student/edx_ace/accountactivation/email/body.txt
 #, python-format
@@ -5422,11 +5370,13 @@ msgid ""
 "If you need help, please use our web form at %(support_url)s or email "
 "%(support_email)s."
 msgstr ""
+"Wenn Sie Hilfe benötigen, verwenden Sie bitte unser Webformular auf "
+"%(support_url)s oder senden Sie eine E-Mail an %(support_email)s."
 
 #: common/templates/student/edx_ace/accountactivation/email/subject.txt
 #, python-format
 msgid "Action Required: Activate your %(platform_name)s account"
-msgstr ""
+msgstr "Bitte aktivieren Sie Ihr Konto für %(platform_name)s"
 
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 msgid "Create Password"
@@ -6963,7 +6913,7 @@ msgstr "Jährliches Haushaltseinkommen"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Use between 1250 and 2500 characters or so in your response."
-msgstr ""
+msgstr "Verwenden Sie in Ihrer Antwort zwischen 1250 und 2500 Zeichen."
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
@@ -7302,22 +7252,28 @@ msgstr ""
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru send template to use on enrolling for audit. "
 msgstr ""
+"Sailthru Vorlage zur Verwendung bei der Einschreibung von Benutzern im "
+"Gasthörermodus."
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru send template to use on passed ID verification."
 msgstr ""
+"Sailthru Vorlage zur Verwendung bei erfolgreicher Verifizierung der ID."
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru send template to use on failed ID verification."
 msgstr ""
+"Sailthru Vorlage zur Verwendung bei fehlgeschlagener Verifizierung der ID."
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru send template to use on upgrading a course. Deprecated "
 msgstr ""
+"Sailthru Vorlage zur Verwendung bei Aktualisierung eines Kurses. Veraltet"
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru send template to use on purchasing a course seat. Deprecated "
 msgstr ""
+"Sailthru Vorlage zur Verwendung bei Bestellung eines Kursplatzes. Veraltet"
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Use the Sailthru content API to fetch course tags."
@@ -7407,7 +7363,7 @@ msgstr "TBD"
 #: lms/djangoapps/instructor/services.py
 #, python-brace-format
 msgid "Proctored Exam Review: {review_status}"
-msgstr ""
+msgstr "Durchsicht der Aufgezeichneten Prüfung: {review_status}"
 
 #: lms/djangoapps/instructor/services.py
 #, python-brace-format
@@ -7418,7 +7374,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/settings/common.py
 msgid "Your Platform Insights"
-msgstr ""
+msgstr "Ihre Plattform-Informationen"
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -7548,7 +7504,7 @@ msgstr ""
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "enrolled learner profile"
-msgstr ""
+msgstr "Profil eines eingeschriebenen Teilnehmers"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
@@ -7619,6 +7575,14 @@ msgstr "Einschreibungsmodus"
 #: lms/djangoapps/instructor/views/api.py
 msgid "Verification Status"
 msgstr "Status der Verifikation"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Last Login"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Date Joined"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
@@ -7722,7 +7686,7 @@ msgstr "detaillierte Einschreibung"
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "executive summary"
-msgstr ""
+msgstr "Kurzfassung"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
@@ -8152,15 +8116,15 @@ msgstr "0 verschickt"
 #, python-brace-format
 msgid "{num_emails} sent"
 msgid_plural "{num_emails} sent"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num_emails} gesendet"
+msgstr[1] "{num_emails} gesendet"
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 #, python-brace-format
 msgid "{num_emails} failed"
 msgid_plural "{num_emails} failed"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num_emails} zurückgestellt"
+msgstr[1] "{num_emails} zurückgestellt"
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "Complete"
@@ -8230,8 +8194,7 @@ msgstr ""
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: cms/templates/register.html lms/templates/signup_modal.html
-#: lms/templates/sysadmin_dashboard.html
+#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
@@ -8358,7 +8321,7 @@ msgstr "Zertifikate erstellt"
 #. {attempted} so far"
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "cohorted"
-msgstr ""
+msgstr "cohortet"
 
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
@@ -8406,7 +8369,7 @@ msgstr "Aktuell eingeschrieben"
 
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Enrollment Source"
-msgstr ""
+msgstr "Einschreibequelle "
 
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Manual (Un)Enrollment Reason"
@@ -8414,7 +8377,7 @@ msgstr "Grund für die Manuelle (Ein-) oder Ausschreibung"
 
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Enrollment Role"
-msgstr ""
+msgstr "Einschreiberolle"
 
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "List Price"
@@ -8651,7 +8614,7 @@ msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "Course Chrome"
-msgstr ""
+msgstr "Kurs Chrome"
 
 #. Translators: DO NOT translate the words in quotes here, they are
 #. specific words for the acceptable values.
@@ -9544,12 +9507,13 @@ msgstr "Ansehen, erstellen und bearbeiten der Teilnehmer Berechtigungen"
 #: lms/djangoapps/support/views/index.py
 #: lms/templates/support/feature_based_enrollments.html
 msgid "Feature Based Enrollments"
-msgstr ""
+msgstr "Zukunftsbasierte Einschreibungen"
 
 #: lms/djangoapps/support/views/index.py
 msgid "View feature based enrollment settings"
 msgstr ""
 
+#: lms/djangoapps/support/views/index.py
 #: lms/templates/support/link_program_enrollments.html
 msgid "Link Program Enrollments"
 msgstr "Verlinke Programmeinschreibungen"
@@ -9632,13 +9596,13 @@ msgid "Teams"
 msgstr "Teams"
 
 #: lms/djangoapps/teams/views.py
+msgid "course_id must be provided"
+msgstr "course_id muss zur Verfügung gestellt werden"
+
+#: lms/djangoapps/teams/views.py
 #, python-brace-format
 msgid "The supplied course id {course_id} is not valid."
 msgstr "Die angegebene Kurs-ID {course_id} ist nicht gültig."
-
-#: lms/djangoapps/teams/views.py
-msgid "course_id must be provided"
-msgstr "course_id muss zur Verfügung gestellt werden"
 
 #: lms/djangoapps/teams/views.py
 msgid "text_search and order_by cannot be provided together"
@@ -9670,6 +9634,10 @@ msgstr "Die angegebene Kurs-ID {course_id} ist nicht gültig."
 #: lms/djangoapps/teams/views.py
 msgid "You are already in a team in this course."
 msgstr "Sie sind bereits in dem Team des Kurses."
+
+#: lms/djangoapps/teams/views.py
+msgid "You can't create a team in an instructor managed topic."
+msgstr ""
 
 #: lms/djangoapps/teams/views.py
 msgid "username or team_id must be specified."
@@ -10267,9 +10235,6 @@ msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
 #: openedx/core/djangoapps/user_api/admin.py
-#: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: cms/templates/videos_index_pagination.html
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -10852,8 +10817,7 @@ msgstr "Zur %(platform_name)s Startseite gehen"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: cms/templates/login.html cms/templates/widgets/header.html
-#: themes/red-theme/cms/templates/login.html
+#: cms/templates/widgets/header.html
 msgid "Sign In"
 msgstr "Anmelden"
 
@@ -10901,6 +10865,10 @@ msgstr "Laden Sie die Android App aus dem Google Play Store herunter"
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr "Unsere Postanschrift lautet"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+msgid "Unsubscribe from these emails."
+msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_head.html
 msgid "edX Email"
@@ -11241,7 +11209,7 @@ msgstr "{first_providers}, und {last_provider}"
 #: openedx/core/djangoapps/credit/exceptions.py
 #, python-brace-format
 msgid "[{username}] is not eligible for credit for [{course_key}]."
-msgstr ""
+msgstr "[{username}] hat keinen Anspruch auf Credits für [{course_key}]."
 
 #: openedx/core/djangoapps/credit/exceptions.py
 #, python-brace-format
@@ -12271,6 +12239,8 @@ msgid ""
 "As an {allowed_domain} user, You must login with your {allowed_domain} "
 "{provider} account."
 msgstr ""
+"Als {allowed_domain} Benutzer müssen Sie sich mit Ihrem "
+"{allowed_domain}{provider} Konto anmelden."
 
 #. Translators: This example email address is used as a placeholder in
 #. a field on the login form meant to hold the user's email address.
@@ -12372,6 +12342,68 @@ msgstr ""
 msgid "The provided access_token is not valid."
 msgstr "Der angegebene access_token ist ungültig."
 
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Full Name cannot contain the following characters: < >"
+msgstr "Der vollständige Name darf folgende Zeichen nicht enthalten: < >"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A properly formatted e-mail is required"
+msgstr "Eine korrekt formatierte E-Mail-Adresse ist nötig."
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your legal name must be a minimum of one character long"
+msgstr "Dein Name muss mindestens ein Zeichen lang sein."
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-format
+msgid "Email cannot be more than %(limit_value)s characters long"
+msgstr ""
+"Die E-Mail Adresse darf nicht länger als %(limit_value)s Zeichen sein."
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "You must accept the terms of service."
+msgstr "Es ist erforderlich, dass Sie die Nutzungsbedingungen akzeptieren."
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A level of education is required"
+msgstr "Die Angabe des Bildungsstands ist nötig"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your gender is required"
+msgstr "Die Angabe Ihres Geschlechts ist erforderlich"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your year of birth is required"
+msgstr "Ihr Geburtsjahr ist erforderlich"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your mailing address is required"
+msgstr "Ihre Postanschrift ist erforderlich"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A description of your goals is required"
+msgstr "Eine Beschreibung Ihrer Ziele ist nötig"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A city is required"
+msgstr "Eine Angabe zu Stadt ist erforderlich"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A country is required"
+msgstr "Ein Angabe zu Land ist notwendig"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "To enroll, you must follow the honor code."
+msgstr "Um sich einzuschreiben, müssen Sie den Verhaltenskodex befolgen."
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "You are missing one or more required fields"
+msgstr "Du hast ein oder mehrere benötigte Felder ausgelassen"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Unauthorized email address."
+msgstr "Unautorisierte E-Mail-Adresse."
+
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's email address.
@@ -12390,7 +12422,7 @@ msgstr "Dieser Name erscheint auf allen Zertifikaten, die Sie erwerben."
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's public username.
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: cms/templates/register.html lms/templates/signup_modal.html
+#: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Public Username"
@@ -12545,7 +12577,7 @@ msgstr "%(min_score)sist kein gültiger Notenprozentsatz"
 #: openedx/core/lib/gating/api.py
 #, python-brace-format
 msgid "Gating milestone for {usage_key}"
-msgstr ""
+msgstr "Meilenstein für {usage_key}"
 
 #: openedx/core/lib/license/mixin.py
 msgid "License"
@@ -13796,55 +13828,11 @@ msgstr "Kurslaufzeit:"
 msgid "Courses"
 msgstr "Meine Kurse"
 
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Sign In to {studio_name}"
-msgstr "Bei {studio_name} anmelden"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr "Sie haben kein {studio_name} Nutzerkonto? Registrieren Sie sich!"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Required Information to Sign In to {studio_name}"
-msgstr "Benötigte Informationen um sich auf {studio_name} zu registrieren"
-
-#: cms/templates/login.html cms/templates/register.html
-#: lms/templates/provider_login.html lms/templates/signup_modal.html
-#: themes/red-theme/cms/templates/login.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "E-mail"
-msgstr "E-Mail"
-
-#. Translators: This is the placeholder text for a field that requests an
-#. email
-#. address.
-#: cms/templates/login.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html cms/templates/register.html
-#: themes/red-theme/cms/templates/login.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr "Beispiel: benutzername@domain.com"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Forgot password?"
-msgstr "Passwort vergessen?"
-
-#. Translators: This is the placeholder text for a field that requests the
-#. user's full name.
-#: cms/templates/register.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "example: Jane Doe"
-msgstr "Beispiel: Susi Sorglos"
-
-#. Translators: This is the placeholder text for a field that asks the user to
-#. pick a username
-#: cms/templates/register.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "example: JaneDoe"
-msgstr "Beispiel: SusiSo"
 
 #: cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
@@ -14647,6 +14635,12 @@ msgstr ""
 "{destination} geschickt. Die Sammlung und Nutzung der Informationen wird "
 "durch die Nutzungsbedingungen und Datenschutzrichtlinien geregelt. "
 
+#: lms/templates/provider_login.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "E-mail"
+msgstr "E-Mail"
+
 #: lms/templates/provider_login.html
 #, python-format
 msgid "Return To %s"
@@ -15025,7 +15019,7 @@ msgstr "Es wurden keine Git-Importprotokolle für diesen Kurs aufgezeichnet."
 
 #: lms/templates/text-me-the-app.html
 msgid "Text Me The App"
-msgstr ""
+msgstr "Schicken Sie mir die App per SMS"
 
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
@@ -15948,6 +15942,34 @@ msgid "Enter a username to view catalogs belonging to that user."
 msgstr ""
 "Geben Sie einen Nutzernamen ein, um zu sehen, welche Kataloge zugehörig "
 "sind."
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Unsubscribe Successful"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Unsubscribe Cancelled"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Confirm Unsubscribe"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "You have been unsubscribed from emails for {course}."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "You have not been unsubscribed from emails for {course}."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Do you want to unsubscribe from emails for {course}?"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Unsubscribe"
+msgstr ""
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Open Calculator"
@@ -22214,10 +22236,19 @@ msgid "Please complete the following fields to register for an account. "
 msgstr "Bitte füllen Sie die folgenden Felder aus, um ein Konto zu erstellen."
 
 #: themes/stanford-style/lms/templates/register-form.html
+msgid "example: Jane Doe"
+msgstr "Beispiel: Susi Sorglos"
+
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Your legal name, used for any certificates you earn."
 msgstr ""
 "Ihr vollständiger Name, der auch auf den Teilnahmezertifikaten erscheinen "
 "wird."
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "example: JaneDoe"
+msgstr "Beispiel: SusiSo"
 
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -22466,62 +22497,6 @@ msgstr ""
 msgid "Studio Accessibility Policy"
 msgstr "Zugangsrichtlinien für Studio"
 
-#: cms/templates/activation_active.html cms/templates/activation_complete.html
-#: cms/templates/activation_invalid.html
-msgid "{studio_name} Account Activation"
-msgstr "{studio_name}-Kontoaktivierung"
-
-#: cms/templates/activation_active.html
-msgid "Your account is already active"
-msgstr "Ihr Konto ist bereits aktiv"
-
-#: cms/templates/activation_active.html
-msgid ""
-"This account, set up using {email}, has already been activated. Please sign "
-"in to start working within {studio_name}."
-msgstr ""
-"Dieses Konto wurde bereits durch {email} aktiviert. Bitte loggen Sie sich in"
-" {studio_name} ein um mit Ihrer Arbeit zu beginnen."
-
-#: cms/templates/activation_active.html cms/templates/activation_complete.html
-msgid "Sign into {studio_name}"
-msgstr "Loggen Sie sich in {studio_name} ein"
-
-#: cms/templates/activation_complete.html
-msgid "Your account activation is complete!"
-msgstr "Ihr Konto wurde aktivert!"
-
-#: cms/templates/activation_complete.html
-msgid ""
-"Thank you for activating your account. You may now sign in and start using "
-"{studio_name} to author courses."
-msgstr ""
-"Vielen Dank für die Aktivierung Ihres Kontos. Nun können Sie sich anmelden "
-"und Kurse in {studio_name} erstellen."
-
-#: cms/templates/activation_invalid.html
-msgid "Your account activation is invalid"
-msgstr "Ihre Kontoaktivierung ist ungültig"
-
-#: cms/templates/activation_invalid.html
-msgid ""
-"We're sorry. Something went wrong with your activation. Check to make sure "
-"the URL you went to was correct, as e-mail programs will sometimes split it "
-"into two lines."
-msgstr ""
-"Entschuldigung. Etwas ist bei der Aktivierung schiefgegangen. Überprüfen Sie"
-" ob die URL korrekt war, da E-Mail Programme diese manchmal in zwei Zeilen "
-"aufteilen."
-
-#: cms/templates/activation_invalid.html
-msgid ""
-"If you still have issues, contact {platform_name} Support. In the meantime, "
-"you can also return to {link_start}the {studio_name} homepage.{link_end}"
-msgstr ""
-"Wenn Sie weiterhin Probleme haben, kontaktieren sie bitte {platform_name} "
-"Support. In der Zwischenzeit können sie zurückkehren auf {link_start} die "
-"Startseite von {studio_name}. {link_end}"
-
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
 msgid "Files & Uploads"
 msgstr "Dateien & Uploads"
@@ -22758,6 +22733,8 @@ msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
 "\"/jump_to_id/<location ID>\" as the URL value."
 msgstr ""
+"Um in diesem Kurs einen Link zu dieser Lerneinheit aus einer HTML-Komponente"
+" zu erstellen, geben Sie als URL-Wert \"/jump_to_id/<location ID>\" ein."
 
 #: cms/templates/course-create-rerun.html
 msgid "Create a Course Rerun of:"
@@ -22846,6 +22823,9 @@ msgid ""
 "(This number will be the same as the original course number and cannot be "
 "changed.)"
 msgstr ""
+"Die individuelle Nummer, die den neuen Kurs innerhalb des Unternehmens "
+"identifiziert. (Diese Nummer entspricht der ursprünglichen Kursnummer und "
+"kann nicht geändert werden.)"
 
 #. Translators: This is an example for the "run" used to identify different
 #. instances of a course, seen when filling out the form to create a new
@@ -22941,6 +22921,11 @@ msgid ""
 "the course team; review course updates and other assets for dated material; "
 "and seed the discussions and wiki."
 msgstr ""
+"Derzeit sind keine Kursinhalte sichtbar und es werden keine Lernenden "
+"angemeldet. Achten Sie darauf, alle Daten zu überprüfen und zurückzusetzen, "
+"einschließlich des Kursstartdatums, das Kursteam einzurichten, Kursupdates "
+"und andere Ressourcen auf datiertes Material zu überprüfen und die "
+"Diskussionen und das Wiki zu erstellen."
 
 #: cms/templates/course_outline.html
 msgid "This course uses features that are no longer supported."
@@ -23145,6 +23130,9 @@ msgid ""
 "(Home, Course, Discussion, Wiki, and Progress) are followed by textbooks and"
 " custom pages that you create."
 msgstr ""
+"Die Seiten werden horizontal am oberen Rand des Kurses aufgelistet. "
+"Standardseiten (Home, Kurs, Diskussion, Wiki und Fortschritt) werden von "
+"Lehrbüchern und benutzerdefinierten Seiten gefolgt, die Sie erstellen."
 
 #: cms/templates/edit-tabs.html
 msgid "Custom pages"
@@ -24683,99 +24671,6 @@ msgid ""
 " library."
 msgstr ""
 
-#: cms/templates/register.html cms/templates/widgets/header.html
-msgid "Sign Up"
-msgstr "Registrieren"
-
-#: cms/templates/register.html
-msgid "Sign Up for {studio_name}"
-msgstr "Melden Sie sich an für {studio_name}"
-
-#: cms/templates/register.html
-msgid "Already have a {studio_name} Account? Sign in"
-msgstr "Haben Sie bereits einen {studio_name} Account? Einloggen"
-
-#: cms/templates/register.html
-msgid ""
-"Ready to start creating online courses? Sign up below and start creating "
-"your first {platform_name} course today."
-msgstr ""
-
-#: cms/templates/register.html
-msgid "Required Information to Sign Up for {studio_name}"
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"This will be used in public discussions with your courses and in our edX101 "
-"support forums"
-msgstr ""
-"Dies wird in öffentlichen Diskussionen in Ihren Kursen und in unseren edX101"
-" Supportforen benutzt"
-
-#: cms/templates/register.html
-msgid "Your Location"
-msgstr "Ihr Ort"
-
-#: cms/templates/register.html
-msgid "Preferred Language"
-msgstr "Bevorzugte Sprache"
-
-#: cms/templates/register.html
-msgid "I agree to the {a_start} Terms of Service {a_end}"
-msgstr "Ich bin mit den {a_start} Nutzungsbedingungen {a_end} einverstanden"
-
-#: cms/templates/register.html
-msgid "Create My Account &amp; Start Authoring Courses"
-msgstr "Erstelle mein Konto &amp; Kurserstellung starten"
-
-#: cms/templates/register.html
-msgid "Common {studio_name} Questions"
-msgstr "Häufige {studio_name} Fragen"
-
-#: cms/templates/register.html
-msgid "Who is {studio_name} for?"
-msgstr "Für wen ist {studio_name}?"
-
-#: cms/templates/register.html
-msgid ""
-"{studio_name} is for anyone that wants to create online courses that "
-"leverage the global {platform_name} platform. Our users are often faculty "
-"members, teaching assistants and course staff, and members of instructional "
-"technology groups."
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"How technically savvy do I need to be to create courses in {studio_name}?"
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"{studio_name} is designed to be easy to use by almost anyone familiar with "
-"common web-based authoring environments (Wordpress, Moodle, etc.). No "
-"programming knowledge is required, but for some of the more advanced "
-"features, a technical background would be helpful. As always, we are here to"
-" help, so don't hesitate to dive right in."
-msgstr ""
-
-#: cms/templates/register.html
-msgid "I've never authored a course online before. Is there help?"
-msgstr "Ich habe noch nie einen Onlinekurs erstellt. Gibt es Hilfe?"
-
-#: cms/templates/register.html
-msgid ""
-"Absolutely. We have created an online course, edX101, that describes some "
-"best practices: from filming video, creating exercises, to the basics of "
-"running an online course. Additionally, we're always here to help, just drop"
-" us a note."
-msgstr ""
-"Genau! Wir haben einen Onlinekurs erstellt, edX101, der einige der besten "
-"Vorgehensweisen beschreibt: vom Filmen von Videos, dem Erstellen von "
-"Übungsaufgaben, hin zu den Grundlagen wie man einem Onlinekurs zum Laufen "
-"bekommt. Zusätzlich sind wir immer da um zu helfen, schreib uns einfach eine"
-" Nachricht."
-
 #: cms/templates/settings.html
 msgid "Schedule & Details Settings"
 msgstr "Terminplan & Details Einstellungen"
@@ -25745,14 +25640,6 @@ msgstr ""
 msgid "Return to the {link_start}home page{link_end}."
 msgstr "Zurück zur {link_start}Startseite{link_end}."
 
-#: cms/templates/registration/reg_complete.html
-msgid ""
-"We've sent an email message to {email} with instructions for activating your"
-" account."
-msgstr ""
-"Wir haben eine E-Mail mit Anweisungen zur Kontoaktivierung an {email} "
-"geschickt."
-
 #: cms/templates/widgets/footer.html
 msgid "Policies"
 msgstr "Richtlinien"
@@ -25804,6 +25691,10 @@ msgstr "Benutzerkontodaten"
 #: cms/templates/widgets/header.html
 msgid "Contextual Online Help"
 msgstr "Kontextbezogene Online-Hilfe"
+
+#: cms/templates/widgets/header.html
+msgid "Sign Up"
+msgstr "Registrieren"
 
 #: cms/templates/widgets/metadata-edit.html
 msgid "Launch Latex Source Compiler"
