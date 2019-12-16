@@ -24,7 +24,7 @@ class TeamsServiceTests(ModuleStoreTestCase):
         # edx.org/courses/blah/teams/#teams/topic_id/team_id
         team_detail_url = self.service.get_team_detail_url(self.team)
         split_url = team_detail_url.split('/')
-        self.assertEquals(
+        self.assertEqual(
             split_url[1:],
             [
                 'courses',
