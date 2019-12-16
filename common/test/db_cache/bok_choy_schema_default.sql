@@ -172,6 +172,36 @@ CREATE TABLE `assessment_criterionoption` (
   CONSTRAINT `assessment_criterion_criterion_id_53928be7_fk_assessmen` FOREIGN KEY (`criterion_id`) REFERENCES `assessment_criterion` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `assessment_historicalsharedfileupload`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `assessment_historicalsharedfileupload` (
+  `id` int(11) NOT NULL,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `team_id` varchar(255) NOT NULL,
+  `course_id` varchar(255) NOT NULL,
+  `item_id` varchar(255) NOT NULL,
+  `owner_id` varchar(255) NOT NULL,
+  `file_key` varchar(255) NOT NULL,
+  `description` longtext NOT NULL,
+  `size` bigint(20) NOT NULL,
+  `history_id` int(11) NOT NULL AUTO_INCREMENT,
+  `history_date` datetime(6) NOT NULL,
+  `history_change_reason` varchar(100) DEFAULT NULL,
+  `history_type` varchar(1) NOT NULL,
+  `history_user_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`history_id`),
+  KEY `assessment_historica_history_user_id_28fa87d9_fk_auth_user` (`history_user_id`),
+  KEY `assessment_historicalsharedfileupload_id_34052991` (`id`),
+  KEY `assessment_historicalsharedfileupload_team_id_e32268e1` (`team_id`),
+  KEY `assessment_historicalsharedfileupload_course_id_7fd70b9d` (`course_id`),
+  KEY `assessment_historicalsharedfileupload_item_id_b7bca199` (`item_id`),
+  KEY `assessment_historicalsharedfileupload_owner_id_09b09e30` (`owner_id`),
+  KEY `assessment_historicalsharedfileupload_file_key_03fbd3e7` (`file_key`),
+  CONSTRAINT `assessment_historica_history_user_id_28fa87d9_fk_auth_user` FOREIGN KEY (`history_user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `assessment_peerworkflow`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -228,6 +258,28 @@ CREATE TABLE `assessment_rubric` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `content_hash` (`content_hash`),
   KEY `assessment_rubric_structure_hash_fb456373` (`structure_hash`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `assessment_sharedfileupload`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `assessment_sharedfileupload` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `team_id` varchar(255) NOT NULL,
+  `course_id` varchar(255) NOT NULL,
+  `item_id` varchar(255) NOT NULL,
+  `owner_id` varchar(255) NOT NULL,
+  `file_key` varchar(255) NOT NULL,
+  `description` longtext NOT NULL,
+  `size` bigint(20) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `file_key` (`file_key`),
+  KEY `assessment_sharedfileupload_team_id_dbdd3cb7` (`team_id`),
+  KEY `assessment_sharedfileupload_course_id_73edb775` (`course_id`),
+  KEY `assessment_sharedfileupload_item_id_b471d0c9` (`item_id`),
+  KEY `assessment_sharedfileupload_owner_id_f4d7fe4f` (`owner_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `assessment_staffworkflow`;
@@ -366,7 +418,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `auth_permission_content_type_id_codename_01ab375a_uniq` (`content_type_id`,`codename`),
   CONSTRAINT `auth_permission_content_type_id_2f476e4b_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2384 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2390 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2448,7 +2500,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_model_76bd3d3b_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=792 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=794 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2459,7 +2511,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=625 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=626 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
