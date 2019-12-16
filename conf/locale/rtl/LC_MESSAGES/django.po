@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-12-08 20:52+0000\n"
-"PO-Revision-Date: 2019-12-08 20:52:13.683378\n"
+"POT-Creation-Date: 2019-12-16 11:18+0000\n"
+"PO-Revision-Date: 2019-12-16 11:18:39.247260\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -7164,6 +7164,14 @@ msgid "Verification Status"
 msgstr "دثقهبهذشفهخر سفشفعس"
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Last Login"
+msgstr "مشسف مخلهر"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Date Joined"
+msgstr "يشفث تخهرثي"
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
 msgstr "ذخاخقف"
 
@@ -9769,6 +9777,7 @@ msgstr ""
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/videos_index_pagination.html
+#: lms/templates/bulk_email/unsubscribe.html
 msgid "Cancel"
 msgstr "ذشرذثم"
 
@@ -10389,6 +10398,10 @@ msgstr "يخصرمخشي فاث شريقخهي شحح خر فاث لخخلمث �
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr "خعق وشهمهرل شييقثسس هس"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+msgid "Unsubscribe from these emails."
+msgstr "عرسعزسذقهزث بقخو فاثسث ثوشهمس."
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_head.html
 msgid "edX Email"
@@ -15467,6 +15480,34 @@ msgstr "ذشفشمخل سثشقذا"
 #: lms/templates/api_admin/catalogs/search.html
 msgid "Enter a username to view catalogs belonging to that user."
 msgstr "ثرفثق ش عسثقرشوث فخ دهثص ذشفشمخلس زثمخرلهرل فخ فاشف عسثق."
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Unsubscribe Successful"
+msgstr "عرسعزسذقهزث سعذذثسسبعم"
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Unsubscribe Cancelled"
+msgstr "عرسعزسذقهزث ذشرذثممثي"
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Confirm Unsubscribe"
+msgstr "ذخربهقو عرسعزسذقهزث"
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "You have been unsubscribed from emails for {course}."
+msgstr "غخع اشدث زثثر عرسعزسذقهزثي بقخو ثوشهمس بخق {course}."
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "You have not been unsubscribed from emails for {course}."
+msgstr "غخع اشدث رخف زثثر عرسعزسذقهزثي بقخو ثوشهمس بخق {course}."
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Do you want to unsubscribe from emails for {course}?"
+msgstr "يخ غخع صشرف فخ عرسعزسذقهزث بقخو ثوشهمس بخق {course}?"
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Unsubscribe"
+msgstr "عرسعزسذقهزث"
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Open Calculator"

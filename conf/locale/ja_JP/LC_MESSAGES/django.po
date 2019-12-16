@@ -113,7 +113,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-12-01 20:42+0000\n"
+"POT-Creation-Date: 2019-12-15 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Japanese (Japan) (https://www.transifex.com/open-edx/teams/6205/ja_JP/)\n"
@@ -447,10 +447,8 @@ msgstr ""
 #: common/djangoapps/student/admin.py
 #: openedx/core/djangoapps/user_authn/views/login_form.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: cms/templates/login.html cms/templates/register.html
 #: lms/templates/provider_login.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
-#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "パスワード"
@@ -482,75 +480,6 @@ msgstr ""
 #: common/djangoapps/student/admin.py
 msgid "User with this email doesn't exist in system."
 msgstr ""
-
-#: common/djangoapps/student/forms.py
-msgid "Full Name cannot contain the following characters: < >"
-msgstr ""
-
-#: common/djangoapps/student/forms.py
-msgid "A properly formatted e-mail is required"
-msgstr "適切なフォーマットのメールが必要です"
-
-#: common/djangoapps/student/forms.py
-msgid "Your legal name must be a minimum of one character long"
-msgstr ""
-
-#: common/djangoapps/student/forms.py
-#, python-format
-msgid "Email cannot be more than %(limit_value)s characters long"
-msgstr "メールは%(limit_value)s文字以下にしてください"
-
-#: common/djangoapps/student/forms.py
-msgid "You must accept the terms of service."
-msgstr "利用規約に同意する必要があります。"
-
-#: common/djangoapps/student/forms.py
-msgid "A level of education is required"
-msgstr "学歴の入力が必要です"
-
-#: common/djangoapps/student/forms.py
-msgid "Your gender is required"
-msgstr "性別の入力が必要です"
-
-#: common/djangoapps/student/forms.py
-msgid "Your year of birth is required"
-msgstr "誕生年の入力が必要です"
-
-#: common/djangoapps/student/forms.py
-msgid "Your mailing address is required"
-msgstr "住所の入力が必要です"
-
-#: common/djangoapps/student/forms.py
-msgid "A description of your goals is required"
-msgstr "あなたの目標についての説明が必要です"
-
-#: common/djangoapps/student/forms.py
-msgid "A city is required"
-msgstr "市の入力が必要です"
-
-#: common/djangoapps/student/forms.py
-msgid "A country is required"
-msgstr "国の入力が必要です"
-
-#: common/djangoapps/student/forms.py
-msgid "To enroll, you must follow the honor code."
-msgstr "受講登録するには、倫理規定を遵守していただく必要があります。"
-
-#: common/djangoapps/student/forms.py
-msgid "You are missing one or more required fields"
-msgstr "必須項目のうち１つ以上入力できていません"
-
-#: common/djangoapps/student/forms.py
-msgid "Unauthorized email address."
-msgstr "許可されていないメールアドレスです。"
-
-#: common/djangoapps/student/forms.py
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid ""
-"It looks like {email} belongs to an existing account. Try again with a "
-"different email address."
-msgstr "この {email} は既存のアカウントに登録されているようです。他のメールアドレスを使って再操作してください。"
 
 #: common/djangoapps/student/helpers.py
 #, python-brace-format
@@ -975,6 +904,14 @@ msgstr "以前のメールアドレスと新しいメールが重複していま
 #: common/djangoapps/student/views/management.py
 msgid "Cannot be same as your sign in email address."
 msgstr ""
+
+#: common/djangoapps/student/views/management.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid ""
+"It looks like {email} belongs to an existing account. Try again with a "
+"different email address."
+msgstr "この {email} は既存のアカウントに登録されているようです。他のメールアドレスを使って再操作してください。"
 
 #: common/djangoapps/student/views/management.py
 msgid "Unable to send email activation link. Please try again later."
@@ -6680,6 +6617,14 @@ msgid "Verification Status"
 msgstr "認証ステータス"
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Last Login"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Date Joined"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
 msgstr "コホート"
 
@@ -7234,8 +7179,7 @@ msgstr "延長する期日は、元の期日以降でなければいけません
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: cms/templates/register.html lms/templates/signup_modal.html
-#: lms/templates/sysadmin_dashboard.html
+#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
@@ -8538,13 +8482,13 @@ msgid "Teams"
 msgstr "チーム"
 
 #: lms/djangoapps/teams/views.py
+msgid "course_id must be provided"
+msgstr "講座IDは必須です"
+
+#: lms/djangoapps/teams/views.py
 #, python-brace-format
 msgid "The supplied course id {course_id} is not valid."
 msgstr "提供された講座ID {course_id} が有効ではありません。"
-
-#: lms/djangoapps/teams/views.py
-msgid "course_id must be provided"
-msgstr "講座IDは必須です"
 
 #: lms/djangoapps/teams/views.py
 msgid "text_search and order_by cannot be provided together"
@@ -8576,6 +8520,10 @@ msgstr "提供された講座ID {course_id} が有効ではありません。"
 #: lms/djangoapps/teams/views.py
 msgid "You are already in a team in this course."
 msgstr "あなたは既にこの講座のチームに参加しています。"
+
+#: lms/djangoapps/teams/views.py
+msgid "You can't create a team in an instructor managed topic."
+msgstr ""
 
 #: lms/djangoapps/teams/views.py
 msgid "username or team_id must be specified."
@@ -9596,10 +9544,11 @@ msgstr ""
 msgid "Go to %(platform_name)s Home Page"
 msgstr ""
 
-#: cms/templates/login.html cms/templates/widgets/header.html
-#: themes/red-theme/cms/templates/login.html
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: cms/templates/widgets/header.html
 msgid "Sign In"
-msgstr "サインイン"
+msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
@@ -9644,6 +9593,10 @@ msgstr ""
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
+msgstr ""
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+msgid "Unsubscribe from these emails."
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_head.html
@@ -10933,6 +10886,67 @@ msgstr "入力されたaccess_tokenは既に別のユーザーと連動してい
 msgid "The provided access_token is not valid."
 msgstr "入力されたaccess_tokenは有効ではありません。"
 
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Full Name cannot contain the following characters: < >"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A properly formatted e-mail is required"
+msgstr "適切なフォーマットのメールが必要です"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your legal name must be a minimum of one character long"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-format
+msgid "Email cannot be more than %(limit_value)s characters long"
+msgstr "メールは%(limit_value)s文字以下にしてください"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "You must accept the terms of service."
+msgstr "利用規約に同意する必要があります。"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A level of education is required"
+msgstr "学歴の入力が必要です"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your gender is required"
+msgstr "性別の入力が必要です"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your year of birth is required"
+msgstr "誕生年の入力が必要です"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your mailing address is required"
+msgstr "住所の入力が必要です"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A description of your goals is required"
+msgstr "あなたの目標についての説明が必要です"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A city is required"
+msgstr "市の入力が必要です"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A country is required"
+msgstr "国の入力が必要です"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "To enroll, you must follow the honor code."
+msgstr "受講登録するには、倫理規定を遵守していただく必要があります。"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "You are missing one or more required fields"
+msgstr "必須項目のうち１つ以上入力できていません"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Unauthorized email address."
+msgstr "許可されていないメールアドレスです。"
+
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's email address.
@@ -10951,7 +10965,7 @@ msgstr "この名前は修了証に記載されます。"
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's public username.
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: cms/templates/register.html lms/templates/signup_modal.html
+#: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Public Username"
@@ -12195,55 +12209,11 @@ msgstr ""
 msgid "Courses"
 msgstr "講座"
 
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Sign In to {studio_name}"
-msgstr "{studio_name}にサインイン"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr "{studio_name}アカウントをお持ちでない？新規登録しよう！"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Required Information to Sign In to {studio_name}"
-msgstr "{studio_name}へのサインインに必要な情報"
-
-#: cms/templates/login.html cms/templates/register.html
-#: lms/templates/provider_login.html lms/templates/signup_modal.html
-#: themes/red-theme/cms/templates/login.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "E-mail"
-msgstr "メール"
-
-#. Translators: This is the placeholder text for a field that requests an
-#. email
-#. address.
-#: cms/templates/login.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html cms/templates/register.html
-#: themes/red-theme/cms/templates/login.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr "例: username@domain.com"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Forgot password?"
-msgstr "パスワードを忘れた方はこちら"
-
-#. Translators: This is the placeholder text for a field that requests the
-#. user's full name.
-#: cms/templates/register.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "example: Jane Doe"
-msgstr "例: 学校 太郎"
-
-#. Translators: This is the placeholder text for a field that asks the user to
-#. pick a username
-#: cms/templates/register.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "example: JaneDoe"
-msgstr "例: gacco"
 
 #: cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
@@ -13003,6 +12973,12 @@ msgid ""
 "service and privacy policy."
 msgstr ""
 "ユーザー名、メールアドレス、氏名は{destination}に送信されます。この情報収集や利用については利用規約およびプライバシーポリシーが適用されます。"
+
+#: lms/templates/provider_login.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "E-mail"
+msgstr "メール"
 
 #: lms/templates/provider_login.html
 #, python-format
@@ -14103,6 +14079,34 @@ msgstr "カタログの検索"
 #: lms/templates/api_admin/catalogs/search.html
 msgid "Enter a username to view catalogs belonging to that user."
 msgstr "ユーザー名を入力して、そのユーザーのカタログを見る。"
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Unsubscribe Successful"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Unsubscribe Cancelled"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Confirm Unsubscribe"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "You have been unsubscribed from emails for {course}."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "You have not been unsubscribed from emails for {course}."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Do you want to unsubscribe from emails for {course}?"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Unsubscribe"
+msgstr ""
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Open Calculator"
@@ -19775,8 +19779,17 @@ msgid "Please complete the following fields to register for an account. "
 msgstr "アカウント登録をするには下記項目の入力をお願いします。"
 
 #: themes/stanford-style/lms/templates/register-form.html
+msgid "example: Jane Doe"
+msgstr "例: 学校 太郎"
+
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Your legal name, used for any certificates you earn."
 msgstr "実名、修了証に使用します。"
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "example: JaneDoe"
+msgstr "例: gacco"
 
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -19991,55 +20004,6 @@ msgstr "もし不具合が解消されない場合は、{email_link}へメール
 #: cms/templates/accessibility.html
 msgid "Studio Accessibility Policy"
 msgstr ""
-
-#: cms/templates/activation_active.html cms/templates/activation_complete.html
-#: cms/templates/activation_invalid.html
-msgid "{studio_name} Account Activation"
-msgstr "{studio_name}のアカウント有効化"
-
-#: cms/templates/activation_active.html
-msgid "Your account is already active"
-msgstr "アカウントは既に有効になっています"
-
-#: cms/templates/activation_active.html
-msgid ""
-"This account, set up using {email}, has already been activated. Please sign "
-"in to start working within {studio_name}."
-msgstr "{email}を使用して設定したアカウントは既に有効化されています。{studio_name}で作業を開始するにはサインインしてください。"
-
-#: cms/templates/activation_active.html cms/templates/activation_complete.html
-msgid "Sign into {studio_name}"
-msgstr "{studio_name}にサインイン"
-
-#: cms/templates/activation_complete.html
-msgid "Your account activation is complete!"
-msgstr "アカウントが有効になりました！"
-
-#: cms/templates/activation_complete.html
-msgid ""
-"Thank you for activating your account. You may now sign in and start using "
-"{studio_name} to author courses."
-msgstr "アカウント登録ありがとうございます。さっそくサインインして、{studio_name}で講座を作成しましょう。"
-
-#: cms/templates/activation_invalid.html
-msgid "Your account activation is invalid"
-msgstr "アカウント登録が無効です"
-
-#: cms/templates/activation_invalid.html
-msgid ""
-"We're sorry. Something went wrong with your activation. Check to make sure "
-"the URL you went to was correct, as e-mail programs will sometimes split it "
-"into two lines."
-msgstr ""
-"申し訳ありませんが、有効化できませんでした。メールプログラムがURLを２行に分割してしまうことがありますので、今一度URL が正しいかご確認ください。"
-
-#: cms/templates/activation_invalid.html
-msgid ""
-"If you still have issues, contact {platform_name} Support. In the meantime, "
-"you can also return to {link_start}the {studio_name} homepage.{link_end}"
-msgstr ""
-"不具合が解消しない場合は "
-"{platform_name}サポートにお問い合わせください。その間、{link_start}{studio_name}ホームページ{link_end}に戻ることもできます。"
 
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
 msgid "Files & Uploads"
@@ -22066,96 +22030,6 @@ msgid ""
 msgstr ""
 "ライブラリ管理者は全ての編集権限を持っており、他のチームメンバーを追加したり削除することができます。ライブラリには管理者権限を持つユーザーが少なくとも１名必要です。"
 
-#: cms/templates/register.html cms/templates/widgets/header.html
-msgid "Sign Up"
-msgstr "登録"
-
-#: cms/templates/register.html
-msgid "Sign Up for {studio_name}"
-msgstr "{studio_name}に登録"
-
-#: cms/templates/register.html
-msgid "Already have a {studio_name} Account? Sign in"
-msgstr "既に{studio_name}のアカウントをお持ちの方はサインインをしてください"
-
-#: cms/templates/register.html
-msgid ""
-"Ready to start creating online courses? Sign up below and start creating "
-"your first {platform_name} course today."
-msgstr "オンライン講座作成を始める準備はできましたか？いますぐ登録をして、最初の{platform_name}講座を作成しましょう！"
-
-#: cms/templates/register.html
-msgid "Required Information to Sign Up for {studio_name}"
-msgstr "{studio_name}への登録に必要な情報"
-
-#: cms/templates/register.html
-msgid ""
-"This will be used in public discussions with your courses and in our edX101 "
-"support forums"
-msgstr "これはあなたの講座とedX101のサポートフォーラムの公開ディスカッションで使用されます"
-
-#: cms/templates/register.html
-msgid "Your Location"
-msgstr "現在地"
-
-#: cms/templates/register.html
-msgid "Preferred Language"
-msgstr "希望言語"
-
-#: cms/templates/register.html
-msgid "I agree to the {a_start} Terms of Service {a_end}"
-msgstr " {a_start}利用規約{a_end}に同意します"
-
-#: cms/templates/register.html
-msgid "Create My Account &amp; Start Authoring Courses"
-msgstr "アカウントを作成する&amp; 講座制作を開始する"
-
-#: cms/templates/register.html
-msgid "Common {studio_name} Questions"
-msgstr "{studio_name}でのよくある質問"
-
-#: cms/templates/register.html
-msgid "Who is {studio_name} for?"
-msgstr "{studio_name}はどんな人向け？"
-
-#: cms/templates/register.html
-msgid ""
-"{studio_name} is for anyone that wants to create online courses that "
-"leverage the global {platform_name} platform. Our users are often faculty "
-"members, teaching assistants and course staff, and members of instructional "
-"technology groups."
-msgstr ""
-"{studio_name}は{platform_name}プラットフォームでオンライン講座を作成したい方のためにあります。教員、ティーチングアシスタント、講座スタッフ、教育技術グループのメンバーなどがユーザーです。"
-
-#: cms/templates/register.html
-msgid ""
-"How technically savvy do I need to be to create courses in {studio_name}?"
-msgstr "{studio_name}で講座を作成するためには、どのような技術的知識が必要ですか？"
-
-#: cms/templates/register.html
-msgid ""
-"{studio_name} is designed to be easy to use by almost anyone familiar with "
-"common web-based authoring environments (Wordpress, Moodle, etc.). No "
-"programming knowledge is required, but for some of the more advanced "
-"features, a technical background would be helpful. As always, we are here to"
-" help, so don't hesitate to dive right in."
-msgstr ""
-"{studio_name}は、一般的なWeb制作環境 (WordpressやMoodleなど) "
-"をご存知の方なら誰でも使えるようにデザインされています。プログラミング知識は必要としませんが、高度な機能の中には技術的知識が助けになるものもあります。しかし、もちろん我々がお手伝いしますので、まずは始めてみましょう。"
-
-#: cms/templates/register.html
-msgid "I've never authored a course online before. Is there help?"
-msgstr "オンライン講座制作は初めてなのですが、ヘルプは用意されていますか？"
-
-#: cms/templates/register.html
-msgid ""
-"Absolutely. We have created an online course, edX101, that describes some "
-"best practices: from filming video, creating exercises, to the basics of "
-"running an online course. Additionally, we're always here to help, just drop"
-" us a note."
-msgstr ""
-"もちろんです。オンライン講座のお手本としてedX101を作成しました。映像撮影、問題の作成からオンライン講座を運営するにあたっての基本事項がわかります。また、スタッフもいますので、お気軽にお問合せください。"
-
 #: cms/templates/settings.html
 msgid "Schedule & Details Settings"
 msgstr "スケジュール＆詳細設定"
@@ -23073,12 +22947,6 @@ msgstr ""
 msgid "Return to the {link_start}home page{link_end}."
 msgstr "{link_start}ホームページ{link_end}へ戻ってください。"
 
-#: cms/templates/registration/reg_complete.html
-msgid ""
-"We've sent an email message to {email} with instructions for activating your"
-" account."
-msgstr "{email} にアカウント有効化の手順に関するメッセージを送信しました。"
-
 #: cms/templates/widgets/footer.html
 msgid "Policies"
 msgstr ""
@@ -23130,6 +22998,10 @@ msgstr "アカウント・ナビゲーション"
 #: cms/templates/widgets/header.html
 msgid "Contextual Online Help"
 msgstr "コンテキストによるオンラインヘルプ"
+
+#: cms/templates/widgets/header.html
+msgid "Sign Up"
+msgstr "登録"
 
 #: cms/templates/widgets/metadata-edit.html
 msgid "Launch Latex Source Compiler"

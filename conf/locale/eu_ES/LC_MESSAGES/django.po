@@ -63,7 +63,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-12-01 20:42+0000\n"
+"POT-Creation-Date: 2019-12-15 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Abel Camacho <abelcama@gmail.com>, 2019\n"
 "Language-Team: Basque (Spain) (https://www.transifex.com/open-edx/teams/6205/eu_ES/)\n"
@@ -393,10 +393,8 @@ msgstr ""
 #: common/djangoapps/student/admin.py
 #: openedx/core/djangoapps/user_authn/views/login_form.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: cms/templates/login.html cms/templates/register.html
 #: lms/templates/provider_login.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
-#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "Pasahitza"
@@ -428,75 +426,6 @@ msgstr ""
 
 #: common/djangoapps/student/admin.py
 msgid "User with this email doesn't exist in system."
-msgstr ""
-
-#: common/djangoapps/student/forms.py
-msgid "Full Name cannot contain the following characters: < >"
-msgstr ""
-
-#: common/djangoapps/student/forms.py
-msgid "A properly formatted e-mail is required"
-msgstr "Formatu egokia duen e-posta behar da"
-
-#: common/djangoapps/student/forms.py
-msgid "Your legal name must be a minimum of one character long"
-msgstr ""
-
-#: common/djangoapps/student/forms.py
-#, python-format
-msgid "Email cannot be more than %(limit_value)s characters long"
-msgstr "E-postak ezin du %(limit_value)s baino karaktere gehiago izan"
-
-#: common/djangoapps/student/forms.py
-msgid "You must accept the terms of service."
-msgstr "Zerbitzuaren baldintzak onartu behar dituzu."
-
-#: common/djangoapps/student/forms.py
-msgid "A level of education is required"
-msgstr "Hezkuntza-maila beharrezkoa da"
-
-#: common/djangoapps/student/forms.py
-msgid "Your gender is required"
-msgstr "Zure sexua beharrezkoa da"
-
-#: common/djangoapps/student/forms.py
-msgid "Your year of birth is required"
-msgstr "Zure jaiotze-urtea beharrezkoa da"
-
-#: common/djangoapps/student/forms.py
-msgid "Your mailing address is required"
-msgstr "Zure posta helbidea beharrezkoa da"
-
-#: common/djangoapps/student/forms.py
-msgid "A description of your goals is required"
-msgstr "Zure helburuen deskribapena beharrezkoa da"
-
-#: common/djangoapps/student/forms.py
-msgid "A city is required"
-msgstr "Hiria beharrezkoa da"
-
-#: common/djangoapps/student/forms.py
-msgid "A country is required"
-msgstr "Herrialdea beharrezkoa da"
-
-#: common/djangoapps/student/forms.py
-msgid "To enroll, you must follow the honor code."
-msgstr "Matrikulatzeko, portaera-kodea errespetatu behar duzu."
-
-#: common/djangoapps/student/forms.py
-msgid "You are missing one or more required fields"
-msgstr "Beharrezko eremuetako bat edo gehiago falta duzu"
-
-#: common/djangoapps/student/forms.py
-msgid "Unauthorized email address."
-msgstr "Baimendu gabeko posta elektronikoaren helbidea"
-
-#: common/djangoapps/student/forms.py
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid ""
-"It looks like {email} belongs to an existing account. Try again with a "
-"different email address."
 msgstr ""
 
 #: common/djangoapps/student/helpers.py
@@ -921,6 +850,14 @@ msgstr "e-posta zaharra eta berria berdinak dira."
 
 #: common/djangoapps/student/views/management.py
 msgid "Cannot be same as your sign in email address."
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid ""
+"It looks like {email} belongs to an existing account. Try again with a "
+"different email address."
 msgstr ""
 
 #: common/djangoapps/student/views/management.py
@@ -6679,6 +6616,14 @@ msgid "Verification Status"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Last Login"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Date Joined"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
 msgstr "Kohortea"
 
@@ -7237,8 +7182,7 @@ msgstr ""
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: cms/templates/register.html lms/templates/signup_modal.html
-#: lms/templates/sysadmin_dashboard.html
+#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
@@ -8489,13 +8433,13 @@ msgid "Teams"
 msgstr "Taldeak"
 
 #: lms/djangoapps/teams/views.py
+msgid "course_id must be provided"
+msgstr "course_id-a eman behar da"
+
+#: lms/djangoapps/teams/views.py
 #, python-brace-format
 msgid "The supplied course id {course_id} is not valid."
 msgstr "Emandako {course_id} ikastaro id-a ez da baliagarria."
-
-#: lms/djangoapps/teams/views.py
-msgid "course_id must be provided"
-msgstr "course_id-a eman behar da"
 
 #: lms/djangoapps/teams/views.py
 msgid "text_search and order_by cannot be provided together"
@@ -8527,6 +8471,10 @@ msgstr "Emandako {course_id} ikastaro_id-a ez da baliagarria."
 #: lms/djangoapps/teams/views.py
 msgid "You are already in a team in this course."
 msgstr "Dagoeneko ikastaro honetan taldean zaude."
+
+#: lms/djangoapps/teams/views.py
+msgid "You can't create a team in an instructor managed topic."
+msgstr ""
 
 #: lms/djangoapps/teams/views.py
 msgid "username or team_id must be specified."
@@ -9052,9 +9000,6 @@ msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
 #: openedx/core/djangoapps/user_api/admin.py
-#: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: cms/templates/videos_index_pagination.html
 msgid "Cancel"
 msgstr "Utzi"
 
@@ -9605,8 +9550,6 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: cms/templates/login.html cms/templates/widgets/header.html
-#: themes/red-theme/cms/templates/login.html
 msgid "Sign In"
 msgstr "Hasi saioa"
 
@@ -9653,6 +9596,10 @@ msgstr ""
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
+msgstr ""
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+msgid "Unsubscribe from these emails."
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_head.html
@@ -10951,6 +10898,67 @@ msgstr ""
 msgid "The provided access_token is not valid."
 msgstr ""
 
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Full Name cannot contain the following characters: < >"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A properly formatted e-mail is required"
+msgstr "Formatu egokia duen e-posta behar da"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your legal name must be a minimum of one character long"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-format
+msgid "Email cannot be more than %(limit_value)s characters long"
+msgstr "E-postak ezin du %(limit_value)s baino karaktere gehiago izan"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "You must accept the terms of service."
+msgstr "Zerbitzuaren baldintzak onartu behar dituzu."
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A level of education is required"
+msgstr "Hezkuntza-maila beharrezkoa da"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your gender is required"
+msgstr "Zure sexua beharrezkoa da"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your year of birth is required"
+msgstr "Zure jaiotze-urtea beharrezkoa da"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your mailing address is required"
+msgstr "Zure posta helbidea beharrezkoa da"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A description of your goals is required"
+msgstr "Zure helburuen deskribapena beharrezkoa da"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A city is required"
+msgstr "Hiria beharrezkoa da"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A country is required"
+msgstr "Herrialdea beharrezkoa da"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "To enroll, you must follow the honor code."
+msgstr "Matrikulatzeko, portaera-kodea errespetatu behar duzu."
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "You are missing one or more required fields"
+msgstr "Beharrezko eremuetako bat edo gehiago falta duzu"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Unauthorized email address."
+msgstr "Baimendu gabeko posta elektronikoaren helbidea"
+
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's email address.
@@ -10969,7 +10977,7 @@ msgstr ""
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's public username.
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-#: cms/templates/register.html lms/templates/signup_modal.html
+#: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Public Username"
@@ -12210,55 +12218,11 @@ msgstr "Ikastaroa ematea:"
 msgid "Courses"
 msgstr "Ikastaroak"
 
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Sign In to {studio_name}"
-msgstr "Hasi saioa hemen: {studio_name}"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr "Ez duzu {studio_name} konturik? Eman izena!"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Required Information to Sign In to {studio_name}"
-msgstr ""
-
-#: cms/templates/login.html cms/templates/register.html
-#: lms/templates/provider_login.html lms/templates/signup_modal.html
-#: themes/red-theme/cms/templates/login.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "E-mail"
-msgstr "E-posta"
-
-#. Translators: This is the placeholder text for a field that requests an
-#. email
-#. address.
-#: cms/templates/login.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html cms/templates/register.html
-#: themes/red-theme/cms/templates/login.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr "adibidea: erabiltzaile-izena@domeinua.com"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Forgot password?"
-msgstr "Pasahitza ahaztu zaizu?"
-
-#. Translators: This is the placeholder text for a field that requests the
-#. user's full name.
-#: cms/templates/register.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "example: Jane Doe"
-msgstr "adibidea: Itziar Urrutia"
-
-#. Translators: This is the placeholder text for a field that asks the user to
-#. pick a username
-#: cms/templates/register.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "example: JaneDoe"
-msgstr "adibidea: ItziarUrrutia"
 
 #: cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
@@ -13021,6 +12985,12 @@ msgid ""
 " collection and use of this information will be governed by their terms of "
 "service and privacy policy."
 msgstr ""
+
+#: lms/templates/provider_login.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "E-mail"
+msgstr "E-posta"
 
 #: lms/templates/provider_login.html
 #, python-format
@@ -14100,6 +14070,34 @@ msgstr ""
 
 #: lms/templates/api_admin/catalogs/search.html
 msgid "Enter a username to view catalogs belonging to that user."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Unsubscribe Successful"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Unsubscribe Cancelled"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Confirm Unsubscribe"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "You have been unsubscribed from emails for {course}."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "You have not been unsubscribed from emails for {course}."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Do you want to unsubscribe from emails for {course}?"
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe.html
+msgid "Unsubscribe"
 msgstr ""
 
 #: lms/templates/calculator/toggle_calculator.html
@@ -19799,8 +19797,17 @@ msgid "Please complete the following fields to register for an account. "
 msgstr "Mesedez, osatu ondorengo eremuak kontua sortzeko."
 
 #: themes/stanford-style/lms/templates/register-form.html
+msgid "example: Jane Doe"
+msgstr "adibidea: Itziar Urrutia"
+
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Your legal name, used for any certificates you earn."
 msgstr ""
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "example: JaneDoe"
+msgstr "adibidea: ItziarUrrutia"
 
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -20029,52 +20036,6 @@ msgstr ""
 
 #: cms/templates/accessibility.html
 msgid "Studio Accessibility Policy"
-msgstr ""
-
-#: cms/templates/activation_active.html cms/templates/activation_complete.html
-#: cms/templates/activation_invalid.html
-msgid "{studio_name} Account Activation"
-msgstr "{studio_name} Kontuaren aktibazioa"
-
-#: cms/templates/activation_active.html
-msgid "Your account is already active"
-msgstr "Zure kontua dagoeneko aktibo dago!"
-
-#: cms/templates/activation_active.html
-msgid ""
-"This account, set up using {email}, has already been activated. Please sign "
-"in to start working within {studio_name}."
-msgstr ""
-
-#: cms/templates/activation_active.html cms/templates/activation_complete.html
-msgid "Sign into {studio_name}"
-msgstr "Hasi saioa hemen: {studio_name}"
-
-#: cms/templates/activation_complete.html
-msgid "Your account activation is complete!"
-msgstr "Kontuaren aktibazioa osatu da!"
-
-#: cms/templates/activation_complete.html
-msgid ""
-"Thank you for activating your account. You may now sign in and start using "
-"{studio_name} to author courses."
-msgstr ""
-
-#: cms/templates/activation_invalid.html
-msgid "Your account activation is invalid"
-msgstr "Kontuaren aktibazioa baliogabea da!"
-
-#: cms/templates/activation_invalid.html
-msgid ""
-"We're sorry. Something went wrong with your activation. Check to make sure "
-"the URL you went to was correct, as e-mail programs will sometimes split it "
-"into two lines."
-msgstr ""
-
-#: cms/templates/activation_invalid.html
-msgid ""
-"If you still have issues, contact {platform_name} Support. In the meantime, "
-"you can also return to {link_start}the {studio_name} homepage.{link_end}"
 msgstr ""
 
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
@@ -22004,92 +21965,6 @@ msgid ""
 " library."
 msgstr ""
 
-#: cms/templates/register.html cms/templates/widgets/header.html
-msgid "Sign Up"
-msgstr "Eman izena"
-
-#: cms/templates/register.html
-msgid "Sign Up for {studio_name}"
-msgstr "Eman izena hemen: {studio_name}"
-
-#: cms/templates/register.html
-msgid "Already have a {studio_name} Account? Sign in"
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"Ready to start creating online courses? Sign up below and start creating "
-"your first {platform_name} course today."
-msgstr ""
-
-#: cms/templates/register.html
-msgid "Required Information to Sign Up for {studio_name}"
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"This will be used in public discussions with your courses and in our edX101 "
-"support forums"
-msgstr ""
-
-#: cms/templates/register.html
-msgid "Your Location"
-msgstr "Zure kokapena"
-
-#: cms/templates/register.html
-msgid "Preferred Language"
-msgstr "Hobetsitako hizkuntza"
-
-#: cms/templates/register.html
-msgid "I agree to the {a_start} Terms of Service {a_end}"
-msgstr "{a_start} Zerbitzuaren baldintzak{a_end} onartzen ditut"
-
-#: cms/templates/register.html
-msgid "Create My Account &amp; Start Authoring Courses"
-msgstr ""
-
-#: cms/templates/register.html
-msgid "Common {studio_name} Questions"
-msgstr ""
-
-#: cms/templates/register.html
-msgid "Who is {studio_name} for?"
-msgstr "Norentzat da {studio_name}?"
-
-#: cms/templates/register.html
-msgid ""
-"{studio_name} is for anyone that wants to create online courses that "
-"leverage the global {platform_name} platform. Our users are often faculty "
-"members, teaching assistants and course staff, and members of instructional "
-"technology groups."
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"How technically savvy do I need to be to create courses in {studio_name}?"
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"{studio_name} is designed to be easy to use by almost anyone familiar with "
-"common web-based authoring environments (Wordpress, Moodle, etc.). No "
-"programming knowledge is required, but for some of the more advanced "
-"features, a technical background would be helpful. As always, we are here to"
-" help, so don't hesitate to dive right in."
-msgstr ""
-
-#: cms/templates/register.html
-msgid "I've never authored a course online before. Is there help?"
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"Absolutely. We have created an online course, edX101, that describes some "
-"best practices: from filming video, creating exercises, to the basics of "
-"running an online course. Additionally, we're always here to help, just drop"
-" us a note."
-msgstr ""
-
 #: cms/templates/settings.html
 msgid "Schedule & Details Settings"
 msgstr ""
@@ -22979,12 +22854,6 @@ msgstr ""
 msgid "Return to the {link_start}home page{link_end}."
 msgstr ""
 
-#: cms/templates/registration/reg_complete.html
-msgid ""
-"We've sent an email message to {email} with instructions for activating your"
-" account."
-msgstr ""
-
 #: cms/templates/widgets/footer.html
 msgid "Policies"
 msgstr ""
@@ -23036,6 +22905,10 @@ msgstr ""
 #: cms/templates/widgets/header.html
 msgid "Contextual Online Help"
 msgstr ""
+
+#: cms/templates/widgets/header.html
+msgid "Sign Up"
+msgstr "Eman izena"
 
 #: cms/templates/widgets/metadata-edit.html
 msgid "Launch Latex Source Compiler"

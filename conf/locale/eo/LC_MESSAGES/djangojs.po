@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-12-08 20:51+0000\n"
-"PO-Revision-Date: 2019-12-08 20:52:13.760494\n"
+"POT-Creation-Date: 2019-12-16 11:18+0000\n"
+"PO-Revision-Date: 2019-12-16 11:18:38.946823\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -5360,6 +5360,11 @@ msgid ""
 msgstr ""
 "Àn érrör häs öççürréd. Trý réfréshïng thé pägé, ör çhéçk ýöür Ìntérnét "
 "çönnéçtïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid "An unexpected error has occurred."
+msgstr ""
+"Àn ünéxpéçtéd érrör häs öççürréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
