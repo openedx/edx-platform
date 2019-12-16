@@ -91,3 +91,7 @@ django-object-actions==1.1.2
 
 # Constraining this since the newer versions require Python 3
 django-debug-toolbar<2.0          # A set of panels that display debug information about the current request/response
+
+
+# Its new version drops support for python2 thats why adding constraint here.
+django-filter<2.0.0
