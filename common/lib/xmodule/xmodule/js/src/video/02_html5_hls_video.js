@@ -42,7 +42,12 @@
                 if (config.browserIsSafari) {
                     this.videoEl.attr('src', config.videoSources[0]);
                 } else {
-                    this.hls = new HLS({autoStartLoad: false});
+                    // load auto start if auto_advance is enabled
+                    if (config.state.auto_advance) {
+                        this.hls = new HLS({autoStartLoad: true});
+                    } else {
+                        this.hls = new HLS({autoStartLoad: false});
+                    }
                     this.hls.loadSource(config.videoSources[0]);
                     this.hls.attachMedia(this.video);
 
