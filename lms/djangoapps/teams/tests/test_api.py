@@ -7,7 +7,6 @@ from __future__ import absolute_import, unicode_literals
 import unittest
 from uuid import uuid4
 
-from mock import patch
 import ddt
 from opaque_keys.edx.keys import CourseKey
 
