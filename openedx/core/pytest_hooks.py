@@ -13,7 +13,7 @@ def pytest_json_modifyreport(json_report):
     * (the environment metadata is one example of unremoveable data)
     * The json warning outputs are meant to be read by jenkins
     """
-    warnings_flag = 'warnings'
+    warnings_flag = "warnings"
     if warnings_flag in json_report:
         warnings = json_report[warnings_flag]
         json_report.clear()
@@ -33,8 +33,8 @@ def create_file_name(dir_path, file_name_postfix, num=0):
     warning json files are not being overwritten.
     """
     name = dir_path + "/"
-    if 'TEST_SUITE' in os.environ:
-        name = name + os.environ['TEST_SUITE'] + "_"
+    if "TEST_SUITE" in os.environ:
+        name = name + os.environ["TEST_SUITE"] + "_"
     name = name + file_name_postfix
     if num != 0:
         name = name + "_" + str(num)
@@ -50,10 +50,12 @@ def pytest_sessionfinish(session):
     file_name_postfix = "pytest_warnings"
     num = 0
     # to make sure this doesn't loop forever, putting a maximum
-    while os.path.isfile(create_file_name(dir_path, file_name_postfix, num)) and num < 100:
+    while (
+        os.path.isfile(create_file_name(dir_path, file_name_postfix, num)) and num < 100
+    ):
         num += 1
 
     report = session.config._json_report.report
 
-    with open(create_file_name(dir_path, file_name_postfix, num), 'w') as outfile:
+    with open(create_file_name(dir_path, file_name_postfix, num), "w") as outfile:
         json.dump(report, outfile)

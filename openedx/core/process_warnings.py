@@ -11,7 +11,16 @@ from write_to_html import HtmlOutlineWriter
 from collections import Counter
 from djangolib.markup import HTML, Text
 
-columns = ['message', 'category', 'filename', 'lineno', 'high_location', 'label', 'num', 'deprecated']
+columns = [
+    "message",
+    "category",
+    "filename",
+    "lineno",
+    "high_location",
+    "label",
+    "num",
+    "deprecated",
+]
 columns_index_dict = {key: index for index, key in enumerate(columns)}
 
 
@@ -42,8 +51,13 @@ def seperate_warnings_by_location(warnings_data):
     for warnings_object in warnings_data:
         warning_origin_located = False
         for key in warnings_locations:
-            if re.search(key, warnings_object[columns_index_dict["filename"]]) is not None:
-                warnings_object[columns_index_dict["high_location"]] = warnings_locations[key]
+            if (
+                re.search(key, warnings_object[columns_index_dict["filename"]])
+                is not None
+            ):
+                warnings_object[
+                    columns_index_dict["high_location"]
+                ] = warnings_locations[key]
                 warning_origin_located = True
                 break
         if not warning_origin_located:
@@ -52,11 +66,11 @@ def seperate_warnings_by_location(warnings_data):
 
 
 def convert_warning_dict_to_list(warning_dict):
-    #namedtuple('message', 'category', 'filename', 'lineno', 'high_location', 'label', 'num')
+    # namedtuple('message', 'category', 'filename', 'lineno', 'high_location', 'label', 'num')
     output = []
     for index, column in enumerate(columns):
         if column in warning_dict:
-            if column == 'message' and "unclosed" in warning_dict[column]:
+            if column == "message" and "unclosed" in warning_dict[column]:
                 None
                 # pdb.set_trace()
             output.append(warning_dict[column])
@@ -94,7 +108,10 @@ def read_warning_data(dir_path):
         with open(os.path.expanduser(dir_path + "/" + file), "r") as read_file:
             json_input = json.load(read_file)
             if "warnings" in json_input:
-                data = [convert_warning_dict_to_list(warning_dict) for warning_dict in json_input["warnings"]]
+                data = [
+                    convert_warning_dict_to_list(warning_dict)
+                    for warning_dict in json_input["warnings"]
+                ]
                 warnings_data.extend(data)
             else:
                 print(file)
@@ -147,34 +164,53 @@ def group_and_sort_by_sumof(dataframe, group, sort_by):
 
 def write_html_report(warnings_dataframe, html_path):
     """
+    converts from panda dataframe to our html
     """
     html_path = os.path.expanduser(html_path)
     with io.open(html_path, "w") as fout:
         html_writer = HtmlOutlineWriter(fout)
-        category_sorted_by_count = group_and_sort_by_sumof(warnings_dataframe, "category", "num")
+        category_sorted_by_count = group_and_sort_by_sumof(
+            warnings_dataframe, "category", "num"
+        )
         for category, group_in_category, category_count in category_sorted_by_count:
-            html = Text(u'<span class="count">{category}, count: {count}</span> ').format(category=HTML(category), count=HTML(category_count))
+            html = Text(
+                u'<span class="count">{category}, count: {count}</span> '
+            ).format(category=HTML(category), count=HTML(category_count))
             html_writer.start_section(html, klass=u"category")
-            locations_sorted_by_count = group_and_sort_by_sumof(group_in_category, "high_location", "num")
+            locations_sorted_by_count = group_and_sort_by_sumof(
+                group_in_category, "high_location", "num"
+            )
 
-            for location, group_in_location, location_count in locations_sorted_by_count:
+            for (
+                location,
+                group_in_location,
+                location_count,
+            ) in locations_sorted_by_count:
                 # pp.pprint(location)
-                html = Text(u'<span class="count">{location}, count: {count}</span> ').format(location=HTML(location), count=HTML(location_count))
+                html = Text(
+                    u'<span class="count">{location}, count: {count}</span> '
+                ).format(location=HTML(location), count=HTML(location_count))
                 html_writer.start_section(html, klass=u"location")
-                message_group_sorted_by_count = group_and_sort_by_sumof(group_in_location, "message", "num")
+                message_group_sorted_by_count = group_and_sort_by_sumof(
+                    group_in_location, "message", "num"
+                )
                 # pdb.set_trace()
-                for message, message_group, message_count in message_group_sorted_by_count:
+                for (
+                    message,
+                    message_group,
+                    message_count,
+                ) in message_group_sorted_by_count:
                     # pp.pprint(warning_text)
-                    html = Text(u'<span class="count">{warning_text}, count: {count}</span> ').format(
-                        warning_text=HTML(message), count=HTML(message_count)
-                    )
+                    html = Text(
+                        u'<span class="count">{warning_text}, count: {count}</span> '
+                    ).format(warning_text=HTML(message), count=HTML(message_count))
                     html_writer.start_section(html, klass=u"warning_text")
                     # warnings_object[location][warning_text] is a list
                     for index, warning in message_group.iterrows():
                         # pp.pprint(warning)
-                        html = Text(u'<span class="count">{warning_file_path}</span> ').format(
-                            warning_file_path=HTML(warning["filename"])
-                        )
+                        html = Text(
+                            u'<span class="count">{warning_file_path}</span> '
+                        ).format(warning_file_path=HTML(warning["filename"]))
                         html_writer.start_section(html, klass=u"warning")
 
                         html = Text(u'<p class="lineno">lineno: {lineno}</p> ').format(
@@ -190,6 +226,7 @@ def write_html_report(warnings_dataframe, html_path):
                     html_writer.end_section()
                 html_writer.end_section()
             html_writer.end_section()
+
 
 parser = argparse.ArgumentParser(
     description="Process and categorize pytest warnings and output html report."

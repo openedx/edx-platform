@@ -10,7 +10,8 @@ from xml.sax.saxutils import escape
 
 
 class HtmlOutlineWriter(object):
-    HEAD = textwrap.dedent(u"""
+    HEAD = textwrap.dedent(
+        u"""
         <!DOCTYPE html>
         <html>
         <head>
@@ -66,14 +67,17 @@ class HtmlOutlineWriter(object):
 
         </style>
         <body>
-    """)
+    """
+    )
 
-    SECTION_START = textwrap.dedent(u"""\
+    SECTION_START = textwrap.dedent(
+        u"""\
         <div class="{klass}">
         <input class="toggle-box {klass}" id="sect_{id:05d}" type="checkbox">
         <label for="sect_{id:05d}">{html}</label>
         <div>
-    """)
+    """
+    )
 
     SECTION_END = six.u("</div></div>")
 
@@ -83,9 +87,9 @@ class HtmlOutlineWriter(object):
         self.fout.write(self.HEAD)
 
     def start_section(self, html, klass=None):
-        self.fout.write(self.SECTION_START.format(
-            id=self.section_id, html=html, klass=klass or "",
-        ))
+        self.fout.write(
+            self.SECTION_START.format(id=self.section_id, html=html, klass=klass or "",)
+        )
         self.section_id += 1
 
     def end_section(self):
