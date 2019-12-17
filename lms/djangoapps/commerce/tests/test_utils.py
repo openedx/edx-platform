@@ -270,6 +270,37 @@ class RefundUtilMethodTests(ModuleStoreTestCase):
         assert refund_success
 
     @httpretty.activate
+    @patch('lms.djangoapps.commerce.utils.send_notification_email_to_support', return_value=True)
+    def test_ecommerce_refund_failed_process_notification_email_sent(self, mock_send_notification):
+        """
+        Test that email is sent for notification instead of creating a ticket on zendesk when
+        `ENABLE_EMAIL_INSTEAD_ZENDESK` feature flag is set to `True`
+        """
+        features = settings.FEATURES.copy()
+        features['ENABLE_EMAIL_INSTEAD_ZENDESK'] = True
+        with override_settings(FEATURES=features):
+            httpretty.register_uri(
+                httpretty.POST,
+                settings.ECOMMERCE_API_URL + 'refunds/',
+                status=201,
+                body='[1]',
+                content_type='application/json'
+            )
+            httpretty.register_uri(
+                httpretty.PUT,
+                settings.ECOMMERCE_API_URL + 'refunds/1/process/',
+                status=400,
+                body='{}',
+                content_type='application/json'
+            )
+            course_entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
+            refund_success = refund_entitlement(course_entitlement)
+            assert mock_send_notification.called
+            assert refund_success
+            call_args = list(mock_send_notification.call_args)
+            assert call_args[1]['message_type'] == 'commerce_support'
+
+    @httpretty.activate
     @patch('lms.djangoapps.commerce.utils._send_refund_notification', return_value=True)
     def test_ecommerce_refund_not_verified_notification_for_entitlement(self, mock_send_notification):
         """
