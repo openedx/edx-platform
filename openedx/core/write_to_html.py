@@ -4,6 +4,7 @@ Class used to write pytest warning data  into html format
 import textwrap
 import six
 
+
 class HtmlOutlineWriter(object):
     """
     writer to handle html writing

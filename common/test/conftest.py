@@ -18,7 +18,7 @@ class DeferPlugin(object):
         return pytest_hooks.pytest_json_modifyreport(json_report)
 
     def pytest_sessionfinish(self, session):
-        return pytest_sessionfinish(session) # pytest: disable=undefined-variable
+        return pytest_sessionfinish(session)  # noqa pylint: disable=undefined-variable
 
 
 def pytest_configure(config):
