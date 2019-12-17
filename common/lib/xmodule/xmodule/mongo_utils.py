@@ -41,6 +41,17 @@ def connect_to_mongodb(
         if read_preference is not None:
             kwargs['read_preference'] = read_preference
 
+    print "host"
+    print host
+    print "port"
+    print port
+    print "tz_aware"
+    print tz_aware
+    print "dict"
+    print dict
+    print "db"
+    print db
+
     mongo_conn = pymongo.database.Database(
         mongo_client_class(
             host=host,
@@ -58,9 +69,15 @@ def connect_to_mongodb(
             wait_time=retry_wait_time
         )
 
+    # default the authSource to be whatever db we are connecting to (for backwards compatiblity)
+    authSource=db
+    if kwargs.get('authSource'):
+        # override if configured to use a different db for auth (e.g. Mongodb Atlas)
+      authSource=kwargs.get('authSource')
+
     # If credentials were provided, authenticate the user.
     if user is not None and password is not None:
-        mongo_conn.authenticate(user, password)
+        mongo_conn.authenticate(user, password, authSource)
 
     return mongo_conn
 
