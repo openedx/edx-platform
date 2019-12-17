@@ -1,6 +1,5 @@
 import analytics
 import json
-
 from datetime import datetime
 from logging import getLogger
 
@@ -104,16 +103,16 @@ def create_account_with_params_custom(request, params, partner):
             log.exception("User creation failed for user {username}".format(username=params['username']), repr(err))
             raise
 
-        extended_profile_fields = g2a_constants.G2A_EXTENDED_PROFILE_DEFAULT_DATA
-        extended_profile_fields[g2a_constants.START_MONTH_YEAR_KEY] = datetime.now().strftime ('%m/%Y')
+        extended_profile_data = g2a_constants.G2A_EXTENDED_PROFILE_DEFAULT_DATA
+        extended_profile_data[g2a_constants.START_MONTH_YEAR_KEY] = datetime.now().strftime('%m/%Y')
 
-        user_profile_fields = g2a_constants.G2A_USER_PROFILE_DEFAULT_DATA
-        user_profile_fields['name'] = '{} {}'.format(first_name, last_name)
+        user_profile_data = g2a_constants.G2A_USER_PROFILE_DEFAULT_DATA
+        user_profile_data['name'] = '{} {}'.format(first_name, last_name)
 
         try:
             # Create user profile
-            profile = UserProfile(user=user, **user_profile_fields)
-            profile.meta = json.dumps(extended_profile_fields)
+            profile = UserProfile(user=user, **user_profile_data)
+            profile.meta = json.dumps(extended_profile_data)
             profile.save()
 
             # We have to manually trigger the post_save so that profile is synced on nodebb
@@ -124,19 +123,19 @@ def create_account_with_params_custom(request, params, partner):
             raise
 
         try:
-            organization_fields = g2a_constants.G2A_ORGANIZATION_DEFAULT_DATA
-            organization_fields[g2a_constants.ORG_TYPE_KEY] = PartnerNetwork.NON_PROFIT_ORG_TYPE_CODE
+            organization_data = g2a_constants.G2A_ORGANIZATION_DEFAULT_DATA
+            organization_data[g2a_constants.ORG_TYPE_KEY] = PartnerNetwork.NON_PROFIT_ORG_TYPE_CODE
 
             organization_name = params['organization_name']
             organization_to_assign = Organization.objects.filter(label__iexact=organization_name).first()
             if not organization_to_assign:
                 # Create organization if not already exists and make user first learner
-                organization_to_assign = Organization.objects.create(label=organization_name, **organization_fields)
+                organization_to_assign = Organization.objects.create(label=organization_name, **organization_data)
                 organization_to_assign.save()
 
             # create User Extended Profile
             extended_profile = UserExtendedProfile.objects.create(
-                user=user, organization=organization_to_assign, **extended_profile_fields
+                user=user, organization=organization_to_assign, **extended_profile_data
             )
 
             extended_profile.save()
