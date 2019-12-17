@@ -45,6 +45,18 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
     AUTH_TOKENS = __config__
 
 
+# A file path to a YAML file from which to load all the code revisions currently deployed
+REVISION_CONFIG_FILE = get_env_setting('REVISION_CFG')
+
+try:
+    with codecs.open(REVISION_CONFIG_FILE, encoding='utf-8') as f:
+        REVISION_CONFIG = yaml.safe_load(f)
+except Exception:  # pylint: disable=broad-except
+    REVISION_CONFIG = {}
+
+# Do NOT calculate this dynamically at startup with git because it's *slow*.
+EDX_PLATFORM_REVISION = REVISION_CONFIG.get('EDX_PLATFORM_REVISION', EDX_PLATFORM_REVISION)
+
 # SERVICE_VARIANT specifies name of the variant used, which decides what JSON
 # configuration files are read during startup.
 SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
@@ -109,9 +121,6 @@ CELERY_QUEUES = {
 }
 
 CELERY_ROUTES = "{}celery.Router".format(QUEUE_VARIANT)
-
-# Do NOT calculate this dynamically at startup with git because it's *slow*.
-EDX_PLATFORM_REVISION = ENV_TOKENS.get('EDX_PLATFORM_REVISION', EDX_PLATFORM_REVISION)
 
 # STATIC_URL_BASE specifies the base url to use for static files
 STATIC_URL_BASE = ENV_TOKENS.get('STATIC_URL_BASE', None)
@@ -196,6 +205,9 @@ if 'loc_cache' not in CACHES:
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'edx_location_mem_cache',
     }
+
+if 'staticfiles' in CACHES:
+    CACHES['staticfiles']['KEY_PREFIX'] = EDX_PLATFORM_REVISION
 
 SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
 SESSION_COOKIE_HTTPONLY = ENV_TOKENS.get('SESSION_COOKIE_HTTPONLY', True)
