@@ -2,7 +2,7 @@ Status: Maintenance
 
 Responsibilities
 ================
-The ``user_authn`` app contains user authentication related features such as login and registration.
+The ``user_authn`` app contains user authentication related features such as login, registration, and credential management.
 
 Direction: Extract
 ==================
