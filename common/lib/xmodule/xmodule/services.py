@@ -7,6 +7,7 @@ import inspect
 
 from config_models.models import ConfigurationModel
 from django.conf import settings
+from xmodule.modulestore.django import modulestore
 
 
 class SettingsService(object):
@@ -95,3 +96,26 @@ class ConfigurationService(object):
             )
 
         self.configuration = configuration_model
+
+
+class TeamsConfigurationService(object):
+    """
+    An XBlock service that returns the teams_configuration object for a course.
+    """
+    def __init__(self):
+        self._course = None
+
+    def get_course(self, course_id):
+        """
+        Return the course instance associated with this TeamsConfigurationService.
+        This default implementation looks up the course from the modulestore.
+        """
+        return modulestore().get_course(course_id)
+
+    def get_teams_configuration(self, course_id):
+        """
+        Returns the team configuration for a given course.id
+        """
+        if not self._course:
+            self._course = self.get_course(course_id)
+        return self._course.teams_configuration
