@@ -32,7 +32,7 @@ from opaque_keys.edx.locator import LibraryLocator, BlockUsageLocator
 from organizations.models import OrganizationCourse
 from path import Path as path
 from pytz import UTC
-from six import iteritems, text_type
+from six import iteritems, text_type, binary_type
 from six.moves import range
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.tasks import UserTask
@@ -630,6 +630,9 @@ def create_export_tarball(course_module, course_key, context, status=None):
     Updates the context with any error information if applicable.
     """
     name = course_module.url_name
+    if isinstance(name, binary_type):
+        name = name.decode('utf-8')
+
     export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")
     root_dir = path(mkdtemp())
 
