@@ -13,6 +13,8 @@ from student import forms as student_forms
 from student.models import CourseEnrollmentAllowed, email_exists_or_retired
 from util.password_policy_validators import validate_password
 
+from lms.djangoapps.onboarding.helpers import   COUNTRIES
+from django.utils.translation import ugettext_noop
 
 class UsernameField(student_forms.UsernameField):
     """
@@ -100,6 +102,13 @@ class Give2AsiaAccountCreationForm(forms.Form):
         """Once form is validated, call this function to get clean registration data"""
         registration_data.update(self.cleaned_data)
 
+    def clean_country(self):
+        country = self.cleaned_data['country']
+
+        cleaned_country=next((code for code,label in COUNTRIES.items() if label.lower()==country.lower()),None)
+        if cleaned_country:
+            return cleaned_country
+        raise forms.ValidationError(ugettext_noop('Please select country.'))
     username = UsernameField()
     password = forms.CharField()
     email = forms.EmailField(
@@ -123,5 +132,11 @@ class Give2AsiaAccountCreationForm(forms.Form):
         max_length=255,
         error_messages={
             "required": "Organization name is required",
+        },
+    )
+
+    country = forms.CharField(
+        error_messages={
+            "required": "Country name is required",
         },
     )

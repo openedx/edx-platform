@@ -109,6 +109,7 @@ def create_account_with_params_custom(request, params, partner):
 
         user_profile_fields = g2a_constants.G2A_USER_PROFILE_DEFAULT_DATA
         user_profile_fields['name'] = '{} {}'.format(first_name, last_name)
+        user_profile_fields['country'] = params['country']
 
         try:
             # Create user profile
