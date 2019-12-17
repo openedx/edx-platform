@@ -503,6 +503,8 @@ class CourseEntitlementSupportDetail(TimeStampedModel):
         on_delete=models.CASCADE,
     )
 
+    history = HistoricalRecords()
+
     def __str__(self):
         """Unicode representation of an Entitlement"""
         return u'Course Entitlement Support Detail: entitlement: {}, support_user: {}, reason: {}'.format(
