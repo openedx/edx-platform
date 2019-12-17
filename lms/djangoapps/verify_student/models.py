@@ -167,6 +167,22 @@ class ManualVerification(IDVerificationAttempt):
         """
         return False
 
+    @property
+    def expiration_datetime(self):
+        """
+        [UCSD_CUSTOM] Datetime that the verification will expire.
+        if `AUTOMATIC_PERMANENT_ACCOUNT_VERIFICATION` flag is set to True,
+        User's verification should never expire.
+        """
+        if settings.FEATURES.get('AUTOMATIC_PERMANENT_ACCOUNT_VERIFICATION'):
+            # We have to add timezone info here because if we don't do that,
+            # datetime.max itself is not timezone aware and in the method:
+            # edx-platform/lms/djangoapps/verify_student/utils.py:is_verification_expiring_soon
+            # when this value is subtracted from datetime.datetime.now(pytz.UTC)) (timezone aware)
+            # an exception is thrown.
+            return datetime.max.replace(tzinfo=pytz.UTC)
+        return super(ManualVerification, self).expiration_datetime
+
 
 class SSOVerification(IDVerificationAttempt):
     """

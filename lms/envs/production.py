@@ -1104,10 +1104,6 @@ COURSE_ENROLLMENT_MODES = ENV_TOKENS.get('COURSE_ENROLLMENT_MODES', COURSE_ENROL
 ############## Settings for Writable Gradebook  #########################
 WRITABLE_GRADEBOOK_URL = ENV_TOKENS.get('WRITABLE_GRADEBOOK_URL', WRITABLE_GRADEBOOK_URL)
 
-############### Settings for UCSD Support #####################
-SUPPORT_DESK_EMAILS = ENV_TOKENS.get('SUPPORT_DESK_EMAILS')
-INSTALLED_APPS.append('openedx.features.ucsd_features')
-
 ############### Settings for Caliper Tracking #####################
 # 'openedx_caliper_tracking' app allows us to transform Edx event-logs according to
 # IMSGlobal Caliper Standards.
@@ -1167,3 +1163,8 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_c
 ########################## Derive Any Derived Settings  #######################
 
 derive_settings(__name__)
+
+############### UCSD Features #####################
+
+SUPPORT_DESK_EMAILS = ENV_TOKENS.get('SUPPORT_DESK_EMAILS')
+INSTALLED_APPS.append('openedx.features.ucsd_features')

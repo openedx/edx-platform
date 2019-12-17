@@ -626,3 +626,4 @@ SUPPORT_DESK_EMAILS = ['servicedesk@ucsd.edu']
 
 INSTALLED_APPS.append('openedx.features.ucsd_features')
 FEATURES['ENABLE_EMAIL_INSTEAD_ZENDESK'] = False
+FEATURES['AUTOMATIC_PERMANENT_ACCOUNT_VERIFICATION'] = False
