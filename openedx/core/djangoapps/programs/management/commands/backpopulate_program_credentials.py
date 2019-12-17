@@ -73,7 +73,7 @@ class Command(BaseCommand):
         if options['args_from_database']:
             logger.info('Loading arguments from the database for custom programs or learners.')
 
-            arguments = self.get_args_from_batabase()  # pylint: disable=no-member
+            arguments = self.get_args_from_database()
             program_uuids = arguments.get('program-uuids', None)
             usernames = arguments.get('usernames', None)
 
