@@ -54,6 +54,7 @@ import uuid
 
 import six
 from config_models.models import ConfigurationModel
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -66,6 +67,7 @@ from model_utils import Choices
 from model_utils.fields import AutoCreatedField
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
+from simple_history.models import HistoricalRecords
 
 from badges.events.course_complete import course_badge_check
 from badges.events.course_meta import completion_check, course_group_check
@@ -279,6 +281,12 @@ class GeneratedCertificate(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
     error_reason = models.CharField(max_length=512, blank=True, default='')
+
+    # This is necessary because CMS does not install the certificates app, but it
+    # imports this models code. Simple History will attempt to connect to the installed
+    # model in the certificates app, which will fail.
+    if 'certificates' in apps.app_configs:
+        history = HistoricalRecords()
 
     class Meta(object):
         unique_together = (('user', 'course_id'),)
