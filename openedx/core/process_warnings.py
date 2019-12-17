@@ -44,7 +44,6 @@ def seperate_warnings_by_location(warnings_data):
         ".*/edx-platform/common/.*\.py": "common",  # noqa pylint: disable=W1401
     }
 
-
     # seperate into locations flow:
     #  * iterate through each wanring_object, see if its filename matches any regex in warning locations.
     #  * If so, change high_location index on warnings_object to location name
