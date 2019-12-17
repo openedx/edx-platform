@@ -14,7 +14,6 @@ from student.models import CourseEnrollmentAllowed, email_exists_or_retired
 from util.password_policy_validators import validate_password
 
 from lms.djangoapps.onboarding.helpers import COUNTRIES
-from django.utils.translation import ugettext_noop
 
 class UsernameField(student_forms.UsernameField):
     """
@@ -104,10 +103,10 @@ class Give2AsiaAccountCreationForm(forms.Form):
 
     def clean_country(self):
         country = self.cleaned_data['country']
-        cleaned_country=next((code for code,label in COUNTRIES.items() if label.lower()==country.lower()),None)
+        cleaned_country = next((code for code, label in COUNTRIES.items() if label.lower() == country.lower()), None)
         if cleaned_country:
             return cleaned_country
-        raise forms.ValidationError(ugettext_noop('Please select country.'))
+        raise ValidationError(_('Please select country.'))
 
     username = UsernameField()
     password = forms.CharField()
@@ -137,6 +136,6 @@ class Give2AsiaAccountCreationForm(forms.Form):
 
     country = forms.CharField(
         error_messages={
-            "required": "Country name is required",
+            "required": _('Country name is required'),
         },
     )
