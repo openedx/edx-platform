@@ -10,8 +10,8 @@ import re
 import argparse
 from collections import Counter
 import pandas as pd
-from write_to_html import HtmlOutlineWriter
-from djangolib.markup import HTML, Text
+from .write_to_html import HtmlOutlineWriter
+from .djangolib.markup import HTML, Text
 
 columns = [
     "message",
@@ -104,8 +104,8 @@ def read_warning_data(dir_path):
 
     # go through each warning file and aggregate warnigns into warnings_data
     warnings_data = []
-    for file in warnings_files:
-        with open(os.path.expanduser(dir_path + "/" + file), "r") as read_file:
+    for temp_file in warnings_files:
+        with open(os.path.expanduser(dir_path + "/" + temp_file), "r") as read_file:
             json_input = json.load(read_file)
             if "warnings" in json_input:
                 data = [
@@ -114,7 +114,7 @@ def read_warning_data(dir_path):
                 ]
                 warnings_data.extend(data)
             else:
-                print(file)
+                print(temp_file)
     return warnings_data
 
 
