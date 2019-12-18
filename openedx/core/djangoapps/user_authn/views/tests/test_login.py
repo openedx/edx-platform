@@ -555,76 +555,123 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             'whitelisted': False,
             'allowed_domain': 'edx.org',
             'user_domain': 'edx.org',
-            'success': True
+            'success': True,
+            'is_third_party_authenticated': False
         },
         {
             'switch_enabled': False,
             'whitelisted': True,
             'allowed_domain': 'edx.org',
             'user_domain': 'edx.org',
-            'success': True
+            'success': True,
+            'is_third_party_authenticated': False
         },
         {
             'switch_enabled': True,
             'whitelisted': False,
             'allowed_domain': 'edx.org',
             'user_domain': 'edx.org',
-            'success': False
+            'success': False,
+            'is_third_party_authenticated': False
         },
         {
             'switch_enabled': True,
             'whitelisted': False,
             'allowed_domain': 'fake.org',
             'user_domain': 'edx.org',
-            'success': True
+            'success': True,
+            'is_third_party_authenticated': False
         },
         {
             'switch_enabled': True,
             'whitelisted': True,
             'allowed_domain': 'edx.org',
             'user_domain': 'edx.org',
-            'success': True
+            'success': True,
+            'is_third_party_authenticated': False
         },
         {
             'switch_enabled': True,
             'whitelisted': False,
             'allowed_domain': 'batman.gotham',
             'user_domain': 'batman.gotham',
-            'success': False
+            'success': False,
+            'is_third_party_authenticated': False
+        },
+        {
+            'switch_enabled': True,
+            'whitelisted': True,
+            'allowed_domain': 'edx.org',
+            'user_domain': 'edx.org',
+            'success': True,
+            'is_third_party_authenticated': True
+        },
+        {
+            'switch_enabled': False,
+            'whitelisted': False,
+            'allowed_domain': 'edx.org',
+            'user_domain': 'fake.org',
+            'success': True,
+            'is_third_party_authenticated': True
         },
     )
     @ddt.unpack
-    def test_login_for_user_auth_flow(self, switch_enabled, whitelisted, allowed_domain, user_domain, success):
+    def test_login_for_user_auth_flow(
+        self,
+        switch_enabled,
+        whitelisted,
+        allowed_domain,
+        user_domain,
+        success,
+        is_third_party_authenticated
+    ):
         """
         Verify that `login._check_user_auth_flow` works as expected.
         """
+        provider = 'Google'
         username = 'batman'
         user_email = '{username}@{domain}'.format(username=username, domain=user_domain)
         user = self._create_user(username, user_email)
-
-        provider = 'Google'
-        site = self.set_up_site(allowed_domain, {
+        default_site_configuration_values = {
             'SITE_NAME': allowed_domain,
             'THIRD_PARTY_AUTH_ONLY_DOMAIN': allowed_domain,
-            'THIRD_PARTY_AUTH_ONLY_PROVIDER': provider
-        })
-
-        if whitelisted:
-            AllowedAuthUser.objects.create(site=site, email=user.email)
-        else:
-            AllowedAuthUser.objects.filter(site=site, email=user.email).delete()
+            'THIRD_PARTY_AUTH_ONLY_PROVIDER': provider,
+        }
 
         with ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY.override(switch_enabled):
-            value = None if success else u'As an {0} user, You must login with your {0} {1} account.'.format(
-                allowed_domain,
-                provider
-            )
-            response, __ = self._login_response(user.email, self.password)
-            self._assert_response(
-                response,
-                success=success,
-                value=value,
-            )
+            if not is_third_party_authenticated:
+                site = self.set_up_site(allowed_domain, default_site_configuration_values)
+
+                if whitelisted:
+                    AllowedAuthUser.objects.create(site=site, email=user.email)
+                else:
+                    AllowedAuthUser.objects.filter(site=site, email=user.email).delete()
+
+                value = None if success else u'As an {0} user, You must login with your {0} {1} account.'.format(
+                    allowed_domain,
+                    provider
+                )
+                response, __ = self._login_response(user.email, self.password)
+                self._assert_response(
+                    response,
+                    success=success,
+                    value=value,
+                )
+            else:
+                default_site_configuration_values.update({'ENABLE_THIRD_PARTY_AUTH': True})
+                self.set_up_site(allowed_domain, default_site_configuration_values)
+                with patch('openedx.core.djangoapps.user_authn.views.login.pipeline'):
+                    with patch(
+                        'openedx.core.djangoapps.user_authn.views.login._check_user_auth_flow'
+                    ) as mock_check_user_auth_flow:
+                        # user is already authenticated by third_party_auth then
+                        # we should by-pass _check_user_auth_flow function
+                        response, __ = self._login_response(user.email, self.password)
+                        self._assert_response(
+                            response,
+                            success=success
+                        )
+                        self.assertFalse(mock_check_user_auth_flow.called)
 
 
 @ddt.ddt
