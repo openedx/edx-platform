@@ -125,7 +125,7 @@ class DjangoStorageReportStoreS3TestCase(MockS3Mixin, ReportStoreTestMixin, Test
         storage.
         """
         test_settings = copy.deepcopy(settings.GRADES_DOWNLOAD)
-        test_settings['STORAGE_CLASS'] = 'openedx.core.storage.S3ReportStorage'
+        test_settings['STORAGE_CLASS'] = 'storages.backends.s3boto.S3BotoStorage'
         test_settings['STORAGE_KWARGS'] = {
             'bucket': settings.GRADES_DOWNLOAD['BUCKET'],
             'location': settings.GRADES_DOWNLOAD['ROOT_PATH'],
