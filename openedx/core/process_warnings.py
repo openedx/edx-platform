@@ -114,7 +114,7 @@ def read_warning_data(dir_path):
                 ]
                 warnings_data.extend(data)
             else:
-                print(temp_file)  # noqa
+                print(temp_file)  # noqa pylint: disable=superfluous-parens
     return warnings_data
 
 
