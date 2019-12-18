@@ -77,7 +77,9 @@ from util.milestones_helpers import (
     is_prerequisite_courses_enabled,
     is_valid_course_key,
     remove_prerequisite_course,
-    set_prerequisite_courses
+    set_prerequisite_courses,
+    get_namespace_choices,
+    generate_milestone_namespace
 )
 from util.organizations_helpers import add_organization_course, get_organization_by_short_name, organizations_enabled
 from util.string_utils import _has_non_ascii_characters
@@ -1136,7 +1138,12 @@ def settings_handler(request, course_key_string):
                         # None is chosen, so remove the course prerequisites
                         course_milestones = milestones_api.get_course_milestones(course_key=course_key, relationship="requires")
                         for milestone in course_milestones:
-                            remove_prerequisite_course(course_key, milestone)
+                            ee_milestone_namespace = generate_milestone_namespace(
+                                get_namespace_choices().get('ENTRANCE_EXAM'),
+                                course_key
+                            )
+                            if not milestone["namespace"] == ee_milestone_namespace:
+                                remove_prerequisite_course(course_key, milestone)
 
                 # If the entrance exams feature has been enabled, we'll need to check for some
                 # feature-specific settings and handle them accordingly

@@ -35,7 +35,7 @@
             advanced_settings_url = reverse('advanced_settings_handler', kwargs={'course_key_string': unicode(course_key)})
             tabs_url = reverse('tabs_handler', kwargs={'course_key_string': unicode(course_key)})
             certificates_url = ''
-            if configuration_helpers.get_value_for_org(current_organization.name, "CERTIFICATES_HTML_VIEW", False) and context_course.cert_html_view_enabled:
+            if current_organization and configuration_helpers.get_value_for_org(current_organization.name, "CERTIFICATES_HTML_VIEW", False) and context_course.cert_html_view_enabled:
                 certificates_url = reverse('certificates_list_handler', kwargs={'course_key_string': unicode(course_key)})
             checklists_url = reverse('checklists_handler', kwargs={'course_key_string': unicode(course_key)})
       %>

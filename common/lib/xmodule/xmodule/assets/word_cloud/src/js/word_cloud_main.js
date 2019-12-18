@@ -309,7 +309,7 @@ export default class WordCloudMain {
     .style('font-family', 'Impact')
     .style('fill', (d, i) => fill(i))
     .attr('text-anchor', 'middle')
-    .attr('transform', d => `translate(${d.x}, ${d.y})rotate(${d.rotate$})scale(${scale})`)
+    .attr('transform', d => `translate(${d.x}, ${d.y})rotate(${d.rotate})scale(${scale})`)
     .text(d => d.text);
   }
 }

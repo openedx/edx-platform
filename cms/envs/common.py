@@ -82,6 +82,8 @@ from lms.envs.common import (
     # Theme to use when no site or site theme is defined,
     DEFAULT_SITE_THEME,
 
+    ACCESS_CONTROL_BACKENDS,
+
     # Default site to use if no site exists matching request headers
     SITE_ID,
 
