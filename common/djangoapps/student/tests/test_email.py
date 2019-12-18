@@ -292,7 +292,7 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
         """
         self.assertEqual(self.do_email_validation(self.user.email), 'Old email is the same as the new email.')
 
-    @patch('django.core.mail.send_mail')
+    @patch('django.core.mail.EmailMultiAlternatives.send')
     def test_email_failure(self, send_mail):
         """
         Test the return value if sending the email for the user to click fails.
@@ -590,7 +590,7 @@ class SecondaryEmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, Ca
         for email in ('bad_email', 'bad_email@', '@bad_email'):
             self.assertEqual(self.do_email_validation(email), 'Valid e-mail address required.')
 
-    @patch('django.core.mail.send_mail')
+    @patch('django.core.mail.EmailMultiAlternatives.send')
     def test_email_failure(self, send_mail):
         """
         Test the return value if sending the email for the user to click fails.
