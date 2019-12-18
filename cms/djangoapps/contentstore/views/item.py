@@ -18,7 +18,7 @@ from django.views.decorators.http import require_http_methods
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
 from pytz import UTC
-from six import text_type
+from six import text_type, binary_type
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope
@@ -413,8 +413,12 @@ def xblock_view_handler(request, usage_key_string, view_name):
         for resource in fragment.resources:
             hashed_resources[hash_resource(resource)] = resource._asdict()
 
+        fragment_content = fragment.content
+        if isinstance(fragment_content, binary_type):
+            fragment_content = fragment.content.decode('utf-8')
+
         return JsonResponse({
-            'html': fragment.content,
+            'html': fragment_content,
             'resources': list(hashed_resources.items())
         })
 
