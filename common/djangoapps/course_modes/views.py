@@ -191,9 +191,11 @@ class ChooseModeView(View):
             )
         )
 
-        title_content = _("Congratulations!  You are now enrolled in {course_name}").format(
-            course_name=course.display_name_with_default
-        )
+        title_content = ''
+        if enrollment_mode:
+            title_content = _("Congratulations!  You are now enrolled in {course_name}").format(
+                course_name=course.display_name_with_default
+            )
 
         context["title_content"] = title_content
 

@@ -199,6 +199,29 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         else:
             self.assertNotContains(response, "Credit")
 
+    @httpretty.activate
+    @ddt.data(True, False)
+    def test_congrats_on_enrollment_message(self, create_enrollment):
+        # Create the course mode
+        CourseModeFactory.create(mode_slug='verified', course_id=self.course.id)
+
+        if create_enrollment:
+            CourseEnrollmentFactory(
+                is_active=True,
+                course_id=self.course.id,
+                user=self.user
+            )
+
+        # Check whether congratulations message is shown on the page
+        # This should *only* be shown when an enrollment exists
+        url = reverse('course_modes_choose', args=[six.text_type(self.course.id)])
+        response = self.client.get(url)
+
+        if create_enrollment:
+            self.assertContains(response, "Congratulations!  You are now enrolled in")
+        else:
+            self.assertNotContains(response, "Congratulations!  You are now enrolled in")
+
     @ddt.data('professional', 'no-id-professional')
     def test_professional_enrollment(self, mode):
         # The only course mode is professional ed
