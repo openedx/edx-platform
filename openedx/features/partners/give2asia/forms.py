@@ -130,7 +130,7 @@ class Give2AsiaAccountCreationForm(forms.Form):
     organization_name = forms.CharField(
         max_length=255,
         error_messages={
-            "required": "Organization name is required",
+            'required': _('Organization name is required'),
         },
     )
 
