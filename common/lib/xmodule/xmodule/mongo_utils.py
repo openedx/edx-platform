@@ -59,10 +59,9 @@ def connect_to_mongodb(
         )
 
     # default the authSource to be whatever db we are connecting to (for backwards compatiblity)
-    authSource=db
+    authSource = db
     if kwargs.get('authSource'):
-        # override if configured to use a different db for auth (e.g. Mongodb Atlas)
-      authSource=kwargs.get('authSource')
+        authSource = kwargs.get('authSource')
 
     # If credentials were provided, authenticate the user.
     if user is not None and password is not None:
