@@ -60,7 +60,7 @@ contextlib2==0.6.0.post1
 cookies==2.2.1            # via moto
 coreapi==2.3.3
 coreschema==0.0.4
-coverage==5.0b1
+coverage==5.0
 git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0
 git+https://github.com/edx/crowdsourcehinter.git@a7ffc85b134b7d8909bf1fefd23dbdb8eb28e467#egg=crowdsourcehinter-xblock==0.2
 cryptography==2.8
@@ -69,7 +69,7 @@ cssutils==1.0.2
 ddt==1.2.2
 decorator==4.4.1
 defusedxml==0.5.0
-diff-cover==0.9.8
+diff-cover==2.5.0
 distlib==0.3.0            # via caniusepython3
 django-appconf==1.0.3
 django-babel-underscore==0.5.2
@@ -223,7 +223,7 @@ pdfminer.six==20191110
 piexif==1.0.2
 pillow==6.2.1
 pkgconfig==1.5.1
-pluggy==0.13.1            # via pytest, tox
+pluggy==0.13.1
 polib==1.1.0
 psutil==1.2.1
 py2neo==3.1.2
