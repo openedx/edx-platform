@@ -10,8 +10,8 @@ import re
 import argparse
 from collections import Counter
 import pandas as pd
-from .write_to_html import HtmlOutlineWriter
-from .djangolib.markup import HTML, Text
+from write_to_html import HtmlOutlineWriter  # noqa pylint: disable=import-error
+from djangolib.markup import HTML, Text  # noqa pylint: disable=import-error
 
 columns = [
     "message",
