@@ -136,6 +136,6 @@ class Give2AsiaAccountCreationForm(forms.Form):
 
     country = forms.CharField(
         error_messages={
-            "required": _('Country name is required'),
+            'required': _('Country name is required'),
         },
     )
