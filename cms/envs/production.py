@@ -208,6 +208,12 @@ if 'loc_cache' not in CACHES:
 if 'staticfiles' in CACHES:
     CACHES['staticfiles']['KEY_PREFIX'] = EDX_PLATFORM_REVISION
 
+# In order to transition from local disk asset storage to S3 backed asset storage,
+# we need to run asset collection twice, once for local disk and once for S3.
+# Once we have migrated to service assets off S3, then we can convert this back to
+# managed by the yaml file contents
+STATICFILES_STORAGE = os.environ.get('STATICFILES_STORAGE', ENV_TOKENS.get('STATICFILES_STORAGE', STATICFILES_STORAGE))
+
 SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
 SESSION_COOKIE_HTTPONLY = ENV_TOKENS.get('SESSION_COOKIE_HTTPONLY', True)
 SESSION_ENGINE = ENV_TOKENS.get('SESSION_ENGINE', SESSION_ENGINE)

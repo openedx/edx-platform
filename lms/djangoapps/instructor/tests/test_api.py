@@ -3297,7 +3297,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         self.assertIn("attachment; filename=org", response['Content-Disposition'])
 
     @patch('lms.djangoapps.instructor_task.models.logger.error')
-    @patch.dict(settings.GRADES_DOWNLOAD, {'STORAGE_TYPE': 's3'})
+    @patch.dict(settings.GRADES_DOWNLOAD, {'STORAGE_TYPE': 's3', 'ROOT_PATH': 'tmp/edx-s3/grades'})
     def test_list_report_downloads_error(self, mock_error):
         """
         Tests the Rate-Limit exceeded is handled and does not raise 500 error.

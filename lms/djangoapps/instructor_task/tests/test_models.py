@@ -84,7 +84,11 @@ class LocalFSReportStoreTestCase(ReportStoreTestMixin, TestReportMixin, SimpleTe
         return ReportStore.from_config(config_name='GRADES_DOWNLOAD')
 
 
-@patch.dict(settings.GRADES_DOWNLOAD, {'STORAGE_TYPE': 's3'})
+@patch.dict(settings.GRADES_DOWNLOAD, {
+    'STORAGE_TYPE': 's3',
+    # Strip the leading `/`, because boto doesn't want it
+    'ROOT_PATH': settings.GRADES_DOWNLOAD['ROOT_PATH'].lstrip('/')
+})
 class S3ReportStoreTestCase(MockS3Mixin, ReportStoreTestMixin, TestReportMixin, SimpleTestCase):
     """
     Test the old S3ReportStore configuration.

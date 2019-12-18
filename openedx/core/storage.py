@@ -7,19 +7,20 @@ from django.contrib.staticfiles.storage import StaticFilesStorage
 from django.core.files.storage import get_storage_class, FileSystemStorage
 from django.utils.deconstruct import deconstructible
 from django.utils.lru_cache import lru_cache
-from pipeline.storage import NonPackagingMixin, PipelineCachedStorage
+from pipeline.storage import NonPackagingMixin
 from require.storage import OptimizedFilesMixin
+from storages.backends.s3boto3 import S3Boto3Storage
 
-from openedx.core.djangoapps.theming.storage import ThemeCachedFilesMixin, ThemePipelineMixin, ThemeStorage
+from openedx.core.djangoapps.theming.storage import ThemeCachedFilesMixin, ThemePipelineMixin, ThemeMixin
 
 
-class PipelineForgivingStorage(PipelineCachedStorage):
+class PipelineForgivingMixin(object):
     """
     An extension of the django-pipeline storage backend which forgives missing files.
     """
     def hashed_name(self, name, content=None, **kwargs):
         try:
-            out = super(PipelineForgivingStorage, self).hashed_name(name, content, **kwargs)
+            out = super(PipelineForgivingMixin, self).hashed_name(name, content, **kwargs)
         except ValueError:
             # This means that a file could not be found, and normally this would
             # cause a fatal error, which seems rather excessive given that
@@ -29,7 +30,7 @@ class PipelineForgivingStorage(PipelineCachedStorage):
 
     def stored_name(self, name):
         try:
-            out = super(PipelineForgivingStorage, self).stored_name(name)
+            out = super(PipelineForgivingMixin, self).stored_name(name)
         except ValueError:
             # This means that a file could not be found, and normally this would
             # cause a fatal error, which seems rather excessive given that
@@ -38,25 +39,33 @@ class PipelineForgivingStorage(PipelineCachedStorage):
         return out
 
 
-class ProductionStorage(
-        PipelineForgivingStorage,
+class ProductionMixin(
+        PipelineForgivingMixin,
         OptimizedFilesMixin,
         ThemePipelineMixin,
         ThemeCachedFilesMixin,
-        ThemeStorage,
-        StaticFilesStorage
+        ThemeMixin,
 ):
     """
-    This class combines Django's StaticFilesStorage class with several mixins
-    that provide additional functionality. We use this version on production.
+    This class combines several mixins that provide additional functionality, and
+    can be applied over an existing Storage.
+    We use this version on production.
     """
+    pass
+
+
+class ProductionStorage(ProductionMixin, StaticFilesStorage):
+    pass
+
+
+class ProductionS3Storage(ProductionMixin, S3Boto3Storage):  # pylint: disable=abstract-method
     pass
 
 
 class DevelopmentStorage(
         NonPackagingMixin,
         ThemePipelineMixin,
-        ThemeStorage,
+        ThemeMixin,
         StaticFilesStorage
 ):
     """
