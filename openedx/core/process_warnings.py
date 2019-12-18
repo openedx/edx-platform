@@ -98,14 +98,14 @@ def read_warning_data(dir_path):
     )
 
     # iterate through files_in_dir and see if they match our know file name pattern
-    for file in files_in_dir:
-        if re.search(warnings_file_name_regex, file) is not None:
-            warnings_files.append(file)
+    for temp_file in files_in_dir:
+        if re.search(warnings_file_name_regex, temp_file) is not None:
+            warnings_files.append(temp_file)
 
     # go through each warning file and aggregate warnigns into warnings_data
     warnings_data = []
     for temp_file in warnings_files:
-        with open(os.path.expanduser(dir_path + "/" + temp_file), "r") as read_file:
+        with io.open(os.path.expanduser(dir_path + "/" + temp_file), "r") as read_file:
             json_input = json.load(read_file)
             if "warnings" in json_input:
                 data = [
@@ -114,7 +114,7 @@ def read_warning_data(dir_path):
                 ]
                 warnings_data.extend(data)
             else:
-                print(temp_file)
+                print(temp_file)  # noqa
     return warnings_data
 
 
