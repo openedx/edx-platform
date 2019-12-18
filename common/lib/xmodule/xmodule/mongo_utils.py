@@ -41,17 +41,6 @@ def connect_to_mongodb(
         if read_preference is not None:
             kwargs['read_preference'] = read_preference
 
-    print "host"
-    print host
-    print "port"
-    print port
-    print "tz_aware"
-    print tz_aware
-    print "dict"
-    print dict
-    print "db"
-    print db
-
     mongo_conn = pymongo.database.Database(
         mongo_client_class(
             host=host,
