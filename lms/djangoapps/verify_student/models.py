@@ -837,7 +837,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         face_aes_key = codecs.decode(face_aes_key_str, 'hex')
         rsa_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["RSA_PUBLIC_KEY"]
         rsa_encrypted_face_aes_key = rsa_encrypt(face_aes_key, rsa_key_str)
-        return base64.b64encode(rsa_encrypted_face_aes_key)
+        return base64.b64encode(rsa_encrypted_face_aes_key).decode('utf-8')
 
     def create_request(self, copy_id_photo_from=None):
         """

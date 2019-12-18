@@ -31,7 +31,7 @@ class Command(BaseCommand):
             dest='verification_ids',
             action='store',
             nargs='+',
-            type=int,
+            type=str,
             help='verifications id used to retry verification'
         )
 
