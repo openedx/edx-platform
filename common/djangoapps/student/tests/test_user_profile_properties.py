@@ -90,7 +90,7 @@ class UserProfilePropertiesTest(CacheIsolationTestCase):
 
     def test_invalidate_cache_user_profile_country_updated(self):
 
-        country = 'us'
+        country = 'US'
         self.profile.country = country
         self.profile.save()
 

@@ -302,7 +302,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
     YEAR_OF_BIRTH = "1998"
     ADDRESS = "123 Fake Street"
     CITY = "Springfield"
-    COUNTRY = "us"
+    COUNTRY = "US"
     GOALS = "Learn all the things!"
     PROFESSION_OPTIONS = [
         {
