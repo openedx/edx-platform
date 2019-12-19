@@ -136,7 +136,7 @@ edx-opaque-keys[django]==2.0.1
 edx-organizations==2.2.0
 edx-proctoring-proctortrack==1.0.5
 edx-proctoring==2.2.2
-edx-rbac==1.0.4
+edx-rbac==1.0.5
 edx-rest-api-client==1.9.2
 edx-search==1.2.2
 edx-sga==0.10.0
@@ -315,7 +315,7 @@ sphinxcontrib-httpdomain==1.7.0
 git+https://github.com/sphinx-contrib/openapi.git@9306435601ae05138edea54419dd83ce9e729ad8#egg=sphinxcontrib-openapi[markdown]==0.0
 sphinxcontrib-websupport==1.1.2  # via sphinx
 sqlparse==0.3.0
-staff-graded-xblock==0.5
+staff-graded-xblock==0.6
 stevedore==1.31.0
 super-csv==0.9.6
 sympy==1.5
