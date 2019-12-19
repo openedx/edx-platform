@@ -2,7 +2,8 @@
 Django storage backends for Open edX.
 """
 from django.contrib.staticfiles.storage import StaticFilesStorage
-from django.core.files.storage import get_storage_class
+from django.core.files.storage import get_storage_class, FileSystemStorage
+from django.utils.deconstruct import deconstructible
 from django.utils.lru_cache import lru_cache
 from pipeline.storage import NonPackagingMixin, PipelineCachedStorage
 from require.storage import OptimizedFilesMixin
@@ -86,6 +87,28 @@ class S3ReportStorage(S3Boto3Storage):  # pylint: disable=abstract-method
         if custom_domain:
             self.custom_domain = custom_domain
         super(S3ReportStorage, self).__init__(acl=acl, bucket=bucket, **settings)
+
+
+@deconstructible
+class OverwriteStorage(FileSystemStorage):
+    """
+    FileSystemStorage subclass which automatically overwrites any previous
+    file with the same name; used in test runs to avoid test file proliferation.
+    Copied from django-storages when this class was removed in version 1.6.
+
+    Comes from http://www.djangosnippets.org/snippets/976/
+    (even if it already exists in S3Storage for ages)
+    See also Django #4339, which might add this functionality to core.
+    """
+
+    def get_available_name(self, name, max_length=None):
+        """
+        Returns a filename that's free on the target storage system, and
+        available for new content to be written to.
+        """
+        if self.exists(name):
+            self.delete(name)
+        return name
 
 
 @lru_cache()
