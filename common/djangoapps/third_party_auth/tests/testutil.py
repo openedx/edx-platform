@@ -18,7 +18,7 @@ from django.contrib.sites.models import Site
 from mako.template import Template
 from provider import constants
 from provider.oauth2.models import Client as OAuth2Client
-from storages.backends.overwrite import OverwriteStorage
+from openedx.core.storage import OverwriteStorage
 
 from third_party_auth.models import (
     LTIProviderConfig,
