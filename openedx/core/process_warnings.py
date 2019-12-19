@@ -10,7 +10,7 @@ import re
 import argparse
 from collections import Counter
 import pandas as pd
-from write_to_html import HtmlOutlineWriter  # noqa pylint: disable=import-error
+from write_to_html import HtmlOutlineWriter  # noqa pylint: disable=import-error,useless-suppression
 from djangolib.markup import HTML, Text  # noqa pylint: disable=import-error
 
 columns = [
@@ -114,7 +114,7 @@ def read_warning_data(dir_path):
                 ]
                 warnings_data.extend(data)
             else:
-                print(temp_file)  # noqa pylint: disable=superfluous-parens
+                print(temp_file)  # noqa pylint: disable=superfluous-parens,useless-suppression
     return warnings_data
 
 
