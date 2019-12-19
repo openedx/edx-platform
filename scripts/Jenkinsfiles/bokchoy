@@ -14,12 +14,12 @@ def runBokchoyTests() {
             noTags: true, shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
             refspec: git_refspec, url: "git@github.com:edx/${REPO_NAME}.git"]]]
         sh 'bash scripts/all-tests.sh'
-        stash includes: 'reports/bok_choy/*coverage*', name: "${TEST_SUITE}-reports-${SHARD}", allowEmpty: true
+        stash includes: 'reports/bok_choy*coverage*', name: "${TEST_SUITE}-reports-${SHARD}", allowEmpty: true
     }
 }
 
 def bokchoyTestCleanup() {
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/bok_choy/*.coverage*,test_root/log/**/*.log,test_root/log/**/*.png,reports/bok_choy/**/xunit.xml'
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/bok_choy*.coverage*,test_root/log/**/*.log,test_root/log/**/*.png,reports/bok_choy/**/xunit.xml'
     junit '**/reports/bok_choy/**/xunit.xml'
     sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
 }
