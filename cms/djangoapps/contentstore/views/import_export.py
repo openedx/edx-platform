@@ -277,7 +277,7 @@ def send_tarball(tarball, size):
     """
     wrapper = FileWrapper(tarball, settings.COURSE_EXPORT_DOWNLOAD_CHUNK_SIZE)
     response = StreamingHttpResponse(wrapper, content_type='application/x-tgz')
-    response['Content-Disposition'] = u'attachment; filename=%s' % os.path.basename(tarball.name.encode('utf-8'))
+    response['Content-Disposition'] = u'attachment; filename=%s' % os.path.basename(tarball.name)
     response['Content-Length'] = size
     return response
 
