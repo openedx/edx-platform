@@ -192,6 +192,8 @@ FEATURES = {
     # .. toggle_warnings: ???
     'DISABLE_HONOR_CERTIFICATES': False,  # Toggle to disable honor certificates
 
+    'DISABLE_AUDIT_CERTIFICATES': False,  # Toggle to disable audit certificates
+
     # for acceptance and load testing
     'AUTOMATIC_AUTH_FOR_TESTING': False,
 
