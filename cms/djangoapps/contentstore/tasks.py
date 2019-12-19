@@ -630,9 +630,6 @@ def create_export_tarball(course_module, course_key, context, status=None):
     Updates the context with any error information if applicable.
     """
     name = course_module.url_name
-    if isinstance(name, binary_type):
-        name = name.decode('utf-8')
-
     export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")
     root_dir = path(mkdtemp())
 
