@@ -469,7 +469,7 @@ PROCTORING_BACKENDS:
     'null': {}
 PROCTORING_SETTINGS: {}
 PROFILE_IMAGE_BACKEND:
-    class: storages.backends.overwrite.OverwriteStorage
+    class: openedx.core.storage.OverwriteStorage
     options:
         base_url: /media/profile-images/
         location: /edx/var/edxapp/media/profile-images/
