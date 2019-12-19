@@ -2242,6 +2242,7 @@ CREATE TABLE `credit_creditrequirement` (
   `criteria` longtext NOT NULL,
   `active` tinyint(1) NOT NULL,
   `course_id` int(11) NOT NULL,
+  `sort_value` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `credit_creditrequirement_namespace_name_course_id_87c301e6_uniq` (`namespace`,`name`,`course_id`),
   KEY `credit_creditrequire_course_id_b6aa812a_fk_credit_cr` (`course_id`),
@@ -2543,7 +2544,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=628 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=629 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
