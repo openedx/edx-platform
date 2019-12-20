@@ -176,12 +176,9 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             self.client.login(username=user.username, password=TEST_PASSWORD)
 
             html_elements = [
-                '<h3 class="hd hd-6 handouts-header">Important Course Dates</h3>',
+                '<h3 class="hd hd-6 handouts-header">Upcoming Dates</h3>',
                 '<div class="date-summary-container">',
-                '<div class="date-summary date-summary-todays-date">',
-                '<span class="hd hd-6 heading localized-datetime"',
-                'data-datetime="2015-01-02 00:00:00+00:00"',
-                u'data-string="Today is {date}"',
+                '<p class="hd hd-6 date localized-datetime"',
                 'data-timezone="None"'
             ]
             url = reverse(url_name, args=(course.id,))
@@ -204,12 +201,9 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             response = self.client.get(url, follow=True)
 
             html_elements = [
-                '<h3 class="hd hd-6 handouts-header">Important Course Dates</h3>',
+                '<h3 class="hd hd-6 handouts-header">Upcoming Dates</h3>',
                 '<div class="date-summary-container">',
-                '<div class="date-summary date-summary-todays-date">',
-                '<span class="hd hd-6 heading localized-datetime"',
-                'data-datetime="2015-01-02 00:00:00+00:00"',
-                u'data-string="Today is {date}"',
+                '<p class="hd hd-6 date localized-datetime"',
                 'data-timezone="America/Los_Angeles"'
             ]
             for html in html_elements:
@@ -235,7 +229,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             url = reverse(url_name, args=(course.id,))
             response = self.client.get(url, follow=True)
             html_elements = [
-                u'data-string="in 1 day - {date}"',
                 'data-datetime="2015-01-03 00:00:00+00:00"'
             ]
             for html in html_elements:
@@ -255,7 +248,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             url = reverse(url_name, args=(course.id,))
             response = self.client.get(url, follow=True)
             html_elements = [
-                u'data-string="in 1 day - {date}"',
                 'data-datetime="2015-01-03 00:00:00+00:00"',
                 'data-timezone="America/Los_Angeles"'
             ]
