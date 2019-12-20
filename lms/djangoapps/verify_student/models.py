@@ -688,7 +688,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
         # Update our record fields
         if six.PY3:
-            self.photo_id_key = codecs.encode(rsa_encrypted_aes_key, 'base64')
+            self.photo_id_key = codecs.encode(rsa_encrypted_aes_key, 'base64').decode('utf-8')
         else:
             self.photo_id_key = rsa_encrypted_aes_key.encode('base64')
 
