@@ -4,8 +4,12 @@ the new XBlock runtime.
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from django.utils.translation import ugettext as _
 from xblock.core import XBlock, XBlockMixin
 from xblock.exceptions import JsonHandlerError
+from web_fragments.fragment import Fragment
+
+from openedx.core.djangolib.markup import HTML
 
 
 @XBlock.wants('completion')
@@ -40,3 +44,28 @@ class LmsBlockMixin(XBlockMixin):
             raise JsonHandlerError(400, u"Block not configured for completion on view.")
         self.runtime.publish(self, "completion", data)
         return {'result': 'ok'}
+
+    def public_view(self, _context):
+        """
+        Default message for blocks that don't implement public_view
+
+        public_view is shown when users aren't logged in and/or are not enrolled
+        in a particular course.
+        """
+        alert_html = HTML(
+            '<div class="page-banner"><div class="alert alert-warning">'
+            '<span class="icon icon-alert fa fa fa-warning" aria-hidden="true"></span>'
+            '<div class="message-content">{}</div></div></div>'
+        )
+
+        # Determine if the user is seeing public_view because they're not logged in or because they're not enrolled.
+        # (Note: 'self.runtime.user' is not part of the XBlock API and some runtimes don't provide it, but this mixin is
+        # part of the runtime so it's OK to access it that way.)
+        if self.runtime.user is None or self.runtime.user.is_anonymous:
+            display_text = _('This content is only accessible to registered learners. Sign in or register to view it.')
+        else:
+            # This is a registered user but they're still seeing public_view
+            # so they must be excluded because of enrollment status.
+            display_text = _('This content is only accessible to enrolled learners. ')
+
+        return Fragment(alert_html.format(display_text))

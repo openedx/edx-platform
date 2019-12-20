@@ -52,6 +52,8 @@ class UnitBlock(XBlock):
         result.add_content('</div>')
         return result
 
+    public_view = student_view
+
     def index_dictionary(self):
         """
         Return dictionary prepared with module content and type for indexing, so

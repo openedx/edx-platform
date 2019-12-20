@@ -9,6 +9,7 @@ from completion.models import BlockCompletion
 from completion.services import CompletionService
 import crum
 from django.contrib.auth import get_user_model
+from django.core.exceptions import PermissionDenied
 from django.utils.lru_cache import lru_cache
 from eventtracking import tracker
 from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
@@ -24,7 +25,9 @@ from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataC
 from lms.djangoapps.grades.api import signals as grades_signals
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 from openedx.core.djangoapps.xblock.runtime.blockstore_field_data import BlockstoreFieldData
+from openedx.core.djangoapps.xblock.runtime.ephemeral_field_data import EphemeralKeyValueStore
 from openedx.core.djangoapps.xblock.runtime.mixin import LmsBlockMixin
+from openedx.core.djangoapps.xblock.utils import get_xblock_id_for_anonymous_user
 from openedx.core.lib.xblock_utils import wrap_fragment, xblock_local_resource_url
 from static_replace import process_static_urls
 from xmodule.errortracker import make_error_tracker
@@ -62,6 +65,11 @@ class XBlockRuntime(RuntimeShim, Runtime):
     # ** Do not add any XModule compatibility code to this class **
     # Add it to RuntimeShim instead, to help keep legacy code isolated.
 
+    # Feature flags:
+
+    # This runtime can save state for users who aren't logged in:
+    suppports_state_for_anonymous_users = True
+
     def __init__(self, system, user):
         super(XBlockRuntime, self).__init__(
             id_reader=system.id_reader,
@@ -78,7 +86,13 @@ class XBlockRuntime(RuntimeShim, Runtime):
         )
         self.system = system
         self.user = user
-        self.user_id = user.id if self.user else None  # Must be set as a separate attribute since base class sets it
+        # self.user_id must be set as a separate attribute since base class sets it:
+        if self.user is None:
+            self.user_id = None
+        elif self.user.is_anonymous:
+            self.user_id = get_xblock_id_for_anonymous_user(user)
+        else:
+            self.user_id = self.user.id
         self.block_field_datas = {}  # dict of FieldData stores for our loaded XBlocks. Key is the block's scope_ids.
         self.django_field_data_caches = {}  # dict of FieldDataCache objects for XBlock with database-based user state
 
@@ -86,11 +100,9 @@ class XBlockRuntime(RuntimeShim, Runtime):
         """
         Get the URL to a specific handler.
         """
-        url = self.system.handler_url(
-            usage_key=block.scope_ids.usage_id,
-            handler_name=handler_name,
-            user_id=XBlockRuntimeSystem.ANONYMOUS_USER if thirdparty else self.user_id,
-        )
+        if thirdparty:
+            raise NotImplementedError("thirdparty handlers are not supported by this runtime.")
+        url = self.system.handler_url(usage_key=block.scope_ids.usage_id, handler_name=handler_name, user=self.user)
         if suffix:
             if not url.endswith('/'):
                 url += '/'
@@ -231,17 +243,15 @@ class XBlockRuntime(RuntimeShim, Runtime):
             # No user is specified, so we want to throw an error if anything attempts to read/write user-specific fields
             student_data_store = None
         elif self.user.is_anonymous:
-            # The user is anonymous. Future work will support saving their state
-            # in a cache or the django session but for now just use a highly
-            # ephemeral dict.
-            student_data_store = KvsFieldData(kvs=DictKeyValueStore())
+            # This is an anonymous (non-registered) user:
+            assert self.user_id.startswith("anon")
+            kvs = EphemeralKeyValueStore()
+            student_data_store = KvsFieldData(kvs)
         elif self.system.student_data_mode == XBlockRuntimeSystem.STUDENT_DATA_EPHEMERAL:
             # We're in an environment like Studio where we want to let the
             # author test blocks out but not permanently save their state.
-            # This in-memory dict will typically only persist for one
-            # request-response cycle, so we need to soon replace it with a store
-            # that puts the state into a cache or the django session.
-            student_data_store = KvsFieldData(kvs=DictKeyValueStore())
+            kvs = EphemeralKeyValueStore()
+            student_data_store = KvsFieldData(kvs)
         else:
             # Use database-backed field data (i.e. store user_state in StudentModule)
             context_key = block.scope_ids.usage_id.context_key
@@ -270,7 +280,11 @@ class XBlockRuntime(RuntimeShim, Runtime):
         """
         Render a specific view of an XBlock.
         """
-        # We only need to override this method because some XBlocks in the
+        # Users who aren't logged in are not allowed to view any views other
+        # than public_view. They may call any handlers though.
+        if (self.user is None or self.user.is_anonymous) and view_name != 'public_view':
+            raise PermissionDenied
+        # We also need to override this method because some XBlocks in the
         # edx-platform codebase use methods like add_webpack_to_fragment()
         # which create relative URLs (/static/studio/bundles/webpack-foo.js).
         # We want all resource URLs to be absolute, such as is done when
@@ -353,8 +367,6 @@ class XBlockRuntimeSystem(object):
     class can be used with many different XBlocks, whereas each XBlock gets its
     own instance of XBlockRuntime.
     """
-    ANONYMOUS_USER = 'anon'  # Special value passed to handler_url() methods
-
     STUDENT_DATA_EPHEMERAL = 'ephemeral'
     STUDENT_DATA_PERSISTED = 'persisted'
 
@@ -371,10 +383,8 @@ class XBlockRuntimeSystem(object):
                 handler_url(
                     usage_key: UsageKey,
                     handler_name: str,
-                    user_id: Union[int, ANONYMOUS_USER],
+                    user_id: Union[int, str],
                 )
-                If user_id is ANONYMOUS_USER, the handler should execute without
-                any user-scoped fields.
             student_data_mode: Specifies whether student data should be kept
                 in a temporary in-memory store (e.g. Studio) or persisted
                 forever in the database.

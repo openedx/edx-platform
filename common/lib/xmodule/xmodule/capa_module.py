@@ -119,6 +119,20 @@ class ProblemBlock(
         shim_xmodule_js(fragment, 'Problem')
         return fragment
 
+    def public_view(self, context):
+        """
+        Return the view seen by users who aren't logged in or who aren't
+        enrolled in the course.
+        """
+        if getattr(self.runtime, 'suppports_state_for_anonymous_users', False):
+            # The new XBlock runtime can generally support capa problems for users who aren't logged in, so show the
+            # normal student_view. To prevent anonymous users from viewing specific problems, adjust course policies
+            # and/or content groups.
+            return self.student_view(context)
+        else:
+            # Show a message that this content requires users to login/enroll.
+            return super(ProblemBlock, self).public_view(context)
+
     def author_view(self, context):
         """
         Renders the Studio preview view.

@@ -252,6 +252,9 @@ class VideoBlock(
         """
         Returns a fragment that contains the html for the public view
         """
+        if getattr(self.runtime, 'suppports_state_for_anonymous_users', False):
+            # The new runtime can support anonymous users as fully as regular users:
+            return self.student_view(context)
         return Fragment(self.get_html(view=PUBLIC_VIEW))
 
     def get_html(self, view=STUDENT_VIEW):
@@ -610,12 +613,8 @@ class VideoBlock(
         field_data = cls.parse_video_xml(node)
         for key, val in field_data.items():
             setattr(video_block, key, cls.fields[key].from_json(val))
-        # Update VAL with info extracted from `xml_object`
-        video_block.edx_video_id = video_block.import_video_info_into_val(
-            node,
-            runtime.resources_fs,
-            keys.usage_id.context_key,
-        )
+        # Don't use VAL in the new runtime:
+        video_block.edx_video_id = None
         return video_block
 
     @classmethod
