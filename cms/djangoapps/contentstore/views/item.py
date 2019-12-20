@@ -70,7 +70,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
-from xmodule.services import ConfigurationService, SettingsService
+from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService
 from xmodule.tabs import CourseTabList
 from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW
 from edx_proctoring.api import get_exam_configuration_dashboard_url, does_backend_support_onboarding
@@ -292,6 +292,8 @@ class StudioEditModuleRuntime(object):
                 return SettingsService()
             if service_name == "lti-configuration":
                 return ConfigurationService(CourseEditLTIFieldsEnabledFlag)
+            if service_name == "teams_configuration":
+                return TeamsConfigurationService()
         return None
 
 
