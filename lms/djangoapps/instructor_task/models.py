@@ -279,6 +279,11 @@ class DjangoStorageReportStore(ReportStore):
         object, ready to be read from the beginning.
         """
         path = self.path_to(course_id, filename)
+        # See https://github.com/boto/boto/issues/2868
+        # Boto doesn't play nice with unicod in python3
+        if not six.PY2:
+            buff = ContentFile(buff.read().encode('utf-8'))
+
         self.storage.save(path, buff)
 
     def store_rows(self, course_id, filename, rows):
