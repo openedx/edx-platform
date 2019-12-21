@@ -203,7 +203,7 @@ mando==0.6.4
 markdown==2.6.11
 markey==0.8
 markupsafe==1.1.1
-maxminddb==1.5.1
+maxminddb==1.5.2
 mccabe==0.6.1
 mistune==0.8.4            # via m2r
 mock==3.0.5
