@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-12-16 11:18+0000\n"
-"PO-Revision-Date: 2019-12-16 11:18:39.247260\n"
+"POT-Creation-Date: 2019-12-22 20:54+0000\n"
+"PO-Revision-Date: 2019-12-22 20:54:37.644391\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -12061,6 +12061,18 @@ msgstr "بخقذث خر"
 msgid "Force Off"
 msgstr "بخقذث خبب"
 
+#: openedx/core/djangoapps/xblock/runtime/mixin.py
+msgid ""
+"This content is only accessible to registered learners. Sign in or register "
+"to view it."
+msgstr ""
+"فاهس ذخرفثرف هس خرمغ شذذثسسهزمث فخ قثلهسفثقثي مثشقرثقس. سهلر هر خق قثلهسفثق "
+"فخ دهثص هف."
+
+#: openedx/core/djangoapps/xblock/runtime/mixin.py
+msgid "This content is only accessible to enrolled learners. "
+msgstr "فاهس ذخرفثرف هس خرمغ شذذثسسهزمث فخ ثرقخممثي مثشقرثقس. "
+
 #: openedx/core/lib/api/view_utils.py
 msgid "This value is invalid."
 msgstr "فاهس دشمعث هس هردشمهي."
@@ -21503,13 +21515,8 @@ msgid "Connect"
 msgstr "ذخررثذف"
 
 #: themes/edx.org/lms/templates/footer.html
-msgid "© 2012–{year} edX Inc. "
-msgstr "© 2012–{year} ثيط هرذ. "
-
-#: themes/edx.org/lms/templates/footer.html
-msgid "edX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
-msgstr ""
-"ثيط, خحثر ثيط, شري وهذقخوشسفثقس شقث قثلهسفثقثي فقشيثوشقنس خب ثيط هرذ. "
+msgid "© {year} edX Inc. All rights reserved."
+msgstr "© {year} ثيط هرذ. شمم قهلافس قثسثقدثي."
 
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
 msgid "About edX Verified Certificates"
