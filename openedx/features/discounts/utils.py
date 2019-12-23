@@ -18,10 +18,9 @@ from web_fragments.fragment import Fragment
 from openedx.features.discounts.applicability import (
     can_receive_discount,
     get_discount_expiration_date,
-    discount_percentage
+    discount_percentage,
+    REV1008_EXPERIMENT_ID
 )
-
-REV1008_EXPERIMENT_ID = 15
 
 
 def offer_banner_wrapper(user, block, view, frag, context):  # pylint: disable=W0613

@@ -44,7 +44,7 @@ DISCOUNT_APPLICABILITY_FLAG = WaffleFlag(
 )
 
 DISCOUNT_APPLICABILITY_HOLDBACK = 'first_purchase_discount_holdback'
-REV1008_EXPERIMENT_ID = 15
+REV1008_EXPERIMENT_ID = 16
 
 
 def get_discount_expiration_date(user, course):

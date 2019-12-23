@@ -15,6 +15,7 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from experiments.models import ExperimentData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
@@ -22,7 +23,7 @@ from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiv
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermissionIsAuthenticated
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 
-from .applicability import can_receive_discount, discount_percentage
+from .applicability import can_receive_discount, discount_percentage, REV1008_EXPERIMENT_ID
 
 
 class CourseUserDiscount(DeveloperErrorViewMixin, APIView):
@@ -33,7 +34,7 @@ class CourseUserDiscount(DeveloperErrorViewMixin, APIView):
 
     **Example Requests**
 
-        GET /api/discounts/v1/course/{course_key_string}
+        GET /api/discounts/course/{course_key_string}
 
     **Response Values**
 
@@ -75,6 +76,15 @@ class CourseUserDiscount(DeveloperErrorViewMixin, APIView):
         discount_applicable = can_receive_discount(user=request.user, course=course)
         discount_percent = discount_percentage(course)
         payload = {'discount_applicable': discount_applicable, 'discount_percent': discount_percent}
+
+        # Record whether the last basket loaded for this course had a discount
+        ExperimentData.objects.update_or_create(
+            user=request.user,
+            experiment_id=REV1008_EXPERIMENT_ID,
+            key='discount_' + str(course),
+            value=discount_applicable
+        )
+
         return Response({
             'discount_applicable': discount_applicable,
             'jwt': create_jwt_for_user(request.user, additional_claims=payload)})
@@ -94,7 +104,7 @@ class CourseUserDiscountWithUserParam(DeveloperErrorViewMixin, APIView):
 
     **Example Requests**
 
-        GET /api/discounts/v1/user/{user_id}/course/{course_key_string}
+        GET /api/discounts/user/{user_id}/course/{course_key_string}
 
     **Response Values**
 
@@ -135,9 +145,20 @@ class CourseUserDiscountWithUserParam(DeveloperErrorViewMixin, APIView):
         course_key = CourseKey.from_string(course_key_string)
         course = CourseOverview.get_from_id(course_key)
         user = User.objects.get(id=user_id)
-        discount_applicable = can_receive_discount(user=user, course=course)
+        # Below code in try/except is temporarily replacing this call
+        # discount_applicable = can_receive_discount(user=user, course=course)
+        # Only show a discount on the order if the last basket loaded for this course had a discount
+        # Do not check any of the discount requirements
+        try:
+            discount_applicable = ExperimentData.objects.get(
+                user=user, experiment_id=REV1008_EXPERIMENT_ID, key='discount_' + str(course)
+            ).value == 'True'
+        except ExperimentData.DoesNotExist:
+            discount_applicable = False
+
         discount_percent = discount_percentage(course)
         payload = {'discount_applicable': discount_applicable, 'discount_percent': discount_percent}
+
         return Response({
             'discount_applicable': discount_applicable,
             'jwt': create_jwt_for_user(request.user, additional_claims=payload)})
