@@ -11,7 +11,10 @@ from student.models import CourseEnrollment
 
 log = getLogger(__name__)
 
+
 class Command(BaseCommand):
+    help = 'Get all enrolled user(s) of given course(s) and add them to respective nodebb group.'
+
     def add_arguments(self, parser):
         parser.add_argument(
             '--course_ids',
@@ -38,6 +41,11 @@ class Command(BaseCommand):
             for enrollment in enrollments:
                 username = enrollment.user.username
                 task_join_group_on_nodebb.delay(category_id=community_id, username=username)
-                log.info('Task to sync enrollment of {username} is added to celery'.format(
-                    username=username
-                ))
+                log.info(
+                    'Task to sync enrollment of {course} '
+                    'for {username} in community:{community} is added to celery'.format(
+                        course=course_id,
+                        username=username,
+                        community=community_id
+                    )
+                )
