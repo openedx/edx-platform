@@ -13,7 +13,7 @@ from edx_rest_framework_extensions.auth.session.authentication import SessionAut
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import APIException, ErrorDetail
 from rest_framework.generics import GenericAPIView
 from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
@@ -132,11 +132,28 @@ def view_auth_classes(is_user=False, is_authenticated=True):
     return _decorator
 
 
+def clean_errors(error):
+    """
+    DRF error messages are of type ErrorDetail and serialize out as such.
+    We want to coerce the strings into the message only.
+
+    This cursively handles the nesting of errors.
+    """
+    if isinstance(error, ErrorDetail):
+        return text_type(error)
+    if isinstance(error, list):
+        return [clean_errors(el) for el in error]
+    else:
+        # We assume that it's a nested dictionary if it's not a list.
+        return {key: clean_errors(value) for key, value in error.items()}
+
+
 def add_serializer_errors(serializer, data, field_errors):
     """Adds errors from serializer validation to field_errors. data is the original data to deserialize."""
     if not serializer.is_valid():
         errors = serializer.errors
         for key, error in iteritems(errors):
+            error = clean_errors(error)
             field_errors[key] = {
                 'developer_message': u"Value '{field_value}' is not valid for field '{field_name}': {error}".format(
                     field_value=data.get(key, ''), field_name=key, error=error

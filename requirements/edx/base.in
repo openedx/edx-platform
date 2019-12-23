@@ -64,7 +64,7 @@ django-storages==1.4.1
 django-user-tasks
 django-waffle==0.12.0
 django-webpack-loader               # Used to wire webpack bundles into the django asset pipeline
-djangorestframework==3.7.7
+djangorestframework==3.9.4
 djangorestframework-jwt
 drf-yasg                            # Replacement for django-rest-swagger
 edx-ace
