@@ -36,6 +36,11 @@ class Command(BaseCommand):
                 continue
 
             community_id = get_community_id(course_key)
+            if not community_id:
+                # Either course id doesn't exist in database or community against this course is not made
+                log.error('Either course or community not found for course id {}'.format(course_id))
+                continue
+
             enrollments = self._get_course_active_enrollments(course_key)
 
             for enrollment in enrollments:
