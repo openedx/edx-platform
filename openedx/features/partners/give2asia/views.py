@@ -1,7 +1,7 @@
 import analytics
-import datetime
 import json
-import logging
+from datetime import datetime
+from logging import getLogger
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login
@@ -18,7 +18,6 @@ from pytz import UTC
 from util.json_request import JsonResponse
 
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER, record_registration_attributions
@@ -26,7 +25,7 @@ from openedx.features.partners.helpers import get_partner_recommended_courses
 from openedx.features.partners.models import PartnerUser
 
 from lms.djangoapps.philu_overrides.user_api.views import RegistrationViewCustom
-from lms.djangoapps.onboarding.models import EmailPreference, Organization, UserExtendedProfile
+from lms.djangoapps.onboarding.models import EmailPreference, Organization, PartnerNetwork, UserExtendedProfile
 from philu_overrides.user_api.views import LoginSessionViewCustom
 from nodebb.helpers import update_nodebb_for_user_status, set_user_activation_status_on_nodebb
 from student.models import Registration, UserProfile
@@ -34,8 +33,8 @@ from student.models import Registration, UserProfile
 from . import constants as g2a_constants
 from .forms import Give2AsiaAccountCreationForm
 
-log = logging.getLogger("edx.student")
-AUDIT_LOG = logging.getLogger("audit")
+log = getLogger("edx.student")
+AUDIT_LOG = getLogger("audit")
 
 
 def dashboard(request, partner_slug):
@@ -52,15 +51,10 @@ class Give2AsiaRegistrationView(RegistrationViewCustom):
 
     def get(self, request, partner):
         # Overriding get method to suppress corresponding method of parent class
-        # TODO show registration popup
         raise Http404
 
     def post(self, request, partner):
         registration_data = request.POST.copy()
-
-        # Adding basic data, required to bypass onboarding flow
-        g2a_constants.GIVE2ASIA_DEFAULT_DATA[g2a_constants.ORGANIZATION_NAME_KEY] = partner.label
-        registration_data.update(g2a_constants.GIVE2ASIA_DEFAULT_DATA)
 
         # validate data provided by end user
         account_creation_form = Give2AsiaAccountCreationForm(data=registration_data, tos_required=True)
@@ -68,10 +62,9 @@ class Give2AsiaRegistrationView(RegistrationViewCustom):
             return JsonResponse({"Error": dict(account_creation_form.errors.items())}, status=400)
 
         account_creation_form.clean_registration_data(registration_data)
-        registration_data[g2a_constants.FIRST_NAME_KEY], registration_data[g2a_constants.LAST_NAME_KEY] = registration_data['name']
-
         try:
-            # Create models for user, UserProfile, UserExtendedProfile and PartnerUser
+            # Create or update models for User, UserProfile,
+            # UserExtendedProfile, Organization, PartnerUser and EmailPreference
             user = create_account_with_params_custom(request, registration_data, partner)
             self.save_user_utm_info(user)
         except Exception as err:
@@ -88,8 +81,8 @@ def create_account_with_params_custom(request, params, partner):
     # Copy params so we can modify it; we can't just do dict(params) because if
     # params is request.POST, that results in a dict containing lists of values
     params = dict(params.items())
-    extended_profile_fields = configuration_helpers.get_value('extended_profile_fields', [])
 
+    first_name, last_name = params['name']
     # Perform operations within a transaction that are critical to account creation
     with transaction.atomic():
         try:
@@ -97,8 +90,8 @@ def create_account_with_params_custom(request, params, partner):
             user = User(
                 username=params['username'],
                 email=params["email"],
-                first_name=params[g2a_constants.FIRST_NAME_KEY],
-                last_name=params[g2a_constants.LAST_NAME_KEY],
+                first_name=first_name,
+                last_name=last_name,
                 is_active=True,
             )
             user.set_password(params["password"])
@@ -110,25 +103,16 @@ def create_account_with_params_custom(request, params, partner):
             log.exception("User creation failed for user {username}".format(username=params['username']), repr(err))
             raise
 
+        extended_profile_data = g2a_constants.G2A_EXTENDED_PROFILE_DEFAULT_DATA
+        extended_profile_data[g2a_constants.START_MONTH_YEAR_KEY] = datetime.now().strftime('%m/%Y')
+
+        user_profile_data = g2a_constants.G2A_USER_PROFILE_DEFAULT_DATA
+        user_profile_data['name'] = '{} {}'.format(first_name, last_name)
+
         try:
-            # Update User profile
-            profile_fields = [
-                "name", "level_of_education", "gender", "country", "year_of_birth"
-            ]
-            profile = UserProfile(
-                user=user,
-                **{key: params.get(key) for key in profile_fields}
-            )
-
-            # Return a dictionary containing the extended_profile_fields and values
-            extended_profile_data = {
-                key: value
-                for key, value in params.items() if key in extended_profile_fields and value is not None
-            }
-
-            if extended_profile_data:
-                profile.meta = json.dumps(extended_profile_data)
-
+            # Create user profile
+            profile = UserProfile(user=user, **user_profile_data)
+            profile.meta = json.dumps(extended_profile_data)
             profile.save()
 
             # We have to manually trigger the post_save so that profile is synced on nodebb
@@ -139,16 +123,19 @@ def create_account_with_params_custom(request, params, partner):
             raise
 
         try:
-            # Get organization so that it can be assigned to new user
-            # Give2AsiaAccountCreationForm will handle if organization not found
-            organization_to_assign = Organization.objects.filter(label__iexact=params['organization_name']).first()
+            organization_data = g2a_constants.G2A_ORGANIZATION_DEFAULT_DATA
+            organization_data[g2a_constants.ORG_TYPE_KEY] = PartnerNetwork.NON_PROFIT_ORG_TYPE_CODE
+
+            organization_name = params['organization_name']
+            organization_to_assign = Organization.objects.filter(label__iexact=organization_name).first()
+            if not organization_to_assign:
+                # Create organization if not already exists and make user first learner
+                organization_to_assign = Organization.objects.create(label=organization_name, **organization_data)
+                organization_to_assign.save()
 
             # create User Extended Profile
             extended_profile = UserExtendedProfile.objects.create(
-                user=user, english_proficiency=params[g2a_constants.ENGLISH_PROFICIENCY_KEY],
-                start_month_year=params[g2a_constants.START_MONTH_YEAR_KEY],
-                is_interests_data_submitted=params[g2a_constants.IS_INTERESTS_DATA_SUBMITTED_KEY],
-                organization=organization_to_assign
+                user=user, organization=organization_to_assign, **extended_profile_data
             )
 
             extended_profile.save()
@@ -163,13 +150,15 @@ def create_account_with_params_custom(request, params, partner):
         except Exception as err:  # pylint: disable=broad-except
             log.exception("partner_user creation failed for user {id}, partner {slug}"
                           .format(id=user.id, slug=partner.slug), repr(err))
+            raise
 
         try:
             user_email_preferences, created = EmailPreference.objects.get_or_create(user=user)
-            user_email_preferences.opt_in = g2a_constants.GIVE2ASIA_DEFAULT_DATA[g2a_constants.OPT_IN_KEY]
+            user_email_preferences.opt_in = g2a_constants.OPT_IN_DATA
             user_email_preferences.save()
         except Exception as err:  # pylint: disable=broad-except
             log.exception("User email preferences creation failed for user {id}.".format(id=user.id), repr(err))
+            raise
 
     # Perform operations that are non-critical parts of account creation
     preferences_api.set_user_preference(user, LANGUAGE_KEY, get_language())
@@ -191,7 +180,7 @@ def create_account_with_params_custom(request, params, partner):
                 'name': profile.name,
                 # Mailchimp requires the age & yearOfBirth to be integers, we send a sane integer default if falsey.
                 'age': profile.age or -1,
-                'yearOfBirth': profile.year_of_birth or datetime.datetime.now(UTC).year,
+                'yearOfBirth': profile.year_of_birth or datetime.now(UTC).year,
                 'education': profile.level_of_education_display,
                 'address': profile.mailing_address,
                 'gender': profile.gender_display,
@@ -224,12 +213,12 @@ def create_account_with_params_custom(request, params, partner):
             }
         )
 
-    # Since all required data corresponding to new user is saved in relevant models
-    # request NodeBB to activate registered user
-    update_nodebb_for_user_status(params['username'])
-
     # Activate user on nodebb manually
     set_user_activation_status_on_nodebb(params['username'], True)
+
+    # Since all required data corresponding to new user is saved in relevant models
+    # request NodeBB to register user
+    update_nodebb_for_user_status(params['username'])
 
     # Announce registration
     REGISTER_USER.send(sender=None, user=user, registration=registration)

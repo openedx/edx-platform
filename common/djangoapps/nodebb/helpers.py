@@ -7,8 +7,11 @@ from courseware.tabs import get_course_tab_list
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from nodebb.models import DiscussionCommunity, TeamGroupChat
-from nodebb.tasks import task_update_onboarding_surveys_status, task_archive_community_on_nodebb, \
+from nodebb.tasks import (
+    task_update_onboarding_surveys_status,
+    task_archive_community_on_nodebb,
     task_activate_user_on_nodebb
+)
 
 from logging import getLogger
 log = getLogger(__name__)

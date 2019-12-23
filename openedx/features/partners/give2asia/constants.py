@@ -1,19 +1,50 @@
-ORGANIZATION_NAME_KEY = 'organization_name'
+# G2A extended profile keys
 ENGLISH_PROFICIENCY_KEY = 'english_proficiency'
-START_MONTH_YEAR_KEY = 'start_month_year'
+GENDER_KEY = 'gender'
+HOURS_PER_WEEK_KEY = 'hours_per_week'
+IS_FIRST_LEARNER = 'is_first_learner'
 IS_INTERESTS_DATA_SUBMITTED_KEY = 'is_interests_data_submitted'
-FIRST_NAME_KEY = 'first_name'
-LAST_NAME_KEY = 'last_name'
-YEAR_OF_BIRTH_KEY = 'year_of_birth'
+IS_ORGANIZATION_METRICS_SUBMITTED = 'is_organization_metrics_submitted'
+LANGUAGE_KEY = 'language'
 LEVEL_OF_EDUCATION_KEY = 'level_of_education'
-OPT_IN_KEY = 'opt_in'
+ORGANIZATION_NAME_KEY = 'organization_name'
+ROLE_IN_ORG_KEY = 'role_in_org'
+YEAR_OF_BIRTH_KEY = 'year_of_birth'
+
+# G2A organization keys
+COUNTRY_KEY = 'country'
+FOCUS_AREA_KEY = 'focus_area'
+FOUNDING_YEAR_KEY = 'founding_year'
+LEVEL_OF_OPERATION_KEY = 'level_of_operation'
+ORG_TYPE_KEY = 'org_type'
+START_MONTH_YEAR_KEY = 'start_month_year'
+TOTAL_EMPLOYEES_KEY = 'total_employees'
+
+OPT_IN_DATA = 'no'  # By default user opt out of emails by MailChimp
+
 # These are minimum required fields to complete registration
 # These are the default values for Give2Asia partner
-GIVE2ASIA_DEFAULT_DATA = {
-    YEAR_OF_BIRTH_KEY: 2000,
-    LEVEL_OF_EDUCATION_KEY: 'IWRNS',  # set I'd rather not say for education level
-    ENGLISH_PROFICIENCY_KEY: 'IWRNS',  # set I'd rather not say for english proficiency
-    START_MONTH_YEAR_KEY: '11/2019',
+G2A_EXTENDED_PROFILE_DEFAULT_DATA = {
+    ENGLISH_PROFICIENCY_KEY: 'IWRNS',  # I'd rather not say
+    HOURS_PER_WEEK_KEY: 1,
+    IS_FIRST_LEARNER: True,  # mark user is first learner
     IS_INTERESTS_DATA_SUBMITTED_KEY: True,  # Flag required for by-passing interests form
-    OPT_IN_KEY: 'no'  # By default user opt out of emails by MailChimp
+    IS_ORGANIZATION_METRICS_SUBMITTED: True,  # mark user has completed organization details
+    ROLE_IN_ORG_KEY: 'IWRNS',  # I'd rather not say
+}
+
+G2A_USER_PROFILE_DEFAULT_DATA = {
+    GENDER_KEY: 'o', # I'd rather not say
+    LANGUAGE_KEY: 'English',
+    LEVEL_OF_EDUCATION_KEY: 'IWRNS',  # I'd rather not say
+    YEAR_OF_BIRTH_KEY: 1900,
+}
+
+# Minimum required fields for making user first learner of an organization
+# when he register from Give2Asia (partner) flow
+G2A_ORGANIZATION_DEFAULT_DATA = {
+    FOCUS_AREA_KEY: 'IWRNS',  # I'd rather not say
+    FOUNDING_YEAR_KEY: '0',  # set to zero
+    LEVEL_OF_OPERATION_KEY: 'IWRNS',  # I'd rather not say
+    TOTAL_EMPLOYEES_KEY: 'NA',  # Not Applicable
 }

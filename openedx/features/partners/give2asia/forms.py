@@ -6,7 +6,6 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
-from lms.djangoapps.onboarding.models import Organization
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
 
@@ -61,12 +60,6 @@ class Give2AsiaAccountCreationForm(forms.Form):
         name_split = name.strip().split(" ", 1)
         if len(name_split) < 2:
             raise forms.ValidationError("Full Name must include first name and last name")
-
-    def validate_organization_name(organization_name):
-        """ Check if organization associated to partner exists"""
-        organization = Organization.objects.filter(label__iexact=organization_name).first()
-        if organization is None:
-            raise forms.ValidationError("Organization associated to this partner is not found")
 
     def clean_password(self):
         """Enforce password policies (if applicable)"""
@@ -127,8 +120,8 @@ class Give2AsiaAccountCreationForm(forms.Form):
         validators=[validate_name]
     )
     organization_name = forms.CharField(
+        max_length=255,
         error_messages={
-            "required": "Valid organization name associated to this partner is required",
+            'required': _('Organization name is required'),
         },
-        validators=[validate_organization_name]
     )
