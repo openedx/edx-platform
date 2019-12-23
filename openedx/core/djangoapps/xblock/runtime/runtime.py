@@ -165,7 +165,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
         """
         Submit a grade for the block.
         """
-        if not self.user.is_anonymous():
+        if not self.user.is_anonymous:
             grades_signals.SCORE_PUBLISHED.send(
                 sender=None,
                 block=block,

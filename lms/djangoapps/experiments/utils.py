@@ -274,7 +274,7 @@ def get_experiment_user_metadata_context(course, user):
         pass  # Not enrolled, use the default values
 
     has_entitlements = False
-    if user.is_authenticated():
+    if user.is_authenticated:
         has_entitlements = CourseEntitlement.objects.filter(user=user).exists()
 
     context = get_base_experiment_metadata_context(course, user, enrollment, user_enrollments)
@@ -284,7 +284,7 @@ def get_experiment_user_metadata_context(course, user):
         forum_roles = list(Role.objects.filter(users=user, course_id=course.id).values_list('name').distinct())
 
     # get user partition data
-    if user.is_authenticated():
+    if user.is_authenticated:
         partition_groups = get_all_partitions_for_course(course)
         user_partitions = get_user_partition_groups(course.id, partition_groups, user, 'name')
     else:
