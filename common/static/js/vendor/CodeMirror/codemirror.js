@@ -6113,6 +6113,11 @@ window.CodeMirror = (function () { 'use strict';
 
     getLine: function(line) {var l = this.getLineHandle(line); return l && l.text},
 
+    setLine: function(line, text) {
+      if (isLine(this, line))
+        replaceRange(this, text, Pos(line, 0), clipPos(this, Pos(line)));
+    },
+
     getLineHandle: function(line) {if (isLine(this, line)) { return getLine(this, line) }},
     getLineNumber: function(line) {return lineNo(line)},
 
