@@ -23,10 +23,10 @@ $bookmarked-icon: "\f02e"; // .fa-bookmark
       margin-bottom: $baseline;
 
       &:hover {
-        border-color: palette(primary, base);
+        border-color: theme-color("primary");
 
         .list-item-breadcrumbtrail {
-          color: palette(primary, base);
+          color: theme-color("primary");
         }
       }
     }
@@ -48,7 +48,7 @@ $bookmarked-icon: "\f02e"; // .fa-bookmark
       position: relative;
       top: -7px;
       font-family: FontAwesome;
-      color: palette(primary, base);
+      color: theme-color("primary");
     }
 
     .list-item-content {

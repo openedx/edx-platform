@@ -17,6 +17,7 @@ $static-path: '../..';
 @import 'course/layout/courseware_preview';
 @import 'shared/modal';
 @import 'shared/help-tab';
+@import './elements/pagination';
 
 // Features
 @import 'features/bookmarks';
