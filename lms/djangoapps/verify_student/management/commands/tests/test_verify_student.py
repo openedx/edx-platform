@@ -73,10 +73,14 @@ class TestVerifyStudentCommand(MockS3Mixin, TestCase):
         """Test management command arguments injected from config model."""
         # Nothing in the database, should default to disabled
 
-        # pylint: disable=deprecated-method, useless-suppression
-        with self.assertRaisesRegex(CommandError, 'SSPVerificationRetryConfig is disabled*'):
+        with LogCapture(LOGGER_NAME) as log:
             call_command('retry_failed_photo_verifications', '--args-from-database')
-
+            log.check_present(
+                (
+                    LOGGER_NAME, 'WARNING',
+                    u"SSPVerificationRetryConfig is disabled or empty, but --args-from-database was requested."
+                ),
+            )
         # Add a config
         config = SSPVerificationRetryConfig.current()
         config.arguments = '--verification-ids 1 2 3'
