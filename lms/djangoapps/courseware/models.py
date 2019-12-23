@@ -168,7 +168,7 @@ class StudentModule(models.Model):
 
     @classmethod
     def save_state(cls, student, course_id, module_state_key, defaults):
-        if not student.is_authenticated():
+        if not student.is_authenticated:
             return
         else:
             cls.objects.update_or_create(
