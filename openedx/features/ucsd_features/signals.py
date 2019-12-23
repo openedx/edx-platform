@@ -12,11 +12,11 @@ logger = getLogger(__name__)
 
 
 @receiver(post_save, sender=UserProfile)
-def generate_manual_verification_for_user(sender, instance, **kwargs):
+def generate_manual_verification_for_user(sender, instance, created, **kwargs):
     """
     Generate ManualVerification for the User (whose UserProfile instance has been created).
     """
-    if not settings.FEATURES.get('AUTOMATIC_PERMANENT_ACCOUNT_VERIFICATION'):
+    if not (settings.FEATURES.get('AUTOMATIC_PERMANENT_ACCOUNT_VERIFICATION') and created):
         return
 
     logger.info('Generating ManualVerification for user: {}'.format(instance.user.email))
