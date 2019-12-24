@@ -46,5 +46,5 @@ G2A_ORGANIZATION_DEFAULT_DATA = {
     FOCUS_AREA_KEY: 'IWRNS',  # I'd rather not say
     FOUNDING_YEAR_KEY: '0',  # set to zero
     LEVEL_OF_OPERATION_KEY: 'IWRNS',  # I'd rather not say
-    TOTAL_EMPLOYEES_KEY: 'NA',  # Not Applicable
+    TOTAL_EMPLOYEES_KEY: 'NOTAPP',  # Not Applicable
 }
