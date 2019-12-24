@@ -371,7 +371,7 @@ def enterprise_customer_from_cache(request=None, uuid=None):
         enterprise_customer = cache.get(cache_key)
 
     # Check if it's cached in the session.
-    if not enterprise_customer and request and request.user.is_authenticated:
+    if not enterprise_customer and request:
         enterprise_customer = request.session.get('enterprise_customer')
 
     return enterprise_customer
