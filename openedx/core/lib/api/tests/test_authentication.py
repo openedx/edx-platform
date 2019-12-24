@@ -57,7 +57,7 @@ class OAuth2AuthenticationDebug(authentication.OAuth2AuthenticationAllowInactive
 
 
 urlpatterns = [
-    url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
+    url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2', app_name='oauth2')),
     url(
         r'^oauth2-test/$',
         MockView.as_view(authentication_classes=[authentication.OAuth2AuthenticationAllowInactiveUser])
