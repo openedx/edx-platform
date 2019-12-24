@@ -14,6 +14,8 @@ from .views import (
     MaintenanceIndexView
 )
 
+app_name = 'cms.djangoapps.maintenance'
+
 urlpatterns = [
     url(r'^$', MaintenanceIndexView.as_view(), name='maintenance_index'),
     url(r'^force_publish_course/?$', ForcePublishCourseView.as_view(), name='force_publish_course'),

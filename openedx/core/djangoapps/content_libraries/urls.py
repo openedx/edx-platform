@@ -7,6 +7,9 @@ from django.conf.urls import include, url
 
 from . import views
 
+
+app_name = 'openedx.core.djangoapps.content_libraries'
+
 # These URLs are only used in Studio. The LMS already provides all the
 # API endpoints needed to serve XBlocks from content libraries using the
 # standard XBlock REST API (see openedx.core.django_apps.xblock.rest_api.urls)

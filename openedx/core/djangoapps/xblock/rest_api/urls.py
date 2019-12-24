@@ -9,6 +9,8 @@ from . import views
 # may act a bit differently in each (e.g. Studio stores user state ephemerally).
 # If necessary at some point in the future, these URLs could be duplicated into
 # urls_studio and urls_lms, and/or the views could be likewise duplicated.
+app_name = 'openedx.core.djangoapps.xblock.rest_api'
+
 urlpatterns = [
     url(r'^api/xblock/v2/', include([
         url(r'^xblocks/(?P<usage_key_str>[^/]+)/', include([
