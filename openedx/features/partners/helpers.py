@@ -9,6 +9,7 @@ from course_action_state.models import CourseRerunState
 from custom_settings.models import CustomSettings
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.features.course_card.helpers import get_course_open_date, get_related_card_id
 from openedx.features.course_card.models import CourseCard
 
@@ -47,9 +48,24 @@ def get_partner_recommended_courses(partner_slug):
 
         if course_rerun_object:
             course_rerun_object.start = get_course_open_date(course_rerun_object)
+            course_rerun_object.description = get_course_description(course_rerun_object)
             recommended_courses.append(course_rerun_object)
 
     return recommended_courses
+
+
+def get_course_description(course):
+    """
+    This function returns the description of the course added via cms
+    :param course:
+    :return: description
+    """
+    description = ""
+    try:
+        description = CourseDetails.fetch_about_attribute(course.id, 'description')
+    except Exception as ex:
+        pass
+    return description
 
 
 def import_module_using_slug(partner_slug):

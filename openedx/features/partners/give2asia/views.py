@@ -21,7 +21,6 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER, record_registration_attributions
-from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.features.partners.helpers import get_partner_recommended_courses
 from openedx.features.partners.models import PartnerUser
 
@@ -40,20 +39,8 @@ AUDIT_LOG = getLogger("audit")
 
 def dashboard(request, partner_slug):
     courses = get_partner_recommended_courses(partner_slug)
-    for course in courses:
-        course.description = get_course_description(course)
-
     return render_to_response('features/partners/g2a/dashboard.html', {'recommended_courses': courses,
                                                                        'slug': partner_slug})
-
-
-def get_course_description(course):
-    description = ""
-    try:
-        description = CourseDetails.fetch_about_attribute(course.id, 'description')
-    except Exception as ex:
-        pass
-    return description
 
 
 class Give2AsiaRegistrationView(RegistrationViewCustom):
