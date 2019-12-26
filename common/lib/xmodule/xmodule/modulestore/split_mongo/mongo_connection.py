@@ -286,9 +286,11 @@ class MongoConnection(object):
         """
         Check that the db is reachable.
         """
-        if self.database.connection.alive():
+        try:
+            # The ismaster command is cheap and does not require auth.
+            self.database.client.admin.command('ismaster')
             return True
-        else:
+        except pymongo.errors.ConnectionFailure:
             raise HeartbeatFailure("Can't connect to {}".format(self.database.name), 'mongo')
 
     def get_structure(self, key, course_context=None):
@@ -579,13 +581,7 @@ class MongoConnection(object):
         """
         Closes any open connections to the underlying databases
         """
-        self.database.connection.close()
-
-    def mongo_wire_version(self):
-        """
-        Returns the wire version for mongo. Only used to unit tests which instrument the connection.
-        """
-        return self.database.connection.max_wire_version
+        self.database.client.close()
 
     def _drop_database(self, database=True, collections=True, connections=True):
         """
@@ -599,7 +595,7 @@ class MongoConnection(object):
 
         If connections is True, then close the connection to the database as well.
         """
-        connection = self.database.connection
+        connection = self.database.client
 
         if database:
             connection.drop_database(self.database.name)

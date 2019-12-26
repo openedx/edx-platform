@@ -18,7 +18,7 @@ mock==1.0.1                         # Stub out code with mock objects and make a
 path.py==8.2.1                      # Easier manipulation of filesystem paths
 paver                               # Build, distribution and deployment scripting tool
 psutil==1.2.1                       # Library for retrieving information on running processes and system utilization
-pymongo==2.9.1                      # via edx-opaque-keys
+pymongo==3.9.0                      # via edx-opaque-keys
 python-memcached==1.48              # Python interface to the memcached memory cache daemon
 requests                            # Simple interface for making HTTP requests
 stevedore==1.10.0                   # via edx-opaque-keys
