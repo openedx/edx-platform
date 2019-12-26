@@ -19,7 +19,7 @@ from testfixtures import LogCapture
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from common.test.utils import MockS3Mixin
+from common.test.utils import MockS3Mixin, py2_only
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from lms.djangoapps.verify_student.tests.test_models import FAKE_SETTINGS, mock_software_secure_post
 
@@ -206,11 +206,14 @@ class TestSendVerificationExpiryEmail(MockS3Mixin, ModuleStoreTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertIsNone(attempt.expiry_email_date)
 
+    @py2_only
     def test_user_enrolled_in_verified_course(self):
         """
         Test that if the user is enrolled in verified track, then after sending the default no of
         emails, `expiry_email_date` is updated to now() so that it's filtered in the future to send
-        email again
+        email again.
+
+        Does not work on python 3 with the latest mongo driver version due to class inheritance issues.
         """
         user = UserFactory.create()
         course = CourseFactory()

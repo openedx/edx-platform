@@ -350,4 +350,4 @@ def add_repo(repo, rdir_in, branch=None):
     cil.save()
 
     log.debug(u'saved CourseImportLog for %s', cil.course_id)
-    mdb.disconnect()
+    mdb.close()
