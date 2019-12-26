@@ -468,9 +468,9 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         }
         json_input = json.dumps(inputs)
         self.advanced_settings.set('Discussion Topic Mapping', json_input)
-        self.assertEqual(
-            self.advanced_settings.get('Discussion Topic Mapping'),
-            '{\n    "key": "value",\n    "key_2": "value_2"\n}'
+        assert self.advanced_settings.get('Discussion Topic Mapping') in (
+            '{\n    "key": "value",\n    "key_2": "value_2"\n}',
+            '{\n    "key_2": "value_2",\n    "key": "value"\n}'
         )
 
     def test_automatic_quoting_of_non_json_value(self):
