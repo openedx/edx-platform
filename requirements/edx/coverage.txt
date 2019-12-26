@@ -6,7 +6,7 @@
 #
 coverage==5.0.1
 diff-cover==2.5.0
-importlib-metadata==1.3.0  # via inflect, pluggy
+importlib-metadata==1.3.0  # via pluggy
 inflect==3.0.2            # via jinja2-pluralize
 jinja2-pluralize==0.3.0   # via diff-cover
 jinja2==2.10.3            # via diff-cover, jinja2-pluralize

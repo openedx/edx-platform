@@ -49,7 +49,7 @@ git+https://github.com/edx/crowdsourcehinter.git@a7ffc85b134b7d8909bf1fefd23dbdb
 cryptography==2.8
 cssutils==1.0.2           # via pynliner
 ddt==1.2.2
-decorator==4.4.1
+decorator==4.4.1          # via pycontracts
 defusedxml==0.5.0
 django-appconf==1.0.3     # via django-statici18n
 django-babel-underscore==0.5.2
@@ -161,7 +161,6 @@ git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752
 mongoengine==0.10.0
 mpmath==1.1.0             # via sympy
 mysqlclient==1.4.6
-networkx==2.2
 newrelic==5.4.1.134
 nltk==3.4.5
 nodeenv==1.3.3
@@ -186,7 +185,6 @@ pycparser==2.19
 pycryptodome==3.9.4       # via pdfminer.six
 pycryptodomex==3.9.4
 pygments==2.5.2
-pygraphviz==1.5
 pyjwkest==1.3.2
 pyjwt==1.5.2
 pymongo==3.9.0

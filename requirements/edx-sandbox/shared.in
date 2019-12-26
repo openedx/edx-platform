@@ -11,5 +11,4 @@
 
 cryptography                        # Implementations of assorted cryptography algorithms
 lxml==4.4.1                         # XML parser
-networkx==2.2                       # Utilities for creating, manipulating, and studying network graphs
 nltk                                # Natural language processing; used by the chem package
