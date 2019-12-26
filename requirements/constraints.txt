@@ -56,3 +56,6 @@ pytest-faulthandler<2.0.0
 #  jsondiff==1.1.1 (from moto==1.2.0->-r requirements/edx/testing.in (line 33))
 #  jsondiff==1.2.0 (from -r requirements/edx/base.txt (line 146))
 jsondiff==1.1.1
+
+# Constraining this since the newer versions no longer work with the deprecated MIDDLEWARE_CLASSES setting
+django-debug-toolbar<2.0

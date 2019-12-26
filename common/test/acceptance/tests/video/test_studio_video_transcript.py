@@ -451,10 +451,12 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         self.video.set_url_field('t__eq_exist.webm', 2)
         self.assertEqual(self.video.message('status'), 'Timed Transcript Conflict')
 
+        self.video.scroll_to_button('choose')
         self.assertTrue(self.video.is_transcript_button_visible(
             'choose',
             button_text='Timed Transcript from t__eq_exist.webm'
         ))
+        self.video.scroll_to_button('choose', index=1)
         self.assertTrue(self.video.is_transcript_button_visible(
             'choose',
             index=1,
