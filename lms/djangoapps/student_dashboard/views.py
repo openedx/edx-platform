@@ -100,6 +100,7 @@ def get_recommended_xmodule_courses(request, _from='onboarding'):
             course.settings_attrs = _settings
             course.course_open_date = get_course_open_date(course_rerun_object)
             course.target_course_id = course_rerun_object.id
+            course.self_paced = course_rerun_object.self_paced
             all_courses.append(course)
 
     user_interests = user.extended_profile.get_user_selected_interests()

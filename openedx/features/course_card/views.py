@@ -55,7 +55,7 @@ def get_course_cards(request):
             id__in=course_rerun_states, enrollment_end__gte=current_time).order_by('enrollment_start').first()
 
         course = get_course_with_link_and_start_date(course, course_rerun_object, request)
-        
+
         filtered_courses.append(course)
 
     return render_to_response(
@@ -96,6 +96,7 @@ def get_course_with_link_and_start_date(course, course_rerun_object, request):
         _enrollment_end_date = course_rerun_object.enrollment_end.replace(tzinfo=utc)
         if _enrollment_end_date > current_time:
             course.start_date = rerun_start_time.strftime(date_time_format)
+            course.self_paced = course_rerun_object.self_paced
             return course
 
     if current_class:
