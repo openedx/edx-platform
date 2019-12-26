@@ -74,7 +74,7 @@ REQ_FILES = \
 	requirements/edx/coverage \
 	requirements/edx/paver \
 	requirements/edx-sandbox/shared \
-	requirements/edx-sandbox/base \
+	requirements/edx-sandbox/py35 \
 	requirements/edx/base \
 	requirements/edx/testing \
 	requirements/edx/development \

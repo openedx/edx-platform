@@ -8,21 +8,17 @@
 # pin when possible.  Writing an issue against the offending project and
 # linking to it here is good.
 
-# These packages are backports which can only be installed on Python 2.7
-functools32 ; python_version == "2.7"
-futures ; python_version == "2.7"
-python-openid ; python_version == "2.7"
-pysqlite ; python_version == "2.7"
+# Version 4.0.0 dropped support for Django < 2.0.1
+django-model-utils<4.0.0
 
-# Convert text markup to HTML; used in capa problems, forums, and course wikis; pin Markdown version as tests failed for its upgrade to latest release
+# Convert text markup to HTML; used in capa problems, forums, and course wikis; pin Markdown version as tests failed for its upgrade to the latest release
 Markdown==2.6.11
+
+# Matplotlib 3.1 requires Python 3.6
+matplotlib<3.1
 
 # mysqlclient 1.5 is scheduled to change internal APIs used by Django 1.11
 mysqlclient<1.5
-
-# required by edx-lint and pinned explicitly here because newer versions don't guarantee python 2 support.
-# Can be removed when we get to Python 3.
-pylint-plugin-utils==0.3
 
 # transifex-client 0.13.5 and 0.13.6 pin six and urllib3 to old versions needlessly
 #   https://github.com/transifex/transifex-client/issues/252
@@ -34,14 +30,8 @@ transifex-client==0.13.4
 requests-oauthlib==1.1.0
 oauthlib==2.1.0
 
-# pytest-randomly dropped support for Python 2 with 2.0.0, and only supports Python 3.4+
-pytest-randomly<2.0.0
-
 # python3-saml 1.6.0 breaks unittests in common/djangoapps/third_party_auth/tests/test_views.py::SAMLMetadataTest
 python3-saml==1.5.0
-
-# version 1.3.0 breaks make upgrade, as it requires py3.5 or above
-scipy<=1.2.1
 
 # Unless we constrain pytest to <4.6.0, it may break all tests inside of
 # xmodule.tests.test_resource_templates.ResourceTemplatesTests See TE-2391 for details.
@@ -52,21 +42,11 @@ pytest<4.6.0
 # acceptance.tests.lms.test_lms_course_discovery.CourseDiscoveryTest.test_search
 edx-search==1.2.2
 
-# This ruamel.ordereddict will not be supported in python3 but is a dependency of ruamel.yaml
-# install it only on python 2.7
-ruamel.ordereddict; python_version == "2.7"
-
 # 1.16.1 requires djangorestframework>=3.8
 drf-yasg==1.16
 
 # 2.0.0 is a dummy package, because faulthandler has been incorporated into pytest 5.0
 pytest-faulthandler<2.0.0
-
-# faulthandler is part of core python staring with python 3.3
-faulthandler; python_version == "2.7"
-
-# Numpy 1.17.0 only supports python >= 3.5
-numpy<1.17.0
 
 # Pinned by moto to this but since moto is only a test requirement, we don't
 # see the constraint when generating base.txt
@@ -76,21 +56,3 @@ numpy<1.17.0
 #  jsondiff==1.1.1 (from moto==1.2.0->-r requirements/edx/testing.in (line 33))
 #  jsondiff==1.2.0 (from -r requirements/edx/base.txt (line 146))
 jsondiff==1.1.1
-
-# Constraining this since the newer versions require Python 3
-more-itertools==5.0.0
-
-# Constraining this Gunicorn requires Python 3.x >= 3.4.
-gunicorn<20.0.0
-
-
-# Upgrading to django-object-actions <=1.1.2 requires support for Python 3. In newer versions Python 2 support is
-# dropped.  This constraint can be removed once we have Python 3.
-django-object-actions==1.1.2
-
-
-# Constraining this since the newer versions require Python 3
-django-debug-toolbar<2.0          # A set of panels that display debug information about the current request/response
-
-# Constraining this since the newer versions require Python 3
-django-model-utils<4.0.0
