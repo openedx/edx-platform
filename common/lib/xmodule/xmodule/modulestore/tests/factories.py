@@ -606,8 +606,6 @@ def mongo_uses_error_check(store):
     """
     Does mongo use the error check as a separate message?
     """
-    if hasattr(store, 'mongo_wire_version'):
-        return store.mongo_wire_version() <= 1
     if hasattr(store, 'modulestores'):
         return any([mongo_uses_error_check(substore) for substore in store.modulestores])
     return False
@@ -626,16 +624,16 @@ def check_mongo_calls_range(max_finds=float("inf"), min_finds=0, max_sends=None,
     :param min_sends: If non-none, make sure number of send calls are >=min_sends
     """
     with check_sum_of_calls(
-        pymongo.message,
-        ['query', 'get_more'],
+        pymongo.collection.Collection,
+        ['find'],
         max_finds,
         min_finds,
     ):
         if max_sends is not None or min_sends is not None:
             with check_sum_of_calls(
-                pymongo.message,
+                pymongo.collection.Collection,
                 # mongo < 2.6 uses insert, update, delete and _do_batched_insert. >= 2.6 _do_batched_write
-                ['insert', 'update', 'delete', '_do_batched_write_command', '_do_batched_insert', ],
+                ['insert', 'update', 'bulk_write', '_delete'],
                 max_sends if max_sends is not None else float("inf"),
                 min_sends if min_sends is not None else 0,
             ):
