@@ -55,6 +55,7 @@ def get_course_cards(request):
             id__in=course_rerun_states, enrollment_end__gte=current_time).order_by('enrollment_start').first()
 
         course = get_course_with_link_and_start_date(course, course_rerun_object, request)
+
         filtered_courses.append(course)
 
     return render_to_response(
