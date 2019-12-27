@@ -21,7 +21,8 @@ class Migration(migrations.Migration):
                 ('possible_all_override', models.FloatField(null=True, blank=True)),
                 ('earned_graded_override', models.FloatField(null=True, blank=True)),
                 ('possible_graded_override', models.FloatField(null=True, blank=True)),
-                ('grade', models.OneToOneField(related_name='override', to='grades.PersistentSubsectionGrade')),
+                ('grade', models.OneToOneField(related_name='override', to='grades.PersistentSubsectionGrade',
+                                               on_delete=models.CASCADE)),
             ],
         ),
     ]
