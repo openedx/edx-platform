@@ -180,19 +180,22 @@ if settings.WIKI_ENABLED:
     from course_wiki import views as course_wiki_views
     from django_notify.urls import get_pattern as notify_pattern
 
+    wiki_url_patterns, wiki_app_name, wiki_namespace = wiki_pattern()
+    notify_url_patterns, notify_app_name, notify_namespace = notify_pattern()
+
     urlpatterns += [
         # First we include views from course_wiki that we use to override the default views.
         # They come first in the urlpatterns so they get resolved first
         url('^wiki/create-root/$', course_wiki_views.root_create, name='root_create'),
-        url(r'^wiki/', include(wiki_pattern())),
-        url(r'^notify/', include(notify_pattern())),
+        url(r'^wiki/', include((wiki_url_patterns, wiki_app_name), namespace=wiki_namespace)),
+        url(r'^notify/', include((notify_url_patterns, notify_app_name), namespace=notify_namespace)),
 
         # These urls are for viewing the wiki in the context of a course. They should
         # never be returned by a reverse() so they come after the other url patterns
         url(r'^courses/{}/course_wiki/?$'.format(settings.COURSE_ID_PATTERN),
             course_wiki_views.course_wiki_redirect, name='course_wiki'),
         url(r'^courses/{}/wiki/'.format(settings.COURSE_KEY_REGEX),
-            include(wiki_pattern(app_name='course_wiki_do_not_reverse', namespace='course_wiki_do_not_reverse'))),
+            include((wiki_url_patterns, 'course_wiki_do_not_reverse'), namespace='course_wiki_do_not_reverse')),
     ]
 
 COURSE_URLS = [
@@ -769,7 +772,7 @@ if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
         # changes go through our user portal and follow complexity requirements.
         url(r'^admin/password_change/$', handler404),
         url(r'^admin/auth/user/\d+/password/$', handler404),
-        url(r'^admin/', include(admin.site.urls)),
+        url(r'^admin/', admin.site.urls),
     ]
 
 if configuration_helpers.get_value('ENABLE_BULK_ENROLLMENT_VIEW', settings.FEATURES.get('ENABLE_BULK_ENROLLMENT_VIEW')):
