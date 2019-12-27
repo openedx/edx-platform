@@ -167,6 +167,10 @@ def write_html_report(warnings_dataframe, html_path):
     converts from panda dataframe to our html
     """
     html_path = os.path.expanduser(html_path)
+    if "/" in html_path:
+        location_of_last_dir = html_path.rfind("/")
+        dir_path = html_path[:location_of_last_dir]
+        os.makedirs(dir_path, exist_ok=True)
     with io.open(html_path, "w") as fout:
         html_writer = HtmlOutlineWriter(fout)
         category_sorted_by_count = group_and_sort_by_sumof(
