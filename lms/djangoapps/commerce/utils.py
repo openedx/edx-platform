@@ -308,6 +308,11 @@ def _process_refund(refund_ids, api_client, mode, user, always_notify=False):
             )
         else:
             try:
+                # [UCSD_CUSTOM] If this feature flag is True, then it means that we are sending
+                # the "Refund Failure" emails from ecommerce and thus no need to send that notification
+                # from here.
+                if settings.FEATURES.get('DISABLE_REFUND_FAILURE_EMAIL'):
+                    return True
                 return _send_refund_notification(user, refunds_requiring_approval)
             except:  # pylint: disable=bare-except
                 # Unable to send notification to Support, do not break as this method is used by Signals
