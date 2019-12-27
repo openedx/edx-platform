@@ -8,17 +8,30 @@ def runPythonTests() {
             noTags: true, shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
             refspec: git_refspec, url: "git@github.com:edx/${REPO_NAME}.git"]]]
         sh 'bash scripts/all-tests.sh'
-        stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}-reports"
+        stash includes: 'reports/**/*coverage*,test_root/log/*.json', name: "${TEST_SUITE}-reports"
     }
 }
 
 def pythonTestCleanup() {
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/**/*,test_root/log/**/*.log,**/nosetests.xml,*.log'
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.html,reports/**/*,test_root/log/**/*.log,test_root/log/*.json,**/nosetests.xml,*.log'
     sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
     junit '**/nosetests.xml'
     sh '''source $HOME/edx-venv-$PYTHON_VERSION/edx-venv/bin/activate
     bash scripts/xdist/terminate_xdist_nodes.sh'''
 }
+
+def createWarningsReport(fileExtension){
+    println "Creating warnings report for ${fileExtension}"
+    warning_filename = "warning_report_${fileExtension}.html"
+    sh """source $HOME/edx-venv-$PYTHON_VERSION/edx-venv/bin/activate
+    python openedx/core/process_warnings.py --dir_path test_root/log --html_path reports/${warning_filename}"""
+
+    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
+                            reportDir: 'reports', reportFiles: "${warning_filename}",
+                            reportName: "${warning_filename}", reportTitles: ''])
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.html'
+}
+
 
 def xdist_git_branch() {
     if (env.ghprbActualCommit) {
@@ -109,13 +122,13 @@ pipeline {
                     }
                     steps {
                         script {
-                            runPythonTests()
+                          runPythonTests()
                         }
                     }
                     post {
                         always {
                             script {
-                                pythonTestCleanup()
+                            pythonTestCleanup()
                             }
                         }
                     }
@@ -129,19 +142,22 @@ pipeline {
                     }
                     steps {
                         script {
-                            runPythonTests()
+                        jinder_random= 'yes'
+                           runPythonTests()
                         }
                     }
                     post {
                         always {
                             script {
-                                pythonTestCleanup()
+                            pythonTestCleanup()
                             }
                         }
                     }
                 }
             }
-        }
+        }    
+        
+        
         stage('Run coverage') {
             environment {
                 CODE_COV_TOKEN = credentials('CODE_COV_TOKEN')
@@ -172,13 +188,14 @@ pipeline {
                         sh """export CI_BRANCH=$ci_branch
                         export TARGET_BRANCH=$target_branch
                         ./scripts/jenkins-report.sh"""
+                        createWarningsReport("all")
                     }
                 }
             }
             post {
                 always {
                     script {
-                        archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.coverage'
+                        archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.coverage,reports/*.html'
                         sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
                         publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
                             reportDir: 'reports/cover', reportFiles: 'index.html',

@@ -7,6 +7,9 @@ import pytest
 
 from safe_lxml import defuse_xml_libs
 
+from openedx.core.pytest_hooks import pytest_json_modifyreport  # pylint: disable=unused-import
+from openedx.core.pytest_hooks import pytest_sessionfinish  # pylint: disable=unused-import
+
 defuse_xml_libs()
 
 
