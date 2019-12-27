@@ -102,6 +102,7 @@ def get_course_with_link_and_start_date(course, course_rerun_object, request):
 
     if current_class:
         course.start_date = current_class_start_date.strftime(date_time_format)
+        course.self_paced = current_class.self_paced
         return course
 
     course.start_date = None
