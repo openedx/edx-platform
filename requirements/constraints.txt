@@ -64,5 +64,3 @@ python-dateutil<2.6.0
 
 #higher releases require python>3.5
 pandas<0.25.0
-#higher releases require python>3.5
-inflect<4.0.0
