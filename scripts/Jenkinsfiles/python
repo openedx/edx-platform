@@ -24,7 +24,7 @@ def createWarningsReport(fileExtension){
     println "Creating warnings report for ${fileExtension}"
     warning_filename = "warning_report_${fileExtension}.html"
     sh """source $HOME/edx-venv-$PYTHON_VERSION/edx-venv/bin/activate
-    python openedx/core/process_warnings.py --dir_path test_root/log --html_path reports/pytest_warnings/${warning_filename}"""
+    python openedx/core/process_warnings.py --dir-path test_root/log --html-path reports/pytest_warnings/${warning_filename}"""
 
     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
                             reportDir: 'reports/pytest_warnings', reportFiles: "${warning_filename}",
