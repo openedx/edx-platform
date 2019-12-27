@@ -13,7 +13,7 @@ def runPythonTests() {
 }
 
 def pythonTestCleanup() {
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.html,reports/**/*,test_root/log/**/*.log,test_root/log/*.json,**/nosetests.xml,*.log'
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/**/*,test_root/log/**/*.log,test_root/log/*.json,**/nosetests.xml,*.log'
     sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
     junit '**/nosetests.xml'
     sh '''source $HOME/edx-venv-$PYTHON_VERSION/edx-venv/bin/activate
@@ -24,12 +24,12 @@ def createWarningsReport(fileExtension){
     println "Creating warnings report for ${fileExtension}"
     warning_filename = "warning_report_${fileExtension}.html"
     sh """source $HOME/edx-venv-$PYTHON_VERSION/edx-venv/bin/activate
-    python openedx/core/process_warnings.py --dir_path test_root/log --html_path reports/${warning_filename}"""
+    python openedx/core/process_warnings.py --dir_path test_root/log --html_path reports/pytest_warnings/${warning_filename}"""
 
     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
-                            reportDir: 'reports', reportFiles: "${warning_filename}",
+                            reportDir: 'reports/pytest_warnings', reportFiles: "${warning_filename}",
                             reportName: "${warning_filename}", reportTitles: ''])
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.html'
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/pytest_warnings/*.html'
 }
 
 
@@ -142,7 +142,7 @@ pipeline {
                     }
                     steps {
                         script {
-                           runPythonTests()
+                            runPythonTests()
                         }
                     }
                     post {
@@ -194,7 +194,7 @@ pipeline {
             post {
                 always {
                     script {
-                        archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.coverage,reports/*.html'
+                        archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.coverage'
                         sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
                         publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
                             reportDir: 'reports/cover', reportFiles: 'index.html',

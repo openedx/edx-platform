@@ -2,6 +2,7 @@
 Script to process pytest warnings output by pytest-json-report plugin and output it as a html
 """
 from __future__ import absolute_import
+from __future__ import print_function
 import json
 import os
 import io
@@ -26,16 +27,13 @@ columns = [
 columns_index_dict = {key: index for index, key in enumerate(columns)}
 
 
-pp = pprint.PrettyPrinter(indent=4, depth=2)
-
-
 def seperate_warnings_by_location(warnings_data):
     """
     Warnings originate from multiple locations, this function takes in list of warning objects
-    and seperates them based on their filename location
+    and separates them based on their filename location
     """
 
-    # first create regex for each know file location
+    # first create regex for each n file location
     warnings_locations = {
         ".*/python\d\.\d/site-packages/.*\.py": "python",  # noqa pylint: disable=W1401
         ".*/edx-platform/lms/.*\.py": "lms",  # noqa pylint: disable=W1401
@@ -44,9 +42,9 @@ def seperate_warnings_by_location(warnings_data):
         ".*/edx-platform/common/.*\.py": "common",  # noqa pylint: disable=W1401
     }
 
-    # seperate into locations flow:
-    #  * iterate through each wanring_object, see if its filename matches any regex in warning locations.
-    #  * If so, change high_location index on warnings_object to location name
+    # separate into locations flow:
+    #  - iterate through each wanring_object, see if its filename matches any regex in warning locations.
+    #  - If so, change high_location index on warnings_object to location name
     for warnings_object in warnings_data:
         warning_origin_located = False
         for key in warnings_locations:
@@ -91,7 +89,7 @@ def read_warning_data(dir_path):
     ]
     warnings_files = []
 
-    # TODO(jinder): currently this is hardcoded in, maybe create a constants file with info
+    # TODO(jinder): currently this is hard-coded in, maybe create a constants file with info
     # THINK(jinder): but creating file for one constant seems overkill
     warnings_file_name_regex = (
         "pytest_warnings_?\d*\.json"  # noqa pylint: disable=W1401
@@ -102,7 +100,7 @@ def read_warning_data(dir_path):
         if re.search(warnings_file_name_regex, temp_file) is not None:
             warnings_files.append(temp_file)
 
-    # go through each warning file and aggregate warnigns into warnings_data
+    # go through each warning file and aggregate warnings into warnings_data
     warnings_data = []
     for temp_file in warnings_files:
         with io.open(os.path.expanduser(dir_path + "/" + temp_file), "r") as read_file:
@@ -114,7 +112,7 @@ def read_warning_data(dir_path):
                 ]
                 warnings_data.extend(data)
             else:
-                print(temp_file)  # noqa pylint: disable=superfluous-parens,useless-suppression
+                print(temp_file)
     return warnings_data
 
 
@@ -140,11 +138,11 @@ def process_warnings_json(dir_path):
     }
 
     flow:
-        Aggregate data from all warning files
-        Seperate warnings by deprecated vs non deprecated(has word deprecate in it)
-        Further categorize warnings
-        Return output
-    Possible Error/enchancement: there might be better ways to seperate deprecates vs
+        - Aggregate data from all warning files
+        - Separate warnings by deprecated vs non deprecated(has word deprecate in it)
+        - Further categorize warnings
+        - Return output
+    Possible Error/enhancement: there might be better ways to separate deprecates vs
         non-deprecated warnings
     """
     warnings_data = read_warning_data(dir_path)
@@ -229,13 +227,13 @@ def write_html_report(warnings_dataframe, html_path):
                 html_writer.end_section()
             html_writer.end_section()
 
-
-parser = argparse.ArgumentParser(
-    description="Process and categorize pytest warnings and output html report."
-)
-parser.add_argument("--dir_path", default="test_root/log")
-parser.add_argument("--html_path", default="test_html.html")
-args = parser.parse_args()
-data_output = process_warnings_json(args.dir_path)
-data_dataframe = pd.DataFrame(data=data_output, columns=columns)
-write_html_report(data_dataframe, args.html_path)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Process and categorize pytest warnings and output html report."
+    )
+    parser.add_argument("--dir-path", default="test_root/log")
+    parser.add_argument("--html-path", default="test_html.html")
+    args = parser.parse_args()
+    data_output = process_warnings_json(args.dir_path)
+    data_dataframe = pd.DataFrame(data=data_output, columns=columns)
+    write_html_report(data_dataframe, args.html_path)
