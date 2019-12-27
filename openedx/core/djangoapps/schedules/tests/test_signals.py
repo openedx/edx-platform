@@ -49,7 +49,7 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
             course_id=course.id,
             mode=CourseMode.AUDIT,
         )
-        with pytest.raises(Schedule.DoesNotExist, message="Expecting Schedule to not exist"):
+        with pytest.raises(Schedule.DoesNotExist):
             enrollment.schedule
 
     @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
@@ -92,7 +92,7 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
         ScheduleConfigFactory.create(site=site, enabled=True, create_schedules=True)
         course = _create_course_run(self_paced=False)
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
-        with pytest.raises(Schedule.DoesNotExist, message="Expecting Schedule to not exist"):
+        with pytest.raises(Schedule.DoesNotExist):
             enrollment.schedule
 
     @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
