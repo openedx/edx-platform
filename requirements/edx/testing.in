@@ -37,6 +37,7 @@ pytest-attrib             # Select tests based on attributes
 pytest-cov                # pytest plugin for measuring code coverage
 git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0
 pytest-django             # Django support for pytest
+pytest-json-report        # Output json formatted warnings after running pytest
 pytest-randomly           # pytest plugin to randomly order tests
 pytest-xdist              # Parallel execution of tests on multiple CPU cores or hosts
 radon                     # Calculates cyclomatic complexity of Python code (code quality utility)

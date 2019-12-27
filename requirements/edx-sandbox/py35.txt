@@ -22,7 +22,7 @@ nltk==3.4.5
 numpy==1.16.5
 pycparser==2.19
 pyparsing==2.2.0
-python-dateutil==2.8.1    # via matplotlib
+python-dateutil==2.5.3    # via matplotlib
 pytz==2019.3              # via matplotlib
 random2==1.0.1
 scipy==1.2.1
