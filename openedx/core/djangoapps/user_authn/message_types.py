@@ -3,7 +3,6 @@ ACE message types for user_authn-related emails.
 """
 
 
-
 from openedx.core.djangoapps.ace_common.message import BaseMessageType
 
 

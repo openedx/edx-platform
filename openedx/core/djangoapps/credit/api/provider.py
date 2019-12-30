@@ -3,7 +3,6 @@ API for initiating and tracking requests for credit from a provider.
 """
 
 
-
 import datetime
 import logging
 import uuid

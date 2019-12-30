@@ -4,7 +4,6 @@ We can use this command to enable/disable commerce configuration or disable chec
 """
 
 
-
 import logging
 
 from django.core.management import BaseCommand

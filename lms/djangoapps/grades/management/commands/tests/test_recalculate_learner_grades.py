@@ -3,7 +3,6 @@ Tests for recalculate_learner_grades management command.
 """
 
 
-
 from tempfile import NamedTemporaryFile
 
 import mock

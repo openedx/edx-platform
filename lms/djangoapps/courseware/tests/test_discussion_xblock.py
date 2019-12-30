@@ -7,7 +7,6 @@ functionalities.
 """
 
 
-
 import json
 import uuid
 

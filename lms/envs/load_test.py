@@ -7,7 +7,6 @@ Settings for load testing.
 # pylint: disable=wildcard-import, unused-wildcard-import
 
 
-
 from six.moves import filter
 
 from .production import *

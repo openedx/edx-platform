@@ -3,7 +3,6 @@ Check that view authentication works properly.
 """
 
 
-
 import datetime
 
 import pytz

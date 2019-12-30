@@ -4,7 +4,6 @@ Tests for util.date_utils
 """
 
 
-
 import unittest
 from datetime import datetime, timedelta, tzinfo
 

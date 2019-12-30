@@ -4,7 +4,6 @@ Common comment client utility functions.
 """
 
 
-
 import six
 from contracts import new_contract
 

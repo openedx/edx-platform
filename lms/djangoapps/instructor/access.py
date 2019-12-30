@@ -10,7 +10,6 @@ TO DO sync instructor and staff flags
 """
 
 
-
 import logging
 
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params

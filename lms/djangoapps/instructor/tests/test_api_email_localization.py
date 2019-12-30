@@ -4,7 +4,6 @@ Unit tests for the localization of emails sent by instructor.api methods.
 """
 
 
-
 from django.core import mail
 from django.test.utils import override_settings
 from django.urls import reverse

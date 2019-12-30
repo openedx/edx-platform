@@ -4,7 +4,6 @@ whether a user has satisfied those requirements.
 """
 
 
-
 import logging
 
 import six

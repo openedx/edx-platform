@@ -4,7 +4,6 @@ Module contains utils specific for video_module but not for transcripts.
 """
 
 
-
 import logging
 from collections import OrderedDict
 

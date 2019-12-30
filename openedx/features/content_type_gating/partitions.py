@@ -6,7 +6,6 @@ of audit learners.
 """
 
 
-
 import datetime
 import logging
 

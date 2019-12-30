@@ -4,7 +4,6 @@ Test the partitions and partitions service
 """
 
 
-
 from datetime import datetime
 
 import six

@@ -3,7 +3,6 @@ Tests for the functionality and infrastructure of grades tasks.
 """
 
 
-
 import itertools
 from collections import OrderedDict
 from contextlib import contextmanager

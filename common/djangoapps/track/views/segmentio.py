@@ -1,7 +1,6 @@
 """Handle events that were forwarded from the Segment webhook integration"""
 
 
-
 import json
 import logging
 

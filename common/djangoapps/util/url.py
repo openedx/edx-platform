@@ -3,7 +3,6 @@ Utility functions related to urls.
 """
 
 
-
 import sys
 import six
 from importlib import import_module

@@ -3,7 +3,6 @@ Student Identity Verification Application Configuration
 """
 
 
-
 from django.apps import AppConfig
 
 

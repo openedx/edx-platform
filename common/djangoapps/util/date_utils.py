@@ -3,7 +3,6 @@ Convenience methods for working with datetime objects
 """
 
 
-
 import re
 from datetime import datetime, timedelta
 

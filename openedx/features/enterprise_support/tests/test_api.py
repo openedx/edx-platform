@@ -3,7 +3,6 @@ Test the enterprise support APIs.
 """
 
 
-
 import mock
 
 import ddt
@@ -368,7 +367,6 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
     def test_no_course_data_consent_required(self,
                                              mock_consent_necessary,
                                              mock_enterprise_enabled):
-
         """
         Verify that the wrapped view is called directly when enterprise integration is enabled,
         and no course consent is required.

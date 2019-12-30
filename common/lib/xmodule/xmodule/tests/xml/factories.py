@@ -3,7 +3,6 @@ Factories for generating edXML for testing XModule import
 """
 
 
-
 import inspect
 from tempfile import mkdtemp
 

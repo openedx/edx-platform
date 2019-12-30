@@ -5,7 +5,6 @@ Passes settings.MODULESTORE as kwargs to MongoModuleStore
 """
 
 
-
 from importlib import import_module
 import gettext
 import logging

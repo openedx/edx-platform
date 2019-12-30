@@ -3,7 +3,6 @@ Contains functions that handle XML course data
 """
 
 
-
 import os
 import sys
 import traceback

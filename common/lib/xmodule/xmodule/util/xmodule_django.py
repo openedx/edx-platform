@@ -5,7 +5,6 @@ runtime environment with the djangoapps in common configured to load
 """
 
 
-
 import webpack_loader
 # NOTE: we are importing this method so that any module that imports us has access to get_current_request
 from crum import get_current_request

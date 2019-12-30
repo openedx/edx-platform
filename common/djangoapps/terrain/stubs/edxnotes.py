@@ -3,7 +3,6 @@ Stub implementation of EdxNotes for acceptance tests
 """
 
 
-
 import json
 import re
 from copy import deepcopy

@@ -3,7 +3,6 @@ Tests for transformer_registry.py
 """
 
 
-
 from unittest import TestCase
 
 import ddt

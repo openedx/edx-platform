@@ -1,7 +1,6 @@
 """ Login related views """
 
 
-
 import json
 import logging
 

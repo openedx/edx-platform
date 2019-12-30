@@ -3,7 +3,6 @@
 """
 
 
-
 from xblock.field_data import ReadOnlyFieldData, SplitFieldData
 from xblock.fields import Scope
 

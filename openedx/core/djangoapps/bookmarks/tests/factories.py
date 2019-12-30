@@ -3,7 +3,6 @@ Factories for Bookmark models.
 """
 
 
-
 from functools import partial
 
 import factory

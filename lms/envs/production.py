@@ -18,7 +18,6 @@ Common traits:
 # pylint: disable=invalid-name
 
 
-
 import codecs
 import datetime
 import os

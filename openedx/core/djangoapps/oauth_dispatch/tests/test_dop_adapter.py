@@ -3,7 +3,6 @@ Tests for DOP Adapter
 """
 
 
-
 from datetime import timedelta
 
 import ddt

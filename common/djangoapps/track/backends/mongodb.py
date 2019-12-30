@@ -1,7 +1,6 @@
 """MongoDB event tracker backend."""
 
 
-
 import logging
 
 import pymongo

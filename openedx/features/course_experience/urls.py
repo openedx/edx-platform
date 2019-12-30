@@ -3,7 +3,6 @@ Defines URLs for the course experience.
 """
 
 
-
 from django.conf.urls import url
 
 from .views.course_dates import CourseDatesFragmentMobileView

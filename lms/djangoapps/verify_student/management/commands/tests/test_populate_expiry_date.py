@@ -3,7 +3,6 @@ Tests for django admin command `populate_expiry_date` in the verify_student modu
 """
 
 
-
 from datetime import timedelta
 
 import boto

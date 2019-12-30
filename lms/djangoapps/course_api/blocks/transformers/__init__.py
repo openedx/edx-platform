@@ -3,7 +3,6 @@ Course API Block Transformers
 """
 
 
-
 from lms.djangoapps.course_blocks.transformers.visibility import VisibilityTransformer
 
 from .block_completion import BlockCompletionTransformer

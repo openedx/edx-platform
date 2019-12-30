@@ -7,7 +7,6 @@ This is the default template for our main set of AWS servers.
 # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-order
 
 
-
 import codecs
 import os
 import yaml

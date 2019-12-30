@@ -1,7 +1,6 @@
 """ URL configuration for the third party auth API """
 
 
-
 from django.conf import settings
 from django.conf.urls import url
 

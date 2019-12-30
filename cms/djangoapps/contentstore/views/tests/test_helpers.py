@@ -3,7 +3,6 @@ Unit tests for helpers.py.
 """
 
 
-
 import six
 from django.utils import http
 

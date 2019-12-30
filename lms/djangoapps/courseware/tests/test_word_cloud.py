@@ -2,7 +2,6 @@
 """Word cloud integration tests using mongo modulestore."""
 
 
-
 import json
 from operator import itemgetter
 

@@ -3,7 +3,6 @@ Unit tests for integration of the django-user-tasks app and its REST API.
 """
 
 
-
 import logging
 from uuid import uuid4
 

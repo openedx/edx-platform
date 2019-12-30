@@ -3,7 +3,6 @@ Unit tests for stub HTTP server base class.
 """
 
 
-
 import json
 import unittest
 

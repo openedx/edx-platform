@@ -3,7 +3,6 @@ Dashboard view and supporting methods
 """
 
 
-
 import datetime
 import logging
 from collections import defaultdict

@@ -3,7 +3,6 @@ Defines URLs for course bookmarks.
 """
 
 
-
 from django.conf.urls import url
 
 from .views.course_bookmarks import CourseBookmarksFragmentView, CourseBookmarksView

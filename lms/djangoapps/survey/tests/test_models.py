@@ -3,7 +3,6 @@ Python tests for the Survey models
 """
 
 
-
 from collections import OrderedDict
 
 import ddt

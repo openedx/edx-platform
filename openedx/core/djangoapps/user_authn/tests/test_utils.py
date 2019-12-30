@@ -1,7 +1,6 @@
 """ Test User Authentication utilities """
 
 
-
 from collections import namedtuple
 
 import ddt

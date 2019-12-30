@@ -3,7 +3,6 @@ Methods for exporting course data to XML
 """
 
 
-
 import logging
 import os
 from abc import abstractmethod

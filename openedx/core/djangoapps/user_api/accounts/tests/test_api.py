@@ -5,7 +5,6 @@ Most of the functionality is covered in test_views.py.
 """
 
 
-
 import itertools
 import re
 import unicodedata

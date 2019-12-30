@@ -3,7 +3,6 @@ Test cases for create_sites_and_configurations command.
 """
 
 
-
 import mock
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site

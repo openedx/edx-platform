@@ -1,7 +1,6 @@
 """HTTP end-points for the User API. """
 
 
-
 from django.contrib.auth.models import User
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError
 from django.db import transaction

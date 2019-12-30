@@ -3,7 +3,6 @@ Test xblock/validation.py
 """
 
 
-
 import unittest
 
 import pytest

@@ -3,7 +3,6 @@ Classes representing asset metadata.
 """
 
 
-
 import json
 from datetime import datetime
 

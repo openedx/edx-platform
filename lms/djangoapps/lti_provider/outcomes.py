@@ -4,7 +4,6 @@ in LTI v1.1.
 """
 
 
-
 import logging
 import uuid
 

@@ -1,7 +1,6 @@
 """Unit tests for the Paver server tasks."""
 
 
-
 import os
 from unittest import TestCase
 from uuid import uuid4

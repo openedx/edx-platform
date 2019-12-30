@@ -3,7 +3,6 @@ Tests for minimum grade requirement status
 """
 
 
-
 from datetime import datetime, timedelta
 
 import ddt

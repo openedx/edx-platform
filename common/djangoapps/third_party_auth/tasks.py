@@ -4,7 +4,6 @@ Code to manage fetching and storing the metadata of IdPs.
 """
 
 
-
 import datetime
 import logging
 

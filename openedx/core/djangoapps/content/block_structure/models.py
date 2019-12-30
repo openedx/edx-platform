@@ -3,7 +3,6 @@ Models used by the block structure framework.
 """
 
 
-
 import errno
 from contextlib import contextmanager
 from datetime import datetime

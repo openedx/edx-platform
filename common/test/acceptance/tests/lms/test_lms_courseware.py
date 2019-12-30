@@ -4,7 +4,6 @@ End-to-end tests for the LMS.
 """
 
 
-
 import json
 from datetime import datetime, timedelta
 

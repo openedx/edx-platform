@@ -4,7 +4,6 @@ It allows us to share code between access.py and block transformers.
 """
 
 
-
 from datetime import datetime, timedelta
 from logging import getLogger
 

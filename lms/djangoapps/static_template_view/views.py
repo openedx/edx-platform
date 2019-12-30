@@ -4,7 +4,6 @@
 # security reasons.
 
 
-
 import mimetypes
 
 from django.conf import settings

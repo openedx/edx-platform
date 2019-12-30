@@ -3,7 +3,6 @@ Management command to resend all lti scores for the requested course.
 """
 
 
-
 import textwrap
 
 import six

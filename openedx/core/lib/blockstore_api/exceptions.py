@@ -3,7 +3,6 @@ Exceptions that may be raised by the Blockstore API
 """
 
 
-
 class BlockstoreException(Exception):
     pass
 

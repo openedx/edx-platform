@@ -5,7 +5,6 @@ that is defined by XModules and XModuleDescriptors (javascript and css)
 """
 
 
-
 import errno
 import hashlib
 import json

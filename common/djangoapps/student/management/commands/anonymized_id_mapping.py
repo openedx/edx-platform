@@ -9,7 +9,6 @@ the following:
 """
 
 
-
 import csv
 
 from django.contrib.auth.models import User

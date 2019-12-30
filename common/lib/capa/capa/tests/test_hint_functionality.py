@@ -4,7 +4,6 @@ Tests of extended hints
 """
 
 
-
 import unittest
 
 from ddt import data, ddt, unpack

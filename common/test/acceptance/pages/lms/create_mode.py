@@ -1,7 +1,6 @@
 """Mode creation page (used to add modes to courses during testing)."""
 
 
-
 import re
 
 from bok_choy.page_object import PageObject

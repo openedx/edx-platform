@@ -3,7 +3,6 @@ Test the lms/staticbook views.
 """
 
 
-
 import textwrap
 
 import mock

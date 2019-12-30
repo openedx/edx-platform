@@ -3,7 +3,6 @@ Test the draft modulestore
 """
 
 
-
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 

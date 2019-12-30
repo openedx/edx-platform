@@ -4,7 +4,6 @@ forums, and to the cohort admin views.
 """
 
 
-
 import logging
 import random
 

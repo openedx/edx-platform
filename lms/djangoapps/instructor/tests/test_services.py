@@ -3,7 +3,6 @@ Tests for the InstructorService
 """
 
 
-
 import json
 
 import mock

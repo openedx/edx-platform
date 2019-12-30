@@ -3,7 +3,6 @@ Utility methods related to file handling.
 """
 
 
-
 import os
 from datetime import datetime
 

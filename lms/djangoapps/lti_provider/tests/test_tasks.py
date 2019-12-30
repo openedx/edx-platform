@@ -3,7 +3,6 @@ Tests for the LTI outcome service handlers, both in outcomes.py and in tasks.py
 """
 
 
-
 import ddt
 import six
 from django.test import TestCase

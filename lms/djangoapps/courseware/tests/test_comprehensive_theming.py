@@ -1,7 +1,6 @@
 """Tests of comprehensive theming."""
 
 
-
 from django.conf import settings
 from django.contrib import staticfiles
 from django.test import TestCase

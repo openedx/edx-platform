@@ -3,7 +3,6 @@ This file contains all entrance exam related utils/logic.
 """
 
 
-
 from opaque_keys.edx.keys import UsageKey
 
 from lms.djangoapps.courseware.access import has_access

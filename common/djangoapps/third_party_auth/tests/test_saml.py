@@ -3,7 +3,6 @@ Unit tests for third_party_auth SAML auth providers
 """
 
 
-
 import mock
 
 from third_party_auth.saml import EdXSAMLIdentityProvider, get_saml_idp_class

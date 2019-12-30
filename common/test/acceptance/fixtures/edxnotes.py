@@ -3,7 +3,6 @@ Tools for creating edxnotes content fixture data.
 """
 
 
-
 import json
 
 import factory

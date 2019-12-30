@@ -3,7 +3,6 @@ Tests for pavelib/utils/test/utils
 """
 
 
-
 import unittest
 
 from mock import patch

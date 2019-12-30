@@ -3,8 +3,6 @@ Test lti_provider management commands.
 """
 
 
-
-
 import six
 from django.test import TestCase
 from mock import patch

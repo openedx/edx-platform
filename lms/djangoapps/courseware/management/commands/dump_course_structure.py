@@ -17,7 +17,6 @@ The resulting JSON object has one entry for each module in the course:
 """
 
 
-
 import json
 from textwrap import dedent
 

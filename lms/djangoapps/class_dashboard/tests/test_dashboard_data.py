@@ -3,7 +3,6 @@ Tests for class dashboard (Metrics tab in instructor dashboard)
 """
 
 
-
 import json
 
 from django.test.client import RequestFactory

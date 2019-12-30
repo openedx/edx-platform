@@ -3,7 +3,6 @@ Tests course_creators.views.py.
 """
 
 
-
 import mock
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied

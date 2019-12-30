@@ -3,7 +3,6 @@ Test for asset XML generation / parsing.
 """
 
 
-
 import unittest
 
 from contracts import ContractNotRespected

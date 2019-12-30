@@ -7,7 +7,6 @@ functionality
 # pylint: disable=protected-access
 
 
-
 from unittest.case import SkipTest, TestCase
 
 import ddt

@@ -13,7 +13,6 @@ Current db representation:
 """
 
 
-
 import logging
 import re
 

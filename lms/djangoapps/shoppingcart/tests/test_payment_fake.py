@@ -3,7 +3,6 @@ Tests for the fake payment page used in acceptance tests.
 """
 
 
-
 from collections import OrderedDict
 
 from django.test import TestCase

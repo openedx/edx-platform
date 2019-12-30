@@ -1,7 +1,6 @@
 """HTTP endpoints for the Course Run API."""
 
 
-
 from django.conf import settings
 from django.http import Http404
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication

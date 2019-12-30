@@ -6,7 +6,6 @@ Integration tests for submitting problem responses and getting grades.
 # pylint: disable=attribute-defined-outside-init
 
 
-
 import json
 import os
 from textwrap import dedent

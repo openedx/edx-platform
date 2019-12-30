@@ -3,7 +3,6 @@ Tests for CourseDetails
 """
 
 
-
 import datetime
 
 import ddt

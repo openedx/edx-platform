@@ -1,7 +1,6 @@
 """Tests for Course run views"""
 
 
-
 import datetime
 
 import ddt

@@ -4,7 +4,6 @@ End-to-end tests related to the cohort management on the LMS Instructor Dashboar
 """
 
 
-
 import os
 import os.path
 import uuid
@@ -249,7 +248,6 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
             new_assignment_type=None,
             verify_updated=False
     ):
-
         """
         Create a new cohort and verify the new and existing settings.
         """

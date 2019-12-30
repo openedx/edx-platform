@@ -3,7 +3,6 @@ Unit tests for the announcements feature.
 """
 
 
-
 import json
 import unittest
 from mock import patch

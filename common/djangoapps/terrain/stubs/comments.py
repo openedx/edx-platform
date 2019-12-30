@@ -3,7 +3,6 @@ Stub implementation of cs_comments_service for acceptance tests
 """
 
 
-
 import re
 from collections import OrderedDict
 

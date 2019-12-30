@@ -4,7 +4,6 @@ adding users, removing users, and listing members
 """
 
 
-
 import logging
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict

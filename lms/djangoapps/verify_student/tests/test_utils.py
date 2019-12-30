@@ -4,7 +4,6 @@ Tests for verify_student utility functions.
 """
 
 
-
 import unittest
 from datetime import timedelta
 

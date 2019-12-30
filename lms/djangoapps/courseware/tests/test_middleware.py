@@ -3,7 +3,6 @@ Tests for courseware middleware
 """
 
 
-
 from django.http import Http404
 from django.test.client import RequestFactory
 

@@ -3,7 +3,6 @@ Models for contentstore
 """
 
 
-
 from config_models.models import ConfigurationModel
 from django.db.models.fields import TextField
 

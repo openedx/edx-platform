@@ -3,7 +3,6 @@ Models for contentserver
 """
 
 
-
 import six
 
 from config_models.models import ConfigurationModel

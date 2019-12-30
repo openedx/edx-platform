@@ -4,7 +4,6 @@ Test the Studio help links.
 """
 
 
-
 from unittest import skip
 
 from six.moves import zip

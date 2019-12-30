@@ -3,7 +3,6 @@ Tests for lang_pref middleware.
 """
 
 
-
 import itertools
 
 import ddt

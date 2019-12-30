@@ -4,7 +4,6 @@ Tests for Verified Track Cohorting models
 # pylint: disable=attribute-defined-outside-init
 
 
-
 import ddt
 import mock
 import six

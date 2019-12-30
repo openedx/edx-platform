@@ -5,7 +5,6 @@ The Discount API Views should return information about discounts that apply to t
 # -*- coding: utf-8 -*-
 
 
-
 from django.contrib.auth.models import User
 from django.utils.decorators import method_decorator
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication

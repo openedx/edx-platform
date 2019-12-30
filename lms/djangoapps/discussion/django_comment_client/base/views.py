@@ -2,7 +2,6 @@
 """Views for discussion forums."""
 
 
-
 import functools
 import json
 import logging

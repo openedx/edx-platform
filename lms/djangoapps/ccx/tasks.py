@@ -3,7 +3,6 @@ Asynchronous tasks for the CCX app.
 """
 
 
-
 import logging
 
 import six

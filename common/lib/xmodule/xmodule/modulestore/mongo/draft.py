@@ -7,7 +7,6 @@ and otherwise returns i4x://org/course/cat/name).
 """
 
 
-
 import logging
 
 import pymongo

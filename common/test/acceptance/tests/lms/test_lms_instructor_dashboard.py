@@ -4,7 +4,6 @@ End-to-end tests for the LMS Instructor Dashboard.
 """
 
 
-
 import ddt
 from bok_choy.promise import EmptyPromise
 from six.moves import range

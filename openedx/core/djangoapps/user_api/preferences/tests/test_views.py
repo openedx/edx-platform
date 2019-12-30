@@ -4,7 +4,6 @@ Unit tests for preference APIs.
 """
 
 
-
 import json
 
 import ddt

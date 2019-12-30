@@ -1,7 +1,6 @@
 # pylint: disable=missing-docstring
 
 
-
 import unittest
 
 from django.conf import settings

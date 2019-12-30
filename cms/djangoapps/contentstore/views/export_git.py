@@ -4,7 +4,6 @@ the giturl attribute is set.
 """
 
 
-
 import logging
 
 import six

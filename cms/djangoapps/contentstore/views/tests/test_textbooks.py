@@ -1,7 +1,6 @@
 """ Test cases for the textbook index page. """
 
 
-
 import json
 from unittest import TestCase
 

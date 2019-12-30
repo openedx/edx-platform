@@ -3,7 +3,6 @@ This file contains utility functions which will responsible for sending emails.
 """
 
 
-
 import logging
 import os
 import uuid

@@ -3,7 +3,6 @@ VerticalBlock - an XBlock which renders its children in a column.
 """
 
 
-
 import logging
 from copy import copy
 from functools import reduce

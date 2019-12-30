@@ -4,7 +4,6 @@ in-process apps through api.py.
 """
 
 
-
 class ProgramEnrollmentStatuses(object):
     """
     Status that a user may have enrolled in a program.

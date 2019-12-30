@@ -3,7 +3,6 @@ Unit tests for the VerificationDeadline signals
 """
 
 
-
 from datetime import timedelta
 
 from django.utils.timezone import now

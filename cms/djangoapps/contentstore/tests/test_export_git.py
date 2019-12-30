@@ -3,7 +3,6 @@ Test the ability to export courses to xml from studio
 """
 
 
-
 import copy
 import os
 import shutil

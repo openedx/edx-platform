@@ -3,7 +3,6 @@ Tests of CourseDurationLimitConfig.
 """
 
 
-
 import itertools
 from datetime import datetime, timedelta
 

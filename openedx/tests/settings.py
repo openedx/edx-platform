@@ -4,7 +4,6 @@ Required in Django 1.9+ due to imports of models in stock Django apps.
 """
 
 
-
 import sys
 import tempfile
 

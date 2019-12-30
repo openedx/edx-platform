@@ -4,7 +4,6 @@ requiring Superuser access for all other Request types on an API endpoint.
 """
 
 
-
 from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 from lms.djangoapps.courseware.access import has_access

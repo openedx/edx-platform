@@ -3,7 +3,6 @@ The Files and Uploads page for a course in Studio
 """
 
 
-
 import os
 
 import six

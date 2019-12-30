@@ -3,7 +3,6 @@ Defines abstract class for the Enrollment Reports.
 """
 
 
-
 import abc
 import collections
 import json

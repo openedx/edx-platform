@@ -3,7 +3,6 @@ View endpoints for Survey
 """
 
 
-
 import json
 import logging
 

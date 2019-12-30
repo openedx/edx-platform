@@ -3,7 +3,6 @@ Unit tests for the Mongo modulestore
 """
 
 
-
 import logging
 import shutil
 from datetime import datetime

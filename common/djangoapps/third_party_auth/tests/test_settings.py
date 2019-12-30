@@ -1,7 +1,6 @@
 """Unit tests for settings.py."""
 
 
-
 import unittest
 
 from mock import patch

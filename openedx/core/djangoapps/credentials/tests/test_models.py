@@ -1,7 +1,6 @@
 """Tests for models supporting Credentials-related functionality."""
 
 
-
 from django.test import TestCase, override_settings
 
 from openedx.core.djangoapps.credentials.models import API_VERSION

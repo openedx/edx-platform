@@ -3,7 +3,6 @@ Decorators related to edXNotes.
 """
 
 
-
 import json
 
 import six

@@ -2,7 +2,6 @@
 """Test for Conditional Xmodule functional logic."""
 
 
-
 from xmodule.conditional_module import ConditionalDescriptor
 
 from . import LogicTest

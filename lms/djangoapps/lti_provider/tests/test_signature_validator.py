@@ -3,7 +3,6 @@ Tests for the SignatureValidator class.
 """
 
 
-
 import ddt
 from django.test import TestCase
 from django.test.client import RequestFactory

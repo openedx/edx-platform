@@ -4,7 +4,6 @@ committing and pushing the changes.
 """
 
 
-
 import logging
 import os
 import subprocess

@@ -2,7 +2,6 @@
 """Tests for OAuth2 permission delegation."""
 
 
-
 from six.moves.urllib.parse import parse_qsl, urlparse  # pylint: disable=import-error
 
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage

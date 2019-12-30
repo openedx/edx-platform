@@ -4,7 +4,6 @@ a csv of (user, course) pairs.
 """
 
 
-
 import csv
 
 from django.core.management.base import BaseCommand

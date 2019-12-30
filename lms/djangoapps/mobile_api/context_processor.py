@@ -3,7 +3,6 @@ Django template context processors.
 """
 
 
-
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
 

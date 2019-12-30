@@ -1,7 +1,6 @@
 """Models providing Programs support for the LMS and Studio."""
 
 
-
 import six
 from config_models.models import ConfigurationModel
 from django.db import models

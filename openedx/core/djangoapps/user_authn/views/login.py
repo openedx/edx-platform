@@ -5,7 +5,6 @@ Much of this file was broken out from views.py, previous history can be found th
 """
 
 
-
 from functools import wraps
 import json
 import logging

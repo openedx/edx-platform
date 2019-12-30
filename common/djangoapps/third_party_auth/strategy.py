@@ -4,7 +4,6 @@ ConfigurationModels rather than django.settings
 """
 
 
-
 from social_core.backends.oauth import OAuthAuth
 from social_django.strategy import DjangoStrategy
 

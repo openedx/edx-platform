@@ -79,7 +79,6 @@ choice for most environments but you may be happy with the trade-offs of the
 """
 
 
-
 from logging import getLogger
 
 from django.conf import settings

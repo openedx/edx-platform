@@ -1,7 +1,6 @@
 """Tests for items views."""
 
 
-
 import copy
 import json
 import tempfile

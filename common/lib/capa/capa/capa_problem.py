@@ -14,7 +14,6 @@ This is used by capa_module.
 """
 
 
-
 import logging
 import os.path
 import re

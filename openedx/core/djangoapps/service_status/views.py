@@ -3,7 +3,6 @@ Django Views for service status app
 """
 
 
-
 import json
 import time
 

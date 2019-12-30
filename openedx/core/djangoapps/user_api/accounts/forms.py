@@ -3,7 +3,6 @@ Django forms for accounts
 """
 
 
-
 from django import forms
 from django.core.exceptions import ValidationError
 

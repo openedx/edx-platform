@@ -3,7 +3,6 @@ Unit tests for the course bookmarks feature.
 """
 
 
-
 import ddt
 from django.test import RequestFactory
 

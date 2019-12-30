@@ -1,7 +1,6 @@
 """Ensure emitted events contain the fields legacy processors expect to find."""
 
 
-
 import ddt
 from django.test import TestCase
 from django.test.utils import override_settings

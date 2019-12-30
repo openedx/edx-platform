@@ -4,7 +4,6 @@ Tests the "preview" selector in the LMS that allows changing between Staff, Lear
 """
 
 
-
 from textwrap import dedent
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc

@@ -8,7 +8,6 @@ Event tracker backend that saves events to a Django database.
 # schema changes or eventually deprecated.
 
 
-
 import logging
 
 from django.db import models

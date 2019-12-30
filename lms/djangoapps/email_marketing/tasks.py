@@ -3,7 +3,6 @@ This file contains celery tasks for email marketing signal handler.
 """
 
 
-
 import logging
 import time
 from datetime import datetime, timedelta

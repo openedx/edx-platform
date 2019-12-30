@@ -6,7 +6,6 @@ apply them to the appropriate events.
 """
 
 
-
 import json
 import logging
 

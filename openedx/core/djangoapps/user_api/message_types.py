@@ -3,7 +3,6 @@ Message Types for user_api emails
 """
 
 
-
 from django.conf import settings
 
 from openedx.core.djangoapps.ace_common.message import BaseMessageType

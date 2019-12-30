@@ -3,7 +3,6 @@ Utility functions for zendesk interaction.
 """
 
 
-
 import json
 import logging
 

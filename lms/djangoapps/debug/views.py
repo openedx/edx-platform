@@ -1,7 +1,6 @@
 """Views for debugging and diagnostics"""
 
 
-
 import pprint
 import traceback
 

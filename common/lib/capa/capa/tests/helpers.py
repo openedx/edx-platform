@@ -1,7 +1,6 @@
 """Tools for helping with testing capa."""
 
 
-
 import gettext
 import io
 import os

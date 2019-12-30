@@ -1,7 +1,6 @@
 """ Objects and functions related to generating CSV reports """
 
 
-
 from decimal import Decimal
 
 import csv

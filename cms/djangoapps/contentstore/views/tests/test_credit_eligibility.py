@@ -3,7 +3,6 @@ Unit tests for credit eligibility UI in Studio.
 """
 
 
-
 import mock
 import six
 

@@ -1,7 +1,6 @@
 # pylint: disable=missing-docstring
 
 
-
 import datetime
 import hashlib
 

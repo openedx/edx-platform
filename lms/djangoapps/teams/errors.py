@@ -3,7 +3,6 @@ Errors thrown in the Team API.
 """
 
 
-
 class TeamAPIRequestError(Exception):
     """There was a problem with a request to the Team API."""
     pass

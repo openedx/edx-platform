@@ -3,7 +3,6 @@ Tests for Course API forms.
 """
 
 
-
 from itertools import product
 
 import ddt

@@ -1,7 +1,6 @@
 """Payment and verification pages"""
 
 
-
 import re
 
 from bok_choy.page_object import PageObject

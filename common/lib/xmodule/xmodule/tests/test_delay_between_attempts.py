@@ -8,7 +8,6 @@ submissions" setting is set to different values
 """
 
 
-
 import datetime
 import textwrap
 import unittest

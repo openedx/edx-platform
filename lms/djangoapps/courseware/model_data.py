@@ -22,7 +22,6 @@ DjangoOrmFieldCache: A base-class for single-row-per-field caches.
 """
 
 
-
 import json
 import logging
 from abc import ABCMeta, abstractmethod

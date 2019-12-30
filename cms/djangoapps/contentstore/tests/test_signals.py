@@ -1,7 +1,6 @@
 """Tests for verifying availability of resources for locking"""
 
 
-
 import ddt
 import six
 from mock import Mock, patch

@@ -3,7 +3,6 @@ Instructor API endpoint urls.
 """
 
 
-
 from django.conf.urls import url
 
 from lms.djangoapps.instructor.views import api, gradebook_api

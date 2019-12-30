@@ -3,7 +3,6 @@ This test will run for annotator_mixin.py
 """
 
 
-
 import unittest
 
 from lxml import etree

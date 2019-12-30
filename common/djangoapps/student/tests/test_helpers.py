@@ -1,7 +1,6 @@
 """ Test Student helpers """
 
 
-
 import logging
 
 import ddt

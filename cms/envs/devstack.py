@@ -3,7 +3,6 @@ Specific overrides to the base prod settings to make development easier.
 """
 
 
-
 import logging
 from os.path import abspath, dirname, join
 

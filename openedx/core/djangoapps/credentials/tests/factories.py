@@ -2,7 +2,6 @@
 # pylint: disable=missing-docstring, invalid-name
 
 
-
 import factory
 
 from openedx.core.djangoapps.catalog.tests.factories import DictFactoryBase, generate_course_run_key

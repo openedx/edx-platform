@@ -4,7 +4,6 @@ Tests for credit course models.
 """
 
 
-
 import ddt
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey

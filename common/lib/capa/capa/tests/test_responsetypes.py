@@ -4,7 +4,6 @@ Tests of responsetypes
 """
 
 
-
 import io
 import json
 import os

@@ -3,7 +3,6 @@ Utility methods for unit tests.
 """
 
 
-
 import filecmp
 
 from path import Path as path

@@ -3,7 +3,6 @@ This module contains signals related to enterprise.
 """
 
 
-
 import logging
 import six
 

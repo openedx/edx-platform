@@ -4,7 +4,6 @@ edx.org uses an edx footer but other instances use an Open edX footer.
 """
 
 
-
 import unittest
 
 import six

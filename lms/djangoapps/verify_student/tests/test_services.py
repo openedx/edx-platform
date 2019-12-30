@@ -4,7 +4,6 @@ Tests for the service classes in verify_student.
 """
 
 
-
 import ddt
 from django.conf import settings
 from mock import patch

@@ -3,7 +3,6 @@ Test courseware search
 """
 
 
-
 import json
 import uuid
 

@@ -14,7 +14,6 @@ def get_logger_config(log_dir,
                       logging_env="no_env",
                       local_loglevel='INFO',
                       service_variant=""):
-
     """
 
     Return the appropriate logging config dictionary. You should assign the

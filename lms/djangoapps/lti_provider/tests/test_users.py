@@ -3,7 +3,6 @@ Tests for the LTI user management functionality
 """
 
 
-
 import string
 
 from django.contrib.auth.models import User

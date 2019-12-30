@@ -3,7 +3,6 @@ End-to-end test for cohorted courseware. This uses both Studio and LMS.
 """
 
 
-
 from bok_choy.page_object import XSS_INJECTION
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc

@@ -3,7 +3,6 @@ Branding API endpoint urls.
 """
 
 
-
 from django.conf.urls import url
 
 from branding.views import footer

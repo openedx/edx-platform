@@ -1,7 +1,6 @@
 """Tests for zendesk_proxy views."""
 
 
-
 from copy import deepcopy
 import json
 

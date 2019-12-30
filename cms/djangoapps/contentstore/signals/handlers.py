@@ -1,7 +1,6 @@
 """ receivers of course_published and library_updated events in order to trigger indexing task """
 
 
-
 import logging
 from datetime import datetime
 from functools import wraps

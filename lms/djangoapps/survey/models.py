@@ -3,7 +3,6 @@ Models to support Course Surveys feature
 """
 
 
-
 import logging
 from collections import OrderedDict
 

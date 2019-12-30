@@ -3,7 +3,6 @@ Student Views
 """
 
 
-
 import datetime
 import logging
 import uuid

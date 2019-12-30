@@ -6,7 +6,6 @@
 # Used in translating LON-CAPA problems to i4x problem specification language.
 
 
-
 import math
 import random
 from six.moves import range

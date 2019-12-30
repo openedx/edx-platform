@@ -3,7 +3,6 @@ Tests for Blocks Views
 """
 
 
-
 import json
 import unittest
 

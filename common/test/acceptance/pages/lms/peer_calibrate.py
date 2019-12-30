@@ -4,7 +4,6 @@ Page that allows the student to grade calibration essays
 """
 
 
-
 from bok_choy.page_object import PageObject
 from bok_choy.promise import Promise
 

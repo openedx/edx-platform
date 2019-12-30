@@ -3,7 +3,6 @@ Tests of modulestore semantics: How do the interfaces methods of ModuleStore rel
 """
 
 
-
 import itertools
 from collections import namedtuple
 

@@ -6,7 +6,6 @@ backend tables.
 """
 
 
-
 import json
 from unittest import skipUnless
 

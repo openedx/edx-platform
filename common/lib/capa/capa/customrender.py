@@ -7,7 +7,6 @@ and the xml element.
 """
 
 
-
 import logging
 import re
 import xml.sax.saxutils as saxutils

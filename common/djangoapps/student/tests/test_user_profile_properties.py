@@ -1,7 +1,6 @@
 """Unit tests for custom UserProfile properties."""
 
 
-
 import datetime
 
 import ddt

@@ -3,7 +3,6 @@ django admin page for the course creators table
 """
 
 
-
 import logging
 from smtplib import SMTPException
 

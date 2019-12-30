@@ -3,7 +3,6 @@ Module for running content split tests
 """
 
 
-
 import json
 import logging
 from functools import reduce

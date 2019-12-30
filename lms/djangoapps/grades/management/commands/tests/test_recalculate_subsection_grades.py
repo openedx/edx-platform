@@ -3,7 +3,6 @@ Tests for reset_grades management command.
 """
 
 
-
 from datetime import datetime
 
 import ddt

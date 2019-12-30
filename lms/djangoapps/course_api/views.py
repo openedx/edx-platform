@@ -3,7 +3,6 @@ Course API Views
 """
 
 
-
 from django.core.exceptions import ValidationError
 from edx_rest_framework_extensions.paginators import NamespacedPageNumberPagination
 from rest_framework.generics import ListAPIView, RetrieveAPIView

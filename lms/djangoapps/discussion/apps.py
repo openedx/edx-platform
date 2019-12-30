@@ -5,7 +5,6 @@ Signal handlers are connected here.
 """
 
 
-
 from django.apps import AppConfig
 
 from openedx.core.constants import COURSE_ID_PATTERN

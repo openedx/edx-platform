@@ -3,7 +3,6 @@ This module provides an abstraction for Module Stores that support Draft and Pub
 """
 
 
-
 import logging
 import threading
 from abc import ABCMeta, abstractmethod

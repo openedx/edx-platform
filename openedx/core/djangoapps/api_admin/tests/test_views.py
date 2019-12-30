@@ -1,7 +1,6 @@
 """ Tests for the api_admin app's views. """
 
 
-
 import json
 
 import ddt

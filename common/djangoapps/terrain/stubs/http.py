@@ -3,7 +3,6 @@ Stub implementation of an HTTP service.
 """
 
 
-
 import json
 import threading
 from functools import wraps

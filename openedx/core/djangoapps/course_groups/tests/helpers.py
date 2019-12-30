@@ -3,7 +3,6 @@ Helper methods for testing cohorts.
 """
 
 
-
 import json
 
 from factory import Sequence, post_generation

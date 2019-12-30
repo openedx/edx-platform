@@ -4,7 +4,6 @@ Admin site configurations for verify_student.
 """
 
 
-
 from django.contrib import admin
 
 from lms.djangoapps.verify_student.models import (

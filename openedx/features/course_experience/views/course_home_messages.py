@@ -3,7 +3,6 @@ View logic for handling course messages.
 """
 
 
-
 from datetime import datetime
 
 from babel.dates import format_date, format_timedelta

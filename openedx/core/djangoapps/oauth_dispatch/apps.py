@@ -3,7 +3,6 @@ Configure OAuthDispatch App
 """
 
 
-
 from django.apps import AppConfig
 
 

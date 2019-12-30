@@ -1,7 +1,6 @@
 """ Tests for tab functions (just primitive). """
 
 
-
 import json
 
 from contentstore.tests.utils import CourseTestCase

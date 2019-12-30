@@ -3,7 +3,6 @@ Unit test for stub YouTube implementation.
 """
 
 
-
 import unittest
 
 import requests

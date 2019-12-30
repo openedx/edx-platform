@@ -3,7 +3,6 @@ Unit tests for Edx Proctoring feature flag in new instructor dashboard.
 """
 
 
-
 import ddt
 from django.apps import apps
 from django.conf import settings

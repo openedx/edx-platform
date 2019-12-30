@@ -3,7 +3,6 @@ This file contains celery tasks for credit course views.
 """
 
 
-
 import six
 from celery import task
 from celery.utils.log import get_task_logger

@@ -21,7 +21,6 @@ To enable this implementation, add the following Django settings:
 """
 
 
-
 import binascii
 import hmac
 import json

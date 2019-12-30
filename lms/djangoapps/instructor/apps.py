@@ -3,7 +3,6 @@ Instructor Application Configuration
 """
 
 
-
 from django.apps import AppConfig
 from django.conf import settings
 from edx_proctoring.runtime import set_runtime_service

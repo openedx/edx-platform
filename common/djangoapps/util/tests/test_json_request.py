@@ -3,7 +3,6 @@ Test for JsonResponse and JsonResponseBadRequest util classes.
 """
 
 
-
 import json
 import unittest
 

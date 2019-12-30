@@ -4,8 +4,6 @@ Tests for OAuth2.  This module is copied from django-rest-framework-oauth
 """
 
 
-
-
 import itertools
 import json
 import unittest

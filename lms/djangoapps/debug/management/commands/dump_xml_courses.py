@@ -8,7 +8,6 @@ of each of its fields (including those fields that are set as default values).
 """
 
 
-
 import json
 
 import six

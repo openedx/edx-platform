@@ -3,7 +3,6 @@ Tests of the LMS XBlock Runtime and associated utilities
 """
 
 
-
 from ddt import data, ddt
 from django.conf import settings
 from django.test import TestCase

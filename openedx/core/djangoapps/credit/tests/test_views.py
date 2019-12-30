@@ -3,7 +3,6 @@ Tests for credit app views.
 """
 
 
-
 import datetime
 import json
 

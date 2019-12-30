@@ -3,7 +3,6 @@ Django Celery tasks for service status app
 """
 
 
-
 import time
 
 from djcelery import celery

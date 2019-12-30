@@ -3,7 +3,6 @@ Django models related to course groups functionality.
 """
 
 
-
 import json
 import logging
 

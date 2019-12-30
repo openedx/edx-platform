@@ -1,7 +1,6 @@
 """Tests for contents"""
 
 
-
 import os
 import unittest
 

@@ -2,7 +2,6 @@
 """ Commerce app tests package. """
 
 
-
 import httpretty
 import mock
 from django.conf import settings

@@ -3,7 +3,6 @@ Courseware search
 """
 
 
-
 from common.test.acceptance.pages.lms.course_page import CoursePage
 
 

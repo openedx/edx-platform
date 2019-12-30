@@ -3,7 +3,6 @@ Module containing API functions for the CCXCon
 """
 
 
-
 import logging
 
 import six

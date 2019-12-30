@@ -3,7 +3,6 @@ Management command for expiring old entitlements.
 """
 
 
-
 import logging
 from textwrap import dedent
 

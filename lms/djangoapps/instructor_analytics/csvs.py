@@ -5,7 +5,6 @@ Format and create csv responses
 """
 
 
-
 import csv
 
 import six

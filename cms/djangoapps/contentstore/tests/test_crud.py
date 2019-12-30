@@ -1,7 +1,6 @@
 """Tests for CRUD Operations"""
 
 
-
 from xmodule import templates
 from xmodule.capa_module import ProblemBlock
 from xmodule.course_module import CourseDescriptor

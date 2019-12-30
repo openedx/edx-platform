@@ -3,7 +3,6 @@ Tests for wiki middleware.
 """
 
 
-
 from django.test.client import Client
 
 from course_wiki.views import get_or_create_root

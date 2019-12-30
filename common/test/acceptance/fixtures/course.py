@@ -3,7 +3,6 @@ Fixture to create a course and course components (XBlocks).
 """
 
 
-
 import datetime
 import json
 import mimetypes

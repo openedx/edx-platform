@@ -3,7 +3,6 @@ Implementation of abstraction layer for other parts of the system to make querie
 """
 
 
-
 import logging
 from itertools import chain
 

@@ -6,7 +6,6 @@ Higher-level tests are in `cms/djangoapps/contentstore`.
 """
 
 
-
 import ddt
 import six
 from bson.objectid import ObjectId

@@ -3,7 +3,6 @@ Tests for the CORS CSRF middleware
 """
 
 
-
 from mock import patch, Mock
 import ddt
 import six

@@ -1,7 +1,6 @@
 """ Tests for rendering functions in the mako pipeline. """
 
 
-
 import ddt
 from mock import patch
 from six.moves import map

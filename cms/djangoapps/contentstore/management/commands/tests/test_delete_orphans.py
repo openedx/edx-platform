@@ -1,7 +1,6 @@
 """Tests running the delete_orphan command"""
 
 
-
 import ddt
 import six
 from django.core.management import CommandError, call_command

@@ -3,7 +3,6 @@ Unit tests for the API module
 """
 
 
-
 import datetime
 
 import mock

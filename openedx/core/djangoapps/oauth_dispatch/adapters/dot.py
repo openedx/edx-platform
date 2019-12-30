@@ -3,7 +3,6 @@ Adapter to isolate django-oauth-toolkit dependencies
 """
 
 
-
 from oauth2_provider import models
 
 from openedx.core.djangoapps.oauth_dispatch.models import RestrictedApplication

@@ -1,7 +1,6 @@
 """ API v0 views. """
 
 
-
 import datetime
 import json
 import logging

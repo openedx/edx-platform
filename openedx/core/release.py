@@ -3,7 +3,6 @@ Information about the release line of this Open edX code.
 """
 
 
-
 import unittest
 
 # The release line: an Open edX release name ("ficus"), or "master".

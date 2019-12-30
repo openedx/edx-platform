@@ -5,7 +5,6 @@ import all the Studio code.
 """
 
 
-
 import os
 
 if os.environ['EDX_PLATFORM_SETTINGS'] == 'devstack_docker':

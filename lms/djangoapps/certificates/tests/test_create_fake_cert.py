@@ -1,7 +1,6 @@
 """Tests for the create_fake_certs management command. """
 
 
-
 import six
 
 from django.core.management import call_command

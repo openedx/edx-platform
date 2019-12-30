@@ -3,7 +3,6 @@ Test module for user certificate generation.
 """
 
 
-
 import ddt
 from django.test import TestCase
 from mock import call, patch

@@ -2,7 +2,6 @@
 """Signals related to the comments service."""
 
 
-
 from django.dispatch import Signal
 
 thread_created = Signal(providing_args=['user', 'post'])

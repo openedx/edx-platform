@@ -3,7 +3,6 @@ This command will be run by an ansible script.
 """
 
 
-
 import fnmatch
 import json
 import logging

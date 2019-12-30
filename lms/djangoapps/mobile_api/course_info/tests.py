@@ -3,7 +3,6 @@ Tests for course_info
 """
 
 
-
 import ddt
 from django.conf import settings
 from milestones.tests.utils import MilestonesTestCaseMixin

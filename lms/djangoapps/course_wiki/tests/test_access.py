@@ -3,7 +3,6 @@ Tests for wiki permissions
 """
 
 
-
 from django.contrib.auth.models import Group
 
 from course_wiki import settings

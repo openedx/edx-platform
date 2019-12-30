@@ -10,7 +10,6 @@ If no grade response is configured, a default response will be returned.
 """
 
 
-
 import copy
 import json
 from threading import Timer

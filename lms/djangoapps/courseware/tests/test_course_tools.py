@@ -3,7 +3,6 @@ Unit tests for course tools.
 """
 
 
-
 import datetime
 
 import crum

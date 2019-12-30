@@ -3,7 +3,6 @@ Definitions of all options used by the various bok_choy tasks.
 """
 
 
-
 import os
 from optparse import make_option
 

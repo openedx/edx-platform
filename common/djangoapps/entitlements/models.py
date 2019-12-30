@@ -1,7 +1,6 @@
 """Entitlement Models"""
 
 
-
 import logging
 import uuid as uuid_tools
 from datetime import timedelta

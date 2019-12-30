@@ -4,7 +4,6 @@ This file contains implementation override of SearchInitializer which will allow
 """
 
 
-
 from opaque_keys.edx.keys import CourseKey
 from search.initializer import SearchInitializer
 

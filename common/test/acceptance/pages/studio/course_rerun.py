@@ -3,7 +3,6 @@ Course rerun page in Studio
 """
 
 
-
 from common.test.acceptance.pages.studio.course_page import CoursePage
 from common.test.acceptance.pages.studio.utils import set_input_value
 

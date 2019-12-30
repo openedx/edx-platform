@@ -4,7 +4,6 @@ when using the Split modulestore.
 """
 
 
-
 from shutil import rmtree
 from tempfile import mkdtemp
 from unittest import TestCase, skip

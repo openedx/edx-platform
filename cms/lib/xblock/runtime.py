@@ -3,7 +3,6 @@ XBlock runtime implementations for edX Studio
 """
 
 
-
 import six
 from django.urls import reverse
 

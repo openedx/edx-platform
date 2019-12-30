@@ -5,7 +5,6 @@ Tests for compute_grades management command.
 # pylint: disable=protected-access
 
 
-
 import ddt
 import six
 from six.moves import range

@@ -3,7 +3,6 @@ Views to support bulk email functionalities like opt-out.
 """
 
 
-
 import logging
 
 from six import text_type

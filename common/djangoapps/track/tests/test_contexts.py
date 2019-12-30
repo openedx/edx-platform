@@ -1,7 +1,6 @@
 # pylint: disable=missing-docstring
 
 
-
 from unittest import TestCase
 
 import ddt

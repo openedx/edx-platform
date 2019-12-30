@@ -3,7 +3,6 @@ Video player in the courseware.
 """
 
 
-
 import json
 import logging
 import time

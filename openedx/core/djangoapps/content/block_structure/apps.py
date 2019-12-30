@@ -3,7 +3,6 @@ Configuration for block_structure djangoapp
 """
 
 
-
 from django.apps import AppConfig
 
 

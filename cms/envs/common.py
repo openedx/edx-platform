@@ -40,7 +40,6 @@ When refering to XBlocks, we use the entry-point name. For example,
 # pylint: disable=unused-import
 
 
-
 import imp
 import os
 import sys

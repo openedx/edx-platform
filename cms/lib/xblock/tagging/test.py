@@ -3,7 +3,6 @@ Tests for the Studio Tagging XBlockAside
 """
 
 
-
 import json
 from datetime import datetime
 from six import StringIO

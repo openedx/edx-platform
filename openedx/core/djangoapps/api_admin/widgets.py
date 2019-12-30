@@ -1,7 +1,6 @@
 """ Form widget classes """
 
 
-
 from django.conf import settings
 from django.forms.utils import flatatt
 from django.forms.widgets import CheckboxInput

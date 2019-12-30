@@ -2,7 +2,6 @@
 """Tests for certificates views. """
 
 
-
 import datetime
 import json
 from collections import OrderedDict

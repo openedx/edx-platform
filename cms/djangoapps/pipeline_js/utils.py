@@ -3,7 +3,6 @@ Utilities for returning XModule JS (used by requirejs)
 """
 
 
-
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 

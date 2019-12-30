@@ -7,7 +7,6 @@
 # http://www.sphinx-doc.org/en/master/config
 
 
-
 import os
 
 import edx_theme

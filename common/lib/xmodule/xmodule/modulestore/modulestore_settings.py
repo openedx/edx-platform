@@ -3,7 +3,6 @@ This file contains helper functions for configuring module_store_setting setting
 """
 
 
-
 import copy
 import warnings
 

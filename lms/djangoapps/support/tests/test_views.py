@@ -4,7 +4,6 @@ Tests for support views.
 """
 
 
-
 import itertools
 import json
 import re

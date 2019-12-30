@@ -4,7 +4,6 @@ This file contains implementation override of SearchFilterGenerator which will a
 """
 
 
-
 import six
 from search.filter_generator import SearchFilterGenerator
 

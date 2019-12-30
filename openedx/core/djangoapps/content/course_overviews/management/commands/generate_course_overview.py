@@ -3,7 +3,6 @@ Command to load course overviews.
 """
 
 
-
 import logging
 
 import six

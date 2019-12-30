@@ -12,7 +12,6 @@ In two separate processes on devstack:
 """
 
 
-
 import os
 
 # We intentionally define lots of variables that aren't used, and

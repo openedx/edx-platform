@@ -3,7 +3,6 @@ Tests for EmbargoMiddleware with CountryAccessRules
 """
 
 
-
 import ddt
 import six
 from config_models.models import cache as config_cache

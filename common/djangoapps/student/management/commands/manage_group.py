@@ -4,7 +4,6 @@ and set their permissions by name.
 """
 
 
-
 from django.apps import apps
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
