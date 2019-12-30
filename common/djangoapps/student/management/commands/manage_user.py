@@ -148,5 +148,5 @@ class Command(BaseCommand):
             )
         )
 
-        user.groups = new_groups
+        user.groups.set(new_groups)
         user.save()
