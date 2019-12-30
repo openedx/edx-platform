@@ -209,9 +209,17 @@ def user_by_anonymous_id(uid):
     if uid is None:
         return None
 
+    request_cache = RequestCache('user_by_anonymous_id')
+    cache_response = request_cache.get_cached_response(uid)
+    if cache_response.is_found:
+        return cache_response.value
+
     try:
-        return User.objects.get(anonymoususerid__anonymous_user_id=uid)
+        user = User.objects.get(anonymoususerid__anonymous_user_id=uid)
+        request_cache.set(uid, user)
+        return user
     except ObjectDoesNotExist:
+        request_cache.set(uid, None)
         return None
 
 
@@ -1207,13 +1215,24 @@ class CourseEnrollment(models.Model):
         if user.is_anonymous:
             return None
         try:
+            request_cache = RequestCache('get_enrollment')
+            if select_related:
+                cache_key = (user.id, course_key, ','.join(select_related))
+            else:
+                cache_key = (user.id, course_key)
+            cache_response = request_cache.get_cached_response(cache_key)
+            if cache_response.is_found:
+                return cache_response.value
+
             query = cls.objects
             if select_related is not None:
                 query = query.select_related(*select_related)
-            return query.get(
+            enrollment = query.get(
                 user=user,
                 course_id=course_key
             )
+            request_cache.set(cache_key, enrollment)
+            return enrollment
         except cls.DoesNotExist:
             return None
 
@@ -1257,6 +1276,8 @@ class CourseEnrollment(models.Model):
         This saves immediately.
 
         """
+        RequestCache('get_enrollment').clear()
+
         activation_changed = False
         # if is_active is None, then the call to update_enrollment didn't specify
         # any value, so just leave is_active as it is
@@ -1488,6 +1509,8 @@ class CourseEnrollment(models.Model):
 
         `skip_refund` can be set to True to avoid the refund process.
         """
+        RequestCache('get_enrollment').clear()
+
         try:
             record = cls.objects.get(user=user, course_id=course_id)
             record.update_enrollment(is_active=False, skip_refund=skip_refund)
@@ -1509,6 +1532,8 @@ class CourseEnrollment(models.Model):
 
         `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
         """
+        RequestCache('get_enrollment').clear()
+
         try:
             user = User.objects.get(email=email)
             return cls.unenroll(user, course_id)
