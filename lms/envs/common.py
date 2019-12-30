@@ -1322,7 +1322,14 @@ MIDDLEWARE_CLASSES = [
 
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
+
+    'edly_panel_app.middleware.EdlyUserActivityMiddleware',
 ]
+
+# Edly Configuration
+EDLY_PANEL_GROUP_NAME = 'Edly Panel Users'
+ADMIN_CONFIGURATION_USERS_GROUP_NAME = 'Admin Configuration Users'
+
 
 # Clickjacking protection can be disbaled by setting this to 'ALLOW'
 X_FRAME_OPTIONS = 'DENY'
@@ -2294,6 +2301,8 @@ INSTALLED_APPS = [
 
     # edx-drf-extensions
     'csrf.apps.CsrfAppConfig',  # Enables frontend apps to retrieve CSRF tokens.
+
+    'edly_panel_app',
 ]
 
 ######################### CSRF #########################################
