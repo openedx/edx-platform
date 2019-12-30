@@ -39,7 +39,7 @@ class TestClass(ResourceTemplates):
     derive a class from it in order to fill in some data it's expecting to find
     in its mro.
     """
-    template_packages = [__name__]
+    template_packages = ['xmodule']
 
     @classmethod
     def get_template_dir(cls):
