@@ -531,8 +531,8 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         """
         method_calls = mock_audit_log.method_calls
         name, args, _kwargs = method_calls[-1]
-        self.assertEquals(name, level)
-        self.assertEquals(len(args), 1)
+        self.assertEqual(name, level)
+        self.assertEqual(len(args), 1)
         format_string = args[0]
         for log_string in log_strings:
             self.assertIn(log_string, format_string)
@@ -543,8 +543,8 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         """
         method_calls = mock_audit_log.method_calls
         name, args, _kwargs = method_calls[-1]
-        self.assertEquals(name, level)
-        self.assertEquals(len(args), 1)
+        self.assertEqual(name, level)
+        self.assertEqual(len(args), 1)
         format_string = args[0]
         for log_string in log_strings:
             self.assertNotIn(log_string, format_string)

@@ -31,12 +31,12 @@ class ShortcutsTests(UrlResetMixin, TestCase):
             with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
                 expected_link = 'https://dummy-root/about-us'
                 link = marketing_link('ABOUT')
-                self.assertEquals(link, expected_link)
+                self.assertEqual(link, expected_link)
             # test marketing site off
             with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
                 expected_link = reverse(self._get_test_url_name())
                 link = marketing_link('ABOUT')
-                self.assertEquals(link, expected_link)
+                self.assertEqual(link, expected_link)
 
     @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'ABOUT': '/about-us'})
     def test_is_marketing_link_set(self):

@@ -294,7 +294,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         self.assertEqual("world peace", data["goals"])
         self.assertTrue(data["is_active"])
         self.assertEqual("Park Ave", data['mailing_address'])
-        self.assertEquals(requires_parental_consent, data["requires_parental_consent"])
+        self.assertEqual(requires_parental_consent, data["requires_parental_consent"])
         self.assertIsNone(data["secondary_email"])
         self.assertEqual(year_of_birth, data["year_of_birth"])
 

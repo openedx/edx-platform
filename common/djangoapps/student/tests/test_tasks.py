@@ -34,11 +34,11 @@ class SendActivationEmailTestCase(TestCase):
         """
         Tests that attributes of the message are being filled correctly in compose_activation_email
         """
-        self.assertEquals(self.msg.recipient.username, self.student.username)
-        self.assertEquals(self.msg.recipient.email_address, self.student.email)
-        self.assertEquals(self.msg.context['routed_user'], self.student.username)
-        self.assertEquals(self.msg.context['routed_user_email'], self.student.email)
-        self.assertEquals(self.msg.context['routed_profile_name'], '')
+        self.assertEqual(self.msg.recipient.username, self.student.username)
+        self.assertEqual(self.msg.recipient.email_address, self.student.email)
+        self.assertEqual(self.msg.context['routed_user'], self.student.username)
+        self.assertEqual(self.msg.context['routed_user_email'], self.student.email)
+        self.assertEqual(self.msg.context['routed_profile_name'], '')
 
     @mock.patch('time.sleep', mock.Mock(return_value=None))
     @mock.patch('student.tasks.log')
@@ -60,7 +60,7 @@ class SendActivationEmailTestCase(TestCase):
                     attempt=attempt,
                     max_attempts=email_max_attempts
                 ))
-        self.assertEquals(mock_log.info.call_count, 6)
+        self.assertEqual(mock_log.info.call_count, 6)
 
         # Asserts that the error was logged on crossing max retry attempts.
         mock_log.error.assert_called_with(
@@ -69,7 +69,7 @@ class SendActivationEmailTestCase(TestCase):
             self.student.email,
             exc_info=True
         )
-        self.assertEquals(mock_log.error.call_count, 1)
+        self.assertEqual(mock_log.error.call_count, 1)
 
     @mock.patch('student.tasks.log')
     @mock.patch('student.tasks.ace.send', mock.Mock(side_effect=ChannelError))
@@ -90,6 +90,6 @@ class SendActivationEmailTestCase(TestCase):
         )
 
         # Assert that nothing else was logged
-        self.assertEquals(mock_log.info.call_count, 0)
-        self.assertEquals(mock_log.error.call_count, 0)
-        self.assertEquals(mock_log.exception.call_count, 1)
+        self.assertEqual(mock_log.info.call_count, 0)
+        self.assertEqual(mock_log.error.call_count, 0)
+        self.assertEqual(mock_log.exception.call_count, 1)

@@ -52,7 +52,7 @@ class CreateFakeCertTest(TestCase):
             errstring = 'Error: too few arguments'
         else:
             errstring = 'Error: the following arguments are required: COURSE_KEY'
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             self._run_command(self.USERNAME)
 
     def _run_command(self, *args, **kwargs):

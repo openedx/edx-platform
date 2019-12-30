@@ -100,7 +100,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
             else:
                 self.assertRedirects(response, reverse('dashboard'))
         else:
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
 
     def test_no_id_redirect(self):
         # Create the course modes
@@ -174,7 +174,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
             follow=False,
         )
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         # TODO: Fix it so that response.templates works w/ mako templates, and then assert
         # that the right template rendered
 
@@ -378,12 +378,12 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         url = reverse('create_mode', args=[six.text_type(self.course.id)])
         response = self.client.get(url)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
         expected_mode = [Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None, None, None, None)]
         course_mode = CourseMode.modes_for_course(self.course.id)
 
-        self.assertEquals(course_mode, expected_mode)
+        self.assertEqual(course_mode, expected_mode)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @ddt.data(
@@ -402,7 +402,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         url = reverse('create_mode', args=[six.text_type(self.course.id)])
         response = self.client.get(url, parameters)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
         expected_mode = [
             Mode(
@@ -419,7 +419,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         ]
         course_mode = CourseMode.modes_for_course(self.course.id)
 
-        self.assertEquals(course_mode, expected_mode)
+        self.assertEqual(course_mode, expected_mode)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_multiple_mode_creation(self):
@@ -444,7 +444,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         expected_modes = [honor_mode, verified_mode]
         course_modes = CourseMode.modes_for_course(self.course.id)
 
-        self.assertEquals(course_modes, expected_modes)
+        self.assertEqual(course_modes, expected_modes)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @with_comprehensive_theme("edx.org")

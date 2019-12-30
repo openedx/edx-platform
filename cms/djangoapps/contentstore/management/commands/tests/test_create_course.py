@@ -27,7 +27,7 @@ class TestArgParsing(TestCase):
             errstring = "Error: too few arguments"
         else:
             errstring = "Error: the following arguments are required: modulestore, user, org, number, run"
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('create_course')
 
     def test_invalid_store(self):
@@ -36,12 +36,12 @@ class TestArgParsing(TestCase):
 
     def test_nonexistent_user_id(self):
         errstring = "No user 99 found"
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('create_course', "split", "99", "org", "course", "run")
 
     def test_nonexistent_user_email(self):
         errstring = "No user fake@example.com found"
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('create_course', "mongo", "fake@example.com", "org", "course", "run")
 
 
