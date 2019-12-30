@@ -10,6 +10,7 @@ import re
 import argparse
 from collections import Counter
 import pandas as pd
+
 from write_to_html import (
     HtmlOutlineWriter,
 )  # noqa pylint: disable=import-error,useless-suppression
@@ -177,7 +178,7 @@ def write_html_report(warnings_dataframe, html_path):
             warnings_dataframe, "category", "num"
         )
         for category, group_in_category, category_count in category_sorted_by_count:
-            ## xss-lint: disable==python-requires-html-or-text
+            # xss-lint: disable=python-wrap-html
             html = u'<span class="count">{category}, count: {count}</span> '.format(
                 category=category, count=category_count
             )
@@ -191,7 +192,7 @@ def write_html_report(warnings_dataframe, html_path):
                 group_in_location,
                 location_count,
             ) in locations_sorted_by_count:
-                ## xss-lint: disable==python-requires-html-or-text
+                # xss-lint: disable=python-wrap-html
                 html = u'<span class="count">{location}, count: {count}</span> '.format(
                     location=location, count=location_count
                 )
@@ -204,24 +205,24 @@ def write_html_report(warnings_dataframe, html_path):
                     message_group,
                     message_count,
                 ) in message_group_sorted_by_count:
-                    ## xss-lint: disable==python-requires-html-or-text
+                    # xss-lint: disable=python-wrap-html
                     html = u'<span class="count">{warning_text}, count: {count}</span> '.format(
                         warning_text=message, count=message_count
                     )
                     html_writer.start_section(html, klass=u"warning_text")
                     # warnings_object[location][warning_text] is a list
                     for _, warning in message_group.iterrows():
-                        ## xss-lint: disable==python-requires-html-or-text
+                        # xss-lint: disable=python-wrap-html
                         html = u'<span class="count">{warning_file_path}</span> '.format(
                             warning_file_path=warning["filename"]
                         )
                         html_writer.start_section(html, klass=u"warning")
-                        ## xss-lint: disable==python-requires-html-or-text
+                        # xss-lint: disable=python-wrap-html
                         html = u'<p class="lineno">lineno: {lineno}</p> '.format(
                             lineno=warning["lineno"]
                         )
                         html_writer.write(html)
-                        ## xss-lint: disable==python-requires-html-or-text
+                        # xss-lint: disable=python-wrap-html
                         html = u'<p class="num">num_occur: {num}</p> '.format(
                             num=warning["num"]
                         )
