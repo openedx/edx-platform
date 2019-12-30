@@ -27,7 +27,7 @@ anyjson==0.3.3
 apipkg==1.5
 appdirs==1.4.3
 argh==0.26.2
-astroid==1.5.3
+astroid==2.3.3
 attrs==19.3.0
 aws-xray-sdk==0.95
 babel==1.3
@@ -120,7 +120,7 @@ edx-django-utils==2.0.2
 edx-drf-extensions==2.4.5
 edx-enterprise==2.0.36
 edx-i18n-tools==0.5.0
-edx-lint==1.3.0
+edx-lint==1.4.1
 edx-milestones==0.2.6
 edx-oauth2-provider==1.3.1
 edx-opaque-keys[django]==2.0.1
@@ -238,9 +238,9 @@ pyinotify==0.9.6
 pyjwkest==1.3.2
 pyjwt==1.5.2
 pylint-celery==0.3
-pylint-django==0.7.2
+pylint-django==2.0.11
 pylint-plugin-utils==0.6
-pylint==1.7.6
+pylint==2.4.2
 pymongo==3.9.0
 pynliner==0.8.0
 pyparsing==2.2.0
@@ -314,6 +314,7 @@ toml==0.10.0
 tox-battery==0.5.1
 tox==3.14.3
 transifex-client==0.13.4
+typed-ast==1.4.0
 unicodecsv==0.14.1
 unidiff==0.5.5
 uritemplate==3.0.1
@@ -329,7 +330,7 @@ webencodings==0.5.1
 webob==1.8.5
 websocket-client==0.57.0
 werkzeug==0.16.0
-wrapt==1.10.5
+wrapt==1.11.2
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.6#egg=xblock-drag-and-drop-v2==2.2.6
 git+https://github.com/open-craft/xblock-poll@3c7dcaf6c933d914188f0740a60711603f948d26#egg=xblock-poll==1.9.1
 xblock-utils==1.2.4

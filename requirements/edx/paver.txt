@@ -26,7 +26,7 @@ six==1.13.0               # via edx-opaque-keys, libsass, mock, paver, python-me
 stevedore==1.31.0
 urllib3==1.25.7           # via requests
 watchdog==0.9.0
-wrapt==1.10.5
+wrapt==1.11.2
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
