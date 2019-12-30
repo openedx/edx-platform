@@ -23,4 +23,4 @@ python-memcached                    # Python interface to the memcached memory c
 requests                            # Simple interface for making HTTP requests
 stevedore                           # Support for runtime plugins, used for XBlocks and edx-platform Django app plugins
 watchdog                            # Used in paver watch_assets
-wrapt==1.10.5                       # Decorator utilities used in the @timed paver task decorator
+wrapt                               # Decorator utilities used in the @timed paver task decorator

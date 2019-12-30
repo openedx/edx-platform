@@ -23,7 +23,7 @@ code-annotations          # Perform code annotation checking, such as for PII an
 cssselect                 # Used to extract HTML fragments via CSS selectors in 2 test cases and pyquery
 ddt                       # Run a test case multiple times with different input; used in many, many of our tests
 edx-i18n-tools>=0.4.6     # Commands for developers and translators to extract, compile and validate translations
-edx-lint==1.3.0           # pylint extensions for Open edX repositories
+edx-lint                  # pylint extensions for Open edX repositories
 factory_boy==2.8.1        # Library for creating test fixtures, used in many tests
 freezegun                 # Allows tests to mock the output of assorted datetime module functions
 httpretty                 # Library for mocking HTTP requests, used in many tests
