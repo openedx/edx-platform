@@ -21,6 +21,7 @@ from django.utils.translation import ugettext as _
 from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
 
 from course_modes.models import CourseMode
+from lms.djangoapps.branding.api import get_privacy_url
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
 from openedx.core.djangoapps.user_authn.views.login_form import login_and_registration_form
@@ -438,7 +439,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
                 enterprise_name=ec_name,
                 platform_name=settings.PLATFORM_NAME,
                 privacy_policy_link_start=HTML(u"<a href='{pp_url}' rel='noopener' target='_blank'>").format(
-                    pp_url=settings.MKTG_URLS.get('PRIVACY', 'https://www.edx.org/edx-privacy-policy')
+                    pp_url=get_privacy_url()
                 ),
                 privacy_policy_link_end=HTML("</a>"),
             )
