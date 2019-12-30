@@ -481,13 +481,13 @@ class FormulaResponseTest(ResponseTest):
         input_dict = {'1_2_1': "x + 2*y + y"}
         correct_map = problem.grade_answers(input_dict)
         self.assertEqual(correct_map.get_hint('1_2_1'),
-                          'Check the coefficient of y')
+                         'Check the coefficient of y')
 
         # Expect to receive a hint if we leave out x
         input_dict = {'1_2_1': "2*y"}
         correct_map = problem.grade_answers(input_dict)
         self.assertEqual(correct_map.get_hint('1_2_1'),
-                          'Try including the variable x')
+                         'Try including the variable x')
 
     def test_script(self):
         """
@@ -819,13 +819,13 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         input_dict = {'1_2_1': 'Wisconsin'}
         correct_map = problem.grade_answers(input_dict)
         self.assertEqual(correct_map.get_hint('1_2_1'),
-                          "The state capital of Wisconsin is Madison")
+                         "The state capital of Wisconsin is Madison")
 
         # We should get a hint for Minnesota
         input_dict = {'1_2_1': 'Minnesota'}
         correct_map = problem.grade_answers(input_dict)
         self.assertEqual(correct_map.get_hint('1_2_1'),
-                          "The state capital of Minnesota is St. Paul")
+                         "The state capital of Minnesota is St. Paul")
 
         # We should NOT get a hint for Michigan (the correct answer)
         input_dict = {'1_2_1': 'Michigan'}
@@ -868,13 +868,13 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         input_dict = {'1_2_1': 'Wisconsin'}
         correct_map = problem.grade_answers(input_dict)
         self.assertEqual(correct_map.get_hint('1_2_1'),
-                          "The state capital of Wisconsin is Madison")
+                         "The state capital of Wisconsin is Madison")
 
         # We should get a hint for Minnesota
         input_dict = {'1_2_1': 'Minnesota'}
         correct_map = problem.grade_answers(input_dict)
         self.assertEqual(correct_map.get_hint('1_2_1'),
-                          "The state capital of Minnesota is St. Paul")
+                         "The state capital of Minnesota is St. Paul")
 
         # We should NOT get a hint for Michigan (the correct answer)
         input_dict = {'1_2_1': 'Michigan'}

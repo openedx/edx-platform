@@ -130,7 +130,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         without_new_lines = the_html.replace("\\n", "").replace("\n", "")
         # pylint: disable=line-too-long
         self.assertRegex(without_new_lines,
-                                 r"<targetedfeedback explanation-id=\"feedbackC\" role=\"group\" aria-describedby=\"1_2_1-legend\">\s*<span class=\"sr\">Correct</span>.*Feedback on your correct solution...")
+                         r"<targetedfeedback explanation-id=\"feedbackC\" role=\"group\" aria-describedby=\"1_2_1-legend\">\s*<span class=\"sr\">Correct</span>.*Feedback on your correct solution...")
         self.assertNotRegexpMatches(without_new_lines, r"feedback1|feedback2|feedback3")
 
     def test_targeted_feedback_id_typos(self):

@@ -105,8 +105,7 @@ class TestGitExport(CourseTestCase):
         with self.assertRaisesRegex(GitExportError, six.text_type(GitExportError.URL_BAD)):
             git_export_utils.export_to_git(course_key, 'example.com:edx/notreal')
 
-        with self.assertRaisesRegex(GitExportError,
-                                     six.text_type(GitExportError.URL_NO_AUTH)):
+        with self.assertRaisesRegex(GitExportError, six.text_type(GitExportError.URL_NO_AUTH)):
             git_export_utils.export_to_git(course_key, 'http://blah')
 
     def test_bad_git_repos(self):
@@ -117,23 +116,20 @@ class TestGitExport(CourseTestCase):
         self.assertFalse(os.path.isdir(test_repo_path))
         course_key = CourseLocator('foo', 'blah', '100-')
         # Test bad clones
-        with self.assertRaisesRegex(GitExportError,
-                                     six.text_type(GitExportError.CANNOT_PULL)):
+        with self.assertRaisesRegex(GitExportError, six.text_type(GitExportError.CANNOT_PULL)):
             git_export_utils.export_to_git(
                 course_key,
                 'https://user:blah@example.com/test_repo.git')
         self.assertFalse(os.path.isdir(test_repo_path))
 
         # Setup good repo with bad course to test xml export
-        with self.assertRaisesRegex(GitExportError,
-                                     six.text_type(GitExportError.XML_EXPORT_FAIL)):
+        with self.assertRaisesRegex(GitExportError, six.text_type(GitExportError.XML_EXPORT_FAIL)):
             git_export_utils.export_to_git(
                 course_key,
                 'file://{0}'.format(self.bare_repo_dir))
 
         # Test bad git remote after successful clone
-        with self.assertRaisesRegex(GitExportError,
-                                     six.text_type(GitExportError.CANNOT_PULL)):
+        with self.assertRaisesRegex(GitExportError, six.text_type(GitExportError.CANNOT_PULL)):
             git_export_utils.export_to_git(
                 course_key,
                 'https://user:blah@example.com/r.git')
@@ -189,7 +185,6 @@ class TestGitExport(CourseTestCase):
             'file://{0}'.format(self.bare_repo_dir)
         )
 
-        with self.assertRaisesRegex(GitExportError,
-                                     six.text_type(GitExportError.CANNOT_COMMIT)):
+        with self.assertRaisesRegex(GitExportError, six.text_type(GitExportError.CANNOT_COMMIT)):
             git_export_utils.export_to_git(
                 self.course.id, 'file://{0}'.format(self.bare_repo_dir))

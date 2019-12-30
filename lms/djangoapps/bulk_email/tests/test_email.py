@@ -595,7 +595,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         self.assertEqual(json.loads(response.content.decode('utf-8')), self.success_content)
 
         self.assertEqual(mock_factory.emails_sent,
-                          1 + len(self.staff) + len(self.students) + LARGE_NUM_EMAILS - len(optouts))
+                         1 + len(self.staff) + len(self.students) + LARGE_NUM_EMAILS - len(optouts))
         outbox_contents = [e.to[0] for e in mail.outbox]
         should_send_contents = ([self.instructor.email] +
                                 [s.email for s in self.staff] +
@@ -668,14 +668,14 @@ class TestCourseEmailContext(SharedModuleStoreTestCase):
         self.assertEqual(email_context['platform_name'], settings.PLATFORM_NAME)
         self.assertEqual(email_context['course_title'], self.course_title)
         self.assertEqual(email_context['course_url'],
-                          '{}://edx.org/courses/{}/{}/{}/'.format(scheme,
-                                                                  self.course_org,
-                                                                  self.course_number,
-                                                                  self.course_run))
+                         '{}://edx.org/courses/{}/{}/{}/'.format(scheme,
+                                                                 self.course_org,
+                                                                 self.course_number,
+                                                                 self.course_run))
         self.assertEqual(email_context['course_image_url'],
-                          '{}://edx.org/c4x/{}/{}/asset/images_course_image.jpg'.format(scheme,
-                                                                                        self.course_org,
-                                                                                        self.course_number))
+                         '{}://edx.org/c4x/{}/{}/asset/images_course_image.jpg'.format(scheme,
+                                                                                       self.course_org,
+                                                                                       self.course_number))
         self.assertEqual(email_context['email_settings_url'], '{}://edx.org/dashboard'.format(scheme))
         self.assertEqual(email_context['account_settings_url'], '{}://edx.org/account/settings'.format(scheme))
 

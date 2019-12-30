@@ -2194,7 +2194,7 @@ class TestComponentHandler(TestCase):
         self.descriptor.handle = create_response
 
         self.assertEqual(component_handler(self.request, self.usage_key_string, 'dummy_handler').status_code,
-                          status_code)
+                         status_code)
 
     @ddt.data((True, True), (False, False),)
     @ddt.unpack

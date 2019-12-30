@@ -28,7 +28,7 @@ class LMSLinksTestCase(TestCase):
         location = course_key.make_usage_key('vertical', 'contacting_us')
         link = utils.get_lms_link_for_item(location, False)
         self.assertEqual(link, "//localhost:8000/courses/course-v1:mitX+101+test/jump_to/block-v1:mitX+101+test+type"
-                                "@vertical+block@contacting_us")
+                         "@vertical+block@contacting_us")
 
         # test preview
         link = utils.get_lms_link_for_item(location, True)
@@ -42,7 +42,7 @@ class LMSLinksTestCase(TestCase):
         location = course_key.make_usage_key('course', 'test')
         link = utils.get_lms_link_for_item(location)
         self.assertEqual(link, "//localhost:8000/courses/course-v1:mitX+101+test/jump_to/block-v1:mitX+101+test+type"
-                                "@course+block@test")
+                         "@course+block@test")
 
     def lms_link_for_certificate_web_view_test(self):
         """ Tests get_lms_link_for_certificate_web_view. """

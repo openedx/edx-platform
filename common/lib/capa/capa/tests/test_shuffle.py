@@ -279,7 +279,7 @@ class CapaShuffleTest(unittest.TestCase):
         html = orig_html.replace('\n', ' ')  # avoid headaches with .* matching
         print(html)
         self.assertRegex(html, r"<div>.*\[.*'Banana'.*'Apple'.*'Chocolate'.*'Donut'.*\].*</div>.*" +
-                                       r"<div>.*\[.*'C'.*'A'.*'D'.*'B'.*\].*</div>")
+                         r"<div>.*\[.*'C'.*'A'.*'D'.*'B'.*\].*</div>")
         # Look at the responses in their authored order
         responses = sorted(list(problem.responders.values()), key=lambda resp: int(resp.id[resp.id.rindex('_') + 1:]))
         self.assertFalse(responses[0].has_mask())

@@ -962,7 +962,7 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
         data = json.loads(response.content.decode('utf-8'))
         self.assertNotEqual(len(data['general_errors']), 0)
         self.assertEqual(data['general_errors'][0], 'Make sure that the file you upload is in CSV format with '
-                                                     'no extraneous characters or rows.')
+                         'no extraneous characters or rows.')
 
     def test_bad_file_upload_type(self):
         """
