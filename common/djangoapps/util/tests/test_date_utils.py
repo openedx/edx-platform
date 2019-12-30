@@ -3,7 +3,7 @@
 Tests for util.date_utils
 """
 
-from __future__ import absolute_import
+
 
 import unittest
 from datetime import datetime, timedelta, tzinfo

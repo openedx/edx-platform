@@ -3,7 +3,7 @@ Test lti_provider management commands.
 """
 
 
-from __future__ import absolute_import
+
 
 import six
 from django.test import TestCase

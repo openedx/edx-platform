@@ -1,5 +1,5 @@
 """Models governing integration with the catalog service."""
-from __future__ import absolute_import
+
 
 from config_models.models import ConfigurationModel
 from django.conf import settings

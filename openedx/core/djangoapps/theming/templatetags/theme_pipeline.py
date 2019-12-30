@@ -2,7 +2,7 @@
 Theme aware pipeline template tags.
 """
 
-from __future__ import absolute_import
+
 
 from django import template
 from django.template.loader import render_to_string

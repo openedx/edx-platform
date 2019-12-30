@@ -1,7 +1,7 @@
 """
 Tests for the Course Outline view and supporting views.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import json

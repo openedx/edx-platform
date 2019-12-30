@@ -2,7 +2,7 @@
 Management command for expiring old entitlements.
 """
 
-from __future__ import absolute_import
+
 
 import logging
 from textwrap import dedent

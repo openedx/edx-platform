@@ -1,7 +1,7 @@
 """
 Tests for the force_publish management command
 """
-from __future__ import absolute_import
+
 
 import mock
 import six

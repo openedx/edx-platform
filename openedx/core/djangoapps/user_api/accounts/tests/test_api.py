@@ -4,7 +4,7 @@ Unit tests for behavior that is specific to the api methods (vs. the view method
 Most of the functionality is covered in test_views.py.
 """
 
-from __future__ import absolute_import
+
 
 import itertools
 import re

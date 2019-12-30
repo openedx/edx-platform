@@ -1,7 +1,7 @@
 """
 Views for the course_mode module
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import decimal
 import json

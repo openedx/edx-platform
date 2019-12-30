@@ -3,7 +3,7 @@ The Enrollment API Views should be simple, lean HTTP endpoints for API access. T
 consist primarily of authentication, request validation, and serialization.
 
 """
-from __future__ import absolute_import
+
 
 import logging
 

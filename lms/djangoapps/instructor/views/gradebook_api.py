@@ -2,7 +2,7 @@
 Grade book view for instructor and pagination work (for grade book)
 which is currently use by ccx and instructor apps.
 """
-from __future__ import absolute_import
+
 
 import math
 

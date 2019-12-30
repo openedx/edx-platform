@@ -5,7 +5,7 @@ Includes:
     BrandingInfoConfig: A ConfigurationModel for managing how Video Module will
         use Branding.
 """
-from __future__ import absolute_import
+
 
 import json
 

@@ -1,7 +1,7 @@
 """
 Delete course tests.
 """
-from __future__ import absolute_import
+
 
 import mock
 from django.core.management import CommandError, call_command

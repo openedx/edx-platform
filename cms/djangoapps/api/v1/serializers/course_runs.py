@@ -1,5 +1,5 @@
 """ Course run serializers. """
-from __future__ import absolute_import
+
 
 import logging
 import time  # pylint: disable=unused-import

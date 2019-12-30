@@ -2,7 +2,7 @@
 Tests for Blocks api.py
 """
 
-from __future__ import absolute_import
+
 
 from itertools import product
 

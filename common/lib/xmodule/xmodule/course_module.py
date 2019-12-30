@@ -1,7 +1,7 @@
 """
 Django module container for classes and operations related to the "Course Module" content type
 """
-from __future__ import absolute_import
+
 
 import json
 import logging

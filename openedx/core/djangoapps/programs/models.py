@@ -1,6 +1,6 @@
 """Models providing Programs support for the LMS and Studio."""
 
-from __future__ import absolute_import
+
 
 import six
 from config_models.models import ConfigurationModel

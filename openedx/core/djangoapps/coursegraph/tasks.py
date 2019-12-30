@@ -2,7 +2,7 @@
 This file contains a management command for exporting the modulestore to
 neo4j, a graph database.
 """
-from __future__ import absolute_import, print_function, unicode_literals
+
 
 import logging
 

@@ -1,7 +1,7 @@
 """
 Utility functions for validating forms
 """
-from __future__ import absolute_import
+
 
 import re
 from importlib import import_module

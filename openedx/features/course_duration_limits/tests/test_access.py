@@ -1,6 +1,6 @@
 """Tests of openedx.features.course_duration_limits.access"""
 
-from __future__ import absolute_import
+
 
 import itertools
 from datetime import datetime, timedelta

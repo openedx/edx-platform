@@ -3,7 +3,7 @@
 End-to-end tests for the LMS that utilize the course home page and course outline.
 """
 
-from __future__ import absolute_import
+
 
 from datetime import datetime, timedelta
 

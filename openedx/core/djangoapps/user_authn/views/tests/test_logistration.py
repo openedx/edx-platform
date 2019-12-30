@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """ Tests for Logistration views. """
 
-from __future__ import absolute_import
+
 
 from http.cookies import SimpleCookie
 

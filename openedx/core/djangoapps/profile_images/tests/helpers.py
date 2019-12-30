@@ -1,7 +1,7 @@
 """
 Helper methods for use in profile image tests.
 """
-from __future__ import absolute_import
+
 from contextlib import contextmanager
 import os
 from tempfile import NamedTemporaryFile

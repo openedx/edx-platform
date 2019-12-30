@@ -1,7 +1,7 @@
 """
 This file contains celery tasks for contentstore views
 """
-from __future__ import absolute_import
+
 
 import base64
 import json

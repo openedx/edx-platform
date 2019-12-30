@@ -5,7 +5,7 @@ Tests of the Capa XModule
 # pylint: disable=missing-docstring
 # pylint: disable=invalid-name
 
-from __future__ import absolute_import
+
 
 import datetime
 import json

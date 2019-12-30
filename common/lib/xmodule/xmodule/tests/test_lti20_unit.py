@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Tests for LTI Xmodule LTIv2.0 functional logic."""
-from __future__ import absolute_import
+
 
 import datetime
 import textwrap

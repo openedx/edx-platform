@@ -3,7 +3,7 @@
 A mixin class for LTI 2.0 functionality.  This is really just done to refactor the code to
 keep the LTIModule class from getting too big
 """
-from __future__ import absolute_import
+
 
 import base64
 import hashlib

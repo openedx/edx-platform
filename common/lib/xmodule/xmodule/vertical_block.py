@@ -2,7 +2,7 @@
 VerticalBlock - an XBlock which renders its children in a column.
 """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import logging
 from copy import copy

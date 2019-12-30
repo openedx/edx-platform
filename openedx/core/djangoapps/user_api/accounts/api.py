@@ -3,7 +3,7 @@
 """
 Programmatic integration point for User API Accounts sub-application
 """
-from __future__ import absolute_import
+
 
 import datetime
 

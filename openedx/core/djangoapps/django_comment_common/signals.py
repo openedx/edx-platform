@@ -1,7 +1,7 @@
 # pylint: disable=invalid-name
 """Signals related to the comments service."""
 
-from __future__ import absolute_import
+
 
 from django.dispatch import Signal
 

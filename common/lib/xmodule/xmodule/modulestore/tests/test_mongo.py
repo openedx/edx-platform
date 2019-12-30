@@ -2,7 +2,7 @@
 Unit tests for the Mongo modulestore
 """
 
-from __future__ import absolute_import
+
 
 import logging
 import shutil

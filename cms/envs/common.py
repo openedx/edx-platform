@@ -39,7 +39,7 @@ When refering to XBlocks, we use the entry-point name. For example,
 # want to import all variables from base settings files
 # pylint: disable=unused-import
 
-from __future__ import absolute_import
+
 
 import imp
 import os

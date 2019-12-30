@@ -1,7 +1,7 @@
 """
 Course Grading Settings page.
 """
-from __future__ import absolute_import
+
 
 from bok_choy.javascript import requirejs
 from bok_choy.promise import BrokenPromise

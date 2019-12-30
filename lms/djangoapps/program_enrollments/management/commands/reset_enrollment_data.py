@@ -4,7 +4,7 @@ a side effect of enrolling students.
 
 Intented for use in integration sandbox environments
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import logging
 from textwrap import dedent

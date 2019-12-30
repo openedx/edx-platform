@@ -2,7 +2,7 @@
 Common test utilities for courseware functionality
 """
 
-from __future__ import absolute_import
+
 
 from abc import ABCMeta, abstractmethod
 from datetime import datetime, timedelta

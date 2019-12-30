@@ -1,6 +1,6 @@
 """Unit tests for custom UserProfile properties."""
 
-from __future__ import absolute_import
+
 
 import datetime
 

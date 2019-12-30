@@ -15,7 +15,7 @@ personally identifiable information (PII) so if some security bug results in one
 user accessing a different user's entries in this particular store, it's not a
 big deal.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 from django.conf import settings
 from django.core.cache import caches

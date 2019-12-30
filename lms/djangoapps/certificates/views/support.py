@@ -4,7 +4,7 @@ Certificate end-points used by the student support UI.
 See lms/djangoapps/support for more details.
 
 """
-from __future__ import absolute_import
+
 
 import logging
 from functools import wraps

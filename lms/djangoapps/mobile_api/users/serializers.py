@@ -2,7 +2,7 @@
 Serializer for user API
 """
 
-from __future__ import absolute_import
+
 
 import six
 from rest_framework import serializers

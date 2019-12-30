@@ -2,7 +2,7 @@
 Tests for keyword_substitution.py
 """
 
-from __future__ import absolute_import
+
 
 import six
 from ddt import ddt, file_data

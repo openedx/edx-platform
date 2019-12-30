@@ -1,5 +1,5 @@
 """Tests the course modules and their functions"""
-from __future__ import absolute_import, print_function
+
 
 import itertools
 import unittest

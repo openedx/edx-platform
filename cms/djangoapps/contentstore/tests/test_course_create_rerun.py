@@ -1,7 +1,7 @@
 """
 Test view handler for rerun (and eventually create)
 """
-from __future__ import absolute_import
+
 
 import datetime
 

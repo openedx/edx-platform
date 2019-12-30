@@ -1,7 +1,7 @@
 """
 Acceptance tests for Studio.
 """
-from __future__ import absolute_import
+
 
 import uuid
 

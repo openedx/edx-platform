@@ -2,7 +2,7 @@
 Test the enterprise support APIs.
 """
 
-from __future__ import absolute_import
+
 
 import mock
 

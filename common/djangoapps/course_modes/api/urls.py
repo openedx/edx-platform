@@ -1,7 +1,7 @@
 """
 URL definitions for the course_modes API.
 """
-from __future__ import absolute_import
+
 
 from django.conf.urls import include, url
 

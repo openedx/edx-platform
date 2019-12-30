@@ -2,7 +2,7 @@
 Tests of modulestore semantics: How do the interfaces methods of ModuleStore relate to each other?
 """
 
-from __future__ import absolute_import
+
 
 import itertools
 from collections import namedtuple

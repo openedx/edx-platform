@@ -3,7 +3,7 @@
 Code to manage fetching and storing the metadata of IdPs.
 """
 
-from __future__ import absolute_import
+
 
 import datetime
 import logging

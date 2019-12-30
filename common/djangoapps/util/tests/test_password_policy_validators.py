@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for util.password_policy_validators module."""
 
-from __future__ import absolute_import
+
 
 import unittest
 

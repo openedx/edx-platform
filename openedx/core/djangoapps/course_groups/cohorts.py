@@ -3,7 +3,7 @@ This file contains the logic for cohorts, as exposed internally to the
 forums, and to the cohort admin views.
 """
 
-from __future__ import absolute_import
+
 
 import logging
 import random

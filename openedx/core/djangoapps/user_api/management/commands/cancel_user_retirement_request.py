@@ -3,7 +3,7 @@ Use this mgmt command when a user requests retirement mistakenly, then requests
 for the retirement request to be cancelled. The command can't cancel a retirement
 that has already commenced - only pending retirements.
 """
-from __future__ import absolute_import, print_function
+
 
 import logging
 

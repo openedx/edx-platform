@@ -19,7 +19,7 @@ When reports are generated, we need to handle:
 The command will always use the read replica database if one is configured.
 
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import contextlib
 import csv

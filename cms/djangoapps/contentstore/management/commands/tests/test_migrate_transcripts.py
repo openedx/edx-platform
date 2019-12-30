@@ -2,7 +2,7 @@
 """
 Tests for course transcript migration management command.
 """
-from __future__ import absolute_import
+
 
 import itertools
 import logging

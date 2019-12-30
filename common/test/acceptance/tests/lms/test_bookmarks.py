@@ -2,7 +2,7 @@
 """
 End-to-end tests for the courseware unit bookmarks.
 """
-from __future__ import absolute_import
+
 
 import json
 from unittest import skip

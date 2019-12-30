@@ -1,6 +1,6 @@
 """ API v0 views. """
 
-from __future__ import absolute_import
+
 
 import datetime
 import json

@@ -2,7 +2,7 @@
 """
 Django model specifications for the Program Enrollments API
 """
-from __future__ import absolute_import, unicode_literals
+
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError

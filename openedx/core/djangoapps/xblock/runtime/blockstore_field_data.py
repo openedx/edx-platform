@@ -1,7 +1,7 @@
 """
 Key-value store that holds XBlock field data read out of Blockstore
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 from collections import namedtuple
 from weakref import WeakKeyDictionary
 import logging

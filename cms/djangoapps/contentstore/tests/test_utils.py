@@ -1,5 +1,5 @@
 """ Tests for utils. """
-from __future__ import absolute_import
+
 
 import collections
 from datetime import datetime, timedelta

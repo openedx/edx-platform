@@ -1,7 +1,7 @@
 """
 Tests for the CourseGradeFactory class.
 """
-from __future__ import absolute_import
+
 
 import itertools
 

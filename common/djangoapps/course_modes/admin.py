@@ -1,5 +1,5 @@
 """Django admin for course_modes"""
-from __future__ import absolute_import, unicode_literals
+
 
 import six
 from django import forms

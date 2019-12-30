@@ -3,7 +3,7 @@
 """
 Tests for js_utils.py
 """
-from __future__ import absolute_import
+
 import re
 import six.moves.html_parser  # pylint: disable=import-error
 import json

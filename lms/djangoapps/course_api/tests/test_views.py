@@ -1,7 +1,7 @@
 """
 Tests for Course API views.
 """
-from __future__ import absolute_import
+
 
 from datetime import datetime
 from hashlib import md5

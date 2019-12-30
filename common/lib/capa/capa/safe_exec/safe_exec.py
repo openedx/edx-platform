@@ -1,6 +1,6 @@
 """Capa's specialized use of codejail.safe_exec."""
 
-from __future__ import absolute_import
+
 
 import hashlib
 

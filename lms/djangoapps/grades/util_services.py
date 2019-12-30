@@ -1,5 +1,5 @@
 "A light weight interface to grading helper functions"
-from __future__ import absolute_import
+
 
 from . import grade_utils
 

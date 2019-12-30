@@ -7,7 +7,7 @@ each as a separate output file containing the json representation
 of each of its fields (including those fields that are set as default values).
 """
 
-from __future__ import absolute_import, print_function
+
 
 import json
 

@@ -2,7 +2,7 @@
 Tests around our XML modulestore, including importing
 well-formed and not-well-formed XML.
 """
-from __future__ import absolute_import
+
 
 import os.path
 from glob import glob

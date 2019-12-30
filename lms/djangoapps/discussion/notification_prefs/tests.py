@@ -1,5 +1,5 @@
 # pylint: disable=missing-docstring,consider-iterating-dictionary
-from __future__ import absolute_import
+
 
 import json
 

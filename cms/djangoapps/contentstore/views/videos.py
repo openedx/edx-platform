@@ -1,7 +1,7 @@
 """
 Views related to the video upload feature
 """
-from __future__ import absolute_import
+
 
 import csv
 import json

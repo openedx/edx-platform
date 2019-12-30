@@ -2,7 +2,7 @@
 Unit tests for third_party_auth LTI auth providers
 """
 
-from __future__ import absolute_import
+
 
 import unittest
 

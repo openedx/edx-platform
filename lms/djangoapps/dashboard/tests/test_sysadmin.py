@@ -1,7 +1,7 @@
 """
 Provide tests for sysadmin dashboard feature in sysadmin.py
 """
-from __future__ import absolute_import
+
 
 import glob
 import os

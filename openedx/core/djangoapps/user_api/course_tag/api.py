@@ -7,7 +7,7 @@ Stores global metadata using the UserPreference model, and per-course metadata u
 UserCourseTag model.
 """
 
-from __future__ import absolute_import
+
 
 from collections import defaultdict
 

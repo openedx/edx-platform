@@ -2,7 +2,7 @@
 Unit tests for getting the list of courses for a user through iterating all courses and
 by reversing group name formats.
 """
-from __future__ import absolute_import
+
 
 import unittest
 

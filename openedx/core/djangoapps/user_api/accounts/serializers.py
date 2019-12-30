@@ -1,7 +1,7 @@
 """
 Django REST Framework serializers for the User API Accounts sub-application
 """
-from __future__ import absolute_import
+
 
 import json
 import logging

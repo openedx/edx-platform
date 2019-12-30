@@ -1,7 +1,7 @@
 """
 Unit tests for course import and export Celery tasks
 """
-from __future__ import absolute_import, division, print_function
+
 
 import copy
 import json

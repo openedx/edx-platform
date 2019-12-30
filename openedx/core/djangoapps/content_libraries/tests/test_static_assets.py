@@ -2,7 +2,7 @@
 """
 Tests for static asset files in Blockstore-based Content Libraries
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import requests
 

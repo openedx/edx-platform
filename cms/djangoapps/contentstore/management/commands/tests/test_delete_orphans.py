@@ -1,6 +1,6 @@
 """Tests running the delete_orphan command"""
 
-from __future__ import absolute_import
+
 
 import ddt
 import six

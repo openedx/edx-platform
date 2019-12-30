@@ -5,7 +5,7 @@ Integration tests for submitting problem responses and getting grades.
 
 # pylint: disable=attribute-defined-outside-init
 
-from __future__ import absolute_import
+
 
 import json
 import os

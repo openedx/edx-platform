@@ -1,7 +1,7 @@
 """
 Javascript tests for the crowdsourcehinter xblock
 """
-from __future__ import absolute_import
+
 
 from textwrap import dedent
 

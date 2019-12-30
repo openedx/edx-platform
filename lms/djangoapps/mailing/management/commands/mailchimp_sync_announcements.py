@@ -1,7 +1,7 @@
 """
 Synchronizes the announcement list with all active students.
 """
-from __future__ import absolute_import
+
 
 import logging
 

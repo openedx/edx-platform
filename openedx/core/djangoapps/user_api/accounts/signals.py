@@ -2,7 +2,7 @@
 Django Signal related functionality for user_api accounts
 """
 
-from __future__ import absolute_import
+
 
 from django.dispatch import Signal
 

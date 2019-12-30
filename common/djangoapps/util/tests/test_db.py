@@ -1,6 +1,6 @@
 """Tests for util.db module."""
 
-from __future__ import absolute_import
+
 
 import threading
 import time

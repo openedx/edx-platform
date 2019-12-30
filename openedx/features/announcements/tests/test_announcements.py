@@ -2,7 +2,7 @@
 Unit tests for the announcements feature.
 """
 
-from __future__ import absolute_import
+
 
 import json
 import unittest

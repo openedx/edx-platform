@@ -2,7 +2,7 @@
 These views handle all actions in Studio related to import and exporting of
 courses
 """
-from __future__ import absolute_import
+
 
 import base64
 import json

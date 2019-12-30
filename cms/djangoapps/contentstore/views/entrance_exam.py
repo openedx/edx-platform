@@ -2,7 +2,7 @@
 Entrance Exams view module -- handles all requests related to entrance exam management via Studio
 Intended to be utilized as an AJAX callback handler, versus a proper view/screen
 """
-from __future__ import absolute_import
+
 
 import logging
 from functools import wraps

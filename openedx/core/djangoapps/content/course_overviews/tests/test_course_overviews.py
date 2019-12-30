@@ -1,7 +1,7 @@
 """
 Tests for course_overviews app.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import itertools

@@ -3,7 +3,7 @@ Tests for course group views
 """
 # pylint: disable=attribute-defined-outside-init
 # pylint: disable=no-member
-from __future__ import absolute_import
+
 
 import json
 from collections import namedtuple

@@ -2,7 +2,7 @@
     Tests for comprehensive them
 """
 
-from __future__ import absolute_import
+
 
 from django.conf import settings
 from django.contrib.messages.middleware import MessageMiddleware

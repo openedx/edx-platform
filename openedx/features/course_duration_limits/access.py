@@ -3,7 +3,7 @@
 Contains code related to computing content gating course duration limits
 and course access based on these limits.
 """
-from __future__ import absolute_import
+
 
 from datetime import timedelta
 

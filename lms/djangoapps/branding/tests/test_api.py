@@ -1,6 +1,6 @@
 # encoding: utf-8
 """Tests of Branding API """
-from __future__ import absolute_import, unicode_literals
+
 
 import mock
 from django.conf import settings

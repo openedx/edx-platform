@@ -1,5 +1,5 @@
 """ Test the behavior of split_mongo/MongoConnection """
-from __future__ import absolute_import
+
 
 import unittest
 

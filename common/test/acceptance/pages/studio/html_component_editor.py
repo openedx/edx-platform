@@ -1,7 +1,7 @@
 """
 HTML component editor in studio
 """
-from __future__ import absolute_import
+
 
 from six.moves import zip
 

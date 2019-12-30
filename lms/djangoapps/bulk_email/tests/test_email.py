@@ -2,7 +2,7 @@
 """
 Unit tests for sending course email
 """
-from __future__ import absolute_import
+
 
 import json
 import os

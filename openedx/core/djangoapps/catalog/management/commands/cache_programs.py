@@ -1,5 +1,5 @@
 """"Management command to add program information to the cache."""
-from __future__ import absolute_import
+
 
 import logging
 import sys

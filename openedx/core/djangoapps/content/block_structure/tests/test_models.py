@@ -2,7 +2,7 @@
 Unit tests for Block Structure models.
 """
 # pylint: disable=protected-access
-from __future__ import absolute_import
+
 
 import errno
 from itertools import product

@@ -10,7 +10,7 @@ Note: The access control logic in this file does NOT check for enrollment in
   If enrollment is to be checked, use get_course_with_access in courseware.courses.
   It is a wrapper around has_access that additionally checks for enrollment.
 """
-from __future__ import absolute_import
+
 
 import logging
 from datetime import datetime

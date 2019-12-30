@@ -3,7 +3,7 @@
 Unit tests for SafeCookieData
 """
 
-from __future__ import absolute_import
+
 
 import itertools
 from time import time

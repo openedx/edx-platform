@@ -3,7 +3,7 @@
 Tests of verify_student views.
 """
 
-from __future__ import absolute_import
+
 
 import simplejson as json
 from datetime import timedelta

@@ -28,7 +28,7 @@ Longer TODO:
 # and throws spurious errors. Therefore, we disable invalid-name checking.
 # pylint: disable=invalid-name, wrong-import-position
 
-from __future__ import absolute_import
+
 
 import imp
 import sys

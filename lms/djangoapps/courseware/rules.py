@@ -1,7 +1,7 @@
 """
 django-rules and Bridgekeeper rules for courseware related features
 """
-from __future__ import absolute_import
+
 
 import logging
 import traceback

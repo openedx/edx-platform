@@ -1,7 +1,7 @@
 """
 Command to load course blocks.
 """
-from __future__ import absolute_import
+
 
 import logging
 

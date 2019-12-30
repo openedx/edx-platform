@@ -1,7 +1,7 @@
 """
 Acceptance tests for HTML component in studio
 """
-from __future__ import absolute_import
+
 
 import os
 

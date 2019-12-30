@@ -2,7 +2,7 @@
 """
 Test models, managers, and validators.
 """
-from __future__ import absolute_import
+
 
 import ddt
 from completion import waffle

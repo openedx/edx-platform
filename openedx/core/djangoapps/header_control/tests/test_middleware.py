@@ -1,5 +1,5 @@
 """Tests for header_control middleware."""
-from __future__ import absolute_import
+
 
 from django.http import HttpRequest, HttpResponse
 from django.test import TestCase

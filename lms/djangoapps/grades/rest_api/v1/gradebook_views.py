@@ -1,7 +1,7 @@
 """
 Defines an endpoint for gradebook data related to a course.
 """
-from __future__ import absolute_import
+
 
 import logging
 from collections import namedtuple

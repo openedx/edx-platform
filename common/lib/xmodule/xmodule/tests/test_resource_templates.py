@@ -1,7 +1,7 @@
 """
 Tests for xmodule.x_module.ResourceTemplates
 """
-from __future__ import absolute_import
+
 
 import unittest
 

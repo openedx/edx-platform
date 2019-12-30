@@ -1,7 +1,7 @@
 """
 Tests for users API
 """
-from __future__ import absolute_import
+
 
 import datetime
 

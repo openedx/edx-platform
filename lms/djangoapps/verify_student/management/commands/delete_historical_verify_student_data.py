@@ -2,7 +2,7 @@
 Command to delete all rows from the verify_student_historicalverificationdeadline table.
 """
 
-from __future__ import absolute_import
+
 
 import logging
 

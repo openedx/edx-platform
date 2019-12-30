@@ -4,7 +4,7 @@ The settings can be provided by environment variables in the shell running the t
 in a variety of environment variables but provides sensible defaults in case those env var
 overrides don't exist
 """
-from __future__ import absolute_import
+
 
 import os
 

@@ -1,7 +1,7 @@
 """
 Views related to operations on course objects
 """
-from __future__ import absolute_import
+
 
 import copy
 import json

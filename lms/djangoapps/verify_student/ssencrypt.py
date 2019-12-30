@@ -15,7 +15,7 @@ An RSA private key can be in any of the following formats:
 * PKCS#1 RSAPrivateKey DER SEQUENCE (binary or PEM encoding)
 * PKCS#8 PrivateKeyInfo DER SEQUENCE (binary or PEM encoding)
 """
-from __future__ import absolute_import, division
+
 
 import base64
 import binascii

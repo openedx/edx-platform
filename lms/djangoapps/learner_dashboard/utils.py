@@ -1,7 +1,7 @@
 """
 The utility methods and functions to help the djangoapp logic
 """
-from __future__ import absolute_import
+
 
 import six
 from opaque_keys.edx.keys import CourseKey

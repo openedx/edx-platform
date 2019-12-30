@@ -4,7 +4,7 @@ Enrolls the user in the DemoX course.
 Optionally takes in username, email, and course UUID arguments.
 """
 
-from __future__ import absolute_import, unicode_literals
+
 
 from datetime import datetime
 from textwrap import dedent

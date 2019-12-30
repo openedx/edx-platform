@@ -1,7 +1,7 @@
 """
 Unit tests for course import and export
 """
-from __future__ import absolute_import
+
 
 import copy
 import json

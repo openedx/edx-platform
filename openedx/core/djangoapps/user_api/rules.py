@@ -1,7 +1,7 @@
 """
 Django rules for accounts
 """
-from __future__ import absolute_import
+
 
 import rules
 from django.conf import settings

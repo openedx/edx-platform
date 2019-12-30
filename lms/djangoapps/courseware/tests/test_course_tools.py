@@ -2,7 +2,7 @@
 Unit tests for course tools.
 """
 
-from __future__ import absolute_import
+
 
 import datetime
 

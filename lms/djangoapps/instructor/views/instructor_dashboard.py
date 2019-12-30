@@ -2,7 +2,7 @@
 Instructor Dashboard Views
 """
 
-from __future__ import absolute_import
+
 
 import datetime
 import logging

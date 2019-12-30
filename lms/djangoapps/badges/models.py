@@ -1,7 +1,7 @@
 """
 Database models for the badges app
 """
-from __future__ import absolute_import
+
 
 from importlib import import_module
 

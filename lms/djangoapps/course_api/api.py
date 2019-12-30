@@ -2,7 +2,7 @@
 Course API
 """
 
-from __future__ import absolute_import
+
 
 from edx_when.api import get_dates_for_course
 from django.conf import settings

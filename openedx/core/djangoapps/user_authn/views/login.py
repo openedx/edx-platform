@@ -4,7 +4,7 @@ Views for login / logout and associated functionality
 Much of this file was broken out from views.py, previous history can be found there.
 """
 
-from __future__ import absolute_import
+
 
 from functools import wraps
 import json

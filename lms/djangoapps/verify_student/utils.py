@@ -3,7 +3,7 @@
 Common Utilities for the verify_student application.
 """
 
-from __future__ import absolute_import
+
 
 import datetime
 import logging

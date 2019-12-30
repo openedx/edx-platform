@@ -2,7 +2,7 @@
 """
 Tests for the dump_to_neo4j management command.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 from datetime import datetime
 

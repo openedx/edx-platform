@@ -1,7 +1,7 @@
 """
 Serializers for Course Blocks related return objects.
 """
-from __future__ import absolute_import
+
 
 import six
 from django.conf import settings

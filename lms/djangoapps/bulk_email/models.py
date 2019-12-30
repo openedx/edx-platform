@@ -1,7 +1,7 @@
 """
 Models for bulk email
 """
-from __future__ import absolute_import
+
 
 import logging
 

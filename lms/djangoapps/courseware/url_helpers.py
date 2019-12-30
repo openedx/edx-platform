@@ -1,7 +1,7 @@
 """
 Module to define url helpers functions
 """
-from __future__ import absolute_import
+
 
 import six
 from django.urls import reverse

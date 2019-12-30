@@ -9,7 +9,7 @@ need to be configurable by open source partners and modifying the
 with a variety of unpleasant follow-on effects for the partner when
 upgrading the model at a later date.
 """
-from __future__ import absolute_import, print_function
+
 
 import copy
 import logging

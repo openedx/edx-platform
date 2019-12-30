@@ -3,7 +3,7 @@ This test file will run through some XBlock test scenarios regarding the
 recommender system
 """
 
-from __future__ import absolute_import
+
 
 import codecs
 from io import BytesIO

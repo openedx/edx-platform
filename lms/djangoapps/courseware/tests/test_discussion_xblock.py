@@ -6,7 +6,7 @@ tests for functionalities that require django API, and lms specific
 functionalities.
 """
 
-from __future__ import absolute_import
+
 
 import json
 import uuid

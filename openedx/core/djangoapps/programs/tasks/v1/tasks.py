@@ -1,7 +1,7 @@
 """
 This file contains celery tasks for programs-related functionality.
 """
-from __future__ import absolute_import
+
 
 from celery import task
 from celery.exceptions import MaxRetriesExceededError

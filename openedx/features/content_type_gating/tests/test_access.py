@@ -1,7 +1,7 @@
 """
 Test audit user's access to various content based on content-gating features.
 """
-from __future__ import absolute_import
+
 
 import json
 import os

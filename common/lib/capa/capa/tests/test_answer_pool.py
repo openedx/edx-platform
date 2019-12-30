@@ -3,7 +3,7 @@ Tests the logic of the "answer-pool" attribute, e.g.
   <choicegroup answer-pool="4">
 """
 
-from __future__ import absolute_import
+
 
 import textwrap
 import unittest

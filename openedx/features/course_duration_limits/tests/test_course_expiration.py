@@ -1,7 +1,7 @@
 """
 Contains tests to verify correctness of course expiration functionality
 """
-from __future__ import absolute_import
+
 
 import json
 from datetime import timedelta

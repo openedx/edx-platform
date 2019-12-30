@@ -1,7 +1,7 @@
 """
 Useful django models for implementing XBlock infrastructure in django.
 """
-from __future__ import absolute_import
+
 
 import logging
 import warnings

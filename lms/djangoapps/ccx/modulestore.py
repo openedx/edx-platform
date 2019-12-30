@@ -9,7 +9,7 @@ CourseLocator or BlockUsageLocator will actually be used. And all objects
 returned from the modulestore will have their keys updated to be the CCX
 version that was passed in.
 """
-from __future__ import absolute_import
+
 
 from contextlib import contextmanager
 from functools import partial

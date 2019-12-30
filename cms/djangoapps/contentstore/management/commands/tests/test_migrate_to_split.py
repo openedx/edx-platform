@@ -1,7 +1,7 @@
 """
 Unittests for migrating a course to split mongo
 """
-from __future__ import absolute_import
+
 
 import six
 

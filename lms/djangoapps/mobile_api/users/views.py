@@ -2,7 +2,7 @@
 Views for user API
 """
 
-from __future__ import absolute_import
+
 
 import six
 from django.contrib.auth.signals import user_logged_in

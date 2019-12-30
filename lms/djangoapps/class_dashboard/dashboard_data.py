@@ -1,7 +1,7 @@
 """
 Computes the data to display on the Instructor Dashboard
 """
-from __future__ import absolute_import
+
 
 import decimal
 import json

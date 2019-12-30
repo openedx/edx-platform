@@ -2,7 +2,7 @@
 """
 tests for overrides
 """
-from __future__ import absolute_import
+
 
 import datetime
 

@@ -1,7 +1,7 @@
 """
 Segregation of pymongo functions from the data modeling mechanisms for split modulestore.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import logging

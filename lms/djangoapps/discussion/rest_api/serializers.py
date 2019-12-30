@@ -1,7 +1,7 @@
 """
 Discussion API serializers
 """
-from __future__ import absolute_import
+
 
 from django.contrib.auth.models import User as DjangoUser
 from django.core.exceptions import ValidationError

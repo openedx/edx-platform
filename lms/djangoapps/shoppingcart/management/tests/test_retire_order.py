@@ -1,6 +1,6 @@
 """Tests for the retire_order command"""
 
-from __future__ import absolute_import
+
 
 from six import text_type
 from tempfile import NamedTemporaryFile

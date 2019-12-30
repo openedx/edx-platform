@@ -1,7 +1,7 @@
 """
 Unit tests for getting the list of courses and the course outline.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import json

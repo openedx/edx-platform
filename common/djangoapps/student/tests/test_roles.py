@@ -1,7 +1,7 @@
 """
 Tests of student.roles
 """
-from __future__ import absolute_import
+
 
 import ddt
 import six

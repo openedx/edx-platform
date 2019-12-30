@@ -1,7 +1,7 @@
 """
 Safe configuration wrapper for Course Teams feature.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import re
 from enum import Enum

@@ -1,7 +1,7 @@
 """
 Tests for block_structure.py
 """
-from __future__ import absolute_import
+
 
 import itertools
 # pylint: disable=protected-access

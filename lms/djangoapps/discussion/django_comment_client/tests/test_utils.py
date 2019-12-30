@@ -1,6 +1,6 @@
 # pylint: skip-file
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
+
 
 import datetime
 import json

@@ -1,7 +1,7 @@
 """
 Custom user-related utility code.
 """
-from __future__ import absolute_import
+
 
 from django.utils.encoding import python_2_unicode_compatible
 from django.contrib.auth.models import AnonymousUser

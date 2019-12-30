@@ -2,7 +2,7 @@
 Views related to course groups functionality.
 """
 
-from __future__ import absolute_import
+
 
 import logging
 import re

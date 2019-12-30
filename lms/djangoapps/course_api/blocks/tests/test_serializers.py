@@ -1,7 +1,7 @@
 """
 Tests for Course Blocks serializers
 """
-from __future__ import absolute_import
+
 
 import six
 from mock import MagicMock

@@ -8,7 +8,7 @@ of a student over a period of time. Right now, the only models are the abstract
 `SoftwareSecurePhotoVerification`. The hope is to keep as much of the
 photo verification process as generic as possible.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import base64
 import codecs

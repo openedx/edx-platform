@@ -2,7 +2,7 @@
 Specialized models for oauth_dispatch djangoapp
 """
 
-from __future__ import absolute_import
+
 
 from datetime import datetime
 

@@ -1,7 +1,7 @@
 """
 Specific overrides to the base prod settings to make development easier.
 """
-from __future__ import absolute_import
+
 
 # Silence noisy logs
 import logging

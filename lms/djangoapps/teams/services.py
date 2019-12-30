@@ -1,5 +1,5 @@
 """ Services to expose the Teams API to XBlocks """
-from __future__ import absolute_import
+
 
 from django.urls import reverse
 

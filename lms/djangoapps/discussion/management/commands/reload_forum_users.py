@@ -2,7 +2,7 @@
 """
 Reload forum (comment client) users from existing users.
 """
-from __future__ import absolute_import, print_function
+
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand

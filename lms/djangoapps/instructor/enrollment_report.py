@@ -2,7 +2,7 @@
 Defines abstract class for the Enrollment Reports.
 """
 
-from __future__ import absolute_import
+
 
 import abc
 import collections

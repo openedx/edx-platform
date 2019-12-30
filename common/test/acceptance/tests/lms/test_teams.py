@@ -1,7 +1,7 @@
 """
 Acceptance tests for the teams feature.
 """
-from __future__ import absolute_import
+
 
 import json
 import random

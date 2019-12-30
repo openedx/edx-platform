@@ -1,7 +1,7 @@
 """
 Django storage backends for Open edX.
 """
-from __future__ import absolute_import
+
 
 from django.contrib.staticfiles.storage import StaticFilesStorage
 from django.core.files.storage import get_storage_class, FileSystemStorage

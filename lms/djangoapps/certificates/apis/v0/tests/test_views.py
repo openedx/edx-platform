@@ -1,7 +1,7 @@
 """
 Tests for the Certificate REST APIs.
 """
-from __future__ import absolute_import
+
 
 from itertools import product
 

@@ -3,7 +3,7 @@ An implementation of :class:`XBlockUserStateClient`, which stores XBlock Scope.u
 data in a Django ORM model.
 """
 
-from __future__ import absolute_import
+
 
 import itertools
 import logging

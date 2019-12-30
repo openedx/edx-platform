@@ -2,7 +2,7 @@
 Tests for functionality in openedx/core/lib/courses.py.
 """
 
-from __future__ import absolute_import
+
 import ddt
 from django.test.utils import override_settings
 

@@ -2,7 +2,7 @@
 Code which dynamically discovers comprehensive themes. Deliberately uses no Django settings,
 as the discovery happens during the initial setup of Django settings.
 """
-from __future__ import absolute_import
+
 
 import os
 

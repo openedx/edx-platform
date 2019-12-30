@@ -2,7 +2,7 @@
 Tests for course wiki
 """
 
-from __future__ import absolute_import
+
 
 import six
 from django.urls import reverse

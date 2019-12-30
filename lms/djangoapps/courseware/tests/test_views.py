@@ -2,7 +2,7 @@
 """
 Tests courseware views.py
 """
-from __future__ import absolute_import
+
 
 import itertools
 import json

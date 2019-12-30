@@ -4,7 +4,7 @@ The Discount API Views should return information about discounts that apply to t
 """
 # -*- coding: utf-8 -*-
 
-from __future__ import absolute_import
+
 import six
 
 from django.utils.decorators import method_decorator

@@ -2,7 +2,7 @@
 Tests course_creators.views.py.
 """
 
-from __future__ import absolute_import
+
 
 import mock
 from django.contrib.auth.models import User

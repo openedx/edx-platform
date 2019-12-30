@@ -1,7 +1,7 @@
 """Tests covering utilities for integrating with the catalog service."""
 # pylint: disable=missing-docstring
 
-from __future__ import absolute_import
+
 
 from collections import defaultdict
 from datetime import timedelta

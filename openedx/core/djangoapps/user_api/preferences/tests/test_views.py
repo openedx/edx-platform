@@ -3,7 +3,7 @@
 Unit tests for preference APIs.
 """
 
-from __future__ import absolute_import
+
 
 import json
 

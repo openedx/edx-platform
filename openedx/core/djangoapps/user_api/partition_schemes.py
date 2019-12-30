@@ -1,7 +1,7 @@
 """
 Provides partition support to the user service.
 """
-from __future__ import absolute_import
+
 
 import logging
 import random

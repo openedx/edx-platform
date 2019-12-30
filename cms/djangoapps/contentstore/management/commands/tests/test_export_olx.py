@@ -2,7 +2,7 @@
 Tests for exporting OLX content.
 """
 
-from __future__ import absolute_import
+
 
 import shutil
 import tarfile

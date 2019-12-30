@@ -12,7 +12,7 @@ are consistent across the LMS and other sites (such as
 the marketing site and blog).
 
 """
-from __future__ import absolute_import
+
 
 import logging
 

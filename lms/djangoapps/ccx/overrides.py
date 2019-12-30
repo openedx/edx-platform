@@ -2,7 +2,7 @@
 API related to providing field overrides for individual students.  This is used
 by the individual custom courses feature.
 """
-from __future__ import absolute_import
+
 
 import json
 import logging

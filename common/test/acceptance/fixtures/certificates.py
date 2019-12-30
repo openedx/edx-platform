@@ -2,7 +2,7 @@
 Tools for creating certificates config fixture data.
 """
 
-from __future__ import absolute_import
+
 
 import json
 

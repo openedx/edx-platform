@@ -1,7 +1,7 @@
 """
 Unit tests for the container page.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import re

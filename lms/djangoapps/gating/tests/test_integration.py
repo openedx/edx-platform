@@ -1,7 +1,7 @@
 """
 Integration tests for gated content.
 """
-from __future__ import absolute_import
+
 
 import ddt
 from completion import waffle as completion_waffle

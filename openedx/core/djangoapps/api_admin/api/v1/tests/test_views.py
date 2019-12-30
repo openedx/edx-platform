@@ -1,7 +1,7 @@
 """
 Tests for the `api_admin` api module.
 """
-from __future__ import absolute_import
+
 import json
 
 from rest_framework.reverse import reverse

@@ -2,7 +2,7 @@
 """
 Basic unit tests for LibraryRoot
 """
-from __future__ import absolute_import
+
 
 from mock import patch
 from six.moves import range

@@ -2,7 +2,7 @@
 Helper functions for the account/profile Python APIs.
 This is NOT part of the public API.
 """
-from __future__ import absolute_import
+
 
 import json
 import logging

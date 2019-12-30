@@ -45,7 +45,7 @@ Eligibility:
        then the student will be issued a certificate regardless of his grade,
        unless he has allow_certificate set to False.
 """
-from __future__ import absolute_import
+
 
 import json
 import logging

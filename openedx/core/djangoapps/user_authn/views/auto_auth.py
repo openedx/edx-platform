@@ -1,5 +1,5 @@
 """ Views related to auto auth. """
-from __future__ import absolute_import
+
 
 import datetime
 import uuid

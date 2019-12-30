@@ -1,7 +1,7 @@
 """
 Module implementing `xblock.runtime.Runtime` functionality for the LMS
 """
-from __future__ import absolute_import
+
 
 import six
 import xblock.reference.plugins

@@ -1,7 +1,7 @@
 """
 Test finding orphans via the view and django config
 """
-from __future__ import absolute_import
+
 
 import json
 

@@ -8,7 +8,7 @@ a student's score or the course grading policy changes. As they are
 persisted, course grades are also immune to changes in course content.
 """
 
-from __future__ import absolute_import
+
 
 import json
 import logging

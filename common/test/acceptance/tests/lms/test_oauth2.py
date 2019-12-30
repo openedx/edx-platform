@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for OAuth2 permission delegation."""
 
-from __future__ import absolute_import
+
 
 from six.moves.urllib.parse import parse_qsl, urlparse  # pylint: disable=import-error
 

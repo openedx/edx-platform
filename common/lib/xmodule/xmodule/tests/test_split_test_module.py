@@ -1,7 +1,7 @@
 """
 Tests for the Split Testing Module
 """
-from __future__ import absolute_import
+
 
 import ddt
 import lxml

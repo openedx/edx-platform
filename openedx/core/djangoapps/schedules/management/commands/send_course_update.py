@@ -1,7 +1,7 @@
 """
 Management command to send Schedule course updates
 """
-from __future__ import absolute_import
+
 
 from textwrap import dedent
 

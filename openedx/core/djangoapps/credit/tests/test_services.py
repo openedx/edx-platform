@@ -2,7 +2,7 @@
 Tests for the Credit xBlock service
 """
 
-from __future__ import absolute_import
+
 
 import ddt
 import six

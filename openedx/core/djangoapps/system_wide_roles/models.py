@@ -1,7 +1,7 @@
 """
 Django models for system wide roles.
 """
-from __future__ import unicode_literals
+
 
 from edx_rbac.models import UserRole, UserRoleAssignment
 

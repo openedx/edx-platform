@@ -2,7 +2,7 @@
 Views to support bulk email functionalities like opt-out.
 """
 
-from __future__ import division
+
 
 import logging
 

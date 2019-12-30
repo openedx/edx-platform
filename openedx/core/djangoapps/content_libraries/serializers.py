@@ -2,7 +2,7 @@
 Serializers for the content libraries REST API
 """
 # pylint: disable=abstract-method
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 from django.core.validators import validate_unicode_slug
 from rest_framework import serializers

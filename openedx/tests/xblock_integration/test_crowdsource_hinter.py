@@ -1,7 +1,7 @@
 """
 Test scenarios for the crowdsource hinter xblock.
 """
-from __future__ import absolute_import
+
 
 import unittest
 

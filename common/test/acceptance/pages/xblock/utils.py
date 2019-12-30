@@ -1,7 +1,7 @@
 """
 Utility methods useful for XBlock page tests.
 """
-from __future__ import absolute_import
+
 
 from bok_choy.promise import Promise
 

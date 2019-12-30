@@ -9,7 +9,7 @@ Example usage:
     $ ./manage.py lms create_fake_cert test_user edX/DemoX/Demo_Course --mode honor --grade 0.89
 
 """
-from __future__ import absolute_import
+
 
 import logging
 from textwrap import dedent

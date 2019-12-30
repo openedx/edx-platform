@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Tests for the email opt-in list management command. """
-from __future__ import absolute_import
+
 
 import csv
 import os.path

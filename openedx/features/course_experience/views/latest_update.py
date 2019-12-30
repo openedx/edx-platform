@@ -6,7 +6,7 @@ this fragment dismisses the message for a limited time so new updates
 will continue to appear, where the welcome message gets permanently
 dismissed.
 """
-from __future__ import absolute_import
+
 
 from django.template.loader import render_to_string
 from opaque_keys.edx.keys import CourseKey

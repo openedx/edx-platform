@@ -1,7 +1,7 @@
 """
 Test the publish code (mostly testing that publishing doesn't result in orphans)
 """
-from __future__ import absolute_import
+
 
 import itertools
 import os

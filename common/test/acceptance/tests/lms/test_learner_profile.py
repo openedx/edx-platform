@@ -2,7 +2,7 @@
 """
 End-to-end tests for Student's Profile Page.
 """
-from __future__ import absolute_import
+
 
 from contextlib import contextmanager
 from datetime import datetime

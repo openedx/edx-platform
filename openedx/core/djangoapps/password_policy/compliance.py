@@ -1,7 +1,7 @@
 """
 Utilities for enforcing and tracking compliance with password policy rules.
 """
-from __future__ import absolute_import
+
 from datetime import datetime
 
 import pytz

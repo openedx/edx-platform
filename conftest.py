@@ -1,7 +1,7 @@
 """
 Default unit test configuration and fixtures.
 """
-from __future__ import absolute_import, unicode_literals
+
 from unittest import TestCase
 
 import pytest

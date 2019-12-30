@@ -4,7 +4,7 @@
 Install bok-choy page objects for acceptance and end-to-end tests.
 """
 
-from __future__ import absolute_import
+
 
 import os
 

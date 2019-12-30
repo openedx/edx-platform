@@ -1,7 +1,7 @@
 """
 Badges related signal handlers.
 """
-from __future__ import absolute_import
+
 
 from django.dispatch import receiver
 

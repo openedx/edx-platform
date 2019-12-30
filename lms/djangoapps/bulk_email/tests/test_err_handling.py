@@ -2,7 +2,7 @@
 """
 Unit tests for handling email sending errors
 """
-from __future__ import absolute_import
+
 
 import json
 from itertools import cycle

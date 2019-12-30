@@ -2,7 +2,7 @@
 This module contains all general use signals.
 """
 
-from __future__ import absolute_import
+
 from django.dispatch import Signal
 
 # Signal that fires when a user is graded

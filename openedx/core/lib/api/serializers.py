@@ -2,7 +2,7 @@
 Serializers to be used in APIs.
 """
 
-from __future__ import absolute_import
+
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework import serializers

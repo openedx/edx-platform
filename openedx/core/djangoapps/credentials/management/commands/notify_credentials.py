@@ -9,7 +9,7 @@ This management command will manually trigger the receivers we care about.
 (We don't want to trigger all receivers for these signals, since these are busy
 signals.)
 """
-from __future__ import absolute_import, division, print_function
+
 
 import logging
 import math

@@ -1,7 +1,7 @@
 """
 Base file for testing email sending functionality
 """
-from __future__ import absolute_import
+
 
 import datetime
 import logging

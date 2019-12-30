@@ -2,7 +2,7 @@
 Unit tests for checking default forum role "Student" of a user when he creates a course or
 after deleting it creates same course again
 """
-from __future__ import absolute_import
+
 
 from contentstore.tests.utils import AjaxEnabledTestClient
 from contentstore.utils import delete_course, reverse_url

@@ -10,7 +10,7 @@ Used by capa_problem.py
 
 # pylint: disable=attribute-defined-outside-init
 # standard library imports
-from __future__ import absolute_import
+
 
 import abc
 # TODO: Refactor this code and fix this issue.

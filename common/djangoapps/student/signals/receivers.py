@@ -1,7 +1,7 @@
 """
 Signal receivers for the "student" application.
 """
-from __future__ import absolute_import
+
 
 from django.conf import settings
 from django.utils import timezone

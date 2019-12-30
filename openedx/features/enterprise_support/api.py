@@ -1,7 +1,7 @@
 """
 APIs providing support for enterprise functionality.
 """
-from __future__ import absolute_import
+
 
 import logging
 from functools import wraps

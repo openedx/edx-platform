@@ -1,7 +1,7 @@
 """
 Configuration for the ``student`` Django application.
 """
-from __future__ import absolute_import
+
 
 import os
 

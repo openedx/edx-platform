@@ -1,7 +1,7 @@
 """
 Management command for clear expired access tokens!
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import logging
 from datetime import timedelta

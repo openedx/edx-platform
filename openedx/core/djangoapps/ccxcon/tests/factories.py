@@ -1,7 +1,7 @@
 """
 Dummy factories for tests
 """
-from __future__ import absolute_import
+
 
 from factory.django import DjangoModelFactory
 

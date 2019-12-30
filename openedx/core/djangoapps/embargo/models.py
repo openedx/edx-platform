@@ -11,7 +11,7 @@ file and check it in at the same time as your model changes. To do that,
 3. Add the migration file created in edx-platform/openedx/core/djangoapps/embargo/migrations/
 """
 
-from __future__ import absolute_import
+
 
 import ipaddress
 import json

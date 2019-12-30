@@ -1,7 +1,7 @@
 """
 Acceptance tests for the Import and Export pages
 """
-from __future__ import absolute_import
+
 
 from abc import abstractmethod
 from datetime import datetime

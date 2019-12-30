@@ -2,7 +2,7 @@
 Test module for user certificate generation.
 """
 
-from __future__ import absolute_import
+
 
 import ddt
 from django.test import TestCase

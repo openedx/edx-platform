@@ -3,7 +3,7 @@ Management command `manage_group` is used to idempotently create Django groups
 and set their permissions by name.
 """
 
-from __future__ import absolute_import
+
 
 from django.apps import apps
 from django.contrib.auth.models import Group, Permission

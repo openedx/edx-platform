@@ -4,7 +4,7 @@ Helpers for accessing comprehensive theming related variables.
 This file is imported at startup. Imports of models or things which import models will break startup on Django 1.9+. If
 you need models here, please import them inside the function which uses them.
 """
-from __future__ import absolute_import
+
 
 import os
 import re

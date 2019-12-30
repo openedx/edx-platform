@@ -1,7 +1,7 @@
 """
 Tests related to the cohorting feature.
 """
-from __future__ import absolute_import
+
 
 from uuid import uuid4
 

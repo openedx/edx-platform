@@ -1,7 +1,7 @@
 """
 Tests for helper function provided by site_configuration app.
 """
-from __future__ import absolute_import
+
 
 import six
 from django.test import TestCase

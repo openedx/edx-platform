@@ -1,7 +1,7 @@
 """
 Studio Problem Editor
 """
-from __future__ import absolute_import
+
 
 from selenium.webdriver.support.ui import Select
 from six.moves import range

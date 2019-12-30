@@ -3,7 +3,7 @@ APIs for configuring credit eligibility requirements and tracking
 whether a user has satisfied those requirements.
 """
 
-from __future__ import absolute_import
+
 
 import logging
 

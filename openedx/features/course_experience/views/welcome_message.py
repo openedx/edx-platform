@@ -2,7 +2,7 @@
 View logic for handling course welcome messages.
 """
 
-from __future__ import absolute_import
+
 
 import six
 from django.http import HttpResponse

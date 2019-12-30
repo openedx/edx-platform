@@ -2,7 +2,7 @@
 Tests for the LTI user management functionality
 """
 
-from __future__ import absolute_import
+
 
 import string
 
