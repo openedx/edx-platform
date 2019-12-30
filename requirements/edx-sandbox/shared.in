@@ -10,5 +10,5 @@
 -c ../constraints.txt
 
 cryptography                        # Implementations of assorted cryptography algorithms
-lxml==4.4.1                         # XML parser
+lxml                                # XML parser
 nltk                                # Natural language processing; used by the chem package

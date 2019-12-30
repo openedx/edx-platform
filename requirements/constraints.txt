@@ -8,6 +8,9 @@
 # pin when possible.  Writing an issue against the offending project and
 # linking to it here is good.
 
+# The CORS_ORIGIN_WHITELIST changes in a backwards incompatible way in 3.0.0, needs matching configuration repo changes
+django-cors-headers<3.0.0
+
 # Constraining this since the newer versions no longer work with the deprecated MIDDLEWARE_CLASSES setting
 django-debug-toolbar<2.0
 
