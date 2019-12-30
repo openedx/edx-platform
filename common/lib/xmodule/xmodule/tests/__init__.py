@@ -501,10 +501,10 @@ class CourseComparisonTest(TestCase):
         actual_course_assets = actual_modulestore.get_all_asset_metadata(
             actual_course_key, None, sort=('displayname', ModuleStoreEnum.SortOrder.descending)
         )
-        self.assertEquals(len(expected_course_assets), len(actual_course_assets))
+        self.assertEqual(len(expected_course_assets), len(actual_course_assets))
         for idx, __ in enumerate(expected_course_assets):
             for attr in AssetMetadata.ATTRS_ALLOWED_TO_UPDATE:
                 if attr in ('edited_on',):
                     # edited_on is updated upon import.
                     continue
-                self.assertEquals(getattr(expected_course_assets[idx], attr), getattr(actual_course_assets[idx], attr))
+                self.assertEqual(getattr(expected_course_assets[idx], attr), getattr(actual_course_assets[idx], attr))

@@ -197,7 +197,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         # Now add the course and make sure it does match
         response = self._add_edx4edx()
-        self.assertRegexpMatches(response.content.decode('utf-8'), table_re)
+        self.assertRegex(response.content.decode('utf-8'), table_re)
 
     def test_gitlogs(self):
         """

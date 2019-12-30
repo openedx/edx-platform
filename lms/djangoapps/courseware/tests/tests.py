@@ -174,5 +174,5 @@ class TestLmsFieldData(TestCase):
         base_student = mock.Mock()
         first_level = LmsFieldData(base_authored, base_student)
         second_level = LmsFieldData(first_level, base_student)
-        self.assertEquals(second_level._authored_data, first_level._authored_data)
+        self.assertEqual(second_level._authored_data, first_level._authored_data)
         self.assertNotIsInstance(second_level._authored_data, LmsFieldData)

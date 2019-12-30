@@ -488,7 +488,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
             'openedx.core.djangoapps.content.course_overviews.models.CourseOverview.get_from_id'
         ) as mock_get_from_id:
             CourseOverview.update_select_courses(select_course_ids)
-            self.assertEquals(mock_get_from_id.call_count, len(select_course_ids))
+            self.assertEqual(mock_get_from_id.call_count, len(select_course_ids))
 
     def test_get_all_courses(self):
         course_ids = [CourseFactory.create(emit_signals=True).id for __ in range(3)]

@@ -327,7 +327,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         """Test that anonymous GET is allowed."""
         dispatch_url = self._get_dispatch_url()
         response = self.client.get(dispatch_url)
-        self.assertEquals(200, response.status_code)
+        self.assertEqual(200, response.status_code)
 
     def test_anonymous_post_xblock_callback(self):
         """Test that anonymous POST is not allowed."""
@@ -335,8 +335,8 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         response = self.client.post(dispatch_url, {'position': 2})
 
         # https://openedx.atlassian.net/browse/LEARNER-7131
-        self.assertEquals('Unauthenticated', response.content.decode('utf-8'))
-        self.assertEquals(403, response.status_code)
+        self.assertEqual('Unauthenticated', response.content.decode('utf-8'))
+        self.assertEqual(403, response.status_code)
 
     def test_session_authentication(self):
         """ Test that the xblock endpoint supports session authentication."""
@@ -632,7 +632,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
             data={'file_id': (self._mock_file(), ) * (settings.MAX_FILEUPLOADS_PER_INPUT + 1)}
         )
         request.user = self.mock_user
-        self.assertEquals(
+        self.assertEqual(
             render.handle_xblock_callback(
                 request,
                 text_type(self.course_key),
@@ -652,7 +652,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
             data={'file_id': inputfile}
         )
         request.user = self.mock_user
-        self.assertEquals(
+        self.assertEqual(
             render.handle_xblock_callback(
                 request,
                 text_type(self.course_key),
@@ -744,13 +744,13 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
             'set_score',
             '',
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         student_module = StudentModule.objects.get(
             student=self.mock_user,
             module_state_key=block.scope_ids.usage_id,
         )
-        self.assertEquals(student_module.grade, 0.75)
-        self.assertEquals(student_module.max_grade, 1)
+        self.assertEqual(student_module.grade, 0.75)
+        self.assertEqual(student_module.max_grade, 1)
 
     @ddt.data(
         ('complete', {'completion': 0.625}),
@@ -960,14 +960,14 @@ class TestXBlockView(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         request = self.request_factory.get(self.xblock_view_url)
         request.user = UserFactory.create()
         response = render.xblock_view(request, *self.view_args)
-        self.assertEquals(200, response.status_code)
+        self.assertEqual(200, response.status_code)
 
         expected = ['csrf_token', 'html', 'resources']
         content = json.loads(response.content.decode('utf-8'))
         for section in expected:
             self.assertIn(section, content)
         doc = PyQuery(content['html'])
-        self.assertEquals(len(doc('div.xblock-student_view-html')), 1)
+        self.assertEqual(len(doc('div.xblock-student_view-html')), 1)
 
     @ddt.data(True, False)
     def test_hide_staff_markup(self, hide):
@@ -981,7 +981,7 @@ class TestXBlockView(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         if hide:
             request.GET = {'hide_staff_markup': 'true'}
         response = render.xblock_view(request, *self.view_args)
-        self.assertEquals(200, response.status_code)
+        self.assertEqual(200, response.status_code)
 
         html = json.loads(response.content.decode('utf-8'))['html']
         self.assertEqual('Staff Debug Info' in html, not hide)
@@ -990,7 +990,7 @@ class TestXBlockView(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         request = self.request_factory.get(self.xblock_view_url)
         request.user = AnonymousUser()
         response = render.xblock_view(request, *self.view_args)
-        self.assertEquals(401, response.status_code)
+        self.assertEqual(401, response.status_code)
 
 
 @ddt.ddt
@@ -1090,8 +1090,8 @@ class TestTOC(ModuleStoreTestCase):
                 )
             for toc_section in expected:
                 self.assertIn(toc_section, actual['chapters'])
-            self.assertEquals(actual['previous_of_active_section']['url_name'], 'Toy_Videos')
-            self.assertEquals(actual['next_of_active_section']['url_name'], 'video_123456789012')
+            self.assertEqual(actual['previous_of_active_section']['url_name'], 'Toy_Videos')
+            self.assertEqual(actual['next_of_active_section']['url_name'], 'video_123456789012')
 
 
 @ddt.ddt
@@ -1248,7 +1248,7 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
             # we expect there not to be a 'proctoring' key in the dict
             self.assertNotIn('proctoring', section_actual)
         self.assertIsNone(actual['previous_of_active_section'])
-        self.assertEquals(actual['next_of_active_section']['url_name'], u"Welcome")
+        self.assertEqual(actual['next_of_active_section']['url_name'], u"Welcome")
 
     @ddt.data(
         (
@@ -1552,7 +1552,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         )
         result_fragment = module.render(STUDENT_VIEW)
 
-        self.assertEquals(len(PyQuery(result_fragment.content)('div.xblock.xblock-student_view.xmodule_HtmlBlock')), 1)
+        self.assertEqual(len(PyQuery(result_fragment.content)('div.xblock.xblock-student_view.xmodule_HtmlBlock')), 1)
 
     def test_xmodule_display_wrapper_disabled(self):
         module = render.get_module(
@@ -2034,7 +2034,7 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
     @ddt.data(*PER_STUDENT_ANONYMIZED_DESCRIPTORS)
     def test_per_student_anonymized_id(self, descriptor_class):
         for course_id in ('MITx/6.00x/2012_Fall', 'MITx/6.00x/2013_Spring'):
-            self.assertEquals(
+            self.assertEqual(
                 # This value is set by observation, so that later changes to the student
                 # id computation don't break old data
                 '5afe5d9bb03796557ee2614f5c9611fb',
@@ -2043,14 +2043,14 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
 
     @ddt.data(*PER_COURSE_ANONYMIZED_DESCRIPTORS)
     def test_per_course_anonymized_id(self, descriptor_class):
-        self.assertEquals(
+        self.assertEqual(
             # This value is set by observation, so that later changes to the student
             # id computation don't break old data
             'e3b0b940318df9c14be59acb08e78af5',
             self._get_anonymous_id(CourseKey.from_string('MITx/6.00x/2012_Fall'), descriptor_class)
         )
 
-        self.assertEquals(
+        self.assertEqual(
             # This value is set by observation, so that later changes to the student
             # id computation don't break old data
             'f82b5416c9f54b5ce33989511bb5ef2e',
@@ -2089,7 +2089,7 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
     def test_context_contains_display_name(self, mock_tracker):
         problem_display_name = u'Option Response Problem'
         module_info = self.handle_callback_and_get_module_info(mock_tracker, problem_display_name)
-        self.assertEquals(problem_display_name, module_info['display_name'])
+        self.assertEqual(problem_display_name, module_info['display_name'])
 
     @XBlockAside.register_temp_plugin(AsideTestType, 'test_aside')
     @patch('xmodule.modulestore.mongo.base.CachingDescriptorSystem.applicable_aside_types',
@@ -2114,9 +2114,9 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
         self.assertIn('asides', context_info)
         self.assertIn('test_aside', context_info['asides'])
         self.assertIn('content', context_info['asides']['test_aside'])
-        self.assertEquals(context_info['asides']['test_aside']['content'], 'test1')
+        self.assertEqual(context_info['asides']['test_aside']['content'], 'test1')
         self.assertIn('data_field', context_info['asides']['test_aside'])
-        self.assertEquals(context_info['asides']['test_aside']['data_field'], 'test2')
+        self.assertEqual(context_info['asides']['test_aside']['data_field'], 'test2')
 
     def handle_callback_and_get_context_info(self, mock_tracker, problem_display_name=None):
         """
@@ -2140,11 +2140,11 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
             'problem_check',
         )
 
-        self.assertEquals(len(mock_tracker.send.mock_calls), 1)
+        self.assertEqual(len(mock_tracker.send.mock_calls), 1)
         mock_call = mock_tracker.send.mock_calls[0]
         event = mock_call[1][0]
 
-        self.assertEquals(event['event_type'], 'problem_check')
+        self.assertEqual(event['event_type'], 'problem_check')
         return event['context']
 
     def handle_callback_and_get_module_info(self, mock_tracker, problem_display_name=None):
@@ -2300,7 +2300,7 @@ class TestRebindModule(TestSubmittingProblems):
         module = self.get_module_for_user(self.user)
         user2 = UserFactory()
         user2.id = 2
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             render.LmsModuleRenderError,
             "rebind_noauth_module_to_user can only be called from a module bound to an anonymous user"
         ):
@@ -2600,7 +2600,7 @@ class TestFilteredChildren(SharedModuleStoreTestCase):
         """
         Used to assert that sets of children are equivalent.
         """
-        self.assertEquals(set(child_usage_ids), set(child.scope_ids.usage_id for child in block.get_children()))
+        self.assertEqual(set(child_usage_ids), set(child.scope_ids.usage_id for child in block.get_children()))
 
 
 @ddt.ddt

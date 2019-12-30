@@ -69,12 +69,12 @@ class TestArgParsing(TestCase):
     """
     def test_no_args(self):
         errstring = "Must specify exactly one of --course_ids, --all_courses, --from_settings"
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('migrate_transcripts')
 
     def test_invalid_course(self):
         errstring = "Invalid course_key: 'invalid-course'."
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('migrate_transcripts', '--course-id', 'invalid-course')
 
 

@@ -277,11 +277,11 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
             problem_score = subsection_grade.problem_scores[problem.location]
             self.assertEqual(type(expected_score.first_attempted), type(problem_score.first_attempted))
             expected_score.first_attempted = problem_score.first_attempted
-            self.assertEquals(problem_score, expected_score)
+            self.assertEqual(problem_score, expected_score)
 
         # verify subsection grades
-        self.assertEquals(subsection_grade.all_total.earned, expected_score.earned * len(self.problems))
-        self.assertEquals(subsection_grade.all_total.possible, expected_score.possible * len(self.problems))
+        self.assertEqual(subsection_grade.all_total.earned, expected_score.earned * len(self.problems))
+        self.assertEqual(subsection_grade.all_total.possible, expected_score.possible * len(self.problems))
 
     @ddt.data(
         *itertools.product(

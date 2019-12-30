@@ -129,7 +129,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
 
     def test_student_view_init(self):
         seq_module = SequenceModule(runtime=Mock(position=2), descriptor=Mock(), scope_ids=Mock())
-        self.assertEquals(seq_module.position, 2)  # matches position set in the runtime
+        self.assertEqual(seq_module.position, 2)  # matches position set in the runtime
 
     @ddt.unpack
     @ddt.data(

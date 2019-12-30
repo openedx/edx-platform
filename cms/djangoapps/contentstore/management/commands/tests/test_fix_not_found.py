@@ -25,7 +25,7 @@ class TestFixNotFound(ModuleStoreTestCase):
         else:
             msg = "Error: the following arguments are required: course_id"
 
-        with self.assertRaisesRegexp(CommandError, msg):
+        with self.assertRaisesRegex(CommandError, msg):
             call_command('fix_not_found')
 
     def test_fix_not_found_non_split(self):
@@ -33,7 +33,7 @@ class TestFixNotFound(ModuleStoreTestCase):
         The management command doesn't work on non split courses
         """
         course = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
-        with self.assertRaisesRegexp(CommandError, "The owning modulestore does not support this command."):
+        with self.assertRaisesRegex(CommandError, "The owning modulestore does not support this command."):
             call_command("fix_not_found", six.text_type(course.id))
 
     def test_fix_not_found(self):

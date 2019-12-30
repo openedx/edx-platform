@@ -105,7 +105,7 @@ class TestWordCloud(BaseTestXmodule):
         }
 
         for _, response_content in users_state.items():
-            self.assertEquals(response_content, correct_initial_data)
+            self.assertEqual(response_content, correct_initial_data)
 
     def test_post_words(self):
         """Students can submit data succesfully.

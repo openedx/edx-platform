@@ -134,16 +134,16 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         expected_total = expected_total \
             if expected_total else expected_num_succeeded + expected_num_skipped
         # check return value
-        self.assertEquals(status.get('attempted'), expected_attempted)
-        self.assertEquals(status.get('succeeded'), expected_num_succeeded)
-        self.assertEquals(status.get('skipped'), expected_num_skipped)
-        self.assertEquals(status.get('total'), expected_total)
-        self.assertEquals(status.get('action_name'), action_name)
+        self.assertEqual(status.get('attempted'), expected_attempted)
+        self.assertEqual(status.get('succeeded'), expected_num_succeeded)
+        self.assertEqual(status.get('skipped'), expected_num_skipped)
+        self.assertEqual(status.get('total'), expected_total)
+        self.assertEqual(status.get('action_name'), action_name)
         self.assertGreater(status.get('duration_ms'), 0)
         # compare with entry in table:
         entry = InstructorTask.objects.get(id=task_entry.id)
-        self.assertEquals(json.loads(entry.task_output), status)
-        self.assertEquals(entry.task_state, SUCCESS)
+        self.assertEqual(json.loads(entry.task_output), status)
+        self.assertEqual(entry.task_state, SUCCESS)
 
     def _test_run_with_no_state(self, task_class, action_name):
         """Run with no StudentModules defined for the current problem."""
@@ -186,7 +186,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
                                                student=student,
                                                module_state_key=self.location)
             state = json.loads(module.state)
-            self.assertEquals(state['attempts'], num_attempts)
+            self.assertEqual(state['attempts'], num_attempts)
 
     def _test_run_with_failure(self, task_class, expected_message):
         """Run a task and trigger an artificial failure with the given message."""
@@ -196,10 +196,10 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
             self._run_task_with_mock_celery(task_class, task_entry.id, task_entry.task_id, expected_message)
         # compare with entry in table:
         entry = InstructorTask.objects.get(id=task_entry.id)
-        self.assertEquals(entry.task_state, FAILURE)
+        self.assertEqual(entry.task_state, FAILURE)
         output = json.loads(entry.task_output)
-        self.assertEquals(output['exception'], 'TestTaskFailure')
-        self.assertEquals(output['message'], expected_message)
+        self.assertEqual(output['exception'], 'TestTaskFailure')
+        self.assertEqual(output['message'], expected_message)
 
     def _test_run_with_long_error_msg(self, task_class):
         """
@@ -213,11 +213,11 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
             self._run_task_with_mock_celery(task_class, task_entry.id, task_entry.task_id, expected_message)
         # compare with entry in table:
         entry = InstructorTask.objects.get(id=task_entry.id)
-        self.assertEquals(entry.task_state, FAILURE)
+        self.assertEqual(entry.task_state, FAILURE)
         self.assertGreater(1023, len(entry.task_output))
         output = json.loads(entry.task_output)
-        self.assertEquals(output['exception'], 'TestTaskFailure')
-        self.assertEquals(output['message'], expected_message[:len(output['message']) - 3] + "...")
+        self.assertEqual(output['exception'], 'TestTaskFailure')
+        self.assertEqual(output['message'], expected_message[:len(output['message']) - 3] + "...")
         self.assertNotIn('traceback', output)
 
     def _test_run_with_short_error_msg(self, task_class):
@@ -233,12 +233,12 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
             self._run_task_with_mock_celery(task_class, task_entry.id, task_entry.task_id, expected_message)
         # compare with entry in table:
         entry = InstructorTask.objects.get(id=task_entry.id)
-        self.assertEquals(entry.task_state, FAILURE)
+        self.assertEqual(entry.task_state, FAILURE)
         self.assertGreater(1023, len(entry.task_output))
         output = json.loads(entry.task_output)
-        self.assertEquals(output['exception'], 'TestTaskFailure')
-        self.assertEquals(output['message'], expected_message)
-        self.assertEquals(output['traceback'][-3:], "...")
+        self.assertEqual(output['exception'], 'TestTaskFailure')
+        self.assertEqual(output['message'], expected_message)
+        self.assertEqual(output['traceback'][-3:], "...")
 
 
 class TestOverrideScoreInstructorTask(TestInstructorTasks):
@@ -303,8 +303,8 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
         # check values stored in table:
         entry = InstructorTask.objects.get(id=task_entry.id)
         output = json.loads(entry.task_output)
-        self.assertEquals(output['exception'], "UpdateProblemModuleStateError")
-        self.assertEquals(output['message'], "Scores cannot be overridden for this problem type.")
+        self.assertEqual(output['exception'], "UpdateProblemModuleStateError")
+        self.assertEqual(output['message'], "Scores cannot be overridden for this problem type.")
         self.assertGreater(len(output['traceback']), 0)
 
     def test_overriding_unaccessable(self):
@@ -435,8 +435,8 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         # check values stored in table:
         entry = InstructorTask.objects.get(id=task_entry.id)
         output = json.loads(entry.task_output)
-        self.assertEquals(output['exception'], "UpdateProblemModuleStateError")
-        self.assertEquals(output['message'], u"Specified module {0} of type {1} does not support rescoring.".format(
+        self.assertEqual(output['exception'], "UpdateProblemModuleStateError")
+        self.assertEqual(output['message'], u"Specified module {0} of type {1} does not support rescoring.".format(
             self.location,
             mock_instance.__class__,
         ))
@@ -553,7 +553,7 @@ class TestResetAttemptsInstructorTask(TestInstructorTasks):
                                                student=student,
                                                module_state_key=self.location)
             state = json.loads(module.state)
-            self.assertEquals(state['attempts'], initial_attempts)
+            self.assertEqual(state['attempts'], initial_attempts)
 
         if use_email:
             student_ident = students[3].email
@@ -563,16 +563,16 @@ class TestResetAttemptsInstructorTask(TestInstructorTasks):
 
         status = self._run_task_with_mock_celery(reset_problem_attempts, task_entry.id, task_entry.task_id)
         # check return value
-        self.assertEquals(status.get('attempted'), 1)
-        self.assertEquals(status.get('succeeded'), 1)
-        self.assertEquals(status.get('total'), 1)
-        self.assertEquals(status.get('action_name'), 'reset')
+        self.assertEqual(status.get('attempted'), 1)
+        self.assertEqual(status.get('succeeded'), 1)
+        self.assertEqual(status.get('total'), 1)
+        self.assertEqual(status.get('action_name'), 'reset')
         self.assertGreater(status.get('duration_ms'), 0)
 
         # compare with entry in table:
         entry = InstructorTask.objects.get(id=task_entry.id)
-        self.assertEquals(json.loads(entry.task_output), status)
-        self.assertEquals(entry.task_state, SUCCESS)
+        self.assertEqual(json.loads(entry.task_output), status)
+        self.assertEqual(entry.task_state, SUCCESS)
         # check that the correct entry was reset
         for index, student in enumerate(students):
             module = StudentModule.objects.get(course_id=self.course.id,
@@ -580,9 +580,9 @@ class TestResetAttemptsInstructorTask(TestInstructorTasks):
                                                module_state_key=self.location)
             state = json.loads(module.state)
             if index == 3:
-                self.assertEquals(state['attempts'], 0)
+                self.assertEqual(state['attempts'], 0)
             else:
-                self.assertEquals(state['attempts'], initial_attempts)
+                self.assertEqual(state['attempts'], initial_attempts)
 
     def test_reset_with_student_username(self):
         self._test_reset_with_student(False)

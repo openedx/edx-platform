@@ -364,7 +364,7 @@ class OLXFormatChecker(unittest.TestCase):
                 to match against the named attribute.
         """
         for attribute, regex in attrs.items():
-            self.assertRegexpMatches(element.get(attribute), regex)
+            self.assertRegex(element.get(attribute), regex)
 
     def parse_olx(self, block_type, block_id, **kwargs):
         """

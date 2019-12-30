@@ -55,7 +55,7 @@ class LTI20RESTResultServiceTest(LogicTest):
         """
         Input with bad content type
         """
-        with self.assertRaisesRegexp(LTIError, "Content-Type must be"):
+        with self.assertRaisesRegex(LTIError, "Content-Type must be"):
             request = Mock(headers={u'Content-Type': u'Non-existent'})
             self.xmodule.verify_lti_2_0_result_rest_headers(request)
 
@@ -65,7 +65,7 @@ class LTI20RESTResultServiceTest(LogicTest):
         """
         err_msg = "OAuth body verification failed"
         self.xmodule.verify_oauth_body_sign = Mock(side_effect=LTIError(err_msg))
-        with self.assertRaisesRegexp(LTIError, err_msg):
+        with self.assertRaisesRegex(LTIError, err_msg):
             request = Mock(headers={u'Content-Type': u'application/vnd.ims.lis.v2.result+json'})
             self.xmodule.verify_lti_2_0_result_rest_headers(request)
 
@@ -98,7 +98,7 @@ class LTI20RESTResultServiceTest(LogicTest):
         fit the form user/<anon_id>
         """
         for einput in self.BAD_DISPATCH_INPUTS:
-            with self.assertRaisesRegexp(LTIError, "No valid user id found in endpoint URL"):
+            with self.assertRaisesRegex(LTIError, "No valid user id found in endpoint URL"):
                 self.xmodule.parse_lti_2_0_handler_suffix(einput)
 
     GOOD_DISPATCH_INPUTS = [
@@ -159,7 +159,7 @@ class LTI20RESTResultServiceTest(LogicTest):
         """
         for error_inputs, error_message in self.BAD_JSON_INPUTS:
             for einput in error_inputs:
-                with self.assertRaisesRegexp(LTIError, error_message):
+                with self.assertRaisesRegex(LTIError, error_message):
                     self.xmodule.parse_lti_2_0_result_json(einput)
 
     GOOD_JSON_INPUTS = [

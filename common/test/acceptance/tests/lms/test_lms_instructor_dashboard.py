@@ -180,7 +180,7 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
             favorite_movie="Harry Potter",
         )
         course_names = self.dashboard_page.wait_for_page().available_courses
-        self.assertEquals(len(course_names), 1)
+        self.assertEqual(len(course_names), 1)
         self.assertIn(self.course_info["display_name"], course_names)
 
     def test_clicking_file_upload_button_without_file_shows_error(self):
@@ -617,7 +617,7 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         Verifies that a report can be downloaded and an event fired.
         """
         download_links = self.data_download_section.report_download_links
-        self.assertEquals(len(download_links), 1)
+        self.assertEqual(len(download_links), 1)
         download_links[0].click()
         expected_url = download_links.attrs('href')[0]
         self.assertIn(report_name, expected_url)

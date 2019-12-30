@@ -368,13 +368,13 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
             'student_view_data': 'discussion'
         }
         response = self.client.get(url, query_params)
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.data['root'], six.text_type(self.course_usage_key))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['root'], six.text_type(self.course_usage_key))
         for block_key_string, block_data in six.iteritems(response.data['blocks']):
             block_key = deserialize_usage_key(block_key_string, self.course_key)
-            self.assertEquals(block_data['id'], block_key_string)
-            self.assertEquals(block_data['type'], block_key.block_type)
-            self.assertEquals(block_data['display_name'], self.store.get_item(block_key).display_name or '')
+            self.assertEqual(block_data['id'], block_key_string)
+            self.assertEqual(block_data['type'], block_key.block_type)
+            self.assertEqual(block_data['display_name'], self.store.get_item(block_key).display_name or '')
             self.assertEqual(block_data['student_view_data'], {"topic_id": self.discussion_id})
 
 

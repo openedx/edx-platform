@@ -277,7 +277,7 @@ class TestUsernamePasswordNonmatch(TestCase):
         self.url_params['username'] = "foobar"
         self.url_params['password'] = "foobar"
         response = self.client.post(self.url, self.url_params)
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
         obj = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             obj['password'][0]['user_message'],
@@ -291,6 +291,6 @@ class TestUsernamePasswordNonmatch(TestCase):
         self.url_params['username'] = "foobar"
         self.url_params['password'] = "nonmatch"
         response = self.client.post(self.url, self.url_params)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         obj = json.loads(response.content.decode('utf-8'))
         self.assertTrue(obj['success'])

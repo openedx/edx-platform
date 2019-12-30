@@ -312,7 +312,7 @@ class TestAnnouncementsViews(MaintenanceViewTestCase):
         self.assertContains(response, '<div class="wrapper-form announcement-container">')
         self.client.post(url, {"content": "Test Edit Announcement", "active": True})
         announcement = Announcement.objects.get(pk=announcement.pk)
-        self.assertEquals(announcement.content, "Test Edit Announcement")
+        self.assertEqual(announcement.content, "Test Edit Announcement")
 
     def test_delete(self):
         """

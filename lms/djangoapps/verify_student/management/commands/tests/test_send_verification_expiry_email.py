@@ -122,7 +122,7 @@ class TestSendVerificationExpiryEmail(MockS3Mixin):
 
         expected_date = now()
         attempt = SoftwareSecurePhotoVerification.objects.get(user_id=verification.user_id)
-        self.assertEquals(attempt.expiry_email_date.date(), expected_date.date())
+        self.assertEqual(attempt.expiry_email_date.date(), expected_date.date())
         self.assertEqual(len(mail.outbox), 1)
 
     def test_email_already_sent(self):
@@ -237,5 +237,5 @@ class TestSendVerificationExpiryEmail(MockS3Mixin):
     def test_command_error(self):
         err_string = u"DEFAULT_EMAILS must be a positive integer. If you do not wish to send " \
                      u"emails use --dry-run flag instead."
-        with self.assertRaisesRegexp(CommandError, err_string):
+        with self.assertRaisesRegex(CommandError, err_string):
             call_command('send_verification_expiry_email')

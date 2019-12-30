@@ -660,11 +660,11 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
 
     def test_page_size(self):
         result = self.get_teams_list(200, {'page_size': 2})
-        self.assertEquals(2, result['num_pages'])
+        self.assertEqual(2, result['num_pages'])
 
     def test_page(self):
         result = self.get_teams_list(200, {'page_size': 1, 'page': 3})
-        self.assertEquals(3, result['num_pages'])
+        self.assertEqual(3, result['num_pages'])
         self.assertIsNone(result['next'])
         self.assertIsNotNone(result['previous'])
 
@@ -1059,7 +1059,7 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
         prev_name = self.solar_team.name
         team = self.patch_team_detail(self.solar_team.team_id, status, {'name': 'foo'}, user=user)
         if status == 200:
-            self.assertEquals(team['name'], 'foo')
+            self.assertEqual(team['name'], 'foo')
             self.assert_event_emitted(
                 'edx.team.changed',
                 team_id=self.solar_team.team_id,

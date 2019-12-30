@@ -37,7 +37,7 @@ class ValidateVideoImageTestCase(TestCase):
         Test that when no file information is provided to validate_video_image, it gives proper error message.
         """
         error = validate_video_image({})
-        self.assertEquals(error, 'The image must have name, content type, and size information.')
+        self.assertEqual(error, 'The image must have name, content type, and size information.')
 
     def test_corrupt_image_file(self):
         """
@@ -50,7 +50,7 @@ class ValidateVideoImageTestCase(TestCase):
                 size=settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MIN_BYTES']
             )
             error = validate_video_image(uploaded_image_file)
-            self.assertEquals(error, 'There is a problem with this image file. Try to upload a different file.')
+            self.assertEqual(error, 'There is a problem with this image file. Try to upload a different file.')
 
 
 @ddt.ddt

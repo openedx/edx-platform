@@ -31,8 +31,8 @@ class TestCreateSiteConfiguration(TestCase):
         )
 
         site = Site.objects.get(domain__contains=self.site_domain)
-        self.assertEquals(site.name, self.site_domain)
-        self.assertEquals(site.domain, self.site_domain)
+        self.assertEqual(site.name, self.site_domain)
+        self.assertEqual(site.domain, self.site_domain)
 
         self._validate_site_configuration(site)
 

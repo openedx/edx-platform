@@ -103,7 +103,7 @@ class EnrollmentTrackPartitionSchemeTest(SharedModuleStoreTestCase):
         """
         Ensure that the scheme extension is correctly plugged in (via entry point in setup.py)
         """
-        self.assertEquals(UserPartition.get_scheme('enrollment_track'), EnrollmentTrackPartitionScheme)
+        self.assertEqual(UserPartition.get_scheme('enrollment_track'), EnrollmentTrackPartitionScheme)
 
     def test_create_user_partition(self):
         user_partition = UserPartition.get_scheme('enrollment_track').create_user_partition(
