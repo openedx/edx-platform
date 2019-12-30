@@ -10,8 +10,9 @@ import re
 import argparse
 from collections import Counter
 import pandas as pd
-from write_to_html import HtmlOutlineWriter  # noqa pylint: disable=import-error,useless-suppression
-from djangolib.markup import HTML, Text  # noqa pylint: disable=import-error
+from write_to_html import (
+    HtmlOutlineWriter,
+)  # noqa pylint: disable=import-error,useless-suppression
 
 columns = [
     "message",
@@ -176,9 +177,10 @@ def write_html_report(warnings_dataframe, html_path):
             warnings_dataframe, "category", "num"
         )
         for category, group_in_category, category_count in category_sorted_by_count:
-            html = Text(
-                u'<span class="count">{category}, count: {count}</span> '
-            ).format(category=HTML(category), count=HTML(category_count))
+            ## xss-lint: disable==python-requires-html-or-text
+            html = u'<span class="count">{category}, count: {count}</span> '.format(
+                category=category, count=category_count
+            )
             html_writer.start_section(html, klass=u"category")
             locations_sorted_by_count = group_and_sort_by_sumof(
                 group_in_category, "high_location", "num"
@@ -189,39 +191,39 @@ def write_html_report(warnings_dataframe, html_path):
                 group_in_location,
                 location_count,
             ) in locations_sorted_by_count:
-                # pp.pprint(location)
-                html = Text(
-                    u'<span class="count">{location}, count: {count}</span> '
-                ).format(location=HTML(location), count=HTML(location_count))
+                ## xss-lint: disable==python-requires-html-or-text
+                html = u'<span class="count">{location}, count: {count}</span> '.format(
+                    location=location, count=location_count
+                )
                 html_writer.start_section(html, klass=u"location")
                 message_group_sorted_by_count = group_and_sort_by_sumof(
                     group_in_location, "message", "num"
                 )
-                # pdb.set_trace()
                 for (
                     message,
                     message_group,
                     message_count,
                 ) in message_group_sorted_by_count:
-                    # pp.pprint(warning_text)
-                    html = Text(
-                        u'<span class="count">{warning_text}, count: {count}</span> '
-                    ).format(warning_text=HTML(message), count=HTML(message_count))
+                    ## xss-lint: disable==python-requires-html-or-text
+                    html = u'<span class="count">{warning_text}, count: {count}</span> '.format(
+                        warning_text=message, count=message_count
+                    )
                     html_writer.start_section(html, klass=u"warning_text")
                     # warnings_object[location][warning_text] is a list
                     for _, warning in message_group.iterrows():
-                        # pp.pprint(warning)
-                        html = Text(
-                            u'<span class="count">{warning_file_path}</span> '
-                        ).format(warning_file_path=HTML(warning["filename"]))
+                        ## xss-lint: disable==python-requires-html-or-text
+                        html = u'<span class="count">{warning_file_path}</span> '.format(
+                            warning_file_path=warning["filename"]
+                        )
                         html_writer.start_section(html, klass=u"warning")
-
-                        html = Text(u'<p class="lineno">lineno: {lineno}</p> ').format(
-                            lineno=HTML(warning["lineno"])
+                        ## xss-lint: disable==python-requires-html-or-text
+                        html = u'<p class="lineno">lineno: {lineno}</p> '.format(
+                            lineno=warning["lineno"]
                         )
                         html_writer.write(html)
-                        html = Text(u'<p class="num">num_occur: {num}</p> ').format(
-                            num=HTML(warning["num"])
+                        ## xss-lint: disable==python-requires-html-or-text
+                        html = u'<p class="num">num_occur: {num}</p> '.format(
+                            num=warning["num"]
                         )
                         html_writer.write(html)
 
@@ -229,6 +231,7 @@ def write_html_report(warnings_dataframe, html_path):
                     html_writer.end_section()
                 html_writer.end_section()
             html_writer.end_section()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
