@@ -11,6 +11,7 @@ from ccx_keys.locator import CCXLocator
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.db import models, transaction
+from django.db.models import Q
 from django.db.models.fields import BooleanField, DateTimeField, DecimalField, FloatField, IntegerField, TextField
 from django.db.utils import IntegrityError
 from django.template import defaultfilters
@@ -605,7 +606,10 @@ class CourseOverview(TimeStampedModel):
             # In rare cases, courses belonging to the same org may be accidentally assigned
             # an org code with a different casing (e.g., Harvardx as opposed to HarvardX).
             # Case-insensitive matching allows us to deal with this kind of dirty data.
-            course_overviews = course_overviews.filter(org__iregex=r'(^' + '$|^'.join(orgs) + '$)')
+            org_filter = Q()  # Avoiding the `reduce()` for more readability, so a no-op filter starter is needed.
+            for org in orgs:
+                org_filter |= Q(org__iexact=org)
+            course_overviews = course_overviews.filter(org_filter)
 
         if filter_:
             course_overviews = course_overviews.filter(**filter_)
