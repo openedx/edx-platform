@@ -3,7 +3,6 @@ Tests for the Sending activation email celery tasks
 """
 
 
-
 import mock
 from django.conf import settings
 from django.test import TestCase

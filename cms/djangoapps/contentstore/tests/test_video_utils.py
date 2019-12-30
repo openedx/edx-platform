@@ -4,7 +4,6 @@ Unit tests for video utils.
 """
 
 
-
 from datetime import datetime
 from unittest import TestCase
 

@@ -2,7 +2,6 @@
 """ Tests for Logistration views. """
 
 
-
 from http.cookies import SimpleCookie
 
 import ddt

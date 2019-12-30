@@ -3,7 +3,6 @@ Django admin dashboard configuration.
 """
 
 
-
 from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _

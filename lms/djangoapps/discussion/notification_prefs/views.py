@@ -4,7 +4,6 @@ Views to support notification preferences.
 """
 
 
-
 import json
 import os
 from base64 import urlsafe_b64decode, urlsafe_b64encode

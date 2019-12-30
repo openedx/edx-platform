@@ -3,7 +3,6 @@ Tests i18n in courseware
 """
 
 
-
 import json
 import re
 import six

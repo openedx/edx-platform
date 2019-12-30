@@ -3,7 +3,6 @@ Custom fields
 """
 
 
-
 from django.db.models.fields import AutoField
 
 

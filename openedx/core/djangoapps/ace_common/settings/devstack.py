@@ -3,7 +3,6 @@ Settings for edX ACE on devstack.
 """
 
 
-
 from openedx.core.djangoapps.ace_common.settings import common
 
 

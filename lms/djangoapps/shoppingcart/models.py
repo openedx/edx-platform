@@ -2,7 +2,6 @@
 """ Models for the shopping cart and assorted purchase types """
 
 
-
 import csv
 import json
 import logging

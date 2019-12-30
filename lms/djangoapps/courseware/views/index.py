@@ -5,7 +5,6 @@ View for Courseware Index
 # pylint: disable=attribute-defined-outside-init
 
 
-
 import logging
 
 import six

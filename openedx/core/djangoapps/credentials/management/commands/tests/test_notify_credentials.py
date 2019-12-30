@@ -3,7 +3,6 @@ Tests the ``notify_credentials`` management command.
 """
 
 
-
 from datetime import datetime
 import mock
 

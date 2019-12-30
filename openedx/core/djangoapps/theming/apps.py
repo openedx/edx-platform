@@ -1,6 +1,5 @@
 
 
-
 from django.apps import AppConfig
 
 from openedx.core.djangoapps.plugins.constants import PluginURLs, ProjectType

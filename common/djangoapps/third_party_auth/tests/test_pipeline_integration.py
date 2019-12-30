@@ -1,7 +1,6 @@
 """Integration tests for pipeline.py."""
 
 
-
 import datetime
 import unittest
 

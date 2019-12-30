@@ -5,7 +5,6 @@ Which kind of view has been selected is stored in the session state.
 '''
 
 
-
 import logging
 from datetime import datetime
 

@@ -3,7 +3,6 @@ Command to delete all rows from the verify_student_historicalverificationdeadlin
 """
 
 
-
 import logging
 
 from lms.djangoapps.verify_student.models import VerificationDeadline

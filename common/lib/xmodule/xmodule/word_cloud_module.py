@@ -7,7 +7,6 @@ If student have answered - words he entered and cloud.
 """
 
 
-
 import json
 import logging
 

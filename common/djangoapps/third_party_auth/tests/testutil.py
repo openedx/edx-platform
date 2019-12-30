@@ -5,7 +5,6 @@ Used by Django and non-Django tests; must not have Django deps.
 """
 
 
-
 import os.path
 from contextlib import contextmanager
 

@@ -4,7 +4,6 @@ End-to-end tests related to the divided discussion management on the LMS Instruc
 """
 
 
-
 import uuid
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc

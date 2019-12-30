@@ -3,7 +3,6 @@ Middleware to serve assets.
 """
 
 
-
 import logging
 import datetime
 import six

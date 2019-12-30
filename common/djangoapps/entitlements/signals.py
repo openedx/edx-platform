@@ -3,7 +3,6 @@ Entitlements related signal handlers.
 """
 
 
-
 from django.dispatch import receiver
 
 from entitlements.models import CourseEntitlement

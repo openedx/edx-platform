@@ -1,7 +1,6 @@
 """ Unit tests for custom UserProfile properties. """
 
 
-
 import ddt
 from completion import models
 from completion.test_utils import CompletionWaffleTestMixin

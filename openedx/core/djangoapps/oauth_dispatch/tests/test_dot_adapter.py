@@ -3,7 +3,6 @@ Tests for DOT Adapter
 """
 
 
-
 import unittest
 from datetime import timedelta
 

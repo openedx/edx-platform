@@ -1,7 +1,6 @@
 """This module contains views related to shopping cart"""
 
 
-
 import datetime
 import decimal
 import json

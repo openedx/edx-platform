@@ -1,7 +1,6 @@
 """ Command line script to change credit course eligibility deadline. """
 
 
-
 import logging
 from datetime import datetime, timedelta
 

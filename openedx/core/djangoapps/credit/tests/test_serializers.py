@@ -1,7 +1,6 @@
 """ Tests for Credit API serializers. """
 
 
-
 import six
 from django.test import TestCase
 

@@ -39,7 +39,6 @@ graded status as'status'
 # general css and layout strategy for capa, document it, then implement it.
 
 
-
 import json
 import logging
 import re

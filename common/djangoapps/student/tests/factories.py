@@ -1,7 +1,6 @@
 """Provides factories for student models."""
 
 
-
 from datetime import datetime
 from uuid import uuid4
 

@@ -3,7 +3,6 @@ Defuse vulnerabilities in XML packages.
 """
 
 
-
 def defuse_xml_libs():
     """
     Monkey patch and defuse all stdlib xml packages and lxml.

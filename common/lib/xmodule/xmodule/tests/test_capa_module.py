@@ -6,7 +6,6 @@ Tests of the Capa XModule
 # pylint: disable=invalid-name
 
 
-
 import datetime
 import json
 import os

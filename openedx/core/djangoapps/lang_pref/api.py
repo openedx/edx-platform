@@ -2,7 +2,6 @@
 """ Python API for language and translation management. """
 
 
-
 from collections import namedtuple
 
 from django.conf import settings

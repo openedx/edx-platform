@@ -1,7 +1,6 @@
 """ Custom API permissions. """
 
 
-
 from django.contrib.auth.models import User
 from rest_framework.permissions import BasePermission, DjangoModelPermissions
 

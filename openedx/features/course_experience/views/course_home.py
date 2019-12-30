@@ -3,7 +3,6 @@ Views for the course home page.
 """
 
 
-
 import six
 from django.conf import settings
 from django.template.context_processors import csrf

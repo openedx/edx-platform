@@ -4,7 +4,6 @@ Structured Tagging based on XBlockAsides
 """
 
 
-
 import six
 from django.conf import settings
 from web_fragments.fragment import Fragment

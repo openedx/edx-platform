@@ -58,7 +58,6 @@ See https://python-social-auth.readthedocs.io/en/latest/pipeline.html for more d
 """
 
 
-
 import base64
 import hashlib
 import hmac

@@ -3,7 +3,6 @@ Test signal handlers for completion.
 """
 
 
-
 from datetime import datetime
 
 import ddt

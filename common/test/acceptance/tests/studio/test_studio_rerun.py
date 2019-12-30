@@ -3,7 +3,6 @@ Acceptance tests for Studio related to course reruns.
 """
 
 
-
 import random
 
 from bok_choy.promise import EmptyPromise

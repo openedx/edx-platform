@@ -3,7 +3,6 @@ Python tests for the Survey workflows
 """
 
 
-
 from collections import OrderedDict
 from copy import deepcopy
 

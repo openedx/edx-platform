@@ -3,7 +3,6 @@ Block Completion Transformer
 """
 
 
-
 from completion.models import BlockCompletion
 from xblock.completable import XBlockCompletionMode as CompletionMode
 

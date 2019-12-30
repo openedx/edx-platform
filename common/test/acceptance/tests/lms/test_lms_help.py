@@ -3,7 +3,6 @@ Test Help links in LMS
 """
 
 
-
 from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
 from common.test.acceptance.tests.discussion.helpers import CohortTestMixin

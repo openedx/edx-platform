@@ -12,7 +12,6 @@ For processing xml always prefer this over using lxml.etree directly.
 # pylint: disable=unused-import, wildcard-import, unused-wildcard-import
 
 
-
 from lxml.etree import XMLParser as _XMLParser
 from lxml.etree import *
 from lxml.etree import _Element, _ElementTree

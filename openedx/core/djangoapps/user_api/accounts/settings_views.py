@@ -1,7 +1,6 @@
 """ Views related to Account Settings. """
 
 
-
 import logging
 from datetime import datetime
 

@@ -3,7 +3,6 @@ Tests for verified track content views.
 """
 
 
-
 import json
 import six
 

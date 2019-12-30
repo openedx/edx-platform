@@ -1,7 +1,6 @@
 """Unit tests for the Paver asset tasks."""
 
 
-
 import os
 from unittest import TestCase
 

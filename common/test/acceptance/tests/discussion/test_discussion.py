@@ -3,7 +3,6 @@ Tests for discussion pages
 """
 
 
-
 import datetime
 import time
 from unittest import skip

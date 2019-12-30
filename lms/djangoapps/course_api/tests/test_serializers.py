@@ -3,7 +3,6 @@ Test data created by CourseSerializer and CourseDetailSerializer
 """
 
 
-
 from datetime import datetime
 
 import ddt

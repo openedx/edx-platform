@@ -4,7 +4,6 @@ django-oauth-toolkit as appropriate.
 """
 
 
-
 import json
 
 from django.conf import settings

@@ -11,7 +11,6 @@ decorator `django.utils.decorators.decorator_from_middleware(middleware_class)`
 """
 
 
-
 import logging
 import geoip2.database
 

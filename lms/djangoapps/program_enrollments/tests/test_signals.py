@@ -3,7 +3,6 @@ Test signal handlers for program_enrollments
 """
 
 
-
 import mock
 import pytest
 from django.core.cache import cache

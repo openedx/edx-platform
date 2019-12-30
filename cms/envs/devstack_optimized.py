@@ -19,7 +19,6 @@ invoked each time that changes have been made.
 """
 
 
-
 import os
 
 ########################## Devstack settings ###################################

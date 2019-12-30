@@ -3,7 +3,6 @@ Utility methods for the entitlement application.
 """
 
 
-
 import logging
 
 from django.utils import timezone

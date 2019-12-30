@@ -3,7 +3,6 @@ This file contains receivers of course publication signals.
 """
 
 
-
 import logging
 
 import six

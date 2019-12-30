@@ -3,7 +3,6 @@ Tests for course_modes views.
 """
 
 
-
 import decimal
 import unittest
 from datetime import datetime, timedelta

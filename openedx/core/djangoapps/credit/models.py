@@ -7,7 +7,6 @@ successful completion of a course on EdX
 """
 
 
-
 import datetime
 import logging
 from collections import defaultdict

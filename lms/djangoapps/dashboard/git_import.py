@@ -4,7 +4,6 @@ instance when using a mongo modulestore
 """
 
 
-
 import logging
 import os
 import re

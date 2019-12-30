@@ -3,7 +3,6 @@ Course API forms
 """
 
 
-
 from collections import namedtuple
 
 import six

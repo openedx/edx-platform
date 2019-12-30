@@ -4,7 +4,6 @@ that are stored in a database an accessible using their Location as an identifie
 """
 
 
-
 import datetime
 import logging
 import re

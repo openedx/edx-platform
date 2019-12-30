@@ -3,7 +3,6 @@ LTI Provider view functions
 """
 
 
-
 import logging
 
 import six

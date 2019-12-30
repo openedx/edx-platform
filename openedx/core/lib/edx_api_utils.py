@@ -1,7 +1,6 @@
 """Helper functions to get data from APIs"""
 
 
-
 import logging
 
 from django.core.cache import cache

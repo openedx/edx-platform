@@ -6,7 +6,6 @@ paths actually work.
 """
 
 
-
 import json
 from functools import partial
 from uuid import uuid4

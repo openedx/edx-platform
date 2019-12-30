@@ -3,7 +3,6 @@ Views handling read (GET) requests for the Discussion tab and inline discussions
 """
 
 
-
 from django.conf import settings
 from django.utils.translation import ugettext_noop
 

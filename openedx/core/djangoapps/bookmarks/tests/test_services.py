@@ -3,7 +3,6 @@ Tests for bookmark services.
 """
 
 
-
 from opaque_keys.edx.keys import UsageKey
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms

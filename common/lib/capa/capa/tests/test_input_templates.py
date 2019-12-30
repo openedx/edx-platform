@@ -3,7 +3,6 @@ Tests for the logic in input type mako templates.
 """
 
 
-
 import json
 import unittest
 from collections import OrderedDict

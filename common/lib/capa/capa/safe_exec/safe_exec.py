@@ -1,7 +1,6 @@
 """Capa's specialized use of codejail.safe_exec."""
 
 
-
 import hashlib
 
 from codejail.safe_exec import SafeExecException, json_safe

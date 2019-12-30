@@ -14,7 +14,6 @@ Note: Hotfix (PLAT-734) No asset calls find_asset_metadata, and directly accesse
 """
 
 
-
 from contracts import contract, new_contract
 from opaque_keys.edx.keys import AssetKey
 

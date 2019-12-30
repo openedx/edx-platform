@@ -3,7 +3,6 @@ Test for contentstore signals receiver
 """
 
 
-
 import mock
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey

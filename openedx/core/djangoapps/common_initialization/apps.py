@@ -3,7 +3,6 @@ Common initialization app for the LMS and CMS
 """
 
 
-
 from django.apps import AppConfig
 
 

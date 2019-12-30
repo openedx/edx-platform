@@ -3,7 +3,6 @@ Tests for the CCXCon celery tasks
 """
 
 
-
 import mock
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey

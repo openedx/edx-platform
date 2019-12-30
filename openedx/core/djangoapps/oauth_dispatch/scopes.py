@@ -3,7 +3,6 @@ Custom Django OAuth Toolkit scopes backends.
 """
 
 
-
 from oauth2_provider.scopes import SettingsScopes
 
 from openedx.core.djangoapps.oauth_dispatch.models import ApplicationAccess

@@ -1,7 +1,6 @@
 """Tests for display of certificates on the student dashboard. """
 
 
-
 import datetime
 import unittest
 

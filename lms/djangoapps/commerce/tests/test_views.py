@@ -1,7 +1,6 @@
 """ Tests for commerce views. """
 
 
-
 import json
 
 import ddt

@@ -3,7 +3,6 @@ Course Advanced Settings page
 """
 
 
-
 import six
 from bok_choy.promise import EmptyPromise
 

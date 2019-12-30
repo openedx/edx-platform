@@ -4,7 +4,6 @@ Django Admin pages for DiscountRestrictionConfig.
 """
 
 
-
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 

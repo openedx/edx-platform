@@ -8,7 +8,6 @@ such as the site visible courses, university name and logo.
 """
 
 
-
 from django.conf import settings
 from opaque_keys.edx.keys import CourseKey
 

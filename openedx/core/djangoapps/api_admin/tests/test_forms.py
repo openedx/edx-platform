@@ -1,7 +1,6 @@
 #pylint: disable=missing-docstring
 
 
-
 import ddt
 from django.test import TestCase
 

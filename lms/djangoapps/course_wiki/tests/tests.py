@@ -3,7 +3,6 @@ Tests for course wiki
 """
 
 
-
 import six
 from django.urls import reverse
 from mock import patch

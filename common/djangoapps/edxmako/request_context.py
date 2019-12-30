@@ -19,8 +19,6 @@ Methods for creating RequestContext for using with Mako templates.
 """
 
 
-
-
 from crum import get_current_request
 from django.template import RequestContext
 

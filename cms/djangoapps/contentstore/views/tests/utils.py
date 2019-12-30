@@ -3,7 +3,6 @@ Utilities for view tests.
 """
 
 
-
 import json
 
 from contentstore.tests.utils import CourseTestCase

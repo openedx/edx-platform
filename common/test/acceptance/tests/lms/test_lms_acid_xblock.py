@@ -4,7 +4,6 @@ End-to-end tests for the LMS.
 """
 
 
-
 import pytest
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc

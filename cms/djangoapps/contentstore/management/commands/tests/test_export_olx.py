@@ -3,7 +3,6 @@ Tests for exporting OLX content.
 """
 
 
-
 import shutil
 import tarfile
 import unittest

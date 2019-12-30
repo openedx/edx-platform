@@ -3,7 +3,6 @@ Implementation of "Instructor" service
 """
 
 
-
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist

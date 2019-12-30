@@ -1,7 +1,6 @@
 """ Credit API Serializers """
 
 
-
 import datetime
 import logging
 

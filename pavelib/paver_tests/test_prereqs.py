@@ -3,7 +3,6 @@ Tests covering the Open edX Paver prequisites installation workflow
 """
 
 
-
 import os
 import unittest
 

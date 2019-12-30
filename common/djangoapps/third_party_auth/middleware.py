@@ -1,7 +1,6 @@
 """Middleware classes for third_party_auth."""
 
 
-
 import six.moves.urllib.parse  # pylint: disable=import-error
 from django.contrib import messages
 from django.shortcuts import redirect

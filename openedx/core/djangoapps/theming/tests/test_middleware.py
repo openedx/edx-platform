@@ -3,7 +3,6 @@
 """
 
 
-
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sites.models import Site
 from django.test import RequestFactory, TestCase, override_settings

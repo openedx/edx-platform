@@ -4,7 +4,6 @@ Unit tests for SafeCookieData
 """
 
 
-
 import itertools
 from time import time
 

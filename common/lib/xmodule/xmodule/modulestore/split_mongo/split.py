@@ -976,7 +976,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         return version_guids, id_version_map
 
     def _get_structures_for_branch_and_locator(self, branch, locator_factory, **kwargs):
-
         """
         Internal generator for fetching lists of courses, libraries, etc.
         :param str branch: Branch to fetch structures from

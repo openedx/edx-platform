@@ -1,7 +1,6 @@
 """Module annotatable tests"""
 
 
-
 import unittest
 
 from lxml import etree

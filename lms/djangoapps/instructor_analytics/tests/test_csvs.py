@@ -1,7 +1,6 @@
 """ Tests for analytics.csvs """
 
 
-
 import pytest
 from django.test import TestCase
 from six.moves import range

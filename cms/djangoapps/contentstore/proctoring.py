@@ -3,7 +3,6 @@ Code related to the handling of Proctored Exams in Studio
 """
 
 
-
 import logging
 
 import six

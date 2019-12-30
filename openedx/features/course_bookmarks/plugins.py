@@ -3,7 +3,6 @@ Platform plugins to support course bookmarks.
 """
 
 
-
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 

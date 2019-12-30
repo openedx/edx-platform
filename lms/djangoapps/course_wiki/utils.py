@@ -3,7 +3,6 @@ Utility functions for course_wiki.
 """
 
 
-
 from django.core.exceptions import ObjectDoesNotExist
 
 import lms.djangoapps.courseware

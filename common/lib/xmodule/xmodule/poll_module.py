@@ -7,7 +7,6 @@ If student have answered - Question with statistics for each answers.
 """
 
 
-
 import cgi
 import json
 import logging

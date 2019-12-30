@@ -3,7 +3,6 @@ Python tests for the Survey views
 """
 
 
-
 import json
 from collections import OrderedDict
 

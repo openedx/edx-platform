@@ -3,7 +3,6 @@ Tests for the fake software secure response.
 """
 
 
-
 from django.test import TestCase
 from mock import patch
 

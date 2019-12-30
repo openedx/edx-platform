@@ -3,7 +3,6 @@ Tests for keyword_substitution.py
 """
 
 
-
 import six
 from ddt import ddt, file_data
 from mock import patch

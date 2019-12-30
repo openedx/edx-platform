@@ -4,7 +4,6 @@ Unit tests for embargo app admin forms.
 """
 
 
-
 import six
 # Explicitly import the cache from ConfigurationModel so we can reset it after each test
 from config_models.models import cache

@@ -3,7 +3,6 @@ Code used to get and cache the requested course-data
 """
 
 
-
 from django.utils.encoding import python_2_unicode_compatible
 
 from lms.djangoapps.course_blocks.api import get_course_blocks

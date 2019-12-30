@@ -1,7 +1,6 @@
 """Tests for classes defined in fields.py."""
 
 
-
 import datetime
 import unittest
 

@@ -17,7 +17,6 @@ we receive from the credit provider.
 """
 
 
-
 import hashlib
 import hmac
 import logging

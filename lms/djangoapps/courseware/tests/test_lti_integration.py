@@ -1,7 +1,6 @@
 """LTI integration tests"""
 
 
-
 import json
 from collections import OrderedDict
 

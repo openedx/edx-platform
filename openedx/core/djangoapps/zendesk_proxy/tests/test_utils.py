@@ -3,7 +3,6 @@ Tests of Zendesk interaction utility functions
 """
 
 
-
 import json
 from collections import OrderedDict
 

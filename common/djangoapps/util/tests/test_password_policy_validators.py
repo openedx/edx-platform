@@ -2,7 +2,6 @@
 """Tests for util.password_policy_validators module."""
 
 
-
 import unittest
 
 from ddt import data, ddt, unpack

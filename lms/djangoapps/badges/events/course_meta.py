@@ -4,7 +4,6 @@ as enrolling in a certain number, completing a certain number, or completing a s
 """
 
 
-
 from badges.models import BadgeClass, CourseEventBadgesConfiguration
 from badges.utils import requires_badges_enabled
 

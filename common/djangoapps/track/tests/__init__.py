@@ -1,7 +1,6 @@
 """Helpers for tests related to emitting events to the tracking logs."""
 
 
-
 from datetime import datetime
 
 from django.test import TestCase

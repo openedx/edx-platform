@@ -3,7 +3,6 @@ Helper functions and classes for discussion tests.
 """
 
 
-
 import json
 from uuid import uuid4
 

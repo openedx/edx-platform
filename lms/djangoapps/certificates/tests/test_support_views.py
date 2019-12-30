@@ -3,7 +3,6 @@ Tests for certificate app views used by the support team.
 """
 
 
-
 import json
 
 import ddt

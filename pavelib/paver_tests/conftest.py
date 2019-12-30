@@ -3,7 +3,6 @@ Pytest fixtures for the pavelib unit tests.
 """
 
 
-
 import os
 from shutil import rmtree
 

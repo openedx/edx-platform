@@ -3,7 +3,6 @@ Platform plugins to support a verified upgrade tool.
 """
 
 
-
 import datetime
 
 import pytz

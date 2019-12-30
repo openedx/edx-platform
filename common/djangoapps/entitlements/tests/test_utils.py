@@ -3,7 +3,6 @@ Test entitlements utilities
 """
 
 
-
 from datetime import timedelta
 
 from django.conf import settings

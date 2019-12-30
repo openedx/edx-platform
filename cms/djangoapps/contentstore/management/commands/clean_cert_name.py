@@ -4,7 +4,6 @@ erroneous certificate names.
 """
 
 
-
 from collections import namedtuple
 
 from django.core.management.base import BaseCommand

@@ -1,7 +1,6 @@
 """Tests for the user API at the HTTP request level. """
 
 
-
 import json
 from unittest import skipUnless
 

@@ -4,7 +4,6 @@ of content where learning happens.
 """
 
 
-
 class LearningContext(object):
     """
     Abstract base class for learning context implementations.

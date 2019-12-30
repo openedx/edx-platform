@@ -4,7 +4,6 @@ Tests of verify_student views.
 """
 
 
-
 import simplejson as json
 from datetime import timedelta
 from uuid import uuid4

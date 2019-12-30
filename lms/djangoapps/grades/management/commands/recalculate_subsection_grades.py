@@ -4,7 +4,6 @@ in the specified time range.
 """
 
 
-
 import logging
 from datetime import datetime
 

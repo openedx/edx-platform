@@ -3,7 +3,6 @@ Command to migrate transcripts to django storage.
 """
 
 
-
 import logging
 
 from django.core.management import BaseCommand, CommandError

@@ -5,7 +5,6 @@ Tests for OAuth token exchange views
 # pylint: disable=no-member
 
 
-
 import json
 import unittest
 from datetime import timedelta

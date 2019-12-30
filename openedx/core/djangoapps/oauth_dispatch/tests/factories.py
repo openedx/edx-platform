@@ -1,7 +1,6 @@
 # pylint: disable=missing-docstring
 
 
-
 from datetime import datetime, timedelta
 
 import factory

@@ -3,7 +3,6 @@ Stub implementation of ecommerce service for acceptance tests
 """
 
 
-
 import re
 
 import six.moves.urllib.parse  # pylint: disable=import-error

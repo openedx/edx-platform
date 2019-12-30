@@ -1,7 +1,6 @@
 """Event tracker backend that saves events to a python logger."""
 
 
-
 import json
 import logging
 

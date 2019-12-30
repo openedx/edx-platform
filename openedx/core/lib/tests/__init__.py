@@ -3,8 +3,6 @@ Utility functions for the edx-platform test suite.
 """
 
 
-
-
 def attr(*args, **kwargs):
     """
     Set the given attributes on the decorated test class, function or method.

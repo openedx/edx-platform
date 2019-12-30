@@ -1,7 +1,6 @@
 """Tests for course run serializers"""
 
 
-
 import datetime
 
 import ddt

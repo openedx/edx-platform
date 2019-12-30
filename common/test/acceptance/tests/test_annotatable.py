@@ -4,7 +4,6 @@ E2E tests for the LMS.
 """
 
 
-
 from textwrap import dedent
 
 from six.moves import range

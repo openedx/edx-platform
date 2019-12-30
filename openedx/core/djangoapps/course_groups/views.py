@@ -3,7 +3,6 @@ Views related to course groups functionality.
 """
 
 
-
 import logging
 import re
 
@@ -693,7 +692,6 @@ class CohortUsers(DeveloperErrorViewMixin, APIPermissions):
         return Response(self.get_serializer(queryset, many=True).data)
 
     def delete(self, request, course_key_string, cohort_id, username=None):
-
         """
         Removes and user from a specific cohort.
 

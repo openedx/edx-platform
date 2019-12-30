@@ -3,7 +3,6 @@ Encapsulates permissions checks for Course Blocks API
 """
 
 
-
 from lms.djangoapps.courseware.access import has_access
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole

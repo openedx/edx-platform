@@ -7,7 +7,6 @@
 # http://www.sphinx-doc.org/en/master/config
 
 
-
 import datetime
 import os
 import sys

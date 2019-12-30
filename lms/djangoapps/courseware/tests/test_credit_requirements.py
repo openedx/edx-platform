@@ -3,7 +3,6 @@ Tests for credit requirement display on the progress page.
 """
 
 
-
 import ddt
 import six
 from django.conf import settings

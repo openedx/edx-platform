@@ -3,7 +3,6 @@ Fixture to create a Content Library
 """
 
 
-
 import six
 from opaque_keys.edx.keys import CourseKey
 

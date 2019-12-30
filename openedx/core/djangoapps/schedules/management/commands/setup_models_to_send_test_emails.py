@@ -3,7 +3,6 @@ A managment command that can be used to set up Schedules with various configurat
 """
 
 
-
 import datetime
 from textwrap import dedent
 

@@ -3,7 +3,6 @@ Asset compilation and collection.
 """
 
 
-
 import argparse
 import glob
 import os

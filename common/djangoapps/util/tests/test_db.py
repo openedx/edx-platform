@@ -1,7 +1,6 @@
 """Tests for util.db module."""
 
 
-
 import threading
 import time
 import unittest

@@ -4,7 +4,6 @@ Tests for mobile API utilities.
 """
 
 
-
 import ddt
 from django.test import TestCase
 

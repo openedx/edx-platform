@@ -6,7 +6,6 @@ included early in the INSTALLED_APPS list.
 """
 
 
-
 import analytics
 from django.apps import AppConfig
 from django.conf import settings

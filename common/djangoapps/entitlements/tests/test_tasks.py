@@ -3,7 +3,6 @@ Test entitlements tasks
 """
 
 
-
 from datetime import datetime, timedelta
 
 import mock

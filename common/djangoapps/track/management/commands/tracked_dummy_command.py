@@ -3,7 +3,6 @@ Command used for testing TrackedCommands
 """
 
 
-
 import json
 from textwrap import dedent
 

@@ -3,7 +3,6 @@ some xmodules by conditions.
 """
 
 
-
 import json
 import logging
 

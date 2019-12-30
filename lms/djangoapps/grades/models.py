@@ -9,7 +9,6 @@ persisted, course grades are also immune to changes in course content.
 """
 
 
-
 import json
 import logging
 from base64 import b64encode

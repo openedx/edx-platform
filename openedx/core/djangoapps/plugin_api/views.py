@@ -3,7 +3,6 @@ Views for building plugins.
 """
 
 
-
 import logging
 
 from django.conf import settings

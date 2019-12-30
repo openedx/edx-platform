@@ -438,7 +438,6 @@ class CreditRequirementApiTests(CreditApiTestBase):
         return req_status
 
     def _set_credit_course_requirements(self):
-
         """
         Sets requirements for the credit course.
 

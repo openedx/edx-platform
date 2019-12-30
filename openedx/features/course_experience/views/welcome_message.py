@@ -3,7 +3,6 @@ View logic for handling course welcome messages.
 """
 
 
-
 import six
 from django.http import HttpResponse
 from django.template.loader import render_to_string

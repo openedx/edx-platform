@@ -1,7 +1,6 @@
 """Test Entitlements models"""
 
 
-
 import unittest
 from datetime import timedelta
 from uuid import uuid4

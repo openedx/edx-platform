@@ -3,7 +3,6 @@ Unit tests for stub XQueue implementation.
 """
 
 
-
 import ast
 import json
 import unittest

@@ -3,7 +3,6 @@ Forms for the Announcement Editor
 """
 
 
-
 from django import forms
 
 from .models import Announcement

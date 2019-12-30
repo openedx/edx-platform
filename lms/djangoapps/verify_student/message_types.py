@@ -3,7 +3,6 @@ ACE message types for the verify_student module.
 """
 
 
-
 from openedx.core.djangoapps.ace_common.message import BaseMessageType
 
 

@@ -2,7 +2,6 @@
 """Test for LTI Xmodule functional logic."""
 
 
-
 import datetime
 import textwrap
 from copy import copy

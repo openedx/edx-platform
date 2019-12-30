@@ -3,7 +3,6 @@ Tests for credit course tasks.
 """
 
 
-
 from datetime import datetime
 
 import mock

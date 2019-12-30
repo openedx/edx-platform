@@ -3,7 +3,6 @@ Course Textbooks page.
 """
 
 
-
 import requests
 from path import Path as path
 

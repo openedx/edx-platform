@@ -3,7 +3,6 @@ Command to compute all grades for specified courses.
 """
 
 
-
 import hashlib
 import logging
 

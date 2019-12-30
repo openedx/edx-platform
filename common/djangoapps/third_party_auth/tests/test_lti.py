@@ -3,7 +3,6 @@ Unit tests for third_party_auth LTI auth providers
 """
 
 
-
 import unittest
 
 from oauthlib.common import Request

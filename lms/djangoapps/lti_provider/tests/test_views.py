@@ -3,7 +3,6 @@ Tests for the LTI provider views
 """
 
 
-
 import six
 from django.test import TestCase
 from django.test.client import RequestFactory

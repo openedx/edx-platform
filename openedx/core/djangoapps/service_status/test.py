@@ -1,7 +1,6 @@
 """Test for async task service status"""
 
 
-
 import json
 import unittest
 

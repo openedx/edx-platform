@@ -1,7 +1,6 @@
 """ CCX API v0 Serializers. """
 
 
-
 import six
 from ccx_keys.locator import CCXLocator
 from rest_framework import serializers

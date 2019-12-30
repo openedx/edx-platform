@@ -3,7 +3,6 @@ Unit test module covering utils module
 """
 
 
-
 import ddt
 import six
 from django.test import TestCase

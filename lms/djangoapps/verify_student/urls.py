@@ -3,7 +3,6 @@ URL definitions for the verify_student app.
 """
 
 
-
 from django.conf import settings
 from django.conf.urls import url
 

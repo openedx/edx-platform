@@ -3,7 +3,6 @@ URL mappings for the Survey feature
 """
 
 
-
 from django.conf.urls import url
 
 from survey import views

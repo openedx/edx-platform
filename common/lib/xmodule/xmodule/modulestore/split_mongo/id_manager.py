@@ -4,7 +4,6 @@ mechanism.
 """
 
 
-
 from opaque_keys.edx.locator import DefinitionLocator, LocalId
 
 from xmodule.modulestore.split_mongo import BlockKey

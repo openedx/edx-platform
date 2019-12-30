@@ -3,7 +3,6 @@ Module for the dual-branch fall-back Draft->Published Versioning ModuleStore
 """
 
 
-
 from contracts import contract
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator, LibraryUsageLocator
 

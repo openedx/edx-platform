@@ -3,7 +3,6 @@ Specialized models for oauth_dispatch djangoapp
 """
 
 
-
 from datetime import datetime
 
 import six

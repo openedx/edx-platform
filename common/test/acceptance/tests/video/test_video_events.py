@@ -1,7 +1,6 @@
 """Ensure videos emit proper events"""
 
 
-
 import datetime
 import json
 from unittest import skip

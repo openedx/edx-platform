@@ -5,7 +5,6 @@ Tests for Django management commands
 """
 
 
-
 import json
 from six import StringIO
 

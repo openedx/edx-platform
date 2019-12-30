@@ -3,7 +3,6 @@ URLs for mobile API
 """
 
 
-
 from django.conf.urls import include, url
 
 from .users.views import my_user_info

@@ -3,7 +3,6 @@ URLs for LMS
 """
 
 
-
 from config_models.views import ConfigurationModelCurrentAPIView
 from django.conf import settings
 from django.conf.urls import include, url

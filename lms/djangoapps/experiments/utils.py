@@ -3,7 +3,6 @@ Utilities to facilitate experimentation
 """
 
 
-
 import logging
 from decimal import Decimal
 

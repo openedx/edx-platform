@@ -3,7 +3,6 @@ Tests of the encryption and decryption utilities in the ssencrypt module.
 """
 
 
-
 import base64
 import binascii
 

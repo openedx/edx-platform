@@ -10,7 +10,6 @@ not possible to have this LTI multiple times on a single page in LMS.
 """
 
 
-
 import base64
 import hashlib
 import logging

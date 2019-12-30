@@ -3,7 +3,6 @@ Common test utilities for courseware functionality
 """
 
 
-
 from abc import ABCMeta, abstractmethod
 from datetime import datetime, timedelta
 

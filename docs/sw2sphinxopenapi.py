@@ -9,7 +9,6 @@ detailed segment page.
 """
 
 
-
 import functools
 import itertools
 import os

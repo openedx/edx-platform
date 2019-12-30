@@ -3,7 +3,6 @@ Tests for django admin command `send_verification_expiry_email` in the verify_st
 """
 
 
-
 from datetime import timedelta
 
 import boto

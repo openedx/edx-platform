@@ -3,7 +3,6 @@ Defines URLs for theming views.
 """
 
 
-
 from django.conf.urls import url
 
 from .helpers import is_comprehensive_theming_enabled

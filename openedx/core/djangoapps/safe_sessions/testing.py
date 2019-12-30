@@ -3,7 +3,6 @@ Test overrides to support Safe Cookies with Test Clients.
 """
 
 
-
 from django.test.client import Client
 
 

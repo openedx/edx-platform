@@ -4,7 +4,6 @@ Video xmodule tests in mongo.
 """
 
 
-
 import io
 import json
 import shutil

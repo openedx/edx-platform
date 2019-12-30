@@ -1,7 +1,6 @@
 """ Tests calling the grades api directly """
 
 
-
 import ddt
 from mock import patch
 

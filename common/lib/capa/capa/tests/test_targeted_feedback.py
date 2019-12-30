@@ -4,7 +4,6 @@ i.e. those with the <multiplechoiceresponse> element
 """
 
 
-
 import textwrap
 import unittest
 

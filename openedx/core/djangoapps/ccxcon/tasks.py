@@ -3,7 +3,6 @@ This file contains celery tasks for ccxcon
 """
 
 
-
 from celery.task import task
 from celery.utils.log import get_task_logger
 from opaque_keys.edx.keys import CourseKey

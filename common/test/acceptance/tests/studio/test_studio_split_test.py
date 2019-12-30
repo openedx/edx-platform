@@ -3,7 +3,6 @@ Acceptance tests for Studio related to the split_test module.
 """
 
 
-
 import math
 
 from bok_choy.promise import Promise

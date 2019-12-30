@@ -3,7 +3,6 @@ Course API
 """
 
 
-
 from edx_when.api import get_dates_for_course
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User

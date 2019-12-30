@@ -4,7 +4,6 @@ Helper functions shared by built-in XBlocks.
 """
 
 
-
 from django.conf import settings
 
 

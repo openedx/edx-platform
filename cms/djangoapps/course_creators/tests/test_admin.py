@@ -3,7 +3,6 @@ Tests course_creators.admin.py.
 """
 
 
-
 import mock
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User

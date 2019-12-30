@@ -3,7 +3,6 @@ Utility methods for the Shopping Cart app
 """
 
 
-
 from django.conf import settings
 from pdfminer.converter import PDFPageAggregator
 from pdfminer.layout import LAParams, LTFigure, LTTextBox, LTTextLine

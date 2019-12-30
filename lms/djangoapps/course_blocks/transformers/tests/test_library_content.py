@@ -3,7 +3,6 @@ Tests for ContentLibraryTransformer.
 """
 
 
-
 from six.moves import range
 
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache

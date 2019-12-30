@@ -2,7 +2,6 @@
 """Video xmodule tests in mongo."""
 
 
-
 import json
 import os
 import tempfile

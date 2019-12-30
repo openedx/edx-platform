@@ -3,7 +3,6 @@ URLs for user API
 """
 
 
-
 from django.conf import settings
 from django.conf.urls import url
 

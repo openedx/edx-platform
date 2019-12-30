@@ -1,7 +1,6 @@
 """Tests for the lms module itself."""
 
 
-
 import logging
 import mimetypes
 

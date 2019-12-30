@@ -3,7 +3,6 @@ Views for course info API
 """
 
 
-
 from rest_framework import generics
 from rest_framework.response import Response
 

@@ -3,7 +3,6 @@ Test instructor.access
 """
 
 
-
 import pytest
 from six.moves import range
 

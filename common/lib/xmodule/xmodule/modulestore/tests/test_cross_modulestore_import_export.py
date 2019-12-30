@@ -13,7 +13,6 @@ and then for each combination of modulestores, performing the sequence:
 """
 
 
-
 import itertools
 import os
 from shutil import rmtree

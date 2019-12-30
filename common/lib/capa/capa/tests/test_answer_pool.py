@@ -4,7 +4,6 @@ Tests the logic of the "answer-pool" attribute, e.g.
 """
 
 
-
 import textwrap
 import unittest
 

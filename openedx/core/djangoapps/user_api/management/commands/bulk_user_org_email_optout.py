@@ -17,7 +17,6 @@ will be have the 'email-optin' tag set to 'False'.
 """
 
 
-
 import csv
 import logging
 import time

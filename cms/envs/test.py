@@ -14,7 +14,6 @@ sessions. Assumes structure:
 # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-order
 
 
-
 from .common import *
 import os
 from uuid import uuid4

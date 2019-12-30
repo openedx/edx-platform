@@ -3,7 +3,6 @@ Models for static_replace
 """
 
 
-
 import six
 from six.moves import map
 

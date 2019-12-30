@@ -3,7 +3,6 @@ Tests for wiki views.
 """
 
 
-
 from django.conf import settings
 from django.test.client import RequestFactory
 

@@ -174,7 +174,6 @@ class XQueueCertInterface(object):
         )
 
     def del_cert(self, student, course_id):
-
         """
         Arguments:
           student - User.object

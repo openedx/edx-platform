@@ -1,7 +1,6 @@
 """Test that we have defused XML."""
 
 
-
 import defusedxml
 from lxml import etree
 

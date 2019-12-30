@@ -12,7 +12,6 @@ Test utilities for mobile API tests:
 # pylint: disable=no-member
 
 
-
 import datetime
 
 import ddt

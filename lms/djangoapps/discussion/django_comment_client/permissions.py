@@ -4,7 +4,6 @@ Module for checking permissions with the comment_client backend
 """
 
 
-
 import logging
 
 import six

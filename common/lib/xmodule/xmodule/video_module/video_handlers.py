@@ -6,7 +6,6 @@ StudioViewHandlers are handlers for video descriptor instance.
 """
 
 
-
 import json
 import logging
 

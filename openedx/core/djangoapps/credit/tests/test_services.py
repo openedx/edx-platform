@@ -3,7 +3,6 @@ Tests for the Credit xBlock service
 """
 
 
-
 import ddt
 import six
 

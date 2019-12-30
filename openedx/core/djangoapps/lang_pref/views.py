@@ -3,7 +3,6 @@ Language Preference Views
 """
 
 
-
 import json
 
 import six

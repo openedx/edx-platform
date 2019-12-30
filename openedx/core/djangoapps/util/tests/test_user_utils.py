@@ -1,7 +1,6 @@
 """Tests for util.user_utils module."""
 
 
-
 import unittest
 
 import six

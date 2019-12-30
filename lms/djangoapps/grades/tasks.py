@@ -3,7 +3,6 @@ This module contains tasks for asynchronous execution of grade updates.
 """
 
 
-
 from logging import getLogger
 
 import six

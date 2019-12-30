@@ -3,7 +3,6 @@ Utility library for working with the edx-organizations app
 """
 
 
-
 from django.conf import settings
 from django.db.utils import DatabaseError
 

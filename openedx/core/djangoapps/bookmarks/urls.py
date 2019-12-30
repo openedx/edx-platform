@@ -3,7 +3,6 @@ URL routes for the bookmarks app.
 """
 
 
-
 from django.conf import settings
 from django.conf.urls import url
 

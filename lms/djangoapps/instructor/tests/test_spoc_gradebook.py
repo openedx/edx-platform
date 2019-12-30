@@ -3,7 +3,6 @@ Tests of the instructor dashboard spoc gradebook
 """
 
 
-
 from django.urls import reverse
 from six import text_type
 from six.moves import range

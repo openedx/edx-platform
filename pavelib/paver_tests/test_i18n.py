@@ -3,7 +3,6 @@ Tests for pavelib/i18n.py.
 """
 
 
-
 import os
 import textwrap
 import unittest

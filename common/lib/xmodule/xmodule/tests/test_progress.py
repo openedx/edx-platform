@@ -1,7 +1,6 @@
 """Module progress tests"""
 
 
-
 import unittest
 
 from mock import Mock

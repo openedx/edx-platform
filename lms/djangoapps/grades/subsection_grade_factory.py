@@ -3,7 +3,6 @@ SubsectionGrade Factory Class
 """
 
 
-
 from collections import OrderedDict
 from logging import getLogger
 

@@ -3,7 +3,6 @@ Utility Mixins for unit tests
 """
 
 
-
 import json
 import sys
 

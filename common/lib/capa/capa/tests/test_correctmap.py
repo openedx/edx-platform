@@ -3,7 +3,6 @@ Tests to verify that CorrectMap behaves correctly
 """
 
 
-
 import datetime
 import unittest
 

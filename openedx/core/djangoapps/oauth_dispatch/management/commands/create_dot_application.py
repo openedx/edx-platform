@@ -5,7 +5,6 @@ Also creates an oauth_dispatch application access if scopes are provided.
 """
 
 
-
 import logging
 
 from django.contrib.auth.models import User

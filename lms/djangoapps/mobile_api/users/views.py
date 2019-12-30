@@ -3,7 +3,6 @@ Views for user API
 """
 
 
-
 import six
 from django.contrib.auth.signals import user_logged_in
 from django.shortcuts import redirect

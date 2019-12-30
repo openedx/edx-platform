@@ -3,7 +3,6 @@ Test grading events across apps.
 """
 
 
-
 import six
 from crum import set_current_request
 from mock import call as mock_call

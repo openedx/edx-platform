@@ -4,7 +4,6 @@ access control rules.
 """
 
 
-
 import ddt
 from stevedore.extension import Extension, ExtensionManager
 

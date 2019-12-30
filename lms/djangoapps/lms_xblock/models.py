@@ -7,7 +7,6 @@ Includes:
 """
 
 
-
 from config_models.models import ConfigurationModel
 from django.db.models import TextField
 from xblock.core import XBlockAside

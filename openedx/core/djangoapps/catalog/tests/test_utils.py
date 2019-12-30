@@ -2,7 +2,6 @@
 # pylint: disable=missing-docstring
 
 
-
 from collections import defaultdict
 from datetime import timedelta
 

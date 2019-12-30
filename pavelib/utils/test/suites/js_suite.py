@@ -3,7 +3,6 @@ Javascript test tasks
 """
 
 
-
 from paver import tasks
 
 from pavelib import assets

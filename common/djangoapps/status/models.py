@@ -3,7 +3,6 @@ Store status messages in the database.
 """
 
 
-
 import six
 from config_models.admin import ConfigurationModelAdmin
 from config_models.models import ConfigurationModel

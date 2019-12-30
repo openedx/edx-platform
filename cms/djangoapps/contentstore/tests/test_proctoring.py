@@ -3,7 +3,6 @@ Tests for the edx_proctoring integration into Studio
 """
 
 
-
 from datetime import datetime, timedelta
 
 import ddt

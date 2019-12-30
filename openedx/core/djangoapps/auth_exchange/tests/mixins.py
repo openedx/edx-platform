@@ -4,7 +4,6 @@ Django-OAuth2-Provider.
 """
 
 
-
 from unittest import expectedFailure
 
 from django.test.client import RequestFactory

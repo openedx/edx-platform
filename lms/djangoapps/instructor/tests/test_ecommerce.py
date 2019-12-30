@@ -3,7 +3,6 @@ Unit tests for Ecommerce feature flag in new instructor dashboard.
 """
 
 
-
 import datetime
 
 import pytz

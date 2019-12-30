@@ -3,7 +3,6 @@ Tests for the milestones helpers library, which is the integration point for the
 """
 
 
-
 import ddt
 import pytest
 import six

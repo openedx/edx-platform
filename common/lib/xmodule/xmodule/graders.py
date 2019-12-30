@@ -3,7 +3,6 @@ Code used to calculate learner grades.
 """
 
 
-
 import abc
 import inspect
 import logging

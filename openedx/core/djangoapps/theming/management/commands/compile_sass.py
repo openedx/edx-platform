@@ -3,7 +3,6 @@ Management command for compiling sass.
 """
 
 
-
 import six
 from django.core.management import BaseCommand, CommandError
 from paver.easy import call_task

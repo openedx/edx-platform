@@ -3,7 +3,6 @@ Integration tests of the payment flow, including course mode selection.
 """
 
 
-
 import six
 from django.urls import reverse
 

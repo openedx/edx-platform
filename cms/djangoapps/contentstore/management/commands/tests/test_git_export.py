@@ -3,7 +3,6 @@ Unittests for exporting to git via management command.
 """
 
 
-
 import copy
 import os
 import shutil

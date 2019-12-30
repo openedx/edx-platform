@@ -3,7 +3,6 @@ Set up lookup paths for mako templates.
 """
 
 
-
 import contextlib
 import hashlib
 import os

@@ -1,7 +1,6 @@
 """Management command to restore assets from trash"""
 
 
-
 from django.core.management.base import BaseCommand
 
 from xmodule.contentstore.utils import restore_asset_from_trashcan

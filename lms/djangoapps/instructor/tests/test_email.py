@@ -6,7 +6,6 @@ that the view is conditionally available when Course Auth is turned on.
 """
 
 
-
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from six import text_type

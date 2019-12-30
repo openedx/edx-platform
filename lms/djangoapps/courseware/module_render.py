@@ -3,7 +3,6 @@ Module rendering
 """
 
 
-
 import hashlib
 import json
 import logging

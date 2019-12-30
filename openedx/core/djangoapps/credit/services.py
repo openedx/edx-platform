@@ -3,7 +3,6 @@ Implementation of "credit" XBlock service
 """
 
 
-
 import logging
 
 import six
