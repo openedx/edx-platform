@@ -13,7 +13,7 @@ from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.features.course_card.helpers import get_course_open_date, get_related_card_id
 from openedx.features.course_card.models import CourseCard
 
-from lms.djangoapps.student.models.CourseEnrollment import is_enrolled
+from student.models import CourseEnrollment
 
 PARTNERS_VIEW_FRMT = 'openedx.features.partners.{slug}.views'
 
@@ -51,7 +51,7 @@ def get_partner_recommended_courses(partner_slug, user):
         if course_rerun_object:
             course_rerun_object.start = get_course_open_date(course_rerun_object)
             course_rerun_object.description = get_course_description(course_rerun_object)
-            course_rerun_object.enrolled = is_enrolled(user, course_rerun_object.id)
+            course_rerun_object.enrolled = CourseEnrollment.is_enrolled(user, course_rerun_object.id)
             recommended_courses.append(course_rerun_object)
 
     return recommended_courses
