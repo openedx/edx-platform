@@ -3,7 +3,7 @@
 Instructor (2) dashboard page.
 """
 
-from __future__ import absolute_import
+
 
 import os
 import os.path

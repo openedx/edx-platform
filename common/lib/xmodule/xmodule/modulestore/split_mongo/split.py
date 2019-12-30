@@ -53,7 +53,7 @@ Representation:
         *** 'original_version': definition_id of the root of the previous version relation on this
         definition. Acts as a pseudo-object identifier.
 """
-from __future__ import absolute_import
+
 
 import copy
 import datetime

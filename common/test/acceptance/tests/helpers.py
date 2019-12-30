@@ -2,7 +2,7 @@
 Test helper functions and base classes.
 """
 
-from __future__ import absolute_import
+
 
 import functools
 import inspect

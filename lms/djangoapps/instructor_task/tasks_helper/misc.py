@@ -3,7 +3,7 @@ This file contains tasks that are designed to perform background operations on t
 running state of a course.
 
 """
-from __future__ import absolute_import
+
 
 import logging
 from collections import OrderedDict

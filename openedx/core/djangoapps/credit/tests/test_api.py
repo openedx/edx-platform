@@ -1,7 +1,7 @@
 """
 Tests for the API functions in the credit app.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import json

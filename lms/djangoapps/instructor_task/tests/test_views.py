@@ -2,7 +2,7 @@
 """
 Test for LMS instructor background task views.
 """
-from __future__ import absolute_import
+
 
 import json
 

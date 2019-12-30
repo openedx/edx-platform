@@ -2,7 +2,7 @@
 Tests for `saml` management command, this command fetches saml metadata from providers and updates
 existing data accordingly.
 """
-from __future__ import absolute_import
+
 
 import os
 import unittest

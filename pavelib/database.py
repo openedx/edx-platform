@@ -1,7 +1,7 @@
 """
 Tasks for controlling the databases used in tests
 """
-from __future__ import absolute_import, print_function
+
 
 from paver.easy import cmdopts, needs, task
 

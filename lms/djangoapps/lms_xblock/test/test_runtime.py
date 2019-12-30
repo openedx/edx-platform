@@ -2,7 +2,7 @@
 Tests of the LMS XBlock Runtime and associated utilities
 """
 
-from __future__ import absolute_import
+
 
 from ddt import data, ddt
 from django.conf import settings

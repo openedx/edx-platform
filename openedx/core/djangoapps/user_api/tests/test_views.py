@@ -1,6 +1,6 @@
 """Tests for the user API at the HTTP request level. """
 
-from __future__ import absolute_import
+
 
 import json
 from unittest import skipUnless

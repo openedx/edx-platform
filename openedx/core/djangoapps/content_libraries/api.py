@@ -4,7 +4,7 @@ Python API for content libraries.
 Unless otherwise specified, all APIs in this file deal with the DRAFT version
 of the content library.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 from uuid import UUID
 import logging
 

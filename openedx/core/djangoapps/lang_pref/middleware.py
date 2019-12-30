@@ -1,7 +1,7 @@
 """
 Middleware for Language Preferences
 """
-from __future__ import absolute_import
+
 
 from django.conf import settings
 from django.utils.translation import LANGUAGE_SESSION_KEY

@@ -2,7 +2,7 @@
 API function for retrieving course blocks data
 """
 
-from __future__ import absolute_import
+
 
 import lms.djangoapps.course_blocks.api as course_blocks_api
 from lms.djangoapps.course_blocks.transformers.access_denied_filter import AccessDeniedMessageFilterTransformer

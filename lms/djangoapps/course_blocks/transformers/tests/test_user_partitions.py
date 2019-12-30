@@ -2,7 +2,7 @@
 """
 Tests for UserPartitionTransformer.
 """
-from __future__ import absolute_import
+
 
 import string
 from collections import namedtuple

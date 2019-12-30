@@ -1,7 +1,7 @@
 """
 Test the about xblock
 """
-from __future__ import absolute_import
+
 
 import datetime
 

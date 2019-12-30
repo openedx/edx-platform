@@ -3,7 +3,7 @@ Utilities for export a course's XML into a git repository,
 committing and pushing the changes.
 """
 
-from __future__ import absolute_import
+
 
 import logging
 import os

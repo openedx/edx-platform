@@ -17,7 +17,7 @@ Common traits:
 # and throws spurious errors. Therefore, we disable invalid-name checking.
 # pylint: disable=invalid-name
 
-from __future__ import absolute_import
+
 
 import codecs
 import datetime

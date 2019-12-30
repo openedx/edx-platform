@@ -1,6 +1,6 @@
 """Tests for embargo app views. """
 
-from __future__ import absolute_import
+
 import ddt
 import maxminddb
 import geoip2.database

@@ -1,7 +1,7 @@
 """
 Unit tests for the gating feature in Studio
 """
-from __future__ import absolute_import
+
 
 import json
 

@@ -2,7 +2,7 @@
 """
 ProgramEnrollment Views
 """
-from __future__ import absolute_import, unicode_literals
+
 
 from ccx_keys.locator import CCXLocator
 from django.conf import settings

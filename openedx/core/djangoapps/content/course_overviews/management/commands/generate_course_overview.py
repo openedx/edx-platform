@@ -2,7 +2,7 @@
 Command to load course overviews.
 """
 
-from __future__ import absolute_import
+
 
 import logging
 

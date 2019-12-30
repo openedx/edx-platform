@@ -2,7 +2,7 @@
 Tests for StudioEditableModule.
 """
 
-from __future__ import absolute_import
+
 
 from xmodule.tests.test_vertical import BaseVerticalBlockTest
 from xmodule.x_module import AUTHOR_VIEW

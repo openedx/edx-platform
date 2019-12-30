@@ -13,7 +13,7 @@ Main module which shows problems (of "capa" type).
 This is used by capa_module.
 """
 
-from __future__ import absolute_import
+
 
 import logging
 import os.path

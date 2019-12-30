@@ -2,7 +2,7 @@
 A mixin that provides functionality and default attributes for all XBlocks in
 the new XBlock runtime.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 from django.utils.translation import ugettext as _
 from xblock.core import XBlock, XBlockMixin

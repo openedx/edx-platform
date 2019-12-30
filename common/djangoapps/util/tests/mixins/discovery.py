@@ -1,7 +1,7 @@
 """
 Mixins for the CourseDiscoveryApiClient.
 """
-from __future__ import absolute_import
+
 
 import json
 

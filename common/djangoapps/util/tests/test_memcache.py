@@ -2,7 +2,7 @@
 Tests for memcache in util app
 """
 
-from __future__ import absolute_import
+
 
 from django.core.cache import caches
 from django.test import TestCase

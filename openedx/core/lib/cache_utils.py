@@ -1,7 +1,7 @@
 """
 Utilities related to caching.
 """
-from __future__ import absolute_import
+
 
 import collections
 import functools

@@ -1,7 +1,7 @@
 """
 Slightly customized python-social-auth backend for SAML 2.0 support
 """
-from __future__ import absolute_import
+
 
 import logging
 from copy import deepcopy

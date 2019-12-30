@@ -12,7 +12,7 @@ and then for each combination of modulestores, performing the sequence:
 
 """
 
-from __future__ import absolute_import
+
 
 import itertools
 import os

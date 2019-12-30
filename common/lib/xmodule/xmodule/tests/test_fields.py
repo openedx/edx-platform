@@ -1,6 +1,6 @@
 """Tests for classes defined in fields.py."""
 
-from __future__ import absolute_import
+
 
 import datetime
 import unittest

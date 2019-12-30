@@ -2,7 +2,7 @@
 Tests for the logic in input type mako templates.
 """
 
-from __future__ import absolute_import
+
 
 import json
 import unittest

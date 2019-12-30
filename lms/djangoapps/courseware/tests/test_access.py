@@ -2,7 +2,7 @@
 """
 Test the access control framework
 """
-from __future__ import absolute_import
+
 
 import datetime
 import itertools

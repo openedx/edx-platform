@@ -2,7 +2,7 @@
 Management command to resend all lti scores for the requested course.
 """
 
-from __future__ import absolute_import
+
 
 import textwrap
 

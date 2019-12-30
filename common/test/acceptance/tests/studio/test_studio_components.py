@@ -1,7 +1,7 @@
 """
 Acceptance tests for adding components in Studio.
 """
-from __future__ import absolute_import
+
 
 import ddt
 

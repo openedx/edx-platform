@@ -2,7 +2,7 @@
 """
 Tests for course video thumbnails management command.
 """
-from __future__ import absolute_import
+
 
 import logging
 

@@ -1,7 +1,7 @@
 """
 Signal handlers for the gating djangoapp
 """
-from __future__ import absolute_import
+
 
 import six
 from completion.models import BlockCompletion

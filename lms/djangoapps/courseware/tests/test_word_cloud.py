@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Word cloud integration tests using mongo modulestore."""
 
-from __future__ import absolute_import
+
 
 import json
 from operator import itemgetter

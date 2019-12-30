@@ -1,7 +1,7 @@
 """
 Tests for Discussion API internal interface
 """
-from __future__ import absolute_import
+
 
 import itertools
 from datetime import datetime, timedelta

@@ -38,7 +38,7 @@ graded status as'status'
 # makes sense, but a bunch of problems have markup that assumes block.  Bigger TODO: figure out a
 # general css and layout strategy for capa, document it, then implement it.
 
-from __future__ import absolute_import
+
 
 import json
 import logging

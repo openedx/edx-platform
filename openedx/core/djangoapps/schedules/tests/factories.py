@@ -1,7 +1,7 @@
 """
 Factories for schedules tests
 """
-from __future__ import absolute_import
+
 
 import factory
 import pytz

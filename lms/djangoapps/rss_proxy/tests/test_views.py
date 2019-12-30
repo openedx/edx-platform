@@ -1,7 +1,7 @@
 """
 Tests for the rss_proxy views
 """
-from __future__ import absolute_import, print_function
+
 
 from django.test import TestCase
 from django.urls import reverse

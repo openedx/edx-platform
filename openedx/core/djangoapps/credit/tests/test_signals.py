@@ -2,7 +2,7 @@
 Tests for minimum grade requirement status
 """
 
-from __future__ import absolute_import
+
 
 from datetime import datetime, timedelta
 

@@ -1,7 +1,7 @@
 """
 Django management command to generate a test course from a course config json
 """
-from __future__ import absolute_import
+
 
 import json
 import logging

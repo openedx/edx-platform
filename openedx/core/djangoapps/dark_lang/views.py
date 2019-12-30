@@ -1,7 +1,7 @@
 """
 Views file for the Darklang Django App
 """
-from __future__ import absolute_import
+
 
 from django.contrib.auth.decorators import login_required
 from django.http import Http404

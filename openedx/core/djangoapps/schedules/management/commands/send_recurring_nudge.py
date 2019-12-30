@@ -1,7 +1,7 @@
 """
 Management command to send recurring Schedule nudges
 """
-from __future__ import absolute_import
+
 
 from textwrap import dedent
 

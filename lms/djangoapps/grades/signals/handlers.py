@@ -1,7 +1,7 @@
 """
 Grades related signals.
 """
-from __future__ import absolute_import
+
 
 from contextlib import contextmanager
 from logging import getLogger

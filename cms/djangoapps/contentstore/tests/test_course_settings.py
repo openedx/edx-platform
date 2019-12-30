@@ -1,7 +1,7 @@
 """
 Tests for Studio Course Settings.
 """
-from __future__ import absolute_import
+
 
 import copy
 import datetime

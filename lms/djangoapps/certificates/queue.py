@@ -1,5 +1,5 @@
 """Interface for adding certificate generation tasks to the XQueue. """
-from __future__ import absolute_import
+
 
 import json
 import logging

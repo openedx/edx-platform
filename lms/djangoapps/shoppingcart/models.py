@@ -1,7 +1,7 @@
 # pylint: disable=arguments-differ
 """ Models for the shopping cart and assorted purchase types """
 
-from __future__ import absolute_import
+
 
 import csv
 import json

@@ -1,7 +1,7 @@
 """
 Common utilities for the course experience, including course outline.
 """
-from __future__ import absolute_import
+
 
 import logging
 

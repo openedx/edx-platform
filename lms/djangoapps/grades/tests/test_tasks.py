@@ -2,7 +2,7 @@
 Tests for the functionality and infrastructure of grades tasks.
 """
 
-from __future__ import absolute_import
+
 
 import itertools
 from collections import OrderedDict

@@ -5,7 +5,7 @@ This must be run only after seed_permissions_roles.py!
 Creates default roles for all users in the provided course. Just runs through
 Enrollments.
 """
-from __future__ import absolute_import, print_function
+
 
 from django.core.management.base import BaseCommand
 

@@ -1,5 +1,5 @@
 """Ensure we can parse events sent to us from the Segment webhook integration"""
-from __future__ import absolute_import
+
 
 import json
 

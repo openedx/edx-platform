@@ -2,7 +2,7 @@
 Python tests for the Survey views
 """
 
-from __future__ import absolute_import
+
 
 import json
 from collections import OrderedDict

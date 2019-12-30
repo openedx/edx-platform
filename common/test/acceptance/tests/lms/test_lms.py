@@ -2,7 +2,7 @@
 """
 End-to-end tests for the LMS.
 """
-from __future__ import absolute_import
+
 
 import json
 from datetime import datetime, timedelta

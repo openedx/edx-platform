@@ -3,7 +3,7 @@
 End-to-end tests related to the divided discussion management on the LMS Instructor Dashboard
 """
 
-from __future__ import absolute_import
+
 
 import uuid
 

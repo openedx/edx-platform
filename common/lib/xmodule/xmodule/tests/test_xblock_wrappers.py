@@ -6,7 +6,7 @@ functionality
 # For tests, ignore access to protected members
 # pylint: disable=protected-access
 
-from __future__ import absolute_import
+
 
 from unittest.case import SkipTest, TestCase
 

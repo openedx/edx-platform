@@ -55,7 +55,7 @@ SSL-protected channel.  Otherwise, a session hijacker could copy
 the entire cookie and use it to impersonate the victim.
 
 """
-from __future__ import absolute_import, unicode_literals
+
 
 from base64 import b64encode
 from contextlib import contextmanager

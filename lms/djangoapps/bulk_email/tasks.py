@@ -3,7 +3,7 @@
 This module contains celery task functions for handling the sending of bulk email
 to a course.
 """
-from __future__ import absolute_import
+
 
 import json
 import logging

@@ -57,7 +57,7 @@ rather than spreading them across two functions in the pipeline.
 See https://python-social-auth.readthedocs.io/en/latest/pipeline.html for more docs.
 """
 
-from __future__ import absolute_import
+
 
 import base64
 import hashlib

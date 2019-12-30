@@ -2,7 +2,7 @@
 Convenience classes for defining StackedConfigModel Admin pages.
 """
 
-from __future__ import absolute_import
+
 
 from config_models.admin import ConfigurationModelAdmin
 from django import forms

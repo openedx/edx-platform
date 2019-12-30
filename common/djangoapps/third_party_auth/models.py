@@ -3,7 +3,7 @@
 Models used to implement SAML SSO support in third_party_auth
 (inlcuding Shibboleth support)
 """
-from __future__ import absolute_import
+
 
 import json
 import logging

@@ -2,7 +2,7 @@
 Tests for django admin commands in the verify_student module
 
 """
-from __future__ import absolute_import
+
 
 import logging
 import os

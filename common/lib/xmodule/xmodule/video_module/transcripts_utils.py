@@ -2,7 +2,7 @@
 Utility functions for transcripts.
 ++++++++++++++++++++++++++++++++++
 """
-from __future__ import absolute_import
+
 
 import copy
 import simplejson as json

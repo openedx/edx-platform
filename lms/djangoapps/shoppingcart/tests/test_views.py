@@ -1,7 +1,7 @@
 """
 Tests for Shopping Cart views
 """
-from __future__ import absolute_import
+
 
 import json
 from collections import OrderedDict

@@ -1,6 +1,6 @@
 """Factories for generating fake catalog data."""
 # pylint: disable=missing-docstring, invalid-name
-from __future__ import absolute_import
+
 
 import uuid
 from functools import partial

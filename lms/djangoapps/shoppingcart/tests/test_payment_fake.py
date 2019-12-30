@@ -2,7 +2,7 @@
 Tests for the fake payment page used in acceptance tests.
 """
 
-from __future__ import absolute_import
+
 
 from collections import OrderedDict
 

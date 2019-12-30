@@ -1,7 +1,7 @@
 # pylint: skip-file
 # -*- coding: utf-8 -*-
 """Tests for django comment client views."""
-from __future__ import absolute_import
+
 
 import json
 import logging

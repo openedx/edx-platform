@@ -2,7 +2,7 @@
 Account constants
 """
 
-from __future__ import absolute_import
+
 
 from django.utils.text import format_lazy
 from django.utils.translation import ugettext_lazy as _

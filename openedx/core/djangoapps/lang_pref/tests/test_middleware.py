@@ -2,7 +2,7 @@
 Tests for lang_pref middleware.
 """
 
-from __future__ import absolute_import
+
 
 import itertools
 

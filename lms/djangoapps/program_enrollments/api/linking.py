@@ -5,7 +5,7 @@ LMS user.
 Outside of this subpackage, import these functions
 from `lms.djangoapps.program_enrollments.api`.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import logging
 

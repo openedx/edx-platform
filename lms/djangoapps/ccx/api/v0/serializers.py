@@ -1,6 +1,6 @@
 """ CCX API v0 Serializers. """
 
-from __future__ import absolute_import
+
 
 import six
 from ccx_keys.locator import CCXLocator

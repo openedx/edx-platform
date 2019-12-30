@@ -1,7 +1,7 @@
 """
 Add and create new modes for running courses on this particular LMS
 """
-from __future__ import absolute_import
+
 
 from collections import defaultdict, namedtuple
 from datetime import timedelta

@@ -5,7 +5,7 @@ Runs tasks on answers to course problems to validate that code
 paths actually work.
 
 """
-from __future__ import absolute_import
+
 
 import json
 import logging

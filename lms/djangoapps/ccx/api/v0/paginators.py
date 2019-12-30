@@ -1,6 +1,6 @@
 """ CCX API v0 Paginators. """
 
-from __future__ import absolute_import
+
 
 from edx_rest_framework_extensions.paginators import DefaultPagination
 

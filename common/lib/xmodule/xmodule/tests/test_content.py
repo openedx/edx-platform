@@ -1,6 +1,6 @@
 """Tests for contents"""
 
-from __future__ import absolute_import
+
 
 import os
 import unittest

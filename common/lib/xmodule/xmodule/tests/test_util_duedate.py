@@ -1,7 +1,7 @@
 """
 Tests for extended due date utilities.
 """
-from __future__ import absolute_import
+
 
 import unittest
 

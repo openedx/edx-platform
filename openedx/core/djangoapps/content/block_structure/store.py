@@ -2,7 +2,7 @@
 Module for the Storage of BlockStructure objects.
 """
 # pylint: disable=protected-access
-from __future__ import absolute_import
+
 
 from logging import getLogger
 

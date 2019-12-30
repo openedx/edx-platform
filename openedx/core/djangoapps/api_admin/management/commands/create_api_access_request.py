@@ -1,5 +1,5 @@
 """ Management command to create an ApiAccessRequest for given users """
-from __future__ import unicode_literals
+
 
 import logging
 from contextlib import contextmanager

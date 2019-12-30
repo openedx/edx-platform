@@ -2,7 +2,7 @@
 Convenience methods for working with datetime objects
 """
 
-from __future__ import absolute_import
+
 
 import re
 from datetime import datetime, timedelta

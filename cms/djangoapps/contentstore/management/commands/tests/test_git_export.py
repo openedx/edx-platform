@@ -2,7 +2,7 @@
 Unittests for exporting to git via management command.
 """
 
-from __future__ import absolute_import
+
 
 import copy
 import os

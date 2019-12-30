@@ -30,7 +30,7 @@ Patterns for using the error handler:
     NOTE: To avoid duplication, do not call the tracker on errors
     that you're about to re-raise---let the caller track them.
 """
-from __future__ import absolute_import
+
 
 import logging
 import sys

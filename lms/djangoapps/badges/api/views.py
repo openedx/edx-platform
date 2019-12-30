@@ -1,7 +1,7 @@
 """
 API views for badges
 """
-from __future__ import absolute_import
+
 
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError

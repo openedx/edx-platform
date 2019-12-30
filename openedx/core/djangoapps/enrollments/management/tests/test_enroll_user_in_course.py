@@ -1,6 +1,6 @@
 """ Test the change_enrollment command line script."""
 
-from __future__ import absolute_import
+
 import unittest
 from uuid import uuid4
 import ddt

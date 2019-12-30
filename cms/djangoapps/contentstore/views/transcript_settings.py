@@ -1,7 +1,7 @@
 """
 Views related to the transcript preferences feature
 """
-from __future__ import absolute_import
+
 
 import logging
 import os

@@ -3,7 +3,7 @@ This is a service-like API that assigns tracks which groups users are in for var
 user partitions.  It uses the user_service key/value store provided by the LMS runtime to
 persist the assignments.
 """
-from __future__ import absolute_import
+
 
 import logging
 

@@ -2,7 +2,7 @@
 This file contains all entrance exam related utils/logic.
 """
 
-from __future__ import absolute_import
+
 
 from opaque_keys.edx.keys import UsageKey
 

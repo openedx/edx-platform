@@ -2,7 +2,7 @@
 """
 Test the Blockstore-based XBlock runtime and content libraries together.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 import json
 
 from completion.test_utils import CompletionWaffleTestMixin

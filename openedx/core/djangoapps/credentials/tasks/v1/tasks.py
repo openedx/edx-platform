@@ -1,7 +1,7 @@
 """
 This file contains celery tasks for credentials-related functionality.
 """
-from __future__ import absolute_import
+
 
 from celery import task
 from celery.utils.log import get_task_logger

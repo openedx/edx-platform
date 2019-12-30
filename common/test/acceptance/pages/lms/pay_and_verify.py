@@ -1,6 +1,6 @@
 """Payment and verification pages"""
 
-from __future__ import absolute_import
+
 
 import re
 

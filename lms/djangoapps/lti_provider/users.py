@@ -3,7 +3,7 @@ LTI user management functionality. This module reconciles the two identities
 that an individual has in the campus LMS platform and on edX.
 """
 
-from __future__ import absolute_import
+
 
 import random
 import string

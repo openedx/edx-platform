@@ -1,7 +1,7 @@
 """
 Acceptance tests for Studio's Settings Details pages
 """
-from __future__ import absolute_import
+
 
 from datetime import datetime, timedelta
 

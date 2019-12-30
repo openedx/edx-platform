@@ -2,7 +2,7 @@
 Tests for pavelib/utils/test/utils
 """
 
-from __future__ import absolute_import
+
 
 import unittest
 

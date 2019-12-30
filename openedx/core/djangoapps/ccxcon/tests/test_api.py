@@ -2,7 +2,7 @@
 Unit tests for the API module
 """
 
-from __future__ import absolute_import
+
 
 import datetime
 

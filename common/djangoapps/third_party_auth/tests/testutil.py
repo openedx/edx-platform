@@ -4,7 +4,7 @@ Utilities for writing third_party_auth tests.
 Used by Django and non-Django tests; must not have Django deps.
 """
 
-from __future__ import absolute_import
+
 
 import os.path
 from contextlib import contextmanager

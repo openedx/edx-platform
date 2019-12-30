@@ -5,7 +5,7 @@ by name (or name prefix) in the EventTransformerRegistry, which is used to
 apply them to the appropriate events.
 """
 
-from __future__ import absolute_import
+
 
 import json
 import logging

@@ -7,7 +7,7 @@ of the submit_problem method of a capa module when the "delay between quiz
 submissions" setting is set to different values
 """
 
-from __future__ import absolute_import
+
 
 import datetime
 import textwrap

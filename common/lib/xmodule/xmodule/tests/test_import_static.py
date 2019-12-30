@@ -1,7 +1,7 @@
 """
 Tests that check that we ignore the appropriate files when importing courses.
 """
-from __future__ import absolute_import
+
 
 import unittest
 

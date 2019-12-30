@@ -2,7 +2,7 @@
 Tests for cohorts
 """
 # pylint: disable=no-member
-from __future__ import absolute_import
+
 
 import ddt
 from django.contrib.auth.models import AnonymousUser, User

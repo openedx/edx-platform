@@ -2,7 +2,7 @@
 Block Structure Transformer Registry implemented using the platform's
 PluginManager.
 """
-from __future__ import absolute_import
+
 
 from base64 import b64encode
 from hashlib import sha1

@@ -1,5 +1,5 @@
 """Test of models for embargo app"""
-from __future__ import absolute_import
+
 
 import json
 

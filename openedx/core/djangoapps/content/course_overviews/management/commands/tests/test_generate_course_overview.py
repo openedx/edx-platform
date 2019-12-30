@@ -1,7 +1,7 @@
 """
 Tests that the generate_course_overview management command actually generates course overviews.
 """
-from __future__ import absolute_import
+
 
 import six
 from django.core.management.base import CommandError

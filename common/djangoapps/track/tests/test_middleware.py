@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Tests for tracking middleware."""
-from __future__ import absolute_import
+
 
 import ddt
 import six

@@ -2,7 +2,7 @@
 Tests for course_modes views.
 """
 
-from __future__ import absolute_import
+
 
 import decimal
 import unittest

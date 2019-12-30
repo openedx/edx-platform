@@ -1,6 +1,6 @@
 """ Tests for tab functions (just primitive). """
 
-from __future__ import absolute_import
+
 
 import json
 

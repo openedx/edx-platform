@@ -2,7 +2,7 @@
 Tests for sequence module.
 """
 # pylint: disable=no-member
-from __future__ import absolute_import
+
 
 import ast
 import json

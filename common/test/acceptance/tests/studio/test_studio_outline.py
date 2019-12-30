@@ -2,7 +2,7 @@
 """
 Acceptance tests for studio related to the outline page.
 """
-from __future__ import absolute_import
+
 
 import itertools
 import json

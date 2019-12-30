@@ -18,7 +18,7 @@ front-end validation will not pass.
                   one stored on YouTube
     t_not_exist - this file does not exist on YouTube; it exists locally
 """
-from __future__ import absolute_import
+
 
 from common.test.acceptance.tests.video.test_studio_video_module import CMSVideoBaseTest
 

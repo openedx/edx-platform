@@ -1,7 +1,7 @@
 """
 The main function for the XSS linter.
 """
-from __future__ import absolute_import
+
 
 import argparse
 import importlib

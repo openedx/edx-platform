@@ -2,7 +2,7 @@
 View logic for handling course messages.
 """
 
-from __future__ import absolute_import
+
 
 from datetime import datetime
 

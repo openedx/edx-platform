@@ -1,5 +1,5 @@
 """utils for feature-based enrollments"""
-from __future__ import absolute_import
+
 
 from student.models import FBEEnrollmentExclusion
 

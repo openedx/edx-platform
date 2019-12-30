@@ -1,7 +1,7 @@
 """
 Base file for testing schedules with upsell
 """
-from __future__ import absolute_import
+
 
 import datetime
 import itertools

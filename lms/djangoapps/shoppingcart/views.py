@@ -1,6 +1,6 @@
 """This module contains views related to shopping cart"""
 
-from __future__ import absolute_import
+
 
 import datetime
 import decimal

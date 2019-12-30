@@ -1,7 +1,7 @@
 """
 Content library unit tests that require the CMS runtime.
 """
-from __future__ import absolute_import
+
 
 import ddt
 import six

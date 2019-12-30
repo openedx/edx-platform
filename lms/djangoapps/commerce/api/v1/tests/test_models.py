@@ -1,5 +1,5 @@
 """ Tests for models. """
-from __future__ import absolute_import
+
 
 import ddt
 from django.test import TestCase

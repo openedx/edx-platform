@@ -2,7 +2,7 @@
 Tests for the fix_not_found management command
 """
 
-from __future__ import absolute_import
+
 
 import six
 from django.core.management import CommandError, call_command

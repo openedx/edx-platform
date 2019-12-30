@@ -2,7 +2,7 @@
 Tests for assetstore using any of the modulestores for metadata. May extend to testing the storage options
 too.
 """
-from __future__ import absolute_import
+
 
 import unittest
 from datetime import datetime, timedelta

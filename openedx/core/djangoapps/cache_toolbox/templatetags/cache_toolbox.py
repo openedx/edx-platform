@@ -2,7 +2,7 @@
 Implementation of custom django template tags for
 automatically caching template fragments.
 """
-from __future__ import absolute_import
+
 
 from django import template
 from django.core.cache import cache

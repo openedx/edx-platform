@@ -1,5 +1,5 @@
 """ Commerce API v0 view tests. """
-from __future__ import absolute_import
+
 
 import itertools
 import json

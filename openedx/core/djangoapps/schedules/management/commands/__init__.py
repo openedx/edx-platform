@@ -1,7 +1,7 @@
 """
 Base management command for sending emails
 """
-from __future__ import absolute_import
+
 
 import datetime
 

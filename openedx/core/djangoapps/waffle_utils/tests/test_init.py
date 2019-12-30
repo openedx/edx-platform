@@ -1,7 +1,7 @@
 """
 Tests for waffle utils features.
 """
-from __future__ import absolute_import
+
 import crum
 import ddt
 from django.test import TestCase

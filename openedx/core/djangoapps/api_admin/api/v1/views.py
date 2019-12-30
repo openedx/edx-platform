@@ -1,7 +1,7 @@
 """
 API Views.
 """
-from __future__ import absolute_import
+
 from django_filters.rest_framework import DjangoFilterBackend
 
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication

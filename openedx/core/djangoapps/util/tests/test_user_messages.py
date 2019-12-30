@@ -2,7 +2,7 @@
 Unit tests for user messages.
 """
 
-from __future__ import absolute_import
+
 
 import ddt
 from django.contrib.messages.middleware import MessageMiddleware

@@ -9,7 +9,7 @@ This is also home to urls for endpoints that have been consolidated from other d
 which leads to inconsistent prefixing.
 
 """
-from __future__ import absolute_import
+
 
 from django.conf import settings
 from django.conf.urls import url

@@ -1,7 +1,7 @@
 """
 Performance test for asset metadata in the modulestore.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import itertools

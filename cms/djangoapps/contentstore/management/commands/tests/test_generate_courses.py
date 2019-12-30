@@ -1,7 +1,7 @@
 """
 Unittest for generate a test course in an given modulestore
 """
-from __future__ import absolute_import
+
 
 import json
 

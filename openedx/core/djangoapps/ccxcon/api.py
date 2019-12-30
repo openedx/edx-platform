@@ -2,7 +2,7 @@
 Module containing API functions for the CCXCon
 """
 
-from __future__ import absolute_import
+
 
 import logging
 

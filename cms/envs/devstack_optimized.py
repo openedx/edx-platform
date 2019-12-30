@@ -18,7 +18,7 @@ as they are for non-optimized devstack. Instead, update_assets must be
 invoked each time that changes have been made.
 """
 
-from __future__ import absolute_import
+
 
 import os
 

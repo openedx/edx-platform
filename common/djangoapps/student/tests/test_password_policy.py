@@ -2,7 +2,7 @@
 """
 This test file will verify proper password policy enforcement, which is an option feature
 """
-from __future__ import absolute_import
+
 
 import json
 

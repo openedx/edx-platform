@@ -1,7 +1,7 @@
 """
 URLs for the Bulk Enrollment API
 """
-from __future__ import absolute_import
+
 
 from django.conf.urls import url
 

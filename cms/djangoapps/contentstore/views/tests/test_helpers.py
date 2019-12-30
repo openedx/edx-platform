@@ -2,7 +2,7 @@
 Unit tests for helpers.py.
 """
 
-from __future__ import absolute_import
+
 
 import six
 from django.utils import http

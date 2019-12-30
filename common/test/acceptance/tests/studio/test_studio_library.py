@@ -1,7 +1,7 @@
 """
 Acceptance tests for Content Libraries in Studio
 """
-from __future__ import absolute_import
+
 
 from ddt import data, ddt
 from six.moves import range

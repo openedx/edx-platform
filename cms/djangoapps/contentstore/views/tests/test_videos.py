@@ -2,7 +2,7 @@
 """
 Unit tests for video-related REST APIs.
 """
-from __future__ import absolute_import
+
 
 import csv
 import json

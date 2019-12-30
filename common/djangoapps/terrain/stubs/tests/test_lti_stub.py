@@ -1,7 +1,7 @@
 """
 Unit tests for stub LTI implementation.
 """
-from __future__ import absolute_import
+
 
 import unittest
 

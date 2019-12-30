@@ -2,7 +2,7 @@
 This file contains celery tasks for credit course views.
 """
 
-from __future__ import absolute_import
+
 
 import six
 from celery import task

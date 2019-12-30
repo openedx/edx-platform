@@ -2,7 +2,7 @@
 A runtime designed to work with Blockstore, reading and writing
 XBlock field data directly from Blockstore.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 import logging
 import os.path
 

@@ -2,7 +2,7 @@
 Stub implementation of ecommerce service for acceptance tests
 """
 
-from __future__ import absolute_import
+
 
 import re
 

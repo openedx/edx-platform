@@ -2,7 +2,7 @@
 Test the ability to export courses to xml from studio
 """
 
-from __future__ import absolute_import
+
 
 import copy
 import os

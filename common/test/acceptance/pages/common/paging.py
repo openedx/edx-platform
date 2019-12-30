@@ -3,7 +3,7 @@ Common mixin for paginated UIs.
 """
 
 
-from __future__ import absolute_import
+
 
 import six
 from selenium.webdriver.common.keys import Keys

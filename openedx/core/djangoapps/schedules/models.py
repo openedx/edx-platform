@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 from config_models.models import ConfigurationModel
 from django.contrib.sites.models import Site

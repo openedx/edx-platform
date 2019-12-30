@@ -2,7 +2,7 @@
 Tests for pavelib/i18n.py.
 """
 
-from __future__ import absolute_import
+
 
 import os
 import textwrap

@@ -5,7 +5,7 @@ Actions manager for transcripts ajax calls.
 Module do not support rollback (pressing "Cancel" button in Studio)
 All user changes are saved immediately.
 """
-from __future__ import absolute_import
+
 
 import copy
 import json

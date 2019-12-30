@@ -1,7 +1,7 @@
 """
 Verify the structure of courseware as to it's suitability for import
 """
-from __future__ import absolute_import, print_function
+
 
 from argparse import REMAINDER
 

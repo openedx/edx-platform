@@ -1,7 +1,7 @@
 """
 Useful helper methods related to the XBlock runtime
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 import hashlib
 import hmac
 import math

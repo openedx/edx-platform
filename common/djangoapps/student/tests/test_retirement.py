@@ -1,7 +1,7 @@
 """
 Test user retirement methods
 """
-from __future__ import absolute_import
+
 
 import json
 

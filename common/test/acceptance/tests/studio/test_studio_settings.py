@@ -2,7 +2,7 @@
 """
 Acceptance tests for Studio's Setting pages
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import json
 import os

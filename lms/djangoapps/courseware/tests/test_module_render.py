@@ -2,7 +2,7 @@
 """
 Test for lms courseware app, module render unit
 """
-from __future__ import absolute_import
+
 
 import itertools
 import json

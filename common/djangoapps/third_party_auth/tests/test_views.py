@@ -2,7 +2,7 @@
 Test the views served by third_party_auth.
 """
 
-from __future__ import absolute_import
+
 
 import unittest
 

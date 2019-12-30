@@ -1,7 +1,7 @@
 """
 Tests for `remove_social_auth_users` management command
 """
-from __future__ import absolute_import
+
 
 import sys
 import unittest

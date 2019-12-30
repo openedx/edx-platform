@@ -3,7 +3,7 @@ CCX Enrollment operations for use by Coach APIs.
 
 Does not include any access control, be sure to check access before calling.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import logging

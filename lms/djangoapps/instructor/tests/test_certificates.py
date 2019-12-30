@@ -1,5 +1,5 @@
 """Tests for the certificates panel of the instructor dash. """
-from __future__ import absolute_import
+
 
 import contextlib
 import io

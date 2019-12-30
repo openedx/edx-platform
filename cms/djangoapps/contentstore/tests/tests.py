@@ -1,7 +1,7 @@
 """
 This test file will test registration, login, activation, and session activity timeouts
 """
-from __future__ import absolute_import, print_function
+
 
 import datetime
 import time

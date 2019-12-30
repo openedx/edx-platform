@@ -1,7 +1,7 @@
 """
 Tests for the Paver commands for updating test databases and its utility methods
 """
-from __future__ import absolute_import
+
 
 import os
 import shutil

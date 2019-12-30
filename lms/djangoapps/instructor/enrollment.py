@@ -4,7 +4,7 @@ Enrollment operations for use by instructor APIs.
 Does not include any access control, be sure to check access before calling.
 """
 
-from __future__ import absolute_import
+
 
 import json
 import logging

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for certificates views. """
 
-from __future__ import absolute_import
+
 
 import datetime
 import json

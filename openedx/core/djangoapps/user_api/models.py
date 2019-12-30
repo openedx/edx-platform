@@ -1,7 +1,7 @@
 """
 Django ORM model specifications for the User API application
 """
-from __future__ import absolute_import
+
 
 import logging
 

@@ -2,7 +2,7 @@
 Tests of the instructor dashboard spoc gradebook
 """
 
-from __future__ import absolute_import
+
 
 from django.urls import reverse
 from six import text_type

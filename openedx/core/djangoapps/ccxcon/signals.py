@@ -1,7 +1,7 @@
 """
 Signal handler for posting course updated to CCXCon
 """
-from __future__ import absolute_import
+
 
 import six
 from django.dispatch.dispatcher import receiver

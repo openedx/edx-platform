@@ -1,7 +1,7 @@
 # pylint: disable=missing-docstring,unused-argument
 """Views for discussion forums."""
 
-from __future__ import absolute_import, print_function
+
 
 import functools
 import json

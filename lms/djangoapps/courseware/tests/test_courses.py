@@ -2,7 +2,7 @@
 """
 Tests for course access
 """
-from __future__ import absolute_import
+
 
 import datetime
 import itertools

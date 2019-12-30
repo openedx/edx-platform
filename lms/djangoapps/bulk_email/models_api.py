@@ -1,7 +1,7 @@
 """
 Provides Python APIs exposed from Bulk Email models.
 """
-from __future__ import absolute_import
+
 
 from bulk_email.models import BulkEmailFlag, CourseAuthorization, Optout
 

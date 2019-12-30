@@ -1,7 +1,7 @@
 """
 Tests for the lms_result_processor
 """
-from __future__ import absolute_import
+
 
 import six
 

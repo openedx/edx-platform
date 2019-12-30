@@ -2,7 +2,7 @@
 """
 End-to-end tests for the main LMS Dashboard (aka, Student Dashboard).
 """
-from __future__ import absolute_import
+
 
 import datetime
 import re

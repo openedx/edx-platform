@@ -2,7 +2,7 @@
 Tests for Blocks Views
 """
 
-from __future__ import absolute_import
+
 
 import json
 import unittest

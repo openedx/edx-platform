@@ -1,7 +1,7 @@
 """
 Test cases covering workflows and behaviors for the Randomize XModule
 """
-from __future__ import absolute_import
+
 
 import unittest
 from datetime import datetime, timedelta

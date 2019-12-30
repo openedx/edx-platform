@@ -5,7 +5,7 @@ These are used together to allow course content to be blocked for a subset
 of audit learners.
 """
 
-from __future__ import absolute_import
+
 
 import datetime
 import logging

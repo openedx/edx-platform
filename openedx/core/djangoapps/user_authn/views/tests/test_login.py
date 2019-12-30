@@ -2,7 +2,7 @@
 """
 Tests for student activation and login
 """
-from __future__ import absolute_import
+
 
 import datetime
 import json

@@ -1,7 +1,7 @@
 """
     Test split modulestore w/o using any django stuff.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import os

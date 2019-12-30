@@ -1,7 +1,7 @@
 """
 Tests third_party_auth admin views
 """
-from __future__ import absolute_import
+
 
 import unittest
 

@@ -3,7 +3,7 @@ Tests the logic of the "targeted-feedback" attribute for MultipleChoice question
 i.e. those with the <multiplechoiceresponse> element
 """
 
-from __future__ import absolute_import
+
 
 import textwrap
 import unittest

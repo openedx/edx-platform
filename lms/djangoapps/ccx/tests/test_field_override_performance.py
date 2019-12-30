@@ -2,7 +2,7 @@
 """
 Performance tests for field overrides.
 """
-from __future__ import absolute_import
+
 
 import itertools
 from datetime import datetime

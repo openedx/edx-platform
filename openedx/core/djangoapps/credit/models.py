@@ -6,7 +6,7 @@ Credit courses allow students to receive university credit for
 successful completion of a course on EdX
 """
 
-from __future__ import absolute_import
+
 
 import datetime
 import logging

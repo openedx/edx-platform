@@ -4,7 +4,7 @@ Views that implement a RESTful API for interacting with XBlocks.
 Note that these views are only for interacting with existing blocks. Other
 Studio APIs cover use cases like adding/deleting/editing blocks.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 from django.contrib.auth import get_user_model
 from django.views.decorators.clickjacking import xframe_options_exempt

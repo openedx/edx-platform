@@ -1,5 +1,5 @@
 """Tests for certificate Django models. """
-from __future__ import absolute_import
+
 
 import json
 

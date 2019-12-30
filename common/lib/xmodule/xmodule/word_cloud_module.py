@@ -6,7 +6,7 @@ If student does not yet answered - `num_inputs` numbers of text inputs.
 If student have answered - words he entered and cloud.
 """
 
-from __future__ import absolute_import
+
 
 import json
 import logging

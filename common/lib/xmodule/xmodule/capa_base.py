@@ -1,5 +1,5 @@
 """Implements basics of Capa, including class CapaModule."""
-from __future__ import absolute_import
+
 
 import copy
 import datetime

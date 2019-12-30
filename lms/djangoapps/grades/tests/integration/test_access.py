@@ -1,7 +1,7 @@
 """
 Test grading with access changes.
 """
-from __future__ import absolute_import
+
 
 from crum import set_current_request
 

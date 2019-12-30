@@ -2,7 +2,7 @@
 Test xblock/validation.py
 """
 
-from __future__ import absolute_import
+
 
 import unittest
 

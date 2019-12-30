@@ -1,5 +1,5 @@
 """Helper functions for working with the catalog service."""
-from __future__ import absolute_import, unicode_literals
+
 
 import copy
 import datetime

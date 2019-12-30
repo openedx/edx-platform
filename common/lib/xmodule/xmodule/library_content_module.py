@@ -2,7 +2,7 @@
 """
 LibraryContent: The XBlock used to include blocks from a library in a course.
 """
-from __future__ import absolute_import
+
 
 import json
 import logging

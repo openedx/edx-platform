@@ -2,7 +2,7 @@
 Tests for course_info
 """
 
-from __future__ import absolute_import
+
 
 import ddt
 from django.conf import settings

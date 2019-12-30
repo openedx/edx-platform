@@ -1,6 +1,6 @@
 """LTI integration tests"""
 
-from __future__ import absolute_import
+
 
 import json
 from collections import OrderedDict

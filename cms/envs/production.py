@@ -6,7 +6,7 @@ This is the default template for our main set of AWS servers.
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-order
 
-from __future__ import absolute_import
+
 
 import codecs
 import os

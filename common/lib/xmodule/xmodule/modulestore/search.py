@@ -1,5 +1,5 @@
 ''' useful functions for finding content and its position '''
-from __future__ import absolute_import
+
 
 from logging import getLogger
 

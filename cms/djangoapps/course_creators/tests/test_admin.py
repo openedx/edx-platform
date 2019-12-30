@@ -2,7 +2,7 @@
 Tests course_creators.admin.py.
 """
 
-from __future__ import absolute_import
+
 
 import mock
 from django.contrib.admin.sites import AdminSite

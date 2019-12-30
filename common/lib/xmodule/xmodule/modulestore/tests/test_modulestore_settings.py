@@ -1,7 +1,7 @@
 """
 Tests for testing the modulestore settings migration code.
 """
-from __future__ import absolute_import
+
 
 import copy
 from unittest import TestCase

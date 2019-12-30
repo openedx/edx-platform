@@ -1,7 +1,7 @@
 """
 Unit tests for ProgramEnrollment models.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 from uuid import uuid4
 

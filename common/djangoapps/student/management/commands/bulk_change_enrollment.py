@@ -1,5 +1,5 @@
 """Management command to change many user enrollments at once."""
-from __future__ import absolute_import
+
 
 import logging
 

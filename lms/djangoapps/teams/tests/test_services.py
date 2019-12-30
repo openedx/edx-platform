@@ -2,7 +2,7 @@
 """
 Tests for any Teams app services
 """
-from __future__ import absolute_import, unicode_literals
+
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory

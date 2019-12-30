@@ -3,7 +3,7 @@ Middleware for user api.
 Adds user's tags to tracking event context.
 """
 
-from __future__ import absolute_import
+
 
 from eventtracking import tracker
 from opaque_keys import InvalidKeyError

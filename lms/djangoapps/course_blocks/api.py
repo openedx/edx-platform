@@ -2,7 +2,7 @@
 API entry point to the course_blocks app with top-level
 get_course_blocks function.
 """
-from __future__ import absolute_import
+
 
 from django.conf import settings
 from edx_when import field_data

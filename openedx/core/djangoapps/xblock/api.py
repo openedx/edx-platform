@@ -7,7 +7,7 @@ the older runtime.
 Note that these views are only for interacting with existing blocks. Other
 Studio APIs cover use cases like adding/deleting/editing blocks.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 import logging
 
 from django.urls import reverse

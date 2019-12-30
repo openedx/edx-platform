@@ -25,7 +25,7 @@ Usage:
     configure a whitelist or blacklist of countries for that course.
 
 """
-from __future__ import absolute_import
+
 import logging
 import re
 

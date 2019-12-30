@@ -2,7 +2,7 @@
 Platform plugins to support a verified upgrade tool.
 """
 
-from __future__ import absolute_import
+
 
 import datetime
 

@@ -2,7 +2,7 @@
 Django models related to course groups functionality.
 """
 
-from __future__ import absolute_import
+
 
 import json
 import logging

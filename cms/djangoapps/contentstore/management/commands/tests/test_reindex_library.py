@@ -1,5 +1,5 @@
 """ Tests for library reindex command """
-from __future__ import absolute_import
+
 
 import ddt
 import mock

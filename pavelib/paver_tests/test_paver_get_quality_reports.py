@@ -1,7 +1,7 @@
 """
 Tests to ensure only the report files we want are returned as part of run_quality.
 """
-from __future__ import absolute_import
+
 
 import unittest
 

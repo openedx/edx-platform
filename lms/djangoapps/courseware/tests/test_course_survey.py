@@ -2,7 +2,7 @@
 Python tests for the Survey workflows
 """
 
-from __future__ import absolute_import
+
 
 from collections import OrderedDict
 from copy import deepcopy

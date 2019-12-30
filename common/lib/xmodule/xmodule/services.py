@@ -1,7 +1,7 @@
 """
 Module contains various XModule/XBlock services
 """
-from __future__ import absolute_import
+
 
 import inspect
 

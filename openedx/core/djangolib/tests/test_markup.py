@@ -3,7 +3,7 @@
 Tests for openedx.core.djangolib.markup
 """
 
-from __future__ import absolute_import
+
 import unittest
 
 import ddt

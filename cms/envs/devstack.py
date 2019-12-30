@@ -2,7 +2,7 @@
 Specific overrides to the base prod settings to make development easier.
 """
 
-from __future__ import absolute_import
+
 
 import logging
 from os.path import abspath, dirname, join

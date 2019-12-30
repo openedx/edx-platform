@@ -2,7 +2,7 @@
 """
 End-to-end tests for the Account Settings page.
 """
-from __future__ import absolute_import
+
 
 from datetime import datetime
 from unittest import skip

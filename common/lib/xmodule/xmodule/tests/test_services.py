@@ -2,7 +2,7 @@
 Tests for SettingsService
 """
 
-from __future__ import absolute_import
+
 
 import unittest
 from django.test import TestCase

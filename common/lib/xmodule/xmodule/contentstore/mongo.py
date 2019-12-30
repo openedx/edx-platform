@@ -1,7 +1,7 @@
 """
 MongoDB/GridFS-level code for the contentstore.
 """
-from __future__ import absolute_import
+
 
 import json
 import os

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Tests for the XQueue certificates interface. """
-from __future__ import absolute_import
+
 
 import json
 from contextlib import contextmanager

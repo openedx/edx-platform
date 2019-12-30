@@ -4,7 +4,7 @@ HTTP end-points for the Bookmarks API.
 For more information, see:
 https://openedx.atlassian.net/wiki/display/TNL/Bookmarks+API
 """
-from __future__ import absolute_import
+
 
 import logging
 

@@ -1,7 +1,7 @@
 """
 This file contains signal handlers for credentials-related functionality.
 """
-from __future__ import absolute_import
+
 
 from logging import getLogger
 

@@ -1,7 +1,7 @@
 """
 Unit tests for ProgramEnrollment views.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import json
 from collections import defaultdict

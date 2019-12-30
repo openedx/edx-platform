@@ -1,7 +1,7 @@
 """
 Test the student dashboard view.
 """
-from __future__ import absolute_import
+
 
 import itertools
 import json

@@ -1,7 +1,7 @@
 """
 Tests for CourseData utility class.
 """
-from __future__ import absolute_import
+
 
 import six
 from mock import patch

@@ -1,7 +1,7 @@
 """
 Tests for exporting courseware to the desired path
 """
-from __future__ import absolute_import
+
 
 import shutil
 import unittest

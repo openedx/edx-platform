@@ -3,7 +3,7 @@
 Tests of responsetypes
 """
 
-from __future__ import absolute_import
+
 
 import io
 import json

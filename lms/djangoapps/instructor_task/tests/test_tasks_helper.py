@@ -7,7 +7,7 @@ Unit tests for LMS instructor-initiated background tasks helper functions.
 - Tests all of the existing reports.
 
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import os
 import shutil

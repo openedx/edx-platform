@@ -1,7 +1,7 @@
 """
 Code to delete rows from a table within a Django mgmt command using best practices.
 """
-from __future__ import absolute_import
+
 
 import logging
 import time

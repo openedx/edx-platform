@@ -1,7 +1,7 @@
 """
 Tests for course welcome messages.
 """
-from __future__ import absolute_import
+
 
 import ddt
 import six

@@ -2,7 +2,7 @@
 Functions for accessing and displaying courses within the
 courseware.
 """
-from __future__ import absolute_import
+
 
 import logging
 from collections import defaultdict

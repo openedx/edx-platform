@@ -2,7 +2,7 @@
 Stub implementation of cs_comments_service for acceptance tests
 """
 
-from __future__ import absolute_import
+
 
 import re
 from collections import OrderedDict

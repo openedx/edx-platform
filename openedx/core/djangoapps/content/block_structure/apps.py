@@ -2,7 +2,7 @@
 Configuration for block_structure djangoapp
 """
 
-from __future__ import absolute_import
+
 
 from django.apps import AppConfig
 

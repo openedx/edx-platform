@@ -1,7 +1,7 @@
 """
 Tests for contentstore.views.preview.py
 """
-from __future__ import absolute_import
+
 
 import re
 

@@ -2,7 +2,7 @@
 """
 Classes used for defining and running pytest test suites
 """
-from __future__ import absolute_import
+
 
 import os
 from glob import glob

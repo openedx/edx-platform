@@ -2,7 +2,7 @@
 Tests for verified track content views.
 """
 
-from __future__ import absolute_import
+
 
 import json
 import six

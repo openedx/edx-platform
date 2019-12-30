@@ -1,7 +1,7 @@
 """
 Test for LMS instructor background task queue management
 """
-from __future__ import absolute_import
+
 
 import ddt
 from celery.states import FAILURE

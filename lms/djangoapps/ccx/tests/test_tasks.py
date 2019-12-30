@@ -1,7 +1,7 @@
 """
 Tests for celery tasks defined in tasks module
 """
-from __future__ import absolute_import
+
 
 import contextlib
 

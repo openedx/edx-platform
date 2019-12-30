@@ -1,7 +1,7 @@
 """
 Utilities related to API views
 """
-from __future__ import absolute_import
+
 from collections import Sequence
 from functools import wraps
 

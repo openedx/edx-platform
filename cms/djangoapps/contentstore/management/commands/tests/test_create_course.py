@@ -1,7 +1,7 @@
 """
 Unittests for creating a course in an chosen modulestore
 """
-from __future__ import absolute_import
+
 
 from six import StringIO
 

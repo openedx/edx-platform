@@ -2,7 +2,7 @@
 Tests for bulk operations in Split Modulestore.
 """
 # pylint: disable=protected-access
-from __future__ import absolute_import
+
 
 import copy
 import unittest

@@ -1,7 +1,7 @@
 """
 Unit tests for the Mixed Modulestore, with DDT for the various stores (Split, Draft, XML)
 """
-from __future__ import absolute_import
+
 
 import datetime
 import itertools

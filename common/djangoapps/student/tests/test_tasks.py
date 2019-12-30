@@ -2,7 +2,7 @@
 Tests for the Sending activation email celery tasks
 """
 
-from __future__ import absolute_import
+
 
 import mock
 from django.conf import settings

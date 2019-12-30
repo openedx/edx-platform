@@ -1,5 +1,5 @@
 """Tests the capa shuffle and name-masking."""
-from __future__ import absolute_import, print_function
+
 
 import textwrap
 import unittest

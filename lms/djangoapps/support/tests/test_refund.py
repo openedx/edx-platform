@@ -7,7 +7,7 @@ so we can easily deprecate it once the transition from shoppingcart
 to the E-Commerce service is complete.
 
 """
-from __future__ import absolute_import
+
 
 import datetime
 

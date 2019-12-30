@@ -1,6 +1,6 @@
 """ receivers of course_published and library_updated events in order to trigger indexing task """
 
-from __future__ import absolute_import
+
 
 import logging
 from datetime import datetime

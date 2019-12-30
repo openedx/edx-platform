@@ -16,7 +16,7 @@ TODO:
 - test funny xml chars -- should never get xml parse error if things are escaped properly.
 
 """
-from __future__ import absolute_import
+
 
 import json
 import textwrap

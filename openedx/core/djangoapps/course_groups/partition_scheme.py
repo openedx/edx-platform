@@ -1,7 +1,7 @@
 """
 Provides a UserPartition driver for cohorts.
 """
-from __future__ import absolute_import
+
 
 import logging
 
