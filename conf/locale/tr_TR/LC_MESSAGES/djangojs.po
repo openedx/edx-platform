@@ -107,7 +107,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-12-22 20:42+0000\n"
+"POT-Creation-Date: 2019-12-29 20:42+0000\n"
 "PO-Revision-Date: 2019-12-04 19:20+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
@@ -422,8 +422,8 @@ msgstr[1] ""
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{num_points} point possible (ungraded)"
 msgid_plural "{num_points} points possible (ungraded)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num_points} alınabilir puan (notlandırılmayan)"
+msgstr[1] "{num_points} alınabilir puan (notlandırılmayan)"
 
 #. Translators: {earned} is the number of points earned. {possible} is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
@@ -432,8 +432,8 @@ msgstr[1] ""
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{earned}/{possible} point (graded)"
 msgid_plural "{earned}/{possible} points (graded)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{possible} üzerinden {earned} puan (notlandırılan)"
+msgstr[1] "{possible} üzerinden {earned} puan (notlandırılan)"
 
 #. Translators: {earned} is the number of points earned. {possible} is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
@@ -2592,7 +2592,7 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Select a subject for your support request."
-msgstr ""
+msgstr "Destek talebiniz için bir konu seçin."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
@@ -2839,8 +2839,8 @@ msgstr ""
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
 msgid "{memberCount} / {maxMemberCount} Member"
 msgid_plural "{memberCount} / {maxMemberCount} Members"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{memberCount} / {maxMemberCount} Üye"
+msgstr[1] "{memberCount} / {maxMemberCount} Üye"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "All teams"
@@ -2964,7 +2964,7 @@ msgstr "Konu"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the {topic_name} Topic"
-msgstr ""
+msgstr "{topic_name}  Başlığı Altındaki Takımları Görüntüle "
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
 msgid ""
@@ -3369,6 +3369,8 @@ msgstr ""
 #: lms/static/js/dashboard/legacy.js
 msgid "Are you sure you want to unenroll from {courseName} ({courseNumber})?"
 msgstr ""
+"{courseName} ({courseNumber}) dersindeki kaydınızı iptal etmek istediğinize "
+"emin misiniz?"
 
 #: lms/static/js/dashboard/legacy.js
 msgid ""
@@ -4813,7 +4815,7 @@ msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid "An unexpected error has occurred."
-msgstr ""
+msgstr "Beklenmeyen bir hata oluştu."
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
