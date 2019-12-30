@@ -1330,6 +1330,7 @@ MIDDLEWARE_CLASSES = [
 EDLY_PANEL_GROUP_NAME = 'Edly Panel Users'
 ADMIN_CONFIGURATION_USERS_GROUP_NAME = 'Admin Configuration Users'
 
+CSRF_TRUSTED_ORIGINS = ['.edly.io']
 
 # Clickjacking protection can be disbaled by setting this to 'ALLOW'
 X_FRAME_OPTIONS = 'DENY'
