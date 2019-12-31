@@ -40,7 +40,7 @@ class ProgramEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unic
     user = models.ForeignKey(
         User,
         null=True,
-        blank=True
+        blank=True, on_delete=models.CASCADE
     )
     external_user_key = models.CharField(
         db_index=True,
