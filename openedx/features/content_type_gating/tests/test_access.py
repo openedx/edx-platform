@@ -399,7 +399,11 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
 
         for mode in modes:
             if expired_upgrade_deadline and mode == 'verified':
-                CourseModeFactory.create(course_id=course.id, mode_slug=mode, expiration_datetime=datetime(2020, 1, 1))
+                CourseModeFactory.create(
+                    course_id=course.id,
+                    mode_slug=mode,
+                    expiration_datetime=start_date + timedelta(days=365),
+                )
             else:
                 CourseModeFactory.create(course_id=course.id, mode_slug=mode)
 
