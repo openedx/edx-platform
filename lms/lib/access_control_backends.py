@@ -21,6 +21,7 @@ class AccessControlBackends(object):
         'course.enroll',
         'course.instructor',
         'course.load',
+        'course.load_forum',
         'course.load_mobile',
         'course.see_about_page',
         'course.see_exists',
