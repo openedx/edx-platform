@@ -361,4 +361,4 @@ derive_settings(__name__)
 
 INSTALLED_APPS.append('openedx.features.ucsd_features')
 FEATURES['ENABLE_EMAIL_INSTEAD_ZENDESK'] = False
-FEATURES['DISABLE_REFUND_FAILURE_EMAIL'] = False
+FEATURES['DISABLE_REFUND_FAILURE_NOTIFICATION'] = False

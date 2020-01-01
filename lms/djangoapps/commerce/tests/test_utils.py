@@ -408,3 +408,36 @@ class RefundUtilMethodTests(ModuleStoreTestCase):
 
         assert refund_success
         self.assertEqual(enrollment.mode, new_mode)
+
+    @httpretty.activate
+    @patch('slumber.Resource.put', side_effect=Exception())
+    @patch('lms.djangoapps.commerce.utils.log.info')
+    def test_refund_failure_notification_is_not_sent_if_disabled(self, mocked_log_info, mocked_put):
+        """
+        Test that refund failure notification is not sent if feature flag DISABLE_REFUND_FAILURE_NOTIFICATION
+        is set to True.
+        """
+        features = settings.FEATURES
+        features['DISABLE_REFUND_FAILURE_NOTIFICATION'] = True
+        with override_settings(FEATURES=features):
+            course_id = CourseLocator('test_org', 'test_course_number', 'test_run')
+            CourseMode.objects.all().delete()
+            course_mode = 'verified'
+            CourseModeFactory.create(
+                course_id=course_id,
+                mode_slug=course_mode,
+                mode_display_name=course_mode,
+            )
+            httpretty.register_uri(
+                httpretty.POST,
+                settings.ECOMMERCE_API_URL + 'refunds/',
+                status=201,
+                body='[1]',
+                content_type='application/json'
+            )
+
+            enrollment = CourseEnrollment.enroll(self.user, course_id, mode=course_mode)
+            refund_success = refund_seat(enrollment, True)
+
+            mocked_log_info.assert_called_with('Skipping refund failure notification to support')
+            assert refund_success

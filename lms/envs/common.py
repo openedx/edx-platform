@@ -3489,4 +3489,4 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_c
 ############## UCSD Features #########################
 
 FEATURES['AUTOMATIC_PERMANENT_ACCOUNT_VERIFICATION'] = True
-FEATURES['DISABLE_REFUND_FAILURE_EMAIL'] = True
+FEATURES['DISABLE_REFUND_FAILURE_NOTIFICATION'] = True
