@@ -2,7 +2,6 @@
 Tests for instructor_task/models.py.
 """
 
-
 import copy
 import time
 from six import StringIO
@@ -12,6 +11,7 @@ from django.conf import settings
 from django.test import SimpleTestCase, TestCase, override_settings
 from mock import patch
 from opaque_keys.edx.locator import CourseLocator
+from botocore.stub import Stubber
 
 from common.test.utils import MockS3Mixin
 from lms.djangoapps.instructor_task.models import InstructorTask, ReportStore, TASK_INPUT_LENGTH
@@ -22,6 +22,7 @@ class TestInstructorTasksModel(TestCase):
     """
     Test validations in instructor task model
     """
+
     def test_task_input_valid_length(self):
         """
         Test allowed length of task_input field
@@ -76,6 +77,7 @@ class LocalFSReportStoreTestCase(ReportStoreTestMixin, TestReportMixin, SimpleTe
     """
     Test the old LocalFSReportStore configuration.
     """
+
     def create_report_store(self):
         """
         Create and return a DjangoStorageReportStore using the old
@@ -84,19 +86,32 @@ class LocalFSReportStoreTestCase(ReportStoreTestMixin, TestReportMixin, SimpleTe
         return ReportStore.from_config(config_name='GRADES_DOWNLOAD')
 
 
+class MockConnection(object):
+    def __init__(self):
+        pass
+
+    def create_bucket(self, bucket_name):
+        pass
+
+
 @patch.dict(settings.GRADES_DOWNLOAD, {'STORAGE_TYPE': 's3'})
-class S3ReportStoreTestCase(MockS3Mixin, ReportStoreTestMixin, TestReportMixin, SimpleTestCase):
+class S3ReportStoreTestCase(ReportStoreTestMixin, TestReportMixin, SimpleTestCase):
     """
     Test the old S3ReportStore configuration.
     """
+    def mock_bucket_create(self, bucket_name):
+        pass
+
     def create_report_store(self):
         """
         Create and return a DjangoStorageReportStore using the old
         S3ReportStore configuration.
         """
-        connection = boto.connect_s3()
-        connection.create_bucket(settings.GRADES_DOWNLOAD['BUCKET'])
-        return ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+        with patch.object(boto, 'connect_s3', return_value=MockConnection()):
+            with patch.object(MockConnection, 'create_bucket', self.mock_bucket_create):
+                connection = boto.connect_s3()
+                connection.create_bucket(settings.GRADES_DOWNLOAD['BUCKET'])
+                return ReportStore.from_config(config_name='GRADES_DOWNLOAD')
 
 
 class DjangoStorageReportStoreLocalTestCase(ReportStoreTestMixin, TestReportMixin, SimpleTestCase):
@@ -104,6 +119,7 @@ class DjangoStorageReportStoreLocalTestCase(ReportStoreTestMixin, TestReportMixi
     Test the DjangoStorageReportStore implementation using the local
     filesystem.
     """
+
     def create_report_store(self):
         """
         Create and return a DjangoStorageReportStore configured to use the
@@ -119,6 +135,7 @@ class DjangoStorageReportStoreS3TestCase(MockS3Mixin, ReportStoreTestMixin, Test
     """
     Test the DjangoStorageReportStore implementation using S3 stubs.
     """
+
     def create_report_store(self):
         """
         Create and return a DjangoStorageReportStore configured to use S3 for
