@@ -18,14 +18,15 @@ class AccessControlBackends(object):
     Meant to be instantiated by this module, so use the `access_control_backends` object.
     """
     SUPPORTED_ACTIONS = {
-        'course.load',
-        'course.load_mobile',
         'course.enroll',
-        'course.see_exists',
-        'course.staff',
         'course.instructor',
-        'course.see_in_catalog',
+        'course.load',
+        'course.load_forum',
+        'course.load_mobile',
         'course.see_about_page',
+        'course.see_exists',
+        'course.see_in_catalog',
+        'course.staff',
     }
     UNSUPPORTED_ERROR_FMT = '`AccessControlBackends` does not support the action `{action}` yet'.format
 
