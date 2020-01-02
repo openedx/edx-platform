@@ -28,8 +28,8 @@ class PartnerCommunityModelAdmin(admin.ModelAdmin):
     """
     Django admin model to add category id to partner so that every user is added automatically to that category
     """
-    list_display = ['id', 'partner', 'category_id']
-    search_fields = ('partner', 'category_id')
+    list_display = ['id', 'partner', 'community_id']
+    search_fields = ('partner', 'community_id')
 
     class Meta(object):
         verbose_name = 'Partner Community'

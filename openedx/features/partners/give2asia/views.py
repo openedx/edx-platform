@@ -21,14 +21,13 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER, record_registration_attributions
-from openedx.features.partners.helpers import get_partner_recommended_courses
-from openedx.features.partners.models import PartnerUser, PartnerCommunity
+from openedx.features.partners.helpers import auto_join_partner_community, get_partner_recommended_courses
+from openedx.features.partners.models import PartnerUser
 
 from lms.djangoapps.philu_overrides.user_api.views import RegistrationViewCustom
 from lms.djangoapps.onboarding.models import EmailPreference, Organization, PartnerNetwork, UserExtendedProfile
 from philu_overrides.user_api.views import LoginSessionViewCustom
 from nodebb.helpers import update_nodebb_for_user_status, set_user_activation_status_on_nodebb
-from nodebb.tasks import task_join_group_on_nodebb
 from student.models import Registration, UserProfile
 
 from . import constants as g2a_constants
@@ -165,14 +164,7 @@ def create_account_with_params_custom(request, params, partner):
     # Perform operations that are non-critical parts of account creation
     preferences_api.set_user_preference(user, LANGUAGE_KEY, get_language())
 
-    try:
-        partner_communities = PartnerCommunity.objects.filter(partner=partner)
-        for community in partner_communities:
-            task_join_group_on_nodebb.delay(
-                category_id=community.category_id, username=user.username)
-    except Exception as err:
-        log.exception("Community joining failed for user {username} for partner {slug}"
-                      .format(id=user.username, slug=partner.slug), repr(err))
+    auto_join_partner_community(partner, user)
 
     if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
         try:
