@@ -10,6 +10,6 @@ jobs:
     steps:
     - name: build images
       run: |
-        tutor images build openedx --build-arg EDX_PLATFORM_REPOSITORY=https://github.com/nunoferreira840/edx-platform --build-arg EDX_PLATFORM_VERSION=master
+        pip install -e .
      
     
