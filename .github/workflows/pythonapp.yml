@@ -10,6 +10,6 @@ jobs:
     steps:
     - name: build images
       run: |
-        pip install -e .
+        ls
      
     
