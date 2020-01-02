@@ -3297,7 +3297,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         self.assertIn("attachment; filename=org", response['Content-Disposition'])
 
     @patch('lms.djangoapps.instructor_task.models.logger.error')
-    @patch.dict(settings.GRADES_DOWNLOAD, {'STORAGE_TYPE': 's3'})
+    @patch.dict(settings.GRADES_DOWNLOAD, {'STORAGE_TYPE': 's3', 'ROOT_PATH': 'tmp/edx-s3/grades'})
     def test_list_report_downloads_error(self, mock_error):
         """
         Tests the Rate-Limit exceeded is handled and does not raise 500 error.
@@ -3305,7 +3305,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         ex_status = 503
         ex_reason = 'Slow Down'
         url = reverse('list_report_downloads', kwargs={'course_id': text_type(self.course.id)})
-        with patch('openedx.core.storage.S3ReportStorage.listdir', side_effect=BotoServerError(ex_status, ex_reason)):
+        with patch('storages.backends.s3boto.S3BotoStorage.listdir', side_effect=BotoServerError(ex_status, ex_reason)):
             response = self.client.post(url, {})
         mock_error.assert_called_with(
             u'Fetching files failed for course: %s, status: %s, reason: %s',

@@ -60,7 +60,7 @@ django-ses
 django-simple-history
 django-splash
 django-statici18n==1.4.0
-django-storages==1.4.1
+django-storages
 django-user-tasks
 django-waffle==0.12.0
 django-webpack-loader               # Used to wire webpack bundles into the django asset pipeline

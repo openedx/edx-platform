@@ -84,7 +84,11 @@ class LocalFSReportStoreTestCase(ReportStoreTestMixin, TestReportMixin, SimpleTe
         return ReportStore.from_config(config_name='GRADES_DOWNLOAD')
 
 
-@patch.dict(settings.GRADES_DOWNLOAD, {'STORAGE_TYPE': 's3'})
+@patch.dict(settings.GRADES_DOWNLOAD, {
+    'STORAGE_TYPE': 's3',
+    # Strip the leading `/`, because boto doesn't want it
+    'ROOT_PATH': settings.GRADES_DOWNLOAD['ROOT_PATH'].lstrip('/')
+})
 class S3ReportStoreTestCase(MockS3Mixin, ReportStoreTestMixin, TestReportMixin, SimpleTestCase):
     """
     Test the old S3ReportStore configuration.
@@ -125,7 +129,7 @@ class DjangoStorageReportStoreS3TestCase(MockS3Mixin, ReportStoreTestMixin, Test
         storage.
         """
         test_settings = copy.deepcopy(settings.GRADES_DOWNLOAD)
-        test_settings['STORAGE_CLASS'] = 'openedx.core.storage.S3ReportStorage'
+        test_settings['STORAGE_CLASS'] = 'storages.backends.s3boto.S3BotoStorage'
         test_settings['STORAGE_KWARGS'] = {
             'bucket': settings.GRADES_DOWNLOAD['BUCKET'],
             'location': settings.GRADES_DOWNLOAD['ROOT_PATH'],

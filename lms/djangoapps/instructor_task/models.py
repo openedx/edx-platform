@@ -212,7 +212,7 @@ class ReportStore(object):
         storage_type = config.get('STORAGE_TYPE', '').lower()
         if storage_type == 's3':
             return DjangoStorageReportStore(
-                storage_class='openedx.core.storage.S3ReportStorage',
+                storage_class='storages.backends.s3boto.S3BotoStorage',
                 storage_kwargs={
                     'bucket': config['BUCKET'],
                     'location': config['ROOT_PATH'],
