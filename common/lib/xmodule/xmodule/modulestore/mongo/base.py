@@ -58,9 +58,9 @@ log = logging.getLogger(__name__)
 new_contract('CourseKey', CourseKey)
 new_contract('AssetKey', AssetKey)
 new_contract('AssetMetadata', AssetMetadata)
-if six.PY2:
+try:
     new_contract('long', long)
-else:
+except NameError:
     new_contract('long', int)
 new_contract('BlockUsageLocator', BlockUsageLocator)
 

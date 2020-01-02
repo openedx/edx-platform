@@ -9,7 +9,6 @@ from datetime import datetime, timedelta
 
 import ddt
 import pytz
-import six
 
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
@@ -35,9 +34,9 @@ class AssetStoreTestData(object):
     """
     now = datetime.now(pytz.utc)
     user_id = 144
-    if six.PY2:
+    try:
         user_id_long = long(user_id)
-    else:
+    except NameError:
         user_id_long = int(user_id)
 
     user_email = "me@example.com"
