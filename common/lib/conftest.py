@@ -7,6 +7,8 @@ import pytest
 
 from safe_lxml import defuse_xml_libs
 
+from openedx.core.pytest_hooks import pytest_configure  # pylint: disable=unused-import
+
 defuse_xml_libs()
 
 
