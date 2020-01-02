@@ -60,3 +60,21 @@ def pytest_sessionfinish(session):
 
     with io.open(create_file_name(dir_path, file_name_postfix, num), "w") as outfile:
         json.dump(report, outfile)
+
+
+class DeferPlugin(object):
+    """Simple plugin to defer pytest-xdist hook functions."""
+
+    def pytest_json_modifyreport(self, json_report):
+        """standard xdist hook function.
+        """
+        return pytest_json_modifyreport(json_report)
+
+    def pytest_sessionfinish(self, session):
+        return pytest_sessionfinish(session)  # noqa pylint: disable=undefined-variable
+
+
+def pytest_configure(config):
+    if config.pluginmanager.hasplugin("json-report"):
+        config.pluginmanager.register(DeferPlugin())
+
