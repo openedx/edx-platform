@@ -171,7 +171,7 @@ class DjangoStorageReportStoreS3TestCase(ReportStoreTestMixin, TestReportMixin, 
                     return ReportStore.from_config(config_name='GRADES_DOWNLOAD')
 
 
-class TestS3ReportStorage(MockS3Mixin, TestCase):
+class TestS3ReportStorage(TestCase):
     """
     Test the S3ReportStorage to make sure that configuration overrides from settings.FINANCIAL_REPORTS
     are used instead of default ones.
