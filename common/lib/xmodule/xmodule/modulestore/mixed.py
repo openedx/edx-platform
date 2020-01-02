@@ -30,7 +30,7 @@ new_contract('AssetMetadata', AssetMetadata)
 new_contract('LibraryLocator', LibraryLocator)
 try:
     new_contract('long', long)
-except NameError::
+except NameError:
     new_contract('long', int)
 
 log = logging.getLogger(__name__)
