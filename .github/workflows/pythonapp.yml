@@ -10,6 +10,6 @@ jobs:
     steps:
     - name: build images
       run: |
-        ls
+        cd bash && ls
      
     
