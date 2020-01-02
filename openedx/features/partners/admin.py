@@ -26,7 +26,7 @@ admin.site.register(PartnerUser)
 
 class PartnerCommunityModelAdmin(admin.ModelAdmin):
     """
-    Django admin model to add community id to partner so that every user is added automatically to that category
+    Django admin model to add community id to partner so that every user is added automatically to that community
     """
     list_display = ['id', 'partner', 'community_id']
     search_fields = ('partner', 'community_id')
