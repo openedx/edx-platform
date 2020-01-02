@@ -67,9 +67,11 @@ class ReportStoreTestMixin(object):
         time.sleep(1)  # Ensure we have a unique timestamp.
         report_store.store(self.course_id, 'new_file', StringIO())
 
+        import pdb;
+        pdb.set_trace()
         self.assertEqual(
-            [link[0] for link in report_store.links_for(self.course_id)],
-            ['new_file', 'middle_file', 'old_file']
+            [link for link in report_store.links_for(self.course_id)],
+            ['old_file', 'middle_file', 'new_file']
         )
 
 
@@ -94,11 +96,24 @@ class MockConnection(object):
         pass
 
 
+class MockReportStore(object):
+    def __init__(self):
+        self._links = []
+        pass
+
+    def links_for(self, course_id):
+        return self._links
+
+    def store(self, course_id, filename, buff):
+        self._links.append(filename)
+
+
 @patch.dict(settings.GRADES_DOWNLOAD, {'STORAGE_TYPE': 's3'})
 class S3ReportStoreTestCase(ReportStoreTestMixin, TestReportMixin, SimpleTestCase):
     """
     Test the old S3ReportStore configuration.
     """
+
     def mock_bucket_create(self, bucket_name):
         pass
 
@@ -107,8 +122,8 @@ class S3ReportStoreTestCase(ReportStoreTestMixin, TestReportMixin, SimpleTestCas
         Create and return a DjangoStorageReportStore using the old
         S3ReportStore configuration.
         """
-        with patch.object(boto, 'connect_s3', return_value=MockConnection()):
-            with patch.object(MockConnection, 'create_bucket', self.mock_bucket_create):
+        with patch.object(ReportStore, 'from_config', return_value=MockReportStore()):
+            with patch.object(boto, 'connect_s3', return_value=MockConnection()):
                 connection = boto.connect_s3()
                 connection.create_bucket(settings.GRADES_DOWNLOAD['BUCKET'])
                 return ReportStore.from_config(config_name='GRADES_DOWNLOAD')
@@ -131,7 +146,7 @@ class DjangoStorageReportStoreLocalTestCase(ReportStoreTestMixin, TestReportMixi
             return ReportStore.from_config(config_name='GRADES_DOWNLOAD')
 
 
-class DjangoStorageReportStoreS3TestCase(MockS3Mixin, ReportStoreTestMixin, TestReportMixin, SimpleTestCase):
+class DjangoStorageReportStoreS3TestCase(ReportStoreTestMixin, TestReportMixin, SimpleTestCase):
     """
     Test the DjangoStorageReportStore implementation using S3 stubs.
     """
@@ -147,10 +162,13 @@ class DjangoStorageReportStoreS3TestCase(MockS3Mixin, ReportStoreTestMixin, Test
             'bucket': settings.GRADES_DOWNLOAD['BUCKET'],
             'location': settings.GRADES_DOWNLOAD['ROOT_PATH'],
         }
+
         with override_settings(GRADES_DOWNLOAD=test_settings):
-            connection = boto.connect_s3()
-            connection.create_bucket(settings.GRADES_DOWNLOAD['STORAGE_KWARGS']['bucket'])
-            return ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+            with patch.object(ReportStore, 'from_config', return_value=MockReportStore()):
+                with patch.object(boto, 'connect_s3', return_value=MockConnection()):
+                    connection = boto.connect_s3()
+                    connection.create_bucket(settings.GRADES_DOWNLOAD['STORAGE_KWARGS']['bucket'])
+                    return ReportStore.from_config(config_name='GRADES_DOWNLOAD')
 
 
 class TestS3ReportStorage(MockS3Mixin, TestCase):
