@@ -220,7 +220,18 @@
 
             request = $.ajax(params).always(function() {
                 if ($elem) {
-                    $elem.prop('disabled', false);
+                    // We don't want to enable the "submit" buttons for post or comment here.
+                    // The buttons will be enabled once there is some text entered.
+                    var elemClassList = $elem.context && $elem.context.classList;
+                    if(
+                        !elemClassList ||
+                        !(
+                            elemClassList.contains('discussion-submit-post') ||
+                            elemClassList.contains('discussion-submit-comment')
+                        )
+                    ){
+                        $elem.prop('disabled', false);
+                    }
                 }
                 if (params.$loading) {
                     if (params.loadedCallback) {
