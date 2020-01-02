@@ -20,6 +20,6 @@ jobs:
         pip install -e .
     - name: workdir
       run: |
-        tutor -h
+        tutor images build openedx
         
     
