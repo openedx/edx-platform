@@ -10,6 +10,11 @@ from drf_yasg.utils import swagger_auto_schema as drf_swagger_auto_schema
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
+try:
+    file
+except NameError:  # Python 3
+    from io import IOBase as file
+
 # -- Code that will eventually be in another openapi-helpers repo -------------
 
 
