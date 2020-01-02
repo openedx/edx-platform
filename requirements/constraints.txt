@@ -62,5 +62,5 @@ transifex-client==0.13.4
 # moving constraint from base.in to constraints.txt
 python-dateutil<2.6.0
 
-#higher releases require python>3.5
+#higher releases require python>3.5 
 pandas<0.25.0
