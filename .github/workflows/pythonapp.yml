@@ -16,7 +16,6 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        apt install python3 libyaml-dev
         pip install tutor-openedx
         pip install -e .
     - name: workdir
