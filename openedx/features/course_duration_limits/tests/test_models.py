@@ -142,9 +142,11 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         non_test_course_enabled = CourseOverviewFactory.create(org='non-test-org-enabled')
         non_test_course_disabled = CourseOverviewFactory.create(org='non-test-org-disabled')
         non_test_site_cfg_enabled = SiteConfigurationFactory.create(
+            site_values={'course_org_filter': non_test_course_enabled.org},
             values={'course_org_filter': non_test_course_enabled.org}
         )
         non_test_site_cfg_disabled = SiteConfigurationFactory.create(
+            site_values={'course_org_filter': non_test_course_disabled.org},
             values={'course_org_filter': non_test_course_disabled.org}
         )
 
@@ -157,7 +159,10 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
 
         # Set up test objects
         test_course = CourseOverviewFactory.create(org='test-org')
-        test_site_cfg = SiteConfigurationFactory.create(values={'course_org_filter': test_course.org})
+        test_site_cfg = SiteConfigurationFactory.create(
+            site_values={'course_org_filter': test_course.org},
+            values={'course_org_filter': test_course.org}
+        )
 
         if reverse_order:
             CourseDurationLimitConfig.objects.create(site=test_site_cfg.site, enabled=site_setting)
@@ -185,7 +190,10 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         for global_setting in (True, False, None):
             CourseDurationLimitConfig.objects.create(enabled=global_setting, enabled_as_of=datetime(2018, 1, 1))
             for site_setting in (True, False, None):
-                test_site_cfg = SiteConfigurationFactory.create(values={'course_org_filter': []})
+                test_site_cfg = SiteConfigurationFactory.create(
+                    site_values={'course_org_filter': []},
+                    values={'course_org_filter': []}
+                )
                 CourseDurationLimitConfig.objects.create(
                     site=test_site_cfg.site, enabled=site_setting, enabled_as_of=datetime(2018, 1, 1)
                 )
@@ -301,7 +309,10 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
 
     def test_caching_org(self):
         course = CourseOverviewFactory.create(org='test-org')
-        site_cfg = SiteConfigurationFactory.create(values={'course_org_filter': course.org})
+        site_cfg = SiteConfigurationFactory.create(
+            site_values={'course_org_filter': course.org},
+            values={'course_org_filter': course.org}
+        )
         org_config = CourseDurationLimitConfig(org=course.org, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         org_config.save()
 
@@ -346,7 +357,10 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
 
     def test_caching_course(self):
         course = CourseOverviewFactory.create(org='test-org')
-        site_cfg = SiteConfigurationFactory.create(values={'course_org_filter': course.org})
+        site_cfg = SiteConfigurationFactory.create(
+            site_values={'course_org_filter': course.org},
+            values={'course_org_filter': course.org}
+        )
         course_config = CourseDurationLimitConfig(course=course, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         course_config.save()
 

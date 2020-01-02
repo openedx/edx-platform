@@ -47,4 +47,9 @@ class Command(BaseCommand):
             LOG.info(u"Found existing site for '{site_name}'".format(site_name=domain))
 
         LOG.info(u"Creating '{site_name}' SiteConfiguration".format(site_name=domain))
-        SiteConfiguration.objects.create(site=site, values=configuration, enabled=True)
+        SiteConfiguration.objects.create(
+            site=site,
+            site_values=configuration,
+            values=configuration,
+            enabled=True
+        )
