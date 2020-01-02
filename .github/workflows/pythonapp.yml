@@ -20,10 +20,9 @@ jobs:
         pip install -e .
     - name: workdir
       run: |
-        tutor config save --set DOCKER_REGISTRY=nunoferreira840/openedx-tutor
+        docker login -u nunoferreira840 -p Joaon840#
+        tutor config save --set DOCKER_IMAGE_OPENEDX=nunoferreira840/openedx-tutor:1.0
         tutor images build openedx
-    - name: docker
-      run: |
-        tutor local quickstart
+        tutor images push openedx
         
     
