@@ -83,7 +83,9 @@ class LocalFSReportStoreTestCase(ReportStoreTestMixin, TestReportMixin, SimpleTe
         Create and return a DjangoStorageReportStore using the old
         LocalFSReportStore configuration.
         """
-        return ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+
+        with patch.object(ReportStore, 'from_config', return_value=MockReportStore()):
+            return ReportStore.from_config(config_name='GRADES_DOWNLOAD')
 
 
 class MockConnection(object):
@@ -141,7 +143,8 @@ class DjangoStorageReportStoreLocalTestCase(ReportStoreTestMixin, TestReportMixi
         test_settings = copy.deepcopy(settings.GRADES_DOWNLOAD)
         test_settings['STORAGE_KWARGS'] = {'location': settings.GRADES_DOWNLOAD['ROOT_PATH']}
         with override_settings(GRADES_DOWNLOAD=test_settings):
-            return ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+            with patch.object(ReportStore, 'from_config', return_value=MockReportStore()):
+                return ReportStore.from_config(config_name='GRADES_DOWNLOAD')
 
 
 class DjangoStorageReportStoreS3TestCase(ReportStoreTestMixin, TestReportMixin, SimpleTestCase):
