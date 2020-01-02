@@ -100,6 +100,7 @@ from xmodule.modulestore.exceptions import (
     DuplicateItemError,
     InsufficientSpecificationError,
     MultipleCourseBlocksFound,
+    MultipleLibraryBlocksFound,
     VersionConflictError
 )
 from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
