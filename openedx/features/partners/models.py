@@ -33,3 +33,11 @@ class PartnerUser(TimeStampedModel):
     class Meta:
         unique_together = ('user', 'partner')
 
+
+class PartnerCommunity(models.Model):
+    community_id = models.IntegerField()
+    partner = models.ForeignKey(Partner, db_index=True, on_delete=models.CASCADE, related_name='communities')
+
+    class Meta:
+        unique_together = ('community_id', 'partner')
+

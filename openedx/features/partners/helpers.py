@@ -2,18 +2,20 @@ import pytz
 
 from datetime import datetime
 from importlib import import_module
+from logging import getLogger
 
 from django.http import Http404
 
 from course_action_state.models import CourseRerunState
 from custom_settings.models import CustomSettings
-
+from nodebb.tasks import task_join_group_on_nodebb
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.features.course_card.helpers import get_course_open_date, get_related_card_id
 from openedx.features.course_card.models import CourseCard
-
 from student.models import CourseEnrollment
+
+log = getLogger(__name__)
 
 PARTNERS_VIEW_FRMT = 'openedx.features.partners.{slug}.views'
 
@@ -76,3 +78,13 @@ def import_module_using_slug(partner_slug):
         return import_module(PARTNERS_VIEW_FRMT.format(slug=partner_slug))
     except ImportError:
         raise Http404('Your partner is not properly registered')
+
+
+def auto_join_partner_community(partner, user):
+    community_ids = partner.communities.all().values_list('community_id', flat=True)
+    username = user.username
+    for community_id in community_ids:
+        task_join_group_on_nodebb.delay(category_id=community_id, username=username)
+        log.info('Task to auto join user {username} in community '
+                 'with id {community_id} for partner {slug} is added to celery'
+                 .format(community_id=community_id, username=username, slug=partner.slug))
