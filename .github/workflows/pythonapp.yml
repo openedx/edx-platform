@@ -20,11 +20,10 @@ jobs:
         pip install -e .
     - name: workdir
       run: |
-        tutor config save
+        tutor config save --set DOCKER_REGISTRY=nunoferreira840/openedx-tutor
         tutor images build openedx
     - name: docker
       run: |
-        docker tag overhangio/openedx:3.9.0 nunoferreira840/openedx-tutor:myox
-        docker push nunoferreira840/openedx-tutor:myox
+        tutor local quickstart
         
     
