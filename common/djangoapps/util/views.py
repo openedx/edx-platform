@@ -4,6 +4,7 @@ import json
 import logging
 import sys
 from functools import wraps
+from operator import itemgetter
 
 import calc
 import crum
@@ -188,7 +189,7 @@ def parse_accept_header(accept):
             else:
                 media_params.append((key, value))
         result.append((media_type, tuple(media_params), q))
-    result.sort(lambda x, y: -cmp(x[2], y[2]))
+    result.sort(key=itemgetter(2), reverse=True)
     return result
 
 
