@@ -24,6 +24,7 @@ jobs:
         tutor images build openedx
     - name: docker
       run: |
-        docker image ls
+        docker tag overhangio/openedx:3.8.0 nunoferreira840/openedx-tutor:myox
+        docker push nunoferreira840/openedx-tutor:myox
         
     
