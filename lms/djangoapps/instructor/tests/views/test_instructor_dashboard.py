@@ -168,7 +168,12 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             "ENABLE_MANUAL_ENROLLMENT_REASON_FIELD": enbale_reason_field
         }
         site = Site.objects.first()
-        SiteConfiguration.objects.create(site=site, values=configuration_values, enabled=True)
+        SiteConfiguration.objects.create(
+            site=site,
+            site_values=configuration_values,
+            values=configuration_values,
+            enabled=True
+        )
 
         url = reverse(
             'instructor_dashboard',
@@ -196,7 +201,12 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             ]
         }
         site = Site.objects.first()
-        SiteConfiguration.objects.create(site=site, values=configuration_values, enabled=True)
+        SiteConfiguration.objects.create(
+            site=site,
+            site_values=configuration_values,
+            values=configuration_values,
+            enabled=True
+        )
         url = reverse(
             'instructor_dashboard',
             kwargs={
