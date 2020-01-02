@@ -15,7 +15,7 @@ from openedx.features.course_card.helpers import get_course_open_date, get_relat
 from openedx.features.course_card.models import CourseCard
 from student.models import CourseEnrollment
 
-log = getLogger("edx.student")
+log = getLogger(__name__)
 
 PARTNERS_VIEW_FRMT = 'openedx.features.partners.{slug}.views'
 
@@ -84,8 +84,7 @@ def auto_join_partner_community(partner, user):
     community_ids = partner.communities.all().values_list('community_id', flat=True)
     username = user.username
     for community_id in community_ids:
-        task_join_group_on_nodebb.delay(
-            category_id=community_id, username=username)
-        log.info("Task to auto join user {username} in community "
-                 "with id {community_id} for partner {slug} is added to celery"
+        task_join_group_on_nodebb.delay(category_id=community_id, username=username)
+        log.info('Task to auto join user {username} in community '
+                 'with id {community_id} for partner {slug} is added to celery'
                  .format(community_id=community_id, username=username, slug=partner.slug))

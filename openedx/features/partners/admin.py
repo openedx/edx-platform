@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import reverse
 
-from .models import Partner, PartnerUser, PartnerCommunity
+from .models import Partner, PartnerCommunity, PartnerUser
 
 
 class PartnerAdmin(admin.ModelAdmin):
@@ -26,7 +26,7 @@ admin.site.register(PartnerUser)
 
 class PartnerCommunityModelAdmin(admin.ModelAdmin):
     """
-    Django admin model to add category id to partner so that every user is added automatically to that category
+    Django admin model to add community id to partner so that every user is added automatically to that category
     """
     list_display = ['id', 'partner', 'community_id']
     search_fields = ('partner', 'community_id')
