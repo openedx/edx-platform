@@ -407,7 +407,7 @@ class CommentSerializer(_ContentSerializer):
                     "parent_id does not identify a comment in the thread identified by thread_id."
                 )
         if is_comment_too_deep(parent):
-            raise ValidationError({"parent_id": ["Comment level is too deep."]})
+            raise ValidationError("Comment level is too deep.")
         return attrs
 
     def create(self, validated_data):

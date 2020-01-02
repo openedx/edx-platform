@@ -9,7 +9,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from rest_framework import permissions, viewsets
-from rest_framework.decorators import list_route
 from rest_framework.response import Response
 
 from experiments import filters, serializers
@@ -77,21 +76,6 @@ class ExperimentDataViewSet(viewsets.ModelViewSet):
 
         return user
 
-    @list_route(methods=['put'], permission_classes=[permissions.IsAdminUser])
-    def bulk_upsert(self, request):
-        upserted = []
-        self._cache_users([datum['user'] for datum in request.data])
-
-        with transaction.atomic():
-            for item in request.data:
-                user = self._get_user(username=item['user'])
-                datum, __ = ExperimentData.objects.update_or_create(
-                    user=user, experiment_id=item['experiment_id'], key=item['key'], defaults={'value': item['value']})
-                upserted.append(datum)
-
-            serializer = self.get_serializer(upserted, many=True)
-            return Response(serializer.data)
-
 
 class ExperimentKeyValueViewSet(viewsets.ModelViewSet):
     authentication_classes = (JwtAuthentication, ExperimentCrossDomainSessionAuth,)
@@ -100,16 +84,3 @@ class ExperimentKeyValueViewSet(viewsets.ModelViewSet):
     permission_classes = (IsStaffOrReadOnly,)
     queryset = ExperimentKeyValue.objects.all()
     serializer_class = serializers.ExperimentKeyValueSerializer
-
-    @list_route(methods=['put'], permission_classes=[permissions.IsAdminUser])
-    def bulk_upsert(self, request):
-        upserted = []
-
-        with transaction.atomic():
-            for item in request.data:
-                datum, __ = ExperimentKeyValue.objects.update_or_create(
-                    experiment_id=item['experiment_id'], key=item['key'], defaults={'value': item['value']})
-                upserted.append(datum)
-
-            serializer = self.get_serializer(upserted, many=True)
-            return Response(serializer.data)
