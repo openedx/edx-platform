@@ -67,8 +67,6 @@ class ReportStoreTestMixin(object):
         time.sleep(1)  # Ensure we have a unique timestamp.
         report_store.store(self.course_id, 'new_file', StringIO())
 
-        import pdb;
-        pdb.set_trace()
         self.assertEqual(
             [link for link in report_store.links_for(self.course_id)],
             ['old_file', 'middle_file', 'new_file']
