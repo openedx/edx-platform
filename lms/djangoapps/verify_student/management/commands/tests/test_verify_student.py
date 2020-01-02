@@ -13,7 +13,7 @@ from django.test import TestCase
 from mock import patch
 from testfixtures import LogCapture
 
-from common.test.utils import MockS3Mixin
+from common.test.utils import MockS3BotoMixin
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSPVerificationRetryConfig
 from lms.djangoapps.verify_student.tests.test_models import (
     FAKE_SETTINGS,
@@ -28,16 +28,10 @@ LOGGER_NAME = 'retry_photo_verification'
 # Lots of patching to stub in our own settings, and HTTP posting
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
-class TestVerifyStudentCommand(MockS3Mixin, TestCase):
+class TestVerifyStudentCommand(MockS3BotoMixin, TestCase):
     """
     Tests for django admin commands in the verify_student module
     """
-
-    def setUp(self):
-        super(TestVerifyStudentCommand, self).setUp()
-        connection = boto.connect_s3()
-        connection.create_bucket(FAKE_SETTINGS['SOFTWARE_SECURE']['S3_BUCKET'])
-
     def create_and_submit(self, username):
         """
         Helper method that lets us create new SoftwareSecurePhotoVerifications

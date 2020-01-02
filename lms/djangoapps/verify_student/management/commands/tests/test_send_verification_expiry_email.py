@@ -5,18 +5,18 @@ Tests for django admin command `send_verification_expiry_email` in the verify_st
 
 from datetime import timedelta
 
-import boto
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.management import call_command, CommandError
+from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.timezone import now
 from mock import patch
 from student.tests.factories import UserFactory
 from testfixtures import LogCapture
 
-from common.test.utils import MockS3Mixin
+from common.test.utils import MockS3BotoMixin
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from lms.djangoapps.verify_student.tests.test_models import FAKE_SETTINGS, mock_software_secure_post
 
@@ -25,14 +25,12 @@ LOGGER_NAME = 'lms.djangoapps.verify_student.management.commands.send_verificati
 
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
-class TestSendVerificationExpiryEmail(MockS3Mixin):
+class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
     """ Tests for django admin command `send_verification_expiry_email` in the verify_student module """
 
     def setUp(self):
         """ Initial set up for tests """
         super(TestSendVerificationExpiryEmail, self).setUp()
-        connection = boto.connect_s3()
-        connection.create_bucket(FAKE_SETTINGS['SOFTWARE_SECURE']['S3_BUCKET'])
         Site.objects.create(domain='edx.org', name='edx.org')
         self.resend_days = settings.VERIFICATION_EXPIRY_EMAIL['RESEND_DAYS']
         self.days = settings.VERIFICATION_EXPIRY_EMAIL['DAYS_RANGE']
