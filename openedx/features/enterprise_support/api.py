@@ -463,7 +463,7 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
     """
     consent_cache_key = get_data_consent_share_cache_key(user.id, course_id)
     data_sharing_consent_needed_cache = TieredCache.get_cached_response(consent_cache_key)
-    if data_sharing_consent_needed_cache.is_found and data_sharing_consent_needed_cache.value is 0:
+    if data_sharing_consent_needed_cache.is_found and data_sharing_consent_needed_cache.value == 0:
         return False
 
     enterprise_learner_details = get_enterprise_learner_data(user)
