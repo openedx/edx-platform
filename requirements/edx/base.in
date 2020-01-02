@@ -28,8 +28,8 @@
 
 analytics-python                    # Used for Segment analytics
 attrs                               # Reduces boilerplate code involving class attributes
-Babel==1.3                          # Internationalization utilities, used for date formatting in a few places
-bleach==2.1.4                       # Allowed-list-based HTML sanitizing library that escapes or strips markup and attributes; used for capa and LTI
+Babel                               # Internationalization utilities, used for date formatting in a few places
+bleach                              # Allowed-list-based HTML sanitizing library that escapes or strips markup and attributes; used for capa and LTI
 boto==2.39.0                        # Deprecated version of the AWS SDK; we should stop using this
 boto3==1.4.8                        # Amazon Web Services SDK for Python
 botocore==1.8.17                    # via boto3, s3transfer
@@ -45,21 +45,21 @@ django-crum                         # Middleware that stores the current request
 django-fernet-fields                # via edx-enterprise (should be added to its setup.py)
 django-filter==1.0.4                # Allows users to filter Django querysets dynamically
 django-ipware                       # Get the client's real IP address
-django-method-override==0.1.0
+django-method-override
 django-model-utils
 django-mptt>=0.8.6,<0.9
 django-mysql==2.4.1
-django-oauth-toolkit<1.2            # Provides oAuth2 capabilities for Django. 1.2+ requires Django 2 and Python 3.5
+django-oauth-toolkit                # Provides oAuth2 capabilities for Django
 django-pipeline
 django-pyfs
 django-ratelimit
-django-ratelimit-backend==1.1.1
+django-ratelimit-backend
 django-require
 django-sekizai
 django-ses
 django-simple-history
 django-splash
-django-statici18n==1.4.0
+django-statici18n
 django-storages
 django-user-tasks
 django-waffle==0.12.0
@@ -92,7 +92,6 @@ edx-user-state-client
 edx-when
 edxval
 event-tracking
-feedparser==5.1.3
 fs==2.0.18
 fs-s3fs==0.1.8
 geoip2                              # Python API for the GeoIP web services and databases
