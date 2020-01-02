@@ -378,7 +378,6 @@
                 });
                 this.model.addComment();
                 this.renderAddResponseButton();
-                event.target.disabled = true
                 return DiscussionUtil.safeAjax({
                     $elem: $(event.target),
                     url: url,
