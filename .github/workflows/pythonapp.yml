@@ -22,5 +22,8 @@ jobs:
       run: |
         tutor config save
         tutor images build openedx
+    - name: docker
+      run: |
+        docker image ls
         
     
