@@ -343,6 +343,16 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         )
         self.assertIs(completion_return, None)
 
+    def test_handle_ajax_metadata(self):
+        """
+        Test that the sequence metadata is returned from the
+        metadata ajax handler.
+        """
+        metadata = json.loads(self.sequence_3_1.handle_ajax('metadata', {}))
+        self.assertEqual(len(metadata['items']), 3)
+        self.assertEqual(metadata['tag'], 'sequential')
+        self.assertEqual(metadata['display_name'], self.sequence_3_1.display_name_with_default)
+
     def get_context_dict_from_string(self, data):
         """
         Retrieve dictionary from string.
