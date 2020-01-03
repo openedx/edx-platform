@@ -52,15 +52,15 @@ mysqlclient<1.5
 requests-oauthlib==1.1.0
 oauthlib==2.1.0
 
+# Version 0.23.0 requires python-dateuil>=2.5.0
+pandas==0.22.0
+
+# Upgrading to 2.5.3 on 2020-01-03 triggered "'tzlocal' object has no attribute '_std_offset'" errors in production
+python-dateutil==2.4.0
+
 # python3-saml 1.6.0 breaks unittests in common/djangoapps/third_party_auth/tests/test_views.py::SAMLMetadataTest
 python3-saml==1.5.0
 
 # transifex-client 0.13.5 and 0.13.6 pin six and urllib3 to old versions needlessly
 #   https://github.com/transifex/transifex-client/issues/252
 transifex-client==0.13.4
-
-# moving constraint from base.in to constraints.txt
-python-dateutil<2.6.0
-
-#higher releases require python>3.5
-pandas<0.25.0
