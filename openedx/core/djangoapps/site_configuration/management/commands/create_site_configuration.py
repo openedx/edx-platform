@@ -50,6 +50,5 @@ class Command(BaseCommand):
         SiteConfiguration.objects.create(
             site=site,
             site_values=configuration,
-            values=configuration,
             enabled=True
         )

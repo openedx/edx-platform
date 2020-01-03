@@ -53,7 +53,7 @@ def has_configuration_override(name):
         (bool): True if given key is present in the configuration.
     """
     configuration = get_current_site_configuration()
-    if configuration and name in configuration.values:
+    if configuration and name in configuration.site_values:
         return True
     return False
 

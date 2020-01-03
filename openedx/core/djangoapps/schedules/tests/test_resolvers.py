@@ -61,7 +61,7 @@ class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, TestCase):
         'course1'
     )
     def test_get_course_org_filter_equal(self, course_org_filter):
-        self.site_config.values['course_org_filter'] = course_org_filter
+        self.site_config.site_values['course_org_filter'] = course_org_filter
         self.site_config.save()
         mock_query = Mock()
         result = self.resolver.filter_by_org(mock_query)
@@ -73,7 +73,7 @@ class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, TestCase):
         (['course1', 'course2'], ['course1', 'course2'])
     )
     def test_get_course_org_filter_include__in(self, course_org_filter, expected_org_list):
-        self.site_config.values['course_org_filter'] = course_org_filter
+        self.site_config.site_values['course_org_filter'] = course_org_filter
         self.site_config.save()
         mock_query = Mock()
         result = self.resolver.filter_by_org(mock_query)
@@ -88,8 +88,7 @@ class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, TestCase):
     )
     def test_get_course_org_filter_exclude__in(self, course_org_filter, expected_org_list):
         SiteConfigurationFactory.create(
-            site_values={'course_org_filter': course_org_filter},
-            values={'course_org_filter': course_org_filter},
+            site_values={'course_org_filter': course_org_filter}
         )
         mock_query = Mock()
         result = self.resolver.filter_by_org(mock_query)

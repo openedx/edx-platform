@@ -36,13 +36,6 @@ class SiteConfiguration(models.Model):
         blank=True,
         load_kwargs={'object_pairs_hook': collections.OrderedDict}
     )
-    # TODO: Delete this deprecated field during the later stages of the rollout
-    # which renames 'values' to 'site_values'.
-    values = JSONField(
-        null=False,
-        blank=True,
-        load_kwargs={'object_pairs_hook': collections.OrderedDict}
-    )
 
     def __str__(self):
         return u"<SiteConfiguration: {site} >".format(site=self.site)  # xss-lint: disable=python-wrap-html
@@ -65,7 +58,7 @@ class SiteConfiguration(models.Model):
         """
         if self.enabled:
             try:
-                return self.values.get(name, default)
+                return self.site_values.get(name, default)
             except AttributeError as error:
                 logger.exception(u'Invalid JSON data. \n [%s]', error)
         else:
@@ -83,7 +76,7 @@ class SiteConfiguration(models.Model):
             org (str): Org to use to filter SiteConfigurations
             select_related (list or None): A list of values to pass as arguments to select_related
         """
-        query = cls.objects.filter(values__contains=org, enabled=True).all()
+        query = cls.objects.filter(site_values__contains=org, enabled=True).all()
         if select_related is not None:
             query = query.select_related(*select_related)
         for configuration in query:
@@ -127,7 +120,7 @@ class SiteConfiguration(models.Model):
         """
         org_filter_set = set()
 
-        for configuration in cls.objects.filter(values__contains='course_org_filter', enabled=True).all():
+        for configuration in cls.objects.filter(site_values__contains='course_org_filter', enabled=True).all():
             course_org_filter = configuration.get_value('course_org_filter', [])
             if not isinstance(course_org_filter, list):
                 course_org_filter = [course_org_filter]
@@ -164,13 +157,6 @@ class SiteConfigurationHistory(TimeStampedModel):
         blank=True,
         load_kwargs={'object_pairs_hook': collections.OrderedDict}
     )
-    # TODO: Delete this deprecated field during the later stages of the rollout
-    # which renames 'values' to 'site_values'.
-    values = JSONField(
-        null=False,
-        blank=True,
-        load_kwargs={'object_pairs_hook': collections.OrderedDict}
-    )
 
     class Meta:
         get_latest_by = 'modified'
@@ -199,7 +185,6 @@ def update_site_configuration_history(sender, instance, **kwargs):  # pylint: di
     """
     SiteConfigurationHistory.objects.create(
         site=instance.site,
-        site_values=instance.values,
-        values=instance.values,
+        site_values=instance.site_values,
         enabled=instance.enabled,
     )

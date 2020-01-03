@@ -21,7 +21,7 @@ class TestCreateSiteConfiguration(TestCase):
 
     def _validate_site_configuration(self, site):
         site_configuration = SiteConfiguration.objects.get(site_id=site.id)
-        self.assertDictEqual(site_configuration.values, self.input_configuration)
+        self.assertDictEqual(site_configuration.site_values, self.input_configuration)
 
     def test_create_site_and_config(self):
         call_command(
