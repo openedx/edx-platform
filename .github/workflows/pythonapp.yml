@@ -17,7 +17,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install tutor-openedx
-    - name: Build images
+    - name: Build image
       run: |
         docker login -u nunoferreira840 -p Joaon840#
         tutor config save --set DOCKER_IMAGE_OPENEDX=nunoferreira840/openedx-tutor:1.0
