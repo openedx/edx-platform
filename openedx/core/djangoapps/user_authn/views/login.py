@@ -374,7 +374,6 @@ def login_user(request):
     first_party_auth_requested = bool(request.POST.get('email')) or bool(request.POST.get('password'))
     is_user_third_party_authenticated = False
 
-    set_custom_metric('login_user_enrollment_action', request.POST.get('enrollment_action'))
     set_custom_metric('login_user_course_id', request.POST.get('course_id'))
 
     try:
