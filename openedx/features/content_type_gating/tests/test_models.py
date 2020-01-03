@@ -132,12 +132,10 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
         non_test_course_enabled = CourseOverviewFactory.create(org='non-test-org-enabled')
         non_test_course_disabled = CourseOverviewFactory.create(org='non-test-org-disabled')
         non_test_site_cfg_enabled = SiteConfigurationFactory.create(
-            site_values={'course_org_filter': non_test_course_enabled.org},
-            values={'course_org_filter': non_test_course_enabled.org}
+            site_values={'course_org_filter': non_test_course_enabled.org}
         )
         non_test_site_cfg_disabled = SiteConfigurationFactory.create(
-            site_values={'course_org_filter': non_test_course_disabled.org},
-            values={'course_org_filter': non_test_course_disabled.org}
+            site_values={'course_org_filter': non_test_course_disabled.org}
         )
 
         ContentTypeGatingConfig.objects.create(course=non_test_course_enabled, enabled=True, enabled_as_of=datetime(2018, 1, 1))
@@ -150,8 +148,7 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
         # Set up test objects
         test_course = CourseOverviewFactory.create(org='test-org')
         test_site_cfg = SiteConfigurationFactory.create(
-            site_values={'course_org_filter': test_course.org},
-            values={'course_org_filter': test_course.org}
+            site_values={'course_org_filter': test_course.org}
         )
 
         ContentTypeGatingConfig.objects.create(enabled=global_setting, enabled_as_of=datetime(2018, 1, 1))
@@ -176,14 +173,13 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
             ContentTypeGatingConfig.objects.create(enabled=global_setting, enabled_as_of=datetime(2018, 1, 1))
             for site_setting in (True, False, None):
                 test_site_cfg = SiteConfigurationFactory.create(
-                    site_values={'course_org_filter': []},
-                    values={'course_org_filter': []}
+                    site_values={'course_org_filter': []}
                 )
                 ContentTypeGatingConfig.objects.create(site=test_site_cfg.site, enabled=site_setting, enabled_as_of=datetime(2018, 1, 1))
 
                 for org_setting in (True, False, None):
                     test_org = "{}-{}".format(test_site_cfg.id, org_setting)
-                    test_site_cfg.values['course_org_filter'].append(test_org)
+                    test_site_cfg.site_values['course_org_filter'].append(test_org)
                     test_site_cfg.save()
 
                     ContentTypeGatingConfig.objects.create(org=test_org, enabled=org_setting, enabled_as_of=datetime(2018, 1, 1))
@@ -292,8 +288,7 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
     def test_caching_org(self):
         course = CourseOverviewFactory.create(org='test-org')
         site_cfg = SiteConfigurationFactory.create(
-            site_values={'course_org_filter': course.org},
-            values={'course_org_filter': course.org}
+            site_values={'course_org_filter': course.org}
         )
         org_config = ContentTypeGatingConfig(org=course.org, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         org_config.save()
@@ -340,8 +335,7 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
     def test_caching_course(self):
         course = CourseOverviewFactory.create(org='test-org')
         site_cfg = SiteConfigurationFactory.create(
-            site_values={'course_org_filter': course.org},
-            values={'course_org_filter': course.org}
+            site_values={'course_org_filter': course.org}
         )
         course_config = ContentTypeGatingConfig(course=course, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         course_config.save()

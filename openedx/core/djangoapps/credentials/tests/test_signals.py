@@ -110,8 +110,7 @@ class TestCredentialsSignalsSendGrade(TestCase):
     def test_send_grade_records_enabled(self, _mock_is_course_run_in_a_program, mock_send_grade_to_credentials,
                                         _mock_is_learner_issuance_enabled):
         site_config = SiteConfigurationFactory.create(
-            site_values={'course_org_filter': [self.key.org]},
-            values={'course_org_filter': [self.key.org]},
+            site_values={'course_org_filter': [self.key.org]}
         )
 
         # Correctly sent
@@ -120,7 +119,7 @@ class TestCredentialsSignalsSendGrade(TestCase):
         mock_send_grade_to_credentials.delay.reset_mock()
 
         # Correctly not sent
-        site_config.values['ENABLE_LEARNER_RECORDS'] = False
+        site_config.site_values['ENABLE_LEARNER_RECORDS'] = False
         site_config.save()
         send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None)
         self.assertFalse(mock_send_grade_to_credentials.delay.called)

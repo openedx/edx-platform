@@ -297,7 +297,7 @@ class TestIndex(SiteMixin, TestCase):
         response = self.client.get(reverse("root"))
         self.assertRedirects(
             response,
-            self.site_configuration_other.values["MKTG_URLS"]["ROOT"],
+            self.site_configuration_other.site_values["MKTG_URLS"]["ROOT"],
             fetch_redirect_response=False
         )
 
@@ -309,4 +309,4 @@ class TestIndex(SiteMixin, TestCase):
         self.use_site(self.site_other)
         self.client.login(username=self.user.username, password="password")
         response = self.client.get(reverse("dashboard"))
-        self.assertIn(self.site_configuration_other.values["MKTG_URLS"]["ROOT"], response.content.decode('utf-8'))
+        self.assertIn(self.site_configuration_other.site_values["MKTG_URLS"]["ROOT"], response.content.decode('utf-8'))

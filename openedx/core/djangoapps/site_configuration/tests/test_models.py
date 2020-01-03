@@ -83,8 +83,6 @@ class SiteConfigurationTests(TestCase):
         )
 
         site_configuration.site_values = {'test': 'test'}
-        # TODO: Remove this deprecated value eventually.
-        site_configuration.values = {'test': 'test'}
         site_configuration.save()
 
         # Verify an entry to SiteConfigurationHistory was added.
@@ -133,9 +131,7 @@ class SiteConfigurationTests(TestCase):
         # add SiteConfiguration to database
         site_configuration = SiteConfigurationFactory.create(
             site=self.site,
-            site_values=self.test_config1,
-            # TODO: Remove this deprecated value eventually.
-            values=self.test_config1,
+            site_values=self.test_config1
         )
 
         # Make sure entry is saved and retrieved correctly
@@ -183,9 +179,7 @@ class SiteConfigurationTests(TestCase):
         # add SiteConfiguration to database
         site_configuration = SiteConfigurationFactory.create(
             site=self.site,
-            site_values=invalid_data,
-            # TODO: Remove this deprecated value eventually.
-            values=invalid_data,
+            site_values=invalid_data
         )
 
         # make sure get_value logs an error for invalid json data
@@ -206,15 +200,11 @@ class SiteConfigurationTests(TestCase):
         # add SiteConfiguration to database
         SiteConfigurationFactory.create(
             site=self.site,
-            site_values=self.test_config1,
-            # TODO: Remove this deprecated value eventually.
-            values=self.test_config1,
+            site_values=self.test_config1
         )
         SiteConfigurationFactory.create(
             site=self.site2,
-            site_values=self.test_config2,
-            # TODO: Remove this deprecated value eventually.
-            values=self.test_config2,
+            site_values=self.test_config2
         )
 
         # Make sure entry is saved and retrieved correctly
@@ -295,15 +285,11 @@ class SiteConfigurationTests(TestCase):
         # add SiteConfiguration to database
         config1 = SiteConfigurationFactory.create(
             site=self.site,
-            site_values=self.test_config1,
-            # TODO: Remove this deprecated value eventually.
-            values=self.test_config1,
+            site_values=self.test_config1
         )
         config2 = SiteConfigurationFactory.create(
             site=self.site2,
-            site_values=self.test_config2,
-            # TODO: Remove this deprecated value eventually.
-            values=self.test_config2,
+            site_values=self.test_config2
         )
 
         # Make sure entry is saved and retrieved correctly
@@ -328,15 +314,11 @@ class SiteConfigurationTests(TestCase):
         # add SiteConfiguration to database
         SiteConfigurationFactory.create(
             site=self.site,
-            site_values=self.test_config1,
-            # TODO: Remove this deprecated value eventually.
-            values=self.test_config1,
+            site_values=self.test_config1
         )
         SiteConfigurationFactory.create(
             site=self.site2,
-            site_values=self.test_config2,
-            # TODO: Remove this deprecated value eventually.
-            values=self.test_config2,
+            site_values=self.test_config2
         )
 
         # Test that the default value is returned if the value for the given key is not found in the configuration
@@ -351,15 +333,11 @@ class SiteConfigurationTests(TestCase):
         SiteConfigurationFactory.create(
             site=self.site,
             site_values=self.test_config1,
-            # TODO: Remove this deprecated value eventually.
-            values=self.test_config1,
             enabled=False,
         )
         SiteConfigurationFactory.create(
             site=self.site2,
-            site_values=self.test_config2,
-            # TODO: Remove this deprecated value eventually.
-            values=self.test_config2,
+            site_values=self.test_config2
         )
 
         # Test that the default value is returned if the value for the given key is not found in the configuration
