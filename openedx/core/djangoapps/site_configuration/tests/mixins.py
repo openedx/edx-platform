@@ -22,9 +22,7 @@ class SiteMixin(object):
         }
         self.site_configuration = SiteConfigurationFactory.create(
             site=self.site,
-            site_values=site_config,
-            # TODO: Remove this deprecated value eventually.
-            values=site_config
+            site_values=site_config
         )
 
         self.site_other = SiteFactory.create(
@@ -44,9 +42,7 @@ class SiteMixin(object):
         }
         self.site_configuration_other = SiteConfigurationFactory.create(
             site=self.site_other,
-            site_values=site_config_other,
-            # TODO: Remove this deprecated value eventually.
-            values=site_config_other
+            site_values=site_config_other
         )
 
         # Initialize client with default site domain
@@ -62,9 +58,7 @@ class SiteMixin(object):
         )
         __ = SiteConfigurationFactory.create(
             site=site,
-            site_values=site_configuration_values,
-            # TODO: Remove this deprecated value eventually.
-            values=site_configuration_values
+            site_values=site_configuration_values
         )
         self.use_site(site)
         return site

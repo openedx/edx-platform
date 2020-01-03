@@ -244,7 +244,7 @@ class StackedConfigurationModel(ConfigurationModel):
         """
         all_courses = CourseOverview.objects.all()
         all_site_configs = SiteConfiguration.objects.filter(
-            values__contains='course_org_filter', enabled=True
+            site_values__contains='course_org_filter', enabled=True
         ).select_related('site')
 
         try:
@@ -254,7 +254,7 @@ class StackedConfigurationModel(ConfigurationModel):
 
         sites_by_org = defaultdict(lambda: default_site)
         site_cfg_org_filters = (
-            (site_cfg.site, site_cfg.values['course_org_filter'])
+            (site_cfg.site, site_cfg.site_values['course_org_filter'])
             for site_cfg in all_site_configs
         )
         sites_by_org.update({

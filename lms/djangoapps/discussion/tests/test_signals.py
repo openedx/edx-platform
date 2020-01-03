@@ -30,7 +30,6 @@ class SendMessageHandlerTestCase(TestCase):
         site_config = SiteConfigurationFactory.create(site=self.site)
         enable_notifications_cfg = {ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY: True}
         site_config.site_values = enable_notifications_cfg
-        site_config.values = enable_notifications_cfg
         site_config.save()
         mock_get_current_site.return_value = self.site
         signals.comment_created.send(sender=self.sender, user=self.user, post=self.post)
@@ -60,7 +59,6 @@ class SendMessageHandlerTestCase(TestCase):
         site_config = SiteConfigurationFactory.create(site=self.site)
         enable_notifications_cfg = {ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY: False}
         site_config.site_values = enable_notifications_cfg
-        site_config.values = enable_notifications_cfg
         site_config.save()
         mock_get_current_site.return_value = self.site
         signals.comment_created.send(sender=self.sender, user=self.user, post=self.post)
