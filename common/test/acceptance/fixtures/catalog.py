@@ -11,7 +11,7 @@ from common.test.acceptance.fixtures import CATALOG_STUB_URL
 from common.test.acceptance.fixtures.config import ConfigModelFixture
 
 
-class CatalogFixture(object):
+class CatalogFixture:
     """
     Interface to set up mock responses from the Catalog stub server.
     """
@@ -67,7 +67,7 @@ class CatalogFixture(object):
         )
 
 
-class CatalogIntegrationMixin(object):
+class CatalogIntegrationMixin:
     """Mixin providing a method used to configure the catalog integration."""
     def set_catalog_integration(self, is_enabled=False, service_username=None):
         """Use this to change the catalog integration config model during tests."""

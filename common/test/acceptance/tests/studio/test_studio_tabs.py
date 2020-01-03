@@ -17,7 +17,7 @@ class PagesTest(StudioCourseTest):
         """
         Install a course with no content using a fixture.
         """
-        super(PagesTest, self).setUp(is_staff)
+        super().setUp(is_staff)
         self.pages_page = PagesPage(
             self.browser,
             self.course_info['org'],
@@ -108,7 +108,7 @@ class PagesTest(StudioCourseTest):
         self.assertEqual(
             static_tab_titles,
             ['Empty', 'First'],
-            u'Order should be:["Empty", "First] but getting {} from the page'.format(static_tab_titles)
+            'Order should be:["Empty", "First] but getting {} from the page'.format(static_tab_titles)
         )
 
     def test_users_can_toggle_visibility(self):

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 End-to-end tests for the CCX dashboard.
 """
@@ -19,7 +18,7 @@ class CreateCCXCoachTest(EventsTestMixin, UniqueCourseTest):
     shard = 7
 
     def setUp(self):
-        super(CreateCCXCoachTest, self).setUp()
+        super().setUp()
         self.course_info.update({"settings": {"enable_ccx": "true"}})
         self.course_fixture = CourseFixture(**self.course_info)
         self.course_fixture.add_advanced_settings({

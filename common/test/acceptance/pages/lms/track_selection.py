@@ -20,7 +20,7 @@ class TrackSelectionPage(PageObject):
             browser (Browser): The browser instance.
             course_id (unicode): The course in which the user is enrolling.
         """
-        super(TrackSelectionPage, self).__init__(browser)
+        super().__init__(browser)
         self._course_id = course_id
 
     @property

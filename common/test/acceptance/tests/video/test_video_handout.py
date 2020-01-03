@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Acceptance tests for CMS Video Handout.
 """

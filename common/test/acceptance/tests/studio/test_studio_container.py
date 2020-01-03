@@ -52,7 +52,7 @@ class NestedVerticalTest(ContainerBase):
         self.group_a_item_1_action_index = 0
         self.group_a_item_2_action_index = 1
 
-        self.duplicate_label = u"Duplicate of '{0}'"
+        self.duplicate_label = "Duplicate of '{0}'"
         self.discussion_label = "Discussion"
 
         course_fixture.add_children(
@@ -230,13 +230,13 @@ class BaseGroupConfigurationsTest(ContainerBase):
     MODAL_NOT_RESTRICTED_MESSAGE = "Access is not restricted"
 
     def setUp(self):
-        super(BaseGroupConfigurationsTest, self).setUp()
+        super().setUp()
 
         # Set up a cohort-schemed user partition
         self.id_base = MINIMUM_STATIC_PARTITION_ID
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
-                u"user_partitions": [
+                "user_partitions": [
                     create_user_partition_json(
                         self.id_base,
                         self.CONTENT_GROUP_PARTITION,
@@ -290,7 +290,7 @@ class BaseGroupConfigurationsTest(ContainerBase):
             self.assertEqual("Access is not restricted", visibility_editor.current_groups_message)
         else:
             self.assertEqual(
-                u"Access is restricted to: {groups}".format(groups=expected_current_groups),
+                "Access is restricted to: {groups}".format(groups=expected_current_groups),
                 visibility_editor.current_groups_message
             )
 
@@ -298,13 +298,13 @@ class BaseGroupConfigurationsTest(ContainerBase):
         """
         Check that the expected partition scheme is selected.
         """
-        six.assertCountEqual(self, expected_scheme, visibility_editor.selected_partition_scheme)
+        self.assertCountEqual(expected_scheme, visibility_editor.selected_partition_scheme)
 
     def verify_selected_groups(self, visibility_editor, expected_groups):
         """
         Check the expected partition groups.
         """
-        six.assertCountEqual(self, expected_groups, [group.text for group in visibility_editor.selected_groups])
+        self.assertCountEqual(expected_groups, [group.text for group in visibility_editor.selected_groups])
 
     def select_and_verify_saved(self, component, partition_label, groups=[]):
         """
@@ -631,14 +631,14 @@ class EnrollmentTrackVisibilityModalTest(BaseGroupConfigurationsTest):
     VERIFIED_TRACK = "Verified Track"
 
     def setUp(self):
-        super(EnrollmentTrackVisibilityModalTest, self).setUp()
+        super().setUp()
 
         # Add an audit mode to the course
-        ModeCreationPage(self.browser, self.course_id, mode_slug=u'audit', mode_display_name=self.AUDIT_TRACK).visit()
+        ModeCreationPage(self.browser, self.course_id, mode_slug='audit', mode_display_name=self.AUDIT_TRACK).visit()
 
         # Add a verified mode to the course
         ModeCreationPage(
-            self.browser, self.course_id, mode_slug=u'verified',
+            self.browser, self.course_id, mode_slug='verified',
             mode_display_name=self.VERIFIED_TRACK, min_price=10
         ).visit()
 
@@ -1163,7 +1163,7 @@ class ProblemCategoryTabsTest(ContainerBase):
     Test to verify tabs in problem category.
     """
     def setUp(self, is_staff=True):
-        super(ProblemCategoryTabsTest, self).setUp(is_staff=is_staff)
+        super().setUp(is_staff=is_staff)
 
     def populate_course_fixture(self, course_fixture):
         """
@@ -1226,7 +1226,7 @@ class MoveComponentTest(ContainerBase):
     DRAFT_STATUS = "Publishing Status\nDraft (Unpublished changes)"
 
     def setUp(self, is_staff=True):
-        super(MoveComponentTest, self).setUp(is_staff=is_staff)
+        super().setUp(is_staff=is_staff)
         self.container = ContainerPage(self.browser, None)
         self.move_modal_view = MoveModalView(self.browser)
 
@@ -1237,8 +1237,8 @@ class MoveComponentTest(ContainerBase):
         }
         self.source_component_display_name = 'HTML 11'
         self.source_xblock_category = 'component'
-        self.message_move = u'Success! "{display_name}" has been moved.'
-        self.message_undo = u'Move cancelled. "{display_name}" has been moved back to its original location.'
+        self.message_move = 'Success! "{display_name}" has been moved.'
+        self.message_undo = 'Move cancelled. "{display_name}" has been moved back to its original location.'
 
     def populate_course_fixture(self, course_fixture):
         """
@@ -1431,14 +1431,14 @@ class MoveComponentTest(ContainerBase):
         """
         # Add content experiment support to course.
         self.course_fixture.add_advanced_settings({
-            u'advanced_modules': {'value': ['split_test']},
+            'advanced_modules': {'value': ['split_test']},
         })
 
         # Create group configurations
         # pylint: disable=protected-access
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             'metadata': {
-                u'user_partitions': [
+                'user_partitions': [
                     create_user_partition_json(
                         0,
                         'Test Group Configuration',

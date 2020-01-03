@@ -12,7 +12,7 @@ from common.test.acceptance.fixtures import EDXNOTES_STUB_URL
 
 
 class Range(factory.Factory):
-    class Meta(object):
+    class Meta:
         model = dict
 
     start = "/div[1]/p[1]"
@@ -22,7 +22,7 @@ class Range(factory.Factory):
 
 
 class Note(factory.Factory):
-    class Meta(object):
+    class Meta:
         model = dict
 
     user = "dummy-user"
@@ -40,7 +40,7 @@ class EdxNotesFixtureError(Exception):
     pass
 
 
-class EdxNotesFixture(object):
+class EdxNotesFixture:
     notes = []
 
     def create_notes(self, notes_list):
@@ -58,7 +58,7 @@ class EdxNotesFixture(object):
 
         if not response.ok:
             raise EdxNotesFixtureError(
-                u"Could not create notes {0}.  Status was {1}".format(
+                "Could not create notes {}.  Status was {}".format(
                     json.dumps(self.notes), response.status_code
                 )
             )
@@ -74,7 +74,7 @@ class EdxNotesFixture(object):
 
         if not response.ok:
             raise EdxNotesFixtureError(
-                u"Could not cleanup EdxNotes service {0}.  Status was {1}".format(
+                "Could not cleanup EdxNotes service {}.  Status was {}".format(
                     json.dumps(self.notes), response.status_code
                 )
             )

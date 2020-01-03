@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 End-to-end tests for the LMS Index page (aka, Home page).  Note that this is different than
 what students see @ edx.org because we redirect requests to a separate web application.
@@ -19,7 +18,7 @@ class BaseLmsIndexTest(AcceptanceTest):
         Initializes the components (page objects, courses, users) for this test suite
         """
         # Some state is constructed by the parent setUp() routine
-        super(BaseLmsIndexTest, self).setUp()
+        super().setUp()
 
         # Load page objects for use by the tests
         self.page = IndexPage(self.browser)
@@ -33,7 +32,7 @@ class LmsIndexPageTest(BaseLmsIndexTest):
     shard = 2
 
     def setUp(self):
-        super(LmsIndexPageTest, self).setUp()
+        super().setUp()
 
         # Useful to capture the current datetime for our tests
         self.now = datetime.datetime.now()
@@ -43,7 +42,7 @@ class LmsIndexPageTest(BaseLmsIndexTest):
         Perform a general validation of the index page, renders normally, no exceptions raised, etc.
         """
         self.assertTrue(self.page.banner_element.visible)
-        expected_links = [u'About', u'Blog', u'News', u'Help Center', u'Contact', u'Careers', u'Donate']
+        expected_links = ['About', 'Blog', 'News', 'Help Center', 'Contact', 'Careers', 'Donate']
         self.assertEqual(self.page.footer_links, expected_links)
 
     def test_intro_video_hidden_by_default(self):

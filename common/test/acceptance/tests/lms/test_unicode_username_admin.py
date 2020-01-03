@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 End-to-end tests for admin change view.
 """
@@ -18,7 +17,7 @@ class UnicodeUsernameAdminTest(AcceptanceTest):
     # The word below reads "Omar II", in Arabic. It also contains a space and
     # an Eastern Arabic Number another option is to use the Esperanto fake
     # language but this was used instead to test non-western letters.
-    FIXTURE_USERNAME = u'عمر ٢'
+    FIXTURE_USERNAME = 'عمر ٢'
 
     # From the db fixture `unicode_user.json`
     FIXTURE_USER_ID = 1000
@@ -28,7 +27,7 @@ class UnicodeUsernameAdminTest(AcceptanceTest):
         Initializes and visits the change user admin page as a superuser.
         """
         # Some state is constructed by the parent setUp() routine
-        super(UnicodeUsernameAdminTest, self).setUp()
+        super().setUp()
 
         AutoAuthPage(self.browser, staff=True, superuser=True).visit()
 

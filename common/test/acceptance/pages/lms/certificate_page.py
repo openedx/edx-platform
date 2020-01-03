@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Module for Certificates pages.
 """
@@ -24,7 +23,7 @@ class CertificatePage(PageObject):
             user_id: id of the user whom certificate is awarded
             course_id: course key of the course where certificate is awarded
         """
-        super(CertificatePage, self).__init__(browser)
+        super().__init__(browser)
         self.user_id = user_id
         self.course_id = course_id
 

@@ -24,7 +24,7 @@ class LibraryPage(PageObject, HelpMixin):
     Base page for Library pages. Defaults URL to the edit page.
     """
     def __init__(self, browser, locator):
-        super(LibraryPage, self).__init__(browser)
+        super().__init__(browser)
         self.locator = locator
 
     @property
@@ -32,7 +32,7 @@ class LibraryPage(PageObject, HelpMixin):
         """
         URL to the library edit page for the given library.
         """
-        return "{}/library/{}".format(BASE_URL, six.text_type(self.locator))
+        return "{}/library/{}".format(BASE_URL, str(self.locator))
 
     def is_browser_on_page(self):
         """
@@ -62,7 +62,7 @@ class LibraryEditPage(LibraryPage, PaginatedMixin, UsersPageMixin):
         for improved test reliability.
         """
         self.wait_for_ajax()
-        super(LibraryEditPage, self).wait_until_ready()
+        super().wait_until_ready()
 
     @property
     def xblocks(self):
@@ -85,7 +85,7 @@ class LibraryEditPage(LibraryPage, PaginatedMixin, UsersPageMixin):
         self.q(css='.toggle-preview-button').click()
         EmptyPromise(
             lambda: self.are_previews_showing() == toggle,
-            u'Preview is visible: %s' % toggle,
+            'Preview is visible: %s' % toggle,
             timeout=30
         ).fulfill()
         self.wait_until_ready()
@@ -132,7 +132,7 @@ class LibraryEditPage(LibraryPage, PaginatedMixin, UsersPageMixin):
         action is 'edit', 'duplicate', or 'delete'
         """
         return self._div_for_xblock_id(xblock_id)[0].find_element_by_css_selector(
-            u'.header-actions .{action}-button.action-button'.format(action=action)
+            '.header-actions .{action}-button.action-button'.format(action=action)
         )
 
 

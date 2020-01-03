@@ -315,7 +315,7 @@ class ProblemPage(PageObject):
             status_selector(str): status selector string.
             message(str): description of promise, to be logged.
         """
-        msg = u"Wait for status to be {}".format(message)
+        msg = "Wait for status to be {}".format(message)
         self.wait_for_element_visibility(status_selector, msg)
 
     def is_expected_status_visible(self, status_selector):
@@ -379,7 +379,7 @@ class ProblemPage(PageObject):
         Arguments:
             hint_index (int): Index of a displayed hint
         """
-        css = u'.notification-hint .notification-message > ol > li.hint-index-{hint_index}'.format(
+        css = '.notification-hint .notification-message > ol > li.hint-index-{hint_index}'.format(
             hint_index=hint_index
         )
         self.wait_for(
@@ -391,7 +391,7 @@ class ProblemPage(PageObject):
         """
         Click on the "Review" button within the visible notification.
         """
-        css_string = u'.notification.notification-{notification_type} .review-btn'.format(
+        css_string = '.notification.notification-{notification_type} .review-btn'.format(
             notification_type=notification_type
         )
 
@@ -472,7 +472,7 @@ class ProblemPage(PageObject):
 
         Problem <clarification>clarification text hidden by an icon in rendering</clarification> Text
         """
-        self.q(css=u'div.problem .clarification:nth-child({index}) span[data-tooltip]'.format(index=index + 1)).click()
+        self.q(css='div.problem .clarification:nth-child({index}) span[data-tooltip]'.format(index=index + 1)).click()
 
     @property
     def visible_tooltip_text(self):
@@ -497,14 +497,14 @@ class ProblemPage(PageObject):
             If not set, then the status can be elswhere in the problem.
         """
         if show_answer:
-            choice_status_xpath = (u'//fieldset/div[contains(@class, "field")][{{0}}]'
-                                   u'/label[contains(@class, "choicegroup_{choice}")]'
-                                   u'/span[contains(@class, "status {choice}")]'.format(choice=choice))
-            any_status_xpath = u'//fieldset/div[contains(@class, "field")][{0}]/label/span'
+            choice_status_xpath = ('//fieldset/div[contains(@class, "field")][{{0}}]'
+                                   '/label[contains(@class, "choicegroup_{choice}")]'
+                                   '/span[contains(@class, "status {choice}")]'.format(choice=choice))
+            any_status_xpath = '//fieldset/div[contains(@class, "field")][{0}]/label/span'
         else:
-            choice_status_xpath = (u'//fieldset/div[contains(@class, "field")][{{0}}]'
-                                   u'/label[contains(@class, "choicegroup_{choice}")]'.format(choice=choice))
-            any_status_xpath = u'//div[contains(@class, "indicator-container")]/span[contains(@class, "status")]'
+            choice_status_xpath = ('//fieldset/div[contains(@class, "field")][{{0}}]'
+                                   '/label[contains(@class, "choicegroup_{choice}")]'.format(choice=choice))
+            any_status_xpath = '//div[contains(@class, "indicator-container")]/span[contains(@class, "status")]'
 
         for possible_choice in choices_list:
             if not self.q(xpath=choice_status_xpath.format(possible_choice)).is_present():

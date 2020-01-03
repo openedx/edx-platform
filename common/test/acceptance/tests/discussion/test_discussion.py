@@ -38,7 +38,7 @@ from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin,
 from common.test.acceptance.tests.helpers import UniqueCourseTest, get_modal_alert, skip_if_browser
 from openedx.core.lib.tests import attr
 
-THREAD_CONTENT_WITH_LATEX = u"""Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+THREAD_CONTENT_WITH_LATEX = """Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
                                ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
                                ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
                                reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.
@@ -125,7 +125,7 @@ class DiscussionResponsePaginationTestMixin(BaseDiscussionMixin):
             (
                 None if response_total == 0 else
                 "Showing all responses" if response_total == displayed_responses else
-                u"Showing first {} responses".format(displayed_responses)
+                "Showing first {} responses".format(displayed_responses)
             )
         )
         self.assertEqual(
@@ -188,7 +188,7 @@ class DiscussionHomePageTest(BaseDiscussionTestCase):
     SEARCHED_USERNAME = "gizmo"
 
     def setUp(self):
-        super(DiscussionHomePageTest, self).setUp()
+        super().setUp()
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
         self.page = DiscussionTabHomePage(self.browser, self.course_id)
         self.page.visit()
@@ -244,7 +244,7 @@ class DiscussionNavigationTest(BaseDiscussionTestCase):
     """
 
     def setUp(self):
-        super(DiscussionNavigationTest, self).setUp()
+        super().setUp()
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
 
         thread_id = "test_thread_{}".format(uuid4().hex)
@@ -323,7 +323,7 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
     """
 
     def setUp(self):
-        super(DiscussionTabSingleThreadTest, self).setUp()
+        super().setUp()
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
         self.tab_nav = TabNavPage(self.browser)
 
@@ -401,7 +401,7 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
         # Update course advance settings with a valid blackout period.
         self.course_fixture.add_advanced_settings(
             {
-                u"discussion_blackouts": {
+                "discussion_blackouts": {
                     "value": [
                         [
                             (now - datetime.timedelta(days=14)).isoformat(),
@@ -443,7 +443,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase, BaseDiscussionMixi
     Tests for the discussion page with multiple threads
     """
     def setUp(self):
-        super(DiscussionTabMultipleThreadTest, self).setUp()
+        super().setUp()
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
         self.thread_count = 2
         self.thread_ids = []
@@ -493,7 +493,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
     """
 
     def setUp(self):
-        super(DiscussionOpenClosedThreadTest, self).setUp()
+        super().setUp()
 
         self.thread_id = "test_thread_{}".format(uuid4().hex)
 
@@ -645,10 +645,10 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.submit_response_edit(response_id, description)
 
         expected_response_html = (
-            u'<p><a href="{}">{}</a></p>'.format(url, description)
+            '<p><a href="{}">{}</a></p>'.format(url, description)
         )
         actual_response_html = page.q(
-            css=u".response_{} .response-body".format(response_id)
+            css=".response_{} .response-body".format(response_id)
         ).html[0]
         self.assertEqual(expected_response_html, actual_response_html)
 
@@ -679,10 +679,10 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.submit_response_edit(response_id, '')
 
         expected_response_html = (
-            u'<p><img src="{}" alt="{}" title=""></p>'.format(url, description)
+            '<p><img src="{}" alt="{}" title=""></p>'.format(url, description)
         )
         actual_response_html = page.q(
-            css=u".response_{} .response-body".format(response_id)
+            css=".response_{} .response-body".format(response_id)
         ).html[0]
         self.assertEqual(expected_response_html, actual_response_html)
 
@@ -734,11 +734,11 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.submit_response_edit(response_id, "Some content")
 
         expected_response_html = (
-            u'<p>Some content<img src="{}" alt="{}" title=""></p>'.format(
+            '<p>Some content<img src="{}" alt="{}" title=""></p>'.format(
                 url, description)
         )
         actual_response_html = page.q(
-            css=u".response_{} .response-body".format(response_id)
+            css=".response_{} .response-body".format(response_id)
         ).html[0]
         self.assertEqual(expected_response_html, actual_response_html)
 
@@ -954,7 +954,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
 @attr(shard=2)
 class DiscussionEditorPreviewTest(UniqueCourseTest):
     def setUp(self):
-        super(DiscussionEditorPreviewTest, self).setUp()
+        super().setUp()
         CourseFixture(**self.course_info).install()
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
         self.page = DiscussionTabHomePage(self.browser, self.course_id)
@@ -1030,7 +1030,7 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
         appear in the preview box
         """
         self.page.set_new_post_editor_value(
-            six.text_type(
+            str(
                 r'\begin{equation}'
                 r'\tau_g(\omega) = - \frac{d}{d\omega}\phi(\omega) \hspace{2em} (1) '  # pylint: disable=unicode-format-string
                 r'\end{equation}'
@@ -1052,7 +1052,7 @@ class InlineDiscussionTest(UniqueCourseTest):
     """
 
     def setUp(self):
-        super(InlineDiscussionTest, self).setUp()
+        super().setUp()
         self.thread_ids = []
         self.discussion_id = "test_discussion_{}".format(uuid4().hex)
         self.additional_discussion_id = "test_discussion_{}".format(uuid4().hex)
@@ -1189,7 +1189,7 @@ class InlineDiscussionTest(UniqueCourseTest):
         now = datetime.datetime.now(UTC)
         self.course_fix.add_advanced_settings(
             {
-                u"discussion_blackouts": {
+                "discussion_blackouts": {
                     "value": [
                         [
                             (now - datetime.timedelta(days=14)).isoformat(),
@@ -1212,7 +1212,7 @@ class DiscussionUserProfileTest(UniqueCourseTest):
     PROFILED_USERNAME = "profiled-user"
 
     def setUp(self):
-        super(DiscussionUserProfileTest, self).setUp()
+        super().setUp()
         self.setup_course()
         # The following line creates a user enrolled in our course, whose
         # threads will be viewed, but not the one who will view the page.
@@ -1307,7 +1307,7 @@ class DiscussionUserProfileTest(UniqueCourseTest):
             self.PROFILED_USERNAME
         )
         page.visit()
-        self.assertEqual(page.get_user_roles(), u'Student')
+        self.assertEqual(page.get_user_roles(), 'Student')
 
 
 class DiscussionSearchAlertTest(UniqueCourseTest):
@@ -1318,7 +1318,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
     SEARCHED_USERNAME = "gizmo"
 
     def setUp(self):
-        super(DiscussionSearchAlertTest, self).setUp()
+        super().setUp()
         CourseFixture(**self.course_info).install()
         # first auto auth call sets up a user that we will search for in some tests
         self.searched_user_id = AutoAuthPage(
@@ -1410,7 +1410,7 @@ class DiscussionSortPreferenceTest(UniqueCourseTest):
     """
 
     def setUp(self):
-        super(DiscussionSortPreferenceTest, self).setUp()
+        super().setUp()
 
         # Create a course to register for.
         CourseFixture(**self.course_info).install()

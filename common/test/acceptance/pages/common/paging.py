@@ -7,7 +7,7 @@ import six
 from selenium.webdriver.common.keys import Keys
 
 
-class PaginatedUIMixin(object):
+class PaginatedUIMixin:
     """Common methods used for paginated UI."""
 
     PAGINATION_FOOTER_CSS = 'nav.bottom'
@@ -40,7 +40,7 @@ class PaginatedUIMixin(object):
 
     def go_to_page(self, page_number):
         """Go to the given page_number in the paginated list results."""
-        self.q(css=self.PAGE_NUMBER_INPUT_CSS).results[0].send_keys(six.text_type(page_number), Keys.ENTER)
+        self.q(css=self.PAGE_NUMBER_INPUT_CSS).results[0].send_keys(str(page_number), Keys.ENTER)
         self.wait_for_ajax()
 
     def press_next_page_button(self):

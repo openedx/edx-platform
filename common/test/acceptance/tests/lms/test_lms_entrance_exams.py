@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Bok choy acceptance tests for Entrance exams in the LMS
 """
@@ -20,7 +19,7 @@ class EntranceExamTest(UniqueCourseTest):
     EMAIL = "joe@example.com"
 
     def setUp(self):
-        super(EntranceExamTest, self).setUp()
+        super().setUp()
 
         self.xqueue_grade_response = None
 

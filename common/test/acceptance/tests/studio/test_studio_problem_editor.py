@@ -21,7 +21,7 @@ class ProblemComponentEditor(ContainerBase):
         """
         Create a course with a section, subsection, and unit to which to add the component.
         """
-        super(ProblemComponentEditor, self).setUp(is_staff=is_staff)
+        super().setUp(is_staff=is_staff)
         self.component = 'Blank Common Problem'
         self.unit = self.go_to_unit_page()
         self.container_page = ContainerPage(self.browser, None)
@@ -52,15 +52,15 @@ class ProblemComponentEditor(ContainerBase):
         And Edit High Level Source is not visible
         """
         expected_default_settings = {
-            'Display Name': u'Blank Common Problem',
-            'Matlab API key': u'',
-            'Maximum Attempts': u'',
-            'Problem Weight': u'',
-            'Randomization': u'Never',
-            'Show Answer': u'Finished',
-            'Show Answer: Number of Attempts': u'0',
-            'Show Reset Button': u'False',
-            'Timer Between Attempts': u'0'
+            'Display Name': 'Blank Common Problem',
+            'Matlab API key': '',
+            'Maximum Attempts': '',
+            'Problem Weight': '',
+            'Randomization': 'Never',
+            'Show Answer': 'Finished',
+            'Show Answer: Number of Attempts': '0',
+            'Show Reset Button': 'False',
+            'Timer Between Attempts': '0'
         }
         self.problem_editor.open_settings()
         settings = self.problem_editor.get_settings()

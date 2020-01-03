@@ -107,14 +107,14 @@ class GroupConfigurationsPage(CoursePage):
         return self.q(css='.wrapper-groups.content-groups.enrollment_track .collection-details .title').text
 
 
-class GroupConfiguration(object):
+class GroupConfiguration:
     """
     Group Configuration wrapper.
     """
 
     def __init__(self, page, prefix, index):
         self.page = page
-        self.SELECTOR = prefix + u' .wrapper-collection-{}'.format(index)
+        self.SELECTOR = prefix + ' .wrapper-collection-{}'.format(index)
         self.index = index
 
     def get_selector(self, css=''):
@@ -309,7 +309,7 @@ class GroupConfiguration(object):
         return "<{}:{}>".format(self.__class__.__name__, self.name)
 
 
-class Group(object):
+class Group:
     """
     Group wrapper.
     """

@@ -20,7 +20,7 @@ class TextbooksTest(StudioCourseTest):
         """
         Install a course with no content using a fixture.
         """
-        super(TextbooksTest, self).setUp(is_staff)
+        super().setUp(is_staff)
         self.textbook_upload_page = TextbookUploadPage(
             self.browser,
             self.course_info['org'],

@@ -11,7 +11,7 @@ from common.test.acceptance.pages.studio.course_page import CoursePage
 from common.test.acceptance.pages.studio.utils import HelpMixin
 
 
-class LoginMixin(object):
+class LoginMixin:
     """
     Mixin class used for logging into the system.
     """

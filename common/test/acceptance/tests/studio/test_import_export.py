@@ -18,7 +18,7 @@ from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTes
 from openedx.core.lib.tests import attr
 
 
-class ExportTestMixin(object):
+class ExportTestMixin:
     """
     Tests to run both for course and library export pages.
     """
@@ -101,7 +101,7 @@ class TestCourseExport(ExportTestMixin, StudioCourseTest):
     Export tests for courses.
     """
     def setUp(self):  # pylint: disable=arguments-differ
-        super(TestCourseExport, self).setUp()
+        super().setUp()
         self.export_page = ExportCoursePage(
             self.browser,
             self.course_info['org'], self.course_info['number'], self.course_info['run'],
@@ -127,7 +127,7 @@ class TestLibraryExport(ExportTestMixin, StudioLibraryTest):
         """
         Ensure a library exists and navigate to the library edit page.
         """
-        super(TestLibraryExport, self).setUp()
+        super().setUp()
         self.export_page = ExportLibraryPage(self.browser, self.library_key)
         self.export_page.visit()
 
@@ -142,12 +142,12 @@ class TestLibraryExport(ExportTestMixin, StudioLibraryTest):
 
 
 @attr(shard=7)
-class ImportTestMixin(object):
+class ImportTestMixin:
     """
     Tests to run for both course and library import pages.
     """
     def setUp(self):
-        super(ImportTestMixin, self).setUp()
+        super().setUp()
         self.import_page = self.import_page_class(*self.page_args())
         self.landing_page = self.landing_page_class(*self.page_args())
         self.import_page.visit()

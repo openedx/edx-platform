@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 End-to-end tests for the LMS Instructor Dashboard.
 """
@@ -73,7 +72,7 @@ class LMSInstructorDashboardA11yTest(BaseInstructorDashboardTest):
     Instructor dashboard base accessibility test.
     """
     def setUp(self):
-        super(LMSInstructorDashboardA11yTest, self).setUp()
+        super().setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
         self.log_in_as_instructor()
         self.instructor_dashboard_page = self.visit_instructor_dashboard()
@@ -96,7 +95,7 @@ class BulkEmailTest(BaseInstructorDashboardTest):
     shard = 23
 
     def setUp(self):
-        super(BulkEmailTest, self).setUp()
+        super().setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
         self.log_in_as_instructor()
         instructor_dashboard_page = self.visit_instructor_dashboard()
@@ -133,7 +132,7 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
     """
 
     def setUp(self):
-        super(AutoEnrollmentWithCSVTest, self).setUp()
+        super().setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
         self.log_in_as_instructor()
         instructor_dashboard_page = self.visit_instructor_dashboard()
@@ -250,7 +249,7 @@ class BatchBetaTestersTest(BaseInstructorDashboardTest):
     shard = 23
 
     def setUp(self):
-        super(BatchBetaTestersTest, self).setUp()
+        super().setUp()
         self.username = "test_{uuid}".format(uuid=self.unique_id[0:6])
         self.email = "{user}@example.com".format(user=self.username)
         AutoAuthPage(self.browser, username=self.username, email=self.email, is_active=False).visit()
@@ -303,7 +302,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
     EMAIL = "student101@example.com"
 
     def setUp(self):
-        super(ProctoredExamsTest, self).setUp()
+        super().setUp()
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
 
@@ -332,7 +331,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
 
         # Add a verified mode to the course
         ModeCreationPage(
-            self.browser, self.course_id, mode_slug=u'verified', mode_display_name=u'Verified Certificate',
+            self.browser, self.course_id, mode_slug='verified', mode_display_name='Verified Certificate',
             min_price=10, suggested_prices='10,20'
         ).visit()
 
@@ -449,7 +448,7 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
     )
 
     def setUp(self):
-        super(EntranceExamGradeTest, self).setUp()
+        super().setUp()
         self.course_info.update({"settings": {"entrance_exam_enabled": "true"}})
         CourseFixture(**self.course_info).install()
         self.student_identifier = "johndoe_saee@example.com"
@@ -589,7 +588,7 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
     Bok Choy tests for the "Data Downloads" tab.
     """
     def setUp(self):
-        super(DataDownloadsTest, self).setUp()
+        super().setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
         self.instructor_username, self.instructor_id, __, __ = self.log_in_as_instructor()
         instructor_dashboard_page = self.visit_instructor_dashboard()
@@ -600,7 +599,7 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         Verifies that the correct event is emitted when a report is requested.
         """
         self.assert_matching_events_were_emitted(
-            event_filter={'name': u'edx.instructor.report.requested', 'report_type': report_type}
+            event_filter={'name': 'edx.instructor.report.requested', 'report_type': report_type}
         )
 
     def verify_report_downloaded_event(self, report_url):
@@ -608,7 +607,7 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         Verifies that the correct event is emitted when a report is downloaded.
         """
         self.assert_matching_events_were_emitted(
-            event_filter={'name': u'edx.instructor.report.downloaded', 'report_url': report_url}
+            event_filter={'name': 'edx.instructor.report.downloaded', 'report_url': report_url}
         )
 
     def verify_report_download(self, report_name):
@@ -634,7 +633,7 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         When I click on the report
         Then a report downloaded event should be emitted
         """
-        report_name = u"student_profile_info"
+        report_name = "student_profile_info"
         self.data_download_section.generate_student_report_button.click()
         self.data_download_section.wait_for_available_report()
         self.verify_report_requested_event(report_name)
@@ -652,7 +651,7 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         When I click on the report
         Then a report downloaded event should be emitted
         """
-        report_name = u"grade_report"
+        report_name = "grade_report"
         self.data_download_section.generate_grade_report_button.click()
         self.data_download_section.wait_for_available_report()
         self.verify_report_requested_event(report_name)
@@ -670,7 +669,7 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         When I click on the report
         Then a report downloaded event should be emitted
         """
-        report_name = u"problem_grade_report"
+        report_name = "problem_grade_report"
         self.data_download_section.generate_problem_report_button.click()
         self.data_download_section.wait_for_available_report()
         self.verify_report_requested_event(report_name)
@@ -685,7 +684,7 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         And I click on the "Download ORA2 Responses" button
         Then a report should be generated
         """
-        report_name = u"ORA_data"
+        report_name = "ORA_data"
         self.data_download_section.generate_ora2_response_report_button.click()
         self.data_download_section.wait_for_available_report()
         self.verify_report_download(report_name)
@@ -709,7 +708,7 @@ class DataDownloadsWithMultipleRoleTests(BaseInstructorDashboardTest):
     shard = 23
 
     def setUp(self):
-        super(DataDownloadsWithMultipleRoleTests, self).setUp()
+        super().setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
 
     @ddt.data(['staff'], ['instructor'])
@@ -773,7 +772,7 @@ class DataDownloadsWithMultipleRoleTests(BaseInstructorDashboardTest):
             | instructor    |
             | staff         |
         """
-        expected = u"""-----------------------------------------------------------------------------
+        expected = """-----------------------------------------------------------------------------
 Course grader:
 <class 'xmodule.graders.WeightedSubsectionsGrader'>
 
@@ -807,7 +806,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
     """
 
     def setUp(self):
-        super(CertificatesTest, self).setUp()
+        super().setUp()
         self.test_certificate_config = {
             'id': 1,
             'name': 'Certificate name',
@@ -978,7 +977,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.add_certificate_exception(self.user_name, '')
 
         self.assertIn(
-            u'{user} already in exception list.'.format(user=self.user_name),
+            '{user} already in exception list.'.format(user=self.user_name),
             self.certificates_section.message.text
         )
 
@@ -1025,7 +1024,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.wait_for_ajax()
 
         self.assertIn(
-            u"{user} does not exist in the LMS. Please check your spelling and retry.".format(user=invalid_user),
+            "{user} does not exist in the LMS. Please check your spelling and retry.".format(user=invalid_user),
             self.certificates_section.message.text
         )
 
@@ -1058,7 +1057,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.wait_for_ajax()
 
         self.assertIn(
-            u"{user} is not enrolled in this course. Please check your spelling and retry.".format(user=new_user),
+            "{user} is not enrolled in this course. Please check your spelling and retry.".format(user=new_user),
             self.certificates_section.message.text
         )
 
@@ -1138,7 +1137,7 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
 
     @classmethod
     def setUpClass(cls):
-        super(CertificateInvalidationTest, cls).setUpClass()
+        super().setUpClass()
 
         # Create course fixture once each test run
         CourseFixture(
@@ -1149,7 +1148,7 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
         ).install()
 
     def setUp(self):
-        super(CertificateInvalidationTest, self).setUp()
+        super().setUp()
         # set same course number as we have in fixture json
         self.course_info['number'] = "335535897951379478207964576572017930000"
 
@@ -1201,7 +1200,7 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
 
         # Validate success message
         self.assertIn(
-            u"Certificate has been successfully invalidated for {user}.".format(user=self.student_name),
+            "Certificate has been successfully invalidated for {user}.".format(user=self.student_name),
             self.certificates_section.certificate_invalidation_message.text
         )
 
@@ -1268,8 +1267,8 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
         self.certificates_section.wait_for_ajax()
 
         self.assertIn(
-            u'Student username/email field is required and can not be empty. '
-            u'Kindly fill in username/email and then press "Invalidate Certificate" button.',
+            'Student username/email field is required and can not be empty. '
+            'Kindly fill in username/email and then press "Invalidate Certificate" button.',
             self.certificates_section.certificate_invalidation_message.text
         )
 
@@ -1292,7 +1291,7 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
         self.certificates_section.wait_for_ajax()
 
         self.assertIn(
-            u"{user} does not exist in the LMS. Please check your spelling and retry.".format(user=invalid_user),
+            "{user} does not exist in the LMS. Please check your spelling and retry.".format(user=invalid_user),
             self.certificates_section.certificate_invalidation_message.text
         )
 
@@ -1324,7 +1323,7 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
         self.certificates_section.wait_for_ajax()
 
         self.assertIn(
-            u"{user} is not enrolled in this course. Please check your spelling and retry.".format(user=new_user),
+            "{user} is not enrolled in this course. Please check your spelling and retry.".format(user=new_user),
             self.certificates_section.certificate_invalidation_message.text
         )
 
@@ -1374,7 +1373,7 @@ class EcommerceTest(BaseInstructorDashboardTest):
         """
         Add an honor mode to the course
         """
-        ModeCreationPage(browser=self.browser, course_id=self.course_id, mode_slug=u'honor', min_price=10,
+        ModeCreationPage(browser=self.browser, course_id=self.course_id, mode_slug='honor', min_price=10,
                          sku=sku_value).visit()
 
     def test_enrollment_codes_section_visible_for_non_ecommerce_course(self):
@@ -1390,7 +1389,7 @@ class EcommerceTest(BaseInstructorDashboardTest):
         self.add_course_mode()
 
         # Log in and visit E-commerce section under Instructor dashboard
-        self.assertIn(u'Enrollment Codes', self.visit_ecommerce_section().get_sections_header_values())
+        self.assertIn('Enrollment Codes', self.visit_ecommerce_section().get_sections_header_values())
 
     def test_coupon_codes_section_visible_for_non_ecommerce_course(self):
         """
@@ -1405,7 +1404,7 @@ class EcommerceTest(BaseInstructorDashboardTest):
         self.add_course_mode()
 
         # Log in and visit E-commerce section under Instructor dashboard
-        self.assertIn(u'Coupon Code List', self.visit_ecommerce_section().get_sections_header_values())
+        self.assertIn('Coupon Code List', self.visit_ecommerce_section().get_sections_header_values())
 
     def test_enrollment_codes_section_not_visible_for_ecommerce_course(self):
         """
@@ -1420,7 +1419,7 @@ class EcommerceTest(BaseInstructorDashboardTest):
         self.add_course_mode('test_sku')
 
         # Log in and visit E-commerce section under Instructor dashboard
-        self.assertNotIn(u'Enrollment Codes', self.visit_ecommerce_section().get_sections_header_values())
+        self.assertNotIn('Enrollment Codes', self.visit_ecommerce_section().get_sections_header_values())
 
     def test_coupon_codes_section_not_visible_for_ecommerce_course(self):
         """
@@ -1435,7 +1434,7 @@ class EcommerceTest(BaseInstructorDashboardTest):
         self.add_course_mode('test_sku')
 
         # Log in and visit E-commerce section under Instructor dashboard
-        self.assertNotIn(u'Coupon Code List', self.visit_ecommerce_section().get_sections_header_values())
+        self.assertNotIn('Coupon Code List', self.visit_ecommerce_section().get_sections_header_values())
 
 
 class StudentAdminTest(BaseInstructorDashboardTest):
@@ -1447,7 +1446,7 @@ class StudentAdminTest(BaseInstructorDashboardTest):
     shard = 23
 
     def setUp(self):
-        super(StudentAdminTest, self).setUp()
+        super().setUp()
         self.course_fix = CourseFixture(
             self.course_info['org'],
             self.course_info['number'],

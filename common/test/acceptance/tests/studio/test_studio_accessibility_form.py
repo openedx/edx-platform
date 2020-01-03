@@ -20,7 +20,7 @@ class AccessibilityPageTest(AcceptanceTest):
         """
         Load the helper for the accessibility page.
         """
-        super(AccessibilityPageTest, self).setUp()
+        super().setUp()
         self.accessibility_page = AccessibilityPage(self.browser)
 
     def test_page_loads(self):

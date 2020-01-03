@@ -41,7 +41,7 @@ class CourseTeamPageTest(StudioCourseTest):
         """
         Install a course with no content using a fixture.
         """
-        super(CourseTeamPageTest, self).setUp(is_staff)
+        super().setUp(is_staff)
 
         self.other_user = self._make_user('other')
         self.dashboard_page = DashboardPage(self.browser)
@@ -77,7 +77,7 @@ class CourseTeamPageTest(StudioCourseTest):
                 course1['run'] == course2['run']
             )
 
-        actual_visible = any((check_course_equality(course, self.course_info) for course in courses))
+        actual_visible = any(check_course_equality(course, self.course_info) for course in courses)
 
         self.assertEqual(actual_visible, visible)
 

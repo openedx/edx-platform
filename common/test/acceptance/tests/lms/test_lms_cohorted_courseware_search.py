@@ -36,7 +36,7 @@ class CoursewareSearchCohortTest(ContainerBase, CohortTestMixin):
             json.dump({}, index_file)
         self.addCleanup(remove_file, self.TEST_INDEX_FILENAME)
 
-        super(CoursewareSearchCohortTest, self).setUp(is_staff=is_staff)
+        super().setUp(is_staff=is_staff)
         self.staff_user = self.user
 
         self.studio_course_outline = StudioCourseOutlinePage(

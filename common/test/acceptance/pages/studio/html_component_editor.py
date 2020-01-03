@@ -222,7 +222,7 @@ class HtmlXBlockEditorView(XBlockEditorView):
         """
         If editing, set the value of a field.
         """
-        selector = u'.xblock-studio_view li.field label:contains("{}") + input'.format(field_display_name)
+        selector = '.xblock-studio_view li.field label:contains("{}") + input'.format(field_display_name)
         script = "$(arguments[0]).val(arguments[1]).change();"
         self.browser.execute_script(script, selector, field_value)
 

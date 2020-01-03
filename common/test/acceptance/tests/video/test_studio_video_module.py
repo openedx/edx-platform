@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Acceptance tests for CMS Video Module.
 """
@@ -28,7 +26,7 @@ class CMSVideoBaseTest(UniqueCourseTest):
         """
         Initialization of pages and course fixture for tests
         """
-        super(CMSVideoBaseTest, self).setUp()
+        super().setUp()
 
         self.video = VideoComponentPage(self.browser)
 
@@ -352,4 +350,4 @@ class CMSVideoA11yTest(CMSVideoBaseTest):
             browser = 'firefox'
 
         with patch.dict(os.environ, {'SELENIUM_BROWSER': browser}):
-            super(CMSVideoA11yTest, self).setUp()
+            super().setUp()

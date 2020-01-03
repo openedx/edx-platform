@@ -14,7 +14,7 @@ class LibraryContentXBlockWrapper(PageObject):
     BODY_SELECTOR = '.xblock-student_view div'
 
     def __init__(self, browser, locator):
-        super(LibraryContentXBlockWrapper, self).__init__(browser)
+        super().__init__(browser)
         self.locator = locator
 
     def is_browser_on_page(self):
@@ -27,7 +27,7 @@ class LibraryContentXBlockWrapper(PageObject):
         """
         Return `selector`, but limited to this particular block's context
         """
-        return u'{}[data-id="{}"] {}'.format(
+        return '{}[data-id="{}"] {}'.format(
             self.BODY_SELECTOR,
             self.locator,
             selector

@@ -21,7 +21,7 @@ class GradingPageTest(StudioCourseTest):
     GRACE_FIELD_CSS = "#course-grading-graceperiod"
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(GradingPageTest, self).setUp()
+        super().setUp()
         self.grading_page = GradingPage(
             self.browser,
             self.course_info['org'],
@@ -145,7 +145,7 @@ class GradingPageTest(StudioCourseTest):
         self.assertIn(
             '0-3',
             grade_ranges,
-            u'expected range: 0-3, not found in grade ranges:{}'.format(grade_ranges)
+            'expected range: 0-3, not found in grade ranges:{}'.format(grade_ranges)
         )
 
     def test_settings_are_persisted_on_save_only(self):

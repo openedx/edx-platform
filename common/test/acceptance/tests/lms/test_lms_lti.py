@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Bok choy acceptance tests for LTI xblock
 """
@@ -29,7 +28,7 @@ class TestLTIConsumer(UniqueCourseTest):
     host = os.environ.get('BOK_CHOY_HOSTNAME', '127.0.0.1')
 
     def setUp(self):
-        super(TestLTIConsumer, self).setUp()
+        super().setUp()
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.lti_iframe = LTIContentIframe(self.browser, self.course_id)
         self.tab_nav = TabNavPage(self.browser)

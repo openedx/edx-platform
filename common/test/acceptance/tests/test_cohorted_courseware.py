@@ -29,7 +29,7 @@ class EndToEndCohortedCoursewareTest(ContainerBase, CohortTestMixin):
 
     def setUp(self, is_staff=True):
 
-        super(EndToEndCohortedCoursewareTest, self).setUp(is_staff=is_staff)
+        super().setUp(is_staff=is_staff)
         self.staff_user = self.user
 
         self.content_group_a = "Content Group A" + XSS_INJECTION

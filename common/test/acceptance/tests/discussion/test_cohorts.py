@@ -52,7 +52,7 @@ class CohortedDiscussionTestMixin(BaseDiscussionMixin, CohortTestMixin):
         self.refresh_thread_page(self.thread_id)
         self.assertEqual(
             self.thread_page.get_group_visibility_label(),
-            u"This post is visible only to {}.".format(self.cohort_1_name)
+            "This post is visible only to {}.".format(self.cohort_1_name)
         )
 
         # Disable cohorts and verify that the post now shows as visible to everyone.
@@ -66,7 +66,7 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase):
     Tests for the discussion page displaying a single thread.
     """
     def setUp(self):
-        super(DiscussionTabSingleThreadTest, self).setUp()
+        super().setUp()
         self.setup_cohorts()
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
 
@@ -103,7 +103,7 @@ class InlineDiscussionTest(UniqueCourseTest):
     Tests for inline discussions
     """
     def setUp(self):
-        super(InlineDiscussionTest, self).setUp()
+        super().setUp()
         self.discussion_id = "test_discussion_{}".format(uuid4().hex)
         self.course_fixture = CourseFixture(**self.course_info).add_children(
             XBlockFixtureDesc("chapter", "Test Section").add_children(

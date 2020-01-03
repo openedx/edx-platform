@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 End-to-end tests for the gating feature.
 """
@@ -29,7 +28,7 @@ class GatingTest(UniqueCourseTest):
     shard = 23
 
     def setUp(self):
-        super(GatingTest, self).setUp()
+        super().setUp()
 
         self.logout_page = LogoutPage(self.browser)
         self.course_home_page = CourseHomePage(self.browser, self.course_id)

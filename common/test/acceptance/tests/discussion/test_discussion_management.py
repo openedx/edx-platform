@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 End-to-end tests related to the divided discussion management on the LMS Instructor Dashboard
 """
@@ -24,7 +23,7 @@ class BaseDividedDiscussionTest(UniqueCourseTest, CohortTestMixin):
         """
         Set up a discussion topic
         """
-        super(BaseDividedDiscussionTest, self).setUp()
+        super().setUp()
 
         self.discussion_id = "test_discussion_{}".format(uuid.uuid4().hex)
         self.course_fixture = CourseFixture(**self.course_info).add_children(
@@ -483,7 +482,7 @@ class DivisionSchemeTest(BaseDividedDiscussionTest, BaseDiscussionMixin):
         refresh_thread_page()
         self.assertEqual(
             self.thread_page.get_group_visibility_label(),
-            u"This post is visible only to {}.".format("Audit")
+            "This post is visible only to {}.".format("Audit")
         )
 
         # Disable dividing discussions and verify that the post now shows as visible to everyone.

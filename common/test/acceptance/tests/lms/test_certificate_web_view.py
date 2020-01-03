@@ -17,7 +17,7 @@ class CertificateWebViewTest(EventsTestMixin, UniqueCourseTest):
     shard = 5
 
     def setUp(self):
-        super(CertificateWebViewTest, self).setUp()
+        super().setUp()
         # set same course number as we have in fixture json
         self.course_info['number'] = "335535897951379478207964576572017930000"
         test_certificate_config = {

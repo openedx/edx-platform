@@ -21,7 +21,7 @@ from common.test.acceptance.pages.lms.discussion import DiscussionTabSingleThrea
 from common.test.acceptance.tests.helpers import UniqueCourseTest
 
 
-class BaseDiscussionMixin(object):
+class BaseDiscussionMixin:
     """
     A mixin containing methods common to discussion tests.
     """
@@ -60,7 +60,7 @@ class BaseDiscussionMixin(object):
         self.assertTrue(response.ok, "Failed to push discussion content")
 
 
-class CohortTestMixin(object):
+class CohortTestMixin:
     """
     Mixin for tests of cohorted courses
     """
@@ -71,7 +71,7 @@ class CohortTestMixin(object):
         """
         course_fixture._update_xblock(course_fixture._course_location, {
             "metadata": {
-                u"cohort_config": {
+                "cohort_config": {
                     "auto_cohort_groups": auto_cohort_groups or [],
                     "cohorted_discussions": [],
                     "cohorted": True,
@@ -129,7 +129,7 @@ class CohortTestMixin(object):
 class BaseDiscussionTestCase(UniqueCourseTest, ForumsConfigMixin):
     """Base test case class for all discussions-related tests."""
     def setUp(self):
-        super(BaseDiscussionTestCase, self).setUp()
+        super().setUp()
 
         self.discussion_id = "test_discussion_{}".format(uuid4().hex)
         self.course_fixture = CourseFixture(**self.course_info)

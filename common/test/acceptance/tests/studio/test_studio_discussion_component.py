@@ -21,7 +21,7 @@ class DiscussionComponentTest(ContainerBase):
         """
         Create a course with a section, subsection, and unit to which to add the component.
         """
-        super(DiscussionComponentTest, self).setUp(is_staff=is_staff)
+        super().setUp(is_staff=is_staff)
         self.component = 'discussion'
         self.unit = self.go_to_unit_page()
         self.container_page = ContainerPage(self.browser, None)

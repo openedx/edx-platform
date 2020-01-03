@@ -28,7 +28,7 @@ class CourseHomePage(CoursePage):
         return self.q(css='.course-outline').present
 
     def __init__(self, browser, course_id):
-        super(CourseHomePage, self).__init__(browser, course_id)
+        super().__init__(browser, course_id)
         self.course_id = course_id
         self.outline = CourseOutlinePage(browser, self)
         self.preview = StaffPreviewPage(browser, self)
@@ -84,7 +84,7 @@ class CourseOutlinePage(PageObject):
     url = None
 
     def __init__(self, browser, parent_page):
-        super(CourseOutlinePage, self).__init__(browser)
+        super().__init__(browser)
         self.parent_page = parent_page
         self._section_selector = '.outline-item.section'
         self._subsection_selector = '.subsection.accordion'
@@ -160,9 +160,9 @@ class CourseOutlinePage(PageObject):
                              for sub_webel in subsection_webelements]
 
         try:
-            subsection_index = subsection_titles.index(text_type(subsection_title))
+            subsection_index = subsection_titles.index(str(subsection_title))
         except ValueError:
-            raise ValueError(u"Could not find subsection '{0}' in section '{1}'".format(
+            raise ValueError("Could not find subsection '{}' in section '{}'".format(
                 subsection_title, section_title
             ))
 
@@ -190,11 +190,11 @@ class CourseOutlinePage(PageObject):
         try:
             section_title = self._section_titles()[section_index]
         except IndexError:
-            raise ValueError(u"Section index '{0}' is out of range.".format(section_index))
+            raise ValueError("Section index '{}' is out of range.".format(section_index))
         try:
             subsection_title = self._subsection_titles(section_index)[subsection_index]
         except IndexError:
-            raise ValueError(u"Subsection index '{0}' in section index '{1}' is out of range.".format(
+            raise ValueError("Subsection index '{}' in section index '{}' is out of range.".format(
                 subsection_index, section_index
             ))
 
@@ -207,7 +207,7 @@ class CourseOutlinePage(PageObject):
         try:
             section_index = self._section_titles().index(section_title)
         except ValueError:
-            raise ValueError(u"Could not find section '{0}'".format(section_title))
+            raise ValueError("Could not find section '{}'".format(section_title))
 
         return section_index
 
@@ -254,7 +254,7 @@ class CourseOutlinePage(PageObject):
         self.wait_for(
             promise_check_func=lambda: courseware_page.nav.is_on_section(
                 section_title, subsection_title),
-            description=u"Waiting for course page with section '{0}' and subsection '{1}'".format(
+            description="Waiting for course page with section '{}' and subsection '{}'".format(
                 section_title, subsection_title)
         )
 
@@ -280,7 +280,7 @@ class CourseOutlinePage(PageObject):
 
     @staticmethod
     def _is_html_element_aria_expanded(html_element):
-        return html_element.get_attribute('aria-expanded') == u'true'
+        return html_element.get_attribute('aria-expanded') == 'true'
 
     @staticmethod
     def _get_outline_element_title(outline_element):
@@ -337,7 +337,7 @@ class CourseSearchResultsPage(CoursePage):
         return self.q(css='.page-content > .search-results').present
 
     def __init__(self, browser, course_id):
-        super(CourseSearchResultsPage, self).__init__(browser, course_id)
+        super().__init__(browser, course_id)
         self.course_id = course_id
 
     @property

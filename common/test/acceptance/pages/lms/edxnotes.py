@@ -17,7 +17,7 @@ class NoteChild(PageObject):
     BODY_SELECTOR = None
 
     def __init__(self, browser, item_id):
-        super(NoteChild, self).__init__(browser)
+        super().__init__(browser)
         self.item_id = item_id
 
     def is_browser_on_page(self):
@@ -27,7 +27,7 @@ class NoteChild(PageObject):
         """
         Return `selector`, but limited to this particular `NoteChild` context
         """
-        return u"{}#{} {}".format(
+        return "{}#{} {}".format(
             self.BODY_SELECTOR,
             self.item_id,
             selector,
@@ -61,7 +61,7 @@ class EdxNotesChapterGroup(NoteChild):
         return [EdxNotesSubsectionGroup(self.browser, child.get_attribute("id")) for child in children]
 
 
-class EdxNotesGroupMixin(object):
+class EdxNotesGroupMixin:
     """
     Helper mixin that works with note groups (used for subsection and tag groupings).
     """
@@ -106,7 +106,7 @@ class EdxNotesTagsGroup(NoteChild, EdxNotesGroupMixin):
         top_script = "return " + title_selector + ".getBoundingClientRect().top;"
         EmptyPromise(
             lambda: 8 < self.browser.execute_script(top_script) < 12,
-            u"Expected tag title '{}' to scroll to top, but was at location {}".format(
+            "Expected tag title '{}' to scroll to top, but was at location {}".format(
                 self.title, self.browser.execute_script(top_script)
             )
         ).fulfill()
@@ -182,7 +182,7 @@ class EdxNotesPageView(PageObject):
         try:
             return self.wait_for_page()
         except BrokenPromise:
-            raise PageLoadError(u"Timed out waiting to load page '{!r}'".format(self))
+            raise PageLoadError("Timed out waiting to load page '{!r}'".format(self))
 
     def is_browser_on_page(self):
         return all([
@@ -196,13 +196,13 @@ class EdxNotesPageView(PageObject):
         """
         Indicates if tab is closable or not.
         """
-        return self.q(css=u"{} .action-close".format(self.TAB_SELECTOR)).present
+        return self.q(css="{} .action-close".format(self.TAB_SELECTOR)).present
 
     def close(self):
         """
         Closes the tab.
         """
-        self.q(css=u"{} .action-close".format(self.TAB_SELECTOR)).first.click()
+        self.q(css="{} .action-close".format(self.TAB_SELECTOR)).first.click()
 
     @property
     def children(self):
@@ -262,7 +262,7 @@ class EdxNotesPage(CoursePage, PaginatedUIMixin):
     }
 
     def __init__(self, *args, **kwargs):
-        super(EdxNotesPage, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.current_view = self.MAPPING["recent"](self.browser)
 
     def is_browser_on_page(self):
@@ -494,7 +494,7 @@ class EdxNoteHighlight(NoteChild):
     NOTE_SELECTOR = ".annotator-note"
 
     def __init__(self, browser, element, parent_id):
-        super(EdxNoteHighlight, self).__init__(browser, parent_id)
+        super().__init__(browser, parent_id)
         self.element = element
         self.item_id = parent_id
         disable_animations(self)
@@ -657,7 +657,7 @@ class EdxNoteHighlight(NoteChild):
         label_exists = False
         EmptyPromise(
             lambda: len(self.q(css=self._bounded_selector("li.annotator-item > label.sr"))) > sr_index,
-            u"Expected more than '{}' sr labels".format(sr_index)
+            "Expected more than '{}' sr labels".format(sr_index)
         ).fulfill()
         annotator_field_label = self.q(css=self._bounded_selector("li.annotator-item > label.sr"))[sr_index]
         for_attrib_correct = annotator_field_label.get_attribute("for") == "annotator-field-" + str(field_index)

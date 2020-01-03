@@ -51,7 +51,7 @@ class CoursewareSearchTest(UniqueCourseTest):
             json.dump({}, index_file)
         self.addCleanup(remove_file, self.TEST_INDEX_FILENAME)
 
-        super(CoursewareSearchTest, self).setUp()
+        super().setUp()
 
         self.course_home_page = CourseHomePage(self.browser, self.course_id)
 

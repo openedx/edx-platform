@@ -29,7 +29,7 @@ class CoursewarePage(CoursePage, CompletionOnViewMixin):
     subsection_selector = '.chapter-content-container a'
 
     def __init__(self, browser, course_id):
-        super(CoursewarePage, self).__init__(browser, course_id)
+        super().__init__(browser, course_id)
         self.nav = CourseNavPage(browser, self)
 
     def is_browser_on_page(self):
@@ -97,7 +97,7 @@ class CoursewarePage(CoursePage, CompletionOnViewMixin):
         # When Student Notes feature is enabled, it looks for the content inside
         # `.edx-notes-wrapper-content` element (Otherwise, you will get an
         # additional html related to Student Notes).
-        element = self.q(css=u'{} .edx-notes-wrapper-content'.format(self.xblock_component_selector))
+        element = self.q(css='{} .edx-notes-wrapper-content'.format(self.xblock_component_selector))
         if element.first:
             return element.attrs('innerHTML')[index].strip()
         else:
@@ -112,8 +112,8 @@ class CoursewarePage(CoursePage, CompletionOnViewMixin):
         for index, tab in enumerate(self.q(css='#sequence-list > li')):
             ActionChains(self.browser).move_to_element(tab).perform()
             self.wait_for_element_visibility(
-                u'#tab_{index} > .sequence-tooltip'.format(index=index),
-                u'Tab {index} should appear'.format(index=index)
+                '#tab_{index} > .sequence-tooltip'.format(index=index),
+                'Tab {index} should appear'.format(index=index)
             )
 
     @property
@@ -144,7 +144,7 @@ class CoursewarePage(CoursePage, CompletionOnViewMixin):
             except IndexError:
                 return False
 
-        sequential_position_css = u'#sequence-list #tab_{0}'.format(sequential_position - 1)
+        sequential_position_css = '#sequence-list #tab_{}'.format(sequential_position - 1)
         self.q(css=sequential_position_css).first.click()
         EmptyPromise(is_at_new_position, "Position navigation fulfilled").fulfill()
 
@@ -198,7 +198,7 @@ class CoursewarePage(CoursePage, CompletionOnViewMixin):
                 return False
 
         self.q(
-            css=u'.{} > .sequence-nav-button.{}'.format(top_or_bottom_class, next_or_previous_class)
+            css='.{} > .sequence-nav-button.{}'.format(top_or_bottom_class, next_or_previous_class)
         ).first.click()
         EmptyPromise(is_at_new_tab_id, "Button navigation fulfilled").fulfill()
 
@@ -332,8 +332,8 @@ class CoursewarePage(CoursePage, CompletionOnViewMixin):
         Check if the gated banner for locked content is visible.
         """
         return self.q(css='.problem-header').is_present() \
-            and self.q(css='.btn-brand').text[0] == u'Go To Prerequisite Section' \
-            and self.q(css='.problem-header').text[0] == u'Content Locked'
+            and self.q(css='.btn-brand').text[0] == 'Go To Prerequisite Section' \
+            and self.q(css='.problem-header').text[0] == 'Content Locked'
 
     @property
     def is_word_cloud_rendered(self):
@@ -350,7 +350,7 @@ class CoursewarePage(CoursePage, CompletionOnViewMixin):
             answer_word(str): An answer words to be filled in the field
         """
         self.wait_for_element_visibility('.input-cloud', "Word cloud fields are visible")
-        css = u'.input_cloud_section label:nth-child({}) .input-cloud'
+        css = '.input_cloud_section label:nth-child({}) .input-cloud'
         for index in range(1, len(self.q(css='.input-cloud')) + 1):
             self.q(css=css.format(index)).fill(answer_word + str(index))
 
@@ -461,7 +461,7 @@ class CoursewareSequentialTabPage(CoursePage):
     """
 
     def __init__(self, browser, course_id, chapter, subsection, position):
-        super(CoursewareSequentialTabPage, self).__init__(browser, course_id)
+        super().__init__(browser, course_id)
         self.url_path = "courseware/{}/{}/{}".format(chapter, subsection, position)
 
     def is_browser_on_page(self):
@@ -483,7 +483,7 @@ class CourseNavPage(PageObject):
     url = None
 
     def __init__(self, browser, parent_page):
-        super(CourseNavPage, self).__init__(browser)
+        super().__init__(browser)
         self.parent_page = parent_page
         # TODO: TNL-6546: Remove the following
         self.course_outline_page = False
@@ -540,7 +540,7 @@ class CourseNavPage(PageObject):
         for sec_index, sec_title in enumerate(section_titles):
 
             if len(section_titles) < 1:
-                self.warning(u"Could not find subsections for '{0}'".format(sec_title))
+                self.warning("Could not find subsections for '{}'".format(sec_title))
             else:
                 # Add one to convert list index (starts at 0) to CSS index (starts at 1)
                 nav_dict[sec_title] = self._subsection_titles(sec_index + 1)
@@ -577,26 +577,26 @@ class CourseNavPage(PageObject):
         try:
             sec_index = self._section_titles().index(section_title)
         except ValueError:
-            self.warning(u"Could not find section '{0}'".format(section_title))
+            self.warning("Could not find section '{}'".format(section_title))
             return
 
         # Click the section to ensure it's open (no harm in clicking twice if it's already open)
         # Add one to convert from list index to CSS index
-        section_css = u'.course-navigation .chapter:nth-of-type({0})'.format(sec_index + 1)
+        section_css = '.course-navigation .chapter:nth-of-type({})'.format(sec_index + 1)
         self.q(css=section_css).first.click()
 
         # Get the subsection by index
         try:
             subsec_index = self._subsection_titles(sec_index + 1).index(subsection_title)
         except ValueError:
-            msg = u"Could not find subsection '{0}' in section '{1}'".format(subsection_title, section_title)
+            msg = "Could not find subsection '{}' in section '{}'".format(subsection_title, section_title)
             self.warning(msg)
             return
 
         # Convert list indices (start at zero) to CSS indices (start at 1)
         subsection_css = (
-            u".course-navigation .chapter-content-container:nth-of-type({0}) "
-            ".menu-item:nth-of-type({1})"
+            ".course-navigation .chapter-content-container:nth-of-type({}) "
+            ".menu-item:nth-of-type({})"
         ).format(sec_index + 1, subsec_index + 1)
 
         # Click the subsection and ensure that the page finishes reloading
@@ -615,7 +615,7 @@ class CourseNavPage(PageObject):
             seq_index = all_items.index(vertical_title)
 
         except ValueError:
-            msg = u"Could not find sequential '{0}'.  Available sequentials: [{1}]".format(
+            msg = "Could not find sequential '{}'.  Available sequentials: [{}]".format(
                 vertical_title, ", ".join(all_items)
             )
             self.warning(msg)
@@ -624,7 +624,7 @@ class CourseNavPage(PageObject):
 
             # Click on the sequence item at the correct index
             # Convert the list index (starts at 0) to a CSS index (starts at 1)
-            seq_css = "ol#sequence-list>li:nth-of-type({0})>.nav-item".format(seq_index + 1)
+            seq_css = "ol#sequence-list>li:nth-of-type({})>.nav-item".format(seq_index + 1)
             self.q(css=seq_css).first.click()
             # Click triggers an ajax event
             self.wait_for_ajax()
@@ -646,7 +646,7 @@ class CourseNavPage(PageObject):
         # Retrieve the subsection title for the section
         # Add one to the list index to get the CSS index, which starts at one
         subsection_css = (
-            u".course-navigation .chapter-content-container:nth-of-type({0}) "
+            ".course-navigation .chapter-content-container:nth-of-type({}) "
             ".menu-item a p:nth-of-type(1)"
         ).format(section_index)
 
@@ -666,7 +666,7 @@ class CourseNavPage(PageObject):
         Return a `Promise` that is fulfilled when the user is on
         the correct section and subsection.
         """
-        desc = u"currently at section '{0}' and subsection '{1}'".format(section_title, subsection_title)
+        desc = "currently at section '{}' and subsection '{}'".format(section_title, subsection_title)
         return EmptyPromise(
             lambda: self.is_on_section(section_title, subsection_title), desc
         )
@@ -728,7 +728,7 @@ class RenderXBlockPage(PageObject, CompletionOnViewMixin):
     xblock_component_selector = '.xblock'
 
     def __init__(self, browser, block_id):
-        super(RenderXBlockPage, self).__init__(browser)
+        super().__init__(browser)
         self.block_id = block_id
 
     @property

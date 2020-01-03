@@ -41,7 +41,7 @@ class DashboardSearchTest(AcceptanceTest):
         with open(self.TEST_INDEX_FILENAME, "w+") as index_file:
             json.dump({}, index_file)
 
-        super(DashboardSearchTest, self).setUp()
+        super().setUp()
         self.dashboard = DashboardSearchPage(self.browser)
 
         self.courses = {
@@ -68,7 +68,7 @@ class DashboardSearchTest(AcceptanceTest):
         # generate course fixtures and outline pages
         self.studio_course_outlines = {}
         self.course_fixtures = {}
-        for key, course_info in six.iteritems(self.courses):
+        for key, course_info in self.courses.items():
             studio_course_outline = StudioCourseOutlinePage(
                 self.browser,
                 course_info['org'],
@@ -102,7 +102,7 @@ class DashboardSearchTest(AcceptanceTest):
         """
         Remove index file
         """
-        super(DashboardSearchTest, self).tearDown()
+        super().tearDown()
         os.remove(self.TEST_INDEX_FILENAME)
 
     def _auto_auth(self, username, email, staff):

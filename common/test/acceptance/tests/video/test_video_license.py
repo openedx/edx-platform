@@ -1,4 +1,3 @@
-# coding: utf-8
 """
 Acceptance tests for licensing of the Video module
 """
@@ -18,7 +17,7 @@ class VideoLicenseTest(StudioCourseTest):
     shard = 22
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(VideoLicenseTest, self).setUp()
+        super().setUp()
 
         self.lms_courseware = CoursewarePage(
             self.browser,

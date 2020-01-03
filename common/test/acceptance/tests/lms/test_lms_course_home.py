@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 End-to-end tests for the LMS that utilize the course home page and course outline.
 """
@@ -29,7 +28,7 @@ class CourseHomeBaseTest(UniqueCourseTest):
         """
         Initialize pages and install a course fixture.
         """
-        super(CourseHomeBaseTest, self).setUp()
+        super().setUp()
 
         self.course_home_page = CourseHomePage(self.browser, self.course_id)
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
@@ -74,7 +73,7 @@ class CourseHomeTest(CourseHomeBaseTest):
         Smoke test of course goals, course outline, breadcrumbs to and from course outline, and bookmarks.
         """
         ModeCreationPage(
-            self.browser, self.course_id, mode_slug=u'verified',
+            self.browser, self.course_id, mode_slug='verified',
             mode_display_name='verified', min_price=10
         ).visit()
         self.course_home_page.visit()
@@ -97,17 +96,17 @@ class CourseHomeTest(CourseHomeBaseTest):
 
         # Check that the course navigation appears correctly
         EXPECTED_SECTIONS = {
-            u'Test Section': [u'Test Subsection'],
-            u'Test Section 2': [u'Test Subsection 2', u'Test Subsection 3']
+            'Test Section': ['Test Subsection'],
+            'Test Section 2': ['Test Subsection 2', 'Test Subsection 3']
         }
 
         actual_sections = self.course_home_page.outline.sections
-        for section, _ in six.iteritems(EXPECTED_SECTIONS):
+        for section, _ in EXPECTED_SECTIONS.items():
             self.assertIn(section, actual_sections)
             self.assertEqual(actual_sections[section], EXPECTED_SECTIONS[section])
 
         # Navigate to a particular section
-        self.course_home_page.outline.go_to_section(u'Test Section', u'Test Subsection')
+        self.course_home_page.outline.go_to_section('Test Section', 'Test Subsection')
 
         # Check the sequence items on the courseware page
         EXPECTED_ITEMS = ['Test Problem 1', 'Test Problem 2', 'Test HTML']
@@ -180,7 +179,7 @@ class CourseOutlineTest(UniqueCourseTest):
         """
         Initialize pages and install a course fixture.
         """
-        super(CourseOutlineTest, self).setUp()
+        super().setUp()
 
         self.course_home_page = CourseHomePage(self.browser, self.course_id)
         # Install a course with sections and problems

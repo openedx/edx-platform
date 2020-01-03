@@ -22,7 +22,7 @@ class CreateLibraryTest(AcceptanceTest):
         """
         Load the helper for the home page (dashboard page)
         """
-        super(CreateLibraryTest, self).setUp()
+        super().setUp()
 
         self.auth_page = AutoAuthPage(self.browser, staff=True)
         self.dashboard_page = DashboardPage(self.browser)
@@ -33,7 +33,7 @@ class StudioLanguageTest(AcceptanceTest):
     shard = 21
 
     def setUp(self):
-        super(StudioLanguageTest, self).setUp()
+        super().setUp()
         self.dashboard_page = DashboardPage(self.browser)
         self.account_settings = AccountSettingsPage(self.browser)
         AutoAuthPage(self.browser).visit()
@@ -46,12 +46,12 @@ class StudioLanguageTest(AcceptanceTest):
         Then I visit the student account settings page and I can see the language has been updated to 'Dummy Language'
         in both drop downs.
         """
-        dummy_language = u'Dummy Language (Esperanto)'
+        dummy_language = 'Dummy Language (Esperanto)'
         self.dashboard_page.visit()
         language_selector = self.dashboard_page.language_selector
         self.assertEqual(
             get_selected_option_text(language_selector),
-            u'English'
+            'English'
         )
 
         select_option_by_text(language_selector, dummy_language)
@@ -60,7 +60,7 @@ class StudioLanguageTest(AcceptanceTest):
         self.assertEqual(self.account_settings.value_for_dropdown_field('pref-lang'), dummy_language)
         self.assertEqual(
             get_selected_option_text(language_selector),
-            u'Dummy Language (Esperanto)'
+            'Dummy Language (Esperanto)'
         )
 
 
@@ -71,7 +71,7 @@ class ArchivedCourseTest(StudioCourseTest):
         """
         Load the helper for the home page (dashboard page)
         """
-        super(ArchivedCourseTest, self).setUp(is_staff=is_staff, test_xss=test_xss)
+        super().setUp(is_staff=is_staff, test_xss=test_xss)
         self.dashboard_page = DashboardPage(self.browser)
 
     def populate_course_fixture(self, course_fixture):

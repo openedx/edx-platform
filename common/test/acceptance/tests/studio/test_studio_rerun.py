@@ -33,7 +33,7 @@ class CourseRerunTest(StudioCourseTest):
         """
         Login as global staff because that's the only way to rerun a course.
         """
-        super(CourseRerunTest, self).setUp(is_staff=True)
+        super().setUp(is_staff=True)
         self.dashboard_page = DashboardPage(self.browser)
 
     def populate_course_fixture(self, course_fixture):

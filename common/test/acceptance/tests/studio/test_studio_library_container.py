@@ -31,7 +31,7 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest, TestWithSe
         Install library with some content and a course using fixtures
         """
         self._create_search_index()
-        super(StudioLibraryContainerTest, self).setUp()
+        super().setUp()
         # Also create a course:
         self.course_fixture = CourseFixture(
             self.course_info['org'], self.course_info['number'],
@@ -50,7 +50,7 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest, TestWithSe
     def tearDown(self):
         """ Tear down method: remove search index backing file """
         self._cleanup_index_file()
-        super(StudioLibraryContainerTest, self).tearDown()
+        super().tearDown()
 
     def populate_library_fixture(self, library_fixture):
         """
@@ -65,7 +65,7 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest, TestWithSe
     def populate_course_fixture(self, course_fixture):
         """ Install a course with sections/problems, tabs, updates, and handouts """
         library_content_metadata = {
-            'source_library_id': six.text_type(self.library_key),
+            'source_library_id': str(self.library_key),
             'mode': 'random',
             'max_count': 1,
         }
@@ -221,8 +221,8 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest, TestWithSe
         And I set Problem Type selector so "Any"
         Then I can see that "No matching content" warning is shown
         """
-        expected_tpl = u"The specified library is configured to fetch {count} problems, " \
-                       u"but there are only {actual} matching problems."
+        expected_tpl = "The specified library is configured to fetch {count} problems, " \
+                       "but there are only {actual} matching problems."
 
         library_container = self._get_library_xblock_wrapper(self.unit_page.xblocks[1])
 

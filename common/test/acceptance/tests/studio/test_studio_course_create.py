@@ -25,7 +25,7 @@ class CreateCourseTest(AcceptanceTest):
         """
         Load the helper for the home page (dashboard page)
         """
-        super(CreateCourseTest, self).setUp()
+        super().setUp()
 
         self.auth_page = AutoAuthPage(self.browser, staff=True)
         self.dashboard_page = DashboardPage(self.browser)
@@ -59,7 +59,7 @@ class CreateCourseTest(AcceptanceTest):
         self.dashboard_page.submit_new_course_form()
         self.assertTrue(self.dashboard_page.error_notification.present)
         self.assertIn(
-            u'Organization you selected does not exist in the system', self.dashboard_page.error_notification_message
+            'Organization you selected does not exist in the system', self.dashboard_page.error_notification_message
         )
 
     def test_create_course_with_existing_org(self):

@@ -20,7 +20,7 @@ from openedx.core.djangoapps.catalog.tests.factories import (
 class ProgramPageBase(ProgramsConfigMixin, CatalogIntegrationMixin, UniqueCourseTest):
     """Base class used for program listing page tests."""
     def setUp(self):
-        super(ProgramPageBase, self).setUp()
+        super().setUp()
 
         self.set_programs_api_configuration(is_enabled=True)
 
@@ -79,7 +79,7 @@ class ProgramListingPageTest(ProgramPageBase):
     shard = 21
 
     def setUp(self):
-        super(ProgramListingPageTest, self).setUp()
+        super().setUp()
 
         self.listing_page = ProgramListingPage(self.browser)
 
@@ -103,7 +103,7 @@ class ProgramListingPageA11yTest(ProgramPageBase):
     a11y = True
 
     def setUp(self):
-        super(ProgramListingPageA11yTest, self).setUp()
+        super().setUp()
 
         self.listing_page = ProgramListingPage(self.browser)
 
@@ -152,7 +152,7 @@ class ProgramDetailsPageA11yTest(ProgramPageBase):
     a11y = True
 
     def setUp(self):
-        super(ProgramDetailsPageA11yTest, self).setUp()
+        super().setUp()
 
         self.details_page = ProgramDetailsPage(self.browser)
 

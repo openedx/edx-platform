@@ -28,7 +28,7 @@ class EdxNotesTestMixin(UniqueCourseTest):
         """
         Initialize pages and install a course fixture.
         """
-        super(EdxNotesTestMixin, self).setUp()
+        super().setUp()
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.course_home_page = CourseHomePage(self.browser, self.course_id)
         self.note_unit_page = EdxNotesUnitPage(self.browser, self.course_id)
@@ -45,7 +45,7 @@ class EdxNotesTestMixin(UniqueCourseTest):
         )
 
         self.course_fixture.add_advanced_settings({
-            u"edxnotes": {u"value": True}
+            "edxnotes": {"value": True}
         })
 
         self.course_fixture.add_children(
@@ -55,7 +55,7 @@ class EdxNotesTestMixin(UniqueCourseTest):
                         XBlockFixtureDesc(
                             "html",
                             "Test HTML 1",
-                            data=u"""
+                            data="""
                                 <p><span class="{}">Annotate this!</span></p>
                                 <p>Annotate this</p>
                             """.format(self.selector)
@@ -63,14 +63,14 @@ class EdxNotesTestMixin(UniqueCourseTest):
                         XBlockFixtureDesc(
                             "html",
                             "Test HTML 2",
-                            data=u"""<p><span class="{}">Annotate this!</span></p>""".format(self.selector)
+                            data="""<p><span class="{}">Annotate this!</span></p>""".format(self.selector)
                         ),
                     ),
                     XBlockFixtureDesc("vertical", "Test Unit 2").add_children(
                         XBlockFixtureDesc(
                             "html",
                             "Test HTML 3",
-                            data=u"""<p><span class="{}">Annotate this!</span></p>""".format(self.selector)
+                            data="""<p><span class="{}">Annotate this!</span></p>""".format(self.selector)
                         ),
                     ),
                 ),
@@ -79,7 +79,7 @@ class EdxNotesTestMixin(UniqueCourseTest):
                         XBlockFixtureDesc(
                             "html",
                             "Test HTML 4",
-                            data=u"""
+                            data="""
                                 <p><span class="{}">Annotate this!</span></p>
                             """.format(self.selector)
                         ),
@@ -92,14 +92,14 @@ class EdxNotesTestMixin(UniqueCourseTest):
                         XBlockFixtureDesc(
                             "html",
                             "Test HTML 5",
-                            data=u"""
+                            data="""
                                 <p><span class="{}">Annotate this!</span></p>
                             """.format(self.selector)
                         ),
                         XBlockFixtureDesc(
                             "html",
                             "Test HTML 6",
-                            data=u"""<p><span class="{}">Annotate this!</span></p>""".format(self.selector)
+                            data="""<p><span class="{}">Annotate this!</span></p>""".format(self.selector)
                         ),
                     ),
                 ),
@@ -136,7 +136,7 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
         index = offset
         for component in components:
             for note in component.create_note(".{}".format(self.selector)):
-                note.text = u"TEST TEXT {}".format(index)
+                note.text = "TEST TEXT {}".format(index)
                 index += 1
 
     def edit_notes(self, components, offset=0):
@@ -145,7 +145,7 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
         for component in components:
             self.assertGreater(len(component.notes), 0)
             for note in component.edit_note():
-                note.text = u"TEST TEXT {}".format(index)
+                note.text = "TEST TEXT {}".format(index)
                 index += 1
 
     def edit_tags_in_notes(self, components, tags):
@@ -170,7 +170,7 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
 
     def assert_text_in_notes(self, notes):
         actual = [note.text for note in notes]
-        expected = [u"TEST TEXT {}".format(i) for i in range(len(notes))]
+        expected = ["TEST TEXT {}".format(i) for i in range(len(notes))]
         self.assertEqual(expected, actual)
 
     def assert_tags_in_notes(self, notes, expected_tags):
@@ -339,7 +339,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
                 user=self.username,
                 course_id=self.course_fixture._course_key,
                 text="",
-                quote=u"Annotate this",
+                quote="Annotate this",
                 updated=datetime(2012, 1, 1, 1, 1, 1, 1).isoformat(),
                 tags=["Review", "cool"] if tags is None else tags
             ),
@@ -489,7 +489,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         self.notes_page.search("note")
         # No error message appears
         self.assertFalse(self.notes_page.is_error_visible)
-        self.assertIn(u"Search Results", self.notes_page.tabs)
+        self.assertIn("Search Results", self.notes_page.tabs)
 
         self.assertEqual(self.notes_page.get_total_pages, 2)
 
@@ -541,7 +541,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[0],
-            quote=u"quote",
+            quote="quote",
             text='<b>bold</b>',
             unit_name="Test Unit 1",
             time_updated="Feb 01, 2014 at 01:01 UTC",
@@ -550,7 +550,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[1],
-            quote=u"quote",
+            quote="quote",
             text='<script>alert("XSS")</script>',
             unit_name="Test Unit 1",
             time_updated="Jan 01, 2014 at 01:01 UTC",
@@ -573,15 +573,15 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[0],
-            quote=u"Annotate this",
-            text=u"Fifth note",
+            quote="Annotate this",
+            text="Fifth note",
             unit_name="Test Unit 1",
             time_updated="Jan 01, 2015 at 01:01 UTC"
         )
 
         self.assertNoteContent(
             notes[1],
-            text=u"Fourth note",
+            text="Fourth note",
             unit_name="Test Unit 3",
             time_updated="Jan 01, 2014 at 01:01 UTC",
             tags=["review"]
@@ -590,7 +590,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         self.assertNoteContent(
             notes[2],
             quote="Annotate this",
-            text=u"Third note",
+            text="Third note",
             unit_name="Test Unit 1",
             time_updated="Jan 01, 2013 at 01:01 UTC",
             tags=["Cool", "TODO"]
@@ -598,7 +598,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[3],
-            quote=u"Annotate this",
+            quote="Annotate this",
             unit_name="Test Unit 2",
             time_updated="Jan 01, 2012 at 01:01 UTC",
             tags=["Review", "cool"]
@@ -606,8 +606,8 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[4],
-            quote=u"Annotate this",
-            text=u"First note",
+            quote="Annotate this",
+            text="First note",
             unit_name="Test Unit 4",
             time_updated="Jan 01, 2011 at 01:01 UTC"
         )
@@ -636,28 +636,28 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertChapterContent(
             groups[0],
-            title=u"Test Section 1",
-            subtitles=[u"Test Subsection 1", u"Test Subsection 2"]
+            title="Test Section 1",
+            subtitles=["Test Subsection 1", "Test Subsection 2"]
         )
 
         self.assertGroupContent(
             sections[0],
-            title=u"Test Subsection 1",
-            notes=[u"Fifth note", u"Third note", None]
+            title="Test Subsection 1",
+            notes=["Fifth note", "Third note", None]
         )
 
         self.assertNoteContent(
             notes[0],
-            quote=u"Annotate this",
-            text=u"Fifth note",
+            quote="Annotate this",
+            text="Fifth note",
             unit_name="Test Unit 1",
             time_updated="Jan 01, 2015 at 01:01 UTC"
         )
 
         self.assertNoteContent(
             notes[1],
-            quote=u"Annotate this",
-            text=u"Third note",
+            quote="Annotate this",
+            text="Third note",
             unit_name="Test Unit 1",
             time_updated="Jan 01, 2013 at 01:01 UTC",
             tags=["Cool", "TODO"]
@@ -665,7 +665,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[2],
-            quote=u"Annotate this",
+            quote="Annotate this",
             unit_name="Test Unit 2",
             time_updated="Jan 01, 2012 at 01:01 UTC",
             tags=["Review", "cool"]
@@ -673,13 +673,13 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertGroupContent(
             sections[1],
-            title=u"Test Subsection 2",
-            notes=[u"Fourth note"]
+            title="Test Subsection 2",
+            notes=["Fourth note"]
         )
 
         self.assertNoteContent(
             notes[3],
-            text=u"Fourth note",
+            text="Fourth note",
             unit_name="Test Unit 3",
             time_updated="Jan 01, 2014 at 01:01 UTC",
             tags=["review"]
@@ -687,20 +687,20 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertChapterContent(
             groups[1],
-            title=u"Test Section 2",
-            subtitles=[u"Test Subsection 3"],
+            title="Test Section 2",
+            subtitles=["Test Subsection 3"],
         )
 
         self.assertGroupContent(
             sections[2],
-            title=u"Test Subsection 3",
-            notes=[u"First note"]
+            title="Test Subsection 3",
+            notes=["First note"]
         )
 
         self.assertNoteContent(
             notes[4],
-            quote=u"Annotate this",
-            text=u"First note",
+            quote="Annotate this",
+            text="First note",
             unit_name="Test Unit 4",
             time_updated="Jan 01, 2011 at 01:01 UTC"
         )
@@ -727,14 +727,14 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         # Tag group "cool"
         self.assertGroupContent(
             groups[0],
-            title=u"cool (2)",
-            notes=[u"Third note", None]
+            title="cool (2)",
+            notes=["Third note", None]
         )
 
         self.assertNoteContent(
             notes[0],
-            quote=u"Annotate this",
-            text=u"Third note",
+            quote="Annotate this",
+            text="Third note",
             unit_name="Test Unit 1",
             time_updated="Jan 01, 2013 at 01:01 UTC",
             tags=["Cool", "TODO"]
@@ -742,7 +742,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[1],
-            quote=u"Annotate this",
+            quote="Annotate this",
             unit_name="Test Unit 2",
             time_updated="Jan 01, 2012 at 01:01 UTC",
             tags=["Review", "cool"]
@@ -751,13 +751,13 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         # Tag group "review"
         self.assertGroupContent(
             groups[1],
-            title=u"review (2)",
-            notes=[u"Fourth note", None]
+            title="review (2)",
+            notes=["Fourth note", None]
         )
 
         self.assertNoteContent(
             notes[2],
-            text=u"Fourth note",
+            text="Fourth note",
             unit_name="Test Unit 3",
             time_updated="Jan 01, 2014 at 01:01 UTC",
             tags=["review"]
@@ -765,7 +765,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[3],
-            quote=u"Annotate this",
+            quote="Annotate this",
             unit_name="Test Unit 2",
             time_updated="Jan 01, 2012 at 01:01 UTC",
             tags=["Review", "cool"]
@@ -774,14 +774,14 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         # Tag group "todo"
         self.assertGroupContent(
             groups[2],
-            title=u"todo (1)",
+            title="todo (1)",
             notes=["Third note"]
         )
 
         self.assertNoteContent(
             notes[4],
-            quote=u"Annotate this",
-            text=u"Third note",
+            quote="Annotate this",
+            text="Third note",
             unit_name="Test Unit 1",
             time_updated="Jan 01, 2013 at 01:01 UTC",
             tags=["Cool", "TODO"]
@@ -790,22 +790,22 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         # Notes with no tags
         self.assertGroupContent(
             groups[3],
-            title=u"[no tags] (2)",
+            title="[no tags] (2)",
             notes=["Fifth note", "First note"]
         )
 
         self.assertNoteContent(
             notes[5],
-            quote=u"Annotate this",
-            text=u"Fifth note",
+            quote="Annotate this",
+            text="Fifth note",
             unit_name="Test Unit 1",
             time_updated="Jan 01, 2015 at 01:01 UTC"
         )
 
         self.assertNoteContent(
             notes[6],
-            quote=u"Annotate this",
-            text=u"First note",
+            quote="Annotate this",
+            text="First note",
             unit_name="Test Unit 4",
             time_updated="Jan 01, 2011 at 01:01 UTC"
         )
@@ -882,28 +882,28 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         self.notes_page.search("   ")
         # Displays error message
         self.assertTrue(self.notes_page.is_error_visible)
-        self.assertEqual(self.notes_page.error_text, u"Please enter a term in the search field.")
+        self.assertEqual(self.notes_page.error_text, "Please enter a term in the search field.")
         # Search results tab does not appear
-        self.assertNotIn(u"Search Results", self.notes_page.tabs)
+        self.assertNotIn("Search Results", self.notes_page.tabs)
         # Run the search with correct query
         self.notes_page.search("note")
         # Error message disappears
         self.assertFalse(self.notes_page.is_error_visible)
-        self.assertIn(u"Search Results", self.notes_page.tabs)
+        self.assertIn("Search Results", self.notes_page.tabs)
         notes = self.notes_page.notes
         self.assertEqual(len(notes), 4)
 
         self.assertNoteContent(
             notes[0],
-            quote=u"Annotate this",
-            text=u"Fifth note",
+            quote="Annotate this",
+            text="Fifth note",
             unit_name="Test Unit 1",
             time_updated="Jan 01, 2015 at 01:01 UTC"
         )
 
         self.assertNoteContent(
             notes[1],
-            text=u"Fourth note",
+            text="Fourth note",
             unit_name="Test Unit 3",
             time_updated="Jan 01, 2014 at 01:01 UTC",
             tags=["review"]
@@ -912,7 +912,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         self.assertNoteContent(
             notes[2],
             quote="Annotate this",
-            text=u"Third note",
+            text="Third note",
             unit_name="Test Unit 1",
             time_updated="Jan 01, 2013 at 01:01 UTC",
             tags=["Cool", "TODO"]
@@ -920,8 +920,8 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assertNoteContent(
             notes[3],
-            quote=u"Annotate this",
-            text=u"First note",
+            quote="Annotate this",
+            text="First note",
             unit_name="Test Unit 4",
             time_updated="Jan 01, 2011 at 01:01 UTC"
         )
@@ -1011,11 +1011,11 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         # We're on Recent Activity tab.
         self.assertEqual(len(self.notes_page.tabs), 3)
-        self.assertEqual([u"Recent Activity", u"Location in Course", u"Tags"], self.notes_page.tabs)
+        self.assertEqual(["Recent Activity", "Location in Course", "Tags"], self.notes_page.tabs)
         self.notes_page.search("note")
         # We're on Search Results tab
         self.assertEqual(len(self.notes_page.tabs), 4)
-        self.assertIn(u"Search Results", self.notes_page.tabs)
+        self.assertIn("Search Results", self.notes_page.tabs)
         self.assertEqual(len(self.notes_page.notes), 4)
         # We can switch on Recent Activity tab and back.
         self.notes_page.switch_to_tab("recent")
@@ -1028,7 +1028,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         # Can close search results page
         self.notes_page.close_tab()
         self.assertEqual(len(self.notes_page.tabs), 3)
-        self.assertNotIn(u"Search Results", self.notes_page.tabs)
+        self.assertNotIn("Search Results", self.notes_page.tabs)
         self.assertEqual(len(self.notes_page.notes), 5)
 
     def test_open_note_when_accessed_from_notes_page(self):
@@ -1382,7 +1382,7 @@ class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
     """
 
     def setUp(self):
-        super(EdxNotesToggleSingleNoteTest, self).setUp()
+        super().setUp()
         self._add_notes()
         self.note_unit_page.visit()
 
@@ -1451,7 +1451,7 @@ class EdxNotesToggleNotesTest(EdxNotesTestMixin):
     """
 
     def setUp(self):
-        super(EdxNotesToggleNotesTest, self).setUp()
+        super().setUp()
         self._add_notes()
         self.note_unit_page.visit()
 
@@ -1469,12 +1469,12 @@ class EdxNotesToggleNotesTest(EdxNotesTestMixin):
         """
         # Disable all notes
         self.note_unit_page.toggle_visibility()
-        self.note_unit_page.wait_for(lambda: len(self.note_unit_page.notes) == 0, u"Notes are hidden")
+        self.note_unit_page.wait_for(lambda: len(self.note_unit_page.notes) == 0, "Notes are hidden")
         self.courseware_page.go_to_sequential_position(2)
-        self.note_unit_page.wait_for(lambda: len(self.note_unit_page.notes) == 0, u"Notes are hidden")
+        self.note_unit_page.wait_for(lambda: len(self.note_unit_page.notes) == 0, "Notes are hidden")
         self.course_home_page.visit()
-        self.course_home_page.outline.go_to_section(u"Test Section 1", u"Test Subsection 2")
-        self.note_unit_page.wait_for(lambda: len(self.note_unit_page.notes) == 0, u"Notes are hidden")
+        self.course_home_page.outline.go_to_section("Test Section 1", "Test Subsection 2")
+        self.note_unit_page.wait_for(lambda: len(self.note_unit_page.notes) == 0, "Notes are hidden")
 
     def test_can_reenable_all_notes(self):
         """
@@ -1496,9 +1496,9 @@ class EdxNotesToggleNotesTest(EdxNotesTestMixin):
         # Enable notes to make sure that I can enable notes without refreshing
         # the page.
         self.note_unit_page.toggle_visibility()
-        self.note_unit_page.wait_for(lambda: len(self.note_unit_page.notes) > 0, u"Notes are visible")
+        self.note_unit_page.wait_for(lambda: len(self.note_unit_page.notes) > 0, "Notes are visible")
         self.courseware_page.go_to_sequential_position(2)
-        self.note_unit_page.wait_for(lambda: len(self.note_unit_page.notes) > 0, u"Notes are visible")
+        self.note_unit_page.wait_for(lambda: len(self.note_unit_page.notes) > 0, "Notes are visible")
         self.course_home_page.visit()
-        self.course_home_page.outline.go_to_section(u"Test Section 1", u"Test Subsection 2")
-        self.note_unit_page.wait_for(lambda: len(self.note_unit_page.notes) > 0, u"Notes are visible")
+        self.course_home_page.outline.go_to_section("Test Section 1", "Test Subsection 2")
+        self.note_unit_page.wait_for(lambda: len(self.note_unit_page.notes) > 0, "Notes are visible")

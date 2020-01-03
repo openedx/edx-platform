@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Test the Studio help links.
 """
@@ -67,24 +66,24 @@ class StudioHelpTest(StudioCourseTest):
         click_studio_help(page)
         links = studio_help_links(page)
         expected_links = [{
-            'href': u'http://docs.edx.org/',
-            'text': u'edX Documentation',
-            'sr_text': u'Access documentation on http://docs.edx.org'
+            'href': 'http://docs.edx.org/',
+            'text': 'edX Documentation',
+            'sr_text': 'Access documentation on http://docs.edx.org'
         }, {
-            'href': u'https://open.edx.org/',
-            'text': u'Open edX Portal',
-            'sr_text': u'Access the Open edX Portal'
+            'href': 'https://open.edx.org/',
+            'text': 'Open edX Portal',
+            'sr_text': 'Access the Open edX Portal'
         }, {
-            'href': u'https://www.edx.org/course/overview-creating-edx-course-edx-edx101#.VO4eaLPF-n1',
-            'text': u'Enroll in edX101',
-            'sr_text': u'Enroll in edX101: Overview of Creating an edX Course'
+            'href': 'https://www.edx.org/course/overview-creating-edx-course-edx-edx101#.VO4eaLPF-n1',
+            'text': 'Enroll in edX101',
+            'sr_text': 'Enroll in edX101: Overview of Creating an edX Course'
         }, {
-            'href': u'https://www.edx.org/course/creating-course-edx-studio-edx-studiox',
-            'text': u'Enroll in StudioX',
-            'sr_text': u'Enroll in StudioX: Creating a Course with edX Studio'
+            'href': 'https://www.edx.org/course/creating-course-edx-studio-edx-studiox',
+            'text': 'Enroll in StudioX',
+            'sr_text': 'Enroll in StudioX: Creating a Course with edX Studio'
         }, {
-            'href': u'mailto:partner-support@example.com',
-            'text': u'Contact Us',
+            'href': 'mailto:partner-support@example.com',
+            'text': 'Contact Us',
             'sr_text': 'Send an email to partner-support@example.com'
         }]
         for expected, actual in zip(expected_links, links):
@@ -103,7 +102,7 @@ class HomeHelpTest(StudioCourseTest):
     Tests help links on 'Home'(Courses tab) page.
     """
     def setUp(self):  # pylint: disable=arguments-differ
-        super(HomeHelpTest, self).setUp()
+        super().setUp()
         self.home_page = HomePage(self.browser)
         self.home_page.visit()
 
@@ -141,7 +140,7 @@ class HomeHelpTest(StudioCourseTest):
             test=self,
             page=self.home_page,
             href=expected_url,
-            help_text=u'Getting Started with Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸',
+            help_text='Getting Started with Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸',
             as_list_item=True
         )
 
@@ -153,7 +152,7 @@ class NewCourseHelpTest(AcceptanceTest):
     Test help links while creating a new course.
     """
     def setUp(self):
-        super(NewCourseHelpTest, self).setUp()
+        super().setUp()
         self.auth_page = AutoAuthPage(self.browser, staff=True)
         self.dashboard_page = DashboardPage(self.browser)
         self.auth_page.visit()
@@ -195,7 +194,7 @@ class NewCourseHelpTest(AcceptanceTest):
             test=self,
             page=self.dashboard_page,
             href=expected_url,
-            help_text=u'Getting Started with Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸',
+            help_text='Getting Started with Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸',
             as_list_item=True
         )
 
@@ -207,7 +206,7 @@ class NewLibraryHelpTest(AcceptanceTest):
     Test help links while creating a new library
     """
     def setUp(self):
-        super(NewLibraryHelpTest, self).setUp()
+        super().setUp()
         self.auth_page = AutoAuthPage(self.browser, staff=True)
         self.dashboard_page = DashboardPage(self.browser)
         self.auth_page.visit()
@@ -249,7 +248,7 @@ class NewLibraryHelpTest(AcceptanceTest):
             test=self,
             page=self.dashboard_page,
             href=expected_url,
-            help_text=u'Getting Started with Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸',
+            help_text='Getting Started with Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸',
             as_list_item=True
         )
 
@@ -261,7 +260,7 @@ class LibraryTabHelpTest(AcceptanceTest):
     Test help links on the library tab present at dashboard.
     """
     def setUp(self):
-        super(LibraryTabHelpTest, self).setUp()
+        super().setUp()
         self.auth_page = AutoAuthPage(self.browser, staff=True)
         self.dashboard_page = DashboardPage(self.browser)
         self.auth_page.visit()
@@ -295,7 +294,7 @@ class LibraryHelpTest(StudioLibraryTest):
     Test help links on a Library page.
     """
     def setUp(self):
-        super(LibraryHelpTest, self).setUp()
+        super().setUp()
         self.library_page = LibraryPage(self.browser, self.library_key)
         self.library_user_page = LibraryUsersPage(self.browser, self.library_key)
 
@@ -329,7 +328,7 @@ class LibraryImportHelpTest(StudioLibraryTest):
     Test help links on a Library import and export pages.
     """
     def setUp(self):
-        super(LibraryImportHelpTest, self).setUp()
+        super().setUp()
         self.library_import_page = ImportLibraryPage(self.browser, self.library_key)
         self.library_import_page.visit()
 
@@ -378,7 +377,7 @@ class LibraryExportHelpTest(StudioLibraryTest):
     Test help links on a Library export pages.
     """
     def setUp(self):
-        super(LibraryExportHelpTest, self).setUp()
+        super().setUp()
         self.library_export_page = ExportLibraryPage(self.browser, self.library_key)
         self.library_export_page.visit()
 
@@ -427,7 +426,7 @@ class CourseOutlineHelpTest(StudioCourseTest):
     Tests help links on course outline page.
     """
     def setUp(self):  # pylint: disable=arguments-differ
-        super(CourseOutlineHelpTest, self).setUp()
+        super().setUp()
         self.course_outline_page = CourseOutlinePage(
             self.browser,
             self.course_info['org'],
@@ -483,7 +482,7 @@ class CourseUpdateHelpTest(StudioCourseTest):
     Test help links on Course Update page
     """
     def setUp(self):  # pylint: disable=arguments-differ
-        super(CourseUpdateHelpTest, self).setUp()
+        super().setUp()
         self.course_update_page = CourseUpdatesPage(
             self.browser,
             self.course_info['org'],
@@ -518,7 +517,7 @@ class AssetIndexHelpTest(StudioCourseTest):
     Test help links on Course 'Files & Uploads' page
     """
     def setUp(self):  # pylint: disable=arguments-differ
-        super(AssetIndexHelpTest, self).setUp()
+        super().setUp()
         self.course_asset_index_page = AssetIndexPageStudioFrontend(
             self.browser,
             self.course_info['org'],
@@ -553,7 +552,7 @@ class CoursePagesHelpTest(StudioCourseTest):
     Test help links on Course 'Pages' page
     """
     def setUp(self):  # pylint: disable=arguments-differ
-        super(CoursePagesHelpTest, self).setUp()
+        super().setUp()
         self.course_pages_page = PagesPage(
             self.browser,
             self.course_info['org'],
@@ -588,7 +587,7 @@ class UploadTextbookHelpTest(StudioCourseTest):
     Test help links on Course 'Textbooks' page
     """
     def setUp(self):  # pylint: disable=arguments-differ
-        super(UploadTextbookHelpTest, self).setUp()
+        super().setUp()
         self.course_textbook_upload_page = TextbookUploadPage(
             self.browser,
             self.course_info['org'],
@@ -642,7 +641,7 @@ class StudioUnitHelpTest(ContainerBase):
     Tests help links on Unit page.
     """
     def setUp(self, is_staff=True):
-        super(StudioUnitHelpTest, self).setUp(is_staff=is_staff)
+        super().setUp(is_staff=is_staff)
 
     def populate_course_fixture(self, course_fixture):
         """
@@ -654,7 +653,7 @@ class StudioUnitHelpTest(ContainerBase):
         Also add a section with a subsection and a unit.
         """
         course_fixture.add_advanced_settings(
-            {u"advanced_modules": {"value": ["split_test"]}}
+            {"advanced_modules": {"value": ["split_test"]}}
         )
 
         course_fixture.add_children(
@@ -692,7 +691,7 @@ class SettingsHelpTest(StudioCourseTest):
     Tests help links on Schedule and Details Settings page
     """
     def setUp(self, is_staff=False, test_xss=True):
-        super(SettingsHelpTest, self).setUp()
+        super().setUp()
 
         self.settings_page = SettingsPage(
             self.browser,
@@ -729,7 +728,7 @@ class GradingPageHelpTest(StudioCourseTest):
     Tests help links on Grading page
     """
     def setUp(self, is_staff=False, test_xss=True):
-        super(GradingPageHelpTest, self).setUp()
+        super().setUp()
 
         self.grading_page = GradingPage(
             self.browser,
@@ -766,7 +765,7 @@ class CourseTeamSettingsHelpTest(StudioCourseTest):
     Tests help links on Course Team settings page
     """
     def setUp(self, is_staff=False, test_xss=True):
-        super(CourseTeamSettingsHelpTest, self).setUp()
+        super().setUp()
 
         self.course_team_settings_page = CourseTeamPage(
             self.browser,
@@ -803,7 +802,7 @@ class CourseGroupConfigurationHelpTest(StudioCourseTest):
     Tests help links on course Group Configurations settings page
     """
     def setUp(self, is_staff=False, test_xss=True):
-        super(CourseGroupConfigurationHelpTest, self).setUp()
+        super().setUp()
 
         self.course_group_configuration_page = GroupConfigurationsPage(
             self.browser,
@@ -861,7 +860,7 @@ class AdvancedSettingHelpTest(StudioCourseTest):
     Tests help links on course Advanced Settings page.
     """
     def setUp(self, is_staff=False, test_xss=True):
-        super(AdvancedSettingHelpTest, self).setUp()
+        super().setUp()
 
         self.advanced_settings = AdvancedSettingsPage(
             self.browser,
@@ -898,7 +897,7 @@ class CertificatePageHelpTest(StudioCourseTest):
     Tests help links on course Certificate settings page.
     """
     def setUp(self, is_staff=False, test_xss=True):
-        super(CertificatePageHelpTest, self).setUp()
+        super().setUp()
 
         self.certificates_page = CertificatesPage(
             self.browser,
@@ -956,7 +955,7 @@ class GroupExperimentConfigurationHelpTest(ContainerBase):
     It is related to Experiment Group Configurations on the page.
     """
     def setUp(self):  # pylint: disable=arguments-differ
-        super(GroupExperimentConfigurationHelpTest, self).setUp()
+        super().setUp()
         self.group_configuration_page = GroupConfigurationsPage(
             self.browser,
             self.course_info['org'],
@@ -974,7 +973,7 @@ class GroupExperimentConfigurationHelpTest(ContainerBase):
         course.
         """
         course_fixture.add_advanced_settings(
-            {u"advanced_modules": {"value": ["split_test"]}}
+            {"advanced_modules": {"value": ["split_test"]}}
         )
 
     def test_course_group_configuration_experiment_side_bar_help(self):
@@ -1009,7 +1008,7 @@ class ToolsImportHelpTest(StudioCourseTest):
     """
     def setUp(self, is_staff=False, test_xss=True):
 
-        super(ToolsImportHelpTest, self).setUp()
+        super().setUp()
 
         self.import_page = ImportCoursePage(
             self.browser,
@@ -1065,7 +1064,7 @@ class ToolsExportHelpTest(StudioCourseTest):
     """
     def setUp(self, is_staff=False, test_xss=True):
 
-        super(ToolsExportHelpTest, self).setUp()
+        super().setUp()
 
         self.export_page = ExportCoursePage(
             self.browser,
@@ -1120,7 +1119,7 @@ class StudioWelcomeHelpTest(AcceptanceTest):
     Tests help link on 'Welcome' page ( User not logged in)
     """
     def setUp(self):
-        super(StudioWelcomeHelpTest, self).setUp()
+        super().setUp()
         self.index_page = IndexPage(self.browser)
         self.index_page.visit()
 

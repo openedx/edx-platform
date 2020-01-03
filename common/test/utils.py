@@ -22,7 +22,7 @@ def nostderr():
     """
     savestderr = sys.stderr
 
-    class Devnull(object):
+    class Devnull:
         """ /dev/null incarnation as output-stream-like object """
         def write(self, _):
             """ Write method - just does nothing"""
@@ -35,7 +35,7 @@ def nostderr():
         sys.stderr = savestderr
 
 
-class XssTestMixin(object):
+class XssTestMixin:
     """
     Mixin for testing XSS vulnerabilities.
     """
@@ -63,7 +63,7 @@ def disable_signal(module, signal):
     return patch.object(module, signal, new=Signal())
 
 
-class MockSignalHandlerMixin(object):
+class MockSignalHandlerMixin:
     """Mixin for testing sending of signals."""
 
     @contextmanager
@@ -117,28 +117,28 @@ def skip_signal(signal, **kwargs):
         signal.connect(**kwargs)
 
 
-class MockS3Mixin(object):
+class MockS3Mixin:
     """
     TestCase mixin that stubs S3 using the moto library. Note that this will
     activate httpretty, which will monkey patch socket.
     """
     def setUp(self):
-        super(MockS3Mixin, self).setUp()
+        super().setUp()
         self._mock_s3 = moto.mock_s3_deprecated()
         self._mock_s3.start()
 
     def tearDown(self):
         self._mock_s3.stop()
-        super(MockS3Mixin, self).tearDown()
+        super().tearDown()
 
 
-class reprwrapper(object):
+class reprwrapper:
     """
     Wrapper class for functions that need a normalized string representation.
     """
     def __init__(self, func):
         self._func = func
-        self.repr = u'Func: {}'.format(func.__name__)
+        self.repr = 'Func: {}'.format(func.__name__)
         functools.update_wrapper(self, func)
 
     def __call__(self, *args, **kw):

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for OAuth2 permission delegation."""
 
 
@@ -16,7 +15,7 @@ class OAuth2PermissionDelegationTests(AcceptanceTest):
     shard = 16
 
     def setUp(self):
-        super(OAuth2PermissionDelegationTests, self).setUp()
+        super().setUp()
         self.oauth_page = OAuth2Confirmation(self.browser)
 
     def _auth(self):

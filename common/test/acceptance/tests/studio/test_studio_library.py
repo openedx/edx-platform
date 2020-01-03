@@ -25,7 +25,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         """
         Ensure a library exists and navigate to the library edit page.
         """
-        super(LibraryEditPageTest, self).setUp()
+        super().setUp()
         self.lib_page = LibraryEditPage(self.browser, self.library_key)
         self.lib_page.visit()
         self.lib_page.wait_until_ready()
@@ -197,7 +197,7 @@ class LibraryNavigationTest(StudioLibraryTest):
         """
         Ensure a library exists and navigate to the library edit page.
         """
-        super(LibraryNavigationTest, self).setUp()
+        super().setUp()
         self.lib_page = LibraryEditPage(self.browser, self.library_key)
         self.lib_page.visit()
         self.lib_page.wait_until_ready()
@@ -509,7 +509,7 @@ class LibraryUsersPageTest(StudioLibraryTest):
     Test the functionality of the library "Instructor Access" page.
     """
     def setUp(self):
-        super(LibraryUsersPageTest, self).setUp()
+        super().setUp()
 
         # Create a second user for use in these tests:
         AutoAuthPage(self.browser, username="second", email="second@example.com", no_login=True).visit()

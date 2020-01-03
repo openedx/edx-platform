@@ -35,7 +35,7 @@ class ModeCreationPage(PageObject):
             currency (str): The currency in which to list prices.
             sku (str): The product SKU value.
         """
-        super(ModeCreationPage, self).__init__(browser)
+        super().__init__(browser)
 
         self._course_id = course_id
         self._parameters = {}

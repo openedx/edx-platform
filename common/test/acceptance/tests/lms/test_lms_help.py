@@ -31,7 +31,7 @@ class TestCohortHelp(ContainerBase, CohortTestMixin):
     shard = 2
 
     def setUp(self, is_staff=True):
-        super(TestCohortHelp, self).setUp(is_staff=is_staff)
+        super().setUp(is_staff=is_staff)
         self.enable_cohorting(self.course_fixture)
         self.instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
         self.instructor_dashboard_page.visit()
@@ -98,7 +98,7 @@ class InstructorDashboardHelp(BaseInstructorDashboardTest):
     shard = 2
 
     def setUp(self):
-        super(InstructorDashboardHelp, self).setUp()
+        super().setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
         self.log_in_as_instructor()
         self.instructor_dashboard_page = self.visit_instructor_dashboard()

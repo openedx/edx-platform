@@ -21,7 +21,7 @@ from common.test.acceptance.tests.helpers import disable_animations, enable_anim
 
 
 @js_defined('jQuery')
-class CourseOutlineItem(object):
+class CourseOutlineItem:
     """
     A mixin class for any :class:`PageObject` shown in a course outline.
     """
@@ -41,9 +41,9 @@ class CourseOutlineItem(object):
         # Check for the existence of a locator so that errors when navigating to the course outline page don't show up
         # as errors in the repr method instead.
         try:
-            return u"{}(<browser>, {!r})".format(self.__class__.__name__, self.locator)
+            return "{}(<browser>, {!r})".format(self.__class__.__name__, self.locator)
         except AttributeError:
-            return u"{}(<browser>)".format(self.__class__.__name__)
+            return "{}(<browser>)".format(self.__class__.__name__)
 
     def _bounded_selector(self, selector):
         """
@@ -53,7 +53,7 @@ class CourseOutlineItem(object):
         # This happens in the context of the CourseOutlinePage
         # pylint: disable=no-member
         if self.BODY_SELECTOR and hasattr(self, 'locator'):
-            return u'{}[data-locator="{}"] {}'.format(
+            return '{}[data-locator="{}"] {}'.format(
                 self.BODY_SELECTOR,
                 self.locator,
                 selector
@@ -157,7 +157,7 @@ class CourseOutlineItem(object):
             select_option_by_text(groups_select, partition_name)
 
             for group_id in group_ids:
-                checkbox = self.q(css=u'#content-group-{group_id}'.format(group_id=group_id))
+                checkbox = self.q(css='#content-group-{group_id}'.format(group_id=group_id))
                 checkbox.click()
             modal.save()
 
@@ -306,11 +306,11 @@ class CourseOutlineContainer(CourseOutlineItem):
         self.scroll_to_element(css_element)  # pylint: disable=no-member
         ele = self.browser.find_element_by_css_selector(css_element)  # pylint: disable=no-member
         ActionChains(self.browser).move_to_element_with_offset(ele, 8, 8).click().perform()  # pylint: disable=no-member
-        self.wait_for_element_presence(self._bounded_selector(self.ADD_BUTTON_SELECTOR), u'Subsection is expanded')
+        self.wait_for_element_presence(self._bounded_selector(self.ADD_BUTTON_SELECTOR), 'Subsection is expanded')
 
         EmptyPromise(
             lambda: subsection_expanded() != currently_expanded,
-            u"Check that the container {} has been toggled".format(self.locator)
+            "Check that the container {} has been toggled".format(self.locator)
         ).fulfill()
 
         enable_animations(self)
@@ -335,7 +335,7 @@ class CourseOutlineChild(PageObject, CourseOutlineItem):
     BODY_SELECTOR = '.outline-item'
 
     def __init__(self, browser, locator):
-        super(CourseOutlineChild, self).__init__(browser)
+        super().__init__(browser)
         self.locator = locator
 
     def is_browser_on_page(self):
@@ -352,7 +352,7 @@ class CourseOutlineChild(PageObject, CourseOutlineItem):
         """
         Return `selector`, but limited to this particular `CourseOutlineChild` context
         """
-        return u'{}[data-locator="{}"] {}'.format(
+        return '{}[data-locator="{}"] {}'.format(
             self.BODY_SELECTOR,
             self.locator,
             selector
@@ -477,7 +477,7 @@ class CourseOutlineSection(CourseOutlineContainer, CourseOutlineChild):
         self.add_child()
 
 
-class ExpandCollapseLinkState(object):
+class ExpandCollapseLinkState:
     """
     Represents the three states that the expand/collapse link can be in
     """
@@ -532,7 +532,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         Find and click on first section name in course outline
         """
-        self.q(css=u'{} .section-name'.format(parent_css)).first.click()
+        self.q(css='{} .section-name'.format(parent_css)).first.click()
 
     def get_section_name(self, parent_css='', page_refresh=False):
         """
@@ -540,21 +540,21 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         if page_refresh:
             self.browser.refresh()
-        return self.q(css=u'{} .section-name'.format(parent_css)).text
+        return self.q(css='{} .section-name'.format(parent_css)).text
 
     def section_name_edit_form_present(self, parent_css=''):
         """
         Check that section name edit form present
         """
-        return self.q(css=u'{} .section-name input'.format(parent_css)).present
+        return self.q(css='{} .section-name input'.format(parent_css)).present
 
     def change_section_name(self, new_name, parent_css=''):
         """
         Change section name of first section present in course outline
         """
         self.click_section_name(parent_css)
-        self.q(css=u'{} .section-name input'.format(parent_css)).first.fill(new_name)
-        self.q(css=u'{} .section-name .save-button'.format(parent_css)).first.click()
+        self.q(css='{} .section-name input'.format(parent_css)).first.fill(new_name)
+        self.q(css='{} .section-name .save-button'.format(parent_css)).first.click()
         self.wait_for_ajax()
 
     def sections(self):
@@ -915,7 +915,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         return self.q(css='.advance-modules-list li').text
 
 
-class CourseOutlineModal(object):
+class CourseOutlineModal:
     """
     Page object specifically for a modal window on the course outline page.
 
@@ -1011,14 +1011,14 @@ class CourseOutlineModal(object):
         else:  # Use default timepicker values, which are current month and year.
             current_month, current_year = datetime.datetime.today().month, datetime.datetime.today().year
         date_diff = 12 * (year - current_year) + month - current_month
-        selector = u"a.ui-datepicker-{}".format('next' if date_diff > 0 else 'prev')
+        selector = "a.ui-datepicker-{}".format('next' if date_diff > 0 else 'prev')
         for __ in range(abs(date_diff)):
             self.page.q(css=selector).click()
         self.page.q(css="a.ui-state-default").nth(day - 1).click()  # set day
         self.page.wait_for_element_invisibility("#ui-datepicker-div", "datepicker should be closed")
         EmptyPromise(
-            lambda: getattr(self, property_name) == u'{m}/{d}/{y}'.format(m=month, d=day, y=year),
-            u"{} is updated in modal.".format(property_name)
+            lambda: getattr(self, property_name) == '{m}/{d}/{y}'.format(m=month, d=day, y=year),
+            "{} is updated in modal.".format(property_name)
         ).fulfill()
 
     def set_time(self, input_selector, time):

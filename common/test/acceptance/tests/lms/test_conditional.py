@@ -19,7 +19,7 @@ class ConditionalTest(UniqueCourseTest):
     shard = 23
 
     def setUp(self):
-        super(ConditionalTest, self).setUp()
+        super().setUp()
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
         AutoAuthPage(

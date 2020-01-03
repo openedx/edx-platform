@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Acceptance tests for studio related to the outline page.
 """
@@ -43,7 +42,7 @@ class CourseOutlineTest(StudioCourseTest):
         """
         Install a course with no content using a fixture.
         """
-        super(CourseOutlineTest, self).setUp()
+        super().setUp()
         self.course_outline_page = CourseOutlinePage(
             self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']
         )
@@ -150,7 +149,7 @@ class WarningMessagesTest(CourseOutlineTest):
     FUTURE_UNPUBLISHED_WARNING = 'Unpublished changes to content that will release in the future'
     NEVER_PUBLISHED_WARNING = 'Unpublished units will not be released'
 
-    class PublishState(object):
+    class PublishState:
         """
         Default values for representing the published state of a unit
         """
@@ -159,7 +158,7 @@ class WarningMessagesTest(CourseOutlineTest):
         PUBLISHED = 3
         VALUES = [NEVER_PUBLISHED, UNPUBLISHED_CHANGES, PUBLISHED]
 
-    class UnitState(object):
+    class UnitState:
         """ Represents the state of a unit """
 
         def __init__(self, is_released, publish_state, is_locked):
@@ -387,11 +386,11 @@ class EditingSectionsTest(CourseOutlineTest):
         self.assertTrue(modal.has_policy())
 
         # Verify initial values
-        self.assertEqual(modal.release_date, u'1/1/1970')
-        self.assertEqual(modal.release_time, u'00:00')
-        self.assertEqual(modal.due_date, u'')
-        self.assertEqual(modal.due_time, u'')
-        self.assertEqual(modal.policy, u'Not Graded')
+        self.assertEqual(modal.release_date, '1/1/1970')
+        self.assertEqual(modal.release_time, '00:00')
+        self.assertEqual(modal.due_date, '')
+        self.assertEqual(modal.due_time, '')
+        self.assertEqual(modal.policy, 'Not Graded')
 
         # Set new values
         modal.release_date = '3/12/1972'
@@ -401,11 +400,11 @@ class EditingSectionsTest(CourseOutlineTest):
         modal.policy = 'Lab'
 
         modal.save()
-        self.assertIn(u'Released: Mar 12, 1972', subsection.release_date)
-        self.assertIn(u'04:01', subsection.release_date)
-        self.assertIn(u'Due: Jul 21, 2014', subsection.due_date)
-        self.assertIn(u'23:39', subsection.due_date)
-        self.assertIn(u'Lab', subsection.policy)
+        self.assertIn('Released: Mar 12, 1972', subsection.release_date)
+        self.assertIn('04:01', subsection.release_date)
+        self.assertIn('Due: Jul 21, 2014', subsection.due_date)
+        self.assertIn('23:39', subsection.due_date)
+        self.assertIn('Lab', subsection.policy)
 
     def test_can_edit_section(self):
         """
@@ -437,13 +436,13 @@ class EditingSectionsTest(CourseOutlineTest):
         self.assertFalse(modal.has_policy())
 
         # Verify initial value
-        self.assertEqual(modal.release_date, u'1/1/1970')
+        self.assertEqual(modal.release_date, '1/1/1970')
 
         # Set new value
         modal.release_date = '5/14/1969'
 
         modal.save()
-        self.assertIn(u'Released: May 14, 1969', section.release_date)
+        self.assertIn('Released: May 14, 1969', section.release_date)
         # Verify that Due date and Policy are not present
         self.assertFalse(section.due_date)
         self.assertFalse(section.policy)
@@ -464,7 +463,7 @@ class EditingSectionsTest(CourseOutlineTest):
         progress_page = ProgressPage(self.browser, self.course_id)
         progress_page.visit()
         progress_page.wait_for_page()
-        self.assertEqual(u'Practice', progress_page.grading_formats[0])
+        self.assertEqual('Practice', progress_page.grading_formats[0])
         self.course_outline_page.visit()
 
         subsection = self.course_outline_page.section(SECTION_NAME).subsection(SUBSECTION_NAME)
@@ -475,7 +474,7 @@ class EditingSectionsTest(CourseOutlineTest):
 
         progress_page.visit()
 
-        self.assertEqual(u'Problem', progress_page.grading_formats[0])
+        self.assertEqual('Problem', progress_page.grading_formats[0])
 
     def test_unchanged_release_date_is_not_saved(self):
         """
@@ -511,7 +510,7 @@ class UnitAccessTest(CourseOutlineTest):
     __test__ = True
 
     def setUp(self):
-        super(UnitAccessTest, self).setUp()
+        super().setUp()
         self.group_configurations_page = GroupConfigurationsPage(
             self.browser,
             self.course_info['org'],
@@ -1659,10 +1658,10 @@ class DeprecationWarningMessageTest(CourseOutlineTest):
     HEADING_TEXT = 'This course uses features that are no longer supported.'
     COMPONENT_LIST_HEADING = 'You must delete or replace the following components.'
     ADVANCE_MODULES_REMOVE_TEXT = (
-        u'To avoid errors, édX strongly recommends that you remove unsupported features '
-        u'from the course advanced settings. To do this, go to the Advanced Settings '
-        u'page, locate the "Advanced Module List" setting, and then delete the following '
-        u'modules from the list.'
+        'To avoid errors, édX strongly recommends that you remove unsupported features '
+        'from the course advanced settings. To do this, go to the Advanced Settings '
+        'page, locate the "Advanced Module List" setting, and then delete the following '
+        'modules from the list.'
     )
     DEFAULT_DISPLAYNAME = "Deprecated Component"
 
@@ -1715,7 +1714,7 @@ class DeprecationWarningMessageTest(CourseOutlineTest):
         self.assertEqual(self.course_outline_page.components_visible, components_present)
         if components_present:
             self.assertEqual(self.course_outline_page.components_list_heading, self.COMPONENT_LIST_HEADING)
-            six.assertCountEqual(self, self.course_outline_page.components_display_names, components_display_name_list)
+            self.assertCountEqual(self.course_outline_page.components_display_names, components_display_name_list)
 
     def test_no_deprecation_warning_message_present(self):
         """
@@ -1879,7 +1878,7 @@ class CourseStatusOutlineTest(CourseOutlineTest):
     shard = 6
 
     def setUp(self):
-        super(CourseStatusOutlineTest, self).setUp()
+        super().setUp()
 
         self.schedule_and_details_settings = SettingsPage(
             self.browser,

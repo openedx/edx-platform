@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 """
 Mixins for completion.
 """
 
 
-class CompletionOnViewMixin(object):
+class CompletionOnViewMixin:
     """
     Methods for testing completion on view.
     """

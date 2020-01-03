@@ -40,7 +40,7 @@ class PaymentAndVerificationFlow(PageObject):
         Raises:
             ValueError
         """
-        super(PaymentAndVerificationFlow, self).__init__(browser)
+        super().__init__(browser)
         self._course_id = course_id
 
         if entry_point not in ['start-flow', 'upgrade', 'verify-now', 'verify-later', 'payment-confirmation']:
@@ -147,7 +147,7 @@ class FakePaymentPage(PageObject):
             browser (Browser): The browser instance.
             course_id (unicode): The course in which the user is enrolling.
         """
-        super(FakePaymentPage, self).__init__(browser)
+        super().__init__(browser)
         self._course_id = course_id
 
     url = BASE_URL + "/shoppingcart/payment_fake/"

@@ -116,7 +116,7 @@ class UsersPageMixin(PageObject):
 
     def modal_dialog_text(self, dialog_type):
         """ Gets modal dialog text """
-        return self.q(css=u'.prompt.{dialog_type} .message'.format(dialog_type=dialog_type)).text[0]
+        return self.q(css='.prompt.{dialog_type} .message'.format(dialog_type=dialog_type)).text[0]
 
     def wait_until_no_loading_indicator(self):
         """
@@ -160,7 +160,7 @@ class LibraryUsersPage(UsersPageMixin, HelpMixin):
     Library Team page in Studio
     """
     def __init__(self, browser, locator):
-        super(LibraryUsersPage, self).__init__(browser)
+        super().__init__(browser)
         self.locator = locator
 
     @property
@@ -168,7 +168,7 @@ class LibraryUsersPage(UsersPageMixin, HelpMixin):
         """
         URL to the "User Access" page for the given library.
         """
-        return "{}/library/{}/team/".format(BASE_URL, six.text_type(self.locator))
+        return "{}/library/{}/team/".format(BASE_URL, str(self.locator))
 
 
 class CourseTeamPage(UsersPageMixin, CoursePage):
@@ -190,7 +190,7 @@ class CourseTeamPage(UsersPageMixin, CoursePage):
             self.course_info['course_run'],
             deprecated=(default_store == 'draft')
         )
-        return "/".join([BASE_URL, self.url_path, six.text_type(course_key)])
+        return "/".join([BASE_URL, self.url_path, str(course_key)])
 
 
 class UserWrapper(PageObject):
@@ -205,9 +205,9 @@ class UserWrapper(PageObject):
     }
 
     def __init__(self, browser, email):
-        super(UserWrapper, self).__init__(browser)
+        super().__init__(browser)
         self.email = email
-        self.selector = u'.user-list .user-item[data-email="{}"]'.format(self.email)
+        self.selector = '.user-list .user-item[data-email="{}"]'.format(self.email)
 
     def is_browser_on_page(self):
         """
@@ -219,7 +219,7 @@ class UserWrapper(PageObject):
         """
         Return `selector`, but limited to this particular user entry's context
         """
-        return u'{} {}'.format(self.selector, selector)
+        return '{} {}'.format(self.selector, selector)
 
     @property
     def name(self):

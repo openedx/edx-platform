@@ -22,7 +22,7 @@ class XBlockAcidBase(AcceptanceTest):
         Create a unique identifier for the course used in this test.
         """
         # Ensure that the superclass sets up
-        super(XBlockAcidBase, self).setUp()
+        super().setUp()
 
         # Define a unique course identifier
         self.course_info = {
@@ -124,7 +124,7 @@ class XBlockAcidParentBase(XBlockAcidBase):
     __test__ = False
 
     def validate_acid_block_preview(self, acid_block):
-        super(XBlockAcidParentBase, self).validate_acid_block_preview(acid_block)
+        super().validate_acid_block_preview(acid_block)
         self.assertTrue(acid_block.child_tests_passed)
 
     def test_acid_block_preview(self):
@@ -202,7 +202,7 @@ class XBlockAcidChildTest(XBlockAcidParentBase):
         self.user = course_fix.user
 
     def test_acid_block_preview(self):
-        super(XBlockAcidChildTest, self).test_acid_block_preview()
+        super().test_acid_block_preview()
 
     def test_acid_block_editor(self):
-        super(XBlockAcidChildTest, self).test_acid_block_editor()
+        super().test_acid_block_editor()

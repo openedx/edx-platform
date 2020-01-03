@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Acceptance tests for CMS Video Editor.
 """
@@ -101,7 +99,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.video.upload_translation('chinese_transcripts.srt', 'zh')
         self.save_unit_settings()
         self.assertTrue(self.video.is_captions_visible())
-        unicode_text = u"好 各位同学"
+        unicode_text = "好 各位同学"
         self.assertIn(unicode_text, self.video.captions_text)
         self.edit_component()
         self.open_advanced_tab()
@@ -150,7 +148,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.video.upload_translation('1mb_transcripts.srt', 'uk')
         self.save_unit_settings()
         self.video.wait_for(self.video.is_captions_visible, 'Captions are visible', timeout=10)
-        unicode_text = u"Привіт, edX вітає вас."
+        unicode_text = "Привіт, edX вітає вас."
         self.assertIn(unicode_text, self.video.captions_lines())
 
     def test_translations_download_works_w_saving(self):
@@ -181,9 +179,9 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.open_advanced_tab()
         self.assertEqual(sorted(self.video.translations()), sorted(['zh', 'uk']))
         self.assertEqual(sorted(list(self.video.caption_languages.keys())), sorted(['zh', 'uk']))
-        zh_unicode_text = u"好 各位同学"
+        zh_unicode_text = "好 各位同学"
         self.assertTrue(self.video.download_translation('zh', zh_unicode_text))
-        uk_unicode_text = u"Привіт, edX вітає вас."
+        uk_unicode_text = "Привіт, edX вітає вас."
         self.assertTrue(self.video.download_translation('uk', uk_unicode_text))
 
     def test_translations_download_works_wo_saving(self):
@@ -204,9 +202,9 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.open_advanced_tab()
         self.video.upload_translation('uk_transcripts.srt', 'uk')
         self.video.upload_translation('chinese_transcripts.srt', 'zh')
-        zh_unicode_text = u"好 各位同学"
+        zh_unicode_text = "好 各位同学"
         self.assertTrue(self.video.download_translation('zh', zh_unicode_text))
-        uk_unicode_text = u"Привіт, edX вітає вас."
+        uk_unicode_text = "Привіт, edX вітає вас."
         self.assertTrue(self.video.download_translation('uk', uk_unicode_text))
 
     def test_translations_remove_works_wo_saving(self):
@@ -293,7 +291,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.video.upload_translation('chinese_transcripts.srt', 'zh')
         self.save_unit_settings()
         self.assertTrue(self.video.is_captions_visible())
-        unicode_text = u"好 各位同学"
+        unicode_text = "好 各位同学"
         self.assertIn(unicode_text, self.video.captions_text)
         self.edit_component()
         self.open_advanced_tab()
@@ -301,7 +299,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.video.replace_translation('zh', 'uk', 'uk_transcripts.srt')
         self.save_unit_settings()
         self.assertTrue(self.video.is_captions_visible())
-        unicode_text = u"Привіт, edX вітає вас."
+        unicode_text = "Привіт, edX вітає вас."
         self.assertIn(unicode_text, self.video.captions_text)
 
     def test_replace_translation_wo_save(self):
@@ -325,7 +323,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.video.replace_translation('zh', 'uk', 'uk_transcripts.srt')
         self.save_unit_settings()
         self.assertTrue(self.video.is_captions_visible())
-        unicode_text = u"Привіт, edX вітає вас."
+        unicode_text = "Привіт, edX вітає вас."
         self.assertIn(unicode_text, self.video.captions_text)
 
     def test_translation_upload_remove_upload(self):
@@ -352,7 +350,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.video.upload_translation('uk_transcripts.srt', 'zh')
         self.save_unit_settings()
         self.assertTrue(self.video.is_captions_visible())
-        unicode_text = u"Привіт, edX вітає вас."
+        unicode_text = "Привіт, edX вітає вас."
         self.assertIn(unicode_text, self.video.captions_text)
 
     def test_select_language_twice(self):
@@ -397,9 +395,9 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.video.upload_translation('chinese_transcripts.srt', 'ab')
         self.save_unit_settings()
         self.assertTrue(self.video.is_captions_visible())
-        unicode_text = u"好 各位同学"
+        unicode_text = "好 各位同学"
         self.assertIn(unicode_text, self.video.captions_text)
-        self.assertEqual(sorted(list(self.video.caption_languages.keys())), sorted([u'ab', u'uk']))
+        self.assertEqual(sorted(list(self.video.caption_languages.keys())), sorted(['ab', 'uk']))
         self.assertEqual(sorted(list(self.video.caption_languages.keys()))[0], 'ab')
 
     def test_upload_transcript_with_BOM(self):
@@ -419,7 +417,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.video.upload_translation('chinese_transcripts_with_BOM.srt', 'zh')
         self.save_unit_settings()
         self.assertTrue(self.video.is_captions_visible())
-        unicode_text = u"莎拉·佩林 (Sarah Palin)"
+        unicode_text = "莎拉·佩林 (Sarah Palin)"
         self.assertIn(unicode_text, self.video.captions_lines())
 
     def test_simplified_and_traditional_chinese_transcripts_uploading(self):
@@ -447,8 +445,8 @@ class VideoEditorTest(CMSVideoBaseTest):
         self._create_video_component()
 
         langs_info = [
-            ('zh_HANS', 'simplified_chinese.srt', u'在线学习是革'),
-            ('zh_HANT', 'traditional_chinese.srt', u'在線學習是革')
+            ('zh_HANS', 'simplified_chinese.srt', '在线学习是革'),
+            ('zh_HANT', 'traditional_chinese.srt', '在線學習是革')
         ]
 
         for lang_code, lang_file, lang_text in langs_info:
@@ -458,7 +456,7 @@ class VideoEditorTest(CMSVideoBaseTest):
             self.save_unit_settings()
             self.assertTrue(self.video.is_captions_visible())
             # If there is only one language then there will be no subtitle/captions menu
-            if lang_code == u'zh_HANT':
+            if lang_code == 'zh_HANT':
                 self.video.select_language(lang_code)
             unicode_text = lang_text
             self.assertIn(unicode_text, self.video.captions_text)

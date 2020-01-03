@@ -36,7 +36,7 @@ class CourseDiscoveryTest(AcceptanceTest):
 
         self.addCleanup(remove_file, self.TEST_INDEX_FILENAME)
 
-        super(CourseDiscoveryTest, self).setUp()
+        super().setUp()
         self.page = CourseDiscoveryPage(self.browser)
 
         for i in range(12):

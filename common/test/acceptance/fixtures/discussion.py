@@ -14,7 +14,7 @@ from common.test.acceptance.fixtures.config import ConfigModelFixture
 
 
 class ContentFactory(factory.Factory):
-    class Meta(object):
+    class Meta:
         model = dict
 
     id = None
@@ -68,7 +68,7 @@ class Response(Comment):
 
 
 class SearchResult(factory.Factory):
-    class Meta(object):
+    class Meta:
         model = dict
 
     discussion_data = []
@@ -78,7 +78,7 @@ class SearchResult(factory.Factory):
     corrected_text = None
 
 
-class DiscussionContentFixture(object):
+class DiscussionContentFixture:
 
     def push(self):
         """
@@ -175,7 +175,7 @@ class SearchResultFixture(DiscussionContentFixture):
         return {"search_result": json.dumps(self.result)}
 
 
-class ForumsConfigMixin(object):
+class ForumsConfigMixin:
     """Mixin providing a method used to configure the forums integration."""
     def enable_forums(self, is_enabled=True):
         """Configures whether or not forums are enabled."""

@@ -1,4 +1,3 @@
-# coding: utf-8
 """
 Course Schedule and Details Settings page.
 """
@@ -79,7 +78,7 @@ class SettingsPage(CoursePage):
         Set the values of the elements to those specified
         in the element_values dict.
         """
-        for css, value in six.iteritems(element_values):
+        for css, value in element_values.items():
             element = self.get_element(css)
             element.clear()
             element.send_keys(value)
@@ -224,7 +223,7 @@ class SettingsPage(CoursePage):
         """
         self.wait_for_element_presence(self.checked_pacing_css, 'course pacing controls present')
         statuses = self.q(css=self.pacing_css).map(lambda e: e.get_attribute('disabled')).results
-        return all((s == 'true' for s in statuses))
+        return all(s == 'true' for s in statuses)
 
     ################
     # Waits

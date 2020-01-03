@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 End-to-end tests for the courseware unit bookmarks.
 """
@@ -29,7 +28,7 @@ class BookmarksTestMixin(EventsTestMixin, UniqueCourseTest):
     EMAIL = "student@example.com"
 
     def setUp(self):
-        super(BookmarksTestMixin, self).setUp()
+        super().setUp()
 
         self.studio_course_outline_page = StudioCourseOutlinePage(
             self.browser,

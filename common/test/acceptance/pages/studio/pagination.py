@@ -6,7 +6,7 @@ Mixin to include for Paginated container pages
 from selenium.webdriver.common.keys import Keys
 
 
-class PaginatedMixin(object):
+class PaginatedMixin:
     """
     Mixin class used for paginated page tests.
     """
@@ -19,7 +19,7 @@ class PaginatedMixin(object):
         To specify a specific arrow, pass an iterable with a single element, 'next' or 'previous'.
         """
         return all([
-            self.q(css=u'nav.%s * .%s-page-link.is-disabled' % (position, arrow))
+            self.q(css='nav.{} * .{}-page-link.is-disabled'.format(position, arrow))
             for arrow in arrows
         ])
 
@@ -27,14 +27,14 @@ class PaginatedMixin(object):
         """
         Clicks one of the forward nav buttons. Position can be 'top' or 'bottom'.
         """
-        self.q(css=u'nav.%s * .previous-page-link' % position)[0].click()
+        self.q(css='nav.%s * .previous-page-link' % position)[0].click()
         self.wait_until_ready()
 
     def move_forward(self, position):
         """
         Clicks one of the forward nav buttons. Position can be 'top' or 'bottom'.
         """
-        self.q(css=u'nav.%s * .next-page-link' % position)[0].click()
+        self.q(css='nav.%s * .next-page-link' % position)[0].click()
         self.wait_until_ready()
 
     def go_to_page(self, number):

@@ -1,4 +1,3 @@
-# coding: utf-8
 """
 Acceptance tests for Studio's Setting pages
 """
@@ -36,7 +35,7 @@ class ContentGroupConfigurationTest(StudioCourseTest):
     There are tests for the experiment groups in test_studio_split_test.
     """
     def setUp(self):
-        super(ContentGroupConfigurationTest, self).setUp()
+        super().setUp()
         self.group_configurations_page = GroupConfigurationsPage(
             self.browser,
             self.course_info['org'],
@@ -133,7 +132,7 @@ class ContentGroupConfigurationTest(StudioCourseTest):
         """
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
-                u"user_partitions": [
+                "user_partitions": [
                     create_user_partition_json(
                         0,
                         'Configuration alpha,',
@@ -245,7 +244,7 @@ class EnrollmentTrackModeTest(StudioCourseTest):
     """
 
     def setUp(self, is_staff=True, test_xss=True):
-        super(EnrollmentTrackModeTest, self).setUp(is_staff=is_staff)
+        super().setUp(is_staff=is_staff)
 
         self.audit_track = "Audit"
         self.verified_track = "Verified"
@@ -300,7 +299,7 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
     course_name_value = 'Test Name'
 
     def setUp(self):
-        super(AdvancedSettingsValidationTest, self).setUp()
+        super().setUp()
         self.advanced_settings = AdvancedSettingsPage(
             self.browser,
             self.course_info['org'],
@@ -550,7 +549,7 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         self.check_modal_shows_correct_contents(self.type_fields)
         self.advanced_settings.refresh_and_wait_for_load()
 
-        for key, val in six.iteritems(original_values_map):
+        for key, val in original_values_map.items():
             self.assertEqual(
                 self.advanced_settings.get(key),
                 val,
@@ -573,7 +572,7 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         self.advanced_settings.undo_changes_via_modal()
 
         # Check that changes are undone
-        for key, val in six.iteritems(original_values_map):
+        for key, val in original_values_map.items():
             self.assertEqual(
                 self.advanced_settings.get(key),
                 val,
@@ -599,7 +598,7 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         self.assertFalse(self.advanced_settings.is_validation_modal_present())
 
         # Iterate through the wrong values and make sure they're still displayed
-        for key, val in six.iteritems(inputs):
+        for key, val in inputs.items():
             self.assertEqual(
                 str(self.advanced_settings.get(key)),
                 str(val),
@@ -673,7 +672,7 @@ class ContentLicenseTest(StudioCourseTest):
     for an entire course's content, to All Rights Reserved or Creative Commons)
     """
     def setUp(self):  # pylint: disable=arguments-differ
-        super(ContentLicenseTest, self).setUp()
+        super().setUp()
         self.outline_page = CourseOutlinePage(
             self.browser,
             self.course_info['org'],
@@ -748,7 +747,7 @@ class StudioSettingsA11yTest(StudioCourseTest):
     """
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(StudioSettingsA11yTest, self).setUp()
+        super().setUp()
         self.settings_page = SettingsPage(self.browser, self.course_info['org'], self.course_info['number'],
                                           self.course_info['run'])
 
@@ -793,7 +792,7 @@ class StudioSubsectionSettingsA11yTest(StudioCourseTest):
             browser = 'firefox'
 
         with patch.dict(os.environ, {'SELENIUM_BROWSER': browser}):
-            super(StudioSubsectionSettingsA11yTest, self).setUp(is_staff=True)
+            super().setUp(is_staff=True)
 
         self.course_outline = CourseOutlinePage(
             self.browser,
@@ -843,7 +842,7 @@ class StudioSettingsImageUploadTest(StudioCourseTest):
     Class to test course settings image uploads.
     """
     def setUp(self):  # pylint: disable=arguments-differ
-        super(StudioSettingsImageUploadTest, self).setUp()
+        super().setUp()
         self.settings_page = SettingsPage(self.browser, self.course_info['org'], self.course_info['number'],
                                           self.course_info['run'])
         self.settings_page.visit()
@@ -898,7 +897,7 @@ class CourseSettingsTest(StudioCourseTest):
     dummy_time = "15:30"
 
     def setUp(self, is_staff=False, test_xss=True):
-        super(CourseSettingsTest, self).setUp()
+        super().setUp()
 
         self.settings_page = SettingsPage(
             self.browser,

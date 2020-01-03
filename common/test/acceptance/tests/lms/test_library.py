@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 End-to-end tests for LibraryContent block in LMS
 """
@@ -44,7 +43,7 @@ class LibraryContentTestBase(UniqueCourseTest):
         """
         Set up library, course and library content XBlock
         """
-        super(LibraryContentTestBase, self).setUp()
+        super().setUp()
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
 
@@ -55,7 +54,7 @@ class LibraryContentTestBase(UniqueCourseTest):
             self.course_info['run']
         )
 
-        self.library_fixture = LibraryFixture('test_org', self.unique_id, u'Test Library {}'.format(self.unique_id))
+        self.library_fixture = LibraryFixture('test_org', self.unique_id, 'Test Library {}'.format(self.unique_id))
         self.populate_library_fixture(self.library_fixture)
 
         self.library_fixture.install()
@@ -69,7 +68,7 @@ class LibraryContentTestBase(UniqueCourseTest):
         )
 
         library_content_metadata = {
-            'source_library_id': six.text_type(self.library_key),
+            'source_library_id': str(self.library_key),
             'mode': 'random',
             'max_count': 1,
         }
@@ -211,20 +210,20 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase, TestWithSearc
     def setUp(self):
         """ SetUp method """
         self._create_search_index()
-        super(StudioLibraryContainerCapaFilterTest, self).setUp()
+        super().setUp()
 
     def tearDown(self):
         self._cleanup_index_file()
-        super(StudioLibraryContainerCapaFilterTest, self).tearDown()
+        super().tearDown()
 
     def _get_problem_choice_group_text(self, name, items):
         """ Generates Choice Group CAPA problem XML """
         items_text = "\n".join([
-            u"<choice correct='{correct}'>{item}</choice>".format(correct=correct, item=item)
+            "<choice correct='{correct}'>{item}</choice>".format(correct=correct, item=item)
             for item, correct in items
         ])
 
-        return textwrap.dedent(u"""
+        return textwrap.dedent("""
         <problem>
             <p>{name}</p>
             <multiplechoiceresponse>
@@ -234,9 +233,9 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase, TestWithSearc
 
     def _get_problem_select_text(self, name, items, correct):
         """ Generates Select Option CAPA problem XML """
-        items_text = ",".join(["'{0}'".format(item) for item in items])
+        items_text = ",".join(["'{}'".format(item) for item in items])
 
-        return textwrap.dedent(u"""
+        return textwrap.dedent("""
         <problem>
             <p>{name}</p>
             <optionresponse>

@@ -25,7 +25,7 @@ class BaseXBlockEditorView(PageObject):
             browser (selenium.webdriver): The Selenium-controlled browser that this page is loaded in.
             locator (str): The locator that identifies which xblock this :class:`.xblock-editor` relates to.
         """
-        super(BaseXBlockEditorView, self).__init__(browser)
+        super().__init__(browser)
         self.locator = locator
 
     def is_browser_on_page(self):
@@ -35,7 +35,7 @@ class BaseXBlockEditorView(PageObject):
         """
         Return `selector`, but limited to this particular `XBlockEditorView` context
         """
-        return u'{}[data-locator="{}"] {}'.format(
+        return '{}[data-locator="{}"] {}'.format(
             self.BODY_SELECTOR,
             self.locator,
             selector

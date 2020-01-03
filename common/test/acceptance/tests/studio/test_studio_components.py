@@ -24,11 +24,11 @@ class AdvancedProblemComponentTest(ContainerBase):
         """
         Create a course with a section, subsection, and unit to which to add the component.
         """
-        super(AdvancedProblemComponentTest, self).setUp(is_staff=is_staff)
+        super().setUp(is_staff=is_staff)
 
     def populate_course_fixture(self, course_fixture):
         course_fixture.add_advanced_settings(
-            {u"advanced_modules": {"value": ["split_test"]}}
+            {"advanced_modules": {"value": ["split_test"]}}
         )
 
         course_fixture.add_children(
@@ -83,7 +83,7 @@ class ComponentTest(ContainerBase):
         """
         Create a course with a section, subsection, and unit to which to add the component.
         """
-        super(ComponentTest, self).setUp(is_staff=is_staff)
+        super().setUp(is_staff=is_staff)
         self.advanced_settings = AdvancedSettingsPage(
             self.browser,
             self.course_info['org'],
@@ -93,7 +93,7 @@ class ComponentTest(ContainerBase):
 
     def populate_course_fixture(self, course_fixture):
         course_fixture.add_advanced_settings(
-            {u"advanced_modules": {"value": ["split_test"]}}
+            {"advanced_modules": {"value": ["split_test"]}}
         )
 
         course_fixture.add_children(

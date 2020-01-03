@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Bok choy acceptance tests for problems in the LMS
 """
@@ -25,7 +24,7 @@ class ProblemsTest(UniqueCourseTest):
     """
 
     def setUp(self):
-        super(ProblemsTest, self).setUp()
+        super().setUp()
 
         self.username = "test_student_{uuid}".format(uuid=self.unique_id[0:8])
         self.email = "{username}@example.com".format(username=self.username)
@@ -78,7 +77,7 @@ class ProblemClarificationTest(ProblemsTest):
         """
         Create a problem with a <clarification>
         """
-        xml = dedent(u"""
+        xml = dedent("""
             <problem markdown="null">
                 <text>
                     <p>
@@ -122,7 +121,7 @@ class ProblemHintTest(ProblemsTest, EventsTestMixin):
         """
         self.courseware_page.visit()
         problem_page = ProblemPage(self.browser)
-        self.assertEqual(problem_page.problem_text[0], u'question text')
+        self.assertEqual(problem_page.problem_text[0], 'question text')
         problem_page.fill_answer(answer)
         problem_page.click_submit()
         self.assertEqual(problem_page.message_text, answer_text)
@@ -446,14 +445,14 @@ class ProblemExtendedHintTest(ProblemHintTest, EventsTestMixin):
         """
         self.verify_check_hint(
             'B',
-            u'Answer\nIncorrect: hint',
+            'Answer\nIncorrect: hint',
             [
                 {
                     'event':
                         {
-                            'hint_label': u'Incorrect:',
+                            'hint_label': 'Incorrect:',
                             'trigger_type': 'single',
-                            'student_answer': [u'B'],
+                            'student_answer': ['B'],
                             'correctness': False,
                             'question_type': 'stringresponse',
                             'hints': [{'text': 'hint'}]
@@ -467,11 +466,11 @@ class ProblemExtendedHintTest(ProblemHintTest, EventsTestMixin):
         Test clicking hint button shows the demand hint in its div.
         """
         self.verify_demand_hints(
-            u'Hint (1 of 2): demand-hint1',
-            u'Hint (1 of 2): demand-hint1\nHint (2 of 2): demand-hint2',
+            'Hint (1 of 2): demand-hint1',
+            'Hint (1 of 2): demand-hint1\nHint (2 of 2): demand-hint2',
             [
-                {'event': {u'hint_index': 0, u'hint_len': 2, u'hint_text': u'demand-hint1'}},
-                {'event': {u'hint_index': 1, u'hint_len': 2, u'hint_text': u'demand-hint2'}}
+                {'event': {'hint_index': 0, 'hint_len': 2, 'hint_text': 'demand-hint1'}},
+                {'event': {'hint_index': 1, 'hint_len': 2, 'hint_text': 'demand-hint2'}}
             ]
         )
 
@@ -507,14 +506,14 @@ class ProblemHintWithHtmlTest(ProblemHintTest, EventsTestMixin):
         """
         self.verify_check_hint(
             'C',
-            u'Answer\nIncorrect: aa bb cc',
+            'Answer\nIncorrect: aa bb cc',
             [
                 {
                     'event':
                         {
-                            'hint_label': u'Incorrect:',
+                            'hint_label': 'Incorrect:',
                             'trigger_type': 'single',
-                            'student_answer': [u'C'],
+                            'student_answer': ['C'],
                             'correctness': False,
                             'question_type': 'stringresponse',
                             'hints': [{'text': '<a href="#">aa bb</a> cc'}]
@@ -528,11 +527,11 @@ class ProblemHintWithHtmlTest(ProblemHintTest, EventsTestMixin):
         Test clicking hint button shows the demand hints in a notification area.
         """
         self.verify_demand_hints(
-            u'Hint (1 of 2): aa bb cc',
-            u'Hint (1 of 2): aa bb cc\nHint (2 of 2): dd ee ff',
+            'Hint (1 of 2): aa bb cc',
+            'Hint (1 of 2): aa bb cc\nHint (2 of 2): dd ee ff',
             [
-                {'event': {u'hint_index': 0, u'hint_len': 2, u'hint_text': u'aa <a href="#">bb</a> cc'}},
-                {'event': {u'hint_index': 1, u'hint_len': 2, u'hint_text': u'<a href="#">dd  ee</a> ff'}}
+                {'event': {'hint_index': 0, 'hint_len': 2, 'hint_text': 'aa <a href="#">bb</a> cc'}},
+                {'event': {'hint_index': 1, 'hint_len': 2, 'hint_text': '<a href="#">dd  ee</a> ff'}}
             ]
         )
 
@@ -707,7 +706,7 @@ class ProblemQuestionDescriptionTest(ProblemsTest):
         """
         Create a problem with question and description.
         """
-        xml = dedent(u"""
+        xml = dedent("""
             <problem>
                 <choiceresponse>
                     <label>Eggplant is a _____?</label>
@@ -736,7 +735,7 @@ class ProblemQuestionDescriptionTest(ProblemsTest):
         self.assertEqual(problem_page.problem_question_descriptions, self.descriptions)
 
 
-class CAPAProblemA11yBaseTestMixin(object):
+class CAPAProblemA11yBaseTestMixin:
     """Base TestCase Class to verify CAPA problem accessibility."""
 
     def test_a11y(self):
@@ -956,7 +955,7 @@ class FormulaProblemTest(ProblemsTest):
         Given a course, setup a formula problem type and view it in courseware
         Given the MathJax requirement for generating preview, wait for MathJax files to load
         """
-        super(FormulaProblemTest, self).setUp()
+        super().setUp()
         self.courseware_page.visit()
         time.sleep(6)
 
@@ -1034,7 +1033,7 @@ class FormulaProblemRandomizeTest(ProblemsTest):
         Given a course, setup a formula problem type and view it in courseware
         Given the MathJax requirement for generating preview, wait for MathJax files to load
         """
-        super(FormulaProblemRandomizeTest, self).setUp()
+        super().setUp()
         self.courseware_page.visit()
         time.sleep(6)
 
@@ -1097,7 +1096,7 @@ class DragAndDropXblockWithMixinsTest(UniqueCourseTest):
     """
 
     def setUp(self):
-        super(DragAndDropXblockWithMixinsTest, self).setUp()
+        super().setUp()
 
         self.username = "test_student_{uuid}".format(uuid=self.unique_id[0:8])
         self.email = "{username}@example.com".format(username=self.username)

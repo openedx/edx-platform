@@ -61,7 +61,7 @@ def skip_if_browser(browser):
         @functools.wraps(test_function)
         def wrapper(self, *args, **kwargs):
             if self.browser.name == browser:
-                raise SkipTest(u'Skipping as this test will not work with {}'.format(browser))
+                raise SkipTest('Skipping as this test will not work with {}'.format(browser))
             test_function(self, *args, **kwargs)
         return wrapper
     return decorator
@@ -89,7 +89,7 @@ def is_youtube_available():
         'transcript': 'http://video.google.com/timedtext?lang=en&v=3_yD_cEKoCk',
     }
 
-    for url in six.itervalues(youtube_api_urls):
+    for url in youtube_api_urls.values():
         try:
             response = requests.get(url, allow_redirects=False)
         except requests.exceptions.ConnectionError:
@@ -105,7 +105,7 @@ def is_focused_on_element(browser, selector):
     """
     Check if the focus is on the element that matches the selector.
     """
-    return browser.execute_script(u"return $('{}').is(':focus')".format(selector))
+    return browser.execute_script("return $('{}').is(':focus')".format(selector))
 
 
 def load_data_str(rel_path):
@@ -162,7 +162,7 @@ def disable_css_animations(page):
     """
     Disable CSS3 animations, transitions, transforms.
     """
-    page.browser.execute_script(u"""
+    page.browser.execute_script("""
         var id = 'no-transitions';
 
         // if styles were already added, just do nothing.
@@ -239,7 +239,7 @@ def select_option_by_text(select_browser_query, option_text, focus_out=False):
         except StaleElementReferenceException:
             return False
 
-    msg = u'Selected option {}'.format(option_text)
+    msg = 'Selected option {}'.format(option_text)
     EmptyPromise(lambda: select_option(select_browser_query, option_text), msg).fulfill()
 
 
@@ -353,7 +353,7 @@ def get_element_padding(page, selector):
         progress_page.get_element_padding('.wrapper-msg.wrapper-auto-cert')
 
     """
-    js_script = u"""
+    js_script = """
         var $element = $('%(selector)s');
 
         element_padding = {
@@ -383,7 +383,7 @@ def create_multiple_choice_xml(correct_choice=2, num_choices=4):
     choices[correct_choice] = True
 
     choice_names = ['choice_{}'.format(index) for index in range(num_choices)]
-    question_text = u'The correct answer is Choice {}'.format(correct_choice)
+    question_text = 'The correct answer is Choice {}'.format(correct_choice)
 
     return MultipleChoiceResponseXMLFactory().build_xml(
         question_text=question_text,
@@ -437,7 +437,7 @@ def assert_opened_help_link_is_correct(test, url):
     # Check that the URL loads. Can't do this in the browser because it might
     # be loading a "Maze Found" missing content page.
     response = requests.get(url)
-    test.assertEqual(response.status_code, 200, u"URL {!r} returned {}".format(url, response.status_code))
+    test.assertEqual(response.status_code, 200, "URL {!r} returned {}".format(url, response.status_code))
 
 
 EDX_BOOKS = {
@@ -466,7 +466,7 @@ class EventsTestMixin(TestCase):
     Helpers and setup for running tests that evaluate events emitted
     """
     def setUp(self):
-        super(EventsTestMixin, self).setUp()
+        super().setUp()
         mongo_host = 'edx.devstack.mongo' if 'BOK_CHOY_HOSTNAME' in os.environ else 'localhost'
         self.event_collection = MongoClient(mongo_host)["test"]["events"]
         self.start_time = datetime.now()
@@ -563,7 +563,7 @@ class EventsTestMixin(TestCase):
             # This is a bit of a hack, Promise calls str(description), so I set the description to an object with a
             # custom __str__ and have it do some intelligent stuff to generate a helpful error message.
             CollectedEventsDescription(
-                u'Waiting for {number_of_matches} events to match the filter:\n{event_filter}'.format(
+                'Waiting for {number_of_matches} events to match the filter:\n{event_filter}'.format(
                     number_of_matches=number_of_matches,
                     event_filter=self.event_filter_to_descriptive_string(event_filter),
                 ),
@@ -691,7 +691,7 @@ class EventsTestMixin(TestCase):
 
             try:
                 list_of_source_lines, line_no = inspect.getsourcelines(event_filter)
-            except IOError:
+            except OSError:
                 pass
             else:
                 message = '{file_name}:{line_no}\n{hr}\n{event_filter}\n{hr}'.format(
@@ -710,7 +710,7 @@ class EventsTestMixin(TestCase):
         return message
 
 
-class CollectedEventsDescription(object):
+class CollectedEventsDescription:
     """
     Produce a clear error message when tests fail.
 
@@ -743,14 +743,14 @@ class AcceptanceTest(WebAppTest):
     """
 
     def __init__(self, *args, **kwargs):
-        super(AcceptanceTest, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         # Use long messages so that failures show actual and expected values
         self.longMessage = True  # pylint: disable=invalid-name
 
     def tearDown(self):
         self._save_console_log()
-        super(AcceptanceTest, self).tearDown()
+        super().tearDown()
 
     def _save_console_log(self):
         """
@@ -783,9 +783,9 @@ class AcceptanceTest(WebAppTest):
                 os.makedirs(log_dir)
 
             log_path = os.path.join(log_dir, '{}_browser.log'.format(self.id()))
-            with io.open(log_path, 'w') as browser_log:
+            with open(log_path, 'w') as browser_log:
                 for (message, url, line_no, col_no, stack) in logs:
-                    browser_log.write(u"{}:{}:{}: {}\n    {}\n".format(
+                    browser_log.write("{}:{}:{}: {}\n    {}\n".format(
                         url,
                         line_no,
                         col_no,
@@ -800,7 +800,7 @@ class UniqueCourseTest(AcceptanceTest):
     """
 
     def setUp(self):
-        super(UniqueCourseTest, self).setUp()
+        super().setUp()
 
         self.course_info = {
             'org': 'test_org',
@@ -822,7 +822,7 @@ class UniqueCourseTest(AcceptanceTest):
             self.course_info['run'],
             deprecated=(default_store == 'draft')
         )
-        return six.text_type(course_key)
+        return str(course_key)
 
 
 class YouTubeConfigError(Exception):
@@ -832,7 +832,7 @@ class YouTubeConfigError(Exception):
     pass
 
 
-class YouTubeStubConfig(object):
+class YouTubeStubConfig:
     """
     Configure YouTube Stub Server.
     """
@@ -860,7 +860,7 @@ class YouTubeStubConfig(object):
 
         if not response.ok:
             raise YouTubeConfigError(
-                u'YouTube Server Configuration Failed. URL {0}, Configuration Data: {1}, Status was {2}'.format(
+                'YouTube Server Configuration Failed. URL {}, Configuration Data: {}, Status was {}'.format(
                     youtube_stub_config_url, config, response.status_code))
 
     @classmethod
@@ -878,7 +878,7 @@ class YouTubeStubConfig(object):
 
         if not response.ok:
             raise YouTubeConfigError(
-                u'YouTube Server Configuration Failed. URL: {0} Status was {1}'.format(
+                'YouTube Server Configuration Failed. URL: {} Status was {}'.format(
                     youtube_stub_config_url, response.status_code))
 
     @classmethod
@@ -922,7 +922,7 @@ def create_user_partition_json(partition_id, name, description, groups, scheme="
     Helper method to create user partition JSON. If scheme is not supplied, "random" is used.
     """
     # All that is persisted about a scheme is its name.
-    class MockScheme(object):
+    class MockScheme:
         name = scheme
 
     return UserPartition(
@@ -1003,7 +1003,7 @@ def close_help_window(page):
         page.browser.switch_to_window(page.browser.window_handles[0])
 
 
-class TestWithSearchIndexMixin(object):
+class TestWithSearchIndexMixin:
     """ Mixin encapsulating search index creation """
     TEST_INDEX_FILENAME = "test_root/index_file.dat"
 

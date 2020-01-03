@@ -35,7 +35,7 @@ class LoggedOutTest(AcceptanceTest):
     shard = 21
 
     def setUp(self):
-        super(LoggedOutTest, self).setUp()
+        super().setUp()
         self.pages = [LoginPage(self.browser), IndexPage(self.browser), SignupPage(self.browser),
                       AccessibilityPage(self.browser)]
 
@@ -56,7 +56,7 @@ class LoggedInPagesTest(AcceptanceTest):
     shard = 21
 
     def setUp(self):
-        super(LoggedInPagesTest, self).setUp()
+        super().setUp()
         self.auth_page = AutoAuthPage(self.browser, staff=True)
         self.dashboard_page = DashboardPage(self.browser)
         self.home_page = HomePage(self.browser)
@@ -77,7 +77,7 @@ class SignUpAndSignInTest(UniqueCourseTest):
     shard = 21
 
     def setUp(self):
-        super(SignUpAndSignInTest, self).setUp()
+        super().setUp()
         self.sign_up_page = SignupPage(self.browser)
         self.login_page = LoginPage(self.browser)
 
@@ -184,7 +184,7 @@ class CoursePagesTest(StudioCourseTest):
         """
         Install a course with no content using a fixture.
         """
-        super(CoursePagesTest, self).setUp()
+        super().setUp()
 
         self.pages = [
             clz(self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run'])
@@ -232,7 +232,7 @@ class DiscussionPreviewTest(StudioCourseTest):
     shard = 21
 
     def setUp(self):
-        super(DiscussionPreviewTest, self).setUp()
+        super().setUp()
         cop = CourseOutlinePage(
             self.browser,
             self.course_info['org'],

@@ -19,7 +19,7 @@ class CertificatesTest(StudioCourseTest):
     shard = 22
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(CertificatesTest, self).setUp(is_staff=True, test_xss=False)
+        super().setUp(is_staff=True, test_xss=False)
         self.certificates_page = CertificatesPage(
             self.browser,
             self.course_info['org'],
@@ -36,7 +36,7 @@ class CertificatesTest(StudioCourseTest):
 
         # Add a verified mode to the course
         ModeCreationPage(
-            self.browser, self.course_id, mode_slug=u'verified', mode_display_name=u'Verified Certificate',
+            self.browser, self.course_id, mode_slug='verified', mode_display_name='Verified Certificate',
             min_price=10, suggested_prices='10,20'
         ).visit()
 
@@ -45,9 +45,9 @@ class CertificatesTest(StudioCourseTest):
         Makes signatory dict which can be used in the tests to create certificates
         """
         return {
-            'name': u'{prefix} Signatory Name'.format(prefix=prefix),
-            'title': u'{prefix} Signatory Title'.format(prefix=prefix),
-            'organization': u'{prefix} Signatory Organization'.format(prefix=prefix),
+            'name': '{prefix} Signatory Name'.format(prefix=prefix),
+            'title': '{prefix} Signatory Title'.format(prefix=prefix),
+            'organization': '{prefix} Signatory Organization'.format(prefix=prefix),
         }
 
     def create_and_verify_certificate(self, course_title_override, existing_certs, signatories):

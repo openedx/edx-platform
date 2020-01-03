@@ -9,7 +9,7 @@ from common.test.acceptance.pages.lms import BASE_URL
 class OAuth2Confirmation(PageObject):
     """Page for OAuth2 confirmation view."""
     def __init__(self, browser, client_id="test-id", scopes=("email",)):
-        super(OAuth2Confirmation, self).__init__(browser)
+        super().__init__(browser)
         self.client_id = client_id
         self.scopes = scopes
 

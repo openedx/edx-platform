@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 LMS index (home) page.
 """

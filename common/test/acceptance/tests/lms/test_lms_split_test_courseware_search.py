@@ -34,7 +34,7 @@ class SplitTestCoursewareSearchTest(ContainerBase):
             json.dump({}, index_file)
         self.addCleanup(remove_file, self.TEST_INDEX_FILENAME)
 
-        super(SplitTestCoursewareSearchTest, self).setUp(is_staff=is_staff)
+        super().setUp(is_staff=is_staff)
         self.staff_user = self.user
 
         self.course_home_page = CourseHomePage(self.browser, self.course_id)
@@ -71,7 +71,7 @@ class SplitTestCoursewareSearchTest(ContainerBase):
         # pylint: disable=protected-access
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
-                u"user_partitions": [
+                "user_partitions": [
                     create_user_partition_json(
                         0,
                         "Configuration A/B",
@@ -87,7 +87,7 @@ class SplitTestCoursewareSearchTest(ContainerBase):
         Populate the children of the test course fixture.
         """
         course_fixture.add_advanced_settings({
-            u"advanced_modules": {"value": ["split_test"]},
+            "advanced_modules": {"value": ["split_test"]},
         })
 
         course_fixture.add_children(

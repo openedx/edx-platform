@@ -32,7 +32,7 @@ class CertificateConfigFixture(StudioApiFixture):
     def __init__(self, course_id, certificates_data):
         self.course_id = course_id
         self.certificates = certificates_data
-        super(CertificateConfigFixture, self).__init__()
+        super().__init__()
 
     def install(self):
         """
@@ -46,7 +46,7 @@ class CertificateConfigFixture(StudioApiFixture):
 
         if not response.ok:
             raise CertificateConfigFixtureError(
-                u"Could not create certificate {0}.  Status was {1}".format(
+                "Could not create certificate {}.  Status was {}".format(
                     json.dumps(self.certificates), response.status_code
                 )
             )
@@ -65,7 +65,7 @@ class CertificateConfigFixture(StudioApiFixture):
 
         if not response.ok:
             raise CertificateConfigUpdateFixtureError(
-                u"Could not update certificate {0}.  Status was {1}".format(
+                "Could not update certificate {}.  Status was {}".format(
                     json.dumps(self.certificates), response.status_code
                 )
             )

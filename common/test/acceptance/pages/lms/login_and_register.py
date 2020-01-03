@@ -19,7 +19,7 @@ class RegisterPage(PageObject):
         Course ID is currently of the form "edx/999/2013_Spring"
         but this format could change.
         """
-        super(RegisterPage, self).__init__(browser)
+        super().__init__(browser)
         self._course_id = course_id
 
     @property
@@ -132,7 +132,7 @@ class CombinedLoginAndRegisterPage(PageObject):
                 is trying to enroll in a course.
 
         """
-        super(CombinedLoginAndRegisterPage, self).__init__(browser)
+        super().__init__(browser)
         self._course_id = course_id
 
         if start_page not in ["register", "login"]:

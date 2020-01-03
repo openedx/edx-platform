@@ -30,7 +30,7 @@ class UsersCanAddUpdatesTest(StudioCourseTest):
         self.assertTrue(self.course_updates_page.is_first_update_message(message))
 
     def setUp(self, is_staff=False, test_xss=True):
-        super(UsersCanAddUpdatesTest, self).setUp()
+        super().setUp()
         self.auth_page = AutoAuthPage(self.browser, staff=True)
         self.dashboard_page = DashboardPage(self.browser)
         self.course_updates_page = CourseUpdatesPage(

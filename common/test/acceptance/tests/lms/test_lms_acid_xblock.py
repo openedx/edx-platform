@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 End-to-end tests for the LMS.
 """
@@ -24,7 +23,7 @@ class XBlockAcidBase(UniqueCourseTest):
         Create a unique identifier for the course used in this test.
         """
         # Ensure that the superclass sets up
-        super(XBlockAcidBase, self).setUp()
+        super().setUp()
 
         self.setup_fixtures()
 
@@ -108,7 +107,7 @@ class XBlockAcidChildTest(XBlockAcidBase):
         ).install()
 
     def validate_acid_parent_block_view(self, acid_parent_block):
-        super(XBlockAcidChildTest, self).validate_acid_block_view(acid_parent_block)
+        super().validate_acid_block_view(acid_parent_block)
         self.assertTrue(acid_parent_block.child_tests_passed)
 
     def test_acid_block(self):

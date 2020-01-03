@@ -53,7 +53,7 @@ class ProblemTypeTestBaseMeta(ABCMeta):
         ]
 
         for required_attr in required_attrs:
-            msg = (u'{} is a required attribute for {}').format(
+            msg = ('{} is a required attribute for {}').format(
                 required_attr, str(cls)
             )
 
@@ -66,7 +66,7 @@ class ProblemTypeTestBaseMeta(ABCMeta):
         return obj
 
 
-class ProblemTypeTestBase(six.with_metaclass(ProblemTypeTestBaseMeta, ProblemsTest, EventsTestMixin)):
+class ProblemTypeTestBase(ProblemsTest, EventsTestMixin, metaclass=ProblemTypeTestBaseMeta):
     """
     Base class for testing assesment problem types in bok choy.
 
@@ -100,7 +100,7 @@ class ProblemTypeTestBase(six.with_metaclass(ProblemTypeTestBaseMeta, ProblemsTe
         """
         Visits courseware_page and defines self.problem_page.
         """
-        super(ProblemTypeTestBase, self).setUp()
+        super().setUp()
         self.courseware_page.visit()
         self.problem_page = ProblemPage(self.browser)
 
@@ -127,7 +127,7 @@ class ProblemTypeTestBase(six.with_metaclass(ProblemTypeTestBaseMeta, ProblemsTe
         Args:
             status: one of ("correct", "incorrect", "unanswered", "submitted")
         """
-        msg = u"Wait for status to be {}".format(status)
+        msg = "Wait for status to be {}".format(status)
         selector = ', '.join(self.status_indicators[status])
         self.problem_page.wait_for_element_visibility(selector, msg)
 
@@ -158,7 +158,7 @@ class ProblemTypeTestBase(six.with_metaclass(ProblemTypeTestBaseMeta, ProblemsTe
         raise NotImplementedError()
 
 
-class ProblemTypeA11yTestMixin(object):
+class ProblemTypeA11yTestMixin:
     """
     Shared a11y tests for all problem types.
     """
@@ -400,7 +400,7 @@ class ProblemTypeTestMixin(ProblemTypeA11yTestMixin):
 
 
 @ddt.ddt
-class ChangingAnswerOfProblemTestMixin(object):
+class ChangingAnswerOfProblemTestMixin:
     """
     Test the effect of changing the answers of problem
     """
@@ -483,7 +483,7 @@ class NonRandomizedProblemTypeTestMixin(ProblemTypeA11yTestMixin):
 
 
 @ddt.ddt
-class ProblemNeverShowCorrectnessMixin(object):
+class ProblemNeverShowCorrectnessMixin:
     """
     Tests the effect of adding `show_correctness: never` to the sequence metadata
     for subclasses of ProblemTypeTestMixin.
@@ -513,9 +513,9 @@ class ProblemNeverShowCorrectnessMixin(object):
         # Problem progress text depends on points possible
         possible = 'possible (ungraded, results hidden)'
         if self.problem_points == 1:
-            problem_progress = u'1 point {}'.format(possible)
+            problem_progress = '1 point {}'.format(possible)
         else:
-            problem_progress = u'{} points {}'.format(self.problem_points, possible)
+            problem_progress = '{} points {}'.format(self.problem_points, possible)
 
         # Make sure we're looking at the right problem
         self.problem_page.wait_for(
@@ -590,7 +590,7 @@ class AnnotationProblemTypeBase(ProblemTypeTestBase):
         """
         Additional setup for AnnotationProblemTypeBase
         """
-        super(AnnotationProblemTypeBase, self).setUp(*args, **kwargs)
+        super().setUp(*args, **kwargs)
 
         self.problem_page.a11y_audit.config.set_rules({
             "ignore": [
@@ -972,7 +972,7 @@ class MultipleChoiceProblemTypeTestMultipleAttempt(MultipleChoiceProblemTypeBase
         for attempts_used in range(3):
             self.assertEqual(
                 self.problem_page.submission_feedback,
-                u"You have used {} of 3 attempts".format(str(attempts_used)),
+                "You have used {} of 3 attempts".format(str(attempts_used)),
                 "All 3 attempts are not available"
             )
             if attempts_used == 2:
@@ -1755,7 +1755,7 @@ class ChoiceTextProblemTypeTestBase(ProblemTypeTestBase):
         Selects the nth (where n == input_num) choice of the problem.
         """
         self.problem_page.q(
-            css=u'div.problem input.ctinput[type="{}"]'.format(self.choice_type)
+            css='div.problem input.ctinput[type="{}"]'.format(self.choice_type)
         ).nth(input_num).click()
 
     def _fill_input_text(self, value, input_num):
@@ -1827,7 +1827,7 @@ class RadioTextProblemTypeBase(ChoiceTextProblemTypeTestBase):
         """
         Additional setup for RadioTextProblemTypeBase
         """
-        super(RadioTextProblemTypeBase, self).setUp(*args, **kwargs)
+        super().setUp(*args, **kwargs)
 
         self.problem_page.a11y_audit.config.set_rules({
             "ignore": [
@@ -1946,7 +1946,7 @@ class CheckboxTextProblemTypeBase(ChoiceTextProblemTypeTestBase):
         """
         Additional setup for CheckboxTextProblemTypeBase
         """
-        super(CheckboxTextProblemTypeBase, self).setUp(*args, **kwargs)
+        super().setUp(*args, **kwargs)
 
         self.problem_page.a11y_audit.config.set_rules({
             "ignore": [

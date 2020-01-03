@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 End-to-end tests for the LMS.
 """
@@ -37,7 +36,7 @@ class CoursewareTest(UniqueCourseTest):
     EMAIL = "student101@example.com"
 
     def setUp(self):
-        super(CoursewareTest, self).setUp()
+        super().setUp()
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.course_home_page = CourseHomePage(self.browser, self.course_id)
@@ -116,9 +115,9 @@ class CoursewareTest(UniqueCourseTest):
         """
         xblocks = self.course_fix.get_nested_xblocks(category="problem")
         for index in range(1, len(xblocks) + 1):
-            test_section_title = u'Test Section {}'.format(index)
-            test_subsection_title = u'Test Subsection {}'.format(index)
-            test_unit_title = u'Test Problem {}'.format(index)
+            test_section_title = 'Test Section {}'.format(index)
+            test_subsection_title = 'Test Subsection {}'.format(index)
+            test_unit_title = 'Test Problem {}'.format(index)
             self.course_home_page.visit()
             self.course_home_page.outline.go_to_section(test_section_title, test_subsection_title)
             course_nav = self.courseware_page.nav
@@ -137,7 +136,7 @@ class ProctoredExamTest(UniqueCourseTest):
     EMAIL = "student101@example.com"
 
     def setUp(self):
-        super(ProctoredExamTest, self).setUp()
+        super().setUp()
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
 
@@ -180,7 +179,7 @@ class ProctoredExamTest(UniqueCourseTest):
 
         # Add a verified mode to the course
         ModeCreationPage(
-            self.browser, self.course_id, mode_slug=u'verified', mode_display_name=u'Verified Certificate',
+            self.browser, self.course_id, mode_slug='verified', mode_display_name='Verified Certificate',
             min_price=10, suggested_prices='10,20'
         ).visit()
 
@@ -352,7 +351,7 @@ class CoursewareMultipleVerticalsTestBase(UniqueCourseTest, EventsTestMixin):
     EMAIL = "student101@example.com"
 
     def setUp(self):
-        super(CoursewareMultipleVerticalsTestBase, self).setUp()
+        super().setUp()
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.course_home_page = CourseHomePage(self.browser, self.course_id)
@@ -594,7 +593,7 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
     problem2_name = 'MULTIPLE CHOICE TEST PROBLEM 2'
 
     def setUp(self):
-        super(ProblemStateOnNavigationTest, self).setUp()
+        super().setUp()
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
 
@@ -717,7 +716,7 @@ class SubsectionHiddenAfterDueDateTest(UniqueCourseTest):
     EMAIL = "student101@example.com"
 
     def setUp(self):
-        super(SubsectionHiddenAfterDueDateTest, self).setUp()
+        super().setUp()
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.logout_page = LogoutPage(self.browser)
@@ -821,7 +820,7 @@ class CompletionTestCase(UniqueCourseTest, EventsTestMixin):
     COMPLETION_BY_VIEWING_DELAY_MS = '1000'
 
     def setUp(self):
-        super(CompletionTestCase, self).setUp()
+        super().setUp()
 
         self.studio_course_outline = StudioCourseOutlinePage(
             self.browser,
@@ -878,7 +877,7 @@ class WordCloudTests(UniqueCourseTest):
     EMAIL = "student101@example.com"
 
     def setUp(self):
-        super(WordCloudTests, self).setUp()
+        super().setUp()
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
 
@@ -939,4 +938,4 @@ class WordCloudTests(UniqueCourseTest):
         self.assertTrue(self.courseware_page.is_word_cloud_rendered)
         self.courseware_page.input_word_cloud('test_wordcloud')
         self.courseware_page.save_word_cloud()
-        six.assertCountEqual(self, expected_data, self.courseware_page.word_cloud_answer_list)
+        self.assertCountEqual(expected_data, self.courseware_page.word_cloud_answer_list)

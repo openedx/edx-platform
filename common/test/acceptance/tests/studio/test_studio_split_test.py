@@ -22,7 +22,7 @@ from .base_studio_test import StudioCourseTest
 from .test_studio_container import ContainerBase
 
 
-class SplitTestMixin(object):
+class SplitTestMixin:
     """
     Mixin that contains useful methods for split_test module testing.
     """
@@ -71,11 +71,11 @@ class SplitTest(ContainerBase, SplitTestMixin):
     shard = 15
 
     def setUp(self):
-        super(SplitTest, self).setUp()
+        super().setUp()
         # This line should be called once courseFixture is installed
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
-                u"user_partitions": [
+                "user_partitions": [
                     create_user_partition_json(
                         0,
                         'Configuration alpha,beta',
@@ -94,7 +94,7 @@ class SplitTest(ContainerBase, SplitTestMixin):
 
     def populate_course_fixture(self, course_fixture):
         course_fixture.add_advanced_settings(
-            {u"advanced_modules": {"value": ["split_test"]}}
+            {"advanced_modules": {"value": ["split_test"]}}
         )
 
         course_fixture.add_children(
@@ -129,7 +129,7 @@ class SplitTest(ContainerBase, SplitTestMixin):
         component_editor.set_select_value_and_save('Group Configuration', 'Configuration alpha,beta')
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
-                u"user_partitions": [
+                "user_partitions": [
                     create_user_partition_json(
                         0,
                         'Configuration alpha,beta',
@@ -185,7 +185,7 @@ class GroupConfigurationsNoSplitTest(StudioCourseTest):
     shard = 15
 
     def setUp(self):
-        super(GroupConfigurationsNoSplitTest, self).setUp()
+        super().setUp()
         self.group_configurations_page = GroupConfigurationsPage(
             self.browser,
             self.course_info['org'],
@@ -213,7 +213,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
     shard = 15
 
     def setUp(self):
-        super(GroupConfigurationsTest, self).setUp()
+        super().setUp()
         self.page = GroupConfigurationsPage(
             self.browser,
             self.course_info['org'],
@@ -273,7 +273,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
 
     def populate_course_fixture(self, course_fixture):
         course_fixture.add_advanced_settings({
-            u"advanced_modules": {"value": ["split_test"]},
+            "advanced_modules": {"value": ["split_test"]},
         })
         course_fixture.add_children(
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
@@ -293,7 +293,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         # Create a new group configurations
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
-                u"user_partitions": [
+                "user_partitions": [
                     create_user_partition_json(0, "Name", "Description.", groups),
                 ],
             },
@@ -366,7 +366,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         """
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
-                u"user_partitions": [
+                "user_partitions": [
                     create_user_partition_json(
                         0,
                         'Name of the Group Configuration',
@@ -541,7 +541,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         """
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
-                u"user_partitions": [
+                "user_partitions": [
                     create_user_partition_json(
                         0,
                         'Name of the Group Configuration',
@@ -625,7 +625,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         """
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
-                u"user_partitions": [
+                "user_partitions": [
                     create_user_partition_json(
                         0,
                         'Name of the Group Configuration',
@@ -721,7 +721,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         # Create a new group configurations
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
-                u"user_partitions": [
+                "user_partitions": [
                     create_user_partition_json(
                         0,
                         "Name",
@@ -755,7 +755,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         # Create a new group configurations
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
-                u"user_partitions": [
+                "user_partitions": [
                     create_user_partition_json(
                         0,
                         "Name",
@@ -800,7 +800,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         """
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
-                u"user_partitions": [
+                "user_partitions": [
                     create_user_partition_json(
                         0,
                         'Configuration 1',
@@ -843,7 +843,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         # Create a new group configurations
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
-                u"user_partitions": [
+                "user_partitions": [
                     create_user_partition_json(
                         0,
                         "Name",
@@ -884,7 +884,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         # Create a new group configurations
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
-                u"user_partitions": [
+                "user_partitions": [
                     create_user_partition_json(
                         0,
                         "Name",
@@ -1043,7 +1043,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         Publish first unit in LMS and verify that Courseware page has given Groups
         """
         self.publish_unit_in_lms_and_view(courseware_page, publish)
-        self.assertEqual(u'split_test', courseware_page.xblock_component_type())
+        self.assertEqual('split_test', courseware_page.xblock_component_type())
         self.assertTrue(courseware_page.q(css=".split-test-select").is_present())
         rendered_group_names = self.get_select_options(page=courseware_page, selector=".split-test-select")
         self.assertListEqual(group_names, rendered_group_names)
@@ -1069,7 +1069,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
 
         # render in LMS correctly
         courseware_page = CoursewarePage(self.browser, self.course_id)
-        self.publish_unit_and_verify_groups_in_lms(courseware_page, [u'Group A', u'Group B', u'Group C'])
+        self.publish_unit_and_verify_groups_in_lms(courseware_page, ['Group A', 'Group B', 'Group C'])
 
         # I go to group configuration and delete group
         self.page.visit()
@@ -1085,7 +1085,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         # render in LMS to see how inactive vertical is rendered
         self.publish_unit_and_verify_groups_in_lms(
             courseware_page,
-            [u'Group A', u'Group B', u'Group ID 2 (inactive)'],
+            ['Group A', 'Group B', 'Group ID 2 (inactive)'],
             publish=False
         )
 
@@ -1097,4 +1097,4 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         container.delete(0)
 
         # render in LMS again
-        self.publish_unit_and_verify_groups_in_lms(courseware_page, [u'Group A', u'Group B'])
+        self.publish_unit_and_verify_groups_in_lms(courseware_page, ['Group A', 'Group B'])

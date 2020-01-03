@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 End-to-end tests related to the cohort management on the LMS Instructor Dashboard
 """
@@ -36,7 +35,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         """
         Set up a cohorted course
         """
-        super(CohortConfigurationTest, self).setUp()
+        super().setUp()
 
         # create course with cohorts
         self.manual_cohort_name = "ManualCohort1"
@@ -546,7 +545,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         TODO: refactor events verification to handle this scenario. Events verification assumes movements
         between other cohorts (manual and auto).
         """
-        unicode_hello_in_korean = u'ßßßßßß'
+        unicode_hello_in_korean = 'ßßßßßß'
         self._verify_cohort_settings(cohort_name=unicode_hello_in_korean, assignment_type=None)
         csv_contents = [
             ['username', 'email', 'cohort'],
@@ -567,7 +566,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         start_time = datetime.now(UTC)
         self.cohort_management_page.upload_cohort_file(filename)
         self._verify_cohort_by_csv_notification(
-            u"Your file '{}' has been uploaded. Allow a few minutes for processing.".format(filename)
+            "Your file '{}' has been uploaded. Allow a few minutes for processing.".format(filename)
         )
 
         if not skip_events:
@@ -698,7 +697,7 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
         """
         Set up a cohorted course with a user_partition of scheme "cohort".
         """
-        super(CohortContentGroupAssociationTest, self).setUp()
+        super().setUp()
 
         # create course with single cohort and two content groups (user_partition of type "cohort")
         self.cohort_name = "OnlyCohort"
@@ -708,7 +707,7 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
 
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
-                u"user_partitions": [
+                "user_partitions": [
                     create_user_partition_json(
                         0,
                         'Apples, Bananas',
@@ -820,7 +819,7 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
         self._create_new_cohort_linked_to_content_group(new_cohort, "Apples")
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
-                u"user_partitions": [
+                "user_partitions": [
                     create_user_partition_json(
                         0,
                         'Apples, Bananas',
