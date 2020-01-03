@@ -7,7 +7,6 @@ from collections import OrderedDict
 
 from bok_choy.page_object import PageObject
 from bok_choy.promise import BrokenPromise
-from six import text_type
 
 from .bookmarks import BookmarksPage
 from .course_page import CoursePage

@@ -6,7 +6,6 @@ Acceptance tests for Library Content in LMS
 import textwrap
 
 import ddt
-import six
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.studio.library import StudioLibraryContainerXBlockWrapper, StudioLibraryContentEditor

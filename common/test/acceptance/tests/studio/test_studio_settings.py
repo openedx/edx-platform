@@ -9,10 +9,8 @@ import random
 import string
 from textwrap import dedent
 
-import six
 from bok_choy.promise import EmptyPromise
 from mock import patch
-from six.moves import range
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.common.utils import add_enrollment_course_modes

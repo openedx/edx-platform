@@ -3,7 +3,6 @@ Library edit page in Studio
 """
 
 
-import six
 from bok_choy.javascript import js_defined, wait_for_js
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise

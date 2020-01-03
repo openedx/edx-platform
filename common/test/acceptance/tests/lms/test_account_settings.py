@@ -6,7 +6,6 @@ End-to-end tests for the Account Settings page.
 from datetime import datetime
 from unittest import skip
 
-import six
 from bok_choy.page_object import XSS_INJECTION
 from pytz import timezone, utc
 

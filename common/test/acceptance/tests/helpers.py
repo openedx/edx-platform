@@ -14,10 +14,9 @@ import sys
 from contextlib import contextmanager
 from datetime import datetime
 from unittest import SkipTest, TestCase
+from urllib.parse import urljoin
 
 import requests
-import six
-import six.moves.urllib.parse  # pylint: disable=import-error
 from bok_choy.javascript import js_defined
 from bok_choy.page_object import XSS_INJECTION
 from bok_choy.promise import EmptyPromise, Promise
@@ -30,7 +29,6 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
-from six.moves import range, zip
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
@@ -677,7 +675,7 @@ class EventsTestMixin(TestCase):
 
     def relative_path_to_absolute_uri(self, relative_path):
         """Return an aboslute URI given a relative path taking into account the test context."""
-        return six.moves.urllib.parse.urljoin(BASE_URL, relative_path)
+        return urljoin(BASE_URL, relative_path)
 
     def event_filter_to_descriptive_string(self, event_filter):
         """Find the source code of the callable or pretty-print the dictionary"""

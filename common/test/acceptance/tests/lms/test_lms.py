@@ -8,7 +8,6 @@ from datetime import datetime, timedelta
 from textwrap import dedent
 
 import pytz
-from six.moves import range
 
 from common.test.acceptance.fixtures.course import CourseFixture, CourseUpdateDesc, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage

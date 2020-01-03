@@ -7,7 +7,6 @@ import json
 import re
 
 import requests
-import six
 from lazy import lazy
 
 from common.test.acceptance.fixtures import LMS_BASE_URL, STUDIO_BASE_URL

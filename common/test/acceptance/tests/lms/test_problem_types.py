@@ -9,10 +9,8 @@ from abc import ABCMeta, abstractmethod
 
 import ddt
 import pytest
-import six
 from bok_choy.promise import BrokenPromise
 from selenium.webdriver import ActionChains
-from six.moves import range
 
 from capa.tests.response_xml_factory import (
     AnnotationResponseXMLFactory,

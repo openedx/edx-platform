@@ -5,8 +5,6 @@ Acceptance tests for Studio's Settings Details pages
 
 from datetime import datetime, timedelta
 
-import six
-
 from common.test.acceptance.fixtures.config import ConfigModelFixture
 from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage

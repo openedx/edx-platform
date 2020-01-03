@@ -3,7 +3,6 @@ Common mixin for paginated UIs.
 """
 
 
-import six
 from selenium.webdriver.common.keys import Keys
 
 

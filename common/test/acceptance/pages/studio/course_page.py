@@ -6,7 +6,6 @@ Base class for pages specific to a course in Studio.
 import os
 from abc import abstractmethod
 
-import six
 from bok_choy.page_object import PageObject
 from opaque_keys.edx.locator import CourseLocator
 

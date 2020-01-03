@@ -7,8 +7,6 @@ from contextlib import contextmanager
 from datetime import datetime
 from unittest import skip
 
-import six
-
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage

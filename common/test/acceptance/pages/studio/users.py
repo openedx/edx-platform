@@ -5,7 +5,6 @@ Page classes to test either the Course Team page or the Library Team page.
 
 import os
 
-import six
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise
 from opaque_keys.edx.locator import CourseLocator

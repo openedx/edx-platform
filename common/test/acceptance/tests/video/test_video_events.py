@@ -6,7 +6,6 @@ import json
 from unittest import skip
 
 import ddt
-import six
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from common.test.acceptance.pages.lms.video.video import _parse_time_str

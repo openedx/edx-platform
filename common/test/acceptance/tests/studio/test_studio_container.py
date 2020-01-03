@@ -8,7 +8,6 @@ for displaying containers within units.
 import datetime
 
 import ddt
-import six
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.lms.courseware import CoursewarePage

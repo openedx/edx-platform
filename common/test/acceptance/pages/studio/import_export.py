@@ -9,7 +9,6 @@ import time
 from datetime import datetime
 
 import requests
-import six
 from bok_choy.promise import EmptyPromise
 
 from common.test.acceptance.pages.common.utils import click_css

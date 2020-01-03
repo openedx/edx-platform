@@ -6,7 +6,6 @@ Instructor (2) dashboard page.
 import os
 import os.path
 
-import six
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise, Promise
 

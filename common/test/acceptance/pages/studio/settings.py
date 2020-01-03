@@ -6,7 +6,6 @@ Course Schedule and Details Settings page.
 import os
 import os.path
 
-import six
 from bok_choy.javascript import requirejs
 from bok_choy.promise import EmptyPromise
 

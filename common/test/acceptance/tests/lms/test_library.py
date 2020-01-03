@@ -6,7 +6,6 @@ End-to-end tests for LibraryContent block in LMS
 import textwrap
 
 import ddt
-import six
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.fixtures.library import LibraryFixture

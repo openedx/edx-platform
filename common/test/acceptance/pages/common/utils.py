@@ -3,7 +3,6 @@ Utility methods common to Studio and the LMS.
 """
 
 
-import six
 from bok_choy.promise import BrokenPromise
 from selenium.webdriver.common.action_chains import ActionChains
 

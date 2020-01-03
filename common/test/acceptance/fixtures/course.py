@@ -9,7 +9,6 @@ import mimetypes
 from collections import namedtuple
 from textwrap import dedent
 
-import six
 from opaque_keys.edx.keys import CourseKey
 from path import Path
 
