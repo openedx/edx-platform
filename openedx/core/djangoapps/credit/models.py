@@ -304,15 +304,11 @@ class CreditRequirement(TimeStampedModel):
     active = models.BooleanField(default=True)
     sort_value = models.PositiveIntegerField(default=0)
 
-    # TODO: Delete this deprecated field during the later stages of the rollout
-    # which renames `order` to `sort_value`.
-    order = models.PositiveIntegerField(default=0)
-
     CACHE_NAMESPACE = u"credit.CreditRequirement.cache."
 
     class Meta(object):
         unique_together = ('namespace', 'name', 'course')
-        ordering = ["order"]
+        ordering = ["sort_value"]
 
     def __str__(self):
         return u'{course_id} - {name}'.format(course_id=self.course.course_key, name=self.display_name)
@@ -337,8 +333,6 @@ class CreditRequirement(TimeStampedModel):
             defaults={
                 "display_name": requirement["display_name"],
                 "criteria": requirement["criteria"],
-                # TODO: remove this deprecated field key during later stages of the order->sort_value rename.
-                "order": sort_value,
                 "sort_value": sort_value,
                 "active": True
             }
@@ -346,8 +340,6 @@ class CreditRequirement(TimeStampedModel):
         if not created:
             credit_requirement.criteria = requirement["criteria"]
             credit_requirement.active = True
-            # TODO: remove this deprecated field key during later stages of the order->sort_value rename.
-            credit_requirement.order = sort_value
             credit_requirement.sort_value = sort_value
             credit_requirement.display_name = requirement["display_name"]
             credit_requirement.save()
