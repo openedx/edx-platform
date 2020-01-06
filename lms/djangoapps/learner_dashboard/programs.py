@@ -8,7 +8,7 @@ import json
 from django.http import Http404
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.utils.translation import get_language_bidi
+from django.utils.translation import get_language_bidi, ugettext_lazy as _
 from web_fragments.fragment import Fragment
 
 from lms.djangoapps.commerce.utils import EcommerceService
@@ -57,6 +57,12 @@ class ProgramsFragmentView(EdxFragmentView):
         self.add_fragment_resource_urls(programs_fragment)
 
         return programs_fragment
+
+    def standalone_page_title(self, request, fragment, **kwargs):
+        """
+        Return page title for the standalone page.
+        """
+        return _('Programs')
 
     def css_dependencies(self):
         """
@@ -147,6 +153,12 @@ class ProgramDetailsFragmentView(EdxFragmentView):
         program_details_fragment = Fragment(html)
         self.add_fragment_resource_urls(program_details_fragment)
         return program_details_fragment
+
+    def standalone_page_title(self, request, fragment, **kwargs):
+        """
+        Return page title for the standalone page.
+        """
+        return _('Program Details')
 
     def css_dependencies(self):
         """
