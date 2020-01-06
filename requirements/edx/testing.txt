@@ -52,7 +52,7 @@ contextlib2==0.6.0.post1
 cookies==2.2.1            # via moto
 coreapi==2.3.3
 coreschema==0.0.4
-coverage==5.0.1
+coverage==5.0.2
 git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0
 git+https://github.com/edx/crowdsourcehinter.git@a7ffc85b134b7d8909bf1fefd23dbdb8eb28e467#egg=crowdsourcehinter-xblock==0.2
 cryptography==2.8
@@ -82,7 +82,7 @@ django-mysql==2.4.1
 git+https://github.com/edx/django-oauth-plus.git@b9b64a3ac24fd11f471763c88462bbf3c53e46e6#egg=django-oauth-plus==2.2.9.edx-4
 django-oauth-toolkit==1.1.3
 django-object-actions==2.0.0
-django-pipeline==1.6.14
+django-pipeline==1.7.0
 django-pyfs==2.1
 django-ratelimit-backend==1.1.1
 django-ratelimit==2.0.0
@@ -115,7 +115,7 @@ edx-django-release-util==0.3.2
 edx-django-sites-extensions==2.4.2
 edx-django-utils==2.0.2
 edx-drf-extensions==2.4.5
-edx-enterprise==2.0.37
+edx-enterprise==2.0.38
 edx-i18n-tools==0.5.0
 edx-lint==1.3.0
 edx-milestones==0.2.6
@@ -132,7 +132,7 @@ edx-submissions==3.0.3
 edx-tincan-py35==0.0.5
 edx-user-state-client==1.1.2
 edx-when==0.5.2
-edxval==1.1.33
+edxval==1.2.0
 elasticsearch==1.9.0
 entrypoints==0.3          # via flake8
 enum34==1.1.6
@@ -199,15 +199,15 @@ nodeenv==1.3.3
 numpy==1.18.0
 git+https://github.com/joestump/python-oauth2.git@b94f69b1ad195513547924e380d9265133e995fa#egg=oauth2
 oauthlib==2.1.0
-git+https://github.com/edx/edx-ora2.git@2.5.4#egg=ora2==2.5.4
-packaging==19.2           # via pytest, tox
-pandas==0.22.0
+git+https://github.com/edx/edx-ora2.git@2.5.6#egg=ora2==2.5.6
+packaging==20.0           # via pytest, tox
+pandas==0.24.2
 path.py==8.2.1
 pathlib2==2.3.5           # via pytest
 pathtools==0.1.2
 paver==1.3.4
 pbr==5.4.4
-pdfminer.six==20191110
+pdfminer.six==20200104
 piexif==1.0.2
 pillow==7.0.0
 pkgconfig==1.5.1
@@ -286,7 +286,7 @@ sqlparse==0.3.0
 staff-graded-xblock==0.6
 stevedore==1.31.0
 super-csv==0.9.6
-sympy==1.5
+sympy==1.5.1
 testfixtures==6.10.3
 text-unidecode==1.3
 toml==0.10.0              # via tox
