@@ -12,11 +12,11 @@ from django.http import Http404
 from django.urls import reverse
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from edx_rest_framework_extensions.auth.bearer.authentication import BearerAuthentication
 from rest_framework import exceptions, permissions, status, throttling
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_oauth.authentication import OAuth2Authentication
 from social_django.models import UserSocialAuth
 
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
@@ -333,7 +333,7 @@ class UserMappingView(ListAPIView):
             * remote_id: The Id from third party auth provider
     """
     authentication_classes = (
-        OAuth2Authentication,
+        BearerAuthentication,
     )
 
     serializer_class = serializers.UserMappingSerializer
