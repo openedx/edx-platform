@@ -50,6 +50,7 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitFo
       <option value="MicroBachelors">{gettext('MicroBachelors')}</option>
       <option value="Photo Verification">{gettext('Photo Verification')}</option>
       <option value="Proctoring">{gettext('Proctoring')}</option>
+      <option value="Security">{gettext('Security')}</option>
       <option value="Other">{gettext('Other')}</option>
     </select>
   </div>);
