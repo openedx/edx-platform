@@ -201,7 +201,7 @@ git+https://github.com/joestump/python-oauth2.git@b94f69b1ad195513547924e380d926
 oauthlib==2.1.0
 git+https://github.com/edx/edx-ora2.git@2.5.6#egg=ora2==2.5.6
 packaging==20.0           # via pytest, tox
-pandas==0.24.2
+pandas==0.22.0
 path.py==8.2.1
 pathlib2==2.3.5           # via pytest
 pathtools==0.1.2
