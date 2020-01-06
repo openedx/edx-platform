@@ -2161,8 +2161,15 @@ class ManualEnrollmentAudit(models.Model):
         # It is possible that this could also be bad if a user has thousands of manual
         # enrollments, but currently that number tends to be very low.
         manual_enrollment_ids = list(cls.objects.filter(enrollment__user=user).values_list('id', flat=True))
+        manual_enrollment_audits = cls.objects.filter(id__in=manual_enrollment_ids)
 
-        return cls.objects.filter(id__in=manual_enrollment_ids).update(reason="", enrolled_email=retired_email)
+        if not manual_enrollment_audits:
+            return False
+
+        for manual_enrollment_audit in manual_enrollment_audits:
+            manual_enrollment_audit.history.update(reason="", enrolled_email=retired_email)
+        manual_enrollment_audits.update(reason="", enrolled_email=retired_email)
+        return True
 
 
 @python_2_unicode_compatible
