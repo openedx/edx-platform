@@ -3,9 +3,9 @@
 
 from django.http import Http404
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from edx_rest_framework_extensions.auth.bearer.authentication import BearerAuthentication
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import RetrieveAPIView
+from rest_framework_oauth.authentication import OAuth2Authentication
 
 from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 from lms.djangoapps.verify_student.utils import most_recent_verification
@@ -19,7 +19,7 @@ from openedx.core.lib.api.permissions import IsStaffOrOwner
 
 class IDVerificationStatusView(RetrieveAPIView):
     """ IDVerificationStatus detail endpoint. """
-    authentication_classes = (JwtAuthentication, BearerAuthentication, SessionAuthentication,)
+    authentication_classes = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
     permission_classes = (IsStaffOrOwner,)
 
     def get_serializer(self, *args, **kwargs):
