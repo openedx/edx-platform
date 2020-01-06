@@ -23,7 +23,6 @@ from student.tests.factories import UserFactory
 from third_party_auth.api.permissions import ThirdPartyAuthProviderApiPermission
 from third_party_auth.models import ProviderApiPermissions
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
-import pdb
 
 VALID_API_KEY = "i am a key"
 IDP_SLUG_TESTSHIB = 'testshib'
@@ -252,7 +251,6 @@ class UserMappingViewAPITests(TpaAPITestCase):
     )
     @ddt.unpack
     def test_list_all_user_mappings_oauth2(self, provider_id, access_token, expect_code, expect_data):
-        pdb.set_trace()
         url = reverse('third_party_auth_user_mapping_api', kwargs={'provider_id': provider_id})
         # create oauth2 auth data
         user = UserFactory.create(username='api_user')

@@ -6,7 +6,6 @@ API views for Bulk Enrollment
 import json
 
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from edx_rest_framework_extensions.auth.bearer.authentication import BearerAuthentication
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
@@ -19,6 +18,7 @@ from lms.djangoapps.instructor.views.api import students_update_enrollment
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, get_cohort_by_name
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.enrollments.views import EnrollmentUserThrottle
+from openedx.core.lib.api.authentication import OAuth2Authentication
 from openedx.core.lib.api.permissions import IsStaff
 from util.disable_rate_limit import can_disable_rate_limit
 
@@ -68,7 +68,7 @@ class BulkEnrollView(APIView):
         to the 'before' and 'after' states.
     """
 
-    authentication_classes = JwtAuthentication, BearerAuthentication
+    authentication_classes = JwtAuthentication, OAuth2Authentication
     permission_classes = (IsStaff,)
     throttle_classes = (EnrollmentUserThrottle,)
 
