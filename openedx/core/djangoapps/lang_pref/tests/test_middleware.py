@@ -257,18 +257,18 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
 
     @mock.patch('openedx.core.djangoapps.lang_pref.middleware.is_request_from_mobile_app')
     @mock.patch('openedx.core.djangoapps.lang_pref.middleware.get_user_preference')
-    def test_lang_pref_cookie_must_not_sent_to_mobile(self, mock_get_user_preference, mock_is_mobile_request):
+    def test_remove_lang_cookie_for_mobile_app(self, mock_get_user_preference, mock_is_mobile_request):
         """
-        Test to verify language preference cookie must not be set for mobile requests
+        Test to verify language preference cookie removed for mobile app requests.
         """
-        mock_get_user_preference.return_value = 'test_value'
-        mock_is_mobile_request.return_value = True
-
-        response = self.client.get('/')
-        self.middleware.process_response(self.request, response)
-        self.assertFalse(response.cookies.get('openedx-language-preference'))
-
+        mock_get_user_preference.return_value = 'en'
         mock_is_mobile_request.return_value = False
-        response = self.client.get('/')
-        self.middleware.process_response(self.request, response)
-        self.assertTrue(response.cookies.get('openedx-language-preference'))
+        response = mock.Mock(spec=HttpResponse)
+
+        response = self.middleware.process_response(self.request, response)
+        response.delete_cookie.assert_not_called()
+        response.set_cookie.assert_called()
+
+        mock_is_mobile_request.return_value = True
+        response = self.middleware.process_response(self.request, response)
+        response.delete_cookie.assert_called()

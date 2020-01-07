@@ -70,8 +70,7 @@ class LanguagePreferenceMiddleware(object):
                     pass
 
             # If set, set the user_pref in the LANGUAGE_COOKIE
-            if user_pref:
-                if not is_request_from_mobile_app(request):
+            if user_pref and not is_request_from_mobile_app(request):
                     response.set_cookie(
                         settings.LANGUAGE_COOKIE,
                         value=user_pref,
