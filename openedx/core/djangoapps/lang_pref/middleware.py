@@ -71,12 +71,12 @@ class LanguagePreferenceMiddleware(object):
 
             # If set, set the user_pref in the LANGUAGE_COOKIE
             if user_pref and not is_request_from_mobile_app(request):
-                    response.set_cookie(
-                        settings.LANGUAGE_COOKIE,
-                        value=user_pref,
-                        domain=settings.SESSION_COOKIE_DOMAIN,
-                        max_age=COOKIE_DURATION,
-                    )
+                response.set_cookie(
+                    settings.LANGUAGE_COOKIE,
+                    value=user_pref,
+                    domain=settings.SESSION_COOKIE_DOMAIN,
+                    max_age=COOKIE_DURATION,
+                )
             else:
                 response.delete_cookie(
                     settings.LANGUAGE_COOKIE,
