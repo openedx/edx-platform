@@ -27,9 +27,7 @@ OPT_IN_DATA = 'no'  # By default user opt out of emails by MailChimp
 G2A_EXTENDED_PROFILE_DEFAULT_DATA = {
     ENGLISH_PROFICIENCY_KEY: 'IWRNS',  # I'd rather not say
     HOURS_PER_WEEK_KEY: 1,
-    IS_FIRST_LEARNER: True,  # mark user is first learner
     IS_INTERESTS_DATA_SUBMITTED_KEY: True,  # Flag required for by-passing interests form
-    IS_ORGANIZATION_METRICS_SUBMITTED: True,  # mark user has completed organization details
     ROLE_IN_ORG_KEY: 'IWRNS',  # I'd rather not say
 }
 
