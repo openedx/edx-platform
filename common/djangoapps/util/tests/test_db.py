@@ -222,7 +222,7 @@ class MigrationTests(TestCase):
     Tests for migrations.
     """
 
-    @unittest.skip("Need to skip as step 3 of a 4-release rollout to rename a field in edx-val 1.2.1. This work is part of DE-1824.")
+    @unittest.skip("Need to skip as part of renaming a field in schedules app. This will be unskipped in DE-1825")
     @override_settings(MIGRATION_MODULES={})
     def test_migrations_are_in_sync(self):
         """

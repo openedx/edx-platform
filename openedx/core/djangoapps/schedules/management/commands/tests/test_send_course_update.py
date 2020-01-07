@@ -87,6 +87,7 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
 
         _, offset, target_day, _ = self._get_dates(offset=self.expected_offsets[0])
         enrollment.schedule.start = target_day
+        enrollment.schedule.start_date = target_day
         enrollment.schedule.save()
 
         with patch.object(tasks, 'ace') as mock_ace:
