@@ -1,7 +1,7 @@
 """
 Course API
 """
-
+import logging
 
 from edx_when.api import get_dates_for_course
 from django.conf import settings
@@ -19,8 +19,15 @@ from lms.djangoapps.courseware.courses import (
 )
 from openedx.core.lib.api.view_utils import LazySequence
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from .permissions import can_view_courses_for_username
+
+
+logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
+
+
+UNKNOWN_BLOCK_DISPLAY_NAME = 'UNKNOWN'
 
 
 def get_effective_user(requesting_user, target_username):
@@ -178,14 +185,18 @@ def get_due_dates(request, course_key, user):
     due_dates = []
     for (block_key, date_type), date in six.iteritems(dates):
         if date_type == 'due':
-            block = store.get_item(block_key)
+            try:
+                block_display_name = store.get_item(block_key).display_name
+            except ItemNotFoundError:
+                logger.exception('Failed to get block for due date item with key: {}'.format(block_key))
+                block_display_name = UNKNOWN_BLOCK_DISPLAY_NAME
 
             # get url to the block in the course
             block_url = reverse('jump_to', args=[course_key, block_key])
             block_url = request.build_absolute_uri(block_url)
 
             due_dates.append({
-                'name': block.display_name,
+                'name': block_display_name,
                 'url': block_url,
                 'date': date,
             })
