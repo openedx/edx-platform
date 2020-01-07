@@ -70,7 +70,7 @@ class TestCourseExportOlx(ModuleStoreTestCase):
     def check_export_file(self, tar_file, course_key):
         """Check content of export file."""
         names = tar_file.getnames()
-        dirname = "{0.org}-{0.course}-{0.run}".format(course_key)
+        dirname = modulestore().get_course(course_key).url_name
         self.assertIn(dirname, names)
         # Check if some of the files are present, without being exhaustive.
         self.assertIn("{}/about".format(dirname), names)
