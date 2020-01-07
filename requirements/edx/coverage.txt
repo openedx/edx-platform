@@ -12,7 +12,7 @@ jinja2-pluralize==0.3.0   # via diff-cover
 jinja2==2.10.3            # via diff-cover, jinja2-pluralize
 markupsafe==1.1.1         # via jinja2
 more-itertools==8.0.2     # via zipp
-numpy==1.18.0             # via pandas
+numpy==1.18.1             # via pandas
 pandas==0.22.0
 pluggy==0.13.1            # via diff-cover
 pygments==2.5.2           # via diff-cover
