@@ -281,7 +281,6 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
                 course_id=course.id
             )
             ScheduleFactory(
-                start=self.THREE_YEARS_AGO + datetime.timedelta(days=1),
                 start_date=self.THREE_YEARS_AGO + datetime.timedelta(days=1),
                 enrollment=enrollment
             )

@@ -783,12 +783,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             user=self.user,
             course_id=course.id
         )
-        startdate = self.THREE_YEARS_AGO + timedelta(days=1)
-        schedule = ScheduleFactory(
-            start=startdate,
-            start_date=startdate,
-            enrollment=enrollment
-        )
+        schedule = ScheduleFactory(start_date=self.THREE_YEARS_AGO + timedelta(days=1), enrollment=enrollment)
 
         response = self.client.get(reverse('dashboard'))
         dashboard_html = self._remove_whitespace_from_response(response)

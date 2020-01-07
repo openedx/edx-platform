@@ -136,7 +136,6 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
 
     def _schedule_factory(self, offset=None, **factory_kwargs):
         _, _, target_day, upgrade_deadline = self._get_dates(offset=offset)
-        factory_kwargs.setdefault('start', target_day)
         factory_kwargs.setdefault('start_date', target_day)
         factory_kwargs.setdefault('upgrade_deadline', upgrade_deadline)
         factory_kwargs.setdefault('enrollment__course__self_paced', True)
