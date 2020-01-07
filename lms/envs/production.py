@@ -249,6 +249,7 @@ if 'staticfiles' in CACHES:
 # Once we have migrated to service assets off S3, then we can convert this back to
 # managed by the yaml file contents
 STATICFILES_STORAGE = os.environ.get('STATICFILES_STORAGE', ENV_TOKENS.get('STATICFILES_STORAGE', STATICFILES_STORAGE))
+STATICFILES_STORAGE_KWARGS = ENV_TOKENS.get('STATICFILES_STORAGE_KWARGS', STATICFILES_STORAGE_KWARGS)
 
 # Load all AWS_ prefixed variables to allow an S3Boto3Storage to be configured
 _locals = locals()
