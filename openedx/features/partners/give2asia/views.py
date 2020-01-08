@@ -1,5 +1,6 @@
 import analytics
 import json
+from copy import deepcopy
 from datetime import datetime
 from logging import getLogger
 
@@ -103,10 +104,10 @@ def create_account_with_params_custom(request, params, partner):
             log.exception("User creation failed for user {username}".format(username=params['username']), repr(err))
             raise
 
-        extended_profile_data = g2a_constants.G2A_EXTENDED_PROFILE_DEFAULT_DATA
+        extended_profile_data = deepcopy(g2a_constants.G2A_EXTENDED_PROFILE_DEFAULT_DATA)
         extended_profile_data[g2a_constants.START_MONTH_YEAR_KEY] = datetime.now().strftime('%m/%Y')
 
-        user_profile_data = g2a_constants.G2A_USER_PROFILE_DEFAULT_DATA
+        user_profile_data = deepcopy(g2a_constants.G2A_USER_PROFILE_DEFAULT_DATA)
         user_profile_data['name'] = '{} {}'.format(first_name, last_name)
         user_profile_data['country'] = params['country']
 
@@ -124,12 +125,18 @@ def create_account_with_params_custom(request, params, partner):
             raise
 
         try:
-            organization_data = g2a_constants.G2A_ORGANIZATION_DEFAULT_DATA
+            organization_data = deepcopy(g2a_constants.G2A_ORGANIZATION_DEFAULT_DATA)
             organization_data[g2a_constants.ORG_TYPE_KEY] = PartnerNetwork.NON_PROFIT_ORG_TYPE_CODE
 
             organization_name = params['organization_name']
             organization_to_assign = Organization.objects.filter(label__iexact=organization_name).first()
+
             if not organization_to_assign:
+
+                # making user first learner
+                extended_profile_data[g2a_constants.IS_FIRST_LEARNER] = True
+                extended_profile_data[g2a_constants.IS_ORGANIZATION_METRICS_SUBMITTED] = True
+
                 # Create organization if not already exists and make user first learner
                 organization_to_assign = Organization.objects.create(label=organization_name, **organization_data)
                 organization_to_assign.save()
