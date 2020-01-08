@@ -76,7 +76,7 @@ def get_competency_assessments_score(user, course_id, chapter_id):
     total_pre_assessment_score = len(pre_problems)
 
     for problem in pre_problems:
-        sm = StudentModule.objects.get(module_state_key=problem)
+        sm = StudentModule.objects.get(student=user, module_state_key=problem)
         student_pre_assessment_score = student_pre_assessment_score + int(sm.grade if sm.grade is not None else 0)
 
     course_key = CourseKey.from_string(course_id)
@@ -99,7 +99,7 @@ def get_competency_assessments_score(user, course_id, chapter_id):
 
         for problem in post_problems:
             try:
-                sm = StudentModule.objects.get(module_state_key=problem)
+                sm = StudentModule.objects.get(student=user, module_state_key=problem)
                 student_post_assessment_score = student_post_assessment_score + int(sm.grade if sm.grade is not None else 0)
             except StudentModule.DoesNotExist:
                 pass
