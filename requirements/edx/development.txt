@@ -13,6 +13,7 @@
 git+https://github.com/solashirai/crowdsourcehinter.git@518605f0a95190949fe77bd39158450639e2e1dc#egg=crowdsourcehinter-xblock==0.1
 git+https://github.com/mitodl/django-cas.git@afac57bc523f145ae826f4ed3d4fa8b2c86c5364#egg=django-cas==2.1.1
 git+https://github.com/edx/django-celery.git@756cb57aad765cb2b0d37372c1855b8f5f37e6b0#egg=django-celery==3.2.1+edx.2
+-e git+https://github.com/edly-io/xblock-video.git@dev#egg=video_xblock
 git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c4aee6e76b9abe61cc808#egg=django-debug-toolbar-mongo==0.1.10
 git+https://github.com/edx/django-oauth-plus.git@01ec2a161dfc3465f9d35b9211ae790177418316#egg=django-oauth-plus==2.2.9.edx-1
 git+https://github.com/edx/django-openid-auth.git@0.15.1#egg=django-openid-auth==0.15.1
