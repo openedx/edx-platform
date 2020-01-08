@@ -7,6 +7,7 @@ from StringIO import StringIO
 from time import time
 
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.utils.translation import ugettext as _
 from pytz import UTC
 
@@ -14,8 +15,15 @@ from courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_string
 from instructor_analytics.basic import enrolled_students_features, list_may_enroll
 from instructor_analytics.csvs import format_dictlist
-from lms.djangoapps.instructor.paidcourse_enrollment_report import PaidCourseEnrollmentReportProvider
+from lms.djangoapps.instructor.enrollment import (
+    enroll_email,
+    get_email_params,
+    get_user_email_language,
+)
 from lms.djangoapps.instructor_task.models import ReportStore
+from lms.djangoapps.instructor.paidcourse_enrollment_report import PaidCourseEnrollmentReportProvider
+from lms.djangoapps.instructor.views.tools import get_student_from_identifier
+from openedx.core.lib.celery.task_utils import emulate_http_request
 from shoppingcart.models import (
     CouponRedemption,
     CourseRegCodeItem,
@@ -25,7 +33,7 @@ from shoppingcart.models import (
     PaidCourseRegistration,
     RegistrationCodeRedemption
 )
-from student.models import CourseAccessRole, CourseEnrollment
+from student.models import CourseAccessRole, CourseEnrollment, User
 from util.file import course_filename_prefix_generator
 
 from .runner import TaskProgress
@@ -391,3 +399,67 @@ def _upload_exec_summary_to_store(data_dict, report_name, course_id, generated_a
         output_buffer,
     )
     tracker_emit(report_name)
+
+
+def enroll_user_to_course(request_info, course_id, username_or_email):
+    """
+    Look up the given user, and if successful, enroll them to the specified course.
+
+    Arguments:
+        request_info (dict): Dict containing task request information
+        course_id (str): The ID string of the course
+        username_or_email: user's username or email string
+
+    Returns:
+        User object (or None if user in not registered,
+        and whether the user is already enrolled or not
+
+    """
+    # First try to get a user object from the identifier (email)
+    user = None
+    user_already_enrolled = False
+    language = None
+    email_students = True
+    auto_enroll = True
+    thread_site = Site.objects.get(domain=request_info['host'])
+    thread_author = User.objects.get(username=request_info['username'])
+
+    try:
+        user = get_student_from_identifier(username_or_email)
+    except User.DoesNotExist:
+        email = username_or_email
+    else:
+        email = user.email
+        language = get_user_email_language(user)
+
+    if user:
+        course_enrollment = CourseEnrollment.get_enrollment(user=user, course_key=course_id)
+        if course_enrollment:
+            user_already_enrolled = True
+            # Set the enrollment to active if its not already active
+            if not course_enrollment.is_active:
+                course_enrollment.update_enrollment(is_active=True)
+
+    if not user or not user_already_enrolled:
+        course = get_course_by_id(course_id, depth=0)
+        try:
+            with emulate_http_request(site=thread_site, user=thread_author):
+                email_params = get_email_params(course, auto_enroll)
+                __ = enroll_email(
+                    course_id, email, auto_enroll, email_students, email_params, language=language
+                )
+                if user:
+                    TASK_LOG.info(
+                        u'User %s enrolled successfully in course %s via CSV bulk enrollment',
+                        username_or_email,
+                        course_id
+                    )
+        except:
+            TASK_LOG.exception(
+                u'There was an error enrolling user %s in course %s via CSV bulk enrollment',
+                username_or_email,
+                course_id
+            )
+            return None, None
+
+    return user, user_already_enrolled

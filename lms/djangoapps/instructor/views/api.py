@@ -776,6 +776,55 @@ def students_update_enrollment(request, course_id):
     return JsonResponse(response_payload)
 
 
+def _bulk_enrollment_csv_validator(file_storage, file_to_validate):
+    """
+    Verifies that the expected columns are present in the CSV used to enroll users to course.
+    """
+    with file_storage.open(file_to_validate) as f:
+        reader = unicodecsv.reader(UniversalNewlineIterator(f), encoding='utf-8')
+        try:
+            fieldnames = next(reader)
+        except StopIteration:
+            fieldnames = []
+
+        if 'email' not in fieldnames:
+            msg = _("The file must contain an 'email' column.")
+            raise FileValidationException(msg)
+
+
+@transaction.non_atomic_requests
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_POST
+@require_level('staff')
+@common_exceptions_400
+def bulk_enroll_users_to_course(request, course_id):
+    """
+    View method that accepts an uploaded file (using key "uploaded-file")
+    containing users for course enrollment.
+
+    This method spawns a celery task to do the enrollments, generates a CSV
+    file with results and this file is provided via data downloads.
+    """
+    course_key = CourseKey.from_string(course_id)
+
+    try:
+        __, filename = store_uploaded_file(
+            request,
+            'uploaded-file',
+            ['.csv'],
+            course_and_time_based_filename_generator(course_key, 'bulk enrollments'),
+            max_file_size=2000000,  # limit to 2 MB
+            validator=_bulk_enrollment_csv_validator
+        )
+        # The task will assume the default file storage.
+        lms.djangoapps.instructor_task.api.submit_bulk_users_enrollments(request, course_key, filename)
+    except (FileValidationException, PermissionDenied) as err:
+        return JsonResponse({'error': unicode(err)}, status=400)
+
+    return JsonResponse()
+
+
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)

@@ -37,6 +37,7 @@ from lms.djangoapps.instructor_task.tasks_helper.enrollments import (
 )
 from lms.djangoapps.instructor_task.tasks_helper.grades import CourseGradeReport, ProblemGradeReport, ProblemResponses
 from lms.djangoapps.instructor_task.tasks_helper.misc import (
+    bulk_enroll_students_and_upload,
     cohort_students_and_upload,
     upload_course_survey_report,
     upload_ora2_data,
@@ -301,6 +302,16 @@ def cohort_students(entry_id, xmodule_instance_args):
     # An example of such a message is: "Progress: {action} {succeeded} of {attempted} so far"
     action_name = ugettext_noop('cohorted')
     task_fn = partial(cohort_students_and_upload, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
+
+
+@task(base=BaseInstructorTask)
+def bulk_users_enrollments(entry_id, xmodule_instance_args):
+    """
+    Enroll users in bulk, and upload the results.
+    """
+    action_name = ugettext_noop('users enrolled in bulk')
+    task_fn = partial(bulk_enroll_students_and_upload, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
 
 
