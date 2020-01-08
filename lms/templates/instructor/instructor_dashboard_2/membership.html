@@ -66,6 +66,39 @@ from openedx.core.djangolib.markup import HTML, Text
     <div class="request-response-error"></div>
 </fieldset>
 
+<!-- Uploading a CSV file of bulk enrollment. -->
+<hr class="divider"/>
+<div class="bulk_enroll bulk_enroll_csv membership-section">
+    <h3 class="hd hd-3">${_("Batch Enrollment By CSV")}</h3>
+
+    <div class="csv-upload hidden" id="bulk-enrollment-file-upload" tabindex="-1"  data-url="${ section_data['upload_bulk_enrollments_csv_url'] }"></div>
+
+    <div class="bulk-enroll-management" style="margin-top: 20px; padding: 10px 20px; background: #f8f8f8; border-radius: 2px;">
+        <p class="">
+            <span class="icon fa fa-info-circle" aria-hidden="true"></span>
+            ${Text(
+                _("Here is a sample bulk enrollments CSV file: {link_start}Edly Learners Bulk Enrollment (CSV).csv{link_end}.")
+            ).format(
+                link_start=HTML('<a href="https://edly-cloud-static-assets.s3.amazonaws.com/Edly+Learners+Bulk+Enrollment+(CSV).csv" class="btn-link link-cross-reference" target="_blank">'),
+                link_end=HTML('</a>')
+            )}
+        </p>
+    </div>
+    <div class="bulk-enroll-management" style="margin-top: 2px; padding: 10px 20px; background: #f8f8f8; border-radius: 2px;">
+        <p class="">
+            <span class="icon fa fa-info-circle" aria-hidden="true"></span>
+            ${Text(
+                _("To review students enrollments or see the results of uploading a CSV file, download bulk enrollment results file on the {link_start}Data Download{link_end} page.")
+            ).format(
+                link_start=HTML('<button type="button" id="data_download_tab_button" class="btn-link link-cross-reference" data-section="data_download">'),
+                link_end=HTML('</button>')
+            )}
+        </p>
+    </div>
+
+    <div class="results"></div>
+</div>
+
 %if static.get_value('ALLOW_AUTOMATED_SIGNUPS', settings.FEATURES.get('ALLOW_AUTOMATED_SIGNUPS', False)):
 <hr class="divider" />
 

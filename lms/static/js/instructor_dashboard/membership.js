@@ -13,6 +13,7 @@ such that the value can be defined later than this assignment (file load order).
     var AuthListWidget,
         Membership,
         BatchEnrollment,
+        BulkEnrollmentViaCsv,
         BetaTesterBulkAddition,
         MemberListWidget,
         emailStudents, plantTimeout, statusAjaxError, enableAddButton,
@@ -288,6 +289,50 @@ such that the value can be defined later than this assignment (file load order).
 
         return AuthListWidget;
     }(MemberListWidget));
+
+    BulkEnrollmentViaCsv = (function() {
+        function bulkEnrollmentViaCsv($container) {
+            var hiddenClass = 'hidden',
+              uploadElement = $('.csv-upload').removeClass(hiddenClass);
+              this.$dataDownloadTabButton = $container.find('#data_download_tab_button');
+
+            if (!this.fileUploaderView) {
+                this.fileUploaderView = new FileUploaderView({
+                    el: uploadElement,
+                    title: gettext(
+                      'Bulk enroll students to this course by uploading a CSV file that contains the email column. ' +
+                      'Enrollment emails will be sent to registered students and registration invitation emails will be ' +
+                      'sent to new users.'
+                    ),
+                    inputLabel: gettext('Choose a .csv file'),
+                    inputTip: gettext('Only properly formatted .csv files will be accepted with max file size of 2 MB.'),
+                    submitButtonText: gettext('Upload File and Bulk Enroll Students'),
+                    extensions: '.csv',
+                    url: uploadElement.data('url'),
+                    successNotification: function(file, event, data) {
+                        var message = interpolate_text(gettext(
+                            "Your file '{file}' has been uploaded. Allow a few minutes for processing."
+                        ), {file: file});
+                        return new NotificationModel({
+                            type: 'confirmation',
+                            title: message
+                        });
+                    }
+                }).render();
+            }
+
+            this.$dataDownloadTabButton.click(function() {
+                var section = $(event.currentTarget).data('section');
+                $(getSectionCss(section)).click();
+                $(window).scrollTop(0);
+            });
+        }
+        function getSectionCss(section) {
+            return ".instructor-nav .nav-item [data-section='" + section + "']";
+        }
+
+        return bulkEnrollmentViaCsv;
+    }());
 
     this.AutoEnrollmentViaCsv = (function() {
         function AutoEnrollmentViaCsv($container) {
@@ -978,6 +1023,9 @@ such that the value can be defined later than this assignment (file load order).
             this.$section.data('wrapper', this);
             plantTimeout(0, function() {
                 return new BatchEnrollment(thismembership.$section.find('.batch-enrollment'));
+            });
+            plantTimeout(0, function() {
+                return new BulkEnrollmentViaCsv(thismembership.$section.find('.bulk_enroll_csv'));
             });
             plantTimeout(0, function() {
                 return new AutoEnrollmentViaCsv(thismembership.$section.find('.auto_enroll_csv'));
