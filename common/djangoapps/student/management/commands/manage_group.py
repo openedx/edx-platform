@@ -84,7 +84,7 @@ class Command(BaseCommand):
             )
         )
 
-        group.permissions = new_permissions
+        group.permissions.set(new_permissions)
 
         group.save()
 
