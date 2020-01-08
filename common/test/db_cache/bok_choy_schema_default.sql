@@ -2238,7 +2238,6 @@ CREATE TABLE `credit_creditrequirement` (
   `namespace` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
   `display_name` varchar(255) NOT NULL,
-  `order` int(10) unsigned NOT NULL,
   `criteria` longtext NOT NULL,
   `active` tinyint(1) NOT NULL,
   `course_id` int(11) NOT NULL,
@@ -2544,7 +2543,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=634 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=636 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3804,24 +3803,6 @@ CREATE TABLE `grades_persistentsubsectiongradeoverride` (
   KEY `grades_persistentsubsectiongradeoverride_created_f80819d0` (`created`),
   KEY `grades_persistentsubsectiongradeoverride_modified_21efde2a` (`modified`),
   CONSTRAINT `grades_persistentsub_grade_id_74123016_fk_grades_pe` FOREIGN KEY (`grade_id`) REFERENCES `grades_persistentsubsectiongrade` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `grades_persistentsubsectiongradeoverridehistory`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `grades_persistentsubsectiongradeoverridehistory` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `override_id` int(11) NOT NULL,
-  `feature` varchar(32) NOT NULL,
-  `action` varchar(32) NOT NULL,
-  `comments` varchar(300) DEFAULT NULL,
-  `created` datetime(6) NOT NULL,
-  `user_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `grades_persistentsub_user_id_2d8efcca_fk_auth_user` (`user_id`),
-  KEY `grades_persistentsubsection_override_id_f41bf7c1` (`override_id`),
-  KEY `grades_persistentsubsectiongradeoverridehistory_created_d903656e` (`created`),
-  CONSTRAINT `grades_persistentsub_user_id_2d8efcca_fk_auth_user` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `grades_visibleblocks`;
