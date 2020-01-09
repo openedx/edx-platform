@@ -599,3 +599,7 @@ ACCOUNT_MICROFRONTEND_URL = "http://account-mfe/"
 DASHBOARD_COURSE_LIMIT = 250
 
 PROCTORING_SETTINGS = {}
+
+############### Settings for Django Rate limit #####################
+
+RATELIMIT_RATE = '2/m'

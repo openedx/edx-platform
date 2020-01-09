@@ -7,6 +7,7 @@
 -e git+https://github.com/edx/acid-block.git@98aecba94ecbfa934e2d00262741c0ea9f557fc9#egg=acid-xblock
 -e common/lib/capa
 -e git+https://github.com/edx/codejail.git@4127fc4bd5775cc72aee8d7f0a70e31405e22439#egg=codejail
+-e git+https://github.com/jsocol/django-ratelimit.git@72edbe8949fbf6699848e5847645a1998f121d46#egg=ratelimit
 -e git+https://github.com/edx/django-wiki.git@v0.0.25#egg=django-wiki
 -e git+https://github.com/edx/DoneXBlock.git@2.0.1#egg=done-xblock
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
@@ -76,7 +77,6 @@ django-object-actions==2.0.0  # via edx-enterprise
 django-pipeline==1.7.0
 django-pyfs==2.1
 django-ratelimit-backend==2.0
-django-ratelimit==2.0.0
 django-require==1.0.11
 django-sekizai==1.1.0
 django-ses==0.8.14
