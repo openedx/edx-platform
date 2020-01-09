@@ -15,7 +15,6 @@
 
 from django.conf import settings
 from django.template import Context, engines
-from edx_django_utils.cache import RequestCache
 from mako.template import Template as MakoTemplate
 from six import text_type
 
@@ -46,27 +45,9 @@ class Template(object):
         """
         This takes a render call with a context (from Django) and translates
         it to a render call on the mako template.
-
-        When rendering a large sequence of XBlocks, we may end up rendering
-        hundreds of small templates. Even if context processors aren't very
-        expensive individually, they will quickly add up in that situation. To
-        help guard against this, we do context processing once for a given
-        request and then cache it.
         """
         context_object = self._get_context_object(request)
-
-        request_cache = RequestCache('context_processors')
-        cache_response = request_cache.get_cached_response('cp_output')
-        if cache_response.is_found:
-            context_dictionary = dict(cache_response.value)
-        else:
-            context_dictionary = self._get_context_processors_output_dict(context_object)
-            # The context_dictionary is later updated with template specific
-            # variables. There are potentially hundreds of calls to templates
-            # rendering and we don't want them to interfere with each other, so
-            # we store the items() from the output of the context processors and
-            # and recreate a new dict every time we pull from the cache.
-            request_cache.set('cp_output', context_dictionary.items())
+        context_dictionary = self._get_context_processors_output_dict(context_object)
 
         if isinstance(context, Context):
             context_dictionary.update(context.flatten())
