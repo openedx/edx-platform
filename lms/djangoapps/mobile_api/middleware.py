@@ -8,6 +8,7 @@ from datetime import datetime
 from django.conf import settings
 from django.core.cache import cache
 from django.http import HttpResponse
+from django.utils.deprecation import MiddlewareMixin
 from pytz import UTC
 import six
 
@@ -18,7 +19,7 @@ from openedx.core.lib.cache_utils import get_cache
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
 
-class AppVersionUpgrade(object):
+class AppVersionUpgrade(MiddlewareMixin):
     """
     Middleware class to keep track of mobile application version being used.
     """

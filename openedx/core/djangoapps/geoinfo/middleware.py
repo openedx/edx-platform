@@ -15,12 +15,13 @@ import logging
 import geoip2.database
 
 from django.conf import settings
+from django.utils.deprecation import MiddlewareMixin
 from ipware.ip import get_real_ip
 
 log = logging.getLogger(__name__)
 
 
-class CountryMiddleware(object):
+class CountryMiddleware(MiddlewareMixin):
     """
     Identify the country by IP address.
     """
