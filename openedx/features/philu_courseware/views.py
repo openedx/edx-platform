@@ -22,12 +22,12 @@ from .serializers import CompetencyAssessmentRecordSerializer
 @api_view()
 @view_auth_classes(is_authenticated=True)
 @renderer_classes([JSONRenderer, BrowsableAPIRenderer])
-def competency_assessments_score_view(request, course_id, chapter_id):
+def competency_assessments_score_view(request, course_id, chapter_id, section_id, is_pre):
     """
     API View to fetch competency assessments score.
     """
     try:
-        score_dict = get_competency_assessments_score(request.user, course_id, chapter_id)
+        score_dict = get_competency_assessments_score(request.user, course_id, chapter_id, section_id, is_pre)
         return Response(score_dict, status=status.HTTP_200_OK)
     except (CourseAccessRedirect, CoursewareAccessException):
         return Response({

@@ -2,16 +2,13 @@ from logging import getLogger
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext as _
 
-from rest_framework.exceptions import NotFound
-
-from courseware.courses import get_course_with_access
+from courseware.models import StudentModule
 from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import BlockUsageLocator
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from xmodule.modulestore.django import modulestore
-
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from philu_commands.helpers import generate_course_structure
 
 from . import constants
 
@@ -46,91 +43,52 @@ def get_nth_chapter_link(course, chapter_index=0):
     return base_url + course_target
 
 
-def get_competency_assessments_score(user, course_id, chapter_id):
+def get_competency_assessments_score(user, course_id, chapter_id, section_id, is_pre):
     """
     Return competency assessments scores of user in chapter of specified course
 
     :param user: user
     :param course_id: the identifier for the course.
     :param chapter_id: chapter url_name.
+    :param section_id: section url_name.
+    :param is_pre: Boolean to check if the assessment is pre or post.
     :return: assessments score dictionary
     :raises:
         NotFound: if chapter, pre or post assessment not found
     """
 
-    # course_chapters = modulestore().get_items(
-    #     course_key,
-    #     qualifiers={'category': 'course'}
-    # )
-
-    from courseware.models import StudentModule
-    from opaque_keys.edx.locator import BlockUsageLocator
-    from philu_commands.helpers import generate_course_structure
-
-    # pre_block = BlockUsageLocator.from_string('block-v1:Arbisoft+CSAPI_101+2020_01+type@sequential+block@f90e748bbf9f4d97bdcc0934e5d16a61')     #  Local Server
-    pre_block = BlockUsageLocator.from_string('block-v1:Collins+CE101+4_2.44_20200301_20200330+type@sequential+block@636647b14ddd4f7e96aa7a6b82b47d20')
-    pre_sequential = modulestore().get_item(pre_block)
-    pre_problems = modulestore().get_item(pre_sequential.children[0]).children
-
-    student_pre_assessment_score = 0
-    total_pre_assessment_score = len(pre_problems)
-
-    for problem in pre_problems:
-        sm = StudentModule.objects.get(student=user, module_state_key=problem)
-        student_pre_assessment_score = student_pre_assessment_score + int(sm.grade if sm.grade is not None else 0)
-
     course_key = CourseKey.from_string(course_id)
+    course_block = get_course_block_key(course_key)
     course_struct = generate_course_structure(course_key)['structure']
 
-    # chapter_children = course_struct['blocks']['block-v1:Arbisoft+CSAPI_101+2020_01+type@chapter+block@f5e6f0a629134ac893c883d96d1e2e86']['children']  # Local Server
-    chapter_children = course_struct['blocks']['block-v1:Collins+CE101+4_2.44_20200301_20200330+type@chapter+block@e58cf0e176204ec5b5628e508caa1047']['children']
-
-    for child in chapter_children:
-        if course_struct['blocks'][child]['format'] == 'Post Assessment':
-            post_block = BlockUsageLocator.from_string(child)
-            break
-
-    student_post_assessment_score = 0
-    if post_block:
-        post_sequential = modulestore().get_item(post_block)
-        post_problems = modulestore().get_item(post_sequential.children[0]).children
-
-        total_post_assessment_score = len(post_problems)
-
-        for problem in post_problems:
-            try:
-                sm = StudentModule.objects.get(student=user, module_state_key=problem)
-                student_post_assessment_score = student_post_assessment_score + int(sm.grade if sm.grade is not None else 0)
-            except StudentModule.DoesNotExist:
-                pass
-
-    course = get_course_with_access(user, 'load', course_key,
-                                    check_if_enrolled=True)
-    course_grade = CourseGradeFactory().read(user, course)
-    chapter_grade = course_grade.chapter_grades.values()
-    try:
-        chapter = next(chapter for chapter in chapter_grade
-                       if chapter['url_name'] == chapter_id)
-    except StopIteration:
-        raise NotFound(_('Chapter not found'))
-
     pre_assessment_score = post_assessment_score = None
-    pre_assessment_attempted = all_pre_assessment_attempted = all_post_assessment_attempted = False
-    for section in chapter['sections']:
-        if is_pre_assessment(section):
-            pre_assessment_score = section.all_total.earned
-            pre_assessment_attempted = bool(section.all_total.first_attempted)
-            all_pre_assessment_attempted = is_all_attempted(section)
-        elif is_post_assessment(section):
-            post_assessment_score = section.all_total.earned
-            all_post_assessment_attempted = is_all_attempted(section)
+    pre_assessment_attempted = all_pre_assessment_attempted = all_post_assessment_attempted = None
 
-    if pre_assessment_score is None or post_assessment_score is None:
-        raise NotFound(_('Pre or post assessment not found'))
+    if is_pre == 'True':
+        pre_block = BlockUsageLocator.from_string(get_complete_block_key(course_block, section_id, 'sequential'))
+        pre_assessment_score, pre_assessment_attempted, all_pre_assessment_attempted = get_assessment_score(
+            user, pre_block)
+
+    else:
+        post_block = BlockUsageLocator.from_string(get_complete_block_key(course_block, section_id, 'sequential'))
+        post_assessment_score, post_assessment_attempted, all_post_assessment_attempted = get_assessment_score(
+            user, post_block)
+
+        chapter_block_key = get_complete_block_key(course_block, chapter_id, 'chapter')
+        chapter_children = course_struct['blocks'][chapter_block_key]['children']
+
+        for child in chapter_children:
+            if course_struct['blocks'][child]['format'].lower() == constants.PRE_ASSESSMENT_FORMAT:
+                pre_block = BlockUsageLocator.from_string(child)
+                break
+
+        if pre_block:
+            pre_assessment_score, pre_assessment_attempted, all_pre_assessment_attempted = get_assessment_score(
+                user, pre_block)
 
     return {
-        'pre_assessment_score': student_pre_assessment_score,
-        'post_assessment_score': student_post_assessment_score,
+        'pre_assessment_score': pre_assessment_score,
+        'post_assessment_score': post_assessment_score,
         'pre_assessment_attempted': pre_assessment_attempted,
         'all_pre_assessment_attempted': all_pre_assessment_attempted,
         'all_post_assessment_attempted': all_post_assessment_attempted,
@@ -156,3 +114,35 @@ def is_post_assessment(section):
 
 def get_section_format(section):
     return section.format.lower() if section and section.format else ''
+
+
+def get_complete_block_key(course_id, block_id, block_type):
+    return constants.BLOCK_KEY_FORMATTER.format(course_id=course_id, block_type=block_type, block_id=block_id)
+    # return 'block-v1:'+course_id+'+type@'+block_type+'+block@'+block_id
+
+
+def get_course_block_key(course_key):
+    return constants.COURSE_KEY_FORMATTER.format(org=course_key.org, course_name=course_key.course, run=course_key.run)
+
+
+def get_assessment_score(user, assessment_block_key):
+    sequential = modulestore().get_item(assessment_block_key)
+    pre_problems = modulestore().get_item(sequential.children[0]).children
+
+    assessment_score = 0
+    problem_attempted = 0
+    assessment_attempted = False
+    all_problem_attempted = False
+
+    for problem in pre_problems:
+        try:
+            problem_submission = StudentModule.objects.get(student=user, module_state_key=problem)
+            if problem_submission.grade is not None:
+                assessment_attempted = True
+                problem_attempted += 1
+            assessment_score = assessment_score + int(problem_submission.grade if problem_submission.grade is not None else 0)
+        except StudentModule.DoesNotExist:
+            pass
+    if problem_attempted == constants.COMPETENCY_ASSESSMENT_DEFAULT_PROBLEMS_COUNT:
+        all_problem_attempted = True
+    return assessment_score, assessment_attempted, all_problem_attempted
