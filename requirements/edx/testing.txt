@@ -74,9 +74,10 @@ django-crum==0.7.5
 django-fernet-fields==0.6
 django-filter==1.0.4
 django-ipware==2.1.0
+django-js-asset==1.2.2
 django-method-override==0.2.0
 django-model-utils==3.0.0
-django-mptt==0.8.7
+django-mptt==0.10.0
 django-multi-email-field==0.5.1
 django-mysql==2.4.1
 git+https://github.com/edx/django-oauth-plus.git@b9b64a3ac24fd11f471763c88462bbf3c53e46e6#egg=django-oauth-plus==2.2.9.edx-4

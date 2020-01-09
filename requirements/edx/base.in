@@ -47,7 +47,7 @@ django-filter==1.0.4                # Allows users to filter Django querysets dy
 django-ipware                       # Get the client's real IP address
 django-method-override
 django-model-utils
-django-mptt>=0.8.6,<0.9
+django-mptt
 django-mysql==2.4.1
 django-oauth-toolkit                # Provides oAuth2 capabilities for Django
 django-pipeline
