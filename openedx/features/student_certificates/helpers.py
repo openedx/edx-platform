@@ -181,6 +181,9 @@ def override_update_certificate_context(request, context, course, user_certifica
 def get_verification_url(user_certificate):
     verification_url = PREVIEW_CERTIFICATE_VERIFICATION_URL
     if user_certificate.pk:
-        verification_url = user_certificate.certificate_verification_key.verification_url
+        verification_url = '{}{}'.format(
+            settings.LMS_ROOT_URL,
+            user_certificate.certificate_verification_key.verification_url
+        )
     return verification_url
 
