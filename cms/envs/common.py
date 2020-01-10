@@ -906,6 +906,7 @@ CERTIFICATE_TEMPLATE_LANGUAGES = {
 USE_I18N = True
 USE_L10N = True
 
+STATICI18N_FILENAME_FUNCTION = 'statici18n.utils.legacy_filename'
 STATICI18N_ROOT = PROJECT_ROOT / "static"
 
 LOCALE_PATHS = _make_locale_paths
@@ -935,6 +936,7 @@ PIPELINE = {
 }
 
 STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
+STATICFILES_STORAGE_KWARGS = {}
 
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files

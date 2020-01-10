@@ -3,6 +3,7 @@ Django storage backends for Open edX.
 """
 
 
+from django.conf import settings
 from django.contrib.staticfiles.storage import StaticFilesStorage
 from django.core.files.storage import get_storage_class, FileSystemStorage
 from django.utils.deconstruct import deconstructible
@@ -51,7 +52,9 @@ class ProductionMixin(
     can be applied over an existing Storage.
     We use this version on production.
     """
-    pass
+    def __init__(self, *args, **kwargs):
+        kwargs.update(settings.STATICFILES_STORAGE_KWARGS.get(settings.STATICFILES_STORAGE, {}))
+        super(ProductionMixin, self).__init__(*args, **kwargs)
 
 
 class ProductionStorage(ProductionMixin, StaticFilesStorage):

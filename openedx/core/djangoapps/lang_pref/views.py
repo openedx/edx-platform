@@ -27,11 +27,10 @@ def update_session_language(request):
         language = data.get(LANGUAGE_KEY, settings.LANGUAGE_CODE)
         if request.session.get(LANGUAGE_SESSION_KEY, None) != language:
             request.session[LANGUAGE_SESSION_KEY] = six.text_type(language)
-        if not is_request_from_mobile_app(request):
-            response.set_cookie(
-                settings.LANGUAGE_COOKIE,
-                language,
-                domain=settings.SESSION_COOKIE_DOMAIN,
-                max_age=COOKIE_DURATION
-            )
+        response.set_cookie(
+            settings.LANGUAGE_COOKIE,
+            language,
+            domain=settings.SESSION_COOKIE_DOMAIN,
+            max_age=COOKIE_DURATION
+        )
     return response

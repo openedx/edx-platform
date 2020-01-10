@@ -499,7 +499,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         # Now make sure that the user can get the same information, even if not active
         self.user.is_active = False
         self.user.save()
-        verify_get_own_information(15)
+        verify_get_own_information(13)
 
     def test_get_account_empty_string(self):
         """

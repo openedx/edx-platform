@@ -7,6 +7,7 @@ import logging
 from functools import wraps
 import traceback
 
+from crum import get_current_request
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
@@ -257,10 +258,11 @@ class EnterpriseApiClient(object):
             response = endpoint().get(**querystring)
         except (HttpClientError, HttpServerError):
             LOGGER.exception(
-                u'Failed to get enterprise-learner for user [%s] with client user [%s]. Caller: %s',
+                u'Failed to get enterprise-learner for user [%s] with client user [%s]. Caller: %s, Request PATH: %s',
                 user.username,
                 self.user.username,
-                "".join(traceback.format_stack())
+                "".join(traceback.format_stack()),
+                get_current_request().META['PATH_INFO'],
             )
             return None
 
