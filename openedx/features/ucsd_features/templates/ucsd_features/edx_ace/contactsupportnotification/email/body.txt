@@ -2,7 +2,7 @@
 
 {% block content %}
     Hello,
-    We were contacted by a user on LearnX @ UC San Diego. Please take a moment to review and respond.
+    We were contacted by a user on UC San Diego Online. Please take a moment to review and respond.
     Learner: {{name}} ({{email}})
     {% if course %}
     Course: {{course}}
