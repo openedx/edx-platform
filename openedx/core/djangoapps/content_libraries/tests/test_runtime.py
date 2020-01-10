@@ -20,7 +20,7 @@ from openedx.core.djangoapps.content_libraries.tests.base import (
 )
 from openedx.core.djangoapps.content_libraries.tests.user_state_block import UserStateTestBlock
 from openedx.core.djangoapps.xblock import api as xblock_api
-from openedx.core.djangolib.testing.utils import skip_unless_lms
+from openedx.core.djangolib.testing.utils import skip_unless_lms, skip_unless_cms
 from openedx.core.lib import blockstore_api
 from student.tests.factories import UserFactory
 from xmodule.unit_block import UnitBlock
@@ -62,13 +62,45 @@ class ContentLibraryRuntimeTest(ContentLibraryContentTestMixin, TestCase):
     content library.
     """
 
+    @skip_unless_cms  # creating child blocks only works properly in Studio
+    def test_identical_olx(self):
+        """
+        Test library blocks with children that also have identical OLX. Since
+        the blockstore runtime caches authored field data based on the hash of
+        the OLX, this can catch some potential bugs, especially given that the
+        "children" field stores usage IDs, not definition IDs.
+        """
+        # Create a unit containing a <problem>
+        unit_block_key = library_api.create_library_block(self.library.key, "unit", "u1").usage_key
+        library_api.create_library_block_child(unit_block_key, "problem", "p1")
+        library_api.publish_changes(self.library.key)
+        # Now do the same in a different library:
+        library2 = library_api.create_library(
+            collection_uuid=self.collection.uuid,
+            org=self.organization,
+            slug="idolx",
+            title=("Identical OLX Test Lib 2"),
+            description="",
+        )
+        unit_block2_key = library_api.create_library_block(library2.key, "unit", "u1").usage_key
+        library_api.create_library_block_child(unit_block2_key, "problem", "p1")
+        library_api.publish_changes(library2.key)
+        # Load both blocks:
+        unit_block = xblock_api.load_block(unit_block_key, self.student_a)
+        unit_block2 = xblock_api.load_block(unit_block2_key, self.student_a)
+        self.assertEqual(
+            library_api.get_library_block_olx(unit_block_key),
+            library_api.get_library_block_olx(unit_block2_key),
+        )
+        self.assertNotEqual(unit_block.children, unit_block2.children)
+
     def test_has_score(self):
         """
         Test that the LMS-specific 'has_score' attribute is getting added to
         blocks.
         """
-        unit_block_key = library_api.create_library_block(self.library.key, "unit", "u1").usage_key
-        problem_block_key = library_api.create_library_block(self.library.key, "problem", "p1").usage_key
+        unit_block_key = library_api.create_library_block(self.library.key, "unit", "score-unit1").usage_key
+        problem_block_key = library_api.create_library_block(self.library.key, "problem", "score-prob1").usage_key
         library_api.publish_changes(self.library.key)
         unit_block = xblock_api.load_block(unit_block_key, self.student_a)
         problem_block = xblock_api.load_block(problem_block_key, self.student_a)

@@ -24,7 +24,7 @@ from web_fragments.fragment import Fragment
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from lms.djangoapps.grades.api import signals as grades_signals
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
-from openedx.core.djangoapps.xblock.runtime.blockstore_field_data import BlockstoreFieldData
+from openedx.core.djangoapps.xblock.runtime.blockstore_field_data import BlockstoreFieldData, BlockstoreChildrenData
 from openedx.core.djangoapps.xblock.runtime.ephemeral_field_data import EphemeralKeyValueStore
 from openedx.core.djangoapps.xblock.runtime.mixin import LmsBlockMixin
 from openedx.core.djangoapps.xblock.utils import get_xblock_id_for_anonymous_user
@@ -269,7 +269,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
             Scope.content: self.system.authored_data_store,
             Scope.settings: self.system.authored_data_store,
             Scope.parent: self.system.authored_data_store,
-            Scope.children: self.system.authored_data_store,
+            Scope.children: self.system.children_data_store,
             Scope.user_state_summary: student_data_store,
             Scope.user_state: student_data_store,
             Scope.user_info: student_data_store,
@@ -395,6 +395,7 @@ class XBlockRuntimeSystem(object):
         self.id_generator = MemoryIdManager()  # We don't really use id_generator until we need to support asides
         self.runtime_class = runtime_class
         self.authored_data_store = BlockstoreFieldData()
+        self.children_data_store = BlockstoreChildrenData(self.authored_data_store)
         assert student_data_mode in (self.STUDENT_DATA_EPHEMERAL, self.STUDENT_DATA_PERSISTED)
         self.student_data_mode = student_data_mode
         self._error_trackers = {}
