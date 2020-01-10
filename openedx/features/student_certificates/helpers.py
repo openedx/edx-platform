@@ -16,6 +16,7 @@ from constants import (
     PDFKIT_HTML_STRING,
     PDFKIT_IMAGE_TAG,
     PDFKIT_OPTIONS,
+    PREVIEW_CERTIFICATE_VERIFICATION_URL,
     SOCIAL_MEDIA_SHARE_URL_FMT,
     TMPDIR,
     TWITTER_META_TITLE_FMT,
@@ -162,10 +163,6 @@ def get_pdfkit_html(image_base64):
 def override_update_certificate_context(request, context, course, user_certificate):
     """
     This method adds custom context to the certificate
-    :param request:
-    :param context:
-    :param course:
-    :param user_certificate:
     :return: Updated context
     """
     border = request.GET.get('border', None)
@@ -176,23 +173,16 @@ def override_update_certificate_context(request, context, course, user_certifica
 
     context['download_pdf'] = reverse('download_certificate_pdf',
                                       kwargs={'certificate_uuid': user_certificate.verify_uuid})
-    context['verification_url'] = get_certificate_verification_url(user_certificate)
     context['social_sharing_urls'] = get_philu_certificate_social_context(course, user_certificate)
 
+    verification_url = get_verification_url(user_certificate)
 
-def get_certificate_verification_url(certificate):
-    """
-    This method generates a verification url for course certificate
-    :param certificate:
-    :return: verification url
-    """
-    verification_url_f = settings.LMS_ROOT_URL + '{}'
+    context['verification_url'] = verification_url
 
-    if certificate.pk:
-        return verification_url_f.format(
-            reverse(
-                'certificate_verification',
-                kwargs={'key': certificate.certificate_verification_key.verification_key}
-            )
-        )
-    return verification_url_f.format('PREVIEW_VERIFICATION')
+
+def get_verification_url(user_certificate):
+    verification_url = PREVIEW_CERTIFICATE_VERIFICATION_URL
+    if user_certificate.pk:
+        verification_url = user_certificate.certificate_verification_key.verification_url
+    return verification_url
+

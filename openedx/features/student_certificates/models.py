@@ -2,6 +2,7 @@ import re
 from random import sample
 
 from django.db import models
+from django.urls import reverse
 
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from constants import (
@@ -35,3 +36,7 @@ class CertificateVerificationKey(models.Model):
             rotated_key = ''.join(sample(CERTIFICATE_VERIFICATION_SALT_CHARACTERS, salt_weight)) + rotated_key
 
         return rotated_key
+
+    @property
+    def verification_url(self):
+        return reverse('certificate_verification', kwargs={'key': self.verification_key})
