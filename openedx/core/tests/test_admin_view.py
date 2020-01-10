@@ -33,4 +33,5 @@ class TestAdminView(TestCase):
         student = UserFactory.create()
         self.client.login(username=student.username, password=TEST_PASSWORD)
         response = self.client.get(reverse('admin:index'))
+        a = 1
         assert response.status_code == 302
