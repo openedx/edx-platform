@@ -245,11 +245,11 @@ def can_user_create_team_in_topic(user, course_id, topic_id):
     )
 
 
-def get_team_for_user_and_course(user, course_id):
+def get_team_for_user_course_topic(user, course_id, topic_id):
     """
-    Returns the team that the given user is on in the course, or None
+    Returns the matching CourseTeam for the given user, course, and topic
 
-    If course_id does not exist, a ValueError is raised
+    If course_id is invalid, a ValueError is raised
     """
     try:
         course_key = CourseKey.from_string(course_id)
@@ -257,8 +257,24 @@ def get_team_for_user_and_course(user, course_id):
         raise ValueError(u"The supplied course id {course_id} is not valid.".format(
             course_id=course_id
         ))
-
-    return CourseTeam.objects.filter(
-        course_id=course_key,
-        membership__user__username=user.username,
-    ).first()
+    try:
+        return CourseTeam.objects.get(
+            course_id=course_key,
+            membership__user__username=user.username,
+            topic_id=topic_id,
+        )
+    except CourseTeam.DoesNotExist:
+        return None
+    except CourseTeam.MultipleObjectsReturned:
+        # This shouldn't ever happen but it's here for safety's sake
+        msg = "user {username} is on multiple teams within course {course} topic {topic}"
+        logger.error(msg.format(
+            username=user.username,
+            course=course_id,
+            topic=topic_id,
+        ))
+        return CourseTeam.objects.filter(
+            course_id=course_key,
+            membership__user__username=user.username,
+            topic_id=topic_id,
+        ).first()
