@@ -175,9 +175,7 @@ def override_update_certificate_context(request, context, course, user_certifica
                                       kwargs={'certificate_uuid': user_certificate.verify_uuid})
     context['social_sharing_urls'] = get_philu_certificate_social_context(course, user_certificate)
 
-    verification_url = get_verification_url(user_certificate)
-
-    context['verification_url'] = verification_url
+    context['verification_url'] = get_verification_url(user_certificate)
 
 
 def get_verification_url(user_certificate):

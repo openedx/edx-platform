@@ -589,8 +589,7 @@ def render_html_view(request, user_id, course_id):
         # Append user info
         _update_context_with_user_info(context, user, user_certificate)
 
-        # Append social sharing info
-        # _update_social_context(request, context, course, user, user_certificate, platform_name)
+        # Append PhilU related context
         override_update_certificate_context(request, context, course, user_certificate)
 
         # Append/Override the existing view context values with certificate specific values
