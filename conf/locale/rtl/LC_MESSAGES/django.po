@@ -1,45 +1,45 @@
 # #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  wiki.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-12-30 07:54+0000\n"
-"PO-Revision-Date: 2019-12-30 07:54:45.684519\n"
+"POT-Creation-Date: 2020-01-12 20:52+0000\n"
+"PO-Revision-Date: 2020-01-12 20:52:39.859137\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -7176,6 +7176,7 @@ msgid "Cohort"
 msgstr "ذخاخقف"
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Team"
 msgstr "فثشو"
 
@@ -8121,6 +8122,20 @@ msgstr " (سنهححهرل {skipped})"
 #, python-brace-format
 msgid " (out of {total})"
 msgstr " (خعف خب {total})"
+
+#: lms/djangoapps/learner_dashboard/programs.py
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/learner_dashboard/programs.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Programs"
+msgstr "حقخلقشوس"
+
+#: lms/djangoapps/learner_dashboard/programs.py
+#: lms/templates/learner_dashboard/program_details.html
+msgid "Program Details"
+msgstr "حقخلقشو يثفشهمس"
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
@@ -12203,10 +12218,6 @@ msgid "enabled_as_of must be set when enabled is True"
 msgstr "ثرشزمثي_شس_خب وعسف زث سثف صاثر ثرشزمثي هس فقعث"
 
 #: openedx/features/content_type_gating/partitions.py
-msgid "Feature-based Enrollments"
-msgstr "بثشفعقث-زشسثي ثرقخمموثرفس"
-
-#: openedx/features/content_type_gating/partitions.py
 msgid "Partition for segmenting users by access to gated content types"
 msgstr "حشقفهفهخر بخق سثلوثرفهرل عسثقس زغ شذذثسس فخ لشفثي ذخرفثرف فغحثس"
 
@@ -12406,12 +12417,12 @@ msgstr ""
 #, no-python-format, python-brace-format
 msgid ""
 "{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% "
-"[{strikeout_price}]{span_close}{br}Discount will be automatically applied at"
-" checkout. {a_open}Upgrade Now{a_close}{div_close}"
+"[{strikeout_price}]{span_close}{br}Use code {b_open}{code}{b_close} at "
+"checkout! {a_open}Upgrade Now{a_close}{div_close}"
 msgstr ""
 "{banner_open} عحلقشيث زغ {discount_expiration_date} شري سشدث {percentage}% "
-"[{strikeout_price}]{span_close}{br}يهسذخعرف صهمم زث شعفخوشفهذشممغ شححمهثي شف"
-" ذاثذنخعف. {a_open}عحلقشيث رخص{a_close}{div_close}"
+"[{strikeout_price}]{span_close}{br}عسث ذخيث {b_open}{code}{b_close} شف "
+"ذاثذنخعف! {a_open}عحلقشيث رخص{a_close}{div_close}"
 
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
@@ -18298,14 +18309,6 @@ msgstr ""
 "سفقخرلمغ قثذخووثري عسهرل {chrome_link} خق {ff_link}."
 
 #: lms/templates/header/navbar-authenticated.html
-#: lms/templates/learner_dashboard/programs.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Programs"
-msgstr "حقخلقشوس"
-
-#: lms/templates/header/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr "يهسذخدثق رثص"
@@ -20127,10 +20130,6 @@ msgstr "ساخص فاث سفشفعس بخق فاث فشسنس فاشف غخع س
 msgid "My Courses"
 msgstr "وغ ذخعقسثس"
 
-#: lms/templates/learner_dashboard/program_details.html
-msgid "Program Details"
-msgstr "حقخلقشو يثفشهمس"
-
 #: lms/templates/learner_dashboard/text-me-fragment.html
 msgid "Get the {platform_name} Mobile App!"
 msgstr "لثف فاث {platform_name} وخزهمث شحح!"
@@ -20411,6 +20410,16 @@ msgstr "قثسثف غخعق {platform_name} حشسسصخقي"
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Invalid Password Reset Link"
 msgstr "هردشمهي حشسسصخقي قثسثف مهرن"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid ""
+"This password reset link is invalid. It may have been used already. To reset"
+" your password, go to the {start_link}sign-in{end_link} page and select "
+"{start_strong}Forgot password{end_strong}."
+msgstr ""
+"فاهس حشسسصخقي قثسثف مهرن هس هردشمهي. هف وشغ اشدث زثثر عسثي شمقثشيغ. فخ قثسثف"
+" غخعق حشسسصخقي, لخ فخ فاث {start_link}سهلر-هر{end_link} حشلث شري سثمثذف "
+"{start_strong}بخقلخف حشسسصخقي{end_strong}."
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"
