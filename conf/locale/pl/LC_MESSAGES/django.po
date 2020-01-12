@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Polish (http://www.transifex.com/open-edx/edx-platform/language/pl/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -33,7 +33,7 @@
 # Dyfeomorfizm <ximixd@gmail.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Polish (http://www.transifex.com/open-edx/edx-platform/language/pl/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -46,7 +46,7 @@
 # ajafo <transifex@ajafo.com>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Polish (http://www.transifex.com/open-edx/edx-platform/language/pl/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -76,7 +76,7 @@
 # ajafo <transifex@ajafo.com>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Polish (http://www.transifex.com/open-edx/edx-platform/language/pl/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -98,7 +98,7 @@
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Polish (http://www.transifex.com/open-edx/edx-platform/language/pl/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -115,9 +115,9 @@
 # Radek <d.exax@hotmail.com>, 2014
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Polish (https://www.transifex.com/open-edx/teams/6205/pl/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # Translators:
 # Waheed Ahmed <waheed@edx.org>, 2019
@@ -126,7 +126,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-12-29 20:42+0000\n"
+"POT-Creation-Date: 2020-01-12 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Polish (https://www.transifex.com/open-edx/teams/6205/pl/)\n"
@@ -7311,6 +7311,7 @@ msgid "Cohort"
 msgstr "Kohorta"
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Team"
 msgstr "Zespół"
 
@@ -8284,6 +8285,18 @@ msgstr "(opuszczono {skipped})"
 #, python-brace-format
 msgid " (out of {total})"
 msgstr "(spośród {total})"
+
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/learner_dashboard/programs.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Programs"
+msgstr "Programy"
+
+#: lms/templates/learner_dashboard/program_details.html
+msgid "Program Details"
+msgstr "Szczegóły programu"
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
@@ -12085,10 +12098,6 @@ msgid "enabled_as_of must be set when enabled is True"
 msgstr ""
 
 #: openedx/features/content_type_gating/partitions.py
-msgid "Feature-based Enrollments"
-msgstr ""
-
-#: openedx/features/content_type_gating/partitions.py
 msgid "Partition for segmenting users by access to gated content types"
 msgstr ""
 
@@ -12253,8 +12262,8 @@ msgstr ""
 #, no-python-format, python-brace-format
 msgid ""
 "{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% "
-"[{strikeout_price}]{span_close}{br}Discount will be automatically applied at"
-" checkout. {a_open}Upgrade Now{a_close}{div_close}"
+"[{strikeout_price}]{span_close}{br}Use code {b_open}{code}{b_close} at "
+"checkout! {a_open}Upgrade Now{a_close}{div_close}"
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py
@@ -17867,14 +17876,6 @@ msgstr ""
 "jest w pełni wspierana. Zalecamy korzystanie z {chrome_link} lub {ff_link}."
 
 #: lms/templates/header/navbar-authenticated.html
-#: lms/templates/learner_dashboard/programs.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Programs"
-msgstr "Programy"
-
-#: lms/templates/header/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr ""
@@ -19692,10 +19693,6 @@ msgstr "Pokaż status czynności zgłoszonych dla tego ćwiczenia."
 msgid "My Courses"
 msgstr "Moje kursy"
 
-#: lms/templates/learner_dashboard/program_details.html
-msgid "Program Details"
-msgstr "Szczegóły programu"
-
 #: lms/templates/learner_dashboard/text-me-fragment.html
 msgid "Get the {platform_name} Mobile App!"
 msgstr ""
@@ -19969,6 +19966,13 @@ msgstr "Zresetuj swoje hasło w {platform_name}"
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Invalid Password Reset Link"
 msgstr "Nieprawidłowy odnośnik resetowania hasła"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid ""
+"This password reset link is invalid. It may have been used already. To reset"
+" your password, go to the {start_link}sign-in{end_link} page and select "
+"{start_strong}Forgot password{end_strong}."
+msgstr ""
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"

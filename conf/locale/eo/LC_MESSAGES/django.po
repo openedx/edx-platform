@@ -1,45 +1,45 @@
 # #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  wiki.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-12-30 07:54+0000\n"
-"PO-Revision-Date: 2019-12-30 07:54:45.684519\n"
+"POT-Creation-Date: 2020-01-12 20:52+0000\n"
+"PO-Revision-Date: 2020-01-12 20:52:39.859137\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -8309,6 +8309,7 @@ msgid "Cohort"
 msgstr "Çöhört Ⱡ'σяєм ιρѕυ#"
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Team"
 msgstr "Téäm Ⱡ'σяєм ι#"
 
@@ -9423,6 +9424,20 @@ msgstr " (skïppïng {skipped}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #, python-brace-format
 msgid " (out of {total})"
 msgstr " (öüt öf {total}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/djangoapps/learner_dashboard/programs.py
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/learner_dashboard/programs.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Programs"
+msgstr "Prögräms Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/djangoapps/learner_dashboard/programs.py
+#: lms/templates/learner_dashboard/program_details.html
+msgid "Program Details"
+msgstr "Prögräm Détäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
@@ -14121,10 +14136,6 @@ msgstr ""
 "¢σηѕє¢тєтυя α#"
 
 #: openedx/features/content_type_gating/partitions.py
-msgid "Feature-based Enrollments"
-msgstr "Féätüré-ßäséd Énröllménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: openedx/features/content_type_gating/partitions.py
 msgid "Partition for segmenting users by access to gated content types"
 msgstr ""
 "Pärtïtïön för ségméntïng üsérs ßý äççéss tö gätéd çöntént týpés Ⱡ'σяєм ιρѕυм"
@@ -14355,12 +14366,13 @@ msgstr ""
 #, no-python-format, python-brace-format
 msgid ""
 "{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% "
-"[{strikeout_price}]{span_close}{br}Discount will be automatically applied at"
-" checkout. {a_open}Upgrade Now{a_close}{div_close}"
+"[{strikeout_price}]{span_close}{br}Use code {b_open}{code}{b_close} at "
+"checkout! {a_open}Upgrade Now{a_close}{div_close}"
 msgstr ""
 "{banner_open} Ûpgrädé ßý {discount_expiration_date} änd sävé {percentage}% "
-"[{strikeout_price}]{span_close}{br}Dïsçöünt wïll ßé äütömätïçällý äpplïéd ät"
-" çhéçköüt. {a_open}Ûpgrädé Nöw{a_close}{div_close} Ⱡ'σяєм ιρѕυм ∂σ#"
+"[{strikeout_price}]{span_close}{br}Ûsé çödé {b_open}{code}{b_close} ät "
+"çhéçköüt! {a_open}Ûpgrädé Nöw{a_close}{div_close} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт,#"
 
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
@@ -20991,14 +21003,6 @@ msgstr ""
 "αмєт, ¢ση#"
 
 #: lms/templates/header/navbar-authenticated.html
-#: lms/templates/learner_dashboard/programs.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Programs"
-msgstr "Prögräms Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/templates/header/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr "Dïsçövér Néw Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -23118,10 +23122,6 @@ msgstr ""
 msgid "My Courses"
 msgstr "Mý Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
-#: lms/templates/learner_dashboard/program_details.html
-msgid "Program Details"
-msgstr "Prögräm Détäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
 #: lms/templates/learner_dashboard/text-me-fragment.html
 msgid "Get the {platform_name} Mobile App!"
 msgstr "Gét thé {platform_name} Mößïlé Àpp! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
@@ -23426,6 +23426,22 @@ msgstr "Rését Ýöür {platform_name} Pässwörd Ⱡ'σяєм ιρѕυм ∂σ
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Invalid Password Reset Link"
 msgstr "Ìnvälïd Pässwörd Rését Lïnk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid ""
+"This password reset link is invalid. It may have been used already. To reset"
+" your password, go to the {start_link}sign-in{end_link} page and select "
+"{start_strong}Forgot password{end_strong}."
+msgstr ""
+"Thïs pässwörd rését lïnk ïs ïnvälïd. Ìt mäý hävé ßéén üséd älréädý. Tö rését"
+" ýöür pässwörd, gö tö thé {start_link}sïgn-ïn{end_link} pägé änd séléçt "
+"{start_strong}Förgöt pässwörd{end_strong}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
+"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
+"∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
+" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι"
+" σƒƒι¢ια ∂єѕєяυηт мσłł#"
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"

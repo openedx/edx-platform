@@ -1,39 +1,39 @@
 # #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-12-30 07:54+0000\n"
-"PO-Revision-Date: 2019-12-30 07:54:45.526728\n"
+"POT-Creation-Date: 2020-01-12 20:52+0000\n"
+"PO-Revision-Date: 2020-01-12 20:52:39.898095\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -2395,11 +2395,19 @@ msgid "Masters"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "MicroBachelors"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Photo Verification"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Proctoring"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Security"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx

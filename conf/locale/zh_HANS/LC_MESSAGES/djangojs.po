@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -83,7 +83,7 @@
 # 顾翔 <c0710204@gmail.com>, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -145,9 +145,9 @@
 # 肖寒 <bookman@vip.163.com>, 2013
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/open-edx/teams/6205/zh_CN/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # Translators:
 # jsgang <jsgang9@gmail.com>, 2019
@@ -156,7 +156,7 @@
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -191,7 +191,7 @@
 # 胡超威 <chadennishu@gmail.com>, 2014
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -225,7 +225,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-12-29 20:42+0000\n"
+"POT-Creation-Date: 2020-01-12 20:42+0000\n"
 "PO-Revision-Date: 2019-09-29 20:43+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -2553,11 +2553,19 @@ msgid "Masters"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "MicroBachelors"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Photo Verification"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Proctoring"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Security"
 msgstr ""
 
 #: cms/templates/js/asset-library.underscore

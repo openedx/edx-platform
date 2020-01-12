@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -30,7 +30,7 @@
 # ElektrikAkar <volkan.kumtepeli@gmail.com>, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -55,9 +55,9 @@
 # ElektrikAkar <volkan.kumtepeli@gmail.com>, 2014
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # Translators:
 # Pelin Çılgın <pelincilgin@hotmail.com>, 2019
@@ -66,7 +66,7 @@
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -85,7 +85,7 @@
 # sevde <savda95@hotmail.com>, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -107,7 +107,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-12-29 20:42+0000\n"
+"POT-Creation-Date: 2020-01-12 20:42+0000\n"
 "PO-Revision-Date: 2019-12-04 19:20+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
@@ -2538,12 +2538,20 @@ msgid "Masters"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "MicroBachelors"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Photo Verification"
 msgstr "Fotoğraf Doğrulama"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Proctoring"
 msgstr "Gözetmenli"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Security"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: cms/templates/js/asset-library.underscore
