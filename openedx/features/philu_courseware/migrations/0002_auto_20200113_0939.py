@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='competencyassessmentrecord',
             name='chapter_id',
-            field=models.TextField(default='533902602a9d4c8dafd7e7becc4b927d', max_length=255),
+            field=models.TextField(max_length=255),
             preserve_default=False,
         ),
     ]
