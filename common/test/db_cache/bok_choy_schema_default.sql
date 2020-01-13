@@ -191,6 +191,7 @@ CREATE TABLE `assessment_historicalsharedfileupload` (
   `history_change_reason` varchar(100) DEFAULT NULL,
   `history_type` varchar(1) NOT NULL,
   `history_user_id` int(11) DEFAULT NULL,
+  `name` varchar(255) NOT NULL,
   PRIMARY KEY (`history_id`),
   KEY `assessment_historica_history_user_id_28fa87d9_fk_auth_user` (`history_user_id`),
   KEY `assessment_historicalsharedfileupload_id_34052991` (`id`),
@@ -274,6 +275,7 @@ CREATE TABLE `assessment_sharedfileupload` (
   `file_key` varchar(255) NOT NULL,
   `description` longtext NOT NULL,
   `size` bigint(20) NOT NULL,
+  `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `file_key` (`file_key`),
   KEY `assessment_sharedfileupload_team_id_dbdd3cb7` (`team_id`),
@@ -2543,7 +2545,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=638 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=639 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
