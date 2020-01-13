@@ -54,14 +54,19 @@ def get_competency_assessments_score(user, chapter_id):
     pre_assessment_score = post_assessment_score = 0
     attempted_pre_assessments = attempted_post_assessments = 0
 
+    COMPETENCY_ASSESSMENT_RECORD_QUERY_FORMAT = 'SELECT MAX(id) AS id, COUNT(assessment_type) AS assessments_count, ' \
+                                      'assessment_type, correctness FROM philu_courseware_competencyassessmentrecord' \
+                                      ' WHERE id IN (SELECT MAX(id) FROM philu_courseware_competencyassessmentrecord' \
+                                      ' WHERE chapter_id = "{chapter_id}" and user_id = {user_id} ' \
+                                      'GROUP BY problem_id) GROUP BY correctness, assessment_type'
+
     assessments_record = CompetencyAssessmentRecord.objects.raw(
-        'SELECT MAX(id) AS id, COUNT(assessment_type) AS assessments_count, assessment_type, correctness '
-        'FROM philu_courseware_competencyassessmentrecord WHERE id IN (SELECT MAX(id) FROM '
-        'philu_courseware_competencyassessmentrecord WHERE chapter_id = "{chapter_id}" and user_id = {user_id} '
-        'GROUP BY problem_id) GROUP BY correctness, assessment_type'.format(chapter_id=chapter_id, user_id=user.id))
+        COMPETENCY_ASSESSMENT_RECORD_QUERY_FORMAT.format(chapter_id=chapter_id, user_id=user.id))
 
     """
-        Sample result of upper query
+        Sample result of upper query. This Query will return results of problems from latest attempt
+        for both "Pre" and "Post" assessments. All attempts are saved in our table and we are concerned only with the
+        latest one, hence sub query provide us the latest attempt of all problems
 
         |  id   | assessment_count | assessment_type   |  correctness  |
         +-------+------------------+-------------------+---------------+
