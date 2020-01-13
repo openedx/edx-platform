@@ -68,6 +68,7 @@ class CourseOverview(TimeStampedModel):
     display_org_with_default = TextField()
 
     # Start/end dates
+    # TODO Remove 'start' & 'end' in removing field in column renaming, DE-1822
     start = DateTimeField(null=True)
     end = DateTimeField(null=True)
     start_date = DateTimeField(null=True)
