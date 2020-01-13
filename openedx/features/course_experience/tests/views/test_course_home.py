@@ -70,7 +70,6 @@ from .test_course_updates import create_course_update, remove_course_updates
 TEST_PASSWORD = 'test'
 TEST_CHAPTER_NAME = 'Test Chapter'
 TEST_COURSE_TOOLS = 'Course Tools'
-TEST_COURSE_TODAY = 'Today is'
 TEST_BANNER_CLASS = '<div class="course-expiration-message">'
 TEST_WELCOME_MESSAGE = '<h2>Welcome!</h2>'
 TEST_UPDATE_MESSAGE = '<h2>Test Update!</h2>'
@@ -311,7 +310,6 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
         # Verify that the course tools and dates are always shown
         self.assertContains(response, TEST_COURSE_TOOLS)
-        self.assertContains(response, TEST_COURSE_TODAY)
 
         is_anonymous = user_type is CourseUserType.ANONYMOUS
         is_enrolled = user_type is CourseUserType.ENROLLED
@@ -365,7 +363,6 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
         # Verify that the course tools and dates are always shown
         self.assertContains(response, TEST_COURSE_TOOLS)
-        self.assertContains(response, TEST_COURSE_TODAY)
 
         # Verify that welcome messages are never shown
         self.assertNotContains(response, TEST_WELCOME_MESSAGE)
@@ -639,7 +636,6 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         response = self.client.get(course_home_url(audit_only_course))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, TEST_COURSE_TOOLS)
-        self.assertContains(response, TEST_COURSE_TODAY)
         self.assertNotContains(response, TEST_BANNER_CLASS)
 
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
