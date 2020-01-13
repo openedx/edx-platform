@@ -278,7 +278,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         gating_mock_1_2.return_value.required_prereq.return_value = True
         gating_mock_1_2.return_value.compute_is_prereq_met.return_value = [
             False,
-            {'url': 'PrereqUrl', 'display_name': 'PrereqSectionName'}
+            {'url': 'PrereqUrl', 'display_name': 'PrereqSectionName', 'id': 'mockId'}
         ]
         self.sequence_1_2.xmodule_runtime._services['gating'] = gating_mock_1_2  # pylint: disable=protected-access
         self.sequence_1_2.display_name = 'sequence_1_2'
