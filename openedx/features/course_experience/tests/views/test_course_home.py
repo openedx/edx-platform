@@ -25,7 +25,7 @@ from experiments.models import ExperimentData
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.api import add_course_goal, remove_course_goal
-from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
+from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
     GlobalStaffFactory,
@@ -218,7 +218,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
 
         # Fetch the view and verify the query counts
         # TODO: decrease query count as part of REVO-28
-        with self.assertNumQueries(74, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(76, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
