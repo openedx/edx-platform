@@ -119,7 +119,8 @@ class TestModels(TestCase):
     def setUp(self):
         super(TestModels, self).setUp()
         self.course = CourseOverviewFactory.create(
-            start=now()
+            start=now(),
+            start_date=now()
         )
         self.enrollment = CourseEnrollmentFactory.create(course_id=self.course.id)
         self.user = UserFactory()
@@ -172,6 +173,7 @@ class TestModels(TestCase):
         entitlement.created = past_datetime
         self.enrollment.created = past_datetime
         self.course.start = past_datetime
+        self.course.start_date = past_datetime
         entitlement.save()
         self.course.save()
         self.enrollment.save()
@@ -211,6 +213,7 @@ class TestModels(TestCase):
         entitlement = CourseEntitlementFactory.create(enrollment_course_run=self.enrollment, created=past_datetime)
         self.enrollment.created = past_datetime
         self.course.start = past_datetime
+        self.course.start_date = past_datetime
 
         self.course.save()
         self.enrollment.save()
@@ -263,6 +266,7 @@ class TestModels(TestCase):
         entitlement.created = past_datetime
         self.enrollment.created = past_datetime
         self.course.start = past_datetime
+        self.course.start_date = past_datetime
         entitlement.save()
         self.course.save()
         self.enrollment.save()
@@ -278,6 +282,7 @@ class TestModels(TestCase):
         entitlement.created = now()
         self.enrollment.created = past_datetime
         self.course.start = past_datetime
+        self.course.start_date = past_datetime
         entitlement.save()
         self.enrollment.save()
         self.course.save()
@@ -294,6 +299,7 @@ class TestModels(TestCase):
         start = now()
         self.enrollment.created = start
         self.course.start = start
+        self.course.start_date = start
         entitlement.save()
         self.course.save()
         self.enrollment.save()
