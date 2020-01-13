@@ -2545,7 +2545,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=639 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=640 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -7236,10 +7236,7 @@ CREATE TABLE `wiki_urlpath` (
   UNIQUE KEY `wiki_urlpath_site_id_parent_id_slug_e4942e5d_uniq` (`site_id`,`parent_id`,`slug`),
   KEY `wiki_urlpath_article_id_9ef0c0fb_fk_wiki_article_id` (`article_id`),
   KEY `wiki_urlpath_slug_39d212eb` (`slug`),
-  KEY `wiki_urlpath_lft_46bfd227` (`lft`),
-  KEY `wiki_urlpath_rght_186fc98e` (`rght`),
   KEY `wiki_urlpath_tree_id_090b475d` (`tree_id`),
-  KEY `wiki_urlpath_level_57f17cfd` (`level`),
   KEY `wiki_urlpath_parent_id_a6e675ac` (`parent_id`),
   CONSTRAINT `wiki_urlpath_article_id_9ef0c0fb_fk_wiki_article_id` FOREIGN KEY (`article_id`) REFERENCES `wiki_article` (`id`),
   CONSTRAINT `wiki_urlpath_parent_id_a6e675ac_fk_wiki_urlpath_id` FOREIGN KEY (`parent_id`) REFERENCES `wiki_urlpath` (`id`),
