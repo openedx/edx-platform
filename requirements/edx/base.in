@@ -43,7 +43,7 @@ django-cors-headers                 # Used to allow to configure CORS headers fo
 django-countries                    # Country data for Django forms and model fields
 django-crum                         # Middleware that stores the current request and user in thread local storage
 django-fernet-fields                # via edx-enterprise (should be added to its setup.py)
-django-filter==1.0.4                # Allows users to filter Django querysets dynamically
+django-filter                       # Allows users to filter Django querysets dynamically
 django-ipware                       # Get the client's real IP address
 django-method-override
 django-model-utils
