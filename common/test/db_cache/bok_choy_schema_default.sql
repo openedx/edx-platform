@@ -1783,6 +1783,8 @@ CREATE TABLE `course_overviews_courseoverview` (
   `eligible_for_financial_aid` tinyint(1) NOT NULL,
   `language` longtext,
   `certificate_available_date` datetime(6) DEFAULT NULL,
+  `end_date` datetime(6) DEFAULT NULL,
+  `start_date` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1880,6 +1882,8 @@ CREATE TABLE `course_overviews_historicalcourseoverview` (
   `history_change_reason` varchar(100) DEFAULT NULL,
   `history_type` varchar(1) NOT NULL,
   `history_user_id` int(11) DEFAULT NULL,
+  `end_date` datetime(6) DEFAULT NULL,
+  `start_date` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`history_id`),
   KEY `course_overviews_his_history_user_id_e21063d9_fk_auth_user` (`history_user_id`),
   KEY `course_overviews_historicalcourseoverview_id_647043f0` (`id`),
@@ -2545,7 +2549,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=639 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=641 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -7236,10 +7240,7 @@ CREATE TABLE `wiki_urlpath` (
   UNIQUE KEY `wiki_urlpath_site_id_parent_id_slug_e4942e5d_uniq` (`site_id`,`parent_id`,`slug`),
   KEY `wiki_urlpath_article_id_9ef0c0fb_fk_wiki_article_id` (`article_id`),
   KEY `wiki_urlpath_slug_39d212eb` (`slug`),
-  KEY `wiki_urlpath_lft_46bfd227` (`lft`),
-  KEY `wiki_urlpath_rght_186fc98e` (`rght`),
   KEY `wiki_urlpath_tree_id_090b475d` (`tree_id`),
-  KEY `wiki_urlpath_level_57f17cfd` (`level`),
   KEY `wiki_urlpath_parent_id_a6e675ac` (`parent_id`),
   CONSTRAINT `wiki_urlpath_article_id_9ef0c0fb_fk_wiki_article_id` FOREIGN KEY (`article_id`) REFERENCES `wiki_article` (`id`),
   CONSTRAINT `wiki_urlpath_parent_id_a6e675ac_fk_wiki_urlpath_id` FOREIGN KEY (`parent_id`) REFERENCES `wiki_urlpath` (`id`),
