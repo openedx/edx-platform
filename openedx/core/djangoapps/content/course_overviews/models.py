@@ -54,7 +54,7 @@ class CourseOverview(TimeStampedModel):
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 6
+    VERSION = 7
 
     # Cache entry versioning.
     version = IntegerField()
@@ -70,6 +70,8 @@ class CourseOverview(TimeStampedModel):
     # Start/end dates
     start = DateTimeField(null=True)
     end = DateTimeField(null=True)
+    start_date = DateTimeField(null=True)
+    end_date = DateTimeField(null=True)
     advertised_start = TextField(null=True)
     announcement = DateTimeField(null=True)
 
