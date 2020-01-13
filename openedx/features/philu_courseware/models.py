@@ -3,6 +3,7 @@ from model_utils.models import TimeStampedModel
 from django.contrib.auth.models import User
 
 from opaque_keys.edx.django.models import UsageKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 from .constants import COMPETENCY_ASSESSMENT_TYPE_CHOICES, CORRECTNESS_CHOICES
 
@@ -18,7 +19,7 @@ class CompetencyAssessmentRecord(TimeStampedModel):
     choice_id = models.CharField(max_length=255)
     choice_text = models.TextField()
     score = models.FloatField()
-
+    chapter_id = models.TextField(max_length=255)
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
 
     def __unicode__(self):
