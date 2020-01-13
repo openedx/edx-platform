@@ -180,7 +180,10 @@ class CourseOverview(TimeStampedModel):
         course_overview.display_org_with_default = course.display_org_with_default
 
         course_overview.start = start
+        # Add writes to new fields 'start_date' & 'end_date'.
+        course_overview.start_date = start
         course_overview.end = end
+        course_overview.end_date = end
         course_overview.advertised_start = course.advertised_start
         course_overview.announcement = course.announcement
 

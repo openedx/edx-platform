@@ -294,6 +294,7 @@ class TestModels(TestCase):
         start = now()
         self.enrollment.created = start
         self.course.start = start
+        self.course.start_date = start
         entitlement.save()
         self.course.save()
         self.enrollment.save()
