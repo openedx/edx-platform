@@ -7,10 +7,11 @@ from django.contrib.auth.models import User
 from rest_framework import pagination
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions import permissions
 
 from lms.djangoapps.discussion.notification_prefs import NOTIFICATION_PREF_KEY
 from lms.djangoapps.discussion.notifier_api.serializers import NotifierUserSerializer
-from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 
 
 class NotifierPaginator(pagination.PageNumberPagination):
@@ -38,7 +39,8 @@ class NotifierUsersViewSet(ReadOnlyModelViewSet):
     daily forum digests, including all information that the notifier needs about
     such users.
     """
-    permission_classes = (ApiKeyHeaderPermission,)
+    authentication_classes = (JwtAuthentication, )
+    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = NotifierUserSerializer
     pagination_class = NotifierPaginator
 
