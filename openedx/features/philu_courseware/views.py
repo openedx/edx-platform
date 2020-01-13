@@ -37,7 +37,7 @@ def competency_assessments_score_view(request, chapter_id):
 
 @api_view(['POST'])
 @view_auth_classes(is_authenticated=True)
-def record_competency_assessment(request):
+def record_and_fetch_competency_assessment(request):
     """
     :param request:
     request's POST data must have following keys
@@ -57,6 +57,11 @@ def record_competency_assessment(request):
     serializer = CompetencyAssessmentRecordSerializer(data=competency_record)
     if serializer.is_valid():
         serializer.save()
-        return Response({'message': COMP_ASSESS_RECORD_SUCCESS_MSG}, status=status.HTTP_201_CREATED)
+        competency_assessment_score = get_competency_assessments_score(request.user, competency_record['chapter_id'])
+        return Response(
+            {
+                'competency_assessment_score': competency_assessment_score,
+                'message': COMP_ASSESS_RECORD_SUCCESS_MSG
+            }, status=status.HTTP_201_CREATED)
     else:
         return Response({'message': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)

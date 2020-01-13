@@ -3,7 +3,6 @@ from model_utils.models import TimeStampedModel
 from django.contrib.auth.models import User
 
 from opaque_keys.edx.django.models import UsageKeyField
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 from .constants import COMPETENCY_ASSESSMENT_TYPE_CHOICES, CORRECTNESS_CHOICES
 

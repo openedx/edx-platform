@@ -7,9 +7,13 @@ COMPETENCY_ASSESSMENT_DEFAULT_PROBLEMS_COUNT = 5
 COMP_ASSESS_RECORD_SUCCESS_MSG = 'Attempt successfully recorded.'
 INVALID_PROBLEM_ID_MSG = 'Problem Id is not valid.'
 
+PRE_ASSESSMENT_KEY = 'pre'
+POST_ASSESSMENT_KEY = 'post'
+CORRECT_ASSESSMENT_KEY = 'correct'
+
 COMPETENCY_ASSESSMENT_TYPE_CHOICES = (
-    ('pre', 'Pre Assessment'),
-    ('post', 'Post Assesment')
+    (PRE_ASSESSMENT_KEY, 'Pre Assessment'),
+    (POST_ASSESSMENT_KEY, 'Post Assesment')
 )
 CORRECTNESS_CHOICES = (
     ('correct', 'Correct'),

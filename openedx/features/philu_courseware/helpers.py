@@ -72,14 +72,14 @@ def get_competency_assessments_score(user, chapter_id):
     """
 
     for assessment in assessments_record:
-        if assessment.assessment_type == constants.COMPETENCY_ASSESSMENT_TYPE_CHOICES[0][0]:
+        if assessment.assessment_type == constants.PRE_ASSESSMENT_KEY:
             pre_assessment_attempted = True
-            if assessment.correctness == constants.CORRECTNESS_CHOICES[0][0]:
+            if assessment.correctness == constants.CORRECT_ASSESSMENT_KEY:
                 pre_assessment_score = assessment.assessments_count
             attempted_pre_assessments += assessment.assessments_count
 
         else:
-            if assessment.correctness == constants.CORRECTNESS_CHOICES[0][0]:
+            if assessment.correctness == constants.CORRECT_ASSESSMENT_KEY:
                 post_assessment_score = assessment.assessments_count
             attempted_post_assessments += assessment.assessments_count
 
@@ -96,7 +96,7 @@ def is_all_attempted(section):
     attempted_problem_scores = [score for score in section.problem_scores.values()
                                     if score.first_attempted] \
                                     if section and section.problem_scores else []
-    problems_count = configuration_helpers.get_value("COMPETENCY_ASSESSMENT_PROBLEMS_COUNT",
+    problems_count = configuration_helpers.get_value('COMPETENCY_ASSESSMENT_PROBLEMS_COUNT',
                         constants.COMPETENCY_ASSESSMENT_DEFAULT_PROBLEMS_COUNT)
     return len(attempted_problem_scores) == problems_count
 
