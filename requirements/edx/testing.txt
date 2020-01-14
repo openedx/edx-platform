@@ -144,7 +144,7 @@ faker==4.0.0              # via factory-boy
 filelock==3.0.12          # via tox
 flake8-polyfill==1.0.2    # via radon
 flake8==3.7.9             # via flake8-polyfill
-freezegun==0.3.13
+freezegun==0.3.12
 fs-s3fs==0.1.8
 fs==2.0.18
 future==0.18.2

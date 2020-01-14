@@ -148,7 +148,7 @@ faker==4.0.0
 filelock==3.0.12
 flake8-polyfill==1.0.2
 flake8==3.7.9
-freezegun==0.3.13
+freezegun==0.3.12
 fs-s3fs==0.1.8
 fs==2.0.18
 future==0.18.2
