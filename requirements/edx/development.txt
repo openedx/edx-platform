@@ -119,7 +119,7 @@ edx-django-release-util==0.3.3
 edx-django-sites-extensions==2.4.2
 edx-django-utils==2.0.2
 edx-drf-extensions==2.4.5
-edx-enterprise==2.0.47
+edx-enterprise==2.0.48
 edx-i18n-tools==0.5.0
 edx-lint==1.3.0
 edx-milestones==0.2.6
@@ -144,11 +144,11 @@ enum34==1.1.6
 event-tracking==0.3.0
 execnet==1.7.1
 factory_boy==2.8.1
-faker==3.0.0
+faker==4.0.0
 filelock==3.0.12
 flake8-polyfill==1.0.2
 flake8==3.7.9
-freezegun==0.3.13
+freezegun==0.3.12
 fs-s3fs==0.1.8
 fs==2.0.18
 future==0.18.2
