@@ -6,6 +6,7 @@ Tests for any Teams app services
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 from lms.djangoapps.teams.services import TeamsService
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
@@ -17,8 +18,20 @@ class TeamsServiceTests(ModuleStoreTestCase):
     def setUp(self):
         super(TeamsServiceTests, self).setUp()
         self.course_run = CourseRunFactory.create()
-        self.team = CourseTeamFactory.create(course_id=self.course_run['key'])
+        self.course_key = self.course_run['key']
+        self.team = CourseTeamFactory.create(course_id=self.course_key)
         self.service = TeamsService()
+        self.user = UserFactory.create()
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course_key)
+        self.team.add_user(self.user)
+
+    def test_get_team(self):
+        user_team = self.service.get_team(self.user, self.course_key, self.team.topic_id)
+        self.assertEqual(user_team, self.team)
+
+        user2 = UserFactory.create()
+        user2_team = self.service.get_team(user2, self.course_key, self.team.topic_id)
+        self.assertIsNone(user2_team)
 
     def test_get_team_detail_url(self):
         # edx.org/courses/blah/teams/#teams/topic_id/team_id
