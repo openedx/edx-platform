@@ -246,9 +246,9 @@ def can_user_create_team_in_topic(user, course_id, topic_id):
     )
 
 
-def get_team_for_user_course_topic(user, course_id, topic_id):
+def get_team_for_user_course_teamset(user, course_id, teamset_id):
     """
-    Returns the matching CourseTeam for the given user, course, and topic
+    Returns the matching CourseTeam for the given user, course, and teamset
 
     If course_id is invalid, a ValueError is raised
     """
@@ -262,7 +262,7 @@ def get_team_for_user_course_topic(user, course_id, topic_id):
         return CourseTeam.objects.get(
             course_id=course_key,
             membership__user__username=user.username,
-            topic_id=topic_id,
+            topic_id=teamset_id,
         )
     except CourseTeam.DoesNotExist:
         return None
@@ -272,12 +272,12 @@ def get_team_for_user_course_topic(user, course_id, topic_id):
         logger.error(msg.format(
             username=user.username,
             course=course_id,
-            topic=topic_id,
+            topic=teamset_id,
         ))
         return CourseTeam.objects.filter(
             course_id=course_key,
             membership__user__username=user.username,
-            topic_id=topic_id,
+            topic_id=teamset_id,
         ).first()
 
 

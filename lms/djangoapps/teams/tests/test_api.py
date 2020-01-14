@@ -23,8 +23,8 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 COURSE_KEY1 = CourseKey.from_string('edx/history/1')
 COURSE_KEY2 = CourseKey.from_string('edx/history/2')
-TOPIC1 = 'topic-1'
-TOPIC2 = 'topic-2'
+TEAMSET_1_ID = 'teamset-1-id'
+TEAMSET_2_ID = 'teamset-2-id'
 
 DISCUSSION_TOPIC_ID = uuid4().hex
 
@@ -52,18 +52,18 @@ class PythonAPITests(SharedModuleStoreTestCase):
             course_id=COURSE_KEY1,
             discussion_topic_id=DISCUSSION_TOPIC_ID,
             team_id='team1',
-            topic_id=TOPIC1,
+            topic_id=TEAMSET_1_ID,
         )
-        cls.team1a = CourseTeamFactory(  # Same topic / team set as team1
+        cls.team1a = CourseTeamFactory(  # Same team set as team1
             course_id=COURSE_KEY1,
             team_id='team1a',
-            topic_id=TOPIC1,
+            topic_id=TEAMSET_1_ID,
         )
-        cls.team2 = CourseTeamFactory(course_id=COURSE_KEY2, team_id='team2', topic_id=TOPIC2)
-        cls.team2a = CourseTeamFactory(  # Same topic / team set as team2
+        cls.team2 = CourseTeamFactory(course_id=COURSE_KEY2, team_id='team2', topic_id=TEAMSET_2_ID)
+        cls.team2a = CourseTeamFactory(  # Same team set as team2
             course_id=COURSE_KEY2,
             team_id='team2a',
-            topic_id=TOPIC2
+            topic_id=TEAMSET_2_ID
         )
 
         cls.team1.add_user(cls.user1)
@@ -105,16 +105,16 @@ class PythonAPITests(SharedModuleStoreTestCase):
 
     @ddt.unpack
     @ddt.data(
-        (COURSE_KEY1, TOPIC1, ['team1', 'team1', None, 'team1a']),
-        (COURSE_KEY1, TOPIC2, [None, None, None, None]),
-        (COURSE_KEY2, TOPIC1, [None, None, None, None]),
-        (COURSE_KEY2, TOPIC2, [None, None, 'team2', 'team2a']),
+        (COURSE_KEY1, TEAMSET_1_ID, ['team1', 'team1', None, 'team1a']),
+        (COURSE_KEY1, TEAMSET_2_ID, [None, None, None, None]),
+        (COURSE_KEY2, TEAMSET_1_ID, [None, None, None, None]),
+        (COURSE_KEY2, TEAMSET_2_ID, [None, None, 'team2', 'team2a']),
     )
-    def test_get_team_for_user_course_topic(self, course_key, topic_id, expected_team_ids):
-        user1_team = teams_api.get_team_for_user_course_topic(self.user1, str(course_key), topic_id)
-        user2_team = teams_api.get_team_for_user_course_topic(self.user2, str(course_key), topic_id)
-        user3_team = teams_api.get_team_for_user_course_topic(self.user3, str(course_key), topic_id)
-        user4_team = teams_api.get_team_for_user_course_topic(self.user4, str(course_key), topic_id)
+    def test_get_team_for_user_course_teamset(self, course_key, teamset_id, expected_team_ids):
+        user1_team = teams_api.get_team_for_user_course_teamset(self.user1, str(course_key), teamset_id)
+        user2_team = teams_api.get_team_for_user_course_teamset(self.user2, str(course_key), teamset_id)
+        user3_team = teams_api.get_team_for_user_course_teamset(self.user3, str(course_key), teamset_id)
+        user4_team = teams_api.get_team_for_user_course_teamset(self.user4, str(course_key), teamset_id)
 
         self.assertEqual(user1_team.team_id if user1_team else None, expected_team_ids[0])
         self.assertEqual(user2_team.team_id if user2_team else None, expected_team_ids[1])
@@ -126,25 +126,25 @@ class PythonAPITests(SharedModuleStoreTestCase):
         """
         This is a test for a use case that is very unlikely to occur.
         Currently users cannot be in multiple teams in a course, but even after we allow multiple
-        teams in a course then they should still be limited to one team per topic
+        teams in a course then they should still be limited to one team per teamset
         """
         mocked_manager.get.side_effect = CourseTeam.MultipleObjectsReturned()
         expected_result = "This is somehow the first team"
         mock_qs = mock.MagicMock()
         mock_qs.first.return_value = expected_result
         mocked_manager.filter.return_value = mock_qs
-        result = teams_api.get_team_for_user_course_topic(self.user1, str(COURSE_KEY1), TOPIC1)
+        result = teams_api.get_team_for_user_course_teamset(self.user1, str(COURSE_KEY1), TEAMSET_1_ID)
         self.assertEqual(result, expected_result)
 
     def test_get_team_course_not_found(self):
-        team = teams_api.get_team_for_user_course_topic(self.user1, 'nonsense/garbage/nonexistant', 'topic')
+        team = teams_api.get_team_for_user_course_teamset(self.user1, 'nonsense/garbage/nonexistant', 'teamset-id')
         self.assertIsNone(team)
 
     def test_get_team_invalid_course(self):
         invalid_course_id = 'lol!()#^$&course'
         message = 'The supplied course id lol!()#^$&course is not valid'
         with self.assertRaisesMessage(ValueError, message):
-            teams_api.get_team_for_user_course_topic(self.user1, invalid_course_id, 'who-cares')
+            teams_api.get_team_for_user_course_teamset(self.user1, invalid_course_id, 'who-cares')
 
 
 @ddt.ddt
