@@ -330,7 +330,7 @@ webob==1.8.5
 websocket-client==0.57.0
 werkzeug==0.16.0
 wrapt==1.10.5
-git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.6#egg=xblock-drag-and-drop-v2==2.2.6
+git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.8#egg=xblock-drag-and-drop-v2==2.2.8
 git+https://github.com/open-craft/xblock-poll@3c7dcaf6c933d914188f0740a60711603f948d26#egg=xblock-poll==1.9.1
 xblock-utils==1.2.4
 xblock==1.2.9
