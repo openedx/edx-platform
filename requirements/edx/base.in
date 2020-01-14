@@ -48,7 +48,7 @@ django-ipware                       # Get the client's real IP address
 django-method-override
 django-model-utils
 django-mptt
-django-mysql==2.4.1
+django-mysql
 django-oauth-toolkit                # Provides oAuth2 capabilities for Django
 django-pipeline
 django-pyfs

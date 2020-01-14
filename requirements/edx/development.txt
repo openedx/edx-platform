@@ -81,7 +81,7 @@ django-method-override==0.2.0
 django-model-utils==3.0.0
 django-mptt==0.10.0
 django-multi-email-field==0.5.1
-django-mysql==2.4.1
+django-mysql==3.3.0
 git+https://github.com/edx/django-oauth-plus.git@b9b64a3ac24fd11f471763c88462bbf3c53e46e6#egg=django-oauth-plus==2.2.9.edx-4
 django-oauth-toolkit==1.1.3
 django-object-actions==2.0.0
