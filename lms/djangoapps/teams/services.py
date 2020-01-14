@@ -10,6 +10,10 @@ class TeamsService(object):
         from . import api
         return api.get_team_for_user_course_teamset(user, course_id, teamset_id)
 
+    def get_teamset(self, course_id, teamset_id):
+        from . import api
+        return api.get_teamset(course_id, teamset_id)
+
     def get_team_detail_url(self, team):
         """ Returns the url to the detail view for the given team """
         teams_dashboard_url = reverse('teams_dashboard', kwargs={'course_id': team.course_id})

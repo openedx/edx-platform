@@ -3,10 +3,11 @@
 Tests for any Teams app services
 """
 
-
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory
+from openedx.core.lib.teams_config import TeamsConfig
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from lms.djangoapps.teams.services import TeamsService
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
@@ -48,3 +49,20 @@ class TeamsServiceTests(ModuleStoreTestCase):
                 self.team.team_id,
             ]
         )
+
+    def test_get_teamset(self):
+        course = CourseFactory.create(
+            teams_configuration=TeamsConfig({
+                "max_team_size": 10,
+                "topics": [
+                    {
+                        "name": u"Topic 1",
+                        "id": "topic_id",
+                        "description": u"Description",
+                    }
+                ]
+            })
+        )
+        teamset = self.service.get_teamset(str(course.id), 'topic_id')
+        self.assertEqual(teamset.name, "Topic 1")
+        self.assertEqual(teamset.description, "Description")
