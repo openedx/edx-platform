@@ -19,4 +19,4 @@ pygments==2.5.2           # via diff-cover
 python-dateutil==2.4.0    # via pandas
 pytz==2019.3              # via pandas
 six==1.13.0               # via diff-cover
-zipp==0.6.0               # via importlib-metadata
+zipp==1.0.0               # via importlib-metadata
