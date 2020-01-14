@@ -511,7 +511,7 @@ class TestAuthorizationView(_DispatchingViewTestCase):
         Check that django-oauth2-provider gives an appropriate authorization response.
         """
         # django-oauth-provider redirects to a confirmation page
-        self.assertRedirects(response, u'http://testserver/oauth2/authorize/confirm', target_status_code=200)
+        self.assertRedirects(response, u'/oauth2/authorize/confirm', target_status_code=200)
 
         context = response.context_data
         form = context['form']
