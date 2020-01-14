@@ -9,8 +9,11 @@ import six.moves.urllib.request  # pylint: disable=import-error
 from django.urls import reverse
 from rest_framework import serializers
 
+from lms.djangoapps.courseware.tabs import get_course_tab_list
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.api.fields import AbsoluteURLField
+from student.models import CourseEnrollment
+from xmodule.modulestore.django import modulestore
 
 
 class _MediaSerializer(serializers.Serializer):  # pylint: disable=abstract-method
@@ -121,3 +124,54 @@ class CourseDetailSerializer(CourseSerializer):  # pylint: disable=abstract-meth
         # fields from CourseSerializer, which get their data
         # from the CourseOverview object in SQL.
         return CourseDetails.fetch_about_attribute(course_overview.id, 'overview')
+
+
+class CourseWithTabsSerializer(CourseSerializer):
+    enrollment = serializers.SerializerMethodField()
+    tabs = serializers.SerializerMethodField()
+
+    # these deprecated fields have been removed
+    course_id = None
+    blocks_url = None
+
+    def __init__(self, *args, **kwargs):
+        """
+        Initialize the serializer.
+        If `requested_fields` is set, then only return that subset of fields.
+        """
+        super().__init__(*args, **kwargs)
+        self.user = self.context['user']
+        requested_fields = self.context['requested_fields']
+        if requested_fields is not None:
+            allowed = set(requested_fields.split(','))
+            existing = set(self.fields)
+            for field_name in existing - allowed:
+                self.fields.pop(field_name)
+
+    def get_tabs(self, course_overview):
+        """
+        Return course tab metadata.
+        """
+        # Ideally, we wouldn't have to load the course, but get_course_tabs won't work
+        # with a CourseOverview without more refactoring.
+        course = modulestore().get_course(course_overview.id)
+        tabs = []
+        for priority, tab in enumerate(get_course_tab_list(self.user, course)):
+            tabs.append({
+                'title': tab.title,
+                'slug': tab.tab_id,
+                'priority': priority,
+                'type': tab.type,
+                'url': tab.link_func(course, reverse),
+            })
+        return tabs
+
+    def get_enrollment(self, course_overview):
+        """
+        Return the enrollment for the logged in user.
+        """
+        mode, is_active = CourseEnrollment.enrollment_mode_for_user(
+            self.user,
+            course_overview.id
+        )
+        return {'mode': mode, 'is_active': is_active}
