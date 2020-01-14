@@ -301,7 +301,7 @@ def _check_user_auth_flow(site, user):
                 link_start=HTML("<a href='{tpa_provider_link}'>").format(
                     tpa_provider_link='{dashboard_url}?tpa_hint={tpa_hint}'.format(
                         dashboard_url=reverse('dashboard'),
-                        tpa_hint=site.configuration.get_value('THIRD_PARTY_AUTH_HINT'),
+                        tpa_hint=site.configuration.get_value('THIRD_PARTY_AUTH_ONLY_HINT'),
                     )
                 ),
                 provider=site.configuration.get_value('THIRD_PARTY_AUTH_ONLY_PROVIDER'),

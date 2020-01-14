@@ -638,7 +638,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             'SITE_NAME': allowed_domain,
             'THIRD_PARTY_AUTH_ONLY_DOMAIN': allowed_domain,
             'THIRD_PARTY_AUTH_ONLY_PROVIDER': provider,
-            'THIRD_PARTY_AUTH_HINT': provider_tpa_hint,
+            'THIRD_PARTY_AUTH_ONLY_HINT': provider_tpa_hint,
         }
 
         with ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY.override(switch_enabled):
