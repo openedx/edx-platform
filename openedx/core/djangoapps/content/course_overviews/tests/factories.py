@@ -39,9 +39,9 @@ class CourseOverviewFactory(DjangoModelFactory):
         return "{} Course".format(self.id)
 
     @factory.lazy_attribute
-    def start(self):
+    def start_date(self):
         return timezone.now()
 
     @factory.lazy_attribute
-    def end(self):
+    def end_date(self):
         return timezone.now() + timedelta(30)

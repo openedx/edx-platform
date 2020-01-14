@@ -76,8 +76,8 @@ class CertificatesApiTestCase(TestCase):
     def setUp(self):
         super(CertificatesApiTestCase, self).setUp()
         self.course = CourseOverviewFactory.create(
-            start=datetime(2017, 1, 1, tzinfo=pytz.UTC),
-            end=datetime(2017, 1, 31, tzinfo=pytz.UTC),
+            start_date=datetime(2017, 1, 1, tzinfo=pytz.UTC),
+            end_date=datetime(2017, 1, 31, tzinfo=pytz.UTC),
             certificate_available_date=None
         )
         self.user = UserFactory.create()

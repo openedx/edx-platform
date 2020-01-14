@@ -174,10 +174,7 @@ class CourseOverview(TimeStampedModel):
         course_overview.display_number_with_default = course.display_number_with_default
         course_overview.display_org_with_default = course.display_org_with_default
 
-        course_overview.start = start
-        # Add writes to new fields 'start_date' & 'end_date'.
         course_overview.start_date = start
-        course_overview.end = end
         course_overview.end_date = end
         course_overview.advertised_start = course.advertised_start
         course_overview.announcement = course.announcement
@@ -451,19 +448,19 @@ class CourseOverview(TimeStampedModel):
         """
          Return start date to diplay on learner's dashboard, preferably `Course Advertised Start`
         """
-        return self.advertised_start or self.start
+        return self.advertised_start or self.start_date
 
     def has_started(self):
         """
         Returns whether the the course has started.
         """
-        return course_metadata_utils.has_course_started(self.start)
+        return course_metadata_utils.has_course_started(self.start_date)
 
     def has_ended(self):
         """
         Returns whether the course has ended.
         """
-        return course_metadata_utils.has_course_ended(self.end)
+        return course_metadata_utils.has_course_ended(self.end_date)
 
     def has_marketing_url(self):
         """
@@ -482,16 +479,16 @@ class CourseOverview(TimeStampedModel):
         """
         Returns True if the course starts with-in given number of days otherwise returns False.
         """
-        return course_metadata_utils.course_starts_within(self.start, days)
+        return course_metadata_utils.course_starts_within(self.start_date, days)
 
     @property
     def start_date_is_still_default(self):
         """
         Checks if the start date set for the course is still default, i.e.
-        .start has not been modified, and .advertised_start has not been set.
+        .start_date has not been modified, and .advertised_start has not been set.
         """
         return course_metadata_utils.course_start_date_is_default(
-            self.start,
+            self.start_date,
             self.advertised_start,
         )
 
@@ -505,7 +502,7 @@ class CourseOverview(TimeStampedModel):
 
         The lower the number the "newer" the course.
         """
-        return course_metadata_utils.sorting_score(self.start, self.advertised_start, self.announcement)
+        return course_metadata_utils.sorting_score(self.start_date, self.advertised_start, self.announcement)
 
     @property
     def start_type(self):
@@ -514,7 +511,7 @@ class CourseOverview(TimeStampedModel):
         """
         if self.advertised_start:
             return u'string'
-        elif self.start != DEFAULT_START_DATE:
+        elif self.start_date != DEFAULT_START_DATE:
             return u'timestamp'
         else:
             return u'empty'
@@ -526,8 +523,8 @@ class CourseOverview(TimeStampedModel):
         """
         if self.advertised_start:
             return self.advertised_start
-        elif self.start != DEFAULT_START_DATE:
-            return defaultfilters.date(self.start, "DATE_FORMAT")
+        elif self.start_date != DEFAULT_START_DATE:
+            return defaultfilters.date(self.start_date, "DATE_FORMAT")
         else:
             return None
 
