@@ -222,7 +222,6 @@ class MigrationTests(TestCase):
     Tests for migrations.
     """
 
-    @unittest.skip("Due to some recent schema changes this test is failing. Temporarily skipping it.")
     @override_settings(MIGRATION_MODULES={})
     def test_migrations_are_in_sync(self):
         """
