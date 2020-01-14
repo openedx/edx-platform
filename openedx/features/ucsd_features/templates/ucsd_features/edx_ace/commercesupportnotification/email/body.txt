@@ -2,7 +2,7 @@
 
 {% block content %}
     Hello,
-    LearnX was not able to process a user request, and we need to take action.
+    UC San Diego Online was not able to process a user request, and we need to take action.
     Here are the details:
     Learner: {{name}} ({{email}})
 
