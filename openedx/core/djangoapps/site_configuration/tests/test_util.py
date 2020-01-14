@@ -29,10 +29,9 @@ def with_site_configuration(domain="test.localhost", configuration=None):
             site, __ = Site.objects.get_or_create(domain=domain, name=domain)
             site_configuration, created = SiteConfiguration.objects.get_or_create(
                 site=site,
-                defaults={"enabled": True, "site_values": configuration, "values": configuration},
+                defaults={"enabled": True, "values": configuration},
             )
             if not created:
-                site_configuration.site_values = configuration
                 site_configuration.values = configuration
                 site_configuration.save()
 
@@ -57,10 +56,9 @@ def with_site_configuration_context(domain="test.localhost", configuration=None)
     site, __ = Site.objects.get_or_create(domain=domain, name=domain)
     site_configuration, created = SiteConfiguration.objects.get_or_create(
         site=site,
-        defaults={"enabled": True, "site_values": configuration, "values": configuration},
+        defaults={"enabled": True, "values": configuration},
     )
     if not created:
-        site_configuration.site_values = configuration
         site_configuration.values = configuration
         site_configuration.save()
 
