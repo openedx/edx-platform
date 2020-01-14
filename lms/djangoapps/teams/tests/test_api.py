@@ -14,9 +14,11 @@ from course_modes.models import CourseMode
 from lms.djangoapps.teams import api as teams_api
 from lms.djangoapps.teams.models import CourseTeam
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
+from openedx.core.lib.teams_config import TeamsConfig
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 COURSE_KEY1 = CourseKey.from_string('edx/history/1')
@@ -143,6 +145,70 @@ class PythonAPITests(SharedModuleStoreTestCase):
         message = 'The supplied course id lol!()#^$&course is not valid'
         with self.assertRaisesMessage(ValueError, message):
             teams_api.get_team_for_user_course_topic(self.user1, invalid_course_id, 'who-cares')
+
+
+@ddt.ddt
+class TeamsConfigurationTests(SharedModuleStoreTestCase):
+    """
+    Tests for Teams API functionality that use TeamsConfiguration
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super(TeamsConfigurationTests, cls).setUpClass()
+        cls.teamset_1 = dict(
+            id='teamset_a',
+            name='Animals',
+            description='woof woof meow',
+        )
+        cls.teamset_2 = dict(
+            id='teamset_b',
+            name='Basketball',
+            description='get your head in the game',
+        )
+        cls.teamset_3 = dict(
+            id='teamset_c',
+            name='Card Games',
+            description='i play pot of greed which lets me draw two cards',
+        )
+        teams_configuration = TeamsConfig({
+            'team_sets': [cls.teamset_1, cls.teamset_2, cls.teamset_3],
+            'max_team_size': 3,
+        })
+        cls.course = CourseFactory.create(
+            org='MIT',
+            course='test',
+            display_name='Tests',
+            teams_configuration=teams_configuration,
+        )
+
+    def _test_get_teamset(self, expected_teamset):
+        actual_teamset = teams_api.get_teamset(str(self.course.id), expected_teamset['id'])
+        self.assertEqual(actual_teamset.name, expected_teamset['name'])
+        self.assertEqual(actual_teamset.description, expected_teamset['description'])
+
+    def test_get_teamset_1(self):
+        self._test_get_teamset(self.teamset_1)
+
+    def test_get_teamset_2(self):
+        self._test_get_teamset(self.teamset_2)
+
+    def test_get_teamset_3(self):
+        self._test_get_teamset(self.teamset_3)
+
+    def test_get_teamset_course_not_found(self):
+        teamset = teams_api.get_teamset('nonsense/garbage/nonexistant', None)
+        self.assertIsNone(teamset)
+
+    def test_get_teamset_teamset_not_found(self):
+        teamset = teams_api.get_teamset(str(self.course.id), 'nonexistant-teamset-id')
+        self.assertIsNone(teamset)
+
+    def test_get_teamset_invalid_course(self):
+        invalid_course_id = 'lol!()#^$&course'
+        message = 'The supplied course id lol!()#^$&course is not valid'
+        with self.assertRaisesMessage(ValueError, message):
+            teams_api.get_teamset(invalid_course_id, None)
 
 
 @ddt.ddt

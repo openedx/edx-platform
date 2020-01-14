@@ -15,6 +15,7 @@ from lms.djangoapps.discussion.django_comment_client.utils import has_discussion
 from lms.djangoapps.teams.models import CourseTeam
 from student.models import CourseEnrollment
 from student.roles import CourseInstructorRole, CourseStaffRole
+from xmodule.modulestore.django import modulestore
 
 logger = logging.getLogger(__name__)
 
@@ -278,3 +279,28 @@ def get_team_for_user_course_topic(user, course_id, topic_id):
             membership__user__username=user.username,
             topic_id=topic_id,
         ).first()
+
+
+def get_teamset(course_id, teamset_id):
+    """
+    Returns the TeamsetConfig associated with this course_id and teamset_id
+
+    If course_id is invalid, raises a ValueError
+    If the course associated with course_id is not found, returns None
+    If the teamset associated with teamset_id is not found, returns None
+    """
+    try:
+        course_key = CourseKey.from_string(course_id)
+    except InvalidKeyError:
+        raise ValueError(u"The supplied course id {course_id} is not valid.".format(
+            course_id=course_id
+        ))
+
+    course_module = modulestore().get_course(course_key)
+    if course_module is None:
+        return None
+
+    try:
+        return course_module.teamsets_by_id[teamset_id]
+    except KeyError:
+        return None
