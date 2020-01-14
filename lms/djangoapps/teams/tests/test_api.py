@@ -119,7 +119,7 @@ class PythonAPITests(SharedModuleStoreTestCase):
         self.assertEqual(user3_team.team_id if user3_team else None, expected_team_ids[2])
         self.assertEqual(user4_team.team_id if user4_team else None, expected_team_ids[3])
 
-    @mock.patch('lms.djangoapps.teams.CourseTeam.objects')
+    @mock.patch('lms.djangoapps.teams.api.CourseTeam.objects')
     def test_get_team_multiple_teams(self, mocked_manager):
         """
         This is a test for a use case that should never happen.
