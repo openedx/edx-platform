@@ -62,7 +62,7 @@ ddt==1.2.2
 decorator==4.4.1
 defusedxml==0.5.0
 diff-cover==2.5.2
-django-appconf==1.0.3
+git+https://github.com/django-compressor/django-appconf@1526a842ee084b791aa66c931b3822091a442853#egg=django-appconf
 django-babel-underscore==0.5.2
 django-babel==0.6.2
 git+https://github.com/edx/django-celery.git@756cb57aad765cb2b0d37372c1855b8f5f37e6b0#egg=django-celery==3.2.1+edx.2
