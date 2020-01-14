@@ -92,8 +92,8 @@ def get_competency_assessments_score(user, chapter_id):
         'pre_assessment_score': pre_assessment_score,
         'post_assessment_score': post_assessment_score,
         'pre_assessment_attempted': pre_assessment_attempted,
-        'all_pre_assessment_attempted': True if attempted_pre_assessments == constants.COMPETENCY_ASSESSMENT_DEFAULT_PROBLEMS_COUNT else False,
-        'all_post_assessment_attempted': True if attempted_post_assessments == constants.COMPETENCY_ASSESSMENT_DEFAULT_PROBLEMS_COUNT else False,
+        'all_pre_assessment_attempted': attempted_pre_assessments == constants.COMPETENCY_ASSESSMENT_DEFAULT_PROBLEMS_COUNT,
+        'all_post_assessment_attempted': attempted_post_assessments == constants.COMPETENCY_ASSESSMENT_DEFAULT_PROBLEMS_COUNT,
     }
 
 
