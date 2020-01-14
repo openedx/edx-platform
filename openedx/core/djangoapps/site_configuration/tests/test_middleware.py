@@ -41,9 +41,6 @@ class SessionCookieDomainTests(TestCase):
         )
         self.site_configuration = SiteConfigurationFactory.create(
             site=self.site,
-            site_values={
-                "SESSION_COOKIE_DOMAIN": self.site.domain,
-            },
             values={
                 "SESSION_COOKIE_DOMAIN": self.site.domain,
             }
@@ -79,9 +76,6 @@ class SessionCookieDomainSiteConfigurationOverrideTests(TestCase):
         )
         self.site_configuration = SiteConfigurationFactory.create(
             site=self.site,
-            site_values={
-                "SESSION_COOKIE_DOMAIN": self.site.domain,
-            },
             values={
                 "SESSION_COOKIE_DOMAIN": self.site.domain,
             }
