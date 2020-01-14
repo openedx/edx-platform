@@ -122,7 +122,7 @@ class PythonAPITests(SharedModuleStoreTestCase):
     @mock.patch('lms.djangoapps.teams.api.CourseTeam.objects')
     def test_get_team_multiple_teams(self, mocked_manager):
         """
-        This is a test for a use case that should never happen.
+        This is a test for a use case that is very unlikely to occur.
         Currently users cannot be in multiple teams in a course, but even after we allow multiple
         teams in a course then they should still be limited to one team per topic
         """
