@@ -44,8 +44,8 @@ def is_course_run_entitlement_fulfillable(
         return False
 
     # Verify that the course is still running
-    run_start = course_overview.start
-    run_end = course_overview.end
+    run_start = course_overview.start_date
+    run_end = course_overview.end_date
     is_running = run_start and (not run_end or (run_end and (run_end > compare_date)))
 
     # Verify that the course run can currently be enrolled

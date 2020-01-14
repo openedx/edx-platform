@@ -56,7 +56,7 @@ class TestAccess(CacheIsolationTestCase):
             return strftime_localized(date, u'%b %-d, %Y')
 
         enrollment = CourseEnrollmentFactory.create(
-            course__start=datetime(2018, 1, 1, tzinfo=UTC),
+            course__start_date=datetime(2018, 1, 1, tzinfo=UTC),
             course__self_paced=True,
         )
         CourseModeFactory.create(

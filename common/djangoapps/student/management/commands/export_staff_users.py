@@ -74,7 +74,7 @@ class Command(BaseCommand):
             self.to_addresses = ['sustaining-mavericks@edx.org']
         current_date = datetime.now(tz=utc)
         starting_date = current_date - timedelta(days=days)
-        active_courses = CourseOverview.objects.filter(end__gte=current_date).values_list('id', flat=True)
+        active_courses = CourseOverview.objects.filter(end_date__gte=current_date).values_list('id', flat=True)
         course_access_roles = CourseAccessRole.objects.filter(
             role__in=['staff', 'instructor'],
             user__last_login__range=(starting_date, current_date),

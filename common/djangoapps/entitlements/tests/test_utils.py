@@ -42,8 +42,8 @@ class TestCourseRunFulfillableForEntitlement(ModuleStoreTestCase):
             upgraded_ended_from_now=1
     ):
         course_overview = CourseOverviewFactory.create(
-            start=now() + timedelta(days=start_from_now),
-            end=now() + timedelta(days=end_from_now),
+            start_date=now() + timedelta(days=start_from_now),
+            end_date=now() + timedelta(days=end_from_now),
             enrollment_start=now() + timedelta(days=enrollment_start_from_now),
             enrollment_end=now() + timedelta(days=enrollment_end_from_now)
         )
@@ -83,7 +83,7 @@ class TestCourseRunFulfillableForEntitlement(ModuleStoreTestCase):
             enrollment_start_from_now=-1,
             enrollment_end_from_now=1
         )
-        course_overview.start = None
+        course_overview.start_date = None
         course_overview.save()
 
         entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)

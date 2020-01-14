@@ -720,7 +720,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
 
     def test_reinstate_refundable_entitlement(self):
         """ Verify that an entitlement that is refundable stays refundable when support reinstates it. """
-        enrollment = CourseEnrollmentFactory(user=self.user, is_active=True, course=CourseOverviewFactory(start=now()))
+        enrollment = CourseEnrollmentFactory(user=self.user, is_active=True, course=CourseOverviewFactory(start_date=now()))
         fulfilled_entitlement = CourseEntitlementFactory.create(
             user=self.user, enrollment_course_run=enrollment
         )

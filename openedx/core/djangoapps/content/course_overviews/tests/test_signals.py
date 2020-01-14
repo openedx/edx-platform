@@ -3,6 +3,7 @@
 import datetime
 
 import ddt
+import logging
 from mock import patch
 
 from xmodule.modulestore import ModuleStoreEnum
@@ -11,6 +12,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 
 from ..models import CourseOverview
 
+log = logging.getLogger(__name__)
 
 @ddt.ddt
 class CourseOverviewSignalsTestCase(ModuleStoreTestCase):
@@ -81,6 +83,8 @@ class CourseOverviewSignalsTestCase(ModuleStoreTestCase):
         # changing the given field fires the signal
         setattr(course, field_name, changed_value)
         self.store.update_item(course, ModuleStoreEnum.UserID.test)
+        log.info("mock_signal :{}".format(mock_signal))
+        log.info("mock_signal.called :{}".format(mock_signal.called))
         self.assertTrue(mock_signal.called)
 
     @patch('openedx.core.djangoapps.content.course_overviews.signals.COURSE_START_DATE_CHANGED.send')

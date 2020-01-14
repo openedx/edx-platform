@@ -54,6 +54,7 @@ from static_replace import replace_static_urls
 from student.models import CourseEnrollment
 from survey.utils import is_survey_required_and_unanswered
 from util.date_utils import strftime_localized
+from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import STUDENT_VIEW
@@ -150,13 +151,17 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
         return
 
     request = get_current_request()
-    check_content_start_date_for_masquerade_user(course.id, user, request, course.start)
+    if isinstance(course, CourseDescriptor):
+        course_start = course.start
+    elif isinstance(course, CourseOverview):
+        course_start = course.start_date
+    check_content_start_date_for_masquerade_user(course.id, user, request, course_start)
 
     access_response = has_access(user, action, course, course.id)
     if not access_response:
         # Redirect if StartDateError
         if isinstance(access_response, StartDateError):
-            start_date = strftime_localized(course.start, 'SHORT_DATE')
+            start_date = strftime_localized(course_start, 'SHORT_DATE')
             params = QueryDict(mutable=True)
             params['notlive'] = start_date
             raise CourseAccessRedirect('{dashboard_url}?{params}'.format(
@@ -584,7 +589,7 @@ def sort_by_start_date(courses):
     """
     courses = sorted(
         courses,
-        key=lambda course: (course.has_ended(), course.start is None, course.start),
+        key=lambda course: (course.has_ended(), course.start_date is None, course.start_date),
         reverse=False
     )
 

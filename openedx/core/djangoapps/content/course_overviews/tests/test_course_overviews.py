@@ -5,6 +5,7 @@ Tests for course_overviews app.
 
 import datetime
 import itertools
+import logging
 import math
 from six import BytesIO
 
@@ -34,7 +35,8 @@ from xmodule.course_metadata_utils import DEFAULT_START_DATE
 from xmodule.course_module import (
     CATALOG_VISIBILITY_ABOUT,
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
-    CATALOG_VISIBILITY_NONE
+    CATALOG_VISIBILITY_NONE,
+    CourseDescriptor
 )
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
@@ -44,6 +46,8 @@ from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 
 from ..models import CourseOverview, CourseOverviewImageConfig, CourseOverviewImageSet
 from .factories import CourseOverviewFactory
+
+log = logging.getLogger(__name__)
 
 
 @ddt.ddt
@@ -161,7 +165,11 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         # resulting values are often off by fractions of a second. So, as a
         # workaround, we simply test if the start and end times are the same
         # number of seconds from the Unix epoch.
-        time_field_accessor = lambda object, field_name: get_seconds_since_epoch(getattr(object, field_name))
+        time_field_accessor = lambda object, field_name: get_seconds_since_epoch(field_check(object, field_name))
+        def field_check(object, field_name):
+            if isinstance(object, CourseOverview) and field_name in ('start', 'end'):
+                field_name = field_name+'_date'
+            return getattr(object, field_name)
 
         # The course about fields are accessed through the CourseDetail
         # class for the course module, and stored as attributes on the
@@ -210,7 +218,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         [
             {
                 "display_name": "Test Course",              # Display name provided
-                "start": LAST_WEEK,                         # In the middle of the course
+                "start": LAST_WEEK,                    # In the middle of the course
                 "end": NEXT_WEEK,
                 "announcement": LAST_MONTH,                 # Announcement date provided
                 "advertised_start": "2015-01-01 11:22:33",  # Parse-able advertised_start

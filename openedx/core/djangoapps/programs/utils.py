@@ -536,7 +536,7 @@ class ProgramDataExtender(object):
         run_mode['enrollment_open_date'] = strftime_localized(self.enrollment_start, 'SHORT_DATE')
 
     def _attach_course_run_is_course_ended(self, run_mode):
-        end_date = self.course_overview.end or datetime.datetime.max.replace(tzinfo=utc)
+        end_date = self.course_overview.end_date or datetime.datetime.max.replace(tzinfo=utc)
         run_mode['is_course_ended'] = end_date < datetime.datetime.now(utc)
 
     def _attach_course_run_is_enrolled(self, run_mode):

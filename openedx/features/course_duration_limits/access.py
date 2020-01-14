@@ -26,6 +26,7 @@ from openedx.core.djangolib.markup import HTML
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from student.models import CourseEnrollment
 from util.date_utils import strftime_localized
+from xmodule.course_module import CourseDescriptor
 
 EXPIRATION_DATE_FORMAT_STR = u'%b %-d, %Y'
 
@@ -87,6 +88,11 @@ def get_user_course_expiration_date(user, course):
     if enrollment is None or enrollment.mode != CourseMode.AUDIT:
         return None
 
+    if isinstance(course, CourseDescriptor):
+        course_start = course.start
+    elif isinstance(course, CourseOverview):
+        course_start = course.start_date
+
     try:
         # Content availability date is equivalent to max(enrollment date, course start date)
         # for most people. Using the schedule date will provide flexibility to deal with
@@ -96,9 +102,9 @@ def get_user_course_expiration_date(user, course):
         # equal to the course start, but should have been equal to the enrollment start
         # https://openedx.atlassian.net/browse/PROD-58
         # This section is meant to address that case
-        if enrollment.created and course.start:
-            if (content_availability_date.date() == course.start.date() and
-               course.start < enrollment.created < timezone.now()):
+        if enrollment.created and course_start:
+            if (content_availability_date.date() == course_start.date() and
+               course_start < enrollment.created < timezone.now()):
                 content_availability_date = enrollment.created
             # If course teams change the course start date, set the content_availability_date
             # to max of enrollment or course start date
@@ -106,7 +112,7 @@ def get_user_course_expiration_date(user, course):
                   content_availability_date.date() < enrollment.created.date()):
                 content_availability_date = max(enrollment.created, course.start)
     except CourseEnrollment.schedule.RelatedObjectDoesNotExist:
-        content_availability_date = max(enrollment.created, course.start)
+        content_availability_date = max(enrollment.created, course_start)
 
     return content_availability_date + access_duration
 

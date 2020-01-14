@@ -177,7 +177,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
             number='1001',
             display_name='Starting earlier, Announced earlier',
             metadata={
-                'start': datetime.datetime.now(UTC) + datetime.timedelta(days=2),
+                'start_date': datetime.datetime.now(UTC) + datetime.timedelta(days=2),
                 'announcement': datetime.datetime.now(UTC) + datetime.timedelta(days=1),
             },
             emit_signals=True,
@@ -246,6 +246,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertEqual(template, 'index.html')
 
         # by default the courses will be sorted by their creation dates, earliest first.
+        print("context :{0} \n starting_earlier: {1}".format(context['courses'][0].id, self.starting_earlier.id))
         self.assertEqual(context['courses'][0].id, self.starting_earlier.id)
         self.assertEqual(context['courses'][1].id, self.starting_later.id)
         self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)

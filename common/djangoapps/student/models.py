@@ -1779,7 +1779,7 @@ class CourseEnrollment(models.Model):
 
         refund_window_start_date = max(
             datetime.strptime(date_placed, ECOMMERCE_DATE_FORMAT),
-            self.course_overview.start.replace(tzinfo=None)
+            self.course_overview.start_date.replace(tzinfo=None)
         )
 
         return refund_window_start_date.replace(tzinfo=UTC) + EnrollmentRefundConfiguration.current().refund_window
