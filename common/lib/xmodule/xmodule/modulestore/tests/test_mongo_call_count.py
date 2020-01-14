@@ -151,11 +151,11 @@ class CountMongoCallsCourseTraversal(TestCase):
         (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, True, False, 359),
         # The line below shows the way this traversal *should* be done
         # (if you'll eventually access all the fields and load all the definitions anyway).
-        (MIXED_SPLIT_MODULESTORE_BUILDER, None, False, True, 3),
+        (MIXED_SPLIT_MODULESTORE_BUILDER, None, False, True, 4),
         (MIXED_SPLIT_MODULESTORE_BUILDER, None, True, True, 38),
         (MIXED_SPLIT_MODULESTORE_BUILDER, 0, False, True, 38),
         (MIXED_SPLIT_MODULESTORE_BUILDER, 0, True, True, 38),
-        (MIXED_SPLIT_MODULESTORE_BUILDER, None, False, False, 3),
+        (MIXED_SPLIT_MODULESTORE_BUILDER, None, False, False, 4),
         (MIXED_SPLIT_MODULESTORE_BUILDER, None, True, False, 3),
         (MIXED_SPLIT_MODULESTORE_BUILDER, 0, False, False, 3),
         (MIXED_SPLIT_MODULESTORE_BUILDER, 0, True, False, 3)
@@ -177,7 +177,7 @@ class CountMongoCallsCourseTraversal(TestCase):
 
     @ddt.data(
         (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 176),
-        (MIXED_SPLIT_MODULESTORE_BUILDER, 4),
+        (MIXED_SPLIT_MODULESTORE_BUILDER, 5),
     )
     @ddt.unpack
     def test_lazy_when_course_previously_cached(self, store_builder, num_mongo_calls):
