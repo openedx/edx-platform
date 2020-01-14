@@ -2549,7 +2549,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=641 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=642 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5411,6 +5411,7 @@ CREATE TABLE `site_configuration_siteconfiguration` (
   `values` longtext NOT NULL,
   `site_id` int(11) NOT NULL,
   `enabled` tinyint(1) NOT NULL,
+  `site_values` longtext NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `site_id` (`site_id`),
   CONSTRAINT `site_configuration_s_site_id_84302d1f_fk_django_si` FOREIGN KEY (`site_id`) REFERENCES `django_site` (`id`)
@@ -5426,6 +5427,7 @@ CREATE TABLE `site_configuration_siteconfigurationhistory` (
   `values` longtext NOT NULL,
   `site_id` int(11) NOT NULL,
   `enabled` tinyint(1) NOT NULL,
+  `site_values` longtext NOT NULL,
   PRIMARY KEY (`id`),
   KEY `site_configuration_s_site_id_272f5c1a_fk_django_si` (`site_id`),
   CONSTRAINT `site_configuration_s_site_id_272f5c1a_fk_django_si` FOREIGN KEY (`site_id`) REFERENCES `django_site` (`id`)
