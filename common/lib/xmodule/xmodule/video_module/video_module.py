@@ -415,6 +415,13 @@ class VideoBlock(
             'ytTestTimeout': settings.YOUTUBE['TEST_TIMEOUT'],
             'ytApiUrl': settings.YOUTUBE['API'],
             'lmsRootURL': settings.LMS_ROOT_URL,
+            'ytMetadataEndpoint': (
+                # In the new runtime, get YouTube metadata via a handler. The handler supports anonymous users and
+                # can work in sandboxed iframes. In the old runtime, the JS will call the LMS's yt_video_metadata
+                # API endpoint directly (not an XBlock handler).
+                self.runtime.handler_url(self, 'yt_video_metadata')
+                if getattr(self.runtime, 'suppports_state_for_anonymous_users', False) else ''
+            ),
 
             'transcriptTranslationUrl': self.runtime.handler_url(
                 self, 'transcript', 'translation/__lang__'
