@@ -7,7 +7,7 @@
 -e git+https://github.com/edx/acid-block.git@98aecba94ecbfa934e2d00262741c0ea9f557fc9#egg=acid-xblock
 -e common/lib/capa
 -e git+https://github.com/edx/codejail.git@4127fc4bd5775cc72aee8d7f0a70e31405e22439#egg=codejail
--e git+https://github.com/edx/django-wiki.git@v0.0.23#egg=django-wiki
+-e git+https://github.com/edx/django-wiki.git@v0.0.25#egg=django-wiki
 -e git+https://github.com/edx/DoneXBlock.git@2.0.1#egg=done-xblock
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
 -e .
@@ -56,16 +56,17 @@ django-babel-underscore==0.5.2
 django-babel==0.6.2       # via django-babel-underscore
 git+https://github.com/edx/django-celery.git@756cb57aad765cb2b0d37372c1855b8f5f37e6b0#egg=django-celery==3.2.1+edx.2
 django-classy-tags==0.9.0  # via django-sekizai
-django-config-models==1.0.3
+django-config-models==1.0.4
 django-cors-headers==2.5.3
 django-countries==5.5
 django-crum==0.7.5
 django-fernet-fields==0.6
-django-filter==1.0.4
+django-filter==2.2.0
 django-ipware==2.1.0
+django-js-asset==1.2.2    # via django-mptt
 django-method-override==0.2.0
 django-model-utils==3.0.0
-django-mptt==0.8.7
+django-mptt==0.10.0
 django-multi-email-field==0.5.1  # via edx-enterprise
 django-mysql==2.4.1
 git+https://github.com/edx/django-oauth-plus.git@b9b64a3ac24fd11f471763c88462bbf3c53e46e6#egg=django-oauth-plus==2.2.9.edx-4
@@ -80,10 +81,10 @@ django-sekizai==1.0.0
 django-ses==0.8.13
 django-simple-history==2.8.0
 django-splash==0.2.5
-django-statici18n==1.8.3
+django-statici18n==1.9.0
 django-storages==1.8
 django-user-tasks==0.3.0
-django-waffle==0.12.0
+django-waffle==0.18.0
 django-webpack-loader==0.6.0
 django==1.11.27
 djangorestframework-jwt==1.11.0
@@ -91,7 +92,7 @@ git+https://github.com/edx/django-rest-framework-oauth.git@0a43e8525f1e3048efe4b
 djangorestframework-xml==1.4.0  # via edx-enterprise
 djangorestframework==3.9.4
 docopt==0.6.2
-docutils==0.15.2          # via botocore
+docutils==0.16            # via botocore
 drf-yasg==1.16
 edx-ace==0.1.13
 edx-analytics-data-api-client==0.15.3
@@ -104,7 +105,7 @@ edx-django-release-util==0.3.2
 edx-django-sites-extensions==2.4.2
 edx-django-utils==2.0.2
 edx-drf-extensions==2.4.5
-edx-enterprise==2.0.42
+edx-enterprise==2.0.46
 edx-i18n-tools==0.5.0
 edx-milestones==0.2.6
 edx-oauth2-provider==1.3.1
@@ -163,11 +164,11 @@ mpmath==1.1.0             # via sympy
 mysqlclient==1.4.6
 newrelic==5.4.1.134
 nltk==3.4.5
-nodeenv==1.3.3
+nodeenv==1.3.4
 numpy==1.18.1             # via scipy
 git+https://github.com/joestump/python-oauth2.git@b94f69b1ad195513547924e380d9265133e995fa#egg=oauth2
 oauthlib==2.1.0
-git+https://github.com/edx/edx-ora2.git@2.5.8#egg=ora2==2.5.8
+git+https://github.com/edx/edx-ora2.git@2.6.0#egg=ora2==2.6.0
 path.py==8.2.1
 pathtools==0.1.2
 paver==1.3.4
@@ -242,7 +243,7 @@ web-fragments==0.3.1
 webencodings==0.5.1       # via bleach, html5lib
 webob==1.8.5              # via xblock
 wrapt==1.10.5
-git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.6#egg=xblock-drag-and-drop-v2==2.2.6
+git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.8#egg=xblock-drag-and-drop-v2==2.2.8
 git+https://github.com/open-craft/xblock-poll@3c7dcaf6c933d914188f0740a60711603f948d26#egg=xblock-poll==1.9.1
 xblock-utils==1.2.4
 xblock==1.2.9
