@@ -33,12 +33,6 @@ TEST_USERNAME = 'test_user'
 TEST_PASSWORD = 'test_password'
 
 
-@override_settings(
-    MIDDLEWARE_CLASSES=[
-        middleware for middleware in settings.MIDDLEWARE_CLASSES
-        if middleware != 'lms.djangoapps.onboarding.middleware.RedirectMiddleware'
-    ]
-)
 class TeamsTestsBaseClass(ModuleStoreTestCase):
     """Base class for all test cases of "Teams" module."""
 

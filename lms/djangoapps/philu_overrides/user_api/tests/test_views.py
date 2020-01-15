@@ -218,12 +218,6 @@ class LoginSessionViewTest(ApiTestCase):
         self.assertHttpBadRequest(response)
 
 
-@override_settings(
-    MIDDLEWARE_CLASSES=[
-        klass for klass in settings.MIDDLEWARE_CLASSES
-        if klass != 'lms.djangoapps.onboarding.middleware.RedirectMiddleware'
-    ]
-)
 @ddt.ddt
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):

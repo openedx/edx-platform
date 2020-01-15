@@ -24,8 +24,7 @@ from edxmako.shortcuts import render_to_response
 from nodebb.helpers import update_nodebb_for_user_status
 
 from lms.djangoapps.onboarding import forms
-from lms.djangoapps.onboarding.decorators import can_save_org_data, can_not_update_onboarding_steps, \
-    can_save_org_details
+from lms.djangoapps.onboarding.decorators import can_save_org_data, can_save_org_details
 from lms.djangoapps.onboarding.email_utils import send_admin_activation_email, send_admin_update_confirmation_email, \
     send_admin_update_email
 from lms.djangoapps.onboarding.helpers import calculate_age_years, COUNTRIES, LANGUAGES, oef_eligible_first_learner, \
@@ -43,7 +42,6 @@ log = logging.getLogger("edx.onboarding")
 
 
 @login_required
-@can_not_update_onboarding_steps
 @transaction.atomic
 def user_info(request):
     """
@@ -155,7 +153,6 @@ def user_info(request):
 
 
 @login_required
-@can_not_update_onboarding_steps
 @transaction.atomic
 def interests(request):
     """
@@ -228,7 +225,6 @@ def interests(request):
 
 @login_required
 @can_save_org_data
-@can_not_update_onboarding_steps
 @transaction.atomic
 def organization(request):
     """
@@ -341,7 +337,6 @@ def get_country_names(request):
 
 @login_required
 @can_save_org_details
-@can_not_update_onboarding_steps
 @transaction.atomic
 def org_detail_survey(request):
     user_extended_profile = request.user.extended_profile
