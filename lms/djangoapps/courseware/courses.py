@@ -143,7 +143,7 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
         return
 
     request = get_current_request()
-    check_content_start_date_for_masquerade_user(course.id, user, request, course.start)
+    check_content_start_date_for_masquerade_user(course.id, user, request, course.start_date)
 
     access_response = has_access(user, action, course, course.id)
     if not access_response:

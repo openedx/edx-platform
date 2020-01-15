@@ -114,12 +114,12 @@ def get_user_course_expiration_date(user, course):
         # equal to the course start, but should have been equal to the enrollment start
         # https://openedx.atlassian.net/browse/PROD-58
         # This section is meant to address that case
-        if enrollment.created and course.start:
-            if (content_availability_date.date() == course.start.date() and
-               course.start < enrollment.created < timezone.now()):
+        if enrollment.created and course.start_date:
+            if (content_availability_date.date() == course.start_date.date() and
+               course.start_date < enrollment.created < timezone.now()):
                 content_availability_date = enrollment.created
     except CourseEnrollment.schedule.RelatedObjectDoesNotExist:
-        content_availability_date = max(enrollment.created, course.start)
+        content_availability_date = max(enrollment.created, course.start_date)
 
     return content_availability_date + access_duration
 

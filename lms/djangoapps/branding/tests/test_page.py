@@ -177,7 +177,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
             number='1001',
             display_name='Starting earlier, Announced earlier',
             metadata={
-                'start': datetime.datetime.now(UTC) + datetime.timedelta(days=2),
+                'start_date': datetime.datetime.now(UTC) + datetime.timedelta(days=2),
                 'announcement': datetime.datetime.now(UTC) + datetime.timedelta(days=1),
             },
             emit_signals=True,

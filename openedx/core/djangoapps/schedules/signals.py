@@ -181,7 +181,7 @@ def _create_schedule(enrollment, enrollment_created):
 
     # This represents the first date at which the learner can access the content. This will be the latter of
     # either the enrollment date or the course's start date.
-    content_availability_date = max(enrollment.created, enrollment.course_overview.start)
+    content_availability_date = max(enrollment.created, enrollment.course_overview.start_date)
     upgrade_deadline = _calculate_upgrade_deadline(enrollment.course_id, content_availability_date)
     experience_type = _get_experience_type(enrollment)
 

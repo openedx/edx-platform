@@ -168,8 +168,8 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         course_about_accessor = lambda object, field_name: CourseDetails.fetch_about_attribute(object.id, field_name)
 
         others_to_test = [
-            ('start', time_field_accessor, time_field_accessor),
-            ('end', time_field_accessor, time_field_accessor),
+            ('start_date', time_field_accessor, time_field_accessor),
+            ('end_date', time_field_accessor, time_field_accessor),
             ('enrollment_start', time_field_accessor, time_field_accessor),
             ('enrollment_end', time_field_accessor, time_field_accessor),
             ('announcement', time_field_accessor, time_field_accessor),
@@ -209,8 +209,8 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         [
             {
                 "display_name": "Test Course",              # Display name provided
-                "start": LAST_WEEK,                         # In the middle of the course
-                "end": NEXT_WEEK,
+                "start_date": LAST_WEEK,                    # In the middle of the course
+                "end_date": NEXT_WEEK,
                 "announcement": LAST_MONTH,                 # Announcement date provided
                 "advertised_start": "2015-01-01 11:22:33",  # Parse-able advertised_start
                 "pre_requisite_courses": [                  # Has pre-requisites
@@ -222,8 +222,8 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
             },
             {
                 "display_name": "",                         # Empty display name
-                "start": NEXT_WEEK,                         # Course hasn't started yet
-                "end": NEXT_MONTH,
+                "start_date": NEXT_WEEK,                         # Course hasn't started yet
+                "end_date": NEXT_MONTH,
                 "advertised_start": "Very Soon!",           # Not parse-able advertised_start
                 "pre_requisite_courses": [],                # No pre-requisites
                 "static_asset_path": "my/relative/path",    # Relative asset path
@@ -232,8 +232,8 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
             },
             {
                 "display_name": "",                         # Empty display name
-                "start": LAST_MONTH,                        # Course already ended
-                "end": LAST_WEEK,
+                "start_date": LAST_MONTH,                        # Course already ended
+                "end_date": LAST_WEEK,
                 "advertised_start": None,                   # No advertised start
                 "pre_requisite_courses": [],                # No pre-requisites
                 "static_asset_path": "",                    # Empty asset path
@@ -242,8 +242,8 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
             },
             {
                 #                                           # Don't set display name
-                "start": 'default_start_date',              # Default start and end dates
-                "end": None,
+                "start_date": 'default_start_date',              # Default start and end dates
+                "end_date": None,
                 "advertised_start": None,                   # No advertised start
                 "pre_requisite_courses": [],                # No pre-requisites
                 "static_asset_path": None,                  # No asset path
@@ -265,8 +265,8 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
                 course in.
         """
         kwargs = course_kwargs.copy()
-        kwargs['start'] = self.DATES[course_kwargs['start']]
-        kwargs['end'] = self.DATES[course_kwargs['end']]
+        kwargs['start_date'] = self.DATES[course_kwargs['start_date']]
+        kwargs['end_date'] = self.DATES[course_kwargs['end_date']]
         if 'announcement' in course_kwargs:
             kwargs['announcement'] = self.DATES[course_kwargs['announcement']]
         # Note: We specify a value for 'run' here because, for some reason,

@@ -71,7 +71,7 @@ class CourseEntitlementPolicy(models.Model):
             return days_until_expiry
         course_overview = CourseOverview.get_from_id(entitlement.enrollment_course_run.course_id)
         # Compute the days left for the regain
-        days_since_course_start = (now_timestamp - course_overview.start).days
+        days_since_course_start = (now_timestamp - course_overview.start_date).days
         days_since_enrollment = (now_timestamp - entitlement.enrollment_course_run.created).days
         days_since_entitlement_created = (now_timestamp - entitlement.created).days
 

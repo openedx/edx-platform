@@ -576,7 +576,7 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         global_config = DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
         course = create_self_paced_course_run(days_till_start=3)
         overview = CourseOverview.get_from_id(course.id)
-        expected = overview.start + timedelta(days=global_config.deadline_days)
+        expected = overview.start_date + timedelta(days=global_config.deadline_days)
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
         block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
         self.assertEqual(block.date, expected)
