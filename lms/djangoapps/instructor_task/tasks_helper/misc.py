@@ -24,6 +24,7 @@ from util.file import UniversalNewlineIterator
 
 from .runner import TaskProgress
 from .utils import UPDATE_STATUS_FAILED, UPDATE_STATUS_SUCCEEDED, upload_csv_to_report_store
+from .enrollments import enroll_user_to_course
 
 # define different loggers for use within tasks and on client side
 TASK_LOG = logging.getLogger('edx.celery.task')
@@ -232,6 +233,95 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
     ]
     output_rows.insert(0, output_header)
     upload_csv_to_report_store(output_rows, 'cohort_results', course_id, start_date)
+
+    return task_progress.update_task_state(extra_meta=current_step)
+
+
+def bulk_enroll_students_and_upload(_xmodule_instance_args, _entry_id, course_id, task_input, action_name):
+    """
+    Within a given course, enroll students in bulk, then upload the results
+    using a `ReportStore`.
+    """
+    start_time = time()
+    start_date = datetime.now(UTC)
+
+    # Iterate through rows to get total assignments for task progress
+    with DefaultStorage().open(task_input['file_name']) as f:
+        total_assignments = 0
+        for _line in unicodecsv.DictReader(UniversalNewlineIterator(f)):
+            total_assignments += 1
+
+    task_progress = TaskProgress(action_name, total_assignments, start_time)
+    current_step = {'step': 'Bulk Enrollment of Students'}
+    task_progress.update_task_state(extra_meta=current_step)
+
+    # enrollments_status is a mapping from course enrollments.
+    # The metadata will include information about users successfully enrolled
+    # to the course, users not found, already enrolled user
+    enrollments_status = {
+        'Course ID': course_id,
+        'Learners Enrolled': 0,
+        'Learners Not Found': set(),
+        'Learners Already Enrolled': set(),
+        'Learners Failed To Enroll': set(),
+    }
+
+    with DefaultStorage().open(task_input['file_name']) as f:
+        for row in unicodecsv.DictReader(UniversalNewlineIterator(f), encoding='utf-8'):
+            # Try to use the 'email' field to identify the user.  If it's not present, use 'username'.
+            username_or_email = row.get('email') or row.get('username')
+            task_progress.attempted += 1
+
+            try:
+                # If enroll_user_to_course successfully enrolls a user or user
+                # is already enrolled, a user object is returned.
+                # If it is not registered, no user object is returned.
+                (user, user_already_enrolled) = enroll_user_to_course(
+                    _xmodule_instance_args['request_info'], course_id, username_or_email
+                )
+
+                if user and user_already_enrolled:
+                    enrollments_status['Learners Already Enrolled'].add(username_or_email)
+                    task_progress.skipped += 1
+                elif user and not user_already_enrolled:
+                    enrollments_status['Learners Enrolled'] += 1
+                    task_progress.succeeded += 1
+                else:
+                    enrollments_status['Learners Not Found'].add(username_or_email)
+                    task_progress.skipped += 1
+            except:  # pylint: disable=bare-except
+                TASK_LOG.exception(
+                    u'Exception enrolling user %s in course %s via CSV bulk enrollment',
+                    username_or_email,
+                    course_id
+                )
+                enrollments_status['Learners Failed To Enroll'].add(username_or_email)
+                task_progress.failed += 1
+
+            task_progress.update_task_state(extra_meta=current_step)
+
+    current_step['step'] = 'Uploading CSV'
+    task_progress.update_task_state(extra_meta=current_step)
+
+    # Filter the output of `bulk_enroll_users_to_course` in order to upload the result.
+    output_header = [
+        'Learners Enrolled', 'Learners Not Found', 'Learners Already Enrolled', 'Learners Failed To Enroll',
+    ]
+
+    output_rows = [
+        [
+            ','.join(enrollments_status.get(column_name, '')) if (
+                column_name == 'Learners Not Found'
+                or column_name == 'Learners Already Enrolled'
+                or column_name == 'Learners Failed To Enroll'
+            )
+            else enrollments_status[column_name]
+            for column_name in output_header
+        ]
+    ]
+
+    output_rows.insert(0, output_header)
+    upload_csv_to_report_store(output_rows, 'bulk_enrollment_results', course_id, start_date)
 
     return task_progress.update_task_state(extra_meta=current_step)
 

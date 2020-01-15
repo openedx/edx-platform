@@ -24,6 +24,7 @@ from lms.djangoapps.instructor_task.api_helper import (
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.tasks import (
     override_problem_score,
+    bulk_users_enrollments,
     calculate_grades_csv,
     calculate_may_enroll_csv,
     calculate_problem_grade_report,
@@ -455,6 +456,20 @@ def submit_cohort_students(request, course_key, file_name):
     task_class = cohort_students
     task_input = {'file_name': file_name}
     task_key = ""
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def submit_bulk_users_enrollments(request, course_key, file_name):
+    """
+    Request to have users enrolled in bulk.
+
+    Raises "AlreadyRunningError" if users are currently being enrolled.
+    """
+    task_type = 'bulk_users_enrollments'
+    task_class = bulk_users_enrollments
+    task_input = {'file_name': file_name}
+    task_key = ''
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 

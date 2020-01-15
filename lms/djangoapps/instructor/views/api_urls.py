@@ -80,6 +80,9 @@ urlpatterns = [
     # Cohort management
     url(r'add_users_to_cohorts$', api.add_users_to_cohorts, name='add_users_to_cohorts'),
 
+    # Bulk enrollment management
+    url(r'enroll_users_to_course$', api.bulk_enroll_users_to_course, name='bulk_enroll_users_to_course'),
+
     # Certificates
     url(r'^generate_example_certificates$', api.generate_example_certificates, name='generate_example_certificates'),
     url(r'^enable_certificate_generation$', api.enable_certificate_generation, name='enable_certificate_generation'),

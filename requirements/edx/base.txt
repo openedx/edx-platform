@@ -19,6 +19,7 @@ git+https://github.com/jazzband/django-pipeline.git@d068a019169c9de5ee20ece041a6
 git+https://github.com/edx/django-rest-framework-oauth.git@0a43e8525f1e3048efe4bc70c03de308a277197c#egg=djangorestframework-oauth==1.1.1
 git+https://github.com/edx/django-rest-framework.git@1ceda7c086fddffd1c440cc86856441bbf0bd9cb#egg=djangorestframework==3.6.3
 -e git+https://github.com/edx/DoneXBlock.git@01a14f3bd80ae47dd08cdbbe2f88f3eb88d00fba#egg=done-xblock
+-e git+https://github.com/edly-io/xblock-video.git@dev#egg=video_xblock
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
 git+https://github.com/mitodl/edx-sga.git@3828ba9e413080a81b907a3381e5ffa05e063f81#egg=edx-sga==0.8.3
 git+https://github.com/edx/xblock-lti-consumer.git@v1.1.8#egg=lti_consumer-xblock==1.1.8
