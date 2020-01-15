@@ -278,7 +278,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         gating_mock_1_2.return_value.required_prereq.return_value = True
         gating_mock_1_2.return_value.compute_is_prereq_met.return_value = [
             False,
-            {'url': 'PrereqUrl', 'display_name': 'PrereqSectionName'}
+            {'url': 'PrereqUrl', 'display_name': 'PrereqSectionName', 'id': 'mockId'}
         ]
         self.sequence_1_2.xmodule_runtime._services['gating'] = gating_mock_1_2  # pylint: disable=protected-access
         self.sequence_1_2.display_name = 'sequence_1_2'
@@ -342,6 +342,16 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
             {'usage_key': usage_key}
         )
         self.assertIs(completion_return, None)
+
+    def test_handle_ajax_metadata(self):
+        """
+        Test that the sequence metadata is returned from the
+        metadata ajax handler.
+        """
+        metadata = json.loads(self.sequence_3_1.handle_ajax('metadata', {}))
+        self.assertEqual(len(metadata['items']), 3)
+        self.assertEqual(metadata['tag'], 'sequential')
+        self.assertEqual(metadata['display_name'], self.sequence_3_1.display_name_with_default)
 
     def get_context_dict_from_string(self, data):
         """
