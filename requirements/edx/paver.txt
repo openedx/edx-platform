@@ -22,7 +22,7 @@ pymongo==3.9.0
 python-memcached==1.59
 pyyaml==5.3               # via watchdog
 requests==2.22.0
-six==1.13.0               # via edx-opaque-keys, libsass, mock, paver, python-memcached, stevedore
+six==1.14.0               # via edx-opaque-keys, libsass, mock, paver, python-memcached, stevedore
 stevedore==1.31.0
 urllib3==1.25.7           # via requests
 watchdog==0.9.0
