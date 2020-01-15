@@ -3,6 +3,7 @@ import unittest
 from mock import patch
 from pymongo.errors import ConnectionFailure
 
+from xmodule.exceptions import HeartbeatFailure
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
 from xmodule.exceptions import HeartbeatFailure
 

@@ -4,7 +4,6 @@ Common MongoDB connection functions.
 import logging
 
 import pymongo
-from pymongo import ReadPreference
 from mongodb_proxy import MongoProxy
 from pymongo.read_preferences import (
     ReadPreference,

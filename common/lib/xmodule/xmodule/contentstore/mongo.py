@@ -301,12 +301,14 @@ class MongoContentStore(ContentStore):
         # Set values if result of query is empty
         count = 0
         assets = []
-
-        if cursor.alive:
+        try:
             result = cursor.next()
             if result:
                 count = result['count']
                 assets = list(result['results'])
+        except StopIteration:
+            # Skip if no assets were returned
+            pass
 
         # We're constructing the asset key immediately after retrieval from the database so that
         # callers are insulated from knowing how our identifiers are stored.
