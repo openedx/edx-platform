@@ -2388,6 +2388,9 @@ INSTALLED_APPS = [
     # Badges app
     'openedx.features.badging',
 
+    # Specializations app
+    'openedx.features.specializations',
+
     # On demand course email preferences
     'openedx.features.ondemand_email_preferences',
 

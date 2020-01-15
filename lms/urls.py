@@ -93,6 +93,7 @@ urlpatterns = [
     url(r'', include('openedx.features.partners.urls')),
     url(r'', include('openedx.features.philu_courseware.urls')),
     url(r'', include('openedx.features.badging.urls')),
+    url(r'', include('openedx.features.specializations.urls')),
 
     # Event tracking endpoints
     url(r'', include('track.urls')),
