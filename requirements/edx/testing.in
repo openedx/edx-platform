@@ -25,7 +25,8 @@ ddt                       # Run a test case multiple times with different input;
 edx-i18n-tools>=0.4.6     # Commands for developers and translators to extract, compile and validate translations
 edx-lint==1.3.0           # pylint extensions for Open edX repositories
 factory_boy==2.8.1        # Library for creating test fixtures, used in many tests
-freezegun                 # Allows tests to mock the output of assorted datetime module functions
+# Pinning the freezegun version because 0.3.13 is causing failures which have also been reported on the git repo by public.
+freezegun==0.3.12         # Allows tests to mock the output of assorted datetime module functions
 httpretty                 # Library for mocking HTTP requests, used in many tests
 isort                     # For checking and fixing the order of imports
 moto==1.3.1               # Lets tests mock AWS access via the boto library
