@@ -599,14 +599,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         Closes any open connections to the underlying database
         """
-        self.collection.database.connection.close()
-
-    def mongo_wire_version(self):
-        """
-        Returns the wire version for mongo. Only used to unit tests which instrument the connection.
-        """
-        self.database.connection._ensure_connected()
-        return self.database.connection.max_wire_version
+        self.collection.database.client.close()
 
     def _drop_database(self, database=True, collections=True, connections=True):
         """
@@ -623,14 +616,14 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # drop the assets
         super(MongoModuleStore, self)._drop_database(database, collections, connections)
 
-        connection = self.collection.database.connection
+        connection = self.collection.database.client
 
         if database:
             connection.drop_database(self.collection.database.proxied_object)
         elif collections:
             self.collection.drop()
         else:
-            self.collection.remove({})
+            self.collection.delete_many({})
 
         if connections:
             connection.close()
@@ -1908,8 +1901,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             dest_course_key (CourseKey): identifier of course to copy to
         """
         source_assets = self._find_course_assets(source_course_key)
-        dest_assets = {'assets': source_assets.asset_md.copy(), 'course_id': unicode(dest_course_key)}
-        self.asset_collection.remove({'course_id': unicode(dest_course_key)})
+        dest_assets = {'assets': source_assets.asset_md.copy(), 'course_id': six.text_type(dest_course_key)}
+        self.asset_collection.delete_many({'course_id': six.text_type(dest_course_key)})
         # Update the document.
         self.asset_collection.insert(dest_assets)
 
@@ -1981,7 +1974,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # A single document exists per course to store the course asset metadata.
         try:
             course_assets = self._find_course_assets(course_key)
-            self.asset_collection.remove(course_assets.doc_id)
+            self.asset_collection.delete_many({'_id': course_assets.doc_id})
         except ItemNotFoundError:
             # When deleting asset metadata, if a course's asset metadata is not present, no big deal.
             pass
@@ -1990,9 +1983,11 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         Check that the db is reachable.
         """
-        if self.database.connection.alive():
+        try:
+            # The ismaster command is cheap and does not require auth.
+            self.database.client.admin.command('ismaster')
             return {ModuleStoreEnum.Type.mongo: True}
-        else:
+        except pymongo.errors.ConnectionFailure:
             raise HeartbeatFailure("Can't connect to {}".format(self.database.name), 'mongo')
 
     def ensure_indexes(self):

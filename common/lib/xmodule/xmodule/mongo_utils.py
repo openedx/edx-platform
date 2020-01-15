@@ -4,10 +4,19 @@ Common MongoDB connection functions.
 import logging
 
 import pymongo
-from pymongo import ReadPreference
 from mongodb_proxy import MongoProxy
+from pymongo.read_preferences import (
+    ReadPreference,
+    read_pref_mode_from_name,
+    _MONGOS_MODES,
+    _MODES
+)
+
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
+
+# This will yeld a map of all available Mongo modes and their name
+MONGO_READ_PREFERENCE_MAP = dict(zip(_MONGOS_MODES, _MODES))
 
 
 # pylint: disable=bad-continuation
@@ -34,10 +43,19 @@ def connect_to_mongodb(
         # No 'replicaSet' in kwargs - so no secondary reads.
         mongo_client_class = pymongo.MongoClient
 
-    # If read_preference is given as a name of a valid ReadPreference.<NAME> constant
-    # such as "SECONDARY_PREFERRED", convert it. Otherwise pass it through unchanged.
+    # If the MongoDB server uses a separate authentication database that should be specified here
+    auth_source = kwargs.pop('auth_source', '') or None
+
+    # If read_preference is given as a name of a valid ReadPreference.<NAME>
+    # constant such as "SECONDARY_PREFERRED" or a mongo mode such as
+    # "secondaryPreferred", convert it. Otherwise pass it through unchanged.
     if 'read_preference' in kwargs:
-        read_preference = getattr(ReadPreference, kwargs['read_preference'], None)
+        read_preference = MONGO_READ_PREFERENCE_MAP.get(
+            kwargs['read_preference'],
+            kwargs['read_preference']
+        )
+
+        read_preference = getattr(ReadPreference, read_preference, None)
         if read_preference is not None:
             kwargs['read_preference'] = read_preference
 
@@ -58,9 +76,14 @@ def connect_to_mongodb(
             wait_time=retry_wait_time
         )
 
+    # default the authSource to be whatever db we are connecting to (for backwards compatiblity)
+    authSource = db
+    if kwargs.get('authSource'):
+        authSource = kwargs.get('authSource')
+
     # If credentials were provided, authenticate the user.
     if user is not None and password is not None:
-        mongo_conn.authenticate(user, password)
+        mongo_conn.authenticate(user, password, authSource)
 
     return mongo_conn
 
