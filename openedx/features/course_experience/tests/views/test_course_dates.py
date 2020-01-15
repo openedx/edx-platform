@@ -41,7 +41,6 @@ class TestCourseDatesFragmentView(ModuleStoreTestCase):
 
     def test_course_dates_fragment(self):
         response = self.client.get(self.dates_fragment_url)
-        self.assertContains(response, 'Today is')
         self.assertContains(response, 'Course End')
 
         self.client.logout()

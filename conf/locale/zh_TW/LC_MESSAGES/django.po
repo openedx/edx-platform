@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (Taiwan) (http://www.transifex.com/open-edx/edx-platform/language/zh_TW/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -44,7 +44,7 @@
 # 陳子琦 <christtabris@gmail.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (Taiwan) (http://www.transifex.com/open-edx/edx-platform/language/zh_TW/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -72,7 +72,7 @@
 # Zhen-Rong Chen <zhenrc@gmail.com>, 2014-2015
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (Taiwan) (http://www.transifex.com/open-edx/edx-platform/language/zh_TW/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -114,7 +114,7 @@
 # 薛念林 <nlhsueh@mail.fcu.edu.tw>, 2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (Taiwan) (http://www.transifex.com/open-edx/edx-platform/language/zh_TW/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -151,7 +151,7 @@
 # KUN-MIN SYU <qwer20108@gmail.com>, 2014
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (Taiwan) (http://www.transifex.com/open-edx/edx-platform/language/zh_TW/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -166,9 +166,9 @@
 # Ya-chi Chang <yacchang@mail.fcu.edu.tw>, 2016
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (Taiwan) (https://www.transifex.com/open-edx/teams/6205/zh_TW/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # Translators:
 # Waheed Ahmed <waheed@edx.org>, 2019
@@ -177,7 +177,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-12-29 20:42+0000\n"
+"POT-Creation-Date: 2020-01-12 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Chinese (Taiwan) (https://www.transifex.com/open-edx/teams/6205/zh_TW/)\n"
@@ -6622,6 +6622,7 @@ msgid "Cohort"
 msgstr "學習夥伴"
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Team"
 msgstr "團隊"
 
@@ -7526,6 +7527,20 @@ msgstr "(略過{skipped})"
 #, python-brace-format
 msgid " (out of {total})"
 msgstr "(out of {total})"
+
+#: lms/djangoapps/learner_dashboard/programs.py
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/learner_dashboard/programs.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Programs"
+msgstr ""
+
+#: lms/djangoapps/learner_dashboard/programs.py
+#: lms/templates/learner_dashboard/program_details.html
+msgid "Program Details"
+msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
@@ -11158,10 +11173,6 @@ msgid "enabled_as_of must be set when enabled is True"
 msgstr ""
 
 #: openedx/features/content_type_gating/partitions.py
-msgid "Feature-based Enrollments"
-msgstr ""
-
-#: openedx/features/content_type_gating/partitions.py
 msgid "Partition for segmenting users by access to gated content types"
 msgstr ""
 
@@ -11326,8 +11337,8 @@ msgstr ""
 #, no-python-format, python-brace-format
 msgid ""
 "{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% "
-"[{strikeout_price}]{span_close}{br}Discount will be automatically applied at"
-" checkout. {a_open}Upgrade Now{a_close}{div_close}"
+"[{strikeout_price}]{span_close}{br}Use code {b_open}{code}{b_close} at "
+"checkout! {a_open}Upgrade Now{a_close}{div_close}"
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py
@@ -16544,14 +16555,6 @@ msgstr ""
 "{begin_strong}警告:{end_strong} 您的瀏覽器僅部分支援。強烈建議您使用 {chrome_link} 或 {ff_link}。"
 
 #: lms/templates/header/navbar-authenticated.html
-#: lms/templates/learner_dashboard/programs.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Programs"
-msgstr ""
-
-#: lms/templates/header/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr ""
@@ -18202,10 +18205,6 @@ msgstr ""
 msgid "My Courses"
 msgstr "我的課程"
 
-#: lms/templates/learner_dashboard/program_details.html
-msgid "Program Details"
-msgstr ""
-
 #: lms/templates/learner_dashboard/text-me-fragment.html
 msgid "Get the {platform_name} Mobile App!"
 msgstr ""
@@ -18458,6 +18457,13 @@ msgstr "重設您的 {platform_name} 密碼"
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Invalid Password Reset Link"
 msgstr "密碼重設連結無效"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid ""
+"This password reset link is invalid. It may have been used already. To reset"
+" your password, go to the {start_link}sign-in{end_link} page and select "
+"{start_strong}Forgot password{end_strong}."
+msgstr ""
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"

@@ -5,6 +5,7 @@ Utility functions for working with discounts and discounted pricing.
 from datetime import datetime
 
 import six
+from django.utils.translation import get_language
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import RequestCache
 import pytz
@@ -14,7 +15,7 @@ from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_lin
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from experiments.models import ExperimentData
 
-from openedx.core.djangolib.markup import HTML
+from openedx.core.djangolib.markup import HTML, Text
 from web_fragments.fragment import Fragment
 from openedx.features.discounts.applicability import (
     can_receive_discount,
@@ -119,7 +120,7 @@ def generate_offer_html(user, course):
                 can_receive_discount(user=user, course=course, discount_expiration_date=discount_expiration_date)):
             # Translator: xgettext:no-python-format
             offer_message = _(u'{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% '
-                              u'[{strikeout_price}]{span_close}{br}Discount will be automatically applied at checkout. '
+                              u'[{strikeout_price}]{span_close}{br}Use code {b_open}{code}{b_close} at checkout! '
                               u'{a_open}Upgrade Now{a_close}{div_close}')
 
             message_html = HTML(offer_message).format(
@@ -127,6 +128,9 @@ def generate_offer_html(user, course):
                     upgrade_link=verified_upgrade_deadline_link(user=user, course=course)
                 ),
                 a_close=HTML('</a>'),
+                b_open=HTML('<b>'),
+                code=Text('BIENVENIDOAEDX') if get_language() == 'es-419' else Text('EDXWELCOME'),
+                b_close=HTML('</b>'),
                 br=HTML('<br>'),
                 banner_open=HTML(
                     '<div class="first-purchase-offer-banner" role="note">'

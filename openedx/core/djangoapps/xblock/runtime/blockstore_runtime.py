@@ -85,15 +85,8 @@ class BlockstoreXBlockRuntime(XBlockRuntime):
         This runtime API should normally be used via
         runtime.get_block() -> block.parse_xml() -> runtime.add_node_as_child
         """
-        parent_usage = block.scope_ids.usage_id
-        parent_definition = block.scope_ids.def_id
-        learning_context = get_learning_context_impl(parent_usage)
         parsed_include = parse_xblock_include(node)
-        usage_key = learning_context.usage_for_child_include(parent_usage, parent_definition, parsed_include)
-        block.children.append(usage_key)
-        if parent_definition.draft_name:
-            # Store the <xblock-include /> data which we'll need later if saving changes to this block
-            self.child_includes_of(block).append(parsed_include)
+        self.add_child_include(block, parsed_include)
 
     def add_child_include(self, block, parsed_include):
         """
@@ -103,33 +96,15 @@ class BlockstoreXBlockRuntime(XBlockRuntime):
         modify block.children to append a usage ID, since that doesn't provide
         enough information to serialize the block's <xblock-include /> elements.
         """
-        learning_context = get_learning_context_impl(block.scope_ids.usage_id)
-        child_usage_key = learning_context.usage_for_child_include(
-            block.scope_ids.usage_id, block.scope_ids.def_id, parsed_include,
-        )
-        block.children.append(child_usage_key)
-        self.child_includes_of(block).append(parsed_include)
+        self.system.children_data_store.append_include(block, parsed_include)
+        block.children = self.system.children_data_store.get(block, 'children')
 
     def child_includes_of(self, block):
         """
-        Get the (mutable) list of <xblock-include /> directives that define the
-        children of this block's definition.
+        Get the list of <xblock-include /> directives that define the children
+        of this block's definition.
         """
-        # A hack: when serializing an XBlock, we need to re-create the <xblock-include definition="..." usage="..." />
-        # elements that were in its original XML. But doing so requires the usage="..." hint attribute, which is
-        # technically part of the parent definition but which is not otherwise stored anywhere; we only have the derived
-        # usage_key, but asking the learning context to transform the usage_key back to the usage="..." hint attribute
-        # is non-trivial and could lead to bugs, because it could happen differently if the same parent definition is
-        # used in a library compared to a course (each would have different usage keys for the same usage hint).
-        # So, if this is a draft XBlock (we are editing it), we store the actual parsed <xblock-includes> so we can
-        # re-use them exactly when serializing this block back to XML.
-        # This implies that changes to an XBlock's children cannot be made by manipulating the .children field and
-        # then calling save().
-        assert block.scope_ids.def_id.draft_name, "Manipulating includes is only relevant for draft XBlocks."
-        attr_name = "children_includes_{}".format(id(block))  # Force use of this accessor method
-        if not hasattr(block, attr_name):
-            setattr(block, attr_name, [])
-        return getattr(block, attr_name)
+        return self.system.children_data_store.get_includes(block)
 
     def save_block(self, block):
         """

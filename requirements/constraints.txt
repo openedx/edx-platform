@@ -31,6 +31,9 @@ drf-yasg==1.16
 # acceptance.tests.lms.test_lms_course_discovery.CourseDiscoveryTest.test_search
 edx-search==1.2.2
 
+# Version 0.3.13 broke the timing returned by python3-saml OneLogin_Saml2_Utils.now()
+freezegun==0.3.12
+
 # 4.0.0 dropped support for Python 3.5
 inflect<4.0.0
 
@@ -70,3 +73,6 @@ python3-saml==1.5.0
 # transifex-client 0.13.5 and 0.13.6 pin six and urllib3 to old versions needlessly
 #   https://github.com/transifex/transifex-client/issues/252
 transifex-client==0.13.4
+
+# freezegun 0.3.13 is breaking a test: https://github.com/spulec/freezegun/issues/326
+freezegun==0.3.12

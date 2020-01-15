@@ -180,15 +180,15 @@ if settings.WIKI_ENABLED:
     from course_wiki import views as course_wiki_views
     from django_notify.urls import get_pattern as notify_pattern
 
-    wiki_url_patterns, wiki_app_name, wiki_namespace = wiki_pattern()
-    notify_url_patterns, notify_app_name, notify_namespace = notify_pattern()
+    wiki_url_patterns, wiki_app_name = wiki_pattern()
+    notify_url_patterns, notify_app_name = notify_pattern()
 
     urlpatterns += [
         # First we include views from course_wiki that we use to override the default views.
         # They come first in the urlpatterns so they get resolved first
         url('^wiki/create-root/$', course_wiki_views.root_create, name='root_create'),
-        url(r'^wiki/', include((wiki_url_patterns, wiki_app_name), namespace=wiki_namespace)),
-        url(r'^notify/', include((notify_url_patterns, notify_app_name), namespace=notify_namespace)),
+        url(r'^wiki/', include((wiki_url_patterns, wiki_app_name), namespace='wiki')),
+        url(r'^notify/', include((notify_url_patterns, notify_app_name), namespace='notify')),
 
         # These urls are for viewing the wiki in the context of a course. They should
         # never be returned by a reverse() so they come after the other url patterns

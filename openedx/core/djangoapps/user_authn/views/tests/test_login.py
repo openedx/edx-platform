@@ -616,6 +616,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         },
     )
     @ddt.unpack
+    @skip_unless_lms
     def test_login_for_user_auth_flow(
         self,
         switch_enabled,
@@ -629,6 +630,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         Verify that `login._check_user_auth_flow` works as expected.
         """
         provider = 'Google'
+        provider_tpa_hint = 'saml-test'
         username = 'batman'
         user_email = '{username}@{domain}'.format(username=username, domain=user_domain)
         user = self._create_user(username, user_email)
@@ -636,6 +638,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             'SITE_NAME': allowed_domain,
             'THIRD_PARTY_AUTH_ONLY_DOMAIN': allowed_domain,
             'THIRD_PARTY_AUTH_ONLY_PROVIDER': provider,
+            'THIRD_PARTY_AUTH_ONLY_HINT': provider_tpa_hint,
         }
 
         with ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY.override(switch_enabled):
@@ -647,10 +650,14 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
                 else:
                     AllowedAuthUser.objects.filter(site=site, email=user.email).delete()
 
-                value = None if success else u'As an {0} user, You must login with your {0} {1} account.'.format(
-                    allowed_domain,
-                    provider
-                )
+                if success:
+                    value = None
+                else:
+                    value = u'As {0} user, You must login with your {0} <a href=\'{1}\'>{2} account</a>.'.format(
+                        allowed_domain,
+                        '{}?tpa_hint={}'.format(reverse("dashboard"), provider_tpa_hint),
+                        provider,
+                    )
                 response, __ = self._login_response(user.email, self.password)
                 self._assert_response(
                     response,

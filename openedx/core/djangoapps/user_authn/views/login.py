@@ -16,6 +16,7 @@ from django.contrib.auth import login as django_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
@@ -292,11 +293,19 @@ def _check_user_auth_flow(site, user):
 
         # If user belongs to allowed domain and not whitelisted then user must login through allowed domain SSO
         if user_domain == allowed_domain and not AllowedAuthUser.objects.filter(site=site, email=user.email).exists():
-            msg = _(
-                u'As an {allowed_domain} user, You must login with your {allowed_domain} {provider} account.'
-            ).format(
+            msg = Text(_(
+                u'As {allowed_domain} user, You must login with your {allowed_domain} '
+                u'{link_start}{provider} account{link_end}.'
+            )).format(
                 allowed_domain=allowed_domain,
-                provider=site.configuration.get_value('THIRD_PARTY_AUTH_ONLY_PROVIDER')
+                link_start=HTML("<a href='{tpa_provider_link}'>").format(
+                    tpa_provider_link='{dashboard_url}?tpa_hint={tpa_hint}'.format(
+                        dashboard_url=reverse('dashboard'),
+                        tpa_hint=site.configuration.get_value('THIRD_PARTY_AUTH_ONLY_HINT'),
+                    )
+                ),
+                provider=site.configuration.get_value('THIRD_PARTY_AUTH_ONLY_PROVIDER'),
+                link_end=HTML("</a>")
             )
             raise AuthFailedError(msg)
 

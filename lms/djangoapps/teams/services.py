@@ -6,9 +6,9 @@ from django.urls import reverse
 
 class TeamsService(object):
     """ Functions to provide teams functionality to XBlocks"""
-    def get_team(self, user, course_id):
+    def get_team(self, user, course_id, topic_id):
         from . import api
-        return api.get_team_for_user_and_course(user, course_id)
+        return api.get_team_for_user_course_topic(user, course_id, topic_id)
 
     def get_team_detail_url(self, team):
         """ Returns the url to the detail view for the given team """
