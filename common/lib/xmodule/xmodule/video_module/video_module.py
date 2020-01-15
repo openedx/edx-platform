@@ -617,6 +617,8 @@ class VideoBlock(
         video_block = runtime.construct_xblock_from_class(cls, keys)
         field_data = cls.parse_video_xml(node)
         for key, val in field_data.items():
+            if key not in cls.fields:
+                continue  # parse_video_xml returns some old non-fields like 'source'
             setattr(video_block, key, cls.fields[key].from_json(val))
         # Don't use VAL in the new runtime:
         video_block.edx_video_id = None
