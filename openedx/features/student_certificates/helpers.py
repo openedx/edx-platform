@@ -5,6 +5,7 @@ import shutil
 
 from boto.s3.key import Key
 from django.conf import settings
+from django.urls import reverse
 from PIL import Image
 from tempfile import TemporaryFile
 
@@ -15,6 +16,7 @@ from constants import (
     PDFKIT_HTML_STRING,
     PDFKIT_IMAGE_TAG,
     PDFKIT_OPTIONS,
+    PREVIEW_CERTIFICATE_VERIFICATION_URL,
     SOCIAL_MEDIA_SHARE_URL_FMT,
     TMPDIR,
     TWITTER_META_TITLE_FMT,
@@ -156,3 +158,32 @@ def get_pdfkit_html(image_base64):
     :return: html
     """
     return PDFKIT_HTML_STRING.format(image_tag=PDFKIT_IMAGE_TAG.format(base64_img=image_base64))
+
+
+def override_update_certificate_context(request, context, course, user_certificate):
+    """
+    This method adds custom context to the certificate
+    :return: Updated context
+    """
+    border = request.GET.get('border', None)
+    if border and border == 'hide':
+        context['border_class'] = 'certificate-border-hide'
+    else:
+        context['border_class'] = ''
+
+    context['download_pdf'] = reverse('download_certificate_pdf',
+                                      kwargs={'certificate_uuid': user_certificate.verify_uuid})
+    context['social_sharing_urls'] = get_philu_certificate_social_context(course, user_certificate)
+
+    context['verification_url'] = get_verification_url(user_certificate)
+
+
+def get_verification_url(user_certificate):
+    verification_url = PREVIEW_CERTIFICATE_VERIFICATION_URL
+    if user_certificate.pk:
+        verification_url = '{}{}'.format(
+            settings.LMS_ROOT_URL,
+            user_certificate.certificate_verification_key.verification_url
+        )
+    return verification_url
+
