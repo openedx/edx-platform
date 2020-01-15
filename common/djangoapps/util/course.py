@@ -76,7 +76,17 @@ def has_certificates_enabled(course):
     return course.cert_html_view_enabled
 
 
-def should_display_grade(end_date):
-    if end_date and end_date < now().replace(hour=0, minute=0, second=0, microsecond=0):
+def should_display_grade(course_overview):
+    course_end_date = course_overview.end_date
+    cert_available_date = course_overview.certificate_available_date
+    current_date = now().replace(hour=0, minute=0, second=0, microsecond=0)
+
+    is_course_ended = course_end_date and course_end_date < current_date
+    conditional_vars = [is_course_ended]
+    if cert_available_date:
+        is_cert_available_date_passed = cert_available_date < current_date
+        conditional_vars.append(is_cert_available_date_passed)
+
+    if all(conditional_vars):
         return True
-    return False
+
