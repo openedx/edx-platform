@@ -37,15 +37,6 @@ freezegun==0.3.12
 # 4.0.0 dropped support for Python 3.5
 inflect<4.0.0
 
-# Pinned by moto to this but since moto is only a test requirement, we don't
-# see the constraint when generating base.txt
-#
-# There are incompatible versions in the resolved dependencies:
-#  jsondiff (from edx-enterprise==1.8.6->-r requirements/edx/base.txt (line 108))
-#  jsondiff==1.1.1 (from moto==1.2.0->-r requirements/edx/testing.in (line 33))
-#  jsondiff==1.2.0 (from -r requirements/edx/base.txt (line 146))
-jsondiff==1.1.1
-
 # Convert text markup to HTML; used in capa problems, forums, and course wikis; pin Markdown version as tests failed for its upgrade to the latest release
 Markdown==2.6.11
 
