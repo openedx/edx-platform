@@ -127,6 +127,7 @@ def get_course_overview_with_access(user, action, course_key, check_if_enrolled=
     except CourseOverview.DoesNotExist:
         raise Http404("Course not found.")
     check_course_access(course_overview, user, action, check_if_enrolled)
+    course_overview.effective_user = user
     return course_overview
 
 
