@@ -265,7 +265,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
                 course in.
         """
         kwargs = course_kwargs.copy()
-        kwargs['start_date'] = self.DATES[course_kwargs['start_date']]
+        kwargs['start'] = self.DATES[course_kwargs['start']]
         kwargs['end'] = self.DATES[course_kwargs['end']]
         if 'announcement' in course_kwargs:
             kwargs['announcement'] = self.DATES[course_kwargs['announcement']]
