@@ -85,7 +85,7 @@ class CourseOverviewSignalsTestCase(ModuleStoreTestCase):
 
     @patch('openedx.core.djangoapps.content.course_overviews.signals.COURSE_START_DATE_CHANGED.send')
     def test_start_changed(self, mock_signal):
-        self.assert_changed_signal_sent('start_date', self.TODAY, self.NEXT_WEEK, mock_signal)
+        self.assert_changed_signal_sent('start', self.TODAY, self.NEXT_WEEK, mock_signal)
 
     @patch('openedx.core.djangoapps.content.course_overviews.signals.COURSE_PACING_CHANGED.send')
     def test_pacing_changed(self, mock_signal):
