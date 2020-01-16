@@ -222,7 +222,6 @@ class MigrationTests(TestCase):
     Tests for migrations.
     """
 
-    @unittest.skip("Need to skip as part of renaming fields in course_overviews app. This will be unskipped in DE-1822")
     @override_settings(MIGRATION_MODULES={})
     def test_migrations_are_in_sync(self):
         """
