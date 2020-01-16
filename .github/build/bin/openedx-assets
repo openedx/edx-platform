@@ -1,0 +1,164 @@
+#! /usr/bin/env python
+from __future__ import print_function
+import argparse
+import os
+import subprocess
+import sys
+import traceback
+
+from path import Path
+
+from pavelib import assets
+from xmodule import static_content as xmodule_static_content
+
+
+DEFAULT_STATIC_ROOT = '/openedx/staticfiles'
+DEFAULT_THEMES_DIR = '/openedx/themes'
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Various assets processing/building/collection utility for Open edX"
+    )
+    subparsers = parser.add_subparsers()
+
+    npm = subparsers.add_parser('npm', help="Copy static assets from node_modules")
+    npm.set_defaults(func=run_npm)
+
+    build = subparsers.add_parser('build', help="Build all assets")
+    build.add_argument('-e', '--env', choices=['prod', 'dev'], default='prod')
+    build.add_argument('--theme-dirs', nargs='+', default=[DEFAULT_THEMES_DIR])
+    build.add_argument('--themes', nargs='+', default=['all'])
+    build.add_argument('-r', '--static-root', default=DEFAULT_STATIC_ROOT)
+    build.add_argument('--systems', nargs='+', default=['lms', 'cms'])
+    build.set_defaults(func=run_build)
+
+    xmodule = subparsers.add_parser('xmodule', help="Process assets from xmodule")
+    xmodule.set_defaults(func=run_xmodule)
+
+    webpack = subparsers.add_parser('webpack', help="Run webpack")
+    webpack.add_argument('-r', '--static-root', default=DEFAULT_STATIC_ROOT)
+    webpack.add_argument('-e', '--env', choices=['prod', 'dev'], default='prod')
+    webpack.set_defaults(func=run_webpack)
+
+    common = subparsers.add_parser('common', help="Compile static assets for common theme")
+    common.add_argument('--systems', nargs='+', default=['lms', 'cms'])
+    common.set_defaults(func=run_common)
+
+    themes = subparsers.add_parser('themes', help="Compile static assets for custom themes")
+    themes.add_argument('--theme-dirs', nargs='+', default=[DEFAULT_THEMES_DIR])
+    themes.add_argument('--themes', nargs='+', default=['all'])
+    themes.add_argument('--systems', nargs='+', default=['lms', 'cms'])
+    themes.set_defaults(func=run_themes)
+
+    collect = subparsers.add_parser('collect', help="Collect static assets to be served by webserver")
+    collect.add_argument('-s', '--settings', default=os.environ.get('SETTINGS'), help="Django settings module")
+    collect.add_argument('--systems', nargs='+', choices=['lms', 'cms'], default=['lms', 'cms'], help="Limit collection to lms or cms")
+    collect.set_defaults(func=run_collect)
+
+    watch_themes = subparsers.add_parser('watch-themes', help="Watch theme assets for changes and recompile on-the-fly")
+    watch_themes.add_argument('-e', '--env', choices=['prod', 'dev'], default='prod', help="Webpack target to run")
+    watch_themes.add_argument('--theme-dirs', default=[DEFAULT_THEMES_DIR])
+    watch_themes.set_defaults(func=run_watch_themes)
+
+    args = parser.parse_args()
+    args.func(args)
+
+def run_build(args):
+    run_xmodule(args)
+    run_npm(args)
+    run_webpack(args)
+    run_common(args)
+    run_themes(args)
+
+def run_xmodule(args):
+    sys.argv[1:] = ['common/static/xmodule']
+    xmodule_static_content.main()
+
+def run_npm(args):
+    assets.process_npm_assets()
+
+def run_webpack(args):
+    os.environ['STATIC_ROOT_LMS'] = args.static_root
+    os.environ['STATIC_ROOT_CMS'] = os.path.join(args.static_root, 'studio')
+    os.environ['NODE_ENV'] = {
+        'prod': 'production',
+        'dev': 'development',
+    }[args.env]
+    subprocess.call([
+        'webpack', '--config=webpack.{env}.config.js'.format(env=args.env)
+    ])
+
+def run_common(args):
+    for system in args.systems:
+        print("Compiling {} sass assets from common theme...".format(system))
+        assets._compile_sass(system, None, False, False, [])
+
+def run_themes(args):
+    for theme_dir in args.theme_dirs:
+        local_themes = list_subdirectories(theme_dir) if 'all' in args.themes else args.themes
+        for theme in local_themes:
+            theme_path = os.path.join(theme_dir, theme)
+            if os.path.exists(theme_path):
+                for system in args.systems:
+                    print("Compiling {} sass assets from theme {}...".format(system, theme_path))
+                    assets._compile_sass(system, Path(theme_path), False, False, [])
+
+def run_collect(args):
+    assets.collect_assets(args.systems, args.settings)
+
+def run_watch_themes(args):
+    """
+    Watch static assets for changes and re-compile those changes when
+    necessary. This piece of code is heavily inspired from the
+    edx-platform/pavelib/assets.py:watch_assets function, which could not be
+    used directly because it does not properly read the platform settings
+    environment variable.
+
+    Note that this function will only work for watching assets in development
+    mode. In production, watching changes does not make much sense anyway.
+    """
+    observer = assets.Observer()
+    for theme_dir in args.theme_dirs:
+        print("Watching changes in {}...".format(theme_dir))
+        ThemeWatcher(theme_dir).register(observer)
+    observer.start()
+    try:
+        while True:
+            observer.join(2)
+    except KeyboardInterrupt:
+        observer.stop()
+
+def list_subdirectories(path):
+    return [subpath for subpath in os.listdir(path) if os.path.isdir(os.path.join(path, subpath))]
+
+
+class ThemeWatcher(assets.SassWatcher):
+
+    def __init__(self, theme_dir):
+        super(ThemeWatcher, self).__init__()
+        self.theme_dir = theme_dir
+
+    #pylint: disable=arguments-differ
+    def register(self, observer):
+        return super(ThemeWatcher, self).register(observer, [self.theme_dir])
+
+    @assets.debounce()
+    def on_any_event(self, event):
+        components = os.path.relpath(event.src_path, self.theme_dir).split('/')
+        try:
+            theme = components[0]
+            system = components[1]
+        except IndexError:
+            return
+        try:
+            print("Detected change:", event.src_path)
+            print("\tRecompiling {} theme for {}".format(theme, system))
+            assets._compile_sass(system, Path(self.theme_dir) / theme, False, False, [])
+            print("\tDone recompiling {} theme for {}".format(theme, system))
+        except Exception: # pylint: disable=broad-except
+            traceback.print_exc()
+
+
+if __name__ == '__main__':
+    main()
