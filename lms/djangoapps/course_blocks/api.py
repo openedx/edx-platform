@@ -27,7 +27,7 @@ def has_individual_student_override_provider():
     return INDIVIDUAL_STUDENT_OVERRIDE_PROVIDER in getattr(settings, 'FIELD_OVERRIDE_PROVIDERS', ())
 
 
-def get_course_block_access_transformers(user):
+def get_course_block_access_transformers(user, grading=False):
     """
     Default list of transformers for manipulating course block structures
     based on the user's access to the course blocks.
@@ -37,6 +37,15 @@ def get_course_block_access_transformers(user):
             which the block structure is to be transformed.
 
     """
+    if grading:
+        return [
+            library_content.ContentLibraryTransformer(),
+            ContentTypeGateTransformer(),
+            user_partitions.UserPartitionTransformer(),
+            visibility.VisibilityTransformer(),
+            field_data.DateOverrideTransformer(user),
+        ]
+
     course_block_access_transformers = [
         library_content.ContentLibraryTransformer(),
         start_date.StartDateTransformer(),
@@ -57,6 +66,7 @@ def get_course_blocks(
         starting_block_usage_key,
         transformers=None,
         collected_block_structure=None,
+        grading=False,
 ):
     """
     A higher order function implemented on top of the
@@ -89,7 +99,7 @@ def get_course_blocks(
             access.
     """
     if not transformers:
-        transformers = BlockStructureTransformers(get_course_block_access_transformers(user))
+        transformers = BlockStructureTransformers(get_course_block_access_transformers(user, grading))
     transformers.usage_info = CourseUsageInfo(starting_block_usage_key.course_key, user)
 
     return get_block_structure_manager(starting_block_usage_key.course_key).get_transformed(
