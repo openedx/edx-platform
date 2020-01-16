@@ -121,7 +121,7 @@ edx-submissions==3.0.3
 edx-tincan-py35==0.0.5    # via edx-enterprise
 edx-user-state-client==1.1.2
 edx-when==0.5.2
-edxval==1.2.0
+edxval==1.2.1
 elasticsearch==1.9.0      # via edx-search
 enum34==1.1.6             # via edxval
 event-tracking==0.3.0
