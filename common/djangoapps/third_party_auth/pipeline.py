@@ -557,6 +557,10 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
             if should_force_account_creation():
                 return dispatch_to_register()
             return dispatch_to_login()
+        elif auth_entry == AUTH_ENTRY_REGISTER:
+            # User has authenticated with the third party provider and now wants to finish
+            # creating their edX account.
+            return dispatch_to_register()
         elif auth_entry == AUTH_ENTRY_ACCOUNT_SETTINGS:
             raise AuthEntryError(backend, 'auth_entry is wrong. Settings requires a user.')
         elif auth_entry in AUTH_ENTRY_CUSTOM:
