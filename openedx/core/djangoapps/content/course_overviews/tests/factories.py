@@ -43,13 +43,5 @@ class CourseOverviewFactory(DjangoModelFactory):
         return timezone.now()
 
     @factory.lazy_attribute
-    def start_date(self):
-        return timezone.now()
-
-    @factory.lazy_attribute
     def end(self):
-        return timezone.now() + timedelta(30)
-
-    @factory.lazy_attribute
-    def end_date(self):
         return timezone.now() + timedelta(30)
