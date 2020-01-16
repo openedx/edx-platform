@@ -26,7 +26,7 @@ python-dateutil==2.8.1    # via matplotlib
 pytz==2019.3              # via matplotlib
 random2==1.0.1
 scipy==1.2.1
-six==1.13.0
+six==1.14.0
 sympy==1.4
 
 # The following packages are considered to be unsafe in a requirements file:

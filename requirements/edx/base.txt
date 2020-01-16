@@ -51,7 +51,7 @@ cssutils==1.0.2           # via pynliner
 ddt==1.2.2
 decorator==4.4.1          # via pycontracts
 defusedxml==0.5.0
-django-appconf==1.0.3     # via django-statici18n
+git+https://github.com/django-compressor/django-appconf@1526a842ee084b791aa66c931b3822091a442853#egg=django-appconf
 django-babel-underscore==0.5.2
 django-babel==0.6.2       # via django-babel-underscore
 git+https://github.com/edx/django-celery.git@756cb57aad765cb2b0d37372c1855b8f5f37e6b0#egg=django-celery==3.2.1+edx.2
@@ -68,7 +68,7 @@ django-method-override==0.2.0
 django-model-utils==3.0.0
 django-mptt==0.10.0
 django-multi-email-field==0.5.1  # via edx-enterprise
-django-mysql==2.4.1
+django-mysql==3.3.0
 git+https://github.com/edx/django-oauth-plus.git@b9b64a3ac24fd11f471763c88462bbf3c53e46e6#egg=django-oauth-plus==2.2.9.edx-4
 django-oauth-toolkit==1.1.3
 django-object-actions==2.0.0  # via edx-enterprise
@@ -101,11 +101,11 @@ edx-ccx-keys==1.0.0
 edx-celeryutils==0.3.1
 edx-completion==3.0.2
 edx-django-oauth2-provider==1.3.5
-edx-django-release-util==0.3.2
+edx-django-release-util==0.3.3
 edx-django-sites-extensions==2.4.2
-edx-django-utils==2.0.2
+edx-django-utils==2.0.3
 edx-drf-extensions==2.4.5
-edx-enterprise==2.0.46
+edx-enterprise==2.0.48
 edx-i18n-tools==0.5.0
 edx-milestones==0.2.6
 edx-oauth2-provider==1.3.1
@@ -121,7 +121,7 @@ edx-submissions==3.0.3
 edx-tincan-py35==0.0.5    # via edx-enterprise
 edx-user-state-client==1.1.2
 edx-when==0.5.2
-edxval==1.2.0
+edxval==1.2.1
 elasticsearch==1.9.0      # via edx-search
 enum34==1.1.6             # via edxval
 event-tracking==0.3.0
@@ -141,7 +141,7 @@ isodate==0.6.0            # via python3-saml
 itypes==1.1.0             # via coreapi
 jinja2==2.10.3            # via code-annotations, coreschema
 jmespath==0.9.4           # via boto3, botocore
-jsondiff==1.1.1           # via edx-enterprise
+jsondiff==1.2.0           # via edx-enterprise
 jsonfield==2.0.2
 kombu==3.0.37             # via celery
 laboratory==1.0.2
@@ -219,7 +219,7 @@ semantic-version==2.8.4   # via edx-drf-extensions
 shapely==1.6.4.post2
 shortuuid==0.5.0          # via edx-django-oauth2-provider
 simplejson==3.17.0
-six==1.13.0
+six==1.14.0
 slumber==0.7.1            # via edx-bulk-grades, edx-enterprise, edx-rest-api-client
 social-auth-app-django==3.1.0
 social-auth-core==3.2.0

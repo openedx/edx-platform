@@ -237,6 +237,22 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             return json.dumps({
                 'complete': complete
             })
+        elif dispatch == 'metadata':
+            context = {'exclude_units': True}
+            prereq_met = True
+            prereq_meta_info = {}
+            banner_text = None
+            display_items = self.get_display_items()
+
+            if self._required_prereq():
+                if self.runtime.user_is_staff:
+                    banner_text = _('This subsection is unlocked for learners when they meet the prerequisite requirements.')
+                else:
+                    # check if prerequisite has been met
+                    prereq_met, prereq_meta_info = self._compute_is_prereq_met(True)
+            meta = self._get_render_metadata(context, display_items, prereq_met, prereq_meta_info, banner_text, STUDENT_VIEW)
+            meta['display_name'] = self.display_name_with_default
+            return json.dumps(meta)
         raise NotFoundError('Unexpected dispatch type')
 
     @classmethod
@@ -345,27 +361,18 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         # NOTE (CCB): We default to true to maintain the behavior in place prior to allowing anonymous access access.
         return context.get('user_authenticated', True)
 
-    def _student_or_public_view(self, context, prereq_met, prereq_meta_info, banner_text=None, view=STUDENT_VIEW):
-        """
-        Returns the rendered student view of the content of this
-        sequential.  If banner_text is given, it is added to the
-        content.
-        """
-        _ = self.runtime.service(self, "i18n").ugettext
-        display_items = self.get_display_items()
-        self._update_position(context, len(display_items))
-
+    def _get_render_metadata(self, context, display_items, prereq_met, prereq_meta_info, banner_text=None, view=STUDENT_VIEW, fragment=None):
         if prereq_met and not self._is_gate_fulfilled():
             banner_text = _(
                 'This section is a prerequisite. You must complete this section in order to unlock additional content.'
             )
 
-        fragment = Fragment()
         items = self._render_student_view_for_items(context, display_items, fragment, view) if prereq_met else []
         params = {
             'items': items,
             'element_id': self.location.html_id(),
             'item_id': text_type(self.location),
+            'is_time_limited': self.is_time_limited,
             'position': self.position,
             'tag': self.location.block_type,
             'ajax_url': self.system.ajax_url,
@@ -377,6 +384,20 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             'gated_content': self._get_gated_content_info(prereq_met, prereq_meta_info),
             'exclude_units': context.get('exclude_units', False)
         }
+        return params
+
+    def _student_or_public_view(self, context, prereq_met, prereq_meta_info, banner_text=None, view=STUDENT_VIEW):
+        """
+        Returns the rendered student view of the content of this
+        sequential.  If banner_text is given, it is added to the
+        content.
+        """
+        _ = self.runtime.service(self, "i18n").ugettext
+        display_items = self.get_display_items()
+        self._update_position(context, len(display_items))
+
+        fragment = Fragment()
+        params = self._get_render_metadata(context, display_items, prereq_met, prereq_meta_info, banner_text, view, fragment)
         fragment.add_content(self.system.render_template("seq_module.html", params))
 
         self._capture_full_seq_item_metrics(display_items)
@@ -388,11 +409,18 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         """
         Returns a dict of information about gated_content context
         """
-        gated_content = {}
-        gated_content['gated'] = not prereq_met
-        gated_content['prereq_url'] = prereq_meta_info['url'] if not prereq_met else None
-        gated_content['prereq_section_name'] = prereq_meta_info['display_name'] if not prereq_met else None
-        gated_content['gated_section_name'] = self.display_name
+        gated_content = {
+            'prereq_id': None,
+            'prereq_url': None,
+            'prereq_section_name': None,
+            'gated': False,
+            'gated_section_name': self.display_name,
+        }
+        if not prereq_met:
+            gated_content['gated'] = True
+            gated_content['prereq_url'] = prereq_meta_info['url']
+            gated_content['prereq_section_name'] = prereq_meta_info['display_name']
+            gated_content['prereq_id'] = prereq_meta_info['id']
 
         return gated_content
 
@@ -474,11 +502,11 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         """
         render_items = not context.get('exclude_units', False)
         is_user_authenticated = self.is_user_authenticated(context)
+        completion_service = self.runtime.service(self, 'completion')
         if render_items:
             bookmarks_service = self.runtime.service(self, 'bookmarks')
-            completion_service = self.runtime.service(self, 'completion')
         else:
-            bookmarks_service = completion_service = None
+            bookmarks_service = None
         context['username'] = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(
             'edx-platform.username')
         display_names = [
@@ -527,10 +555,9 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 # The item url format can be defined in the template context like so:
                 # context['item_url'] = '/my/item/path/{usage_key}/whatever'
                 iteminfo['href'] = context.get('item_url', '').format(usage_key=usage_id)
-            if is_user_authenticated and render_items:
-                if item.location.block_type == 'vertical':
-                    if completion_service:
-                        iteminfo['complete'] = completion_service.vertical_is_complete(item)
+            if is_user_authenticated:
+                if item.location.block_type == 'vertical' and completion_service:
+                    iteminfo['complete'] = completion_service.vertical_is_complete(item)
 
             contents.append(iteminfo)
 

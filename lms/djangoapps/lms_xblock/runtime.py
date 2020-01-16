@@ -20,7 +20,7 @@ from openedx.core.lib.xblock_utils import wrap_xblock_aside, xblock_local_resour
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.partitions.partitions_service import PartitionService
-from xmodule.services import SettingsService
+from xmodule.services import SettingsService, TeamsConfigurationService
 from xmodule.x_module import ModuleSystem
 
 
@@ -157,6 +157,7 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
             services['badging'] = BadgingService(course_id=kwargs.get('course_id'), modulestore=store)
         self.request_token = kwargs.pop('request_token', None)
         services['teams'] = TeamsService()
+        services['teams_config'] = TeamsConfigurationService()
         super(LmsModuleSystem, self).__init__(**kwargs)
 
     def handler_url(self, *args, **kwargs):

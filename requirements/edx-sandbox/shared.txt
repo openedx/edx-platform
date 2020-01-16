@@ -9,4 +9,4 @@ cryptography==2.8
 lxml==4.4.2
 nltk==3.4.5
 pycparser==2.19           # via cffi
-six==1.13.0               # via cryptography, nltk
+six==1.14.0               # via cryptography, nltk
