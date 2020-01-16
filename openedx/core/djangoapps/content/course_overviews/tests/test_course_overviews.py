@@ -201,7 +201,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
 
         # test tabs for both cached miss and cached hit courses
         for course_overview in [course_overview_cache_miss, course_overview_cache_hit]:
-            course_overview_tabs = course_overview.tabs.all()
+            course_overview_tabs = course_overview.tab_set.all()
             course_resp_tabs = {tab.tab_id for tab in course_overview_tabs}
             self.assertEqual(self.COURSE_OVERVIEW_TABS, course_resp_tabs)
 
@@ -1086,7 +1086,7 @@ class CourseOverviewTabTestCase(ModuleStoreTestCase):
         """
         course = CourseFactory.create(default_store=modulestore_type)
         course_overview = CourseOverview.get_from_id(course.id)
-        expected_tabs = {tab.tab_id for tab in course_overview.tabs.all()}
+        expected_tabs = {tab.tab_id for tab in course_overview.tab_set.all()}
 
         with mock.patch(
             'openedx.core.djangoapps.content.course_overviews.models.CourseOverviewTab.objects.bulk_create'
@@ -1102,6 +1102,6 @@ class CourseOverviewTabTestCase(ModuleStoreTestCase):
 
             # Asserts that the tabs deletion is properly rolled back to a save point and
             # the course overview is not updated.
-            actual_tabs = {tab.tab_id for tab in course_overview.tabs.all()}
+            actual_tabs = {tab.tab_id for tab in course_overview.tab_set.all()}
             self.assertEqual(actual_tabs, expected_tabs)
             self.assertNotEqual(course_overview.display_name, course.display_name)

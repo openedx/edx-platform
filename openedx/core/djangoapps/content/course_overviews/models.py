@@ -16,6 +16,7 @@ from django.db.models.fields import BooleanField, DateTimeField, DecimalField, F
 from django.db.utils import IntegrityError
 from django.template import defaultfilters
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.functional import cached_property
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from six import text_type  # pylint: disable=ungrouped-imports
@@ -31,6 +32,8 @@ from xmodule import block_metadata_utils, course_metadata_utils
 from xmodule.course_module import DEFAULT_START_DATE, CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
+from xmodule.tabs import CourseTab
+
 
 log = logging.getLogger(__name__)
 
@@ -54,7 +57,7 @@ class CourseOverview(TimeStampedModel):
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 7
+    VERSION = 8
 
     # Cache entry versioning.
     version = IntegerField()
@@ -243,7 +246,12 @@ class CourseOverview(TimeStampedModel):
                         # Remove and recreate all the course tabs
                         CourseOverviewTab.objects.filter(course_overview=course_overview).delete()
                         CourseOverviewTab.objects.bulk_create([
-                            CourseOverviewTab(tab_id=tab.tab_id, course_overview=course_overview)
+                            CourseOverviewTab(
+                                tab_id=tab.tab_id,
+                                type=tab.type,
+                                name=tab.name,
+                                course_staff_only=tab.course_staff_only,
+                                course_overview=course_overview)
                             for tab in course.tabs
                         ])
                         # Remove and recreate course images
@@ -629,12 +637,24 @@ class CourseOverview(TimeStampedModel):
         """
         Returns True if course has discussion tab and is enabled
         """
-        tabs = self.tabs.all()
+        tabs = self.tab_set.all()
         # creates circular import; hence explicitly referenced is_discussion_enabled
         for tab in tabs:
             if tab.tab_id == "discussion" and django_comment_client.utils.is_discussion_enabled(self.id):
                 return True
         return False
+
+    @property
+    def tabs(self):
+        """
+        Returns an iterator of CourseTabs.
+        """
+        for tab_dict in self.tab_set.all().values():
+            tab = CourseTab.from_json(tab_dict)
+            if tab is None:
+                log.warning("Can't instantiate CourseTab from %r", tab_dict)
+            else:
+                yield tab
 
     @property
     def image_urls(self):
@@ -733,6 +753,42 @@ class CourseOverview(TimeStampedModel):
 
         return urlunparse(('', base_url, path, params, query, fragment))
 
+    @cached_property
+    def _original_course(self):
+        """
+        Returns the course from the modulestore.
+        """
+        log.warning('Falling back on modulestore to get course information for %s', self.id)
+        return modulestore().get_course(self.id)
+
+    @property
+    def allow_public_wiki_access(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.allow_public_wiki_access
+
+    @property
+    def textbooks(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.textbooks
+
+    @property
+    def hide_progress_tab(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.hide_progress_tab
+
+    @property
+    def edxnotes(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.edxnotes
+
     def __str__(self):
         """Represent ourselves with the course key."""
         return six.text_type(self.id)
@@ -745,7 +801,13 @@ class CourseOverviewTab(models.Model):
     .. no_pii:
     """
     tab_id = models.CharField(max_length=50)
-    course_overview = models.ForeignKey(CourseOverview, db_index=True, related_name="tabs", on_delete=models.CASCADE)
+    course_overview = models.ForeignKey(CourseOverview, db_index=True, related_name="tab_set", on_delete=models.CASCADE)
+    type = models.CharField(max_length=50, null=True)
+    name = models.TextField(null=True)
+    course_staff_only = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.tab_id
 
 
 @python_2_unicode_compatible

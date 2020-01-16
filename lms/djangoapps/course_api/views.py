@@ -4,7 +4,6 @@ Course API Views
 
 
 from django.core.exceptions import ValidationError
-from django.contrib.auth import get_user_model
 from edx_rest_framework_extensions.paginators import NamespacedPageNumberPagination
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.throttling import UserRateThrottle
@@ -117,7 +116,6 @@ class CourseDetailView(DeveloperErrorViewMixin, RetrieveAPIView):
         form = CourseDetailGetForm(requested_params, initial={'requesting_user': self.request.user})
         if not form.is_valid():
             raise ValidationError(form.errors)
-        self.requested_username = form.cleaned_data['username'] or self.request.user.username
         return course_detail(
             self.request,
             form.cleaned_data['username'],
@@ -186,9 +184,11 @@ class CourseDetailViewV2(CourseDetailView):
     serializer_class = CourseWithTabsSerializer
 
     def get_serializer_context(self):
+        """
+        Return extra context to be used by the serializer class.
+        """
         context = super().get_serializer_context()
         context['requested_fields'] = self.request.GET.get('requested_fields', None)
-        context['user'] = get_user_model().objects.get(username=self.requested_username)
         return context
 
 

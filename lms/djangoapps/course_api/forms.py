@@ -25,7 +25,7 @@ class UsernameValidatorMixin(object):
         as an anonymous user.
         """
         username = self.cleaned_data.get('username')
-        return username or ''
+        return username or self.initial['requesting_user'].username
 
 
 class CourseDetailGetForm(UsernameValidatorMixin, Form):

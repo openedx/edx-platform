@@ -13,7 +13,6 @@ from lms.djangoapps.courseware.tabs import get_course_tab_list
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.api.fields import AbsoluteURLField
 from student.models import CourseEnrollment
-from xmodule.modulestore.django import modulestore
 
 
 class _MediaSerializer(serializers.Serializer):  # pylint: disable=abstract-method
@@ -126,7 +125,13 @@ class CourseDetailSerializer(CourseSerializer):  # pylint: disable=abstract-meth
         return CourseDetails.fetch_about_attribute(course_overview.id, 'overview')
 
 
-class CourseWithTabsSerializer(CourseSerializer):
+class CourseWithTabsSerializer(CourseSerializer):  # pylint: disable=abstract-method
+    """
+    Serializer for Course objects, along with CourseTabs and CourseEnrollment
+    information.
+
+    If requested with `requested_fields`, only those fields will be returned.
+    """
     enrollment = serializers.SerializerMethodField()
     tabs = serializers.SerializerMethodField()
 
@@ -140,7 +145,6 @@ class CourseWithTabsSerializer(CourseSerializer):
         If `requested_fields` is set, then only return that subset of fields.
         """
         super().__init__(*args, **kwargs)
-        self.user = self.context['user']
         requested_fields = self.context['requested_fields']
         if requested_fields is not None:
             allowed = set(requested_fields.split(','))
@@ -152,17 +156,14 @@ class CourseWithTabsSerializer(CourseSerializer):
         """
         Return course tab metadata.
         """
-        # Ideally, we wouldn't have to load the course, but get_course_tabs won't work
-        # with a CourseOverview without more refactoring.
-        course = modulestore().get_course(course_overview.id)
         tabs = []
-        for priority, tab in enumerate(get_course_tab_list(self.user, course)):
+        for priority, tab in enumerate(get_course_tab_list(course_overview.effective_user, course_overview)):
             tabs.append({
                 'title': tab.title,
                 'slug': tab.tab_id,
                 'priority': priority,
                 'type': tab.type,
-                'url': tab.link_func(course, reverse),
+                'url': tab.link_func(course_overview, reverse),
             })
         return tabs
 
@@ -171,7 +172,7 @@ class CourseWithTabsSerializer(CourseSerializer):
         Return the enrollment for the logged in user.
         """
         mode, is_active = CourseEnrollment.enrollment_mode_for_user(
-            self.user,
+            course_overview.effective_user,
             course_overview.id
         )
         return {'mode': mode, 'is_active': is_active}
