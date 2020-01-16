@@ -3,8 +3,6 @@ Common utilities for the course experience, including course outline.
 """
 
 
-import logging
-
 from completion.models import BlockCompletion
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import CourseKey
@@ -23,8 +21,6 @@ from openedx.features.discounts.applicability import (
 )
 from openedx.features.discounts.utils import format_strikeout_price
 from xmodule.modulestore.django import modulestore
-
-log = logging.getLogger(__name__)
 
 
 @request_cached()
@@ -48,16 +44,7 @@ def get_course_outline_block_tree(request, course_id, user=None):
 
         for i in range(len(children)):
             child_id = block['children'][i]
-            try:
-                child_detail = populate_children(all_blocks[child_id], all_blocks)
-            except TypeError:
-                if u"MITx+6.002x+MITx_2012_Alumni" in course_outline_root_block['id']:
-                    log.info(u"PopulateChildrenError for Child: {child} in block:{block} at index:{index}".format(
-                        child=child_id,
-                        block=block['id'],
-                        index=i
-                    ))
-                raise
+            child_detail = populate_children(all_blocks[child_id], all_blocks)
             block['children'][i] = child_detail
 
         return block
