@@ -1,7 +1,7 @@
 """
 Utilities for dealing with Javascript and JSON.
 """
-from __future__ import absolute_import
+
 import json
 
 from django.utils.html import escapejs

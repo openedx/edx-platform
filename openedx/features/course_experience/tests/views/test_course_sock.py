@@ -2,7 +2,7 @@
 Tests for course verification sock
 """
 
-from __future__ import absolute_import
+
 import mock
 
 import ddt

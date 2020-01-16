@@ -1,8 +1,7 @@
 """
 Courseware views functions
 """
-from __future__ import absolute_import
-from __future__ import division
+
 
 import json
 import logging

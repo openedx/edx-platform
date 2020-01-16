@@ -2,7 +2,7 @@
 """
 Class used for defining and running Bok Choy acceptance test suite
 """
-from __future__ import absolute_import, print_function
+
 
 import os
 from time import sleep

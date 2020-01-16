@@ -28,7 +28,6 @@ Longer TODO:
 # and throws spurious errors. Therefore, we disable invalid-name checking.
 # pylint: disable=invalid-name, wrong-import-position
 
-from __future__ import absolute_import
 
 import imp
 import sys
@@ -191,6 +190,8 @@ FEATURES = {
     # .. toggle_status: supported
     # .. toggle_warnings: ???
     'DISABLE_HONOR_CERTIFICATES': False,  # Toggle to disable honor certificates
+
+    'DISABLE_AUDIT_CERTIFICATES': False,  # Toggle to disable audit certificates
 
     # for acceptance and load testing
     'AUTOMATIC_AUTH_FOR_TESTING': False,
@@ -1273,6 +1274,7 @@ CERTIFICATE_TEMPLATE_LANGUAGES = {
 USE_I18N = True
 USE_L10N = True
 
+STATICI18N_FILENAME_FUNCTION = 'statici18n.utils.legacy_filename'
 STATICI18N_ROOT = PROJECT_ROOT / "static"
 STATICI18N_OUTPUT_DIR = "js/i18n"
 
@@ -1547,6 +1549,7 @@ PIPELINE = {
 }
 
 STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
+STATICFILES_STORAGE_KWARGS = {}
 
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
@@ -3316,7 +3319,7 @@ MODULESTORE_FIELD_OVERRIDE_PROVIDERS = ('openedx.features.content_type_gating.fi
 # occurring when a user uploads a new profile image to replace an
 # earlier one (the file will temporarily be deleted).
 PROFILE_IMAGE_BACKEND = {
-    'class': 'storages.backends.overwrite.OverwriteStorage',
+    'class': 'openedx.core.storage.OverwriteStorage',
     'options': {
         'location': os.path.join(MEDIA_ROOT, 'profile-images/'),
         'base_url': os.path.join(MEDIA_URL, 'profile-images/'),
@@ -3575,6 +3578,7 @@ ENTERPRISE_CONSENT_API_URL = LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
 ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
 ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE = 512   # Enterprise logo image size limit in KB's
+ENTERPRISE_CATALOG_INTERNAL_ROOT_URL = 'http://enterprise.catalog.app:18160'
 
 ############## ENTERPRISE SERVICE LMS CONFIGURATION ##################################
 # The LMS has some features embedded that are related to the Enterprise service, but
@@ -3832,7 +3836,10 @@ MAILCHIMP_NEW_USER_LIST_ID = ""
 
 ########################## BLOCKSTORE #####################################
 BLOCKSTORE_PUBLIC_URL_ROOT = 'http://localhost:18250'
-BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1'
+BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
+# Which of django's caches to use for storing anonymous user state for XBlocks
+# in the blockstore-based XBlock runtime
+XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
 
 ########################## LEARNER PORTAL ##############################
 LEARNER_PORTAL_URL_ROOT = 'https://learner-portal-localhost:18000'

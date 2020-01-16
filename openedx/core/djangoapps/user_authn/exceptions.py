@@ -1,6 +1,5 @@
 """ User Authn related Exceptions. """
 
-from __future__ import absolute_import
 
 from openedx.core.djangolib.markup import Text
 

@@ -1,7 +1,7 @@
 """
 This test tests that i18n extraction (`paver i18n_extract -v`) works properly.
 """
-from __future__ import absolute_import
+
 
 import os
 import random

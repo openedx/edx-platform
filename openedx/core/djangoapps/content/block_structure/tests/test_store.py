@@ -1,7 +1,7 @@
 """
 Tests for block_structure/cache.py
 """
-from __future__ import absolute_import
+
 
 import ddt
 

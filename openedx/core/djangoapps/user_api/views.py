@@ -1,6 +1,5 @@
 """HTTP end-points for the User API. """
 
-from __future__ import absolute_import
 
 from django.contrib.auth.models import User
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError

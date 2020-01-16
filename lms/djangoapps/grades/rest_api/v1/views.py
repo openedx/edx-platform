@@ -1,5 +1,5 @@
 """ API v0 views. """
-from __future__ import absolute_import
+
 
 import logging
 from contextlib import contextmanager

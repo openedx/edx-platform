@@ -4,7 +4,7 @@ This is a Python API for generating certificates asynchronously.
 Other Django apps should use the API functions defined in this module
 rather than importing Django models directly.
 """
-from __future__ import absolute_import
+
 
 import logging
 

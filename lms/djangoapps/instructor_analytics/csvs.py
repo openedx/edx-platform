@@ -4,7 +4,6 @@ Student and course analytics.
 Format and create csv responses
 """
 
-from __future__ import absolute_import
 
 import csv
 

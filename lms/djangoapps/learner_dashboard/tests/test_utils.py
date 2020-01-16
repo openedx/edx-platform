@@ -2,7 +2,6 @@
 Unit test module covering utils module
 """
 
-from __future__ import absolute_import
 
 import ddt
 import six

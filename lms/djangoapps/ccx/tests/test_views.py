@@ -1,7 +1,7 @@
 """
 test views
 """
-from __future__ import absolute_import
+
 
 import datetime
 import json
@@ -1175,7 +1175,7 @@ class CCXCoachTabTestCase(CcxTestCase):
         """
         with self.settings(FEATURES={'CUSTOM_COURSES_EDX': ccx_feature_flag}):
             course = self.ccx_enabled_course if enable_ccx else self.ccx_disabled_course
-            self.assertEquals(
+            self.assertEqual(
                 expected_result,
                 self.check_ccx_tab(course, self.user)
             )

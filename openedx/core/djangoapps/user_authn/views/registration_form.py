@@ -1,7 +1,7 @@
 """
 Objects and utilities used to construct registration forms.
 """
-from __future__ import absolute_import
+
 
 import copy
 from importlib import import_module

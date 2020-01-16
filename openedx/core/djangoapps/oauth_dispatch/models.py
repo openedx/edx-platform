@@ -2,7 +2,6 @@
 Specialized models for oauth_dispatch djangoapp
 """
 
-from __future__ import absolute_import
 
 from datetime import datetime
 
@@ -69,7 +68,8 @@ class ApplicationAccess(models.Model):
     .. no_pii:
     """
 
-    application = models.OneToOneField(oauth2_settings.APPLICATION_MODEL, related_name='access')
+    application = models.OneToOneField(oauth2_settings.APPLICATION_MODEL, related_name='access',
+                                       on_delete=models.CASCADE)
     scopes = ListCharField(
         base_field=models.CharField(max_length=32),
         size=25,
@@ -109,8 +109,9 @@ class ApplicationOrganization(models.Model):
         (RELATION_TYPE_CONTENT_ORG, _('Content Provider')),
     )
 
-    application = models.ForeignKey(oauth2_settings.APPLICATION_MODEL, related_name='organizations')
-    organization = models.ForeignKey(Organization)
+    application = models.ForeignKey(oauth2_settings.APPLICATION_MODEL, related_name='organizations',
+                                    on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
     relation_type = models.CharField(
         max_length=32,
         choices=RELATION_TYPES,

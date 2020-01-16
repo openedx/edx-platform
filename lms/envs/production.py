@@ -17,7 +17,6 @@ Common traits:
 # and throws spurious errors. Therefore, we disable invalid-name checking.
 # pylint: disable=invalid-name
 
-from __future__ import absolute_import
 
 import codecs
 import datetime
@@ -244,6 +243,19 @@ if 'loc_cache' not in CACHES:
 
 if 'staticfiles' in CACHES:
     CACHES['staticfiles']['KEY_PREFIX'] = EDX_PLATFORM_REVISION
+
+# In order to transition from local disk asset storage to S3 backed asset storage,
+# we need to run asset collection twice, once for local disk and once for S3.
+# Once we have migrated to service assets off S3, then we can convert this back to
+# managed by the yaml file contents
+STATICFILES_STORAGE = os.environ.get('STATICFILES_STORAGE', ENV_TOKENS.get('STATICFILES_STORAGE', STATICFILES_STORAGE))
+STATICFILES_STORAGE_KWARGS = ENV_TOKENS.get('STATICFILES_STORAGE_KWARGS', STATICFILES_STORAGE_KWARGS)
+
+# Load all AWS_ prefixed variables to allow an S3Boto3Storage to be configured
+_locals = locals()
+for key, value in ENV_TOKENS.items():
+    if key.startswith('AWS_'):
+        _locals[key] = value
 
 # Email overrides
 DEFAULT_FROM_EMAIL = ENV_TOKENS.get('DEFAULT_FROM_EMAIL', DEFAULT_FROM_EMAIL)
@@ -1013,6 +1025,11 @@ ENTERPRISE_API_CACHE_TIMEOUT = ENV_TOKENS.get(
     'ENTERPRISE_API_CACHE_TIMEOUT',
     ENTERPRISE_API_CACHE_TIMEOUT
 )
+ENTERPRISE_CATALOG_INTERNAL_ROOT_URL = ENV_TOKENS.get(
+    'ENTERPRISE_CATALOG_INTERNAL_ROOT_URL',
+    ENTERPRISE_CATALOG_INTERNAL_ROOT_URL
+)
+
 
 ############## ENTERPRISE SERVICE LMS CONFIGURATION ##################################
 # The LMS has some features embedded that are related to the Enterprise service, but

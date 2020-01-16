@@ -1,12 +1,14 @@
 """
 The Python API other app should use to work with Teams feature
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import logging
 from enum import Enum
 
 from django.db.models import Count
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
@@ -241,3 +243,38 @@ def can_user_create_team_in_topic(user, course_id, topic_id):
         (not is_instructor_managed_topic(topic_id)) or
         has_course_staff_privileges(user, course_id)
     )
+
+
+def get_team_for_user_course_topic(user, course_id, topic_id):
+    """
+    Returns the matching CourseTeam for the given user, course, and topic
+
+    If course_id is invalid, a ValueError is raised
+    """
+    try:
+        course_key = CourseKey.from_string(course_id)
+    except InvalidKeyError:
+        raise ValueError(u"The supplied course id {course_id} is not valid.".format(
+            course_id=course_id
+        ))
+    try:
+        return CourseTeam.objects.get(
+            course_id=course_key,
+            membership__user__username=user.username,
+            topic_id=topic_id,
+        )
+    except CourseTeam.DoesNotExist:
+        return None
+    except CourseTeam.MultipleObjectsReturned:
+        # This shouldn't ever happen but it's here for safety's sake
+        msg = "user {username} is on multiple teams within course {course} topic {topic}"
+        logger.error(msg.format(
+            username=user.username,
+            course=course_id,
+            topic=topic_id,
+        ))
+        return CourseTeam.objects.filter(
+            course_id=course_key,
+            membership__user__username=user.username,
+            topic_id=topic_id,
+        ).first()

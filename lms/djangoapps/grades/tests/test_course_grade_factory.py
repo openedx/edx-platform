@@ -1,7 +1,7 @@
 """
 Tests for the CourseGradeFactory class.
 """
-from __future__ import absolute_import
+
 
 import itertools
 
@@ -100,32 +100,32 @@ class TestCourseGradeFactory(GradeTestBase):
         with self.assertNumQueries(3), mock_get_score(1, 2):
             _assert_read(expected_pass=False, expected_percent=0)  # start off with grade of 0
 
-        num_queries = 46
+        num_queries = 45
         with self.assertNumQueries(num_queries), mock_get_score(1, 2):
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(3):
             _assert_read(expected_pass=True, expected_percent=0.5)  # updated to grade of .5
 
-        num_queries = 8
+        num_queries = 7
         with self.assertNumQueries(num_queries), mock_get_score(1, 4):
             grade_factory.update(self.request.user, self.course, force_update_subsections=False)
 
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(3):
             _assert_read(expected_pass=True, expected_percent=0.5)  # NOT updated to grade of .25
 
-        num_queries = 25
+        num_queries = 24
         with self.assertNumQueries(num_queries), mock_get_score(2, 2):
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(3):
             _assert_read(expected_pass=True, expected_percent=1.0)  # updated to grade of 1.0
 
-        num_queries = 29
+        num_queries = 28
         with self.assertNumQueries(num_queries), mock_get_score(0, 0):  # the subsection now is worth zero
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(3):
             _assert_read(expected_pass=False, expected_percent=0.0)  # updated to grade of 0.0
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
@@ -146,7 +146,7 @@ class TestCourseGradeFactory(GradeTestBase):
             mocked_course_blocks.return_value = self.course_structure
             with mock_get_score(1, 2):
                 grade_factory.update(self.request.user, self.course, force_update_subsections=True)
-                self.assertEquals(mocked_course_blocks.call_count, 1)
+                self.assertEqual(mocked_course_blocks.call_count, 1)
 
         with patch('lms.djangoapps.grades.course_data.get_course_blocks') as mocked_course_blocks:
             with patch('lms.djangoapps.grades.subsection_grade.get_score') as mocked_get_score:
@@ -290,7 +290,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
             wraps=BlockStructureFactory.create_from_store
         ) as mock_create_from_store:
             all_course_grades, all_errors = self._course_grades_and_errors_for(self.course, self.students)
-            self.assertEquals(mock_create_from_store.call_count, 1)
+            self.assertEqual(mock_create_from_store.call_count, 1)
 
         self.assertEqual(len(all_errors), 0)
         for course_grade in all_course_grades.values():

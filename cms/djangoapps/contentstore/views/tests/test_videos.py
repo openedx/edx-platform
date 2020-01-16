@@ -2,7 +2,7 @@
 """
 Unit tests for video-related REST APIs.
 """
-from __future__ import absolute_import
+
 
 import csv
 import json
@@ -324,7 +324,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
     def test_get_html(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertRegexpMatches(response["Content-Type"], "^text/html(;.*)?$")
+        self.assertRegex(response["Content-Type"], "^text/html(;.*)?$")
         self.assertContains(response, _get_default_video_image_url())
         # Crude check for presence of data in returned HTML
         for video in self.previous_uploads:

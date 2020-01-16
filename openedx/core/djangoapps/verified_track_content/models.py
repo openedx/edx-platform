@@ -1,7 +1,7 @@
 """
 Models for verified track selections.
 """
-from __future__ import absolute_import
+
 
 import logging
 import six

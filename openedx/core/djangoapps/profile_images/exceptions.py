@@ -1,7 +1,7 @@
 """
 Exceptions related to the handling of profile images.
 """
-from __future__ import absolute_import
+
 
 from six import text_type
 

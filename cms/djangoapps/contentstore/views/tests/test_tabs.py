@@ -1,6 +1,5 @@
 """ Tests for tab functions (just primitive). """
 
-from __future__ import absolute_import
 
 import json
 
@@ -208,13 +207,13 @@ class PrimitiveTabEdit(ModuleStoreTestCase):
         tabs.primitive_delete(course, 2)
         self.assertNotIn({u'type': u'textbooks'}, course.tabs)
         # Check that discussion has shifted up
-        self.assertEquals(course.tabs[2], {'type': 'discussion', 'name': 'Discussion'})
+        self.assertEqual(course.tabs[2], {'type': 'discussion', 'name': 'Discussion'})
 
     def test_insert(self):
         """Test primitive tab insertion."""
         course = CourseFactory.create()
         tabs.primitive_insert(course, 2, 'pdf_textbooks', 'aname')
-        self.assertEquals(course.tabs[2], {'type': 'pdf_textbooks', 'name': 'aname'})
+        self.assertEqual(course.tabs[2], {'type': 'pdf_textbooks', 'name': 'aname'})
         with self.assertRaises(ValueError):
             tabs.primitive_insert(course, 0, 'pdf_textbooks', 'aname')
         with self.assertRaises(ValueError):
@@ -225,4 +224,4 @@ class PrimitiveTabEdit(ModuleStoreTestCase):
         course = CourseFactory.create()
         tabs.primitive_insert(course, 3, 'pdf_textbooks', 'aname')
         course2 = modulestore().get_course(course.id)
-        self.assertEquals(course2.tabs[3], {'type': 'pdf_textbooks', 'name': 'aname'})
+        self.assertEqual(course2.tabs[3], {'type': 'pdf_textbooks', 'name': 'aname'})

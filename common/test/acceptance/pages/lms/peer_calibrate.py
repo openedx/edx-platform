@@ -3,7 +3,6 @@ Page that allows the student to grade calibration essays
 (requirement for being allowed to grade peers).
 """
 
-from __future__ import absolute_import
 
 from bok_choy.page_object import PageObject
 from bok_choy.promise import Promise

@@ -2,7 +2,7 @@
 """
 Tests for the teams API at the HTTP request level.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import itertools
 from contextlib import contextmanager

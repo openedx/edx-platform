@@ -2,7 +2,7 @@
 Code to implement backwards compatibility
 """
 # pylint: disable=no-member
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 import hashlib
 import warnings
 
@@ -62,10 +62,14 @@ class RuntimeShim(object):
         """
         Get an anonymized identifier for this user.
         """
-        # TODO: Change this to a runtime service or method so that we can have
+        # To do? Change this to a runtime service or method so that we can have
         # access to the context_key without relying on self._active_block.
-        if self.user_id is None:
-            raise NotImplementedError("TODO: anonymous ID for anonymous users.")
+        if self.user.is_anonymous:
+            # This is an anonymous user, and the self.user_id value is already
+            # an anonymous string. It's not anonymized per course, but we don't
+            # really care since this user's XBlock data is ephemeral and is only
+            # kept around for a day or two anyways.
+            return self.user_id
         #### TEMPORARY IMPLEMENTATION:
         # TODO: Update student.models.AnonymousUserId to have a 'context_key'
         # column instead of 'course_key' (no DB migration needed). Then change
@@ -279,13 +283,8 @@ class RuntimeShim(object):
             "    is_staff = user.opt_attrs.get('edx-platform.user_is_staff')",
             DeprecationWarning, stacklevel=2,
         )
-        if self.user_id:
-            from django.contrib.auth import get_user_model
-            try:
-                user = get_user_model().objects.get(id=self.user_id)
-            except get_user_model().DoesNotExist:
-                return False
-            return user.is_staff
+        if self.user and self.user.is_authenticated:
+            return self.user.is_staff
         return False
 
     @cached_property
@@ -368,7 +367,7 @@ class RuntimeShim(object):
         # Many CSS styles for former XModules use
         # .xmodule_display.xmodule_VideoBlock
         # as their selector, so add those classes:
-        if view == 'student_view':
+        if view in ('student_view', 'public_view'):
             css_classes.append('xmodule_display')
         elif view == 'studio_view':
             css_classes.append('xmodule_edit')

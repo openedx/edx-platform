@@ -1,7 +1,7 @@
 """
 Utility methods for Enterprise
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import hashlib
 import json
@@ -14,6 +14,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import TieredCache
 from enterprise.models import EnterpriseCustomerUser
+from lms.djangoapps.branding.api import get_privacy_url
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings
 from openedx.core.djangolib.markup import HTML, Text
@@ -119,7 +120,7 @@ def get_enterprise_sidebar_context(enterprise_customer):
         enterprise_name=enterprise_customer['name'],
         platform_name=platform_name,
         privacy_policy_link_start=HTML("<a href='{pp_url}' rel='noopener' target='_blank'>").format(
-            pp_url=settings.MKTG_URLS.get('PRIVACY', 'https://www.edx.org/edx-privacy-policy')
+            pp_url=get_privacy_url()
         ),
         privacy_policy_link_end=HTML("</a>"),
     )

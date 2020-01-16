@@ -5,7 +5,7 @@ invalidation. Import these instead of django.core.cache.
 Note that 'default' is being preserved for user session caching, which we're
 not migrating so as not to inconvenience users by logging them all out.
 """
-from __future__ import absolute_import
+
 
 from functools import wraps
 

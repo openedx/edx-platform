@@ -2,7 +2,6 @@
 Block Completion Transformer
 """
 
-from __future__ import absolute_import
 
 from completion.models import BlockCompletion
 from xblock.completable import XBlockCompletionMode as CompletionMode

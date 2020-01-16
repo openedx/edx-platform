@@ -2,7 +2,7 @@
 """
 Test cases to cover Accounts-related behaviors of the User API application
 """
-from __future__ import absolute_import
+
 
 import datetime
 import hashlib
@@ -294,7 +294,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         self.assertEqual("world peace", data["goals"])
         self.assertTrue(data["is_active"])
         self.assertEqual("Park Ave", data['mailing_address'])
-        self.assertEquals(requires_parental_consent, data["requires_parental_consent"])
+        self.assertEqual(requires_parental_consent, data["requires_parental_consent"])
         self.assertIsNone(data["secondary_email"])
         self.assertEqual(year_of_birth, data["year_of_birth"])
 
@@ -499,7 +499,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         # Now make sure that the user can get the same information, even if not active
         self.user.is_active = False
         self.user.save()
-        verify_get_own_information(15)
+        verify_get_own_information(13)
 
     def test_get_account_empty_string(self):
         """

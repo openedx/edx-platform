@@ -1,7 +1,7 @@
 """
 Test the test_bulk_user_org_email_optout management command
 """
-from __future__ import absolute_import
+
 
 import io
 import os

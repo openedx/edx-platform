@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Video xmodule tests in mongo."""
 
-from __future__ import absolute_import
 
 import json
 import os

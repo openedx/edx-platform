@@ -1,6 +1,5 @@
 """Tests for the user API at the HTTP request level. """
 
-from __future__ import absolute_import
 
 import json
 from unittest import skipUnless
@@ -611,7 +610,7 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
         preference = UserOrgTag.objects.get(
             user=self.user, org=self.course.id.org, key="email-optin"
         )
-        self.assertEquals(preference.value, result)
+        self.assertEqual(preference.value, result)
 
     @ddt.data(
         (True, False),
@@ -643,7 +642,7 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
         preference = UserOrgTag.objects.get(
             user=self.user, org=self.course.id.org, key="email-optin"
         )
-        self.assertEquals(preference.value, u"True")
+        self.assertEqual(preference.value, u"True")
 
     def test_update_email_opt_in_anonymous_user(self):
         """

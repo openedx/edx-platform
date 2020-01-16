@@ -1,6 +1,6 @@
 # encoding: utf-8
 """Tests of Branding API views. """
-from __future__ import absolute_import
+
 
 import json
 

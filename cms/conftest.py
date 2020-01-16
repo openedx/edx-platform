@@ -6,12 +6,14 @@ pytest from looking for the conftest.py module in the parent directory when
 only running cms tests.
 """
 
-from __future__ import absolute_import, unicode_literals
 
 import importlib
 import os
 import contracts
 import pytest
+
+from openedx.core.pytest_hooks import pytest_json_modifyreport  # pylint: disable=unused-import
+from openedx.core.pytest_hooks import pytest_sessionfinish  # pylint: disable=unused-import
 
 
 # Patch the xml libs before anything else.

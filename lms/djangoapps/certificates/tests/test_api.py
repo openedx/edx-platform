@@ -1,5 +1,5 @@
 """Tests for the certificates Python API. """
-from __future__ import absolute_import
+
 
 import uuid
 from contextlib import contextmanager

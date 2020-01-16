@@ -1,6 +1,5 @@
 """ Tests for the api_admin app's views. """
 
-from __future__ import absolute_import
 
 import json
 

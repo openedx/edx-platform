@@ -2,7 +2,6 @@
 Grading tests
 """
 
-from __future__ import absolute_import
 
 import unittest
 from datetime import datetime, timedelta
@@ -406,7 +405,7 @@ class ShowCorrectnessTest(unittest.TestCase):
             due_date = None
         else:
             due_date = getattr(self, due_date_str)
-        self.assertEquals(
+        self.assertEqual(
             ShowCorrectness.correctness_available(ShowCorrectness.PAST_DUE, due_date, has_staff_access),
             expected_result
         )

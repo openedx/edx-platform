@@ -1,7 +1,7 @@
 """
 Forms for validating user input to the Course Enrollment related views.
 """
-from __future__ import absolute_import
+
 
 from django.core.exceptions import ValidationError
 from django.forms import CharField, Form

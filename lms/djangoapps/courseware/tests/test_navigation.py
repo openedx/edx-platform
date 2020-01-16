@@ -1,7 +1,7 @@
 """
 This test file will run through some LMS test scenarios regarding access and navigation of the LMS
 """
-from __future__ import absolute_import
+
 
 import time
 

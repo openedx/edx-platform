@@ -3,7 +3,6 @@ Classes used to model the roles used in the courseware. Each role is responsible
 adding users, removing users, and listing members
 """
 
-from __future__ import absolute_import
 
 import logging
 from abc import ABCMeta, abstractmethod

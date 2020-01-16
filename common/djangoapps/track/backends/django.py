@@ -7,7 +7,6 @@ Event tracker backend that saves events to a Django database.
 # brought here for legacy support. It should be updated when the
 # schema changes or eventually deprecated.
 
-from __future__ import absolute_import
 
 import logging
 

@@ -1,6 +1,5 @@
 """ Unit tests for custom UserProfile properties. """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
 
 import ddt
 from completion import models

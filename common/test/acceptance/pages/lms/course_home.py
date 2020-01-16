@@ -2,7 +2,6 @@
 LMS Course Home page object
 """
 
-from __future__ import absolute_import
 
 from collections import OrderedDict
 

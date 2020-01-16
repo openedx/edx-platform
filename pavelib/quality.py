@@ -4,7 +4,7 @@
 """
 Check code quality using pycodestyle, pylint, and diff_quality.
 """
-from __future__ import absolute_import, print_function
+
 
 import io
 import json

@@ -1,7 +1,7 @@
 """
 Django models related to teams functionality.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 from datetime import datetime
 from uuid import uuid4

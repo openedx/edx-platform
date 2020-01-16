@@ -23,7 +23,7 @@ or:
 }
 values are (x, y) coordinates of centers of dragged images.
 """
-from __future__ import absolute_import
+
 
 import json
 import six

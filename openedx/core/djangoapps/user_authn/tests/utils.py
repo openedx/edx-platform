@@ -1,5 +1,5 @@
 """ Common utilities for tests in the user_authn app. """
-from __future__ import absolute_import
+
 
 from datetime import datetime, timedelta
 from enum import Enum

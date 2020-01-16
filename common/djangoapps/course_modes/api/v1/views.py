@@ -2,7 +2,6 @@
 Defines the "ReSTful" API for course modes.
 """
 
-from __future__ import absolute_import
 
 import logging
 

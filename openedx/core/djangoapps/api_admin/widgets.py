@@ -1,6 +1,5 @@
 """ Form widget classes """
 
-from __future__ import absolute_import
 
 from django.conf import settings
 from django.forms.utils import flatatt
@@ -17,7 +16,7 @@ from openedx.core.djangolib.markup import HTML, Text
 class TermsOfServiceCheckboxInput(CheckboxInput):
     """ Renders a checkbox with a label linking to the terms of service. """
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         extra_attrs = attrs.copy()
         extra_attrs.update({'type': 'checkbox', 'name': name})
         final_attrs = self.build_attrs(self.attrs, extra_attrs=extra_attrs)

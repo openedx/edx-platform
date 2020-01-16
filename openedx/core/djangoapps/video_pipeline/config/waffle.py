@@ -2,7 +2,7 @@
 This module contains configuration settings via waffle flags
 for the Video Pipeline app.
 """
-from __future__ import absolute_import
+
 from openedx.core.djangoapps.waffle_utils import WaffleFlagNamespace, CourseWaffleFlag
 
 # Videos Namespace

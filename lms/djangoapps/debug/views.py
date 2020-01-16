@@ -1,6 +1,5 @@
 """Views for debugging and diagnostics"""
 
-from __future__ import absolute_import
 
 import pprint
 import traceback

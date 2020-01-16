@@ -1,7 +1,7 @@
 """
 Fragment for rendering the course's sock and associated toggle button.
 """
-from __future__ import absolute_import
+
 
 from django.template.loader import render_to_string
 from web_fragments.fragment import Fragment

@@ -1,7 +1,7 @@
 """
     Test split modulestore w/o using any django stuff.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import os
@@ -1819,7 +1819,7 @@ class TestCourseCreation(SplitModuleTest):
             'best', 'leech', 'leech_run', 'leech_master', BRANCH_NAME_DRAFT,
             versions_dict=original_index['versions'])
         new_draft_locator = new_draft.location
-        self.assertRegexpMatches(new_draft_locator.org, 'best')
+        self.assertRegex(new_draft_locator.org, 'best')
         # the edited_by and other meta fields on the new course will be the original author not this one
         self.assertEqual(new_draft.edited_by, 'test@edx.org')
         self.assertEqual(new_draft_locator.version_guid, original_index['versions'][BRANCH_NAME_DRAFT])
@@ -1869,7 +1869,7 @@ class TestCourseCreation(SplitModuleTest):
             fields=fields
         )
         new_draft_locator = new_draft.location
-        self.assertRegexpMatches(new_draft_locator.org, 'counter')
+        self.assertRegex(new_draft_locator.org, 'counter')
         # the edited_by and other meta fields on the new course will be the original author not this one
         self.assertEqual(new_draft.edited_by, 'leech_master')
         self.assertNotEqual(new_draft_locator.version_guid, original_index['versions'][BRANCH_NAME_DRAFT])

@@ -2,7 +2,6 @@
 Test Help links in LMS
 """
 
-from __future__ import absolute_import
 
 from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage

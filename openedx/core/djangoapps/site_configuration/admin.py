@@ -1,7 +1,7 @@
 """
 Django admin page for Site Configuration models
 """
-from __future__ import absolute_import
+
 
 from django.contrib import admin
 

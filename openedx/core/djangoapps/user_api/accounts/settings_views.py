@@ -1,6 +1,5 @@
 """ Views related to Account Settings. """
 
-from __future__ import absolute_import
 
 import logging
 from datetime import datetime

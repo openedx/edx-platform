@@ -1,6 +1,5 @@
 """Entitlement Models"""
 
-from __future__ import absolute_import
 
 import logging
 import uuid as uuid_tools
@@ -502,6 +501,8 @@ class CourseEntitlementSupportDetail(TimeStampedModel):
         db_constraint=False,
         on_delete=models.CASCADE,
     )
+
+    history = HistoricalRecords()
 
     def __str__(self):
         """Unicode representation of an Entitlement"""

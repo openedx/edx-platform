@@ -2,7 +2,6 @@
 Django forms for accounts
 """
 
-from __future__ import absolute_import
 
 from django import forms
 from django.core.exceptions import ValidationError

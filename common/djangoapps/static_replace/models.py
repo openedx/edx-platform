@@ -2,7 +2,6 @@
 Models for static_replace
 """
 
-from __future__ import absolute_import
 
 import six
 from six.moves import map

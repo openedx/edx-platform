@@ -1,5 +1,5 @@
 """Tests for per-course verification status on the dashboard. """
-from __future__ import absolute_import
+
 
 import unittest
 from datetime import datetime, timedelta

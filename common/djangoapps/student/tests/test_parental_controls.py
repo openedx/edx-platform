@@ -1,6 +1,5 @@
 """Unit tests for parental controls."""
 
-from __future__ import absolute_import
 
 import datetime
 

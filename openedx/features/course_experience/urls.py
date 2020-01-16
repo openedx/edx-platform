@@ -2,7 +2,6 @@
 Defines URLs for the course experience.
 """
 
-from __future__ import absolute_import
 
 from django.conf.urls import url
 

@@ -1,7 +1,7 @@
 """
 This file contains celery tasks related to course content gating.
 """
-from __future__ import absolute_import
+
 
 import logging
 

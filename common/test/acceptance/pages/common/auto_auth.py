@@ -1,7 +1,7 @@
 """
 Auto-auth page (used to automatically log in during testing).
 """
-from __future__ import absolute_import
+
 
 import json
 import os

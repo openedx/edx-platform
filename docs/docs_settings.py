@@ -4,7 +4,6 @@ Basically the LMS devstack settings plus a few items needed to successfully
 import all the Studio code.
 """
 
-from __future__ import absolute_import, unicode_literals
 
 import os
 

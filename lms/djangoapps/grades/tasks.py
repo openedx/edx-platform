@@ -2,7 +2,6 @@
 This module contains tasks for asynchronous execution of grade updates.
 """
 
-from __future__ import absolute_import
 
 from logging import getLogger
 

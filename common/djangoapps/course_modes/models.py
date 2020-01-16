@@ -1,7 +1,7 @@
 """
 Add and create new modes for running courses on this particular LMS
 """
-from __future__ import absolute_import
+
 
 from collections import defaultdict, namedtuple
 from datetime import timedelta
@@ -254,6 +254,14 @@ class CourseMode(models.Model):
         if new_datetime is not None:
             self.expiration_datetime_is_explicit = True
         self._expiration_datetime = new_datetime
+
+    @classmethod
+    def get_default_mode_slug(cls):
+        """
+        Returns the default mode slug to be used in the CourseEnrollment model mode field
+        as the default value.
+        """
+        return cls.DEFAULT_MODE_SLUG
 
     @classmethod
     def all_modes_for_courses(cls, course_id_list):

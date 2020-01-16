@@ -1,7 +1,7 @@
 """
 Tests for the Shopping Cart Models
 """
-from __future__ import absolute_import
+
 
 import copy
 import datetime
@@ -101,7 +101,7 @@ class OrderTest(ModuleStoreTestCase):
         CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
         # should return the same cart
         cart2 = Order.get_cart_for_user(user=self.user)
-        self.assertEquals(cart2.orderitem_set.count(), 1)
+        self.assertEqual(cart2.orderitem_set.count(), 1)
 
     def test_user_cart_has_items(self):
         anon = AnonymousUser()
@@ -131,23 +131,23 @@ class OrderTest(ModuleStoreTestCase):
         cart = Order.get_cart_for_user(user=self.user)
         CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
         CertificateItem.add_to_order(cart, self.other_course_keys[0], self.cost, 'honor')
-        self.assertEquals(cart.orderitem_set.count(), 2)
+        self.assertEqual(cart.orderitem_set.count(), 2)
         self.assertTrue(cart.has_items())
         cart.clear()
-        self.assertEquals(cart.orderitem_set.count(), 0)
+        self.assertEqual(cart.orderitem_set.count(), 0)
         self.assertFalse(cart.has_items())
 
     def test_add_item_to_cart_currency_match(self):
         cart = Order.get_cart_for_user(user=self.user)
         CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor', currency='eur')
         # verify that a new item has been added
-        self.assertEquals(cart.orderitem_set.count(), 1)
+        self.assertEqual(cart.orderitem_set.count(), 1)
         # verify that the cart's currency was updated
-        self.assertEquals(cart.currency, 'eur')
+        self.assertEqual(cart.currency, 'eur')
         with self.assertRaises(InvalidCartItem):
             CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor', currency='usd')
         # assert that this item did not get added to the cart
-        self.assertEquals(cart.orderitem_set.count(), 1)
+        self.assertEqual(cart.orderitem_set.count(), 1)
 
     def test_total_cost(self):
         cart = Order.get_cart_for_user(user=self.user)
@@ -158,8 +158,8 @@ class OrderTest(ModuleStoreTestCase):
                         (self.other_course_keys[3], 20)]
         for course, cost in course_costs:
             CertificateItem.add_to_order(cart, course, cost, 'honor')
-        self.assertEquals(cart.orderitem_set.count(), len(course_costs))
-        self.assertEquals(cart.total_cost, sum(cost for _course, cost in course_costs))
+        self.assertEqual(cart.orderitem_set.count(), len(course_costs))
+        self.assertEqual(cart.total_cost, sum(cost for _course, cost in course_costs))
 
     def test_start_purchase(self):
         # Start the purchase, which will mark the cart as "paying"
@@ -266,8 +266,8 @@ class OrderTest(ModuleStoreTestCase):
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_key))
 
         # Test email sending
-        self.assertEquals(len(mail.outbox), 1)
-        self.assertEquals('Order Payment Confirmation', mail.outbox[0].subject)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual('Order Payment Confirmation', mail.outbox[0].subject)
         self.assertIn(settings.PAYMENT_SUPPORT_EMAIL, mail.outbox[0].body)
         self.assertIn(six.text_type(cart.total_cost), mail.outbox[0].body)
         self.assertIn(item.additional_instruction_text(), mail.outbox[0].body)
@@ -305,7 +305,7 @@ class OrderTest(ModuleStoreTestCase):
                 # verify that we rolled back the entire transaction
                 self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_key))
                 # verify that e-mail wasn't sent
-                self.assertEquals(len(mail.outbox), 0)
+                self.assertEqual(len(mail.outbox), 0)
 
     def test_purchase_twice(self):
         cart = Order.get_cart_for_user(self.user)
@@ -313,7 +313,7 @@ class OrderTest(ModuleStoreTestCase):
         # purchase the cart more than once
         cart.purchase()
         cart.purchase()
-        self.assertEquals(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox), 1)
 
     @patch('shoppingcart.models.log.error')
     def test_purchase_item_email_smtp_failure(self, error_logger):
@@ -454,7 +454,7 @@ class OrderItemTest(TestCase):
         self.assertTrue(cart.has_items())
         (inst_dict, inst_set) = cart.generate_receipt_instructions()
         self.assertDictEqual({item.pk_with_subclass: set([])}, inst_dict)
-        self.assertEquals(set([]), inst_set)
+        self.assertEqual(set([]), inst_set)
 
     def test_is_discounted(self):
         """
@@ -902,15 +902,15 @@ class CertificateItemTest(ModuleStoreTestCase):
         self.mock_tracker.reset_mock()
         cart.purchase()
         enrollment = CourseEnrollment.objects.get(user=self.user, course_id=self.course_key)
-        self.assertEquals(enrollment.mode, u'verified')
+        self.assertEqual(enrollment.mode, u'verified')
 
     def test_single_item_template(self):
         cart = Order.get_cart_for_user(user=self.user)
         cert_item = CertificateItem.add_to_order(cart, self.course_key, self.cost, 'verified')
-        self.assertEquals(cert_item.single_item_receipt_template, 'shoppingcart/receipt.html')
+        self.assertEqual(cert_item.single_item_receipt_template, 'shoppingcart/receipt.html')
 
         cert_item = CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
-        self.assertEquals(cert_item.single_item_receipt_template, 'shoppingcart/receipt.html')
+        self.assertEqual(cert_item.single_item_receipt_template, 'shoppingcart/receipt.html')
 
     @override_settings(LMS_SEGMENT_KEY="foobar")
     @patch.dict(settings.FEATURES, {'STORE_BILLING_INFO': True})
@@ -930,7 +930,7 @@ class CertificateItemTest(ModuleStoreTestCase):
         target_certs = CertificateItem.objects.filter(course_id=self.course_key, user_id=self.user, status='refunded', mode='verified')
         self.assertTrue(target_certs[0])
         self.assertTrue(target_certs[0].refund_requested_time)
-        self.assertEquals(target_certs[0].order.status, 'refunded')
+        self.assertEqual(target_certs[0].order.status, 'refunded')
         self._assert_refund_tracked()
 
     def test_no_refund_on_cert_callback(self):
@@ -949,7 +949,7 @@ class CertificateItemTest(ModuleStoreTestCase):
         )
         self.assertTrue(target_certs[0])
         self.assertFalse(target_certs[0].refund_requested_time)
-        self.assertEquals(target_certs[0].order.status, 'purchased')
+        self.assertEqual(target_certs[0].order.status, 'purchased')
 
     @override_settings(LMS_SEGMENT_KEY="foobar")
     @patch.dict(settings.FEATURES, {'STORE_BILLING_INFO': True})
@@ -980,7 +980,7 @@ class CertificateItemTest(ModuleStoreTestCase):
         target_certs = CertificateItem.objects.filter(course_id=self.course_key, user_id=self.user, status='refunded', mode='verified')
         self.assertTrue(target_certs[0])
         self.assertTrue(target_certs[0].refund_requested_time)
-        self.assertEquals(target_certs[0].order.status, 'refunded')
+        self.assertEqual(target_certs[0].order.status, 'refunded')
         self._assert_refund_tracked()
 
     @patch('student.models.CourseEnrollment.refund_cutoff_date')
@@ -1007,9 +1007,9 @@ class CertificateItemTest(ModuleStoreTestCase):
         with patch('shoppingcart.models.log.error') as mock_error_logger:
             CourseEnrollment.unenroll(self.user, course_key)
             self.assertFalse(mock_error_logger.called)
-            self.assertEquals(len(mail.outbox), 1)
-            self.assertEquals('[Refund] User-Requested Refund', mail.outbox[0].subject)
-            self.assertEquals(settings.PAYMENT_SUPPORT_EMAIL, mail.outbox[0].from_email)
+            self.assertEqual(len(mail.outbox), 1)
+            self.assertEqual('[Refund] User-Requested Refund', mail.outbox[0].subject)
+            self.assertEqual(settings.PAYMENT_SUPPORT_EMAIL, mail.outbox[0].from_email)
             self.assertIn('has requested a refund on Order', mail.outbox[0].body)
 
     @patch('student.models.CourseEnrollment.refund_cutoff_date')
@@ -1083,12 +1083,12 @@ class CertificateItemTest(ModuleStoreTestCase):
         self.mock_tracker.reset_mock()
         cart.purchase()
         enrollment = CourseEnrollment.objects.get(user=self.user, course_id=self.course_key)
-        self.assertEquals(enrollment.mode, u'no-id-professional')
+        self.assertEqual(enrollment.mode, u'no-id-professional')
 
         # Check that the tax-deduction information appears in the confirmation email
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
-        self.assertEquals('Order Payment Confirmation', email.subject)
+        self.assertEqual('Order Payment Confirmation', email.subject)
         self.assertNotIn("If you haven't verified your identity yet, please start the verification process", email.body)
         self.assertIn(
             "You can unenroll in the course and receive a full refund for 2 days after the course start date. ",
@@ -1140,7 +1140,7 @@ class DonationTest(ModuleStoreTestCase):
         # Check that the tax-deduction information appears in the confirmation email
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
-        self.assertEquals('Order Payment Confirmation', email.subject)
+        self.assertEqual('Order Payment Confirmation', email.subject)
         self.assertIn("tax purposes", email.body)
 
     def test_donate_no_such_course(self):

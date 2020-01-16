@@ -2,7 +2,6 @@
 Test grading events across apps.
 """
 
-from __future__ import absolute_import
 
 import six
 from crum import set_current_request

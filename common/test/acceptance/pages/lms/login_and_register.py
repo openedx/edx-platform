@@ -1,6 +1,5 @@
 """Login and Registration pages """
 
-from __future__ import absolute_import
 
 from bok_choy.page_object import PageObject, unguarded
 from bok_choy.promise import EmptyPromise, Promise

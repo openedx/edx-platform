@@ -3,7 +3,7 @@ Unit tests for contentstore.views.library
 
 More important high-level tests are in contentstore/tests/test_libraries.py
 """
-from __future__ import absolute_import
+
 
 import ddt
 import mock

@@ -1,7 +1,7 @@
 """
 django admin pages for certificates models
 """
-from __future__ import absolute_import
+
 
 from operator import itemgetter
 

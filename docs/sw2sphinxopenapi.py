@@ -8,7 +8,6 @@ detailed segment page.
 
 """
 
-from __future__ import print_function
 
 import functools
 import itertools

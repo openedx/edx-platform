@@ -6,7 +6,6 @@
 # full list see the documentation:
 # http://www.sphinx-doc.org/en/master/config
 
-from __future__ import absolute_import, unicode_literals
 
 import datetime
 import os

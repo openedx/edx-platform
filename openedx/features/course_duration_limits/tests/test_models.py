@@ -2,7 +2,6 @@
 Tests of CourseDurationLimitConfig.
 """
 
-from __future__ import absolute_import
 
 import itertools
 from datetime import datetime, timedelta

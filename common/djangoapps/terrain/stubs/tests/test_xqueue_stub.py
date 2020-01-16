@@ -2,7 +2,6 @@
 Unit tests for stub XQueue implementation.
 """
 
-from __future__ import absolute_import
 
 import ast
 import json

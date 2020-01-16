@@ -3,7 +3,7 @@ Test of custom django-oauth-toolkit behavior
 """
 
 # pylint: disable=protected-access
-from __future__ import absolute_import
+
 
 import datetime
 import unittest

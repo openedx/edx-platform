@@ -1,7 +1,7 @@
 """
 Platform related Operations for Mobile APP
 """
-from __future__ import absolute_import
+
 
 import abc
 import re

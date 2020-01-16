@@ -1,5 +1,5 @@
 """Common utility for testing third party oauth2 features."""
-from __future__ import absolute_import
+
 
 import json
 from base64 import b64encode

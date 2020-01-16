@@ -1,7 +1,7 @@
 """
 Fixture to manipulate configuration models.
 """
-from __future__ import absolute_import
+
 
 import json
 import re

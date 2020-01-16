@@ -1,7 +1,7 @@
 """
 A script to create some dummy users
 """
-from __future__ import absolute_import, print_function
+
 
 import uuid
 

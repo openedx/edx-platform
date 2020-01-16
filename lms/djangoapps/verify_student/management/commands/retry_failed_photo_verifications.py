@@ -1,7 +1,7 @@
 """
 Django admin commands related to verify_student
 """
-from __future__ import absolute_import, print_function
+
 
 import logging
 from django.core.management.base import BaseCommand
@@ -31,7 +31,7 @@ class Command(BaseCommand):
             dest='verification_ids',
             action='store',
             nargs='+',
-            type=int,
+            type=str,
             help='verifications id used to retry verification'
         )
 
@@ -46,7 +46,8 @@ class Command(BaseCommand):
 
         sspv_retry_config = SSPVerificationRetryConfig.current()
         if not sspv_retry_config.enabled:
-            raise CommandError('SSPVerificationRetryConfig is disabled, but --args-from-database was requested.')
+            log.warning('SSPVerificationRetryConfig is disabled or empty, but --args-from-database was requested.')
+            return {}
 
         # We don't need fancy shell-style whitespace/quote handling - none of our arguments are complicated
         argv = sspv_retry_config.arguments.split()

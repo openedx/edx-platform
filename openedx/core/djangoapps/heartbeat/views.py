@@ -1,7 +1,7 @@
 """
 Views for verifying the health (heartbeat) of the app.
 """
-from __future__ import absolute_import
+
 
 import six
 

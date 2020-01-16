@@ -3,7 +3,6 @@
 Video xmodule tests in mongo.
 """
 
-from __future__ import absolute_import
 
 import io
 import json

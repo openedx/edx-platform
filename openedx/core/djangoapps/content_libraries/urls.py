@@ -1,11 +1,14 @@
 """
 URL configuration for Studio's Content Libraries REST API
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 from django.conf.urls import include, url
 
 from . import views
+
+
+app_name = 'openedx.core.djangoapps.content_libraries'
 
 # These URLs are only used in Studio. The LMS already provides all the
 # API endpoints needed to serve XBlocks from content libraries using the

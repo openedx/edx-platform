@@ -6,7 +6,6 @@ Settings for load testing.
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
 
-from __future__ import absolute_import
 
 from six.moves import filter
 

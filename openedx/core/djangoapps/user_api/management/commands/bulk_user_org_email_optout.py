@@ -16,7 +16,6 @@ If the user/org combo does not currently exist in the table, a row will be creat
 will be have the 'email-optin' tag set to 'False'.
 """
 
-from __future__ import absolute_import, print_function
 
 import csv
 import logging

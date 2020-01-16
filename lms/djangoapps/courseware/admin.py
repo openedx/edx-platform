@@ -1,7 +1,7 @@
 """
 Admin view for courseware.
 """
-from __future__ import absolute_import
+
 
 from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
 from django.contrib import admin

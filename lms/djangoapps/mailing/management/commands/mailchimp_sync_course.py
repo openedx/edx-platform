@@ -1,7 +1,7 @@
 """
 Synchronizes a mailchimp list with the students of a course.
 """
-from __future__ import absolute_import
+
 
 import itertools
 import logging

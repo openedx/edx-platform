@@ -3,7 +3,7 @@ Student and course analytics.
 
 Serve miscellaneous course and student data
 """
-from __future__ import absolute_import
+
 
 import datetime
 import json

@@ -6,7 +6,6 @@ Credit courses allow students to receive university credit for
 successful completion of a course on EdX
 """
 
-from __future__ import absolute_import
 
 import datetime
 import logging
@@ -301,21 +300,21 @@ class CreditRequirement(TimeStampedModel):
     namespace = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
     display_name = models.CharField(max_length=255, default=u"")
-    order = models.PositiveIntegerField(default=0)
     criteria = JSONField()
     active = models.BooleanField(default=True)
+    sort_value = models.PositiveIntegerField(default=0)
 
     CACHE_NAMESPACE = u"credit.CreditRequirement.cache."
 
     class Meta(object):
         unique_together = ('namespace', 'name', 'course')
-        ordering = ["order"]
+        ordering = ["sort_value"]
 
     def __str__(self):
         return u'{course_id} - {name}'.format(course_id=self.course.course_key, name=self.display_name)
 
     @classmethod
-    def add_or_update_course_requirement(cls, credit_course, requirement, order):
+    def add_or_update_course_requirement(cls, credit_course, requirement, sort_value):
         """
         Add requirement to a given course.
 
@@ -334,14 +333,14 @@ class CreditRequirement(TimeStampedModel):
             defaults={
                 "display_name": requirement["display_name"],
                 "criteria": requirement["criteria"],
-                "order": order,
+                "sort_value": sort_value,
                 "active": True
             }
         )
         if not created:
             credit_requirement.criteria = requirement["criteria"]
             credit_requirement.active = True
-            credit_requirement.order = order
+            credit_requirement.sort_value = sort_value
             credit_requirement.display_name = requirement["display_name"]
             credit_requirement.save()
 

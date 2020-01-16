@@ -1,6 +1,5 @@
 """ Objects and functions related to generating CSV reports """
 
-from __future__ import absolute_import
 
 from decimal import Decimal
 

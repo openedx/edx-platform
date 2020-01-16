@@ -1,7 +1,7 @@
 """
 Fragment for rendering the course dates sidebar.
 """
-from __future__ import absolute_import
+
 
 from django.http import Http404
 from django.template.loader import render_to_string
@@ -28,7 +28,7 @@ class CourseDatesFragmentView(EdxFragmentView):
         course_date_blocks = get_course_date_blocks(course, request.user)
 
         context = {
-            'course_date_blocks': course_date_blocks
+            'course_date_blocks': [block for block in course_date_blocks if block.title != 'current_datetime']
         }
         html = render_to_string(self.template_name, context)
         dates_fragment = Fragment(html)

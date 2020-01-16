@@ -2,7 +2,6 @@
 Test helper functions and base classes.
 """
 
-from __future__ import absolute_import
 
 import functools
 import inspect
@@ -648,7 +647,7 @@ class EventsTestMixin(TestCase):
             lambda: matching_events
         )
 
-        self.assertEquals(len(matching_events), 0, description)
+        self.assertEqual(len(matching_events), 0, description)
 
     def assert_events_match(self, expected_events, actual_events, in_order=True):
         """Assert that each actual event matches one of the expected events.

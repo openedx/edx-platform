@@ -3,7 +3,6 @@ Tests related to the basic footer-switching based off SITE_NAME to ensure
 edx.org uses an edx footer but other instances use an Open edX footer.
 """
 
-from __future__ import absolute_import
 
 import unittest
 

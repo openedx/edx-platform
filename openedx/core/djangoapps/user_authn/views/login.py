@@ -4,7 +4,6 @@ Views for login / logout and associated functionality
 Much of this file was broken out from views.py, previous history can be found there.
 """
 
-from __future__ import absolute_import
 
 from functools import wraps
 import json
@@ -17,6 +16,7 @@ from django.contrib.auth import login as django_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
@@ -181,7 +181,7 @@ def _log_and_raise_inactive_user_auth_error(unauthenticated_user):
     raise AuthFailedError(_generate_not_activated_message(unauthenticated_user))
 
 
-def _authenticate_first_party(request, unauthenticated_user):
+def _authenticate_first_party(request, unauthenticated_user, third_party_auth_requested):
     """
     Use Django authentication on the given request, using rate limiting if configured
     """
@@ -190,7 +190,11 @@ def _authenticate_first_party(request, unauthenticated_user):
     # to fail and we can take advantage of the ratelimited backend
     username = unauthenticated_user.username if unauthenticated_user else ""
 
-    _check_user_auth_flow(request.site, unauthenticated_user)
+    # First time when a user login through third_party_auth account then user needs to link
+    # third_party account with the platform account by login through email and password that's
+    # why we need to by-pass this check when user is already authenticated by third_party_auth.
+    if not third_party_auth_requested:
+        _check_user_auth_flow(request.site, unauthenticated_user)
 
     try:
         password = normalize_password(request.POST['password'])
@@ -289,11 +293,19 @@ def _check_user_auth_flow(site, user):
 
         # If user belongs to allowed domain and not whitelisted then user must login through allowed domain SSO
         if user_domain == allowed_domain and not AllowedAuthUser.objects.filter(site=site, email=user.email).exists():
-            msg = _(
-                u'As an {allowed_domain} user, You must login with your {allowed_domain} {provider} account.'
-            ).format(
+            msg = Text(_(
+                u'As {allowed_domain} user, You must login with your {allowed_domain} '
+                u'{link_start}{provider} account{link_end}.'
+            )).format(
                 allowed_domain=allowed_domain,
-                provider=site.configuration.get_value('THIRD_PARTY_AUTH_ONLY_PROVIDER')
+                link_start=HTML("<a href='{tpa_provider_link}'>").format(
+                    tpa_provider_link='{dashboard_url}?tpa_hint={tpa_hint}'.format(
+                        dashboard_url=reverse('dashboard'),
+                        tpa_hint=site.configuration.get_value('THIRD_PARTY_AUTH_ONLY_HINT'),
+                    )
+                ),
+                provider=site.configuration.get_value('THIRD_PARTY_AUTH_ONLY_PROVIDER'),
+                link_end=HTML("</a>")
             )
             raise AuthFailedError(msg)
 
@@ -337,6 +349,33 @@ def finish_auth(request):  # pylint: disable=unused-argument
 def login_user(request):
     """
     AJAX request to log in the user.
+
+    Arguments:
+        request (HttpRequest)
+
+    Required params:
+        email, password
+
+    Optional params:
+        analytics: a JSON-encoded object with additional info to include in the login analytics event. The only
+            supported field is "enroll_course_id" to indicate that the user logged in while enrolling in a particular
+            course.
+
+    Returns:
+        HttpResponse: 200 if successful.
+            Ex. {'success': true}
+        HttpResponse: 400 if the request failed.
+            Ex. {'success': false, 'value': '{'success': false, 'value: 'Email or password is incorrect.'}
+        HttpResponse: 403 if successful authentication with a third party provider but does not have a linked account.
+            Ex. {'success': false, 'error_code': 'third-party-auth-with-no-linked-account'}
+
+    Example Usage:
+
+        POST /login_ajax
+        with POST params `email`, `password`
+
+        200 {'success': true}
+
     """
     _parse_analytics_param_for_course_id(request)
 
@@ -344,7 +383,6 @@ def login_user(request):
     first_party_auth_requested = bool(request.POST.get('email')) or bool(request.POST.get('password'))
     is_user_third_party_authenticated = False
 
-    set_custom_metric('login_user_enrollment_action', request.POST.get('enrollment_action'))
     set_custom_metric('login_user_course_id', request.POST.get('course_id'))
 
     try:
@@ -376,7 +414,7 @@ def login_user(request):
         possibly_authenticated_user = user
 
         if not is_user_third_party_authenticated:
-            possibly_authenticated_user = _authenticate_first_party(request, user)
+            possibly_authenticated_user = _authenticate_first_party(request, user, third_party_auth_requested)
             if possibly_authenticated_user and password_policy_compliance.should_enforce_compliance_on_login():
                 # Important: This call must be made AFTER the user was successfully authenticated.
                 _enforce_password_policy_compliance(request, possibly_authenticated_user)
@@ -445,34 +483,17 @@ class LoginSessionView(APIView):
     def post(self, request):
         """Log in a user.
 
-        You must send all required form fields with the request.
-
-        You can optionally send an `analytics` param with a JSON-encoded
-        object with additional info to include in the login analytics event.
-        Currently, the only supported field is "enroll_course_id" to indicate
-        that the user logged in while enrolling in a particular course.
-
-        Arguments:
-            request (HttpRequest)
-
-        Returns:
-            HttpResponse: 200 on success
-            HttpResponse: 400 if the request is not valid.
-            HttpResponse: 403 if authentication failed.
-                403 with content "third-party-auth" if the user
-                has successfully authenticated with a third party provider
-                but does not have a linked account.
-            HttpResponse: 302 if redirecting to another page.
+        See `login_user` for details.
 
         Example Usage:
 
             POST /user_api/v1/login_session
-            with POST params `email`, `password`, and `remember`.
+            with POST params `email`, `password`.
 
-            200 OK
+            200 {'success': true}
 
         """
-        return shim_student_view(login_user, check_logged_in=True)(request)
+        return login_user(request)
 
     @method_decorator(sensitive_post_parameters("password"))
     def dispatch(self, request, *args, **kwargs):
@@ -508,129 +529,3 @@ def _parse_analytics_param_for_course_id(request):
                     analytics=analytics
                 )
             )
-
-
-def shim_student_view(view_func, check_logged_in=False):
-    """Create a "shim" view for a view function from the student Django app.
-
-    UPDATE: This shim is only used to wrap `login_user`, which now lives in
-    the user_authn Django app (not the student app).
-
-    Specifically, we need to:
-    * Strip out enrollment params, since the client for the new registration/login
-        page will communicate with the enrollment API to update enrollments.
-
-    * Return responses with HTTP status codes indicating success/failure
-        (instead of always using status 200, but setting "success" to False in
-        the JSON-serialized content of the response)
-
-    * Use status code 403 to indicate a login failure.
-
-    The shim will preserve any cookies set by the view.
-
-    Arguments:
-        view_func (function): The view function from the student Django app.
-
-    Keyword Args:
-        check_logged_in (boolean): If true, check whether the user successfully
-            authenticated and if not set the status to 403. This argument is
-            used to test the shim by skipping this check.
-
-    Returns:
-        function
-
-    """
-    @wraps(view_func)
-    def _inner(request):  # pylint: disable=missing-docstring
-        # Call the original view to generate a response.
-        # We can safely modify the status code or content
-        # of the response, but to be safe we won't mess
-        # with the headers.
-        response = view_func(request)
-
-        # Most responses from this view are JSON-encoded
-        # dictionaries with keys "success", "value", and
-        # (sometimes) "redirect_url".
-        #
-        # We want to communicate some of this information
-        # using HTTP status codes instead.
-        #
-        # We ignore the "redirect_url" parameter, because we don't need it:
-        # 1) It's used to redirect on change enrollment, which
-        # our client will handle directly
-        # (that's why we strip out the enrollment params from the request)
-        # 2) It's used by third party auth when a user has already successfully
-        # authenticated and we're not sending login credentials.  However,
-        # this case is never encountered in practice: on the old login page,
-        # the login form would be submitted directly, so third party auth
-        # would always be "trumped" by first party auth.  If a user has
-        # successfully authenticated with us, we redirect them to the dashboard
-        # regardless of how they authenticated; and if a user is completing
-        # the third party auth pipeline, we redirect them from the pipeline
-        # completion end-point directly.
-        try:
-            response_dict = json.loads(response.content.decode('utf-8'))
-            msg = response_dict.get("value", u"")
-            success = response_dict.get("success")
-            set_custom_metric('shim_original_response_is_json', True)
-            set_custom_metric('shim_original_redirect_url', response_dict.get("redirect_url"))
-            set_custom_metric('shim_original_redirect', response_dict.get("redirect"))
-        except (ValueError, TypeError):
-            msg = response.content
-            success = True
-            set_custom_metric('shim_original_response_is_json', False)
-        set_custom_metric('shim_original_response_msg', msg)
-        set_custom_metric('shim_original_response_success', success)
-        set_custom_metric('shim_original_response_status', response.status_code)
-
-        # If the user is not authenticated when we expect them to be
-        # send the appropriate status code.
-        # We check whether the user attribute is set to make
-        # it easier to test this without necessarily running
-        # the request through authentication middleware.
-        is_authenticated = (
-            getattr(request, 'user', None) is not None
-            and request.user.is_authenticated
-        )
-        if check_logged_in and not is_authenticated:
-            # If we get a 403 status code from the student view
-            # this means we've successfully authenticated with a
-            # third party provider, but we don't have a linked
-            # EdX account.  Send a helpful error code so the client
-            # knows this occurred.
-            if response.status_code == 403:
-                response.content = "third-party-auth"
-
-            # Otherwise, it's a general authentication failure.
-            # Ensure that the status code is a 403 and pass
-            # along the message from the view.
-            else:
-                response.status_code = 403
-                response.content = msg
-
-        # If an error condition occurs, send a status 400
-        elif response.status_code != 200 or not success:
-            # login_user sends status 200 even when an error occurs
-            # If the JSON-serialized content has a value "success" set to False,
-            # then we know an error occurred.
-            # NOTE: temporary metric added so we can remove this code once the
-            # original response is 400 instead of 200.
-            set_custom_metric('shim_adjusted_status_code', bool(response.status_code == 200))
-            if response.status_code == 200:
-                response.status_code = 400
-            response.content = msg
-
-        # If the response is successful, then return the content
-        # of the response directly rather than including it
-        # in a JSON-serialized dictionary.
-        else:
-            response.content = msg
-
-        set_custom_metric('shim_final_response_msg', response.content)
-        set_custom_metric('shim_final_response_status', response.status_code)
-        # Return the response, preserving the original headers.
-        # This is really important, since the student views set cookies
-        # that are used elsewhere in the system (such as the marketing site).
-        return response
-
-    return _inner

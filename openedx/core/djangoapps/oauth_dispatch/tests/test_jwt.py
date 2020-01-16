@@ -1,5 +1,5 @@
 """ Tests for OAuth Dispatch's jwt module. """
-from __future__ import absolute_import
+
 
 import itertools
 from datetime import timedelta

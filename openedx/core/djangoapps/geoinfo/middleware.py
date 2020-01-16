@@ -10,7 +10,6 @@ decorator `django.utils.decorators.decorator_from_middleware(middleware_class)`
 
 """
 
-from __future__ import absolute_import
 
 import logging
 import geoip2.database

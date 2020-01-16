@@ -8,7 +8,7 @@ of a student over a period of time. Right now, the only models are the abstract
 `SoftwareSecurePhotoVerification`. The hope is to keep as much of the
 photo verification process as generic as possible.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import base64
 import codecs
@@ -688,7 +688,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
         # Update our record fields
         if six.PY3:
-            self.photo_id_key = codecs.encode(rsa_encrypted_aes_key, 'base64')
+            self.photo_id_key = codecs.encode(rsa_encrypted_aes_key, 'base64').decode('utf-8')
         else:
             self.photo_id_key = rsa_encrypted_aes_key.encode('base64')
 
@@ -837,7 +837,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         face_aes_key = codecs.decode(face_aes_key_str, 'hex')
         rsa_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["RSA_PUBLIC_KEY"]
         rsa_encrypted_face_aes_key = rsa_encrypt(face_aes_key, rsa_key_str)
-        return base64.b64encode(rsa_encrypted_face_aes_key)
+        return base64.b64encode(rsa_encrypted_face_aes_key).decode('utf-8')
 
     def create_request(self, copy_id_photo_from=None):
         """

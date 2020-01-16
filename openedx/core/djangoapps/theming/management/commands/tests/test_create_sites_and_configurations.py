@@ -2,7 +2,6 @@
 Test cases for create_sites_and_configurations command.
 """
 
-from __future__ import absolute_import
 
 import mock
 from django.contrib.auth.models import User

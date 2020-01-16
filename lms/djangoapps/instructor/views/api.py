@@ -5,7 +5,7 @@ JSON views which the instructor dashboard requests.
 
 Many of these GETs may become PUTs in the future.
 """
-from __future__ import absolute_import
+
 
 import csv
 import decimal

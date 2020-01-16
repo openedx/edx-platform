@@ -2,7 +2,6 @@
 Test the enterprise support APIs.
 """
 
-from __future__ import absolute_import
 
 import mock
 
@@ -319,6 +318,22 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             self.assertEqual(mock_enterprise_customer_from_api.called, False)
             self.assertEqual(mock_enterprise_customer_from_cache.called, True)
 
+        # Verify enterprise customer data fetched from session for subsequent calls
+        # with unauthenticated user in SAML case
+        del dummy_request.user
+
+        with mock.patch(
+            'openedx.features.enterprise_support.api.enterprise_customer_from_api',
+            return_value=enterprise_data
+        ) as mock_enterprise_customer_from_api, mock.patch(
+            'openedx.features.enterprise_support.api.enterprise_customer_from_cache',
+            return_value=enterprise_data
+        ) as mock_enterprise_customer_from_cache:
+            enterprise_customer = enterprise_customer_for_request(dummy_request)
+            self.assertEqual(enterprise_customer, enterprise_data)
+            self.assertEqual(mock_enterprise_customer_from_api.called, False)
+            self.assertEqual(mock_enterprise_customer_from_cache.called, True)
+
     def check_data_sharing_consent(self, consent_required=False, consent_url=None):
         """
         Used to test the data_sharing_consent_required view decorator.
@@ -341,7 +356,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         # not be called.
         if consent_required:
             self.assertIsInstance(response, HttpResponseRedirect)
-            self.assertEquals(response.url, consent_url)  # pylint: disable=no-member
+            self.assertEqual(response.url, consent_url)  # pylint: disable=no-member
 
         # Otherwise, the view function should have been called with the expected arguments.
         else:
@@ -368,7 +383,6 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
     def test_no_course_data_consent_required(self,
                                              mock_consent_necessary,
                                              mock_enterprise_enabled):
-
         """
         Verify that the wrapped view is called directly when enterprise integration is enabled,
         and no course consent is required.

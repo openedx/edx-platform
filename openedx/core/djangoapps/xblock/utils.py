@@ -1,12 +1,14 @@
 """
 Useful helper methods related to the XBlock runtime
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 import hashlib
 import hmac
 import math
 import time
+from uuid import uuid4
 
+import crum
 from django.conf import settings
 from six import text_type
 
@@ -67,3 +69,32 @@ def validate_secure_token_for_xblock_handler(user_id, block_key_str, token):
     # All computations happen above this line so this function always takes a
     # constant time to produce its answer (security best practice).
     return bool(result1 or result2)
+
+
+def get_xblock_id_for_anonymous_user(user):
+    """
+    Get a unique string that identifies the current anonymous (not logged in)
+    user. (This is different than the "anonymous user ID", which is an
+    anonymized identifier for a logged in user.)
+
+    Note that this ID is a string, not an int. It is guaranteed to be in a
+    unique namespace that won't collide with "normal" user IDs, even when
+    they are converted to a string.
+    """
+    if not user or not user.is_anonymous:
+        raise TypeError("get_xblock_id_for_anonymous_user() is only for anonymous (not logged in) users.")
+    if hasattr(user, 'xblock_id_for_anonymous_user'):
+        # If code elsewhere (like the xblock_handler API endpoint) has stored
+        # the key on the AnonymousUser object, just return that - it supersedes
+        # everything else:
+        return user.xblock_id_for_anonymous_user
+    # We use the session to track (and create if needed) a unique ID for this anonymous user:
+    current_request = crum.get_current_request()
+    if current_request and current_request.session:
+        # Make sure we have a key for this user:
+        if "xblock_id_for_anonymous_user" not in current_request.session:
+            new_id = "anon{}".format(uuid4().hex[:20])
+            current_request.session["xblock_id_for_anonymous_user"] = new_id
+        return current_request.session["xblock_id_for_anonymous_user"]
+    else:
+        raise RuntimeError("Cannot get a user ID for an anonymous user outside of an HTTP request context.")

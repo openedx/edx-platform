@@ -1,5 +1,5 @@
 # pylint: disable=missing-docstring,consider-iterating-dictionary
-from __future__ import absolute_import
+
 
 import json
 
@@ -189,7 +189,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):
     def test_unsubscribe_invalid_token(self):
         def test_invalid_token(token, message):
             request = self.request_factory.get("dummy")
-            self.assertRaisesRegexp(Http404, "^{}$".format(message), set_subscription, request, token, False)
+            self.assertRaisesRegex(Http404, "^{}$".format(message), set_subscription, request, token, False)
 
         # Invalid base64 encoding
         test_invalid_token("ZOMG INVALID BASE64 CHARS!!!", "base64url")

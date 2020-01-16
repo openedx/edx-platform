@@ -2,7 +2,7 @@
 """
 Admin site configuration for third party authentication
 """
-from __future__ import absolute_import
+
 
 from config_models.admin import KeyedConfigurationModelAdmin
 from django import forms

@@ -2,7 +2,6 @@
 Check that view authentication works properly.
 """
 
-from __future__ import absolute_import
 
 import datetime
 

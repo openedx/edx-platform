@@ -1,7 +1,7 @@
 """
 This test file will test registration, login, activation, and session activity timeouts
 """
-from __future__ import absolute_import, print_function
+
 
 import datetime
 import time
@@ -151,7 +151,7 @@ class AuthTestCase(ContentStoreTestCase):
         # make sure we can access courseware immediately
         course_url = '/home/'
         resp = self.client.get_html(course_url)
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
 
         # then wait a bit and see if we get timed out
         time.sleep(2)

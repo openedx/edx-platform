@@ -2,7 +2,6 @@
 Instructor Dashboard Views
 """
 
-from __future__ import absolute_import
 
 import datetime
 import logging
@@ -821,10 +820,10 @@ def _section_open_response_assessment(request, course, openassessment_blocks, ac
         result_item_id = six.text_type(block.location)
         if block_parent_id not in parents:
             parents[block_parent_id] = modulestore().get_item(block.parent)
-
+        assessment_name = _("Team") + " : " + block.display_name if block.teams_enabled else block.display_name
         ora_items.append({
             'id': result_item_id,
-            'name': block.display_name,
+            'name': assessment_name,
             'parent_id': block_parent_id,
             'parent_name': parents[block_parent_id].display_name,
             'staff_assessment': 'staff-assessment' in block.assessment_steps,

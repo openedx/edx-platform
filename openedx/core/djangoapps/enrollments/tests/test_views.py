@@ -2,7 +2,7 @@
 """
 Tests for user enrollment.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import itertools
@@ -273,7 +273,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             _assert_no_opt_in_set()
         else:
             preference = UserOrgTag.objects.get(user=self.user, org=self.course.id.org, key="email-optin")
-            self.assertEquals(preference.value, pref_value)
+            self.assertEqual(preference.value, pref_value)
 
     def test_enroll_prof_ed(self):
         # Create the prod ed mode.
@@ -946,7 +946,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             self.assertEqual(is_active, old_is_active)
             self.assertEqual(course_mode, old_mode)
             # error message should contain specific text.  Otto checks for this text in the message.
-            self.assertRegexpMatches(
+            self.assertRegex(
                 json.loads(response.content.decode('utf-8'))['message'],
                 'Enrollment mode mismatch'
             )

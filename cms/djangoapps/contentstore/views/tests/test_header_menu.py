@@ -3,7 +3,7 @@
 """
 Course Header Menu Tests.
 """
-from __future__ import absolute_import
+
 
 from django.conf import settings
 from django.test.utils import override_settings

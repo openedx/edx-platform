@@ -1,7 +1,7 @@
 """
 Tests third_party_auth admin views
 """
-from __future__ import absolute_import
+
 
 import unittest
 
@@ -55,8 +55,8 @@ class Oauth2ProviderConfigAdminTest(testutil.TestCase):
 
         # Get the provider instance with active flag
         providers = OAuth2ProviderConfig.objects.all()
-        self.assertEquals(len(providers), 1)
-        self.assertEquals(providers[pcount].id, provider1.id)
+        self.assertEqual(len(providers), 1)
+        self.assertEqual(providers[pcount].id, provider1.id)
 
         # Edit the provider via the admin edit link
         admin = OAuth2ProviderConfigAdmin(provider1, AdminSite())
@@ -76,14 +76,14 @@ class Oauth2ProviderConfigAdminTest(testutil.TestCase):
 
         # Post the edit form: expecting redirect
         response = self.client.post(update_url, post_data)
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
 
         # Editing the existing provider creates a new provider instance
         providers = OAuth2ProviderConfig.objects.all()
-        self.assertEquals(len(providers), pcount + 2)
-        self.assertEquals(providers[pcount].id, provider1.id)
+        self.assertEqual(len(providers), pcount + 2)
+        self.assertEqual(providers[pcount].id, provider1.id)
         provider2 = providers[pcount + 1]
 
         # Ensure the icon_image was preserved on the new provider instance
-        self.assertEquals(provider2.icon_image, provider1.icon_image)
-        self.assertEquals(provider2.name, post_data['name'])
+        self.assertEqual(provider2.icon_image, provider1.icon_image)
+        self.assertEqual(provider2.name, post_data['name'])

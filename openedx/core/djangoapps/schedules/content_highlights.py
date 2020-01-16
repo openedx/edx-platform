@@ -2,7 +2,7 @@
 Contains methods for accessing weekly course highlights. Weekly highlights is a
 schedule experience built on the Schedules app.
 """
-from __future__ import absolute_import
+
 
 import logging
 

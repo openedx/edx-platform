@@ -2,7 +2,6 @@
 Utility functions for course_wiki.
 """
 
-from __future__ import absolute_import
 
 from django.core.exceptions import ObjectDoesNotExist
 

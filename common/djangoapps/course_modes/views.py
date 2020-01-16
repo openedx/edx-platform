@@ -1,7 +1,7 @@
 """
 Views for the course_mode module
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import decimal
 import json
@@ -36,7 +36,6 @@ from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from openedx.features.discounts.utils import get_first_purchase_offer_banner_fragment
 from openedx.features.discounts.applicability import discount_percentage
 from student.models import CourseEnrollment
 from util.db import outer_atomic
@@ -191,9 +190,11 @@ class ChooseModeView(View):
             )
         )
 
-        title_content = _("Congratulations!  You are now enrolled in {course_name}").format(
-            course_name=course.display_name_with_default
-        )
+        title_content = ''
+        if enrollment_mode:
+            title_content = _("Congratulations!  You are now enrolled in {course_name}").format(
+                course_name=course.display_name_with_default
+            )
 
         context["title_content"] = title_content
 

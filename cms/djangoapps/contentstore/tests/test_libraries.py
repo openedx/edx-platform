@@ -1,7 +1,7 @@
 """
 Content library unit tests that require the CMS runtime.
 """
-from __future__ import absolute_import
+
 
 import ddt
 import six
@@ -790,7 +790,7 @@ class TestLibraryAccess(LibraryTestCase):
             edit_view_url = reverse_usage_url("xblock_view_handler", lib_block.location, {"view_name": STUDIO_VIEW})
 
             resp = self.client.get_json(edit_view_url)
-            self.assertEquals(resp.status_code, 200)
+            self.assertEqual(resp.status_code, 200)
 
             return parse_json(resp)['html']
 
@@ -804,7 +804,7 @@ class TestLibraryAccess(LibraryTestCase):
         self._login_as_non_staff_user()
         response = self.client.get_json(LIBRARY_REST_URL)
         staff_libs = parse_json(response)
-        self.assertEquals(2, len(staff_libs))
+        self.assertEqual(2, len(staff_libs))
 
         non_staff_settings_html = _get_settings_html()
         self.assertIn('staff_lib_1', non_staff_settings_html)

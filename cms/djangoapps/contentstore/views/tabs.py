@@ -1,7 +1,7 @@
 """
 Views related to course tabs
 """
-from __future__ import absolute_import
+
 
 import six
 from django.contrib.auth.decorators import login_required

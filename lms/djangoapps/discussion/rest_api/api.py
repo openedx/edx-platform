@@ -1,7 +1,7 @@
 """
 Discussion API internal interface
 """
-from __future__ import absolute_import
+
 
 import itertools
 from collections import defaultdict

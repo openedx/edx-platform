@@ -1,5 +1,5 @@
 """Course Email optOut Policy"""
-from __future__ import absolute_import
+
 
 from edx_ace.channel import ChannelType
 from edx_ace.policy import Policy, PolicyResult

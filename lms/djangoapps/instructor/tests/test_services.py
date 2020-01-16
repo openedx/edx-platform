@@ -2,7 +2,6 @@
 Tests for the InstructorService
 """
 
-from __future__ import absolute_import
 
 import json
 

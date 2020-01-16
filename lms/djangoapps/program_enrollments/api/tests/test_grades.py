@@ -9,4 +9,3 @@ mocks in the view tests.
 This file serves as a placeholder and reminder to do that the next time there
 is development on the program_enrollments grades API.
 """
-from __future__ import absolute_import, unicode_literals

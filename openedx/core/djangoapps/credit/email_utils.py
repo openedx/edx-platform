@@ -2,7 +2,6 @@
 This file contains utility functions which will responsible for sending emails.
 """
 
-from __future__ import absolute_import
 
 import logging
 import os

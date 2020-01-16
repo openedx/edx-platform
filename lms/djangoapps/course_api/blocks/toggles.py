@@ -2,7 +2,7 @@
 Toggles for Course API.
 """
 
-from __future__ import absolute_import
+
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlag, WaffleFlagNamespace
 
 

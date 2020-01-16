@@ -2,7 +2,7 @@
 """
 Unit tests covering the program listing and detail pages.
 """
-from __future__ import absolute_import
+
 
 import json
 import re

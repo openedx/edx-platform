@@ -2,18 +2,16 @@
 Tests for django admin command `populate_expiry_date` in the verify_student module
 """
 
-from __future__ import absolute_import
 
 from datetime import timedelta
 
-import boto
 from django.conf import settings
 from django.core.management import call_command
 from django.test import TestCase
 from mock import patch
 from testfixtures import LogCapture
 
-from common.test.utils import MockS3Mixin
+from common.test.utils import MockS3BotoMixin
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from lms.djangoapps.verify_student.tests.test_models import FAKE_SETTINGS, mock_software_secure_post
 from student.tests.factories import UserFactory
@@ -23,14 +21,8 @@ LOGGER_NAME = 'lms.djangoapps.verify_student.management.commands.populate_expiry
 
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
-class TestPopulateExpiryDate(MockS3Mixin, TestCase):
+class TestPopulateExpiryDate(MockS3BotoMixin, TestCase):
     """ Tests for django admin command `populate_expiry_date` in the verify_student module """
-
-    def setUp(self):
-        """ Initial set up for tests """
-        super(TestPopulateExpiryDate, self).setUp()
-        connection = boto.connect_s3()
-        connection.create_bucket(FAKE_SETTINGS['SOFTWARE_SECURE']['S3_BUCKET'])
 
     def create_and_submit(self, user):
         """ Helper method that lets us create new SoftwareSecurePhotoVerifications """

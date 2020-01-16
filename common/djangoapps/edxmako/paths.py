@@ -2,7 +2,6 @@
 Set up lookup paths for mako templates.
 """
 
-from __future__ import absolute_import
 
 import contextlib
 import hashlib

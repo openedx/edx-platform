@@ -2,7 +2,6 @@
 Tests for discussion pages
 """
 
-from __future__ import absolute_import
 
 import datetime
 import time

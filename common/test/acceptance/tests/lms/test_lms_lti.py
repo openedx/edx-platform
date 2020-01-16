@@ -2,7 +2,7 @@
 """
 Bok choy acceptance tests for LTI xblock
 """
-from __future__ import absolute_import
+
 
 import os
 

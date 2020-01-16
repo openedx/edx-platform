@@ -1,5 +1,5 @@
 """Tests for cached authentication middleware."""
-from __future__ import absolute_import
+
 
 from django.conf import settings
 from django.contrib.auth.models import User

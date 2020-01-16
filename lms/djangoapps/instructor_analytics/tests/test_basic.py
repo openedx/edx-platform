@@ -2,7 +2,7 @@
 """
 Tests for instructor.basic
 """
-from __future__ import absolute_import
+
 
 import ddt
 import datetime

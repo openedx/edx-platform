@@ -39,7 +39,6 @@ When refering to XBlocks, we use the entry-point name. For example,
 # want to import all variables from base settings files
 # pylint: disable=unused-import
 
-from __future__ import absolute_import
 
 import imp
 import os
@@ -907,6 +906,7 @@ CERTIFICATE_TEMPLATE_LANGUAGES = {
 USE_I18N = True
 USE_L10N = True
 
+STATICI18N_FILENAME_FUNCTION = 'statici18n.utils.legacy_filename'
 STATICI18N_ROOT = PROJECT_ROOT / "static"
 
 LOCALE_PATHS = _make_locale_paths
@@ -936,6 +936,7 @@ PIPELINE = {
 }
 
 STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
+STATICFILES_STORAGE_KWARGS = {}
 
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
@@ -2093,7 +2094,10 @@ PROCTORING_SETTINGS = {}
 
 ################## BLOCKSTORE RELATED SETTINGS  #########################
 BLOCKSTORE_PUBLIC_URL_ROOT = 'http://localhost:18250'
-BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1'
+BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
+# Which of django's caches to use for storing anonymous user state for XBlocks
+# in the blockstore-based XBlock runtime
+XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
 
 ###################### LEARNER PORTAL ################################
 LEARNER_PORTAL_URL_ROOT = 'https://learner-portal-localhost:18000'

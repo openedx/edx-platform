@@ -1,6 +1,5 @@
 """Unit tests for custom UserProfile properties."""
 
-from __future__ import absolute_import
 
 import datetime
 
@@ -90,7 +89,7 @@ class UserProfilePropertiesTest(CacheIsolationTestCase):
 
     def test_invalidate_cache_user_profile_country_updated(self):
 
-        country = 'us'
+        country = 'US'
         self.profile.country = country
         self.profile.save()
 

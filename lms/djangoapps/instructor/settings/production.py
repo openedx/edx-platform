@@ -1,5 +1,5 @@
 """AWS environment variables unique to the instructor plugin."""
-from __future__ import absolute_import
+
 
 import warnings
 

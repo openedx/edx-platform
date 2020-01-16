@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import absolute_import, print_function
 
 import copy
 import shutil
@@ -1352,7 +1351,7 @@ class ContentStoreTest(ContentStoreTestCase):
         resp = self.client.ajax_post('/course/', self.course_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
-        self.assertRegexpMatches(data['ErrMsg'], error_message)
+        self.assertRegex(data['ErrMsg'], error_message)
         if test_enrollment:
             # One test case involves trying to create the same course twice. Hence for that course,
             # the user will be enrolled. In the other cases, initially_enrolled will be False.
@@ -1518,7 +1517,7 @@ class ContentStoreTest(ContentStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
         retarget = text_type(course.id.make_usage_key('chapter', 'REPLACE')).replace('REPLACE', r'([0-9]|[a-f]){3,}')
-        self.assertRegexpMatches(data['locator'], retarget)
+        self.assertRegex(data['locator'], retarget)
 
     def test_capa_module(self):
         """Test that a problem treats markdown specially."""

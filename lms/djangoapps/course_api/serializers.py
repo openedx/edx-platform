@@ -2,7 +2,6 @@
 Course API Serializers.  Representing course catalog data
 """
 
-from __future__ import absolute_import
 
 import six.moves.urllib.error  # pylint: disable=import-error
 import six.moves.urllib.parse  # pylint: disable=import-error

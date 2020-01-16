@@ -1,7 +1,7 @@
 """
 Tests for program enrollment reading Python API.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 from uuid import UUID
 

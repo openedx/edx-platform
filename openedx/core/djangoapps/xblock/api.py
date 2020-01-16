@@ -7,7 +7,7 @@ the older runtime.
 Note that these views are only for interacting with existing blocks. Other
 Studio APIs cover use cases like adding/deleting/editing blocks.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 import logging
 
 from django.urls import reverse
@@ -24,7 +24,7 @@ from openedx.core.djangoapps.xblock.learning_context.manager import get_learning
 from openedx.core.djangoapps.xblock.runtime.blockstore_runtime import BlockstoreXBlockRuntime, xml_for_definition
 from openedx.core.djangoapps.xblock.runtime.runtime import XBlockRuntimeSystem
 from openedx.core.djangolib.blockstore_cache import BundleCache
-from .utils import get_secure_token_for_xblock_handler
+from .utils import get_secure_token_for_xblock_handler, get_xblock_id_for_anonymous_user
 
 log = logging.getLogger(__name__)
 
@@ -160,11 +160,9 @@ def render_block_view(block, view_name, user):  # pylint: disable=unused-argumen
     """
     Get the HTML, JS, and CSS needed to render the given XBlock view.
 
-    The difference between this method and calling
+    The only difference between this method and calling
         load_block().render(view_name)
-    is that this method will automatically save any changes to field data that
-    resulted from rendering the view. If you don't want that, call .render()
-    directly.
+    is that this method can fall back from 'author_view' to 'student_view'
 
     Returns a Fragment.
     """
@@ -179,14 +177,10 @@ def render_block_view(block, view_name, user):  # pylint: disable=unused-argumen
         else:
             raise
 
-    # TODO: save any changed user state fields
-    # TODO: if the view is anything other than student_view and we're not in the LMS, save any changed
-    # content/settings/children fields.
-
     return fragment
 
 
-def get_handler_url(usage_key, handler_name, user_id):
+def get_handler_url(usage_key, handler_name, user):
     """
     A method for getting the URL to any XBlock handler. The URL must be usable
     without any authentication (no cookie, no OAuth/JWT), and may expire. (So
@@ -202,26 +196,30 @@ def get_handler_url(usage_key, handler_name, user_id):
     Params:
         usage_key       - Usage Key (Opaque Key object or string)
         handler_name    - Name of the handler or a dummy name like 'any_handler'
-        user_id         - User ID or XBlockRuntimeSystem.ANONYMOUS_USER
+        user            - Django User (registered or anonymous)
 
     This view does not check/care if the XBlock actually exists.
     """
     usage_key_str = six.text_type(usage_key)
     site_root_url = get_xblock_app_config().get_site_root_url()
-    if user_id is None:
+    if not user:
         raise TypeError("Cannot get handler URLs without specifying a specific user ID.")
-    elif user_id == XBlockRuntimeSystem.ANONYMOUS_USER:
-        raise NotImplementedError("handler links for anonymous users are not yet implemented")  # TODO: implement
+    elif user.is_authenticated:
+        user_id = user.id
+    elif user.is_anonymous:
+        user_id = get_xblock_id_for_anonymous_user(user)
     else:
-        # Normal case: generate a token-secured URL for this handler, specific
-        # to this user and this XBlock.
-        secure_token = get_secure_token_for_xblock_handler(user_id, usage_key_str)
-        path = reverse('xblock_api:xblock_handler', kwargs={
-            'usage_key_str': usage_key_str,
-            'user_id': user_id,
-            'secure_token': secure_token,
-            'handler_name': handler_name,
-        })
+        raise ValueError("Invalid user value")
+    # Now generate a token-secured URL for this handler, specific to this user
+    # and this XBlock:
+    secure_token = get_secure_token_for_xblock_handler(user_id, usage_key_str)
+    # Now generate the URL to that handler:
+    path = reverse('xblock_api:xblock_handler', kwargs={
+        'usage_key_str': usage_key_str,
+        'user_id': user_id,
+        'secure_token': secure_token,
+        'handler_name': handler_name,
+    })
     # We must return an absolute URL. We can't just use
     # rest_framework.reverse.reverse to get the absolute URL because this method
     # can be called by the XBlock from python as well and in that case we don't

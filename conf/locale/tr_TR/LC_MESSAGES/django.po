@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -27,7 +27,7 @@
 # iron_man <inactive+iron_man@transifex.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -47,7 +47,7 @@
 # Mustafa Tat, 2015
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -81,7 +81,7 @@
 # iron_man <inactive+iron_man@transifex.com>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -106,7 +106,7 @@
 # Yasar Celep <yasar.celep@hotmail.com>, 2017
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -117,9 +117,9 @@
 # a56fc07028489bb2b53400de33ba6a83, 2014
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # Translators:
 # Ali Işıngör <ali@artistanbul.io>, 2019
@@ -128,7 +128,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-12-15 20:42+0000\n"
+"POT-Creation-Date: 2020-01-12 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -504,7 +504,7 @@ msgstr ""
 #: common/djangoapps/student/admin.py
 #, python-brace-format
 msgid "Email doesn't have {domain_name} domain name."
-msgstr ""
+msgstr "E-posta {domain_name} alan adına sahip değil."
 
 #: common/djangoapps/student/admin.py
 msgid "User with this email doesn't exist in system."
@@ -5038,7 +5038,7 @@ msgstr "Hesabınızı Etkinleştirin"
 #: common/templates/student/edx_ace/accountactivation/email/body.txt
 #, python-format
 msgid "Enjoy learning with %(platform_name)s."
-msgstr ""
+msgstr "%(platform_name)s ile öğrenmenin keyfini çıkarın."
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
 #, python-format, python-brace-format
@@ -5067,7 +5067,7 @@ msgstr ""
 #: common/templates/student/edx_ace/accountactivation/email/subject.txt
 #, python-format
 msgid "Action Required: Activate your %(platform_name)s account"
-msgstr ""
+msgstr "İşlem Bekleniyor: %(platform_name)s hesabınızı etkinleştirin"
 
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 msgid "Create Password"
@@ -7171,13 +7171,14 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Date Joined"
-msgstr ""
+msgstr "Katılma Tarihi"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
 msgstr "Topluluk"
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Team"
 msgstr "Takım"
 
@@ -8133,6 +8134,18 @@ msgstr "(atlıyor {skipped})"
 msgid " (out of {total})"
 msgstr "({total} içinde)"
 
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/learner_dashboard/programs.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Programs"
+msgstr "Programlar"
+
+#: lms/templates/learner_dashboard/program_details.html
+msgid "Program Details"
+msgstr "Program Ayrıntıları"
+
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
 "This component's access settings refer to deleted or invalid group "
@@ -9075,6 +9088,7 @@ msgid "View feature based enrollment settings"
 msgstr "Bedava tur kayıtlanma ayarlarını görüntüle"
 
 #: lms/djangoapps/support/views/index.py
+#: lms/templates/support/link_program_enrollments.html
 msgid "Link Program Enrollments"
 msgstr "Program Kayıtlanma Bağlantısı"
 
@@ -9771,6 +9785,10 @@ msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
 #: openedx/core/djangoapps/user_api/admin.py
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
+#: cms/templates/videos_index_pagination.html
+#: lms/templates/bulk_email/unsubscribe.html
 msgid "Cancel"
 msgstr "İptal"
 
@@ -11971,6 +11989,16 @@ msgstr "Açmaya Zorla"
 msgid "Force Off"
 msgstr "Kapamaya Zorla"
 
+#: openedx/core/djangoapps/xblock/runtime/mixin.py
+msgid ""
+"This content is only accessible to registered learners. Sign in or register "
+"to view it."
+msgstr ""
+
+#: openedx/core/djangoapps/xblock/runtime/mixin.py
+msgid "This content is only accessible to enrolled learners. "
+msgstr ""
+
 #: openedx/core/lib/api/view_utils.py
 msgid "This value is invalid."
 msgstr "Değer geçersiz."
@@ -12085,10 +12113,6 @@ msgstr ""
 #: openedx/features/course_duration_limits/models.py
 msgid "enabled_as_of must be set when enabled is True"
 msgstr ""
-
-#: openedx/features/content_type_gating/partitions.py
-msgid "Feature-based Enrollments"
-msgstr "Bedava-tur Kayıtlanmaları"
 
 #: openedx/features/content_type_gating/partitions.py
 msgid "Partition for segmenting users by access to gated content types"
@@ -12260,8 +12284,8 @@ msgstr ""
 #, no-python-format, python-brace-format
 msgid ""
 "{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% "
-"[{strikeout_price}]{span_close}{br}Discount will be automatically applied at"
-" checkout. {a_open}Upgrade Now{a_close}{div_close}"
+"[{strikeout_price}]{span_close}{br}Use code {b_open}{code}{b_close} at "
+"checkout! {a_open}Upgrade Now{a_close}{div_close}"
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py
@@ -12390,6 +12414,8 @@ msgid ""
 "Non writable git url provided. Expecting something like: "
 "git@github.com:edx/edx4edx_lite.git"
 msgstr ""
+"Yazılamaz git url'si verildi. Bunun gibi bir şey bekliyoruz: "
+"git@github.com:edx/edx4edx_lite.git"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
@@ -13125,7 +13151,7 @@ msgstr "Ders Taslağı"
 #: cms/templates/course_outline.html
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Warning"
-msgstr ""
+msgstr "Uyarı"
 
 #: cms/templates/html_error.html lms/templates/module-error.html
 msgid "Error:"
@@ -13225,6 +13251,8 @@ msgid ""
 "edX, Open edX, and the edX and Open edX logos are registered trademarks of "
 "{link_start}edX Inc.{link_end}"
 msgstr ""
+"edX, Open edX, ve edX ile Open edX logoları {link_start}edX "
+"Inc'in.{link_end} tescilli markalarıdır."
 
 #: cms/templates/widgets/header.html lms/templates/header/header.html
 #: lms/templates/navigation/navigation.html
@@ -13391,7 +13419,7 @@ msgstr "Tartışma ileti dizisi listesi"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_private_fragment.html
 msgid "Private Discussion"
-msgstr ""
+msgstr "Gizli Tartışma"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_private_fragment.html
 msgid ""
@@ -13493,7 +13521,7 @@ msgstr ""
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Click to load all enrolled courses"
-msgstr ""
+msgstr "Kayıtlanılmış tüm dersleri yüklemek için tıklayın"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "You are not enrolled in any courses yet."
@@ -13927,7 +13955,7 @@ msgstr "Cevabınızı sıfırlayın"
 
 #: lms/templates/problem.html
 msgid "Answers are displayed within the problem"
-msgstr ""
+msgstr "Cevaplar problem içinde gösterilir"
 
 #: lms/templates/problem_notifications.html
 msgid "Next Hint"
@@ -14003,13 +14031,13 @@ msgstr "Önemli!"
 #: lms/templates/seq_module.html
 msgctxt "unit"
 msgid "Previous"
-msgstr ""
+msgstr "Önceki"
 
 #. Translators: A button for showing the Next Unit
 #: lms/templates/seq_module.html
 msgctxt "unit"
 msgid "Next"
-msgstr ""
+msgstr "Sonraki"
 
 #: lms/templates/seq_module.html
 msgid "Sequence"
@@ -14018,7 +14046,7 @@ msgstr "Sıralı"
 #: lms/templates/seq_module.html
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Completed"
-msgstr ""
+msgstr "Tamamlandı"
 
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"
@@ -14670,12 +14698,16 @@ msgid ""
 "The following activities are not acceptable when using the APIs (this is not"
 " an exhaustive list):"
 msgstr ""
+"Aşağıdaki etkinlikler API'ler kullanıldığında kabul edilmeyen davranışlardır"
+" (bu ayrıntılı bir liste değildir):"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
 "collecting or storing the names, passwords, or other credentials of "
 "{platform_name} users;"
 msgstr ""
+"{platform_name} kullanıcılarının adlarını, parolalarını veya diğer kimlik "
+"bilgilerini toplamak veya saklamak;"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -17852,14 +17884,6 @@ msgstr ""
 "{chrome_link} veya {ff_link} kullanmanızı şiddetle tavsiye ediyoruz."
 
 #: lms/templates/header/navbar-authenticated.html
-#: lms/templates/learner_dashboard/programs.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Programs"
-msgstr "Programlar"
-
-#: lms/templates/header/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr "Dersleri Keşfet"
@@ -19645,10 +19669,6 @@ msgstr "Bu problem için gönderdiğiniz görevlerin durumunu gösterin."
 msgid "My Courses"
 msgstr "Derslerim"
 
-#: lms/templates/learner_dashboard/program_details.html
-msgid "Program Details"
-msgstr "Program Ayrıntıları"
-
 #: lms/templates/learner_dashboard/text-me-fragment.html
 msgid "Get the {platform_name} Mobile App!"
 msgstr "{platform_name} mobil uygulamasını indirin!"
@@ -19927,6 +19947,13 @@ msgstr "{platform_name} şifreni yenile"
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Invalid Password Reset Link"
 msgstr "Geçersiz Parola Sıfırlama Bağlantısı"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid ""
+"This password reset link is invalid. It may have been used already. To reset"
+" your password, go to the {start_link}sign-in{end_link} page and select "
+"{start_strong}Forgot password{end_strong}."
+msgstr ""
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"
@@ -21022,12 +21049,8 @@ msgid "Connect"
 msgstr "Bağlan"
 
 #: themes/edx.org/lms/templates/footer.html
-msgid "© 2012–{year} edX Inc. "
-msgstr "© 2012–{year} edX Inc. "
-
-#: themes/edx.org/lms/templates/footer.html
-msgid "edX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
-msgstr "edX, Open edX ve MicroMasters, edX Inc.'in tescilli markalarıdır."
+msgid "© {year} edX Inc. All rights reserved."
+msgstr "© {year} edX Inc. Tüm hakları saklıdır."
 
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
 msgid "About edX Verified Certificates"

@@ -2,7 +2,6 @@
 Tests that policy json files import correctly when loading XML
 """
 
-from __future__ import absolute_import
 
 import pytest
 

@@ -11,7 +11,6 @@ Test utilities for mobile API tests:
 """
 # pylint: disable=no-member
 
-from __future__ import absolute_import
 
 import datetime
 

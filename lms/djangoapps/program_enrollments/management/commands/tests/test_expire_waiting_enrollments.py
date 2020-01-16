@@ -1,7 +1,7 @@
 """
 Tests for the expire_waiting_enrollments management command.
 """
-from __future__ import absolute_import
+
 
 import ddt
 from django.core.management import call_command

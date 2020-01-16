@@ -1,7 +1,7 @@
 """
 Management command to update course_teams' search index.
 """
-from __future__ import absolute_import, print_function, unicode_literals
+
 
 from textwrap import dedent
 

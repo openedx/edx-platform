@@ -2,7 +2,7 @@
 Functions that can are used to modify XBlock fragments for use in the LMS and Studio
 """
 
-from __future__ import absolute_import
+
 import datetime
 import hashlib
 import json

@@ -3,7 +3,7 @@
 Tests of the update_fixtures management command for bok-choy test database
 initialization.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import os
 

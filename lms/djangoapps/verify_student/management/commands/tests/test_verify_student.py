@@ -3,7 +3,7 @@ Tests for django admin commands in the verify_student module
 
 Lots of imports from verify_student's model tests, since they cover similar ground
 """
-from __future__ import absolute_import
+
 
 import boto
 from django.conf import settings
@@ -13,7 +13,7 @@ from django.test import TestCase
 from mock import patch
 from testfixtures import LogCapture
 
-from common.test.utils import MockS3Mixin
+from common.test.utils import MockS3BotoMixin
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSPVerificationRetryConfig
 from lms.djangoapps.verify_student.tests.test_models import (
     FAKE_SETTINGS,
@@ -28,16 +28,10 @@ LOGGER_NAME = 'retry_photo_verification'
 # Lots of patching to stub in our own settings, and HTTP posting
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
-class TestVerifyStudentCommand(MockS3Mixin, TestCase):
+class TestVerifyStudentCommand(MockS3BotoMixin, TestCase):
     """
     Tests for django admin commands in the verify_student module
     """
-
-    def setUp(self):
-        super(TestVerifyStudentCommand, self).setUp()
-        connection = boto.connect_s3()
-        connection.create_bucket(FAKE_SETTINGS['SOFTWARE_SECURE']['S3_BUCKET'])
-
     def create_and_submit(self, username):
         """
         Helper method that lets us create new SoftwareSecurePhotoVerifications
@@ -73,10 +67,14 @@ class TestVerifyStudentCommand(MockS3Mixin, TestCase):
         """Test management command arguments injected from config model."""
         # Nothing in the database, should default to disabled
 
-        # pylint: disable=deprecated-method, useless-suppression
-        with self.assertRaisesRegex(CommandError, 'SSPVerificationRetryConfig is disabled*'):
+        with LogCapture(LOGGER_NAME) as log:
             call_command('retry_failed_photo_verifications', '--args-from-database')
-
+            log.check_present(
+                (
+                    LOGGER_NAME, 'WARNING',
+                    u"SSPVerificationRetryConfig is disabled or empty, but --args-from-database was requested."
+                ),
+            )
         # Add a config
         config = SSPVerificationRetryConfig.current()
         config.arguments = '--verification-ids 1 2 3'

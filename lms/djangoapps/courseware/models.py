@@ -12,7 +12,7 @@ file and check it in at the same time as your model changes. To do that,
 ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
-from __future__ import absolute_import
+
 
 import itertools
 import logging
@@ -168,7 +168,7 @@ class StudentModule(models.Model):
 
     @classmethod
     def save_state(cls, student, course_id, module_state_key, defaults):
-        if not student.is_authenticated():
+        if not student.is_authenticated:
             return
         else:
             cls.objects.update_or_create(

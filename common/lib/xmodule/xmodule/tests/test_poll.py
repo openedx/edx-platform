@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Test for Poll Xmodule functional logic."""
-from __future__ import absolute_import
+
 
 from mock import Mock
 

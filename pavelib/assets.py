@@ -2,7 +2,6 @@
 Asset compilation and collection.
 """
 
-from __future__ import absolute_import, print_function
 
 import argparse
 import glob
@@ -925,7 +924,11 @@ def update_assets(args):
     )
     parser.add_argument(
         '--debug', action='store_true', default=False,
-        help="Disable Sass compression",
+        help="Enable all debugging",
+    )
+    parser.add_argument(
+        '--debug-collect', action='store_true', default=False,
+        help="Disable collect static",
     )
     parser.add_argument(
         '--skip-collect', dest='collect', action='store_false', default=True,
@@ -964,7 +967,7 @@ def update_assets(args):
     execute_compile_sass(args)
 
     if args.collect:
-        if args.debug:
+        if args.debug or args.debug_collect:
             collect_log_args.update({COLLECTSTATIC_LOG_DIR_ARG: None})
 
         if args.collect_log_dir:

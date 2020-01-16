@@ -1,7 +1,7 @@
 """
 Tests for send_recurring_nudge management command.
 """
-from __future__ import absolute_import
+
 
 from unittest import skipUnless
 

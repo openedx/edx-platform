@@ -2,7 +2,6 @@
 Custom fields
 """
 
-from __future__ import absolute_import
 
 from django.db.models.fields import AutoField
 

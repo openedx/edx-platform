@@ -1,7 +1,7 @@
 """
 Unit tests for the container page.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import re
@@ -112,7 +112,7 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         """
         html = self.get_page_html(xblock)
         self.assertIn(expected_section_tag, html)
-        self.assertRegexpMatches(html, re.compile(expected_breadcrumbs, re.DOTALL))
+        self.assertRegex(html, re.compile(expected_breadcrumbs, re.DOTALL))
 
     def test_public_container_preview_html(self):
         """

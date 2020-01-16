@@ -2,7 +2,6 @@
 XBlock runtime implementations for edX Studio
 """
 
-from __future__ import absolute_import
 
 import six
 from django.urls import reverse

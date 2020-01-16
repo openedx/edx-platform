@@ -1,7 +1,7 @@
 """
 Install Python and Node prerequisites.
 """
-from __future__ import absolute_import, print_function
+
 
 import hashlib
 import io
@@ -203,6 +203,7 @@ PACKAGES_TO_UNINSTALL = [
     "i18n-tools",                   # Because now it's called edx-i18n-tools
     "python-saml",                  # Because python3-saml shares the same directory name
     "pdfminer",                     # Replaced by pdfminer.six, which shares the same directory name
+    "pytest-faulthandler",          # Because it was bundled into pytest
 ]
 
 

@@ -2,7 +2,7 @@
 """
 Python APIs exposed by the grades app to other in-process apps.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 from datetime import datetime
 

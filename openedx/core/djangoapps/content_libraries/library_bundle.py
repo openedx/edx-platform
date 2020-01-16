@@ -1,7 +1,7 @@
 """
 Helper code for working with Blockstore bundles that contain OLX
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 import logging
 
 from django.utils.lru_cache import lru_cache

@@ -16,7 +16,7 @@ TODO:
 - test funny xml chars -- should never get xml parse error if things are escaped properly.
 
 """
-from __future__ import absolute_import
+
 
 import json
 import textwrap
@@ -1619,7 +1619,7 @@ class TestChoiceText(unittest.TestCase):
         Test to ensure having a tag other than <choice> inside of
         a checkbox or radiotextgroup problem raises an error.
         """
-        with self.assertRaisesRegexp(Exception, "Error in xml"):
+        with self.assertRaisesRegex(Exception, "Error in xml"):
             self.check_group('checkboxtextgroup', 'invalid', 'checkbox')
 
 

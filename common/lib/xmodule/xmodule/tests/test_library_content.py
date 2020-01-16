@@ -4,7 +4,7 @@ Basic unit tests for LibraryContentModule
 
 Higher-level tests are in `cms/djangoapps/contentstore/tests/test_libraries.py`.
 """
-from __future__ import absolute_import
+
 
 import six
 from bson.objectid import ObjectId

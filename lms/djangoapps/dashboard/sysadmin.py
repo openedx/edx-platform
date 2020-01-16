@@ -2,7 +2,7 @@
 This module creates a sysadmin dashboard for managing and viewing
 courses.
 """
-from __future__ import absolute_import
+
 
 import json
 import logging
@@ -553,7 +553,7 @@ class GitLogs(TemplateView):
             page = min(max(1, given_page), paginator.num_pages)
             logs = paginator.page(page)
 
-        mdb.disconnect()
+        mdb.close()
         context = {
             'logs': logs,
             'course_id': text_type(course_id) if course_id else None,

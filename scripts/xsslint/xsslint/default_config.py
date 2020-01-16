@@ -1,5 +1,5 @@
 # Default xsslint config module.
-from __future__ import absolute_import
+
 
 from xsslint.linters import (
     JavaScriptLinter, MakoTemplateLinter,

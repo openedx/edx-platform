@@ -2,7 +2,6 @@
 Models used by the block structure framework.
 """
 
-from __future__ import absolute_import
 
 import errno
 from contextlib import contextmanager

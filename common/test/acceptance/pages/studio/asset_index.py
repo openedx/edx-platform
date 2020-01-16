@@ -2,7 +2,6 @@
 The Files and Uploads page for a course in Studio
 """
 
-from __future__ import absolute_import
 
 import os
 

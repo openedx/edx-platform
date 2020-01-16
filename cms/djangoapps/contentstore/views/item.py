@@ -1,5 +1,5 @@
 """Views for items (modules)."""
-from __future__ import absolute_import
+
 
 import hashlib
 import logging
@@ -18,7 +18,7 @@ from django.views.decorators.http import require_http_methods
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
 from pytz import UTC
-from six import text_type
+from six import text_type, binary_type
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope
@@ -70,7 +70,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
-from xmodule.services import ConfigurationService, SettingsService
+from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService
 from xmodule.tabs import CourseTabList
 from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW
 from edx_proctoring.api import get_exam_configuration_dashboard_url, does_backend_support_onboarding
@@ -292,6 +292,8 @@ class StudioEditModuleRuntime(object):
                 return SettingsService()
             if service_name == "lti-configuration":
                 return ConfigurationService(CourseEditLTIFieldsEnabledFlag)
+            if service_name == "teams_configuration":
+                return TeamsConfigurationService()
         return None
 
 
@@ -413,8 +415,12 @@ def xblock_view_handler(request, usage_key_string, view_name):
         for resource in fragment.resources:
             hashed_resources[hash_resource(resource)] = resource._asdict()
 
+        fragment_content = fragment.content
+        if isinstance(fragment_content, binary_type):
+            fragment_content = fragment.content.decode('utf-8')
+
         return JsonResponse({
-            'html': fragment.content,
+            'html': fragment_content,
             'resources': list(hashed_resources.items())
         })
 

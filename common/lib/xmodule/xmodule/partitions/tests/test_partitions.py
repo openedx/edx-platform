@@ -3,7 +3,6 @@ Test the partitions and partitions service
 
 """
 
-from __future__ import absolute_import
 
 from datetime import datetime
 
@@ -74,7 +73,7 @@ class TestGroup(TestCase):
             "name": name,
             "version": -1,
         }
-        with self.assertRaisesRegexp(TypeError, "has unexpected version"):
+        with self.assertRaisesRegex(TypeError, "has unexpected version"):
             Group.from_json(jsonified)
 
         # Missing key "id"
@@ -82,7 +81,7 @@ class TestGroup(TestCase):
             "name": name,
             "version": Group.VERSION
         }
-        with self.assertRaisesRegexp(TypeError, "missing value key 'id'"):
+        with self.assertRaisesRegex(TypeError, "missing value key 'id'"):
             Group.from_json(jsonified)
 
         # Has extra key - should not be a problem
@@ -197,8 +196,8 @@ class TestUserPartition(PartitionTestCase):
         self.assertEqual(user_partition.name, self.TEST_NAME)
         self.assertEqual(user_partition.description, self.TEST_DESCRIPTION)
         self.assertEqual(user_partition.groups, self.TEST_GROUPS)
-        self.assertEquals(user_partition.scheme.name, self.TEST_SCHEME_NAME)
-        self.assertEquals(user_partition.parameters, self.TEST_PARAMETERS)
+        self.assertEqual(user_partition.scheme.name, self.TEST_SCHEME_NAME)
+        self.assertEqual(user_partition.parameters, self.TEST_PARAMETERS)
 
     def test_string_id(self):
         user_partition = UserPartition(
@@ -273,7 +272,7 @@ class TestUserPartition(PartitionTestCase):
             "groups": [group.to_json() for group in self.TEST_GROUPS],
             "version": 2,
         }
-        with self.assertRaisesRegexp(TypeError, "missing value key 'scheme'"):
+        with self.assertRaisesRegex(TypeError, "missing value key 'scheme'"):
             UserPartition.from_json(jsonified)
 
         # Test that version 3 partitions have a scheme specified
@@ -317,7 +316,7 @@ class TestUserPartition(PartitionTestCase):
             "version": UserPartition.VERSION,
             "scheme": self.TEST_SCHEME_NAME,
         }
-        with self.assertRaisesRegexp(TypeError, "missing value key 'id'"):
+        with self.assertRaisesRegex(TypeError, "missing value key 'id'"):
             UserPartition.from_json(jsonified)
 
         # Missing scheme
@@ -329,7 +328,7 @@ class TestUserPartition(PartitionTestCase):
             "groups": [group.to_json() for group in self.TEST_GROUPS],
             "version": UserPartition.VERSION,
         }
-        with self.assertRaisesRegexp(TypeError, "missing value key 'scheme'"):
+        with self.assertRaisesRegex(TypeError, "missing value key 'scheme'"):
             UserPartition.from_json(jsonified)
 
         # Invalid scheme
@@ -342,7 +341,7 @@ class TestUserPartition(PartitionTestCase):
             "version": UserPartition.VERSION,
             "scheme": "no_such_scheme",
         }
-        with self.assertRaisesRegexp(UserPartitionError, "Unrecognized scheme"):
+        with self.assertRaisesRegex(UserPartitionError, "Unrecognized scheme"):
             UserPartition.from_json(jsonified)
 
         # Wrong version
@@ -355,7 +354,7 @@ class TestUserPartition(PartitionTestCase):
             "version": -1,
             "scheme": self.TEST_SCHEME_NAME,
         }
-        with self.assertRaisesRegexp(TypeError, "has unexpected version"):
+        with self.assertRaisesRegex(TypeError, "has unexpected version"):
             UserPartition.from_json(jsonified)
 
         # Has extra key - should not be a problem

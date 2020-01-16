@@ -1,7 +1,7 @@
 """
 Test audit user's access to various content based on content-gating features.
 """
-from __future__ import absolute_import
+
 
 import json
 import os
@@ -399,7 +399,11 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
 
         for mode in modes:
             if expired_upgrade_deadline and mode == 'verified':
-                CourseModeFactory.create(course_id=course.id, mode_slug=mode, expiration_datetime=datetime(2020, 1, 1))
+                CourseModeFactory.create(
+                    course_id=course.id,
+                    mode_slug=mode,
+                    expiration_datetime=start_date + timedelta(days=365),
+                )
             else:
                 CourseModeFactory.create(course_id=course.id, mode_slug=mode)
 
@@ -682,9 +686,9 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         block_view_url = reverse('render_xblock', kwargs={'usage_key_string': six.text_type(block.scope_ids.usage_id)})
         response = self.client.get(block_view_url)
         if is_gated:
-            self.assertEquals(response.status_code, 404)
+            self.assertEqual(response.status_code, 404)
         else:
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
 
     def update_masquerade(self, role='student', group_id=None, username=None, user_partition_id=None):
         """
@@ -741,7 +745,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         block = self.blocks_dict['problem']
         block_view_url = reverse('render_xblock', kwargs={'usage_key_string': six.text_type(block.scope_ids.usage_id)})
         response = self.client.get(block_view_url)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     @ddt.data(
         FORUM_ROLE_COMMUNITY_TA,

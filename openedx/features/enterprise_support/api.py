@@ -1,12 +1,13 @@
 """
 APIs providing support for enterprise functionality.
 """
-from __future__ import absolute_import
+
 
 import logging
 from functools import wraps
 import traceback
 
+from crum import get_current_request
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
@@ -257,10 +258,11 @@ class EnterpriseApiClient(object):
             response = endpoint().get(**querystring)
         except (HttpClientError, HttpServerError):
             LOGGER.exception(
-                u'Failed to get enterprise-learner for user [%s] with client user [%s]. Caller: %s',
+                u'Failed to get enterprise-learner for user [%s] with client user [%s]. Caller: %s, Request PATH: %s',
                 user.username,
                 self.user.username,
-                "".join(traceback.format_stack())
+                "".join(traceback.format_stack()),
+                get_current_request().META['PATH_INFO'],
             )
             return None
 
@@ -371,7 +373,7 @@ def enterprise_customer_from_cache(request=None, uuid=None):
         enterprise_customer = cache.get(cache_key)
 
     # Check if it's cached in the session.
-    if not enterprise_customer and request and request.user.is_authenticated:
+    if not enterprise_customer and request:
         enterprise_customer = request.session.get('enterprise_customer')
 
     return enterprise_customer
@@ -463,7 +465,7 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
     """
     consent_cache_key = get_data_consent_share_cache_key(user.id, course_id)
     data_sharing_consent_needed_cache = TieredCache.get_cached_response(consent_cache_key)
-    if data_sharing_consent_needed_cache.is_found and data_sharing_consent_needed_cache.value is 0:
+    if data_sharing_consent_needed_cache.is_found and data_sharing_consent_needed_cache.value == 0:
         return False
 
     enterprise_learner_details = get_enterprise_learner_data(user)

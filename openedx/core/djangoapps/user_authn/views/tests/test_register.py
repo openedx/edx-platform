@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Tests for account creation"""
-from __future__ import absolute_import
+
 
 import json
 from unittest import skipIf, skipUnless
@@ -302,7 +302,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
     YEAR_OF_BIRTH = "1998"
     ADDRESS = "123 Fake Street"
     CITY = "Springfield"
-    COUNTRY = "us"
+    COUNTRY = "US"
     GOALS = "Learn all the things!"
     PROFESSION_OPTIONS = [
         {
@@ -1741,15 +1741,15 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
     def _verify_user_existence(self, user_exists, social_link_exists, user_is_active=None, username=None):
         """Verifies whether the user object exists."""
         users = User.objects.filter(username=(username if username else "test_username"))
-        self.assertEquals(users.exists(), user_exists)
+        self.assertEqual(users.exists(), user_exists)
         if user_exists:
-            self.assertEquals(users[0].is_active, user_is_active)
+            self.assertEqual(users[0].is_active, user_is_active)
             self.assertEqual(
                 UserSocialAuth.objects.filter(user=users[0], provider=self.BACKEND).exists(),
                 social_link_exists
             )
         else:
-            self.assertEquals(UserSocialAuth.objects.count(), 0)
+            self.assertEqual(UserSocialAuth.objects.count(), 0)
 
     def test_success(self):
         self._verify_user_existence(user_exists=False, social_link_exists=False)

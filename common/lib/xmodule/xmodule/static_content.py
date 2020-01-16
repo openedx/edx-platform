@@ -4,7 +4,6 @@ This module has utility functions for gathering up the static content
 that is defined by XModules and XModuleDescriptors (javascript and css)
 """
 
-from __future__ import absolute_import
 
 import errno
 import hashlib

@@ -10,7 +10,7 @@ file and check it in at the same time as your model changes. To do that,
 2. ./manage.py lms schemamigration student --auto description_of_your_change
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
-from __future__ import absolute_import, print_function
+
 
 import hashlib
 import json
@@ -209,9 +209,17 @@ def user_by_anonymous_id(uid):
     if uid is None:
         return None
 
+    request_cache = RequestCache('user_by_anonymous_id')
+    cache_response = request_cache.get_cached_response(uid)
+    if cache_response.is_found:
+        return cache_response.value
+
     try:
-        return User.objects.get(anonymoususerid__anonymous_user_id=uid)
+        user = User.objects.get(anonymoususerid__anonymous_user_id=uid)
+        request_cache.set(uid, user)
+        return user
     except ObjectDoesNotExist:
+        request_cache.set(uid, None)
         return None
 
 
@@ -1101,7 +1109,7 @@ class CourseEnrollment(models.Model):
 
     # Represents the modes that are possible. We'll update this later with a
     # list of possible values.
-    mode = models.CharField(default=CourseMode.DEFAULT_MODE_SLUG, max_length=100)
+    mode = models.CharField(default=CourseMode.get_default_mode_slug, max_length=100)
 
     # An audit row will be created for every change to a CourseEnrollment. This
     # will create a new model behind the scenes - HistoricalCourseEnrollment and a
@@ -1207,13 +1215,24 @@ class CourseEnrollment(models.Model):
         if user.is_anonymous:
             return None
         try:
+            request_cache = RequestCache('get_enrollment')
+            if select_related:
+                cache_key = (user.id, course_key, ','.join(select_related))
+            else:
+                cache_key = (user.id, course_key)
+            cache_response = request_cache.get_cached_response(cache_key)
+            if cache_response.is_found:
+                return cache_response.value
+
             query = cls.objects
             if select_related is not None:
                 query = query.select_related(*select_related)
-            return query.get(
+            enrollment = query.get(
                 user=user,
                 course_id=course_key
             )
+            request_cache.set(cache_key, enrollment)
+            return enrollment
         except cls.DoesNotExist:
             return None
 
@@ -1257,6 +1276,8 @@ class CourseEnrollment(models.Model):
         This saves immediately.
 
         """
+        RequestCache('get_enrollment').clear()
+
         activation_changed = False
         # if is_active is None, then the call to update_enrollment didn't specify
         # any value, so just leave is_active as it is
@@ -1488,6 +1509,8 @@ class CourseEnrollment(models.Model):
 
         `skip_refund` can be set to True to avoid the refund process.
         """
+        RequestCache('get_enrollment').clear()
+
         try:
             record = cls.objects.get(user=user, course_id=course_id)
             record.update_enrollment(is_active=False, skip_refund=skip_refund)
@@ -1509,6 +1532,8 @@ class CourseEnrollment(models.Model):
 
         `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
         """
+        RequestCache('get_enrollment').clear()
+
         try:
             user = User.objects.get(email=email)
             return cls.unenroll(user, course_id)
@@ -2088,6 +2113,7 @@ class ManualEnrollmentAudit(models.Model):
     state_transition = models.CharField(max_length=255, choices=TRANSITION_STATES)
     reason = models.TextField(null=True)
     role = models.CharField(blank=True, null=True, max_length=64)
+    history = HistoricalRecords()
 
     @classmethod
     def create_manual_enrollment_audit(cls, user, email, state_transition, reason, enrollment=None, role=None):
@@ -2135,8 +2161,15 @@ class ManualEnrollmentAudit(models.Model):
         # It is possible that this could also be bad if a user has thousands of manual
         # enrollments, but currently that number tends to be very low.
         manual_enrollment_ids = list(cls.objects.filter(enrollment__user=user).values_list('id', flat=True))
+        manual_enrollment_audits = cls.objects.filter(id__in=manual_enrollment_ids)
 
-        return cls.objects.filter(id__in=manual_enrollment_ids).update(reason="", enrolled_email=retired_email)
+        if not manual_enrollment_audits:
+            return False
+
+        for manual_enrollment_audit in manual_enrollment_audits:
+            manual_enrollment_audit.history.update(reason="", enrolled_email=retired_email)
+        manual_enrollment_audits.update(reason="", enrolled_email=retired_email)
+        return True
 
 
 @python_2_unicode_compatible

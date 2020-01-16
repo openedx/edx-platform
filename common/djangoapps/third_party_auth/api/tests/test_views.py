@@ -1,7 +1,7 @@
 """
 Tests for the Third Party Auth REST API
 """
-from __future__ import absolute_import
+
 
 import unittest
 

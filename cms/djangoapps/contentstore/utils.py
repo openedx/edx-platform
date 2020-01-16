@@ -1,7 +1,7 @@
 """
 Common utility functions useful throughout the contentstore
 """
-from __future__ import absolute_import, print_function
+
 
 import logging
 from datetime import datetime

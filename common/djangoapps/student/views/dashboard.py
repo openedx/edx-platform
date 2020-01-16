@@ -2,7 +2,6 @@
 Dashboard view and supporting methods
 """
 
-from __future__ import absolute_import
 
 import datetime
 import logging

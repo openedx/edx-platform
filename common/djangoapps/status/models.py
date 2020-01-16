@@ -2,7 +2,6 @@
 Store status messages in the database.
 """
 
-from __future__ import absolute_import
 
 import six
 from config_models.admin import ConfigurationModelAdmin

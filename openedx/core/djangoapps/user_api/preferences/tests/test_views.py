@@ -3,7 +3,6 @@
 Unit tests for preference APIs.
 """
 
-from __future__ import absolute_import
 
 import json
 
@@ -237,7 +236,7 @@ class TestPreferencesAPI(UserAPITestCase):
         )
         self.assertTrue(response.data.get("field_errors", None))
         field_errors = response.data["field_errors"]
-        self.assertEquals(
+        self.assertEqual(
             field_errors,
             {
                 TOO_LONG_PREFERENCE_KEY: {
@@ -519,7 +518,7 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         new_value = "new value"
         self._set_url(too_long_preference_key)
         response = self.send_put(self.client, new_value, expected_status=400)
-        self.assertEquals(
+        self.assertEqual(
             response.data,
             {
                 "developer_message": get_expected_validation_developer_message(too_long_preference_key, new_value),

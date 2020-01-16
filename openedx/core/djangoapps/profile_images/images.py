@@ -1,7 +1,7 @@
 """
 Image file manipulation functions related to profile images.
 """
-from __future__ import absolute_import
+
 
 import binascii
 from collections import namedtuple

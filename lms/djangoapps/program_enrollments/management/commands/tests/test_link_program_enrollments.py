@@ -1,7 +1,7 @@
 """
 Tests for the link_program_enrollments management command.
 """
-from __future__ import absolute_import
+
 
 from uuid import UUID
 

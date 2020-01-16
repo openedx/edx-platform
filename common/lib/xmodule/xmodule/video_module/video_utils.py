@@ -3,7 +3,6 @@
 Module contains utils specific for video_module but not for transcripts.
 """
 
-from __future__ import absolute_import
 
 import logging
 from collections import OrderedDict

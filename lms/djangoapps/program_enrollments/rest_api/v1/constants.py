@@ -1,7 +1,7 @@
 """
 Constants used throughout the program_enrollments V1 API.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 # Captures strings composed of alphanumeric characters a-f and dashes.
 PROGRAM_UUID_PATTERN = r'(?P<program_uuid>[A-Fa-f0-9-]+)'

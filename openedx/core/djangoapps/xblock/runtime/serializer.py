@@ -1,7 +1,7 @@
 """
 Code to serialize an XBlock to OLX
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 from collections import namedtuple
 from contextlib import contextmanager
 import logging

@@ -2,7 +2,7 @@
 These views handle all actions in Studio related to import and exporting of
 courses
 """
-from __future__ import absolute_import
+
 
 import base64
 import json
@@ -277,7 +277,7 @@ def send_tarball(tarball, size):
     """
     wrapper = FileWrapper(tarball, settings.COURSE_EXPORT_DOWNLOAD_CHUNK_SIZE)
     response = StreamingHttpResponse(wrapper, content_type='application/x-tgz')
-    response['Content-Disposition'] = u'attachment; filename=%s' % os.path.basename(tarball.name.encode('utf-8'))
+    response['Content-Disposition'] = u'attachment; filename=%s' % os.path.basename(tarball.name)
     response['Content-Length'] = size
     return response
 
@@ -374,7 +374,7 @@ def export_status_handler(request, course_key_string):
         if isinstance(artifact.file.storage, FileSystemStorage):
             output_url = reverse_course_url('export_output_handler', course_key)
         elif isinstance(artifact.file.storage, S3BotoStorage):
-            filename = os.path.basename(artifact.file.name).encode('utf-8')
+            filename = os.path.basename(artifact.file.name)
             disposition = u'attachment; filename="{}"'.format(filename)
             output_url = artifact.file.storage.url(artifact.file.name, response_headers={
                 'response-content-disposition': disposition,

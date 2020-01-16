@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 from logging import getLogger
 from django.conf.urls import include, url
 from . import constants, registry, utils

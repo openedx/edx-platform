@@ -1,7 +1,7 @@
 """
 Helper methods for working with learning contexts
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 from opaque_keys.edx.keys import LearningContextKey, UsageKeyV2
 

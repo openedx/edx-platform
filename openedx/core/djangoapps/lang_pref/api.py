@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """ Python API for language and translation management. """
 
-from __future__ import absolute_import
 
 from collections import namedtuple
 

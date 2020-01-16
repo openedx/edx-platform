@@ -1,7 +1,7 @@
 """
 Django module for Course Metadata class -- manages advanced settings and related parameters
 """
-from __future__ import absolute_import
+
 
 import six
 from crum import get_current_user

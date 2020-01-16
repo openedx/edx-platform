@@ -1,7 +1,7 @@
 """
 Unit tests for bulk-email-related models.
 """
-from __future__ import absolute_import
+
 
 import datetime
 

@@ -2,7 +2,7 @@
 """
 Tests for linters.py
 """
-from __future__ import absolute_import, print_function
+
 
 import textwrap
 from unittest import TestCase

@@ -4,7 +4,6 @@ Unit tests for behavior that is specific to the api methods (vs. the view method
 Most of the functionality is covered in test_views.py.
 """
 
-from __future__ import absolute_import
 
 import itertools
 import re
@@ -367,7 +366,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         self.assertIn("Valid e-mail address required.", field_errors["email"]["developer_message"])
         self.assertIn("Full Name cannot contain the following characters: < >", field_errors["name"]["user_message"])
 
-    @patch('django.core.mail.send_mail')
+    @patch('django.core.mail.EmailMultiAlternatives.send')
     @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_update_sending_email_fails(self, send_mail):
         """Test what happens if all validation checks pass, but sending the email for email change fails."""

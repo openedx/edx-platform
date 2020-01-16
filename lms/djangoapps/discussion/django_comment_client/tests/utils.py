@@ -1,7 +1,7 @@
 """
 Utilities for tests within the django_comment_client module.
 """
-from __future__ import absolute_import
+
 
 from mock import patch
 

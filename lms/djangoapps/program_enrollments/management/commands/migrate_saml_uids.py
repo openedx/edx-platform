@@ -5,7 +5,7 @@ Intented for use in production environments, to help support migration
 of existing SSO learners into our most-recent program enrollment flow
 without needing to manually re-link their account.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import json
 import logging

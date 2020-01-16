@@ -1,14 +1,12 @@
 """
 Django app configuration for the XBlock Runtime django app
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 from django.apps import AppConfig, apps
 from django.conf import settings
-from xblock.runtime import DictKeyValueStore, KvsFieldData
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.xblock.runtime.blockstore_field_data import BlockstoreFieldData
 
 
 class XBlockAppConfig(AppConfig):

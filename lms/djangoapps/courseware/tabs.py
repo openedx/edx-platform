@@ -2,7 +2,7 @@
 This module is essentially a broker to xmodule/tabs.py -- it was originally introduced to
 perform some LMS-specific tab display gymnastics for the Entrance Exams feature
 """
-from __future__ import absolute_import
+
 
 import six
 from django.conf import settings

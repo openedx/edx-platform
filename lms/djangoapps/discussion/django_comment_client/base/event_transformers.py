@@ -2,7 +2,7 @@
 """
 Transformers for Discussion-related events.
 """
-from __future__ import absolute_import
+
 
 import six
 from django.contrib.auth.models import User

@@ -1,7 +1,7 @@
 """
 Tests for users API
 """
-from __future__ import absolute_import
+
 
 import datetime
 
@@ -76,6 +76,21 @@ class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
 
         response = self.api_response(expected_response_code=302, api_version=api_version)
         self.assertIn(self.username, response['location'])
+
+    @ddt.data(API_V05, API_V1)
+    def test_last_loggedin_updated(self, api_version):
+        """Verify that a user's last logged in value updates after hitting the my_user_info endpoint"""
+        self.login()
+
+        self.user.refresh_from_db()
+        last_login_before = self.user.last_login
+
+        # just hit the api endpoint; we don't care about the response here (tested previously)
+        self.api_response(expected_response_code=302, api_version=api_version)
+
+        self.user.refresh_from_db()
+        last_login_after = self.user.last_login
+        assert last_login_after > last_login_before
 
 
 @ddt.ddt
@@ -352,7 +367,7 @@ class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, Milestone
 
         response = self.api_response()
         certificate_data = response.data[0]['certificate']
-        self.assertEquals(certificate_data['url'], certificate_url)
+        self.assertEqual(certificate_data['url'], certificate_url)
 
     @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
     def test_no_certificate(self):
@@ -392,7 +407,7 @@ class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, Milestone
 
         response = self.api_response()
         certificate_data = response.data[0]['certificate']
-        self.assertRegexpMatches(
+        self.assertRegex(
             certificate_data['url'],
             r'http.*/certificates/user/{user_id}/course/{course_id}'.format(
                 user_id=self.user.id,

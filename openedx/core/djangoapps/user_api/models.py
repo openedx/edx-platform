@@ -1,7 +1,7 @@
 """
 Django ORM model specifications for the User API application
 """
-from __future__ import absolute_import
+
 
 import logging
 
@@ -204,7 +204,7 @@ class UserRetirementPartnerReportingStatus(TimeStampedModel):
     .. pii_types: name, username, email_address
     .. pii_retirement: local_api
     """
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     original_username = models.CharField(max_length=150, db_index=True)
     original_email = models.EmailField(db_index=True)
     original_name = models.CharField(max_length=255, blank=True, db_index=True)

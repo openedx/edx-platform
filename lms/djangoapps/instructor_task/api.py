@@ -6,7 +6,7 @@ already been submitted, filtered either by running state or input
 arguments.
 
 """
-from __future__ import absolute_import
+
 
 import hashlib
 from collections import Counter

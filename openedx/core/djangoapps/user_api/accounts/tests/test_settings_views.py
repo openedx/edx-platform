@@ -1,6 +1,6 @@
 """ Tests for views related to account settings. """
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
+
 
 import mock
 from django.conf import settings

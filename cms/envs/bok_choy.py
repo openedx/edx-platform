@@ -11,7 +11,6 @@ support both generating static assets to a directory and also serving static
 from the same directory.
 """
 
-from __future__ import absolute_import
 
 # Silence noisy logs
 import logging

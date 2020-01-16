@@ -2,7 +2,7 @@
 Manages the creation and termination of EC2 workers, to be used with pytest-xdist
 as part of the CI process on Jenkins.
 """
-from __future__ import absolute_import
+
 import argparse
 import logging
 import time

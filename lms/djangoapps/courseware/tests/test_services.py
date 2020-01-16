@@ -1,8 +1,9 @@
 """
 Tests for courseware services.
 """
-from __future__ import absolute_import
 
+
+import itertools
 import json
 
 import ddt
@@ -55,11 +56,28 @@ class TestUserStateService(ModuleStoreTestCase):
             state=json.dumps(state)
         )
 
+    def _get_email_or_username(self, should_use_email):
+        """
+        Helper function that returns either username or email of the user based on given criteria.
+
+        Arguments:
+            should_use_email(bool): Flag to identify if the email is to be returned
+        Returns:
+            username/email depending upon the value of provided flag
+        """
+        return self.user.email if should_use_email else self.user.username
+
     @ddt.data(
-        ({'key_1a': 'value_1a', 'key_2a': 'value_2a'}),
-        ({'key_1b': 'value_1b', 'key_2b': 'value_2b', 'key_3b': 'value_3b'})
-    )
-    def test_student_state(self, expected_state):
+        *itertools.product(
+            [
+                ({'key_1a': 'value_1a', 'key_2a': 'value_2a'}),
+                ({'key_1b': 'value_1b', 'key_2b': 'value_2b', 'key_3b': 'value_3b'})
+            ], [
+                True, False
+            ]
+        ))
+    @ddt.unpack
+    def test_student_state(self, expected_state, should_use_email):
         """
         Verify the service gets the correct state from the student module.
 
@@ -71,16 +89,22 @@ class TestUserStateService(ModuleStoreTestCase):
         """
         self._create_student_module(expected_state)
         state = UserStateService().get_state_as_dict(
-            self.user.username, self.problem.location
+            self._get_email_or_username(should_use_email), self.problem.location
         )
         self.assertDictEqual(state, expected_state)
 
     @ddt.data(
-        ({'username': 'no_user', 'block_id': 'block-v1:myOrg+1234+2030_T2+type@openassessment+block@hash'}),
-        ({'username': 'no_user'}),
-        ({'block_id': 'block-v1:myOrg+1234+2030_T2+type@openassessment+block@hash'})
-    )
-    def test_nonexistent_student_module_state(self, state_params):
+        *itertools.product(
+            [
+                ({'username_or_email': 'no_user', 'block_id': 'block-v1:myOrg+123+2030_T2+type@openassessment+block@hash'}),  # pylint: disable=line-too-long
+                ({'username_or_email': 'no_user'}),
+                ({'block_id': 'block-v1:myOrg+1234+2030_T2+type@openassessment+block@hash'})
+            ], [
+                True, False
+            ]
+        ))
+    @ddt.unpack
+    def test_nonexistent_student_module_state(self, state_params, should_use_email):
         """
         Verify the user state service returns empty dict for non-existent student module entry.
 
@@ -91,7 +115,7 @@ class TestUserStateService(ModuleStoreTestCase):
             Then an empty dict is returned
         """
         params = {
-            'username': self.user.username,
+            'username_or_email': self._get_email_or_username(should_use_email),
             'block_id': self.problem.location
         }
         params.update(state_params)

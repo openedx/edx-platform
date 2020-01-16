@@ -2,7 +2,6 @@
 Test for asset XML generation / parsing.
 """
 
-from __future__ import absolute_import
 
 import unittest
 

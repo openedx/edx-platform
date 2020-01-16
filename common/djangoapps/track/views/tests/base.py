@@ -2,7 +2,7 @@
 Base class for tests related to emitted events to one of the tracking 'views'
 (e.g. SegmentIO).
 """
-from __future__ import absolute_import
+
 
 import json
 

@@ -2,7 +2,7 @@
 """
 Unit tests for instructor.api methods.
 """
-from __future__ import absolute_import, print_function
+
 
 import datetime
 import functools
@@ -684,9 +684,9 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEquals(len(data['row_errors']), 0)
-        self.assertEquals(len(data['warnings']), 0)
-        self.assertEquals(len(data['general_errors']), 0)
+        self.assertEqual(len(data['row_errors']), 0)
+        self.assertEqual(len(data['warnings']), 0)
+        self.assertEqual(len(data['general_errors']), 0)
 
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 1)
@@ -705,9 +705,9 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEquals(len(data['row_errors']), 0)
-        self.assertEquals(len(data['warnings']), 0)
-        self.assertEquals(len(data['general_errors']), 0)
+        self.assertEqual(len(data['row_errors']), 0)
+        self.assertEqual(len(data['warnings']), 0)
+        self.assertEqual(len(data['general_errors']), 0)
 
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 1)
@@ -728,9 +728,9 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEquals(len(data['row_errors']), 0)
-        self.assertEquals(len(data['warnings']), 0)
-        self.assertEquals(len(data['general_errors']), 0)
+        self.assertEqual(len(data['row_errors']), 0)
+        self.assertEqual(len(data['warnings']), 0)
+        self.assertEqual(len(data['general_errors']), 0)
 
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 1)
@@ -751,8 +751,8 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertNotEquals(len(data['general_errors']), 0)
-        self.assertEquals(
+        self.assertNotEqual(len(data['general_errors']), 0)
+        self.assertEqual(
             data['general_errors'][0]['response'],
             'Make sure that the file you upload is in CSV format with no extraneous characters or rows.'
         )
@@ -768,8 +768,8 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertNotEquals(len(data['general_errors']), 0)
-        self.assertEquals(data['general_errors'][0]['response'], 'Could not read uploaded file.')
+        self.assertNotEqual(len(data['general_errors']), 0)
+        self.assertEqual(data['general_errors'][0]['response'], 'Could not read uploaded file.')
 
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 0)
@@ -783,10 +783,10 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEquals(len(data['row_errors']), 0)
-        self.assertEquals(len(data['warnings']), 0)
-        self.assertEquals(len(data['general_errors']), 1)
-        self.assertEquals(data['general_errors'][0]['response'], 'Data in row #1 must have exactly four columns: email, username, full name, and country')
+        self.assertEqual(len(data['row_errors']), 0)
+        self.assertEqual(len(data['warnings']), 0)
+        self.assertEqual(len(data['general_errors']), 1)
+        self.assertEqual(data['general_errors'][0]['response'], 'Data in row #1 must have exactly four columns: email, username, full name, and country')
 
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 0)
@@ -800,10 +800,10 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         response = self.client.post(self.url, {'students_list': uploaded_file})
         data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response.status_code, 200)
-        self.assertNotEquals(len(data['row_errors']), 0)
-        self.assertEquals(len(data['warnings']), 0)
-        self.assertEquals(len(data['general_errors']), 0)
-        self.assertEquals(data['row_errors'][0]['response'], u'Invalid email {0}.'.format('test_student.example.com'))
+        self.assertNotEqual(len(data['row_errors']), 0)
+        self.assertEqual(len(data['warnings']), 0)
+        self.assertEqual(len(data['general_errors']), 0)
+        self.assertEqual(data['row_errors'][0]['response'], u'Invalid email {0}.'.format('test_student.example.com'))
 
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 0)
@@ -841,8 +841,8 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         data = json.loads(response.content.decode('utf-8'))
         warning_message = u'An account with email {email} exists but the provided username {username} ' \
                           u'is different. Enrolling anyway with {email}.'.format(email='test_student@example.com', username='test_student_2')
-        self.assertNotEquals(len(data['warnings']), 0)
-        self.assertEquals(data['warnings'][0]['response'], warning_message)
+        self.assertNotEqual(len(data['warnings']), 0)
+        self.assertEqual(data['warnings'][0]['response'], warning_message)
         user = User.objects.get(email='test_student@example.com')
         self.assertTrue(CourseEnrollment.is_enrolled(user, self.course.id))
 
@@ -872,8 +872,8 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertNotEquals(len(data['row_errors']), 0)
-        self.assertEquals(
+        self.assertNotEqual(len(data['row_errors']), 0)
+        self.assertEqual(
             data['row_errors'][0]['response'],
             u'Invalid email {email}.'.format(email=conflicting_email)
         )
@@ -892,8 +892,8 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertNotEquals(len(data['row_errors']), 0)
-        self.assertEquals(data['row_errors'][0]['response'], u'Username {user} already exists.'.format(user='test_student_1'))
+        self.assertNotEqual(len(data['row_errors']), 0)
+        self.assertEqual(data['row_errors'][0]['response'], u'Username {user} already exists.'.format(user='test_student_1'))
 
     def test_csv_file_not_attached(self):
         """
@@ -907,8 +907,8 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         response = self.client.post(self.url, {'file_not_found': uploaded_file})
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertNotEquals(len(data['general_errors']), 0)
-        self.assertEquals(data['general_errors'][0]['response'], 'File is not attached.')
+        self.assertNotEqual(len(data['general_errors']), 0)
+        self.assertEqual(data['general_errors'][0]['response'], 'File is not attached.')
 
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 0)
@@ -927,8 +927,8 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
 
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertNotEquals(len(data['row_errors']), 0)
-        self.assertEquals(data['row_errors'][0]['response'], 'NonExistentCourseError')
+        self.assertNotEqual(len(data['row_errors']), 0)
+        self.assertEqual(data['row_errors'][0]['response'], 'NonExistentCourseError')
 
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 0)
@@ -938,7 +938,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         generate_unique_password should generate a unique password string that excludes certain characters.
         """
         password = generate_unique_password([], 12)
-        self.assertEquals(len(password), 12)
+        self.assertEqual(len(password), 12)
         for letter in password:
             self.assertNotIn(letter, 'aAeEiIoOuU1l')
 
@@ -960,12 +960,12 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertNotEquals(len(data['row_errors']), 0)
-        self.assertEquals(
+        self.assertNotEqual(len(data['row_errors']), 0)
+        self.assertEqual(
             data['row_errors'][0]['response'],
             u'Username {user} already exists.'.format(user='test_student_1')
         )
-        self.assertEquals(
+        self.assertEqual(
             data['row_errors'][1]['response'],
             u'Invalid email {email}.'.format(email='test_student4@example.com')
         )
@@ -985,14 +985,14 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         """
         generated_password = ['first']
         password = generate_unique_password(generated_password, 12)
-        self.assertNotEquals(password, 'first')
+        self.assertNotEqual(password, 'first')
 
     @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': False})
     def test_allow_automated_signups_flag_not_set(self):
         csv_content = b"test_student1@example.com,test_student_1,tester1,USA"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 0)
@@ -1011,9 +1011,9 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
 
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEquals(len(data['row_errors']), 0)
-        self.assertEquals(len(data['warnings']), 0)
-        self.assertEquals(len(data['general_errors']), 0)
+        self.assertEqual(len(data['row_errors']), 0)
+        self.assertEqual(len(data['warnings']), 0)
+        self.assertEqual(len(data['general_errors']), 0)
 
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 1)
@@ -1042,9 +1042,9 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
 
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEquals(len(data['row_errors']), 0)
-        self.assertEquals(len(data['warnings']), 0)
-        self.assertEquals(len(data['general_errors']), 0)
+        self.assertEqual(len(data['row_errors']), 0)
+        self.assertEqual(len(data['warnings']), 0)
+        self.assertEqual(len(data['general_errors']), 0)
 
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 1)
@@ -1068,9 +1068,9 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
 
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEquals(len(data['row_errors']), 0)
-        self.assertEquals(len(data['warnings']), 0)
-        self.assertEquals(len(data['general_errors']), 0)
+        self.assertEqual(len(data['row_errors']), 0)
+        self.assertEqual(len(data['warnings']), 0)
+        self.assertEqual(len(data['general_errors']), 0)
 
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 1)
@@ -2639,12 +2639,12 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         redeem_url = reverse('register_code_redemption', args=[code], is_dashboard_endpoint=False)
         self.client.login(username=user.username, password='test')
         response = self.client.get(redeem_url)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         # check button text
         self.assertContains(response, 'Activate Course Enrollment')
 
         response = self.client.post(redeem_url)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_invalidate_sale_record(self):
         """
@@ -3297,7 +3297,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         self.assertIn("attachment; filename=org", response['Content-Disposition'])
 
     @patch('lms.djangoapps.instructor_task.models.logger.error')
-    @patch.dict(settings.GRADES_DOWNLOAD, {'STORAGE_TYPE': 's3'})
+    @patch.dict(settings.GRADES_DOWNLOAD, {'STORAGE_TYPE': 's3', 'ROOT_PATH': 'tmp/edx-s3/grades'})
     def test_list_report_downloads_error(self, mock_error):
         """
         Tests the Rate-Limit exceeded is handled and does not raise 500 error.
@@ -3305,7 +3305,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         ex_status = 503
         ex_reason = 'Slow Down'
         url = reverse('list_report_downloads', kwargs={'course_id': text_type(self.course.id)})
-        with patch('openedx.core.storage.S3ReportStorage.listdir', side_effect=BotoServerError(ex_status, ex_reason)):
+        with patch('storages.backends.s3boto.S3BotoStorage.listdir', side_effect=BotoServerError(ex_status, ex_reason)):
             response = self.client.post(url, {})
         mock_error.assert_called_with(
             u'Fetching files failed for course: %s, status: %s, reason: %s',

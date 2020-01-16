@@ -2,7 +2,6 @@
 Tests for certificate app views used by the support team.
 """
 
-from __future__ import absolute_import
 
 import json
 

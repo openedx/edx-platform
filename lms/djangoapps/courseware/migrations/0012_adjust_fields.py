@@ -4,7 +4,7 @@
 # This migration does not produce any actual database changes; it only affects
 # the python code. You can confirm this with:
 #    ./manage.py lms sqlmigrate courseware 0012_adjust_fields
-from __future__ import unicode_literals
+
 
 from django.conf import settings
 from django.db import migrations, models

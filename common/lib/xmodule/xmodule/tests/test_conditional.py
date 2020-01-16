@@ -1,4 +1,4 @@
-from __future__ import absolute_import, print_function
+
 
 import json
 import unittest
@@ -173,7 +173,7 @@ class ConditionalModuleBasicTest(unittest.TestCase):
             'element_id': u'i4x-edX-conditional_test-conditional-SampleConditional',
             'depends': u'i4x-edX-conditional_test-problem-SampleProblem',
         })
-        self.assertEquals(expected, html)
+        self.assertEqual(expected, html)
 
     def test_handle_ajax(self):
         modules = ConditionalFactory.create(self.test_system)
@@ -238,7 +238,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         modulestore = XMLModuleStore(DATA_DIR, source_dirs=[name])
         courses = modulestore.get_courses()
         self.modulestore = modulestore
-        self.assertEquals(len(courses), 1)
+        self.assertEqual(len(courses), 1)
         return courses[0]
 
     def test_conditional_module(self):

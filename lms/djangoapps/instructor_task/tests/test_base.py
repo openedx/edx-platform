@@ -2,7 +2,7 @@
 Base test classes for LMS instructor-initiated background tasks
 
 """
-from __future__ import absolute_import
+
 
 import json
 # pylint: disable=attribute-defined-outside-init

@@ -5,7 +5,7 @@ This is a place to put simple functions that operate on course metadata. It
 allows us to share code between the CourseDescriptor and CourseOverview
 classes, which both need these type of functions.
 """
-from __future__ import absolute_import
+
 
 from base64 import b32encode
 from datetime import datetime, timedelta
@@ -201,7 +201,7 @@ def sorting_dates(start, advertised_start, announcement):
         start = dateutil.parser.parse(advertised_start)
         if start.tzinfo is None:
             start = start.replace(tzinfo=utc)
-    except (ValueError, AttributeError):
+    except (TypeError, ValueError, AttributeError):
         start = start
 
     now = datetime.now(utc)

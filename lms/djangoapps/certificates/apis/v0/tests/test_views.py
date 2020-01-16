@@ -1,7 +1,7 @@
 """
 Tests for the Certificate REST APIs.
 """
-from __future__ import absolute_import
+
 
 from itertools import product
 
@@ -270,7 +270,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
     def test_query_counts(self):
         # Test student with no certificates
         student_no_cert = UserFactory.create(password=self.user_password)
-        with self.assertNumQueries(22):
+        with self.assertNumQueries(21):
             resp = self.get_response(
                 AuthType.jwt,
                 requesting_user=student_no_cert,
@@ -280,7 +280,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             self.assertEqual(len(resp.data), 0)
 
         # Test student with 1 certificate
-        with self.assertNumQueries(17):
+        with self.assertNumQueries(14):
             resp = self.get_response(
                 AuthType.jwt,
                 requesting_user=self.student,
@@ -320,7 +320,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             download_url='www.google.com',
             grade="0.88",
         )
-        with self.assertNumQueries(17):
+        with self.assertNumQueries(14):
             resp = self.get_response(
                 AuthType.jwt,
                 requesting_user=student_2_certs,

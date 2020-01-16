@@ -2,7 +2,6 @@
 Models for contentstore
 """
 
-from __future__ import absolute_import
 
 from config_models.models import ConfigurationModel
 from django.db.models.fields import TextField

@@ -1,7 +1,7 @@
 """
 Utility methods for the account settings.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import re
 

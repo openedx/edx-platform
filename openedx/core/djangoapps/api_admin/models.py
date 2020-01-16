@@ -1,5 +1,5 @@
 """Models for API management."""
-from __future__ import absolute_import
+
 
 import logging
 from smtplib import SMTPException

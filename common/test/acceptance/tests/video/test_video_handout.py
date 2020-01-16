@@ -3,7 +3,7 @@
 """
 Acceptance tests for CMS Video Handout.
 """
-from __future__ import absolute_import
+
 
 from common.test.acceptance.tests.video.test_studio_video_module import CMSVideoBaseTest
 

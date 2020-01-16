@@ -5,7 +5,6 @@ StudentViewHandlers are handlers for video module instance.
 StudioViewHandlers are handlers for video descriptor instance.
 """
 
-from __future__ import absolute_import
 
 import json
 import logging

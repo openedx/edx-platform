@@ -1,6 +1,5 @@
 """Tests for models supporting Credentials-related functionality."""
 
-from __future__ import absolute_import
 
 from django.test import TestCase, override_settings
 

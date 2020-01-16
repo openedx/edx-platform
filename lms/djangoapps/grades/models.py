@@ -8,7 +8,6 @@ a student's score or the course grading policy changes. As they are
 persisted, course grades are also immune to changes in course content.
 """
 
-from __future__ import absolute_import
 
 import json
 import logging
@@ -655,7 +654,7 @@ class PersistentSubsectionGradeOverride(models.Model):
     class Meta(object):
         app_label = "grades"
 
-    grade = models.OneToOneField(PersistentSubsectionGrade, related_name='override')
+    grade = models.OneToOneField(PersistentSubsectionGrade, related_name='override', on_delete=models.CASCADE)
 
     # Created/modified timestamps prevent race-conditions when using with async rescoring tasks
     created = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -771,60 +770,3 @@ class PersistentSubsectionGradeOverride(models.Model):
                 getattr(subsection_grade_model, field_name)
             )
         return cleaned_data
-
-
-@python_2_unicode_compatible
-class PersistentSubsectionGradeOverrideHistory(models.Model):
-    """
-    A django model tracking persistent grades override audit records.
-
-    .. no_pii:
-    """
-    OVERRIDE_FEATURES = (
-        (constants.GradeOverrideFeatureEnum.proctoring, u'proctoring'),
-        (constants.GradeOverrideFeatureEnum.gradebook, u'gradebook'),
-    )
-
-    CREATE_OR_UPDATE = u'CREATEORUPDATE'
-    DELETE = u'DELETE'
-    OVERRIDE_ACTIONS = (
-        (CREATE_OR_UPDATE, u'create_or_update'),
-        (DELETE, u'delete')
-    )
-
-    class Meta(object):
-        app_label = "grades"
-
-    override_id = models.IntegerField(db_index=True)
-    feature = models.CharField(
-        max_length=32,
-        choices=OVERRIDE_FEATURES,
-        default=constants.GradeOverrideFeatureEnum.proctoring,
-    )
-    action = models.CharField(
-        max_length=32,
-        choices=OVERRIDE_ACTIONS,
-        default=CREATE_OR_UPDATE
-    )
-    user = models.ForeignKey(User, blank=True, null=True)
-    comments = models.CharField(max_length=300, blank=True, null=True)
-    created = models.DateTimeField(auto_now_add=True, db_index=True)
-
-    def __str__(self):
-        """
-        String representation of this model.
-        """
-        return (
-            u"{} override_id: {}, user_id: {}, feature: {}, action: {}, created: {}"
-        ).format(
-            type(self).__name__,
-            self.override_id,
-            self.user,
-            self.feature,
-            self.action,
-            self.created
-        )
-
-    @classmethod
-    def get_override_history(cls, override_id):
-        return cls.objects.filter(override_id=override_id)

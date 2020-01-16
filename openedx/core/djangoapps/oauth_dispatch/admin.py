@@ -2,7 +2,6 @@
 Override admin configuration for django-oauth-toolkit
 """
 
-from __future__ import absolute_import
 
 from django.contrib.admin import ModelAdmin, site
 from oauth2_provider import models

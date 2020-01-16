@@ -1,7 +1,7 @@
 """
 Test the various password reset flows
 """
-from __future__ import absolute_import
+
 
 import json
 import re
@@ -83,9 +83,9 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         bad_pwd_req = self.request_factory.post('/password_reset/', {'email': self.user_bad_passwd.email})
         bad_pwd_resp = password_reset(bad_pwd_req)
         # If they've got an unusable password, we return a successful response code
-        self.assertEquals(bad_pwd_resp.status_code, 200)
+        self.assertEqual(bad_pwd_resp.status_code, 200)
         obj = json.loads(bad_pwd_resp.content.decode('utf-8'))
-        self.assertEquals(obj, {
+        self.assertEqual(obj, {
             'success': True,
             'value': "('registration/password_reset_done.html', [])",
         })
@@ -105,9 +105,9 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         # Note: even if the email is bad, we return a successful response code
         # This prevents someone potentially trying to "brute-force" find out which
         # emails are and aren't registered with edX
-        self.assertEquals(bad_email_resp.status_code, 200)
+        self.assertEqual(bad_email_resp.status_code, 200)
         obj = json.loads(bad_email_resp.content.decode('utf-8'))
-        self.assertEquals(obj, {
+        self.assertEqual(obj, {
             'success': True,
             'value': "('registration/password_reset_done.html', [])",
         })
@@ -128,12 +128,12 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
                 'email': 'thisdoesnotexist{0}@foo.com'.format(i)
             })
             good_resp = password_reset(good_req)
-            self.assertEquals(good_resp.status_code, 200)
+            self.assertEqual(good_resp.status_code, 200)
 
         # then the rate limiter should kick in and give a HttpForbidden response
         bad_req = self.request_factory.post('/password_reset/', {'email': 'thisdoesnotexist@foo.com'})
         bad_resp = password_reset(bad_req)
-        self.assertEquals(bad_resp.status_code, 403)
+        self.assertEqual(bad_resp.status_code, 403)
         self.assert_no_events_were_emitted()
 
         cache.clear()
@@ -154,7 +154,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         dot_access_token = dot_factories.AccessTokenFactory(user=self.user, application=dot_application)
         dot_factories.RefreshTokenFactory(user=self.user, application=dot_application, access_token=dot_access_token)
         good_resp = password_reset(good_req)
-        self.assertEquals(good_resp.status_code, 200)
+        self.assertEqual(good_resp.status_code, 200)
         self.assertFalse(dop_models.AccessToken.objects.filter(user=self.user).exists())
         self.assertFalse(dop_models.RefreshToken.objects.filter(user=self.user).exists())
         self.assertFalse(dot_models.AccessToken.objects.filter(user=self.user).exists())
@@ -175,8 +175,8 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
 
         self.assertIn("Password reset", sent_message.subject)
         self.assertIn(expected_output, body)
-        self.assertEquals(sent_message.from_email, from_email)
-        self.assertEquals(len(sent_message.to), 1)
+        self.assertEqual(sent_message.from_email, from_email)
+        self.assertEqual(len(sent_message.to), 1)
         self.assertIn(self.user.email, sent_message.to)
 
         self.assert_event_emitted(
@@ -191,10 +191,9 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         re.search(r'password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/', body).groupdict()
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
-    @patch('django.core.mail.send_mail')
     @ddt.data((False, 'http://'), (True, 'https://'))
     @ddt.unpack
-    def test_reset_password_email_https(self, is_secure, protocol, send_email):
+    def test_reset_password_email_https(self, is_secure, protocol):
         """
         Tests that the right url protocol is included in the reset password link
         """
@@ -205,7 +204,8 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         req.is_secure = Mock(return_value=is_secure)
         req.user = self.user
         password_reset(req)
-        _, msg, _, _ = send_email.call_args[0]
+        sent_message = mail.outbox[0]
+        msg = sent_message.body
         expected_msg = "Please go to the following page and choose a new password:\n\n" + protocol
 
         self.assertIn(expected_msg, msg)
@@ -215,10 +215,9 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         )
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
-    @patch('django.core.mail.send_mail')
     @ddt.data(('Crazy Awesome Site', 'Crazy Awesome Site'), ('edX', 'edX'))
     @ddt.unpack
-    def test_reset_password_email_site(self, site_name, platform_name, send_email):
+    def test_reset_password_email_site(self, site_name, platform_name):
         """
         Tests that the right url domain and platform name is included in
         the reset password email
@@ -231,7 +230,8 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
                 req.user = self.user
                 req.site = Mock(domain='example.com')
                 password_reset(req)
-                _, msg, _, _ = send_email.call_args[0]
+                sent_message = mail.outbox[0]
+                msg = sent_message.body
 
                 reset_msg = u"you requested a password reset for your user account at {}"
                 reset_msg = reset_msg.format(site_name)
@@ -463,14 +463,13 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         good_reset_req.user = self.user
         password_reset_confirm_wrapper(good_reset_req, self.uidb36, self.token)
         confirm_kwargs = reset_confirm.call_args[1]
-        self.assertEquals(confirm_kwargs['extra_context']['platform_name'], 'Fake University')
+        self.assertEqual(confirm_kwargs['extra_context']['platform_name'], 'Fake University')
         self.user = User.objects.get(pk=self.user.pk)
         self.assertTrue(self.user.is_active)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
-    @patch('django.core.mail.send_mail')
     @ddt.data('Crazy Awesome Site', 'edX')
-    def test_reset_password_email_subject(self, platform_name, send_email):
+    def test_reset_password_email_subject(self, platform_name):
         """
         Tests that the right platform name is included in
         the reset password email subject
@@ -482,7 +481,8 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
             req.user = self.user
             req.site = Mock(domain='example.com')
             password_reset(req)
-            subj, _, _, _ = send_email.call_args[0]
+            sent_message = mail.outbox[0]
+            subj = sent_message.subject
 
             self.assertIn(platform_name, subj)
 

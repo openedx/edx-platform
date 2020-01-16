@@ -1,7 +1,7 @@
 """
 Tests for the Bulk Enrollment views.
 """
-from __future__ import absolute_import
+
 
 import json
 

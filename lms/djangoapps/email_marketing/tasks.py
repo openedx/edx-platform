@@ -2,7 +2,6 @@
 This file contains celery tasks for email marketing signal handler.
 """
 
-from __future__ import absolute_import
 
 import logging
 import time

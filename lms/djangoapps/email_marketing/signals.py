@@ -1,7 +1,7 @@
 """
 This module contains signals needed for email integration
 """
-from __future__ import absolute_import
+
 
 import datetime
 import logging

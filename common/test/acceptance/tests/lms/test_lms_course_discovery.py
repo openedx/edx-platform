@@ -1,7 +1,7 @@
 """
 Test course discovery.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import json

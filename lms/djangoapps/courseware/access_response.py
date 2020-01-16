@@ -2,7 +2,6 @@
 This file contains all the classes used by has_access for error handling
 """
 
-from __future__ import absolute_import
 
 from django.utils.translation import ugettext as _
 

@@ -12,7 +12,7 @@ You can then use the CourseFactory and XModuleItemFactory as defined
 in common/lib/xmodule/xmodule/modulestore/tests/factories.py to create
 the course, section, subsection, unit, etc.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import json
@@ -280,7 +280,7 @@ class VideoBlockImportTestCase(TestCase):
         Assert that `video` has the correct attributes. `attrs` is a map of {metadata_field: value}.
         """
         for key, value in attrs.items():
-            self.assertEquals(getattr(video, key), value)
+            self.assertEqual(getattr(video, key), value)
 
     def test_constructor(self):
         sample_xml = '''
@@ -820,7 +820,7 @@ class VideoExportTestCase(VideoBlockTestBase):
         xml = self.descriptor.definition_to_xml(self.file_system)
         # Check that download_video field is also set to default (False) in xml for backward compatibility
         expected = '<video url_name="SampleProblem"/>\n'
-        self.assertEquals(expected, etree.tostring(xml, pretty_print=True).decode('utf-8'))
+        self.assertEqual(expected, etree.tostring(xml, pretty_print=True).decode('utf-8'))
 
     @patch('xmodule.video_module.video_module.edxval_api', None)
     def test_export_to_xml_with_transcripts_as_none(self):
@@ -830,7 +830,7 @@ class VideoExportTestCase(VideoBlockTestBase):
         self.descriptor.transcripts = None
         xml = self.descriptor.definition_to_xml(self.file_system)
         expected = b'<video url_name="SampleProblem"/>\n'
-        self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
+        self.assertEqual(expected, etree.tostring(xml, pretty_print=True))
 
     @patch('xmodule.video_module.video_module.edxval_api', None)
     def test_export_to_xml_invalid_characters_in_attributes(self):
@@ -898,7 +898,7 @@ class VideoBlockStudentViewDataTestCase(unittest.TestCase):
         descriptor = instantiate_descriptor(**field_data)
         descriptor.runtime.course_id = MagicMock()
         student_view_data = descriptor.student_view_data()
-        self.assertEquals(student_view_data, expected_student_view_data)
+        self.assertEqual(student_view_data, expected_student_view_data)
 
     @patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
     @patch('xmodule.video_module.transcripts_utils.get_available_transcript_languages', Mock(return_value=['es']))
@@ -1220,4 +1220,4 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
         descriptor.transcripts = None
         response = descriptor.get_transcripts_info()
         expected = {'transcripts': {}, 'sub': ''}
-        self.assertEquals(expected, response)
+        self.assertEqual(expected, response)
