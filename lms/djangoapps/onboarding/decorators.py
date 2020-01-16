@@ -12,18 +12,9 @@ def can_access_org_page(user_extended_profile):
     :param user_extended_profile:
     :return: boolean
     """
-    # user is admin of organization => can access org page
-    if user_extended_profile.organization and user_extended_profile.is_organization_admin:
-        can_access = True
-
-    # user is at registration pages & signup as admin/first_learner => can access org page
-    elif user_extended_profile.organization and (user_extended_profile.is_organization_admin
-                                                 or user_extended_profile.is_first_signup_in_org):
-        can_access = True
-    else:
-        can_access = False
-
-    return can_access
+    return bool(user_extended_profile.organization and
+                (user_extended_profile.is_organization_admin or
+                 user_extended_profile.is_first_signup_in_org))
 
 
 def can_save_org_data(function):
