@@ -1,6 +1,7 @@
 """
 Common MongoDB connection functions.
 """
+import ssl
 import logging
 
 import pymongo
@@ -65,6 +66,7 @@ def connect_to_mongodb(
             port=port,
             tz_aware=tz_aware,
             document_class=dict,
+            ssl_cert_reqs=ssl.CERT_NONE,
             **kwargs
         ),
         db
