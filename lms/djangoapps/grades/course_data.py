@@ -4,6 +4,7 @@ Code used to get and cache the requested course-data
 
 
 from django.utils.encoding import python_2_unicode_compatible
+from edx_when import field_data
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers import (
@@ -67,13 +68,14 @@ class CourseData(object):
     @property
     def structure(self):
         if self._structure is None:
+            # Default transformers minus start_date
             transformers = [
                 library_content.ContentLibraryTransformer(),
-                library_content.ContentLibraryOrderTransformer(),
                 # start_date.StartDateTransformer(),
                 ContentTypeGateTransformer(),
                 user_partitions.UserPartitionTransformer(),
                 visibility.VisibilityTransformer(),
+                field_data.DateOverrideTransformer(self.user),
             ]
             self._structure = get_course_blocks(
                 self.user,
