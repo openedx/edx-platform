@@ -53,6 +53,13 @@ ENV PATH ./node_modules/.bin:${PATH}
 COPY .github/build/bin /openedx/bin
 ENV PATH /openedx/bin:${PATH}
 
+# Create folder that will store *.env.json and *.auth.json files, as well as
+# the settings files.
+COPY .github/build/settings/lms/*.py ./lms/envs/prod/
+COPY .github/build/settings/cms/*.py ./cms/envs/prod/
+RUN mkdir -p /openedx/config ./lms/envs/prod ./cms/envs/prod
+ENV CONFIG_ROOT /openedx/config
+
 # Collect production assets. By default, only assets from the default theme
 # will be processed. This makes the docker image lighter and faster to build.
 # Only the custom themes added to /openedx/themes will be compiled.
