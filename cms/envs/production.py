@@ -607,6 +607,10 @@ ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = ENV_TOKENS.get(
     'ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER',
     ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER
 )
+ENTERPRISE_CATALOG_INTERNAL_ROOT_URL = ENV_TOKENS.get(
+    'ENTERPRISE_CATALOG_INTERNAL_ROOT_URL',
+    ENTERPRISE_CATALOG_INTERNAL_ROOT_URL
+)
 
 # This limits the type of roles that are submittable via the `student` app's manual enrollment
 # audit API. While this isn't used in CMS, it is used via Enterprise which is installed in
