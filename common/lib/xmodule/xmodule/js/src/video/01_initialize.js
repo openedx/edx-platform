@@ -723,12 +723,20 @@ function(VideoPlayer, i18n, moment, _) {
     }
 
     function getVideoMetadata(url, callback) {
+        var youTubeEndpoint;
         if (!(_.isString(url))) {
             url = this.videos['1.0'] || '';
         }
         // Will hit the API URL to get the youtube video metadata.
+        youTubeEndpoint = this.config.ytMetadataEndpoint; // The new runtime supports anonymous users
+                                                          // and uses an XBlock handler to get YouTube metadata
+        if (!youTubeEndpoint) {
+            // The old runtime has a full/separate LMS API for getting YouTube metadata, but it doesn't
+            // support anonymous users nor videos that play in a sandboxed iframe.
+            youTubeEndpoint = [this.config.lmsRootURL, '/courses/yt_video_metadata', '?id=', url].join('');
+        }
         return $.ajax({
-            url: [this.config.lmsRootURL, '/courses/yt_video_metadata', '?id=', url].join(''),
+            url: youTubeEndpoint,
             success: _.isFunction(callback) ? callback : null,
             error: function() {
                 console.warn(
