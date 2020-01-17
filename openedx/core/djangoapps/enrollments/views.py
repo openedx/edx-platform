@@ -696,12 +696,14 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         # Check that the user specified is either the same user, or this is a server-to-server request.
         if not username:
             username = request.user.username
-        if username != request.user.username and not has_api_key_permissions:
+        if username != request.user.username and not has_api_key_permissions \
+                and not GlobalStaff().has_user(request.user):
             # Return a 404 instead of a 403 (Unauthorized). If one user is looking up
             # other users, do not let them deduce the existence of an enrollment.
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        if mode not in (CourseMode.AUDIT, CourseMode.HONOR, None) and not has_api_key_permissions:
+        if mode not in (CourseMode.AUDIT, CourseMode.HONOR, None) and not has_api_key_permissions \
+                and not GlobalStaff().has_user(request.user):
             return Response(
                 status=status.HTTP_403_FORBIDDEN,
                 data={
