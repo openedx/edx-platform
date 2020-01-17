@@ -321,9 +321,8 @@ class CourseOverview(TimeStampedModel):
         try:
             course_overview = cls.objects.select_related('image_set').get(id=course_id)
             if course_overview.version < cls.VERSION:
-                # Throw away old versions of CourseOverview, as they might contain stale data.
-                course_overview.delete()
-                course_overview = None
+                # Reload the overview from the modulestore to update the version
+                course_overview = cls.load_from_module_store(course_id)
         except cls.DoesNotExist:
             course_overview = None
 

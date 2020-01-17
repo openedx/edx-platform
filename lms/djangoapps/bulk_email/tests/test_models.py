@@ -188,6 +188,7 @@ class CourseEmailTemplateTest(TestCase):
             'email_settings_url': "/location/of/email/settings/url",
             'platform_name': 'edX',
             'email': 'your-email@test.com',
+            'unsubscribe_link': '/bulk_email/email/optout/dummy'
         }
         return context
 

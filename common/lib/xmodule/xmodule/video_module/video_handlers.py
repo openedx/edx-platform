@@ -377,6 +377,19 @@ class VideoStudentViewHandlers(object):
 
         return response
 
+    @XBlock.handler
+    def yt_video_metadata(self, request, suffix=''):
+        """
+        Endpoint to get YouTube metadata.
+        This handler is only used in the Blockstore-based runtime. The old
+        runtime uses a similar REST API that's not an XBlock handler.
+        """
+        from lms.djangoapps.courseware.views.views import load_metadata_from_youtube
+        metadata, status_code = load_metadata_from_youtube(video_id=self.youtube_id_1_0)
+        response = Response(json.dumps(metadata), status=status_code)
+        response.content_type = 'application/json'
+        return response
+
 
 class VideoStudioViewHandlers(object):
     """

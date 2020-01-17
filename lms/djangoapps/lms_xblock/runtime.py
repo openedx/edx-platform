@@ -157,7 +157,7 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
             services['badging'] = BadgingService(course_id=kwargs.get('course_id'), modulestore=store)
         self.request_token = kwargs.pop('request_token', None)
         services['teams'] = TeamsService()
-        services['teams_config'] = TeamsConfigurationService()
+        services['teams_configuration'] = TeamsConfigurationService()
         super(LmsModuleSystem, self).__init__(**kwargs)
 
     def handler_url(self, *args, **kwargs):

@@ -499,7 +499,7 @@ class CourseEntitlementSupportDetail(TimeStampedModel):
         null=True,
         blank=True,
         db_constraint=False,
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
     )
 
     history = HistoricalRecords()

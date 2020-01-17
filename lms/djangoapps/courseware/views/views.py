@@ -280,10 +280,21 @@ def yt_video_metadata(request):
     Will hit the youtube API if the key is available in settings
     :return: youtube video metadata
     """
-    response = {}
-    status_code = 500
     video_id = request.GET.get('id', None)
-    if settings.YOUTUBE_API_KEY and video_id:
+    metadata, status_code = load_metadata_from_youtube(video_id)
+    return Response(metadata, status=status_code, content_type='application/json')
+
+
+def load_metadata_from_youtube(video_id):
+    """
+    Get metadata about a YouTube video.
+
+    This method is used via the standalone /courses/yt_video_metadata REST API
+    endpoint, or via the video XBlock as a its 'yt_video_metadata' handler.
+    """
+    metadata = {}
+    status_code = 500
+    if video_id and settings.YOUTUBE_API_KEY and settings.YOUTUBE_API_KEY != 'PUT_YOUR_API_KEY_HERE':
         yt_api_key = settings.YOUTUBE_API_KEY
         yt_metadata_url = settings.YOUTUBE['METADATA_URL']
         yt_timeout = settings.YOUTUBE.get('TEST_TIMEOUT', 1500) / 1000  # converting milli seconds to seconds
@@ -295,7 +306,7 @@ def yt_video_metadata(request):
                 try:
                     res_json = res.json()
                     if res_json.get('items', []):
-                        response = res_json
+                        metadata = res_json
                     else:
                         logging.warning(u'Unable to find the items in response. Following response '
                                         u'was received: {res}'.format(res=res.text))
@@ -310,7 +321,7 @@ def yt_video_metadata(request):
     else:
         logging.warning(u'YouTube API key or video id is None. Please make sure API key and video id is not None')
 
-    return Response(response, status=status_code, content_type='application/json')
+    return metadata, status_code
 
 
 @ensure_csrf_cookie
