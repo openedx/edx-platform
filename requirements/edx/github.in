@@ -61,6 +61,10 @@ git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752
 -e git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
 
+# Forked to get Django 2.2 support from unreleased master branch from social-app-django repo.
+# This can be removed once an official social-auth-app-django Pypi release with Django 2.2 support is available in the future.
+-e git+https://github.com/python-social-auth/social-app-django.git@c00d23c2b45c3317bd35b15ad1b959338689cef8#egg=social-auth-app-django
+
 # Forked to get Django 1.10+ compat that is in origin BitBucket repo, without an official build.
 # This can go away when we update auth to not use django-rest-framework-oauth
 git+https://github.com/edx/django-oauth-plus.git@b9b64a3ac24fd11f471763c88462bbf3c53e46e6#egg=django-oauth-plus==2.2.9.edx-4
