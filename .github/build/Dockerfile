@@ -32,7 +32,6 @@ WORKDIR /openedx/edx-platform
 # they will be overwritten when we mount edx-platform)
 ENV NO_PYTHON_UNINSTALL 1
 RUN pip install --src ../venv/src -r requirements/edx/base.txt
-RUN pip install --src ../venv/src -r requirements/edx/development.txt
 
 # Remove the original versions of ora2 and edx-sga
 RUN pip uninstall -y ora2 edx-sga
