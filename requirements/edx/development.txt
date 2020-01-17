@@ -114,7 +114,7 @@ edx-celeryutils==0.3.1
 edx-completion==3.0.2
 edx-django-oauth2-provider==1.3.5
 edx-django-release-util==0.3.3
-edx-django-sites-extensions==2.4.2
+git+https://github.com/edx/edx-django-sites-extensions.git@a2840f8966fff6ade16fe812155772320e512006#edx-django-sites-extensions
 edx-django-utils==2.0.3
 edx-drf-extensions==2.4.5
 edx-enterprise==2.0.49

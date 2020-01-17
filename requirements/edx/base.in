@@ -75,7 +75,7 @@ edx-celeryutils
 edx-completion
 edx-django-oauth2-provider
 edx-django-release-util             # Release utils for the edx release pipeline
-edx-django-sites-extensions
+git+https://github.com/edx/edx-django-sites-extensions.git@a2840f8966fff6ade16fe812155772320e512006#edx-django-sites-extensions
 edx-django-utils
 edx-drf-extensions
 edx-enterprise
