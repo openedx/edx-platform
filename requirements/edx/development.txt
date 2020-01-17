@@ -155,7 +155,7 @@ glob2==0.7
 gunicorn==20.0.4
 help-tokens==1.0.5
 html5lib==1.0.1
-httplib2==0.15.0
+httplib2==0.16.0
 httpretty==0.9.7
 idna==2.8
 imagesize==1.2.0          # via sphinx
@@ -285,7 +285,7 @@ six==1.14.0
 slumber==0.7.1
 snowballstemmer==2.0.0    # via sphinx
 social-auth-core==3.2.0
-sorl-thumbnail==12.5.0
+git+https://github.com/jazzband/sorl-thumbnail.git@13bedfb7d2970809eda597e3ef79318a6fa80ac2#egg=sorl-thumbnail
 sortedcontainers==2.1.0
 soupsieve==1.9.5
 sphinx==2.3.1             # via edx-sphinx-theme, sphinxcontrib-httpdomain
