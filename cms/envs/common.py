@@ -1902,6 +1902,9 @@ VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
 ########## Settings youtube thumbnails scraper tasks ############
 SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
 
+########## Settings update search index task ############
+UPDATE_SEARCH_INDEX_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
+
 ###################### VIDEO IMAGE STORAGE ######################
 
 VIDEO_IMAGE_DEFAULT_FILENAME = 'images/video-images/default_video_image.png'
