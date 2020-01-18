@@ -105,7 +105,7 @@ djangorestframework-xml==1.4.0
 djangorestframework==3.9.4
 docopt==0.6.2
 docutils==0.16
-drf-yasg==1.16
+drf-yasg==1.17.0
 edx-ace==0.1.13
 edx-analytics-data-api-client==0.15.3
 edx-api-doc-tools==1.0.2
@@ -142,7 +142,7 @@ entrypoints==0.3
 enum34==1.1.6
 event-tracking==0.3.0
 execnet==1.7.1
-factory_boy==2.8.1
+factory-boy==2.12.0
 faker==4.0.0
 filelock==3.0.12
 flake8-polyfill==1.0.2
@@ -176,7 +176,7 @@ jsonschema==3.2.0         # via sphinxcontrib-openapi
 kombu==3.0.37
 laboratory==1.0.2
 lazy-object-proxy==1.4.3
-lazy==1.1
+lazy==1.4
 lepl==5.1.3
 libsass==0.10.0
 loremipsum==1.0.5
@@ -207,13 +207,14 @@ oauthlib==2.1.0
 git+https://github.com/edx/edx-ora2.git@2.6.0#egg=ora2==2.6.0
 packaging==20.0
 pandas==0.22.0
-path.py==8.2.1
+path.py==12.4.0
+path==13.1.0
 pathlib2==2.3.5
 pathtools==0.1.2
 paver==1.3.4
 pbr==5.4.4
 pdfminer.six==20200104
-piexif==1.0.2
+piexif==1.1.3
 pillow==7.0.0
 pip-tools==4.3.0
 pkgconfig==1.5.1
@@ -223,7 +224,7 @@ psutil==1.2.1
 py2neo==3.1.2
 py==1.8.1
 pycodestyle==2.5.0
-pycontracts==1.7.1
+pycontracts==1.8.12
 pycountry==19.8.18
 pycparser==2.19
 pycryptodome==3.9.4
@@ -322,7 +323,7 @@ wcwidth==0.1.8
 web-fragments==0.3.1
 webencodings==0.5.1
 webob==1.8.5
-wrapt==1.10.5
+wrapt==1.11.2
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.8#egg=xblock-drag-and-drop-v2==2.2.8
 git+https://github.com/open-craft/xblock-poll@3c7dcaf6c933d914188f0740a60711603f948d26#egg=xblock-poll==1.9.1
 xblock-utils==1.2.4

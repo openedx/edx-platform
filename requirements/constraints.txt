@@ -23,9 +23,6 @@ django-method-override<1.0.0
 # Version 4.0.0 dropped support for Django < 2.0.1
 django-model-utils<4.0.0
 
-# 1.16.1 requires djangorestframework>=3.8
-drf-yasg==1.16
-
 # 1.2.3 breaks unittest in
 # lms.djangoapps.course_api.tests.test_views.CourseListSearchViewTest.test_list_all_with_search_term
 # acceptance.tests.lms.test_lms_course_discovery.CourseDiscoveryTest.test_search
@@ -61,7 +58,7 @@ python-dateutil==2.4.0
 # python3-saml 1.6.0 breaks unittests in common/djangoapps/third_party_auth/tests/test_views.py::SAMLMetadataTest
 python3-saml==1.5.0
 
-# transifex-client 0.13.5 and 0.13.6 pin six and urllib3 to old versions needlessly
+# transifex-client 0.13.5 and 0.13.6 needlessly pin six and urllib3, 0.13.7 does so for python-slugify
 #   https://github.com/transifex/transifex-client/issues/252
 transifex-client==0.13.4
 
