@@ -201,7 +201,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-01-05 20:42+0000\n"
+"POT-Creation-Date: 2020-01-12 20:42+0000\n"
 "PO-Revision-Date: 2019-12-13 16:54+0000\n"
 "Last-Translator: Sébastien Vigneau <sebastien.vigneau@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
@@ -2621,11 +2621,19 @@ msgid "Masters"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "MicroBachelors"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Photo Verification"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Proctoring"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Security"
 msgstr ""
 
 #: cms/templates/js/asset-library.underscore

@@ -64,7 +64,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-01-05 20:42+0000\n"
+"POT-Creation-Date: 2020-01-12 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Catalan (https://www.transifex.com/open-edx/teams/6205/ca/)\n"
@@ -6460,6 +6460,7 @@ msgid "Cohort"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Team"
 msgstr ""
 
@@ -7353,6 +7354,18 @@ msgstr ""
 #, python-brace-format
 msgid " (out of {total})"
 msgstr ""
+
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/learner_dashboard/programs.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Programs"
+msgstr "Programes"
+
+#: lms/templates/learner_dashboard/program_details.html
+msgid "Program Details"
+msgstr "Detalls del programa"
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
@@ -10984,10 +10997,6 @@ msgid "enabled_as_of must be set when enabled is True"
 msgstr ""
 
 #: openedx/features/content_type_gating/partitions.py
-msgid "Feature-based Enrollments"
-msgstr ""
-
-#: openedx/features/content_type_gating/partitions.py
 msgid "Partition for segmenting users by access to gated content types"
 msgstr ""
 
@@ -11150,8 +11159,8 @@ msgstr ""
 #, no-python-format, python-brace-format
 msgid ""
 "{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% "
-"[{strikeout_price}]{span_close}{br}Discount will be automatically applied at"
-" checkout. {a_open}Upgrade Now{a_close}{div_close}"
+"[{strikeout_price}]{span_close}{br}Use code {b_open}{code}{b_close} at "
+"checkout! {a_open}Upgrade Now{a_close}{div_close}"
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py
@@ -17057,14 +17066,6 @@ msgstr ""
 "compatible. Us recomanem que feu servir {chrome_link} o {ff_link}."
 
 #: lms/templates/header/navbar-authenticated.html
-#: lms/templates/learner_dashboard/programs.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Programs"
-msgstr "Programes"
-
-#: lms/templates/header/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr "Descobreix Nou"
@@ -18921,10 +18922,6 @@ msgstr "Mostra l'estat de les tasques que heu enviat per a aquest problema."
 msgid "My Courses"
 msgstr "Els meus cursos"
 
-#: lms/templates/learner_dashboard/program_details.html
-msgid "Program Details"
-msgstr "Detalls del programa"
-
 #: lms/templates/learner_dashboard/text-me-fragment.html
 msgid "Get the {platform_name} Mobile App!"
 msgstr "Obteniu l'aplicació mòbil {platform_name}."
@@ -19209,6 +19206,13 @@ msgstr "Reinicia la teva contrasenya {platform_name}"
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Invalid Password Reset Link"
 msgstr "Enllaç de restabliment de contrasenya no vàlid"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid ""
+"This password reset link is invalid. It may have been used already. To reset"
+" your password, go to the {start_link}sign-in{end_link} page and select "
+"{start_strong}Forgot password{end_strong}."
+msgstr ""
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"
