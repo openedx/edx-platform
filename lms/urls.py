@@ -149,7 +149,7 @@ if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
 
 if settings.FEATURES.get('ENABLE_OPENBADGES'):
     urlpatterns += [
-        url(r'^api/badges/v1/', include('badges.api.urls', app_name='badges', namespace='badges_api')),
+        url(r'^api/badges/v1/', include(('badges.api.urls', 'badges'), namespace='badges_api')),
     ]
 
 urlpatterns += [
