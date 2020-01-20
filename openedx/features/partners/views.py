@@ -18,6 +18,12 @@ def dashboard(request, slug):
     return views.dashboard(request, partner.slug)
 
 
+def performance_dashboard(request, slug):
+    partner = get_object_or_404(Partner, slug=slug)
+    views = import_module_using_slug(partner.slug)
+    return views.performance_dashboard(request, partner)
+
+
 @require_http_methods(["POST"])
 @sensitive_post_parameters('password')
 def register_user(request, slug):

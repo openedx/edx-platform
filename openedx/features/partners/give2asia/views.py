@@ -6,6 +6,7 @@ from logging import getLogger
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models.signals import post_save
@@ -42,6 +43,13 @@ def dashboard(request, partner_slug):
     courses = get_partner_recommended_courses(partner_slug, request.user)
     return render_to_response('features/partners/g2a/dashboard.html', {'recommended_courses': courses,
                                                                        'slug': partner_slug})
+
+
+def performance_dashboard(request, partner):
+    if request.user.has_perm('can_access_g2a_performance'):
+        return render_to_response('features/partners/g2a/performance_dashboard.html',
+                                  {'slug': partner.slug, 'performance_url': partner.performance_url})
+    raise Http404
 
 
 class Give2AsiaRegistrationView(RegistrationViewCustom):
