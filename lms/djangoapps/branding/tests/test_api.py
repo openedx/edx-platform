@@ -148,8 +148,8 @@ class TestFooter(TestCase):
                  'icon-class': 'fa-twitter-square', 'title': 'Twitter'},
                 {'url': '#', 'action': 'Follow \xe9dX on LinkedIn', 'name': 'linkedin',
                  'icon-class': 'fa-linkedin-square', 'title': 'LinkedIn'},
-                {'url': '#', 'action': 'Follow \xe9dX on Google+', 'name': 'google_plus',
-                 'icon-class': 'fa-google-plus-square', 'title': 'Google+'},
+                {'url': '#', 'action': 'Follow \xe9dX on Instagram', 'name': 'instagram',
+                 'icon-class': 'fa-instagram', 'title': 'Instagram'},
                 {'url': '#', 'action': 'Subscribe to the \xe9dX subreddit',
                  'name': 'reddit', 'icon-class': 'fa-reddit-square', 'title': 'Reddit'}
             ],
