@@ -2,7 +2,6 @@
 Tests for schedules resolvers
 """
 
-
 import datetime
 from unittest import skipUnless
 
@@ -11,18 +10,15 @@ from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 from mock import Mock, patch
-from waffle.testutils import override_switch
 
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
-from openedx.core.djangoapps.schedules.resolvers import (
-    BinnedSchedulesBaseResolver,
-    CourseUpdateResolver,
-)
+from openedx.core.djangoapps.schedules.resolvers import BinnedSchedulesBaseResolver, CourseUpdateResolver
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, skip_unless_lms
 from student.tests.factories import CourseEnrollmentFactory
+from waffle.testutils import override_switch
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -31,6 +27,7 @@ class SchedulesResolverTestMixin(CacheIsolationMixin):
     """
     Base class for the resolver tests.
     """
+
     def setUp(self):
         super(SchedulesResolverTestMixin, self).setUp()
         self.site = SiteFactory.create()
@@ -46,6 +43,7 @@ class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, TestCase):
     """
     Tests the BinnedSchedulesBaseResolver.
     """
+
     def setUp(self):
         super(TestBinnedSchedulesBaseResolver, self).setUp()
 
@@ -103,6 +101,7 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
     """
     Tests the CourseUpdateResolver.
     """
+
     def setUp(self):
         super(TestCourseUpdateResolver, self).setUp()
         self.course = CourseFactory(highlights_enabled_for_messaging=True, self_paced=True)
@@ -155,3 +154,13 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
         resolver = self.create_resolver()
         schedules = list(resolver.schedules_for_bin())
         self.assertIn('optout', schedules[0][2]['unsubscribe_url'])
+
+    def test_get_schedules_with_target_date_by_bin_and_orgs_filter_inactive_users(self):
+        """Tests that schedules of inactive users are excluded"""
+        resolver = self.create_resolver()
+        schedules = resolver.get_schedules_with_target_date_by_bin_and_orgs()
+        self.assertEqual(schedules.count(), 1)
+        self.user.is_active = False
+        self.user.save()
+        schedules = resolver.get_schedules_with_target_date_by_bin_and_orgs()
+        self.assertEqual(schedules.count(), 0)
