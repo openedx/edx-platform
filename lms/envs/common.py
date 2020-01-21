@@ -2535,7 +2535,7 @@ REST_FRAMEWORK = {
 }
 
 SWAGGER_SETTINGS = {
-    'DEFAULT_INFO': 'openedx.core.apidocs.default_info',
+    'DEFAULT_INFO': 'openedx.core.apidocs.api_info',
 }
 
 # How long to cache OpenAPI schemas and UI, in seconds.
