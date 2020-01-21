@@ -5,6 +5,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 
 from lms.djangoapps.verify_student.models import ManualVerification
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import UserProfile
 
 
@@ -29,3 +30,14 @@ def generate_manual_verification_for_user(sender, instance, created, **kwargs):
         )
     except Exception:  # pylint: disable=broad-except
         logger.error('Error while generating ManualVerification for user: %s', instance.user.email, exc_info=True)
+
+
+@receiver(post_save, sender=CourseOverview)
+def course_image_change(sender, instance, created, **kwargs):
+    """
+    Change the default course image whenever new course is created
+    """
+    if created:
+        if instance.course_image_url.endswith('images_course_image.jpg'):
+            instance.course_image_url = "/static/" + settings.DEFAULT_COURSE_ABOUT_IMAGE_URL
+            instance.save()
