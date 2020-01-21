@@ -92,3 +92,44 @@ ${HTML(fragment.foot_html())}
       % endif
     </nav>
 % endif
+
+<script type="text/javascript">
+  if (window !== window.parent) {
+    var learningAppReferrer = "${settings.LEARNING_MICROFRONTEND_URL}";
+    if (document.referrer === learningAppReferrer) {
+
+      var lastHeight = window.offsetHeight;
+      var lastWidth = window.offsetWidth;
+
+      function dispatchResizeMessage() {
+        if (document.body.offsetHeight !== lastHeight || document.body.offsetWidth !== lastWidth) {
+          window.parent.postMessage({
+              type: 'plugin.resize',
+              payload: {
+                width: document.body.offsetWidth,
+                height: document.body.offsetHeight,
+              }
+            }, document.referrer
+          );
+          lastHeight = document.body.offsetHeight;
+          lastWidth = document.body.offsetWidth;
+        }
+      }
+
+      // Create an observer instance linked to the callback function
+      const observer = new MutationObserver(dispatchResizeMessage);
+
+      // Start observing the target node for configured mutations
+      observer.observe(document.body, { attributes: true, childList: true, subtree: true });
+
+
+      window.addEventListener('load', function() {
+          dispatchResizeMessage();
+      });
+
+      window.addEventListener('resize', function() {
+        dispatchResizeMessage();
+      });
+    }
+  }
+</script>

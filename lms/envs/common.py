@@ -3755,6 +3755,7 @@ PROFILE_MICROFRONTEND_URL = None
 ORDER_HISTORY_MICROFRONTEND_URL = None
 ACCOUNT_MICROFRONTEND_URL = None
 PROGRAM_MANAGER_MICROFRONTEND_URL = None
+LEARNING_MICROFRONTEND_URL = 'http://localhost:2000/'
 
 ############### Settings for the ace_common plugin #################
 ACE_ENABLED_CHANNELS = ['django_email']
