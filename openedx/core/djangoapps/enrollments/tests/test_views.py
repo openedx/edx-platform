@@ -1000,6 +1000,40 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         self.assertTrue(is_active)
         self.assertEqual(course_mode, updated_mode)
 
+    @ddt.data(
+        (True, status.HTTP_200_OK),
+        (False, status.HTTP_404_NOT_FOUND)
+    )
+    @ddt.unpack
+    def test_enrollment_with_global_staff_permissions(self, using_global_staff_user, http_status):
+        """Verify no audit enrollments for user different than requesting user and without
+        API_KEY should be done by the users having global staff permissions. """
+
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug=CourseMode.VERIFIED,
+            mode_display_name=CourseMode.VERIFIED,
+        )
+
+        username = self.OTHER_USERNAME
+        if using_global_staff_user:
+            username = 'global_staff'
+            AdminFactory(username=username, email='global_staff@example.com', password=self.PASSWORD)
+        self.client.login(username=username, password=self.PASSWORD)
+
+        # Create an enrollment
+        self.assert_enrollment_status(
+            as_server=False,
+            mode=CourseMode.VERIFIED,
+            expected_status=http_status
+        )
+
+        if using_global_staff_user:
+            course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+            self.assertTrue(is_active)
+            self.assertEqual(course_mode, CourseMode.VERIFIED)
+        self.client.logout()
+
     @httpretty.activate
     @override_settings(ENTERPRISE_SERVICE_WORKER_USERNAME='enterprise_worker',
                        FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
