@@ -322,7 +322,7 @@ class DjangoStorageReportStore(ReportStore):
             )
             return []
         files = [(filename, os.path.join(course_dir, filename)) for filename in filenames]
-        files.sort(key=lambda f: self.storage.modified_time(f[1]), reverse=True)
+        files.sort(key=lambda f: self.storage.get_modified_time(f[1]), reverse=True)
         return [
             (filename, self.storage.url(full_path))
             for filename, full_path in files
