@@ -28,6 +28,9 @@ django-model-utils<4.0.0
 # acceptance.tests.lms.test_lms_course_discovery.CourseDiscoveryTest.test_search
 edx-search==1.2.2
 
+# Upgrading to 2.12.0 breaks several test classes due to API changes, need to update our code accordingly
+factory-boy==2.8.1
+
 # Version 0.3.13 broke the timing returned by python3-saml OneLogin_Saml2_Utils.now()
 freezegun==0.3.12
 

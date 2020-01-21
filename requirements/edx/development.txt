@@ -142,7 +142,7 @@ entrypoints==0.3
 enum34==1.1.6
 event-tracking==0.3.0
 execnet==1.7.1
-factory-boy==2.12.0
+factory-boy==2.8.1
 faker==4.0.0
 filelock==3.0.12
 flake8-polyfill==1.0.2
