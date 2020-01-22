@@ -22,9 +22,9 @@ class ScheduleFactory(factory.DjangoModelFactory):
     class Meta(object):
         model = models.Schedule
 
-    # TODO replace 'start' field with 'start_date' after data migration,
-    #  in removing writes from old field step in column renaming release
+    # TODO drop 'start' when removing this field in column renaming release
     start = factory.Faker('future_datetime', tzinfo=pytz.UTC)
+    start_date = factory.Faker('future_datetime', tzinfo=pytz.UTC)
     upgrade_deadline = factory.Faker('future_datetime', tzinfo=pytz.UTC)
     enrollment = factory.SubFactory(CourseEnrollmentFactory)
     experience = factory.RelatedFactory(ScheduleExperienceFactory, 'schedule')
