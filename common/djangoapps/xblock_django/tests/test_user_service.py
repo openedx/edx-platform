@@ -85,29 +85,6 @@ class UserServiceTestCase(TestCase):
         anonymous_user_id = django_user_service.get_anonymous_user_id(username=self.user.username, course_id='edx/toy/2012_Fall')
         self.assertIsNone(anonymous_user_id)
 
-    def test_get_anonymous_user_id_allows_workaround(self):
-        """
-        Tests for anonymous_user_id method to allow case-specific workaround.
-
-        Specifically for teams functionality we need the ability to find teammates user IDs for team submisssions
-        so we have the `ignore_staff_check` flag as a workaround
-        """
-        course_key = CourseKey.from_string('edX/toy/2012_Fall')
-        anon_user_id = anonymous_id_for_user(
-            user=self.user,
-            course_id=course_key,
-            save=True
-        )
-
-        django_user_service = DjangoXBlockUserService(self.user, user_is_staff=False)
-        anonymous_user_id = django_user_service.get_anonymous_user_id(
-            username=self.user.username,
-            course_id='edX/toy/2012_Fall',
-            ignore_staff_check=True
-        )
-
-        self.assertEqual(anonymous_user_id, anon_user_id)
-
     def test_get_anonymous_user_id_returns_none_for_non_existing_users(self):
         """
         Tests for anonymous_user_id method to return None username does not exist in system.

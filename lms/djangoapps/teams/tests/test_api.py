@@ -144,6 +144,10 @@ class PythonAPITests(SharedModuleStoreTestCase):
         with self.assertRaisesMessage(ValueError, message):
             teams_api.get_team_for_user_course_topic(self.user1, invalid_course_id, 'who-cares')
 
+    def test_get_team_anonymous_user_ids(self):
+        team_anonymous_user_ids = teams_api.get_team_anonymous_user_ids(self.team1)
+        self.assertEquals(len(self.team1.users), team_anonymous_user_ids)
+
 
 @ddt.ddt
 class TeamAccessTests(SharedModuleStoreTestCase):
