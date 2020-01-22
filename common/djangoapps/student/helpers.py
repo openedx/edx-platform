@@ -493,6 +493,8 @@ def _cert_info(user, course_overview, cert_status):
                     'show_cert_web_view': True,
                     'cert_web_view_url': get_certificate_url(course_id=course_overview.id, uuid=cert_status['uuid'])
                 })
+            elif cert_status['download_url']:
+                status_dict['download_url'] = cert_status['download_url']
             else:
                 # don't show download certificate button if we don't have an active certificate for course
                 status_dict['status'] = 'unavailable'
