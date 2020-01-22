@@ -107,7 +107,7 @@ class PlatformSyncService(APIView):
             "is_admin": user_extended_profile.is_organization_admin,
             "eligible_for_oef": eligible_for_oef(user_extended_profile),
             "help_center": configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
-            "can_access_partner_performance":  partner and user_has_performance_access(user, partner),
+            "can_access_partner_performance":  user_has_performance_access(user, partner),
             "partner_performance_url": partner and reverse('partner_performance', args=[partner.slug])
         }, status=status.HTTP_200_OK)
 

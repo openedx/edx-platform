@@ -12,11 +12,9 @@ def add_performance_permission_for_g2a(apps, schema_editor):
     ContentType = apps.get_model('contenttypes', 'ContentType')
     Partner = apps.get_model('partners', 'Partner')
 
-    g2a_slug = 'give2asia'
-    partner_ct = ContentType.objects.get_for_model(Partner)
-
-    Permission.objects.create(codename=PERFORMANCE_PERM_FRMT.format(slug=g2a_slug),
-                              name='Can access give2asia performance', content_type=partner_ct)
+    Permission.objects.create(codename=PERFORMANCE_PERM_FRMT.format(slug='give2asia'),
+                              name='Can access give2asia performance',
+                              content_type=ContentType.objects.get_for_model(Partner))
 
 
 class Migration(migrations.Migration):

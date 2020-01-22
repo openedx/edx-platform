@@ -11,7 +11,6 @@ from .models import Partner
 def create_partner_performance_permission(sender, instance, created, **kwargs):
     if created:
         slug = instance.slug
-        partner_ct = ContentType.objects.get_for_model(Partner)
         Permission.objects.create(codename=PERFORMANCE_PERM_FRMT.format(slug=slug),
                                  name='Can access {slug} performance'.format(slug=slug),
-                                 content_type=partner_ct)
+                                 content_type=ContentType.objects.get_for_model(Partner))
