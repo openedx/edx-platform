@@ -19,7 +19,7 @@ def runQualityTests() {
 
         checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: git_branch]],
             doGenerateSubmoduleConfigurations: false, extensions: git_extensions, submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
-            refspec: refspec, url: "git@github.com:edx/${REPO_NAME}.git"]]]
+            refspec: refspec, url: "git@github.com:ucsd-ets/${REPO_NAME}.git"]]]
 
         sh "bash scripts/all-tests.sh"
         stash includes: '**/reports/**/*', name: "${TEST_SUITE}-${SHARD}-reports"
@@ -57,7 +57,7 @@ pipeline {
                     build job: 'github-build-status',
                         parameters: [
                             string(name: 'GIT_SHA', value: commit_sha),
-                            string(name: 'GITHUB_ORG', value: 'edx'),
+                            string(name: 'GITHUB_ORG', value: 'ucsd-ets'),
                             string(name: 'GITHUB_REPO', value: "${REPO_NAME}"),
                             string(name: 'TARGET_URL', value: "${BUILD_URL}"),
                             string(name: 'DESCRIPTION', value: 'Pending'),
@@ -165,7 +165,7 @@ pipeline {
                         honorRefspec: true, noTags: true, shallow: false], [$class: 'WipeWorkspace']], submoduleCfg: [],
                         userRemoteConfigs: [[credentialsId: 'jenkins-worker',
                         refspec: "+refs/heads/${ghprbTargetBranch}:refs/remotes/origin/${ghprbTargetBranch} +refs/pull/${ghprbPullId}/*:refs/remotes/origin/pr/${ghprbPullId}/*",
-                        url: "git@github.com:edx/${REPO_NAME}.git"]]]
+                        url: "git@github.com:ucsd-ets/${REPO_NAME}.git"]]]
                     unstash 'quality-1-reports'
                     unstash 'quality-2-reports'
                     unstash 'quality-3-reports'
@@ -220,7 +220,7 @@ pipeline {
                         commit_sha = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
                         build job: 'github-build-status', parameters: [
                                 string(name: 'GIT_SHA', value: commit_sha),
-                                string(name: 'GITHUB_ORG', value: 'edx'),
+                                string(name: 'GITHUB_ORG', value: 'ucsd-ets'),
                                 string(name: 'GITHUB_REPO', value: "${REPO_NAME}"),
                                 string(name: 'TARGET_URL', value: "${BUILD_URL}"),
                                 string(name: 'DESCRIPTION', value: build_description),
@@ -244,12 +244,12 @@ pipeline {
                                 }
                             }
                             emailext body: email_body,
-                                subject: "Build failed in Jenkins: ${JOB_NAME} #${BUILD_NUMBER}", to: 'testeng@edx.org'
+                                subject: "Build failed in Jenkins: ${JOB_NAME} #${BUILD_NUMBER}", to: 'devops@arbisoft.com'
                         } else if (currentBuild.currentResult == "SUCCESS" && currentBuild.previousBuild.currentResult != "SUCCESS") {
                             slackSend botUser: true,
                                 message: "`${JOB_NAME}` #${BUILD_NUMBER}: Back to normal after ${currentBuild.durationString.replace(' and counting', '')}\n${BUILD_URL}"
                             emailext body: "See <${BUILD_URL}>",
-                                subject: "Jenkins Build is back to normal: ${JOB_NAME} #${BUILD_NUMBER}", to: 'testeng@edx.org'
+                                subject: "Jenkins Build is back to normal: ${JOB_NAME} #${BUILD_NUMBER}", to: 'devops@arbisoft.com'
                         }
                     }
                 }

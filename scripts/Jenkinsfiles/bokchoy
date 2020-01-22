@@ -12,7 +12,7 @@ def runBokchoyTests() {
         checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: git_branch]],
             doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', honorRefspec: true,
             noTags: true, shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
-            refspec: git_refspec, url: "git@github.com:edx/${REPO_NAME}.git"]]]
+            refspec: git_refspec, url: "git@github.com:ucsd-ets/${REPO_NAME}.git"]]]
         console_output = sh(returnStdout: true, script: 'bash scripts/all-tests.sh').trim()
         dir('stdout') {
             writeFile file: "${TEST_SUITE}-${SHARD}-stdout.log", text: console_output
@@ -43,7 +43,7 @@ pipeline {
                     build job: 'github-build-status',
                         parameters: [
                             string(name: 'GIT_SHA', value: commit_sha),
-                            string(name: 'GITHUB_ORG', value: 'edx'),
+                            string(name: 'GITHUB_ORG', value: 'ucsd-ets'),
                             string(name: 'GITHUB_REPO', value: "${REPO_NAME}"),
                             string(name: 'TARGET_URL', value: "${BUILD_URL}"),
                             string(name: 'DESCRIPTION', value: 'Pending'),
@@ -103,7 +103,7 @@ pipeline {
                     build job: 'github-build-status',
                         parameters: [
                             string(name: 'GIT_SHA', value: commit_sha),
-                            string(name: 'GITHUB_ORG', value: 'edx'),
+                            string(name: 'GITHUB_ORG', value: 'ucsd-ets'),
                             string(name: 'GITHUB_REPO', value: "${REPO_NAME}"),
                             string(name: 'TARGET_URL', value: "${BUILD_URL}"),
                             string(name: 'DESCRIPTION', value: build_description),
@@ -127,12 +127,12 @@ pipeline {
                             }
                         }
                         emailext body: email_body,
-                            subject: "Build failed in Jenkins: ${JOB_NAME} #${BUILD_NUMBER}", to: 'testeng@edx.org'
+                            subject: "Build failed in Jenkins: ${JOB_NAME} #${BUILD_NUMBER}", to: 'devops@arbisoft.com'
                     } else if (currentBuild.currentResult == "SUCCESS" && currentBuild.previousBuild.currentResult != "SUCCESS") {
                         slackSend botUser: true,
                             message: "`${JOB_NAME}` #${BUILD_NUMBER}: Back to normal after ${currentBuild.durationString.replace(' and counting', '')}\\n${BUILD_URL}"
                         emailext body: "See <${BUILD_URL}>",
-                            subject: "Jenkins Build is back to normal: ${JOB_NAME} #${BUILD_NUMBER}", to: 'testeng@edx.org'
+                            subject: "Jenkins Build is back to normal: ${JOB_NAME} #${BUILD_NUMBER}", to: 'devops@arbisoft.com'
                     }
                 }
             }
