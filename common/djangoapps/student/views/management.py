@@ -619,14 +619,6 @@ def validate_secondary_email(account_recovery, new_email):
     if new_email == account_recovery.user.email:
         raise ValueError(_('Cannot be same as your sign in email address.'))
 
-    # Make sure that secondary email address is not same as any of the primary emails currently in use or retired
-    if email_exists_or_retired(new_email):
-        raise ValueError(
-            _("It looks like {email} belongs to an existing account. Try again with a different email address.").format(
-                email=new_email
-            )
-        )
-
     message = get_secondary_email_validation_error(new_email)
     if message:
         raise ValueError(message)
