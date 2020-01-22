@@ -35,7 +35,7 @@ class DjangoXBlockUserService(UserService):
         """
         return self._convert_django_user_to_xblock_user(self._django_user)
 
-    def get_anonymous_user_id(self, username, course_id, ignore_staff_check=False):
+    def get_anonymous_user_id(self, username, course_id):
         """
         Get the anonymous user id for a user.
 
@@ -47,7 +47,7 @@ class DjangoXBlockUserService(UserService):
             A unique anonymous_user_id for (user, course) pair.
             None for Non-staff users.
         """
-        if not ignore_staff_check and not self.get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF):
+        if not self.get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF):
             return None
 
         try:

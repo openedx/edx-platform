@@ -13,7 +13,7 @@ from opaque_keys.edx.keys import CourseKey
 from course_modes.models import CourseMode
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, anonymous_id_for_user
 from student.roles import CourseInstructorRole, CourseStaffRole
 
 logger = logging.getLogger(__name__)
@@ -278,3 +278,38 @@ def get_team_for_user_course_topic(user, course_id, topic_id):
             membership__user__username=user.username,
             topic_id=topic_id,
         ).first()
+
+def get_team_anonymous_user_ids(team_id):
+    """ Get the anonymous user IDs for members of a team, used in team submissions
+
+        Returns:
+            (Array) User IDs, sorted to remove any correlation to usernames
+    """
+    team = None
+
+    try:
+        team = CourseTeam.objects.get(
+            team_id=team_id
+        )
+    except CourseTeam.DoesNotExist:
+        return None
+    except CourseTeam.MultipleObjectsReturned:
+        # This shouldn't ever happen but it's here for safety's sake
+        msg = "multiple teams returned for ID {team_id}"
+        logger.error(msg.format(
+            team_id=team_id
+        ))
+        team = CourseTeam.objects.filter(
+            team_id=team_id
+        ).first()
+
+    users = team.users
+    ids = []
+
+    for user in users.all():
+        ids.append(anonymous_id_for_user(user=user, course_id=team.course_id, save=False))
+
+    # the IDs are sorted to avoid leaking any correlation to user
+    ids.sort()
+
+    return ids
