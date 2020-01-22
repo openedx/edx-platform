@@ -6,7 +6,6 @@ from logging import getLogger
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models.signals import post_save
