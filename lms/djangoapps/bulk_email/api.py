@@ -16,6 +16,7 @@ from django.conf import settings
 from django.urls import reverse
 
 from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 def get_emails_enabled(user, course_id):
@@ -42,7 +43,8 @@ def get_unsubscribed_link(username, course_id):
     :param course_id:
     :return: AES encrypted token based on the user email
     """
+    lms_root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
     token = UsernameCipher.encrypt(username)
     optout_url = reverse('bulk_email_opt_out', kwargs={'token': token, 'course_id': course_id})
-    url = '{base_url}{optout_url}'.format(base_url=settings.LMS_ROOT_URL, optout_url=optout_url)
+    url = '{base_url}{optout_url}'.format(base_url=lms_root_url, optout_url=optout_url)
     return url

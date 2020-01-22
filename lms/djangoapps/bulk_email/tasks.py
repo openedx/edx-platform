@@ -112,6 +112,7 @@ def _get_course_email_context(course):
         course_root
     )
     image_url = u'{}{}'.format(settings.LMS_ROOT_URL, course_image_url(course))
+    lms_root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
     email_context = {
         'course_title': course_title,
         'course_root': course_root,
@@ -119,8 +120,8 @@ def _get_course_email_context(course):
         'course_url': course_url,
         'course_image_url': image_url,
         'course_end_date': course_end_date,
-        'account_settings_url': '{}{}'.format(settings.LMS_ROOT_URL, reverse('account_settings')),
-        'email_settings_url': '{}{}'.format(settings.LMS_ROOT_URL, reverse('dashboard')),
+        'account_settings_url': '{}{}'.format(lms_root_url, reverse('account_settings')),
+        'email_settings_url': '{}{}'.format(lms_root_url, reverse('dashboard')),
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         'year': timezone.now().year,
     }
