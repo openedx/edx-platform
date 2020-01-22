@@ -19,9 +19,6 @@ class Partner(TimeStampedModel):
     class Meta:
         verbose_name = "Partner"
         verbose_name_plural = "Partners"
-        permissions = (
-            ("can_access_g2a_performance", "Can access g2a performance"),
-        )
 
 
 class PartnerUser(TimeStampedModel):

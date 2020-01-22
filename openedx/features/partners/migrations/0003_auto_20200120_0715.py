@@ -4,6 +4,20 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 
+from openedx.features.partners.constants import PERFORMANCE_PERM_FRMT
+
+
+def add_performance_permission_for_g2a(apps, schema_editor):
+    Permission = apps.get_model('auth', 'Permission')
+    ContentType = apps.get_model('contenttypes', 'ContentType')
+    Partner = apps.get_model('partners', 'Partner')
+
+    g2a_slug = 'give2asia'
+    partner_ct = ContentType.objects.get_for_model(Partner)
+
+    Permission.objects.create(codename=PERFORMANCE_PERM_FRMT.format(slug=g2a_slug),
+                              name='Can access give2asia performance', content_type=partner_ct)
+
 
 class Migration(migrations.Migration):
 
@@ -12,10 +26,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterModelOptions(
-            name='partner',
-            options={'permissions': (('can_access_g2a_performance', 'Can access g2a performance'),), 'verbose_name': 'Partner', 'verbose_name_plural': 'Partners'},
-        ),
+        migrations.RunPython(add_performance_permission_for_g2a),
         migrations.AddField(
             model_name='partner',
             name='performance_url',

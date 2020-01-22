@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from .views import dashboard, login_user, register_user, reset_password_view, performance_dashboard
+from .views import dashboard, login_user, performance_dashboard, register_user, reset_password_view
 
 PARTNERS_SLUG_PARAM = '(?P<slug>[0-9a-z_-]+)'
 

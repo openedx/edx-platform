@@ -35,7 +35,7 @@ from student.models import Registration, UserProfile
 from . import constants as g2a_constants
 from .forms import Give2AsiaAccountCreationForm
 
-log = getLogger("edx.student")
+log = getLogger(__name__)
 AUDIT_LOG = getLogger("audit")
 
 
@@ -46,10 +46,8 @@ def dashboard(request, partner_slug):
 
 
 def performance_dashboard(request, partner):
-    if request.user.has_perm('can_access_g2a_performance'):
-        return render_to_response('features/partners/g2a/performance_dashboard.html',
-                                  {'slug': partner.slug, 'performance_url': partner.performance_url})
-    raise Http404
+    return render_to_response('features/partners/g2a/performance_dashboard.html',
+                              {'slug': partner.slug, 'performance_url': partner.performance_url})
 
 
 class Give2AsiaRegistrationView(RegistrationViewCustom):
