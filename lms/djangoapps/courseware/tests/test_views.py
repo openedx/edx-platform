@@ -1272,6 +1272,7 @@ class ProgressPageBaseTests(ModuleStoreTestCase):
 
 
 # pylint: disable=protected-access
+@patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
 @ddt.ddt
 class ProgressPageTests(ProgressPageBaseTests):
     """
@@ -1370,7 +1371,6 @@ class ProgressPageTests(ProgressPageBaseTests):
         resp = self._get_progress_page()
         self.assertNotContains(resp, 'Request Certificate')
 
-    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     def test_view_certificate_for_unverified_student(self):
         """
@@ -1402,7 +1402,6 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertNotContains(resp, u"Certificate unavailable")
             self.assertContains(resp, u"Your certificate is available")
 
-    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     def test_view_certificate_link(self):
         """
@@ -1464,7 +1463,6 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, "Your certificate is available")
             self.assertContains(resp, "earned a certificate for this course.")
 
-    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
     def test_view_certificate_link_hidden(self):
         """
@@ -1494,8 +1492,8 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        (True, 49),
-        (False, 48)
+        (True, 51),
+        (False, 50)
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
@@ -1508,8 +1506,8 @@ class ProgressPageTests(ProgressPageBaseTests):
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 57, 37),
-        (True, 48, 32)
+        (False, 59, 38),
+        (True, 50, 33)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
@@ -1528,7 +1526,6 @@ class ProgressPageTests(ProgressPageBaseTests):
                 ), check_mongo_calls(1):
                     self._get_progress_page()
 
-    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     @ddt.data(
         *itertools.product(
             (
@@ -1650,7 +1647,6 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, u"View Certificate")
             self.assert_invalidate_certificate(generated_certificate)
 
-    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     def test_page_with_invalidated_certificate_with_pdf(self):
         """
         Verify that for pdf certs if certificate is marked as invalidated than
@@ -1733,7 +1729,6 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.assertNotContains(response, bannerText, html=True)
 
     @patch('lms.djangoapps.courseware.views.views.is_course_passed', PropertyMock(return_value=True))
-    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     @override_settings(FEATURES=FEATURES_WITH_DISABLE_HONOR_CERTIFICATE)
     @ddt.data(CourseMode.AUDIT, CourseMode.HONOR)
     def test_message_for_ineligible_mode(self, course_mode):
@@ -1780,9 +1775,9 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.generate_certificate(
             "http://www.example.com/certificate.pdf", "honor"
         )
-        with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
-                   return_value=self.mock_certificate_downloadable_status(is_downloadable=True)):
-            response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
+        response = views._get_cert_data(
+            self.user, self.course, CourseMode.HONOR, MagicMock(passed=True)
+        )
 
         self.assertEqual(response.cert_status, 'downloadable')
         self.assertEqual(response.title, 'Your certificate is available')

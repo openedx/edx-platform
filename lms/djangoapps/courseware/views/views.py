@@ -1111,9 +1111,9 @@ def _progress(request, course_key, student_id):
         'student': student,
         'credit_course_requirements': _credit_course_requirements(course_key, student),
         'course_expiration_fragment': course_expiration_fragment,
+        'certificate_data': _get_cert_data(student, course, enrollment_mode, course_grade)
     }
-    if certs_api.get_active_web_certificate(course):
-        context['certificate_data'] = _get_cert_data(student, course, enrollment_mode, course_grade)
+
     context.update(
         get_experiment_user_metadata_context(
             course,
@@ -1136,7 +1136,7 @@ def _downloadable_certificate_message(course, cert_downloadable_status):
                     course_id=course.id, uuid=cert_downloadable_status['uuid']
                 )
             )
-        else:
+        elif not cert_downloadable_status['download_url']:
             return GENERATING_CERT_DATA
 
     return _downloadable_cert_data(download_url=cert_downloadable_status['download_url'])
@@ -1189,7 +1189,11 @@ def _get_cert_data(student, course, enrollment_mode, course_grade=None):
     if not auto_certs_api.can_show_certificate_message(course, student, course_grade, certificates_enabled_for_course):
         return
 
-    return _certificate_message(student, course, enrollment_mode)
+    cert_data = _certificate_message(student, course, enrollment_mode)
+    if not certs_api.get_active_web_certificate(course) and not auto_certs_api.is_valid_pdf_certificate(cert_data):
+        return
+
+    return cert_data
 
 
 def _credit_course_requirements(course_key, student):
