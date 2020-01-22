@@ -12,6 +12,7 @@ from .models import UserBadge
 
 
 @require_GET
+@login_required
 def trophycase(request):
     user = request.user
 
@@ -32,7 +33,7 @@ def trophycase(request):
     return render_to_response(
             "features/badging/trophy_case.html",
             {
-                'course_badges': []
+                'course_badges': trophycase_dict
             }
         )
 

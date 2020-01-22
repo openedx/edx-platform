@@ -71,6 +71,10 @@ def get_course_badges(user, course_id, earned_badges, badge_queryset=None):
                 # user has not joined any team
                 badges['team_joined'] = False
 
+            if course_team and 'team_id' in course_team and course_team['team_id']:
+                # only if user has joined any team
+                badges['team_id'] = course_team['team_id']
+
         badge_list = list(
             badge_queryset.filter(type=badge_type).values()
         )
@@ -108,7 +112,8 @@ def filter_earned_badge_by_joined_team(user, course, earned_badges):
         flag: Has user joined any team
         earned_badges: All badges earned in a course, specific to joined team
     """
-    course_team = CourseTeam.objects.filter(course_id=course.id, users=user).values('team__room_id').first()
+    # course_team = CourseTeam.objects.filter(course_id=course.id, users=user).values('team__room_id').first()
+    course_team = CourseTeam.objects.filter(course_id=course.id, users=user).values('team_id', 'team__room_id').first()
 
     if not course_team:
         # if user has not joined any team, return empty list for earned badges
