@@ -93,7 +93,8 @@ urlpatterns = [
     url(r'^api/enrollment/v1/', include('openedx.core.djangoapps.enrollments.urls')),
 
     # Entitlement API RESTful endpoints
-    url(r'^api/entitlements/', include('entitlements.api.urls', namespace='entitlements_api')),
+    url(r'^api/entitlements/', include(('entitlements.api.urls', 'common.djangoapps.entitlements'),
+                                       namespace='entitlements_api')),
 
     # Courseware search endpoints
     url(r'^search/', include('search.urls')),
@@ -115,33 +116,38 @@ urlpatterns = [
     # independently of courseware. https://github.com/edx/edx-val
     url(r'^api/val/v0/', include('edxval.urls')),
 
-    url(r'^api/commerce/', include('commerce.api.urls', namespace='commerce_api')),
+    url(r'^api/commerce/', include(('commerce.api.urls', 'lms.djangoapps.commerce'), namespace='commerce_api')),
     url(r'^api/credit/', include('openedx.core.djangoapps.credit.urls')),
     url(r'^rss_proxy/', include('rss_proxy.urls')),
     url(r'^api/organizations/', include('organizations.urls', namespace='organizations')),
 
-    url(r'^catalog/', include('openedx.core.djangoapps.catalog.urls', namespace='catalog')),
+    url(r'^catalog/', include(('openedx.core.djangoapps.catalog.urls', 'openedx.core.djangoapps.catalog'),
+                              namespace='catalog')),
 
     # Update session view
     url(r'^lang_pref/session_language', lang_pref_views.update_session_language, name='session_language'),
 
     # Multiple course modes and identity verification
     url(r'^course_modes/', include('course_modes.urls')),
-    url(r'^api/course_modes/', include('course_modes.api.urls', namespace='course_modes_api')),
+    url(r'^api/course_modes/', include(('course_modes.api.urls', 'common.djangoapps.course_mods'),
+                                       namespace='course_modes_api')),
     url(r'^verify_student/', include('verify_student.urls')),
 
     # URLs for managing dark launches of languages
-    url(r'^update_lang/', include('openedx.core.djangoapps.dark_lang.urls', namespace='dark_lang')),
+    url(r'^update_lang/', include(('openedx.core.djangoapps.dark_lang.urls', 'openedx.core.djangoapps.dark_lang'),
+                                  namespace='dark_lang')),
 
     # For redirecting to help pages.
     url(r'^help_token/', include('help_tokens.urls')),
 
     # URLs for API access management
-    url(r'^api-admin/', include('openedx.core.djangoapps.api_admin.urls', namespace='api_admin')),
+    url(r'^api-admin/', include(('openedx.core.djangoapps.api_admin.urls', 'openedx.core.djangoapps.api_admin'),
+                                namespace='api_admin')),
 
     url(r'^dashboard/', include('learner_dashboard.urls')),
-    url(r'^api/experiments/', include('experiments.urls', namespace='api_experiments')),
-    url(r'^api/discounts/', include('openedx.features.discounts.urls', namespace='api_discounts')),
+    url(r'^api/experiments/', include(('experiments.urls', 'lms.djangoapps.experiments'), namespace='api_experiments')),
+    url(r'^api/discounts/', include(('openedx.features.discounts.urls', 'openedx.features.discounts'),
+                                    namespace='api_discounts')),
 ]
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
@@ -277,7 +283,8 @@ urlpatterns += [
     ),
 
     # New (Blockstore-based) XBlock REST API
-    url(r'', include('openedx.core.djangoapps.xblock.rest_api.urls', namespace='xblock_api')),
+    url(r'', include(('openedx.core.djangoapps.xblock.rest_api.urls', 'openedx.core.djangoapps.xblock'),
+                     namespace='xblock_api')),
 
     url(
         r'^courses/{}/xqueue/(?P<userid>[^/]*)/(?P<mod_id>.*?)/(?P<dispatch>[^/]*)$'.format(
@@ -524,7 +531,9 @@ urlpatterns += [
     ),
 
     # Cohorts management API
-    url(r'^api/cohorts/', include('openedx.core.djangoapps.course_groups.urls', namespace='api_cohorts')),
+    url(r'^api/cohorts/', include(
+        ('openedx.core.djangoapps.course_groups.urls', 'openedx.core.djangoapps.course_groups'),
+        namespace='api_cohorts')),
 
     # Cohorts management
     url(
@@ -786,19 +795,22 @@ if configuration_helpers.get_value('ENABLE_BULK_ENROLLMENT_VIEW', settings.FEATU
 # Shopping cart
 urlpatterns += [
     url(r'^shoppingcart/', include('shoppingcart.urls')),
-    url(r'^commerce/', include('lms.djangoapps.commerce.urls', namespace='commerce')),
+    url(r'^commerce/', include(('lms.djangoapps.commerce.urls', 'lms.djangoapps.commerce'), namespace='commerce')),
 ]
 
 # Course goals
 urlpatterns += [
-    url(r'^api/course_goals/', include('lms.djangoapps.course_goals.urls', namespace='course_goals_api')),
+    url(r'^api/course_goals/', include(('lms.djangoapps.course_goals.urls', 'lms.djangoapps.course_goals'),
+                                       namespace='course_goals_api')),
 ]
 
 # Embargo
 if settings.FEATURES.get('EMBARGO'):
     urlpatterns += [
-        url(r'^embargo/', include('openedx.core.djangoapps.embargo.urls', namespace='embargo')),
-        url(r'^api/embargo/', include('openedx.core.djangoapps.embargo.urls', namespace='api_embargo')),
+        url(r'^embargo/', include(('openedx.core.djangoapps.embargo.urls', 'openedx.core.djangoapps.embargo'),
+                                  namespace='embargo')),
+        url(r'^api/embargo/', include(('openedx.core.djangoapps.embargo.urls', 'openedx.core.djangoapps.embargo'),
+                                      namespace='api_embargo')),
     ]
 
 # Survey Djangoapp
@@ -814,11 +826,11 @@ if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
         # These URLs contain the django-oauth2-provider default behavior.  It exists to provide
         # URLs for django-oauth2-provider to call using reverse() with the oauth2 namespace, and
         # also to maintain support for views that have not yet been wrapped in dispatch views.
-        url(r'^oauth2/', include('edx_oauth2_provider.urls', namespace='oauth2')),
+        url(r'^oauth2/', include(('edx_oauth2_provider.urls', 'edx_oauth2_provider'), namespace='oauth2')),
         # The /_o/ prefix exists to provide a target for code in django-oauth-toolkit that
         # uses reverse() with the 'oauth2_provider' namespace.  Developers should not access these
         # views directly, but should rather use the wrapped views at /oauth2/
-        url(r'^_o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+        url(r'^_o/', include(('oauth2_provider.urls', 'edx_oauth2_provider'), namespace='oauth2_provider')),
     ]
 
 if settings.FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
@@ -887,7 +899,8 @@ urlpatterns += [
 
     # REST APIs
     url(r'^api/certificates/',
-        include('lms.djangoapps.certificates.apis.urls', namespace='certificates_api')),
+        include(('lms.djangoapps.certificates.apis.urls', 'lms.djangoapps.certificates'),
+                namespace='certificates_api')),
 ]
 
 # XDomain proxy
@@ -900,7 +913,7 @@ if settings.FEATURES.get('CUSTOM_COURSES_EDX'):
     urlpatterns += [
         url(r'^courses/{}/'.format(settings.COURSE_ID_PATTERN),
             include('ccx.urls')),
-        url(r'^api/ccx/', include('lms.djangoapps.ccx.api.urls', namespace='ccx_api')),
+        url(r'^api/ccx/', include(('lms.djangoapps.ccx.api.urls', 'lms.djangoapps.ccx'), namespace='ccx_api')),
     ]
 
 # Access to courseware as an LTI provider
