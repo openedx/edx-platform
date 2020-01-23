@@ -18,7 +18,7 @@ OAUTH2_TOKEN_ERROR_NONEXISTENT = u'token_nonexistent'
 OAUTH2_TOKEN_ERROR_NOT_PROVIDED = u'token_not_provided'
 
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class EdxOAuth2Authentication(BaseAuthentication):
@@ -41,13 +41,13 @@ class EdxOAuth2Authentication(BaseAuthentication):
             return None
 
         if len(auth) == 1:
-            raise exceptions.AuthenticationFailed(
+            raise exceptions.AuthenticationFailed({
                 u'error_code': OAUTH2_TOKEN_ERROR_NOT_PROVIDED,
-                u'developer_message': 'Invalid token header. No credentials provided.')
+                u'developer_message': 'Invalid token header. No credentials provided.'})
         elif len(auth) > 2:
-            raise exceptions.AuthenticationFailed(
+            raise exceptions.AuthenticationFailed({
                 u'error_code':  OAUTH2_TOKEN_ERROR_MALFORMED,
-                u'developer_message': 'Invalid token header. Token string should not contain spaces.')
+                u'developer_message': 'Invalid token header. Token string should not contain spaces.'})
         return self.authenticate_credentials(request, auth[1].decode('utf8'))
 
     def authenticate_credentials(self, request, access_token):
