@@ -37,7 +37,7 @@ bok-choy==1.0.1
 boto3==1.4.8
 boto==2.39.0
 botocore==1.8.17
-git+https://github.com/edx/bridgekeeper.git@4e34894e4ac5d0467ed1901811a81fd87ee01937#egg=bridgekeeper==0.0
+git+https://github.com/edx/bridgekeeper.git@2423e8d8788c2132ebeec509e1a7b17e1f5b9364#egg=bridgekeeper==0.0
 git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
 celery==3.1.25
 certifi==2019.11.28
@@ -76,7 +76,7 @@ django-ipware==2.1.0
 django-js-asset==1.2.2
 django-method-override==0.2.0
 django-model-utils==3.0.0
-django-mptt==0.10.0
+django-mptt==0.11.0
 django-multi-email-field==0.5.1
 django-mysql==3.3.0
 git+https://github.com/edx/django-oauth-plus.git@b9b64a3ac24fd11f471763c88462bbf3c53e46e6#egg=django-oauth-plus==2.2.9.edx-4
@@ -88,7 +88,7 @@ django-ratelimit-backend==2.0
 django-ratelimit==2.0.0
 django-require==1.0.11
 django-sekizai==1.0.0
-django-ses==0.8.13
+django-ses==0.8.14
 django-simple-history==2.8.0
 django-splash==0.2.5
 django-statici18n==1.9.0
@@ -187,7 +187,7 @@ mccabe==0.6.1             # via flake8, pylint
 mock==3.0.5
 git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a#egg=MongoDBProxy==0.1.0+edx.2
 mongoengine==0.10.0
-more-itertools==8.1.0
+more-itertools==8.1.0     # via pytest, zipp
 mpmath==1.1.0
 mysqlclient==1.4.6
 newrelic==5.4.1.134

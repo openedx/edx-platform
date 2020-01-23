@@ -81,10 +81,10 @@ git+https://github.com/edx/django-celery.git@756cb57aad765cb2b0d37372c1855b8f5f3
 # This dependency will be removed after package is updated at PyPi
 git+https://github.com/jazzband/sorl-thumbnail.git@13bedfb7d2970809eda597e3ef79318a6fa80ac2#egg=sorl-thumbnail
 
-# Forked to fix predicate inversion
+# Forked to fix predicate inversion and keep support for Django 1.1 alive
 # Once https://github.com/excitedleigh/bridgekeeper/pull/10 is merged, and we get to django 2, we can
 # remove this fork
-git+https://github.com/edx/bridgekeeper.git@4e34894e4ac5d0467ed1901811a81fd87ee01937#egg=bridgekeeper==0.0
+git+https://github.com/edx/bridgekeeper.git@2423e8d8788c2132ebeec509e1a7b17e1f5b9364#egg=bridgekeeper==0.0
 
 # Our libraries:
 -e git+https://github.com/edx/codejail.git@4127fc4bd5775cc72aee8d7f0a70e31405e22439#egg=codejail
