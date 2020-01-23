@@ -219,9 +219,10 @@
         function exit() {
             if (getFullscreenElement() === this.el[0]) {
                 exitFullscreen();
+            } else {
+                // Else some other element is fullscreen or the fullscreen api does not exist.
+                this.videoFullScreen.handleExit();
             }
-            // Else some other element is fullscreen or the fullscreen api does not exist.
-            this.videoFullScreen.handleExit();
         }
 
         function enter() {
