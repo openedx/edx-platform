@@ -114,7 +114,7 @@ edx-ccx-keys==1.0.0
 edx-celeryutils==0.3.1
 edx-completion==3.0.2
 edx-django-oauth2-provider==1.3.5
-edx-django-release-util==0.3.3
+edx-django-release-util==0.3.5
 edx-django-sites-extensions==2.4.3
 edx-django-utils==2.0.3
 edx-drf-extensions==2.4.5
@@ -128,7 +128,7 @@ edx-organizations==2.2.0
 edx-proctoring-proctortrack==1.0.5
 edx-proctoring==2.2.4
 edx-rbac==1.0.5
-edx-rest-api-client==3.0.0
+edx-rest-api-client==2.0.0
 edx-search==1.2.2
 edx-sga==0.10.0
 edx-sphinx-theme==1.5.0
