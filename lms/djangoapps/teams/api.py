@@ -304,10 +304,9 @@ def get_team_anonymous_user_ids(team_id):
             team_id=team_id
         ).first()
 
-    users = team.users
     ids = []
 
-    for user in users.all():
+    for user in team.users.all():
         ids.append(anonymous_id_for_user(user=user, course_id=team.course_id, save=False))
 
     # the IDs are sorted to avoid leaking any correlation to user
