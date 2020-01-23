@@ -201,6 +201,7 @@ PACKAGES_TO_UNINSTALL = [
     "django-oauth2-provider",       # Because now it's called edx-django-oauth2-provider.
     "edx-oauth2-provider",          # Because it moved from github to pypi
     "i18n-tools",                   # Because now it's called edx-i18n-tools
+    "moto",                         # Because we no longer use it and it conflicts with recent jsondiff versions
     "python-saml",                  # Because python3-saml shares the same directory name
     "pdfminer",                     # Replaced by pdfminer.six, which shares the same directory name
     "pytest-faulthandler",          # Because it was bundled into pytest

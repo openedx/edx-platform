@@ -24,6 +24,7 @@ from mock import Mock, patch
 from bulk_email.models import BulkEmailFlag, Optout
 from bulk_email.tasks import _get_course_email_context, _get_source_address
 from course_modes.models import CourseMode
+
 from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory
 from lms.djangoapps.instructor_task.subtasks import update_subtask_status
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
@@ -602,6 +603,28 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
                                 [s.email for s in self.students] +
                                 [s.email for s in added_users if s not in optouts])
         six.assertCountEqual(self, outbox_contents, should_send_contents)
+
+    def test_unsubscribe_link_in_email(self):
+        """
+        Make sure opt out link is present in email.
+        """
+
+        test_email = {
+            'action': 'Send email',
+            'send_to': '["learners"]',
+            'subject': 'Checking unsubscribe link in email',
+            'message': 'test message for all'
+        }
+        response = self.client.post(self.send_mail_url, test_email)
+        self.assertEqual(json.loads(response.content.decode('utf-8')), self.success_content)
+
+        # check unsubscribe link in template
+        for m in mail.outbox:
+            plain_template = m.body
+            html_template = m.alternatives[0][0]
+
+            assert u'bulk_email/email/optout/' in plain_template
+            assert u'bulk_email/email/optout/' in html_template
 
 
 @skipIf(os.environ.get("TRAVIS") == 'true', "Skip this test in Travis CI.")

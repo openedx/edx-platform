@@ -2549,7 +2549,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=641 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=644 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5013,7 +5013,7 @@ CREATE TABLE `schedules_schedule` (
   `start` datetime(6) NOT NULL,
   `upgrade_deadline` datetime(6) DEFAULT NULL,
   `enrollment_id` int(11) NOT NULL,
-  `start_date` datetime(6) DEFAULT NULL,
+  `start_date` datetime(6) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `enrollment_id` (`enrollment_id`),
   KEY `schedules_schedule_start_8685ed8e` (`start`),

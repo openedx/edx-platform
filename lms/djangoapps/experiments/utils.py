@@ -313,7 +313,7 @@ def get_base_experiment_metadata_context(course, user, enrollment, user_enrollme
         enrollment_time = enrollment.created
 
         try:
-            schedule_start = enrollment.schedule.start
+            schedule_start = enrollment.schedule.start_date
         except Schedule.DoesNotExist:
             pass
 

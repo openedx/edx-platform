@@ -169,7 +169,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-01-05 20:42+0000\n"
+"POT-Creation-Date: 2020-01-12 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019\n"
 "Language-Team: German (Germany) (https://www.transifex.com/open-edx/teams/6205/de_DE/)\n"
@@ -7603,6 +7603,7 @@ msgid "Cohort"
 msgstr "Geburtsjahrgang"
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Team"
 msgstr "Team"
 
@@ -8581,6 +8582,20 @@ msgstr " (überspringe {skipped})"
 #, python-brace-format
 msgid " (out of {total})"
 msgstr "(von {total})"
+
+#: lms/djangoapps/learner_dashboard/programs.py
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/learner_dashboard/programs.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Programs"
+msgstr "Programme"
+
+#: lms/djangoapps/learner_dashboard/programs.py
+#: lms/templates/learner_dashboard/program_details.html
+msgid "Program Details"
+msgstr "Programmdetails"
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
@@ -12774,10 +12789,6 @@ msgid "enabled_as_of must be set when enabled is True"
 msgstr "enabled_as_of muss gesetzt werden wenn enabled \"wahr\" ist"
 
 #: openedx/features/content_type_gating/partitions.py
-msgid "Feature-based Enrollments"
-msgstr "Fähigkeit-basierte Einschreibungen"
-
-#: openedx/features/content_type_gating/partitions.py
 msgid "Partition for segmenting users by access to gated content types"
 msgstr ""
 "Partition zur Segmentierung von Benutzern durch Zugriff auf beschränkte "
@@ -12985,12 +12996,12 @@ msgstr ""
 #, no-python-format, python-brace-format
 msgid ""
 "{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% "
-"[{strikeout_price}]{span_close}{br}Discount will be automatically applied at"
-" checkout. {a_open}Upgrade Now{a_close}{div_close}"
+"[{strikeout_price}]{span_close}{br}Use code {b_open}{code}{b_close} at "
+"checkout! {a_open}Upgrade Now{a_close}{div_close}"
 msgstr ""
 "{banner_open} Aktualisieren Sie bis zum {discount_expiration_date} und "
-"sparen Sie {percentage}% [{strikeout_price}]{span_close}{br}Rabatt wird "
-"automatisch an der Kasse angewendet. {a_open}Jetzt "
+"sparen Sie {percentage}% [{strikeout_price}]{span_close}{br}Nutzen Sie den "
+"{b_open}{code}{b_close} an der Kasse! {a_open}Jetzt "
 "Upgraden{a_close}{div_close}"
 
 #: openedx/features/enterprise_support/api.py
@@ -19054,14 +19065,6 @@ msgstr ""
 "{ff_link}."
 
 #: lms/templates/header/navbar-authenticated.html
-#: lms/templates/learner_dashboard/programs.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Programs"
-msgstr "Programme"
-
-#: lms/templates/header/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr "Kursübersicht"
@@ -20957,10 +20960,6 @@ msgstr ""
 msgid "My Courses"
 msgstr "Meine Kurse"
 
-#: lms/templates/learner_dashboard/program_details.html
-msgid "Program Details"
-msgstr "Programmdetails"
-
 #: lms/templates/learner_dashboard/text-me-fragment.html
 msgid "Get the {platform_name} Mobile App!"
 msgstr "Holen Sie sich die mobile {platform_name} App!"
@@ -21250,6 +21249,17 @@ msgstr "{platform_name}-Passwort zurücksetzen"
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Invalid Password Reset Link"
 msgstr "Ungültiger Link zum Zurücksetzen"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid ""
+"This password reset link is invalid. It may have been used already. To reset"
+" your password, go to the {start_link}sign-in{end_link} page and select "
+"{start_strong}Forgot password{end_strong}."
+msgstr ""
+"Dieser Link zum Zurücksetzen des Passwortes is ungültig. Er wurde vielleicht"
+" bereits benutzt. Um Ihr Passwort dennoch zurückzusetzen, gehen Sie zu der "
+"{start_link}Anmelde{end_link} Seite und wählen Sie {start_strong}Passwort "
+"vergessen{end_strong}."
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"

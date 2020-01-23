@@ -23,6 +23,8 @@ from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserF
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+from lms.djangoapps.bulk_email.api import get_unsubscribed_link
+
 
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestOptoutCourseEmails(ModuleStoreTestCase):
@@ -86,6 +88,30 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         # Assert that self.student.email not in mail.to, outbox should only contain "myself" target
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to[0], self.instructor.email)
+
+    def test_optout_using_unsubscribe_link_in_email(self):
+        """
+        Make sure email is't sent to learner after opt out.
+        """
+        self.client.logout()
+
+        self.client.login(username=self.instructor.username, password="test")
+
+        unsubscribe_link = get_unsubscribed_link(self.student.username, text_type(self.course.id))
+        response = self.client.post(unsubscribe_link, {'unsubscribe': True})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'You have successfully unsubscribed from')
+
+        test_email = {
+            'action': 'Send email',
+            'send_to': '["myself", "learners"]',
+            'subject': 'Checking unsubscribe link in email',
+            'message': 'test message for all'
+        }
+        response = self.client.post(self.send_mail_url, test_email)
+        self.assertEqual(json.loads(response.content.decode('utf-8')), self.success_content)
+        self.assertEqual(len(mail.outbox), 1)
 
     def test_optin_course(self):
         """

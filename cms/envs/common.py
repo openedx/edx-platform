@@ -103,6 +103,9 @@ from lms.envs.common import (
 
     GENERATE_PROFILE_SCORES,
 
+    # Enterprise service settings
+    ENTERPRISE_CATALOG_INTERNAL_ROOT_URL,
+
     # Methods to derive settings
     _make_mako_template_dirs,
     _make_locale_paths,
@@ -1901,6 +1904,9 @@ VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
 
 ########## Settings youtube thumbnails scraper tasks ############
 SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
+
+########## Settings update search index task ############
+UPDATE_SEARCH_INDEX_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
 
 ###################### VIDEO IMAGE STORAGE ######################
 

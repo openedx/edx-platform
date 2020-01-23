@@ -156,7 +156,7 @@ class UpdateScheduleTests(SharedModuleStoreTestCase):
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True, deadline_days=self.VERIFICATION_DEADLINE_DAYS)
 
     def assert_schedule_dates(self, schedule, expected_start):
-        assert _strip_secs(schedule.start) == _strip_secs(expected_start)
+        assert _strip_secs(schedule.start_date) == _strip_secs(expected_start)
         deadline_delta = datetime.timedelta(days=self.VERIFICATION_DEADLINE_DAYS)
         assert _strip_secs(schedule.upgrade_deadline) == _strip_secs(expected_start) + deadline_delta
 
