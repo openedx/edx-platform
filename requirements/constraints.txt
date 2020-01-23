@@ -73,4 +73,4 @@ zipp==1.0.0
 
 # the latest release seems be backwards incompatible and is causing issues
 # error reported in: https://openedx.atlassian.net/browse/PROD-1195
-edx-rest-api-client<3.0.0
+edx-rest-api-client<2.0.0
