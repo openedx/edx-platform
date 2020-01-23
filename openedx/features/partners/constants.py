@@ -1,1 +1,1 @@
-PERFORMANCE_PERM_FRMT = 'can_access_{slug}_performance'
+PERFORMANCE_PERM_FRMT = 'partners.can_access_{slug}_performance'
