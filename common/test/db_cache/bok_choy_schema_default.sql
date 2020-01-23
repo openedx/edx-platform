@@ -2549,7 +2549,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=644 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=645 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2834,7 +2834,6 @@ CREATE TABLE `edxval_thirdpartytranscriptcredentialsstate` (
   `modified` datetime(6) NOT NULL,
   `org` varchar(32) NOT NULL,
   `provider` varchar(20) NOT NULL,
-  `exists` tinyint(1) DEFAULT NULL,
   `has_creds` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `edxval_thirdpartytranscr_org_provider_188f7ddf_uniq` (`org`,`provider`)
