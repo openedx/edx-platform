@@ -1016,12 +1016,16 @@ class CourseEnrollmentManager(models.Manager):
 
     def users_enrolled_in(self, course_id, include_inactive=False, verified_only=False):
         """
-        Return a queryset of User for every user enrolled in the course.  If
-        `include_inactive` is True, returns both active and inactive enrollees
-        for the course. Otherwise returns actively enrolled users only.
-        If 'verified_only' is True, returns report only for verified enrollees.
+        Return a queryset of User for every user enrolled in the course.
+
+        Arguments:
+            course_id (CourseLocator): course_id to return enrollees for.
+            include_inactive (boolean): is a boolean when True, returns both active and inactive enrollees
+            verified_only (boolean): is a boolean when True, returns only verified enrollees.
+
+        Returns:
+            Returns a User queryset.
         """
-        # enrolled
         filter_kwargs = {
             'courseenrollment__course_id': course_id,
         }
