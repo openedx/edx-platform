@@ -8,6 +8,7 @@ import itertools
 import json
 import unittest
 from datetime import datetime, timedelta
+from pytz import utc
 from uuid import uuid4
 
 import ddt
@@ -60,6 +61,7 @@ from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
 from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
+from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
@@ -77,6 +79,7 @@ from openedx.features.course_duration_limits.models import CourseDurationLimitCo
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
     COURSE_OUTLINE_PAGE_FLAG,
+    DATE_WIDGET_V2_FLAG,
     UNIFIED_COURSE_TAB_FLAG
 )
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
@@ -3122,3 +3125,88 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
         course = CourseFactory.create(start=start_date)
 
         self.assertEqual(bool(check_course_open_for_learner(staff_user, course)), expected_value)
+
+
+@ddt.ddt
+class DatesTabTestCase(ModuleStoreTestCase):
+    """
+    Ensure that the dates page renders with the correct data for both a verified and audit learner
+    """
+
+    def setUp(self):
+        super(DatesTabTestCase, self).setUp()
+        self.user = UserFactory.create()
+
+        now = datetime.now(utc)
+        self.course = CourseFactory.create(start=now + timedelta(days=-1))
+        self.course.end = now + timedelta(days=3)
+
+        CourseModeFactory(course_id=self.course.id, mode_slug=CourseMode.AUDIT)
+        CourseModeFactory(
+            course_id=self.course.id,
+            mode_slug=CourseMode.VERIFIED,
+            expiration_datetime=now + timedelta(days=1)
+        )
+        VerificationDeadline.objects.create(
+            course_key=self.course.id,
+            deadline=now + timedelta(days=2)
+        )
+
+    def _get_response(self, course):
+        """ Returns the HTML for the progress page """
+        return self.client.get(reverse('dates', args=[six.text_type(course.id)]))
+
+    @override_waffle_flag(DATE_WIDGET_V2_FLAG, active=True)
+    def test_defaults(self):
+        request = RequestFactory().request()
+        request.user = self.user
+        enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.VERIFIED)
+        now = datetime.now(utc)
+        with self.store.bulk_operations(self.course.id):
+            section = ItemFactory.create(category='chapter', parent_location=self.course.location)
+            subsection = ItemFactory.create(
+                category='sequential',
+                display_name='Released',
+                parent_location=section.location,
+                start=now - timedelta(days=1),
+                due=now,  # Setting this today so it'll show the 'Due Today' pill
+                graded=True,
+            )
+
+        with patch('lms.djangoapps.courseware.courses.get_dates_for_course') as mock_get_dates:
+            with patch('lms.djangoapps.courseware.views.views.get_enrollment') as mock_get_enrollment:
+                mock_get_dates.return_value = {
+                    (subsection.location, 'due'): subsection.due,
+                    (subsection.location, 'start'): subsection.start,
+                }
+                mock_get_enrollment.return_value = {
+                    'mode': enrollment.mode
+                }
+                response = self._get_response(self.course)
+                self.assertContains(response, subsection.display_name)
+                # Show the Verification Deadline for everyone
+                self.assertContains(response, 'Verification Deadline')
+                # Make sure pill exists for assignment due today
+                self.assertContains(response, '<div class="pill due">')
+                # No pills for verified enrollments
+                self.assertNotContains(response, '<div class="pill verified">')
+
+                enrollment.delete()
+                subsection.due = now + timedelta(days=1)
+                enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.AUDIT)
+                mock_get_dates.return_value = {
+                    (subsection.location, 'due'): subsection.due,
+                    (subsection.location, 'start'): subsection.start,
+                }
+                mock_get_enrollment.return_value = {
+                    'mode': enrollment.mode
+                }
+
+                response = self._get_response(self.course)
+                self.assertContains(response, subsection.display_name)
+                # Show the Verification Deadline for everyone
+                self.assertContains(response, 'Verification Deadline')
+                # Pill doesn't exist for assignment due tomorrow
+                self.assertNotContains(response, '<div class="pill due">')
+                # Should have verified pills for audit enrollments
+                self.assertContains(response, '<div class="pill verified">')
