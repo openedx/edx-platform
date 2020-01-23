@@ -1327,8 +1327,20 @@ MIDDLEWARE_CLASSES = [
 ]
 
 # Edly Configuration
-EDLY_PANEL_GROUP_NAME = 'Edly Panel Users'
-ADMIN_CONFIGURATION_USERS_GROUP_NAME = 'Admin Configuration Users'
+ADMIN_CONFIGURATION_USERS_GROUP = 'Admin Configuration Users'
+EDLY_PANEL_USERS_GROUP = 'Edly Panel Users'
+EDLY_PANEL_ADMIN_USERS_GROUP = 'Edly Panel Admin Users'
+EDLY_PANEL_RESTRICTED_USERS_GROUP = 'Edly Panel Restricted Users'
+EDLY_WP_ADMIN_USERS_GROUP = 'WordPress Edly Admin Users'
+EDLY_WP_SUBSCRIBER_USERS_GROUP = 'WordPress Subscriber Users'
+
+EDLY_USER_ROLES = {
+    'panel_restricted': EDLY_PANEL_RESTRICTED_USERS_GROUP,
+    'panel_user': EDLY_PANEL_USERS_GROUP,
+    'panel_admin': EDLY_PANEL_ADMIN_USERS_GROUP,
+    'subscriber': EDLY_WP_SUBSCRIBER_USERS_GROUP,
+    'edly_admin': EDLY_WP_ADMIN_USERS_GROUP
+}
 
 CSRF_TRUSTED_ORIGINS = ['.edly.io']
 
