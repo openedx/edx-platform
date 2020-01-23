@@ -21,7 +21,6 @@
     //
     //     For more information about the Fullscreen Web API see MDN:
     //     https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API
-    //     way - you don't have to do repeated jQuery element selects.
         var prefixedFullscreenProperties = (function() {
             if ('fullscreenEnabled' in document) {
                 return {
