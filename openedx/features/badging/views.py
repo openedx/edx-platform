@@ -27,13 +27,10 @@ def trophycase(request):
 
     trophycase_dict = populate_trophycase(user, enrolled_courses_data, earned_user_badges)
 
-    if request.GET.get('json'):
-        return JsonResponse(trophycase_dict)
-
     return render_to_response(
             "features/badging/trophy_case.html",
             {
-                'course_badges': trophycase_dict
+                'trophycase_data': trophycase_dict
             }
         )
 
