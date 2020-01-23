@@ -280,36 +280,26 @@ def get_team_for_user_course_topic(user, course_id, topic_id):
         ).first()
 
 
-def get_team_anonymous_user_ids(team_id):
+def get_team_anonymous_user_ids(user, team):
     """ Get the anonymous user IDs for members of a team, used in team submissions
+        Requesting user must be a member of the team or course staff
 
         Returns:
             (Array) User IDs, sorted to remove any correlation to usernames
     """
-    team = None
+    if not user or not team:
+        raise Exception("User and team must be provided for ID lookup")
 
-    try:
-        team = CourseTeam.objects.get(
-            team_id=team_id
-        )
-    except CourseTeam.DoesNotExist:
-        return None
-    except CourseTeam.MultipleObjectsReturned:
-        # This shouldn't ever happen but it's here for safety's sake
-        msg = "multiple teams returned for ID {team_id}"
-        logger.error(msg.format(
-            team_id=team_id
+    if not has_course_staff_privileges(user, team.course_id) and not user_is_a_team_member(user, team):
+        raise Exception("User {user} is not permitted to access team info for {team}".format(
+            user=user.username,
+            team=team.team_id
         ))
-        team = CourseTeam.objects.filter(
-            team_id=team_id
-        ).first()
 
     ids = []
+    for team_member in team.users.all():
+        ids.append(anonymous_id_for_user(user=team_member, course_id=team.course_id, save=False))
 
-    for user in team.users.all():
-        ids.append(anonymous_id_for_user(user=user, course_id=team.course_id, save=False))
-
-    # the IDs are sorted to avoid leaking any correlation to user
     ids.sort()
 
     return ids

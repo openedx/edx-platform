@@ -145,8 +145,14 @@ class PythonAPITests(SharedModuleStoreTestCase):
             teams_api.get_team_for_user_course_topic(self.user1, invalid_course_id, 'who-cares')
 
     def test_get_team_anonymous_user_ids(self):
-        team_anonymous_user_ids = teams_api.get_team_anonymous_user_ids(self.team1.team_id)
+        team_anonymous_user_ids = teams_api.get_team_anonymous_user_ids(self.user1, self.team1)
         self.assertEqual(len(self.team1.users.all()), len(team_anonymous_user_ids))
+
+    def test_get_team_anonymous_user_ids_not_on_team(self):
+        self.assertRaises(Exception, teams_api.get_team_anonymous_user_ids, self.user1, self.team2)
+
+    def test_get_team_anonymous_user_ids_staff(self):
+        pass
 
 
 @ddt.ddt
