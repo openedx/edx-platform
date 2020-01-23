@@ -1,4 +1,4 @@
-from django.http import Http404, JsonResponse
+from django.http import Http404, HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
@@ -8,7 +8,7 @@ from rest_framework import status
 from student.views import password_change_request_handler
 
 from .forms import PartnerResetPasswordForm
-from .helpers import import_module_using_slug
+from .helpers import import_module_using_slug, user_has_performance_access
 from .models import Partner
 
 
@@ -16,6 +16,14 @@ def dashboard(request, slug):
     partner = get_object_or_404(Partner, slug=slug)
     views = import_module_using_slug(partner.slug)
     return views.dashboard(request, partner.slug)
+
+
+def performance_dashboard(request, slug):
+    partner = get_object_or_404(Partner, slug=slug)
+    if user_has_performance_access(request.user, partner):
+        partner_views = import_module_using_slug(partner.slug)
+        return partner_views.performance_dashboard(request, partner)
+    return HttpResponseForbidden()
 
 
 @require_http_methods(["POST"])

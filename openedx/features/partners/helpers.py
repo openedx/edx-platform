@@ -15,6 +15,8 @@ from openedx.features.course_card.helpers import get_course_open_date, get_relat
 from openedx.features.course_card.models import CourseCard
 from student.models import CourseEnrollment
 
+from .constants import PERFORMANCE_PERM_FRMT
+
 log = getLogger(__name__)
 
 PARTNERS_VIEW_FRMT = 'openedx.features.partners.{slug}.views'
@@ -88,3 +90,17 @@ def auto_join_partner_community(partner, user):
         log.info('Task to auto join user {username} in community '
                  'with id {community_id} for partner {slug} is added to celery'
                  .format(community_id=community_id, username=username, slug=partner.slug))
+
+
+def get_partner_from_user(user):
+    """
+    :param user: User object, instance of auth User Model
+    :return: partner, user is associated to any partner
+             None, user is not associated to any partner
+    """
+    partner_user = user.partner_user.first()
+    return partner_user and partner_user.partner
+
+
+def user_has_performance_access(user, partner):
+    return bool(partner and user.has_perm(PERFORMANCE_PERM_FRMT.format(slug=partner.slug)))
