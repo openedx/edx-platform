@@ -350,6 +350,7 @@ console, run these commands::
     paver test_js_run -s cms
     paver test_js_run -s cms-squire
     paver test_js_run -s xmodule
+    paver test_js_run -s xmodule-webpack
     paver test_js_run -s common
     paver test_js_run -s common-requirejs
 
@@ -359,6 +360,7 @@ To run JavaScript tests in a browser, run these commands::
     paver test_js_dev -s cms
     paver test_js_dev -s cms-squire
     paver test_js_dev -s xmodule
+    paver test_js_dev -s xmodule-webpack
     paver test_js_dev -s common
     paver test_js_dev -s common-requirejs
 
