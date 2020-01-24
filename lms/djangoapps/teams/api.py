@@ -13,8 +13,10 @@ from opaque_keys.edx.keys import CourseKey
 from course_modes.models import CourseMode
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam
+from openedx.core.lib.teams_config import TeamsetType
 from student.models import CourseEnrollment
 from student.roles import CourseInstructorRole, CourseStaffRole
+from xmodule.modulestore.django import modulestore
 
 logger = logging.getLogger(__name__)
 
@@ -61,33 +63,41 @@ def get_team_by_discussion(discussion_id):
         return None
 
 
+def _get_teamset_type(course_id, teamset_id):
+    """
+    Helper to get teamset type from a course_id and teamset_id.
+    Assumes course_id exists and teamset_id is defined
+    """
+    course = modulestore().get_course(course_id)
+    return course.teams_configuration.teamsets_by_id[teamset_id].teamset_type
+
+
 def is_team_discussion_private(team):
     """
-    This is the function to check if the team is configured to have its discussion
-    to be private. We need a way to check the setting on the team.
-    This function also provide ways to toggle the setting of discussion visibility on the
-    individual team level.
-    To be followed up by MST-25
+    Checks to see if the team is configured to have its discussion to be private
     """
-    return getattr(team, 'is_discussion_private', False)
+    if not team:
+        return False
+    return _get_teamset_type(team.course_id, team.topic_id) == TeamsetType.private_managed
 
 
-def is_instructor_managed_team(team):  # pylint: disable=unused-argument
+def is_instructor_managed_team(team):
     """
     Return true if the team is managed by instructors.
-    For now always return false, will complete the logic later.
-    TODO MST-25
     """
-    return False
+    if not team:
+        return False
+    return is_instructor_managed_topic(team.course_id, team.topic_id)
 
 
-def is_instructor_managed_topic(topic):  # pylint: disable=unused-argument
+def is_instructor_managed_topic(course_id, topic):
     """
     Return true if the topic is managed by instructors.
-    For now always return false, will complete the logic later.
-    TODO MST-25
     """
-    return False
+    if not course_id or not topic:
+        return False
+    managed_types = (TeamsetType.private_managed, TeamsetType.public_managed)
+    return _get_teamset_type(course_id, topic) in managed_types
 
 
 def user_is_a_team_member(user, team):
@@ -240,7 +250,7 @@ def can_user_create_team_in_topic(user, course_id, topic_id):
     Assumes that user is enrolled in course run.
     """
     return (
-        (not is_instructor_managed_topic(topic_id)) or
+        (not is_instructor_managed_topic(course_id, topic_id)) or
         has_course_staff_privileges(user, course_id)
     )
 

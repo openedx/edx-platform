@@ -886,7 +886,7 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
             name="Fully specified team",
             course=self.test_course_1,
             description="Another fantastic team",
-            topic_id='great-topic',
+            topic_id='topic_1',
             country='CA',
             language='fr'
         ), user=creator)
@@ -930,7 +930,7 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
             'name': 'Fully specified team',
             'language': 'fr',
             'country': 'CA',
-            'topic_id': 'great-topic',
+            'topic_id': 'topic_1',
             'course_id': str(self.test_course_1.id),
             'description': 'Another fantastic team',
             'organization_protected': False,

@@ -527,7 +527,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         topic_id = request.data.get('topic_id')
-        if not can_user_create_team_in_topic(request.user, course_id, topic_id):
+        if not can_user_create_team_in_topic(request.user, course_key, topic_id):
             return Response(
                 build_api_error(ugettext_noop("You can't create a team in an instructor managed topic.")),
                 status=status.HTTP_403_FORBIDDEN
