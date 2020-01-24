@@ -66,6 +66,7 @@ from enrollment.api import _default_course_mode
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.request_cache import clear_cache, get_cache
+from openedx.core.djangoapps.signals.signals import USER_ACCOUNT_ACTIVATED
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
@@ -728,6 +729,7 @@ class Registration(models.Model):
         self.user.is_active = True
         self._track_activation()
         self.user.save()
+        USER_ACCOUNT_ACTIVATED.send_robust(self.__class__, user=self.user)
         log.info(u'User %s (%s) account is successfully activated.', self.user.username, self.user.email)
 
     def _track_activation(self):
