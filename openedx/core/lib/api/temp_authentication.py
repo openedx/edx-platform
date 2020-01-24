@@ -8,7 +8,6 @@ from oauth2_provider import models as dot_models
 from provider.oauth2 import models as dop_models
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.authentication import BaseAuthentication, get_authorization_header
-from rest_framework_oauth.authentication import OAuth2Authentication
 
 
 OAUTH2_TOKEN_ERROR = 'token_error'
@@ -41,11 +40,11 @@ class EdxOAuth2Authentication(BaseAuthentication):
             return None
 
         if len(auth) == 1:
-            raise exceptions.AuthenticationFailed({
+            raise AuthenticationFailed({
                 'error_code': OAUTH2_TOKEN_ERROR_NOT_PROVIDED,
                 'developer_message': 'Invalid token header. No credentials provided.'})
         elif len(auth) > 2:
-            raise exceptions.AuthenticationFailed({
+            raise AuthenticationFailed({
                 'error_code': OAUTH2_TOKEN_ERROR_MALFORMED,
                 'developer_message': 'Invalid token header. Token string should not contain spaces.'})
         return self.authenticate_credentials(request, auth[1].decode('utf8'))
@@ -73,7 +72,7 @@ class EdxOAuth2Authentication(BaseAuthentication):
             user = token.user
             if not user.is_active:
                 msg = 'User inactive or deleted: %s' % user.get_username()
-                raise exceptions.AuthenticationFailed(msg)
+                raise AuthenticationFailed(msg)
             return user, token
 
     def get_access_token(self, access_token):
