@@ -165,7 +165,7 @@ class UpdateScheduleTests(SharedModuleStoreTestCase):
 
         course = _create_course_run(self_paced=True, start_day_offset=5)  # course starts in future
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
-        self.assert_schedule_dates(enrollment.schedule, enrollment.course.start)
+        self.assert_schedule_dates(enrollment.schedule, enrollment.course.start_date)
 
         course.start = course.start + datetime.timedelta(days=3)  # new course start changes to another future date
         self.store.update_item(course, ModuleStoreEnum.UserID.test)
@@ -189,7 +189,7 @@ class UpdateScheduleTests(SharedModuleStoreTestCase):
 
         course = _create_course_run(self_paced=True, start_day_offset=5)  # course starts in future
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
-        previous_start = enrollment.course.start
+        previous_start = enrollment.course.start_date
         self.assert_schedule_dates(enrollment.schedule, previous_start)
 
         course.start = course.start + datetime.timedelta(days=-10)  # new course start changes to a past date

@@ -13,13 +13,15 @@ from pytz import UTC
 
 from lms.djangoapps.courseware.access_response import AccessResponse, StartDateError
 from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_student
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from xmodule.course_module import CourseDescriptor
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_experience import COURSE_PRE_START_ACCESS_FLAG
 from student.roles import CourseBetaTesterRole
 from xmodule.util.xmodule_django import get_current_request_hostname
 
-DEBUG_ACCESS = False
+DEBUG_ACCESS = True
 log = getLogger(__name__)
 
 ACCESS_GRANTED = AccessResponse(True)
@@ -102,4 +104,8 @@ def check_course_open_for_learner(user, course):
     """
     if COURSE_PRE_START_ACCESS_FLAG.is_enabled():
         return ACCESS_GRANTED
-    return check_start_date(user, course.days_early_for_beta, course.start, course.id)
+    if isinstance(course, CourseDescriptor):
+        course_start = course.start
+    elif isinstance(course, CourseOverview):
+        course_start = course.start_date
+    return check_start_date(user, course.days_early_for_beta, course_start, course.id)

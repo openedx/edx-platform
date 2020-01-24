@@ -25,6 +25,7 @@ from openedx.core.djangolib.markup import HTML
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from student.models import CourseEnrollment
 from util.date_utils import strftime_localized
+from xmodule.course_module import CourseDescriptor
 
 MIN_DURATION = timedelta(weeks=4)
 MAX_DURATION = timedelta(weeks=18)
@@ -114,12 +115,16 @@ def get_user_course_expiration_date(user, course):
         # equal to the course start, but should have been equal to the enrollment start
         # https://openedx.atlassian.net/browse/PROD-58
         # This section is meant to address that case
-        if enrollment.created and course.start:
-            if (content_availability_date.date() == course.start.date() and
-               course.start < enrollment.created < timezone.now()):
+        if isinstance(course, CourseDescriptor):
+            course_start = course.start
+        elif isinstance(course, CourseOverview):
+            course_start = course.start_date
+        if enrollment.created and course_start:
+            if (content_availability_date.date() == course_start.date() and
+               course_start < enrollment.created < timezone.now()):
                 content_availability_date = enrollment.created
     except CourseEnrollment.schedule.RelatedObjectDoesNotExist:
-        content_availability_date = max(enrollment.created, course.start)
+        content_availability_date = max(enrollment.created, course_start)
 
     return content_availability_date + access_duration
 

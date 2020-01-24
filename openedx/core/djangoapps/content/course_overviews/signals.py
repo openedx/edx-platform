@@ -50,22 +50,22 @@ def _check_for_course_changes(previous_course_overview, updated_course_overview)
 
 
 def _check_for_course_date_changes(previous_course_overview, updated_course_overview):
-    if previous_course_overview.start != updated_course_overview.start:
+    if previous_course_overview.start_date != updated_course_overview.start_date:
         _log_start_date_change(previous_course_overview, updated_course_overview)
         COURSE_START_DATE_CHANGED.send(
             sender=None,
             updated_course_overview=updated_course_overview,
-            previous_start_date=previous_course_overview.start,
+            previous_start_date=previous_course_overview.start_date,
         )
 
 
 def _log_start_date_change(previous_course_overview, updated_course_overview):
     previous_start_str = 'None'
-    if previous_course_overview.start is not None:
-        previous_start_str = previous_course_overview.start.isoformat()
+    if previous_course_overview.start_date is not None:
+        previous_start_str = previous_course_overview.start_date.isoformat()
     new_start_str = 'None'
-    if updated_course_overview.start is not None:
-        new_start_str = updated_course_overview.start.isoformat()
+    if updated_course_overview.start_date is not None:
+        new_start_str = updated_course_overview.start_date.isoformat()
     LOG.info(u'Course start date changed: course={0} previous={1} new={2}'.format(
         updated_course_overview.id,
         previous_start_str,
