@@ -1,5 +1,5 @@
 describe('HTMLEditingDescriptor', function() {
-  beforeEach(() => window.baseUrl = "/static/deadbeef");
+  beforeEach(() => window.baseUrl = "/static/deadbeef/");
   afterEach(() => delete window.baseUrl);
   describe('Visual HTML Editor', function() {
     beforeEach(function() {
@@ -47,6 +47,10 @@ describe('HTMLEditingDescriptor', function() {
       this.descriptor.getVisualEditor().setContent(editorData)
       const savedContent = this.descriptor.getVisualEditor().getContent()
       expect(savedContent).toEqual(expectedData);
+    });
+    it('Editor base URL does not contain double slash', function(){
+      const editor = this.descriptor.getVisualEditor();
+      expect(editor.editorManager.baseURL).not.toContain('//');
     });
   });
   describe('Raw HTML Editor', function() {
