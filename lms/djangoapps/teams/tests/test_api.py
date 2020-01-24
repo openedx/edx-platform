@@ -145,14 +145,28 @@ class PythonAPITests(SharedModuleStoreTestCase):
             teams_api.get_team_for_user_course_topic(self.user1, invalid_course_id, 'who-cares')
 
     def test_get_team_anonymous_user_ids(self):
+        """
+        A learner should be able to get the anonymous user IDs of their team members
+        """
         team_anonymous_user_ids = teams_api.get_team_anonymous_user_ids(self.user1, self.team1)
         self.assertEqual(len(self.team1.users.all()), len(team_anonymous_user_ids))
 
     def test_get_team_anonymous_user_ids_not_on_team(self):
+        """
+        A learner should not be able to get IDs from members of a team they are not a member of
+        """
         self.assertRaises(Exception, teams_api.get_team_anonymous_user_ids, self.user1, self.team2)
 
     def test_get_team_anonymous_user_ids_staff(self):
-        pass
+        """
+        Course staff should be able to get anonymous IDs for teams in their course
+        """
+        user_staff = UserFactory.create(username='user_staff')
+        CourseEnrollmentFactory.create(user=user_staff, course_id=COURSE_KEY1)
+        CourseStaffRole(COURSE_KEY1).add_users(user_staff)
+
+        team_anonymous_user_ids = teams_api.get_team_anonymous_user_ids(user_staff, self.team1)
+        self.assertEqual(len(self.team1.users.all()), len(team_anonymous_user_ids))
 
 
 @ddt.ddt
