@@ -53,6 +53,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
 from openedx.core.djangoapps.django_comment_common.utils import ThreadContext, seed_permissions_roles
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
+from openedx.core.lib.teams_config import TeamsConfig
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from student.roles import CourseStaffRole, UserBasedRole
@@ -1305,7 +1306,18 @@ class InlineDiscussionTestCase(ForumsEnableMixin, ModuleStoreTestCase):
     def setUp(self):
         super(InlineDiscussionTestCase, self).setUp()
 
-        self.course = CourseFactory.create(org="TestX", number="101", display_name="Test Course")
+        self.course = CourseFactory.create(
+            org="TestX",
+            number="101",
+            display_name="Test Course",
+            teams_configuration=TeamsConfig({
+                'topics': [{
+                    'id': 'topic_id',
+                    'name': 'A topic',
+                    'description': 'A topic',
+                }]
+            })
+        )
         self.student = UserFactory.create()
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
         self.discussion1 = ItemFactory.create(
@@ -1334,7 +1346,7 @@ class InlineDiscussionTestCase(ForumsEnableMixin, ModuleStoreTestCase):
     def test_context(self, mock_request):
         team = CourseTeamFactory(
             name='Team Name',
-            topic_id='A topic',
+            topic_id='topic_id',
             course_id=self.course.id,
             discussion_topic_id=self.discussion1.discussion_id
         )
@@ -2148,7 +2160,15 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
     def setUp(self):  # pylint: disable=arguments-differ
         super(ThreadViewedEventTestCase, self).setUp('eventtracking.tracker')
 
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(
+            teams_configuration=TeamsConfig({
+                'topics': [{
+                    'id': 'arbitrary-topic-id',
+                    'name': 'arbitrary-topic-name',
+                    'description': 'arbitrary-topic-desc'
+                }]
+            })
+        )
         seed_permissions_roles(self.course.id)
 
         PASSWORD = 'test'
