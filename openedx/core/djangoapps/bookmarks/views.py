@@ -22,7 +22,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_oauth.authentication import OAuth2Authentication
+from openedx.core.lib.api.temp_authentication import OAuth2Authentication
 
 from openedx.core.djangoapps.bookmarks.api import BookmarksLimitReachedError
 from openedx.core.lib.api.permissions import IsUserInUrl

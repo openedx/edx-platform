@@ -20,7 +20,7 @@ OAUTH2_TOKEN_ERROR_NOT_PROVIDED = 'token_not_provided'
 logger = logging.getLogger(__name__)
 
 
-class EdxOAuth2Authentication(BaseAuthentication):
+class OAuth2Authentication(BaseAuthentication):
     """
     This is created to be a drop in replacement for django-rest-framework-oauth oauth2Authentication class.
     This is based on NOAuth2AuthenticationAllowINactiveUsers

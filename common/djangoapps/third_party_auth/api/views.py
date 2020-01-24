@@ -16,7 +16,7 @@ from rest_framework import exceptions, permissions, status, throttling
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from openedx.core.lib.api.temp_authentication import EdxOAuth2Authentication
+from openedx.core.lib.api.temp_authentication import OAuth2Authentication
 from social_django.models import UserSocialAuth
 
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
@@ -333,7 +333,7 @@ class UserMappingView(ListAPIView):
             * remote_id: The Id from third party auth provider
     """
     authentication_classes = (
-        EdxOAuth2Authentication,
+        OAuth2Authentication,
     )
 
     serializer_class = serializers.UserMappingSerializer
