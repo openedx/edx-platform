@@ -70,6 +70,7 @@ from openedx.core.djangoapps.enrollments.api import (
     get_enrollment_attributes,
     set_enrollment_attributes
 )
+from openedx.core.djangoapps.signals.signals import USER_ACCOUNT_ACTIVATED
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
@@ -839,6 +840,7 @@ class Registration(models.Model):
     def activate(self):
         self.user.is_active = True
         self.user.save(update_fields=['is_active'])
+        USER_ACCOUNT_ACTIVATED.send_robust(self.__class__, user=self.user)
         log.info(u'User %s (%s) account is successfully activated.', self.user.username, self.user.email)
 
 
