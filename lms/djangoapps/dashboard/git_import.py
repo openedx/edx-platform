@@ -360,9 +360,11 @@ def add_repo(repo, rdir_in, branch=None):
             date=parser.parse(git_log_json['date']),
             git_log=ret_git,
         )
-        cil.save()
-
-        log.debug('saved CourseImportLog for %s', cil.course_id)
+        try:
+            cil.save()
+            log.debug(u'saved CourseImportLog for %s', cil.course_id)
+        except mongoengine.errors.ValidationError as e:
+            log.exception('Unable to save the course import log for %s.', cil.course_id)
         mdb.disconnect()
     else:
         log.error('Unable to save CourseImportLog because of an error in building mongo connection')
