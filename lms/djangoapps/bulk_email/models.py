@@ -448,7 +448,7 @@ class CourseAuthorization(models.Model):
     course_id = CourseKeyField(max_length=255, db_index=True, unique=True)
 
     # Whether or not to enable instructor email
-    email_enabled = models.BooleanField(default=False)
+    email_enabled = models.BooleanField(default=True)
 
     @classmethod
     def instructor_email_enabled(cls, course_id):
