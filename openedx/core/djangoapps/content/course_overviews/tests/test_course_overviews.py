@@ -47,8 +47,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 from ..models import CourseOverview, CourseOverviewImageConfig, CourseOverviewImageSet
 from .factories import CourseOverviewFactory
 
-log = logging.getLogger(__name__)
-
 
 @ddt.ddt
 class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, CacheIsolationTestCase):
@@ -166,9 +164,10 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         # workaround, we simply test if the start and end times are the same
         # number of seconds from the Unix epoch.
         time_field_accessor = lambda object, field_name: get_seconds_since_epoch(field_check(object, field_name))
+
         def field_check(object, field_name):
             if isinstance(object, CourseOverview) and field_name in ('start', 'end'):
-                field_name = field_name+'_date'
+                field_name = field_name + '_date'
             return getattr(object, field_name)
 
         # The course about fields are accessed through the CourseDetail
