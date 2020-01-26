@@ -106,6 +106,11 @@ def get_user_course_expiration_date(user, course):
     if enrollment is None or enrollment.mode != CourseMode.AUDIT:
         return None
 
+    if isinstance(course, CourseDescriptor):
+        course_start = course.start
+    elif isinstance(course, CourseOverview):
+        course_start = course.start_date
+
     try:
         # Content availability date is equivalent to max(enrollment date, course start date)
         # for most people. Using the schedule date will provide flexibility to deal with
@@ -115,10 +120,6 @@ def get_user_course_expiration_date(user, course):
         # equal to the course start, but should have been equal to the enrollment start
         # https://openedx.atlassian.net/browse/PROD-58
         # This section is meant to address that case
-        if isinstance(course, CourseDescriptor):
-            course_start = course.start
-        elif isinstance(course, CourseOverview):
-            course_start = course.start_date
         if enrollment.created and course_start:
             if (content_availability_date.date() == course_start.date() and
                course_start < enrollment.created < timezone.now()):

@@ -40,8 +40,8 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     course_name = serializers.CharField(source="display_name_with_default")
     enrollment_start = serializers.DateTimeField(format=None)
     enrollment_end = serializers.DateTimeField(format=None)
-    course_start = serializers.DateTimeField(source="start", format=None)
-    course_end = serializers.DateTimeField(source="end", format=None)
+    course_start = serializers.DateTimeField(source="start_date", format=None)
+    course_end = serializers.DateTimeField(source="end_date", format=None)
     invite_only = serializers.BooleanField(source="invitation_only")
     course_modes = serializers.SerializerMethodField()
 

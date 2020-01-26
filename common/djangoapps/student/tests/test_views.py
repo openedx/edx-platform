@@ -313,7 +313,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         CourseEntitlementFactory.create(user=self.user, course_uuid=program['courses'][0]['uuid'])
         mock_get_programs.return_value = [program]
         course_key = CourseKey.from_string('course-v1:FAKE+FA1-MA1.X+3T2017')
-        mock_course_overview.return_value = CourseOverviewFactory.create(start=self.TOMORROW, id=course_key)
+        mock_course_overview.return_value = CourseOverviewFactory.create(start_date=self.TOMORROW, id=course_key)
         mock_course_runs.return_value = [
             {
                 'key': six.text_type(course_key),
@@ -370,7 +370,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             created=self.THREE_YEARS_AGO,
             expired_at=now()
         )
-        mock_course_overview.return_value = CourseOverviewFactory(start=self.TOMORROW)
+        mock_course_overview.return_value = CourseOverviewFactory(start_date=self.TOMORROW)
         mock_course_runs.return_value = [
             {
                 'key': 'course-v1:FAKE+FA1-MA1.X+3T2017',
@@ -398,7 +398,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         # Test an enrollment end in the past
         mocked_course_overview = CourseOverviewFactory.create(
-            start=self.TOMORROW, end=self.THREE_YEARS_FROM_NOW, self_paced=True, enrollment_end=self.THREE_YEARS_AGO
+            start_date=self.TOMORROW, end_date=self.THREE_YEARS_FROM_NOW, self_paced=True, enrollment_end=self.THREE_YEARS_AGO
         )
         mock_course_overview.return_value = mocked_course_overview
         course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=six.text_type(mocked_course_overview.id))
@@ -462,7 +462,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             - a related programs message
         """
         mocked_course_overview = CourseOverviewFactory(
-            start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
+            start_date=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
         )
         mock_course_overview.return_value = mocked_course_overview
         course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=six.text_type(mocked_course_overview.id))
@@ -497,7 +497,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             - a related programs message
         """
         mocked_course_overview = CourseOverviewFactory(
-            start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
+            start_date=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
         )
         mock_course_overview.return_value = mocked_course_overview
         course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=six.text_type(mocked_course_overview.id), created=self.THREE_YEARS_AGO)
@@ -528,7 +528,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         """
         mock_email_feature.return_value = True
         course_overview = CourseOverviewFactory(
-            start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
+            start_date=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
         )
         course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=course_overview.id)
         entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment)
@@ -548,7 +548,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         Assert that the Email Settings action is not shown when the entitlement is not fulfilled.
         """
         mock_email_feature.return_value = True
-        mock_course_overview.return_value = CourseOverviewFactory(start=self.TOMORROW)
+        mock_course_overview.return_value = CourseOverviewFactory(start_date=self.TOMORROW)
         CourseEntitlementFactory(user=self.user)
         response = self.client.get(self.path)
         self.assertEqual(pq(response.content)(self.EMAIL_SETTINGS_ELEMENT_ID).length, 0)

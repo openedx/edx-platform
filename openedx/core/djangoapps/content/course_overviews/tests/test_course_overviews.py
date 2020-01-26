@@ -34,7 +34,8 @@ from xmodule.course_metadata_utils import DEFAULT_START_DATE
 from xmodule.course_module import (
     CATALOG_VISIBILITY_ABOUT,
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
-    CATALOG_VISIBILITY_NONE
+    CATALOG_VISIBILITY_NONE,
+    CourseDescriptor
 )
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
@@ -150,11 +151,8 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         ]
         for method_name, method_args in methods_to_test:
             course_value = getattr(course, method_name)(*method_args)
-            print("course_value :{}".format(course_value))
             cache_miss_value = getattr(course_overview_cache_miss, method_name)(*method_args)
             cache_hit_value = getattr(course_overview_cache_hit, method_name)(*method_args)
-            print("cache_miss_value :{}".format(cache_miss_value))
-            print("cache_hit_value :{}".format(cache_hit_value))
             self.assertEqual(course_value, cache_miss_value)
             self.assertEqual(cache_miss_value, cache_hit_value)
 
@@ -166,18 +164,20 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         # resulting values are often off by fractions of a second. So, as a
         # workaround, we simply test if the start and end times are the same
         # number of seconds from the Unix epoch.
-        time_field_accessor = lambda object, field_name: get_seconds_since_epoch(getattr(object, field_name))
-        print("time_field_accessor :{}".format(time_field_accessor))
+        time_field_accessor = lambda object, field_name: get_seconds_since_epoch(field_check(object, field_name))
+        def field_check(object, field_name):
+            if isinstance(object, CourseOverview) and field_name in ('start', 'end'):
+                field_name = field_name+'_date'
+            return getattr(object, field_name)
 
         # The course about fields are accessed through the CourseDetail
         # class for the course module, and stored as attributes on the
         # CourseOverview objects.
         course_about_accessor = lambda object, field_name: CourseDetails.fetch_about_attribute(object.id, field_name)
-        print("course_about_accessor :{}".format(course_about_accessor))
 
         others_to_test = [
-            ('start_date', time_field_accessor, time_field_accessor),
-            ('end_date', time_field_accessor, time_field_accessor),
+            ('start', time_field_accessor, time_field_accessor),
+            ('end', time_field_accessor, time_field_accessor),
             ('enrollment_start', time_field_accessor, time_field_accessor),
             ('enrollment_end', time_field_accessor, time_field_accessor),
             ('announcement', time_field_accessor, time_field_accessor),
@@ -202,11 +202,8 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         ]
         for attribute_name, course_accessor, course_overview_accessor in others_to_test:
             course_value = course_accessor(course, attribute_name)
-            print("course_value: {}".format(course_value))
             cache_miss_value = course_overview_accessor(course_overview_cache_miss, attribute_name)
             cache_hit_value = course_overview_accessor(course_overview_cache_hit, attribute_name)
-            print("cache_miss_value: {}".format(cache_miss_value))
-            print("cache_hit_value: {}".format(cache_hit_value))
             self.assertEqual(course_value, cache_miss_value)
             self.assertEqual(cache_miss_value, cache_hit_value)
 
@@ -220,8 +217,8 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         [
             {
                 "display_name": "Test Course",              # Display name provided
-                "start_date": LAST_WEEK,                    # In the middle of the course
-                "end_date": NEXT_WEEK,
+                "start": LAST_WEEK,                    # In the middle of the course
+                "end": NEXT_WEEK,
                 "announcement": LAST_MONTH,                 # Announcement date provided
                 "advertised_start": "2015-01-01 11:22:33",  # Parse-able advertised_start
                 "pre_requisite_courses": [                  # Has pre-requisites
@@ -233,8 +230,8 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
             },
             {
                 "display_name": "",                         # Empty display name
-                "start_date": NEXT_WEEK,                         # Course hasn't started yet
-                "end_date": NEXT_MONTH,
+                "start": NEXT_WEEK,                         # Course hasn't started yet
+                "end": NEXT_MONTH,
                 "advertised_start": "Very Soon!",           # Not parse-able advertised_start
                 "pre_requisite_courses": [],                # No pre-requisites
                 "static_asset_path": "my/relative/path",    # Relative asset path
@@ -243,8 +240,8 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
             },
             {
                 "display_name": "",                         # Empty display name
-                "start_date": LAST_MONTH,                        # Course already ended
-                "end_date": LAST_WEEK,
+                "start": LAST_MONTH,                        # Course already ended
+                "end": LAST_WEEK,
                 "advertised_start": None,                   # No advertised start
                 "pre_requisite_courses": [],                # No pre-requisites
                 "static_asset_path": "",                    # Empty asset path
@@ -253,8 +250,8 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
             },
             {
                 #                                           # Don't set display name
-                "start_date": 'default_start_date',              # Default start and end dates
-                "end_date": None,
+                "start": 'default_start_date',              # Default start and end dates
+                "end": None,
                 "advertised_start": None,                   # No advertised start
                 "pre_requisite_courses": [],                # No pre-requisites
                 "static_asset_path": None,                  # No asset path
@@ -276,15 +273,14 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
                 course in.
         """
         kwargs = course_kwargs.copy()
-        kwargs['start'] = self.DATES[course_kwargs['start_date']]
-        kwargs['end'] = self.DATES[course_kwargs['end_date']]
+        kwargs['start'] = self.DATES[course_kwargs['start']]
+        kwargs['end'] = self.DATES[course_kwargs['end']]
         if 'announcement' in course_kwargs:
             kwargs['announcement'] = self.DATES[course_kwargs['announcement']]
         # Note: We specify a value for 'run' here because, for some reason,
         # .create raises an InvalidKeyError if we don't (even though my
         # other test functions don't specify a run but work fine).
         course = CourseFactory.create(default_store=modulestore_type, run="TestRun", **kwargs)
-        print("course: {}".format(course))
         self.check_course_overview_against_course(course)
 
     @ddt.data(True, False)

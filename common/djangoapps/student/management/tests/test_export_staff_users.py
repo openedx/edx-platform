@@ -21,8 +21,8 @@ class TestExportStaffUsers(TestCase):
     def create_users_data():
         staff_user = UserFactory(last_login=now() - timedelta(days=5))
         instructor_user = UserFactory(last_login=now() - timedelta(days=5))
-        course = CourseOverviewFactory(end=now() + timedelta(days=30))
-        archived_course = CourseOverviewFactory(end=now() - timedelta(days=30))
+        course = CourseOverviewFactory(end_date=now() + timedelta(days=30))
+        archived_course = CourseOverviewFactory(end_date=now() - timedelta(days=30))
         course_ids = [course.id, archived_course.id]
         for course_id in course_ids:
             CourseAccessRoleFactory.create(course_id=course_id, user=staff_user, role="staff")

@@ -150,7 +150,7 @@ class RefundableTest(SharedModuleStoreTestCase):
             adding_headers={'Content-Type': JSON}
         )
 
-        self.enrollment.course_overview.start = course_start
+        self.enrollment.course_overview.start_date = course_start
         self.enrollment.attributes.create(
             enrollment=self.enrollment,
             namespace='order',
@@ -191,7 +191,7 @@ class RefundableTest(SharedModuleStoreTestCase):
         order_date = now + timedelta(days=2)
         course_start = now + timedelta(days=1)
 
-        self.enrollment.course_overview.start = course_start
+        self.enrollment.course_overview.start_date = course_start
         self.enrollment.attributes.create(
             enrollment=self.enrollment,
             namespace='order',
