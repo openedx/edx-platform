@@ -46,8 +46,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 from ..models import CourseOverview, CourseOverviewImageConfig, CourseOverviewImageSet
 from .factories import CourseOverviewFactory
 
-log = logging.getLogger(__name__)
-
 
 @ddt.ddt
 class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, CacheIsolationTestCase):
