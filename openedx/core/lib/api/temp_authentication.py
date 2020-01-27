@@ -4,6 +4,7 @@
 import logging
 
 import django.utils.timezone
+from django.conf import settings
 from oauth2_provider import models as dot_models
 from provider.oauth2 import models as dop_models
 from rest_framework.exceptions import AuthenticationFailed
@@ -26,6 +27,7 @@ class OAuth2Authentication(BaseAuthentication):
     This is based on NOAuth2AuthenticationAllowINactiveUsers
     """
     www_authenticate_realm = 'api'
+    allow_query_params_token = settings.DEBUG
 
     def authenticate(self, request):
         """
@@ -50,13 +52,15 @@ class OAuth2Authentication(BaseAuthentication):
             access_token = auth[1].decode('utf8')
         elif 'access_token' in request.POST:
             access_token = request.POST['access_token']
+        elif 'access_token' in request.GET and self.allow_query_params_token:
+            access_token = request.GET['access_token']
         else:
             logger.warning("auth is empty")
             return None
 
-        return self.authenticate_credentials(request, access_token)
+        return self.authenticate_credentials(access_token)
 
-    def authenticate_credentials(self, request, access_token):
+    def authenticate_credentials(self, access_token):
         """
         Authenticate the request, given the access token.
 

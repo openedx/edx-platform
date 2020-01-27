@@ -35,7 +35,7 @@ class OAuth2AuthenticationAllowInactiveUser(OAuth2Authentication):
     for mobile endpoints.
     """
 
-    def authenticate_credentials(self, request, access_token):
+    def authenticate_credentials(self, access_token):
         """
         Authenticate the request, given the access token.
 
