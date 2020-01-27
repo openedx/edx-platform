@@ -1429,7 +1429,7 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 
 ################################# Middleware ###################################
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
 
     'crum.CurrentRequestUserMiddleware',
