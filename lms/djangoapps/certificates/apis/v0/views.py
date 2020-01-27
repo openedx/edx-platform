@@ -260,7 +260,7 @@ class CertificatesListView(GenericAPIView):
                 passing_certificates[course_key] = course_certificate
 
         viewable_certificates = []
-        for course_key, course_overview in CourseOverview.get_from_ids_if_exists(
+        for course_key, course_overview in CourseOverview.get_from_ids(
             list(passing_certificates.keys())
         ).items():
             if certificates_viewable_for_course(course_overview):
