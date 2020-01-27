@@ -282,7 +282,7 @@ def course_run_refund_status(request, course_id):
         return JsonResponse({'course_refundable_status': ''}, status=406)
 
     refundable_status = course_enrollment.refundable()
-    logging.info("Course refund status for course {0} is {1}".format(course_id, refundable_status))
+    logging.info("Course refund status for course {0} is {1}".format(str(course_id), refundable_status))
 
     return JsonResponse({'course_refundable_status': refundable_status}, status=200)
 

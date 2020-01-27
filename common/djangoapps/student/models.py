@@ -1556,11 +1556,11 @@ class CourseEnrollment(models.Model):
 
         if not status_hash:
             enrollments = cls.enrollments_for_user(user).values_list('course_id', 'mode')
-            enrollments = [(six.text_type(e[0]).lower(), e[1].lower()) for e in enrollments]
+            enrollments = [(six.text_type(e[0]).lower().encode('utf-8'), e[1].lower()) for e in enrollments]
             enrollments = sorted(enrollments, key=lambda e: e[0])
             hash_elements = [user.username]
             hash_elements += ['{course_id}={mode}'.format(course_id=e[0], mode=e[1]) for e in enrollments]
-            status_hash = hashlib.md5('&'.join(hash_elements).encode('utf-8')).hexdigest()
+            status_hash = hashlib.md5('&'.join(str(element) for element in hash_elements)).hexdigest()
 
             # The hash is cached indefinitely. It will be invalidated when the user enrolls/unenrolls.
             cache.set(cache_key, status_hash, None)

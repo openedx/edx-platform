@@ -5,6 +5,7 @@ Module for the Storage of BlockStructure objects.
 from logging import getLogger
 
 from openedx.core.lib.cache_utils import zpickle, zunpickle
+from six import text_type
 
 from . import config
 from .block_structure import BlockStructureBlockData
@@ -217,12 +218,12 @@ class BlockStructureStore(object):
         BlockStructureModel or StubModel.
         """
         if _is_storage_backing_enabled():
-            return unicode(bs_model)
+            return text_type(bs_model)
 
         else:
             return "v{version}.root.key.{root_usage_key}".format(
-                version=unicode(BlockStructureBlockData.VERSION),
-                root_usage_key=unicode(bs_model.data_usage_key),
+                version=text_type(BlockStructureBlockData.VERSION),
+                root_usage_key=text_type(bs_model.data_usage_key).encode('utf-8'),
             )
 
     @staticmethod
