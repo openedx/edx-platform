@@ -157,6 +157,12 @@ class PythonAPITests(SharedModuleStoreTestCase):
         """
         self.assertRaises(Exception, teams_api.anonymous_user_ids_for_team, self.user1, self.team2)
 
+    def test_anonymous_user_ids_for_team_bad_user_or_team(self):
+        """
+        An exception should be thrown when a bad user or team are passed to the endpoint
+        """
+        self.assertRaises(Exception, teams_api.anonymous_user_ids_for_team, None, self.team1)
+
     def test_anonymous_user_ids_for_team_staff(self):
         """
         Course staff should be able to get anonymous IDs for teams in their course
