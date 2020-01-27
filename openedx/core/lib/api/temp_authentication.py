@@ -35,9 +35,6 @@ class OAuth2Authentication(BaseAuthentication):
         """
 
         auth = get_authorization_header(request).split()
-        if not auth or auth[0].lower() != b'bearer':
-            logger.warning("auth is empty")
-            return None
 
         if len(auth) == 1:
             raise AuthenticationFailed({
@@ -47,7 +44,16 @@ class OAuth2Authentication(BaseAuthentication):
             raise AuthenticationFailed({
                 'error_code': OAUTH2_TOKEN_ERROR_MALFORMED,
                 'developer_message': 'Invalid token header. Token string should not contain spaces.'})
-        return self.authenticate_credentials(request, auth[1].decode('utf8'))
+
+        if auth and auth[0].lower() == b'bearer':
+            access_token = auth[1].decode('utf8')
+        elif 'access_token' in request.POST:
+            access_token = request.POST['access_token']
+        else:
+            logger.warning("auth is empty")
+            return None
+
+        return self.authenticate_credentials(request, access_token)
 
     def authenticate_credentials(self, request, access_token):
         """
