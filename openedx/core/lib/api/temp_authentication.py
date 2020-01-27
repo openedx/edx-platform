@@ -26,6 +26,7 @@ class OAuth2Authentication(BaseAuthentication):
     This is based on NOAuth2AuthenticationAllowINactiveUsers
     """
     www_authenticate_realm = 'api'
+
     def authenticate(self, request):
         """
         Returns two-tuple of (user, token) if access token authentication
@@ -103,6 +104,7 @@ class OAuth2Authentication(BaseAuthentication):
         """
         token_query = dot_models.AccessToken.objects.select_related('user')
         return token_query.filter(token=access_token).first()
+
     def authenticate_header(self, request):
         """
         Bearer is the only finalized type currently
