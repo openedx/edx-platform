@@ -67,7 +67,7 @@ DJFS = {
 ################################ DEBUG TOOLBAR ################################
 
 INSTALLED_APPS += ['debug_toolbar']
-MIDDLEWARE_CLASSES += [
+MIDDLEWARE += [
     'lms.djangoapps.discussion.django_comment_client.utils.QueryCountDebugMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]

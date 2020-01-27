@@ -9,12 +9,12 @@ from third_party_auth.tests import testutil
 
 _ORIGINAL_AUTHENTICATION_BACKENDS = ['first_authentication_backend']
 _ORIGINAL_INSTALLED_APPS = ['first_installed_app']
-_ORIGINAL_MIDDLEWARE_CLASSES = ['first_middleware_class']
+_ORIGINAL_MIDDLEWARE = ['first_middleware_class']
 _ORIGINAL_TEMPLATE_CONTEXT_PROCESSORS = ['first_template_context_preprocessor']
 _SETTINGS_MAP = {
     'AUTHENTICATION_BACKENDS': _ORIGINAL_AUTHENTICATION_BACKENDS,
     'INSTALLED_APPS': _ORIGINAL_INSTALLED_APPS,
-    'MIDDLEWARE_CLASSES': _ORIGINAL_MIDDLEWARE_CLASSES,
+    'MIDDLEWARE': _ORIGINAL_MIDDLEWARE,
     'TEMPLATES': [{
         'OPTIONS': {
             'context_processors': _ORIGINAL_TEMPLATE_CONTEXT_PROCESSORS
@@ -37,7 +37,7 @@ class SettingsUnitTest(testutil.TestCase):
 
     def test_apply_settings_adds_exception_middleware(self):
         settings.apply_settings(self.settings)
-        self.assertIn('third_party_auth.middleware.ExceptionMiddleware', self.settings.MIDDLEWARE_CLASSES)
+        self.assertIn('third_party_auth.middleware.ExceptionMiddleware', self.settings.MIDDLEWARE)
 
     def test_apply_settings_adds_fields_stored_in_session(self):
         settings.apply_settings(self.settings)
