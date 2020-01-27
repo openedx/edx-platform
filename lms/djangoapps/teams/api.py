@@ -280,7 +280,7 @@ def get_team_for_user_course_topic(user, course_id, topic_id):
         ).first()
 
 
-def get_team_anonymous_user_ids(user, team):
+def anonymous_user_ids_for_team(user, team):
     """ Get the anonymous user IDs for members of a team, used in team submissions
         Requesting user must be a member of the team or course staff
 
