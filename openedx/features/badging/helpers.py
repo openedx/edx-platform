@@ -10,7 +10,9 @@ from nodebb.constants import TEAM_PLAYER_ENTRY_INDEX
 from .constants import (
     BADGES_KEY,
     FILTER_BADGES_ERROR,
-    TEAM_PLAYER
+    TEAM_PLAYER,
+    TEAM_ID_KEY,
+    TEAM_ROOM_ID_KEY
 )
 from .models import Badge
 
@@ -67,9 +69,10 @@ def get_course_badges(user, course_id, earned_badges, badge_queryset=None):
                 continue
 
             course_team, earned_badges = filter_earned_badge_by_joined_team(user, course, earned_badges)
-            if not course_team:
-                # user has not joined any team
-                badges['team_joined'] = False
+
+            if course_team:
+                # only if user has joined any team
+                badges[TEAM_ID_KEY] = course_team[TEAM_ID_KEY]
 
         badge_list = list(
             badge_queryset.filter(type=badge_type).values()
@@ -108,19 +111,19 @@ def filter_earned_badge_by_joined_team(user, course, earned_badges):
         flag: Has user joined any team
         earned_badges: All badges earned in a course, specific to joined team
     """
-    course_team = CourseTeam.objects.filter(course_id=course.id, users=user).values('team__room_id').first()
+    course_team = CourseTeam.objects.filter(course_id=course.id, users=user).values(TEAM_ID_KEY, TEAM_ROOM_ID_KEY).first()
 
     if not course_team:
         # if user has not joined any team, return empty list for earned badges
         return course_team, list()
 
-    if not course_team['team__room_id']:
-        error = FILTER_BADGES_ERROR.format(team_id=course_team['id'])
+    if not course_team[TEAM_ROOM_ID_KEY]:
+        error = FILTER_BADGES_ERROR.format(team_id=course_team[TEAM_ID_KEY])
         log.exception(error)
         raise Exception(error)
 
     # filter earned badges for joined team only
     return course_team, [
         earned_badge for earned_badge in earned_badges if
-        earned_badge.community_id == course_team['team__room_id']
+        earned_badge.community_id == course_team[TEAM_ROOM_ID_KEY]
     ]
