@@ -1492,8 +1492,8 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        (True, 51),
-        (False, 50)
+        (True, 54),
+        (False, 53)
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
@@ -1506,8 +1506,8 @@ class ProgressPageTests(ProgressPageBaseTests):
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 59, 38),
-        (True, 50, 33)
+        (False, 62, 41),
+        (True, 53, 36)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
@@ -1768,9 +1768,11 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.assertEqual(response.cert_status, 'invalidated')
         self.assertEqual(response.title, 'Your certificate has been invalidated')
 
+    @override_settings(FEATURES=FEATURES_WITH_DISABLE_HONOR_CERTIFICATE)
     def test_downloadable_get_cert_data(self):
         """
-        Verify that downloadable cert data is returned if cert is downloadable.
+        Verify that downloadable cert data is returned if cert is downloadable even
+        when DISABLE_HONOR_CERTIFICATES feature flag is turned ON.
         """
         self.generate_certificate(
             "http://www.example.com/certificate.pdf", "honor"
