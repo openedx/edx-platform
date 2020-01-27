@@ -1179,7 +1179,8 @@ def _get_cert_data(student, course, enrollment_mode, course_grade=None):
     Returns:
         returns dict if course certificate is available else None.
     """
-    if not CourseMode.is_eligible_for_certificate(enrollment_mode):
+    cert_data = _certificate_message(student, course, enrollment_mode)
+    if not CourseMode.is_eligible_for_certificate(enrollment_mode, status=cert_data.cert_status):
         return INELIGIBLE_PASSING_CERT_DATA.get(enrollment_mode)
 
     certificates_enabled_for_course = certs_api.cert_generation_enabled(course.id)
@@ -1189,7 +1190,6 @@ def _get_cert_data(student, course, enrollment_mode, course_grade=None):
     if not auto_certs_api.can_show_certificate_message(course, student, course_grade, certificates_enabled_for_course):
         return
 
-    cert_data = _certificate_message(student, course, enrollment_mode)
     if not certs_api.get_active_web_certificate(course) and not auto_certs_api.is_valid_pdf_certificate(cert_data):
         return
 
