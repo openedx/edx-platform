@@ -537,6 +537,10 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
         """Redirects to the registration page."""
         return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER])
 
+    def dispatch_to_custom_redirect(url):
+        """Redirects to the custom redirect url"""
+        return redirect(url)
+
     def should_force_account_creation():
         """ For some third party providers, we auto-create user accounts """
         current_provider = provider.Registry.get_from_pipeline({'backend': current_partial.backend, 'kwargs': kwargs})
@@ -560,7 +564,9 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
         elif auth_entry == AUTH_ENTRY_REGISTER:
             # User has authenticated with the third party provider and now wants to finish
             # creating their edX account.
-            return dispatch_to_register()
+            register_origin_url = strategy.request.session.get('next')
+            return dispatch_to_custom_redirect(register_origin_url) \
+                if register_origin_url else dispatch_to_register()
         elif auth_entry == AUTH_ENTRY_ACCOUNT_SETTINGS:
             raise AuthEntryError(backend, 'auth_entry is wrong. Settings requires a user.')
         elif auth_entry in AUTH_ENTRY_CUSTOM:
