@@ -232,6 +232,10 @@ class CourseOverview(TimeStampedModel):
             - IOError if some other error occurs while trying to load the
                 course from the module store.
         """
+        log.info(
+            "Attempting to load CourseOverview for course %s from modulestore.",
+            course_id,
+        )
         store = modulestore()
         with store.bulk_operations(course_id):
             course = store.get_course(course_id)
@@ -259,10 +263,15 @@ class CourseOverview(TimeStampedModel):
                     # other one will cause an IntegrityError because it tries
                     # to save a duplicate.
                     # (see: https://openedx.atlassian.net/browse/TNL-2854).
-                    pass
+                    log.info(
+                        "Multiple CourseOverviews for course %s requested "
+                        "simultaneously; will only save one.",
+                        course_id,
+                    )
                 except Exception:
                     log.exception(
-                        u"CourseOverview for course %s failed!",
+                        "Saving CourseOverview for course %s failed with "
+                        "unexpected exception!",
                         course_id,
                     )
                     raise
@@ -270,11 +279,16 @@ class CourseOverview(TimeStampedModel):
                 return course_overview
             elif course is not None:
                 raise IOError(
-                    u"Error while loading course {} from the module store: {}",
+                    "Error while loading CourseOverview for course {} "
+                    "from the module store: {}",
                     six.text_type(course_id),
                     course.error_msg if isinstance(course, ErrorDescriptor) else six.text_type(course)
                 )
             else:
+                log.info(
+                    "Could not create CourseOverview for non-existent course: %s",
+                    course_id,
+                )
                 raise cls.DoesNotExist()
 
     @classmethod
