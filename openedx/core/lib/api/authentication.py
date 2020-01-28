@@ -9,7 +9,6 @@ from oauth2_provider import models as dot_models
 from provider.oauth2 import models as dop_models
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.authentication import BaseAuthentication, get_authorization_header
-from openedx.core.lib.api.authentication import OAuth2Authentication
 
 
 OAUTH2_TOKEN_ERROR = u'token_error'
@@ -60,7 +59,7 @@ class OAuth2Authentication(BaseAuthentication):
             logger.warning("auth is empty")
             return None
         user, token = self.authenticate_credentials(access_token)
-        if not allow_inactive_users:
+        if not self.allow_inactive_users:
             if not user.is_active:
                 msg = 'User inactive or deleted: %s' % user.get_username()
                 raise AuthenticationFailed(msg)
