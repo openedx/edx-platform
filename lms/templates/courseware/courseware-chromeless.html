@@ -45,6 +45,18 @@ ${static.get_page_title_breadcrumbs(course_name())}
 
 <link href="${static.url('css/vendor/jquery.autocomplete.css')}" rel="stylesheet" type="text/css">
   ${HTML(fragment.head_html())}
+
+  <script type="text/javascript">
+    // If this chromeless view is in an iframe in the learning microfrontend app
+    // then add a base tag in the head (of the iframe document) to force links
+    // in this iframe to navigate the parent window.
+    if (window !== window.parent) {
+      var learningAppReferrer = "${settings.LEARNING_MICROFRONTEND_URL}";
+      if (document.referrer === learningAppReferrer) {
+        document.write('<base target="_parent">');
+      }
+    }
+  </script>
 </%block>
 
 <%block name="js_extra">
