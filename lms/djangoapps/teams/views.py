@@ -27,7 +27,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
-from openedx.core.lib.api.authentication import OAuth2Authentication
+from openedx.core.lib.api.authentication import OAuth2AuthenticationDeprecated
 
 from lms.djangoapps.courseware.courses import get_course_with_access, has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges

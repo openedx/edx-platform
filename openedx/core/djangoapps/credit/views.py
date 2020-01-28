@@ -18,7 +18,7 @@ from rest_framework import generics, mixins, permissions, views, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from openedx.core.lib.api.authentication import OAuth2Authentication
+from openedx.core.lib.api.authentication import OAuth2AuthenticationDeprecated
 from six import text_type
 
 from openedx.core.djangoapps.credit.api import create_credit_request

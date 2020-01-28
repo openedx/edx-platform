@@ -13,7 +13,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from openedx.core.lib.api.authentication import OAuth2Authentication
+from openedx.core.lib.api.authentication import OAuth2AuthenticationDeprecated
 
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
