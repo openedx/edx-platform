@@ -293,3 +293,6 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
 EDXNOTES_INTERNAL_API = 'http://edx.devstack.edxnotesapi:18120/api/v1'
 EDXNOTES_CLIENT_NAME = 'edx_notes_api-backend-service'
+
+############## Settings for Microfrontends  #########################
+LEARNING_MICROFRONTEND_URL = 'http://localhost:2000/'
