@@ -68,7 +68,7 @@ class BulkEnrollView(APIView):
         to the 'before' and 'after' states.
     """
 
-    authentication_classes = (JwtAuthentication, OAuth2Authentication,)
+    authentication_classes = (JwtAuthentication, OAuth2AuthenticationDeprecated,)
     permission_classes = (IsStaff,)
     throttle_classes = (EnrollmentUserThrottle,)
 

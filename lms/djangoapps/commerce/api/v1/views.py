@@ -30,7 +30,7 @@ log = logging.getLogger(__name__)
 
 class CourseListView(ListAPIView):
     """ List courses and modes. """
-    authentication_classes = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
+    authentication_classes = (JwtAuthentication, OAuth2AuthenticationDeprecated, SessionAuthentication,)
     permission_classes = (IsAuthenticated,)
     serializer_class = CourseSerializer
     pagination_class = None
@@ -44,7 +44,7 @@ class CourseRetrieveUpdateView(PutAsCreateMixin, RetrieveUpdateAPIView):
     lookup_field = 'id'
     lookup_url_kwarg = 'course_id'
     model = CourseMode
-    authentication_classes = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
+    authentication_classes = (JwtAuthentication, OAuth2AuthenticationDeprecated, SessionAuthentication,)
     permission_classes = (ApiKeyOrModelPermission,)
     serializer_class = CourseSerializer
 
