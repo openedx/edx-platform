@@ -232,6 +232,10 @@ class CourseOverview(TimeStampedModel):
             - IOError if some other error occurs while trying to load the
                 course from the module store.
         """
+        log.info(
+            "Attempting to load CourseOverview for course %s from modulestore.",
+            course_id,
+        )
         store = modulestore()
         with store.bulk_operations(course_id):
             course = store.get_course(course_id)
@@ -259,10 +263,15 @@ class CourseOverview(TimeStampedModel):
                     # other one will cause an IntegrityError because it tries
                     # to save a duplicate.
                     # (see: https://openedx.atlassian.net/browse/TNL-2854).
-                    pass
+                    log.info(
+                        "Multiple CourseOverviews for course %s requested "
+                        "simultaneously; will only save one.",
+                        course_id,
+                    )
                 except Exception:
                     log.exception(
-                        u"CourseOverview for course %s failed!",
+                        "Saving CourseOverview for course %s failed with "
+                        "unexpected exception!",
                         course_id,
                     )
                     raise
@@ -270,11 +279,16 @@ class CourseOverview(TimeStampedModel):
                 return course_overview
             elif course is not None:
                 raise IOError(
-                    u"Error while loading course {} from the module store: {}",
+                    "Error while loading CourseOverview for course {} "
+                    "from the module store: {}",
                     six.text_type(course_id),
                     course.error_msg if isinstance(course, ErrorDescriptor) else six.text_type(course)
                 )
             else:
+                log.info(
+                    "Could not create CourseOverview for non-existent course: %s",
+                    course_id,
+                )
                 raise cls.DoesNotExist()
 
     @classmethod
@@ -335,48 +349,34 @@ class CourseOverview(TimeStampedModel):
         return course_overview or cls.load_from_module_store(course_id)
 
     @classmethod
-    def get_from_ids_if_exists(cls, course_ids):
+    def get_from_ids(cls, course_ids):
         """
-        Return a dict mapping course_ids to CourseOverviews, if they exist.
+        Return a dict mapping course_ids to CourseOverviews.
 
-        This method will *not* generate new CourseOverviews or delete outdated
-        ones. It exists only as a small optimization used when CourseOverviews
-        are known to exist, for common situations like the student dashboard.
+        Tries to select all CourseOverviews in one query,
+        then fetches remaining (uncached) overviews from the modulestore.
 
-        Callers should assume that this list is incomplete and fall back to
-        get_from_id if they need to guarantee CourseOverview generation.
+        Course IDs for non-existant courses will map to None.
+
+        Arguments:
+            course_ids (iterable[CourseKey])
+
+        Returns: dict[CourseKey, CourseOverview|None]
         """
-        return {
+        overviews = {
             overview.id: overview
-            for overview
-            in cls.objects.select_related('image_set').filter(
+            for overview in cls.objects.select_related('image_set').filter(
                 id__in=course_ids,
                 version__gte=cls.VERSION
             )
         }
-
-    @classmethod
-    def get_from_id_if_exists(cls, course_id):
-        """
-        Return a CourseOverview for the provided course_id if it exists.
-        Returns None if no CourseOverview exists with the provided course_id
-
-        This method will *not* generate new CourseOverviews or delete outdated
-        ones. It exists only as a small optimization used when CourseOverviews
-        are known to exist, for common situations like the student dashboard.
-
-        Callers should assume that this list is incomplete and fall back to
-        get_from_id if they need to guarantee CourseOverview generation.
-        """
-        try:
-            course_overview = cls.objects.select_related('image_set').get(
-                id=course_id,
-                version__gte=cls.VERSION
-            )
-        except cls.DoesNotExist:
-            course_overview = None
-
-        return course_overview
+        for course_id in course_ids:
+            if course_id not in overviews:
+                try:
+                    overviews[course_id] = cls.load_from_module_store(course_id)
+                except CourseOverview.DoesNotExist:
+                    overviews[course_id] = None
+        return overviews
 
     def clean_id(self, padding_char='='):
         """

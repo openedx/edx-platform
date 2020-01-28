@@ -900,7 +900,7 @@ class ProgramCourseEnrollmentOverviewView(
             is_active=True,
         )
 
-        overviews = CourseOverview.get_from_ids_if_exists(course_run_keys)
+        overviews = CourseOverview.get_from_ids(course_run_keys)
 
         course_run_resume_urls = get_resume_urls_for_enrollments(user, course_enrollments)
 

@@ -7,13 +7,14 @@ django-oauth-toolkit as appropriate.
 import json
 
 from django.conf import settings
+from django.utils.decorators import method_decorator
 from django.views.generic import View
 from edx_django_utils import monitoring as monitoring_utils
 from edx_oauth2_provider import views as dop_views  # django-oauth2-provider views
 from oauth2_provider import models as dot_models  # django-oauth-toolkit
 from oauth2_provider import views as dot_views
 from ratelimit import ALL
-from ratelimit.mixins import RatelimitMixin
+from ratelimit.decorators import ratelimit
 
 from openedx.core.djangoapps.auth_exchange import views as auth_exchange_views
 from openedx.core.djangoapps.oauth_dispatch import adapters
@@ -84,16 +85,18 @@ class _DispatchingView(View):
             return request.POST.get('client_id')
 
 
-class AccessTokenView(RatelimitMixin, _DispatchingView):
+@method_decorator(
+    ratelimit(
+        key='openedx.core.djangoapps.util.ratelimit.real_ip', rate=settings.RATELIMIT_RATE,
+        method=ALL, block=True
+    ), name='dispatch'
+)
+class AccessTokenView(_DispatchingView):
     """
     Handle access token requests.
     """
     dot_view = dot_views.TokenView
     dop_view = dop_views.AccessTokenView
-    ratelimit_key = 'openedx.core.djangoapps.util.ratelimit.real_ip'
-    ratelimit_rate = settings.RATELIMIT_RATE
-    ratelimit_block = True
-    ratelimit_method = ALL
 
     def dispatch(self, request, *args, **kwargs):  # pylint: disable=arguments-differ
         response = super(AccessTokenView, self).dispatch(request, *args, **kwargs)

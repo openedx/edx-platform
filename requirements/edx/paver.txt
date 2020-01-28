@@ -4,7 +4,6 @@
 #
 #    make upgrade
 #
-argh==0.26.2              # via watchdog
 certifi==2019.11.28       # via requests
 chardet==3.0.4            # via requests
 edx-opaque-keys==2.0.1
@@ -21,11 +20,10 @@ pbr==5.4.4                # via stevedore
 psutil==1.2.1
 pymongo==3.9.0
 python-memcached==1.59
-pyyaml==5.3               # via watchdog
 requests==2.22.0
 six==1.14.0               # via edx-opaque-keys, libsass, mock, paver, python-memcached, stevedore
 stevedore==1.31.0
 urllib3==1.25.8           # via requests
-watchdog==0.9.0
+watchdog==0.10.0
 wrapt==1.11.2
 zipp==1.0.0               # via importlib-metadata

@@ -20,6 +20,7 @@ from openedx.core.djangoapps.ace_common.template_context import get_base_templat
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH
 from openedx.core.djangoapps.schedules.content_highlights import get_week_highlights
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
+from openedx.core.djangoapps.schedules.message_types import CourseUpdate, InstructorLedCourseUpdate
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleExperience
 from openedx.core.djangoapps.schedules.utils import PrefixedDebugLoggerMixin
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
@@ -254,6 +255,8 @@ class RecurringNudgeResolver(BinnedSchedulesBaseResolver):
 
     def get_template_context(self, user, user_schedules):
         first_schedule = user_schedules[0]
+        if not first_schedule.enrollment.course.self_paced:
+            raise InvalidContextError
         context = {
             'course_name': first_schedule.enrollment.course.display_name,
             'course_url': _get_trackable_course_home_url(first_schedule.enrollment.course_id),
@@ -286,6 +289,10 @@ class UpgradeReminderResolver(BinnedSchedulesBaseResolver):
         first_valid_upsell_context = None
         first_schedule = None
         for schedule in user_schedules:
+            if not schedule.enrollment.course.self_paced:
+                # We don't want to include instructor led courses in this email
+                continue
+
             upsell_context = _get_upsell_information_for_schedule(user, schedule)
             if not upsell_context['show_upsell']:
                 continue
@@ -349,6 +356,20 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
     num_bins = COURSE_UPDATE_NUM_BINS
     experience_filter = Q(experience__experience_type=ScheduleExperience.EXPERIENCES.course_updates)
 
+    def send(self, msg_type):
+        for (user, language, context, is_self_paced) in self.schedules_for_bin():
+            msg_type = CourseUpdate() if is_self_paced else InstructorLedCourseUpdate()
+            msg = msg_type.personalize(
+                Recipient(
+                    user.username,
+                    self.override_recipient_email or user.email,
+                ),
+                language,
+                context,
+            )
+            with function_trace('enqueue_send_task'):
+                self.async_send_task.apply_async((self.site.id, str(msg)), retry=False)  # pylint: disable=no-member
+
     def schedules_for_bin(self):
         week_num = abs(self.day_offset) // 7
         schedules = self.get_schedules_with_target_date_by_bin_and_orgs(
@@ -358,6 +379,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
         template_context = get_base_template_context(self.site)
         for schedule in schedules:
             enrollment = schedule.enrollment
+            course = schedule.enrollment.course
             user = enrollment.user
 
             try:
@@ -391,7 +413,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
                 })
                 template_context.update(_get_upsell_information_for_schedule(user, schedule))
 
-                yield (user, schedule.enrollment.course.closest_released_language, template_context)
+                yield (user, schedule.enrollment.course.closest_released_language, template_context, course.self_paced)
 
 
 def _get_trackable_course_home_url(course_id):

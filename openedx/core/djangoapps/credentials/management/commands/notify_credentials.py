@@ -16,6 +16,7 @@ import math
 import sys
 import time
 
+from datetime import datetime, timedelta
 import dateutil.parser
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
@@ -138,6 +139,11 @@ class Command(BaseCommand):
             help="Number of items to query at once.",
         )
         parser.add_argument(
+            '--auto',
+            action='store_true',
+            help='Use to run the management command periodically',
+        )
+        parser.add_argument(
             '--args-from-database',
             action='store_true',
             help='Use arguments from the NotifyCredentialsConfig model instead of the command line.',
@@ -164,11 +170,20 @@ class Command(BaseCommand):
         if options['args_from_database']:
             options = self.get_args_from_database()
 
+        if options['auto']:
+            options['end_date'] = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+            options['start_date'] = options['end_date'] - timedelta(days=1)
+
         log.info(
-            u"notify_credentials starting, dry-run=%s, site=%s, delay=%d seconds",
+            u"notify_credentials starting, dry-run=%s, site=%s, delay=%d seconds, page_size=%d, "
+            u"from=%s, to=%s, execution=%s",
             options['dry_run'],
             options['site'],
-            options['delay']
+            options['delay'],
+            options['page_size'],
+            options['start_date'] if options['start_date'] else 'NA',
+            options['end_date'] if options['end_date'] else 'NA',
+            'auto' if options['auto'] else 'manual',
         )
 
         try:
