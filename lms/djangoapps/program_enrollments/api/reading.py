@@ -182,8 +182,8 @@ def fetch_program_course_enrollments(
         * waiting_only (bool)
 
     Optional arguments are used as filtersets if they are not None.
-    At most one of (realized_only, waiting_only) may be provided.
     At most one of (active_only, inactive_only) may be provided.
+    At most one of (realized_only, waiting_only) may be provided.
 
     Returns: queryset[ProgramCourseEnrollment]
     """
@@ -234,7 +234,7 @@ def fetch_program_enrollments_by_student(
         * external_user_key (str)
 
     Optional arguments:
-        * provided_uuids (iterable[UUID|str])
+        * program_uuids (iterable[UUID|str])
         * curriculum_uuids (iterable[UUID|str])
         * program_enrollment_statuses (iterable[str])
         * realized_only (bool)
@@ -285,16 +285,18 @@ def fetch_program_course_enrollments_by_student(
         * external_user_key (str)
 
     Optional arguments:
-        * provided_uuids (iterable[UUID|str])
+        * program_uuids (iterable[UUID|str])
         * curriculum_uuids (iterable[UUID|str])
         * course_keys (iterable[CourseKey|str])
         * program_enrollment_statuses (iterable[str])
+        * active_only (bool)
+        * inactive_only (bool)
         * realized_only (bool)
         * waiting_only (bool)
 
     Optional arguments are used as filtersets if they are not None.
-    At most one of (realized_only, waiting_only) may be provided.
     At most one of (active_only, inactive_only) may be provided.
+    At most one of (realized_only, waiting_only) may be provided.
 
     Returns: queryset[ProgramCourseEnrollment]
     """
