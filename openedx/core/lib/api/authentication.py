@@ -35,7 +35,7 @@ class OAuth2AuthenticationDeprecated(OAuth2Authentication):
         """
 
         set_custom_metric("OAuth2AuthenticationCalled", True)
-        user, token = super().authenticate(request)
+        user, token = super(OAuth2AuthenticationDeprecated, self).authenticate(request)
         set_custom_metric("OAuth2AuthenticationSuccess", True)
         return user, token
 
@@ -53,7 +53,7 @@ class OAuth2AuthenticationAllowInactiveUser(OAuth2AuthenticationDeprecated):
     for mobile endpoints.
     """
 
-    def authenticate(self, *args, **kwargs):
+    def authenticate(self, request):
         """
         Returns two-tuple of (user, token) if access token authentication
         succeeds, raises an AuthenticationFailed (HTTP 401) if authentication
@@ -62,7 +62,7 @@ class OAuth2AuthenticationAllowInactiveUser(OAuth2AuthenticationDeprecated):
         """
 
         try:
-            return super(OAuth2AuthenticationAllowInactiveUser, self).authenticate(*args, **kwargs)
+            return super().authenticate(request)
         except AuthenticationFailed as exc:
             if isinstance(exc.detail, dict):
                 developer_message = exc.detail['developer_message']
