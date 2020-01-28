@@ -15,6 +15,7 @@ from django.conf import settings
 from django.db.models import Prefetch
 from django.http import Http404, QueryDict
 from django.urls import reverse
+from edx_django_utils.monitoring import function_trace
 from fs.errors import ResourceNotFound
 from opaque_keys.edx.keys import UsageKey
 from path import Path as path
@@ -457,6 +458,7 @@ def get_course_syllabus_section(course, section_key):
     raise KeyError("Invalid about key " + str(section_key))
 
 
+@function_trace('get_courses')
 def get_courses(user, org=None, filter_=None):
     """
     Return a LazySequence of courses available, optionally filtered by org code (case-insensitive).

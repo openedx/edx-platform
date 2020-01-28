@@ -3,6 +3,7 @@ Course API
 """
 import logging
 
+from edx_django_utils.monitoring import function_trace
 from edx_when.api import get_dates_for_course
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User
@@ -118,6 +119,7 @@ def _filter_by_search(course_queryset, search_term):
     )
 
 
+@function_trace('list_courses')
 def list_courses(request, username, org=None, roles=None, filter_=None, search_term=None):
     """
     Yield all available courses.
