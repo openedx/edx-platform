@@ -99,12 +99,12 @@ class OAuth2Tests(TestCase):
             redirect_uri='https://example.edx/redirect',
         )
 
-        self.access_token = oauth2_provider.models.AccessToken.objects.create(
+        self.access_token = oauth2_provider.oauth2.models.AccessToken.objects.create(
             token=self.ACCESS_TOKEN,
             client=self.dop_oauth2_client,
             user=self.user,
         )
-        self.refresh_token = oauth2_provider.models.RefreshToken.objects.create(
+        self.refresh_token = oauth2_provider.oauth2.models.RefreshToken.objects.create(
             user=self.user,
             access_token=self.access_token,
             client=self.dop_oauth2_client,
