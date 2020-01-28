@@ -45,7 +45,7 @@ from openedx.core.lib.api.mixins import PutAsCreateMixin
 from openedx.core.lib.api.permissions import IsStaffOrOwner
 
 log = logging.getLogger(__name__)
-AUTHENTICATION_CLASSES = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
+AUTHENTICATION_CLASSES = (JwtAuthentication, OAuth2AuthenticationDeprecated, SessionAuthentication,)
 
 
 class CreditProviderViewSet(viewsets.ReadOnlyModelViewSet):

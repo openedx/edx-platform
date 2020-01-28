@@ -19,7 +19,7 @@ from openedx.core.lib.api.permissions import IsStaffOrOwner
 
 class IDVerificationStatusView(RetrieveAPIView):
     """ IDVerificationStatus detail endpoint. """
-    authentication_classes = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
+    authentication_classes = (JwtAuthentication, OAuth2AuthenticationDeprecated, SessionAuthentication,)
     permission_classes = (IsStaffOrOwner,)
 
     def get_serializer(self, *args, **kwargs):

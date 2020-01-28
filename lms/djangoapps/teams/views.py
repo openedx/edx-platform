@@ -368,7 +368,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
     """
 
     # OAuth2Authentication must come first to return a 401 for unauthenticated users
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    authentication_classes = (OAuth2AuthenticationDeprecated, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = CourseTeamSerializer
 
@@ -696,7 +696,7 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
             If the user is logged in and the team does not exist, a 404 is returned.
 
     """
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    authentication_classes = (OAuth2AuthenticationDeprecated, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsStaffOrPrivilegedOrReadOnly, IsEnrolledOrIsStaff,)
     lookup_field = 'team_id'
     serializer_class = CourseTeamSerializer
@@ -791,7 +791,7 @@ class TopicListView(GenericAPIView):
                   those teams whose members are outside of institutions affliation.
     """
 
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    authentication_classes = (OAuth2AuthenticationDeprecated, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
     pagination_class = TopicsPagination
 
@@ -922,7 +922,7 @@ class TopicDetailView(APIView):
                   those teams whose members are outside of institutions affliation.
     """
 
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    authentication_classes = (OAuth2AuthenticationDeprecated, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, topic_id, course_id):
@@ -1082,7 +1082,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
             another user to a team.
     """
 
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    authentication_classes = (OAuth2AuthenticationDeprecated, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = MembershipSerializer
 
@@ -1295,7 +1295,7 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
             If the membership does not exist, a 404 error is returned.
     """
 
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    authentication_classes = (OAuth2AuthenticationDeprecated, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
     serializer_class = MembershipSerializer
