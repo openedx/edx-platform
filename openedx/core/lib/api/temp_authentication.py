@@ -28,6 +28,7 @@ class OAuth2Authentication(BaseAuthentication):
     """
     www_authenticate_realm = 'api'
     allow_query_params_token = settings.DEBUG
+    allow_inactive_users = False
 
     def authenticate(self, request):
         """
@@ -57,8 +58,12 @@ class OAuth2Authentication(BaseAuthentication):
         else:
             logger.warning("auth is empty")
             return None
-
-        return self.authenticate_credentials(access_token)
+        user, token = self.authenticate_credentials(access_token)
+        if not allow_inactive_users:
+            if not user.is_active:
+                msg = 'User inactive or deleted: %s' % user.get_username()
+                raise AuthenticationFailed(msg)
+        return user, token
 
     def authenticate_credentials(self, access_token):
         """

@@ -8,7 +8,7 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListAPIView
-from openedx.core.lib.api.temp_authentication import OAuth2Authentication
+from openedx.core.lib.api.authentication import OAuth2Authentication
 
 from openedx.core.djangoapps.api_admin.api.v1 import serializers as api_access_serializers
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
