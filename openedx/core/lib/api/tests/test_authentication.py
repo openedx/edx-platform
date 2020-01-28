@@ -22,7 +22,6 @@ from django.utils.timezone import now
 from oauth2_provider import models as dot_models
 from oauth2_provider.contrib.rest_framework.permissions import TokenHasReadWriteScope
 from rest_framework import status
-            return user, token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.test import APIClient, APIRequestFactory
 from rest_framework.views import APIView
