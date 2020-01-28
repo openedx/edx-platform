@@ -187,33 +187,18 @@ def fetch_program_course_enrollments(
 
     Returns: queryset[ProgramCourseEnrollment]
     """
-    if active_only and inactive_only:
-        raise ValueError(
-            _REALIZED_FILTER_ERROR_TEMPLATE.format("active_only", "inactive_only")
-        )
-    if realized_only and waiting_only:
-        raise ValueError(
-            _REALIZED_FILTER_ERROR_TEMPLATE.format("realized_only", "waiting_only")
-        )
-    filters = {
-        "program_enrollment__curriculum_uuid__in": curriculum_uuids,
-        "program_enrollment__user__in": users,
-        "program_enrollment__external_user_key__in": external_user_keys,
-        "program_enrollment__status__in": program_enrollment_statuses,
-        "program_enrollment__in": program_enrollments,
-    }
-    if active_only:
-        filters["status"] = "active"
-    if inactive_only:
-        filters["status"] = "inactive"
-    if realized_only:
-        filters["program_enrollment__user__isnull"] = False
-    if waiting_only:
-        filters["program_enrollment__user__isnull"] = True
-    return ProgramCourseEnrollment.objects.filter(
-        program_enrollment__program_uuid=program_uuid,
-        course_key=course_key,
-        **_remove_none_values(filters)
+    return fetch_program_course_enrollments_by_course(
+        course_key,
+        program_uuids=[program_uuid],
+        curriculum_uuids=None,
+        users=None,
+        external_user_keys=None,
+        program_enrollment_statuses=None,
+        program_enrollments=None,
+        active_only=False,
+        inactive_only=False,
+        realized_only=False,
+        waiting_only=False,
     )
 
 
@@ -263,6 +248,71 @@ def fetch_program_enrollments_by_student(
     if waiting_only:
         filters["user__isnull"] = True
     return ProgramEnrollment.objects.filter(**_remove_none_values(filters))
+
+
+def fetch_program_course_enrollments_by_course(
+        course_key,
+        program_uuids=None,
+        curriculum_uuids=None,
+        users=None,
+        external_user_keys=None,
+        program_enrollment_statuses=None,
+        program_enrollments=None,
+        active_only=False,
+        inactive_only=False,
+        realized_only=False,
+        waiting_only=False,
+):
+    """
+    Fetch program-course enrollments for a specific course.
+
+    Required argument:
+        * course_key (CourseKey|str)
+
+    Optional arguments:
+        * program_uuids (iterable[UUID|str])
+        * curriculum_uuids (iterable[UUID|str])
+        * course_keys (iterable[CourseKey|str])
+        * program_enrollment_statuses (iterable[str])
+        * active_only (bool)
+        * inactive_only (bool)
+        * realized_only (bool)
+        * waiting_only (bool)
+
+    Optional arguments are used as filtersets if they are not None.
+    At most one of (active_only, inactive_only) may be provided.
+    At most one of (realized_only, waiting_only) may be provided.
+
+    Returns: queryset[ProgramCourseEnrollment]
+    """
+    if active_only and inactive_only:
+        raise ValueError(
+            _REALIZED_FILTER_ERROR_TEMPLATE.format("active_only", "inactive_only")
+        )
+    if realized_only and waiting_only:
+        raise ValueError(
+            _REALIZED_FILTER_ERROR_TEMPLATE.format("realized_only", "waiting_only")
+        )
+    filters = {
+        "program_enrollment__curriculum_uuid__in": curriculum_uuids,
+        "program_enrollment__external_user_key__in": external_user_keys,
+        "program_enrollment__in": program_enrollments,
+        "program_enrollment__program_uuid__in": program_uuids,
+        "program_enrollment__status__in": program_enrollment_statuses,
+        "program_enrollment__user__in": users,
+    }
+    if active_only:
+        filters["status"] = "active"
+    if inactive_only:
+        filters["status"] = "inactive"
+    if realized_only:
+        filters["program_enrollment__user__isnull"] = False
+    if waiting_only:
+        filters["program_enrollment__user__isnull"] = True
+    return ProgramCourseEnrollment.objects.filter(
+        course_key=course_key,
+        **_remove_none_values(filters)
+    )
 
 
 def fetch_program_course_enrollments_by_student(
