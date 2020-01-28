@@ -18,6 +18,7 @@ from django.test.client import RequestFactory
 from opaque_keys.edx.locator import CourseLocator
 from openedx.features.learner_profile.toggles import REDIRECT_TO_PROFILE_MICROFRONTEND
 from openedx.features.learner_profile.views.learner_profile import learner_profile_context
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -269,3 +270,28 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
         profile_username = self.user.username
         context = learner_profile_context(request, profile_username, user_is_staff)
         self.assertIn('achievements_fragment', context)
+
+    @mock.patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    def test_certificate_visibility_with_no_cert_config(self):
+        """
+        Verify that certificates are not displayed until there is no active
+        certificate configuration.
+        """
+        # Add new certificate
+        cert = self._create_certificate(enrollment_mode=CourseMode.VERIFIED)
+        cert.download_url = ''
+        cert.save()
+
+        response = self.client.get('/u/{username}'.format(username=self.user.username))
+        self.assertNotContains(
+            response, u'card certificate-card mode-{cert_mode}'.format(cert_mode=CourseMode.VERIFIED)
+        )
+
+        course_overview = CourseOverview.get_from_id(self.course.id)
+        course_overview.has_any_active_web_certificate = True
+        course_overview.save()
+
+        response = self.client.get('/u/{username}'.format(username=self.user.username))
+        self.assertContains(
+            response, u'card certificate-card mode-{cert_mode}'.format(cert_mode=CourseMode.VERIFIED)
+        )
