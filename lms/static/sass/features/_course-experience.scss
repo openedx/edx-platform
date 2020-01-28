@@ -462,14 +462,6 @@ button.accordion-trigger, button.prerequisite-button {
     justify-content: space-between;
     padding: $baseline/2 $baseline/2 $baseline/2 0;
 
-    .heading {
-      font-size: 0.9rem;
-      font: -apple-system-body;
-      line-height: 1;
-      font-weight: $font-bold;
-      color: theme-color("dark");
-    }
-
     .left-column {
       flex: 5%;
 
@@ -490,9 +482,20 @@ button.accordion-trigger, button.prerequisite-button {
         margin-bottom: 8px;
       }
 
+      .heading {
+        font: -apple-system-body;
+        line-height: 1;
+        font-weight: $font-bold;
+        color: theme-color("dark");
+      }
+
       .description {
         margin-bottom: $baseline/2;
         display: inline-block;
+      }
+
+      .heading, .description {
+          font-size: 0.9rem;
       }
 
       .date-summary-link {
