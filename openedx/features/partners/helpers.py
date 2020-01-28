@@ -103,4 +103,4 @@ def get_partner_from_user(user):
 
 
 def user_has_performance_access(user, partner):
-    return bool(partner and user.has_perm(PERFORMANCE_PERM_FRMT.format(slug=partner.slug)))
+    return bool(partner and user.has_perm('partners.%s' % PERFORMANCE_PERM_FRMT.format(slug=partner.slug)))
