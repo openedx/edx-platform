@@ -68,7 +68,7 @@ class TestCourseListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreT
         self.cleaned_data = {
             'username': user.username,
             'org': '',
-            'role': set([]),
+            'role': '',
             'mobile': None,
             'search_term': '',
             'filter_': None,

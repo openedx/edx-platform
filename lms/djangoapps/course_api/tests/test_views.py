@@ -210,7 +210,7 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
                 u"testing course_api.views.CourseListView with filter_={}".format(filter_),
             )
 
-    def test_filter_by_roles_global_staff(self):
+    def test_filter_by_role_global_staff(self):
         """
         Verify that global staff are always returned all courses irregardless of role filter.
         """
@@ -219,16 +219,16 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
         # Create a second course to be filtered out of queries.
         alternate_course = self.create_course(org=md5(self.course.org.encode('utf-8')).hexdigest())
 
-        # Request the courses as the staff user with the different roles specified.
-        for roles in ('', 'staff', 'staff,instructor'):
-            filtered_response = self.verify_response(params={'username': self.staff_user.username, 'role': roles})
+        # Request the courses as the staff user with the different role specified.
+        for role in ('', 'staff', 'instructor'):
+            filtered_response = self.verify_response(params={'username': self.staff_user.username, 'role': role})
             # Both courses should be returned in the course list.
             for org in [self.course.org, alternate_course.org]:
                 self.assertTrue(
                     any(course['org'] == org for course in filtered_response.data['results'])
                 )
 
-    def test_filter_by_roles_non_staff(self):
+    def test_filter_by_role_non_staff(self):
         """
         Verify that a non-staff user can't access CourseOverviews by role.
         """
@@ -238,9 +238,9 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
         filtered_response = self.verify_response(params={'username': self.honor_user.username, 'role': 'staff'})
         self.assertEqual(len(filtered_response.data['results']), 0)
 
-    def test_filter_by_roles_course_staff(self):
+    def test_filter_by_role_course_staff(self):
         """
-        Verify that CourseOverviews are filtered by the provided roles.
+        Verify that CourseOverviews are filtered by the provided role.
         """
         # Make this user a course staff user for the course.
         course_staff_user = self.create_user(username='course_staff', is_staff=False)
@@ -274,13 +274,6 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
         })
         self.assertEqual(len(filtered_response.data['results']), 1)
         self.assertEqual(filtered_response.data['results'][0]['org'], alternate_course.org)
-
-        # The honor user does *not* have the course staff -or- instructor role on any courses.
-        filtered_response = self.verify_response(params={
-            'username': self.honor_user.username,
-            'role': 'staff,instructor'
-        })
-        self.assertEqual(len(filtered_response.data['results']), 0)
 
         # The course instructor user has the inferred course staff role on one course.
         self.setup_user(course_instructor_user)

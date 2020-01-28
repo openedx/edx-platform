@@ -53,7 +53,7 @@ class CourseListGetForm(UsernameValidatorMixin, Form):
     search_term = CharField(required=False)
     username = CharField(required=False)
     org = CharField(required=False)
-    role = MultiValueField(required=False)
+    role = CharField(required=False)
 
     # white list of all supported filter fields
     filter_type = namedtuple('filter_type', ['param_name', 'field_name'])

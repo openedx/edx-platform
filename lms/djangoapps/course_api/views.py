@@ -192,7 +192,7 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
         role (optional):
             If specified, visible `CourseOverview` objects are filtered
             such that only those for which the user has the specified role
-            are returned. Multiple role parameters can be specified.
+            are returned.
             Case-insensitive.
 
     **Returns**
@@ -249,7 +249,7 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
             self.request,
             form.cleaned_data['username'],
             org=form.cleaned_data['org'],
-            roles=form.cleaned_data['role'],
+            role=form.cleaned_data['role'],
             filter_=form.cleaned_data['filter_'],
             search_term=form.cleaned_data['search_term']
         )

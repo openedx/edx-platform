@@ -457,7 +457,7 @@ def get_course_syllabus_section(course, section_key):
     raise KeyError("Invalid about key " + str(section_key))
 
 
-def get_courses(user, org=None, filter_=None):
+def get_courses(user, org=None, filter_=None, role=None):
     """
     Return a LazySequence of courses available, optionally filtered by org code (case-insensitive).
     """
@@ -474,10 +474,13 @@ def get_courses(user, org=None, filter_=None):
         'image_set'
     )
 
-    permission_name = configuration_helpers.get_value(
-        'COURSE_CATALOG_VISIBILITY_PERMISSION',
-        settings.COURSE_CATALOG_VISIBILITY_PERMISSION
-    )
+    if role in ['staff', 'instructor']:
+        permission_name = role
+    else:
+        permission_name = configuration_helpers.get_value(
+            'COURSE_CATALOG_VISIBILITY_PERMISSION',
+            settings.COURSE_CATALOG_VISIBILITY_PERMISSION
+        )
 
     return LazySequence(
         (c for c in courses if has_access(user, permission_name, c)),
