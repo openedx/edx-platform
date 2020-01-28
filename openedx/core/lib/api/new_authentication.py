@@ -9,6 +9,7 @@ from oauth2_provider import models as dot_models
 from provider.oauth2 import models as dop_models
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.authentication import BaseAuthentication, get_authorization_header
+from edx_django_utils.monitoring import set_custom_metric
 
 
 OAUTH2_TOKEN_ERROR = 'token_error'
@@ -38,6 +39,7 @@ class OAuth2Authentication(BaseAuthentication):
         token.
         """
 
+        set_custom_metric("OAuth2AuthenticationCalled", True)
         auth = get_authorization_header(request).split()
 
         if len(auth) == 1:
@@ -59,10 +61,13 @@ class OAuth2Authentication(BaseAuthentication):
             logger.warning("auth is empty")
             return None
         user, token = self.authenticate_credentials(access_token)
-        if not allow_inactive_users:
+        if not self.allow_inactive_users:
             if not user.is_active:
                 msg = 'User inactive or deleted: %s' % user.get_username()
                 raise AuthenticationFailed(msg)
+
+        set_custom_metric("OAuth2AuthenticationSuccess", True)
+
         return user, token
 
     def authenticate_credentials(self, access_token):
@@ -85,11 +90,7 @@ class OAuth2Authentication(BaseAuthentication):
                 'developer_message': 'The provided access token has expired and is no longer valid.',
             })
         else:
-            user = token.user
-            if not user.is_active:
-                msg = 'User inactive or deleted: %s' % user.get_username()
-                raise AuthenticationFailed(msg)
-            return user, token
+            return token.user, token
 
     def get_access_token(self, access_token):
         """
@@ -120,3 +121,21 @@ class OAuth2Authentication(BaseAuthentication):
         Check details on the `OAuth2Authentication.authenticate` method
         """
         return 'Bearer realm="%s"' % self.www_authenticate_realm
+
+
+class OAuth2AuthenticationAllowInactiveUser(OAuth2Authentication):
+    """
+    This is a temporary workaround while the is_active field on the user is coupled
+    with whether or not the user has verified ownership of their claimed email address.
+    Once is_active is decoupled from verified_email, we will no longer need this
+    class override.
+
+    But until then, this authentication class ensures that the user is logged in,
+    but does not require that their account "is_active".
+
+    This class can be used for an OAuth2-accessible endpoint that allows users to access
+    that endpoint without having their email verified.  For example, this is used
+    for mobile endpoints.
+    """
+
+    allow_inactive_users = True

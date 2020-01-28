@@ -18,7 +18,7 @@ from lms.djangoapps.instructor.views.api import students_update_enrollment
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, get_cohort_by_name
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.enrollments.views import EnrollmentUserThrottle
-from openedx.core.lib.api.authentication import OAuth2Authentication
+from openedx.core.lib.api.authentication import OAuth2AuthenticationDeprecated
 from openedx.core.lib.api.permissions import IsStaff
 from util.disable_rate_limit import can_disable_rate_limit
 
