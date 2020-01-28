@@ -26,7 +26,7 @@ class OAuth2AuthenticationDeprecated(OAuth2Authentication):
     This child class was added to add new_relic metrics to OAuth2Authentication. This should be very temporary.
     """
 
-    def authenticate(self, request):
+    def authenticate(self, *args, **kwargs):
         """
         Returns two-tuple of (user, token) if access token authentication
         succeeds, raises an AuthenticationFailed (HTTP 401) if authentication
@@ -35,9 +35,9 @@ class OAuth2AuthenticationDeprecated(OAuth2Authentication):
         """
 
         set_custom_metric("OAuth2AuthenticationCalled", True)
-        user, token = super(OAuth2AuthenticationDeprecated, self).authenticate(request)
+        output = super(OAuth2AuthenticationDeprecated, self).authenticate(*args, **kwargs)
         set_custom_metric("OAuth2AuthenticationSuccess", True)
-        return user, token
+        return output
 
 
 class OAuth2AuthenticationAllowInactiveUser(OAuth2AuthenticationDeprecated):
@@ -53,7 +53,7 @@ class OAuth2AuthenticationAllowInactiveUser(OAuth2AuthenticationDeprecated):
     for mobile endpoints.
     """
 
-    def authenticate(self, request):
+    def authenticate(self, *args, **kwargs):
         """
         Returns two-tuple of (user, token) if access token authentication
         succeeds, raises an AuthenticationFailed (HTTP 401) if authentication
@@ -62,7 +62,7 @@ class OAuth2AuthenticationAllowInactiveUser(OAuth2AuthenticationDeprecated):
         """
 
         try:
-            return super().authenticate(request)
+            return super(OAuth2AuthenticationAllowInactiveUser, self).authenticate(*args, **kwargs)
         except AuthenticationFailed as exc:
             if isinstance(exc.detail, dict):
                 developer_message = exc.detail['developer_message']
