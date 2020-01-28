@@ -1720,10 +1720,7 @@ def financial_assistance_form(request):
     """Render the financial assistance application form page."""
     user = request.user
     enrolled_courses = get_financial_aid_courses(user)
-    incomes = ['Less than $5,000', '$5,000 - $10,000', '$10,000 - $15,000', '$15,000 - $20,000', '$20,000 - $25,000',
-               '$25,000 - $40,000', '$40,000 - $55,000', '$55,000 - $70,000', '$70,000 - $85,000',
-               '$85,000 - $100,000', 'More than $100,000']
-
+    incomes = ['Less than $5,000', '$5,000 - $10,000', '$10,000 - $15,000', '$15,000 - $20,000', '$20,000 - $25,000']
     annual_incomes = [
         {'name': _(income), 'value': income} for income in incomes
     ]
