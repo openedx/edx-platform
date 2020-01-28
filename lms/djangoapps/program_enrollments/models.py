@@ -107,7 +107,7 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
         on_delete=models.CASCADE,
         related_name="program_course_enrollments"
     )
-    course_enrollment = models.OneToOneField(
+    course_enrollment = models.ForeignKey(
         CourseEnrollment,
         null=True,
         blank=True,
