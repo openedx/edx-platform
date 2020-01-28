@@ -203,9 +203,14 @@ def write_program_course_enrollments(
     }
 
     # Fetch existing program-course enrollments.
-    existing_course_enrollments = fetch_program_course_enrollments(
-        program_uuid, course_key, program_enrollments=program_enrollments,
-    )
+    existing_course_enrollments = fetch_program_course_enrollments_by_course(
+        course_key,
+    ).select_related('program_enrollment')
+    # TODO: this mapping will not work because we can no longer assume uniqueness among the results
+    # actually if the only point is to ensure that no other's exist
+    # maybe this should be fine? But no, it's no others exist with
+    # status=active, so reducing like this here will make the check
+    # order-dependent
     existing_course_enrollments_by_key = {key: None for key in external_keys}
     existing_course_enrollments_by_key.update({
         enrollment.program_enrollment.external_user_key: enrollment
@@ -230,6 +235,8 @@ def write_program_course_enrollments(
         existing_course_enrollment = existing_course_enrollments_by_key[external_key]
         if existing_course_enrollment:
             if not update:
+                # TODO different rules apply depending on whether the existing course enrollment(s!) are 1) within the same program (this is the case we were already checking for), or 2) outside this program & status=active
+                # We already need to write some logic to check for these separately so it probably makes sense to customize error messaging for them
                 results[external_key] = ProgramCourseOpStatuses.CONFLICT
                 continue
             results[external_key] = change_program_course_enrollment_status(
