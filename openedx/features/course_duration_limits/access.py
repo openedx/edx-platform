@@ -110,7 +110,7 @@ def get_user_course_expiration_date(user, course):
         # for most people. Using the schedule date will provide flexibility to deal with
         # more complex business rules in the future.
         content_availability_date = enrollment.schedule.start_date
-        # We have anecdotally observed a case where the schedule.start was
+        # We have anecdotally observed a case where the schedule.start_date was
         # equal to the course start, but should have been equal to the enrollment start
         # https://openedx.atlassian.net/browse/PROD-58
         # This section is meant to address that case
