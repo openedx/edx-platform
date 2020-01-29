@@ -21,6 +21,7 @@ OAUTH2_TOKEN_ERROR_NOT_PROVIDED = u'token_not_provided'
 
 log = logging.getLogger(__name__)
 
+
 class OAuth2AuthenticationDeprecated(OAuth2Authentication):
     """
     This child class was added to add new_relic metrics to OAuth2Authentication. This should be very temporary.
