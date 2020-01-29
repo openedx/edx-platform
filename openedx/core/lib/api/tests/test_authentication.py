@@ -20,11 +20,12 @@ from django.test.utils import override_settings
 from django.utils.http import urlencode
 from django.utils.timezone import now
 from oauth2_provider import models as dot_models
-from oauth2_provider.contrib.rest_framework.permissions import TokenHasReadWriteScope
+# from oauth2_provider.contrib.rest_framework.permissions import TokenHasReadWriteScope
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.test import APIClient, APIRequestFactory
 from rest_framework.views import APIView
+from rest_framework_oauth.permissions import TokenHasReadWriteScope
 import provider as oauth2_provider
 
 from openedx.core.djangoapps.oauth_dispatch import adapters
