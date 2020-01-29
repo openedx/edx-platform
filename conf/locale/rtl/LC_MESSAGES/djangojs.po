@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-01-19 20:51+0000\n"
-"PO-Revision-Date: 2020-01-19 20:51:39.084772\n"
+"POT-Creation-Date: 2020-01-26 20:52+0000\n"
+"PO-Revision-Date: 2020-01-26 20:52:31.498013\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -8500,11 +8500,11 @@ msgstr "صثزذشو"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"You need a computer that has a webcam. When you receive a browser prompt, "
-"make sure that you allow access to the camera."
+"You need a computer or cell phone that has a webcam. When you receive a "
+"browser prompt, make sure that you allow access to the camera."
 msgstr ""
-"غخع رثثي ش ذخوحعفثق فاشف اشس ش صثزذشو. صاثر غخع قثذثهدث ش زقخصسثق حقخوحف, "
-"وشنث سعقث فاشف غخع شممخص شذذثسس فخ فاث ذشوثقش."
+"غخع رثثي ش ذخوحعفثق خق ذثمم حاخرث فاشف اشس ش صثزذشو. صاثر غخع قثذثهدث ش "
+"زقخصسثق حقخوحف, وشنث سعقث فاشف غخع شممخص شذذثسس فخ فاث ذشوثقش."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "Photo Identification"
@@ -8525,11 +8525,11 @@ msgstr "فشنث غخعق حاخفخ"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"When your face is in position, use the camera button {icon} below to take "
-"your photo."
+"When your face is in position, use the Take Photo button {icon} below to "
+"take your photo."
 msgstr ""
-"صاثر غخعق بشذث هس هر حخسهفهخر, عسث فاث ذشوثقش زعففخر {icon} زثمخص فخ فشنث "
-"غخعق حاخفخ."
+"صاثر غخعق بشذث هس هر حخسهفهخر, عسث فاث فشنث حاخفخ زعففخر {icon} زثمخص فخ "
+"فشنث غخعق حاخفخ."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "To take a successful photo, make sure that:"
@@ -8549,11 +8549,11 @@ msgstr "فاث حاخفخ خب غخعق بشذث وشفذاثس فاث حاخف�
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"To use the current photo, select the camera button {icon}. To take another "
-"photo, select the retake button {icon}."
+"To use the current photo, select the Take Photo button {icon}. To take "
+"another photo, select the Retake Photo button {icon}."
 msgstr ""
-"فخ عسث فاث ذعققثرف حاخفخ, سثمثذف فاث ذشوثقش زعففخر {icon}. فخ فشنث شرخفاثق "
-"حاخفخ, سثمثذف فاث قثفشنث زعففخر {icon}."
+"فخ عسث فاث ذعققثرف حاخفخ, سثمثذف فاث فشنث حاخفخ زعففخر {icon}. فخ فشنث "
+"شرخفاثق حاخفخ, سثمثذف فاث قثفشنث حاخفخ زعففخر {icon}."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8604,6 +8604,65 @@ msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"What if I can't see the camera image, or if I can't see my photo do "
+"determine which side is visible?"
+msgstr ""
+"صاشف هب ه ذشر'ف سثث فاث ذشوثقش هوشلث, خق هب ه ذشر'ف سثث وغ حاخفخ يخ "
+"يثفثقوهرث صاهذا سهيث هس دهسهزمث?"
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"You may be able to complete the image capture procedure without assistance, "
+"but it may take a couple of submission attempts to get the camera "
+"positioning right.  Optimal camera positioning varies with each computer, "
+"but generally the best position for a headshot is approximately 12-18 inches"
+" (30-45 centimeters) from the camera, with your head centered relative to "
+"the computer screen. "
+msgstr ""
+"غخع وشغ زث شزمث فخ ذخوحمثفث فاث هوشلث ذشحفعقث حقخذثيعقث صهفاخعف شسسهسفشرذث, "
+"زعف هف وشغ فشنث ش ذخعحمث خب سعزوهسسهخر شففثوحفس فخ لثف فاث ذشوثقش "
+"حخسهفهخرهرل قهلاف.  خحفهوشم ذشوثقش حخسهفهخرهرل دشقهثس صهفا ثشذا ذخوحعفثق, "
+"زعف لثرثقشممغ فاث زثسف حخسهفهخر بخق ش اثشيساخف هس شححقخطهوشفثمغ 12-18 هرذاثس"
+" (30-45 ذثرفهوثفثقس) بقخو فاث ذشوثقش, صهفا غخعق اثشي ذثرفثقثي قثمشفهدث فخ "
+"فاث ذخوحعفثق سذقثثر. "
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"If the photos you submit are rejected, try moving the computer or camera "
+"orientation to change the lighting angle.  The most common reason for "
+"rejection is inability to read the text on the ID card."
+msgstr ""
+"هب فاث حاخفخس غخع سعزوهف شقث قثتثذفثي, فقغ وخدهرل فاث ذخوحعفثق خق ذشوثقش "
+"خقهثرفشفهخر فخ ذاشرلث فاث مهلافهرل شرلمث.  فاث وخسف ذخووخر قثشسخر بخق "
+"قثتثذفهخر هس هرشزهمهفغ فخ قثشي فاث فثطف خر فاث هي ذشقي."
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"What if I have difficulty holding my head in position relative to the "
+"camera?"
+msgstr ""
+"صاشف هب ه اشدث يهببهذعمفغ اخميهرل وغ اثشي هر حخسهفهخر قثمشفهدث فخ فاث "
+"ذشوثقش?"
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+#, python-format
+msgid ""
+"If you require assistance with taking either photo for submission, contact "
+"%(platformName)s support for additional suggestions."
+msgstr ""
+"هب غخع قثضعهقث شسسهسفشرذث صهفا فشنهرل ثهفاثق حاخفخ بخق سعزوهسسهخر, ذخرفشذف "
+"%(platformName)s سعححخقف بخق شييهفهخرشم سعللثسفهخرس."
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
@@ -8644,13 +8703,35 @@ msgid "Make sure your ID is well-lit"
 msgstr "وشنث سعقث غخعق هي هس صثمم-مهف"
 
 #: lms/templates/verify_student/id_photo_step.underscore
-msgid "Once in position, use the camera button {icon} to capture your ID"
-msgstr "خرذث هر حخسهفهخر, عسث فاث ذشوثقش زعففخر {icon} فخ ذشحفعقث غخعق هي"
+msgid "Once in position, use the Take Photo button {icon} to capture your ID"
+msgstr "خرذث هر حخسهفهخر, عسث فاث فشنث حاخفخ زعففخر {icon} فخ ذشحفعقث غخعق هي"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Use the retake photo button if you are not pleased with your photo"
+msgid "Use the Retake Photo button if you are not pleased with your photo"
 msgstr "عسث فاث قثفشنث حاخفخ زعففخر هب غخع شقث رخف حمثشسثي صهفا غخعق حاخفخ"
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid ""
+"You may be able to complete the image capture procedure without assistance, "
+"but it may take a couple of submission attempts to get the camera "
+"positioning right.  Optimal camera positioning varies with each computer, "
+"but generally, the best position for a photo of an ID card is 8-12 inches "
+"(20-30 centimeters) from the camera, with the ID card centered relative to "
+"the camera. "
+msgstr ""
+"غخع وشغ زث شزمث فخ ذخوحمثفث فاث هوشلث ذشحفعقث حقخذثيعقث صهفاخعف شسسهسفشرذث, "
+"زعف هف وشغ فشنث ش ذخعحمث خب سعزوهسسهخر شففثوحفس فخ لثف فاث ذشوثقش "
+"حخسهفهخرهرل قهلاف.  خحفهوشم ذشوثقش حخسهفهخرهرل دشقهثس صهفا ثشذا ذخوحعفثق, "
+"زعف لثرثقشممغ, فاث زثسف حخسهفهخر بخق ش حاخفخ خب شر هي ذشقي هس 8-12 هرذاثس "
+"(20-30 ذثرفهوثفثقس) بقخو فاث ذشوثقش, صهفا فاث هي ذشقي ذثرفثقثي قثمشفهدث فخ "
+"فاث ذشوثقش. "
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid ""
+"What if I have difficulty holding my ID in position relative to the camera?"
+msgstr ""
+"صاشف هب ه اشدث يهببهذعمفغ اخميهرل وغ هي هر حخسهفهخر قثمشفهدث فخ فاث ذشوثقش?"
 
 #: lms/templates/verify_student/image_input.underscore
 msgid "Preview of uploaded image"
@@ -8677,8 +8758,10 @@ msgid "Be sure your entire face is inside the frame"
 msgstr "زث سعقث غخعق ثرفهقث بشذث هس هرسهيث فاث بقشوث"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Once in position, use the camera button {icon} to capture your photo"
-msgstr "خرذث هر حخسهفهخر, عسث فاث ذشوثقش زعففخر {icon} فخ ذشحفعقث غخعق حاخفخ"
+msgid ""
+"Once in position, use the Take Photo button {icon} to capture your photo"
+msgstr ""
+"خرذث هر حخسهفهخر, عسث فاث فشنث حاخفخ زعففخر {icon} فخ ذشحفعقث غخعق حاخفخ"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Can we match the photo you took with the one on your ID?"

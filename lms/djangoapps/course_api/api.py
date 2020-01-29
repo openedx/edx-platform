@@ -3,6 +3,7 @@ Course API
 """
 import logging
 
+from edx_django_utils.monitoring import function_trace
 from edx_when.api import get_dates_for_course
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User
@@ -64,11 +65,13 @@ def course_detail(request, username, course_key):
         `CourseOverview` object representing the requested course
     """
     user = get_effective_user(request.user, username)
-    return get_course_overview_with_access(
+    overview = get_course_overview_with_access(
         user,
         get_permission_for_course_about(),
         course_key,
     )
+    overview.effective_user = user
+    return overview
 
 
 def _filter_by_role(course_queryset, user, roles):
@@ -118,6 +121,7 @@ def _filter_by_search(course_queryset, search_term):
     )
 
 
+@function_trace('list_courses')
 def list_courses(request, username, org=None, roles=None, filter_=None, search_term=None):
     """
     Yield all available courses.

@@ -52,7 +52,6 @@ django-mysql
 django-oauth-toolkit                # Provides oAuth2 capabilities for Django
 django-pipeline
 django-pyfs
-django-ratelimit
 django-ratelimit-backend
 django-require
 django-sekizai

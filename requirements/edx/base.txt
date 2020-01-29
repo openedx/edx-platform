@@ -7,6 +7,7 @@
 -e git+https://github.com/edx/acid-block.git@98aecba94ecbfa934e2d00262741c0ea9f557fc9#egg=acid-xblock
 -e common/lib/capa
 -e git+https://github.com/edx/codejail.git@4127fc4bd5775cc72aee8d7f0a70e31405e22439#egg=codejail
+-e git+https://github.com/jsocol/django-ratelimit.git@72edbe8949fbf6699848e5847645a1998f121d46#egg=ratelimit
 -e git+https://github.com/edx/django-wiki.git@v0.0.25#egg=django-wiki
 -e git+https://github.com/edx/DoneXBlock.git@2.0.1#egg=done-xblock
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
@@ -25,7 +26,6 @@ analytics-python==1.2.9
 aniso8601==8.0.0          # via edx-tincan-py35
 anyjson==0.3.3            # via kombu
 appdirs==1.4.3            # via fs
-argh==0.26.2
 attrs==19.3.0
 babel==2.8.0
 beautifulsoup4==4.8.2     # via pynliner
@@ -76,12 +76,11 @@ django-object-actions==2.0.0  # via edx-enterprise
 django-pipeline==1.7.0
 django-pyfs==2.1
 django-ratelimit-backend==2.0
-django-ratelimit==2.0.0
 django-require==1.0.11
 django-sekizai==1.1.0
 django-ses==0.8.14
 django-simple-history==2.8.0
-django-splash==0.2.5
+django-splash==0.2.6
 django-statici18n==1.9.0
 django-storages==1.8
 django-user-tasks==0.3.0
@@ -107,7 +106,7 @@ edx-django-release-util==0.3.5
 edx-django-sites-extensions==2.4.3
 edx-django-utils==2.0.3
 edx-drf-extensions==2.4.5
-edx-enterprise==2.1.2
+edx-enterprise==2.1.6
 edx-i18n-tools==0.5.0
 edx-milestones==0.2.6
 edx-oauth2-provider==1.3.1
@@ -116,14 +115,14 @@ edx-organizations==2.2.0
 edx-proctoring-proctortrack==1.0.5
 edx-proctoring==2.2.4
 edx-rbac==1.0.5           # via edx-enterprise
-edx-rest-api-client==1.9.2
+edx-rest-api-client==3.0.2
 edx-search==1.2.2
 edx-sga==0.10.0
 edx-submissions==3.0.3
 edx-tincan-py35==0.0.5    # via edx-enterprise
 edx-user-state-client==1.1.2
 edx-when==0.5.2
-edxval==1.2.2
+edxval==1.2.3
 elasticsearch==1.9.0      # via edx-search
 enum34==1.1.6             # via edxval
 event-tracking==0.3.0
@@ -135,14 +134,14 @@ glob2==0.7
 gunicorn==20.0.4
 help-tokens==1.0.5
 html5lib==1.0.1
-httplib2==0.16.0
+httplib2==0.17.0
 idna==2.8
 importlib-metadata==1.4.0
 inflection==0.3.1         # via drf-yasg
 ipaddress==1.0.23
 isodate==0.6.0            # via python3-saml
 itypes==1.1.0             # via coreapi
-jinja2==2.10.3            # via code-annotations, coreschema
+jinja2==2.11.0            # via code-annotations, coreschema
 jmespath==0.9.4           # via boto3, botocore
 jsondiff==1.2.0           # via edx-enterprise
 jsonfield==2.0.2
@@ -173,13 +172,13 @@ numpy==1.18.1             # via scipy
 git+https://github.com/joestump/python-oauth2.git@b94f69b1ad195513547924e380d9265133e995fa#egg=oauth2
 oauthlib==2.1.0
 git+https://github.com/edx/edx-ora2.git@2.6.0#egg=ora2==2.6.0
-packaging==20.0           # via drf-yasg
+packaging==20.1           # via drf-yasg
 path.py==12.4.0           # via edx-enterprise, edx-i18n-tools
 path==13.1.0
 pathtools==0.1.2
 paver==1.3.4
 pbr==5.4.4
-pdfminer.six==20200121
+pdfminer.six==20200124
 piexif==1.1.3
 pillow==7.0.0
 pkgconfig==1.5.1          # via xmlsec
@@ -243,7 +242,7 @@ uritemplate==3.0.1        # via coreapi, drf-yasg
 urllib3==1.25.8
 user-util==0.1.5
 voluptuous==0.11.7
-watchdog==0.9.0
+watchdog==0.10.0
 web-fragments==0.3.1
 webencodings==0.5.1       # via bleach, html5lib
 webob==1.8.6              # via xblock

@@ -4,6 +4,8 @@ Course API Views
 
 
 from django.core.exceptions import ValidationError
+from edx_django_utils.monitoring import set_custom_metric
+
 from edx_rest_framework_extensions.paginators import NamespacedPageNumberPagination
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.throttling import UserRateThrottle
@@ -244,6 +246,8 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
         form = CourseListGetForm(self.request.query_params, initial={'requesting_user': self.request.user})
         if not form.is_valid():
             raise ValidationError(form.errors)
+
+        set_custom_metric('query_param_roles', form.cleaned_data['role'])
 
         return list_courses(
             self.request,

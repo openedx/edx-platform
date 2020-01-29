@@ -1827,6 +1827,9 @@ CREATE TABLE `course_overviews_courseoverviewtab` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `tab_id` varchar(50) NOT NULL,
   `course_overview_id` varchar(255) NOT NULL,
+  `course_staff_only` tinyint(1) NOT NULL,
+  `name` longtext,
+  `type` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `course_overviews_cou_course_overview_id_71fa6321_fk_course_ov` (`course_overview_id`),
   CONSTRAINT `course_overviews_cou_course_overview_id_71fa6321_fk_course_ov` FOREIGN KEY (`course_overview_id`) REFERENCES `course_overviews_courseoverview` (`id`)
@@ -2549,7 +2552,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=644 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=649 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2834,7 +2837,6 @@ CREATE TABLE `edxval_thirdpartytranscriptcredentialsstate` (
   `modified` datetime(6) NOT NULL,
   `org` varchar(32) NOT NULL,
   `provider` varchar(20) NOT NULL,
-  `exists` tinyint(1) DEFAULT NULL,
   `has_creds` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `edxval_thirdpartytranscr_org_provider_188f7ddf_uniq` (`org`,`provider`)
@@ -3225,8 +3227,10 @@ CREATE TABLE `enterprise_enterprisecustomeruser` (
   `user_id` int(10) unsigned NOT NULL,
   `enterprise_customer_id` char(32) NOT NULL,
   `active` tinyint(1) NOT NULL,
+  `linked` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `enterprise_enterprisecus_enterprise_customer_id_u_ffddc29f_uniq` (`enterprise_customer_id`,`user_id`),
+  KEY `enterprise_enterprisecustomeruser_user_id_aa8d772f` (`user_id`),
   CONSTRAINT `enterprise_enterpris_enterprise_customer__f0fea924_fk_enterpris` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -4960,6 +4964,7 @@ CREATE TABLE `sap_success_factors_sapsuccessfactorsenterprisecustomerconfidb8a` 
   `show_course_price` tinyint(1) NOT NULL,
   `channel_worker_username` varchar(255) DEFAULT NULL,
   `catalogs_to_transmit` longtext,
+  `show_total_hours` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `enterprise_customer_id` (`enterprise_customer_id`),
   CONSTRAINT `sap_success_factors__enterprise_customer__4819a28c_fk_enterpris` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
