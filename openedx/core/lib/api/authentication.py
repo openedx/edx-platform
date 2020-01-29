@@ -33,7 +33,6 @@ class OAuth2AuthenticationDeprecated(OAuth2Authentication):
         fails or None if the user did not try to authenticate using an access
         token.
         """
-        pdb.set_trace()
         set_custom_metric("OAuth2AuthenticationCalled", True)
         output = super(OAuth2AuthenticationDeprecated, self).authenticate(request)
         set_custom_metric("OAuth2AuthenticationSuccess", True)
