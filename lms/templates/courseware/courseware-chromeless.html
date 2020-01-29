@@ -121,20 +121,24 @@ ${HTML(fragment.foot_html())}
         var contentElement = document.getElementById('content');
 
         function dispatchResizeMessage() {
-          if (contentElement.offsetHeight === lastHeight && contentElement.offsetWidth === lastWidth) {
+          var newHeight = contentElement.offsetHeight;
+          var newWidth = contentElement.offsetWidth;
+
+          if (newWidth === lastWidth && newHeight === lastHeight) {
             return;
           }
 
           window.parent.postMessage({
               type: 'plugin.resize',
               payload: {
-                width: contentElement.offsetWidth,
-                height: contentElement.offsetHeight,
+                width: newWidth,
+                height: newHeight,
               }
             }, document.referrer
           );
-          lastHeight = contentElement.offsetHeight;
-          lastWidth = contentElement.offsetWidth;
+
+          lastHeight = newHeight;
+          lastWidth = newWidth;
         }
 
         // Create an observer instance linked to the callback function
