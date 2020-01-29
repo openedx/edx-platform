@@ -107,9 +107,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         def has_instructor_tab(user, course):
             """Returns true if the "Instructor" tab is shown."""
-            request = RequestFactory().request()
-            request.user = user
-            tabs = get_course_tab_list(request, course)
+            tabs = get_course_tab_list(user, course)
             return len([tab for tab in tabs if tab.name == 'Instructor']) == 1
 
         self.assertTrue(has_instructor_tab(self.instructor, self.course))
