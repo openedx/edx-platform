@@ -274,7 +274,7 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
     @mock.patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
     def test_certificate_visibility_with_no_cert_config(self):
         """
-        Verify that certificates are not displayed until there is no active
+        Verify that certificates are not displayed until there is an active
         certificate configuration.
         """
         # Add new certificate
