@@ -39,6 +39,7 @@ def is_account_activation_requirement_disabled():
 
 class EcommerceService(object):
     """ Helper class for ecommerce service integration. """
+
     def __init__(self):
         self.config = CommerceConfiguration.current()
 
@@ -312,7 +313,8 @@ def _process_refund(refund_ids, api_client, mode, user, always_notify=False):
                 # the "Refund Failure" emails from ecommerce and thus no need to send that notification
                 # from here.
                 if settings.FEATURES.get('DISABLE_REFUND_FAILURE_NOTIFICATION'):
-                    log.info('Skipping refund failure support notification')
+                    log.info('Skipping support notification for refund failure from edx-platform.'
+                             'The email will be sent from the ecommerce service')
                     return True
                 return _send_refund_notification(user, refunds_requiring_approval)
             except:  # pylint: disable=bare-except
