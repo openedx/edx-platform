@@ -109,7 +109,7 @@ def get_user_course_expiration_date(user, course):
         # Content availability date is equivalent to max(enrollment date, course start date)
         # for most people. Using the schedule date will provide flexibility to deal with
         # more complex business rules in the future.
-        content_availability_date = enrollment.schedule.start
+        content_availability_date = enrollment.schedule.start_date
         # We have anecdotally observed a case where the schedule.start was
         # equal to the course start, but should have been equal to the enrollment start
         # https://openedx.atlassian.net/browse/PROD-58
