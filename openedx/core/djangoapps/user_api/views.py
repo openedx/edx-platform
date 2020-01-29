@@ -37,6 +37,9 @@ from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from student.helpers import AccountValidationError
 from util.json_request import JsonResponse
 
+# PhilU imports
+from openedx.features.student_account.helpers import save_user_utm_info
+
 
 class LoginSessionView(APIView):
     """HTTP end-points for logging in users. """
@@ -171,6 +174,7 @@ class RegistrationView(APIView):
 
         response = JsonResponse({"success": True})
         set_logged_in_cookies(request, response, user)
+        save_user_utm_info(request, user)
         return response
 
     @method_decorator(transaction.non_atomic_requests)

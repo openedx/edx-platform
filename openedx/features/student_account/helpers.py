@@ -1,14 +1,23 @@
-from datetime import datetime
+import logging
 
-from lms.djangoapps.philu_overrides.constants import ACTIVATION_ALERT_TYPE
+from datetime import datetime
 from pytz import utc
+
+from django.db.models.signals import post_save
 
 from constants import NON_ACTIVE_COURSE_NOTIFICATION
 from student.models import CourseEnrollment
 from courseware.models import StudentModule
+
 from openedx.features.course_card.helpers import get_course_open_date
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.timed_notification.core import get_course_first_chapter_link
+
+from lms.djangoapps.onboarding.models import EmailPreference, Organization, UserExtendedProfile
+from lms.djangoapps.philu_overrides.constants import ACTIVATION_ALERT_TYPE
+
+
+log = logging.getLogger("edx.student")
 
 
 def get_non_active_course(user):
@@ -46,3 +55,78 @@ def get_non_active_course(user):
         non_active_course_info.append({"type": ACTIVATION_ALERT_TYPE,
                                        "alert": error})
     return non_active_course_info
+
+
+def save_user_utm_info(req, user):
+    """
+    :param req:
+        request to get all utm related params
+    :param user:
+        user for which utm params are being saved
+    :return:
+    """
+    def extract_param_value(request, param_name):
+        utm_value = request.POST.get(param_name, None)
+
+        if not utm_value and param_name in request.session:
+            utm_value = request.session[param_name]
+            del request.session[param_name]
+
+        return utm_value
+
+    try:
+        utm_source = extract_param_value(req, "utm_source")
+        utm_medium = extract_param_value(req, "utm_medium")
+        utm_campaign = extract_param_value(req, "utm_campaign")
+        utm_content = extract_param_value(req, "utm_content")
+        utm_term = extract_param_value(req, "utm_term")
+
+        from openedx.features.user_leads.models import UserLeads
+        UserLeads.objects.create(
+            utm_source=utm_source,
+            utm_medium=utm_medium,
+            utm_campaign=utm_campaign,
+            utm_content=utm_content,
+            utm_term=utm_term,
+            user=user
+        )
+    except Exception as ex:
+        log.error("There is some error saving UTM {}".format(str(ex)))
+        pass
+
+
+def affiliate_user_with_organization(user, form):
+    org_name = form.cleaned_data.get("org_name")
+    org_type = form.cleaned_data.get('org_type')
+    user_extended_profile_data = {}
+
+    if org_name:
+        user_organization, org_created = Organization.objects.get_or_create(label=org_name)
+        org_size = form.cleaned_data.get('org_size')
+        if org_created:
+            user_organization.total_employees = org_size
+            user_organization.org_type = org_type
+            user_organization.save()
+            user_extended_profile_data = {
+                'is_first_learner': True,
+                "organization_id": user_organization.id
+            }
+        else:
+            if org_size:
+                user_organization.total_employees = org_size
+
+            if org_type:
+                user_organization.org_type = org_type
+
+            user_organization.save()
+
+            user_extended_profile_data = {
+                "organization_id": user_organization.id
+            }
+
+    # create User Extended Profile
+    user_extended_profile = UserExtendedProfile.objects.create(user=user, **user_extended_profile_data)
+    post_save.send(UserExtendedProfile, instance=user_extended_profile, created=False)
+
+    # create user email preferences object
+    EmailPreference.objects.create(user=user, opt_in=form.cleaned_data.get('opt_in'))
