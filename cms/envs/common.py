@@ -1733,8 +1733,6 @@ RETIRED_EMAIL_FMT = lambda settings: settings.RETIRED_EMAIL_PREFIX + '{}@' + set
 derived('RETIRED_USERNAME_FMT', 'RETIRED_EMAIL_FMT')
 RETIRED_USER_SALTS = ['abc', '123']
 RETIREMENT_SERVICE_WORKER_USERNAME = 'RETIREMENT_SERVICE_USER'
-RETIREMENT_SERVICE_USER_EMAIL = "retirement_worker@example.com"
-RETIREMENT_SERVICE_USER_NAME = "retirement_worker"
 
 # These states are the default, but are designed to be overridden in configuration.
 RETIREMENT_STATES = [
