@@ -12,6 +12,7 @@ from openedx.features.ucsd_features.utils import send_notification_email_to_supp
 
 log = logging.getLogger(__name__)
 
+
 def create_zendesk_ticket(requester_name, requester_email, subject, body, custom_fields=None, uploads=None, tags=None):
     """
     Create a Zendesk ticket via API or send an email to support team.

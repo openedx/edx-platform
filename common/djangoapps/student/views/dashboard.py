@@ -807,7 +807,7 @@ def student_dashboard(request):
     valid_verification_statuses = ['approved', 'must_reverify', 'pending', 'expired']
     display_sidebar_on_dashboard = (len(order_history_list) or
                                     (verification_status['status'] in valid_verification_statuses and
-                                    verification_status['should_display']))
+                                     verification_status['should_display']))
 
     # Filter out any course enrollment course cards that are associated with fulfilled entitlements
     for entitlement in [e for e in course_entitlements if e.enrollment_course_run is not None]:
@@ -871,13 +871,12 @@ def student_dashboard(request):
     # course_id for which AuthorizeNet transaction has been perfromed but notification is yet to be received.
     transaction_hash = request.COOKIES.get(ECOMMERCE_TRANSACTION_COOKIE_NAME)
     if transaction_hash:
-        decoded_course_id =  base64.b64decode(transaction_hash)
+        decoded_course_id = base64.b64decode(transaction_hash)
         transaction_course_id = CourseKey.from_string(decoded_course_id)
         pending_transaction_course_name = CourseOverview.get_from_id(transaction_course_id).display_name
         context.update({
             'pending_upgrade_course_name': pending_transaction_course_name,
         })
-
 
     if ecommerce_service.is_enabled(request.user):
         context.update({
