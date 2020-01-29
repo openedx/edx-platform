@@ -120,6 +120,15 @@ class CertificatesDetailView(GenericAPIView):
                 status=404,
                 data={'error_code': 'no_certificate_for_user'}
             )
+
+        course_overview = CourseOverview.get_from_id(course_id)
+        # return 404 if it's not a PDF certificates and there is no active certificate configuration.
+        if not user_cert['is_pdf_certificate'] and not course_overview.has_any_active_web_certificate:
+            return Response(
+                status=404,
+                data={'error_code': 'no_certificate_configuration_for_course'}
+            )
+
         return Response(
             {
                 "username": user_cert.get('username'),
@@ -265,9 +274,12 @@ class CertificatesListView(GenericAPIView):
         ).items():
             if certificates_viewable_for_course(course_overview):
                 course_certificate = passing_certificates[course_key]
-                course_certificate['course_display_name'] = course_overview.display_name_with_default
-                course_certificate['course_organization'] = course_overview.display_org_with_default
-                viewable_certificates.append(course_certificate)
+                # add certificate into viewable certificate list only if it's a PDF certificate
+                # or there is an active certificate configuration.
+                if course_certificate['is_pdf_certificate'] or course_overview.has_any_active_web_certificate:
+                    course_certificate['course_display_name'] = course_overview.display_name_with_default
+                    course_certificate['course_organization'] = course_overview.display_org_with_default
+                    viewable_certificates.append(course_certificate)
 
         viewable_certificates.sort(key=lambda certificate: certificate['created'])
         return viewable_certificates
