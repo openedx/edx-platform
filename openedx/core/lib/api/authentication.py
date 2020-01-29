@@ -9,7 +9,6 @@ from provider.oauth2 import models as dop_models
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_oauth.authentication import OAuth2Authentication
 from edx_django_utils.monitoring import set_custom_metric
-import pdb
 
 
 OAUTH2_TOKEN_ERROR = u'token_error'
@@ -27,16 +26,16 @@ class OAuth2AuthenticationDeprecated(OAuth2Authentication):
     This child class was added to add new_relic metrics to OAuth2Authentication. This should be very temporary.
     """
 
-    def authenticate(self, *args, **kwargs):
+    def authenticate(self, request):
         """
         Returns two-tuple of (user, token) if access token authentication
         succeeds, raises an AuthenticationFailed (HTTP 401) if authentication
         fails or None if the user did not try to authenticate using an access
         token.
         """
-
+        pdb.set_trace()
         set_custom_metric("OAuth2AuthenticationCalled", True)
-        output = super(OAuth2AuthenticationDeprecated, self).authenticate(*args, **kwargs)
+        output = super(OAuth2AuthenticationDeprecated, self).authenticate(request)
         set_custom_metric("OAuth2AuthenticationSuccess", True)
         return output
 
@@ -54,7 +53,7 @@ class OAuth2AuthenticationAllowInactiveUser(OAuth2AuthenticationDeprecated):
     for mobile endpoints.
     """
 
-    def authenticate(self, *args, **kwargs):
+    def authenticate(self, request):
         """
         Returns two-tuple of (user, token) if access token authentication
         succeeds, raises an AuthenticationFailed (HTTP 401) if authentication
@@ -63,7 +62,7 @@ class OAuth2AuthenticationAllowInactiveUser(OAuth2AuthenticationDeprecated):
         """
 
         try:
-            return super(OAuth2AuthenticationAllowInactiveUser, self).authenticate(*args, **kwargs)
+            return super(OAuth2AuthenticationAllowInactiveUser, self).authenticate(request)
         except AuthenticationFailed as exc:
             if isinstance(exc.detail, dict):
                 developer_message = exc.detail['developer_message']
