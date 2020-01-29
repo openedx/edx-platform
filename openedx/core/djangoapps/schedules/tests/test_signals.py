@@ -155,7 +155,7 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
         mock_get_current_site.return_value = site
         course = _create_course_run(self_paced=True, start_day_offset=5)  # course starts in future
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
-        assert _strip_secs(enrollment.schedule.start) == _strip_secs(course.start)
+        assert _strip_secs(enrollment.schedule.start_date) == _strip_secs(course.start)
 
     @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def test_course_already_started(self, mock_get_current_site):
@@ -167,7 +167,7 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
         mock_get_current_site.return_value = site
         course = _create_course_run(self_paced=True, start_day_offset=-5)  # course already started
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
-        assert _strip_secs(enrollment.schedule.start) == _strip_secs(enrollment.created)
+        assert _strip_secs(enrollment.schedule.start_date) == _strip_secs(enrollment.created)
 
 
 @ddt.ddt
