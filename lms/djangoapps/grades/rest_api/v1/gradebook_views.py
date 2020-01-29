@@ -496,7 +496,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             kwargs=dict(course_id=text_type(course.id), student_id=user.id)
         )
         user_entry['user_id'] = user.id
-        user_entry['full_name'] = user.get_full_name()
+        user_entry['full_name'] = user.profile.name
 
         external_user_key = self._get_external_user_key(user, course.id)
         if external_user_key:
