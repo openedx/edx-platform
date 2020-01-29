@@ -106,3 +106,50 @@ ${HTML(fragment.foot_html())}
       % endif
     </nav>
 % endif
+
+<script type="text/javascript">
+  (function() {
+    // If this view is rendered in an iframe within the learning microfrontend app
+    // it will report the height of its contents to the parent window when the
+    // document loads, window resizes, or DOM mutates.
+    if (window !== window.parent) {
+      var learningAppReferrer = "${settings.LEARNING_MICROFRONTEND_URL | n, js_escaped_string}";
+      if (document.referrer === learningAppReferrer) {
+
+        var lastHeight = window.offsetHeight;
+        var lastWidth = window.offsetWidth;
+        var contentElement = document.getElementById('content');
+
+        function dispatchResizeMessage() {
+          var newHeight = contentElement.offsetHeight;
+          var newWidth = contentElement.offsetWidth;
+
+          if (newWidth === lastWidth && newHeight === lastHeight) {
+            return;
+          }
+
+          window.parent.postMessage({
+              type: 'plugin.resize',
+              payload: {
+                width: newWidth,
+                height: newHeight,
+              }
+            }, document.referrer
+          );
+
+          lastHeight = newHeight;
+          lastWidth = newWidth;
+        }
+
+        // Create an observer instance linked to the callback function
+        const observer = new MutationObserver(dispatchResizeMessage);
+
+        // Start observing the target node for configured mutations
+        observer.observe(document.body, { attributes: true, childList: true, subtree: true });
+
+        window.addEventListener('load', dispatchResizeMessage);
+        window.addEventListener('resize', dispatchResizeMessage);
+      }
+    }
+  }());
+</script>
