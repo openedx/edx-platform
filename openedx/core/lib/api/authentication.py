@@ -29,13 +29,16 @@ class OAuth2AuthenticationDeprecated(OAuth2Authentication):
     def authenticate(self, request):
         """
         Returns two-tuple of (user, token) if access token authentication
-        succeeds, raises an AuthenticationFailed (HTTP 401) if authentication
-        fails or None if the user did not try to authenticate using an access
-        token.
+        succeeds, None if the user did not try to authenticate using an access
+        token, or raises an AuthenticationFailed (HTTP 401) if authentication
+        fails.
         """
-        set_custom_metric("OAuth2AuthenticationCalled", True)
+        set_custom_metric("OAuth2AuthenticationDeprecated", "Failed")
         output = super(OAuth2AuthenticationDeprecated, self).authenticate(request)
-        set_custom_metric("OAuth2AuthenticationSuccess", True)
+        if output is None:
+            set_custom_metric("OAuth2AuthenticationDeprecated", "None")
+        else:
+            set_custom_metric("OAuth2AuthenticationDeprecated", "Success")
         return output
 
 
