@@ -74,25 +74,6 @@ def course_detail(request, username, course_key):
     return overview
 
 
-def _filter_by_role(course_queryset, user, roles):
-    """
-    Filters a course queryset by the roles for which the user has access.
-    """
-    # Global staff have access to all courses. Filter course roles for non-global staff only.
-    if not user.is_staff:
-        if roles:
-            for role in roles:
-                # Filter the courses again to return only the courses for which the user has each specified role.
-                course_queryset = LazySequence(
-                    (
-                        course for course in course_queryset
-                        if has_access(user, role, course.id)
-                    ),
-                    est_len=len(course_queryset)
-                )
-    return course_queryset
-
-
 def _filter_by_search(course_queryset, search_term):
     """
     Filters a course queryset by the specified search term.
@@ -121,8 +102,7 @@ def _filter_by_search(course_queryset, search_term):
     )
 
 
-@function_trace('list_courses')
-def list_courses(request, username, org=None, roles=None, filter_=None, search_term=None):
+def list_courses(request, username, org=None, filter_=None, search_term=None):
     """
     Yield all available courses.
 
@@ -143,10 +123,6 @@ def list_courses(request, username, org=None, roles=None, filter_=None, search_t
             If specified, visible `CourseOverview` objects are filtered
             such that only those belonging to the organization with the provided
             org code (e.g., "HarvardX") are returned. Case-insensitive.
-        roles (list of strings):
-            If specified, visible `CourseOverview` objects are filtered
-            such that only those for which the user has the specified role(s)
-            are returned. Multiple role parameters can be specified.
         filter_ (dict):
             If specified, visible `CourseOverview` objects are filtered
             by the given key-value pairs.
@@ -158,7 +134,6 @@ def list_courses(request, username, org=None, roles=None, filter_=None, search_t
     """
     user = get_effective_user(request.user, username)
     course_qs = get_courses(user, org=org, filter_=filter_)
-    course_qs = _filter_by_role(course_qs, user, roles)
     course_qs = _filter_by_search(course_qs, search_term)
     return course_qs
 

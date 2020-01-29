@@ -191,12 +191,6 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
             provided org code (e.g., "HarvardX") are returned.
             Case-insensitive.
 
-        role (optional):
-            If specified, visible `CourseOverview` objects are filtered
-            such that only those for which the user has the specified role
-            are returned. Multiple role parameters can be specified.
-            Case-insensitive.
-
     **Returns**
 
         * 200 on success, with a list of course discovery objects as returned
@@ -247,13 +241,10 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
         if not form.is_valid():
             raise ValidationError(form.errors)
 
-        set_custom_metric('query_param_roles', form.cleaned_data['role'])
-
         return list_courses(
             self.request,
             form.cleaned_data['username'],
             org=form.cleaned_data['org'],
-            roles=form.cleaned_data['role'],
             filter_=form.cleaned_data['filter_'],
             search_term=form.cleaned_data['search_term']
         )
