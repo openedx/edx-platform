@@ -372,6 +372,7 @@ class LocalizedJSONEncoder(DjangoJSONEncoder):
     JSON handler that evaluates ugettext_lazy promises.
     """
     # pylint: disable=method-hidden
+
     def default(self, obj):
         """
         Forces evaluation of ugettext_lazy promises.
@@ -515,7 +516,6 @@ def shim_student_view(view_func, check_logged_in=False):
         # in a JSON-serialized dictionary.
         else:
             response.content = msg
-
 
         # Return the response, preserving the original headers.
         # This is really important, since the student views set cookies
