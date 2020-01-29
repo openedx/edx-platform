@@ -197,6 +197,8 @@ def create_account_with_params(request, params):
     # Announce registration
     REGISTER_USER.send(sender=None, user=user, registration=registration)
 
+    # PhilU is not using this feature, so this has been commented
+    # out to avoid useless a call, that results in an error.
     # create_comments_service_user(user)
 
     try:

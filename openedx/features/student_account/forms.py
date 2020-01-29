@@ -11,7 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from lms.djangoapps.onboarding.models import Organization, OrgSector, TotalEmployee
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
-from student.forms import contains_html, UsernameField
+from student.forms import contains_html, UsernameField, validate_name
 from student.models import CourseEnrollmentAllowed, email_exists_or_retired
 from util.password_policy_validators import validate_password
 
@@ -24,18 +24,7 @@ class AccountCreationFormCustom(forms.Form):
 
     _EMAIL_INVALID_MSG = _("A properly formatted e-mail is required")
     _NAME_TOO_SHORT_MSG = _("Your full name must be a minimum of two characters long")
-    _FIRST_NAME_TOO_SHORT_MSG = _("Your first name must be a minimum of one characters long")
-    _LAST_NAME_TOO_SHORT_MSG = _("Your last name must be a minimum of one characters long")
     _OPT_IN_REQUIRED_MSG = _("Email opt in is a required field, and can only be set to true or false")
-
-    def validate_name(name):
-        """
-        Verifies a Full_Name is valid, raises a ValidationError otherwise.
-        Args:
-            name (unicode): The name to validate.
-        """
-        if contains_html(name):
-            raise forms.ValidationError(_('Name field cannot contain the following characters: < >'))
 
     # TODO: Resolve repetition
 
@@ -52,24 +41,6 @@ class AccountCreationFormCustom(forms.Form):
     )
 
     password = forms.CharField()
-
-    first_name = forms.CharField(
-        min_length=1,
-        error_messages={
-            "required": _FIRST_NAME_TOO_SHORT_MSG,
-            "min_length": _FIRST_NAME_TOO_SHORT_MSG,
-        },
-        validators=[validate_name]
-    )
-
-    last_name = forms.CharField(
-        min_length=1,
-        error_messages={
-            "required": _LAST_NAME_TOO_SHORT_MSG,
-            "min_length": _LAST_NAME_TOO_SHORT_MSG,
-        },
-        validators=[validate_name]
-    )
 
     name = forms.CharField(
         min_length=accounts_settings.NAME_MIN_LENGTH,
