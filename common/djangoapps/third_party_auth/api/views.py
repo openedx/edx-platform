@@ -16,9 +16,9 @@ from rest_framework import exceptions, permissions, status, throttling
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from openedx.core.lib.api.authentication import OAuth2AuthenticationDeprecated, OAuth2AuthenticationAllowInactiveUser
 from social_django.models import UserSocialAuth
 
+from openedx.core.lib.api.authentication import OAuth2AuthenticationDeprecated, OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from third_party_auth import pipeline
 from third_party_auth.api import serializers
