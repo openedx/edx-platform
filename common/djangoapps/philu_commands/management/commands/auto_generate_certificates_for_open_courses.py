@@ -3,26 +3,55 @@ Django management command to auto generate certificates for all users
 enrolled in currently running courses with early_no_info or early_with_info set
 in the certificate_display_behavior setting in course advanced settings
 """
-import json
-from logging import getLogger
 
-from django.core.management.base import BaseCommand
+from datetime import datetime
+from logging import getLogger
+from pytz import UTC
 
 from courseware.views.views import _get_cert_data
-from lms.djangoapps.certificates.models import CertificateStatuses
-from lms.djangoapps.certificates.api import generate_user_certificates
+from django.apps import apps
+from django.core.management.base import BaseCommand
+from opaque_keys.edx.keys import UsageKey
+
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
+from lms.djangoapps.certificates.api import generate_user_certificates
+from lms.djangoapps.certificates.models import CertificateStatuses
+
 log = getLogger(__name__)
 
-CERT_GENERATION_RESPONSE_MESSAGE = 'Certificate generation {} for user with ' \
+CERT_GENERATION_RESPONSE_MESSAGE = 'Generating certificate for user with ' \
                                    'username: {} and user_id: {} with ' \
                                    'generation status: {}'
+
+StudentModule = apps.get_model('courseware', 'StudentModule')
+GeneratedCertificate = apps.get_model('certificates', 'GeneratedCertificate')
 
 
 def is_course_valid_for_certificate_auto_generation(course):
     return bool(course.has_started() and not course.has_ended() and course.may_certify())
+
+
+def _is_eligible_for_certificate(user_course_enrollment,
+                                course_chapters, user):
+    """
+    This is checking if the user enrollment if eligible for the certificate generation.
+    :param user_course_enrollment:
+    :param course_chapters:
+    :param user:
+    :return:
+        bool: True if the current enrollment is eligible for the certificate generation.
+    """
+    COURSE_STRUCTURE_INDEX = 0
+    ESTIMATED_MODULE_COMPLETION_DAYS = 7
+    today = datetime.now(UTC)
+    delta_days = (today.date() - user_course_enrollment.created.date()).days
+    total_modules = len(course_chapters[COURSE_STRUCTURE_INDEX].children)
+    last_module_id = str(course_chapters[COURSE_STRUCTURE_INDEX].children[-1])
+    usage_key = UsageKey.from_string(last_module_id)
+    is_lastmodule_visitied = StudentModule.objects.filter(student=user, module_state_key=usage_key).exists()
+    return ((total_modules - 1) * ESTIMATED_MODULE_COMPLETION_DAYS) >= delta_days and not is_lastmodule_visitied
 
 
 class Command(BaseCommand):
@@ -41,20 +70,18 @@ class Command(BaseCommand):
             if not is_course_valid_for_certificate_auto_generation(course):
                 continue
 
-            for user_course_enrollment in CourseEnrollment.objects.filter(course=course.id, is_active=True).all():
+            for user_course_enrollment in CourseEnrollment.objects.filter(course_id=course.id, is_active=True).all():
                 user = user_course_enrollment.user
                 cert_data = _get_cert_data(user, course, user_course_enrollment.mode)
-
                 if not cert_data or cert_data.cert_status != CertificateStatuses.requesting:
                     continue
+                course_chapters = modulestore().get_items(
+                    course.id,
+                    qualifiers={'category': 'course'}
+                )
 
-                status = generate_user_certificates(user, course.id, course=course)
+                if _is_eligible_for_certificate(user_course_enrollment, course_chapters, user):
+                    continue
 
-                if status:
-                    log.info(CERT_GENERATION_RESPONSE_MESSAGE.format(
-                        'passed', user.username, user.id, status))
-                    # TODO: Send mail to user. Remove when story LP-1674 is completed
-
-                else:
-                    log.error(CERT_GENERATION_RESPONSE_MESSAGE.format(
-                        'failed', user.username, user.id, status))
+                status = generate_user_certificates(user, course.id, course=course, send_email=True)
+                log.info(CERT_GENERATION_RESPONSE_MESSAGE.format(user.username, user.id, status))
