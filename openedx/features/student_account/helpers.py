@@ -95,7 +95,7 @@ def save_user_utm_info(req, user):
         pass
 
 
-def affiliate_user_with_organization(user, form):
+def set_opt_in_and_affiliate_user_organization(user, form):
     org_name = form.cleaned_data.get("org_name")
     org_type = form.cleaned_data.get('org_type')
     user_extended_profile_data = {}
@@ -126,6 +126,7 @@ def affiliate_user_with_organization(user, form):
 
     # create User Extended Profile
     user_extended_profile = UserExtendedProfile.objects.create(user=user, **user_extended_profile_data)
+    # This is to sync user organization information on NodeBB
     post_save.send(UserExtendedProfile, instance=user_extended_profile, created=False)
 
     # create user email preferences object
