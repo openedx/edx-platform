@@ -20,13 +20,12 @@ from django.test.utils import override_settings
 from django.utils.http import urlencode
 from django.utils.timezone import now
 from oauth2_provider import models as dot_models
-# from oauth2_provider.contrib.rest_framework.permissions import TokenHasReadWriteScope
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.test import APIClient, APIRequestFactory
 from rest_framework.views import APIView
-from rest_framework_oauth.permissions import TokenHasReadWriteScope
-import provider as oauth2_provider
+from rest_framework_oauth import permissions
+from rest_framework_oauth.compat import oauth2_provider, oauth2_provider_scope
 
 from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.lib.api import authentication
@@ -66,7 +65,7 @@ urlpatterns = [
         r'^oauth2-with-scope-test/$',
         MockView.as_view(
             authentication_classes=[authentication.OAuth2AuthenticationAllowInactiveUser],
-            permission_classes=[TokenHasReadWriteScope]
+            permission_classes=[permissions.TokenHasReadWriteScope]
         )
     ),
 ]
@@ -299,7 +298,7 @@ class OAuth2Tests(TestCase):
     )
     @unittest.skipUnless(oauth2_provider, 'django-oauth2-provider not installed')
     def test_responses_to_scoped_requests(self, scope_statuses):
-        self.access_token.scope = oauth2_provider.scope.SCOPE_NAME_DICT[scope_statuses.scope]
+        self.access_token.scope = oauth2_provider_scope.SCOPE_NAME_DICT[scope_statuses.scope]
         self.access_token.save()
         response = self.get_with_bearer_token('/oauth2-with-scope-test/', token=self.access_token.token)
         self.assertEqual(response.status_code, scope_statuses.read_status)
