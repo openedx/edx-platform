@@ -151,3 +151,15 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
         resolver = self.create_resolver()
         schedules = list(resolver.schedules_for_bin())
         self.assertIn('optout', schedules[0][2]['unsubscribe_url'])
+
+    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
+    def test_get_schedules_with_target_date_by_bin_and_orgs_filter_inactive_users(self):
+        """Tests that schedules of inactive users are excluded"""
+        resolver = self.create_resolver()
+        schedules = resolver.get_schedules_with_target_date_by_bin_and_orgs()
+
+        self.assertEqual(schedules.count(), 1)
+        self.user.is_active = False
+        self.user.save()
+        schedules = resolver.get_schedules_with_target_date_by_bin_and_orgs()
+        self.assertEqual(schedules.count(), 0)
