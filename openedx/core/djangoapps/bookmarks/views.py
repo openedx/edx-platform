@@ -36,6 +36,18 @@ from .serializers import BookmarkSerializer
 log = logging.getLogger(__name__)
 
 temp_authentication_classes = (OAuth2AuthenticationDeprecated, SessionAuthentication)
+
+# .. toggle_name: BOOKMARKS_USE_NEW_OAUTH2_CLASS
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Toggle for switching between OAuth2Authentication classes(external vs internal to edx-platform).
+# .. toggle_category: n/a
+# .. toggle_use_cases: Monitored Rollout
+# .. toggle_creation_date: 2020-01-31
+# .. toggle_expiration_date: 2020-02-28
+# .. toggle_warnings: None
+# .. toggle_tickets: BOM-1037
+# .. toggle_status: supported
 if "BOOKMARKS_USE_NEW_OAUTH2_CLASS" in settings.keys() and settings["use_new_oauth2_authentication_class"]:
     temp_authentication_classes = (OAuth2Authentication, SessionAuthentication)
 
