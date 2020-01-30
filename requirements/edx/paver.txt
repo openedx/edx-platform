@@ -8,7 +8,7 @@ certifi==2019.11.28       # via requests
 chardet==3.0.4            # via requests
 edx-opaque-keys==2.0.1
 idna==2.8                 # via requests
-importlib-metadata==1.4.0  # via path
+importlib-metadata==1.5.0  # via path
 lazy==1.4
 libsass==0.10.0
 markupsafe==1.1.1

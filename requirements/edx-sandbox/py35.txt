@@ -13,7 +13,7 @@ cryptography==2.8
 cycler==0.10.0            # via matplotlib
 decorator==4.4.1          # via networkx
 kiwisolver==1.1.0         # via matplotlib
-lxml==4.4.2
+lxml==4.5.0
 markupsafe==1.1.1
 matplotlib==2.2.4
 mpmath==1.1.0             # via sympy

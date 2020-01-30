@@ -70,3 +70,6 @@ freezegun==0.3.12
 
 # zipp 2.0.0 requires Python >= 3.6
 zipp==1.0.0
+
+# jsonfield2 3.1.0 requires Django 2.2
+jsonfield2==3.0.3
