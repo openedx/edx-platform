@@ -22,8 +22,9 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from openedx.core.lib.api.authentication import OAuth2AuthenticationDeprecated
 
+from openedx.core.lib.api.authentication import OAuth2AuthenticationDeprecated
+from openedx.core.lib.api.new_authentication import OAuth2Authentication
 from openedx.core.djangoapps.bookmarks.api import BookmarksLimitReachedError
 from openedx.core.lib.api.permissions import IsUserInUrl
 from openedx.core.lib.url_utils import unquote_slashes
@@ -33,6 +34,10 @@ from . import DEFAULT_FIELDS, OPTIONAL_FIELDS, api
 from .serializers import BookmarkSerializer
 
 log = logging.getLogger(__name__)
+
+temp_authentication_classes = (OAuth2AuthenticationDeprecated, SessionAuthentication)
+if "BOOKMARKS_USE_NEW_OAUTH2_CLASS" in settings.keys() and settings["use_new_oauth2_authentication_class"]:
+    temp_authentication_classes = (OAuth2Authentication, SessionAuthentication)
 
 # Default error message for user
 DEFAULT_USER_MESSAGE = ugettext_noop(u'An error has occurred. Please try again.')
@@ -99,7 +104,7 @@ class BookmarksViewMixin(object):
 class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
     """REST endpoints for lists of bookmarks."""
 
-    authentication_classes = (OAuth2AuthenticationDeprecated, SessionAuthentication)
+    authentication_classes = temp_authentication_classes
     pagination_class = BookmarksPagination
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = BookmarkSerializer
@@ -290,7 +295,8 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
         to a requesting user's bookmark a 404 is returned. 404 will also be returned
         if the bookmark does not exist.
     """
-    authentication_classes = (OAuth2AuthenticationDeprecated, SessionAuthentication)
+
+    authentication_classes = temp_authentication_classes
     permission_classes = (permissions.IsAuthenticated, IsUserInUrl)
 
     serializer_class = BookmarkSerializer
