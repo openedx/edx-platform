@@ -12,6 +12,7 @@ from courseware.models import StudentModule
 from openedx.features.course_card.helpers import get_course_open_date
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.timed_notification.core import get_course_first_chapter_link
+from openedx.core.lib.request_utils import safe_get_host
 
 from lms.djangoapps.onboarding.models import EmailPreference, Organization, UserExtendedProfile
 from lms.djangoapps.philu_overrides.constants import ACTIVATION_ALERT_TYPE
@@ -131,3 +132,18 @@ def set_opt_in_and_affiliate_user_organization(user, form):
 
     # create user email preferences object
     EmailPreference.objects.create(user=user, opt_in=form.cleaned_data.get('opt_in'))
+
+
+def get_params_for_activation_email(request, registration, user):
+    activation_link = '{protocol}://{site}/activate/{key}'.format(
+        protocol='https' if request.is_secure() else 'http',
+        site=safe_get_host(request),
+        key=registration.activation_key
+    )
+    data = {
+        "activation_link": activation_link,
+        "user_email": user.email,
+        'first_name': user.first_name,
+    }
+
+    return data
