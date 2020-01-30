@@ -233,3 +233,4 @@ class OAuth2Authentication(BaseAuthentication):
         Check details on the `OAuth2Authentication.authenticate` method
         """
         return 'Bearer realm="%s"' % self.www_authenticate_realm
+
