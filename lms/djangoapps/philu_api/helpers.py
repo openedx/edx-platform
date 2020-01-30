@@ -3,7 +3,6 @@ from custom_settings.models import CustomSettings
 from opaque_keys.edx.keys import CourseKey
 from urllib import urlencode
 from w3lib.url import add_or_replace_parameter
-from django.core.urlresolvers import reverse
 
 from lms.envs.common import (SOCIAL_SHARING_URLS, TWITTER_MESSAGE_FORMAT)
 
