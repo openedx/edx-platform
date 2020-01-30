@@ -185,6 +185,36 @@ class PythonAPITests(SharedModuleStoreTestCase):
         with self.assertRaisesMessage(ValueError, message):
             teams_api.get_team_for_user_course_topic(self.user1, invalid_course_id, 'who-cares')
 
+    def test_anonymous_user_ids_for_team(self):
+        """
+        A learner should be able to get the anonymous user IDs of their team members
+        """
+        team_anonymous_user_ids = teams_api.anonymous_user_ids_for_team(self.user1, self.team1)
+        self.assertEqual(len(self.team1.users.all()), len(team_anonymous_user_ids))
+
+    def test_anonymous_user_ids_for_team_not_on_team(self):
+        """
+        A learner should not be able to get IDs from members of a team they are not a member of
+        """
+        self.assertRaises(Exception, teams_api.anonymous_user_ids_for_team, self.user1, self.team2)
+
+    def test_anonymous_user_ids_for_team_bad_user_or_team(self):
+        """
+        An exception should be thrown when a bad user or team are passed to the endpoint
+        """
+        self.assertRaises(Exception, teams_api.anonymous_user_ids_for_team, None, self.team1)
+
+    def test_anonymous_user_ids_for_team_staff(self):
+        """
+        Course staff should be able to get anonymous IDs for teams in their course
+        """
+        user_staff = UserFactory.create(username='user_staff')
+        CourseEnrollmentFactory.create(user=user_staff, course_id=COURSE_KEY1)
+        CourseStaffRole(COURSE_KEY1).add_users(user_staff)
+
+        team_anonymous_user_ids = teams_api.anonymous_user_ids_for_team(user_staff, self.team1)
+        self.assertEqual(len(self.team1.users.all()), len(team_anonymous_user_ids))
+
 
 @ddt.ddt
 class TeamAccessTests(SharedModuleStoreTestCase):
