@@ -13,6 +13,8 @@ from django.conf import settings
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX, make_password
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.views import INTERNAL_RESET_SESSION_TOKEN, PasswordResetConfirmView
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.core import mail
 from django.core.cache import cache
 from django.http import Http404
@@ -34,8 +36,8 @@ from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH, EMAIL_MIN_LENGTH
 from openedx.core.djangoapps.user_authn.views.password_reset import (
-    SETTING_CHANGE_INITIATED, password_reset, password_reset_confirm_wrapper
-)
+    SETTING_CHANGE_INITIATED, password_reset,
+    PasswordResetConfirmWrapper)
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 from student.tests.test_configuration_overrides import fake_get_value
@@ -43,6 +45,12 @@ from student.tests.test_email import mock_render_to_string
 
 from util.password_policy_validators import create_validator_config
 from util.testing import EventTestMixin
+
+
+def process_request(request):
+    middleware = SessionMiddleware()
+    middleware.process_request(request)
+    request.session.save()
 
 
 @unittest.skipUnless(
@@ -55,7 +63,6 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
     Tests that clicking reset password sends email, and doesn't activate the user
     """
     request_factory = RequestFactory()
-
     ENABLED_CACHES = ['default']
 
     def setUp(self):  # pylint: disable=arguments-differ
@@ -303,8 +310,9 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
                 kwargs={"uidb36": uidb36, "token": token}
             )
         )
+        process_request(bad_request)
         bad_request.user = AnonymousUser()
-        password_reset_confirm_wrapper(bad_request, uidb36, token)
+        PasswordResetConfirmWrapper.as_view()(bad_request, uidb36=uidb36, token=token)
         self.user = User.objects.get(pk=self.user.pk)
         self.assertFalse(self.user.is_active)
 
@@ -317,8 +325,9 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
             kwargs={"uidb36": self.uidb36, "token": self.token}
         )
         good_reset_req = self.request_factory.get(url)
+        process_request(good_reset_req)
         good_reset_req.user = self.user
-        password_reset_confirm_wrapper(good_reset_req, self.uidb36, self.token)
+        PasswordResetConfirmWrapper.as_view()(good_reset_req, uidb36=self.uidb36, token=self.token)
         self.user = User.objects.get(pk=self.user.pk)
         self.assertTrue(self.user.is_active)
 
@@ -331,8 +340,9 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
             kwargs={"uidb36": self.uidb36, "token": self.token}
         )
         good_reset_req = self.request_factory.get(url)
+        process_request(good_reset_req)
         good_reset_req.user = AnonymousUser()
-        password_reset_confirm_wrapper(good_reset_req, self.uidb36, self.token)
+        PasswordResetConfirmWrapper.as_view()(good_reset_req, uidb36=self.uidb36, token=self.token)
         self.user = User.objects.get(pk=self.user.pk)
         self.assertTrue(self.user.is_active)
 
@@ -348,10 +358,11 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         )
         request_params = {'new_password1': 'password1', 'new_password2': 'password2'}
         confirm_request = self.request_factory.post(url, data=request_params)
+        process_request(confirm_request)
         confirm_request.user = self.user
 
         # Make a password reset request with mismatching passwords.
-        resp = password_reset_confirm_wrapper(confirm_request, self.uidb36, self.token)
+        resp = PasswordResetConfirmWrapper.as_view()(confirm_request, uidb36=self.uidb36, token=self.token)
 
         # Verify the response status code is: 200 with password reset fail and also verify that
         # the user is not marked as active.
@@ -373,7 +384,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         )
         reset_req = self.request_factory.get(url)
         reset_req.user = self.user
-        resp = password_reset_confirm_wrapper(reset_req, self.uidb36, self.token)
+        resp = PasswordResetConfirmWrapper.as_view()(reset_req, uidb36=self.uidb36, token=self.token)
 
         # Verify the response status code is: 200 with password reset fail and also verify that
         # the user is not marked as active.
@@ -388,7 +399,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
             )
             for request in [self.request_factory.get(url), self.request_factory.post(url)]:
                 request.user = self.user
-                response = password_reset_confirm_wrapper(request, self.uidb36, self.token)
+                response = PasswordResetConfirmWrapper.as_view()(request, uidb36=self.uidb36, token=self.token)
                 assert response.context_data['err_msg'] == SYSTEM_MAINTENANCE_MSG
                 self.user.refresh_from_db()
                 assert not self.user.is_active
@@ -408,8 +419,10 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         password = u'p\u212bssword'
         request_params = {'new_password1': password, 'new_password2': password}
         confirm_request = self.request_factory.post(url, data=request_params)
+        process_request(confirm_request)
+        confirm_request.session[INTERNAL_RESET_SESSION_TOKEN] = self.token
         confirm_request.user = self.user
-        __ = password_reset_confirm_wrapper(confirm_request, self.uidb36, self.token)
+        __ = PasswordResetConfirmWrapper.as_view()(confirm_request, uidb36=self.uidb36, token=self.token)
 
         user = User.objects.get(pk=self.user.pk)
         salt_val = user.password.split('$')[1]
@@ -445,11 +458,11 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         confirm_request.user = self.user
 
         # Make a password reset request with minimum/maximum passwords characters.
-        response = password_reset_confirm_wrapper(confirm_request, self.uidb36, self.token)
+        response = PasswordResetConfirmWrapper.as_view()(confirm_request, uidb36=self.uidb36, token=self.token)
 
         self.assertEqual(response.context_data['err_msg'], password_dict['error_message'])
 
-    @patch('openedx.core.djangoapps.user_authn.views.password_reset.password_reset_confirm')
+    @patch.object(PasswordResetConfirmView, 'dispatch')
     @patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_get_value)
     def test_reset_password_good_token_configuration_override(self, reset_confirm):
         """
@@ -460,8 +473,9 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
             kwargs={"uidb36": self.uidb36, "token": self.token}
         )
         good_reset_req = self.request_factory.get(url)
+        process_request(good_reset_req)
         good_reset_req.user = self.user
-        password_reset_confirm_wrapper(good_reset_req, self.uidb36, self.token)
+        PasswordResetConfirmWrapper.as_view()(good_reset_req, uidb36=self.uidb36, token=self.token)
         confirm_kwargs = reset_confirm.call_args[1]
         self.assertEqual(confirm_kwargs['extra_context']['platform_name'], 'Fake University')
         self.user = User.objects.get(pk=self.user.pk)
@@ -497,7 +511,8 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         reset_request = self.request_factory.get(reset_url)
         reset_request.user = UserFactory.create()
 
-        self.assertRaises(Http404, password_reset_confirm_wrapper, reset_request, self.uidb36, self.token)
+        self.assertRaises(Http404, PasswordResetConfirmWrapper.as_view(), reset_request, uidb36=self.uidb36,
+                          token=self.token)
 
 
 @ddt.ddt
