@@ -465,7 +465,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
         user = UserFactory.create(password=self.TEST_PASSWORD)
         ScheduleFactory(
-            start=THREE_YEARS_AGO,
+            start_date=THREE_YEARS_AGO,
             enrollment__mode=CourseMode.VERIFIED,
             enrollment__course_id=course.id,
             enrollment__user=user
@@ -499,7 +499,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
         user = role_factory.create(password=self.TEST_PASSWORD, course_key=course.id)
         ScheduleFactory(
-            start=THREE_YEARS_AGO,
+            start_date=THREE_YEARS_AGO,
             enrollment__mode=CourseMode.AUDIT,
             enrollment__course_id=course.id,
             enrollment__user=user
@@ -555,7 +555,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
         user = role_factory.create(password=self.TEST_PASSWORD)
         ScheduleFactory(
-            start=THREE_YEARS_AGO,
+            start_date=THREE_YEARS_AGO,
             enrollment__mode=CourseMode.AUDIT,
             enrollment__course_id=course.id,
             enrollment__user=user
@@ -587,7 +587,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         audit_user = UserFactory(password=self.TEST_PASSWORD)
         self.client.login(username=audit_user.username, password=self.TEST_PASSWORD)
         audit_enrollment = CourseEnrollment.enroll(audit_user, course.id, mode=CourseMode.AUDIT)
-        ScheduleFactory(start=THREE_YEARS_AGO + timedelta(days=1), enrollment=audit_enrollment)
+        ScheduleFactory(start_date=THREE_YEARS_AGO + timedelta(days=1), enrollment=audit_enrollment)
 
         response = self.client.get(url)
 
@@ -657,7 +657,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         audit_user = UserFactory(password=self.TEST_PASSWORD)
         self.client.login(username=audit_user.username, password=self.TEST_PASSWORD)
         audit_enrollment = CourseEnrollment.enroll(audit_user, course.id, mode=CourseMode.AUDIT)
-        ScheduleFactory(start=THREE_YEARS_AGO, enrollment=audit_enrollment)
+        ScheduleFactory(start_date=THREE_YEARS_AGO, enrollment=audit_enrollment)
         FBEEnrollmentExclusion.objects.create(
             enrollment=audit_enrollment
         )

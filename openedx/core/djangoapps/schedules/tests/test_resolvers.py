@@ -120,7 +120,7 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
         return CourseUpdateResolver(
             async_send_task=Mock(name='async_send_task'),
             site=self.site_config.site,
-            target_datetime=enrollment.schedule.start,
+            target_datetime=enrollment.schedule.start_date,
             day_offset=-7,
             bin_num=CourseUpdateResolver.bin_num_for_user_id(self.user.id),
         )
