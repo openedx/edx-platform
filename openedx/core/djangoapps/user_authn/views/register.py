@@ -48,9 +48,8 @@ from third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
 from util.db import outer_atomic
 
 # PhilU imports
-from mailchimp_pipeline.signals.handlers import task_send_account_activation_email
 from openedx.features.student_account.forms import AccountCreationFormCustom
-from openedx.features.student_account.helpers import get_params_for_activation_email
+from openedx.features.student_account.helpers import compose_and_send_activation_email_custom
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -181,8 +180,7 @@ def create_account_with_params(request, params):
     if skip_email:
         registration.activate()
     else:
-        data = get_params_for_activation_email(request, registration, user)
-        task_send_account_activation_email.delay(data)
+        compose_and_send_activation_email_custom(request, registration, user)
 
     # Perform operations that are non-critical parts of account creation
     create_or_set_user_attribute_created_on_site(user, request.site)

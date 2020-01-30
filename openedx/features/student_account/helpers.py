@@ -4,6 +4,7 @@ from datetime import datetime
 from pytz import utc
 
 from django.db.models.signals import post_save
+from mailchimp_pipeline.signals.handlers import task_send_account_activation_email
 
 from constants import NON_ACTIVE_COURSE_NOTIFICATION
 from student.models import CourseEnrollment
@@ -127,14 +128,12 @@ def set_opt_in_and_affiliate_user_organization(user, form):
 
     # create User Extended Profile
     user_extended_profile = UserExtendedProfile.objects.create(user=user, **user_extended_profile_data)
-    # This is to sync user organization information on NodeBB
-    post_save.send(UserExtendedProfile, instance=user_extended_profile, created=False)
 
     # create user email preferences object
     EmailPreference.objects.create(user=user, opt_in=form.cleaned_data.get('opt_in'))
 
 
-def get_params_for_activation_email(request, registration, user):
+def compose_and_send_activation_email_custom(request, registration, user):
     activation_link = '{protocol}://{site}/activate/{key}'.format(
         protocol='https' if request.is_secure() else 'http',
         site=safe_get_host(request),
@@ -146,4 +145,5 @@ def get_params_for_activation_email(request, registration, user):
         'first_name': user.first_name,
     }
 
-    return data
+    task_send_account_activation_email.delay(data)
+
