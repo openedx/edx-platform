@@ -163,7 +163,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-01-19 20:42+0000\n"
+"POT-Creation-Date: 2020-01-26 20:42+0000\n"
 "PO-Revision-Date: 2019-09-29 20:43+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -8757,11 +8757,9 @@ msgstr "Cámara web"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"You need a computer that has a webcam. When you receive a browser prompt, "
-"make sure that you allow access to the camera."
+"You need a computer or cell phone that has a webcam. When you receive a "
+"browser prompt, make sure that you allow access to the camera."
 msgstr ""
-"Necesita un equipo que tenga una webcam. Cuando reciba un mensaje desde su "
-"navegador web, asegúrese de permitir el acceso a su webcam."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "Photo Identification"
@@ -8782,11 +8780,9 @@ msgstr "Tome su fotografía"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"When your face is in position, use the camera button {icon} below to take "
-"your photo."
+"When your face is in position, use the Take Photo button {icon} below to "
+"take your photo."
 msgstr ""
-"Luego de colocar tu rostro en posición, haz clic en el siguiente ícono "
-"{icon} para tomar la foto."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "To take a successful photo, make sure that:"
@@ -8806,11 +8802,9 @@ msgstr "La foto de su documento coincide con la foto de su cara."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"To use the current photo, select the camera button {icon}. To take another "
-"photo, select the retake button {icon}."
+"To use the current photo, select the Take Photo button {icon}. To take "
+"another photo, select the Retake Photo button {icon}."
 msgstr ""
-"Para usar la foto actual, selecciona el botón de cámara {icon}. Para tomar "
-"una nueva foto, selecciona el botón de nueva toma {icon}."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8863,6 +8857,50 @@ msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"What if I can't see the camera image, or if I can't see my photo do "
+"determine which side is visible?"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"You may be able to complete the image capture procedure without assistance, "
+"but it may take a couple of submission attempts to get the camera "
+"positioning right.  Optimal camera positioning varies with each computer, "
+"but generally the best position for a headshot is approximately 12-18 inches"
+" (30-45 centimeters) from the camera, with your head centered relative to "
+"the computer screen. "
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"If the photos you submit are rejected, try moving the computer or camera "
+"orientation to change the lighting angle.  The most common reason for "
+"rejection is inability to read the text on the ID card."
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"What if I have difficulty holding my head in position relative to the "
+"camera?"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+#, python-format
+msgid ""
+"If you require assistance with taking either photo for submission, contact "
+"%(platformName)s support for additional suggestions."
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
@@ -8906,15 +8944,28 @@ msgid "Make sure your ID is well-lit"
 msgstr "Asegurese que su documento está bien iluminado"
 
 #: lms/templates/verify_student/id_photo_step.underscore
-msgid "Once in position, use the camera button {icon} to capture your ID"
+msgid "Once in position, use the Take Photo button {icon} to capture your ID"
 msgstr ""
-"Una vez en posición, haz clic en el siguiente ícono {icon} para capturar tu "
-"ID"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Use the retake photo button if you are not pleased with your photo"
-msgstr "Utilice el botón retomar foto si usted no está satisfecho con su foto"
+msgid "Use the Retake Photo button if you are not pleased with your photo"
+msgstr ""
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid ""
+"You may be able to complete the image capture procedure without assistance, "
+"but it may take a couple of submission attempts to get the camera "
+"positioning right.  Optimal camera positioning varies with each computer, "
+"but generally, the best position for a photo of an ID card is 8-12 inches "
+"(20-30 centimeters) from the camera, with the ID card centered relative to "
+"the camera. "
+msgstr ""
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid ""
+"What if I have difficulty holding my ID in position relative to the camera?"
+msgstr ""
 
 #: lms/templates/verify_student/image_input.underscore
 msgid "Preview of uploaded image"
@@ -8941,9 +8992,9 @@ msgid "Be sure your entire face is inside the frame"
 msgstr "Verifique que su cara está completamente dentro del marco de la foto"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Once in position, use the camera button {icon} to capture your photo"
+msgid ""
+"Once in position, use the Take Photo button {icon} to capture your photo"
 msgstr ""
-"Una vez en posición, usa el siguiente ícono {icon} para capturar tu foto"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Can we match the photo you took with the one on your ID?"

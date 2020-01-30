@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-01-26 20:52+0000\n"
-"PO-Revision-Date: 2020-01-26 20:52:31.602054\n"
+"POT-Creation-Date: 2020-01-30 06:42+0000\n"
+"PO-Revision-Date: 2020-01-30 06:42:37.347605\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -12831,6 +12831,7 @@ msgid " By %(filter_title)s "
 msgstr " Bý %(filter_title)s  Ⱡ'σяєм ιρѕυм ∂#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
 #, python-format
 msgid "Welcome to week %(week_num)s of %(course_name)s!"
 msgstr ""
@@ -12864,6 +12865,7 @@ msgstr ""
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕ#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
 msgid "Resume your course now"
 msgstr "Résümé ýöür çöürsé nöw Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
@@ -12880,6 +12882,39 @@ msgstr ""
 #, python-format
 msgid "Welcome to week %(week_num)s"
 msgstr "Wélçömé tö wéék %(week_num)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
+#, python-brace-format
+msgid ""
+"We hope you're enjoying {start_strong}{course_name}{end_strong}! We want to "
+"let you know what you can look forward to in the coming weeks:"
+msgstr ""
+"Wé höpé ýöü'ré énjöýïng {start_strong}{course_name}{end_strong}! Wé wänt tö "
+"lét ýöü knöw whät ýöü çän löök förwärd tö ïn thé çömïng wééks: Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕι#"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.txt
+msgid ""
+"We encourage you to spend time with the course each week. Your focused "
+"attention will pay off in the end!"
+msgstr ""
+"Wé énçöürägé ýöü tö spénd tïmé wïth thé çöürsé éäçh wéék. Ýöür föçüséd "
+"ätténtïön wïll päý öff ïn thé énd! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.txt
+#, python-format
+msgid ""
+"We hope you're enjoying %(course_name)s! We want to let you know what you "
+"can look forward to in the coming weeks:"
+msgstr ""
+"Wé höpé ýöü'ré énjöýïng %(course_name)s! Wé wänt tö lét ýöü knöw whät ýöü "
+"çän löök förwärd tö ïn thé çömïng wééks: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/subject.txt
+#, python-format
+msgid "%(course_name)s Weekly Update"
+msgstr "%(course_name)s Wééklý Ûpdäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
@@ -15785,11 +15820,6 @@ msgstr "Skïp tö lïst öf ännöünçéménts Ⱡ'σяєм ιρѕυм ∂σł�
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Account Status Info"
 msgstr "Àççöünt Stätüs Ìnfö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/templates/dashboard.html lms/templates/header/user_dropdown.html
-#: themes/edx.org/lms/templates/dashboard.html
-msgid "Order History"
-msgstr "Ördér Hïstörý Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
@@ -21049,6 +21079,10 @@ msgstr "Résümé ýöür läst çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя �
 #: lms/templates/header/user_dropdown.html
 msgid "Profile"
 msgstr "Pröfïlé Ⱡ'σяєм ιρѕυм #"
+
+#: lms/templates/header/user_dropdown.html
+msgid "Order History"
+msgstr "Ördér Hïstörý Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html

@@ -169,7 +169,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-01-19 20:42+0000\n"
+"POT-Creation-Date: 2020-01-26 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019\n"
 "Language-Team: German (Germany) (https://www.transifex.com/open-edx/teams/6205/de_DE/)\n"
@@ -10284,6 +10284,9 @@ msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
 #: openedx/core/djangoapps/user_api/admin.py
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
+#: cms/templates/videos_index_pagination.html
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -12315,6 +12318,8 @@ msgid ""
 "As {allowed_domain} user, You must login with your {allowed_domain} "
 "{link_start}{provider} account{link_end}."
 msgstr ""
+"Als {allowed_domain} Benutzer, müssen Sie sich mit Ihrem {allowed_domain} "
+"{link_start}{provider} Konto anmelden{link_end}."
 
 #. Translators: This example email address is used as a placeholder in
 #. a field on the login form meant to hold the user's email address.
@@ -16166,27 +16171,35 @@ msgstr "Austragen"
 #: lms/templates/bulk_email/confirm_unsubscribe.html
 msgid "confirm unsubscribe from {org} {course} emails."
 msgstr ""
+"Bestätigen Sie, dass Sie sich von den {org} Kurs-E-Mails für den Kurs "
+"{course} austragen wollen."
 
 #: lms/templates/bulk_email/confirm_unsubscribe.html
 msgid "Note:"
-msgstr ""
+msgstr "Achtung:"
 
 #: lms/templates/bulk_email/confirm_unsubscribe.html
 msgid ""
 "You will still receive course emails from other courses you are enrolled in."
 msgstr ""
+"Dies beeinflusst nicht die E-Mails aus anderen Kursen, in welche Sie "
+"eingeschrieben sind."
 
 #: lms/templates/bulk_email/unsubscribe_success.html
 msgid "You have successfully unsubscribed from {org} {course} emails."
 msgstr ""
+"Sie sind erfolgreich aus der E-Mail-Liste des Kurses {course} von {org} "
+"ausgetragen."
 
 #: lms/templates/bulk_email/unsubscribe_success.html
 msgid "You have not been unsubscribed from {org} {course} emails."
 msgstr ""
+"Sie wurden nicht aus der E-Mail-Liste des Kurses {course} von {org} "
+"ausgetragen."
 
 #: lms/templates/bulk_email/unsubscribe_success.html
 msgid "{link_start}Return to edX.org{link_end}"
-msgstr ""
+msgstr "{link_start}Zurück zu edX.org{link_end}"
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Open Calculator"
@@ -22143,7 +22156,7 @@ msgstr "Some Rights Reserved"
 
 #: openedx/features/course_experience/templates/course_experience/course-dates-fragment.html
 msgid "Upcoming Dates"
-msgstr ""
+msgstr "Kommende Termine"
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Goal: "
