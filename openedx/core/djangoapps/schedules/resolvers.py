@@ -105,6 +105,7 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
         }
         users = User.objects.filter(
             courseenrollment__is_active=True,
+            is_active=True,
             **schedule_day_equals_target_day_filter
         ).annotate(
             id_mod=F('id') % self.num_bins
