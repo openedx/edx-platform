@@ -137,7 +137,7 @@ class OAuth2Authentication(BaseAuthentication):
     www_authenticate_realm = 'api'
     allow_query_params_token = settings.DEBUG
 
-    # currently, active users are users that confirm their email. In case, we want to allow users to 
+    # currently, active users are users that confirm their email. In case, we want to allow users to
     # access edx without confirming(in case of some mobile users) their email, overwrite this by setting
     # it to True
     allow_inactive_users = False
@@ -233,4 +233,3 @@ class OAuth2Authentication(BaseAuthentication):
         Check details on the `OAuth2Authentication.authenticate` method
         """
         return 'Bearer realm="%s"' % self.www_authenticate_realm
-
