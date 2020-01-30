@@ -72,19 +72,3 @@ def _compile_social_sharing_url(share_url, course_url, url_param, utm_source, te
         url = add_or_replace_parameter(url, 'text', text)
 
     return url
-
-
-def user_org_survey_completion_status(user):
-    """
-    :param user: user for which we want to check org survey completion
-    :return: returns either "complete" or the org survey to which we have to
-             redirect to
-    """
-    user_org_details_complete = 'complete'
-
-    if user.is_authenticated():
-        org_unattended_surveys = user.extended_profile.org_unattended_surveys_v2(_type='list')
-        if org_unattended_surveys:
-            user_org_details_complete = reverse(org_unattended_surveys[0])
-
-    return user_org_details_complete
