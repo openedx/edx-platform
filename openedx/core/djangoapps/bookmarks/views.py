@@ -48,7 +48,7 @@ temp_authentication_classes = (OAuth2AuthenticationDeprecated, SessionAuthentica
 # .. toggle_warnings: None
 # .. toggle_tickets: BOM-1037
 # .. toggle_status: supported
-if "BOOKMARKS_USE_NEW_OAUTH2_CLASS" in settings.keys() and settings["use_new_oauth2_authentication_class"]:
+if getattr(settings, "BOOKMARKS_USE_NEW_OAUTH2_CLASS", False):
     temp_authentication_classes = (OAuth2Authentication, SessionAuthentication)
 
 # Default error message for user
