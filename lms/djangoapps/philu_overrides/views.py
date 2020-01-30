@@ -34,8 +34,7 @@ from lms.djangoapps.philu_overrides.courseware.views.views import get_course_rel
 from lms.djangoapps.courseware.access import has_access, _can_enroll_courselike
 from lms.djangoapps.courseware.courses import get_courses, sort_by_start_date, get_course_by_id, sort_by_announcement
 from lms.djangoapps.onboarding.helpers import reorder_registration_form_fields, get_alquity_community_url
-from lms.djangoapps.philu_api.helpers import get_course_custom_settings, get_social_sharing_urls, \
-    user_org_survey_completion_status
+from lms.djangoapps.philu_api.helpers import get_course_custom_settings, get_social_sharing_urls
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from third_party_auth import pipeline, provider
@@ -668,8 +667,7 @@ def course_about(request, course_id):
             'course_image_urls': overview.image_urls,
             'meta_tags': meta_tags,
             'is_alquity': is_alquity,
-            'social_sharing_urls': social_sharing_urls,
-            'org_survey_status': user_org_survey_completion_status(request.user)
+            'social_sharing_urls': social_sharing_urls
         }
 
         return render_to_response('courseware/course_about.html', context)
