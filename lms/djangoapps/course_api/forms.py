@@ -75,3 +75,11 @@ class CourseListGetForm(UsernameValidatorMixin, Form):
         cleaned_data['filter_'] = filter_ or None
 
         return cleaned_data
+
+
+class CourseIdListGetForm(UsernameValidatorMixin, Form):
+    """
+    A form to validate query parameters in the course list retrieval endpoint
+    """
+    username = CharField(required=False)
+    role = CharField(required=True)
