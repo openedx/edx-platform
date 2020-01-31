@@ -1679,7 +1679,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
     deny_username = 'student_enrolled'
 
     @ddt.data(
-        ('GET', good_course_id, deny_username, 403),
+        ('GET', good_course_id, deny_username, 200),
         ('GET', fake_course_id, allow_username, 404),
         ('GET', fake_course_id, deny_username, 404),
         ('POST', good_course_id, deny_username, 403),

@@ -326,6 +326,22 @@ class CourseTeamMembership(models.Model):
             return cls.objects.filter(user=user, team__course_id=course_id, team__topic_id=topic_id).exists()
 
     @classmethod
+    def user_in_team_set_for_course(cls, user, course_id, topic_id):
+        """
+        Checks whether or not a user is already in a team in the given course.
+
+        Args:
+            user: the user that we want to query on
+            course_id: the course_id of the course we're interested in
+            teamset_id: the teamset_id for the teamset we're interested in
+
+        Returns:
+            True if the user is on a team in the teamset in the course already
+            False if not
+        """
+        return cls.objects.filter(user=user, team__course_id=course_id, team__topic_id=topic_id).exists()
+
+    @classmethod
     def update_last_activity(cls, user, discussion_topic_id):
         """Set the `last_activity_at` for both this user and their team in the
         given discussion topic. No-op if the user is not a member of

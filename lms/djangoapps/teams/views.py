@@ -1380,7 +1380,7 @@ class MembershipBulkManagementView(GenericAPIView):
         )
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
         load_team_membership_csv(self.course, response)
-        return response`
+        return response
 
     def load_team_membership_csv(self, course, response):
         """

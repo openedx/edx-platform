@@ -24,39 +24,53 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super(TeamMembershipCsvTests, cls).setUpClass()
-        cls.user_config = {
-            'user1': {
-                'mode': 'audit',
-                'teams': ['team_1_1', 'team_2_2', 'team_3_1']
-            },
-            'user2': {
-                'mode': 'verified',
-                'teams': ['team_1_1', 'team_2_2', 'team_3_1']
-            },
-            'user3': {
-                'mode': 'audit',
-                'teams': ['team_2_1', 'team_3_2']
-            },
-            'user4': {
-                'mode': 'masters',
-                'teams': ['team_1_1', 'team_3_2']
-            },
-            'user5': {
-                'mode': 'masters',
-                'teams': []
-            },
-        }
+        teams_config = TeamsConfig({
+            'team_sets': [
+                {
+                    'id': 'teamset_{}'.format(i),
+                    'name': 'teamset_{}_name'.format(i),
+                    'description': 'teamset_{}_desc'.format(i),
+                }
+                for i in [1, 2, 3,4]
+            ]
+        })
+        cls.course = CourseFactory(teams_configuration=teams_config)
+        cls.course_no_teamsets = CourseFactory() 
 
-        cls.course, cls.teams, cls.users = cls._make_team(
-            CourseKey.from_string('edx/history/1'),
-            {
-                'teamset_1': ['team_1_1', 'team_1_2'],
-                'teamset_2': ['team_2_1', 'team_2_2'],
-                'teamset_3': ['team_3_1', 'team_3_2'],
-                'teamset_4': [],
-            },
-            cls.user_config,
-        )
+        team1_1 = CourseTeamFactory(course_id=cls.course.id, name='team_1_1', topic_id='teamset_1')
+        team1_2 = CourseTeamFactory(course_id=cls.course.id, name='team_1_2', topic_id='teamset_1')
+        team2_1 = CourseTeamFactory(course_id=cls.course.id, name='team_2_1', topic_id='teamset_2')
+        team2_2 = CourseTeamFactory(course_id=cls.course.id, name='team_2_2', topic_id='teamset_2')
+        team3_1 = CourseTeamFactory(course_id=cls.course.id, name='team_3_1', topic_id='teamset_3')
+        team3_2 = CourseTeamFactory(course_id=cls.course.id, name='team_3_2', topic_id='teamset_3')
+        # No teams in teamset 4 
+
+        user1 = UserFactory.create(username='user1')
+        user2 = UserFactory.create(username='user2')
+        user3 = UserFactory.create(username='user3')
+        user4 = UserFactory.create(username='user4')
+        user5 = UserFactory.create(username='user5')
+
+        CourseEnrollmentFactory.create(user=user1, course_id=cls.course.id, mode='audit')
+        CourseEnrollmentFactory.create(user=user2, course_id=cls.course.id, mode='verified')
+        CourseEnrollmentFactory.create(user=user3, course_id=cls.course.id, mode='honors')
+        CourseEnrollmentFactory.create(user=user4, course_id=cls.course.id, mode='masters')
+        CourseEnrollmentFactory.create(user=user5, course_id=cls.course.id, mode='masters')
+
+        team1_1.add_user(user1)
+        team2_2.add_user(user1)
+        team3_1.add_user(user1)
+
+        team1_1.add_user(user2)
+        team2_2.add_user(user2)
+        team3_1.add_user(user2)
+
+        team2_1.add_user(user3)
+        team3_2.add_user(user3)
+
+        team1_1.add_user(user4)
+        team3_2.add_user(user4)
+
 
     @classmethod
     def _make_team(cls, course_key, teamsets_and_teams, user_config):
@@ -83,41 +97,6 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
                 ...
             }
         """
-        import pdb; pdb.set_trace()
-        teams_config = TeamsConfig({
-            'teamsets': [
-                {
-                    'id': teamset,
-                    'name': teamset + '_name',
-                    'description': teamset + '_desc',
-                }
-                for teamset in teamsets_and_teams
-            ]
-        })
-        course = CourseFactory(teams_configuration=teams_config)
-        teams = {}
-        for teamset_id in teamsets_and_teams:
-            for team_name in teamsets_and_teams[teamset_id]:
-                team = CourseTeamFactory(
-                    course_id=course.id,
-                    name=team_name,
-                    topic_id=teamset_id,
-                )
-                teams[team_name] = team
-
-        users = {}
-        for username in user_config:
-            user = UserFactory.create(username=username)
-            CourseEnrollmentFactory.create(
-                user=user,
-                course_id=course.id,
-                mode=user_config[username]['mode']
-            )
-            for team_name in user_config[username]['teams']:
-                teams[team_name].add_user(user)
-            users[username] = user
-
-        return course, teams, users
 
 
     def setUp(self):
@@ -128,28 +107,24 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
         headers = csv.get_team_membership_csv_headers(self.course)
         self.assertEqual(
             headers,
-            ['user', 'mode', 'teamset_1', 'teamset_2', 'teamset_3']
+            ['user', 'mode', 'teamset_1', 'teamset_2', 'teamset_3', 'teamset_4']
         )
 
     def test_get_headers_no_teamsets(self):
-        course, _, _ = self._make_team(
-            CourseKey.from_string('edx/history/2'),
-            {},
-            {'another_user_1': [], 'another_user_2': [], 'another_user_3': []},
-        )
-        headers = csv.get_team_membership_csv_headers(self.course)
+        headers = csv.get_team_membership_csv_headers(self.course_no_teamsets)
         self.assertEqual(
             headers,
             ['user', 'mode']
         )
 
     def test_lookup_team_membership_data(self):
-        data = csv._lookup_team_membership_data(self.course)
+        with self.assertNumQueries(3):
+            data = csv._lookup_team_membership_data(self.course)
         self.assertEqual(len(data), 5)
         self.assert_teamset_membership(data[0], 'user1', 'audit',    'team_1_1', 'team_2_2', 'team_3_1')
         self.assert_teamset_membership(data[1], 'user2', 'verified', 'team_1_1', 'team_2_2', 'team_3_1')
-        self.assert_teamset_membership(data[2], 'user3', 'audit',     None,      'team_2_1', 'team_3_2')
-        self.assert_teamset_membership(data[3], 'user4', 'verified', 'team_1_1',  None,      'team_3_2')
+        self.assert_teamset_membership(data[2], 'user3', 'honors',     None,      'team_2_1', 'team_3_2')
+        self.assert_teamset_membership(data[3], 'user4', 'masters',  'team_1_1',  None,      'team_3_2')
         self.assert_teamset_membership(data[4], 'user5', 'masters',   None,       None,       None)
 
     def assert_teamset_membership(
@@ -166,10 +141,13 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
         self.assertEqual(user_row.get('teamset_1'), expected_teamset_1_team)
         self.assertEqual(user_row.get('teamset_2'), expected_teamset_2_team)
         self.assertEqual(user_row.get('teamset_3'), expected_teamset_3_team)
-        self.assertEqual(len(user_row), 5)
 
     def test_load_team_membership_csv(self):
-        csv_text = csv.load_team_membership_csv(self.course, self.buf)
-        print(csv_text)
-        self.fail()
-
+        expected_csv_output = ('user,mode,teamset_1,teamset_2,teamset_3,teamset_4\n'
+                               'user1,audit,team_1_1,team_2_2,team_3_1,\n'
+                               'user2,verified,team_1_1,team_2_2,team_3_1,\n'
+                               'user3,honors,,team_2_1,team_3_2,\n'
+                               'user4,masters,team_1_1,,team_3_2,\n'
+                               'user5,masters,,,,\n')
+        csv.load_team_membership_csv(self.course, self.buf)
+        self.assertEqual(expected_csv_output, self.buf.getvalue())
