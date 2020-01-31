@@ -47,7 +47,7 @@ git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2
 click-log==0.3.2          # via edx-lint
 click==7.0
 code-annotations==0.3.3
-colorama==0.4.3           # via radon
+colorama==0.4.1           # via radon
 contextlib2==0.6.0.post1
 coreapi==2.3.3
 coreschema==0.0.4
@@ -106,14 +106,14 @@ edx-analytics-data-api-client==0.15.3
 edx-api-doc-tools==1.0.2
 edx-bulk-grades==0.6.6
 edx-ccx-keys==1.0.0
-edx-celeryutils==0.3.1
+edx-celeryutils==0.3.2
 edx-completion==3.0.2
 edx-django-oauth2-provider==1.3.5
 edx-django-release-util==0.3.6
 edx-django-sites-extensions==2.4.3
 edx-django-utils==2.0.3
 edx-drf-extensions==2.4.5
-edx-enterprise==2.1.6
+edx-enterprise==2.3.0
 edx-i18n-tools==0.5.0
 edx-lint==1.3.0
 edx-milestones==0.2.6
@@ -121,7 +121,7 @@ edx-oauth2-provider==1.3.1
 edx-opaque-keys[django]==2.0.1
 edx-organizations==2.2.0
 edx-proctoring-proctortrack==1.0.5
-edx-proctoring==2.2.4
+edx-proctoring==2.2.5
 edx-rbac==1.0.5
 edx-rest-api-client==3.0.2
 edx-search==1.2.2
@@ -129,7 +129,7 @@ edx-sga==0.10.0
 edx-submissions==3.0.3
 edx-tincan-py35==0.0.5
 edx-user-state-client==1.1.2
-edx-when==0.5.2
+edx-when==0.6.0
 edxval==1.2.3
 elasticsearch==1.9.0
 entrypoints==0.3          # via flake8
@@ -153,7 +153,7 @@ html5lib==1.0.1
 httplib2==0.17.0
 httpretty==0.9.7
 idna==2.8
-importlib-metadata==1.4.0
+importlib-metadata==1.5.0
 inflect==3.0.2
 inflection==0.3.1
 ipaddress==1.0.23
@@ -161,9 +161,10 @@ isodate==0.6.0
 isort==4.3.21
 itypes==1.1.0
 jinja2-pluralize==0.3.0
-jinja2==2.11.0
+jinja2==2.11.1
 jmespath==0.9.4
 jsondiff==1.2.0
+jsonfield2==3.0.3
 jsonfield==2.0.2
 kombu==3.0.37
 laboratory==1.0.2
@@ -173,7 +174,7 @@ lepl==5.1.3
 libsass==0.10.0
 loremipsum==1.0.5
 git+https://github.com/edx/xblock-lti-consumer.git@v1.2.3#egg=lti_consumer-xblock==1.2.3
-lxml==4.4.2
+lxml==4.5.0
 mailsnake==1.6.4
 mako==1.0.2
 mando==0.6.4              # via radon
@@ -185,7 +186,7 @@ mccabe==0.6.1             # via flake8, pylint
 mock==3.0.5
 git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a#egg=MongoDBProxy==0.1.0+edx.2
 mongoengine==0.10.0
-more-itertools==8.1.0
+more-itertools==8.2.0
 mpmath==1.1.0
 mysqlclient==1.4.6
 newrelic==5.4.1.134
@@ -239,7 +240,7 @@ pytest-json-report==1.2.1
 pytest-metadata==1.8.0    # via pytest-json-report
 pytest-randomly==3.2.1
 pytest-xdist==1.31.0
-pytest==5.3.4
+pytest==5.3.5
 python-dateutil==2.4.0
 python-levenshtein==0.12.0
 python-memcached==1.59
@@ -250,7 +251,7 @@ python3-saml==1.5.0
 pytz==2019.3
 pyuca==1.2
 pyyaml==5.3
-radon==4.0.0
+radon==4.1.0
 random2==1.0.1
 recommender-xblock==1.4.5
 redis==2.10.6
@@ -259,14 +260,14 @@ requests==2.22.0
 rest-condition==1.0.3
 rfc6266-parser==0.0.6
 ruamel.yaml.clib==0.2.0
-ruamel.yaml==0.16.6
+ruamel.yaml==0.16.7
 rules==2.2
 s3transfer==0.1.13
 sailthru-client==2.2.3
 scipy==1.4.1
 selenium==3.141.0
 semantic-version==2.8.4
-shapely==1.6.4.post2
+shapely==1.7.0
 shortuuid==0.5.0
 simplejson==3.17.0
 singledispatch==3.4.0.3
@@ -281,10 +282,10 @@ staff-graded-xblock==0.6
 stevedore==1.31.0
 super-csv==0.9.6
 sympy==1.5.1
-testfixtures==6.10.3
+testfixtures==6.11.0
 text-unidecode==1.3
 toml==0.10.0              # via tox
-tox-battery==0.5.1
+tox-battery==0.5.2
 tox==3.14.3
 transifex-client==0.13.4
 unicodecsv==0.14.1
