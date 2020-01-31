@@ -80,9 +80,10 @@ urlpatterns = [
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 @override_settings(ROOT_URLCONF=__name__)
 class OAuth2DeprecatedTests(TestCase):
-    """OAuth 2.0 authentication"""
+    """Tets for OAuth2AllowInActiveUsers Deprecated class"""
 
     OAUTH2_BASE_TESTING_URL = '/oauth2-deprecated-test/'
+
     def setUp(self):
         super(OAuth2DeprecatedTests, self).setUp()
         self.dop_adapter = adapters.DOPAdapter()
@@ -317,7 +318,9 @@ class OAuth2DeprecatedTests(TestCase):
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 @override_settings(ROOT_URLCONF=__name__)
 class OAuth2Tests(OAuth2DeprecatedTests):
+    """ Tests for OAuth2Authentication class"""
     OAUTH2_BASE_TESTING_URL = '/oauth2-test/'
+
     def setUp(self):
         super(OAuth2Tests, self).setUp()
         # Since this is testing back to previous version, user should be set to true

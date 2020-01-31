@@ -138,13 +138,13 @@ class OAuth2Authentication(BaseAuthentication):
 
     def authenticate(self, request):
         """
-        Returns tuple (user, token) if access token authentication  succeeds, 
+        Returns tuple (user, token) if access token authentication  succeeds,
         returns None if the user did not try to authenticate using an access
         token, or raises an AuthenticationFailed (HTTP 401) if authentication
         fails.
         """
 
-        set_custom_metric("OAuth2Authentication", "Failed") # default value
+        set_custom_metric("OAuth2Authentication", "Failed")  # default value
         auth = get_authorization_header(request).split()
 
         if len(auth) == 1:
@@ -209,7 +209,7 @@ class OAuth2Authentication(BaseAuthentication):
                     'developer_message': msg})
             else:
                 set_custom_metric("OAuth2Authentication_user_active", True)
-            
+
             return user, token
 
     def get_access_token(self, access_token):
