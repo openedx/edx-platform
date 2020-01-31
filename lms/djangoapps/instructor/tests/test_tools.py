@@ -15,8 +15,9 @@ from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from edx_when import api, signals
+from edx_when import api
 from edx_when.field_data import DateLookupFieldData
+from openedx.core.djangoapps.course_date_signals import handlers
 from student.tests.factories import UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -215,7 +216,7 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         week3 = ItemFactory.create(parent=course)
         homework = ItemFactory.create(parent=week1)
         assignment = ItemFactory.create(parent=homework, due=due)
-        signals.extract_dates(None, course.id)
+        handlers.extract_dates(None, course.id)
 
         user = UserFactory.create()
 
@@ -296,7 +297,7 @@ class TestDataDumps(ModuleStoreTestCase):
         self.week2 = week2
         self.user1 = user1
         self.user2 = user2
-        signals.extract_dates(None, course.id)
+        handlers.extract_dates(None, course.id)
 
     def test_dump_module_extensions(self):
         extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=UTC)

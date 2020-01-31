@@ -26,7 +26,6 @@ from django.test.utils import override_settings
 from django.urls import reverse as django_reverse
 from django.utils.translation import ugettext as _
 from edx_when.api import get_overrides_for_user
-from edx_when.signals import extract_dates
 from mock import Mock, NonCallableMock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
@@ -62,6 +61,7 @@ from lms.djangoapps.instructor_task.api_helper import (
     QueueConnectionError,
     generate_already_running_error_message
 )
+from openedx.core.djangoapps.course_date_signals.handlers import extract_dates
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
