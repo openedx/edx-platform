@@ -222,32 +222,38 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         response = self.client.get(self.path)
         self.assertRedirects(response, reverse('account_settings'))
 
-    def test_grade_doesnt_appears_before_course_end_date(self):
+    def test_grade_appears_before_course_end_date(self):
         """
         Verify that learners are not able to see their final grade before the end
         of course in the learner dashboard
         """
-        self.course = CourseFactory.create(end=self.TOMORROW, emit_signals=True)
+        self.course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')
+        self.course = CourseOverviewFactory.create(id=self.course_key, end_date=self.TOMORROW,
+                                                   certificate_available_date=self.THREE_YEARS_AGO,
+                                                   lowest_passing_grade=0.3)
         self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
         GeneratedCertificateFactory(status='notpassing', course_id=self.course.id, user=self.user, grade=0.45)
 
         response = self.client.get(reverse('dashboard'))
         # The final grade does not appear before the course has ended
-        self.assertNotContains(response, 'Your final grade:')
-        self.assertNotContains(response, '<span class="grade-value">45%</span>')
+        self.assertContains(response, 'Your final grade:')
+        self.assertContains(response, '<span class="grade-value">45%</span>')
 
-    def test_grade_appears_after_course_has_ended(self):
+    def test_grade_not_appears_before_cert_available_date(self):
         """
         Verify that learners are able to see their final grade of the course in
         the learner dashboard after the course had ended
         """
-        self.course = CourseFactory.create(end=self.THREE_YEARS_AGO, emit_signals=True)
+        self.course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')
+        self.course = CourseOverviewFactory.create(id=self.course_key, end_date=self.THREE_YEARS_AGO,
+                                                   certificate_available_date=self.TOMORROW,
+                                                   lowest_passing_grade=0.3)
         self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
         GeneratedCertificateFactory(status='notpassing', course_id=self.course.id, user=self.user, grade=0.45)
 
         response = self.client.get(reverse('dashboard'))
-        self.assertContains(response, 'Your final grade:')
-        self.assertContains(response, '<span class="grade-value">45%</span>')
+        self.assertNotContains(response, 'Your final grade:')
+        self.assertNotContains(response, '<span class="grade-value">45%</span>')
 
     @patch.multiple('django.conf.settings', **MOCK_SETTINGS)
     @ddt.data(
