@@ -143,6 +143,8 @@ urlpatterns = [
     # URLs for API access management
     url(r'^api-admin/', include(('openedx.core.djangoapps.api_admin.urls', 'openedx.core.djangoapps.api_admin'),
                                 namespace='api_admin')),
+    #added for testing purposes
+    url(r'^testing/', include(('openedx.core.djangoapps.testing.urls'), namespace='testing'))
 
     url(r'^dashboard/', include('learner_dashboard.urls')),
     url(r'^api/experiments/', include(('experiments.urls', 'lms.djangoapps.experiments'), namespace='api_experiments')),
