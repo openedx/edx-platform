@@ -29,9 +29,8 @@ from lms.djangoapps.grades.api import prefetch_course_and_subsection_grades
 from lms.djangoapps.instructor_analytics.basic import list_problem_responses
 from lms.djangoapps.instructor_analytics.csvs import format_dictlist
 from lms.djangoapps.instructor_task.config.waffle import (
-    course_grade_report_verified_only,
-    optimize_get_learners_switch_enabled,
-    problem_grade_report_verified_only
+    generate_grade_report_for_verified_only,
+    optimize_get_learners_switch_enabled
 )
 from lms.djangoapps.teams.models import CourseTeamMembership
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -311,8 +310,9 @@ class CourseGradeReport(object):
             """
             Get enrolled learners in a course.
 
-            verified_only(bool): It indicates if we need only the verified
-            enrollments or all enrollments.
+            Arguments:
+                course_id (CourseLocator): course_id to return enrollees for.
+                verified_only (boolean): is a boolean when True, returns only verified enrollees.
             """
             if optimize_get_learners_switch_enabled():
                 TASK_LOG.info(u'%s, Creating Course Grade with optimization', task_log_message)
@@ -365,8 +365,8 @@ class CourseGradeReport(object):
 
         course_id = context.course_id
         task_log_message = u'{}, Task type: {}'.format(context.task_info_string, context.action_name)
-        verified_users_only = course_grade_report_verified_only(course_id)
-        return get_enrolled_learners_for_course(course_id, verified_users_only)
+        report_for_verified_only = generate_grade_report_for_verified_only()
+        return get_enrolled_learners_for_course(course_id=course_id, verified_only=report_for_verified_only)
 
     def _user_grades(self, course_grade, context):
         """
@@ -543,10 +543,11 @@ class ProblemGradeReport(object):
         status_interval = 100
         task_id = _xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None
 
+        report_for_verified_only = generate_grade_report_for_verified_only()
         enrolled_students = CourseEnrollment.objects.users_enrolled_in(
-            course_id,
+            course_id=course_id,
             include_inactive=True,
-            verified_only=problem_grade_report_verified_only(course_id),
+            verified_only=report_for_verified_only,
         )
         task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 
