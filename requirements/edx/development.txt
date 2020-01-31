@@ -134,7 +134,7 @@ edx-sphinx-theme==1.5.0
 edx-submissions==3.0.3
 edx-tincan-py35==0.0.5
 edx-user-state-client==1.1.2
-edx-when==0.6.0
+edx-when==0.7.0
 edxval==1.2.3
 elasticsearch==1.9.0
 entrypoints==0.3
