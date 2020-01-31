@@ -12,12 +12,12 @@ from rest_framework_oauth.authentication import OAuth2Authentication as OAuth2Au
 from rest_framework.authentication import BaseAuthentication, get_authorization_header
 from edx_django_utils.monitoring import set_custom_metric
 
-
-OAUTH2_TOKEN_ERROR = u'token_error'
-OAUTH2_TOKEN_ERROR_EXPIRED = u'token_expired'
-OAUTH2_TOKEN_ERROR_MALFORMED = u'token_malformed'
-OAUTH2_TOKEN_ERROR_NONEXISTENT = u'token_nonexistent'
-OAUTH2_TOKEN_ERROR_NOT_PROVIDED = u'token_not_provided'
+OAUTH2_TOKEN_ERROR = 'token_error'
+OAUTH2_TOKEN_ERROR_EXPIRED = 'token_expired'
+OAUTH2_TOKEN_ERROR_MALFORMED = 'token_malformed'
+OAUTH2_TOKEN_ERROR_NONEXISTENT = 'token_nonexistent'
+OAUTH2_TOKEN_ERROR_NOT_PROVIDED = 'token_not_provided'
+OAUTH2_USER_NOT_ACTIVE_ERROR = 'user_not_active'
 
 
 logger = logging.getLogger(__name__)
@@ -131,26 +131,20 @@ class OAuth2AuthenticationAllowInactiveUser(OAuth2AuthenticationDeprecated):
 
 class OAuth2Authentication(BaseAuthentication):
     """
-    This is created to be a drop in replacement for django-rest-framework-oauth oauth2Authentication class.
-    This is based on NOAuth2AuthenticationAllowINactiveUsers
+    OAuth 2 authentication backend using either `django-oauth2-provider` or 'django-oauth-toolkit'
     """
-    www_authenticate_realm = 'api'
-    allow_query_params_token = settings.DEBUG
 
-    # currently, active users are users that confirm their email. In case, we want to allow users to
-    # access edx without confirming(in case of some mobile users) their email, overwrite this by setting
-    # it to True
-    allow_inactive_users = False
+    www_authenticate_realm = 'api'
 
     def authenticate(self, request):
         """
-        Returns two-tuple of (user, token) if access token authentication
-        succeeds, raises an AuthenticationFailed (HTTP 401) if authentication
-        fails or None if the user did not try to authenticate using an access
-        token.
+        Returns tuple (user, token) if access token authentication  succeeds, 
+        returns None if the user did not try to authenticate using an access
+        token, or raises an AuthenticationFailed (HTTP 401) if authentication
+        fails.
         """
 
-        set_custom_metric("OAuth2Authentication", "Failed")
+        set_custom_metric("OAuth2Authentication", "Failed") # default value
         auth = get_authorization_header(request).split()
 
         if len(auth) == 1:
@@ -164,19 +158,15 @@ class OAuth2Authentication(BaseAuthentication):
 
         if auth and auth[0].lower() == b'bearer':
             access_token = auth[1].decode('utf8')
+            set_custom_metric('OAuth2Authentication_token_location', 'bearer-in-header')
         elif 'access_token' in request.POST:
             access_token = request.POST['access_token']
-        elif 'access_token' in request.GET and self.allow_query_params_token:
-            access_token = request.GET['access_token']
+            set_custom_metric('OAuth2Authentication_token_location', 'post-token')
         else:
-            logger.warning("auth is empty")
             set_custom_metric("OAuth2Authentication", "None")
             return None
+
         user, token = self.authenticate_credentials(access_token)
-        if not self.allow_inactive_users:
-            if not user.is_active:
-                msg = 'User inactive or deleted: %s' % user.get_username()
-                raise AuthenticationFailed(msg)
 
         set_custom_metric("OAuth2Authentication", "Success")
 
@@ -190,7 +180,14 @@ class OAuth2Authentication(BaseAuthentication):
         inactive.
         """
 
-        token = self.get_access_token(access_token)
+        try:
+            token = self.get_access_token(access_token)
+        except AuthenticationFailed as exc:
+            raise AuthenticationFailed({
+                u'error_code': OAUTH2_TOKEN_ERROR,
+                u'developer_message': exc.detail
+            })
+
         if not token:
             raise AuthenticationFailed({
                 'error_code': OAUTH2_TOKEN_ERROR_NONEXISTENT,
@@ -202,14 +199,34 @@ class OAuth2Authentication(BaseAuthentication):
                 'developer_message': 'The provided access token has expired and is no longer valid.',
             })
         else:
-            return token.user, token
+            user = token.user
+            # Check to make sure the users have activated their account(by confirming their email)
+            if not user.is_active:
+                set_custom_metric("OAuth2Authentication_user_active", False)
+                msg = 'User inactive or deleted: %s' % user.get_username()
+                raise AuthenticationFailed({
+                    'error_code': OAUTH2_USER_NOT_ACTIVE_ERROR,
+                    'developer_message': msg})
+            else:
+                set_custom_metric("OAuth2Authentication_user_active", True)
+            
+            return user, token
 
     def get_access_token(self, access_token):
         """
         Return a valid access token that exists in one of our OAuth2 libraries,
         or None if no matching token is found.
         """
-        return self._get_dot_token(access_token) or self._get_dop_token(access_token)
+        dot_token_return = self._get_dot_token(access_token)
+        if dot_token_return is not None:
+            set_custom_metric('OAuth2Authentication_token_type', 'dot')
+            return dot_token_return
+        dop_token_return = self._get_dop_token(access_token)
+        if dop_token_return is not None:
+            set_custom_metric('OAuth2Authentication_token_type', 'dop')
+            return dop_token_return
+        set_custom_metric('OAuth2Authentication_token_type', 'None')
+        return None
 
     def _get_dop_token(self, access_token):
         """

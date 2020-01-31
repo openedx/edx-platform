@@ -57,9 +57,14 @@ class OAuth2AuthenticationDebug(authentication.OAuth2AuthenticationAllowInactive
 urlpatterns = [
     url(r'^oauth2/', include(('provider.oauth2.urls', 'oauth2'), namespace='oauth2')),
     url(
-        r'^oauth2-test/$',
+        r'^oauth2-deprecated-test/$',
         MockView.as_view(authentication_classes=[authentication.OAuth2AuthenticationAllowInactiveUser])
     ),
+    url(
+        r'^oauth2-test/$',
+        MockView.as_view(authentication_classes=[authentication.OAuth2Authentication])
+    ),
+    # TODO(jinder): remove url when OAuth2AuthenticationDeprecated is fully removed
     url(r'^oauth2-test-debug/$', MockView.as_view(authentication_classes=[OAuth2AuthenticationDebug])),
     url(
         r'^oauth2-with-scope-test/$',
@@ -74,11 +79,12 @@ urlpatterns = [
 @ddt.ddt
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 @override_settings(ROOT_URLCONF=__name__)
-class OAuth2Tests(TestCase):
+class OAuth2DeprecatedTests(TestCase):
     """OAuth 2.0 authentication"""
 
+    OAUTH2_BASE_TESTING_URL = '/oauth2-deprecated-test/'
     def setUp(self):
-        super(OAuth2Tests, self).setUp()
+        super(OAuth2DeprecatedTests, self).setUp()
         self.dop_adapter = adapters.DOPAdapter()
         self.dot_adapter = adapters.DOTAdapter()
         self.csrf_client = APIClient(enforce_csrf_checks=True)
@@ -172,7 +178,7 @@ class OAuth2Tests(TestCase):
     def test_get_form_with_wrong_authorization_header_token_type_failing(self, params):
         """Ensure that a wrong token type lead to the correct HTTP error status code"""
         response = self.csrf_client.get(
-            '/oauth2-test/',
+            self.OAUTH2_BASE_TESTING_URL,
             params,
             HTTP_AUTHORIZATION='Wrong token-type-obviously'
         )
@@ -187,22 +193,23 @@ class OAuth2Tests(TestCase):
     @unittest.skipUnless(oauth2_provider, 'django-oauth2-provider not installed')
     def test_get_form_passing_auth(self):
         """Ensure GETing form over OAuth with correct client credentials succeed"""
-        response = self.get_with_bearer_token('/oauth2-test/')
+        response = self.get_with_bearer_token(self.OAUTH2_BASE_TESTING_URL)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_form_passing_auth_with_dot(self):
-        response = self.get_with_bearer_token('/oauth2-test/', token=self.dot_access_token.token)
+        response = self.get_with_bearer_token(self.OAUTH2_BASE_TESTING_URL, token=self.dot_access_token.token)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     @unittest.skipUnless(oauth2_provider, 'django-oauth2-provider not installed')
     def test_post_form_passing_auth_url_transport(self):
         """Ensure GETing form over OAuth with correct client credentials in form data succeed"""
         response = self.csrf_client.post(
-            '/oauth2-test/',
+            self.OAUTH2_BASE_TESTING_URL,
             data={'access_token': self.access_token.token}
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    # TODO(jinder): remove test when OAuth2AuthenticationDeprecated is fully removed
     @unittest.skipUnless(oauth2_provider, 'django-oauth2-provider not installed')
     def test_get_form_passing_auth_url_transport(self):
         """Ensure GETing form over OAuth with correct client credentials in query succeed when DEBUG is True"""
@@ -214,7 +221,7 @@ class OAuth2Tests(TestCase):
     def test_get_form_failing_auth_url_transport(self):
         """Ensure GETing form over OAuth with correct client credentials in query fails when DEBUG is False"""
         query = urlencode({'access_token': self.access_token.token})
-        response = self.csrf_client.get('/oauth2-test/?%s' % query)
+        response = self.csrf_client.get(self.OAUTH2_BASE_TESTING_URL + '?%s' % query)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         # This case is handled directly by DRF so no error_code is provided (yet).
@@ -223,14 +230,14 @@ class OAuth2Tests(TestCase):
     @unittest.skipUnless(oauth2_provider, 'django-oauth2-provider not installed')
     def test_post_form_passing_auth(self):
         """Ensure POSTing form over OAuth with correct credentials passes and does not require CSRF"""
-        response = self.post_with_bearer_token('/oauth2-test/')
+        response = self.post_with_bearer_token(self.OAUTH2_BASE_TESTING_URL)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     @unittest.skipUnless(oauth2_provider, 'django-oauth2-provider not installed')
     def test_post_form_token_removed_failing_auth(self):
         """Ensure POSTing when there is no OAuth access token in db fails"""
         self.access_token.delete()
-        response = self.post_with_bearer_token('/oauth2-test/')
+        response = self.post_with_bearer_token(self.OAUTH2_BASE_TESTING_URL)
         self.check_error_codes(
             response,
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -240,7 +247,7 @@ class OAuth2Tests(TestCase):
     @unittest.skipUnless(oauth2_provider, 'django-oauth2-provider not installed')
     def test_post_form_with_refresh_token_failing_auth(self):
         """Ensure POSTing with refresh token instead of access token fails"""
-        response = self.post_with_bearer_token('/oauth2-test/', token=self.refresh_token.token)
+        response = self.post_with_bearer_token(self.OAUTH2_BASE_TESTING_URL, token=self.refresh_token.token)
         self.check_error_codes(
             response,
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -252,7 +259,7 @@ class OAuth2Tests(TestCase):
         """Ensure POSTing with expired access token fails with a 'token_expired' error"""
         self.access_token.expires = now() - timedelta(seconds=10)  # 10 seconds late
         self.access_token.save()
-        response = self.post_with_bearer_token('/oauth2-test/')
+        response = self.post_with_bearer_token(self.OAUTH2_BASE_TESTING_URL)
         self.check_error_codes(
             response,
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -274,7 +281,7 @@ class OAuth2Tests(TestCase):
     @ddt.unpack
     @unittest.skipUnless(oauth2_provider, 'django-oauth2-provider not installed')
     def test_response_for_get_request_with_bad_auth_token(self, http_params, token_error):
-        response = self.get_with_bearer_token('/oauth2-test/', http_params, token=token_error.token)
+        response = self.get_with_bearer_token(self.OAUTH2_BASE_TESTING_URL, http_params, token=token_error.token)
         self.check_error_codes(
             response,
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -287,7 +294,7 @@ class OAuth2Tests(TestCase):
         TokenErrorDDT('', authentication.OAUTH2_TOKEN_ERROR_NOT_PROVIDED),
     )
     def test_response_for_post_request_with_bad_auth_token(self, token_error):
-        response = self.post_with_bearer_token('/oauth2-test/', token=token_error.token)
+        response = self.post_with_bearer_token(self.OAUTH2_BASE_TESTING_URL, token=token_error.token)
         self.check_error_codes(response, status_code=status.HTTP_401_UNAUTHORIZED, error_code=token_error.error_code)
 
     ScopeStatusDDT = namedtuple('ScopeStatusDDT', ['scope', 'read_status', 'write_status'])
@@ -304,3 +311,15 @@ class OAuth2Tests(TestCase):
         self.assertEqual(response.status_code, scope_statuses.read_status)
         response = self.post_with_bearer_token('/oauth2-with-scope-test/', token=self.access_token.token)
         self.assertEqual(response.status_code, scope_statuses.write_status)
+
+
+@ddt.ddt
+@unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
+@override_settings(ROOT_URLCONF=__name__)
+class OAuth2Tests(OAuth2DeprecatedTests):
+    OAUTH2_BASE_TESTING_URL = '/oauth2-test/'
+    def setUp(self):
+        super(OAuth2Tests, self).setUp()
+        # Since this is testing back to previous version, user should be set to true
+        self.user.is_active = True
+        self.user.save()
