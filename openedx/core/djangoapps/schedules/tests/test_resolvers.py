@@ -3,19 +3,23 @@ from unittest import skipUnless
 
 import ddt
 from django.conf import settings
-from mock import Mock
+from mock import Mock, patch
 
-from openedx.core.djangoapps.schedules.resolvers import BinnedSchedulesBaseResolver
+from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
+from openedx.core.djangoapps.schedules.resolvers import BinnedSchedulesBaseResolver, CourseUpdateResolver
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory, SiteConfigurationFactory
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
+from student.tests.factories import CourseEnrollmentFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 @ddt.ddt
 @skip_unless_lms
 @skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
             "Can't test schedules if the app isn't installed")
-class TestBinnedSchedulesBaseResolver(CacheIsolationTestCase):
+class TestBinnedSchedulesBaseResolver(CacheIsolationTestCase, ModuleStoreTestCase):
     def setUp(self):
         super(TestBinnedSchedulesBaseResolver, self).setUp()
 
@@ -28,6 +32,22 @@ class TestBinnedSchedulesBaseResolver(CacheIsolationTestCase):
             target_datetime=datetime.datetime.now(),
             day_offset=3,
             bin_num=2,
+        )
+
+    def create_course_update_resolver(self):
+        """
+        Creates a CourseUpdateResolver with an enrollment to schedule.
+        """
+        with patch('openedx.core.djangoapps.schedules.signals.get_current_site') as mock_get_current_site:
+            mock_get_current_site.return_value = self.site_config.site
+            enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=u'audit')
+
+        return CourseUpdateResolver(
+            async_send_task=Mock(name='async_send_task'),
+            site=self.site_config.site,
+            target_datetime=enrollment.schedule.start,
+            day_offset=-7,
+            bin_num=CourseUpdateResolver.bin_num_for_user_id(self.user.id),
         )
 
     @ddt.data(
@@ -67,3 +87,15 @@ class TestBinnedSchedulesBaseResolver(CacheIsolationTestCase):
         result = self.resolver.filter_by_org(mock_query)
         mock_query.exclude.assert_called_once_with(enrollment__course__org__in=expected_org_list)
         self.assertEqual(result, mock_query.exclude.return_value)
+
+    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
+    def test_get_schedules_with_target_date_by_bin_and_orgs_filter_inactive_users(self):
+        """Tests that schedules of inactive users are excluded"""
+        resolver = self.create_course_update_resolver()
+        schedules = resolver.get_schedules_with_target_date_by_bin_and_orgs()
+
+        self.assertEqual(schedules.count(), 1)
+        self.user.is_active = False
+        self.user.save()
+        schedules = resolver.get_schedules_with_target_date_by_bin_and_orgs()
+        self.assertEqual(schedules.count(), 0)
