@@ -63,8 +63,9 @@
                 this.teamEvents.trigger('teams:update', {});
             },
 
-            handleCsvUploadFailure: function() {
-                // This handler is currently unimplemented (TODO MST-44)
+            handleCsvUploadFailure: function(jqXHR, textStatus, errorThrown) {
+                $('#team-management-assign .page-banner .message-content').text(textStatus + ": " + errorThrown)
+                $('#team-management-assign .page-banner').show()
             }
         });
         return ManageView;
