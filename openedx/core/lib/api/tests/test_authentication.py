@@ -314,8 +314,6 @@ class OAuth2DeprecatedTests(TestCase):
         self.assertEqual(response.status_code, scope_statuses.write_status)
 
 
-@unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
-@override_settings(ROOT_URLCONF=__name__)
 class OAuth2Tests(OAuth2DeprecatedTests):
     """ Tests for OAuth2Authentication class"""
     OAUTH2_BASE_TESTING_URL = '/oauth2-test/'
