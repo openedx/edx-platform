@@ -4,7 +4,6 @@
 import logging
 
 import django.utils.timezone
-from django.conf import settings
 from oauth2_provider import models as dot_models
 from provider.oauth2 import models as dop_models
 from rest_framework.exceptions import AuthenticationFailed
