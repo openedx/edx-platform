@@ -142,7 +142,7 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 #: common/lib/xmodule/xmodule/video_module/video_handlers.py
 msgid "A transcript file is required."
-msgstr ""
+msgstr "Transkripzioaren fitxategia beharrezko da."
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
@@ -383,7 +383,7 @@ msgstr "Erabiltzaile-profila"
 
 #: common/djangoapps/student/admin.py
 msgid "Account recovery"
-msgstr ""
+msgstr "Kontua berreskuratzea"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a field on the login form
@@ -832,7 +832,7 @@ msgstr ""
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid "{html_start}Success{html_end} You have activated your account."
-msgstr ""
+msgstr "{html_start}Ondo{html_end} Kontua aktibatu duzu."
 
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
@@ -4595,7 +4595,7 @@ msgstr ""
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
 msgid "Account Activation"
-msgstr ""
+msgstr "Kontuaren aktibazioa"
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
 #: common/templates/student/edx_ace/accountactivation/email/body.txt
@@ -4643,7 +4643,7 @@ msgstr ""
 #: common/templates/student/edx_ace/accountactivation/email/subject.txt
 #, python-format
 msgid "Action Required: Activate your %(platform_name)s account"
-msgstr ""
+msgstr "Beharrezko ekintza: Aktibatu %(platform_name)s plataformako kontua"
 
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 msgid "Create Password"
@@ -10781,7 +10781,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/auto_auth.py
 msgid "Account modification not allowed."
-msgstr ""
+msgstr "Ez dago baimenduta kontua aldatzea."
 
 #: openedx/core/djangoapps/user_authn/views/auto_auth.py
 #: openedx/core/djangoapps/user_authn/views/register.py
@@ -14067,7 +14067,7 @@ msgstr "Editatu {catalog_name}"
 #: lms/templates/api_admin/catalogs/edit.html
 #: lms/templates/api_admin/catalogs/list.html
 msgid "Download CSV"
-msgstr "Jaitsi CSV"
+msgstr "Deskargatu CSV"
 
 #: lms/templates/api_admin/catalogs/edit.html
 msgid "Delete this catalog"
@@ -14079,7 +14079,7 @@ msgstr "Eguneratu katalogoa"
 
 #: lms/templates/api_admin/catalogs/list.html
 msgid "Catalogs for {username}"
-msgstr ""
+msgstr "Ondokoarentzako katalogoak: {username}"
 
 #: lms/templates/api_admin/catalogs/list.html
 msgid "Create new catalog:"

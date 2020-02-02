@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-01-30 06:42+0000\n"
-"PO-Revision-Date: 2020-01-30 06:42:37.347605\n"
+"POT-Creation-Date: 2020-02-02 20:52+0000\n"
+"PO-Revision-Date: 2020-02-02 20:52:08.673750\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -16954,6 +16954,10 @@ msgid "Your final grade:"
 msgstr "غخعق بهرشم لقشيث:"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Grades will be finalized on {cert_available_date}"
+msgstr "لقشيثس صهمم زث بهرشمهظثي خر {cert_available_date}"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Grade required for a {cert_name_short}:"
 msgstr "لقشيث قثضعهقثي بخق ش {cert_name_short}:"
 
@@ -19653,6 +19657,18 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Discussion Admin"
 msgstr "شيي يهسذعسسهخر شيوهر"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Course Data Researcher"
+msgstr "ذخعقسث يشفش قثسثشقذاثق"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Course Data Researchers can access the data download tab."
+msgstr "ذخعقسث يشفش قثسثشقذاثقس ذشر شذذثسس فاث يشفش يخصرمخشي فشز."
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Add Course Data Researcher"
+msgstr "شيي ذخعقسث يشفش قثسثشقذاثق"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Discussion Moderators"
