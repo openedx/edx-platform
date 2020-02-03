@@ -58,33 +58,17 @@
                 );
             },
 
-            handleCsvUploadSuccess: function(data, textStatus, jqXHR) {
+            handleCsvUploadSuccess: function (data, textStatus, jqXHR) {
                 // This handler is currently unimplemented (TODO MST-44)
                 // this.teamEvents.trigger('teams:update', {});
 
                 const { number_of_records_added:recordsAdded } = data
-                $('#team-management-assign .page-banner .message-content').text(`Successfully added ${recordsAdded} students to teams`)
-
-                $('#team-management-assign .page-banner .alert').removeClass('alert-danger')
-                $('#team-management-assign .page-banner .alert').addClass('alert-success')
-
-                $('#team-management-assign .page-banner .icon').removeClass('fa-warning');
-                $('#team-management-assign .page-banner .icon').addClass('fa-check');
-
-                $('#team-management-assign .page-banner').show()
+                TeamUtils.showInfoBanner(`Successfully added ${recordsAdded} students to teams`, false)
             },
 
-            handleCsvUploadFailure: function(jqXHR, textStatus, errorThrown) {
-                const { summary, details } = jqXHR.responseJSON
-                $('#team-management-assign .page-banner .message-content').text(`${summary}: ${details}`)
-
-                $('#team-management-assign .page-banner .alert').removeClass('alert-success')
-                $('#team-management-assign .page-banner .alert').addClass('alert-danger')
-
-                $('#team-management-assign .page-banner .icon').removeClass('fa-check');
-                $('#team-management-assign .page-banner .icon').addClass('fa-warning');
-
-                $('#team-management-assign .page-banner').show()
+            handleCsvUploadFailure: function (jqXHR, textStatus, errorThrown) {
+                const { summary, details } = jqXHR.responseJSON;
+                TeamUtils.showInfoBanner(`${summary}: ${details}`, true);
             }
         });
         return ManageView;

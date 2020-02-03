@@ -72,6 +72,27 @@
                     return false;
                 }
                 return topicType.toLowerCase() !== 'open';
+            },
+
+            /** Toggles between error and info styling on team membership upload
+             * feedback banner.
+             * 
+             * @param: isError - true for error styling, false for info styling
+             */
+            showInfoBanner: function (text, isError) {
+                $('#team-management-assign .page-banner .message-content').text(text)
+
+                // set color sytling
+                $('#team-management-assign .page-banner .alert')
+                    .toggleClass('alert-success', !isError)
+                    .toggleClass('alert-danger', isError)
+
+                // set icon styling
+                $('#team-management-assign .page-banner .icon')
+                    .toggleClass('fa-check', !isError)
+                    .toggleClass('fa-warning', isError);
+
+                $('#team-management-assign .page-banner').show()
             }
         };
     });
