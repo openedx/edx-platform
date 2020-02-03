@@ -113,7 +113,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-01-05 20:42+0000\n"
+"POT-Creation-Date: 2020-01-26 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Japanese (Japan) (https://www.transifex.com/open-edx/teams/6205/ja_JP/)\n"
@@ -6629,6 +6629,7 @@ msgid "Cohort"
 msgstr "コホート"
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Team"
 msgstr "チーム"
 
@@ -7539,6 +7540,18 @@ msgstr " ({skipped} スキップ)"
 #, python-brace-format
 msgid " (out of {total})"
 msgstr " (合計{total}中)"
+
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/learner_dashboard/programs.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Programs"
+msgstr "プログラム"
+
+#: lms/templates/learner_dashboard/program_details.html
+msgid "Program Details"
+msgstr "問題の詳細"
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
@@ -10797,8 +10810,8 @@ msgstr "何度もログイン試行に失敗しました。しばらく時間を
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
 msgid ""
-"As an {allowed_domain} user, You must login with your {allowed_domain} "
-"{provider} account."
+"As {allowed_domain} user, You must login with your {allowed_domain} "
+"{link_start}{provider} account{link_end}."
 msgstr ""
 
 #. Translators: This example email address is used as a placeholder in
@@ -11206,10 +11219,6 @@ msgid "enabled_as_of must be set when enabled is True"
 msgstr ""
 
 #: openedx/features/content_type_gating/partitions.py
-msgid "Feature-based Enrollments"
-msgstr ""
-
-#: openedx/features/content_type_gating/partitions.py
 msgid "Partition for segmenting users by access to gated content types"
 msgstr ""
 
@@ -11374,8 +11383,8 @@ msgstr ""
 #, no-python-format, python-brace-format
 msgid ""
 "{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% "
-"[{strikeout_price}]{span_close}{br}Discount will be automatically applied at"
-" checkout. {a_open}Upgrade Now{a_close}{div_close}"
+"[{strikeout_price}]{span_close}{br}Use code {b_open}{code}{b_close} at "
+"checkout! {a_open}Upgrade Now{a_close}{div_close}"
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py
@@ -14090,32 +14099,34 @@ msgstr "カタログの検索"
 msgid "Enter a username to view catalogs belonging to that user."
 msgstr "ユーザー名を入力して、そのユーザーのカタログを見る。"
 
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe Successful"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe Cancelled"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Confirm Unsubscribe"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "You have been unsubscribed from emails for {course}."
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "You have not been unsubscribed from emails for {course}."
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Do you want to unsubscribe from emails for {course}?"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+#: lms/templates/bulk_email/unsubscribe_success.html
 msgid "Unsubscribe"
+msgstr ""
+
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+msgid "confirm unsubscribe from {org} {course} emails."
+msgstr ""
+
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+msgid "Note:"
+msgstr ""
+
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+msgid ""
+"You will still receive course emails from other courses you are enrolled in."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "You have successfully unsubscribed from {org} {course} emails."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "You have not been unsubscribed from {org} {course} emails."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "{link_start}Return to edX.org{link_end}"
 msgstr ""
 
 #: lms/templates/calculator/toggle_calculator.html
@@ -16662,14 +16673,6 @@ msgstr ""
 "{chrome_link}または{ff_link}をお使いいただくことを強くお勧めします。"
 
 #: lms/templates/header/navbar-authenticated.html
-#: lms/templates/learner_dashboard/programs.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Programs"
-msgstr "プログラム"
-
-#: lms/templates/header/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr ""
@@ -18339,10 +18342,6 @@ msgstr "この問題に関して提出したタスクのステータスを表示
 msgid "My Courses"
 msgstr "受講登録した講座"
 
-#: lms/templates/learner_dashboard/program_details.html
-msgid "Program Details"
-msgstr "問題の詳細"
-
 #: lms/templates/learner_dashboard/text-me-fragment.html
 msgid "Get the {platform_name} Mobile App!"
 msgstr ""
@@ -18604,6 +18603,13 @@ msgstr "{platform_name} のパスワードを変更する"
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Invalid Password Reset Link"
 msgstr "無効なパスワード変更リンク"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid ""
+"This password reset link is invalid. It may have been used already. To reset"
+" your password, go to the {start_link}sign-in{end_link} page and select "
+"{start_strong}Forgot password{end_strong}."
+msgstr ""
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"
@@ -19416,8 +19422,8 @@ msgid "Some Rights Reserved"
 msgstr "部分的に著作権あり"
 
 #: openedx/features/course_experience/templates/course_experience/course-dates-fragment.html
-msgid "Important Course Dates"
-msgstr "講座の重要な予定"
+msgid "Upcoming Dates"
+msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Goal: "
@@ -19526,10 +19532,6 @@ msgstr ""
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "This course does not have any updates."
 msgstr "本講座は更新情報がありません。"
-
-#: openedx/features/course_experience/templates/course_experience/dates-summary.html
-msgid "Today is {date}"
-msgstr "本日は {date} です"
 
 #: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
 msgid "Latest Update"

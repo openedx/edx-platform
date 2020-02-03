@@ -92,7 +92,7 @@ dirs = settings.DEFAULT_TEMPLATE_ENGINE['DIRS']
 theme = get_current_theme()
 if theme:
     dirs = list(dirs)
-    dirs.insert(0, theme.path / 'templates')
+    dirs.append(theme.path / 'templates')
 engine = Engine(dirs=dirs)
 loader = Loader(engine)
 

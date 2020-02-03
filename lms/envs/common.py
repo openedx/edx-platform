@@ -2535,7 +2535,7 @@ REST_FRAMEWORK = {
 }
 
 SWAGGER_SETTINGS = {
-    'DEFAULT_INFO': 'openedx.core.apidocs.default_info',
+    'DEFAULT_INFO': 'openedx.core.apidocs.api_info',
 }
 
 # How long to cache OpenAPI schemas and UI, in seconds.
@@ -2599,7 +2599,7 @@ SOCIAL_MEDIA_FOOTER_NAMES = [
     "twitter",
     # "youtube", see PROD-816 for more details
     "linkedin",
-    "google_plus",
+    "instagram",
     "reddit",
 ]
 
@@ -2631,12 +2631,12 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         "icon": "fa-linkedin-square",
         "action": _(u"Follow {platform_name} on LinkedIn")
     },
-    "google_plus": {
-        # Translators: This is the website name of plus.google.com.  Please
-        # translate this the way that Google+ advertises in your language.
-        "title": _("Google+"),
-        "icon": "fa-google-plus-square",
-        "action": _(u"Follow {platform_name} on Google+")
+    "instagram": {
+        # Translators: This is the website name of www.instagram.com.  Please
+        # translate this the way that Instagram advertises in your language.
+        "title": _("Instagram"),
+        "icon": "fa-instagram",
+        "action": _(u"Follow {platform_name} on Instagram")
     },
     "tumblr": {
         # Translators: This is the website name of www.tumblr.com.  Please
@@ -3755,6 +3755,7 @@ PROFILE_MICROFRONTEND_URL = None
 ORDER_HISTORY_MICROFRONTEND_URL = None
 ACCOUNT_MICROFRONTEND_URL = None
 PROGRAM_MANAGER_MICROFRONTEND_URL = None
+LEARNING_MICROFRONTEND_URL = None
 
 ############### Settings for the ace_common plugin #################
 ACE_ENABLED_CHANNELS = ['django_email']

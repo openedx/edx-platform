@@ -11,11 +11,11 @@
 -c ../constraints.txt
 
 edx-opaque-keys                     # Create and introspect course and xblock identities
-lazy==1.1                           # Lazily-evaluated attributes for Python objects
+lazy                                # Lazily-evaluated attributes for Python objects
 libsass==0.10.0                     # Python bindings for the LibSass CSS compiler
 markupsafe                          # XML/HTML/XHTML Markup safe strings
 mock                                # Stub out code with mock objects and make assertions about how they have been used
-path.py==8.2.1                      # Easier manipulation of filesystem paths
+path                                # Easier manipulation of filesystem paths
 paver                               # Build, distribution and deployment scripting tool
 psutil==1.2.1                       # Library for retrieving information on running processes and system utilization
 pymongo==3.9.0                      # via edx-opaque-keys
@@ -23,4 +23,4 @@ python-memcached                    # Python interface to the memcached memory c
 requests                            # Simple interface for making HTTP requests
 stevedore                           # Support for runtime plugins, used for XBlocks and edx-platform Django app plugins
 watchdog                            # Used in paver watch_assets
-wrapt==1.10.5                       # Decorator utilities used in the @timed paver task decorator
+wrapt                               # Decorator utilities used in the @timed paver task decorator

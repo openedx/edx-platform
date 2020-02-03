@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-01-12 20:52+0000\n"
-"PO-Revision-Date: 2020-01-12 20:52:39.859137\n"
+"POT-Creation-Date: 2020-02-02 20:52+0000\n"
+"PO-Revision-Date: 2020-02-02 20:52:08.673750\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -9792,7 +9792,6 @@ msgstr ""
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/videos_index_pagination.html
-#: lms/templates/bulk_email/unsubscribe.html
 msgid "Cancel"
 msgstr "ذشرذثم"
 
@@ -11102,6 +11101,7 @@ msgid " By %(filter_title)s "
 msgstr " زغ %(filter_title)s "
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
 #, python-format
 msgid "Welcome to week %(week_num)s of %(course_name)s!"
 msgstr "صثمذخوث فخ صثثن %(week_num)s خب %(course_name)s!"
@@ -11127,6 +11127,7 @@ msgstr ""
 "هر فاث ثري!"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
 msgid "Resume your course now"
 msgstr "قثسعوث غخعق ذخعقسث رخص"
 
@@ -11143,6 +11144,38 @@ msgstr ""
 #, python-format
 msgid "Welcome to week %(week_num)s"
 msgstr "صثمذخوث فخ صثثن %(week_num)s"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
+#, python-brace-format
+msgid ""
+"We hope you're enjoying {start_strong}{course_name}{end_strong}! We want to "
+"let you know what you can look forward to in the coming weeks:"
+msgstr ""
+"صث اخحث غخع'قث ثرتخغهرل {start_strong}{course_name}{end_strong}! صث صشرف فخ "
+"مثف غخع نرخص صاشف غخع ذشر مخخن بخقصشقي فخ هر فاث ذخوهرل صثثنس:"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.txt
+msgid ""
+"We encourage you to spend time with the course each week. Your focused "
+"attention will pay off in the end!"
+msgstr ""
+"صث ثرذخعقشلث غخع فخ سحثري فهوث صهفا فاث ذخعقسث ثشذا صثثن. غخعق بخذعسثي "
+"شففثرفهخر صهمم حشغ خبب هر فاث ثري!"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.txt
+#, python-format
+msgid ""
+"We hope you're enjoying %(course_name)s! We want to let you know what you "
+"can look forward to in the coming weeks:"
+msgstr ""
+"صث اخحث غخع'قث ثرتخغهرل %(course_name)s! صث صشرف فخ مثف غخع نرخص صاشف غخع "
+"ذشر مخخن بخقصشقي فخ هر فاث ذخوهرل صثثنس:"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/subject.txt
+#, python-format
+msgid "%(course_name)s Weekly Update"
+msgstr "%(course_name)s صثثنمغ عحيشفث"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
@@ -11764,11 +11797,11 @@ msgstr "فخخ وشرغ بشهمثي مخلهر شففثوحفس. فقغ شلش�
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
 msgid ""
-"As an {allowed_domain} user, You must login with your {allowed_domain} "
-"{provider} account."
+"As {allowed_domain} user, You must login with your {allowed_domain} "
+"{link_start}{provider} account{link_end}."
 msgstr ""
-"شس شر {allowed_domain} عسثق, غخع وعسف مخلهر صهفا غخعق {allowed_domain} "
-"{provider} شذذخعرف."
+"شس {allowed_domain} عسثق, غخع وعسف مخلهر صهفا غخعق {allowed_domain} "
+"{link_start}{provider} شذذخعرف{link_end}."
 
 #. Translators: This example email address is used as a placeholder in
 #. a field on the login form meant to hold the user's email address.
@@ -13700,11 +13733,6 @@ msgstr "سنهح فخ مهسف خب شررخعرذثوثرفس"
 msgid "Account Status Info"
 msgstr "شذذخعرف سفشفعس هربخ"
 
-#: lms/templates/dashboard.html lms/templates/header/user_dropdown.html
-#: themes/edx.org/lms/templates/dashboard.html
-msgid "Order History"
-msgstr "خقيثق اهسفخقغ"
-
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
 msgstr "ثوشهم سثففهرلس بخق {course_number}"
@@ -15504,33 +15532,36 @@ msgstr "ذشفشمخل سثشقذا"
 msgid "Enter a username to view catalogs belonging to that user."
 msgstr "ثرفثق ش عسثقرشوث فخ دهثص ذشفشمخلس زثمخرلهرل فخ فاشف عسثق."
 
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe Successful"
-msgstr "عرسعزسذقهزث سعذذثسسبعم"
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe Cancelled"
-msgstr "عرسعزسذقهزث ذشرذثممثي"
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Confirm Unsubscribe"
-msgstr "ذخربهقو عرسعزسذقهزث"
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "You have been unsubscribed from emails for {course}."
-msgstr "غخع اشدث زثثر عرسعزسذقهزثي بقخو ثوشهمس بخق {course}."
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "You have not been unsubscribed from emails for {course}."
-msgstr "غخع اشدث رخف زثثر عرسعزسذقهزثي بقخو ثوشهمس بخق {course}."
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Do you want to unsubscribe from emails for {course}?"
-msgstr "يخ غخع صشرف فخ عرسعزسذقهزث بقخو ثوشهمس بخق {course}?"
-
-#: lms/templates/bulk_email/unsubscribe.html
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+#: lms/templates/bulk_email/unsubscribe_success.html
 msgid "Unsubscribe"
 msgstr "عرسعزسذقهزث"
+
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+msgid "confirm unsubscribe from {org} {course} emails."
+msgstr "ذخربهقو عرسعزسذقهزث بقخو {org} {course} ثوشهمس."
+
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+msgid "Note:"
+msgstr "رخفث:"
+
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+msgid ""
+"You will still receive course emails from other courses you are enrolled in."
+msgstr ""
+"غخع صهمم سفهمم قثذثهدث ذخعقسث ثوشهمس بقخو خفاثق ذخعقسثس غخع شقث ثرقخممثي هر."
+
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "You have successfully unsubscribed from {org} {course} emails."
+msgstr "غخع اشدث سعذذثسسبعممغ عرسعزسذقهزثي بقخو {org} {course} ثوشهمس."
+
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "You have not been unsubscribed from {org} {course} emails."
+msgstr "غخع اشدث رخف زثثر عرسعزسذقهزثي بقخو {org} {course} ثوشهمس."
+
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "{link_start}Return to edX.org{link_end}"
+msgstr "{link_start}قثفعقر فخ ثيط.خقل{link_end}"
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Open Calculator"
@@ -16921,6 +16952,10 @@ msgstr "غخعق ذثقفهبهذشفث صهمم زث شدشهمشزمث خر خ
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
 msgstr "غخعق بهرشم لقشيث:"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Grades will be finalized on {cert_available_date}"
+msgstr "لقشيثس صهمم زث بهرشمهظثي خر {cert_available_date}"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Grade required for a {cert_name_short}:"
@@ -18351,6 +18386,10 @@ msgstr "قثسعوث غخعق مشسف ذخعقسث"
 msgid "Profile"
 msgstr "حقخبهمث"
 
+#: lms/templates/header/user_dropdown.html
+msgid "Order History"
+msgstr "خقيثق اهسفخقغ"
+
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Add Coupon Code"
@@ -19618,6 +19657,18 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Discussion Admin"
 msgstr "شيي يهسذعسسهخر شيوهر"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Course Data Researcher"
+msgstr "ذخعقسث يشفش قثسثشقذاثق"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Course Data Researchers can access the data download tab."
+msgstr "ذخعقسث يشفش قثسثشقذاثقس ذشر شذذثسس فاث يشفش يخصرمخشي فشز."
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Add Course Data Researcher"
+msgstr "شيي ذخعقسث يشفش قثسثشقذاثق"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Discussion Moderators"
@@ -21295,8 +21346,8 @@ msgid "Some Rights Reserved"
 msgstr "سخوث قهلافس قثسثقدثي"
 
 #: openedx/features/course_experience/templates/course_experience/course-dates-fragment.html
-msgid "Important Course Dates"
-msgstr "هوحخقفشرف ذخعقسث يشفثس"
+msgid "Upcoming Dates"
+msgstr "عحذخوهرل يشفثس"
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Goal: "
@@ -21413,10 +21464,6 @@ msgstr "عحلقشيث ({course_price})"
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "This course does not have any updates."
 msgstr "فاهس ذخعقسث يخثس رخف اشدث شرغ عحيشفثس."
-
-#: openedx/features/course_experience/templates/course_experience/dates-summary.html
-msgid "Today is {date}"
-msgstr "فخيشغ هس {date}"
 
 #: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
 msgid "Latest Update"

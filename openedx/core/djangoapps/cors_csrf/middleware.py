@@ -48,6 +48,7 @@ import logging
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, MiddlewareNotUsed
 from django.middleware.csrf import CsrfViewMiddleware
+from django.utils.deprecation import MiddlewareMixin
 
 from .helpers import is_cross_domain_request_allowed, skip_cross_domain_referer_check
 
@@ -55,14 +56,16 @@ from .helpers import is_cross_domain_request_allowed, skip_cross_domain_referer_
 log = logging.getLogger(__name__)
 
 
-class CorsCSRFMiddleware(CsrfViewMiddleware):
+class CorsCSRFMiddleware(CsrfViewMiddleware, MiddlewareMixin):
     """
     Middleware for handling CSRF checks with CORS requests
     """
-    def __init__(self):
+
+    def __init__(self, *args, **kwargs):
         """Disable the middleware if the feature flag is disabled. """
         if not settings.FEATURES.get('ENABLE_CORS_HEADERS'):
             raise MiddlewareNotUsed()
+        super(CorsCSRFMiddleware, self).__init__(*args, **kwargs)
 
     def process_view(self, request, callback, callback_args, callback_kwargs):
         """Skip the usual CSRF referer check if this is an allowed cross-domain request. """
@@ -74,7 +77,7 @@ class CorsCSRFMiddleware(CsrfViewMiddleware):
             return super(CorsCSRFMiddleware, self).process_view(request, callback, callback_args, callback_kwargs)
 
 
-class CsrfCrossDomainCookieMiddleware(object):
+class CsrfCrossDomainCookieMiddleware(MiddlewareMixin):
     """Set an additional "cross-domain" CSRF cookie.
 
     Usage:
@@ -91,7 +94,7 @@ class CsrfCrossDomainCookieMiddleware(object):
 
     """
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """Disable the middleware if the feature is not enabled. """
         if not settings.FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF_COOKIE'):
             raise MiddlewareNotUsed()
@@ -107,6 +110,7 @@ class CsrfCrossDomainCookieMiddleware(object):
                 "You must set `CROSS_DOMAIN_CSRF_COOKIE_DOMAIN` when "
                 "`FEATURES['ENABLE_CROSS_DOMAIN_CSRF_COOKIE']` is True."
             )
+        super(CsrfCrossDomainCookieMiddleware, self).__init__(*args, **kwargs)
 
     def process_response(self, request, response):
         """Set the cross-domain CSRF cookie. """

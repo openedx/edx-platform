@@ -574,6 +574,9 @@ VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = ENV_TOKENS.get('VIDEO_TRANSCRIPT_MIGRATI
 ########## Settings youtube thumbnails scraper tasks ############
 SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE = ENV_TOKENS.get('SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE', DEFAULT_PRIORITY_QUEUE)
 
+########## Settings update search index task ############
+UPDATE_SEARCH_INDEX_JOB_QUEUE = ENV_TOKENS.get('UPDATE_SEARCH_INDEX_JOB_QUEUE', DEFAULT_PRIORITY_QUEUE)
+
 ########################## Parental controls config  #######################
 
 # The age at which a learner no longer requires parental consent, or None
@@ -606,6 +609,10 @@ FERNET_KEYS = AUTH_TOKENS.get('FERNET_KEYS', FERNET_KEYS)
 ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = ENV_TOKENS.get(
     'ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER',
     ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER
+)
+ENTERPRISE_CATALOG_INTERNAL_ROOT_URL = ENV_TOKENS.get(
+    'ENTERPRISE_CATALOG_INTERNAL_ROOT_URL',
+    ENTERPRISE_CATALOG_INTERNAL_ROOT_URL
 )
 
 # This limits the type of roles that are submittable via the `student` app's manual enrollment

@@ -128,7 +128,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-01-12 20:42+0000\n"
+"POT-Creation-Date: 2020-02-02 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -9785,10 +9785,6 @@ msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
 #: openedx/core/djangoapps/user_api/admin.py
-#: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: cms/templates/videos_index_pagination.html
-#: lms/templates/bulk_email/unsubscribe.html
 msgid "Cancel"
 msgstr "İptal"
 
@@ -11060,6 +11056,7 @@ msgid " By %(filter_title)s "
 msgstr "%(filter_title)s İle"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
 #, python-format
 msgid "Welcome to week %(week_num)s of %(course_name)s!"
 msgstr "%(course_name)s dersinin %(week_num)s. haftasına hoş geldiniz!"
@@ -11080,6 +11077,7 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
 msgid "Resume your course now"
 msgstr "Dersinize devam edin"
 
@@ -11094,6 +11092,32 @@ msgstr ""
 #, python-format
 msgid "Welcome to week %(week_num)s"
 msgstr "%(week_num)s. haftaya hoş geldiniz"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
+#, python-brace-format
+msgid ""
+"We hope you're enjoying {start_strong}{course_name}{end_strong}! We want to "
+"let you know what you can look forward to in the coming weeks:"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.txt
+msgid ""
+"We encourage you to spend time with the course each week. Your focused "
+"attention will pay off in the end!"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.txt
+#, python-format
+msgid ""
+"We hope you're enjoying %(course_name)s! We want to let you know what you "
+"can look forward to in the coming weeks:"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/subject.txt
+#, python-format
+msgid "%(course_name)s Weekly Update"
+msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
@@ -11677,8 +11701,8 @@ msgstr "Fazla sayıda hatalı giriş. Lütfen daha sonra tekrar deneyin."
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
 msgid ""
-"As an {allowed_domain} user, You must login with your {allowed_domain} "
-"{provider} account."
+"As {allowed_domain} user, You must login with your {allowed_domain} "
+"{link_start}{provider} account{link_end}."
 msgstr ""
 
 #. Translators: This example email address is used as a placeholder in
@@ -13561,11 +13585,6 @@ msgstr "Duyurular listesine atla"
 msgid "Account Status Info"
 msgstr "Hesap Durumu Bilgisi"
 
-#: lms/templates/dashboard.html lms/templates/header/user_dropdown.html
-#: themes/edx.org/lms/templates/dashboard.html
-msgid "Order History"
-msgstr "Sipariş Geçmişi"
-
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
 msgstr "{course_number} için E-posta Ayarları"
@@ -15119,32 +15138,34 @@ msgstr "Katalog Ara"
 msgid "Enter a username to view catalogs belonging to that user."
 msgstr "Bu kullanıcıya ait katalogları görmek için kullanıcı adını girin."
 
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe Successful"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe Cancelled"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Confirm Unsubscribe"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "You have been unsubscribed from emails for {course}."
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "You have not been unsubscribed from emails for {course}."
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Do you want to unsubscribe from emails for {course}?"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+#: lms/templates/bulk_email/unsubscribe_success.html
 msgid "Unsubscribe"
+msgstr ""
+
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+msgid "confirm unsubscribe from {org} {course} emails."
+msgstr ""
+
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+msgid "Note:"
+msgstr ""
+
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+msgid ""
+"You will still receive course emails from other courses you are enrolled in."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "You have successfully unsubscribed from {org} {course} emails."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "You have not been unsubscribed from {org} {course} emails."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "{link_start}Return to edX.org{link_end}"
 msgstr ""
 
 #: lms/templates/calculator/toggle_calculator.html
@@ -16497,6 +16518,10 @@ msgstr "Sertifikanız {date} tarihinde ya da öncesinde kullanılabilir olacak"
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
 msgstr "Final notunuz:"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Grades will be finalized on {cert_available_date}"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Grade required for a {cert_name_short}:"
@@ -17926,6 +17951,10 @@ msgstr "Son dersinize devam edin"
 msgid "Profile"
 msgstr "Profil"
 
+#: lms/templates/header/user_dropdown.html
+msgid "Order History"
+msgstr "Sipariş Geçmişi"
+
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Add Coupon Code"
@@ -19177,6 +19206,18 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Discussion Admin"
 msgstr "Tartışma Yöneticisi Ekle"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Course Data Researcher"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Course Data Researchers can access the data download tab."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Add Course Data Researcher"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Discussion Moderators"
@@ -20818,8 +20859,8 @@ msgid "Some Rights Reserved"
 msgstr "Bazı Hakları Saklıdır"
 
 #: openedx/features/course_experience/templates/course_experience/course-dates-fragment.html
-msgid "Important Course Dates"
-msgstr "Önemli Ders Tarihleri"
+msgid "Upcoming Dates"
+msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Goal: "
@@ -20937,10 +20978,6 @@ msgstr "Yükselt ({course_price})"
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "This course does not have any updates."
 msgstr "Bu derste herhangi bir güncelleme yok."
-
-#: openedx/features/course_experience/templates/course_experience/dates-summary.html
-msgid "Today is {date}"
-msgstr "Bugün {date}"
 
 #: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
 msgid "Latest Update"

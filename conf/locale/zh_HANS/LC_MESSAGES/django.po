@@ -395,7 +395,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-01-12 20:42+0000\n"
+"POT-Creation-Date: 2020-02-02 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/open-edx/teams/6205/zh_CN/)\n"
@@ -10545,6 +10545,7 @@ msgid " By %(filter_title)s "
 msgstr "于%(filter_title)s前"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
 #, python-format
 msgid "Welcome to week %(week_num)s of %(course_name)s!"
 msgstr "%(week_num)s学习的第%(course_name)s周！"
@@ -10565,6 +10566,7 @@ msgid ""
 msgstr "自定学习进度的课程，由您自定学习计划时间表。我们建议您每周都能投入学习，您的专注最终将有所回报！"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
 msgid "Resume your course now"
 msgstr "继续学习课程"
 
@@ -10579,6 +10581,32 @@ msgstr "希望您能喜欢我们的课程%(course_name)s！以下是第%(week_nu
 #, python-format
 msgid "Welcome to week %(week_num)s"
 msgstr "欢迎来到第%(week_num)s周"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
+#, python-brace-format
+msgid ""
+"We hope you're enjoying {start_strong}{course_name}{end_strong}! We want to "
+"let you know what you can look forward to in the coming weeks:"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.txt
+msgid ""
+"We encourage you to spend time with the course each week. Your focused "
+"attention will pay off in the end!"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.txt
+#, python-format
+msgid ""
+"We hope you're enjoying %(course_name)s! We want to let you know what you "
+"can look forward to in the coming weeks:"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/subject.txt
+#, python-format
+msgid "%(course_name)s Weekly Update"
+msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
@@ -11134,8 +11162,8 @@ msgstr "失败次数超过限制，请稍后再试！"
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
 msgid ""
-"As an {allowed_domain} user, You must login with your {allowed_domain} "
-"{provider} account."
+"As {allowed_domain} user, You must login with your {allowed_domain} "
+"{link_start}{provider} account{link_end}."
 msgstr ""
 
 #. Translators: This example email address is used as a placeholder in
@@ -12932,11 +12960,6 @@ msgstr "跳转到公告列表"
 msgid "Account Status Info"
 msgstr "账号状态信息"
 
-#: lms/templates/dashboard.html lms/templates/header/user_dropdown.html
-#: themes/edx.org/lms/templates/dashboard.html
-msgid "Order History"
-msgstr "订单记录"
-
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
 msgstr "{course_number}的电子邮件设置"
@@ -14474,32 +14497,34 @@ msgstr "列表搜索"
 msgid "Enter a username to view catalogs belonging to that user."
 msgstr "输入用户名查看该用户的列表。"
 
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe Successful"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe Cancelled"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Confirm Unsubscribe"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "You have been unsubscribed from emails for {course}."
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "You have not been unsubscribed from emails for {course}."
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Do you want to unsubscribe from emails for {course}?"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+#: lms/templates/bulk_email/unsubscribe_success.html
 msgid "Unsubscribe"
+msgstr ""
+
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+msgid "confirm unsubscribe from {org} {course} emails."
+msgstr ""
+
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+msgid "Note:"
+msgstr ""
+
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+msgid ""
+"You will still receive course emails from other courses you are enrolled in."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "You have successfully unsubscribed from {org} {course} emails."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "You have not been unsubscribed from {org} {course} emails."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "{link_start}Return to edX.org{link_end}"
 msgstr ""
 
 #: lms/templates/calculator/toggle_calculator.html
@@ -15792,6 +15817,10 @@ msgid "Your final grade:"
 msgstr "您的最终成绩："
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Grades will be finalized on {cert_available_date}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Grade required for a {cert_name_short}:"
 msgstr "评定{cert_name_short}所需要的成绩："
 
@@ -17079,6 +17108,10 @@ msgstr "继续上门课程的学习"
 msgid "Profile"
 msgstr "用户资料"
 
+#: lms/templates/header/user_dropdown.html
+msgid "Order History"
+msgstr "订单记录"
+
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Add Coupon Code"
@@ -18237,6 +18270,18 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Discussion Admin"
 msgstr "添加论坛管理员"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Course Data Researcher"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Course Data Researchers can access the data download tab."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Add Course Data Researcher"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Discussion Moderators"
@@ -19772,8 +19817,8 @@ msgid "Some Rights Reserved"
 msgstr "保留部分权利"
 
 #: openedx/features/course_experience/templates/course_experience/course-dates-fragment.html
-msgid "Important Course Dates"
-msgstr "重要课程日期"
+msgid "Upcoming Dates"
+msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Goal: "
@@ -19882,10 +19927,6 @@ msgstr "升级({course_price})"
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "This course does not have any updates."
 msgstr "此门课程没有任何更新。"
-
-#: openedx/features/course_experience/templates/course_experience/dates-summary.html
-msgid "Today is {date}"
-msgstr "今天是 {date}"
 
 #: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
 msgid "Latest Update"

@@ -169,7 +169,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-01-05 20:42+0000\n"
+"POT-Creation-Date: 2020-01-26 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019\n"
 "Language-Team: German (Germany) (https://www.transifex.com/open-edx/teams/6205/de_DE/)\n"
@@ -7603,6 +7603,7 @@ msgid "Cohort"
 msgstr "Geburtsjahrgang"
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Team"
 msgstr "Team"
 
@@ -8581,6 +8582,20 @@ msgstr " (überspringe {skipped})"
 #, python-brace-format
 msgid " (out of {total})"
 msgstr "(von {total})"
+
+#: lms/djangoapps/learner_dashboard/programs.py
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/learner_dashboard/programs.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Programs"
+msgstr "Programme"
+
+#: lms/djangoapps/learner_dashboard/programs.py
+#: lms/templates/learner_dashboard/program_details.html
+msgid "Program Details"
+msgstr "Programmdetails"
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
@@ -10272,7 +10287,6 @@ msgstr ""
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/videos_index_pagination.html
-#: lms/templates/bulk_email/unsubscribe.html
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -12301,11 +12315,11 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
 msgid ""
-"As an {allowed_domain} user, You must login with your {allowed_domain} "
-"{provider} account."
+"As {allowed_domain} user, You must login with your {allowed_domain} "
+"{link_start}{provider} account{link_end}."
 msgstr ""
-"Als {allowed_domain} Benutzer müssen Sie sich mit Ihrem "
-"{allowed_domain}{provider} Konto anmelden."
+"Als {allowed_domain} Benutzer, müssen Sie sich mit Ihrem {allowed_domain} "
+"{link_start}{provider} Konto anmelden{link_end}."
 
 #. Translators: This example email address is used as a placeholder in
 #. a field on the login form meant to hold the user's email address.
@@ -12774,10 +12788,6 @@ msgid "enabled_as_of must be set when enabled is True"
 msgstr "enabled_as_of muss gesetzt werden wenn enabled \"wahr\" ist"
 
 #: openedx/features/content_type_gating/partitions.py
-msgid "Feature-based Enrollments"
-msgstr "Fähigkeit-basierte Einschreibungen"
-
-#: openedx/features/content_type_gating/partitions.py
 msgid "Partition for segmenting users by access to gated content types"
 msgstr ""
 "Partition zur Segmentierung von Benutzern durch Zugriff auf beschränkte "
@@ -12985,12 +12995,12 @@ msgstr ""
 #, no-python-format, python-brace-format
 msgid ""
 "{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% "
-"[{strikeout_price}]{span_close}{br}Discount will be automatically applied at"
-" checkout. {a_open}Upgrade Now{a_close}{div_close}"
+"[{strikeout_price}]{span_close}{br}Use code {b_open}{code}{b_close} at "
+"checkout! {a_open}Upgrade Now{a_close}{div_close}"
 msgstr ""
 "{banner_open} Aktualisieren Sie bis zum {discount_expiration_date} und "
-"sparen Sie {percentage}% [{strikeout_price}]{span_close}{br}Rabatt wird "
-"automatisch an der Kasse angewendet. {a_open}Jetzt "
+"sparen Sie {percentage}% [{strikeout_price}]{span_close}{br}Nutzen Sie den "
+"{b_open}{code}{b_close} an der Kasse! {a_open}Jetzt "
 "Upgraden{a_close}{div_close}"
 
 #: openedx/features/enterprise_support/api.py
@@ -16153,36 +16163,43 @@ msgstr ""
 "Geben Sie einen Nutzernamen ein, um zu sehen, welche Kataloge zugehörig "
 "sind."
 
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe Successful"
-msgstr "Erfolgreich ausgetragen"
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe Cancelled"
-msgstr "Austragung fehlgeschlagen"
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Confirm Unsubscribe"
-msgstr "Austragung bestätigt"
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "You have been unsubscribed from emails for {course}."
-msgstr ""
-"Sie wurden von den E-Mails, die den Kurs {course} betreffen, ausgetragen."
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "You have not been unsubscribed from emails for {course}."
-msgstr ""
-"Sie wurden nicht von den E-Mails, die den Kurs {course} betreffen, "
-"ausgetragen."
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Do you want to unsubscribe from emails for {course}?"
-msgstr "Möchten Sie keine weiteren E-Mails zum Kurs {course} bekommen?"
-
-#: lms/templates/bulk_email/unsubscribe.html
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+#: lms/templates/bulk_email/unsubscribe_success.html
 msgid "Unsubscribe"
 msgstr "Austragen"
+
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+msgid "confirm unsubscribe from {org} {course} emails."
+msgstr ""
+"Bestätigen Sie, dass Sie sich von den {org} Kurs-E-Mails für den Kurs "
+"{course} austragen wollen."
+
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+msgid "Note:"
+msgstr "Achtung:"
+
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+msgid ""
+"You will still receive course emails from other courses you are enrolled in."
+msgstr ""
+"Dies beeinflusst nicht die E-Mails aus anderen Kursen, in welche Sie "
+"eingeschrieben sind."
+
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "You have successfully unsubscribed from {org} {course} emails."
+msgstr ""
+"Sie sind erfolgreich aus der E-Mail-Liste des Kurses {course} von {org} "
+"ausgetragen."
+
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "You have not been unsubscribed from {org} {course} emails."
+msgstr ""
+"Sie wurden nicht aus der E-Mail-Liste des Kurses {course} von {org} "
+"ausgetragen."
+
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "{link_start}Return to edX.org{link_end}"
+msgstr "{link_start}Zurück zu edX.org{link_end}"
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Open Calculator"
@@ -19054,14 +19071,6 @@ msgstr ""
 "{ff_link}."
 
 #: lms/templates/header/navbar-authenticated.html
-#: lms/templates/learner_dashboard/programs.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Programs"
-msgstr "Programme"
-
-#: lms/templates/header/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr "Kursübersicht"
@@ -20957,10 +20966,6 @@ msgstr ""
 msgid "My Courses"
 msgstr "Meine Kurse"
 
-#: lms/templates/learner_dashboard/program_details.html
-msgid "Program Details"
-msgstr "Programmdetails"
-
 #: lms/templates/learner_dashboard/text-me-fragment.html
 msgid "Get the {platform_name} Mobile App!"
 msgstr "Holen Sie sich die mobile {platform_name} App!"
@@ -21250,6 +21255,17 @@ msgstr "{platform_name}-Passwort zurücksetzen"
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Invalid Password Reset Link"
 msgstr "Ungültiger Link zum Zurücksetzen"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid ""
+"This password reset link is invalid. It may have been used already. To reset"
+" your password, go to the {start_link}sign-in{end_link} page and select "
+"{start_strong}Forgot password{end_strong}."
+msgstr ""
+"Dieser Link zum Zurücksetzen des Passwortes is ungültig. Er wurde vielleicht"
+" bereits benutzt. Um Ihr Passwort dennoch zurückzusetzen, gehen Sie zu der "
+"{start_link}Anmelde{end_link} Seite und wählen Sie {start_strong}Passwort "
+"vergessen{end_strong}."
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"
@@ -22139,8 +22155,8 @@ msgid "Some Rights Reserved"
 msgstr "Some Rights Reserved"
 
 #: openedx/features/course_experience/templates/course_experience/course-dates-fragment.html
-msgid "Important Course Dates"
-msgstr "Wichtige Kursdaten"
+msgid "Upcoming Dates"
+msgstr "Kommende Termine"
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Goal: "
@@ -22260,10 +22276,6 @@ msgstr "Upgrade ({course_price})"
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "This course does not have any updates."
 msgstr "Dieser Kurs hat keine Updates."
-
-#: openedx/features/course_experience/templates/course_experience/dates-summary.html
-msgid "Today is {date}"
-msgstr "Heute ist der {date}"
 
 #: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
 msgid "Latest Update"

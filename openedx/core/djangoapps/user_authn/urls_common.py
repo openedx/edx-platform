@@ -13,10 +13,10 @@ which leads to inconsistent prefixing.
 
 from django.conf import settings
 from django.conf.urls import url
-from django.contrib.auth.views import password_reset_complete
+from django.contrib.auth.views import PasswordResetCompleteView
 
 from .views import auto_auth, login, logout, password_reset, register
-
+from .views.password_reset import PasswordResetConfirmWrapper
 
 urlpatterns = [
     # Registration
@@ -55,7 +55,7 @@ urlpatterns = [
     url(r'^password_reset/$', password_reset.password_reset, name='password_reset'),
     url(
         r'^password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
-        password_reset.password_reset_confirm_wrapper,
+        PasswordResetConfirmWrapper.as_view(),
         name='password_reset_confirm',
     ),
     url(r'^account/password$', password_reset.password_change_request_handler, name='password_change_request'),
@@ -66,7 +66,7 @@ urlpatterns = [
 urlpatterns += [
     url(
         r'^password_reset_complete/$',
-        password_reset_complete,
+        PasswordResetCompleteView.as_view(),
         name='password_reset_complete',
     ),
 ]

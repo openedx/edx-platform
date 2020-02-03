@@ -13,7 +13,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import ValidationError, validate_email
 from django.utils.translation import override as override_language
 from django.utils.translation import ugettext as _
-from edx_django_utils.monitoring import set_custom_metric
 from pytz import UTC
 from six import text_type  # pylint: disable=ungrouped-imports
 

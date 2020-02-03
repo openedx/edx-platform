@@ -5,7 +5,7 @@
 #
 # Translators:
 # Abel Camacho <abelcama@gmail.com>, 2015-2016
-# Abel Camacho <abelcama@gmail.com>, 2017,2019
+# Abel Camacho <abelcama@gmail.com>, 2017,2019-2020
 # Abel Camacho <abelcama@gmail.com>, 2015
 # Pedro Lonbide <plonbide@gmail.com>, 2015
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
@@ -15,7 +15,7 @@
 #
 # Translators:
 # Abel Camacho <abelcama@gmail.com>, 2015,2017
-# Abel Camacho <abelcama@gmail.com>, 2017,2019
+# Abel Camacho <abelcama@gmail.com>, 2017,2019-2020
 # Abel Camacho <abelcama@gmail.com>, 2015
 # Pedro Lonbide <plonbide@gmail.com>, 2015
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
@@ -34,7 +34,7 @@
 #
 # Translators:
 # Abel Camacho <abelcama@gmail.com>, 2015-2016
-# Abel Camacho <abelcama@gmail.com>, 2017,2019
+# Abel Camacho <abelcama@gmail.com>, 2017,2019-2020
 # Abel Camacho <abelcama@gmail.com>, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Basque (Spain) (http://www.transifex.com/open-edx/edx-platform/language/eu_ES/)
@@ -50,8 +50,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-01-05 20:42+0000\n"
-"PO-Revision-Date: 2019-11-19 11:18+0000\n"
+"POT-Creation-Date: 2020-01-26 20:42+0000\n"
+"PO-Revision-Date: 2020-01-30 12:51+0000\n"
 "Last-Translator: Abel Camacho <abelcama@gmail.com>\n"
 "Language-Team: Basque (Spain) (http://www.transifex.com/open-edx/edx-platform/language/eu_ES/)\n"
 "Language: eu_ES\n"
@@ -1821,11 +1821,11 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "off"
-msgstr ""
+msgstr "itzalita"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "on"
-msgstr ""
+msgstr "piztuta"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video position. Press space to toggle playback"
@@ -1916,11 +1916,11 @@ msgstr "Bideoaren transkripzioa"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Start of transcript. Skip to the end."
-msgstr ""
+msgstr "Transkripzioaren hasiera. Egin jauzi amaierara."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "End of transcript. Skip to the start."
-msgstr ""
+msgstr "Transkripzioaren amaiera. Egin jauzi hasierara."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid ""
@@ -1950,9 +1950,8 @@ msgid "Turn off transcripts"
 msgstr ""
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
-#: cms/templates/js/move-xblock-list.underscore
 msgid "View child items"
-msgstr ""
+msgstr "Ikusi beheragoko elementuak"
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Navigate up"
@@ -2020,14 +2019,14 @@ msgstr ""
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "there is currently {numVotes} vote"
 msgid_plural "there are currently {numVotes} votes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "une honetan bozka {numVotes} dago"
+msgstr[1] "une honetan {numVotes} bozka daude"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "{numVotes} Vote"
 msgid_plural "{numVotes} Votes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Bozka {numVotes}"
+msgstr[1] "{numVotes} bozka"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
@@ -2160,8 +2159,8 @@ msgstr[1] ""
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "{numResponses} response"
 msgid_plural "{numResponses} responses"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "erantzun {numResponses}"
+msgstr[1] "{numResponses} erantzun"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Showing all responses"
@@ -2265,8 +2264,8 @@ msgstr "minutu bat gutxigorabehera"
 #, javascript-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "minutu %d"
+msgstr[1] "%d minutu"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about an hour"
@@ -2424,12 +2423,20 @@ msgid "Masters"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "MicroBachelors"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Photo Verification"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Proctoring"
 msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Security"
+msgstr "Segurtasuna"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: cms/templates/js/asset-library.underscore
@@ -2470,11 +2477,11 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Select a subject for your support request."
-msgstr ""
+msgstr "Aukeratu laguntza-eskaeraren gaia."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
-msgstr ""
+msgstr "Idatzi laguntza-eskaeraren xehetasunak"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 #: lms/djangoapps/support/static/support/jsx/success.jsx
@@ -2654,7 +2661,7 @@ msgstr ""
 #: lms/djangoapps/teams/static/teams/js/views/manage.js
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Manage"
-msgstr ""
+msgstr "Kudeatu"
 
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
@@ -2670,7 +2677,7 @@ msgstr "eta beste batzuk"
 #. * relative timestamp (see: http://momentjs.com/)
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "Last activity {date}"
-msgstr ""
+msgstr "Azken jarduera: {date}"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "View {span_start} {team_name} {span_end}"
@@ -3625,6 +3632,8 @@ msgid ""
 "There was a problem creating the report. Select \"Create Executive Summary\""
 " to try again."
 msgstr ""
+"Arazoa gerttau da txostena sortzean. Aukeratu \"Sortu laburpena\" berriz ere"
+" saiatzeko. "
 
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid "Enter the enrollment code."
@@ -5374,11 +5383,11 @@ msgstr "Ikastaro-zenbakia"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Run:"
-msgstr ""
+msgstr "Ikastaroa ematea:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "(Read-only)"
-msgstr ""
+msgstr "(Irakurtzekoa baino ez)"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Re-run Course"
@@ -5536,7 +5545,7 @@ msgstr "Testu-liburuaren izena beharrezkoa da"
 
 #: cms/static/js/models/textbook.js
 msgid "Please add at least one chapter"
-msgstr ""
+msgstr "Gehitu gutxienez atal bat"
 
 #: cms/static/js/models/textbook.js
 msgid "All chapters must have a name and asset"
@@ -5692,7 +5701,7 @@ msgstr ""
 
 #: cms/static/js/views/course_video_settings.js
 msgid "Select language"
-msgstr ""
+msgstr "Aukeratu hizkuntza"
 
 #: cms/static/js/views/course_video_settings.js
 msgid "Press Remove to remove language"
@@ -5713,7 +5722,7 @@ msgstr "Beharrezkoa"
 
 #: cms/static/js/views/course_video_settings.js
 msgid "Automatic transcripts are disabled."
-msgstr ""
+msgstr "Transkripzio automatikoak desgaitta daude."
 
 #: cms/static/js/views/course_video_settings.js
 msgid "{selectedProvider} credentials saved"
@@ -6176,7 +6185,7 @@ msgstr ""
 #: cms/static/js/views/partition_group_item.js
 #: cms/static/js/views/partition_group_list.js
 msgid "content group"
-msgstr "eduki-taldea"
+msgstr "eduki-multzoa"
 
 #: cms/static/js/views/partition_group_list.js
 msgid "Add your first content group"
@@ -6786,11 +6795,11 @@ msgstr "Ez dago eskuragarri"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Regenerate"
-msgstr ""
+msgstr "Sortu berriz"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Regenerate the user's certificate"
-msgstr ""
+msgstr "Sortu berriz erabiltzailearen ziurtagiria"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Generate"
@@ -6818,11 +6827,11 @@ msgstr "Aukeratu bat"
 
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 msgid "Explain if other."
-msgstr ""
+msgstr "Azaldu, beste bat bada."
 
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 msgid "Submit enrollment change"
-msgstr ""
+msgstr "Bidali matrikulazio-aldaketa"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
@@ -6871,12 +6880,12 @@ msgstr "Ondokoak egin du azken aldaketa:"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Active"
-msgstr ""
+msgstr "Aktibo"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 #: lms/templates/ccx/schedule.underscore
 msgid "N/A"
-msgstr ""
+msgstr "Ez da aplikatzen"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Change Enrollment"
@@ -6931,11 +6940,11 @@ msgstr "Eguneratu taldea."
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 msgid "Cancel team creating."
-msgstr ""
+msgstr "Utzi bertan behera taldea sortzea."
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 msgid "Cancel team updating."
-msgstr ""
+msgstr "Utzi bertan behera taldea eguneratzea."
 
 #: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
 msgid "Instructor tools"
@@ -6951,23 +6960,23 @@ msgstr "Editatu partaidetza"
 
 #: lms/djangoapps/teams/static/teams/templates/manage.underscore
 msgid "View Current Team Memberships"
-msgstr ""
+msgstr "Ikusi oraingo taldekideak"
 
 #: lms/djangoapps/teams/static/teams/templates/manage.underscore
 msgid "Download Memberships"
-msgstr ""
+msgstr "Deskargatu partaidetza"
 
 #: lms/djangoapps/teams/static/teams/templates/manage.underscore
 msgid "Assign Team Memberships"
-msgstr ""
+msgstr "Esleitu talde-partaidetza"
 
 #: lms/djangoapps/teams/static/teams/templates/manage.underscore
 msgid "Upload Memberships"
-msgstr ""
+msgstr "Kargatu partaidetza"
 
 #: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
 msgid "Are you having trouble finding a team to join?"
-msgstr ""
+msgstr "Ba al duzu talderen batekin bat egiteko arazorik?"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile-header-actions.underscore
 msgid "Join Team"
@@ -6987,7 +6996,7 @@ msgstr "Taldekideen profilak"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid "Team capacity"
-msgstr ""
+msgstr "Taldearen gaitasuna"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid "Leave Team"
@@ -7032,7 +7041,7 @@ msgstr "Atala"
 #: lms/templates/ccx/schedule.underscore
 #, python-format
 msgid "Remove chapter %(chapterDisplayName)s"
-msgstr ""
+msgstr "Ezabatu %(chapterDisplayName)s atala"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "remove"
@@ -7055,7 +7064,7 @@ msgstr "Ezabatu %(subsectionDisplayName)sazpiatala"
 #: lms/templates/ccx/schedule.underscore
 #, python-format
 msgid "Remove unit %(unitName)s"
-msgstr ""
+msgstr "Ezabatu %(unitName)s unitatea"
 
 #: lms/templates/commerce/provider.underscore
 #, python-format
@@ -7080,6 +7089,8 @@ msgstr "Lortu kreditua"
 msgid ""
 "Thank you %(full_name)s! We have received your payment for %(course_name)s."
 msgstr ""
+"Eskerrik asko %(full_name)s! Zure ordainketa jaso dugu %(course_name)s dela-"
+"eta."
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -7107,7 +7118,7 @@ msgstr "Denerakoa"
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Please Note"
-msgstr ""
+msgstr "Hartu kontuan"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -7117,12 +7128,12 @@ msgstr ""
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Billed to"
-msgstr ""
+msgstr "Faktura ondokoari egin zaio: "
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "No receipt available"
-msgstr ""
+msgstr "Ordainagiria ez dago eskura"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/financial-assistance/financial_assessment_submitted.underscore
@@ -7139,7 +7150,7 @@ msgstr ""
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Want to confirm your identity later?"
-msgstr ""
+msgstr "Nahi al duzu nortasuna beranduago egiaztatu?"
 
 #: lms/templates/commerce/receipt.underscore
 msgid "Verify Now"
@@ -7147,7 +7158,7 @@ msgstr "Egiaztatu orain!"
 
 #: lms/templates/courseware/proctored-exam-controls.underscore
 msgid "Mark Exam As Completed"
-msgstr ""
+msgstr "Markatu azterketa osatutzat "
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "You are taking \"{exam_link}\" as {exam_type}. "
@@ -7185,7 +7196,7 @@ msgstr "Amaitu azterketa"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "Hide Timer"
-msgstr ""
+msgstr "Ezkutatu denbora"
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
@@ -7198,7 +7209,7 @@ msgstr "Hasiera: %(start_date)s"
 
 #: lms/templates/discovery/course_card.underscore
 msgid "Starts"
-msgstr "Hasiko da"
+msgstr "Hasiera"
 
 #: lms/templates/discovery/filter_bar.underscore
 msgid "Clear All"
@@ -7206,7 +7217,7 @@ msgstr "Garbitu guztiak"
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Highlighted text"
-msgstr ""
+msgstr "Nabarmendutako testua"
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Note"
@@ -7218,7 +7229,7 @@ msgstr "Zuk komentatu zenuen..."
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Noted in:"
-msgstr ""
+msgstr "Oharra hemen egin da: "
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Last Edited:"
@@ -7256,7 +7267,7 @@ msgstr "Aginduaren xehetasunak"
 
 #: lms/templates/fields/field_order_history.underscore
 msgid "for"
-msgstr ""
+msgstr "ondokoarentzat"
 
 #: lms/templates/fields/field_order_history.underscore
 msgid "Product Name"
@@ -7271,7 +7282,7 @@ msgstr ""
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: lms/templates/financial-assistance/financial_assessment_submitted.underscore
 msgid "Financial Assistance Application"
-msgstr ""
+msgstr "Finantza-laguntzarako eskaria"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "About You"
@@ -7289,7 +7300,7 @@ msgstr "E-posta helbidea"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Legal name"
-msgstr ""
+msgstr "Izena"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Country of residence"
@@ -7297,11 +7308,11 @@ msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Back to {platform} FAQs"
-msgstr ""
+msgstr "Itzuli {platform} plataformako FAQetara"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Submit Application"
-msgstr ""
+msgstr "Bidali eskaria"
 
 #: lms/templates/financial-assistance/financial_assessment_submitted.underscore
 msgid ""
@@ -7329,7 +7340,7 @@ msgstr "Kargatu CSV fitxategia"
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Add to Exception List"
-msgstr ""
+msgstr "Gehitu salbuespenen zerrendara"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid ""
@@ -7343,7 +7354,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Invalidate Certificate"
-msgstr ""
+msgstr "Ziurtagiri baliogabea"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Student"
@@ -7351,11 +7362,11 @@ msgstr "Ikaslea"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Invalidated By"
-msgstr ""
+msgstr "Ondokoak baligabetua: "
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Invalidated"
-msgstr ""
+msgstr "Baliogabetua"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
@@ -7364,7 +7375,7 @@ msgstr "Oharrak"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Remove from Invalidation Table"
-msgstr ""
+msgstr "Ezabatu baliogabetuen taulatik"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Individual Exceptions"
@@ -7414,7 +7425,7 @@ msgstr "Ezabatu zerrendatik"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-subcategory.underscore
 msgid "Divided"
-msgstr ""
+msgstr "Zatituta"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Manage Learners"
@@ -7443,7 +7454,7 @@ msgstr "(Beharrezko eremua)"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "e.g. johndoe@example.com, JaneDoe, joeydoe@example.com"
-msgstr ""
+msgstr "adibidez, johndoe@example.com, JaneDoe, joeydoe@example.com"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid ""
@@ -7486,19 +7497,19 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Associated Content Group"
-msgstr "Lotutako eduki-taldea"
+msgstr "Lotutako eduki-multzoa"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "No Content Group"
-msgstr "Ez dago eduki-talderik"
+msgstr "Ez dago eduki-multzorik"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Select a Content Group"
-msgstr "Aukeratu eduki-taldea"
+msgstr "Aukeratu eduki-multzoa"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Choose a content group to associate"
-msgstr ""
+msgstr "Aukeratu eduki-multzo bat lotzeko"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Not selected"
@@ -7506,7 +7517,7 @@ msgstr "Aukeratu gabea"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Deleted Content Group"
-msgstr "Ezabatutako eduki-taldea"
+msgstr "Ezabatutako eduki-multzoa"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid ""
@@ -7525,7 +7536,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Create a content group"
-msgstr "Sartu eduki-taldea"
+msgstr "Sortu eduki-multzoa"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
 #, python-format
@@ -7623,7 +7634,7 @@ msgstr ""
 #: lms/templates/learner_dashboard/certificate_status.underscore
 #: lms/templates/learner_dashboard/upgrade_message.underscore
 msgid "Certificate Status:"
-msgstr ""
+msgstr "Ziurtagiriaren egoera:"
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
 msgid "Certificate Purchased"
@@ -7631,7 +7642,7 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/course_card.underscore
 msgid "Change or Leave Session"
-msgstr ""
+msgstr "Aldatu edo utzi saioa"
 
 #: lms/templates/learner_dashboard/course_card.underscore
 msgid "You must select a session by {expiration_date} to access the course."
@@ -7647,7 +7658,7 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Final Grade"
-msgstr ""
+msgstr "Azken kalifikazioa"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "for {courseName}"
@@ -7663,7 +7674,7 @@ msgstr "Ikusi ikastaroa"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Select a session:"
-msgstr ""
+msgstr "Aukeratu saioa:"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Enroll Now"
@@ -7691,7 +7702,7 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "To access the course, select a session."
-msgstr ""
+msgstr "Ikastarora joateko, aukeratu saioa."
 
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "Session Selection Dropdown for {courseName}"
@@ -7790,7 +7801,7 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Congratulations!"
-msgstr ""
+msgstr "Zorionak!"
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Your Program Journey"
@@ -7808,11 +7819,11 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "${listPrice}"
-msgstr ""
+msgstr "${listPrice}"
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid " ${price} {currency} )"
-msgstr ""
+msgstr " ${price} {currency} )"
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "COURSES IN PROGRESS"
@@ -7820,11 +7831,11 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "REMAINING COURSES"
-msgstr ""
+msgstr "GERATZEN DIREN IKASTAROAK"
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "COMPLETED COURSES"
-msgstr ""
+msgstr "OSATUTAKO IKASTAROAK"
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "As you complete courses, you will see them listed here."
@@ -7910,15 +7921,15 @@ msgstr ""
 #: lms/templates/student_account/institution_register.underscore
 #: lms/templates/student_account/register.underscore
 msgid "Create an Account"
-msgstr ""
+msgstr "Sortu kontua"
 
 #: lms/templates/student_account/login.underscore
 msgid "First time here?"
-msgstr ""
+msgstr "Lehen aldia hemen?"
 
 #: lms/templates/student_account/login.underscore
 msgid "Create an Account."
-msgstr ""
+msgstr "Sortu kontua."
 
 #: lms/templates/student_account/login.underscore
 msgid "Sign in to continue learning as {email}"
@@ -8000,7 +8011,7 @@ msgstr ""
 
 #: lms/templates/student_account/register.underscore
 msgid "Sign in."
-msgstr ""
+msgstr "Hasi saioa."
 
 #: lms/templates/student_account/register.underscore
 msgid "Create an account using"
@@ -8017,7 +8028,7 @@ msgstr ""
 
 #: lms/templates/student_account/register.underscore
 msgid "or create a new one here"
-msgstr ""
+msgstr "edo sortu beste bat hemen"
 
 #: lms/templates/student_account/register.underscore
 msgid "Support education research by providing additional information"
@@ -8075,8 +8086,8 @@ msgstr "Web-kamera"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"You need a computer that has a webcam. When you receive a browser prompt, "
-"make sure that you allow access to the camera."
+"You need a computer or cell phone that has a webcam. When you receive a "
+"browser prompt, make sure that you allow access to the camera."
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8096,8 +8107,8 @@ msgstr "Atera zure argazkia"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"When your face is in position, use the camera button {icon} below to take "
-"your photo."
+"When your face is in position, use the Take Photo button {icon} below to "
+"take your photo."
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8118,8 +8129,8 @@ msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"To use the current photo, select the camera button {icon}. To take another "
-"photo, select the retake button {icon}."
+"To use the current photo, select the Take Photo button {icon}. To take "
+"another photo, select the Retake Photo button {icon}."
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8164,6 +8175,50 @@ msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"What if I can't see the camera image, or if I can't see my photo do "
+"determine which side is visible?"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"You may be able to complete the image capture procedure without assistance, "
+"but it may take a couple of submission attempts to get the camera "
+"positioning right.  Optimal camera positioning varies with each computer, "
+"but generally the best position for a headshot is approximately 12-18 inches"
+" (30-45 centimeters) from the camera, with your head centered relative to "
+"the computer screen. "
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"If the photos you submit are rejected, try moving the computer or camera "
+"orientation to change the lighting angle.  The most common reason for "
+"rejection is inability to read the text on the ID card."
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"What if I have difficulty holding my head in position relative to the "
+"camera?"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+#, python-format
+msgid ""
+"If you require assistance with taking either photo for submission, contact "
+"%(platformName)s support for additional suggestions."
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
@@ -8172,7 +8227,7 @@ msgstr "Hurrengoa: %(nextStepTitle)s"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid "Take a Photo of Your ID"
-msgstr ""
+msgstr "Egin argazkia zure ID-ari"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
@@ -8200,12 +8255,27 @@ msgid "Make sure your ID is well-lit"
 msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
-msgid "Once in position, use the camera button {icon} to capture your ID"
+msgid "Once in position, use the Take Photo button {icon} to capture your ID"
 msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Use the retake photo button if you are not pleased with your photo"
+msgid "Use the Retake Photo button if you are not pleased with your photo"
+msgstr ""
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid ""
+"You may be able to complete the image capture procedure without assistance, "
+"but it may take a couple of submission attempts to get the camera "
+"positioning right.  Optimal camera positioning varies with each computer, "
+"but generally, the best position for a photo of an ID card is 8-12 inches "
+"(20-30 centimeters) from the camera, with the ID card centered relative to "
+"the camera. "
+msgstr ""
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid ""
+"What if I have difficulty holding my ID in position relative to the camera?"
 msgstr ""
 
 #: lms/templates/verify_student/image_input.underscore
@@ -8231,7 +8301,8 @@ msgid "Be sure your entire face is inside the frame"
 msgstr ""
 
 #: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Once in position, use the camera button {icon} to capture your photo"
+msgid ""
+"Once in position, use the Take Photo button {icon} to capture your photo"
 msgstr ""
 
 #: lms/templates/verify_student/incourse_reverify.underscore

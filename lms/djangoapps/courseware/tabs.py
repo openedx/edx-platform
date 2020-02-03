@@ -307,11 +307,10 @@ class SingleTextbookTab(CourseTab):
         raise NotImplementedError('SingleTextbookTab should not be serialized.')
 
 
-def get_course_tab_list(request, course):
+def get_course_tab_list(user, course):
     """
     Retrieves the course tab list from xmodule.tabs and manipulates the set as necessary
     """
-    user = request.user
     xmodule_tab_list = CourseTabList.iterate_displayable(course, user=user)
 
     # Now that we've loaded the tabs for this course, perform the Entrance Exam work.

@@ -83,6 +83,7 @@ setup(
             "password_policy = openedx.core.djangoapps.password_policy.apps:PasswordPolicyConfig",
             "user_authn = openedx.core.djangoapps.user_authn.apps:UserAuthnConfig",
             "program_enrollments = lms.djangoapps.program_enrollments.apps:ProgramEnrollmentsConfig",
+            "courseware_api = openedx.core.djangoapps.courseware_api.apps:CoursewareAPIConfig",
         ],
         "cms.djangoapp": [
             "announcements = openedx.features.announcements.apps:AnnouncementsConfig",

@@ -5,7 +5,7 @@
 #
 # Translators:
 # Abel Camacho <abelcama@gmail.com>, 2015,2017
-# Abel Camacho <abelcama@gmail.com>, 2017,2019
+# Abel Camacho <abelcama@gmail.com>, 2017,2019-2020
 # Abel Camacho <abelcama@gmail.com>, 2015
 # Edu Sánchez <esanchez@mondragon.edu>, 2015
 # Iñigo Zendegi Urzelai, 2015
@@ -26,7 +26,7 @@
 #
 # Translators:
 # Abel Camacho <abelcama@gmail.com>, 2015-2016
-# Abel Camacho <abelcama@gmail.com>, 2017,2019
+# Abel Camacho <abelcama@gmail.com>, 2017,2019-2020
 # Abel Camacho <abelcama@gmail.com>, 2015
 # Muhammad Adeel Khan <adeel@edx.org>, 2019
 # Pedro Lonbide <plonbide@gmail.com>, 2015
@@ -37,7 +37,7 @@
 #
 # Translators:
 # Abel Camacho <abelcama@gmail.com>, 2015-2016
-# Abel Camacho <abelcama@gmail.com>, 2017,2019
+# Abel Camacho <abelcama@gmail.com>, 2017,2019-2020
 # Abel Camacho <abelcama@gmail.com>, 2015
 # Pedro Lonbide <plonbide@gmail.com>, 2015
 # Waheed Ahmed <waheed@edx.org>, 2019
@@ -63,7 +63,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-01-05 20:42+0000\n"
+"POT-Creation-Date: 2020-01-26 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Abel Camacho <abelcama@gmail.com>, 2019\n"
 "Language-Team: Basque (Spain) (https://www.transifex.com/open-edx/teams/6205/eu_ES/)\n"
@@ -142,7 +142,7 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 #: common/lib/xmodule/xmodule/video_module/video_handlers.py
 msgid "A transcript file is required."
-msgstr ""
+msgstr "Transkripzioaren fitxategia beharrezko da."
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
@@ -184,7 +184,7 @@ msgstr "Zain"
 
 #: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
 msgid "Django site admin"
-msgstr ""
+msgstr "Django gunearen kudeaketa"
 
 #: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
 msgid "Django administration"
@@ -383,7 +383,7 @@ msgstr "Erabiltzaile-profila"
 
 #: common/djangoapps/student/admin.py
 msgid "Account recovery"
-msgstr ""
+msgstr "Kontua berreskuratzea"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a field on the login form
@@ -426,7 +426,7 @@ msgstr ""
 
 #: common/djangoapps/student/admin.py
 msgid "User with this email doesn't exist in system."
-msgstr ""
+msgstr "Sisteman ez dago e-posta helbidea duen erabiltzailerik."
 
 #: common/djangoapps/student/helpers.py
 #, python-brace-format
@@ -441,7 +441,7 @@ msgstr "Dagoeneko badago '{email}' e-posta duen kontu bat."
 
 #: common/djangoapps/student/management/commands/manage_group.py
 msgid "Removed group: \"{}\""
-msgstr ""
+msgstr "Ezabatutako taldea: \"{}\""
 
 #: common/djangoapps/student/management/commands/manage_group.py
 msgid "Did not find a group with name \"{}\" - skipping."
@@ -454,7 +454,7 @@ msgstr ""
 
 #: common/djangoapps/student/management/commands/manage_group.py
 msgid "Created new group: \"{}\""
-msgstr ""
+msgstr "Sortutako talde berria: \"{}\""
 
 #: common/djangoapps/student/management/commands/manage_group.py
 msgid "Found existing group: \"{}\""
@@ -500,7 +500,7 @@ msgstr ""
 
 #: common/djangoapps/student/management/commands/manage_user.py
 msgid "Removing user: \"{}\""
-msgstr ""
+msgstr "Erabiltzailea ezabatzen: \"{}\""
 
 #: common/djangoapps/student/management/commands/manage_user.py
 msgid "Created new user: \"{}\""
@@ -708,7 +708,7 @@ msgstr ""
 
 #: common/djangoapps/student/views/dashboard.py
 msgid "ID photo not provided"
-msgstr ""
+msgstr "Argazkiaren IDa ez da eman"
 
 #: common/djangoapps/student/views/dashboard.py
 msgid "ID is invalid"
@@ -761,6 +761,8 @@ msgstr ""
 #, python-brace-format
 msgid "The course you are looking for is closed for enrollment as of {date}."
 msgstr ""
+"Bilatzean ari zaren ikastaroa itxita dago matrikula egiteko {date} dataz "
+"geroztik."
 
 #: common/djangoapps/student/views/management.py
 msgid "Course id not specified"
@@ -830,7 +832,7 @@ msgstr ""
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid "{html_start}Success{html_end} You have activated your account."
-msgstr ""
+msgstr "{html_start}Ondo{html_end} Kontua aktibatu duzu."
 
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
@@ -1358,14 +1360,14 @@ msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "Invalid password."
-msgstr ""
+msgstr "Pasahitz baliogabea."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
 msgid "at least %(min_length)d character"
 msgid_plural "at least %(min_length)d characters"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "gutxienez karaktere %(min_length)d"
+msgstr[1] "gutxienez %(min_length)d karaktere"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -2056,7 +2058,7 @@ msgstr "Muga-data igarota zenbat denboraz onartu diren bidalketak"
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Show Results"
-msgstr ""
+msgstr "Erakutsi emaitzak"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
@@ -2116,7 +2118,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Show Answer: Number of Attempts"
-msgstr ""
+msgstr "Erakutsi erantzuna: saiakera-kopurua"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
@@ -2336,7 +2338,7 @@ msgstr "Neurri batean zuzena"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Answer submitted."
-msgstr ""
+msgstr "Erantzuna bidali da."
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
 #. longer attempt to solve the problem.
@@ -2367,22 +2369,22 @@ msgstr ""
 #, python-brace-format
 msgid "{num_hour} hour"
 msgid_plural "{num_hour} hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ordu {num_hour}"
+msgstr[1] "{num_hour} ordu"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
 msgid "{num_minute} minute"
 msgid_plural "{num_minute} minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "minutu {num_minute}"
+msgstr[1] "{num_minute} minutu"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
 msgid "{num_second} second"
 msgid_plural "{num_second} seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "segundu {num_second}"
+msgstr[1] "{num_second} segundu"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Problem needs to be reset prior to save."
@@ -2439,7 +2441,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid "Answer ID"
-msgstr ""
+msgstr "Erantzunaren IDa"
 
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid "Question"
@@ -2447,11 +2449,11 @@ msgstr "Galdera"
 
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid "Correct Answer"
-msgstr ""
+msgstr "Erantzun zuzena"
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Conditional"
-msgstr ""
+msgstr "Baldintzazkoa"
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "List of urls of children that are references to external modules"
@@ -4593,7 +4595,7 @@ msgstr ""
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
 msgid "Account Activation"
-msgstr ""
+msgstr "Kontuaren aktibazioa"
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
 #: common/templates/student/edx_ace/accountactivation/email/body.txt
@@ -4606,7 +4608,7 @@ msgstr ""
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
 msgid "Activate Your Account"
-msgstr ""
+msgstr "Aktibatu zure kontua"
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
 #: common/templates/student/edx_ace/accountactivation/email/body.txt
@@ -4641,7 +4643,7 @@ msgstr ""
 #: common/templates/student/edx_ace/accountactivation/email/subject.txt
 #, python-format
 msgid "Action Required: Activate your %(platform_name)s account"
-msgstr ""
+msgstr "Beharrezko ekintza: Aktibatu %(platform_name)s plataformako kontua"
 
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 msgid "Create Password"
@@ -5667,7 +5669,7 @@ msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "After this date, course content will be archived."
-msgstr ""
+msgstr "Data honen ondoren, ikastaroaren edukia artxibatuko da."
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid ""
@@ -6621,13 +6623,14 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Date Joined"
-msgstr ""
+msgstr "Bat egindako data "
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
 msgstr "Kohortea"
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Team"
 msgstr "Taldea"
 
@@ -7541,6 +7544,20 @@ msgstr ""
 #, python-brace-format
 msgid " (out of {total})"
 msgstr " ({total}-tik)"
+
+#: lms/djangoapps/learner_dashboard/programs.py
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/learner_dashboard/programs.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Programs"
+msgstr "Programak"
+
+#: lms/djangoapps/learner_dashboard/programs.py
+#: lms/templates/learner_dashboard/program_details.html
+msgid "Program Details"
+msgstr "Programaren xehetasunak"
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
@@ -9000,6 +9017,9 @@ msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
 #: openedx/core/djangoapps/user_api/admin.py
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
+#: cms/templates/videos_index_pagination.html
 msgid "Cancel"
 msgstr "Utzi"
 
@@ -9550,6 +9570,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: cms/templates/widgets/header.html
 msgid "Sign In"
 msgstr "Hasi saioa"
 
@@ -10760,7 +10781,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/auto_auth.py
 msgid "Account modification not allowed."
-msgstr ""
+msgstr "Ez dago baimenduta kontua aldatzea."
 
 #: openedx/core/djangoapps/user_authn/views/auto_auth.py
 #: openedx/core/djangoapps/user_authn/views/register.py
@@ -10808,8 +10829,8 @@ msgstr "Saioa hasteko saiakera oker gehiegi. Saiatu berriz beranduago."
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
 msgid ""
-"As an {allowed_domain} user, You must login with your {allowed_domain} "
-"{provider} account."
+"As {allowed_domain} user, You must login with your {allowed_domain} "
+"{link_start}{provider} account{link_end}."
 msgstr ""
 
 #. Translators: This example email address is used as a placeholder in
@@ -11221,10 +11242,6 @@ msgid "enabled_as_of must be set when enabled is True"
 msgstr ""
 
 #: openedx/features/content_type_gating/partitions.py
-msgid "Feature-based Enrollments"
-msgstr ""
-
-#: openedx/features/content_type_gating/partitions.py
 msgid "Partition for segmenting users by access to gated content types"
 msgstr ""
 
@@ -11389,8 +11406,8 @@ msgstr ""
 #, no-python-format, python-brace-format
 msgid ""
 "{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% "
-"[{strikeout_price}]{span_close}{br}Discount will be automatically applied at"
-" checkout. {a_open}Upgrade Now{a_close}{div_close}"
+"[{strikeout_price}]{span_close}{br}Use code {b_open}{code}{b_close} at "
+"checkout! {a_open}Upgrade Now{a_close}{div_close}"
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py
@@ -12335,7 +12352,7 @@ msgstr "{studio_name} Dokumentazioa"
 #: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "Access documentation on http://docs.edx.org"
-msgstr ""
+msgstr "Eskuratu dokumentazioa hemen: http://docs.edx.org"
 
 #: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
@@ -12346,6 +12363,8 @@ msgstr "edX Dokumentazioa"
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "Enroll in edX101: Overview of Creating an edX Course"
 msgstr ""
+"Matrikulatu edX101-n: Overview of Creating an edX ikastaroak sortzeko "
+"hastapenak"
 
 #: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
@@ -12355,7 +12374,7 @@ msgstr "Matrikulatu edX 101-n"
 #: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "Enroll in StudioX: Creating a Course with edX Studio"
-msgstr ""
+msgstr "Matrikulatu StudioX-n: Sortu ikastaroa edX Studio-rekin"
 
 #: cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
@@ -12431,7 +12450,7 @@ msgstr ""
 
 #: common/templates/emails/sync_learner_profile_data_email_change_body.txt
 msgid "No action is needed on your part."
-msgstr ""
+msgstr "Ez duzu ezer egin behar."
 
 #: common/templates/emails/sync_learner_profile_data_email_change_body.txt
 msgid ""
@@ -12441,7 +12460,7 @@ msgstr ""
 
 #: common/templates/emails/sync_learner_profile_data_email_change_subject.txt
 msgid "Your {platform_name} account email has been updated"
-msgstr ""
+msgstr "{platform_name} plataformako kontuaren e-posta eguneratu da"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
 msgid "Add a Post"
@@ -12463,7 +12482,7 @@ msgstr "Eztabaida pribatua"
 msgid ""
 "This is a private discussion. You do not have permissions to view this "
 "discussion"
-msgstr ""
+msgstr "Hau eztabaida pribatua da. Ez duzu baimenik eztabaida hau ikusteko."
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/discussion/_user_profile.html
@@ -12478,7 +12497,7 @@ msgstr[1] "%s eztabaida hasita"
 #, python-format
 msgid "%s comment"
 msgid_plural "%s comments"
-msgstr[0] "%s iruzkin"
+msgstr[0] "iruzkin %s"
 msgstr[1] "%s iruzkin"
 
 #: lms/djangoapps/discussion/templates/discussion/maintenance_fragment.html
@@ -12561,7 +12580,7 @@ msgstr ""
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "You are not enrolled in any courses yet."
-msgstr ""
+msgstr "Oraindik ez zaude inongo ikastarotan matrikulatuta."
 
 #: lms/templates/dashboard.html
 #: lms/templates/header/navbar-not-authenticated.html
@@ -12657,7 +12676,7 @@ msgstr "Dagoeneko bada e-posta helbide berria duen kontua."
 
 #: lms/templates/enroll_staff.html
 msgid "You should Register before trying to access the Unit"
-msgstr ""
+msgstr "Unitatera sartzen saiatu aurrertik, erregistratu behar zenuke. "
 
 #: lms/templates/enroll_staff.html lms/templates/courseware/course_about.html
 msgctxt "self"
@@ -12746,7 +12765,7 @@ msgstr "Ikastaroa amaitu da."
 
 #: lms/templates/hidden_content.html
 msgid "The due date for this assignment has passed."
-msgstr ""
+msgstr "Ariketa honetarako entregatze-data igaro da"
 
 #: lms/templates/hidden_content.html
 msgid ""
@@ -12951,8 +12970,8 @@ msgstr ""
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
 msgid_plural "You have used {num_used} of {num_total} attempts"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Dagoeneko {num_used} erabili duzu {num_total} saiakeratik"
+msgstr[1] "Dagoeneko {num_used} erabili dituzu {num_total} saiakeratik"
 
 #: lms/templates/problem.html
 msgid ""
@@ -12978,7 +12997,7 @@ msgstr ""
 
 #: lms/templates/problem_notifications.html
 msgid "Next Hint"
-msgstr ""
+msgstr "Hurrengo aholkua"
 
 #: lms/templates/problem_notifications.html
 #: lms/templates/shoppingcart/shopping_cart_flow.html
@@ -13201,7 +13220,7 @@ msgstr ""
 
 #: lms/templates/staff_problem_info.html
 msgid "Override Score"
-msgstr ""
+msgstr "Baliogabetu puntuazioa"
 
 #: lms/templates/staff_problem_info.html
 msgid "Module Fields"
@@ -13377,11 +13396,11 @@ msgstr ""
 
 #: lms/templates/tracking_log.html
 msgid "datetime"
-msgstr ""
+msgstr "data eta ordua"
 
 #: lms/templates/tracking_log.html
 msgid "ipaddr"
-msgstr ""
+msgstr "IP helbidea"
 
 #: lms/templates/tracking_log.html
 msgid "source"
@@ -13393,7 +13412,7 @@ msgstr "mota"
 
 #: lms/templates/unsubscribe.html
 msgid "Unsubscribe Successful!"
-msgstr ""
+msgstr "Harpidetza ondo kendu da"
 
 #: lms/templates/unsubscribe.html
 msgid ""
@@ -13459,7 +13478,7 @@ msgstr ""
 
 #: lms/templates/video.html
 msgid "Downloads and transcripts"
-msgstr ""
+msgstr "Deskargak eta transkripzioak"
 
 #: lms/templates/video.html
 msgid "Download video file"
@@ -13471,11 +13490,11 @@ msgstr "Transkripzioak"
 
 #: lms/templates/video.html
 msgid "Download {file}"
-msgstr "Jaitsi {file}"
+msgstr "Deskargatu {file}"
 
 #: lms/templates/video.html
 msgid "Download transcript"
-msgstr "Jaitsi transkripzioa"
+msgstr "Deskargatu transkripzioa"
 
 #: lms/templates/video.html
 msgid "Handouts"
@@ -13483,7 +13502,7 @@ msgstr "Apunteak"
 
 #: lms/templates/video.html
 msgid "Download Handout"
-msgstr "Jaitsi apunteak"
+msgstr "Deskargatu apunteak"
 
 #: lms/templates/word_cloud.html
 msgid "{num} of {total}"
@@ -13491,7 +13510,7 @@ msgstr ""
 
 #: lms/templates/word_cloud.html
 msgid "Your words were:"
-msgstr ""
+msgstr "Hitzak hauek izan dira:"
 
 #: lms/templates/api_admin/api_access_request_form.html
 msgid "API Access Request"
@@ -13548,7 +13567,7 @@ msgstr ""
 
 #: lms/templates/api_admin/status.html
 msgid "Redirect URLs"
-msgstr ""
+msgstr "Berbideratu URLak"
 
 #: lms/templates/api_admin/status.html
 msgid ""
@@ -13747,7 +13766,7 @@ msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Ownership"
-msgstr ""
+msgstr "Jabetza"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -14048,7 +14067,7 @@ msgstr "Editatu {catalog_name}"
 #: lms/templates/api_admin/catalogs/edit.html
 #: lms/templates/api_admin/catalogs/list.html
 msgid "Download CSV"
-msgstr "Jaitsi CSV"
+msgstr "Deskargatu CSV"
 
 #: lms/templates/api_admin/catalogs/edit.html
 msgid "Delete this catalog"
@@ -14060,11 +14079,11 @@ msgstr "Eguneratu katalogoa"
 
 #: lms/templates/api_admin/catalogs/list.html
 msgid "Catalogs for {username}"
-msgstr ""
+msgstr "Ondokoarentzako katalogoak: {username}"
 
 #: lms/templates/api_admin/catalogs/list.html
 msgid "Create new catalog:"
-msgstr ""
+msgstr "Sortu beste katalogo bat"
 
 #: lms/templates/api_admin/catalogs/list.html
 msgid "Create Catalog"
@@ -14072,42 +14091,44 @@ msgstr "Sortu katalogoa"
 
 #: lms/templates/api_admin/catalogs/search.html
 msgid "Catalog search"
-msgstr ""
+msgstr "Katalogo-bilaketa"
 
 #: lms/templates/api_admin/catalogs/search.html
 msgid "Catalog Search"
-msgstr ""
+msgstr "Katalogo-bilaketa"
 
 #: lms/templates/api_admin/catalogs/search.html
 msgid "Enter a username to view catalogs belonging to that user."
 msgstr ""
 
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe Successful"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe Cancelled"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Confirm Unsubscribe"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "You have been unsubscribed from emails for {course}."
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "You have not been unsubscribed from emails for {course}."
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Do you want to unsubscribe from emails for {course}?"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+#: lms/templates/bulk_email/unsubscribe_success.html
 msgid "Unsubscribe"
+msgstr "Kendu harpidetza"
+
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+msgid "confirm unsubscribe from {org} {course} emails."
+msgstr ""
+
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+msgid "Note:"
+msgstr "Oharra:"
+
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+msgid ""
+"You will still receive course emails from other courses you are enrolled in."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "You have successfully unsubscribed from {org} {course} emails."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "You have not been unsubscribed from {org} {course} emails."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "{link_start}Return to edX.org{link_end}"
 msgstr ""
 
 #: lms/templates/calculator/toggle_calculator.html
@@ -14614,7 +14635,7 @@ msgstr ""
 
 #: lms/templates/commerce/checkout_receipt.html
 msgid "Loading Order Data..."
-msgstr ""
+msgstr "Eskabideen datuak kargatzen..."
 
 #: lms/templates/commerce/checkout_receipt.html
 msgid "Please wait while we retrieve your order details."
@@ -15542,7 +15563,7 @@ msgstr "Saio bat aukeratu behar duzu ikastaroan sartzeko."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Change or Leave Session"
-msgstr ""
+msgstr "Aldatu edo utzi saioa"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You can no longer change sessions."
@@ -15927,7 +15948,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I don't have enough support"
-msgstr ""
+msgstr "Ez daukat laguntza nahikorik"
 
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I am not happy with the quality of the content"
@@ -16588,7 +16609,7 @@ msgstr ""
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Financial Assistance Application"
-msgstr ""
+msgstr "Finantza-laguntzarako eskaria"
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "A Note to Learners"
@@ -16662,14 +16683,6 @@ msgid ""
 "{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
 "strongly recommend using {chrome_link} or {ff_link}."
 msgstr ""
-
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/learner_dashboard/programs.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Programs"
-msgstr "Programak"
 
 #: lms/templates/header/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
@@ -17235,11 +17248,11 @@ msgstr "Sortu matrikulazio-txostena"
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid ""
 "Create an HTML file that contains an executive summary for this course."
-msgstr ""
+msgstr "Sortu ikastaro honen laburpena jasotzen duen HTML fitxategia "
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Create Executive Summary"
-msgstr ""
+msgstr "Sortu laburpena"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Available Reports"
@@ -17305,7 +17318,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Enter the company name."
-msgstr "Idatzi konpainiaren izena."
+msgstr "Idatzi enpresaren izena."
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "The company name cannot be a number."
@@ -17317,11 +17330,11 @@ msgstr "Idatzi konpainiaren kontaktuaren izena."
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "The company contact name cannot be a number."
-msgstr "Konpainiaren kontaktuaren izena ezin da zenbakia izan."
+msgstr "Enpresaren kontaktuaren izena ezin da zenbakia izan."
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Enter the email address for the company contact."
-msgstr "Idatzi konpainiaren kontakturako e-posta helbidea."
+msgstr "Idatzi enpresaren kontakturako e-posta helbidea."
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Enter a valid email address."
@@ -17406,7 +17419,7 @@ msgstr "Eguneratu kupoiaren kodea"
 
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Executive Summary for {display_name}"
-msgstr ""
+msgstr "Laburpena ondokoarentzat: {display_name}"
 
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Report Creation Date"
@@ -18337,10 +18350,6 @@ msgstr ""
 msgid "My Courses"
 msgstr "Nire ikastaroak"
 
-#: lms/templates/learner_dashboard/program_details.html
-msgid "Program Details"
-msgstr "Programaren xehetasunak"
-
 #: lms/templates/learner_dashboard/text-me-fragment.html
 msgid "Get the {platform_name} Mobile App!"
 msgstr ""
@@ -18607,6 +18616,13 @@ msgstr ""
 msgid "Invalid Password Reset Link"
 msgstr ""
 
+#: lms/templates/registration/password_reset_confirm.html
+msgid ""
+"This password reset link is invalid. It may have been used already. To reset"
+" your password, go to the {start_link}sign-in{end_link} page and select "
+"{start_strong}Forgot password{end_strong}."
+msgstr ""
+
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"
 msgstr "Pasahitza ondo berrezarri da"
@@ -18673,11 +18689,11 @@ msgstr "Ordainketa"
 
 #: lms/templates/shoppingcart/download_report.html
 msgid "Download CSV Reports"
-msgstr "Jaitsi CSV txostenak"
+msgstr "Deskargatu CSV txostenak"
 
 #: lms/templates/shoppingcart/download_report.html
 msgid "Download CSV Data"
-msgstr "Jaitsi CSV datuak"
+msgstr "Deskargatu CSV datuak"
 
 #: lms/templates/shoppingcart/download_report.html
 msgid ""
@@ -18785,7 +18801,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "N/A"
-msgstr ""
+msgstr "Ez da aplikatzen"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Purchase Order Number"
@@ -18793,11 +18809,11 @@ msgstr "Erosketa-aginduaren zenbakia:"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Company Contact Name"
-msgstr "Konpainiako kontaktuaren izena"
+msgstr "Enpresako kontaktuaren izena"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Company Contact Email"
-msgstr "Konpainiako kontaktuaren e-posta"
+msgstr "Enpresako kontaktuaren e-posta"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Recipient Name"
@@ -19122,11 +19138,11 @@ msgstr "Hasi saioa edo erregistratu"
 
 #: lms/templates/support/certificates.html lms/templates/support/index.html
 msgid "Student Support"
-msgstr ""
+msgstr "Ikasleentzako laguntza"
 
 #: lms/templates/support/certificates.html
 msgid "Student Support: Certificates"
-msgstr ""
+msgstr "Ikasleentzako laguntza: ziurtagiriak"
 
 #: lms/templates/support/contact_us.html
 msgid "Contact {platform_name} Support"
@@ -19134,7 +19150,7 @@ msgstr ""
 
 #: lms/templates/support/enrollment.html
 msgid "Student Support: Enrollment"
-msgstr ""
+msgstr "Ikasleentzako laguntza: matrikulazioa"
 
 #: lms/templates/support/feature_based_enrollments.html
 msgid "Student Support: Feature Based Enrollments"
@@ -19158,7 +19174,7 @@ msgstr ""
 
 #: lms/templates/support/manage_user.html
 msgid "Student Support: Manage User"
-msgstr ""
+msgstr "Ikasleentzako laguntza: kudeatu erabiltzailea"
 
 #: lms/templates/support/refund.html
 msgid "About to refund this order:"
@@ -19432,8 +19448,8 @@ msgid "Some Rights Reserved"
 msgstr "Zenbait eskubide erreserbatuta"
 
 #: openedx/features/course_experience/templates/course_experience/course-dates-fragment.html
-msgid "Important Course Dates"
-msgstr "Ikastaroaren data garrantzitsuak"
+msgid "Upcoming Dates"
+msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Goal: "
@@ -19543,10 +19559,6 @@ msgstr ""
 msgid "This course does not have any updates."
 msgstr ""
 
-#: openedx/features/course_experience/templates/course_experience/dates-summary.html
-msgid "Today is {date}"
-msgstr "Gaur {date} da"
-
 #: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
 msgid "Latest Update"
 msgstr ""
@@ -19645,7 +19657,7 @@ msgstr ""
 
 #: themes/edx.org/lms/templates/footer.html
 msgid "Connect"
-msgstr ""
+msgstr "Konektatu"
 
 #: themes/edx.org/lms/templates/footer.html
 msgid "© {year} edX Inc. All rights reserved."
@@ -20062,7 +20074,7 @@ msgstr ""
 
 #: cms/templates/certificates.html
 msgid "Working with Certificates"
-msgstr ""
+msgstr "Ziurtagiriekin lanean"
 
 #: cms/templates/certificates.html
 msgid ""
@@ -20091,7 +20103,7 @@ msgstr ""
 
 #: cms/templates/certificates.html
 msgid "Issuing Certificates to Learners"
-msgstr ""
+msgstr "Ziurtagiriak ematen ikasleei"
 
 #: cms/templates/certificates.html
 msgid ""
@@ -20181,7 +20193,7 @@ msgstr ""
 
 #: cms/templates/container.html
 msgid "View Live Version"
-msgstr ""
+msgstr "Ikusi bertsioa zuzenean"
 
 #: cms/templates/container.html
 msgid "Preview the courseware in the LMS"
