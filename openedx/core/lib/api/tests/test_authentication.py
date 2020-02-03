@@ -75,11 +75,11 @@ urlpatterns = [
     ),
 ]
 
-# pylint: missing-docstring
+
 @ddt.ddt
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 @override_settings(ROOT_URLCONF=__name__)
-class OAuth2AllowInActiveUsersTests(TestCase):
+class OAuth2AllowInActiveUsersTests(TestCase):  # pylint: disable=missing-docstring
 
     OAUTH2_BASE_TESTING_URL = '/oauth2-deprecated-test/'
 
