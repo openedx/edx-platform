@@ -82,7 +82,7 @@ django-ses==0.8.14
 django-simple-history==2.8.0
 django-splash==0.2.6
 django-statici18n==1.9.0
-django-storages==1.9
+django-storages==1.8
 django-user-tasks==0.3.0
 django-waffle==0.18.0
 django-webpack-loader==0.6.0
