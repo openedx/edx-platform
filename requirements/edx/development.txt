@@ -93,11 +93,11 @@ django-ses==0.8.14
 django-simple-history==2.8.0
 django-splash==0.2.6
 django-statici18n==1.9.0
-django-storages==1.8
+django-storages==1.9
 django-user-tasks==0.3.0
 django-waffle==0.18.0
 django-webpack-loader==0.6.0
-django==1.11.27
+django==1.11.28
 djangorestframework-jwt==1.11.0
 git+https://github.com/edx/django-rest-framework-oauth.git@0a43e8525f1e3048efe4bc70c03de308a277197c#egg=djangorestframework-oauth==1.1.1
 djangorestframework-xml==1.4.0
@@ -115,9 +115,9 @@ edx-completion==3.0.2
 edx-django-oauth2-provider==1.3.5
 edx-django-release-util==0.3.6
 edx-django-sites-extensions==2.4.3
-edx-django-utils==2.0.3
+edx-django-utils==2.0.4
 edx-drf-extensions==2.4.5
-edx-enterprise==2.3.0
+edx-enterprise==2.3.3
 edx-i18n-tools==0.5.0
 edx-lint==1.3.0
 edx-milestones==0.2.6
@@ -134,7 +134,7 @@ edx-sphinx-theme==1.5.0
 edx-submissions==3.0.3
 edx-tincan-py35==0.0.5
 edx-user-state-client==1.1.2
-edx-when==0.6.0
+edx-when==0.7.0
 edxval==1.2.3
 elasticsearch==1.9.0
 entrypoints==0.3
@@ -216,7 +216,7 @@ pbr==5.4.4
 pdfminer.six==20200124
 piexif==1.1.3
 pillow==7.0.0
-pip-tools==4.4.0
+pip-tools==4.4.1
 pkgconfig==1.5.1
 pluggy==0.13.1
 polib==1.1.0
@@ -227,8 +227,8 @@ pycodestyle==2.5.0
 pycontracts==1.8.12
 pycountry==19.8.18
 pycparser==2.19
-pycryptodome==3.9.4
-pycryptodomex==3.9.4
+pycryptodome==3.9.6
+pycryptodomex==3.9.6
 pyflakes==2.1.1
 pygments==2.5.2
 pyinotify==0.9.6
@@ -318,7 +318,7 @@ user-util==0.1.5
 virtualenv==16.7.9
 voluptuous==0.11.7
 vulture==1.2
-watchdog==0.10.0
+watchdog==0.10.1
 wcwidth==0.1.8
 web-fragments==0.3.1
 webencodings==0.5.1

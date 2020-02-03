@@ -82,11 +82,11 @@ django-ses==0.8.14
 django-simple-history==2.8.0
 django-splash==0.2.6
 django-statici18n==1.9.0
-django-storages==1.8
+django-storages==1.9
 django-user-tasks==0.3.0
 django-waffle==0.18.0
 django-webpack-loader==0.6.0
-django==1.11.27
+django==1.11.28
 djangorestframework-jwt==1.11.0
 git+https://github.com/edx/django-rest-framework-oauth.git@0a43e8525f1e3048efe4bc70c03de308a277197c#egg=djangorestframework-oauth==1.1.1
 djangorestframework-xml==1.4.0  # via edx-enterprise
@@ -104,9 +104,9 @@ edx-completion==3.0.2
 edx-django-oauth2-provider==1.3.5
 edx-django-release-util==0.3.6
 edx-django-sites-extensions==2.4.3
-edx-django-utils==2.0.3
+edx-django-utils==2.0.4
 edx-drf-extensions==2.4.5
-edx-enterprise==2.3.0
+edx-enterprise==2.3.3
 edx-i18n-tools==0.5.0
 edx-milestones==0.2.6
 edx-oauth2-provider==1.3.1
@@ -121,7 +121,7 @@ edx-sga==0.10.0
 edx-submissions==3.0.3
 edx-tincan-py35==0.0.5    # via edx-enterprise
 edx-user-state-client==1.1.2
-edx-when==0.6.0
+edx-when==0.7.0
 edxval==1.2.3
 elasticsearch==1.9.0      # via edx-search
 enum34==1.1.6             # via edxval
@@ -189,8 +189,8 @@ py2neo==3.1.2
 pycontracts==1.8.12
 pycountry==19.8.18
 pycparser==2.19
-pycryptodome==3.9.4       # via pdfminer.six
-pycryptodomex==3.9.4
+pycryptodome==3.9.6       # via pdfminer.six
+pycryptodomex==3.9.6
 pygments==2.5.2
 pyjwkest==1.3.2
 pyjwt==1.5.2
@@ -243,7 +243,7 @@ uritemplate==3.0.1        # via coreapi, drf-yasg
 urllib3==1.25.8
 user-util==0.1.5
 voluptuous==0.11.7
-watchdog==0.10.0
+watchdog==0.10.1
 web-fragments==0.3.1
 webencodings==0.5.1       # via bleach, html5lib
 webob==1.8.6              # via xblock
