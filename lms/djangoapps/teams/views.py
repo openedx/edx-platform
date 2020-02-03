@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render_to_response
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
@@ -1384,7 +1384,16 @@ class MembershipBulkManagementView(View):
         Process uploaded CSV to modify team memberships for given course run.
         """
         self.check_access()
-        return HttpResponse(status=status.HTTP_501_NOT_IMPLEMENTED)
+        try:
+            # -- do the upload --
+            raise Exception('This is a test')
+        except Exception as e:
+            return JsonResponse({
+                'summary': _("Exception"),
+                'details': _(str(e)),
+            }, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return JsonResponse({'success': u"True"})
 
     def check_access(self):
         """

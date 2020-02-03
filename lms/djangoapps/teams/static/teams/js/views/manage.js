@@ -61,10 +61,12 @@
             handleCsvUploadSuccess: function() {
                 // This handler is currently unimplemented (TODO MST-44)
                 this.teamEvents.trigger('teams:update', {});
+                $('#team-management-assign .page-banner').hide()
             },
 
             handleCsvUploadFailure: function(jqXHR, textStatus, errorThrown) {
-                $('#team-management-assign .page-banner .message-content').text(textStatus + ": " + errorThrown)
+                const { summary, details } = jqXHR.responseJSON
+                $('#team-management-assign .page-banner .message-content').text(`${summary}: ${details}`)
                 $('#team-management-assign .page-banner').show()
             }
         });
