@@ -75,7 +75,7 @@ urlpatterns = [
     ),
 ]
 
-
+# pylint: missing-docstring
 @ddt.ddt
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 @override_settings(ROOT_URLCONF=__name__)
@@ -84,7 +84,7 @@ class OAuth2AllowInActiveUsersTests(TestCase):
     OAUTH2_BASE_TESTING_URL = '/oauth2-deprecated-test/'
 
     def setUp(self):
-        super(OAuth2DeprecatedTests, self).setUp()
+        super(OAuth2AllowInActiveUsersTests, self).setUp()
         self.dop_adapter = adapters.DOPAdapter()
         self.dot_adapter = adapters.DOTAdapter()
         self.csrf_client = APIClient(enforce_csrf_checks=True)
@@ -313,12 +313,12 @@ class OAuth2AllowInActiveUsersTests(TestCase):
         self.assertEqual(response.status_code, scope_statuses.write_status)
 
 
-class OAuth2AuthenticationTests(OAuth2AllowInActiveUsersTests):  # pylint: disable=test-inherits-tests, missing-docstring
+class OAuth2AuthenticationTests(OAuth2AllowInActiveUsersTests):  # pylint: disable=test-inherits-tests
 
     OAUTH2_BASE_TESTING_URL = '/oauth2-test/'
 
     def setUp(self):
-        super(OAuth2Tests, self).setUp()
+        super(OAuth2AuthenticationTests, self).setUp()
         # Since this is testing back to previous version, user should be set to true
         self.user.is_active = True
         self.user.save()
