@@ -180,8 +180,8 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
         ('user2', COURSE_KEY2, TEAMSET_1_ID, False),
     )
     @ddt.unpack
-    def test_user_in_team_for_course(self, username, course_id, teamset_id, expected_value):
-        user = getattr(self, username)    
+    def test_user_in_team_set_for_course(self, username, course_id, teamset_id, expected_value):
+        user = getattr(self, username)
         self.assertEqual(
             CourseTeamMembership.user_in_team_set_for_course(user, course_id, teamset_id),
             expected_value

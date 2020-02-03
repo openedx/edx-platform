@@ -1,7 +1,6 @@
 """
 CSV processing and generation utilities for Teams LMS app.
 """
-from itertools import groupby
 from lms.djangoapps.teams.models import CourseTeamMembership
 from student.models import CourseEnrollment
 
@@ -74,7 +73,7 @@ def _group_teamset_memberships_by_user(course_team_memberships):
     """
     Parameters:
         - course_team_memberships: a collection of CourseTeamMemberships
-    
+
     Returns:
         {
             <User>: {

@@ -4,7 +4,6 @@ HTTP endpoints for the Teams API.
 
 
 import logging
-from collections import OrderedDict
 
 import six
 from django.conf import settings
@@ -1381,54 +1380,6 @@ class MembershipBulkManagementView(GenericAPIView):
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
         load_team_membership_csv(self.course, response)
         return response
-
-    def load_team_membership_csv(self, course, response):
-        """
-        """
-        student_team_info = lookup_team_membership_data(course)
-    
-    def lookup_team_membership_data(self, course):
-        """
-        Returns a dict of dicts, in the following form:
-        {
-            student_id: {
-                'mode': <student enrollment mode for the given course>,
-                <teamset id>: <team name>
-            }
-            for student in course
-        }
-        """
-        course_students = CourseEnrollment.objects.users_enrolled_in(course.id)
-        CourseEnrollment.bulk_fetch_enrollment_states(course_students, course.id)
-
-        course_team_memberships = CourseTeamMembership.objects.filter(
-            course_id=course.id
-        ).selected_related('team').all()
-        course_team_memberships_by_user = {
-            user: team_memberships
-            for user, team_memberships in itertools.groupby(course_team_memberships, lambda ctm: ctm.user)
-        }
-        students_teams_dict = OrderedDict()
-        for user in course_students:
-            student_teams = {
-                team_membership.team.topic_id: team_membership.team.name
-                for team_membership in course_team_memberships_by_user.get(user, [])
-            }
-            student_teams['mode'], _ = CourseEnrollment.enrollment_mode_for_user()
-            students_teams_dict[user.username] = student_teams
-        return students_teams_dict
-
-
-
-    def get_user_teams(self, user, course_team_membership_by_user):
-        user_teams = course_team_membership_by_user
-
-
-
-
-
-
-
 
     def post(self, request, **_kwargs):
         """
