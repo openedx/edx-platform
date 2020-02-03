@@ -55,7 +55,7 @@ from .api import (
     has_team_api_access,
     user_organization_protection_status
 )
-from .csv import load_team_membership_csv
+from .csv import load_team_membership_csv, TeamMembershipImportManager
 from .errors import AlreadyOnTeamInCourse, ElasticSearchConnectionError, NotEnrolledInCourseForTeam
 from .search_indexes import CourseTeamIndexer
 from .serializers import (
@@ -1384,16 +1384,20 @@ class MembershipBulkManagementView(View):
         Process uploaded CSV to modify team memberships for given course run.
         """
         self.check_access()
+
+        result = {}
+
         try:
-            # -- do the upload --
-            raise Exception('This is a test')
+            inputfile_handle = request.FILES['csv']
+            team_import_manager = TeamMembershipImportManager(self.course)
+            result = team_import_manager.set_team_membership_from_csv(inputfile_handle)
         except Exception as e:
             return JsonResponse({
                 'summary': _("Exception"),
                 'details': _(str(e)),
             }, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return JsonResponse({'success': u"True"})
+            return JsonResponse(result, status=status.HTTP_201_CREATED)
 
     def check_access(self):
         """
