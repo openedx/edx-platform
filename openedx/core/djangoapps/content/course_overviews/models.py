@@ -796,6 +796,13 @@ class CourseOverview(TimeStampedModel):
         """
         return self._original_course.enable_ccx
 
+    @property
+    def course_visibility(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.course_visibility
+
     def __str__(self):
         """Represent ourselves with the course key."""
         return six.text_type(self.id)

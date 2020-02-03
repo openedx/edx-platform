@@ -4,6 +4,7 @@ Tests for courseware API
 from datetime import datetime
 import unittest
 import ddt
+import mock
 
 from django.conf import settings
 
@@ -52,36 +53,43 @@ class BaseCoursewareTests(SharedModuleStoreTestCase):
         super().setUp()
         self.client.login(username=self.user.username, password='foo')
 
-    def test_unauth(self):
-        self.client.logout()
-        response = self.client.get(self.url)
-        assert response.status_code == 401
 
-
-# pylint: disable=test-inherits-tests
 @ddt.ddt
 class CourseApiTestViews(BaseCoursewareTests):
     """
     Tests for the courseware REST API
     """
-    @ddt.data((None,), ('audit',), ('verified',))
+    @ddt.data(
+        (True, None, False),
+        (True, 'audit', False),
+        (True, 'verified', False),
+        (False, None, False),
+        (False, None, True),
+    )
     @ddt.unpack
-    def test_course_metadata(self, enrollment_mode):
-        if enrollment_mode:
-            CourseEnrollment.enroll(self.user, self.course.id, enrollment_mode)
-        response = self.client.get(self.url)
-        assert response.status_code == 200
-        enrollment = response.data['enrollment']
-        if enrollment_mode:
-            assert enrollment_mode == enrollment['mode']
-            assert enrollment['is_active']
-            assert len(response.data['tabs']) == 4
-        else:
-            assert len(response.data['tabs']) == 2
-            assert not enrollment['is_active']
+    def test_course_metadata(self, logged_in, enrollment_mode, enable_anonymous):
+        allow_public_access = mock.Mock()
+        allow_public_access.return_value = enable_anonymous
+        with mock.patch('openedx.core.djangoapps.courseware_api.views.allow_public_access', allow_public_access):
+            if not logged_in:
+                self.client.logout()
+            if enrollment_mode:
+                CourseEnrollment.enroll(self.user, self.course.id, enrollment_mode)
+            response = self.client.get(self.url)
+            assert response.status_code == 200
+            if enrollment_mode:
+                enrollment = response.data['enrollment']
+                assert enrollment_mode == enrollment['mode']
+                assert enrollment['is_active']
+                assert len(response.data['tabs']) == 4
+            elif enable_anonymous and not logged_in:
+                allow_public_access.assert_called_once()
+                assert response.data['enrollment']['mode'] is None
+                assert response.data['user_has_access']
+            else:
+                assert not response.data['user_has_access']
 
 
-# pylint: disable=test-inherits-tests
 class SequenceApiTestViews(BaseCoursewareTests):
     """
     Tests for the sequence REST API
