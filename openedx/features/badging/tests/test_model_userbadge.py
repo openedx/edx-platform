@@ -1,43 +1,45 @@
-from mock import patch
+import factory
+import mock
 
-from django.contrib.auth.models import User
-from django.db import IntegrityError, transaction
-from django.test import TestCase
-from django.utils import timezone
+from django.db.models import signals
+from django.db.utils import IntegrityError
+from unittest import TestCase
 
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
+from nodebb.constants import (
+    TEAM_PLAYER_ENTRY_INDEX,
+    CONVERSATIONALIST_ENTRY_INDEX
+)
+from opaque_keys.edx.keys import CourseKey
+from openedx.features.teams.tests.factories import TeamGroupChatFactory
+from openedx.features.badging.constants import CONVERSATIONALIST, TEAM_PLAYER
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
-from openedx.features.badging.models import Badge, UserBadge
+from openedx.features.badging.models import UserBadge
+from student.tests.factories import UserFactory
+
+from .. import constants as badge_constants
+from .factories import BadgeFactory, UserBadgeFactory
 
 
 class UserBadgeModelTestCases(TestCase):
 
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='12345')
-        self.badge_team = Badge.objects.create(name="Sample Badge",
-                                               description="This is a sample badge",
-                                               threshold=30,
-                                               type="team",
-                                               image="path/too/image",
-                                               date_created=timezone.now())
+        self.type_conversationalist = CONVERSATIONALIST[CONVERSATIONALIST_ENTRY_INDEX]
+        self.type_team = TEAM_PLAYER[TEAM_PLAYER_ENTRY_INDEX]
+        self.team_badge = BadgeFactory(type=self.type_team)
 
-        self.badge_convo = Badge.objects.create(name="Sample Badge",
-                                                description="This is a sample badge",
-                                                threshold=30,
-                                                type="conversationalist",
-                                                image="path/too/image",
-                                                date_created=timezone.now())
-
-    def test_save_userbadge_normal(self):
+    def test_model_userbadge(self):
         """
-        Trying to save a UserBadge object with expected arguments
+        Trying to save a UserBadge model with expected arguments
         """
-        userbadge = UserBadge(user=self.user,
-                              badge=self.badge_convo,
-                              course_id=CourseKeyField.Empty,
-                              community_id=-1,
-                              date_earned=timezone.now())
+        course_key = CourseKey.from_string('abc/123/course')
+        userbadge_factory = UserBadgeFactory(course_id=course_key)
+        userbadge_query = UserBadge.objects.get(course_id=course_key)
 
-        self.assertEqual(userbadge.save(), None)
+        self.assertEqual(userbadge_query.badge, userbadge_factory.badge)
+        self.assertEqual(userbadge_query.community_id, 1)
+        self.assertEqual(userbadge_query.course_id, course_key)
+        self.assertEqual(userbadge_query.user, userbadge_factory.user)
 
     def test_save_duplicate_badge(self):
         """
@@ -45,106 +47,131 @@ class UserBadgeModelTestCases(TestCase):
         Raises IntegrityError upon trying to save the second object with
         the same arguments
         """
-        UserBadge.objects.create(user=self.user,
-                                 badge=self.badge_convo,
-                                 course_id=CourseKeyField.Empty,
-                                 community_id=-1,
-                                 date_earned=timezone.now())
+        user = UserFactory.create()
+
+        UserBadgeFactory(user=user, badge=self.team_badge)
 
         with self.assertRaises(IntegrityError):
-            with transaction.atomic():
-                UserBadge.objects.create(user=self.user,
-                                         badge=self.badge_convo,
-                                         course_id=CourseKeyField.Empty,
-                                         community_id=-1,
-                                         date_earned=timezone.now())
-
-    def test_course_id_string(self):
-        """
-        Trying to save UserBadge object with course_id as string
-        """
-        self.assertTrue(UserBadge.objects.create(user=self.user,
-                                                 badge=self.badge_convo,
-                                                 course_id="",
-                                                 community_id=-1,
-                                                 date_earned=timezone.now()))
+            UserBadgeFactory(user=user, badge=self.team_badge)
 
     def test_community_id_None(self):
         """
         Trying to save UserBadge object with community_id as None
         """
         with self.assertRaises(IntegrityError):
-            with transaction.atomic():
-                UserBadge.objects.create(user=self.user,
-                                         badge=self.badge_convo,
-                                         course_id="",
-                                         community_id=None,
-                                         date_earned=timezone.now())
+            UserBadgeFactory(community_id=None)
 
-    @patch('openedx.features.badging.models.get_course_id_by_community_id')
-    def test_assign_badge_wrong_badge_id(self, mock_get_community_id):
+    def test_assign_badge_wrong_badge_id(self):
         """
-        Trying to save a UserBadge object with badge id
-        that does not exist
+        Trying to save a UserBadge object with badge id that does not exist
+        """
+        with self.assertRaises(Exception) as error:
+            UserBadge.assign_badge(user_id=mock.ANY, badge_id=-1, community_id=mock.ANY)
+
+        self.assertEqual(str(error.exception), badge_constants.BADGE_NOT_FOUND_ERROR.format(badge_id=-1))
+
+    @mock.patch('openedx.features.badging.models.get_course_id_by_community_id')
+    def test_assign_conversationalist_badge_with_invalid_community_id(self, mock_get_community_id):
+        """
+        Assign conversationalist badge for community which do not exist
         """
         mock_get_community_id.return_value = CourseKeyField.Empty
+        badge = BadgeFactory(type=self.type_conversationalist)
 
-        with self.assertRaises(Exception):
-            with transaction.atomic():
-                UserBadge.assign_badge(self.user.id, -1, "-1")
+        with self.assertRaises(Exception) as error:
+            UserBadge.assign_badge(user_id=1, badge_id=badge.id, community_id=-1)
 
-    @patch('openedx.features.badging.models.get_course_id_by_community_id')
-    def test_assign_badge_wrong_type_discussion(self, mock_get_community_id):
-        """
-        Trying to save a UserBadge object giving a conversationalist
-        badge with a team community
-        """
-        mock_get_community_id.return_value = CourseKeyField.Empty
-        with self.assertRaises(Exception):
-            with transaction.atomic():
-                UserBadge.assign_badge(self.user.id, self.badge_convo.id, "-1")
+        self.assertEqual(
+            str(error.exception),
+            badge_constants.INVALID_COMMUNITY_ERROR.format(badge_id=badge.id, community_id=-1)
+        )
 
-    @patch('openedx.features.badging.models.get_course_id_by_community_id')
-    def test_assign_badge_wrong_type_team(self, mock_get_community_id):
+    def test_assign_team_badge_with_invalid_community_id_and_no_team_group_chat(self):
         """
-        Trying to save a UserBadge object giving a team
-        badge with a conversationalist community
+        Assign team badge for team group chat which do not exist
         """
-        mock_get_community_id.return_value = "some_course_id"
-        with self.assertRaises(Exception):
-            with transaction.atomic():
-                UserBadge.assign_badge(self.user.id, self.badge_team.id, "-1")
+        with self.assertRaises(Exception) as error:
+            UserBadge.assign_badge(user_id=1, badge_id=self.team_badge.id, community_id=-1)
 
-    @patch('openedx.features.badging.models.CourseTeamMembership.objects.filter')
-    @patch('openedx.features.badging.models.TeamGroupChat.objects.first')
-    @patch('openedx.features.badging.models.TeamGroupChat.objects.exclude')
-    @patch('openedx.features.badging.models.TeamGroupChat.objects.filter')
-    @patch('openedx.features.badging.models.get_course_id_by_community_id')
-    def test_assign_badge_team(self, mock_get_community_id, mock_team_group_filter,
-                               mock_team_group_exclude, mock_team_group_first,
-                               mock_course_team_filter):
-        """
-        Trying to save a UserBadge object assigning a team badge
-        successfully
-        """
-        mock_get_community_id.return_value = CourseKeyField.Empty
-        UserBadge.assign_badge(user_id=self.user.id,
-                               badge_id=self.badge_team.id,
-                               community_id=-1)
+        self.assertEqual(
+            str(error.exception),
+            badge_constants.INVALID_TEAM_ERROR.format(badge_id=self.team_badge.id, community_id=-1)
+        )
 
-        assert mock_team_group_filter.called
-        assert mock_course_team_filter.called
-
-    @patch('openedx.features.badging.models.UserBadge.objects.get_or_create')
-    @patch('openedx.features.badging.models.get_course_id_by_community_id')
-    def test_assign_badge_community(self, mock_get_community_id, mock_userbadge_create):
+    def test_unknown_badge_type(self):
         """
-        Trying to save a UserBadge object assigning a conversationalist
-        badge successfully
+        Assign badge for type which does not exists
         """
-        mock_get_community_id.return_value = "some_course_id"
-        UserBadge.assign_badge(user_id=self.user.id,
-                               badge_id=self.badge_convo.id,
-                               community_id=-1)
+        badge = BadgeFactory(type='custom_type')
 
-        assert mock_userbadge_create.called
+        with self.assertRaises(Exception) as error:
+            UserBadge.assign_badge(user_id=1, badge_id=badge.id, community_id=-1)
+
+        self.assertEqual(
+            str(error.exception),
+            badge_constants.BADGE_TYPE_ERROR.format(badge_id=badge.id, badge_type='custom_type')
+        )
+
+    @factory.django.mute_signals(signals.pre_save, signals.post_save)
+    def test_assign_team_badge_invalid_course_id(self):
+        """
+        Assign team badge with invalid course id
+        """
+        course_team = CourseTeamFactory()
+        team_group_chat = TeamGroupChatFactory(team=course_team, room_id=100)
+
+        with self.assertRaises(Exception) as error:
+            UserBadge.assign_badge(user_id=UserFactory(), badge_id=self.team_badge.id,
+                                   community_id=team_group_chat.room_id)
+
+        self.assertEqual(
+            str(error.exception),
+            badge_constants.UNKNOWN_COURSE_ERROR.format(badge_id=self.team_badge.id,
+                                                        community_id=team_group_chat.room_id)
+        )
+
+    @factory.django.mute_signals(signals.pre_save, signals.post_save)
+    def test_assign_team_badge_successfully(self):
+        """
+        Trying to save a UserBadge object assigning a team badge successfully
+        """
+        user = UserFactory()
+        course_key = CourseKey.from_string('test/course/123')
+
+        course_team = CourseTeamFactory(course_id=course_key, team_id='team1')
+
+        # Add two users to team, in course
+        CourseTeamMembershipFactory(user=user, team=course_team)
+        CourseTeamMembershipFactory(user=UserFactory(), team=course_team)
+
+        team_group_chat = TeamGroupChatFactory(team=course_team, room_id=200)
+
+        UserBadge.assign_badge(user_id=user.id, badge_id=self.team_badge.id, community_id=team_group_chat.room_id)
+
+        assigned_user_badges = UserBadge.objects.filter(
+            badge_id=self.team_badge.id,
+            course_id=course_key,
+            community_id=team_group_chat.room_id
+        )
+
+        self.assertEqual(len(assigned_user_badges), 2)
+
+    @mock.patch('openedx.features.badging.models.get_course_id_by_community_id')
+    def test_assign_conversationalist_badge_successfully(self, mock_course_id_by_community_id):
+        """
+        Trying to save a UserBadge object assigning a conversationalist badge successfully
+        """
+        course_key = CourseKey.from_string('abc/xyz/123')
+        mock_course_id_by_community_id.return_value = course_key
+
+        badge = BadgeFactory(type=self.type_conversationalist)
+        user = UserFactory()
+
+        UserBadge.assign_badge(user_id=user.id, badge_id=badge.id, community_id=1)
+
+        user_badge = UserBadge.objects.get(user_id=user.id, badge_id=badge.id)
+
+        self.assertEqual(user_badge.badge, badge)
+        self.assertEqual(user_badge.community_id, 1)
+        self.assertEqual(user_badge.course_id, course_key)
+        self.assertEqual(user_badge.user, user)

@@ -14,6 +14,7 @@ source =
     openedx/features/teams
     openedx/features/student_certificates
     openedx/features/cms
+    openedx/features/badging
 
 omit =
     cms/envs/*

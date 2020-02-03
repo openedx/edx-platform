@@ -1,19 +1,31 @@
-from factory.django import DjangoModelFactory
+import factory
 
+from faker.providers import internet
+
+from nodebb.constants import CONVERSATIONALIST_ENTRY_INDEX
 from openedx.features.badging.models import Badge, UserBadge
+from openedx.features.badging.constants import CONVERSATIONALIST
+from opaque_keys.edx.keys import CourseKey
+from student.tests.factories import UserFactory
+
+factory.Faker.add_provider(internet)
 
 
-class BadgeFactory(DjangoModelFactory):
-    class Meta(object):
+class BadgeFactory(factory.django.DjangoModelFactory):
+    class Meta:
         model = Badge
 
-    description = "This is a sample badge"
-    image = "path/to/image"
+    name = factory.Faker('name')
+    image = factory.Faker('uri_path', deep=None)
+    threshold = 10
+    type = CONVERSATIONALIST[CONVERSATIONALIST_ENTRY_INDEX]
 
 
-class UserBadgeFactory(DjangoModelFactory):
-    class Meta(object):
+class UserBadgeFactory(factory.django.DjangoModelFactory):
+    class Meta:
         model = UserBadge
 
-    course_id = ""
-    community_id = -1
+    badge = factory.SubFactory(BadgeFactory)
+    user = factory.SubFactory(UserFactory)
+    course_id = CourseKey.from_string('abc/123/course')
+    community_id = 1
