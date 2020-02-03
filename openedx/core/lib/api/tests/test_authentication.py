@@ -79,8 +79,7 @@ urlpatterns = [
 @ddt.ddt
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 @override_settings(ROOT_URLCONF=__name__)
-class OAuth2DeprecatedTests(TestCase):
-    """Tets for OAuth2AllowInActiveUsers Deprecated class"""
+class OAuth2AllowInActiveUsersTests(TestCase):
 
     OAUTH2_BASE_TESTING_URL = '/oauth2-deprecated-test/'
 
@@ -314,8 +313,8 @@ class OAuth2DeprecatedTests(TestCase):
         self.assertEqual(response.status_code, scope_statuses.write_status)
 
 
-class OAuth2Tests(OAuth2DeprecatedTests):
-    """ Tests for OAuth2Authentication class"""
+class OAuth2Tests(OAuth2DeprecatedTests):  # pylint: disable=test-inherits-tests, missing-docstring
+
     OAUTH2_BASE_TESTING_URL = '/oauth2-test/'
 
     def setUp(self):

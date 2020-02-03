@@ -220,10 +220,12 @@ class OAuth2Authentication(BaseAuthentication):
         if dot_token_return is not None:
             set_custom_metric('OAuth2Authentication_token_type', 'dot')
             return dot_token_return
+
         dop_token_return = self._get_dop_token(access_token)
         if dop_token_return is not None:
             set_custom_metric('OAuth2Authentication_token_type', 'dop')
             return dop_token_return
+
         set_custom_metric('OAuth2Authentication_token_type', 'None')
         return None
 
@@ -245,7 +247,7 @@ class OAuth2Authentication(BaseAuthentication):
 
     def authenticate_header(self, request):
         """
-        Bearer is the only finalized type currently
-        Check details on the `OAuth2Authentication.authenticate` method
+        Return a string to be used as the value of the `WWW-Authenticate`
+        header in a `401 Unauthenticated` response
         """
         return 'Bearer realm="%s"' % self.www_authenticate_realm
