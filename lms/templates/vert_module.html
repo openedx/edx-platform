@@ -1,11 +1,11 @@
 <%page expression_filter="h"/>
 <%! from openedx.core.djangolib.markup import HTML %>
-%if unit_title:
-  <h2 class="hd hd-2 unit-title">${unit_title}</h2>
-% endif
 
-% if show_bookmark_button:
-    <%include file='bookmark_button.html' args="bookmark_id=bookmark_id, is_bookmarked=bookmarked"/>
+%if unit_title and not is_microfrontend_embed:
+  <h2 class="hd hd-2 unit-title">${unit_title}</h2>
+  % if show_bookmark_button:
+  <%include file='bookmark_button.html' args="bookmark_id=bookmark_id, is_bookmarked=bookmarked"/>
+  % endif
 % endif
 
 <div class="vert-mod">

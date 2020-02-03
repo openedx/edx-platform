@@ -98,6 +98,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         if view == STUDENT_VIEW:
             fragment_context.update({
                 'show_bookmark_button': child_context.get('show_bookmark_button', not is_child_of_vertical),
+                'is_microfrontend_embed': child_context.get('is_microfrontend_embed', False),
                 'bookmarked': child_context['bookmarked'],
                 'bookmark_id': u"{},{}".format(
                     child_context['username'], six.text_type(self.location)),  # pylint: disable=no-member

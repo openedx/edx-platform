@@ -1588,6 +1588,13 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
         student_view_context = request.GET.dict()
         student_view_context['show_bookmark_button'] = False
 
+        # xBlocks iframed into the learning microfrontend application will
+        # not render some parts of an xblock template (notably unit_title
+        # in vert_module.html). The variable name is_microfrontend_embed
+        # is used instead of adding specific flags like show_unit_title to
+        # help keep track of why certain features may be rendered or not.
+        student_view_context['is_microfrontend_embed'] = bool(request.GET.get('is_microfrontend_embed', False))
+
         enable_completion_on_view_service = False
         completion_service = block.runtime.service(block, 'completion')
         if completion_service and completion_service.completion_tracking_enabled():
