@@ -2552,7 +2552,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=651 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=652 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3519,6 +3519,7 @@ CREATE TABLE `entitlements_courseentitlement` (
   `refund_locked` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `entitlements_courseentitlement_uuid_2228ffad_uniq` (`uuid`),
+  UNIQUE KEY `entitlements_courseentit_course_uuid_order_number_b37c9e13_uniq` (`course_uuid`,`order_number`),
   KEY `entitlements_courseentitlement_user_id_a518a225_fk_auth_user_id` (`user_id`),
   KEY `entitlements_coursee_enrollment_course_ru_3fc796af_fk_student_c` (`enrollment_course_run_id`),
   KEY `entitlements_coursee__policy_id_37bd7c13_fk_entitleme` (`_policy_id`),
