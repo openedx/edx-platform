@@ -313,7 +313,7 @@ class OAuth2AllowInActiveUsersTests(TestCase):
         self.assertEqual(response.status_code, scope_statuses.write_status)
 
 
-class OAuth2AuthenticationTests(OAuth2DeprecatedTests):  # pylint: disable=test-inherits-tests, missing-docstring
+class OAuth2AuthenticationTests(OAuth2AllowInActiveUsersTests):  # pylint: disable=test-inherits-tests, missing-docstring
 
     OAUTH2_BASE_TESTING_URL = '/oauth2-test/'
 
