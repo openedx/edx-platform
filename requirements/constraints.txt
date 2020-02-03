@@ -73,3 +73,9 @@ zipp==1.0.0
 
 # jsonfield2 3.1.0 requires Django 2.2
 jsonfield2==3.0.3
+
+# django-storages==1.9 breaks contentstore imports
+django-storages==1.8
+
+# edx-when==0.7.0 has a breaking change
+edx-when==0.6.0
