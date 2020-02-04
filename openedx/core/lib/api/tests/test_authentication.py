@@ -50,7 +50,7 @@ class MockView(APIView):  # pylint: disable=missing-docstring
 # This is the a change we've made from the django-rest-framework-oauth version
 # of these tests.  We're subclassing our custom OAuth2AuthenticationAllowInactiveUser
 # instead of OAuth2Authentication.
-class OAuth2AuthenticationDebug(authentication.OAuth2AuthenticationAllowInactiveUser):
+class OAuth2AuthenticationDebug(authentication.OAuth2AuthenticationAllowInactiveUserDeprecated):
     allow_query_params_token = True
 
 
@@ -58,7 +58,7 @@ urlpatterns = [
     url(r'^oauth2/', include(('provider.oauth2.urls', 'oauth2'), namespace='oauth2')),
     url(
         r'^oauth2-deprecated-test/$',
-        MockView.as_view(authentication_classes=[authentication.OAuth2AuthenticationAllowInactiveUser])
+        MockView.as_view(authentication_classes=[authentication.OAuth2AuthenticationAllowInactiveUserDeprecated])
     ),
     url(
         r'^oauth2-test/$',
@@ -69,7 +69,7 @@ urlpatterns = [
     url(
         r'^oauth2-with-scope-test/$',
         MockView.as_view(
-            authentication_classes=[authentication.OAuth2AuthenticationAllowInactiveUser],
+            authentication_classes=[authentication.OAuth2AuthenticationAllowInactiveUserDeprecated],
             permission_classes=[permissions.TokenHasReadWriteScope]
         )
     ),

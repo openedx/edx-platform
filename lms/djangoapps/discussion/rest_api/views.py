@@ -55,7 +55,7 @@ from openedx.core.djangoapps.django_comment_common.utils import (
 )
 from openedx.core.djangoapps.user_api.accounts.permissions import CanReplaceUsername, CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUserDeprecated
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from util.json_request import JsonResponse
@@ -751,7 +751,7 @@ class CourseDiscussionSettingsAPIView(DeveloperErrorViewMixin, APIView):
     """
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        OAuth2AuthenticationAllowInactiveUserDeprecated,
         SessionAuthenticationAllowInactiveUser,
     )
     parser_classes = (JSONParser, MergePatchParser,)
@@ -886,7 +886,7 @@ class CourseDiscussionRolesAPIView(DeveloperErrorViewMixin, APIView):
     """
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        OAuth2AuthenticationAllowInactiveUserDeprecated,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
