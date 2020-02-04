@@ -87,6 +87,10 @@ git+https://github.com/jazzband/sorl-thumbnail.git@13bedfb7d2970809eda597e3ef793
 # remove this fork
 git+https://github.com/edx/bridgekeeper.git@2423e8d8788c2132ebeec509e1a7b17e1f5b9364#egg=bridgekeeper==0.0
 
+# Forked to get Django 1.11 new style middleware support from django-method-override.
+# This can be removed once edx-platform is using django>=2.x.
+git+https://gitlab.com/Ayub-khan/django-method-override.git@5270af321be2e576d8e8b3c4191711a19975c356#egg=django-method-override
+
 # Our libraries:
 -e git+https://github.com/edx/codejail.git@4127fc4bd5775cc72aee8d7f0a70e31405e22439#egg=codejail
 -e git+https://github.com/edx/acid-block.git@98aecba94ecbfa934e2d00262741c0ea9f557fc9#egg=acid-xblock

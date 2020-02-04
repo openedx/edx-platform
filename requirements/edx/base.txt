@@ -65,7 +65,7 @@ django-fernet-fields==0.6
 django-filter==2.2.0
 django-ipware==2.1.0
 django-js-asset==1.2.2    # via django-mptt
-django-method-override==0.2.0
+git+https://gitlab.com/Ayub-khan/django-method-override.git@5270af321be2e576d8e8b3c4191711a19975c356#egg=django-method-override
 django-model-utils==3.0.0
 django-mptt==0.11.0
 django-multi-email-field==0.6.1  # via edx-enterprise
