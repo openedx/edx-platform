@@ -77,10 +77,22 @@
             /** Toggles between error and info styling on team membership upload
              * feedback banner.
              * 
+             * @param: content - string or array for display
              * @param: isError - true for error styling, false for info styling
              */
-            showInfoBanner: function (text, isError) {
-                $('#team-management-assign .page-banner .message-content').text(text)
+            showInfoBanner: function (content, isError) {
+                // clear message
+                let messageElement = $('#team-management-assign .page-banner .message-content');
+                messageElement.html("")
+
+                // set message
+                if(Array.isArray(content)) {
+                    content.forEach(item => {
+                        messageElement.append($(`<p>${item}</p>`))
+                    })
+                } else {
+                    $('#team-management-assign .page-banner .message-content').text(content)
+                }
 
                 // set color sytling
                 $('#team-management-assign .page-banner .alert')

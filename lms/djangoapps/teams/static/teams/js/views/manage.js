@@ -62,13 +62,13 @@
                 // This handler is currently unimplemented (TODO MST-44)
                 // this.teamEvents.trigger('teams:update', {});
 
-                const { number_of_records_added:recordsAdded } = data
+                const { recordsAdded } = data
                 TeamUtils.showInfoBanner(`Successfully added ${recordsAdded} students to teams`, false)
             },
 
             handleCsvUploadFailure: function (jqXHR, textStatus, errorThrown) {
-                const { summary, details } = jqXHR.responseJSON;
-                TeamUtils.showInfoBanner(`${summary}: ${details}`, true);
+                const { errors } = jqXHR.responseJSON;
+                TeamUtils.showInfoBanner(errors, true);
             }
         });
         return ManageView;
