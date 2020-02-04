@@ -332,7 +332,7 @@ class UserMappingView(ListAPIView):
             * remote_id: The Id from third party auth provider
     """
     authentication_classes = (
-        OAuth2AuthenticationDeprecated,
+        JwtAuthentication, OAuth2AuthenticationDeprecated,
     )
 
     serializer_class = serializers.UserMappingSerializer
