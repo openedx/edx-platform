@@ -260,11 +260,11 @@ class OAuth2Authentication(BaseAuthentication):
 
 class OAuth2AuthenticationAllowInactiveUser(OAuth2Authentication):
     """
-    Currently is_active field on the user is coupled
+    Currently, is_active field on the user is coupled
     with whether or not the user has verified ownership of their claimed email address.
     Once is_active is decoupled from verified_email, we will no longer need this
     class override.
-    But until then, this authentication class ensures that the user is logged in,
+    Until then, this authentication class ensures that the user is logged in,
     but does not require that their account "is_active".
     This class can be used for an OAuth2-accessible endpoint that allows users to access
     that endpoint without having their email verified.  For example, this is used
