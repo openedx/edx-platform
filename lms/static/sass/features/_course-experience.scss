@@ -308,6 +308,35 @@
     padding: 0;
     list-style-type: none;
 
+    // Course outline accordion / link
+    .outline-button {
+      display: block;
+      padding: 10px 0 10px 2px;
+      border: none;
+      width: 100%;
+      text-align: left;
+      margin: 0;
+      background: none;
+      cursor: pointer;
+
+      .fa {
+        color: $blue;
+      }
+
+      .prerequisites-icon {
+        margin-right: 0.25rem;
+      }
+
+      .complete-checkmark {
+        border: 1px solid $green;
+        margin-right: $baseline / 2;
+        border-radius: 100px;
+        color: white;
+        background-color: $green;
+        float: right;
+      }
+    }
+
     .section {
       @include media-breakpoint-up(md) {
         margin: 0;
@@ -346,7 +375,6 @@
             display: inline-block;
             margin: 0;
             font-weight: $font-regular;
-            margin-left: $baseline - 2;
             display: inline;
           }
 
@@ -354,7 +382,6 @@
             .details {
               font-size: $body-font-size;
               color: theme-color("secondary");
-              margin-left: 34px;
             }
 
             .prerequisite {
@@ -362,69 +389,9 @@
               font-weight: $font-bold;
             }
           }
-
-          .vertical {
-            @include margin-left(16px);
-
-            list-style-type: none;
-
-            a.outline-item {
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              padding: ($baseline / 2) 0 ($baseline / 2) 0;
-              margin: 0 0 0 ($baseline);
-              border-top: 1px solid $border-color;
-            }
-
-            a.outline-item:hover {
-              text-decoration: none;
-
-              .vertical-details {
-                text-decoration: underline;
-              }
-
-              .complete-checkmark {
-                text-decoration: none;
-              }
-            }
-
-            .vertical-details {
-              float:left;
-            }
-
-            &:hover,
-            &:focus {
-              background-color: palette(primary, x-back);
-              border-radius: $btn-border-radius;
-              text-decoration: none;
-            }
-
-            .vertical-actions {
-              .resume-right {
-                position: relative;
-                top: calc(50% - (#{$baseline} / 2));
-              }
-            }
-          }
         }
       }
     }
-  }
-}
-
-// Course outline accordion
-button.accordion-trigger, button.prerequisite-button {
-  padding: 10px 0 10px 2px;
-  border: none;
-  width: 100%;
-  text-align: left;
-  margin: 0;
-  background: none;
-  cursor: pointer;
-
-  .fa {
-    color: $blue;
   }
 }
 
@@ -442,15 +409,6 @@ button.accordion-trigger, button.prerequisite-button {
 
 .accordion-panel.is-hidden {
   display: none;
-}
-
-.fa-check.fa.complete-checkmark {
-  border: 1px solid $green;
-  margin-right: $baseline / 2;
-  border-radius: 100px;
-  color: white;
-  background-color: $green;
-  float: right;
 }
 
 // date summary
