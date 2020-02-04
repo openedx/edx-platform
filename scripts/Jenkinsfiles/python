@@ -1,12 +1,7 @@
 def runPythonTests() {
     // Determine git refspec, branch, and clone type
-    if (env.ghprbActualCommit) {
-        git_branch = "${ghprbActualCommit}"
-        git_refspec = "+refs/pull/${ghprbPullId}/*:refs/remotes/origin/pr/${ghprbPullId}/*"
-    } else {
-        git_branch = "${BRANCH_NAME}"
-        git_refspec = "+refs/heads/${BRANCH_NAME}:refs/remotes/origin/${BRANCH_NAME}"
-    }
+    git_branch = xdist_git_branch()
+    git_refspec = xdist_git_refspec()
     sshagent(credentials: ['jenkins-worker', 'jenkins-worker-pem'], ignoreMissing: true) {
         checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: git_branch]],
             doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', honorRefspec: true,
@@ -35,17 +30,30 @@ def xdist_git_branch() {
     }
 }
 
+def xdist_git_refspec() {
+    if (env.ghprbActualCommit) {
+        return "+refs/pull/${ghprbPullId}/*:refs/remotes/origin/pr/${ghprbPullId}/*"
+    } else {
+        return "+refs/heads/${BRANCH_NAME}:refs/remotes/origin/${BRANCH_NAME}"
+    }
+}
+
 pipeline {
-    agent { label "ironwood-jenkins-worker" }
+    agent { label "jenkins-worker" }
     options {
         timestamps()
         timeout(60)
     }
     environment {
-        XDIST_CONTAINER_SUBNET = credentials('XDIST_CONTAINER_SUBNET')
-        XDIST_CONTAINER_SECURITY_GROUP = credentials('XDIST_CONTAINER_SECURITY_GROUP')
-        XDIST_CONTAINER_TASK_NAME = "ironwood-jenkins-worker-task"
         XDIST_GIT_BRANCH = xdist_git_branch()
+        XDIST_GIT_REFSPEC = xdist_git_refspec()
+        XDIST_INSTANCE_TYPE = "c5d.large"
+        XDIST_WORKER_AMI = credentials('XDIST_WORKER_AMI')
+        XDIST_WORKER_IAM_PROFILE_ARN = credentials('XDIST_WORKER_IAM_PROFILE_ARN')
+        XDIST_WORKER_KEY_NAME = "ucsd-jenkins-worker"
+        XDIST_WORKER_SUBNET = credentials('XDIST_WORKER_SUBNET')
+        XDIST_WORKER_SECURITY_GROUP = credentials('XDIST_WORKER_SECURITY_GROUP')
+        WTW_CONTEXT = "python"
     }
     stages {
         stage('Mark build as pending on Github') {
@@ -74,10 +82,10 @@ pipeline {
         stage('Run Tests') {
             parallel {
                 stage("lms-unit") {
-                    agent { label "ironwood-jenkins-worker" }
+                    agent { label "jenkins-worker" }
                     environment {
                         TEST_SUITE = "lms-unit"
-                        XDIST_NUM_TASKS = 10
+                        XDIST_NUM_WORKERS = 10
                         XDIST_REMOTE_NUM_PROCESSES = 1
                     }
                     steps {
@@ -94,10 +102,10 @@ pipeline {
                     }
                 }
                 stage("cms-unit") {
-                    agent { label "ironwood-jenkins-worker" }
+                    agent { label "jenkins-worker" }
                     environment {
                         TEST_SUITE = "cms-unit"
-                        XDIST_NUM_TASKS = 3
+                        XDIST_NUM_WORKERS = 3
                         XDIST_REMOTE_NUM_PROCESSES = 1
                     }
                     steps {
@@ -114,10 +122,10 @@ pipeline {
                     }
                 }
                 stage("commonlib-unit") {
-                    agent { label "ironwood-jenkins-worker" }
+                    agent { label "jenkins-worker" }
                     environment {
                         TEST_SUITE = "commonlib-unit"
-                        XDIST_NUM_TASKS = 3
+                        XDIST_NUM_WORKERS = 3
                         XDIST_REMOTE_NUM_PROCESSES = 1
                     }
                     steps {
