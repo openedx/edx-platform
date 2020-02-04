@@ -87,6 +87,7 @@ def team_post_save_callback(sender, instance, **kwargs):  # pylint: disable=unus
                     six.text_type(getattr(instance, field))
                 )
                 truncated_fields['team_id'] = instance.team_id
+                truncated_fields['team_id'] = instance.team_id
                 truncated_fields['field'] = field
 
                 emit_team_event(
@@ -1360,11 +1361,9 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class MembershipBulkManagementView(View):
+class MembershipBulkManagementView(GenericAPIView):
     """
-    Partially-implemented view for uploading and downloading team membership CSVs.
-
-    TODO MST-31
+    View for uploading and downloading team membership CSVs.
     """
     def get(self, request, **_kwargs):
         """

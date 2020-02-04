@@ -3,7 +3,6 @@ Course API
 """
 import logging
 
-from edx_django_utils.monitoring import function_trace
 from edx_when.api import get_dates_for_course
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User
@@ -18,7 +17,9 @@ from lms.djangoapps.courseware.courses import (
     get_courses,
     get_permission_for_course_about
 )
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.view_utils import LazySequence
+from student.roles import GlobalStaff
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -136,6 +137,50 @@ def list_courses(request, username, org=None, filter_=None, search_term=None):
     course_qs = get_courses(user, org=org, filter_=filter_)
     course_qs = _filter_by_search(course_qs, search_term)
     return course_qs
+
+
+def list_course_keys(request, username, role):
+    """
+    Yield all available CourseKeys for the user having the given role.
+
+    The courses returned include those for which the user identified by
+    `username` has the given role.  Additionally, the logged in user
+    should have permission to view courses available to that user.
+
+    Note: This function does not use branding to determine courses.
+
+    Arguments:
+        request (HTTPRequest):
+            Used to identify the logged-in user and to instantiate the course
+            module to retrieve the course about description
+        username (string):
+            The name of the user the logged-in user would like to be
+            identified as
+
+    Keyword Arguments:
+        role (string):
+            Course keys are filtered such that only those for which the
+            user has the specified role are returned.
+
+    Return value:
+        Yield `CourseKey` objects representing the collection of courses.
+
+    """
+    user = get_effective_user(request.user, username)
+
+    course_keys = CourseOverview.get_all_course_keys()
+
+    # Global staff have access to all courses. Filter courses for non-global staff.
+    if GlobalStaff().has_user(user):
+        return course_keys
+
+    return LazySequence(
+        (
+            course_key for course_key in course_keys
+            if has_access(user, role, course_key)
+        ),
+        est_len=len(course_keys)
+    )
 
 
 def get_due_dates(request, course_key, user):

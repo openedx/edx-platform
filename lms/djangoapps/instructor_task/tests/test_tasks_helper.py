@@ -15,36 +15,30 @@ import tempfile
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 
+from six import text_type
+from six.moves import range, zip
+from six.moves.urllib.parse import quote  # pylint: disable=import-error
+
 import ddt
+import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 import unicodecsv
+from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_django_utils.cache import RequestCache
 from freezegun import freeze_time
-from mock import ANY, MagicMock, Mock, patch
-from pytz import UTC
-from six import text_type
-from six.moves import range, zip
-from six.moves.urllib.parse import quote  # pylint: disable=import-error
-
-import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
-from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
+from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from lms.djangoapps.grades.course_data import CourseData
-from lms.djangoapps.grades.models import (
-    PersistentCourseGrade,
-    PersistentSubsectionGradeOverride,
-)
+from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsectionGradeOverride
 from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
 from lms.djangoapps.grades.transformer import GradesTransformer
 from lms.djangoapps.instructor_analytics.basic import UNAVAILABLE, list_problem_responses
 from lms.djangoapps.instructor_task.tasks_helper.certs import generate_students_certificates
-# from lms.djangoapps.instructor_task.config.waffle import problem_grade_report_verified_only
 from lms.djangoapps.instructor_task.tasks_helper.enrollments import (
     upload_enrollment_report,
     upload_exec_summary_report,
@@ -70,12 +64,14 @@ from lms.djangoapps.instructor_task.tests.test_base import (
 )
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from mock import ANY, MagicMock, Mock, patch
 from openedx.core.djangoapps.course_groups.models import CohortMembership, CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.credit.tests.factories import CreditCourseFactory
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
 from openedx.core.lib.teams_config import TeamsConfig
+from pytz import UTC
 from shoppingcart.models import (
     Coupon,
     CourseRegistrationCode,
@@ -88,19 +84,21 @@ from shoppingcart.models import (
 from student.models import ALLOWEDTOENROLL_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from survey.models import SurveyAnswer, SurveyForm
+from waffle.testutils import override_switch
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from xmodule.partitions.partitions import Group, UserPartition
 
+from ..config.waffle import GENERATE_GRADE_REPORT_VERIFIED_ONLY
 from ..models import ReportStore
 from ..tasks_helper.utils import UPDATE_STATUS_FAILED, UPDATE_STATUS_SUCCEEDED
-
 
 _TEAMS_CONFIG = TeamsConfig({
     'max_size': 2,
     'topics': [{'id': 'topic', 'name': 'Topic', 'description': 'A Topic'}],
 })
+SWITCH_GENERATE_GRADE_REPORT_VERIFIED_ONLY = '.'.join(['instructor_task', GENERATE_GRADE_REPORT_VERIFIED_ONLY])
 
 
 class InstructorGradeReportTestCase(TestReportMixin, InstructorTaskCourseTestCase):
@@ -422,7 +420,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
 
         RequestCache.clear_all_namespaces()
 
-        expected_query_count = 51
+        expected_query_count = 50
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             with check_mongo_calls(mongo_count):
                 with self.assertNumQueries(expected_query_count):
@@ -945,26 +943,23 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         ])
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
+    @override_switch(SWITCH_GENERATE_GRADE_REPORT_VERIFIED_ONLY, True)
     def test_single_problem_verified_student_only(self, _get_current_task):
-        with patch(
-            'lms.djangoapps.instructor_task.tasks_helper.grades.problem_grade_report_verified_only',
-            return_value=True,
-        ):
-            student_verified = self.create_student(u'user_verified', mode='verified')
-            vertical = ItemFactory.create(
-                parent_location=self.problem_section.location,
-                category='vertical',
-                metadata={'graded': True},
-                display_name='Problem Vertical'
-            )
-            self.define_option_problem(u'Problem1', parent=vertical)
+        student_verified = self.create_student(u'user_verified', mode='verified')
+        vertical = ItemFactory.create(
+            parent_location=self.problem_section.location,
+            category='vertical',
+            metadata={'graded': True},
+            display_name='Problem Vertical'
+        )
+        self.define_option_problem(u'Problem1', parent=vertical)
 
-            self.submit_student_answer(self.student_1.username, u'Problem1', ['Option 1'])
-            self.submit_student_answer(student_verified.username, u'Problem1', ['Option 1'])
-            result = ProblemGradeReport.generate(None, None, self.course.id, None, 'graded')
-            self.assertDictContainsSubset(
-                {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0}, result
-            )
+        self.submit_student_answer(self.student_1.username, u'Problem1', ['Option 1'])
+        self.submit_student_answer(student_verified.username, u'Problem1', ['Option 1'])
+        result = ProblemGradeReport.generate(None, None, self.course.id, None, 'graded')
+        self.assertDictContainsSubset(
+            {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0}, result
+        )
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
     @patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.iter')
@@ -2039,31 +2034,28 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
             )
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
+    @override_switch(SWITCH_GENERATE_GRADE_REPORT_VERIFIED_ONLY, True)
     def test_course_grade_with_verified_student_only(self, _get_current_task):
         """
         Tests that course grade report has expected data when it is generated only for
         verified learners.
         """
-        with patch(
-            'lms.djangoapps.instructor_task.tasks_helper.grades.course_grade_report_verified_only',
-            return_value=True,
-        ):
-            student_1 = self.create_student(u'user_honor')
-            student_verified = self.create_student(u'user_verified', mode='verified')
-            vertical = ItemFactory.create(
-                parent_location=self.problem_section.location,
-                category='vertical',
-                metadata={'graded': True},
-                display_name='Problem Vertical'
-            )
-            self.define_option_problem(u'Problem1', parent=vertical)
+        student_1 = self.create_student(u'user_honor')
+        student_verified = self.create_student(u'user_verified', mode='verified')
+        vertical = ItemFactory.create(
+            parent_location=self.problem_section.location,
+            category='vertical',
+            metadata={'graded': True},
+            display_name='Problem Vertical'
+        )
+        self.define_option_problem(u'Problem1', parent=vertical)
 
-            self.submit_student_answer(student_1.username, u'Problem1', ['Option 1'])
-            self.submit_student_answer(student_verified.username, u'Problem1', ['Option 1'])
-            result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
-            self.assertDictContainsSubset(
-                {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0}, result
-            )
+        self.submit_student_answer(student_1.username, u'Problem1', ['Option 1'])
+        self.submit_student_answer(student_verified.username, u'Problem1', ['Option 1'])
+        result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
+        self.assertDictContainsSubset(
+            {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0}, result
+        )
 
     @ddt.data(True, False)
     def test_fast_generation(self, create_non_zero_grade):

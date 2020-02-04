@@ -46,9 +46,14 @@ else:
   % else:
     <div class="message message-status ${status_css_class} is-shown">
       <p class="message-copy">
-        % if should_display_grade(course_overview.end):
+        % if should_display_grade(course_overview):
             ${_("Your final grade:")}
             <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>.
+        % elif course_overview.certificate_available_date:
+          <%
+            cert_available_date = course_overview.certificate_available_date.strftime('%Y-%m-%d')
+          %>
+          ${_("Grades will be finalized on {cert_available_date}".format(cert_available_date=cert_available_date))}
         % endif
         % if cert_status['status'] == 'notpassing':
           % if enrollment.mode != 'audit':

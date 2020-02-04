@@ -26,7 +26,6 @@ from django.test.utils import override_settings
 from django.urls import reverse as django_reverse
 from django.utils.translation import ugettext as _
 from edx_when.api import get_overrides_for_user
-from edx_when.signals import extract_dates
 from mock import Mock, NonCallableMock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
@@ -62,6 +61,7 @@ from lms.djangoapps.instructor_task.api_helper import (
     QueueConnectionError,
     generate_already_running_error_message
 )
+from openedx.core.djangoapps.course_date_signals.handlers import extract_dates
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
@@ -95,7 +95,10 @@ from student.models import (
     get_retired_email_by_email,
     get_retired_username_by_username
 )
-from student.roles import CourseBetaTesterRole, CourseFinanceAdminRole, CourseInstructorRole, CourseSalesAdminRole
+from student.roles import (
+    CourseBetaTesterRole, CourseDataResearcherRole, CourseFinanceAdminRole,
+    CourseInstructorRole, CourseSalesAdminRole
+)
 from student.tests.factories import AdminFactory, UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
@@ -555,6 +558,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
         staff_member = StaffFactory(course_key=self.course.id)
         CourseEnrollment.enroll(staff_member, self.course.id)
         CourseFinanceAdminRole(self.course.id).add_users(staff_member)
+        CourseDataResearcherRole(self.course.id).add_users(staff_member)
         self.client.login(username=staff_member.username, password='test')
         # Try to promote to forums admin - not working
         # update_forum_role(self.course.id, staff_member, FORUM_ROLE_ADMINISTRATOR, 'allow')
@@ -593,6 +597,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
         CourseEnrollment.enroll(inst, self.course.id)
 
         CourseFinanceAdminRole(self.course.id).add_users(inst)
+        CourseDataResearcherRole(self.course.id).add_users(inst)
         self.client.login(username=inst.username, password='test')
 
         for endpoint, args in self.staff_level_endpoints:
@@ -2602,6 +2607,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
                                       min_price=40)
         self.course_mode.save()
         self.instructor = InstructorFactory(course_key=self.course.id)
+        CourseDataResearcherRole(self.course.id).add_users(self.instructor)
         self.client.login(username=self.instructor.username, password='test')
         self.cart = Order.get_cart_for_user(self.instructor)
         self.coupon_code = 'abcde'
@@ -3038,6 +3044,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
                 'max_size': 2, 'topics': [{'id': 'topic', 'name': 'Topic', 'description': 'A Topic'}]
             }))
             course_instructor = InstructorFactory(course_key=self.course.id)
+            CourseDataResearcherRole(self.course.id).add_users(course_instructor)
             self.client.login(username=course_instructor.username, password='test')
 
         url = reverse('get_students_features', kwargs={'course_id': text_type(self.course.id)})

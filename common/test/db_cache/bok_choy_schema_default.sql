@@ -2552,7 +2552,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=649 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=651 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3103,6 +3103,7 @@ CREATE TABLE `enterprise_enterprisecustomer` (
   `enable_learner_portal` tinyint(1) NOT NULL,
   `learner_portal_hostname` varchar(255) NOT NULL,
   `enable_portal_reporting_config_screen` tinyint(1) NOT NULL,
+  `contact_email` varchar(254) DEFAULT NULL,
   PRIMARY KEY (`uuid`),
   UNIQUE KEY `enterprise_enterprisecustomer_slug_80411f46_uniq` (`slug`),
   KEY `enterprise_enterprisecustomer_site_id_947ed084_fk_django_site_id` (`site_id`),
@@ -3120,6 +3121,8 @@ CREATE TABLE `enterprise_enterprisecustomerbrandingconfiguration` (
   `modified` datetime(6) NOT NULL,
   `logo` varchar(255) DEFAULT NULL,
   `enterprise_customer_id` char(32) NOT NULL,
+  `banner_background_color` varchar(7) DEFAULT NULL,
+  `banner_border_color` varchar(7) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `enterprise_customer_id` (`enterprise_customer_id`),
   CONSTRAINT `enterprise_enterpris_enterprise_customer__09c1ee14_fk_enterpris` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
@@ -3352,6 +3355,7 @@ CREATE TABLE `enterprise_historicalenterprisecustomer` (
   `enable_learner_portal` tinyint(1) NOT NULL,
   `learner_portal_hostname` varchar(255) NOT NULL,
   `enable_portal_reporting_config_screen` tinyint(1) NOT NULL,
+  `contact_email` varchar(254) DEFAULT NULL,
   PRIMARY KEY (`history_id`),
   KEY `enterprise_historica_history_user_id_bbd9b0d6_fk_auth_user` (`history_user_id`),
   KEY `enterprise_historicalenterprisecustomer_uuid_75c3528e` (`uuid`),
