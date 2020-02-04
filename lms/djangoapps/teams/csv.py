@@ -1,14 +1,13 @@
 """
 CSV processing and generation utilities for Teams LMS app.
 """
-from lms.djangoapps.teams.models import CourseTeamMembership
-from student.models import CourseEnrollment
 
 import csv
+
 from django.contrib.auth.models import User
-from student.models import CourseEnrollment
 
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
+from student.models import CourseEnrollment
 from .utils import emit_team_event
 
 
