@@ -25,7 +25,9 @@ class TeamMembershipImportManager(object):
     """ Stub for https://github.com/edx/edx-platform/pull/22949/files """
 
     def __init__(self, course_id):
-        pass
+        self.validation_errors = []
+        self.import_succeeded = False
+        self.number_of_records_added = 0
 
     def set_team_membership_from_csv(self, file):
         import random
@@ -33,8 +35,14 @@ class TeamMembershipImportManager(object):
         case = random.randint(0, 2)
 
         if case == 0:
-            return {'success': True, 'number_of_records_added': 5}
+            self.number_of_records_added = 5
+            self.import_succeeded = True
+            return True
         elif case == 1:
-            raise Exception('Bad file format')
+            self.validation_errors.append('Something bad happened')
         else:
-            raise Exception('Something bad happened')
+            self.validation_errors.append('Something bad happened')
+            self.validation_errors.append('Something else bad happened')
+
+        self.import_succeeded = False
+        return False

@@ -1385,19 +1385,16 @@ class MembershipBulkManagementView(View):
         """
         self.check_access()
 
-        result = {}
+        inputfile_handle = request.FILES['csv']
+        team_import_manager = TeamMembershipImportManager(self.course)
+        team_import_manager.set_team_membership_from_csv(inputfile_handle)
 
-        try:
-            inputfile_handle = request.FILES['csv']
-            team_import_manager = TeamMembershipImportManager(self.course)
-            result = team_import_manager.set_team_membership_from_csv(inputfile_handle)
-        except Exception as e:
-            return JsonResponse({
-                'summary': _("Exception"),
-                'details': _(str(e)),
-            }, status=status.HTTP_400_BAD_REQUEST)
+        if team_import_manager.import_succeeded:
+            return JsonResponse({"recordsAdded": team_import_manager.number_of_records_added}, status=status.HTTP_201_CREATED)
         else:
-            return JsonResponse(result, status=status.HTTP_201_CREATED)
+            return JsonResponse({
+                'errors': team_import_manager.validation_errors
+            }, status=status.HTTP_400_BAD_REQUEST)
 
     def check_access(self):
         """
