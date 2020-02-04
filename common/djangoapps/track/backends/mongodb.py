@@ -63,6 +63,7 @@ class MongoBackend(BaseBackend):
         self.connection = MongoClient(
             host=host,
             port=port,
+            maxPoolSize=None,
             **extra
         )
 
