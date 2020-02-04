@@ -2,14 +2,14 @@
 Module to define url helpers functions
 """
 
-
 import six
+from django.conf import settings
 from django.urls import reverse
 from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import navigation_index, path_to_location
-
+from lms.djangoapps.courseware.toggles import should_redirect_to_courseware_microfrontend
 
 def get_redirect_url(course_key, usage_key, request=None):
     """ Returns the redirect url back to courseware
@@ -24,6 +24,10 @@ def get_redirect_url(course_key, usage_key, request=None):
     Returns:
         Redirect url string
     """
+
+    if should_redirect_to_courseware_microfrontend(course_key):
+      path = path_to_location(modulestore(), usage_key, request, full_path=True)
+      return get_microfrontend_redirect_url(course_key, path)
 
     (
         course_key, chapter, section, vertical_unused,
@@ -52,3 +56,39 @@ def get_redirect_url(course_key, usage_key, request=None):
         )
     redirect_url += "?{}".format(urlencode({'activate_block_id': six.text_type(final_target_id)}))
     return redirect_url
+
+def get_microfrontend_redirect_url(course_key, path):
+  """
+    The micro-frontend determines the user's position in the vertical via
+    a separate API call, so all we need here is the course_key, section, and vertical
+    IDs to format it's URL.
+
+    It is also capable of determining our section and vertical if they're not present.  Fully specifying it all is preferable, though, as the micro-frontend can save itself some work, resulting in a better user experience.
+
+    We're building a URL like this:
+
+    http://localhost:2000/course-v1:edX+DemoX+Demo_Course/block-v1:edX+DemoX+Demo_Course+type@sequential+block@19a30717eff543078a5d94ae9d6c18a5/block-v1:edX+DemoX+Demo_Course+type@vertical+block@4a1bba2a403f40bca5ec245e945b0d76
+  """
+
+  redirect_url = '{base_url}/{prefix}/{course_key}'.format(
+   base_url=settings.LEARNING_MICROFRONTEND_URL,
+   prefix='course/',
+   course_key=course_key
+  )
+
+  # The first four elements of the path list are the ones we care about here:
+  # - course
+  # - chapter
+  # - sequence
+  # - vertical
+  # We skip course because we already have it from our argument above, and we skip chapter because the micro-frontend URL doesn't include it.
+  if len(path) > 2:
+    redirect_url += '/{sequence_key}'.format(
+      sequence_key=path[2]
+    )
+  if len(path) > 3:
+    redirect_url += '/{vertical_key}'.format(
+      vertical_key=path[3]
+    )
+
+  return redirect_url

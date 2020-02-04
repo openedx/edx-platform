@@ -295,4 +295,4 @@ EDXNOTES_INTERNAL_API = 'http://edx.devstack.edxnotesapi:18120/api/v1'
 EDXNOTES_CLIENT_NAME = 'edx_notes_api-backend-service'
 
 ############## Settings for Microfrontends  #########################
-LEARNING_MICROFRONTEND_URL = 'http://localhost:2000/'
+LEARNING_MICROFRONTEND_URL = 'http://localhost:2000'
