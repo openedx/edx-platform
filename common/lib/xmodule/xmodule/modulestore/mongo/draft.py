@@ -161,7 +161,7 @@ class DraftModuleStore(MongoModuleStore):
         elif revision is None:
             key = usage_key.to_deprecated_son(prefix='_id.')
             del key['_id.revision']
-            return self.collection.find(key).count() > 0
+            return self.collection.count_documents(key) > 0
         else:
             raise UnsupportedRevisionError()
 
@@ -557,7 +557,7 @@ class DraftModuleStore(MongoModuleStore):
                 # see if other version of to-be-deleted root exists
                 query = location.to_deprecated_son(prefix='_id.')
                 del query['_id.revision']
-                if self.collection.find(query).count() > 1:
+                if self.collection.count_documents(query) > 1:
                     continue
 
             parent_block = super(DraftModuleStore, self).get_item(parent_location)
@@ -817,9 +817,10 @@ class DraftModuleStore(MongoModuleStore):
             versions_found = self.collection.find(
                 query, {'_id': True, 'definition.children': True}, sort=[SORT_REVISION_FAVOR_DRAFT]
             )
+            versions_found = list(versions_found)
             # If 2 versions versions exist, we can assume one is a published version. Go ahead and do the delete
             # of the draft version.
-            if versions_found.count() > 1:
+            if len(versions_found) > 1:
                 # Moving a child from published parent creates a draft of the parent and moved child.
                 published_version = [
                     version
@@ -830,7 +831,7 @@ class DraftModuleStore(MongoModuleStore):
                     # This change makes sure that parents are updated too i.e. an item will have only one parent.
                     self.update_parent_if_moved(root_location, published_version[0], delete_draft_only, user_id)
                 self._delete_subtree(root_location, [as_draft], draft_only=True)
-            elif versions_found.count() == 1:
+            elif len(versions_found) == 1:
                 # Since this method cannot be called on something in DIRECT_ONLY_CATEGORIES and we call
                 # delete_subtree as soon as we find an item with a draft version, if there is only 1 version
                 # it must be published (since adding a child to a published item creates a draft of the parent).

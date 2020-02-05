@@ -368,7 +368,7 @@ class ModuleI18nService(object):
         if block:
             xblock_class = getattr(block, 'unmixed_class', block.__class__)
             xblock_resource = xblock_class.__module__
-            xblock_locale_dir = '/translations'
+            xblock_locale_dir = 'translations'
             xblock_locale_path = resource_filename(xblock_resource, xblock_locale_dir)
             xblock_domain = 'text'
             selected_language = get_language()
