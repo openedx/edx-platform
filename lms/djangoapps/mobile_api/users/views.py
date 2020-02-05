@@ -70,6 +70,12 @@ class UserDetail(generics.RetrieveAPIView):
     serializer_class = UserSerializer
     lookup_field = 'username'
 
+    def get(self, request, *args, **kwargs):
+        # update user's last logged in from here because
+        # updating it from the oauth2 related code is too complex
+        user_logged_in.send(sender=User, user=request.user, request=request)
+        return super(UserDetail, self).get(request, *args, **kwargs)
+
     def get_serializer_context(self):
         context = super(UserDetail, self).get_serializer_context()
         context['api_version'] = self.kwargs.get('api_version')
@@ -380,7 +386,4 @@ def my_user_info(request, api_version):
     """
     Redirect to the currently-logged-in user's info page
     """
-    # update user's last logged in from here because
-    # updating it from the oauth2 related code is too complex
-    user_logged_in.send(sender=User, user=request.user, request=request)
     return redirect("user-detail", api_version=api_version, username=request.user.username)

@@ -58,6 +58,21 @@ class TestUserDetailApi(MobileAPITestCase, MobileAuthUserTestMixin):
         self.assertEqual(response.data['username'], self.user.username)
         self.assertEqual(response.data['email'], self.user.email)
 
+    @ddt.data(API_V05, API_V1)
+    def test_last_loggedin_updated(self, api_version):
+        """Verify that a user's last logged in value updates after hitting the my_user_info endpoint"""
+        self.login()
+
+        self.user.refresh_from_db()
+        last_login_before = self.user.last_login
+
+        # just hit the api endpoint; we don't care about the response here (tested previously)
+        self.api_response(api_version=api_version)
+
+        self.user.refresh_from_db()
+        last_login_after = self.user.last_login
+        assert last_login_after > last_login_before
+
 
 @attr(shard=9)
 @ddt.ddt
@@ -83,8 +98,8 @@ class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
         self.user.refresh_from_db()
         last_login_before = self.user.last_login
 
-        # just hit the api endpoint; we don't care about the response here (tested previously)
-        self.api_response(expected_response_code=302, api_version=api_version)
+        # just follow the api endpoint; we don't care about the response here (tested previously)
+        self.api_response(api_version=api_version, follow=True)
 
         self.user.refresh_from_db()
         last_login_after = self.user.last_login
