@@ -55,7 +55,7 @@ from .api import (
     has_team_api_access,
     user_organization_protection_status
 )
-from .csv import load_team_membership_csv
+from .csv import load_team_membership_csv, TeamMembershipImportManager
 from .errors import AlreadyOnTeamInCourse, ElasticSearchConnectionError, NotEnrolledInCourseForTeam
 from .search_indexes import CourseTeamIndexer
 from .serializers import (
@@ -86,6 +86,7 @@ def team_post_save_callback(sender, instance, **kwargs):  # pylint: disable=unus
                     six.text_type(changed_fields[field]),
                     six.text_type(getattr(instance, field))
                 )
+                truncated_fields['team_id'] = instance.team_id
                 truncated_fields['team_id'] = instance.team_id
                 truncated_fields['field'] = field
 
@@ -1360,11 +1361,9 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class MembershipBulkManagementView(View):
+class MembershipBulkManagementView(GenericAPIView):
     """
-    Partially-implemented view for uploading and downloading team membership CSVs.
-
-    TODO MST-31
+    View for uploading and downloading team membership CSVs.
     """
     def get(self, request, **_kwargs):
         """
@@ -1384,7 +1383,15 @@ class MembershipBulkManagementView(View):
         Process uploaded CSV to modify team memberships for given course run.
         """
         self.check_access()
-        return HttpResponse(status=status.HTTP_501_NOT_IMPLEMENTED)
+        inputfile_handle = request.FILES['csv']
+        team_import_manager = TeamMembershipImportManager(self.course)
+        team_import_manager.set_team_membership_from_csv(inputfile_handle)
+        if team_import_manager.import_succeeded:
+            return Response(str(team_import_manager.number_of_records_added), status=status.HTTP_201_CREATED)
+        else:
+            return Response({
+                'errors': team_import_manager.validation_errors
+            }, status=status.HTTP_400_BAD_REQUEST)
 
     def check_access(self):
         """

@@ -4,22 +4,12 @@ Common utilities for the course experience, including course outline.
 
 
 from completion.models import BlockCompletion
-from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import CourseKey
 from six.moves import range
-from web_fragments.fragment import Fragment
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
-from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
-from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.cache_utils import request_cached
-from openedx.features.discounts.applicability import (
-    can_receive_discount,
-    get_discount_expiration_date,
-    discount_percentage
-)
-from openedx.features.discounts.utils import format_strikeout_price
 from xmodule.modulestore.django import modulestore
 
 

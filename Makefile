@@ -51,6 +51,7 @@ pull_translations: ## pull translations from Transifex
 	git clean -fdX conf/locale/rtl
 	git clean -fdX conf/locale/eo
 	i18n_tool validate
+	paver i18n_compilejs
 
 detect_changed_source_translations: ## check if translation files are up-to-date
 	i18n_tool changed
