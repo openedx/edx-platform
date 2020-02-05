@@ -50,7 +50,8 @@ from openedx.core.djangoapps.appsembler.api.helpers import as_course_key
 from openedx.core.djangoapps.appsembler.api.v1.api import enroll_learners_in_course
 from openedx.core.djangoapps.appsembler.api.v1.filters import (
     CourseEnrollmentFilter,
-    CourseOverviewFilter
+    CourseOverviewFilter,
+    UserIndexFilter,
 )
 from openedx.core.djangoapps.appsembler.api.v1.pagination import (
     TahoeLimitOffsetPagination
@@ -397,6 +398,7 @@ class UserIndexViewSet(TahoeAuthMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = UserIndexSerializer
     throttle_classes = (TahoeAPIUserThrottle,)
     filter_backends = (DjangoFilterBackend, )
+    filter_class = UserIndexFilter
 
     def get_queryset(self):
         site = django.contrib.sites.shortcuts.get_current_site(self.request)

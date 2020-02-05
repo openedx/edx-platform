@@ -1,5 +1,6 @@
 
 import django_filters
+from django.contrib.auth import get_user_model
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.models import (
     CourseOverview,
@@ -68,3 +69,15 @@ class CourseEnrollmentFilter(django_filters.FilterSet):
     class Meta:
         model = CourseEnrollment
         fields = ['course_id', 'user_id', 'username', 'is_active', ]
+
+
+class UserIndexFilter(django_filters.FilterSet):
+    '''Provides filtering for the User model objects in the UserIndexViewSet.
+
+    '''
+
+    email_exact = django_filters.CharFilter(name='email', lookup_expr='iexact')
+
+    class Meta:
+        model = get_user_model()
+        fields = ['email_exact']
