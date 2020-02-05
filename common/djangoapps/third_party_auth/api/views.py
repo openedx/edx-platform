@@ -18,7 +18,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from social_django.models import UserSocialAuth
 
-from openedx.core.lib.api.authentication import OAuth2AuthenticationDeprecated, OAuth2AuthenticationAllowInactiveUserDeprecated
+from openedx.core.lib.api.authentication import (
+    OAuth2AuthenticationDeprecated, 
+    OAuth2AuthenticationAllowInactiveUserDeprecated
+)
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from third_party_auth import pipeline
 from third_party_auth.api import serializers
