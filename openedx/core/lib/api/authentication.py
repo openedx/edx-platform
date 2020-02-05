@@ -136,7 +136,7 @@ class OAuth2Authentication(BaseAuthentication):
     www_authenticate_realm = 'api'
 
     # currently, active users are users that confirm their email.
-    # a subclass could override `allow_inactive_users` to enable access without email confirmation, 
+    # a subclass could override `allow_inactive_users` to enable access without email confirmation,
     # like in the case of mobile users.
     allow_inactive_users = False
 
