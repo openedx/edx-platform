@@ -59,15 +59,15 @@ urlpatterns = [
     url(
         r'^oauth2-deprecated-test/$',
         MockView.as_view(authentication_classes=[authentication.OAuth2AuthenticationAllowInactiveUserDeprecated])
-    ),
-        url(
+        ),
+    url(
         r'^oauth2-inactive-test/$',
         MockView.as_view(authentication_classes=[authentication.OAuth2AuthenticationAllowInactiveUser])
-    ),
+        ),
     url(
         r'^oauth2-test/$',
         MockView.as_view(authentication_classes=[authentication.OAuth2Authentication])
-    ),
+        ),
     # TODO(jinder): remove url when OAuth2AuthenticationDeprecated is fully removed
     url(r'^oauth2-test-debug/$', MockView.as_view(authentication_classes=[OAuth2AuthenticationDebug])),
     url(

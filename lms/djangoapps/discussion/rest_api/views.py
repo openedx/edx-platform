@@ -59,7 +59,7 @@ from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUserDeprecated,
     OAuth2AuthenticationAllowInactiveUser
-    )
+)
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from util.json_request import JsonResponse
@@ -79,6 +79,7 @@ else:
         OAuth2AuthenticationAllowInactiveUserDeprecated,
         SessionAuthenticationAllowInactiveUser,
     )
+
 
 @view_auth_classes()
 class CourseView(DeveloperErrorViewMixin, APIView):
