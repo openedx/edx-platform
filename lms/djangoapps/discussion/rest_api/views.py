@@ -55,7 +55,10 @@ from openedx.core.djangoapps.django_comment_common.utils import (
 )
 from openedx.core.djangoapps.user_api.accounts.permissions import CanReplaceUsername, CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUserDeprecated
+from openedx.core.lib.api.authentication import (
+    OAuth2AuthenticationAllowInactiveUserDeprecated,
+    OAuth2AuthenticationAllowInactiveUser
+    )
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from util.json_request import JsonResponse
@@ -63,6 +66,18 @@ from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
+if getattr(settings, "DISCUSSION_USE_NEW_OAUTH2_CLASS", False):
+    _discussion_configured_authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+else:
+    _discussion_configured_authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUserDeprecated,
+        SessionAuthenticationAllowInactiveUser,
+    )
 
 @view_auth_classes()
 class CourseView(DeveloperErrorViewMixin, APIView):
@@ -749,11 +764,7 @@ class CourseDiscussionSettingsAPIView(DeveloperErrorViewMixin, APIView):
         * available_division_schemes: A list of available division schemes for the course.
 
     """
-    authentication_classes = (
-        JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUserDeprecated,
-        SessionAuthenticationAllowInactiveUser,
-    )
+    authentication_classes = _discussion_configured_authentication_classes
     parser_classes = (JSONParser, MergePatchParser,)
     permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
 
@@ -884,11 +895,7 @@ class CourseDiscussionRolesAPIView(DeveloperErrorViewMixin, APIView):
 
         * division_scheme: The division scheme used by the course.
     """
-    authentication_classes = (
-        JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUserDeprecated,
-        SessionAuthenticationAllowInactiveUser,
-    )
+    authentication_classes = _discussion_configured_authentication_classes
     permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
 
     def _get_request_kwargs(self, course_id, rolename):
