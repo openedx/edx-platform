@@ -51,7 +51,6 @@ from openedx.features.enterprise_support.api import enterprise_enabled
 from static_template_view import views as static_template_view_views
 from staticbook import views as staticbook_views
 from student import views as student_views
-from track import views as track_views
 from util import views as util_views
 
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
@@ -833,11 +832,6 @@ if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
         url(r'^_o/', include(('oauth2_provider.urls', 'edx_oauth2_provider'), namespace='oauth2_provider')),
     ]
 
-if settings.FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
-    urlpatterns += [
-        url(r'^event_logs$', track_views.view_tracking_log),
-        url(r'^event_logs/(?P<args>.+)$', track_views.view_tracking_log),
-    ]
 
 if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns += [

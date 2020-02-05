@@ -108,7 +108,6 @@ FEATURES = {
     'ENABLE_DISCUSSION_EMAIL_DIGEST': False,
 
     'ENABLE_DJANGO_ADMIN_SITE': True,  # set true to enable django's admin site, even on prod (e.g. for course ops)
-    'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
 
     'ENABLE_MASQUERADE': True,  # allow course staff to change to student view of courseware
@@ -896,20 +895,6 @@ EVENT_TRACKING_BACKENDS = {
 }
 EVENT_TRACKING_PROCESSORS = []
 EVENT_TRACKING_SEGMENTIO_EMIT_WHITELIST = []
-
-# Backwards compatibility with ENABLE_SQL_TRACKING_LOGS feature flag.
-# In the future, adding the backend to TRACKING_BACKENDS should be enough.
-if FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
-    TRACKING_BACKENDS.update({
-        'sql': {
-            'ENGINE': 'track.backends.django.DjangoBackend'
-        }
-    })
-    EVENT_TRACKING_BACKENDS.update({
-        'sql': {
-            'ENGINE': 'track.backends.django.DjangoBackend'
-        }
-    })
 
 TRACKING_SEGMENTIO_WEBHOOK_SECRET = None
 TRACKING_SEGMENTIO_ALLOWED_TYPES = ['track']
