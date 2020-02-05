@@ -57,7 +57,7 @@ class OAuth2AuthenticationDebug(authentication.OAuth2AuthenticationAllowInactive
 urlpatterns = [
     url(r'^oauth2/', include(('provider.oauth2.urls', 'oauth2'), namespace='oauth2')),
     url(
-        r'^oauth2-deprecated-test/$',
+        r'^oauth2-inactive-deprecated-test/$',
         MockView.as_view(authentication_classes=[authentication.OAuth2AuthenticationAllowInactiveUserDeprecated])
     ),
     url(
@@ -85,7 +85,7 @@ urlpatterns = [
 @override_settings(ROOT_URLCONF=__name__)
 class OAuth2AllowInActiveUsersDeprecatedTests(TestCase):
 
-    OAUTH2_BASE_TESTING_URL = '/oauth2-deprecated-test/'
+    OAUTH2_BASE_TESTING_URL = '/oauth2-inactive-deprecated-test/'
 
     def setUp(self):
         super(OAuth2AllowInActiveUsersDeprecatedTests, self).setUp()
@@ -331,9 +331,3 @@ class OAuth2AuthenticationTests(OAuth2AllowInActiveUsersDeprecatedTests):  # pyl
 class OAuth2AllowInActiveUsersTests(OAuth2AllowInActiveUsersDeprecatedTests):  # pylint: disable=test-inherits-tests
 
     OAUTH2_BASE_TESTING_URL = '/oauth2-inactive-test/'
-
-    def setUp(self):
-        super(OAuth2AllowInActiveUsersTests, self).setUp()
-        # Since this is testing back to previous version, user should be set to true
-        self.user.is_active = False
-        self.user.save()

@@ -204,7 +204,7 @@ class OAuth2Authentication(BaseAuthentication):
             })
         else:
             user = token.user
-            # Check to make sure the users have activated their account(by confirming their email)
+            # Check to make sure the users have activated their account (by confirming their email)
             if not self.allow_inactive_users and not user.is_active:
                 set_custom_metric("OAuth2Authentication_user_active", False)
                 msg = 'User inactive or deleted: %s' % user.get_username()
@@ -264,8 +264,7 @@ class OAuth2AuthenticationAllowInactiveUser(OAuth2Authentication):
     with whether or not the user has verified ownership of their claimed email address.
     Once is_active is decoupled from verified_email, we will no longer need this
     class override.
-    Until then, this authentication class ensures that the user is logged in,
-    but does not require that their account "is_active".
+
     This class can be used for an OAuth2-accessible endpoint that allows users to access
     that endpoint without having their email verified.  For example, this is used
     for mobile endpoints.

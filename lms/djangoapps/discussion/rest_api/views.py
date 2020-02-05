@@ -67,6 +67,17 @@ from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
+# .. toggle_name: DISCUSSION_USE_NEW_OAUTH2_CLASS
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Toggle for replacing a deprecated class with its replacement
+# .. toggle_category: n/a
+# .. toggle_use_cases: Monitored Rollout
+# .. toggle_creation_date: 2020-01-31
+# .. toggle_expiration_date: 2020-02-28
+# .. toggle_warnings: None
+# .. toggle_tickets: BOM-1037
+# .. toggle_status: supported
 if getattr(settings, "DISCUSSION_USE_NEW_OAUTH2_CLASS", False):
     _discussion_configured_authentication_classes = (
         JwtAuthentication,
