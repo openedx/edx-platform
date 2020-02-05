@@ -47,8 +47,8 @@ class OAuth2AuthenticationDeprecated(OAuth2AuthenticationDeprecatedBase):
                 set_custom_metric('OAuth2Authentication_token_location', 'post-token')
 
             set_custom_metric("OAuth2Authentication_token_parts", len(access_token.split('.')))
-        except:
-            set_custom_metric('OAuth2Authentication_metric_error','True')
+        except:  # pylint: disable=bare-except
+            set_custom_metric('OAuth2Authentication_metric_error', 'True')
 
         output = super(OAuth2AuthenticationDeprecated, self).authenticate(request)
         if output is None:
