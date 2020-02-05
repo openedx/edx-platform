@@ -60,6 +60,10 @@ urlpatterns = [
         r'^oauth2-deprecated-test/$',
         MockView.as_view(authentication_classes=[authentication.OAuth2AuthenticationAllowInactiveUserDeprecated])
     ),
+        url(
+        r'^oauth2-inactive-test/$',
+        MockView.as_view(authentication_classes=[authentication.OAuth2AuthenticationAllowInactiveUser])
+    ),
     url(
         r'^oauth2-test/$',
         MockView.as_view(authentication_classes=[authentication.OAuth2Authentication])
@@ -79,12 +83,12 @@ urlpatterns = [
 @ddt.ddt  # pylint: disable=missing-docstring
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 @override_settings(ROOT_URLCONF=__name__)
-class OAuth2AllowInActiveUsersTests(TestCase):
+class OAuth2AllowInActiveUsersDeprecatedTests(TestCase):
 
     OAUTH2_BASE_TESTING_URL = '/oauth2-deprecated-test/'
 
     def setUp(self):
-        super(OAuth2AllowInActiveUsersTests, self).setUp()
+        super(OAuth2AllowInActiveUsersDeprecatedTests, self).setUp()
         self.dop_adapter = adapters.DOPAdapter()
         self.dot_adapter = adapters.DOTAdapter()
         self.csrf_client = APIClient(enforce_csrf_checks=True)
@@ -313,7 +317,7 @@ class OAuth2AllowInActiveUsersTests(TestCase):
         self.assertEqual(response.status_code, scope_statuses.write_status)
 
 
-class OAuth2AuthenticationTests(OAuth2AllowInActiveUsersTests):  # pylint: disable=test-inherits-tests
+class OAuth2AuthenticationTests(OAuth2AllowInActiveUsersDeprecatedTests):  # pylint: disable=test-inherits-tests
 
     OAUTH2_BASE_TESTING_URL = '/oauth2-test/'
 
@@ -321,4 +325,15 @@ class OAuth2AuthenticationTests(OAuth2AllowInActiveUsersTests):  # pylint: disab
         super(OAuth2AuthenticationTests, self).setUp()
         # Since this is testing back to previous version, user should be set to true
         self.user.is_active = True
+        self.user.save()
+
+
+class OAuth2AllowInActiveUsersTests(OAuth2AllowInActiveUsersDeprecatedTests):  # pylint: disable=test-inherits-tests
+
+    OAUTH2_BASE_TESTING_URL = '/oauth2-inactive-test/'
+
+    def setUp(self):
+        super(OAuth2AllowInActiveUsersTests, self).setUp()
+        # Since this is testing back to previous version, user should be set to true
+        self.user.is_active = False
         self.user.save()
