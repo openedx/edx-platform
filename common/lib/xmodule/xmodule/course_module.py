@@ -22,7 +22,7 @@ from xblock.fields import Boolean, Dict, Float, Integer, List, Scope, String
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.video_pipeline.models import VideoUploadsEnabledByDefault
 from openedx.core.lib.license import LicenseMixin
-from openedx.core.lib.teams_config import TeamsConfig
+from openedx.core.lib.teams_config import TeamsConfig, DEFAULT_COURSE_RUN_MAX_TEAM_SIZE
 from xmodule import course_metadata_utils
 from xmodule.course_metadata_utils import DEFAULT_GRADING_POLICY, DEFAULT_START_DATE
 from xmodule.graders import grader_from_conf
@@ -834,6 +834,7 @@ class CourseFields(object):
             'closing square brackets. '
             'For example, to specify that teams should have a maximum of 5 participants and provide a list of '
             '2 topics, enter the configuration in this format: {example_format}. '
+            'If no max_size is provided, it will default to {default_max}'
             'In "id" values, the only supported special characters are underscore, hyphen, and period.'
             # Note that we also support space (" "), which may have been an accident, but it's in
             # our DB now. Let's not advertise the fact, though.
@@ -845,6 +846,7 @@ class CourseFields(object):
                 '{"topics": [{"name": "Topic1Name", "description": "Topic1Description", "id": "Topic1ID"}, '
                 '{"name": "Topic2Name", "description": "Topic2Description", "id": "Topic2ID"}], "max_team_size": 5}'
             ),
+            default_max=str(DEFAULT_COURSE_RUN_MAX_TEAM_SIZE),
         ),
         scope=Scope.settings,
     )
