@@ -59,8 +59,8 @@
             },
 
             handleCsvUploadSuccess: function (data) {
-                const { message } = data
-                TeamUtils.showInfoBanner(message)
+                const { message } = data;
+                TeamUtils.showInfoBanner(message);
 
                 // This handler is currently unimplemented (TODO MST-44)
                 this.teamEvents.trigger('teams:update', {});

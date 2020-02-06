@@ -82,21 +82,21 @@
             showInfoBanner: function (content, isError=False) {
                 // clear message
                 let messageElement = $('#team-management-assign .page-banner .message-content');
-                messageElement.html("")
+                messageElement.html("");
 
                 // set message
                 if(Array.isArray(content)) {
                     content.forEach(item => {
-                        messageElement.append($(`<p>${item}</p>`))
-                    })
+                        messageElement.append($(`<p>${item}</p>`));
+                    });
                 } else {
-                    $('#team-management-assign .page-banner .message-content').text(content)
+                    $('#team-management-assign .page-banner .message-content').text(content);
                 }
 
                 // set color sytling
                 $('#team-management-assign .page-banner .alert')
                     .toggleClass('alert-success', !isError)
-                    .toggleClass('alert-danger', isError)
+                    .toggleClass('alert-danger', isError);
 
                 // set icon styling
                 $('#team-management-assign .page-banner .icon')
