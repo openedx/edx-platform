@@ -5,7 +5,7 @@ import pickle
 import six
 
 
-class PickleV2Serializer(object):
+class PickleSerializer(object):
     """
     Set the pickle protocol version explicitly because we don't want
     to have session thrashing when we upgrade to newer versions of
