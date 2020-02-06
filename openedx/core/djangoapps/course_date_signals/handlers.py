@@ -7,18 +7,17 @@ from django.dispatch import receiver
 from six import text_type
 from xblock.fields import Scope
 from xmodule.modulestore.django import SignalHandler, modulestore
-
 from edx_when.api import FIELDS_TO_EXTRACT, set_dates_for_course
 
 log = logging.getLogger(__name__)
 
 
-def date_field_values(date_fields, xblock):
+def _field_values(fields, xblock):
     """
-    Read field values for the specified date fields from the supplied xblock.
+    Read field values for the specified fields from the supplied xblock.
     """
     result = {}
-    for field_name in date_fields:
+    for field_name in fields:
         if field_name not in xblock.fields:
             continue
         field = xblock.fields[field_name]
@@ -39,18 +38,18 @@ def extract_dates_from_course(course):
     """
     Extract all dates from the supplied course.
     """
-    log.info('Publishing course dates for %s', course.id)
+    log.info('Extracting course dates for %s', course.id)
     if course.self_paced:
-        metadata = date_field_values(FIELDS_TO_EXTRACT, course)
+        metadata = _field_values(FIELDS_TO_EXTRACT, course)
         # self-paced courses may accidentally have a course due date
         metadata.pop('due', None)
         date_items = [(course.location, metadata)]
     else:
         date_items = []
         items = modulestore().get_items(course.id)
-        log.info('extracting dates from %d items in %s', len(items), course.id)
+        log.info('Extracting dates from %d items in %s', len(items), course.id)
         for item in items:
-            date_items.append((item.location, date_field_values(FIELDS_TO_EXTRACT, item)))
+            date_items.append((item.location, _field_values(FIELDS_TO_EXTRACT, item)))
     return date_items
 
 
@@ -59,12 +58,10 @@ def extract_dates(sender, course_key, **kwargs):  # pylint: disable=unused-argum
     """
     Extract dates from blocks when publishing a course.
     """
-    log.info("Extracting dates from %s", course_key)
-
     course = modulestore().get_course(course_key)
 
     if not course:
-        log.info("No course found for key %s", course_key)
+        log.info("No course found for key %s to extract dates from", course_key)
         return
 
     date_items = extract_dates_from_course(course)
@@ -72,4 +69,4 @@ def extract_dates(sender, course_key, **kwargs):  # pylint: disable=unused-argum
     try:
         set_dates_for_course(course_key, date_items)
     except Exception:  # pylint: disable=broad-except
-        log.exception('setting dates for %s', course_key)
+        log.exception('Unable to set dates for %s on course publish', course_key)

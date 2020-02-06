@@ -41,7 +41,6 @@ class CountryMiddleware(MiddlewareMixin):
             reader = geoip2.database.Reader(settings.GEOIP_PATH)
             try:
                 response = reader.country(new_ip_address)
-                # pylint: disable=no-member
                 country_code = response.country.iso_code
             except geoip2.errors.AddressNotFoundError:
                 country_code = ""

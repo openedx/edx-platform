@@ -444,7 +444,7 @@ class CourseEntitlement(TimeStampedModel):
         refund_successful = refund_entitlement(course_entitlement=self)
         if not refund_successful:
             # This state is achieved in most cases by a failure in the ecommerce service to process the refund.
-            log.warn(
+            log.warning(
                 u'Entitlement Refund failed for Course Entitlement [%s], alert User',
                 self.uuid
             )
