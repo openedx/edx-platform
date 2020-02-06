@@ -30,7 +30,7 @@ from rest_framework.views import APIView
 from openedx.core.djangoapps.auth_exchange.forms import AccessTokenExchangeForm
 from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUserDeprecated
 
 
 class AccessTokenExchangeBase(APIView):
@@ -131,7 +131,7 @@ class LoginWithAccessTokenView(APIView):
     """
     View for exchanging an access token for session cookies
     """
-    authentication_classes = (OAuth2AuthenticationAllowInactiveUser,)
+    authentication_classes = (OAuth2AuthenticationAllowInactiveUserDeprecated,)
     permission_classes = (permissions.IsAuthenticated,)
 
     @staticmethod
