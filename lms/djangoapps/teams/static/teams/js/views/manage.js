@@ -59,8 +59,8 @@
             },
 
             handleCsvUploadSuccess: function (data) {
-                const { recordsAdded } = data
-                TeamUtils.showInfoBanner(`Successfully added ${recordsAdded} students to teams`, false)
+                const { message } = data
+                TeamUtils.showInfoBanner(message, false)
 
                 // This handler is currently unimplemented (TODO MST-44)
                 this.teamEvents.trigger('teams:update', {});
