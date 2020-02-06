@@ -128,6 +128,7 @@ class TeamMembershipImportManager(object):
         return True
 
     def load_user_ids_by_teamset_id(self):
+        Get users associations with each teamset in a course and
         for teamset_id in self.teamset_ids:
             self.user_ids_by_teamset_id[teamset_id] = {
                 membership.user_id for membership in
