@@ -33,7 +33,7 @@ from lms.djangoapps.courseware.courses import get_course_with_access, has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.lib.api.parsers import MergePatchParser
-from openedx.core.lib.api.permissions import IsCourseStaffInstructor, IsStaffOrReadOnly
+from openedx.core.lib.api.permissions import IsStaffOrReadOnly
 from openedx.core.lib.api.view_utils import (
     ExpandableFieldViewMixin,
     RetrievePatchAPIView,
@@ -1367,12 +1367,13 @@ class MembershipBulkManagementView(GenericAPIView):
     """
 
     authentication_classes = (OAuth2AuthenticationDeprecated, SessionAuthentication)
-    permission_classes = (permissions.IsAuthenticated, IsCourseStaffInstructor)
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, **_kwargs):
         """
         Download CSV with team membership data for given course run.
         """
+        self.check_access()
         response = HttpResponse(content_type='text/csv')
         filename = "team-membership_{}_{}_{}.csv".format(
             self.course.id.org, self.course.id.course, self.course.id.run

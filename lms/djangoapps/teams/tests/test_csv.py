@@ -67,14 +67,16 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
         self.buf = StringIO()
 
     def test_get_headers(self):
-        headers = csv.get_team_membership_csv_headers(self.course)
+        # pylint: disable=protected-access
+        headers = csv._get_team_membership_csv_headers(self.course)
         self.assertEqual(
             headers,
             ['user', 'mode', 'teamset_1', 'teamset_2', 'teamset_3', 'teamset_4']
         )
 
     def test_get_headers_no_teamsets(self):
-        headers = csv.get_team_membership_csv_headers(self.course_no_teamsets)
+        # pylint: disable=protected-access
+        headers = csv._get_team_membership_csv_headers(self.course_no_teamsets)
         self.assertEqual(
             headers,
             ['user', 'mode']
@@ -113,11 +115,11 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
         self.assertEqual(user_row.get('teamset_3'), expected_teamset_3_team)
 
     def test_load_team_membership_csv(self):
-        expected_csv_output = ('user,mode,teamset_1,teamset_2,teamset_3,teamset_4\n'
-                               'user1,audit,team_1_1,team_2_2,team_3_1,\n'
-                               'user2,verified,team_1_1,team_2_2,team_3_1,\n'
-                               'user3,honors,,team_2_1,team_3_2,\n'
-                               'user4,masters,team_1_1,,team_3_2,\n'
-                               'user5,masters,,,,\n')
+        expected_csv_output = ('user,mode,teamset_1,teamset_2,teamset_3,teamset_4\r\n'
+                               'user1,audit,team_1_1,team_2_2,team_3_1,\r\n'
+                               'user2,verified,team_1_1,team_2_2,team_3_1,\r\n'
+                               'user3,honors,,team_2_1,team_3_2,\r\n'
+                               'user4,masters,team_1_1,,team_3_2,\r\n'
+                               'user5,masters,,,,\r\n')
         csv.load_team_membership_csv(self.course, self.buf)
         self.assertEqual(expected_csv_output, self.buf.getvalue())

@@ -21,15 +21,14 @@ def load_team_membership_csv(course, response):
         response (HttpResponse): Django response object to which
             the CSV content will be written.
     """
+    headers = _get_team_membership_csv_headers(course)
+    writer = csv.DictWriter(response, fieldnames=headers, extrasaction="ignore")
+    writer.writeheader()
     team_membership_data = _lookup_team_membership_data(course)
-    headers = get_team_membership_csv_headers(course)
-    response.write(','.join(headers) + '\n')
-    for user_data in team_membership_data:
-        row = [user_data.get(header, '') for header in headers]
-        response.write(','.join(row) + '\n')
+    writer.writerows(team_membership_data)
 
 
-def get_team_membership_csv_headers(course):
+def _get_team_membership_csv_headers(course):
     """
     Get headers for team membership csv.
     ['user', 'mode', <teamset_id_1>, ..., ,<teamset_id_n>]
