@@ -118,6 +118,11 @@ def get_user_course_expiration_date(user, course):
             if (content_availability_date.date() == course.start.date() and
                course.start < enrollment.created < timezone.now()):
                 content_availability_date = enrollment.created
+            # If course teams change the course start date, set the content_availability_date
+            # to max of enrollment or course start date
+            elif (content_availability_date.date() < course.start.date() and
+                  content_availability_date.date() < enrollment.created.date()):
+                content_availability_date = max(enrollment.created, course.start)
     except CourseEnrollment.schedule.RelatedObjectDoesNotExist:
         content_availability_date = max(enrollment.created, course.start)
 
