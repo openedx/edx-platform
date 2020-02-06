@@ -19,7 +19,7 @@ from rest_framework.views import APIView
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUserDeprecated
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermissionIsAuthenticated
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 
@@ -100,7 +100,7 @@ class Rev934(DeveloperErrorViewMixin, APIView):
 
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        OAuth2AuthenticationAllowInactiveUserDeprecated,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (ApiKeyHeaderPermissionIsAuthenticated,)

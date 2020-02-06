@@ -1,6 +1,5 @@
 """ Common Authentication Handlers used across projects. """
 
-
 import logging
 
 import django.utils.timezone
@@ -35,6 +34,15 @@ class OAuth2AuthenticationDeprecated(OAuth2AuthenticationDeprecatedBase):
         fails.
         """
         set_custom_metric("OAuth2AuthenticationDeprecated", "Failed")
+        try:
+            auth = get_authorization_header(request).split()
+            set_custom_metric('OAuth2Authentication_token_location', 'unknown')
+
+            if auth and len(auth) == 2 and auth[0].lower() == b'bearer':
+                set_custom_metric('OAuth2Authentication_token_location', 'bearer-in-header')
+        except Exception:  # pylint: disable=broad-except
+            pass
+
         output = super(OAuth2AuthenticationDeprecated, self).authenticate(request)
         if output is None:
             set_custom_metric("OAuth2AuthenticationDeprecated", "None")
@@ -43,7 +51,7 @@ class OAuth2AuthenticationDeprecated(OAuth2AuthenticationDeprecatedBase):
         return output
 
 
-class OAuth2AuthenticationAllowInactiveUser(OAuth2AuthenticationDeprecated):
+class OAuth2AuthenticationAllowInactiveUserDeprecated(OAuth2AuthenticationDeprecated):
     """
     This is a temporary workaround while the is_active field on the user is coupled
     with whether or not the user has verified ownership of their claimed email address.
@@ -65,7 +73,7 @@ class OAuth2AuthenticationAllowInactiveUser(OAuth2AuthenticationDeprecated):
         """
 
         try:
-            return super(OAuth2AuthenticationAllowInactiveUser, self).authenticate(request)
+            return super(OAuth2AuthenticationAllowInactiveUserDeprecated, self).authenticate(request)
         except AuthenticationFailed as exc:
             if isinstance(exc.detail, dict):
                 developer_message = exc.detail['developer_message']
@@ -135,6 +143,11 @@ class OAuth2Authentication(BaseAuthentication):
 
     www_authenticate_realm = 'api'
 
+    # currently, active users are users that confirm their email.
+    # a subclass could override `allow_inactive_users` to enable access without email confirmation,
+    # like in the case of mobile users.
+    allow_inactive_users = False
+
     def authenticate(self, request):
         """
         Returns tuple (user, token) if access token authentication  succeeds,
@@ -164,6 +177,8 @@ class OAuth2Authentication(BaseAuthentication):
         else:
             set_custom_metric("OAuth2Authentication", "None")
             return None
+
+        set_custom_metric("OAuth2Authentication_token_parts", len(access_token.split('.')))
 
         user, token = self.authenticate_credentials(access_token)
 
@@ -199,8 +214,8 @@ class OAuth2Authentication(BaseAuthentication):
             })
         else:
             user = token.user
-            # Check to make sure the users have activated their account(by confirming their email)
-            if not user.is_active:
+            # Check to make sure the users have activated their account (by confirming their email)
+            if not self.allow_inactive_users and not user.is_active:
                 set_custom_metric("OAuth2Authentication_user_active", False)
                 msg = 'User inactive or deleted: %s' % user.get_username()
                 raise AuthenticationFailed({
@@ -251,3 +266,18 @@ class OAuth2Authentication(BaseAuthentication):
         header in a `401 Unauthenticated` response
         """
         return 'Bearer realm="%s"' % self.www_authenticate_realm
+
+
+class OAuth2AuthenticationAllowInactiveUser(OAuth2Authentication):
+    """
+    Currently, is_active field on the user is coupled
+    with whether or not the user has verified ownership of their claimed email address.
+    Once is_active is decoupled from verified_email, we will no longer need this
+    class override.
+
+    This class can be used for an OAuth2-accessible endpoint that allows users to access
+    that endpoint without having their email verified.  For example, this is used
+    for mobile endpoints.
+    """
+
+    allow_inactive_users = True

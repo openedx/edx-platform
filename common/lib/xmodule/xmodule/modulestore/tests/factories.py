@@ -618,7 +618,7 @@ def mongo_uses_error_check(store):
 @contextmanager
 def check_mongo_calls_range(max_finds=float("inf"), min_finds=0, max_sends=None, min_sends=None):
     """
-    Instruments the given store to count the number of calls to find (incl find_one) and the number
+    Instruments the given store to count the number of calls to find (incl find_one and count_documents) and the number
     of calls to send_message which is for insert, update, and remove (if you provide num_sends). At the
     end of the with statement, it compares the counts to the bounds provided in the arguments.
 
@@ -629,7 +629,7 @@ def check_mongo_calls_range(max_finds=float("inf"), min_finds=0, max_sends=None,
     """
     with check_sum_of_calls(
         pymongo.collection.Collection,
-        ['find'],
+        ['find', 'count_documents'],
         max_finds,
         min_finds,
     ):

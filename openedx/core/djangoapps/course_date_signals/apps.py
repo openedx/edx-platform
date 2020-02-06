@@ -1,12 +1,12 @@
 """
-Django app configuration for openedx.core.djangoapps.course_dates_signals
+Django App Configuration for the course_date_signals app
 """
 
 from django.apps import AppConfig
 
 
 class CourseDatesSignalsConfig(AppConfig):
-    name = 'openedx.core.djangoapps.course_dates_signals'
+    name = 'openedx.core.djangoapps.course_date_signals'
 
     def ready(self):
         """

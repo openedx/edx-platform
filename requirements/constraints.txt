@@ -77,5 +77,5 @@ jsonfield2==3.0.3
 # django-storages==1.9 breaks contentstore imports
 django-storages==1.8
 
-# edx-when==0.7.0 has a breaking change
-edx-when==0.6.0
+# mock 4+ requires Python 3.6+
+mock<4

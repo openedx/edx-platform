@@ -108,7 +108,6 @@ FEATURES = {
     'ENABLE_DISCUSSION_EMAIL_DIGEST': False,
 
     'ENABLE_DJANGO_ADMIN_SITE': True,  # set true to enable django's admin site, even on prod (e.g. for course ops)
-    'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
 
     'ENABLE_MASQUERADE': True,  # allow course staff to change to student view of courseware
@@ -604,6 +603,20 @@ OAUTH_ENFORCE_SECURE = True
 OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS = 365
 OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 
+
+# .. toggle_name: ENABLE_DOP_ADAPTER
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: A switch toggle for controlling whether or not we allow usage of the DOP OAuth adapter with the goal of removing the DOP adapter once we're confident it won't be used.
+# .. toggle_category: n/a
+# .. toggle_use_cases: incremental_release
+# .. toggle_creation_date: 2020-02-06
+# .. toggle_expiration_date: 2020-02-29
+# .. toggle_warnings: None
+# .. toggle_tickets: BOM-1160
+# .. toggle_status: supported
+ENABLE_DOP_ADAPTER = True
+
 ################################## THIRD_PARTY_AUTH CONFIGURATION #############################
 TPA_PROVIDER_BURST_THROTTLE = '10/min'
 TPA_PROVIDER_SUSTAINED_THROTTLE = '50/hr'
@@ -896,20 +909,6 @@ EVENT_TRACKING_BACKENDS = {
 }
 EVENT_TRACKING_PROCESSORS = []
 EVENT_TRACKING_SEGMENTIO_EMIT_WHITELIST = []
-
-# Backwards compatibility with ENABLE_SQL_TRACKING_LOGS feature flag.
-# In the future, adding the backend to TRACKING_BACKENDS should be enough.
-if FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
-    TRACKING_BACKENDS.update({
-        'sql': {
-            'ENGINE': 'track.backends.django.DjangoBackend'
-        }
-    })
-    EVENT_TRACKING_BACKENDS.update({
-        'sql': {
-            'ENGINE': 'track.backends.django.DjangoBackend'
-        }
-    })
 
 TRACKING_SEGMENTIO_WEBHOOK_SECRET = None
 TRACKING_SEGMENTIO_ALLOWED_TYPES = ['track']
@@ -2505,6 +2504,9 @@ INSTALLED_APPS = [
 
     # so sample_task is available to celery workers
     'openedx.core.djangoapps.heartbeat',
+
+    # signal handlers to capture course dates into edx-when
+    'openedx.core.djangoapps.course_date_signals',
 ]
 
 ######################### CSRF #########################################

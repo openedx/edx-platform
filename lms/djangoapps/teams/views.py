@@ -1365,6 +1365,10 @@ class MembershipBulkManagementView(GenericAPIView):
     """
     View for uploading and downloading team membership CSVs.
     """
+
+    authentication_classes = (OAuth2AuthenticationDeprecated, SessionAuthentication)
+    permission_classes = (permissions.IsAuthenticated,)
+
     def get(self, request, **_kwargs):
         """
         Download CSV with team membership data for given course run.
