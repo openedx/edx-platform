@@ -156,7 +156,7 @@ class TestI18nDummy(PaverTestCase):
         """
         self.reset_task_messages()
         os.environ['NO_PREREQ_INSTALL'] = "true"
-        call_task('pavelib.i18n.i18n_dummy', options={"settings": Env.TEST_SETTINGS})
+        call_task('pavelib.i18n.i18n_dummy')
         self.assertEqual(
             self.task_messages,
             [

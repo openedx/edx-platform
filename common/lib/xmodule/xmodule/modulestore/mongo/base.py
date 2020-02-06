@@ -1314,8 +1314,11 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             ('_id.category', 'course'),
         ])
         courses = self.collection.find(course_search_location, projection={'_id': True})
-        if courses.count() > 0:
-            raise DuplicateCourseError(course_id, courses[0]['_id'])
+        try:
+            course = courses.next()
+            raise DuplicateCourseError(course_id, course['_id'])
+        except StopIteration:
+            pass
 
         with self.bulk_operations(course_id):
             xblock = self.create_item(user_id, course_id, 'course', course_id.run, fields=fields, **kwargs)

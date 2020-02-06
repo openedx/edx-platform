@@ -245,9 +245,9 @@ class MongoContentStore(ContentStore):
                 ('{}.name'.format(prefix), {'$regex': ASSET_IGNORE_REGEX}),
             ])
             items = self.fs_files.find(query)
-            assets_to_delete = assets_to_delete + items.count()
             for asset in items:
                 self.fs.delete(asset[prefix])
+                assets_to_delete += 1
 
             self.fs_files.remove(query)
         return assets_to_delete
