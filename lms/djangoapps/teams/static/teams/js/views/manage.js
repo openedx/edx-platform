@@ -58,15 +58,15 @@
                 );
             },
 
-            handleCsvUploadSuccess: function (data, textStatus, jqXHR) {
-                // This handler is currently unimplemented (TODO MST-44)
-                // this.teamEvents.trigger('teams:update', {});
-
+            handleCsvUploadSuccess: function (data) {
                 const { recordsAdded } = data
                 TeamUtils.showInfoBanner(`Successfully added ${recordsAdded} students to teams`, false)
+
+                // This handler is currently unimplemented (TODO MST-44)
+                this.teamEvents.trigger('teams:update', {});
             },
 
-            handleCsvUploadFailure: function (jqXHR, textStatus, errorThrown) {
+            handleCsvUploadFailure: function (jqXHR) {
                 const { errors } = jqXHR.responseJSON;
                 TeamUtils.showInfoBanner(errors, true);
             }
