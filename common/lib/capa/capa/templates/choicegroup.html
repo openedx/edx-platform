@@ -25,7 +25,7 @@ import six
 
             if is_radio_input(choice_id) or (input_type != 'radio' and choice_id in value):
               input_class += ' submitted'
-              if status.classname and not show_correctness == 'never':
+              if status.classname and not show_correctness == 'never' and status.classname!='partially-correct':
                 label_class += ' choicegroup_' + status.classname
           %>
           <div class="field">
