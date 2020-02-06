@@ -641,6 +641,11 @@ class TestViewDispatch(TestCase):
         view_object = views.AccessTokenView()
         self.assertRaises(KeyError, view_object.get_view_for_backend, None)
 
+    def test_dop_toggle_enforced(self):
+        with self.settings(ENABLE_DOP_ADAPTER=False):
+            request = self._get_request('dop-id')
+            self.assertEqual(self.view.select_backend(request), self.dot_adapter.backend)
+
 
 class TestRevokeTokenView(AccessTokenLoginMixin, _DispatchingViewTestCase):  # pylint: disable=abstract-method
     """
