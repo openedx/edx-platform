@@ -228,6 +228,9 @@ class TeamMembershipImportManager(object):
                     topic_id=teamset_id
                 )
                 team.save()
+                self.existing_course_teams[(team_name, teamset_id)] = team
+            else:
+                team = self.existing_course_teams[(team_name, teamset_id)]
             team.add_user(user)
             emit_team_event(
                 'edx.team.learner_added',

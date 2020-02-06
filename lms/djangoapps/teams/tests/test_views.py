@@ -1757,7 +1757,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
                        )
         self.assertEqual(
             CourseTeam.objects.filter(name='team 2', course_id=self.test_course_1.id).count(),
-            2
+            1
         )
 
     def test_upload_non_existing_user(self):
@@ -1787,11 +1787,10 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         ) + '\n'
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
-        with self.assertRaises(UnboundLocalError):
-            self.make_call(
-                reverse('team_membership_bulk_management', args=[self.good_course_id]),
-                201,
-                method='post',
-                data={'csv': csv_file},
-                user='staff'
-            )
+        self.make_call(
+            reverse('team_membership_bulk_management', args=[self.good_course_id]),
+            201,
+            method='post',
+            data={'csv': csv_file},
+            user='staff'
+        )
