@@ -97,8 +97,8 @@ def sync_organization_info_with_nodebb(sender, instance, created, **kwargs):  # 
     request = get_current_request()
     focus_area = FocusArea.objects.get(code=instance.focus_area).label if instance.focus_area else ''
 
-    # For anonymous user username is empty('') so we can't sync with mailchimp
-    if request is None or not focus_area or not request.user.is_anonymous():
+    # For anonymous user username is empty('') so we can't sync with nodebb
+    if request is None or not focus_area or request.user.is_anonymous():
         return
 
     data_to_sync = {
