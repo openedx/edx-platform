@@ -60,7 +60,7 @@
 
             handleCsvUploadSuccess: function (data) {
                 const { message } = data
-                TeamUtils.showInfoBanner(message, false)
+                TeamUtils.showInfoBanner(message)
 
                 // This handler is currently unimplemented (TODO MST-44)
                 this.teamEvents.trigger('teams:update', {});
@@ -68,7 +68,7 @@
 
             handleCsvUploadFailure: function (jqXHR) {
                 const { errors } = jqXHR.responseJSON;
-                TeamUtils.showInfoBanner(errors, true);
+                TeamUtils.showErrorBanner(errors);
             }
         });
         return ManageView;

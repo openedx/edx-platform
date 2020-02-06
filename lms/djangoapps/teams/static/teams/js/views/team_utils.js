@@ -74,13 +74,12 @@
                 return topicType.toLowerCase() !== 'open';
             },
 
-            /** Toggles between error and info styling on team membership upload
-             * feedback banner.
+            /** Shows info/error banner for team membership CSV upload
              * 
              * @param: content - string or array for display
-             * @param: isError - true for error styling, false for info styling
+             * @param: isError - true sets error styling, false/none uses info styling
              */
-            showInfoBanner: function (content, isError) {
+            showInfoBanner: function (content, isError=False) {
                 // clear message
                 let messageElement = $('#team-management-assign .page-banner .message-content');
                 messageElement.html("")
@@ -104,7 +103,15 @@
                     .toggleClass('fa-check', !isError)
                     .toggleClass('fa-warning', isError);
 
-                $('#team-management-assign .page-banner').show()
+                $('#team-management-assign .page-banner').show();
+            },
+
+            /** Shows error banner for team membership CSV upload
+             * 
+             * @param: content - string or array for display
+             */
+            showErrorBanner: function(content) {
+                showInfoBanner(content, true);
             }
         };
     });
