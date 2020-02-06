@@ -34,6 +34,8 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 COURSE_KEY1 = CourseKey.from_string('edx/history/1')
 COURSE_KEY2 = CourseKey.from_string('edx/history/2')
+TEAMSET_1_ID = "the-teamset"
+TEAMSET_2_ID = "the-teamset-2"
 
 
 class TestModelStrings(SharedModuleStoreTestCase):
@@ -48,7 +50,7 @@ class TestModelStrings(SharedModuleStoreTestCase):
         cls.team = CourseTeamFactory(
             course_id="edx/the-course/1",
             team_id="the-team",
-            topic_id="the-teamset",
+            topic_id=TEAMSET_1_ID,
             name="The Team"
         )
         cls.team_membership = cls.team.add_user(cls.user)
@@ -98,8 +100,16 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
             CourseEnrollmentFactory.create(user=user, course_id=COURSE_KEY1)
         CourseEnrollmentFactory.create(user=self.user1, course_id=COURSE_KEY2)
 
-        self.team1 = CourseTeamFactory(course_id=COURSE_KEY1, team_id='team1')
-        self.team2 = CourseTeamFactory(course_id=COURSE_KEY2, team_id='team2')
+        self.team1 = CourseTeamFactory(
+            course_id=COURSE_KEY1,
+            team_id='team1',
+            topic_id=TEAMSET_1_ID,
+        )
+        self.team2 = CourseTeamFactory(
+            course_id=COURSE_KEY2,
+            team_id='team2',
+            topic_id=TEAMSET_2_ID,
+        )
 
         self.team_membership11 = self.team1.add_user(self.user1)
         self.team_membership12 = self.team1.add_user(self.user2)
@@ -158,6 +168,22 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
         user = getattr(self, username)
         self.assertEqual(
             CourseTeamMembership.user_in_team_for_course(user, course_id),
+            expected_value
+        )
+
+    @ddt.data(
+        ('user1', COURSE_KEY1, TEAMSET_1_ID, True),
+        ('user1', COURSE_KEY1, TEAMSET_2_ID, False),
+        ('user2', COURSE_KEY1, TEAMSET_1_ID, True),
+        ('user2', COURSE_KEY1, TEAMSET_2_ID, False),
+        ('user1', COURSE_KEY2, TEAMSET_1_ID, False),
+        ('user2', COURSE_KEY2, TEAMSET_1_ID, False),
+    )
+    @ddt.unpack
+    def test_user_in_team_for_course_teamset(self, username, course_id, teamset_id, expected_value):
+        user = getattr(self, username)
+        self.assertEqual(
+            CourseTeamMembership.user_in_team_for_course(user, course_id, teamset_id),
             expected_value
         )
 
