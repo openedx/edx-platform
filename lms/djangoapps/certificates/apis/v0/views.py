@@ -13,7 +13,7 @@ from edx_rest_framework_extensions.auth.session.authentication import SessionAut
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_condition import C
-from rest_framework.generics import GenericAPIView
+from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -28,7 +28,7 @@ log = logging.getLogger(__name__)
 User = get_user_model()
 
 
-class CertificatesDetailView(GenericAPIView):
+class CertificatesDetailView(APIView):
     """
         **Use Case**
 
@@ -143,14 +143,13 @@ class CertificatesDetailView(GenericAPIView):
         )
 
 
-class CertificatesListView(GenericAPIView):
+class CertificatesListView(APIView):
     """REST API endpoints for listing certificates."""
     authentication_classes = (
         JwtAuthentication,
         OAuth2AuthenticationAllowInactiveUserDeprecated,
         SessionAuthenticationAllowInactiveUser,
     )
-
     permission_classes = (
         C(IsAuthenticated) & (
             C(permissions.NotJwtRestrictedApplication) |
@@ -239,7 +238,6 @@ class CertificatesListView(GenericAPIView):
                     'download_url': user_cert.get('download_url'),
                     'grade': user_cert.get('grade'),
                 })
-
         return Response(user_certs)
 
     def _viewable_by_requestor(self, request, username):

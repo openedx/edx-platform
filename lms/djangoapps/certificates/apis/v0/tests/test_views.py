@@ -381,6 +381,6 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             requesting_user=self.student,
             requested_user=self.student,
         )
-        kwargs = {"user_id": str(self.student.id), "course_id": six.text_type(self.course.id)}
-        expected_download_url = reverse('certificates:html_view', kwargs=kwargs)
+        kwargs = {"certificate_uuid": self.cert.verify_uuid}
+        expected_download_url = reverse('certificates:render_cert_by_uuid', kwargs=kwargs)
         self.assert_success_response_for_student(response, download_url=expected_download_url)
