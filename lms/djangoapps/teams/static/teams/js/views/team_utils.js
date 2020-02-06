@@ -79,7 +79,7 @@
              * @param: content - string or array for display
              * @param: isError - true sets error styling, false/none uses info styling
              */
-            showInfoBanner: function (content, isError=False) {
+            showInfoBanner: function (content, isError=false) {
                 // clear message
                 let messageElement = $('#team-management-assign .page-banner .message-content');
                 messageElement.html("");
@@ -87,7 +87,8 @@
                 // set message
                 if(Array.isArray(content)) {
                     content.forEach(item => {
-                        messageElement.append($(`<p>${item}</p>`));
+                        // xss-lint: disable=javascript-jquery-append
+                        messageElement.append($('<p>').text(item));
                     });
                 } else {
                     $('#team-management-assign .page-banner .message-content').text(content);
@@ -111,7 +112,7 @@
              * @param: content - string or array for display
              */
             showErrorBanner: function(content) {
-                showInfoBanner(content, true);
+                this.showInfoBanner(content, true);
             }
         };
     });
