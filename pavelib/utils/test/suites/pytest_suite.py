@@ -163,9 +163,9 @@ class SystemTestSuite(PytestSuite):
                 # The django settings runtime command does not propagate to xdist remote workers
                 django_env_var_cmd = 'export DJANGO_SETTINGS_MODULE={}' \
                                      .format('{}.envs.{}'.format(self.root, self.settings))
-                xdist_string = '--tx {}*ssh="ubuntu@{} -o StrictHostKeyChecking=no"' \
-                               '//python="source /edx/app/edxapp/edxapp_env; {}; python"' \
-                               '//chdir="/edx/app/edxapp/edx-platform"' \
+                xdist_string = '--tx {}*ssh="jenkins@{} -o StrictHostKeyChecking=no"' \
+                               '//python="source edx-venv/bin/activate; {}; python"' \
+                               '//chdir="edx-platform"' \
                                .format(xdist_remote_processes, ip, django_env_var_cmd)
                 cmd.append(xdist_string)
             for rsync_dir in Env.rsync_dirs():
@@ -284,9 +284,9 @@ class LibTestSuite(PytestSuite):
                     django_env_var_cmd = "export DJANGO_SETTINGS_MODULE='lms.envs.test'"
                 else:
                     django_env_var_cmd = "export DJANGO_SETTINGS_MODULE='openedx.tests.settings'"
-                xdist_string = '--tx {}*ssh="ubuntu@{} -o StrictHostKeyChecking=no"' \
-                               '//python="source /edx/app/edxapp/edxapp_env; {}; python"' \
-                               '//chdir="/edx/app/edxapp/edx-platform"' \
+                xdist_string = '--tx {}*ssh="jenkins@{} -o StrictHostKeyChecking=no"' \
+                               '//python="source edx-venv/bin/activate; {}; python"' \
+                               '//chdir="edx-platform"' \
                                .format(xdist_remote_processes, ip, django_env_var_cmd)
                 cmd.append(xdist_string)
             for rsync_dir in Env.rsync_dirs():
