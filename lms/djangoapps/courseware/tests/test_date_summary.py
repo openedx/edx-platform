@@ -593,7 +593,7 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         self._check_text(block)
 
     def _check_text(self, upgrade_date_summary):
-        self.assertEqual(upgrade_date_summary.title, 'Upgrade to Verified Certificate')
+        self.assertEqual(upgrade_date_summary.title, 'Update Enrollment to Earn Statement of Accomplishment')
         self.assertEqual(
             upgrade_date_summary.description,
             'Don\'t miss the opportunity to highlight your new knowledge and skills by earning a verified'
