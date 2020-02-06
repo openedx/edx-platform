@@ -16,6 +16,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.views import redirect_to_login
 from django.http import Http404
+from django.shortcuts import redirect
 from django.template.context_processors import csrf
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -31,6 +32,8 @@ from web_fragments.fragment import Fragment
 from edxmako.shortcuts import render_to_response, render_to_string
 from lms.djangoapps.courseware.courses import allow_public_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from lms.djangoapps.courseware.toggles import should_redirect_to_courseware_microfrontend
+from lms.djangoapps.courseware.url_helpers import get_microfrontend_redirect_url
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.gating.api import get_entrance_exam_score_ratio, get_entrance_exam_usage_key
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -113,6 +116,9 @@ class CoursewareIndex(View):
 
         if not (request.user.is_authenticated or self.enable_unenrolled_access):
             return redirect_to_login(request.get_full_path())
+
+        if should_redirect_to_courseware_microfrontend(self.course_key):
+            return redirect(get_microfrontend_redirect_url(self.course_key))
 
         self.original_chapter_url_name = chapter
         self.original_section_url_name = section

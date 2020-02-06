@@ -18,7 +18,7 @@ WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='courseware')
 # .. toggle_creation_date: 2020-01-29
 # .. toggle_expiration_date: 2020-12-31
 # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and ENABLE_COURSEWARE_MICROFRONTEND.
-# .. toggle_tickets:
+# .. toggle_tickets: TNL-6982
 # .. toggle_status: supported
 REDIRECT_TO_COURSEWARE_MICROFRONTEND = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'redirect_to_microfrontend')
 
