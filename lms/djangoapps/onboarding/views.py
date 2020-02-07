@@ -638,12 +638,12 @@ def admin_activation(request, activation_key):
     try:
         hash_key = OrganizationAdminHashKeys.objects.get(activation_hash=activation_key)
         admin_change_confirmation = True if request.GET.get('confirm') == 'True' else False
-        current_admin = request.user
+        current_admin = hash_key.organization.admin
         user_extended_profile = UserExtendedProfile.objects.get(user__email=hash_key.suggested_admin_email)
         new_admin = user_extended_profile.user
 
         context['key'] = hash_key.activation_hash
-        context['is_org_admin'] = True if hash_key.suggested_by == hash_key.organization.admin else False
+        context['is_org_admin'] = True if hash_key.suggested_by == current_admin else False
 
         if hash_key.is_hash_consumed:
             activation_status = 2
