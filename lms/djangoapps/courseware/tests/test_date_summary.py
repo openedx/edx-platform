@@ -18,7 +18,9 @@ from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.courses import get_course_date_blocks
 from lms.djangoapps.courseware.date_summary import (
     CertificateAvailableDate,
+    CourseAssignmentDate,
     CourseEndDate,
+    CourseExpiredDate,
     CourseStartDate,
     TodaysDate,
     VerificationDeadlineDate,
@@ -38,10 +40,11 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, UPGRADE_DEADLINE_MESSAGE, CourseHomeMessages
 from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @ddt.ddt
@@ -129,6 +132,138 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
         self.assert_block_types(course, user, expected_blocks)
 
+    def test_enabled_block_types_with_assignments(self):
+        """
+        Creates a course with multiple subsections to test all of the different
+        cases for assignment dates showing up. Mocks out calling the edx-when
+        service and then validates the correct data is set and returned.
+        """
+        course = create_course_run(days_till_start=-100)
+        user = create_user()
+        request = RequestFactory().request()
+        request.user = user
+        CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
+        now = datetime.now(utc)
+        assignment_title_html = ['<a href=', '</a>']
+        with self.store.bulk_operations(course.id):
+            section = ItemFactory.create(category='chapter', parent_location=course.location)
+            subsection_1 = ItemFactory.create(
+                category='sequential',
+                display_name='Released',
+                parent_location=section.location,
+                start=now - timedelta(days=1),
+                due=now + timedelta(days=6),
+                graded=True,
+            )
+            subsection_2 = ItemFactory.create(
+                category='sequential',
+                display_name='Not released',
+                parent_location=section.location,
+                start=now + timedelta(days=1),
+                due=now + timedelta(days=7),
+                graded=True,
+            )
+            subsection_3 = ItemFactory.create(
+                category='sequential',
+                display_name='Third nearest assignment',
+                parent_location=section.location,
+                start=now + timedelta(days=1),
+                due=now + timedelta(days=8),
+                graded=True,
+            )
+            subsection_4 = ItemFactory.create(
+                category='sequential',
+                display_name='Past due date',
+                parent_location=section.location,
+                start=now - timedelta(days=14),
+                due=now - timedelta(days=7),
+                graded=True,
+            )
+            subsection_5 = ItemFactory.create(
+                category='sequential',
+                display_name='Not returned since we do not get non-graded subsections',
+                parent_location=section.location,
+                start=now + timedelta(days=1),
+                due=now - timedelta(days=7),
+                graded=False,
+            )
+
+        with patch('lms.djangoapps.courseware.courses.get_dates_for_course') as mock_get_dates:
+            mock_get_dates.return_value = {
+                (subsection_1.location, 'due'): subsection_1.due,
+                (subsection_1.location, 'start'): subsection_1.start,
+                (subsection_2.location, 'due'): subsection_2.due,
+                (subsection_2.location, 'start'): subsection_2.start,
+                (subsection_3.location, 'due'): subsection_3.due,
+                (subsection_3.location, 'start'): subsection_3.start,
+                (subsection_4.location, 'due'): subsection_4.due,
+                (subsection_4.location, 'start'): subsection_4.start,
+                (subsection_5.location, 'due'): subsection_5.due,
+                (subsection_5.location, 'start'): subsection_5.start,
+            }
+            # Standard widget case where we restrict the number of assignments.
+            expected_blocks = (
+                TodaysDate, CourseAssignmentDate, CourseAssignmentDate, CourseEndDate, VerificationDeadlineDate
+            )
+            blocks = get_course_date_blocks(course, user, request, num_assignments=2)
+            self.assertEqual(len(blocks), len(expected_blocks))
+            self.assertEqual(set(type(b) for b in blocks), set(expected_blocks))
+            assignment_blocks = filter(lambda b: isinstance(b, CourseAssignmentDate), blocks)
+            for assignment in assignment_blocks:
+                assignment_title = str(assignment.title)
+                self.assertNotEqual(assignment_title, 'Third nearest assignment')
+                self.assertNotEqual(assignment_title, 'Past due date')
+                self.assertNotEqual(assignment_title, 'Not returned since we do not get non-graded subsections')
+                # checking if it is _in_ the title instead of being the title since released assignments
+                # are actually links. Unreleased assignments are just the string of the title.
+                if 'Released' in assignment_title:
+                    for html_tag in assignment_title_html:
+                        self.assertIn(html_tag, assignment_title)
+                elif assignment_title == 'Not released':
+                    for html_tag in assignment_title_html:
+                        self.assertNotIn(html_tag, assignment_title)
+
+            # No restrictions on number of assignments to return
+            expected_blocks = (
+                CourseStartDate, TodaysDate, CourseAssignmentDate, CourseAssignmentDate, CourseAssignmentDate,
+                CourseAssignmentDate, CourseEndDate, VerificationDeadlineDate
+            )
+            blocks = get_course_date_blocks(course, user, request, include_past_dates=True)
+            self.assertEqual(len(blocks), len(expected_blocks))
+            self.assertEqual(set(type(b) for b in blocks), set(expected_blocks))
+            assignment_blocks = filter(lambda b: isinstance(b, CourseAssignmentDate), blocks)
+            for assignment in assignment_blocks:
+                assignment_title = str(assignment.title)
+                self.assertNotEqual(assignment_title, 'Not returned since we do not get non-graded subsections')
+                # checking if it is _in_ the title instead of being the title since released assignments
+                # are actually links. Unreleased assignments are just the string of the title.
+                if 'Released' in assignment_title:
+                    for html_tag in assignment_title_html:
+                        self.assertIn(html_tag, assignment_title)
+                elif assignment_title == 'Not released':
+                    for html_tag in assignment_title_html:
+                        self.assertNotIn(html_tag, assignment_title)
+                elif assignment_title == 'Third nearest assignment':
+                    # It's still not released
+                    for html_tag in assignment_title_html:
+                        self.assertNotIn(html_tag, assignment_title)
+                elif 'Past due date' in assignment_title:
+                    self.assertGreater(now, assignment.date)
+                    for html_tag in assignment_title_html:
+                        self.assertIn(html_tag, assignment_title)
+
+    def test_enabled_block_types_with_expired_course(self):
+        course = create_course_run(days_till_start=-100)
+        user = create_user()
+        # These two lines are to trigger the course expired block to be rendered
+        CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.AUDIT)
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=utc))
+
+        expected_blocks = (
+            TodaysDate, CourseEndDate, CourseExpiredDate, VerifiedUpgradeDeadlineDate
+        )
+        self.assert_block_types(course, user, expected_blocks)
+
     @ddt.data(
         # Course not started
         ({}, (CourseStartDate, TodaysDate, CourseEndDate)),
@@ -177,7 +312,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
 
             html_elements = [
                 '<h3 class="hd hd-6 handouts-header">Upcoming Dates</h3>',
-                '<div class="date-summary-container">',
+                '<div class="date-summary',
                 '<p class="hd hd-6 date localized-datetime"',
                 'data-timezone="None"'
             ]
@@ -202,7 +337,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
 
             html_elements = [
                 '<h3 class="hd hd-6 handouts-header">Upcoming Dates</h3>',
-                '<div class="date-summary-container">',
+                '<div class="date-summary',
                 '<p class="hd hd-6 date localized-datetime"',
                 'data-timezone="America/Los_Angeles"'
             ]
@@ -286,6 +421,32 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             'This course is archived, which means you can review course content but it is no longer active.'
         )
         self.assertEqual(block.title, 'Course End')
+
+    @ddt.data(
+        {'weeks_to_complete': 7},  # Weeks to complete > time til end (end date shown)
+        {'weeks_to_complete': 4},  # Weeks to complete < time til end (end date not shown)
+    )
+    def test_course_end_date_self_paced(self, cr_details):
+        """
+        In self-paced courses, the end date will now only show up if the learner
+        views the course within the course's weeks to complete (as defined in
+        the course-discovery service). E.g. if the weeks to complete is 5 weeks
+        and the course doesn't end for 10 weeks, there will be no end date, but
+        if the course ends in 3 weeks, the end date will appear.
+        """
+        now = datetime.now(utc)
+        end_timedelta_number = 5
+        course = CourseFactory.create(
+            start=now + timedelta(days=-7), end=now + timedelta(weeks=end_timedelta_number), self_paced=True)
+        user = create_user()
+        with patch('lms.djangoapps.courseware.date_summary.get_course_run_details') as mock_get_cr_details:
+            mock_get_cr_details.return_value = cr_details
+            block = CourseEndDate(course, user)
+            self.assertEqual(block.title, 'Course End')
+            if cr_details['weeks_to_complete'] > end_timedelta_number:
+                self.assertEqual(block.date, course.end)
+            else:
+                self.assertIsNone(block.date)
 
     def test_ecommerce_checkout_redirect(self):
         """Verify the block link redirects to ecommerce checkout if it's enabled."""

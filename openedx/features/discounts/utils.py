@@ -11,7 +11,7 @@ from edx_django_utils.cache import RequestCache
 import pytz
 
 from course_modes.models import get_course_prices, format_course_price
-from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
+from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from experiments.models import ExperimentData
 

@@ -21,7 +21,7 @@ from xblock.field_data import DictFieldData
 
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
+from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from lms.djangoapps.courseware.masquerade import handle_ajax, setup_masquerade
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview

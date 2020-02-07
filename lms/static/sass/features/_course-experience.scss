@@ -14,8 +14,8 @@
       text-align: center;
     }
 
-    &:not(:first-child) {
-      margin-top: $baseline;
+    &:not(:last-child) {
+      margin-bottom: 32px;
     }
   }
 }
@@ -412,64 +412,66 @@
 }
 
 // date summary
-.date-summary-container {
-  .date-summary {
-    @include clearfix;
+.date-summary {
+  @include clearfix;
 
-    display: flex;
-    justify-content: space-between;
-    padding: $baseline/2 $baseline/2 $baseline/2 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  &:last-of-type {
+    padding-bottom: 0;
+  }
 
-    .left-column {
-      flex: 5%;
+  .left-column {
+    flex: 0 0 24px;
 
-      .calendar-icon {
-        margin-top: 3px;
-        height: 1em;
-        width: auto;
-        background: url('#{$static-path}/images/calendar-alt-regular.svg');
-        background-repeat: no-repeat;
-      }
+    .calendar-icon {
+      margin-top: 4px;
+      height: 1em;
+      width: 16px;
+      background: url('#{$static-path}/images/calendar-alt-regular.svg');
+      background-repeat: no-repeat;
+    }
+  }
+
+  .right-column {
+    flex: auto;
+
+    .localized-datetime {
+      font-weight: $font-weight-bold;
+      margin-bottom: 8px;
     }
 
-    .right-column {
-      flex: 85%;
-
-      .localized-datetime {
-        font-weight: $font-weight-bold;
-        margin-bottom: 8px;
-      }
-
-      .heading {
-        font: -apple-system-body;
-        line-height: 1;
-        font-weight: $font-bold;
-        color: theme-color("dark");
-      }
-
-      .description {
-        margin-bottom: $baseline/2;
-        display: inline-block;
-      }
-
-      .heading, .description {
-          font-size: 0.9rem;
-      }
-
-      .date-summary-link {
-        font-weight: $font-semibold;
-
-        a {
-          color: $link-color;
-          font-weight: $font-regular;
-        }
-      }
-    }
-
-    .date {
-      color: theme-color("dark");
+    .heading {
       font: -apple-system-body;
+      line-height: 1;
+      font-weight: $font-bold;
+      color: theme-color("dark");
     }
+
+    .description {
+      margin-bottom: 0;
+      display: inline-block;
+    }
+
+    .heading, .description {
+      font-size: 0.9rem;
+    }
+
+    .date-summary-link {
+      margin-top: 8px;
+      font-weight: $font-semibold;
+
+      a {
+        color: $link-color;
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  .date {
+    color: theme-color("dark");
+    font: -apple-system-body;
   }
 }
 
