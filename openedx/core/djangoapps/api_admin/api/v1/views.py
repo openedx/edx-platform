@@ -57,4 +57,4 @@ class ApiAccessRequestView(ListAPIView):
 
     queryset = ApiAccessRequest.objects.all()
 
-    filter_fields = ('user__username', 'status', 'company_name', 'site__domain', 'contacted')
+    filterset_fields = ('user__username', 'status', 'company_name', 'site__domain', 'contacted')
