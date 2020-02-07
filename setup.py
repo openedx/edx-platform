@@ -95,6 +95,7 @@ setup(
             # consolidate the multiple discussions-related Django apps and
             # either put them in the openedx/ dir, or in another repo entirely.
             "discussion = lms.djangoapps.discussion.apps:DiscussionConfig",
+            "olx_rest_api = openedx.core.djangoapps.olx_rest_api.apps:OlxRestApiAppConfig",
             "plugins = openedx.core.djangoapps.plugins.apps:PluginsConfig",
             "schedules = openedx.core.djangoapps.schedules.apps:SchedulesConfig",
             "theming = openedx.core.djangoapps.theming.apps:ThemingConfig",
