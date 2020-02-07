@@ -84,7 +84,7 @@ class PytestWorkerManager():
         not_running = worker_instance_ids[:]
         ip_addresses = []
         all_running = False
-        for attempt in range(0, self.WORKER_BOOTUP_TIMEOUT_MINUTES * 12):
+        for attempt in range(0, self.WORKER_BOOTUP_TIMEOUT_MINUTES * 30):
             try:
                 list_workers_response = self.ec2.describe_instances(InstanceIds=not_running)
             except:
