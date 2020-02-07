@@ -56,9 +56,6 @@ def nodebb_forum_discussion(request, course_id):
     courseware_link = reverse('courseware', args=[course_id])
 
     room_id = course_community.community_url.split(COMMUNITY_URL_SPLIT_CHAR)[COMMUNITY_ID_SPLIT_INDEX]
-    unearned_badges_dict = Badge.get_unearned_badges(user_id=request.user.id,
-                                                        community_id=room_id,
-                                                        community_type=CONVERSATIONALIST[CONVERSATIONALIST_ENTRY_INDEX])
 
     context = {
         "provider": current_course.org,
@@ -75,7 +72,8 @@ def nodebb_forum_discussion(request, course_id):
         "course_has_ended": current_course.has_ended(),
         "courses_page_link": reverse("courses"),
         "courseware_link": courseware_link,
-        "unearned_badges": json.dumps(unearned_badges_dict)
+        "community_id": room_id,
+        "badges": Badge.get_badges_json(badge_type=CONVERSATIONALIST[CONVERSATIONALIST_ENTRY_INDEX]),
     }
 
     return render(request, 'discussion_nodebb/discussion_board.html', context)
