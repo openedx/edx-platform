@@ -329,7 +329,6 @@ function() {
                     msg = ngettext('%(value)s second', '%(value)s seconds', value);
                     break;
                 }
-                // xss-lint: disable=javascript-interpolate
                 return interpolate(msg, {value: value}, true);
             };
 

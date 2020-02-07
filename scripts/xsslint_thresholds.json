@@ -2,7 +2,6 @@
     "rules": {
         "javascript-concat-html": 142,
         "javascript-escape": 7,
-        "javascript-interpolate": 23,
         "javascript-jquery-append": 68,
         "javascript-jquery-html": 146,
         "javascript-jquery-insert-into-target": 18,

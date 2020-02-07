@@ -2810,7 +2810,7 @@ schematic = (function() {
 			    // for each requested freq, interpolate response value
 			    for (var k = 1; k < flist.length; k++) {
 				var f = flist[k];
-				var v = interpolate(f,x_values,values);  //xss-lint: disable=javascript-interpolate
+				var v = interpolate(f,x_values,values);
 				// convert to dB
 				fvlist.push([f,v == undefined ? 'undefined' : 20.0 * Math.log(v)/Math.LN10]);
 			    }
@@ -2932,7 +2932,7 @@ schematic = (function() {
 				    // for each requested time, interpolate waveform value
 				    for (var k = 1; k < tlist.length; k++) {
 					var t = tlist[k];
-					var v = interpolate(t,times,values); // xss-lint: disable=javascript-interpolate
+					var v = interpolate(t,times,values);
 					tvlist.push([t,v == undefined ? 'undefined' : v]);
 				    }
 				    // save results as list of [t,value] pairs
@@ -2978,7 +2978,7 @@ schematic = (function() {
 
 	// t is the time at which we want a value
 	// times is a list of timepoints from the simulation
-	function interpolate(t,times,values) { // xss-lint: disable=javascript-interpolate
+	function interpolate(t,times,values) {
 	    if (values == undefined) return undefined;
 
 	    for (var i = 0; i < times.length; i++)
@@ -5219,7 +5219,7 @@ schematic = (function() {
 	}
 	Wire.prototype = new Component();
 	Wire.prototype.constructor = Wire;
-    
+
         Wire.prototype.toString = function() {
 	    return edx.StringUtils.interpolate(
 		'<Wire ({x},{y}) ({x_plus_dx},{y_plus_dy})>',
@@ -5348,7 +5348,7 @@ schematic = (function() {
 		    y: this.y
 		});
 	}
-    
+
 	Ground.prototype.draw = function(c) {
 	    Component.prototype.draw.call(this,c);   // give superclass a shot
 	    this.draw_line(c,0,0,0,8);
