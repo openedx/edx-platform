@@ -70,7 +70,7 @@ def _lookup_team_membership_data(course):
 def _group_teamset_memberships_by_user(course_team_memberships):
     """
     Parameters:
-        - course_team_memberships: a collection of CourseTeamMemberships
+        - course_team_memberships: a collection of CourseTeamMemberships.
 
     Returns:
         {
