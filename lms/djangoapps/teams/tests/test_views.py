@@ -1773,17 +1773,17 @@ class TestBulkMembershipManagement(TeamAPITestCase):
     def test_upload_only_existing_courses(self):
         self.create_and_enroll_student(username='a_user')
         self.create_and_enroll_student(username='b_user')
-        self.existing_team_1 = CourseTeamFactory.create(course_id=self.test_course_1.id, topic_id='topic_1')
-        self.existing_team_2 = CourseTeamFactory.create(course_id=self.test_course_1.id, topic_id='topic_2')
+        existing_team_1 = CourseTeamFactory.create(course_id=self.test_course_1.id, topic_id='topic_1')
+        existing_team_2 = CourseTeamFactory.create(course_id=self.test_course_1.id, topic_id='topic_2')
 
         csv_content = 'user,mode,topic_1,topic_2' + '\n'
         csv_content += 'a_user, masters,{},{}'.format(
-            self.existing_team_1.name,
-            self.existing_team_2.name
+            existing_team_1.name,
+            existing_team_2.name
         ) + '\n'
         csv_content += 'b_user, masters,{},{}'.format(
-            self.existing_team_1.name,
-            self.existing_team_2.name
+            existing_team_1.name,
+            existing_team_2.name
         ) + '\n'
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
