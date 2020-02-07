@@ -50,6 +50,9 @@ CONFIG_FILE = get_env_setting('LMS_CFG')
 with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
     __config__ = yaml.safe_load(f)
 
+    # Add the key/values from config into the global namespace of this module.
+    vars().update(__config__)
+
     # ENV_TOKENS and AUTH_TOKENS are included for reverse compatability.
     # Removing them may break plugins that rely on them.
     ENV_TOKENS = __config__
