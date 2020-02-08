@@ -444,9 +444,13 @@
 
     .heading {
       font: -apple-system-body;
-      line-height: 1;
+      line-height: 1.5;
       font-weight: $font-bold;
       color: theme-color("dark");
+
+      a {
+        font-weight: $font-semibold;
+      }
     }
 
     .description {
@@ -459,7 +463,6 @@
     }
 
     .date-summary-link {
-      margin-top: 8px;
       font-weight: $font-semibold;
 
       a {
