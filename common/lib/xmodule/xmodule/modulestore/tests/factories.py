@@ -637,7 +637,7 @@ def check_mongo_calls_range(max_finds=float("inf"), min_finds=0, max_sends=None,
             with check_sum_of_calls(
                 pymongo.collection.Collection,
                 # mongo < 2.6 uses insert, update, delete and _do_batched_insert. >= 2.6 _do_batched_write
-                ['insert', 'update', 'bulk_write', '_delete'],
+                ['insert_one', 'replace_one', 'update_one', 'bulk_write', '_delete'],
                 max_sends if max_sends is not None else float("inf"),
                 min_sends if min_sends is not None else 0,
             ):

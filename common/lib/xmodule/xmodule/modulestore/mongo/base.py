@@ -1484,14 +1484,12 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         bulk_record.dirty = True
         # See http://www.mongodb.org/display/DOCS/Updating for
         # atomic update syntax
-        result = self.collection.update(
+        result = self.collection.update_one(
             {'_id': location.to_deprecated_son()},
             {'$set': update},
-            multi=False,
             upsert=allow_not_found,
-            w=1,  # wait until primary commits
         )
-        if result['n'] == 0:
+        if result.matched_count == 0 and result.upserted_id is None:
             raise ItemNotFoundError(location)
 
     def _update_ancestors(self, location, update):
@@ -1621,10 +1619,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                     bulk_record.dirty = True
                     # The parent is an orphan, so remove all the children including
                     # the location whose parent we are looking for from orphan parent
-                    self.collection.update(
+                    self.collection.update_one(
                         {'_id': parent_loc.to_deprecated_son()},
                         {'$set': {'definition.children': []}},
-                        multi=False,
                         upsert=True,
                     )
                 elif ancestor_loc.block_type == 'course':
@@ -1819,13 +1816,13 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             else:
                 # Course exists, so create matching assets document.
                 course_assets = {'course_id': six.text_type(course_key), 'assets': {}}
-                doc_id = self.asset_collection.insert(course_assets)
+                doc_id = self.asset_collection.insert_one(course_assets).inserted_id
         elif isinstance(course_assets['assets'], list):
             # This record is in the old course assets format.
             # Ensure that no data exists before updating the format.
             assert len(course_assets['assets']) == 0
             # Update the format to a dict.
-            self.asset_collection.update(
+            self.asset_collection.update_one(
                 {'_id': doc_id},
                 {'$set': {'assets': {}}}
             )
@@ -1859,7 +1856,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             updates_by_type[self._make_mongo_asset_key(asset_type)] = list(assets)
 
         # Update the document.
-        self.asset_collection.update(
+        self.asset_collection.update_one(
             {'_id': course_assets.doc_id},
             {'$set': updates_by_type}
         )
@@ -1911,7 +1908,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         dest_assets = {'assets': source_assets.asset_md.copy(), 'course_id': six.text_type(dest_course_key)}
         self.asset_collection.delete_many({'course_id': six.text_type(dest_course_key)})
         # Update the document.
-        self.asset_collection.insert(dest_assets)
+        self.asset_collection.insert_one(dest_assets)
 
     @contract(asset_key='AssetKey', attr_dict=dict, user_id='int|long')
     def set_asset_metadata_attrs(self, asset_key, attr_dict, user_id):
@@ -1939,7 +1936,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # Generate a Mongo doc from the metadata and update the course asset info.
         all_assets[asset_idx] = md.to_storable()
 
-        self.asset_collection.update(
+        self.asset_collection.update_one(
             {'_id': course_assets.doc_id},
             {"$set": {self._make_mongo_asset_key(asset_key.asset_type): all_assets}}
         )
@@ -1963,7 +1960,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         all_asset_info.pop(asset_idx)
 
         # Update the document.
-        self.asset_collection.update(
+        self.asset_collection.update_one(
             {'_id': course_assets.doc_id},
             {'$set': {self._make_mongo_asset_key(asset_key.asset_type): all_asset_info}}
         )
