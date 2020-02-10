@@ -42,7 +42,7 @@ git+https://github.com/edx/bridgekeeper.git@2423e8d8788c2132ebeec509e1a7b17e1f5b
 git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
 celery==3.1.25
 certifi==2019.11.28
-cffi==1.13.2
+cffi==1.14.0
 chardet==3.0.4
 git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
 click-log==0.3.2
@@ -61,13 +61,13 @@ cssutils==1.0.2
 ddt==1.2.2
 decorator==4.4.1
 defusedxml==0.5.0
-diff-cover==2.5.2
+diff-cover==2.6.0
 git+https://github.com/django-compressor/django-appconf@1526a842ee084b791aa66c931b3822091a442853#egg=django-appconf
 django-babel-underscore==0.5.2
 django-babel==0.6.2
 git+https://github.com/edx/django-celery.git@756cb57aad765cb2b0d37372c1855b8f5f37e6b0#egg=django-celery==3.2.1+edx.2
 django-classy-tags==1.0.0
-django-config-models==1.0.4
+django-config-models==2.0.0
 django-cors-headers==2.5.3
 django-countries==5.5
 django-crum==0.7.5
@@ -117,7 +117,7 @@ edx-django-release-util==0.3.6
 edx-django-sites-extensions==2.4.3
 edx-django-utils==2.0.4
 edx-drf-extensions==2.4.6
-edx-enterprise==2.3.6
+edx-enterprise==2.3.7
 edx-i18n-tools==0.5.0
 edx-lint==1.3.0
 edx-milestones==0.2.6
@@ -160,6 +160,7 @@ httpretty==0.9.7
 idna==2.8
 imagesize==1.2.0          # via sphinx
 importlib-metadata==1.5.0
+importlib-resources==1.0.2
 inflect==3.0.2
 inflection==0.3.1
 ipaddress==1.0.23
@@ -290,7 +291,7 @@ social-auth-core==3.2.0
 git+https://github.com/jazzband/sorl-thumbnail.git@13bedfb7d2970809eda597e3ef79318a6fa80ac2#egg=sorl-thumbnail
 sortedcontainers==2.1.0
 soupsieve==1.9.5
-sphinx==2.3.1             # via edx-sphinx-theme, sphinxcontrib-httpdomain
+sphinx==2.4.0             # via edx-sphinx-theme, sphinxcontrib-httpdomain
 sphinxcontrib-applehelp==1.0.1  # via sphinx
 sphinxcontrib-devhelp==1.0.1  # via sphinx
 sphinxcontrib-htmlhelp==1.0.2  # via sphinx
@@ -315,10 +316,10 @@ unidiff==0.5.5
 uritemplate==3.0.1
 urllib3==1.25.8
 user-util==0.1.5
-virtualenv==16.7.9
+virtualenv==20.0.0
 voluptuous==0.11.7
 vulture==1.3
-watchdog==0.10.1
+watchdog==0.10.2
 wcwidth==0.1.8
 web-fragments==0.3.1
 webencodings==0.5.1
