@@ -28,9 +28,7 @@ class ExternalId(TimeStampedModel):
     given id. An external id is linked to an internal id, so that users may be re-identified if the external sent
     back to Open edX.
 
-    .. pii: Contains external_user_id, not retired so that it can be correlated to the user id
-    .. pii_types: external_service
-    .. pii_retirement: retained
+    .. no_pii: We store external_user_id here, but do not consider that PII under OEP-30.
     """
     external_user_id = models.UUIDField(default=uuid_tools.uuid4, editable=False, unique=True)
     external_id_type = models.ForeignKey(ExternalIdType, db_index=True, on_delete=models.CASCADE)
