@@ -15,6 +15,7 @@ from six.moves.urllib.parse import parse_qs, urlsplit, urlunsplit  # pylint: dis
 
 from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
+from third_party_auth import pipeline as tpa_pipeline
 
 
 class LogoutView(TemplateView):
@@ -29,6 +30,7 @@ class LogoutView(TemplateView):
 
     # Keep track of the page to which the user should ultimately be redirected.
     default_target = '/'
+    tpa_logout_url = ''
 
     def post(self, request, *args, **kwargs):
         """
@@ -68,6 +70,9 @@ class LogoutView(TemplateView):
         # We do not log here, because we have a handler registered to perform logging on successful logouts.
         request.is_from_logout = True
 
+        # Get third party auth provider's logout url
+        self.tpa_logout_url = tpa_pipeline.get_idp_logout_url_from_running_pipeline(request)
+
         # Get the list of authorized clients before we clear the session.
         self.oauth_client_ids = request.session.get(edx_oauth2_provider.constants.AUTHORIZED_CLIENTS_SESSION_KEY, [])
 
@@ -105,6 +110,20 @@ class LogoutView(TemplateView):
         unquoted_url = parse.unquote_plus(parse.quote(url))
         return bool(re.match(r'^/enterprise/[a-z0-9\-]+/course', unquoted_url))
 
+    def _show_tpa_logout_link(self, target, referrer):
+        """
+        Return Boolean value indicating if TPA logout link needs to displayed or not.
+        We display TPA logout link when user has active SSO session and logout flow is
+        triggered via learner portal.
+        Args:
+            target: url of the page to land after logout
+            referrer: url of the page where logout request initiated
+        """
+        if bool(target == self.default_target and self.tpa_logout_url) and settings.LEARNER_PORTAL_URL_ROOT in referrer:
+            return True
+
+        return False
+
     def get_context_data(self, **kwargs):
         context = super(LogoutView, self).get_context_data(**kwargs)
 
@@ -134,6 +153,8 @@ class LogoutView(TemplateView):
             'target': target,
             'logout_uris': logout_uris,
             'enterprise_target': self._is_enterprise_target(target),
+            'tpa_logout_url': self.tpa_logout_url,
+            'show_tpa_logout_link': self._show_tpa_logout_link(target, referrer),
         })
 
         return context
