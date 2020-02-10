@@ -12,8 +12,8 @@ from simple_history.models import HistoricalRecords
 
 class ExternalIdType(TimeStampedModel):
     """
-    ExternalIdType defines the type (purpose, or expected use) of an external id. Users may have one id that is sent to
-    Company A and another that is sent to Company B.
+    ExternalIdType defines the type (purpose, or expected use) of an external id. A user may have one id that is sent
+    to Company A and another that is sent to Company B.
 
     .. no_pii:
     """
@@ -25,7 +25,9 @@ class ExternalIdType(TimeStampedModel):
 class ExternalId(TimeStampedModel):
     """
     External ids are sent to systems or companies outside of Open edX. This allows us to limit the exposure of any
-    given id. An external id is linked to an internal id, so that users may be re-identified if the external sent
+    given id.
+
+    An external id is linked to an internal id, so that users may be re-identified if the external id is sent
     back to Open edX.
 
     .. no_pii: We store external_user_id here, but do not consider that PII under OEP-30.
