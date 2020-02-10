@@ -62,6 +62,10 @@ from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRI
 from openedx.core.djangoapps.user_api.errors import UserNotFound, UserAPIInternalError
 from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
+from openedx.features.ucsd_features.ecommerce.utils import is_user_eligible_for_discount
+from openedx.features.ucsd_features.ecommerce.EcommerceClient import EcommerceRestAPIClient
+from openedx.features.ucsd_features.ecommerce.tasks import assign_course_voucher_to_user
+from openedx.features.ucsd_features.ecommerce.constants import IS_DISCOUNT_AVAILABLE_QUERY_PARAM
 
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.journals.api import get_journals_context
@@ -122,7 +126,7 @@ def csrf_token(context):
     if token == 'NOTPROVIDED':
         return ''
     return (HTML(u'<div style="display:none"><input type="hidden"'
-            ' name="csrfmiddlewaretoken" value="{}" /></div>').format(token))
+                 ' name="csrfmiddlewaretoken" value="{}" /></div>').format(token))
 
 
 # NOTE: This view is not linked to directly--it is called from
@@ -412,9 +416,41 @@ def change_enrollment(request, check_access=True):
         # (In the case of no-id-professional/professional ed, this will redirect to a page that
         # funnels users directly into the verification / payment flow)
         if CourseMode.has_verified_mode(available_modes) or CourseMode.has_professional_mode(available_modes):
-            return HttpResponse(
-                reverse("course_modes_choose", kwargs={'course_id': text_type(course_id)})
-            )
+            # [UCSD_CUSTOM] Enable geographic country based discounts on course enrollments
+            redirect_url = reverse("course_modes_choose", kwargs={'course_id': text_type(course_id)})
+            ecommerce_client = EcommerceRestAPIClient(user=request.user)
+            course_key = str(course_id)
+            if is_user_eligible_for_discount(request, course_key):
+                log.info('user {username} is eligible for geographic discount on the course {course_key}.'
+                         'Starting the task to send a request to ecommerce to email user about coupon '
+                         'codes.'.format(
+                             username=user.username,
+                             course_key=course_id
+                         ))
+                redirect_url = '{}?{}=True'.format(redirect_url, IS_DISCOUNT_AVAILABLE_QUERY_PARAM)
+
+                try:
+                    course_sku = CourseMode.objects.get(course=course_id, mode_slug='verified').sku
+                except (AttributeError, CourseMode.DoesNotExist):
+                    course_sku = None
+
+                try:
+                    assign_course_voucher_to_user.delay(request.user.email, course_key, course_sku)
+                    log.info('Successfully scheduled a task to assign a voucher to '
+                             'user {username} for the course {course_key}.'.format(
+                                 username=user.username,
+                                 course_key=course_key
+                             ))
+                except Exception as ex:  # pylint: disable=broad-except
+                    log.exception('Failed to schedule a task to assign a voucher to '
+                                  'user {username} for the course {course_key}.'
+                                  '\nError message: {error}'.format(
+                                      username=user.username,
+                                      course_key=course_key,
+                                      error=ex.message
+                                  ))
+
+            return HttpResponse(redirect_url)
 
         # Otherwise, there is only one mode available (the default)
         return HttpResponse()
