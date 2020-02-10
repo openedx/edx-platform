@@ -200,14 +200,6 @@ class OAuth2AllowInActiveUsersTests(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    # TODO(jinder): remove test when OAuth2AuthenticationDeprecated is fully removed
-    @unittest.skipUnless(oauth2_provider, 'django-oauth2-provider not installed')
-    def test_get_form_passing_auth_url_transport(self):
-        """Ensure GETing form over OAuth with correct client credentials in query succeed when DEBUG is True"""
-        query = urlencode({'access_token': self.access_token.token})
-        response = self.csrf_client.get('/oauth2-test-debug/?%s' % query)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
     @unittest.skipUnless(oauth2_provider, 'django-oauth2-provider not installed')
     def test_get_form_failing_auth_url_transport(self):
         """Ensure GETing form over OAuth with correct client credentials in query fails when DEBUG is False"""
