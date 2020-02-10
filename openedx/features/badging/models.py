@@ -2,14 +2,10 @@ import logging
 
 from django.contrib.auth.models import User
 from django.db import models
-
 from rest_framework.renderers import JSONRenderer
 
-from lms.djangoapps.teams.models import CourseTeamMembership, CourseTeam
-from nodebb.constants import (
-    TEAM_PLAYER_ENTRY_INDEX,
-    CONVERSATIONALIST_ENTRY_INDEX
-)
+from lms.djangoapps.teams.models import CourseTeamMembership
+from nodebb.constants import CONVERSATIONALIST_ENTRY_INDEX, TEAM_PLAYER_ENTRY_INDEX
 from nodebb.helpers import get_course_id_by_community_id
 from nodebb.models import TeamGroupChat
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
@@ -31,6 +27,9 @@ class Badge(models.Model):
     type = models.CharField(max_length=100, blank=False, null=False, choices=BADGE_TYPES)
     image = models.CharField(max_length=255, blank=False, null=False)
     date_created = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        app_label = 'badging'
 
     def __unicode__(self):
         return self.name
@@ -73,6 +72,7 @@ class UserBadge(models.Model):
     date_earned = models.DateTimeField(auto_now=True)
 
     class Meta:
+        app_label = 'badging'
         unique_together = ('user', 'badge', 'course_id', 'community_id')
 
     def __unicode__(self):
@@ -145,3 +145,33 @@ class UserBadge(models.Model):
             error = badge_constants.BADGE_TYPE_ERROR.format(badge_id=badge_id, badge_type=badge_type)
             log.exception(error)
             raise Exception(error)
+
+    @classmethod
+    def assign_missing_team_badges(cls, user_id, team_id):
+        """
+        Assign all previous (missing) badges when user joins a team,
+        such that he has same number of badges as any other member
+        of same team
+        """
+        if not (user_id and team_id):
+            error = badge_constants.TEAM_BADGE_ERROR.format(user_id=user_id, team_id=team_id)
+            log.exception(error)
+            raise Exception(error)
+
+        team_group_chat = TeamGroupChat.objects.filter(team_id=team_id).values(badge_constants.ROOM_ID_KEY).first()
+
+        # The query gathers the badges earned by the team in a specific course while making sure that duplicate data is
+        # not returned, as one badge can be earned by multiple members of the team, hence the distinct keyword.
+        earned_team_badges = UserBadge.objects.filter(community_id=team_group_chat[badge_constants.ROOM_ID_KEY]).values(
+            badge_constants.BADGE_ID_KEY,
+            badge_constants.COURSE_ID_KEY,
+            badge_constants.THRESHOLD_KEY).distinct()
+
+        # assign team's earned badges to current user which are not already earned
+        for user_badge in earned_team_badges:
+            UserBadge.objects.get_or_create(
+                user_id=user_id,
+                badge_id=user_badge[badge_constants.BADGE_ID_KEY],
+                course_id=user_badge[badge_constants.COURSE_ID_KEY],
+                community_id=team_group_chat[badge_constants.ROOM_ID_KEY]
+            )

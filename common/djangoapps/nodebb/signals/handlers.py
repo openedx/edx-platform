@@ -20,6 +20,7 @@ from nodebb.models import DiscussionCommunity, TeamGroupChat
 from nodebb.helpers import get_community_id
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
+from openedx.features.badging.models import UserBadge
 
 from student.models import ENROLL_STATUS_CHANGE, EnrollStatusChange, UserProfile, CourseEnrollment
 from xmodule.modulestore.django import modulestore
@@ -367,6 +368,7 @@ def join_team_subcategory_on_nodebb(sender, instance, created, **kwargs):
                 )
             )
         else:
+            UserBadge.assign_missing_team_badges(instance.user.id, instance.team.id)
             log.info('Success: User has joined team subcategory %s successfully' %
                      instance.team.name)
 
