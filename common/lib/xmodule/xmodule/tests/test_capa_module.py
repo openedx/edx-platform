@@ -2871,6 +2871,27 @@ class ProblemBlockXMLTest(unittest.TestCase):
         with self.assertRaises(etree.XMLSyntaxError):
             self._create_descriptor(sample_invalid_xml, name="Invalid XML")
 
+    def test_invalid_dropdown_xml(self):
+        """
+        Verify the capa problem cannot be created from dropdown xml with multiple correct answers.
+        """
+        problem_xml = textwrap.dedent("""
+        <problem>
+            <optionresponse>
+              <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for dropdown problems. Edit this component to replace this template with your own assessment.</p>
+            <label>Add the question text, or prompt, here. This text is required.</label>
+            <description>You can add an optional tip or note related to the prompt like this. </description>
+            <optioninput>
+                <option correct="False">an incorrect answer</option>
+                <option correct="True">the correct answer</option>
+                <option correct="True">an incorrect answer</option>
+              </optioninput>
+            </optionresponse>
+        </problem>
+        """)
+        with self.assertRaises(Exception):
+            CapaFactory.create(xml=problem_xml)
+
 
 class ComplexEncoderTest(unittest.TestCase):
 
