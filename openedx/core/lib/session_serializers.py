@@ -34,4 +34,4 @@ class PickleV2Serializer(object):
         else:
             # See notes here about pickling python2 objects in python3
             # https://docs.python.org/3/library/pickle.html#pickle.Unpickler
-            return pickle.loads(data, encoding='latin1')  # pylint: disable=unexpected-keyword-arg
+            return pickle.loads(data, encoding='latin1')
