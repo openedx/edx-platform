@@ -79,9 +79,9 @@
              * @param: content - string or array for display
              * @param: isError - true sets error styling, false/none uses info styling
              */
-            showInfoBanner: function (content, isError=false) {
+            showInfoBanner: function (content, isError) {
                 // clear message
-                let messageElement = $('#team-management-assign .page-banner .message-content');
+                var messageElement = $('#team-management-assign .page-banner .message-content');
                 messageElement.html("");
 
                 // set message
@@ -105,14 +105,6 @@
                     .toggleClass('fa-warning', isError);
 
                 $('#team-management-assign .page-banner').show();
-            },
-
-            /** Shows error banner for team membership CSV upload
-             * 
-             * @param: content - string or array for display
-             */
-            showErrorBanner: function(content) {
-                this.showInfoBanner(content, true);
             }
         };
     });

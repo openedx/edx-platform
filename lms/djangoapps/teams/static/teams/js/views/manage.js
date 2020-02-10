@@ -58,17 +58,15 @@
                 );
             },
 
-            handleCsvUploadSuccess: function (data) {
-                const { message } = data;
-                TeamUtils.showInfoBanner(message);
+            handleCsvUploadSuccess: function(data) {
+                TeamUtils.showInfoBanner(data.message, false);
 
                 // This handler is currently unimplemented (TODO MST-44)
                 this.teamEvents.trigger('teams:update', {});
             },
 
-            handleCsvUploadFailure: function (jqXHR) {
-                const { errors } = jqXHR.responseJSON;
-                TeamUtils.showErrorBanner(errors);
+            handleCsvUploadFailure: function(jqXHR) {
+                TeamUtils.showInfoBanner(jqXHR.responseJSON.errors, true);
             }
         });
         return ManageView;
