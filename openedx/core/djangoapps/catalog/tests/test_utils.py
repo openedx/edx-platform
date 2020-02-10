@@ -439,7 +439,7 @@ class TestGetLocalizedPriceText(TestCase):
 
 @skip_unless_lms
 @mock.patch(UTILS_MODULE + '.get_edx_api_data')
-class TestGetCourseRuns(CatalogIntegrationMixin, CacheIsolationTestCase):
+class TestGetCourseRuns(CatalogIntegrationMixin, TestCase):
     """
     Tests covering retrieval of course runs from the catalog service.
     """
@@ -474,7 +474,6 @@ class TestGetCourseRuns(CatalogIntegrationMixin, CacheIsolationTestCase):
         Verify that no errors occur when catalog config is missing.
         """
         CatalogIntegration.objects.all().delete()
-        self.clear_caches()
 
         data = get_course_runs()
         self.assertFalse(mock_get_edx_api_data.called)
