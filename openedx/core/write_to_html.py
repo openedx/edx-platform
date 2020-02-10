@@ -9,14 +9,8 @@ class HtmlOutlineWriter(object):
     """
     writer to handle html writing
     """
-    HEAD = textwrap.dedent(
+    STYLE = textwrap.dedent(
         u"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-        <meta charset="utf-8" />
-        </head>
-        <style>
         .toggle-box{
         display:none;
         }
@@ -60,11 +54,20 @@ class HtmlOutlineWriter(object):
         background-color: #a68968;
         }
 
-
         }
 
+    """
+    )
 
-        </style>
+    HEAD = textwrap.dedent(
+        u"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <meta charset="utf-8" />
+        <link rel = "stylesheet" type = "text/css" href = "css_default.css" />
+        </head>
+        
         <body>
     """
     )
@@ -80,9 +83,12 @@ class HtmlOutlineWriter(object):
 
     SECTION_END = six.u("</div></div>")
 
-    def __init__(self, fout):
-        self.fout = fout
+    def __init__(self, html_fout, css_fout, css_path):
+        self.fout = html_fout
         self.section_id = 0
+        self.HEAD = self.HEAD.replace("css_default.css",css_path)
+        # writing out style to external css file
+        css_fout.write(self.STYLE)
         self.fout.write(self.HEAD)
 
     def start_section(self, html, klass=None):

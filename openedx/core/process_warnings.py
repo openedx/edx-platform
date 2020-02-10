@@ -163,17 +163,20 @@ def group_and_sort_by_sumof(dataframe, group, sort_by):
     return sorted(temp_list_to_sort, key=lambda x: -x[2])
 
 
-def write_html_report(warnings_dataframe, html_path):
+def write_html_report(warnings_dataframe, html_path, css_file_name):
     """
     converts from panda dataframe to our html
     """
     html_path = os.path.expanduser(html_path)
+    css_file_path = ""
     if "/" in html_path:
         location_of_last_dir = html_path.rfind("/")
         dir_path = html_path[:location_of_last_dir]
         os.makedirs(dir_path, exist_ok=True)
-    with io.open(html_path, "w") as fout:
-        html_writer = HtmlOutlineWriter(fout)
+        css_file_path = dir_path + "/" + css_file_name
+
+    with io.open(html_path, "w") as html_fout, io.open(css_file_path, "w") as css_fout:
+        html_writer = HtmlOutlineWriter(html_fout,css_fout, css_file_path)
         category_sorted_by_count = group_and_sort_by_sumof(
             warnings_dataframe, "category", "num"
         )
@@ -240,7 +243,8 @@ if __name__ == "__main__":
     )
     parser.add_argument("--dir-path", default="test_root/log")
     parser.add_argument("--html-path", default="test_html.html")
+    parser.add_argument("--css-name", default="python_warnings_report_style.css")
     args = parser.parse_args()
     data_output = process_warnings_json(args.dir_path)
     data_dataframe = pd.DataFrame(data=data_output, columns=columns)
-    write_html_report(data_dataframe, args.html_path)
+    write_html_report(data_dataframe, args.html_path, args.css_name)
