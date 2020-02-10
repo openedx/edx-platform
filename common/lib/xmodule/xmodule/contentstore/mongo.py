@@ -380,8 +380,8 @@ class MongoContentStore(ContentStore):
                 raise AttributeError("{} is a protected attribute.".format(attr))
         asset_db_key, __ = self.asset_db_key(location)
         # catch upsert error and raise NotFoundError if asset doesn't exist
-        result = self.fs_files.update({'_id': asset_db_key}, {"$set": attr_dict}, upsert=False)
-        if not result.get('updatedExisting', True):
+        result = self.fs_files.update_one({'_id': asset_db_key}, {"$set": attr_dict}, upsert=False)
+        if result.matched_count == 0:
             raise NotFoundError(asset_db_key)
 
     @autoretry_read()
