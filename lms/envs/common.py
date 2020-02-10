@@ -2513,8 +2513,8 @@ INSTALLED_APPS = [
     # signal handlers to capture course dates into edx-when
     'openedx.core.djangoapps.course_date_signals',
 
-    # Management of user ids
-    'user_ids',
+    # Management of external user ids
+    'openedx.core.djangoapps.external_user_ids',
 ]
 
 ######################### CSRF #########################################
