@@ -264,6 +264,7 @@ class OAuth2AllowInActiveUsersTests(TestCase):
         response = self.post_with_bearer_token(self.OAUTH2_BASE_TESTING_URL, token=token_error.token)
         self.check_error_codes(response, status_code=status.HTTP_401_UNAUTHORIZED, error_code=token_error.error_code)
 
+
 class OAuth2AuthenticationTests(OAuth2AllowInActiveUsersTests):  # pylint: disable=test-inherits-tests
 
     OAUTH2_BASE_TESTING_URL = '/oauth2-test/'
