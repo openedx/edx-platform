@@ -447,7 +447,7 @@ class DraftModuleStore(MongoModuleStore):
             bulk_record = self._get_bulk_ops_record(location.course_key)
             bulk_record.dirty = True
             try:
-                self.collection.insert(item)
+                self.collection.insert_one(item)
             except pymongo.errors.DuplicateKeyError:
                 # prevent re-creation of DRAFT versions, unless explicitly requested to ignore
                 if not ignore_if_draft:

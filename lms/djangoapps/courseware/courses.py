@@ -16,7 +16,6 @@ from django.db.models import Prefetch
 from django.http import Http404, QueryDict
 from django.urls import reverse
 from edx_django_utils.monitoring import function_trace
-from edx_when.api import get_dates_for_course
 from fs.errors import ResourceNotFound
 from opaque_keys.edx.keys import UsageKey
 from path import Path as path
@@ -28,9 +27,7 @@ from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access_response import MilestoneAccessError, StartDateError
 from lms.djangoapps.courseware.date_summary import (
     CertificateAvailableDate,
-    CourseAssignmentDate,
     CourseEndDate,
-    CourseExpiredDate,
     CourseStartDate,
     TodaysDate,
     VerificationDeadlineDate,
@@ -393,14 +390,13 @@ def get_course_info_section(request, user, course, section_key):
     return html
 
 
-def get_course_date_blocks(course, user, request=None, include_past_dates=False, num_assignments=None):
+def get_course_date_blocks(course, user):
     """
     Return the list of blocks to display on the course info page,
     sorted by date.
     """
     block_classes = [
         CourseEndDate,
-        CourseExpiredDate,
         CourseStartDate,
         TodaysDate,
         VerificationDeadlineDate,
@@ -409,53 +405,17 @@ def get_course_date_blocks(course, user, request=None, include_past_dates=False,
     if certs_api.get_active_web_certificate(course):
         block_classes.insert(0, CertificateAvailableDate)
 
-    blocks = [cls(course, user) for cls in block_classes]
-    blocks.extend(get_course_assignment_due_dates(
-        course, user, request, num_return=num_assignments, include_past_dates=include_past_dates))
+    blocks = (cls(course, user) for cls in block_classes)
 
-    return sorted((b for b in blocks if b.date and (b.is_enabled or include_past_dates)), key=date_block_key_fn)
-
-
-def date_block_key_fn(block):
-    """
-    If the block's date is None, return the maximum datetime in order
-    to force it to the end of the list of displayed blocks.
-    """
-    return block.date or datetime.max.replace(tzinfo=pytz.UTC)
-
-
-def get_course_assignment_due_dates(course, user, request, num_return=None, include_past_dates=False):
-    """
-    Returns a list of assignment (at the subsection/sequential level) due date
-    blocks for the given course. Will return num_return results or all results
-    if num_return is None in date increasing order.
-    """
-    store = modulestore()
-    all_course_dates = get_dates_for_course(course.id, user)
-    date_blocks = []
-    for (block_key, date_type), date in all_course_dates.items():
-        if date_type == 'due' and block_key.block_type == 'sequential':
-            try:
-                item = store.get_item(block_key)
-            except ItemNotFoundError:
-                continue
-            if item.graded:
-                date_block = CourseAssignmentDate(course, user)
-                date_block.date = date
-
-                block_url = None
-                now = datetime.now().replace(tzinfo=pytz.UTC)
-                assignment_released = item.start < now
-                if assignment_released:
-                    block_url = reverse('jump_to', args=[course.id, block_key])
-                    block_url = request.build_absolute_uri(block_url) if request else None
-                date_block.set_title(item.display_name, block_url)
-
-                date_blocks.append(date_block)
-    date_blocks = sorted((b for b in date_blocks if b.is_enabled or include_past_dates), key=date_block_key_fn)
-    if num_return:
-        return date_blocks[:num_return]
-    return date_blocks
+    def block_key_fn(block):
+        """
+        If the block's date is None, return the maximum datetime in order
+        to force it to the end of the list of displayed blocks.
+        """
+        if block.date is None:
+            return datetime.max.replace(tzinfo=pytz.UTC)
+        return block.date
+    return sorted((b for b in blocks if b.is_enabled), key=block_key_fn)
 
 
 # TODO: Fix this such that these are pulled in as extra course-specific tabs.

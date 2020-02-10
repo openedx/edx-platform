@@ -153,7 +153,7 @@ class process_cached(object):  # pylint: disable=invalid-name
 
 def zpickle(data):
     """Given any data structure, returns a zlib compressed pickled serialization."""
-    return zlib.compress(pickle.dumps(data, 2))  # Keep this constant as we upgrade from python 2 to 3.
+    return zlib.compress(pickle.dumps(data, 4))  # Keep this constant as we upgrade from python 2 to 3.
 
 
 def zunpickle(zdata):
