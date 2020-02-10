@@ -130,6 +130,11 @@ FEATURES = {
     # Toggles OAuth2 authentication provider
     'ENABLE_OAUTH2_PROVIDER': False,
 
+    # Toggles auth class in discussions djangoapps
+    'DISCUSSION_USE_NEW_OAUTH2_CLASS': False,
+    # Toggles auth class in bookmarks djangoapps
+    'BOOKMARKS_USE_NEW_OAUTH2_CLASS': False,
+
     # Allows to enable an API endpoint to serve XBlock view, used for example by external applications.
     # See jquey-xblock: https://github.com/edx-solutions/jquery-xblock
     'ENABLE_XBLOCK_VIEW_ENDPOINT': False,
@@ -3845,7 +3850,7 @@ BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
 XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
 
 ########################## LEARNER PORTAL ##############################
-LEARNER_PORTAL_URL_ROOT = 'https://learner-portal-localhost:18000'
+LEARNER_PORTAL_URL_ROOT = 'http://localhost:8734'
 
 ######################### MICROSITE ###############################
 MICROSITE_ROOT_DIR = '/edx/app/edxapp/edx-microsite'

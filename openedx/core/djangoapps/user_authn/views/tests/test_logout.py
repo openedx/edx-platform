@@ -6,6 +6,7 @@ Tests for logout
 import unittest
 
 import ddt
+import mock
 import six.moves.urllib.parse as parse  # pylint: disable=import-error
 from django.conf import settings
 from django.test import TestCase
@@ -13,7 +14,6 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from edx_oauth2_provider.constants import AUTHORIZED_CLIENTS_SESSION_KEY
 from edx_oauth2_provider.tests.factories import ClientFactory, TrustedClientFactory
-from mock import patch
 
 from student.tests.factories import UserFactory
 
@@ -120,7 +120,7 @@ class LogoutTests(TestCase):
         }
         self.assertDictContainsSubset(expected, response.context_data)
 
-    @patch(
+    @mock.patch(
         'django.conf.settings.IDA_LOGOUT_URI_LIST',
         ['http://fake.ida1/logout', 'http://fake.ida2/accounts/logout', ]
     )
@@ -147,7 +147,7 @@ class LogoutTests(TestCase):
         }
         self.assertDictContainsSubset(expected, response.context_data)
 
-    @patch(
+    @mock.patch(
         'django.conf.settings.IDA_LOGOUT_URI_LIST',
         ['http://fake.ida1/logout', 'http://fake.ida2/accounts/logout', ]
     )
@@ -179,5 +179,26 @@ class LogoutTests(TestCase):
         expected = {
             'logout_uris': [],
             'target': '/',
+            'show_tpa_logout_link': False,
         }
         self.assertDictContainsSubset(expected, response.context_data)
+
+    def test_learner_portal_logout_having_idp_logout_url(self):
+        """
+        Test when learner logout from learner portal having active SSO session
+        logout page should have link to logout url IdP.
+        """
+        learner_portal_logout_url = '{}/logout'.format(settings.LEARNER_PORTAL_URL_ROOT)
+        idp_logout_url = 'http://mock-idp.com/logout'
+        client = self._create_oauth_client()
+
+        with mock.patch(
+            'openedx.core.djangoapps.user_authn.views.logout.tpa_pipeline.get_idp_logout_url_from_running_pipeline'
+        ) as mock_idp_logout_url:
+            mock_idp_logout_url.return_value = idp_logout_url
+            response = self._assert_session_logged_out(client, HTTP_REFERER=learner_portal_logout_url)
+            expected = {
+                'tpa_logout_url': idp_logout_url,
+                'show_tpa_logout_link': True,
+            }
+            self.assertDictContainsSubset(expected, response.context_data)

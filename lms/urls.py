@@ -45,6 +45,7 @@ from openedx.core.djangoapps.plugins import plugin_urls
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_authn.views.login import redirect_to_lms_login
 from openedx.core.djangoapps.verified_track_content import views as verified_track_content_views
 from openedx.core.apidocs import api_info
 from openedx.features.enterprise_support.api import enterprise_enabled
@@ -782,6 +783,9 @@ if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
         # changes go through our user portal and follow complexity requirements.
         url(r'^admin/password_change/$', handler404),
         url(r'^admin/auth/user/\d+/password/$', handler404),
+        # We are enforcing users to login through third party auth in site's
+        # login page so we are disabling the admin panel's login page.
+        url(r'^admin/login/$', redirect_to_lms_login),
         url(r'^admin/', admin.site.urls),
     ]
 

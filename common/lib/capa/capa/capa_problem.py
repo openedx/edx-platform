@@ -245,6 +245,22 @@ class LoncapaProblem(object):
         This translation takes in the new format and synthesizes the old option= attribute
         so all downstream logic works unchanged with the new <option> tag format.
         """
+        def is_optioninput_valid(optioninput):
+            """
+            Verifies if a given optioninput xml is valid or not.
+
+            A given optioninput(Dropdown) problem is invalid if it has more than one correct answer.
+
+            Argument:
+                optioninput: dropdown specification tree
+            Returns:
+                boolean: signifying if the optioninput is valid or not.
+            """
+            correct_options = [
+                option.get('correct').upper() == 'TRUE' for option in optioninput.findall('./option')
+            ]
+            return correct_options.count(True) in (0, 1)
+
         additionals = tree.xpath('//stringresponse/additional_answer')
         for additional in additionals:
             answer = additional.get('answer')
@@ -252,8 +268,9 @@ class LoncapaProblem(object):
             if not answer and text:  # trigger of old->new conversion
                 additional.set('answer', text)
                 additional.text = ''
-
         for optioninput in tree.xpath('//optioninput'):
+            if not is_optioninput_valid(optioninput):
+                raise responsetypes.LoncapaProblemError("Dropdown questions can only have one correct answer.")
             correct_option = None
             child_options = []
             for option_element in optioninput.findall('./option'):

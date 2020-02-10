@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-cffi==1.13.2              # via cryptography
+cffi==1.14.0              # via cryptography
 cryptography==2.8
 lxml==4.5.0
 nltk==3.4.5

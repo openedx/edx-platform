@@ -6,6 +6,7 @@ Test for lms courseware app, module render unit
 
 import itertools
 import json
+import textwrap
 from datetime import datetime
 from functools import partial
 
@@ -1879,6 +1880,47 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
         )
         result_fragment = module.render(STUDENT_VIEW)
         self.assertIn('Staff Debug', result_fragment.content)
+
+    def test_staff_debug_info_score_for_invalid_dropdown(self):
+        """
+        Verifies that for an invalid drop down problem, the max score is set
+        to zero in the html.
+        """
+        problem_xml = """
+        <problem>
+            <optionresponse>
+              <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for dropdown problems. Edit this component to replace this template with your own assessment.</p>
+            <label>Add the question text, or prompt, here. This text is required.</label>
+            <description>You can add an optional tip or note related to the prompt like this. </description>
+            <optioninput>
+                <option correct="False">an incorrect answer</option>
+                <option correct="True">the correct answer</option>
+                <option correct="True">an incorrect answer</option>
+              </optioninput>
+            </optionresponse>
+        </problem>
+        """
+        problem_descriptor = ItemFactory.create(
+            category='problem',
+            data=problem_xml
+        )
+        module = render.get_module(
+            self.user,
+            self.request,
+            problem_descriptor.location,
+            self.field_data_cache
+        )
+        html_fragment = module.render(STUDENT_VIEW)
+        expected_score_override_html = textwrap.dedent("""<div>
+        <label for="sd_fs_{block_id}">Score (for override only):</label>
+        <input type="text" tabindex="0" id="sd_fs_{block_id}" placeholder="0"/>
+        <label for="sd_fs_{block_id}"> / 0</label>
+      </div>""")
+
+        self.assertIn(
+            expected_score_override_html.format(block_id=problem_descriptor.location.block_id),
+            html_fragment.content
+        )
 
     @XBlock.register_temp_plugin(DetachedXBlock, identifier='detached-block')
     def test_staff_debug_info_disabled_for_detached_blocks(self):
