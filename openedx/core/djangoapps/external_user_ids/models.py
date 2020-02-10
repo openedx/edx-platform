@@ -1,5 +1,5 @@
 """
-Models for User Ids
+Models for External User Ids that are sent out of Open edX
 """
 
 import uuid as uuid_tools
