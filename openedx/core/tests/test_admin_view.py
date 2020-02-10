@@ -7,6 +7,7 @@ This is not inside a django app because it is a global property of the system.
 from django.test import TestCase, Client
 from django.urls import reverse
 from student.tests.factories import UserFactory, TEST_PASSWORD
+from openedx.core.djangoapps.user_authn.views.login import ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 
 
 class TestAdminView(TestCase):
@@ -34,3 +35,9 @@ class TestAdminView(TestCase):
         self.client.login(username=student.username, password=TEST_PASSWORD)
         response = self.client.get(reverse('admin:index'))
         assert response.status_code == 302
+
+    def test_admin_login_redirect(self):
+        with ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY.override(True):
+            response = self.client.get(reverse('admin:login'))
+            assert response.url == '/login?next=/admin'
+            assert response.status_code == 302
