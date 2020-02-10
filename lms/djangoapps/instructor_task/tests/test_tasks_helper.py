@@ -943,9 +943,20 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         ])
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
-    @override_switch(SWITCH_GENERATE_GRADE_REPORT_VERIFIED_ONLY, True)
-    def test_single_problem_verified_student_only(self, _get_current_task):
-        student_verified = self.create_student(u'user_verified', mode='verified')
+    @ddt.data(
+        (True, 'verified', 1),
+        (True, 'audit', 3),
+        (False, 'audit', 3),
+        (False, 'verified', 3),
+    )
+    @ddt.unpack
+    def test_problem_grade_report_verified_only_settings(self, switch_value, mode_slug, attempted, _get_current_task):
+        """
+        Tests that problem grade report has expected data when it is generated with/without
+        verified only learners settings.
+        """
+        CourseModeFactory.create(course_id=self.course.id, mode_slug=mode_slug)
+        student_2 = self.create_student('user_verified', mode=mode_slug)
         vertical = ItemFactory.create(
             parent_location=self.problem_section.location,
             category='vertical',
@@ -955,11 +966,12 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.define_option_problem(u'Problem1', parent=vertical)
 
         self.submit_student_answer(self.student_1.username, u'Problem1', ['Option 1'])
-        self.submit_student_answer(student_verified.username, u'Problem1', ['Option 1'])
-        result = ProblemGradeReport.generate(None, None, self.course.id, None, 'graded')
-        self.assertDictContainsSubset(
-            {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0}, result
-        )
+        self.submit_student_answer(student_2.username, u'Problem1', ['Option 1'])
+        with override_switch(SWITCH_GENERATE_GRADE_REPORT_VERIFIED_ONLY, switch_value):
+            result = ProblemGradeReport.generate(None, None, self.course.id, None, 'graded')
+            self.assertDictContainsSubset(
+                {'action_name': 'graded', 'attempted': attempted, 'succeeded': attempted, 'failed': 0}, result
+            )
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
     @patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.iter')
@@ -2034,28 +2046,36 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
             )
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
-    @override_switch(SWITCH_GENERATE_GRADE_REPORT_VERIFIED_ONLY, True)
-    def test_course_grade_with_verified_student_only(self, _get_current_task):
+    @ddt.data(
+        (True, 'verified', 1),
+        (True, 'audit', 3),
+        (False, 'audit', 3),
+        (False, 'verified', 3),
+    )
+    @ddt.unpack
+    def test_course_grade_with_verified_only_settings(self, switch_value, mode_slug, attempted, _get_current_task):
         """
-        Tests that course grade report has expected data when it is generated only for
-        verified learners.
+        Tests that course grade report has expected data when it is generated with/without
+        verified only learners settings.
         """
-        student_1 = self.create_student(u'user_honor')
-        student_verified = self.create_student(u'user_verified', mode='verified')
+        student_1 = self.create_student('user_honor')
+        student_2 = self.create_student('user_verified', mode=mode_slug)
+        CourseModeFactory.create(course_id=self.course.id, mode_slug=mode_slug)
         vertical = ItemFactory.create(
             parent_location=self.problem_section.location,
             category='vertical',
             metadata={'graded': True},
             display_name='Problem Vertical'
         )
-        self.define_option_problem(u'Problem1', parent=vertical)
+        self.define_option_problem('Problem1', parent=vertical)
 
-        self.submit_student_answer(student_1.username, u'Problem1', ['Option 1'])
-        self.submit_student_answer(student_verified.username, u'Problem1', ['Option 1'])
-        result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
-        self.assertDictContainsSubset(
-            {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0}, result
-        )
+        self.submit_student_answer(student_1.username, 'Problem1', ['Option 1'])
+        self.submit_student_answer(student_2.username, 'Problem1', ['Option 1'])
+        with override_switch(SWITCH_GENERATE_GRADE_REPORT_VERIFIED_ONLY, switch_value):
+            result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
+            self.assertDictContainsSubset(
+                {'action_name': 'graded', 'attempted': attempted, 'succeeded': attempted, 'failed': 0}, result
+            )
 
     @ddt.data(True, False)
     def test_fast_generation(self, create_non_zero_grade):

@@ -65,6 +65,12 @@ def _user_enrollment_status(user, course_id):
     return NOT_ENROLLED_IN_COURSE
 
 
+def verified_only_report_for_course(course_id):
+    """Returns True if a grade report should be generated only for verified learners."""
+    has_verified_mode = CourseMode.verified_mode_for_course(course_id, include_expired=True) is not None
+    return has_verified_mode and generate_grade_report_for_verified_only()
+
+
 def _flatten(iterable):
     return list(chain.from_iterable(iterable))
 
@@ -365,8 +371,8 @@ class CourseGradeReport(object):
 
         course_id = context.course_id
         task_log_message = u'{}, Task type: {}'.format(context.task_info_string, context.action_name)
-        report_for_verified_only = generate_grade_report_for_verified_only()
-        return get_enrolled_learners_for_course(course_id=course_id, verified_only=report_for_verified_only)
+        verified_only_report = verified_only_report_for_course(course_id=course_id)
+        return get_enrolled_learners_for_course(course_id=course_id, verified_only=verified_only_report)
 
     def _user_grades(self, course_grade, context):
         """
@@ -543,11 +549,10 @@ class ProblemGradeReport(object):
         status_interval = 100
         task_id = _xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None
 
-        report_for_verified_only = generate_grade_report_for_verified_only()
         enrolled_students = CourseEnrollment.objects.users_enrolled_in(
             course_id=course_id,
             include_inactive=True,
-            verified_only=report_for_verified_only,
+            verified_only=verified_only_report_for_course(course_id=course_id),
         )
         task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 
