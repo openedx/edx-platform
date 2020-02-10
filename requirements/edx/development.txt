@@ -42,7 +42,7 @@ git+https://github.com/edx/bridgekeeper.git@2423e8d8788c2132ebeec509e1a7b17e1f5b
 git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
 celery==3.1.25
 certifi==2019.11.28
-cffi==1.13.2
+cffi==1.14.0
 chardet==3.0.4
 git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
 click-log==0.3.2
@@ -67,7 +67,7 @@ django-babel-underscore==0.5.2
 django-babel==0.6.2
 git+https://github.com/edx/django-celery.git@756cb57aad765cb2b0d37372c1855b8f5f37e6b0#egg=django-celery==3.2.1+edx.2
 django-classy-tags==1.0.0
-django-config-models==1.0.4
+django-config-models==2.0.0
 django-cors-headers==2.5.3
 django-countries==5.5
 django-crum==0.7.5

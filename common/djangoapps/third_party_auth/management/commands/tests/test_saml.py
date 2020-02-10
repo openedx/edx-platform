@@ -16,6 +16,7 @@ from django.utils.six import StringIO
 from requests import exceptions
 from requests.models import Response
 
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from third_party_auth.tests.factories import SAMLConfigurationFactory, SAMLProviderConfigFactory
 
 
@@ -47,7 +48,7 @@ def mock_get(status_code=200):
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class TestSAMLCommand(TestCase):
+class TestSAMLCommand(CacheIsolationTestCase):
     """
     Test django management command for fetching saml metadata.
     """
