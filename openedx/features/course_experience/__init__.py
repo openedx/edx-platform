@@ -78,6 +78,9 @@ USE_BOOTSTRAP_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'use_bootstrap', fl
 SEO_WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='seo')
 COURSE_ENABLE_UNENROLLED_ACCESS_FLAG = CourseWaffleFlag(SEO_WAFFLE_FLAG_NAMESPACE, 'enable_anonymous_courseware_access')
 
+# Waffle flag to enable relative dates for course content
+RELATIVE_DATES_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'relative_dates')
+
 
 def course_home_page_title(course):  # pylint: disable=unused-argument
     """
