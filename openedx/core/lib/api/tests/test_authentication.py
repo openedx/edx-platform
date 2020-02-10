@@ -47,19 +47,8 @@ class MockView(APIView):  # pylint: disable=missing-docstring
         return HttpResponse({'a': 1, 'b': 2, 'c': 3})
 
 
-# This is the a change we've made from the django-rest-framework-oauth version
-# of these tests.  We're subclassing our custom OAuth2AuthenticationAllowInactiveUser
-# instead of OAuth2Authentication.
-class OAuth2AuthenticationDebug(authentication.OAuth2AuthenticationAllowInactiveUserDeprecated):
-    allow_query_params_token = True
-
-
 urlpatterns = [
     url(r'^oauth2/', include(('provider.oauth2.urls', 'oauth2'), namespace='oauth2')),
-    url(
-        r'^oauth2-inactive-deprecated-test/$',
-        MockView.as_view(authentication_classes=[authentication.OAuth2AuthenticationAllowInactiveUserDeprecated])
-    ),
     url(
         r'^oauth2-inactive-test/$',
         MockView.as_view(authentication_classes=[authentication.OAuth2AuthenticationAllowInactiveUser])
@@ -68,12 +57,10 @@ urlpatterns = [
         r'^oauth2-test/$',
         MockView.as_view(authentication_classes=[authentication.OAuth2Authentication])
     ),
-    # TODO(jinder): remove url when OAuth2AuthenticationDeprecated is fully removed
-    url(r'^oauth2-test-debug/$', MockView.as_view(authentication_classes=[OAuth2AuthenticationDebug])),
     url(
         r'^oauth2-with-scope-test/$',
         MockView.as_view(
-            authentication_classes=[authentication.OAuth2AuthenticationAllowInactiveUserDeprecated],
+            authentication_classes=[authentication.OAuth2AuthenticationAllowInactiveUser],
             permission_classes=[permissions.TokenHasReadWriteScope]
         )
     ),
@@ -83,12 +70,12 @@ urlpatterns = [
 @ddt.ddt  # pylint: disable=missing-docstring
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 @override_settings(ROOT_URLCONF=__name__)
-class OAuth2AllowInActiveUsersDeprecatedTests(TestCase):
+class OAuth2AllowInActiveUsersTests(TestCase):
 
-    OAUTH2_BASE_TESTING_URL = '/oauth2-inactive-deprecated-test/'
+    OAUTH2_BASE_TESTING_URL = '/oauth2-inactive-test/'
 
     def setUp(self):
-        super(OAuth2AllowInActiveUsersDeprecatedTests, self).setUp()
+        super(OAuth2AllowInActiveUsersTests, self).setUp()
         self.dop_adapter = adapters.DOPAdapter()
         self.dot_adapter = adapters.DOTAdapter()
         self.csrf_client = APIClient(enforce_csrf_checks=True)
@@ -317,7 +304,7 @@ class OAuth2AllowInActiveUsersDeprecatedTests(TestCase):
         self.assertEqual(response.status_code, scope_statuses.write_status)
 
 
-class OAuth2AuthenticationTests(OAuth2AllowInActiveUsersDeprecatedTests):  # pylint: disable=test-inherits-tests
+class OAuth2AuthenticationTests(OAuth2AllowInActiveUsersTests):  # pylint: disable=test-inherits-tests
 
     OAUTH2_BASE_TESTING_URL = '/oauth2-test/'
 
@@ -328,6 +315,3 @@ class OAuth2AuthenticationTests(OAuth2AllowInActiveUsersDeprecatedTests):  # pyl
         self.user.save()
 
 
-class OAuth2AllowInActiveUsersTests(OAuth2AllowInActiveUsersDeprecatedTests):  # pylint: disable=test-inherits-tests
-
-    OAUTH2_BASE_TESTING_URL = '/oauth2-inactive-test/'
