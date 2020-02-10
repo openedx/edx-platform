@@ -3,7 +3,7 @@
 
 import ddt
 
-from django.test import TestCase, override_settings
+from django.test import override_settings
 
 from openedx.core.djangoapps.catalog.tests import mixins
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
