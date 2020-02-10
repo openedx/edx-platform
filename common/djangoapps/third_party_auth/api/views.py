@@ -19,8 +19,8 @@ from rest_framework.views import APIView
 from social_django.models import UserSocialAuth
 
 from openedx.core.lib.api.authentication import (
-    OAuth2AuthenticationDeprecated,
-    OAuth2AuthenticationAllowInactiveUserDeprecated
+    OAuth2Authentication,
+    OAuth2AuthenticationAllowInactiveUser
 )
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from third_party_auth import pipeline
@@ -67,7 +67,7 @@ class BaseUserView(APIView):
     authentication_classes = (
         # Users may want to view/edit the providers used for authentication before they've
         # activated their account, so we allow inactive users.
-        OAuth2AuthenticationAllowInactiveUserDeprecated,
+        OAuth2AuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     throttle_classes = [ProviderSustainedThrottle, ProviderBurstThrottle]
@@ -335,7 +335,7 @@ class UserMappingView(ListAPIView):
             * remote_id: The Id from third party auth provider
     """
     authentication_classes = (
-        JwtAuthentication, OAuth2AuthenticationDeprecated,
+        JwtAuthentication, OAuth2Authentication,
     )
 
     serializer_class = serializers.UserMappingSerializer
@@ -402,7 +402,7 @@ class ThirdPartyAuthUserStatusView(APIView):
     user with respect to the third party auth providers configured in the system.
     """
     authentication_classes = (
-        JwtAuthentication, OAuth2AuthenticationAllowInactiveUserDeprecated, SessionAuthenticationAllowInactiveUser
+        JwtAuthentication, OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser
     )
     permission_classes = (permissions.IsAuthenticated,)
 

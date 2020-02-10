@@ -23,7 +23,7 @@ from rest_framework.generics import ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from openedx.core.lib.api.authentication import OAuth2AuthenticationDeprecated, OAuth2Authentication
+from openedx.core.lib.api.authentication import OAuth2Authentication
 from openedx.core.djangoapps.bookmarks.api import BookmarksLimitReachedError
 from openedx.core.lib.api.permissions import IsUserInUrl
 from openedx.core.lib.url_utils import unquote_slashes
@@ -34,21 +34,6 @@ from .serializers import BookmarkSerializer
 
 log = logging.getLogger(__name__)
 
-# .. toggle_name: BOOKMARKS_USE_NEW_OAUTH2_CLASS
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Toggle for replacing OAuth2AuthenticationDeprecated with OAuth2Authentication for bookmarks.
-# .. toggle_category: n/a
-# .. toggle_use_cases: Monitored Rollout
-# .. toggle_creation_date: 2020-01-31
-# .. toggle_expiration_date: 2020-02-28
-# .. toggle_warnings: None
-# .. toggle_tickets: BOM-1037
-# .. toggle_status: supported
-if getattr(settings, "BOOKMARKS_USE_NEW_OAUTH2_CLASS", False):
-    _bookmarks_configured_authentication_classes = (OAuth2Authentication, SessionAuthentication)
-else:
-    _bookmarks_configured_authentication_classes = (OAuth2AuthenticationDeprecated, SessionAuthentication)
 
 # Default error message for user
 DEFAULT_USER_MESSAGE = ugettext_noop(u'An error has occurred. Please try again.')
@@ -115,7 +100,7 @@ class BookmarksViewMixin(object):
 class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
     """REST endpoints for lists of bookmarks."""
 
-    authentication_classes = _bookmarks_configured_authentication_classes
+    authentication_classes = (OAuth2Authentication, SessionAuthentication,)
     pagination_class = BookmarksPagination
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = BookmarkSerializer
@@ -307,7 +292,7 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
         if the bookmark does not exist.
     """
 
-    authentication_classes = _bookmarks_configured_authentication_classes
+    authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsUserInUrl)
 
     serializer_class = BookmarkSerializer
