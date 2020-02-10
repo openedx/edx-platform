@@ -24,8 +24,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.test import APIClient, APIRequestFactory
 from rest_framework.views import APIView
-from rest_framework_oauth import permissions
-from rest_framework_oauth.compat import oauth2_provider, oauth2_provider_scope
+import provider as oauth2_provider
 
 from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.lib.api import authentication
@@ -56,14 +55,7 @@ urlpatterns = [
     url(
         r'^oauth2-test/$',
         MockView.as_view(authentication_classes=[authentication.OAuth2Authentication])
-    ),
-    url(
-        r'^oauth2-with-scope-test/$',
-        MockView.as_view(
-            authentication_classes=[authentication.OAuth2AuthenticationAllowInactiveUser],
-            permission_classes=[permissions.TokenHasReadWriteScope]
-        )
-    ),
+    )
 ]
 
 
@@ -181,7 +173,6 @@ class OAuth2AllowInActiveUsersTests(TestCase):
         # provided (yet).
         self.assertNotIn('error_code', json.loads(response.content.decode('utf-8')))
 
-    @unittest.skipUnless(oauth2_provider, 'django-oauth2-provider not installed')
     def test_get_form_passing_auth(self):
         """Ensure GETing form over OAuth with correct client credentials succeed"""
         response = self.get_with_bearer_token(self.OAUTH2_BASE_TESTING_URL)
@@ -191,7 +182,6 @@ class OAuth2AllowInActiveUsersTests(TestCase):
         response = self.get_with_bearer_token(self.OAUTH2_BASE_TESTING_URL, token=self.dot_access_token.token)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    @unittest.skipUnless(oauth2_provider, 'django-oauth2-provider not installed')
     def test_post_form_passing_auth_url_transport(self):
         """Ensure GETing form over OAuth with correct client credentials in form data succeed"""
         response = self.csrf_client.post(
@@ -200,7 +190,6 @@ class OAuth2AllowInActiveUsersTests(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    @unittest.skipUnless(oauth2_provider, 'django-oauth2-provider not installed')
     def test_get_form_failing_auth_url_transport(self):
         """Ensure GETing form over OAuth with correct client credentials in query fails when DEBUG is False"""
         query = urlencode({'access_token': self.access_token.token})
@@ -210,13 +199,11 @@ class OAuth2AllowInActiveUsersTests(TestCase):
         # This case is handled directly by DRF so no error_code is provided (yet).
         self.assertNotIn('error_code', json.loads(response.content.decode('utf-8')))
 
-    @unittest.skipUnless(oauth2_provider, 'django-oauth2-provider not installed')
     def test_post_form_passing_auth(self):
         """Ensure POSTing form over OAuth with correct credentials passes and does not require CSRF"""
         response = self.post_with_bearer_token(self.OAUTH2_BASE_TESTING_URL)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    @unittest.skipUnless(oauth2_provider, 'django-oauth2-provider not installed')
     def test_post_form_token_removed_failing_auth(self):
         """Ensure POSTing when there is no OAuth access token in db fails"""
         self.access_token.delete()
@@ -227,7 +214,6 @@ class OAuth2AllowInActiveUsersTests(TestCase):
             error_code=authentication.OAUTH2_TOKEN_ERROR_NONEXISTENT
         )
 
-    @unittest.skipUnless(oauth2_provider, 'django-oauth2-provider not installed')
     def test_post_form_with_refresh_token_failing_auth(self):
         """Ensure POSTing with refresh token instead of access token fails"""
         response = self.post_with_bearer_token(self.OAUTH2_BASE_TESTING_URL, token=self.refresh_token.token)
@@ -237,7 +223,6 @@ class OAuth2AllowInActiveUsersTests(TestCase):
             error_code=authentication.OAUTH2_TOKEN_ERROR_NONEXISTENT
         )
 
-    @unittest.skipUnless(oauth2_provider, 'django-oauth2-provider not installed')
     def test_post_form_with_expired_access_token_failing_auth(self):
         """Ensure POSTing with expired access token fails with a 'token_expired' error"""
         self.access_token.expires = now() - timedelta(seconds=10)  # 10 seconds late
@@ -262,7 +247,6 @@ class OAuth2AllowInActiveUsersTests(TestCase):
         )
     )
     @ddt.unpack
-    @unittest.skipUnless(oauth2_provider, 'django-oauth2-provider not installed')
     def test_response_for_get_request_with_bad_auth_token(self, http_params, token_error):
         response = self.get_with_bearer_token(self.OAUTH2_BASE_TESTING_URL, http_params, token=token_error.token)
         self.check_error_codes(
@@ -279,22 +263,6 @@ class OAuth2AllowInActiveUsersTests(TestCase):
     def test_response_for_post_request_with_bad_auth_token(self, token_error):
         response = self.post_with_bearer_token(self.OAUTH2_BASE_TESTING_URL, token=token_error.token)
         self.check_error_codes(response, status_code=status.HTTP_401_UNAUTHORIZED, error_code=token_error.error_code)
-
-    ScopeStatusDDT = namedtuple('ScopeStatusDDT', ['scope', 'read_status', 'write_status'])
-
-    @ddt.data(
-        ScopeStatusDDT('read', read_status=status.HTTP_200_OK, write_status=status.HTTP_403_FORBIDDEN),
-        ScopeStatusDDT('write', status.HTTP_403_FORBIDDEN, status.HTTP_200_OK),
-    )
-    @unittest.skipUnless(oauth2_provider, 'django-oauth2-provider not installed')
-    def test_responses_to_scoped_requests(self, scope_statuses):
-        self.access_token.scope = oauth2_provider_scope.SCOPE_NAME_DICT[scope_statuses.scope]
-        self.access_token.save()
-        response = self.get_with_bearer_token('/oauth2-with-scope-test/', token=self.access_token.token)
-        self.assertEqual(response.status_code, scope_statuses.read_status)
-        response = self.post_with_bearer_token('/oauth2-with-scope-test/', token=self.access_token.token)
-        self.assertEqual(response.status_code, scope_statuses.write_status)
-
 
 class OAuth2AuthenticationTests(OAuth2AllowInActiveUsersTests):  # pylint: disable=test-inherits-tests
 
