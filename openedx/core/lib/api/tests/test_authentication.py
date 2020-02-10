@@ -305,5 +305,3 @@ class OAuth2AuthenticationTests(OAuth2AllowInActiveUsersTests):  # pylint: disab
         # Since this is testing back to previous version, user should be set to true
         self.user.is_active = True
         self.user.save()
-
-
