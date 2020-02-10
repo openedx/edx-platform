@@ -100,5 +100,8 @@ class HtmlOutlineWriter(object):
     def end_section(self):
         self.fout.write(self.SECTION_END)
 
+    def end_body(self):
+        self.fout.write("</body>")
+
     def write(self, html):
         self.fout.write(html)

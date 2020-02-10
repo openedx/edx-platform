@@ -235,6 +235,7 @@ def write_html_report(warnings_dataframe, html_path, css_file_name):
                     html_writer.end_section()
                 html_writer.end_section()
             html_writer.end_section()
+        html_writer.end_body()
 
 
 if __name__ == "__main__":

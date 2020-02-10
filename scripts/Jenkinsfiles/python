@@ -29,7 +29,7 @@ def createWarningsReport(fileExtension){
     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
                             reportDir: 'reports/pytest_warnings', reportFiles: "${warning_filename}",
                             reportName: "${warning_filename}", reportTitles: ''])
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/pytest_warnings/*.html'
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/pytest_warnings/*.html, reports/pytest_warnings/*.css'
 }
 
 
