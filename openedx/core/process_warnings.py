@@ -176,7 +176,7 @@ def write_html_report(warnings_dataframe, html_path, css_file_name):
         css_file_path = dir_path + "/" + css_file_name
 
     with io.open(html_path, "w") as html_fout, io.open(css_file_path, "w") as css_fout:
-        html_writer = HtmlOutlineWriter(html_fout,css_fout, css_file_path)
+        html_writer = HtmlOutlineWriter(html_fout, css_fout, css_file_path)
         category_sorted_by_count = group_and_sort_by_sumof(
             warnings_dataframe, "category", "num"
         )

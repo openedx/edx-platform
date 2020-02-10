@@ -67,7 +67,7 @@ class HtmlOutlineWriter(object):
         <meta charset="utf-8" />
         <link rel = "stylesheet" type = "text/css" href = "css_default.css" />
         </head>
-        
+
         <body>
     """
     )
@@ -86,7 +86,7 @@ class HtmlOutlineWriter(object):
     def __init__(self, html_fout, css_fout, css_path):
         self.fout = html_fout
         self.section_id = 0
-        self.HEAD = self.HEAD.replace("css_default.css",css_path)
+        self.HEAD = self.HEAD.replace("css_default.css", css_path)
         # writing out style to external css file
         css_fout.write(self.STYLE)
         self.fout.write(self.HEAD)
