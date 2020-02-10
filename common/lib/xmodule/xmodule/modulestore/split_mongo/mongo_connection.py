@@ -256,7 +256,7 @@ class CourseStructureCache(object):
             return None
 
         with TIMER.timer("CourseStructureCache.set", course_context) as tagger:
-            pickled_data = pickle.dumps(structure, 2)  # Protocol can't be incremented until cache is cleared
+            pickled_data = pickle.dumps(structure, 4)  # Protocol can't be incremented until cache is cleared
             tagger.measure('uncompressed_size', len(pickled_data))
 
             # 1 = Fastest (slightly larger results)
