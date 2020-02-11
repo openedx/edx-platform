@@ -10,7 +10,9 @@ from django.utils.translation import ugettext as _
         % if course_date.date:
             <p class="hd hd-6 date localized-datetime" data-format="shortDate" data-datetime="${course_date.date}" data-timezone="${user_timezone}" data-language="${user_language}"></p>
         % endif
-        % if course_date.title:
+        % if course_date.title_html:
+            <div class="hd hd-6 heading">${course_date.title_html}</div>
+        % elif course_date.title:
             <div class="hd hd-6 heading">${course_date.title}</div>
         % endif
         % if course_date.description:

@@ -63,6 +63,11 @@ class DateSummary(object):
         return ''
 
     @property
+    def title_html(self):
+        """The title as html for this summary."""
+        return ''
+
+    @property
     def description(self):
         """The detail text displayed by this summary."""
         return ''
@@ -340,6 +345,7 @@ class CourseAssignmentDate(DateSummary):
         super().__init__(*args, **kwargs)
         self.assignment_date = None
         self.assignment_title = None
+        self.assignment_title_html = None
 
     @property
     def date(self):
@@ -353,13 +359,17 @@ class CourseAssignmentDate(DateSummary):
     def title(self):
         return self.assignment_title
 
+    @property
+    def title_html(self):
+        return self.assignment_title_html
+
     def set_title(self, title, link=None):
+        """ Used to set the title_html and title properties for the assignment date block """
         if link:
-            self.assignment_title = HTML(
+            self.assignment_title_html = HTML(
                 '<a href="{assignment_link}">{assignment_title}</a>'
             ).format(assignment_link=link, assignment_title=title)
-        else:
-            self.assignment_title = title
+        self.assignment_title = title
 
 
 class CourseExpiredDate(DateSummary):

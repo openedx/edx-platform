@@ -15,6 +15,7 @@ from django.conf import settings
 from django.db.models import Prefetch
 from django.http import Http404, QueryDict
 from django.urls import reverse
+from django.utils.translation import ugettext as _
 from edx_django_utils.monitoring import function_trace
 from edx_when.api import get_dates_for_course
 from fs.errors import ResourceNotFound
@@ -442,11 +443,12 @@ def get_course_assignment_due_dates(course, user, request, num_return=None, incl
 
                 block_url = None
                 now = datetime.now().replace(tzinfo=pytz.UTC)
-                assignment_released = item.start < now
+                assignment_released = item.start < now if item.start else None
                 if assignment_released:
                     block_url = reverse('jump_to', args=[course.id, block_key])
                     block_url = request.build_absolute_uri(block_url) if request else None
-                date_block.set_title(item.display_name, block_url)
+                assignment_title = item.display_name if item.display_name else _('Assignment')
+                date_block.set_title(assignment_title, block_url)
 
                 date_blocks.append(date_block)
     date_blocks = sorted((b for b in date_blocks if b.is_enabled or include_past_dates), key=date_block_key_fn)

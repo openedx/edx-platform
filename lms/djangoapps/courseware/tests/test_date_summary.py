@@ -132,7 +132,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
         self.assert_block_types(course, user, expected_blocks)
 
-    def test_enabled_block_types_with_assignments(self):
+    def test_enabled_block_types_with_assignments(self):  # pylint: disable=too-many-statements
         """
         Creates a course with multiple subsections to test all of the different
         cases for assignment dates showing up. Mocks out calling the edx-when
@@ -187,6 +187,24 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                 due=now - timedelta(days=7),
                 graded=False,
             )
+            subsection_6 = ItemFactory.create(
+                category='sequential',
+                display_name='No start date',
+                parent_location=section.location,
+                start=None,
+                due=now + timedelta(days=9),
+                graded=True,
+            )
+            subsection_7 = ItemFactory.create(
+                category='sequential',
+                # Setting display name to None should set the assignment title to 'Assignment'
+                display_name=None,
+                parent_location=section.location,
+                start=now - timedelta(days=14),
+                due=now + timedelta(days=10),
+                graded=True,
+            )
+            dummy_subsection = ItemFactory.create(category='sequential')
 
         with patch('lms.djangoapps.courseware.courses.get_dates_for_course') as mock_get_dates:
             mock_get_dates.return_value = {
@@ -200,6 +218,12 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                 (subsection_4.location, 'start'): subsection_4.start,
                 (subsection_5.location, 'due'): subsection_5.due,
                 (subsection_5.location, 'start'): subsection_5.start,
+                (subsection_6.location, 'due'): subsection_6.due,
+                (subsection_7.location, 'due'): subsection_7.due,
+                (subsection_7.location, 'start'): subsection_7.start,
+                # Adding this in for the case where we return a block that
+                # doesn't actually exist as part of the course. Should just be ignored.
+                (dummy_subsection.location, 'due'): dummy_subsection.due,
             }
             # Standard widget case where we restrict the number of assignments.
             expected_blocks = (
@@ -210,7 +234,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             self.assertEqual(set(type(b) for b in blocks), set(expected_blocks))
             assignment_blocks = filter(lambda b: isinstance(b, CourseAssignmentDate), blocks)
             for assignment in assignment_blocks:
-                assignment_title = str(assignment.title)
+                assignment_title = str(assignment.title_html) or str(assignment.title)
                 self.assertNotEqual(assignment_title, 'Third nearest assignment')
                 self.assertNotEqual(assignment_title, 'Past due date')
                 self.assertNotEqual(assignment_title, 'Not returned since we do not get non-graded subsections')
@@ -226,14 +250,15 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             # No restrictions on number of assignments to return
             expected_blocks = (
                 CourseStartDate, TodaysDate, CourseAssignmentDate, CourseAssignmentDate, CourseAssignmentDate,
-                CourseAssignmentDate, CourseEndDate, VerificationDeadlineDate
+                CourseAssignmentDate, CourseAssignmentDate, CourseAssignmentDate, CourseEndDate,
+                VerificationDeadlineDate
             )
             blocks = get_course_date_blocks(course, user, request, include_past_dates=True)
             self.assertEqual(len(blocks), len(expected_blocks))
             self.assertEqual(set(type(b) for b in blocks), set(expected_blocks))
             assignment_blocks = filter(lambda b: isinstance(b, CourseAssignmentDate), blocks)
             for assignment in assignment_blocks:
-                assignment_title = str(assignment.title)
+                assignment_title = str(assignment.title_html) or str(assignment.title)
                 self.assertNotEqual(assignment_title, 'Not returned since we do not get non-graded subsections')
                 # checking if it is _in_ the title instead of being the title since released assignments
                 # are actually links. Unreleased assignments are just the string of the title.
@@ -249,6 +274,15 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                         self.assertNotIn(html_tag, assignment_title)
                 elif 'Past due date' in assignment_title:
                     self.assertGreater(now, assignment.date)
+                    for html_tag in assignment_title_html:
+                        self.assertIn(html_tag, assignment_title)
+                elif 'No start date' == assignment_title:
+                    # Can't determine if it is released so it does not get a link
+                    for html_tag in assignment_title_html:
+                        self.assertNotIn(html_tag, assignment_title)
+                # This is the item with no display name where we set one ourselves.
+                elif 'Assignment' in assignment_title:
+                    # Can't determine if it is released so it does not get a link
                     for html_tag in assignment_title_html:
                         self.assertIn(html_tag, assignment_title)
 
