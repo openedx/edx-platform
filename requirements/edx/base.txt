@@ -176,7 +176,7 @@ numpy==1.6.2
 oauth2==1.9.0.post1
 oauthlib==2.1.0
 openapi-codec==1.3.2      # via django-rest-swagger
-openedx-caliper-tracking==0.11.7
+openedx-caliper-tracking==0.11.8
 path.py==8.2.1
 pathtools==0.1.2
 paver==1.3.4
