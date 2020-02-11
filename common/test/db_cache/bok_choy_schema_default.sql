@@ -2552,7 +2552,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=651 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=653 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3519,6 +3519,7 @@ CREATE TABLE `entitlements_courseentitlement` (
   `refund_locked` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `entitlements_courseentitlement_uuid_2228ffad_uniq` (`uuid`),
+  UNIQUE KEY `entitlements_courseentit_course_uuid_order_number_b37c9e13_uniq` (`course_uuid`,`order_number`),
   KEY `entitlements_courseentitlement_user_id_a518a225_fk_auth_user_id` (`user_id`),
   KEY `entitlements_coursee_enrollment_course_ru_3fc796af_fk_student_c` (`enrollment_course_run_id`),
   KEY `entitlements_coursee__policy_id_37bd7c13_fk_entitleme` (`_policy_id`),
@@ -4968,7 +4969,7 @@ CREATE TABLE `sap_success_factors_sapsuccessfactorsenterprisecustomerconfidb8a` 
   `show_course_price` tinyint(1) NOT NULL,
   `channel_worker_username` varchar(255) DEFAULT NULL,
   `catalogs_to_transmit` longtext,
-  `show_total_hours` tinyint(1) NOT NULL,
+  `transmit_total_hours` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `enterprise_customer_id` (`enterprise_customer_id`),
   CONSTRAINT `sap_success_factors__enterprise_customer__4819a28c_fk_enterpris` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
@@ -5007,6 +5008,7 @@ CREATE TABLE `sap_success_factors_sapsuccessfactorslearnerdatatransmission3ce5` 
   `status` varchar(100) NOT NULL,
   `error_message` longtext NOT NULL,
   `created` datetime(6) NOT NULL,
+  `total_hours` double DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `sap_success_factors_sapsucc_enterprise_course_enrollmen_99be77d5` (`enterprise_course_enrollment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
