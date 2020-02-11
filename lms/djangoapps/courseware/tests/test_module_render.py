@@ -1595,7 +1595,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
 
     def test_course_image(self):
         url = course_image_url(self.course)
-        self.assertTrue(url.startswith('/c4x/'))
+        self.assertTrue(url.startswith('/static/'))
 
         self.course.static_asset_path = "toy_course_dir"
         url = course_image_url(self.course)

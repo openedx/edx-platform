@@ -31,11 +31,3 @@ def generate_manual_verification_for_user(sender, instance, created, **kwargs):
     except Exception:  # pylint: disable=broad-except
         logger.error('Error while generating ManualVerification for user: %s', instance.user.email, exc_info=True)
 
-
-@receiver(pre_save, sender=CourseOverview)
-def course_image_change(sender, instance, **kwargs):
-    """
-    Change the default course image whenever new course is created
-    """
-    if instance.course_image_url.endswith('images_course_image.jpg'):
-        instance.course_image_url = "/static/" + settings.DEFAULT_COURSE_ABOUT_IMAGE_URL

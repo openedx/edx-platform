@@ -33,12 +33,15 @@ def course_image_url(course, image_key='course_image'):
         url = settings.STATIC_URL + settings.DEFAULT_COURSE_ABOUT_IMAGE_URL
     else:
         loc = StaticContent.compute_location(course.id, getattr(course, image_key))
-        try:
-            AssetManager.find(loc)
-        except NotFoundError:
-            url = '/static/' + settings.DEFAULT_COURSE_ABOUT_IMAGE_URL
-        else:
-            url = StaticContent.serialize_asset_key_with_slash(loc)
+        if getattr(course, image_key).endswith('images_course_image.jpg'):
+            try:
+                AssetManager.find(loc)
+            except NotFoundError:
+                url = '/static/' + settings.DEFAULT_COURSE_ABOUT_IMAGE_URL
+                return url
+
+        url = StaticContent.serialize_asset_key_with_slash(loc)
+
     return url
 
 

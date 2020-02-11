@@ -3,6 +3,7 @@ Tests for functionality in openedx/core/lib/courses.py.
 """
 
 import ddt
+from django.conf import settings
 from django.test.utils import override_settings
 
 from xmodule.modulestore import ModuleStoreEnum
@@ -29,7 +30,7 @@ class CourseImageTestCase(ModuleStoreTestCase):
         """Test image URL formatting."""
         course = CourseFactory.create()
         self.verify_url(
-            unicode(course.id.make_asset_key('asset', course.course_image)),
+            '/static/' + settings.DEFAULT_COURSE_ABOUT_IMAGE_URL,
             course_image_url(course)
         )
 
