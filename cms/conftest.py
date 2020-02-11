@@ -39,7 +39,6 @@ def pytest_configure(config):
     startup.run()
 
 
-
 @pytest.fixture(autouse=True, scope='function')
 def _django_clear_site_cache():
     """
