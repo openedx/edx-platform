@@ -293,7 +293,8 @@ class UserRetirementStatus(TimeStampedModel):
                 raise ValueError()
         except ValueError:
             err = u'{} does not exist or is an eariler state than current state {}'.format(
-                new_state, self.current_state)
+                new_state, self.current_state
+            )
             raise RetirementStateError(err)
 
     def _validate_update_data(self, data):
@@ -307,7 +308,8 @@ class UserRetirementStatus(TimeStampedModel):
         for required_key in required_keys:
             if required_key not in data:
                 raise RetirementStateError(u'RetirementStatus: Required key {} missing from update'.format(
-                    required_key))
+                    required_key
+                ))
 
         for key in data:
             if key not in known_keys:
