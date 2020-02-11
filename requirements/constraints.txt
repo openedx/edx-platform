@@ -17,9 +17,6 @@ django-debug-toolbar<2.0
 # Version 1.2.0 dropped support for Django 1.11
 django-oauth-toolkit<1.2.0
 
-# Version 1.0.0 dropped support for Django 1.11 simultaneously with adding support for 2.x
-django-method-override<1.0.0
-
 # Version 4.0.0 dropped support for Django < 2.0.1
 django-model-utils<4.0.0
 
