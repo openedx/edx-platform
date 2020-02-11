@@ -12,7 +12,7 @@ from rest_framework.exceptions import APIException
 
 from badges.models import BadgeAssertion
 from openedx.core.djangoapps.user_api.permissions import is_field_shared_factory
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUserDeprecated
+from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 
 from .serializers import BadgeAssertionSerializer
 
@@ -94,7 +94,7 @@ class UserBadgeAssertions(generics.ListAPIView):
     """
     serializer_class = BadgeAssertionSerializer
     authentication_classes = (
-        OAuth2AuthenticationAllowInactiveUserDeprecated,
+        OAuth2AuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser
     )
     permission_classes = (is_field_shared_factory("accomplishments_shared"),)

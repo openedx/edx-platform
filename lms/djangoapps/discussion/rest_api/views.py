@@ -56,40 +56,14 @@ from openedx.core.djangoapps.django_comment_common.utils import (
 )
 from openedx.core.djangoapps.user_api.accounts.permissions import CanReplaceUsername, CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
-from openedx.core.lib.api.authentication import (
-    OAuth2AuthenticationAllowInactiveUserDeprecated,
-    OAuth2AuthenticationAllowInactiveUser
-)
+from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
-
-# .. toggle_name: DISCUSSION_USE_NEW_OAUTH2_CLASS
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Toggle for replacing a deprecated class with its replacement
-# .. toggle_category: n/a
-# .. toggle_use_cases: Monitored Rollout
-# .. toggle_creation_date: 2020-01-31
-# .. toggle_expiration_date: 2020-02-28
-# .. toggle_warnings: None
-# .. toggle_tickets: BOM-1037
-# .. toggle_status: supported
-if getattr(settings, "DISCUSSION_USE_NEW_OAUTH2_CLASS", False):
-    _discussion_configured_authentication_classes = (
-        JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
-        SessionAuthenticationAllowInactiveUser,
-    )
-else:
-    _discussion_configured_authentication_classes = (
-        JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUserDeprecated,
-        SessionAuthenticationAllowInactiveUser,
-    )
 
 
 @view_auth_classes()
@@ -777,7 +751,11 @@ class CourseDiscussionSettingsAPIView(DeveloperErrorViewMixin, APIView):
         * available_division_schemes: A list of available division schemes for the course.
 
     """
-    authentication_classes = _discussion_configured_authentication_classes
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
     parser_classes = (JSONParser, MergePatchParser,)
     permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
 
@@ -908,7 +886,11 @@ class CourseDiscussionRolesAPIView(DeveloperErrorViewMixin, APIView):
 
         * division_scheme: The division scheme used by the course.
     """
-    authentication_classes = _discussion_configured_authentication_classes
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
     permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
 
     def _get_request_kwargs(self, course_id, rolename):
