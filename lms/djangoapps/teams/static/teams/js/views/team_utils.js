@@ -75,20 +75,19 @@
             },
 
             /** Shows info/error banner for team membership CSV upload
-             * 
              * @param: content - string or array for display
              * @param: isError - true sets error styling, false/none uses info styling
              */
-            showInfoBanner: function (content, isError) {
+            showInfoBanner: function(content, isError) {
                 // clear message
-                var messageElement = $('#team-management-assign .page-banner .message-content');
-                messageElement.html("");
+                var $message = $('#team-management-assign .page-banner .message-content');
+                $message.html('');
 
                 // set message
-                if(Array.isArray(content)) {
+                if (Array.isArray(content)) {
                     content.forEach(function(item) {
                         // xss-lint: disable=javascript-jquery-append
-                        messageElement.append($('<p>').text(item));
+                        $message.append($('<p>').text(item));
                     });
                 } else {
                     $('#team-management-assign .page-banner .message-content').text(content);
