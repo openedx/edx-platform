@@ -91,17 +91,13 @@ def i18n_dummy():
 @task
 @needs(
     "pavelib.prereqs.install_prereqs",
-    "pavelib.i18n.i18n_validate_gettext",
 )
-@cmdopts([
-    ("settings=", "s", "The settings to use (defaults to devstack)"),
-])
 @timed
 def i18n_compilejs(options):
     """
-    Generating djangojs.mo file using django-statici18n
+    Generating djangojs.js files using django-statici18n
     """
-    settings = options.get('settings', DEFAULT_SETTINGS)
+    settings = 'devstack_docker'
 
     # Generate static i18n JS files.
     for system in ['lms', 'cms']:
