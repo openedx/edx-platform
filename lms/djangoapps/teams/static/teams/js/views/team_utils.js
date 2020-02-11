@@ -86,7 +86,7 @@
 
                 // set message
                 if(Array.isArray(content)) {
-                    content.forEach(item => {
+                    content.forEach(function(item) {
                         // xss-lint: disable=javascript-jquery-append
                         messageElement.append($('<p>').text(item));
                     });
