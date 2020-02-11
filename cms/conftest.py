@@ -24,6 +24,10 @@ def pytest_configure(config):
     """
     Do core setup operations from manage.py before collecting tests.
     """
+
+    if config.pluginmanager.hasplugin("json-report"):
+        config.pluginmanager.register(DeferPlugin())
+
     if config.getoption('help'):
         return
     enable_contracts = os.environ.get('ENABLE_CONTRACTS', False)
@@ -34,8 +38,6 @@ def pytest_configure(config):
     startup = importlib.import_module(startup_module)
     startup.run()
 
-    if config.pluginmanager.hasplugin("json-report"):
-        config.pluginmanager.register(DeferPlugin())
 
 
 @pytest.fixture(autouse=True, scope='function')
