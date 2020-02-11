@@ -31,9 +31,9 @@ babel==2.8.0
 beautifulsoup4==4.8.2     # via pynliner
 billiard==3.3.0.23        # via celery
 bleach==3.1.0
-boto3==1.4.8
+boto3==1.11.14
+botocore==1.14.15
 boto==2.39.0
-botocore==1.8.17
 git+https://github.com/edx/bridgekeeper.git@2423e8d8788c2132ebeec509e1a7b17e1f5b9364#egg=bridgekeeper==0.0
 git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
 celery==3.1.25
