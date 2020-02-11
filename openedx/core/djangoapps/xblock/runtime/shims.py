@@ -11,6 +11,7 @@ from django.core.cache import cache
 from django.template import TemplateDoesNotExist
 from django.utils.functional import cached_property
 from fs.memoryfs import MemoryFS
+from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 import six
 
 from edxmako.shortcuts import render_to_string
@@ -270,7 +271,12 @@ class RuntimeShim(object):
         Seems only to be used by capa. Remove this if capa can be refactored.
         """
         # TODO: Refactor capa to access this directly, don't bother the runtime. Then remove it from here.
-        return settings.STATIC_URL
+        static_url = settings.STATIC_URL
+        if static_url.startswith('/') and not static_url.startswith('//'):
+            # This is not a full URL - should start with https:// to support loading assets from an iframe sandbox
+            site_root_url = get_xblock_app_config().get_site_root_url()
+            static_url = site_root_url + static_url
+        return static_url
 
     @cached_property
     def user_is_staff(self):
