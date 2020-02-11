@@ -16,6 +16,7 @@ from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy
 from django_countries.fields import CountryField
 from model_utils import FieldTracker
+from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 
 from lms.djangoapps.teams import TEAM_DISCUSSION_CONTEXT
@@ -346,3 +347,28 @@ class CourseTeamMembership(models.Model):
         emit_team_event('edx.team.activity_updated', membership.team.course_id, {
             'team_id': membership.team.team_id,
         })
+
+
+class CourseTeamMeeting(TimeStampedModel):
+    """
+    Records the association between a CourseTeam and a Chime Meeting.
+    """
+    class Meta(object):
+        app_label = "teams"
+        unique_together = (('team', 'meeting_id'),)
+
+    team = models.ForeignKey(CourseTeam, related_name='meetings', on_delete=models.CASCADE)
+    meeting_id = models.UUIDField('The Chime Meeting Identifier', blank=False, null=False)
+
+
+class CourseTeamMeetingAttendee(TimeStampedModel):
+    """
+    Records the association between a CourseTeamMeeting and a User.
+    """
+    class Meta(object):
+        app_label = "teams"
+        unique_together = (('meeting', 'user'),)
+
+    meeting = models.ForeignKey(CourseTeamMeeting, related_name='attendees', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, blank=False, null=False)
+    attended = models.BooleanField()
