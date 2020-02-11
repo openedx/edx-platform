@@ -12,8 +12,7 @@ import os
 import contracts
 import pytest
 
-from openedx.core.pytest_hooks import pytest_json_modifyreport  # pylint: disable=unused-import
-from openedx.core.pytest_hooks import pytest_sessionfinish  # pylint: disable=unused-import
+from openedx.core.pytest_hooks import DeferPlugin
 
 
 # Patch the xml libs before anything else.
@@ -34,6 +33,9 @@ def pytest_configure(config):
     startup_module = 'cms.startup' if settings_module.startswith('cms') else 'lms.startup'
     startup = importlib.import_module(startup_module)
     startup.run()
+
+    if config.pluginmanager.hasplugin("json-report"):
+        config.pluginmanager.register(DeferPlugin())
 
 
 @pytest.fixture(autouse=True, scope='function')
