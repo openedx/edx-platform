@@ -23,7 +23,7 @@ def apply_settings(django_settings):
     django_settings.FIELDS_STORED_IN_SESSION = ['auth_entry', 'next']
 
     # Inject exception middleware to make redirects fire.
-    django_settings.MIDDLEWARE_CLASSES.extend(
+    django_settings.MIDDLEWARE.extend(
         ['third_party_auth.middleware.ExceptionMiddleware']
     )
 
