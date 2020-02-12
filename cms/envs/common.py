@@ -12,12 +12,9 @@ make one call at the end of your site-specific dev file to reset all the
 dependent variables (like INSTALLED_APPS) for you.
 
 Longer TODO:
-1. Right now our treatment of static content in general and in particular
-   course-specific static content is haphazard.
-2. We should have a more disciplined approach to feature flagging, even if it
-   just means that we stick them in a dict called FEATURES.
-3. We need to handle configuration for multiple courses. This could be as
-   multiple sites, but we do need a way to map their data assets.
+1. Right now our treatment of static content in general and in particular course-specific static content is haphazard.
+2. We should have a more disciplined approach to feature flagging, even if it just means that we stick them in a dict called FEATURES.
+3. We need to handle configuration for multiple courses. This could be as multiple sites, but we do need a way to map their data assets.
 
 When refering to XBlocks, we use the entry-point name. For example,
 |   setup(
@@ -156,7 +153,7 @@ PLATFORM_DESCRIPTION = _('Your Platform Description Here')
 PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount"
 PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
 
-# Dummy secret key for dev/test
+#: Dummy secret key for dev/test
 SECRET_KEY = 'dev key'
 FAVICON_PATH = 'images/favicon.ico'
 STUDIO_NAME = _("Your Platform Studio")
@@ -391,8 +388,8 @@ FEATURES = {
 
 ENABLE_JASMINE = False
 
-# List of logout URIs for each IDA that the learner should be logged out of when they logout of the LMS. Only applies to
-# IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
+#: List of logout URIs for each IDA that the learner should be logged out of when they logout of the LMS. Only applies to
+#: IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
 IDA_LOGOUT_URI_LIST = []
 
 ############################# SOCIAL MEDIA SHARING #############################
@@ -407,8 +404,8 @@ SOCIAL_SHARING_SETTINGS = {
 
 SOCIAL_MEDIA_FOOTER_URLS = {}
 
-# This is just a placeholder image.
-# Site operators can customize this with their organization's image.
+#: This is just a placeholder image.
+#: Site operators can customize this with their organization's image.
 FOOTER_ORGANIZATION_IMAGE = "images/logo.png"
 
 ############################# SET PATH INFORMATION #############################
@@ -427,7 +424,7 @@ sys.path.append(REPO_ROOT)
 sys.path.append(PROJECT_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 
-# For geolocation ip database
+#: For geolocation ip database
 GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoLite2-Country.mmdb"
 
 DATA_DIR = COURSES_ROOT
@@ -444,7 +441,7 @@ BRANCH_IO_KEY = ''
 GOOGLE_ANALYTICS_ACCOUNT = None
 
 ############################# TEMPLATE CONFIGURATION #############################
-# Mako templating
+#: Mako templating
 import tempfile
 MAKO_MODULE_DIR = os.path.join(tempfile.gettempdir(), 'mako_cms')
 MAKO_TEMPLATE_DIRS_BASE = [
@@ -469,7 +466,7 @@ CONTEXT_PROCESSORS = (
     'openedx.core.djangoapps.site_configuration.context_processors.configuration_context',
 )
 
-# Django templating
+#: Django templating
 TEMPLATES = [
     {
         'NAME': 'django',
@@ -520,11 +517,11 @@ derived_collection_entry('TEMPLATES', 1, 'DIRS')
 DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
 
 #################################### AWS #######################################
-# S3BotoStorage insists on a timeout for uploaded assets. We should make it
-# permanent instead, but rather than trying to figure out exactly where that
-# setting is, I'm just bumping the expiration time to something absurd (100
-# years). This is only used if DEFAULT_FILE_STORAGE is overriden to use S3
-# in the global settings.py
+#: S3BotoStorage insists on a timeout for uploaded assets. We should make it
+#: permanent instead, but rather than trying to figure out exactly where that
+#: setting is, I'm just bumping the expiration time to something absurd (100
+#: years). This is only used if DEFAULT_FILE_STORAGE is overriden to use S3
+#: in the global settings.py
 AWS_SES_REGION_NAME = 'us-east-1'
 AWS_SES_REGION_ENDPOINT = 'email.us-east-1.amazonaws.com'
 AWS_ACCESS_KEY_ID = None
@@ -537,7 +534,7 @@ AWS_S3_CUSTOM_DOMAIN = 'SET-ME-PLEASE (ex. bucket-name.s3.amazonaws.com)'
 
 EDX_ROOT_URL = ''
 
-# use the ratelimit backend to prevent brute force attacks
+#: use the ratelimit backend to prevent brute force attacks
 AUTHENTICATION_BACKENDS = [
     'rules.permissions.ObjectPermissionBackend',
     'openedx.core.djangoapps.oauth_dispatch.dot_overrides.backends.EdxRateLimitedAllowAllUsersModelBackend',
@@ -546,7 +543,7 @@ AUTHENTICATION_BACKENDS = [
 
 STATIC_ROOT_BASE = '/edx/var/edxapp/staticfiles'
 
-# License for serving content in China
+#: License for serving content in China
 ICP_LICENSE = None
 ICP_LICENSE_INFO = {}
 
@@ -557,7 +554,7 @@ LMS_ROOT_URL = "https://localhost:18000"
 LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
 
 LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/home/'
-# TODO: Determine if LOGIN_URL could be set to the FRONTEND_LOGIN_URL value instead.
+#: TODO: Determine if LOGIN_URL could be set to the FRONTEND_LOGIN_URL value instead.
 LOGIN_URL = reverse_lazy('login_redirect_to_lms')
 FRONTEND_LOGIN_URL = lambda settings: settings.LMS_ROOT_URL + '/login'
 derived('FRONTEND_LOGIN_URL')
@@ -571,7 +568,7 @@ ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
 ENTERPRISE_CONSENT_API_URL = LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
 
-# Public domain name of Studio (should be resolvable from the end-user's browser)
+#: Public domain name of Studio (should be resolvable from the end-user's browser)
 CMS_BASE = 'localhost:18010'
 
 LOG_DIR = '/edx/var/log/edx'
@@ -583,8 +580,8 @@ MAINTENANCE_BANNER_TEXT = 'Sample banner message'
 WIKI_ENABLED = True
 
 CERT_QUEUE = 'certificates'
-# List of logout URIs for each IDA that the learner should be logged out of when they logout of
-# Studio. Only applies to IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
+#: List of logout URIs for each IDA that the learner should be logged out of when they logout of
+#: Studio. Only applies to IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
 IDA_LOGOUT_URI_LIST = []
 
 ELASTIC_SEARCH_CONFIG = [
@@ -595,18 +592,18 @@ ELASTIC_SEARCH_CONFIG = [
     }
 ]
 
-# These are standard regexes for pulling out info like course_ids, usage_ids, etc.
-# They are used so that URLs with deprecated-format strings still work.
+#: These are standard regexes for pulling out info like course_ids, usage_ids, etc.
+#: They are used so that URLs with deprecated-format strings still work.
 from lms.envs.common import (
     COURSE_KEY_PATTERN, COURSE_KEY_REGEX, COURSE_ID_PATTERN, USAGE_KEY_PATTERN, ASSET_KEY_PATTERN
 )
 
 ######################### CSRF #########################################
 
-# Forwards-compatibility with Django 1.7
+#: Forwards-compatibility with Django 1.7
 CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
-# It is highly recommended that you override this in any environment accessed by
-# end users
+#: It is highly recommended that you override this in any environment accessed by
+#: end users
 CSRF_COOKIE_SECURE = False
 
 CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ''
@@ -705,10 +702,10 @@ MIDDLEWARE = [
 
 EXTRA_MIDDLEWARE_CLASSES = []
 
-# Clickjacking protection can be disabled by setting this to 'ALLOW'
+#: Clickjacking protection can be disabled by setting this to 'ALLOW'
 X_FRAME_OPTIONS = 'DENY'
 
-# Platform for Privacy Preferences header
+#: Platform for Privacy Preferences header
 P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
 
 ############# XBlock Configuration ##########
@@ -718,9 +715,9 @@ from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore import prefer_xmodules
 from xmodule.x_module import XModuleMixin
 
-# These are the Mixins that should be added to every XBlock.
-# This should be moved into an XBlock Runtime/Application object
-# once the responsibility of XBlock creation is moved out of modulestore - cpennington
+#: These are the Mixins that should be added to every XBlock.
+#: This should be moved into an XBlock Runtime/Application object
+#: once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (
     LmsBlockMixin,
     InheritanceMixin,
@@ -731,15 +728,15 @@ XBLOCK_MIXINS = (
 
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
-# Paths to wrapper methods which should be applied to every XBlock's FieldData.
+#: Paths to wrapper methods which should be applied to every XBlock's FieldData.
 XBLOCK_FIELD_DATA_WRAPPERS = ()
 
 ############################ ORA 2 ############################################
 
-# By default, don't use a file prefix
+#: By default, don't use a file prefix
 ORA2_FILE_PREFIX = 'default_env-default_deployment/ora2'
 
-# Default File Upload Storage bucket and prefix. Used by the FileUpload Service.
+#: Default File Upload Storage bucket and prefix. Used by the FileUpload Service.
 FILE_UPLOAD_STORAGE_BUCKET_NAME = 'SET-ME-PLEASE (ex. bucket-name)'
 FILE_UPLOAD_STORAGE_PREFIX = 'submissions_attachments'
 
@@ -816,8 +813,8 @@ MODULESTORE = {
     }
 }
 
-# Modulestore-level field override providers. These field override providers don't
-# require student context.
+#: Modulestore-level field override providers. These field override providers don't
+#: require student context.
 MODULESTORE_FIELD_OVERRIDE_PROVIDERS = ()
 
 DATABASES = {
@@ -880,19 +877,19 @@ CODE_JAIL = {
     },
 }
 
-# Some courses are allowed to run unsafe code. This is a list of regexes, one
-# of them must match the course id for that course to run unsafe code.
+#: Some courses are allowed to run unsafe code. This is a list of regexes, one
+#: of them must match the course id for that course to run unsafe code.
 #
-# For example:
+#: For example:
 #
-#   COURSES_WITH_UNSAFE_CODE = [
-#       r"Harvard/XY123.1/.*"
-#   ]
+#:   COURSES_WITH_UNSAFE_CODE = [
+#:       r"Harvard/XY123.1/.*"
+#:   ]
 
 COURSES_WITH_UNSAFE_CODE = []
 
 ############################ DJANGO_BUILTINS ################################
-# Change DEBUG in your environment settings files, not here
+#: Change DEBUG in your environment settings files, not here
 DEBUG = False
 SESSION_COOKIE_SECURE = False
 SESSION_SAVE_EVERY_REQUEST = False
@@ -900,7 +897,7 @@ SESSION_SERIALIZER = 'openedx.core.lib.session_serializers.PickleSerializer'
 SESSION_COOKIE_DOMAIN = ""
 SESSION_COOKIE_NAME = 'sessionid'
 
-# Site info
+#: Site info
 SITE_NAME = "localhost"
 HTTPS = 'on'
 ROOT_URLCONF = 'cms.urls'
@@ -933,10 +930,10 @@ PRESS_EMAIL = 'press@example.com'
 ADMINS = []
 MANAGERS = ADMINS
 
-# Initialize to 'release', but read from JSON in production.py
+#: Initialize to 'release', but read from JSON in production.py
 EDX_PLATFORM_REVISION = 'release'
 
-# Static content
+#: Static content
 STATIC_URL = '/static/studio/'
 STATIC_ROOT = ENV_ROOT / "staticfiles" / 'studio'
 
@@ -948,7 +945,7 @@ STATICFILES_DIRS = [
     # ("book", ENV_ROOT / "book_images"),
 ]
 
-# Locale/Internationalization
+#: Locale/Internationalization
 CELERY_TIMEZONE = 'UTC'
 TIME_ZONE = 'UTC'
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -959,7 +956,7 @@ LANGUAGE_COOKIE = lms.envs.common.LANGUAGE_COOKIE
 LANGUAGES = lms.envs.common.LANGUAGES
 LANGUAGE_DICT = dict(LANGUAGES)
 
-# Languages supported for custom course certificate templates
+#: Languages supported for custom course certificate templates
 CERTIFICATE_TEMPLATE_LANGUAGES = {
     'en': 'English',
     'es': 'Español',
@@ -974,7 +971,7 @@ STATICI18N_ROOT = PROJECT_ROOT / "static"
 LOCALE_PATHS = _make_locale_paths
 derived('LOCALE_PATHS')
 
-# Messages
+#: Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 COURSE_IMPORT_EXPORT_STORAGE = 'django.core.files.storage.FileSystemStorage'
@@ -1000,8 +997,8 @@ PIPELINE = {
 STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 STATICFILES_STORAGE_KWARGS = {}
 
-# List of finder classes that know how to find static files in various locations.
-# Note: the pipeline finder is included to be able to discover optimized files
+#: List of finder classes that know how to find static files in various locations.
+#: Note: the pipeline finder is included to be able to discover optimized files
 STATICFILES_FINDERS = [
     'openedx.core.djangoapps.theming.finders.ThemeFilesFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -1108,8 +1105,8 @@ base_vendor_js = [
     'common/js/vendor/require.js'
 ]
 
-# test_order: Determines the position of this chunk of javascript on
-# the jasmine test page
+#: test_order: Determines the position of this chunk of javascript on
+#: the jasmine test page
 PIPELINE['JAVASCRIPT'] = {
     'base_vendor': {
         'source_filenames': base_vendor_js,
@@ -1151,19 +1148,19 @@ STATICFILES_IGNORE_PATTERNS = (
 ################################# DJANGO-REQUIRE ###############################
 
 
-# The baseUrl to pass to the r.js optimizer, relative to STATIC_ROOT.
+#: The baseUrl to pass to the r.js optimizer, relative to STATIC_ROOT.
 REQUIRE_BASE_URL = "./"
 
-# The name of a build profile to use for your project, relative to REQUIRE_BASE_URL.
-# A sensible value would be 'app.build.js'. Leave blank to use the built-in default build profile.
-# Set to False to disable running the default profile (e.g. if only using it to build Standalone
-# Modules)
+#: The name of a build profile to use for your project, relative to REQUIRE_BASE_URL.
+#: A sensible value would be 'app.build.js'. Leave blank to use the built-in default build profile.
+#: Set to False to disable running the default profile (e.g. if only using it to build Standalone
+#: Modules)
 REQUIRE_BUILD_PROFILE = "cms/js/build.js"
 
-# The name of the require.js script used by your project, relative to REQUIRE_BASE_URL.
+#: The name of the require.js script used by your project, relative to REQUIRE_BASE_URL.
 REQUIRE_JS = "js/vendor/requiresjs/require.js"
 
-# Whether to run django-require in debug mode.
+#: Whether to run django-require in debug mode.
 REQUIRE_DEBUG = False
 
 ########################## DJANGO WEBPACK LOADER ##############################
@@ -1182,38 +1179,38 @@ WEBPACK_CONFIG_PATH = 'webpack.prod.config.js'
 
 ################################# CELERY ######################################
 
-# Auto discover tasks fails to detect contentstore tasks
+#: Auto discover tasks fails to detect contentstore tasks
 CELERY_IMPORTS = (
     'cms.djangoapps.contentstore.tasks',
     'openedx.core.djangoapps.bookmarks.tasks',
     'openedx.core.djangoapps.ccxcon.tasks',
 )
 
-# Message configuration
+#: Message configuration
 
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
 CELERY_MESSAGE_COMPRESSION = 'gzip'
 
-# Results configuration
+#: Results configuration
 
 CELERY_IGNORE_RESULT = False
 CELERY_STORE_ERRORS_EVEN_IF_IGNORED = True
 
-# Events configuration
+#: Events configuration
 
 CELERY_TRACK_STARTED = True
 
 CELERY_SEND_EVENTS = True
 CELERY_SEND_TASK_SENT_EVENT = True
 
-# Exchange configuration
+#: Exchange configuration
 
 CELERY_DEFAULT_EXCHANGE = 'edx.core'
 CELERY_DEFAULT_EXCHANGE_TYPE = 'direct'
 
-# Queues configuration
+#: Queues configuration
 
 HIGH_PRIORITY_QUEUE = 'edx.core.high'
 DEFAULT_PRIORITY_QUEUE = 'edx.core.default'
@@ -1274,9 +1271,9 @@ VIDEO_UPLOAD_PIPELINE = {
 
 ############################ APPS #####################################
 
-# The order of INSTALLED_APPS is important, when adding new apps here
-# remember to check that you are not creating new
-# RemovedInDjango19Warnings in the test logs.
+#: The order of INSTALLED_APPS is important, when adding new apps here
+#: remember to check that you are not creating new
+#: RemovedInDjango19Warnings in the test logs.
 INSTALLED_APPS = [
     # Standard apps
     'django.contrib.auth',
@@ -1511,8 +1508,8 @@ TRACKING_BACKENDS = {
     }
 }
 
-# We're already logging events, and we don't want to capture user
-# names/passwords.  Heartbeat events are likely not interesting.
+#: We're already logging events, and we don't want to capture user
+#: names/passwords.  Heartbeat events are likely not interesting.
 TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
 
 EVENT_TRACKING_ENABLED = True
@@ -1588,8 +1585,8 @@ MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 30 * 60
 
 
 ### Apps only installed in some instances
-# The order of INSTALLED_APPS matters, so this tuple is the app name and the item in INSTALLED_APPS
-# that this app should be inserted *before*. A None here means it should be appended to the list.
+#: The order of INSTALLED_APPS matters, so this tuple is the app name and the item in INSTALLED_APPS
+#: that this app should be inserted *before*. A None here means it should be appended to the list.
 OPTIONAL_APPS = (
     ('problem_builder', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
     ('edx_sga', None),
@@ -1640,8 +1637,8 @@ for app_name, insert_before in OPTIONAL_APPS:
 ### External auth usage -- prefixes for ENROLLMENT_DOMAIN
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
 
-# Set request limits for maximum size of a request body and maximum number of GET/POST parameters. (>=Django 1.10)
-# Limits are currently disabled - but can be used for finer-grained denial-of-service protection.
+#: Set request limits for maximum size of a request body and maximum number of GET/POST parameters. (>=Django 1.10)
+#: Limits are currently disabled - but can be used for finer-grained denial-of-service protection.
 DATA_UPLOAD_MAX_MEMORY_SIZE = None
 DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 
@@ -1651,8 +1648,8 @@ UPLOAD_CHUNK_SIZE_IN_MB = 10
 ### Max size of asset uploads to GridFS
 MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB = 10
 
-# FAQ url to direct users to if they upload
-# a file that exceeds the above size
+#: FAQ url to direct users to if they upload
+#: a file that exceeds the above size
 MAX_ASSET_UPLOAD_FILE_SIZE_URL = ""
 
 ### Default value for entrance exam minimum score
@@ -1661,12 +1658,12 @@ ENTRANCE_EXAM_MIN_SCORE_PCT = 50
 ### Default language for a new course
 DEFAULT_COURSE_LANGUAGE = "en"
 
-# Specify XBlocks that should be treated as advanced problems. Each entry is a
-# dict:
-#       'component': the entry-point name of the XBlock.
-#       'boilerplate_name': an optional YAML template to be used.  Specify as
-#               None to omit.
-#
+#: Specify XBlocks that should be treated as advanced problems. Each entry is a
+#: dict:
+#:       'component': the entry-point name of the XBlock.
+#:       'boilerplate_name': an optional YAML template to be used.  Specify as
+#:               None to omit.
+#:
 ADVANCED_PROBLEM_TYPES = [
     {
         'component': 'openassessment',
@@ -1694,7 +1691,7 @@ RETIREMENT_SERVICE_WORKER_USERNAME = 'RETIREMENT_SERVICE_USER'
 RETIREMENT_SERVICE_USER_EMAIL = "retirement_worker@example.com"
 RETIREMENT_SERVICE_USER_NAME = "retirement_worker"
 
-# These states are the default, but are designed to be overridden in configuration.
+#: These states are the default, but are designed to be overridden in configuration.
 RETIREMENT_STATES = [
     'PENDING',
 
@@ -1726,7 +1723,7 @@ RETIREMENT_STATES = [
 
 USERNAME_REPLACEMENT_WORKER = "REPLACE WITH VALID USERNAME"
 
-# Files and Uploads type filter values
+#: Files and Uploads type filter values
 
 FILES_AND_UPLOAD_TYPE_FILTERS = {
     "Images": ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/tiff', 'image/tif', 'image/x-icon',
@@ -1765,7 +1762,7 @@ FILES_AND_UPLOAD_TYPE_FILTERS = {
              'text/coffeescript', 'text/x-matlab', 'application/sql', 'text/php', ]
 }
 
-# Default to no Search Engine
+#: Default to no Search Engine
 SEARCH_ENGINE = None
 ELASTIC_FIELD_MAPPINGS = {
     "start_date": {
@@ -1780,30 +1777,30 @@ XBLOCK_FS_STORAGE_PREFIX = None
 STUDIO_FRONTEND_CONTAINER_URL = None
 
 ################################ Settings for Credit Course Requirements ################################
-# Initial delay used for retrying tasks.
-# Additional retries use longer delays.
-# Value is in seconds.
+#: Initial delay used for retrying tasks.
+#: Additional retries use longer delays.
+#: Value is in seconds.
 CREDIT_TASK_DEFAULT_RETRY_DELAY = 30
 
-# Maximum number of retries per task for errors that are not related
-# to throttling.
+#: Maximum number of retries per task for errors that are not related
+#: to throttling.
 CREDIT_TASK_MAX_RETRIES = 5
 
-# Maximum age in seconds of timestamps we will accept
-# when a credit provider notifies us that a student has been approved
-# or denied for credit.
+#: Maximum age in seconds of timestamps we will accept
+#: when a credit provider notifies us that a student has been approved
+#: or denied for credit.
 CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
 
 CREDIT_PROVIDER_SECRET_KEYS = {}
 
-# dir containing all themes
+#: dir containing all themes
 COMPREHENSIVE_THEME_DIRS = []
 
-# Theme directory locale paths
+#: Theme directory locale paths
 COMPREHENSIVE_THEME_LOCALE_PATHS = []
 
-# Theme to use when no site or site theme is defined,
-# set to None if you want to use openedx theme
+#: Theme to use when no site or site theme is defined,
+#: set to None if you want to use openedx theme
 DEFAULT_SITE_THEME = None
 
 ENABLE_COMPREHENSIVE_THEMING = False
@@ -1874,14 +1871,13 @@ CACHES = {
 
 ############################ OAUTH2 Provider ###################################
 
-
-# 5 minute expiration time for JWT id tokens issued for external API requests.
+#: 5 minute expiration time for JWT id tokens issued for external API requests.
 OAUTH_ID_TOKEN_EXPIRATION = 5 * 60
 
-# Partner support link for CMS footer
+#: Partner support link for CMS footer
 PARTNER_SUPPORT_EMAIL = ''
 
-# Affiliate cookie tracking
+#: Affiliate cookie tracking
 AFFILIATE_COOKIE_NAME = 'dev_affiliate_id'
 
 ############## Settings for Studio Context Sensitive Help ##############
@@ -1895,7 +1891,7 @@ HELP_TOKENS_BOOKS = {
 }
 derived('HELP_TOKENS_LANGUAGE_CODE', 'HELP_TOKENS_VERSION')
 
-# Used with Email sending
+#: Used with Email sending
 RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS = 5
 RETRY_ACTIVATION_EMAIL_TIMEOUT = 0.5
 
@@ -1907,7 +1903,7 @@ SOFTWARE_SECURE_RETRY_MAX_ATTEMPTS = 6
 
 ############## DJANGO-USER-TASKS ##############
 
-# How long until database records about the outcome of a task and its artifacts get deleted?
+#: How long until database records about the outcome of a task and its artifacts get deleted?
 USER_TASKS_MAX_AGE = timedelta(days=7)
 
 ############## Settings for the Enterprise App ######################
@@ -1915,51 +1911,51 @@ USER_TASKS_MAX_AGE = timedelta(days=7)
 ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + LMS_ENROLLMENT_API_PATH
 ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
 ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
-# The default value of this needs to be a 16 character string
+#: The default value of this needs to be a 16 character string
 ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = {}
 
 BASE_COOKIE_DOMAIN = 'localhost'
 
-# This limits the type of roles that are submittable via the `student` app's manual enrollment
-# audit API. While this isn't used in CMS, it is used via Enterprise which is installed in
-# the CMS. Without this, we get errors.
+#: This limits the type of roles that are submittable via the `student` app's manual enrollment
+#: audit API. While this isn't used in CMS, it is used via Enterprise which is installed in
+#: the CMS. Without this, we get errors.
 MANUAL_ENROLLMENT_ROLE_CHOICES = ['Learner', 'Support', 'Partner']
 
 ############## Settings for the Discovery App ######################
 
 COURSE_CATALOG_API_URL = 'http://localhost:8008/api/v1'
 
-# which access.py permission name to check in order to determine if a course is visible in
-# the course catalog. We default this to the legacy permission 'see_exists'.
+#: which access.py permission name to check in order to determine if a course is visible in
+#: the course catalog. We default this to the legacy permission 'see_exists'.
 COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_exists'
 
-# which access.py permission name to check in order to determine if a course about page is
-# visible. We default this to the legacy permission 'see_exists'.
+#: which access.py permission name to check in order to determine if a course about page is
+#: visible. We default this to the legacy permission 'see_exists'.
 COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
 
 DEFAULT_COURSE_VISIBILITY_IN_CATALOG = "both"
 DEFAULT_MOBILE_AVAILABLE = False
 
 
-# How long to cache OpenAPI schemas and UI, in seconds.
+#: How long to cache OpenAPI schemas and UI, in seconds.
 OPENAPI_CACHE_TIMEOUT = 0
 
 ################# Mobile URLS ##########################
 
-# These are URLs to the app store for mobile.
+#: These are URLs to the app store for mobile.
 MOBILE_STORE_URLS = {}
 
 ############################# Persistent Grades ####################################
 
-# Queue to use for updating persistent grades
+#: Queue to use for updating persistent grades
 RECALCULATE_GRADES_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
-# Queue to use for updating grades due to grading policy change
+#: Queue to use for updating grades due to grading policy change
 POLICY_CHANGE_GRADES_ROUTING_KEY = 'edx.lms.core.default'
 
 SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = 'edx.lms.core.default'
 
-# Rate limit for regrading tasks that a grading policy change can kick off
+#: Rate limit for regrading tasks that a grading policy change can kick off
 POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
 
 ############## Settings for CourseGraph ############################
@@ -2001,15 +1997,15 @@ ZENDESK_USER = ''
 ZENDESK_API_KEY = ''
 ZENDESK_CUSTOM_FIELDS = {}
 ZENDESK_OAUTH_ACCESS_TOKEN = ''
-# A mapping of string names to Zendesk Group IDs
-# To get the IDs of your groups you can go to
-# {zendesk_url}/api/v2/groups.json
+#: A mapping of string names to Zendesk Group IDs
+#: To get the IDs of your groups you can go to
+#: {zendesk_url}/api/v2/groups.json
 ZENDESK_GROUP_ID_MAPPING = {}
 
 ############## Settings for Completion API #########################
 
-# Once a user has watched this percentage of a video, mark it as complete:
-# (0.0 = 0%, 1.0 = 100%)
+#: Once a user has watched this percentage of a video, mark it as complete:
+#: (0.0 = 0%, 1.0 = 100%)
 COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
 
 ############### Settings for edx-rbac  ###############
@@ -2021,12 +2017,12 @@ from openedx.core.djangoapps.plugins import plugin_apps, plugin_settings, consta
 INSTALLED_APPS.extend(plugin_apps.get_apps(plugin_constants.ProjectType.CMS))
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_constants.SettingsType.COMMON)
 
-# Course exports streamed in blocks of this size. 8192 or 8kb is the default
-# setting for the FileWrapper class used to iterate over the export file data.
-# See: https://docs.python.org/2/library/wsgiref.html#wsgiref.util.FileWrapper
+#: Course exports streamed in blocks of this size. 8192 or 8kb is the default
+#: setting for the FileWrapper class used to iterate over the export file data.
+#: See: https://docs.python.org/2/library/wsgiref.html#wsgiref.util.FileWrapper
 COURSE_EXPORT_DOWNLOAD_CHUNK_SIZE = 8192
 
-# E-Commerce API Configuration
+#: E-Commerce API Configuration
 ECOMMERCE_PUBLIC_URL_ROOT = 'http://localhost:8002'
 ECOMMERCE_API_URL = 'http://localhost:8002/api/v2'
 ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
@@ -2110,23 +2106,23 @@ CIELO24_SETTINGS = dict(
 PAYMENT_SUPPORT_EMAIL = 'billing@example.com'
 
 ################################ Bulk Email ###################################
-# Parameters for breaking down course enrollment into subtasks.
+#: Parameters for breaking down course enrollment into subtasks.
 BULK_EMAIL_EMAILS_PER_TASK = 500
 
-# Suffix used to construct 'from' email address for bulk emails.
-# A course-specific identifier is prepended.
+#: Suffix used to construct 'from' email address for bulk emails.
+#: A course-specific identifier is prepended.
 BULK_EMAIL_DEFAULT_FROM_EMAIL = 'no-reply@example.com'
 
-# Flag to indicate if individual email addresses should be logged as they are sent
-# a bulk email message.
+#: Flag to indicate if individual email addresses should be logged as they are sent
+#: a bulk email message.
 BULK_EMAIL_LOG_SENT_EMAILS = False
 
 ############### Settings for django file storage ##################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 ###################### Grade Downloads ######################
-# These keys are used for all of our asynchronous downloadable files, including
-# the ones that contain information other than grades.
+#: These keys are used for all of our asynchronous downloadable files, including
+#: the ones that contain information other than grades.
 GRADES_DOWNLOAD = {
     'STORAGE_CLASS': 'django.core.files.storage.FileSystemStorage',
     'STORAGE_KWARGS': {
@@ -2178,8 +2174,8 @@ PROCTORING_SETTINGS = {}
 ################## BLOCKSTORE RELATED SETTINGS  #########################
 BLOCKSTORE_PUBLIC_URL_ROOT = 'http://localhost:18250'
 BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
-# Which of django's caches to use for storing anonymous user state for XBlocks
-# in the blockstore-based XBlock runtime
+#: Which of django's caches to use for storing anonymous user state for XBlocks
+#: in the blockstore-based XBlock runtime
 XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
 
 ###################### LEARNER PORTAL ################################

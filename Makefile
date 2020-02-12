@@ -36,6 +36,9 @@ api-docs: api-docs-sphinx	## build the REST api docs
 guides: ## build the developer guide docs
 	$(MAKE) --directory=docs/guides clean html
 
+reference-docs: ## build the reference manual docs
+	$(MAKE) --directory=docs/reference html
+
 extract_translations: ## extract localizable strings from sources
 	i18n_tool extract -v
 
