@@ -7,6 +7,7 @@ from django.conf import settings
 from django.conf.urls import url
 
 from .views import (
+    MeetingsView,
     MembershipBulkManagementView,
     MembershipDetailView,
     MembershipListView,
@@ -64,5 +65,12 @@ urlpatterns = [
         ),
         MembershipBulkManagementView.as_view(),
         name="team_membership_bulk_management"
-    )
+    ),
+    url(
+        r'^v0/meetings/{team_id_pattern}$'.format(
+            team_id_pattern=TEAM_ID_PATTERN,
+        ),
+        MeetingsView.as_view(),
+        name="team_meetings",
+    ),
 ]

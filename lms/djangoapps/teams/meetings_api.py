@@ -66,17 +66,21 @@ def attendees_for_meeting(course_team_meeting):
     ]
 
 
-def create_attendees_for_meeting(course_team_meeting):
+def create_attendees_for_meeting(course_team_meeting, users=None):
     """
     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/chime.html?highlight=chime#Chime.Client.batch_create_attendee
     """
+    if not users:
+        users = course_team_meeting.team.users.all()
+
     kwargs = {
         'MeetingId': str(course_team_meeting.meeting_id),
         'Attendees': [
             {'ExternalUserId': user.username}
-            for user in course_team_meeting.team.users.all()
-        ]
+            for user in users
+        ],
     }
+
     response = _chime_client().batch_create_attendee(**kwargs)
     # TODO: handle errors, a list keyed by 'Errors' in response
     attendees_by_username = {

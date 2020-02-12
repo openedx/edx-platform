@@ -31,7 +31,7 @@ from openedx.core.lib.api.authentication import OAuth2Authentication
 
 from lms.djangoapps.courseware.courses import get_course_with_access, has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
-from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
+from lms.djangoapps.teams.models import CourseTeam, CourseTeamMeeting, CourseTeamMembership
 from lms.djangoapps.teams import meetings_api
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.permissions import IsStaffOrReadOnly
@@ -179,14 +179,12 @@ class TeamsDashboardView(GenericAPIView):
                 if not meeting:
                     continue
 
-                teams_meeting_data[team.team_id] = [
-                    {
-                        'meeting_id': meeting.meeting_id,
-                        'attendees': [
-                            user.username for user in meetings_api.attendees_for_meeting(meeting)
-                        ],
-                    }
-                ]
+                teams_meeting_data[team.team_id] = {
+                    'meeting_id': meeting.meeting_id,
+                    'attendees': [
+                        user.username for user in meetings_api.attendees_for_meeting(meeting)
+                    ],
+                }
 
         context = {
             "course": course,
@@ -219,6 +217,7 @@ class TeamsDashboardView(GenericAPIView):
             "show_live_collaboration": show_live_collaboration,
             "live_participant_count": 0,
             "meetings": teams_meeting_data,
+            "create_meetings_url": reverse('team_meetings', request=request, args=['team_id']),
         }
         return render_to_response("teams/teams.html", context)
 
@@ -1447,3 +1446,39 @@ class MembershipBulkManagementView(GenericAPIView):
         if not course_module:
             raise Http404('Course not found: {}'.format(course_id))
         return course_module
+
+
+class MeetingsView(GenericAPIView):
+    """
+    View methods related to the team meetings.
+    """
+    def post(self, request, team_id):
+        """
+        Creates a new meeting, or adds an attendee to one
+        if one already exists for the team.
+
+        Returns an object with keys "meeting_id" and "token".
+        """
+        user = request.user
+
+        try:
+            team = CourseTeam.objects.get(team_id=team_id)
+        except CourseTeam.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        meeting = meetings_api.current_meeting_for_team(team)
+        if not meeting:
+            meeting = meetings_api.new_meeting_for_team(team)
+
+        attendee = meetings_api.create_attendees_for_meeting(
+            current_meeting,
+            users=[user],
+        ).get(user.username)
+
+        return Response(
+            {
+                'meeting_id': current_meeting.meeting_id,
+                'token': attendee['JoinToken'],
+            },
+            status=status.HTTP_201_CREATED
+        )
