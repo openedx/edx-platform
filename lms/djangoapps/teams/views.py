@@ -1471,13 +1471,13 @@ class MeetingsView(GenericAPIView):
             meeting = meetings_api.new_meeting_for_team(team)
 
         attendee = meetings_api.create_attendees_for_meeting(
-            current_meeting,
+            meeting,
             users=[user],
         ).get(user.username)
 
         return Response(
             {
-                'meeting_id': current_meeting.meeting_id,
+                'meeting_id': meeting.meeting_id,
                 'token': attendee['JoinToken'],
             },
             status=status.HTTP_201_CREATED
