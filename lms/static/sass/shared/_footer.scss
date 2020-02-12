@@ -32,11 +32,19 @@
       @include transition(link-color 0.15s ease-in-out 0s, border 0.15s ease-in-out 0s);
 
       border-bottom: none;
-      color: $link-color;
+      @if variable-exists(footer-legal-link-color) {
+        color: $footer-legal-link-color;
+      } @else {
+        color: $link-color;
+      }
       text-decoration: none !important;
 
       &:hover, &:focus, &:active {
-        border-bottom: 1px dotted $link-color;
+        @if variable-exists(footer-legal-link-hover-border-bottom-color) {
+          border-bottom: 1px dotted $footer-legal-link-hover-border-bottom-color;
+        } @else {
+          border-bottom: 1px dotted $link-color;
+        }
       }
     }
 

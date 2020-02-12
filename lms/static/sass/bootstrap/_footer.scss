@@ -51,6 +51,14 @@
           padding: 0;
           margin-right: $baseline/4;
           font-size: .8em;
+          @if variable-exists(footer-legal-link-color) {
+            color: $footer-legal-link-color;
+          }
+          @if variable-exists(footer-legal-link-hover-border-bottom-color) {
+            &:hover {
+              border-bottom: 1px dotted $footer-legal-link-hover-border-bottom-color;
+            }
+          }
         }
       }
 
