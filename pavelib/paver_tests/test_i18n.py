@@ -185,6 +185,8 @@ class TestI18nCompileJS(PaverTestCase):
         """
         Test the "i18n_compilejs" task.
         """
+        Env.TEST_SETTINGS = 'devstack_docker'
+
         self.reset_task_messages()
         os.environ['NO_PREREQ_INSTALL'] = "true"
         call_task('pavelib.i18n.i18n_compilejs', options={"settings": Env.TEST_SETTINGS})
