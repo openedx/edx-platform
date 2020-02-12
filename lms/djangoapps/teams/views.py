@@ -197,6 +197,8 @@ class TeamsDashboardView(GenericAPIView):
             "countries": list(countries),
             "disable_courseware_js": True,
             "teams_base_url": reverse('teams_dashboard', request=request, kwargs={'course_id': course_id}),
+            "show_live_collaboration": True,
+            "live_participant_count": 0
         }
         return render_to_response("teams/teams.html", context)
 

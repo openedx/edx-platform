@@ -33,6 +33,8 @@
                 render: function() {
                     var view = this,
                         username = this.context.userInfo.username,
+                        showLiveCollaboration = this.context.showLiveCollaboration,
+                        liveParticipantCount = this.context.liveParticipantCount,
                         message,
                         showJoinButton,
                         teamHasSpace;
@@ -58,6 +60,8 @@
                             view.$el,
                             HtmlUtils.template(teamProfileHeaderActionsTemplate)({
                                 showJoinButton: showJoinButton,
+                                showLiveCollaboration: showLiveCollaboration,
+                                liveParticipantCount: liveParticipantCount,
                                 message: message,
                                 showEditButton: view.showEditButton
                             })

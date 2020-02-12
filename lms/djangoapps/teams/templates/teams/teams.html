@@ -55,7 +55,9 @@ from openedx.core.djangolib.js_utils import (
         maxTeamSize: ${course.teams_configuration.default_max_team_size | n, dump_js_escaped_json},
         languages: ${languages | n, dump_js_escaped_json},
         countries: ${countries | n, dump_js_escaped_json},
-        teamsBaseUrl: '${teams_base_url | n, js_escaped_string}'
+        teamsBaseUrl: '${teams_base_url | n, js_escaped_string}',
+        showLiveCollaboration: '${show_live_collaboration | n, dump_js_escaped_json}',
+        liveParticipantCount: '${live_participant_count | n, dump_js_escaped_json}'
     });
 </%static:require_module>
 </%block>
