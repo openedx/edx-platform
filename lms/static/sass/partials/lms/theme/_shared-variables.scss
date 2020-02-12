@@ -10,4 +10,12 @@ $btn-sign-in-hover-bg: theme-color("inverse") !default;
 $btn-sign-in-hover-color: theme-color("primary") !default;
 $btn-sign-in-hover-border-color: theme-color("primary") !default;
 
+$btn-register-bg: theme-color("inverse") !default;
+$btn-register-color: theme-color("primary") !default;
+$btn-register-border-color: theme-color("primary") !default;
+
+$btn-register-hover-bg: theme-color("primary") !default;
+$btn-register-hover-color: theme-color("inverse") !default;
+$btn-register-hover-border-color: theme-color("primary") !default;
+
 $footer-bg: $body-bg !default;

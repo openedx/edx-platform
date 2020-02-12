@@ -193,13 +193,15 @@
         }
 
         a.register-btn {
-          background: theme-color("inverse");
-          color: theme-color("primary");
+          background: $btn-register-bg;
+          color: $btn-register-color;
           font-weight: $font-weight-normal;
+          border-color: $btn-register-border-color;
 
           &:hover {
-            background-color: theme-color("primary");
-            color: theme-color("inverse");
+            background-color: $btn-register-hover-bg;
+            color: $btn-register-hover-color;
+            border-color: $btn-register-hover-border-color;
           }
         }
 
