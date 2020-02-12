@@ -30,7 +30,6 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from bulk_email.api import is_bulk_email_feature_enabled
-from class_dashboard.dashboard_data import get_array_section_has_problem, get_section_display_name
 from course_modes.models import CourseMode, CourseModesArchive
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.certificates import api as certs_api
@@ -173,10 +172,6 @@ def instructor_dashboard_2(request, course_id):
     # Gate access to course email by feature flag & by course-specific authorization
     if is_bulk_email_feature_enabled(course_key):
         sections.append(_section_send_email(course, access))
-
-    # Gate access to Metrics tab by featue flag and staff authorization
-    if settings.FEATURES['CLASS_DASHBOARD'] and access['staff']:
-        sections.append(_section_metrics(course, access))
 
     # Gate access to Ecommerce tab
     if course_mode_has_price and (access['finance_admin'] or access['sales_admin']):
@@ -794,23 +789,6 @@ def _section_analytics(course, access):
         'section_display_name': _('Analytics'),
         'access': access,
         'course_id': six.text_type(course.id),
-    }
-    return section_data
-
-
-def _section_metrics(course, access):
-    """Provide data for the corresponding dashboard section """
-    course_key = course.id
-    section_data = {
-        'section_key': 'metrics',
-        'section_display_name': _('Metrics'),
-        'access': access,
-        'course_id': six.text_type(course_key),
-        'sub_section_display_name': get_section_display_name(course_key),
-        'section_has_problem': get_array_section_has_problem(course_key),
-        'get_students_opened_subsection_url': reverse('get_students_opened_subsection'),
-        'get_students_problem_grades_url': reverse('get_students_problem_grades'),
-        'post_metrics_data_csv_url': reverse('post_metrics_data_csv'),
     }
     return section_data
 

@@ -771,11 +771,6 @@ if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW'):
         ),
     ]
 
-if settings.FEATURES.get('CLASS_DASHBOARD'):
-    urlpatterns += [
-        url(r'^class_dashboard/', include('class_dashboard.urls')),
-    ]
-
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     # Jasmine and admin
     urlpatterns += [

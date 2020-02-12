@@ -2708,11 +2708,6 @@ VERIFICATION_EXPIRY_EMAIL = {
 
 DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH = "verify_student_disable_account_activation_requirement"
 
-### This enables the Metrics tab for the Instructor dashboard ###########
-FEATURES['CLASS_DASHBOARD'] = False
-if FEATURES.get('CLASS_DASHBOARD'):
-    INSTALLED_APPS.append('class_dashboard')
-
 ################ Enable credit eligibility feature ####################
 ENABLE_CREDIT_ELIGIBILITY = True
 FEATURES['ENABLE_CREDIT_ELIGIBILITY'] = ENABLE_CREDIT_ELIGIBILITY
