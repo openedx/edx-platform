@@ -217,7 +217,11 @@ class TeamsDashboardView(GenericAPIView):
             "show_live_collaboration": show_live_collaboration,
             "live_participant_count": 0,
             "meetings": teams_meeting_data,
-            "create_meetings_url": reverse('team_meetings', request=request, args=['team_id']),
+            "create_meetings_url": reverse(
+                'team_meetings',
+                request=request,
+                kwargs={'team_id': user_teams[0].team_id},
+            ),
         }
         return render_to_response("teams/teams.html", context)
 
