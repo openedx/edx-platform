@@ -162,20 +162,34 @@
           cursor: pointer;
           text-decoration: none;
         }
+        a.sign-in-btn {
+          background-color: $btn-sign-in-bg;
+          color: $btn-sign-in-color;
+          border: 1px solid $btn-sign-in-border-color;
 
-        a.sign-in-btn,
+          &:hover {
+            background-color: $btn-sign-in-hover-bg;
+            color: $btn-sign-in-hover-color;
+            border-color: $btn-sign-in-hover-border-color;
+          }
+        }
+
         .nav-item a.shopping-cart {
           background-color: theme-color("primary");
           color: theme-color("inverse");
           border: 1px solid theme-color("inverse");
-          font-weight: $font-weight-normal;
-          padding: $baseline/4 $baseline;
 
           &:hover {
             background-color: theme-color("inverse");
             color: theme-color("primary");
             border-color: theme-color("primary");
           }
+        }
+
+        a.sign-in-btn,
+        .nav-item a.shopping-cart {
+          font-weight: $font-weight-normal;
+          padding: $baseline/4 $baseline;
         }
 
         a.register-btn {
