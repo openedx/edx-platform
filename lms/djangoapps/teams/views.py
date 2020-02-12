@@ -176,8 +176,6 @@ class TeamsDashboardView(GenericAPIView):
         if show_live_collaboration:
             for team in user_teams:
                 meeting = meetings_api.current_meeting_for_team(team)
-                print('found meeting for team', meeting)
-                print('attendees', meetings_api.attendees_for_meeting(meeting))
                 if not meeting:
                     continue
 
@@ -222,7 +220,7 @@ class TeamsDashboardView(GenericAPIView):
                 'team_meetings',
                 request=request,
                 kwargs={'team_id': user_teams[0].team_id},
-            ),
+            ) if user_teams else '',
         }
         return render_to_response("teams/teams.html", context)
 
@@ -1451,6 +1449,30 @@ class MembershipBulkManagementView(GenericAPIView):
         if not course_module:
             raise Http404('Course not found: {}'.format(course_id))
         return course_module
+
+
+class MeetingsInfoView(GenericAPIView):
+    def get(self, request, meeting_id):
+        chime_meeting_data = meetings_api.get_chime_meeting(meeting_id)
+
+        user = request.user
+        chime_attendees = meetings_api.chime_attendees_for_meeting(meeting_id)
+
+        import pdb; pdb.set_trace()
+        attendee = None
+        for att in chime_attendees['Attendees']:
+            if att['ExternalUserId'] == user.username:
+                attendee = att
+                break
+
+        if chime_meeting_data:
+            data = {
+                'Meeting': chime_meeting_data.pop('Meeting'),
+                'Attendee': attendee,
+            }
+            return Response(data)
+
+        raise Http404('No Chime meeting found')
 
 
 class MeetingsView(GenericAPIView):

@@ -8,6 +8,7 @@ from django.conf.urls import url
 
 from .views import (
     MeetingsView,
+    MeetingsInfoView,
     MembershipBulkManagementView,
     MembershipDetailView,
     MembershipListView,
@@ -72,5 +73,12 @@ urlpatterns = [
         ),
         MeetingsView.as_view(),
         name="team_meetings",
+    ),
+    url(
+        r'^v0/meetings_info/{meeting_id_pattern}$'.format(
+            meeting_id_pattern=r'(?P<meeting_id>[A-Za-z\d_.-]+)',
+        ),
+        MeetingsInfoView.as_view(),
+        name="team_meetings_info",
     ),
 ]

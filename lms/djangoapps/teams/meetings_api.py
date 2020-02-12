@@ -30,13 +30,16 @@ def get_account_id(course_id=None):
         return DEFAULT_CHIME_ACCOUNT_ID
 
 
+def get_chime_meeting(meeting_id):
+    try:
+        return _chime_client().get_meeting(MeetingId=str(meeting_id))
+    except:
+        return
+
+
 def current_meeting_for_team(team):
     course_team_meeting = CourseTeamMeeting.latest_for_team(team)
-    try:
-        chime_meeting = _chime_client().get_meeting(MeetingId=str(course_team_meeting.meeting_id))
-    except:
-        chime_meeting = None
-
+    chime_meeting = get_chime_meeting(course_team_meeting.meeting_id)
     if chime_meeting:
         return course_team_meeting
     # return null if there's no meeting in progress for the team
@@ -53,8 +56,12 @@ def new_meeting_for_team(team):
     return course_team_meeting
 
 
+def chime_attendees_for_meeting(meeting_id):
+    return _chime_client().list_attendees(MeetingId=str(meeting_id))
+
+
 def attendees_for_meeting(course_team_meeting):
-    attendees = _chime_client().list_attendees(MeetingId=str(course_team_meeting.meeting_id))
+    attendees = chime_attendees_for_meeting(course_team_meeting.meeting_id)
     users_by_username = {
         user.username: user
         for user in course_team_meeting.team.users.all()
