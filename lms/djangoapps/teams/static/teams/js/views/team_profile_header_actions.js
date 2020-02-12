@@ -34,10 +34,11 @@
                     var view = this,
                         username = this.context.userInfo.username,
                         showLiveCollaboration = this.context.showLiveCollaboration,
-                        liveParticipantCount = this.context.liveParticipantCount,
+                        teamMeeting = this.context.meetings[this.model.get('id')],
                         message,
                         showJoinButton,
                         teamHasSpace;
+
                     this.getUserTeamInfo(username, this.context.maxTeamSize).done(function(info) {
                         teamHasSpace = info.teamHasSpace;
 
@@ -61,7 +62,7 @@
                             HtmlUtils.template(teamProfileHeaderActionsTemplate)({
                                 showJoinButton: showJoinButton,
                                 showLiveCollaboration: showLiveCollaboration,
-                                liveParticipantCount: liveParticipantCount,
+                                teamMeeting: teamMeeting,
                                 message: message,
                                 showEditButton: view.showEditButton
                             })

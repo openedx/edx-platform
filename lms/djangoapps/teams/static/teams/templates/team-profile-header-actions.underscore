@@ -11,10 +11,10 @@
         <button class="btn btn-secondary action-edit-team"><%- gettext("Edit Team") %></button>
     <% } %>
     <% if (showLiveCollaboration) {
-        if (liveParticipantCount == 0) {%>
-            <button class="action action-secondary action-start-collab"><%- gettext("Start Live Collaboration") %></button>
-        <% } else {%>
+        if (teamMeeting && teamMeeting.attendees.length) {%>
             <button class="action action-secondary action-join-collab"><%- gettext("Join Live Collaboration") %></button>
+        <% } else {%>
+            <button class="action action-secondary action-start-collab"><%- gettext("Start Live Collaboration") %></button>
         <% }
     } %>
 </div>
