@@ -7,7 +7,6 @@ import edx_oauth2_provider
 import six.moves.urllib.parse as parse  # pylint: disable=import-error
 from django.conf import settings
 from django.contrib.auth import logout
-from django.shortcuts import redirect
 from django.utils.http import urlencode
 from django.views.generic import TemplateView
 from provider.oauth2.models import Client
@@ -61,10 +60,13 @@ class LogoutView(TemplateView):
         if target_url:
             target_url = parse.unquote(parse.quote_plus(target_url))
 
-        if target_url and is_safe_login_or_logout_redirect(self.request, target_url):
-            return target_url
-        else:
-            return self.default_target
+        use_target_url = target_url and is_safe_login_or_logout_redirect(
+            redirect_to=target_url,
+            request_host=self.request.get_host(),
+            dot_client_id=self.request.GET.get('client_id'),
+            require_https=self.request.is_secure(),
+        )
+        return target_url if use_target_url else self.default_target
 
     def dispatch(self, request, *args, **kwargs):
         # We do not log here, because we have a handler registered to perform logging on successful logouts.
