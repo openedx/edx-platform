@@ -211,7 +211,7 @@ def create_tarfile_from_db_cache(fingerprint, files, path):
     return zipfile_name, zipfile_path
 
 
-def upload_to_s3(file_name, file_path, bucket_name):
+def upload_to_s3(file_name, file_path, bucket_name, replace=False):
     """
     Upload the specified files to an s3 bucket.
     """
@@ -229,7 +229,7 @@ def upload_to_s3(file_name, file_path, bucket_name):
               "Continuing without uploading the new cache to S3.")
         return
     key = boto.s3.key.Key(bucket=bucket, name=file_name)
-    bytes_written = key.set_contents_from_filename(file_path, replace=False, policy='public-read')
+    bytes_written = key.set_contents_from_filename(file_path, replace=replace, policy='public-read')
     if bytes_written:
         msg = u"Wrote {} bytes to {}.".format(bytes_written, key.name)
     else:
