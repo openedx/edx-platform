@@ -30,6 +30,7 @@ omit =
 
 concurrency=multiprocessing
 parallel = true
+relative_files = true
 
 [report]
 ignore_errors = True
