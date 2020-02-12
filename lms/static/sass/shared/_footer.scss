@@ -69,10 +69,21 @@
           margin-right: ($baseline*0.75);
 
           a {
-            color: tint($black, 20%);
+            @if variable-exists(footer-colophon-link-color) {
+              color: $footer-colophon-link-color;
+            } @else {
+              color: tint($black, 20%);
+            }
 
             &:hover, &:focus, &:active {
-              color: $link-color;
+              @if variable-exists(footer-colophon-link-hover-color) {
+                color: $footer-colophon-link-hover-color;
+              } @else {
+                color: $link-color;
+              }
+              @if variable-exists(footer-colophon-link-hover-border-bottom-color) {
+                border-bottom-color: $footer-colophon-link-hover-border-bottom-color;
+              }
             }
           }
 

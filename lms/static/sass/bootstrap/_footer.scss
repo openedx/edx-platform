@@ -23,10 +23,20 @@
         .nav-link {
           text-decoration: none;
           padding: 0;
-          color: $gray-900;
-
+          @if variable-exists(footer-colophon-link-color) {
+            color: $footer-colophon-link-color;
+          } @else {
+            color: $gray-900;
+          }
           &:hover {
-            color: theme-color("primary");
+            @if variable-exists(footer-colophon-link-hover-color) {
+              color: $footer-colophon-link-hover-color;
+            } @else {
+              color: theme-color("primary");
+            }
+            @if variable-exists(footer-colophon-link-hover-border-bottom-color) {
+              border-bottom: 1px dotted $footer-colophon-link-hover-border-bottom-color;
+            }
           }
         }
       }
