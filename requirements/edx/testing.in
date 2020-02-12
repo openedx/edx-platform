@@ -35,7 +35,7 @@ pyquery                   # jQuery-like API for retrieving fragments of HTML and
 pytest                    # Testing framework
 pytest-attrib             # Select tests based on attributes
 pytest-cov                # pytest plugin for measuring code coverage
-git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0
+pytest-cagoule           # pytest plugin for selecting tests to run based on coverage
 pytest-django             # Django support for pytest
 pytest-json-report        # Output json formatted warnings after running pytest
 pytest-randomly           # pytest plugin to randomly order tests

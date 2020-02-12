@@ -108,10 +108,8 @@ class PytestSuite(TestSuite):
 
         if self.with_wtw:
             opts.extend([
-                '--wtw',
-                '{}/{}'.format(COVERAGE_CACHE_BASEPATH, WHO_TESTS_WHAT_DIFF),
-                '--wtwdb',
-                '{}/{}'.format(COVERAGE_CACHE_BASEPATH, COVERAGE_CACHE_BASELINE)
+                '--diff',
+                'origin/master',
             ])
 
         return opts
