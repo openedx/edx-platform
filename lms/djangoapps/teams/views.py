@@ -32,6 +32,7 @@ from openedx.core.lib.api.authentication import OAuth2Authentication
 from lms.djangoapps.courseware.courses import get_course_with_access, has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
+from lms.djangoapps.teams import meetings_api
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.permissions import IsStaffOrReadOnly
 from openedx.core.lib.api.view_utils import (
@@ -160,7 +161,7 @@ class TeamsDashboardView(GenericAPIView):
             is_user_org_protected = organization_protection_status == OrganizationProtectionStatus.protected
             filter_query['organization_protected'] = is_user_org_protected
 
-        user_teams = CourseTeam.objects.filter(**filter_query)
+        user_teams = list(CourseTeam.objects.filter(**filter_query))
         user_teams_data = self._serialize_and_paginate(
             MyTeamsPagination,
             user_teams,
@@ -168,6 +169,24 @@ class TeamsDashboardView(GenericAPIView):
             CourseTeamSerializer,
             {'expand': ('user',)}
         )
+
+        show_live_collaboration = True
+
+        teams_meeting_data = {}
+        if show_live_collaboration:
+            for team in user_teams:
+                meeting = meetings_api.current_meeting_for_team(team)
+                if not meeting:
+                    continue
+
+                teams_meeting_data[team.team_id] = [
+                    {
+                        'meeting_id': meeting.meeting_id,
+                        'attendees': [
+                            user.username for user in meetings_api.attendees_for_meeting(meeting)
+                        ],
+                    }
+                ]
 
         context = {
             "course": course,
@@ -179,7 +198,7 @@ class TeamsDashboardView(GenericAPIView):
                 "username": user.username,
                 "privileged": has_discussion_privileges(user, course_key),
                 "staff": bool(has_access(user, 'staff', course_key)),
-                "teams": user_teams_data
+                "teams": user_teams_data,
             },
             "topic_url": reverse(
                 'topics_detail', kwargs={'topic_id': 'topic_id', 'course_id': str(course_id)}, request=request
@@ -197,8 +216,9 @@ class TeamsDashboardView(GenericAPIView):
             "countries": list(countries),
             "disable_courseware_js": True,
             "teams_base_url": reverse('teams_dashboard', request=request, kwargs={'course_id': course_id}),
-            "show_live_collaboration": True,
-            "live_participant_count": 0
+            "show_live_collaboration": show_live_collaboration,
+            "live_participant_count": 0,
+            "meetings": teams_meeting_data,
         }
         return render_to_response("teams/teams.html", context)
 

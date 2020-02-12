@@ -360,6 +360,13 @@ class CourseTeamMeeting(TimeStampedModel):
     team = models.ForeignKey(CourseTeam, related_name='meetings', on_delete=models.CASCADE)
     meeting_id = models.UUIDField('The Chime Meeting Identifier', blank=False, null=False)
 
+    @classmethod
+    def latest_for_team(cls, team):
+        try:
+            return cls.objects.filter(team=team).latest('created')
+        except cls.DoesNotExist:
+            return None
+
 
 class CourseTeamMeetingAttendee(TimeStampedModel):
     """
