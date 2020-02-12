@@ -33,7 +33,7 @@ class TestViews(ModuleStoreTestCase):
         """
         Test returns proper value when have proper access
         """
-        has_access.return_value = True
+        has_access.return_value = True  # has change
         response = views.all_problem_grade_distribution(self.request, 'test/test/test')
 
         self.assertEqual(json.dumps(self.simple_data), response.content.decode('utf-8'))
