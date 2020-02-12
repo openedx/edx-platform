@@ -1,3 +1,5 @@
 @import 'edx-bootstrap/sass/open-edx/theme';
 
 $header-bg: theme-color("inverse") !default;
+
+$footer-bg: $body-bg !default;
