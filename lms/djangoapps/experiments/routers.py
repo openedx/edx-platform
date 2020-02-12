@@ -23,7 +23,7 @@ class DefaultRouter(routers.DefaultRouter):
             initkwargs={'suffix': 'List'}
         ),
         # Dynamically generated list routes.
-        # Generated using @list_route decorator
+        # Generated using @action(detail=False) decorator
         # on methods of the viewset.
         DynamicRoute(
             url=r'^{prefix}/{lookup}{trailing_slash}$',
@@ -45,7 +45,7 @@ class DefaultRouter(routers.DefaultRouter):
             initkwargs={'suffix': 'Instance'}
         ),
         # Dynamically generated detail routes.
-        # Generated using @detail_route decorator on methods of the viewset.
+        # Generated using @action(detail=True) decorator on methods of the viewset.
         DynamicRoute(
             url=r'^{prefix}/{lookup}{trailing_slash}$',
             name='{basename}-detail',
