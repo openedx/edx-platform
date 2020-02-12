@@ -109,7 +109,7 @@ class PytestSuite(TestSuite):
         if self.with_wtw:
             opts.extend([
                 '--diff',
-                'origin/master',
+                self.with_wtw,
             ])
 
         return opts
