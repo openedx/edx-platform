@@ -13,6 +13,7 @@ pythonpath = "/edx/app/edxapp/edx-platform"
 max_requests = 50
 workers = 7
 
+
 def pre_request(worker, req):
     worker.log.info("%s %s" % (req.method, req.path))
 
