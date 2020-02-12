@@ -25,9 +25,9 @@
             <div class="nav-actions donate-actions">
                 <h3 class="sr">${_('Donation Actions')}</h3>
                 % if course_id:
-                    <div class="donate-container" data-course="${ course_id }"></div>
+                    <div class="donate-container" data-course="${ course_id }" data-paypal-button-id="${ paypal_button_id }"></div>
                 % else:
-                    <div class="donate-container"></div>
+                    <div class="donate-container" data-paypal-button-id="${ paypal_button_id }"></div>
                 % endif
             </div>
         % endif

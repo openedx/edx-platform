@@ -83,6 +83,7 @@ var edx = edx || {};
             initialize: function(params) {
                 this.$el = params.el;
                 this.course = params.course;
+                this.paypalButtonId = params.paypalButtonId;
                 _.bindAll(view,
                     'render', 'donate', 'startPayment',
                     'validate', 'startPayment',
@@ -97,7 +98,10 @@ var edx = edx || {};
             * @returns {DonationView}
             */
             render: function() {
-                var html = _.template($('#donation-tpl').html())({course_id: this.course});
+                var html = _.template($('#donation-tpl').html())({
+                    course_id: this.course,
+                    paypalButtonId: this.paypalButtonId
+                });
                 this.$el.html(html);
                 this.$amount = $('input[name="amount"]', this.$el);
                 this.$submit = $('.action-donate', this.$el);
@@ -223,17 +227,14 @@ var edx = edx || {};
     };
 
     $(document).ready(function() {
-        // There may be multiple donation forms on the page
-        // (one for each newly enrolled course).
-        // For each one, create a new donation view to handle
-        // that form, and parameterize it based on the
-        // "data-course" attribute (the course ID).
         $('.donate-container').each(function() {
             var $container = $(this);
             var course = $container.data('course');
+            var paypalButtonId = $container.data('paypal-button-id');
             var view = new edx.dashboard.donation.DonationView({
                 el: $container,
-                course: course
+                course: course,
+                paypalButtonId: paypalButtonId
             }).render();
         });
     });

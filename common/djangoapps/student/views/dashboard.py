@@ -138,7 +138,7 @@ def _allow_donation(course_modes, course_id, enrollment):
         )
     donations_enabled = configuration_helpers.get_value(
         'ENABLE_DONATIONS',
-        DonationConfiguration.current().enabled
+        DonationConfiguration.current().enabled or getattr(settings, 'PAYPAL_DONATION_HOSTED_BUTTON_ID', False)
     )
     return (
         donations_enabled and
@@ -190,6 +190,9 @@ def _create_recent_enrollment_message(course_enrollments, course_modes):  # pyli
                 'enrollments_count': enrollments_count,
                 'allow_donations': allow_donations,
                 'platform_name': platform_name,
+                'paypal_button_id': getattr(settings, 'PAYPAL_DONATION_HOSTED_BUTTON_ID', None),
+                # TODO: we can eliminate a corner case with revenue share by making this consistently the latest course
+                #       the to-do item here is probably to ticket that and socialize the idea a bit
                 'course_id': recently_enrolled_courses[0].course_overview.id if enrollments_count == 1 else None
             }
         )
