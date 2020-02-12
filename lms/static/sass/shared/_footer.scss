@@ -125,7 +125,11 @@
     .copyright {
       margin: -2px 0 8px 0;
       font-size: em(11);
-      color: $gray; // WCAG 2.0 AA requirements
+      @if variable-exists(footer-color) {
+          color: $footer-color;
+      } @else {
+          color: $gray; // WCAG 2.0 AA requirements
+      }
 
       @include text-align(left);
     }

@@ -58,7 +58,12 @@
 
       margin: -2px 0 8px;
       font-size: .8em;
-      color: $gray;
+
+      @if variable-exists(footer-color) {
+        color: $footer-color;
+      } else {
+        color: $gray;
+      }
     }
 
     .footer-about-openedx {
