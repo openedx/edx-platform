@@ -8,10 +8,11 @@ import logging
 from datetime import datetime
 from uuid import uuid4
 
-import pytz
 import six
+import pytz
+
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from django.template import RequestContext
 from django.utils import translation
@@ -444,6 +445,26 @@ def _update_organization_context(context, course):
     context['organization_logo'] = organization_logo
 
 
+def unsupported_url(request, user_id, course_id):
+    """
+    This view returns the un-supported url page aimed to let the user aware that
+    url is no longer supported
+    """
+    platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
+    configuration = CertificateHtmlViewConfiguration.get_config()
+    return _render_invalid_certificate(
+        request, course_id, platform_name, configuration, cert_path='certificates/url_unsupported.html'
+    )
+
+
+@login_required
+def render_preview_certificate(request, course_id):
+    """
+    This view renders the course certificate in preview mode
+    """
+    return render_html_view(request, six.text_type(course_id))
+
+
 def render_cert_by_uuid(request, certificate_uuid):
     """
     This public view generates an HTML representation of the specified certificate
@@ -453,7 +474,7 @@ def render_cert_by_uuid(request, certificate_uuid):
             verify_uuid=certificate_uuid,
             status=CertificateStatuses.downloadable
         )
-        return render_html_view(request, certificate.user.id, six.text_type(certificate.course_id))
+        return render_html_view(request, six.text_type(certificate.course_id), certificate)
     except GeneratedCertificate.DoesNotExist:
         raise Http404
 
@@ -462,16 +483,13 @@ def render_cert_by_uuid(request, certificate_uuid):
     template_path="certificates/server-error.html",
     test_func=lambda request: request.GET.get('preview', None)
 )
-def render_html_view(request, user_id, course_id):
+def render_html_view(request, course_id, certificate=None):
     """
     This public view generates an HTML representation of the specified user and course
     If a certificate is not available, we display a "Sorry!" screen instead
     """
-    try:
-        user_id = int(user_id)
-    except ValueError:
-        raise Http404
-
+    user = certificate.user if certificate else request.user
+    user_id = user.id
     preview_mode = request.GET.get('preview', None)
     platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
     configuration = CertificateHtmlViewConfiguration.get_config()
@@ -483,16 +501,15 @@ def render_html_view(request, user_id, course_id):
     # Load the course and user objects
     try:
         course_key = CourseKey.from_string(course_id)
-        user = User.objects.get(id=user_id)
         course = get_course_by_id(course_key)
 
     # For any course or user exceptions, kick the user back to the "Invalid" screen
-    except (InvalidKeyError, User.DoesNotExist, Http404) as exception:
+    except (InvalidKeyError, Http404) as exception:
         error_str = (
-            u"Invalid cert: error finding course %s or user with id "
-            u"%d. Specific error: %s"
+            u"Invalid cert: error finding course %s "
+            u"Specific error: %s"
         )
-        log.info(error_str, course_id, user_id, str(exception))
+        log.info(error_str, course_id, str(exception))
         return _render_invalid_certificate(request, course_id, platform_name, configuration)
 
     # Kick the user back to the "Invalid" screen if the feature is disabled for the course
@@ -654,7 +671,8 @@ def _get_custom_template_and_language(course_id, course_mode, course_language):
         return (None, None)
 
 
-def _render_invalid_certificate(request, course_id, platform_name, configuration):
+def _render_invalid_certificate(request, course_id, platform_name, configuration,
+                                cert_path=INVALID_CERTIFICATE_TEMPLATE_PATH):
     """
     Renders the invalid certificate view with default header and footer.
     """
@@ -663,7 +681,7 @@ def _render_invalid_certificate(request, course_id, platform_name, configuration
     # Add certificate header/footer data to current context
     context.update(get_certificate_header_context(is_secure=request.is_secure()))
     context.update(get_certificate_footer_context())
-    return render_to_response(INVALID_CERTIFICATE_TEMPLATE_PATH, context)
+    return render_to_response(cert_path, context)
 
 
 def _render_valid_certificate(request, context, custom_template=None):

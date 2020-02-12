@@ -407,10 +407,7 @@ class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, Milestone
         certificate_data = response.data[0]['certificate']
         self.assertRegex(
             certificate_data['url'],
-            r'http.*/certificates/user/{user_id}/course/{course_id}'.format(
-                user_id=self.user.id,
-                course_id=self.course.id,
-            )
+            r'http.*/certificates/[0-9a-f]{32}'
         )
 
 
