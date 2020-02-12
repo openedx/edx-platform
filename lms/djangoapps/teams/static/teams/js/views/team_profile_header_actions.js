@@ -18,7 +18,8 @@
 
                 events: {
                     'click .action-primary': 'joinTeam',
-                    'click .action-edit-team': 'editTeam'
+                    'click .action-edit-team': 'editTeam',
+                    'click .action-join-meeting': 'joinMeeting'
                 },
 
                 initialize: function(options) {
@@ -141,6 +142,26 @@
                         'teams/' + this.topic.id + '/' + this.model.get('id') + '/edit-team',
                         {trigger: true}
                     );
+                },
+
+                joinMeeting: function(event) {
+                    event.preventDefault();
+                    var deferred = $.Deferred();
+                    var view = this;
+                    console.log(view.context);
+                    $.ajax({
+                        type: 'POST',
+                        url: view.context.createMeetingsUrl,
+                    }).done(function(data) {
+                        // Team meeting has been created and attendee added, redirect to MFE
+                        var mfe_url = 'http://something/' + data.meeting_id + '/?token=' + data.token;
+                        window.location.href = mfe_url;
+                        deferred.resolve(info);
+                    }).fail(function(data) {
+                        TeamUtils.parseAndShowMessage(data, view.errorMessage);
+                        deferred.reject();
+                    });
+                    return deferred.promise();
                 }
             });
         });

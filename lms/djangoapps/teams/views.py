@@ -176,6 +176,8 @@ class TeamsDashboardView(GenericAPIView):
         if show_live_collaboration:
             for team in user_teams:
                 meeting = meetings_api.current_meeting_for_team(team)
+                print('found meeting for team', meeting)
+                print('attendees', meetings_api.attendees_for_meeting(meeting))
                 if not meeting:
                     continue
 
@@ -215,7 +217,6 @@ class TeamsDashboardView(GenericAPIView):
             "disable_courseware_js": True,
             "teams_base_url": reverse('teams_dashboard', request=request, kwargs={'course_id': course_id}),
             "show_live_collaboration": show_live_collaboration,
-            "live_participant_count": 0,
             "meetings": teams_meeting_data,
             "create_meetings_url": reverse(
                 'team_meetings',

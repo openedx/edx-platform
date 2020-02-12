@@ -57,7 +57,8 @@ from openedx.core.djangolib.js_utils import (
         countries: ${countries | n, dump_js_escaped_json},
         teamsBaseUrl: '${teams_base_url | n, js_escaped_string}',
         showLiveCollaboration: '${show_live_collaboration | n, dump_js_escaped_json}',
-        meetings: ${meetings | n, dump_js_escaped_json}
+        meetings: ${meetings | n, dump_js_escaped_json},
+        createMeetingsUrl: '${create_meetings_url | js_escaped_string}'
     });
 </%static:require_module>
 </%block>
