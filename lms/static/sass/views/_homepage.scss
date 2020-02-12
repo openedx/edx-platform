@@ -27,7 +27,11 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
       @include transition(all $tmg-f3 linear 0s);
 
       position: relative;
-      border-bottom: 3px solid $action-primary-bg;
+      @if variable-exists(homepage-course-card-border-bottom-color) {
+        border-bottom: 3px solid $homepage-course-card-border-bottom-color;
+      } @else {
+        border-bottom: 3px solid $action-primary-bg;
+      }
       box-shadow: 0 1px 10px 0 $black-t0, inset 0 0 0 1px $white-t3;
       background: $body-bg;
       width: 100%;
@@ -69,8 +73,16 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
           height: ($baseline*2.5);
           border-color: theme-color("primary");
           border-radius: 3px;
-          background: theme-color("primary");
-          color: $white;
+          @if variable-exists(homepage-course-card-btn-learn-more-bg) {
+            background: $homepage-course-card-btn-learn-more-bg;
+          } @else {
+            background: theme-color("primary");
+          }
+          @if variable-exists(homepage-course-card-btn-learn-more-color) {
+            color: $homepage-course-card-btn-learn-more-color;
+          } @else {
+            color: $white;
+          }
           line-height: ($baseline*2.5);
           text-align: center;
           opacity: 0;
@@ -117,7 +129,11 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
           margin: ($baseline*0.25) 0 ($baseline*1.75) 0;
           padding: 0 ($baseline*0.75);
           height: $course-title-height;
-          color: $link-color;
+          @if variable-exists(homepage-course-card-title-color) {
+            color: $homepage-course-card-title-color;
+          } @else {
+            color: $link-color;
+          }
         }
 
         .course-date {
