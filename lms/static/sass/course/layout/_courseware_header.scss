@@ -48,7 +48,7 @@
         @extend %t-title7;
         @extend %t-regular;
 
-        color: theme-color("dark");
+        color: $courseware-course-tab-nav-link-color;
         display: block;
         text-align: center;
         text-decoration: none;
@@ -57,8 +57,9 @@
         &:hover,
         &:focus,
         &.active {
-          color: theme-color("primary");
+          color: $courseware-course-tab-nav-link-hover-color;
           border-bottom-style: solid;
+          border-bottom-color: $courseware-course-tab-nav-link-hover-border-bottom-color;
           background-color: transparent;
         }
       }
