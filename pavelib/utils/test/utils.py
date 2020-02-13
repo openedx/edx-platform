@@ -170,7 +170,7 @@ def fetch_coverage_test_selection_data(options):
     sh(u'mv {base}/{file} {base}/{suite}.coverage'.format(
         base=COVERAGE_CACHE_BASEPATH,
         file=COVERAGE_CACHE_BASELINE,
-        suit=os.environ.get('TEST_SUITE', ''),
+        suite=os.environ.get('TEST_SUITE', ''),
     ))
 
 
