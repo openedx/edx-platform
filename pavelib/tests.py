@@ -192,6 +192,12 @@ def test_system(options, passthrough_options):
     ),
     make_option('-p', '--processes', dest='processes', default=0, help='number of processes to use running tests'),
     make_option('-r', '--randomize', action='store_true', help='run the tests in a random order'),
+    make_option(
+        '--with-wtw',
+        dest='with_wtw',
+        action='store',
+        help="Only run tests based on the lines changed relative to the specified branch"
+    ),
 ], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
 @PassthroughTask
 @timed
