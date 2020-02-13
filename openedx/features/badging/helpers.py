@@ -1,5 +1,3 @@
-import logging
-
 from django.urls import reverse
 from collections import OrderedDict
 
@@ -17,8 +15,6 @@ from .constants import (
     TEAM_ROOM_ID_KEY
 )
 from .models import Badge
-
-log = logging.getLogger('edx.badging')
 
 
 def populate_trophycase(user, courses, earned_badges):
@@ -122,7 +118,6 @@ def filter_earned_badge_by_joined_team(user, course, earned_badges):
 
     if not course_team[TEAM_ROOM_ID_KEY]:
         error = FILTER_BADGES_ERROR.format(team_id=course_team[TEAM_ID_KEY])
-        log.exception(error)
         raise Exception(error)
 
     # filter earned badges for joined team only
