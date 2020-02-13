@@ -233,7 +233,8 @@ pyparsing==2.2.0
 pyquery==1.4.1
 pysrt==1.1.2
 pytest-attrib==0.1.3
-pytest-cagoule==0.4.0
+#pytest-cagoule==0.4.0
+git+https://github.com/cpennington/pytest-cagoule.git@debugging#egg=pytest-cagoule==0.0.0
 pytest-cov==2.8.1
 pytest-django==3.8.0
 pytest-forked==1.1.3      # via pytest-xdist
