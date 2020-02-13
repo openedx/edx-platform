@@ -428,7 +428,18 @@
         position: relative;
         display: inline-block;
 
-        @include tooltip-hover-style(-($baseline*2));
+        @include tooltip-hover-style(-($baseline*2)); 
+        .member-profile-container {
+          display: flex;
+          align-items: flex-start;
+  
+          i {
+            position: relative;
+            right: 18px;
+            top: 4px;
+            color: green;
+          }
+        }
       }
     }
   }

@@ -44,7 +44,6 @@
                         isInstructorManagedTopic = TeamUtils.isInstructorManagedTopic(this.topic.attributes.type);
 
                     var showLeaveLink = isMember && (isAdminOrStaff || !isInstructorManagedTopic);
-
                     HtmlUtils.setHtml(
                         this.$el,
                         HtmlUtils.template(teamTemplate)({
@@ -74,13 +73,15 @@
 
                 renderTeamMembers: function() {
                     var view = this;
+                    var teamMeeting = this.context.meetings[this.model.get('id')];
                     _.each(this.model.get('membership'), function(membership) {
                         HtmlUtils.append(
                             view.$('.members-info'),
                             HtmlUtils.template(teamMemberTemplate)({
                                 imageUrl: membership.user.profile_image.image_url_medium,
                                 username: membership.user.username,
-                                memberProfileUrl: '/u/' + membership.user.username
+                                memberProfileUrl: '/u/' + membership.user.username,
+                                isInMeeting: teamMeeting && teamMeeting.attendees.includes(membership.user.username)
                             })
                         );
                     });

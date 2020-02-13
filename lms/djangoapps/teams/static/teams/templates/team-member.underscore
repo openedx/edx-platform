@@ -1,8 +1,13 @@
 <li>
   <span class="team-member">
     <a class="member-profile" href="<%= memberProfileUrl %>">
-      <p class="tooltip-custom"><%= username %></p>
-      <img class="image-url" src="<%= imageUrl %>" alt="profile page" />
+      <div class="member-profile-container">
+        <p class="tooltip-custom"><%= username %></p>
+        <img class="image-url" src="<%= imageUrl %>" alt="profile page" />
+        <% if (isInMeeting) { %>
+          <i class="fa fa-circle"></i>
+        <% } %>
+      </div>
     </a>
   </span>
 </li>
