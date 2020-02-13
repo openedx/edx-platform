@@ -878,7 +878,7 @@ class RegistrationFormFactory(object):
                 u"By creating an account with {platform_name}, you agree \
                   to abide by our {platform_name} \
                   {terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end} \
-                  and agree to our {privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
+                  and read, acknowledge, and understand our {privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
             )).format(
                 platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
                 terms_of_service=terms_label,
