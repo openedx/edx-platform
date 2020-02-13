@@ -1,6 +1,7 @@
 @import 'edx-bootstrap/sass/open-edx/theme';
 
 $header-bg: theme-color("inverse") !default;
+$header-border-bottom-color: theme-color("primary") !default;
 
 $btn-sign-in-bg: theme-color("primary") !default;
 $btn-sign-in-color: theme-color("inverse") !default;
