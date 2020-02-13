@@ -384,3 +384,29 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
         kwargs = {"certificate_uuid": self.cert.verify_uuid}
         expected_download_url = reverse('certificates:render_cert_by_uuid', kwargs=kwargs)
         self.assert_success_response_for_student(response, download_url=expected_download_url)
+
+    @patch('lms.djangoapps.certificates.apis.v0.views.get_course_run_details')
+    def test_certificate_without_course(self, mock_get_course_run_details):
+        """
+        Verify that certificates are returned for deleted XML courses.
+        """
+        expected_course_name = 'Test Course Title'
+        mock_get_course_run_details.return_value = {'title': expected_course_name}
+        xml_course_key = self.store.make_course_key('edX', 'testDeletedCourse', '2020')
+        cert_for_deleted_course = GeneratedCertificateFactory.create(
+            user=self.student,
+            course_id=xml_course_key,
+            status=CertificateStatuses.downloadable,
+            mode='honor',
+            download_url='www.edx.org/honor-cert-for-deleted-course.pdf',
+            grade="0.88"
+        )
+
+        response = self.get_response(
+            AuthType.jwt,
+            requesting_user=self.student,
+            requested_user=self.student,
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertContains(response, cert_for_deleted_course.download_url)
+        self.assertContains(response, expected_course_name)
