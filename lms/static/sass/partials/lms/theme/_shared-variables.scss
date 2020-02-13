@@ -65,3 +65,38 @@ $header-main-nav-item-link-color: theme-color("secondary") !default;
 
 $header-secondary-nav-item-link-color: theme-color("dark") !default;
 $user-dropdown-link-color: theme-color("dark") !default;
+
+%dashboard-course-card-title-link {
+  @if variable-exists(dashboard-course-card-title-link-color) {
+    color: $dashboard-course-card-title-link-color;
+  }
+  @if variable-exists(dashboard-course-card-title-link-hover-color) {
+    &:hover, &:active, &:focus {
+      color: $dashboard-course-card-title-link-hover-color;
+    }
+  }
+}
+
+%dashboard-btn-enter-course {
+  @if variable-exists(dashboard-btn-enter-course-bg) {
+    background-color: $dashboard-btn-enter-course-bg;
+  }
+  @if variable-exists(dashboard-btn-enter-course-color) {
+    color: $dashboard-btn-enter-course-color;
+  }
+  @if variable-exists(dashboard-btn-enter-course-border-color) {
+    border-color: $dashboard-btn-enter-course-border-color;
+  }
+
+  &:hover, &:active, &:focus {
+    @if variable-exists(dashboard-btn-enter-course-hover-bg) {
+      background-color: $dashboard-btn-enter-course-hover-bg;
+    }
+    @if variable-exists(dashboard-btn-enter-course-hover-color) {
+      color: $dashboard-btn-enter-course-hover-color;
+    }
+    @if variable-exists(dashboard-btn-enter-course-hover-border-color) {
+      border-color: $dashboard-btn-enter-course-hover-border-color;
+    }
+  }
+}

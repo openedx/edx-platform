@@ -135,6 +135,9 @@
               flex-basis: 100%;
               padding-top: $baseline/2;
 
+              a.course-target-link {
+                @extend %dashboard-course-card-title-link;
+              }
               a, span {
                 font: -apple-system-short-headline !important;
                 @extend %t-title3;
@@ -400,6 +403,8 @@
             @extend %btn-pl-white-base;
 
             @include float(right);
+
+            @extend %dashboard-btn-enter-course;
 
             &.archived {
               @extend %btn-pl-default-base;
