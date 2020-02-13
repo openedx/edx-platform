@@ -23,7 +23,7 @@ pymongo==3.9.0
 python-memcached==1.59
 requests==2.22.0
 six==1.14.0               # via edx-opaque-keys, libsass, mock, paver, python-memcached, stevedore
-stevedore==1.31.0
+stevedore==1.32.0
 urllib3==1.25.8           # via requests
 watchdog==0.10.2
 wrapt==1.11.2
