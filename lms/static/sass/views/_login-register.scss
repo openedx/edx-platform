@@ -74,7 +74,11 @@
     margin-top: $baseline;
     letter-spacing: normal;
     font-family: $font-family-sans-serif;
-    color: $uxpl-blue-hover-active;
+    @if variable-exists(logistration-form-header-color) {
+      color: $logistration-form-header-color;
+    } @else {
+      color: $uxpl-blue-hover-active;
+    }
   }
 
   h3 {
@@ -93,7 +97,8 @@
   }
 
   a {
-    text-decoration: underline;
+      text-decoration: underline;
+      @extend %logistration-form-link;
   }
 }
 
@@ -384,7 +389,7 @@
       text-decoration: none;
       text-shadow: none;
       font-family: $font-family-sans-serif;
-
+      @extend %logistration-form-link;
       &:hover,
       &:focus {
         text-decoration: underline;
@@ -501,7 +506,7 @@
 
   .action-primary {
     @extend %btn-primary-blue;
-
+    @extend %logistration-form-btn-action-primary;
     padding: 1ex 1em;
     text-transform: none;
     font-weight: 600;
@@ -895,4 +900,3 @@
 body.open-modal {
   overflow: hidden;
 }
-
