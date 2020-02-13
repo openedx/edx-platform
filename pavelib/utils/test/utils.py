@@ -166,7 +166,6 @@ def fetch_coverage_test_selection_data(options):
     except OSError:
         pass  # Directory already exists
 
-    sh(u'git merge-base {} HEAD'.format(getattr(options, 'compare_branch', 'origin/master')))
     sh(u'git diff $(git merge-base {} HEAD) | tee {}/{}'.format(
         getattr(options, 'compare_branch', 'origin/master'),
         COVERAGE_CACHE_BASEPATH,
