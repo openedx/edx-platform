@@ -1458,7 +1458,6 @@ class MeetingsInfoView(GenericAPIView):
         user = request.user
         chime_attendees = meetings_api.chime_attendees_for_meeting(meeting_id)
 
-        import pdb; pdb.set_trace()
         attendee = None
         for att in chime_attendees['Attendees']:
             if att['ExternalUserId'] == user.username:

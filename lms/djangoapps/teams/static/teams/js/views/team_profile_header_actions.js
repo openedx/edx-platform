@@ -154,7 +154,7 @@
                         url: view.context.createMeetingsUrl,
                     }).done(function(data) {
                         // Team meeting has been created and attendee added, redirect to MFE
-                        var mfe_url = 'http://something/' + data.meeting_id + '/?token=' + data.token;
+                        var mfe_url = 'http://localhost:8081/meeting/' + data.meeting_id;
                         window.location.href = mfe_url;
                         deferred.resolve(info);
                     }).fail(function(data) {
