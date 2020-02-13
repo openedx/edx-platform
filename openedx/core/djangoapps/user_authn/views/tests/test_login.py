@@ -87,7 +87,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         {
             'next_url': None,
             'course_id': None,
-            'expected_redirect': '/dashboard',
+            'expected_redirect': '/homepage-placeholder',
         },
         # A relative path is an acceptable redirect.
         {
@@ -105,7 +105,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         {
             'next_url': 'https://evil.sketchysite',
             'course_id': None,
-            'expected_redirect': '/dashboard',
+            'expected_redirect': '/homepage-placeholder',
         },
         # An absolute URL to a whitelisted domain is acceptable.
         {
@@ -117,26 +117,43 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         {
             'next_url': None,
             'course_id': 'coursekey',
-            'expected_redirect': '/account/finish_auth?course_id=coursekey&next=%2Fdashboard',
+            'expected_redirect': (
+                '/account/finish_auth?course_id=coursekey&next=%2Fhomepage-placeholder'
+            ),
         },
         # If valid course_id AND next_url are provided, redirect to finish_auth with
         # provided next URL.
         {
             'next_url': 'freshpage',
             'course_id': 'coursekey',
-            'expected_redirect': '/account/finish_auth?course_id=coursekey&next=freshpage',
+            'expected_redirect': (
+                '/account/finish_auth?course_id=coursekey&next=freshpage'
+            )
         },
         # If course_id is provided with invalid next_url, redirect to finish_auth with
         # course_id and dashboard as next URL.
         {
             'next_url': 'http://scam.scam',
             'course_id': 'coursekey',
-            'expected_redirect': '/account/finish_auth?course_id=coursekey&next=%2Fdashboard',
+            'expected_redirect': (
+                '/account/finish_auth?course_id=coursekey&next=%2Fhomepage-placeholder'
+            ),
         },
     )
     @ddt.unpack
     @override_settings(LOGIN_REDIRECT_WHITELIST=['openedx.service'])
     @override_settings(FEATURES=FEATURES_WITH_LOGIN_MFE_ENABLED)
+    @patch(
+        # Mock out reverse for LMS and Studio default redirects
+        # (/dashboard and /home, respectively).
+        # That way, we can handle both cases, while also making it easier to change this
+        # test if the default LMS redirect ever changes.
+        'student.helpers.reverse',
+        lambda urlname, *args, **kwargs: (
+            '/homepage-placeholder' if urlname in {'dashboard', 'home'}
+            else reverse(urlname)
+        )
+    )
     def test_login_success_with_redirect(self, next_url, course_id, expected_redirect):
         # Default redirect is student dashboard.
         post_params = {}
