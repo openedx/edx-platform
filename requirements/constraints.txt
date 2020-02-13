@@ -11,9 +11,6 @@
 # The CORS_ORIGIN_WHITELIST changes in a backwards incompatible way in 3.0.0, needs matching configuration repo changes
 django-cors-headers<3.0.0
 
-# Constraining this since the newer versions no longer work with the deprecated MIDDLEWARE_CLASSES setting
-django-debug-toolbar<2.0
-
 # Version 1.2.0 dropped support for Django 1.11
 django-oauth-toolkit<1.2.0
 
@@ -80,3 +77,6 @@ mock<4.0.0
 
 # django-storages version 1.9 drops support for boto storage backend.
 django-storages<1.9
+
+# Support was dropped for Python 3.5, Django 2.0, Django 2.1, DRF 3.7
+drf-yasg<1.17.1
