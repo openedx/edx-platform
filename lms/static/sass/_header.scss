@@ -109,7 +109,7 @@
           margin: 0;
 
           a {
-            color: theme-color("secondary");
+            color: $header-main-nav-item-link-color;
             padding: $baseline*0.35 $baseline*1.25 19px;
             font-weight: $font-weight-normal;
             display: inline-block;
@@ -120,12 +120,12 @@
             &.active,
             &:hover {
               border-bottom-style: solid;
-              border-bottom-color: theme-color("primary");
+              border-bottom-color: $header-main-nav-active-item-border-bottom-color;
             }
 
             &:hover {
               cursor: pointer;
-              border-bottom-color: theme-color("primary");
+              border-bottom-color: $header-main-nav-active-item-border-bottom-color;
             }
           }
         }
@@ -148,8 +148,12 @@
           }
 
           a {
-            color: theme-color("dark");
+            color: $header-secondary-nav-item-link-color;
             font-weight: $font-weight-normal;
+          }
+
+          .dropdown-nav-item a {
+            color: $user-dropdown-link-color;
           }
         }
 
@@ -218,6 +222,10 @@
           padding: $baseline/2;
           text-decoration: none;
           cursor: pointer;
+        }
+
+        span {
+          color: $header-secondary-nav-item-link-color;
         }
 
         .dropdown-user-menu {
