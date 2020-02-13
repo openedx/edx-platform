@@ -154,7 +154,7 @@
                         url: view.context.createMeetingsUrl,
                     }).done(function(data) {
                         // Team meeting has been created and attendee added, redirect to MFE
-                        var mfe_url = 'http://localhost:8081/meeting/' + data.meeting_id;
+                        var mfe_url = 'https://learner-portal-iloveagent57.sandbox.edx.org/meeting/' + data.meeting_id;
                         window.location.href = mfe_url;
                         deferred.resolve(info);
                     }).fail(function(data) {
