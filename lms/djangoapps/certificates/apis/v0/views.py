@@ -18,6 +18,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from lms.djangoapps.certificates.api import get_certificate_for_user, get_certificates_for_user
+from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.user_api.accounts.api import visible_fields
@@ -270,14 +271,32 @@ class CertificatesListView(APIView):
         for course_key, course_overview in CourseOverview.get_from_ids(
             list(passing_certificates.keys())
         ).items():
+            if not course_overview:
+                # For deleted XML courses in which learners have a valid certificate.
+                # i.e. MITx/7.00x/2013_Spring
+                course_overview = self._get_pseudo_course_overview(course_key)
             if certificates_viewable_for_course(course_overview):
                 course_certificate = passing_certificates[course_key]
                 # add certificate into viewable certificate list only if it's a PDF certificate
                 # or there is an active certificate configuration.
                 if course_certificate['is_pdf_certificate'] or course_overview.has_any_active_web_certificate:
-                    course_certificate['course_display_name'] = course_overview.display_name_with_default
+                    course_display_name = course_overview.display_name
+                    if not course_overview.pk:
+                        course_display_name = course_overview.display_name_with_default
+                    course_certificate['course_display_name'] = course_display_name
                     course_certificate['course_organization'] = course_overview.display_org_with_default
                     viewable_certificates.append(course_certificate)
 
         viewable_certificates.sort(key=lambda certificate: certificate['created'])
         return viewable_certificates
+
+    def _get_pseudo_course_overview(self, course_key):
+        """
+        Returns a pseudo course overview object for deleted courses.
+        """
+        course_run = get_course_run_details(course_key, ['title'])
+        return CourseOverview(
+            display_name=course_run.get('title'),
+            display_org_with_default=course_key.org,
+            certificates_show_before_end=True
+        )
