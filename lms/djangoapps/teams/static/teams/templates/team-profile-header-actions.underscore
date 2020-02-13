@@ -1,6 +1,6 @@
 <div class="join-team form-actions">
     <% if (showJoinButton) {%>
-        <button class="action action-primary">
+        <button class="action action-primary action-join-team">
             <%- gettext("Join Team") %>
         </button>
     <% } else if (message) { %>

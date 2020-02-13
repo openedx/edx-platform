@@ -17,7 +17,7 @@
                 notJoinInstructorManagedTeam: gettext('Cannot join instructor managed team'),
 
                 events: {
-                    'click .action-primary': 'joinTeam',
+                    'click .action-join-team': 'joinTeam',
                     'click .action-edit-team': 'editTeam',
                     'click .action-join-meeting': 'joinMeeting'
                 },
