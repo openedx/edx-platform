@@ -39,9 +39,13 @@ def get_chime_meeting(meeting_id):
 
 def current_meeting_for_team(team):
     course_team_meeting = CourseTeamMeeting.latest_for_team(team)
+    if not course_team_meeting:
+        return None
+
     chime_meeting = get_chime_meeting(course_team_meeting.meeting_id)
     if chime_meeting:
         return course_team_meeting
+
     # return null if there's no meeting in progress for the team
     return None
 
