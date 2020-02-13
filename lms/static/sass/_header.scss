@@ -53,7 +53,7 @@
       @include margin($baseline*0.8, 0, 0, $baseline);
 
       font-size: $font-size-sm;
-      color: theme-color("dark");
+      color: $courseware-course-header-color;
       line-height: 1em;
       display: none;
 
