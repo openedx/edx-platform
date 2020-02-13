@@ -172,6 +172,11 @@ def fetch_coverage_test_selection_data(options):
         WHO_TESTS_WHAT_DIFF
     ))
     get_file_from_s3(COVERAGE_CACHE_BUCKET, COVERAGE_CACHE_BASELINE, COVERAGE_CACHE_BASEPATH)
+    sh(u'mv {base}/{file} {base}/{suite}.coverage'.format(
+        base=COVERAGE_CACHE_BASEPATH,
+        file=COVERAGE_CACHE_BASELINE,
+        suit=os.environ.get('TEST_SUITE', ''),
+    ))
 
 
 @task
