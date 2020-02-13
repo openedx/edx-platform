@@ -359,7 +359,7 @@ class Env(object):
         execution.  Needs to include all modules for which coverage is
         measured, not just the tests being run.
         """
-        result = set()
+        result = set(['reports'])
         for module in cls.covered_modules():
             result.add(module.split('/')[0])
         return result
