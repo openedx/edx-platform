@@ -166,11 +166,6 @@ def fetch_coverage_test_selection_data(options):
     except OSError:
         pass  # Directory already exists
 
-    sh(u'git diff $(git merge-base {} HEAD) | tee {}/{}'.format(
-        getattr(options, 'compare_branch', 'origin/master'),
-        COVERAGE_CACHE_BASEPATH,
-        WHO_TESTS_WHAT_DIFF
-    ))
     get_file_from_s3(COVERAGE_CACHE_BUCKET, COVERAGE_CACHE_BASELINE, COVERAGE_CACHE_BASEPATH)
     sh(u'mv {base}/{file} {base}/{suite}.coverage'.format(
         base=COVERAGE_CACHE_BASEPATH,
