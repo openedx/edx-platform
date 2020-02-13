@@ -12,9 +12,9 @@
     <% } %>
     <% if (showLiveCollaboration) {
         if (teamMeeting && teamMeeting.attendees.length) {%>
-            <button class="action action-secondary action-join-meeting"><%- gettext("Join Live Collaboration") %></button>
+            <button class="action action-primary action-join-meeting"><%- gettext("Join Live Collaboration") %></button>
         <% } else {%>
-            <button class="action action-secondary action-join-meeting"><%- gettext("Start Live Collaboration") %></button>
+            <button class="action action-primary action-join-meeting"><%- gettext("Start Live Collaboration") %></button>
         <% }
     } %>
 </div>

@@ -69,7 +69,7 @@ def attendees_for_meeting(course_team_meeting):
     return [
         users_by_username[attendee['ExternalUserId']]
         for attendee in attendees['Attendees']
-        if attendee['ExternalUserId'] in attendees
+        if attendee['ExternalUserId'] in users_by_username
     ]
 
 
