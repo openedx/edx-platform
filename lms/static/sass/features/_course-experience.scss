@@ -309,6 +309,10 @@
     list-style-type: none;
 
     // Course outline accordion / link
+    a.outline-button {
+        @extend %course-outline-link;
+    }
+
     .outline-button {
       display: block;
       padding: 10px 0 10px 2px;
@@ -320,7 +324,11 @@
       cursor: pointer;
 
       .fa {
-        color: $blue;
+        @if variable-exists(course-outline-chevron-color) {
+          color: $course-outline-chevron-color;
+        } @else {
+          color: $blue;
+        }
       }
 
       .prerequisites-icon {
