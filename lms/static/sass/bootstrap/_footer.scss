@@ -3,7 +3,11 @@
 
 .wrapper-footer {
   box-shadow: 0 -1px 5px 0 $shadow-l1;
-  border-top: 1px solid $navbar-light-disabled-color;
+  @if variable-exists(footer-border-top-color) {
+    border-top: 1px solid $footer-border-top-color;
+  } @else {
+    border-top: 1px solid $navbar-light-disabled-color;
+  }
   background-color: $footer-bg;
   margin-top: $baseline/2;
   padding: $baseline;
