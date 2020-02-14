@@ -184,6 +184,10 @@ from pipeline_mako import render_require_js_path_overrides
         <%include file="/preview_menu.html" />
     % endif
 
+    % if course and course.self_paced and tab and relative_dates_is_enabled:
+        <%include file="/reset_deadlines_banner.html" />
+    % endif
+
     <%include file="/page_banner.html" />
 
     <div class="marketing-hero"><%block name="marketing_hero"></%block></div>

@@ -7,7 +7,7 @@ from django.conf.urls import url
 
 from .views.course_dates import CourseDatesFragmentMobileView
 from .views.course_home import CourseHomeFragmentView, CourseHomeView
-from .views.course_outline import CourseOutlineFragmentView
+from .views.course_outline import CourseOutlineFragmentView, reset_course_deadlines
 from .views.course_reviews import CourseReviewsView
 from .views.course_sock import CourseSockFragmentView
 from .views.course_updates import CourseUpdatesFragmentView, CourseUpdatesView
@@ -69,5 +69,10 @@ urlpatterns = [
         r'^mobile_dates_fragment',
         CourseDatesFragmentMobileView.as_view(),
         name='openedx.course_experience.mobile_dates_fragment_view',
+    ),
+    url(
+        r'^reset_deadlines$',
+        reset_course_deadlines,
+        name='openedx.course_experience.reset_course_deadlines',
     ),
 ]
