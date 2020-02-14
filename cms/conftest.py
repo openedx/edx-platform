@@ -9,9 +9,9 @@ only running cms tests.
 
 import importlib
 import os
+import logging
 import contracts
 import pytest
-import logging
 
 from openedx.core.pytest_hooks import DeferPlugin
 
