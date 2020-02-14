@@ -47,7 +47,6 @@ def pytest_sessionfinish(session):
     Since multiple pytests are running,
     this makes sure warnings from different run are not overwritten
     """
-    print("Creating log file")
     dir_path = "test_root/log"
     file_name_postfix = "pytest_warnings"
     num = 0
