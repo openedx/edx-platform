@@ -47,6 +47,7 @@ def pytest_sessionfinish(session):
     Since multiple pytests are running,
     this makes sure warnings from different run are not overwritten
     """
+    print("Creating log file")
     dir_path = "test_root/log"
     file_name_postfix = "pytest_warnings"
     num = 0
@@ -75,5 +76,5 @@ class DeferPlugin(object):
 
 
 def pytest_configure(config):
-    if config.pluginmanager.hasplugin("json-report"):
+    if config.pluginmanager.hasplugin("pytest_jsonreport") or config.pluginmanager.hasplugin("json-report"):
         config.pluginmanager.register(DeferPlugin())

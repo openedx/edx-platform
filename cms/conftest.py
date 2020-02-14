@@ -24,9 +24,10 @@ def pytest_configure(config):
     """
     Do core setup operations from manage.py before collecting tests.
     """
-
-    if config.pluginmanager.hasplugin("json-report"):
+    if config.pluginmanager.hasplugin("pytest_jsonreport") or config.pluginmanager.hasplugin("json-report"):
         config.pluginmanager.register(DeferPlugin())
+    else:
+        print("pytest did not register json_report correctly")
 
     if config.getoption('help'):
         return
