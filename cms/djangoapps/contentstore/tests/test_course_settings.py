@@ -91,6 +91,33 @@ class CourseSettingsEncoderTest(CourseTestCase):
         self.assertEqual(jsondetails['string'], 'string')
 
 
+class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
+    """
+    Tests for AdvanceSettings View.
+    """
+
+    def setUp(self):
+        super(CourseAdvanceSettingViewTest, self).setUp()
+        self.fullcourse = CourseFactory.create()
+        self.course_setting_url = get_url(self.course.id, 'advanced_settings_handler')
+
+    @override_settings(FEATURES={'DISABLE_MOBILE_COURSE_AVAILABLE': True})
+    def test_mobile_field_available(self):
+
+        """
+        Test to check `Mobile Course Available` field is not viewable in Studio
+        when DISABLE_MOBILE_COURSE_AVAILABLE is true.
+        """
+
+        response = self.client.get_html(self.course_setting_url)
+        start = response.content.decode('utf-8').find("mobile_available")
+        end = response.content.decode('utf-8').find("}", start)
+        settings_fields = json.loads(response.content.decode('utf-8')[start + len("mobile_available: "):end + 1])
+
+        self.assertEqual(settings_fields["display_name"], "Mobile Course Available")
+        self.assertEqual(settings_fields["deprecated"], True)
+
+
 @ddt.ddt
 class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
     """

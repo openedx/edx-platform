@@ -407,6 +407,7 @@ FEATURES = {
 
     # Enable feature to remove enrollments and users. Used to reset state of master's integration environments
     'ENABLE_ENROLLMENT_RESET': False,
+    'DISABLE_MOBILE_COURSE_AVAILABLE': False,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
