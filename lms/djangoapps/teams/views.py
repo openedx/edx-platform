@@ -11,12 +11,11 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render_to_response
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
-from django.views import View
 from django_countries import countries
 from edx_rest_framework_extensions.paginators import DefaultPagination, paginate_search_results
 from opaque_keys import InvalidKeyError
@@ -1387,13 +1386,16 @@ class MembershipBulkManagementView(GenericAPIView):
         Process uploaded CSV to modify team memberships for given course run.
         """
         self.check_access()
+
         inputfile_handle = request.FILES['csv']
         team_import_manager = TeamMembershipImportManager(self.course)
         team_import_manager.set_team_membership_from_csv(inputfile_handle)
+
         if team_import_manager.import_succeeded:
-            return Response(str(team_import_manager.number_of_records_added), status=status.HTTP_201_CREATED)
+            msg = "Successfully added {} students to teams".format(team_import_manager.number_of_records_added)
+            return JsonResponse({'message': msg}, status=status.HTTP_201_CREATED)
         else:
-            return Response({
+            return JsonResponse({
                 'errors': team_import_manager.validation_errors
             }, status=status.HTTP_400_BAD_REQUEST)
 
