@@ -11,6 +11,7 @@ import importlib
 import os
 import contracts
 import pytest
+import logging
 
 from openedx.core.pytest_hooks import DeferPlugin
 
@@ -27,7 +28,7 @@ def pytest_configure(config):
     if config.pluginmanager.hasplugin("pytest_jsonreport") or config.pluginmanager.hasplugin("json-report"):
         config.pluginmanager.register(DeferPlugin())
     else:
-        print("pytest did not register json_report correctly")
+        logging.info("pytest did not register json_report correctly")
 
     if config.getoption('help'):
         return
