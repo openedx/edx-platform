@@ -49,7 +49,11 @@
         height: 100%;
         text-overflow: ellipsis;
         white-space: nowrap;
-        color: $link-color;
+        @if variable-exists(wiki-breadcrumb-link-color) {
+          color: $wiki-breadcrumb-link-color;
+        } @else {
+          color: $link-color;
+        }
       }
 
       &::after {
@@ -152,6 +156,11 @@
     color: $body-color;
 
     @include box-sizing(border-box);
+
+    p a, td a {
+      @extend %wiki-article-link;
+    }
+
   }
 
   &.view .main-article {
@@ -273,6 +282,8 @@
           color: $uxpl-blue-hover-active;
           font-weight: bold;
         }
+
+        @extend %wiki-nav-tab-link;
       }
     }
   }
@@ -285,11 +296,13 @@
     li {
       &.active {
         a {
+
           color: $uxpl-blue-hover-active;
           font-weight: bold;
           background-color: $light-gray1;
           border-color: $uxpl-blue-hover-active;
-          border-left: 4px solid
+          border-left: 4px solid;
+          @extend %wiki-nav-tab-active-link;
         }
       }
     }
@@ -315,6 +328,7 @@
         color: $uxpl-blue-hover-active;
         font-weight: bold;
       }
+      @extend %wiki-nav-tab-link;
     }
   }
 

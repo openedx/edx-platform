@@ -153,3 +153,35 @@ $course-outline-tools-link-hover-color: theme-color("primary") !default;
     }
   }
 }
+
+%wiki-nav-tab-active-link {
+  @if variable-exists(wiki-nav-tab-active-link-color) {
+    color: $wiki-nav-tab-active-link-color;
+  }
+
+  @if variable-exists(wiki-nav-tab-active-link-border-color) {
+    border-color: $wiki-nav-tab-active-link-border-color;
+  }
+}
+
+%wiki-nav-tab-link {
+  @if variable-exists(wiki-nav-tab-link-color) {
+    color: $wiki-nav-tab-link-color;
+  }
+  @if variable-exists(wiki-nav-tab-link-hover-color) {
+    &:hover, &:focus, &:active {
+      color: $wiki-nav-tab-link-hover-color;
+    }
+  }
+}
+
+%wiki-article-link {
+  @if variable-exists(wiki-article-link-color) {
+    color: $wiki-article-link-color;
+  }
+  @if variable-exists(wiki-article-link-hover-color) {
+    &:hover, &:focus, &:active {
+      color: $wiki-article-link-hover-color;
+    }
+  }
+}
