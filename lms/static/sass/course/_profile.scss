@@ -311,6 +311,10 @@
             .hd {
               color: $gray-d1;
 
+              a {
+                @extend %progress-page-link;
+              }
+
               span {
                 color: $gray-d2;
                 font-size: em(14);

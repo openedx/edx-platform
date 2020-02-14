@@ -185,3 +185,14 @@ $course-outline-tools-link-hover-color: theme-color("primary") !default;
     }
   }
 }
+
+%progress-page-link {
+  @if variable-exists(progress-page-link-color) {
+    color: $progress-page-link-color;
+  }
+  @if variable-exists(progress-page-link-hover-color) {
+    &:hover, &:focus, &:active {
+      color: $progress-page-link-hover-color;
+    }
+  }
+}
