@@ -7,7 +7,6 @@ from rest_framework import serializers
 
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from openedx.core.lib.api.fields import AbsoluteURLField
-from student.models import CourseEnrollment
 
 
 class _MediaSerializer(serializers.Serializer):  # pylint: disable=abstract-method
@@ -78,7 +77,8 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     start_display = serializers.CharField()
     start_type = serializers.CharField()
     pacing = serializers.CharField()
-    enrollment = serializers.SerializerMethodField()
+    enrollment = serializers.DictField()
+    user_has_access = serializers.BooleanField()
     tabs = serializers.SerializerMethodField()
 
     def __init__(self, *args, **kwargs):
@@ -108,13 +108,3 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
                 'url': tab.link_func(course_overview, reverse),
             })
         return tabs
-
-    def get_enrollment(self, course_overview):
-        """
-        Return the enrollment for the logged in user.
-        """
-        mode, is_active = CourseEnrollment.enrollment_mode_for_user(
-            course_overview.effective_user,
-            course_overview.id
-        )
-        return {'mode': mode, 'is_active': is_active}
