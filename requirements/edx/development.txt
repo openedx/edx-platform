@@ -204,7 +204,7 @@ nodeenv==1.3.5
 numpy==1.18.1
 git+https://github.com/joestump/python-oauth2.git@b94f69b1ad195513547924e380d9265133e995fa#egg=oauth2
 oauthlib==2.1.0
-git+https://github.com/edx/edx-ora2/archive/saad/PROD-515.zip
+https://github.com/edx/edx-ora2/archive/saad/PROD-515.zip
 packaging==20.1
 pandas==0.22.0
 path.py==12.4.0
