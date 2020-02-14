@@ -8,7 +8,7 @@ def runPythonTests() {
             noTags: true, shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
             refspec: git_refspec, url: "git@github.com:edx/${REPO_NAME}.git"]]]
         sh 'bash scripts/all-tests.sh'
-        stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}-reports"
+        stash includes: 'reports/**/*coverage*,test_root/log/*.json', name: "${TEST_SUITE}-reports"
     }
 }
 
@@ -29,7 +29,7 @@ def createWarningsReport(fileExtension){
     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
                             reportDir: 'reports/pytest_warnings', reportFiles: "${warning_filename}",
                             reportName: "${warning_filename}", reportTitles: ''])
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/pytest_warnings/*.html, test_root/log/*.json'
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/pytest_warnings/*.html'
 }
 
 
