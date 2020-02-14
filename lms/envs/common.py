@@ -130,11 +130,6 @@ FEATURES = {
     # Toggles OAuth2 authentication provider
     'ENABLE_OAUTH2_PROVIDER': False,
 
-    # Toggles auth class in discussions djangoapps
-    'DISCUSSION_USE_NEW_OAUTH2_CLASS': False,
-    # Toggles auth class in bookmarks djangoapps
-    'BOOKMARKS_USE_NEW_OAUTH2_CLASS': False,
-
     # Allows to enable an API endpoint to serve XBlock view, used for example by external applications.
     # See jquey-xblock: https://github.com/edx-solutions/jquery-xblock
     'ENABLE_XBLOCK_VIEW_ENDPOINT': False,
