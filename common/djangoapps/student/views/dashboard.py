@@ -664,10 +664,10 @@ def student_dashboard(request):
                         "Add a recovery email to retain access when single-sign on is not available. "
                         "Go to {link_start}your Account Settings{link_end}.")
                 ).format(
-                    link_start = HTML("<a href='{account_setting_page}'>").format(
+                    link_start=HTML("<a href='{account_setting_page}'>").format(
                         account_setting_page=reverse('account_settings'),
                     ),
-                    link_end = HTML("</a>")
+                    link_end=HTML("</a>")
                 )
         else:
             recovery_email_activation_message = Text(
