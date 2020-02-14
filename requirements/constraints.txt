@@ -20,11 +20,6 @@ django-oauth-toolkit<1.2.0
 # Version 4.0.0 dropped support for Django < 2.0.1
 django-model-utils<4.0.0
 
-# 1.2.3 breaks unittest in
-# lms.djangoapps.course_api.tests.test_views.CourseListSearchViewTest.test_list_all_with_search_term
-# acceptance.tests.lms.test_lms_course_discovery.CourseDiscoveryTest.test_search
-edx-search==1.2.2
-
 # Code changes must be made to support 0.7.1
 edx-when==0.7.0
 
