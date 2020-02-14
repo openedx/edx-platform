@@ -439,5 +439,6 @@ class RefundUtilMethodTests(ModuleStoreTestCase):
             enrollment = CourseEnrollment.enroll(self.user, course_id, mode=course_mode)
             refund_success = refund_seat(enrollment, True)
 
-            mocked_log_info.assert_called_with('Skipping refund failure notification to support')
+            mocked_log_info.assert_called_with('Skipping support notification for refund failure from edx-platform.'
+                                               'The email will be sent from the ecommerce service')
             assert refund_success
