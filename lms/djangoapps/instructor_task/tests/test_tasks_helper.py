@@ -12,6 +12,7 @@ Unit tests for LMS instructor-initiated background tasks helper functions.
 import os
 import shutil
 import tempfile
+from collections import OrderedDict
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 
@@ -529,7 +530,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         problem = self.define_option_problem(u'Problem1')
         self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
         with self._remove_capa_report_generator():
-            student_data, _ = ProblemResponses._build_student_data(
+            student_data, student_data_keys_list = ProblemResponses._build_student_data(
                 user_id=self.instructor.id,
                 course_key=self.course.id,
                 usage_key_str=str(problem.location),
@@ -542,6 +543,8 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             'title': 'Problem1',
         }, student_data[0])
         self.assertIn('state', student_data[0])
+        self.assertEqual(student_data_keys_list,
+                         ['username', 'title', 'location', 'block_key', 'state'])
         mock_list_problem_responses.assert_called_with(self.course.id, ANY, ANY)
 
     @patch('xmodule.capa_module.ProblemBlock.generate_report_data', create=True)
@@ -558,7 +561,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             ('student', state1),
             ('student', state2),
         ])
-        student_data, _ = ProblemResponses._build_student_data(
+        student_data, student_data_keys_list = ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
             usage_key_str=str(self.course.location),
@@ -581,6 +584,50 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             'more': 'state2!',
         }, student_data[1])
         self.assertEqual(student_data[0]['state'], student_data[1]['state'])
+        self.assertEqual(student_data_keys_list,
+                         ['username', 'title', 'location', 'more', 'some', 'block_key', 'state'])
+
+    @patch('xmodule.capa_module.ProblemBlock.generate_report_data', create=True)
+    def test_build_student_data_for_block_with_ordered_generate_report_data(self, mock_generate_report_data):
+        """
+        Ensure that building student data for a block that returns OrderedDicts from the
+        ``generate_report_data`` sorts the columns as expected.
+        """
+        self.define_option_problem(u'Problem1')
+        self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
+        state1 = OrderedDict()
+        state1['some'] = 'state1'
+        state1['more'] = 'state1!'
+        state2 = {'some': 'state2', 'more': 'state2!'}
+        mock_generate_report_data.return_value = iter([
+            ('student', state1),
+            ('student', state2),
+        ])
+        student_data, student_data_keys_list = ProblemResponses._build_student_data(
+            user_id=self.instructor.id,
+            course_key=self.course.id,
+            usage_key_str=str(self.course.location),
+        )
+        self.assertEqual(len(student_data), 2)
+        self.assertDictContainsSubset({
+            'username': 'student',
+            'location': 'test_course > Section > Subsection > Problem1',
+            'block_key': 'i4x://edx/1.23x/problem/Problem1',
+            'title': 'Problem1',
+            'some': 'state1',
+            'more': 'state1!',
+        }, student_data[0])
+        self.assertDictContainsSubset({
+            'username': 'student',
+            'location': 'test_course > Section > Subsection > Problem1',
+            'block_key': 'i4x://edx/1.23x/problem/Problem1',
+            'title': 'Problem1',
+            'some': 'state2',
+            'more': 'state2!',
+        }, student_data[1])
+        self.assertEqual(student_data[0]['state'], student_data[1]['state'])
+        self.assertEqual(student_data_keys_list,
+                         ['username', 'title', 'location', 'some', 'more', 'block_key', 'state'])
 
     def test_build_student_data_for_block_with_real_generate_report_data(self):
         """
@@ -589,7 +636,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         """
         self.define_option_problem(u'Problem1')
         self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
-        student_data, _ = ProblemResponses._build_student_data(
+        student_data, student_data_keys_list = ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
             usage_key_str=str(self.course.location),
@@ -606,6 +653,10 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             'Question': u'The correct answer is Option 1',
         }, student_data[0])
         self.assertIn('state', student_data[0])
+        self.assertEqual(student_data_keys_list,
+                         ['username', 'title', 'location',
+                          'Answer', 'Answer ID', 'Correct Answer', 'Question',
+                          'block_key', 'state'])
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.grades.list_problem_responses')
     @patch('xmodule.capa_module.ProblemBlock.generate_report_data', create=True)
