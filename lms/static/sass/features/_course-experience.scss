@@ -17,6 +17,10 @@
     &:not(:first-child) {
       margin-top: $baseline;
     }
+
+    a {
+      @extend %course-sidebar-link;
+    }
   }
 }
 
@@ -406,7 +410,17 @@
 #expand-collapse-outline-all-button {
   float: right;
   background-color: $white;
-  color: $black;
+
+  @if variable-exists(btn-expand-collapse-outline-border-color) {
+    border-color: $btn-expand-collapse-outline-border-color;
+  }
+
+  @if variable-exists(btn-expand-collapse-outline-color) {
+    color: $btn-expand-collapse-outline-color;
+  } @else {
+    color: $black;
+  }
+
   cursor: pointer;
 }
 
@@ -508,6 +522,10 @@
       }
     }
   }
+}
+
+#course-container .action-resume-course {
+  @extend %btn-resume-course;
 }
 
 // Course Reviews Page
