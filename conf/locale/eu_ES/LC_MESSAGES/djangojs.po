@@ -25,7 +25,7 @@
 # EdX Team <info@edx.org>, 2020.
 #
 # Translators:
-# Abel Camacho <abelcama@gmail.com>, 2019
+# Abel Camacho <abelcama@gmail.com>, 2020
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Basque (Spain) (http://www.transifex.com/open-edx/edx-platform/language/eu_ES/)
@@ -50,7 +50,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-01-26 20:42+0000\n"
+"POT-Creation-Date: 2020-02-09 20:42+0000\n"
 "PO-Revision-Date: 2020-01-30 12:51+0000\n"
 "Last-Translator: Abel Camacho <abelcama@gmail.com>\n"
 "Language-Team: Basque (Spain) (http://www.transifex.com/open-edx/edx-platform/language/eu_ES/)\n"
@@ -298,19 +298,19 @@ msgstr "Falta diren taldeak sortzen"
 
 #: common/lib/xmodule/xmodule/assets/word_cloud/src/js/word_cloud_main.js
 msgid "{start_strong}{total}{end_strong} words submitted in total."
-msgstr ""
+msgstr "{start_strong}{total}{end_strong} denera bidalitako hitzak"
 
 #: common/lib/xmodule/xmodule/assets/word_cloud/src/js/word_cloud_main.js
 msgid "text_word_{uniqueId} title_word_{uniqueId}"
-msgstr ""
+msgstr "text_word_{uniqueId} title_word_{uniqueId}"
 
 #: common/lib/xmodule/xmodule/assets/word_cloud/src/js/word_cloud_main.js
 msgid "title_word_{uniqueId}"
-msgstr ""
+msgstr "title_word_{uniqueId}"
 
 #: common/lib/xmodule/xmodule/assets/word_cloud/src/js/word_cloud_main.js
 msgid "text_word_{uniqueId}"
-msgstr ""
+msgstr "text_word_{uniqueId}"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Show Annotations"
@@ -342,31 +342,32 @@ msgstr "Erantzun oharpenari"
 msgid "{num_points} point possible (graded, results hidden)"
 msgid_plural "{num_points} points possible (graded, results hidden)"
 msgstr[0] ""
-msgstr[1] ""
+"puntu posible {num_points} (kalifikatuta, emaitzak ezkutuan hidden)"
+msgstr[1] "{num_points} puntu posible (kalifikatuta, emaitzak ezkutuan)"
 
 #. Translators: {num_points} is the number of points possible (examples: 1, 3,
 #. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{num_points} point possible (ungraded, results hidden)"
 msgid_plural "{num_points} points possible (ungraded, results hidden)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "puntu posible {num_points} (kalifikatu gabea, emaitzak ezkutuan)"
+msgstr[1] "{num_points} puntu posinle (kalifikatu gabea, emaitzak ezkutuan)"
 
 #. Translators: {num_points} is the number of points possible (examples: 1, 3,
 #. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{num_points} point possible (graded)"
 msgid_plural "{num_points} points possible (graded)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "puntu posible {num_points} (kalifikatuta)"
+msgstr[1] "{num_points} puntu posible (kalifikatuta)"
 
 #. Translators: {num_points} is the number of points possible (examples: 1, 3,
 #. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{num_points} point possible (ungraded)"
 msgid_plural "{num_points} points possible (ungraded)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "puntu posible {num_points} (kalifikatu gabea)"
+msgstr[1] "{num_points} puntu posible (kalifikatu gabea)"
 
 #. Translators: {earned} is the number of points earned. {possible} is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
@@ -375,8 +376,8 @@ msgstr[1] ""
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{earned}/{possible} point (graded)"
 msgid_plural "{earned}/{possible} points (graded)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "puntu {earned}/{possible} (kalifikatuta)"
+msgstr[1] "{earned}/{possible} puntu (kalifikatuta)"
 
 #. Translators: {earned} is the number of points earned. {possible} is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
@@ -385,8 +386,8 @@ msgstr[1] ""
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{earned}/{possible} point (ungraded)"
 msgid_plural "{earned}/{possible} points (ungraded)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "puntu {earned}/{possible} (kalifikatu gabea)"
+msgstr[1] "{earned}/{possible} puntu (kalifikatu gabea)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "The grading process is still running. Refresh the page to see updates."
@@ -395,7 +396,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Could not grade your answer. The submission was aborted."
-msgstr ""
+msgstr "Ezin da zure erantzuna kalifikatu. Bidalketa bertan behera geratu da."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid ""
@@ -403,18 +404,23 @@ msgid ""
 "you can, please use Chrome or Safari which have been verified to support "
 "file uploads."
 msgstr ""
+"Bidalketa bertan behera geratu da!  Zure nabigatzaileak ez du fitxategiak "
+"kargatzea onartzen. Ahal baduzu, erabili Chrome edo Safari zeren horiek "
+"egiaztatu baitute fitxategiak kargatzen dituztela."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "You submitted {filename}; only {allowedFiles} are allowed."
 msgstr ""
+"You submitted {filename} fitxategai bidali duzu; {allowedFiles} fitxategiak "
+"baino ez daude baimenduta."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Your file {filename} is too large (max size: {maxSize}MB)."
-msgstr ""
+msgstr "{filename} fitxategia handiegia da (gehienezko tamaina: {maxSize}MB)."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "You did not submit the required files: {requiredFiles}."
-msgstr ""
+msgstr "Ez dituzu beharrezko fitxategiak bidali: {requiredFiles}."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "You did not select any files to submit."
@@ -428,7 +434,7 @@ msgstr "{label}: {status}"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "This problem has been reset."
-msgstr "Arazo hau berrabiarazi da."
+msgstr "Ariketa hau berrabiarazi da."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "unsubmitted"
@@ -438,6 +444,7 @@ msgstr "bidali gabea"
 msgid ""
 "{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
 msgstr ""
+"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -710,7 +717,7 @@ msgstr "Pertsonalizatutako kolorea"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Custom..."
-msgstr "Pertsonalizatu"
+msgstr "Pertsonalizatu..."
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1249,6 +1256,8 @@ msgid ""
 "Paste is now in plain text mode. Contents will now be pasted as plain text "
 "until you toggle this option off."
 msgstr ""
+"Itsasteko funtzioa testu lau gisa dago ezarrita une honetan. Edukiak testu "
+"lau gisa itsatsiko dira ezarpen hau aldatu arte."
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1266,7 +1275,7 @@ msgstr "Itsatsi lerroa aurretik"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paste your embed code below:"
-msgstr "Itsatsi zure enbotatutako kodea azpian:"
+msgstr "Itsatsi azpian enbotatu duzun kodea:"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1353,6 +1362,8 @@ msgid ""
 "Rich Text Area. Press ALT-F9 for menu. Press ALT-F10 for toolbar. Press "
 "ALT-0 for help"
 msgstr ""
+"Testu-eremu aberastua. Sakatu ALT-F9 menurako. Sakatu ALT-F10 tresna-"
+"barrarako. Sakatu ALT-0 laguntzarako."
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1625,7 +1636,7 @@ msgstr "Ikusi"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Visual aids"
-msgstr ""
+msgstr "Ikusizko laguntza"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1659,6 +1670,8 @@ msgid ""
 "Your browser doesn't support direct access to the clipboard. Please use the "
 "Ctrl+X/C/V keyboard shortcuts instead."
 msgstr ""
+"Zure nabigatzaileak ez du sarbide zuzena onartzen arbelera. Horren ordez, "
+"erabili Ctrl+X/C/V teklatu-lasterbidea."
 
 #. Translators: this is a toolbar button tooltip from the raw HTML editor
 #. displayed in the browser when a user needs to edit HTML
@@ -1672,6 +1685,9 @@ msgid ""
 "\n"
 "Click Cancel to return to this page without sending your information."
 msgstr ""
+"Sakatu ADOS erabiltzaile-izena eta posta elektronikoaren helbidea hirugarrenen aplikazio batera bidaltzeko.\n"
+"\n"
+"Sakatu UTZI  orri honetara itzultzeko zure informazioa bidali gabe."
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
 msgid ""
@@ -1679,6 +1695,9 @@ msgid ""
 "\n"
 "Click Cancel to return to this page without sending your information."
 msgstr ""
+"Sakatu ADOS erabiltzaile-izena hirugarrenen aplikazio batera bidaltzeko.\n"
+"\n"
+"Sakatu UTZI  orri honetara itzultzeko zure informazioa bidali gabe."
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
 msgid ""
@@ -1686,6 +1705,9 @@ msgid ""
 "\n"
 "Click Cancel to return to this page without sending your information."
 msgstr ""
+"Sakatu ADOS posta elektronikoaren helbidea hirugarrenen aplikazio batera bidaltzeko.\n"
+"\n"
+"Sakatu UTZI  orri honetara itzultzeko zure informazioa bidali gabe."
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "incorrect"
@@ -1764,7 +1786,7 @@ msgstr "Abiadura"
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/08_video_auto_advance_control.js
 msgid "Auto-advance"
-msgstr ""
+msgstr "Aurreratze automatikoa"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
@@ -1817,7 +1839,7 @@ msgstr "Saiatu beste nabigatzaile bat erabilita, Google Chrome adibidez."
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "High Definition"
-msgstr ""
+msgstr "Definizio altua"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "off"
@@ -1867,7 +1889,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Adjust video volume"
-msgstr ""
+msgstr "Doitu bideoaren bolumena"
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid ""
@@ -1878,7 +1900,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid "Adjust video speed"
-msgstr ""
+msgstr "Doitu bideoaren abiadura"
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid "Video speed: "
@@ -1943,7 +1965,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on transcripts"
-msgstr ""
+msgstr "Gaitu transkripzioak"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcripts"
@@ -2445,7 +2467,7 @@ msgstr "Bestelako bat"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "What can we help you with, {username}?"
-msgstr ""
+msgstr "Zertan lagundu ahal dizugu, {username}?"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
@@ -2454,6 +2476,7 @@ msgstr "Xehetasunak"
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "The more you tell us, the more quickly and helpfully we can respond!"
 msgstr ""
+"Zenbat eta gehiago esan, orduan eta azkarrago eta hobeto erantzungo dizugu!"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -2462,7 +2485,7 @@ msgstr "Bidali"
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
-msgstr ""
+msgstr "Hasi saioa {platform} plataforman laguntza hobea eman ahal izateko."
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid ""
@@ -2494,7 +2517,7 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Search the {platform} Help Center"
-msgstr ""
+msgstr "Bilatu {platform} plataformako Laguntza-zentroa"
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid "Go to my Dashboard"
@@ -2876,6 +2899,8 @@ msgid ""
 "Type in a URL or use the \"Choose File\" button to upload a file from your "
 "machine. (e.g. 'http://example.com/img/clouds.jpg')"
 msgstr ""
+"Idatzi URL bat edo erabili \"Aukeratu fitxategia\" botoia irufi bat zure "
+"ordenagailutik kargatzeko. (adibidez, 'http://example.com/img/clouds.jpg')"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Image Description"
@@ -2892,6 +2917,8 @@ msgid ""
 "e.g. 'Sky with clouds'. The description is helpful for users who cannot see "
 "the image."
 msgstr ""
+"adibidez, 'Zeru hodeitsua'. Deskribapena erabilgarria da irudia ikusteko "
+"modurik ez dutenentzat."
 
 #: lms/static/js/Markdown.Editor.js
 msgid "How to create useful text alternatives."
