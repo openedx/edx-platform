@@ -1663,7 +1663,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         )
 
     @override_settings(
-        MKTG_URLS={"ROOT": "https://www.test.com/", "HONOR": "honor"},
+        MKTG_URLS={"ROOT": "https://www.test.com/", "TOS": "honor"},
     )
     @mock.patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": True})
     def test_registration_honor_code_mktg_site_enabled(self):
@@ -1696,7 +1696,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             }
         )
 
-    @override_settings(MKTG_URLS_LINK_MAP={"HONOR": "honor"})
+    @override_settings(MKTG_URL_LINK_MAP={"TOS": "honor", "PRIVACY": "privacy"})
     @mock.patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": False})
     def test_registration_honor_code_mktg_site_disabled(self):
         link_template = "<a href='/privacy' target='_blank'>{link_label}</a>"
