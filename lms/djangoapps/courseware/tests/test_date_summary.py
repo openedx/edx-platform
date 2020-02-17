@@ -596,8 +596,8 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         self.assertEqual(upgrade_date_summary.title, 'Update Enrollment to Earn Statement of Accomplishment')
         self.assertEqual(
             upgrade_date_summary.description,
-            'Don\'t miss the opportunity to highlight your new knowledge and skills by earning a verified'
-            ' certificate.'
+            'Don\'t miss the opportunity to highlight your new knowledge and skills by earning a'
+            ' Statement of Accomplishment'
         )
         self.assertEqual(upgrade_date_summary.relative_datestring, 'by {date}')
 
