@@ -3,7 +3,6 @@ import logging
 from datetime import datetime
 from pytz import utc
 
-from django.db.models.signals import post_save
 from mailchimp_pipeline.signals.handlers import task_send_account_activation_email
 
 from constants import NON_ACTIVE_COURSE_NOTIFICATION
