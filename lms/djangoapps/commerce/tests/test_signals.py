@@ -231,7 +231,7 @@ class TestRefundSignal(TestCase):
 
     # [UCSD_CUSTOM] These changes are only for UCSD to send refund failure notification on unenroll
     # The check required for this test has been disabled for UCSD
-    
+
     # @mock.patch('openedx.core.djangoapps.theming.helpers.is_request_in_themed_site', return_value=True)
     # def test_notification_themed_site(self, mock_is_request_in_themed_site):  # pylint: disable=unused-argument
     #     """
