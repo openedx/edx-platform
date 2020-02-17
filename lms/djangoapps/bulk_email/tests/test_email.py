@@ -662,11 +662,12 @@ class TestCourseEmailContext(SharedModuleStoreTestCase):
         self.assertEquals(email_context['platform_name'], settings.PLATFORM_NAME)
         self.assertEquals(email_context['course_title'], self.course_title)
         self.assertEquals(email_context['course_url'],
-                          '{}://edx.org/static/{}'.format(scheme, settings.DEFAULT_COURSE_ABOUT_IMAGE_URL))
+                          '{}://edx.org/courses/{}/{}/{}/'.format(scheme,
+                                                                  self.course_org,
+                                                                  self.course_number,
+                                                                  self.course_run))
         self.assertEquals(email_context['course_image_url'],
-                          '{}://edx.org/c4x/{}/{}/asset/images_course_image.jpg'.format(scheme,
-                                                                                        self.course_org,
-                                                                                        self.course_number))
+                          '{}://edx.org/static/{}'.format(scheme, settings.DEFAULT_COURSE_ABOUT_IMAGE_URL))
         self.assertEquals(email_context['email_settings_url'], '{}://edx.org/dashboard'.format(scheme))
         self.assertEquals(email_context['account_settings_url'], '{}://edx.org/account/settings'.format(scheme))
 
