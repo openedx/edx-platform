@@ -25,7 +25,7 @@ from openedx.core.lib.api.authentication import (
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from third_party_auth import pipeline
 from third_party_auth.api import serializers
-from third_party_auth.api.permissions import ThirdPartyAuthProviderApiPermission
+from third_party_auth.api.permissions import TPA_PERMISSIONS
 from third_party_auth.provider import Registry
 
 
@@ -334,22 +334,15 @@ class UserMappingView(ListAPIView):
 
             * remote_id: The Id from third party auth provider
     """
-    authentication_classes = (
-        JwtAuthentication, BearerAuthentication,
-    )
+    authentication_classes = (JwtAuthentication, BearerAuthentication, )
+    permission_classes = (TPA_PERMISSIONS, )
+    required_scopes = ['tpa:read']
 
     serializer_class = serializers.UserMappingSerializer
     provider = None
 
     def get_queryset(self):
         provider_id = self.kwargs.get('provider_id')
-
-        # permission checking. We allow both API_KEY access and OAuth2 client credential access
-        if not (
-                self.request.user.is_superuser or ApiKeyHeaderPermission().has_permission(self.request, self) or
-                ThirdPartyAuthProviderApiPermission(provider_id).has_permission(self.request, self)
-        ):
-            raise exceptions.PermissionDenied()
 
         # provider existence checking
         self.provider = Registry.get(provider_id)
