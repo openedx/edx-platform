@@ -159,3 +159,17 @@ class BearerAuthenticationAllowInactiveUser(BearerAuthentication):
     """
 
     allow_inactive_users = True
+
+
+class OAuth2Authentication(BearerAuthentication):
+    """
+    Creating temperary class cause things outside of edx-platform need OAuth2Authentication.
+    This will be removed when repos outside edx-platform import BearerAuthentiction instead.
+    """
+
+
+class OAuth2AuthenticationAllowInactiveUser(BearerAuthenticationAllowInactiveUser):
+    """
+    Creating temperary class cause things outside of edx-platform need OAuth2Authentication.
+    This will be removed when repos outside edx-platform import BearerAuthentiction instead.
+    """
