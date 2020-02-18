@@ -21,7 +21,7 @@ from lms.djangoapps.certificates.api import get_certificate_for_user, get_certif
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.user_api.accounts.api import visible_fields
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
 
 log = logging.getLogger(__name__)
@@ -85,7 +85,7 @@ class CertificatesDetailView(APIView):
 
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
 
@@ -147,7 +147,7 @@ class CertificatesListView(APIView):
     """REST API endpoints for listing certificates."""
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (

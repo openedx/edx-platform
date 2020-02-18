@@ -1,6 +1,6 @@
 """
 Tests for OAuth2.  This module is copied from django-rest-framework-oauth
-(tests/test_authentication.py) and updated to use our subclass of OAuth2Authentication.
+(tests/test_authentication.py) and updated to use our subclass of BearerAuthentication.
 """
 
 
@@ -50,11 +50,11 @@ urlpatterns = [
     url(r'^oauth2/', include(('provider.oauth2.urls', 'oauth2'), namespace='oauth2')),
     url(
         r'^oauth2-inactive-test/$',
-        MockView.as_view(authentication_classes=[authentication.OAuth2AuthenticationAllowInactiveUser])
+        MockView.as_view(authentication_classes=[authentication.BearerAuthenticationAllowInactiveUser])
     ),
     url(
         r'^oauth2-test/$',
-        MockView.as_view(authentication_classes=[authentication.OAuth2Authentication])
+        MockView.as_view(authentication_classes=[authentication.BearerAuthentication])
     )
 ]
 
@@ -265,12 +265,12 @@ class OAuth2AllowInActiveUsersTests(TestCase):
         self.check_error_codes(response, status_code=status.HTTP_401_UNAUTHORIZED, error_code=token_error.error_code)
 
 
-class OAuth2AuthenticationTests(OAuth2AllowInActiveUsersTests):  # pylint: disable=test-inherits-tests
+class BearerAuthenticationTests(OAuth2AllowInActiveUsersTests):  # pylint: disable=test-inherits-tests
 
     OAUTH2_BASE_TESTING_URL = '/oauth2-test/'
 
     def setUp(self):
-        super(OAuth2AuthenticationTests, self).setUp()
+        super(BearerAuthenticationTests, self).setUp()
         # Since this is testing back to previous version, user should be set to true
         self.user.is_active = True
         self.user.save()
