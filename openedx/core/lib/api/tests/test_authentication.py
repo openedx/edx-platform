@@ -182,13 +182,6 @@ class OAuth2AllowInActiveUsersTests(TestCase):
         response = self.get_with_bearer_token(self.OAUTH2_BASE_TESTING_URL, token=self.dot_access_token.token)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_post_form_passing_auth_url_transport(self):
-        """Ensure GETing form over OAuth with correct client credentials in form data succeed"""
-        response = self.csrf_client.post(
-            self.OAUTH2_BASE_TESTING_URL,
-            data={'access_token': self.access_token.token}
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_form_failing_auth_url_transport(self):
         """Ensure GETing form over OAuth with correct client credentials in query fails when DEBUG is False"""
