@@ -1,9 +1,15 @@
 (function(define) {
     'use strict';
 
-    define(['backbone', 'gettext', 'teams/js/views/teams', 'edx-ui-toolkit/js/utils/html-utils'],
-        function(Backbone, gettext, TeamsView, HtmlUtils) {
+    define(['underscore', 'backbone', 'gettext', 'teams/js/views/teams', 'edx-ui-toolkit/js/utils/html-utils'],
+        function(_, Backbone, gettext, TeamsView, HtmlUtils) {
             var MyTeamsView = TeamsView.extend({
+
+                initialize: function(options) {
+                    this.getTopic = options.getTopic;
+                    TeamsView.prototype.initialize.call(this, options);
+                },
+
                 render: function() {
                     var view = this;
                     if (this.collection.isStale) {
@@ -17,6 +23,14 @@
                             }
                         });
                     return this;
+                },
+
+                getTopicType: function(topicId) {
+                    var deferred = $.Deferred();
+                    this.getTopic(topicId).done(function(topic) {
+                        deferred.resolve(topic.get('type'));
+                    });
+                    return deferred.promise();
                 },
 
                 createHeaderView: function() {

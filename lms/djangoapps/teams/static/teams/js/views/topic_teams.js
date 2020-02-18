@@ -102,6 +102,12 @@
                     srInfo: this.srInfo,
                     showSortControls: this.showSortControls
                 });
+            },
+
+            getTopicType: function(topicId) { // eslint-disable-line no-unused-vars
+                var deferred = $.Deferred();
+                deferred.resolve(this.model.get('type'));
+                return deferred.promise();
             }
         });
 
