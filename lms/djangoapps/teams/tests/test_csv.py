@@ -34,7 +34,8 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
         team2_1 = CourseTeamFactory(course_id=cls.course.id, name='team_2_1', topic_id='teamset_2')
         team2_2 = CourseTeamFactory(course_id=cls.course.id, name='team_2_2', topic_id='teamset_2')
         team3_1 = CourseTeamFactory(course_id=cls.course.id, name='team_3_1', topic_id='teamset_3')
-        team3_2 = CourseTeamFactory(course_id=cls.course.id, name='team_3_2', topic_id='teamset_3')
+        # protected team
+        team3_2 = CourseTeamFactory(course_id=cls.course.id, name='team_3_2', topic_id='teamset_3', organization_protected=True)
         #  No teams in teamset 4
 
         user1 = UserFactory.create(username='user1')
@@ -58,9 +59,8 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
         team3_1.add_user(user2)
 
         team2_1.add_user(user3)
-        team3_2.add_user(user3)
+        team3_1.add_user(user3)
 
-        team1_1.add_user(user4)
         team3_2.add_user(user4)
 
     def setUp(self):
@@ -90,8 +90,8 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
         self.assertEqual(len(data), 5)
         self.assert_teamset_membership(data[0], 'user1', 'audit', 'team_1_1', 'team_2_2', 'team_3_1')
         self.assert_teamset_membership(data[1], 'user2', 'verified', 'team_1_1', 'team_2_2', 'team_3_1')
-        self.assert_teamset_membership(data[2], 'user3', 'honors', None, 'team_2_1', 'team_3_2')
-        self.assert_teamset_membership(data[3], 'user4', 'masters', 'team_1_1', None, 'team_3_2')
+        self.assert_teamset_membership(data[2], 'user3', 'honors', None, 'team_2_1', 'team_3_1')
+        self.assert_teamset_membership(data[3], 'user4', 'masters', None, None, 'team_3_2')
         self.assert_teamset_membership(data[4], 'user5', 'masters', None, None, None)
 
     def assert_teamset_membership(
@@ -119,8 +119,8 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
         expected_csv_output = ('user,mode,teamset_1,teamset_2,teamset_3,teamset_4\r\n'
                                'user1,audit,team_1_1,team_2_2,team_3_1,\r\n'
                                'user2,verified,team_1_1,team_2_2,team_3_1,\r\n'
-                               'user3,honors,,team_2_1,team_3_2,\r\n'
-                               'user4,masters,team_1_1,,team_3_2,\r\n'
+                               'user3,honors,,team_2_1,team_3_1,\r\n'
+                               'user4,masters,,,team_3_2,\r\n'
                                'user5,masters,,,,\r\n')
         csv.load_team_membership_csv(self.course, self.buf)
         self.assertEqual(expected_csv_output, self.buf.getvalue())
