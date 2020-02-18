@@ -9,6 +9,7 @@ only running cms tests.
 
 import importlib
 import os
+import logging
 import contracts
 import pytest
 
@@ -24,6 +25,11 @@ def pytest_configure(config):
     """
     Do core setup operations from manage.py before collecting tests.
     """
+    if config.pluginmanager.hasplugin("pytest_jsonreport") or config.pluginmanager.hasplugin("json-report"):
+        config.pluginmanager.register(DeferPlugin())
+    else:
+        logging.info("pytest did not register json_report correctly")
+
     if config.getoption('help'):
         return
     enable_contracts = os.environ.get('ENABLE_CONTRACTS', False)
@@ -33,9 +39,6 @@ def pytest_configure(config):
     startup_module = 'cms.startup' if settings_module.startswith('cms') else 'lms.startup'
     startup = importlib.import_module(startup_module)
     startup.run()
-
-    if config.pluginmanager.hasplugin("json-report"):
-        config.pluginmanager.register(DeferPlugin())
 
 
 @pytest.fixture(autouse=True, scope='function')

@@ -47,7 +47,7 @@ from openedx.core.djangoapps.catalog.utils import (
     normalize_program_type
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, PaginatedAPIView
 from student.helpers import get_resume_urls_for_enrollments
 from student.models import CourseEnrollment
@@ -328,7 +328,7 @@ class ProgramEnrollmentsView(
     """
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (permissions.JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS,)
@@ -472,7 +472,7 @@ class ProgramCourseEnrollmentsView(
     """
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (permissions.JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS,)
@@ -614,7 +614,7 @@ class ProgramCourseGradesView(
     """
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (permissions.JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS,)
@@ -695,7 +695,7 @@ class UserProgramReadOnlyAccessView(DeveloperErrorViewMixin, PaginatedAPIView):
     """
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (IsAuthenticated,)
@@ -874,7 +874,7 @@ class ProgramCourseEnrollmentOverviewView(
     """
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (IsAuthenticated,)
@@ -983,7 +983,7 @@ class EnrollmentDataResetView(APIView):
     """
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (permissions.JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS,)

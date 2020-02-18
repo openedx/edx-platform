@@ -2905,3 +2905,40 @@ input[name="subject"] {
     }
   }
 }
+
+div.staff_info {
+  display: none;
+
+  @include clearfix();
+
+  white-space: pre-wrap;
+  border-top: 1px solid $gray-l3;
+  padding-top: lh();
+  margin-top: lh();
+  line-height: lh();
+  font-family: Consolas, "Lucida Console", Monaco, "Courier New", Courier, monospace;
+
+  // Debugging content is always in English, therefore it's never RTL
+  direction: ltr;
+  text-align: left;
+}
+
+.xqa-modal,
+.staff-modal,
+.history-modal {
+  width: 80%;
+  height: 80%;
+  left: left(20%);
+  overflow: auto;
+  display: none;
+}
+
+div.staff_actions {
+  p.error {
+    color: theme-color("danger");
+  }
+
+  p.success {
+    color: theme-color("success");
+  }
+}

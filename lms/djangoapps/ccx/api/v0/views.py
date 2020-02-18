@@ -353,7 +353,7 @@ class CCXListView(GenericAPIView):
     """
     authentication_classes = (
         JwtAuthentication,
-        authentication.OAuth2AuthenticationAllowInactiveUser,
+        authentication.BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (IsAuthenticated, permissions.IsMasterCourseStaffInstructor)
@@ -612,7 +612,7 @@ class CCXDetailView(GenericAPIView):
 
     authentication_classes = (
         JwtAuthentication,
-        authentication.OAuth2AuthenticationAllowInactiveUser,
+        authentication.BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (IsAuthenticated, permissions.IsCourseStaffInstructor)

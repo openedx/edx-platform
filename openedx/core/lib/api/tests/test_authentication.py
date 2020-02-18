@@ -1,6 +1,6 @@
 """
 Tests for OAuth2.  This module is copied from django-rest-framework-oauth
-(tests/test_authentication.py) and updated to use our subclass of OAuth2Authentication.
+(tests/test_authentication.py) and updated to use our subclass of BearerAuthentication.
 """
 
 
@@ -50,11 +50,11 @@ urlpatterns = [
     url(r'^oauth2/', include(('provider.oauth2.urls', 'oauth2'), namespace='oauth2')),
     url(
         r'^oauth2-inactive-test/$',
-        MockView.as_view(authentication_classes=[authentication.OAuth2AuthenticationAllowInactiveUser])
+        MockView.as_view(authentication_classes=[authentication.BearerAuthenticationAllowInactiveUser])
     ),
     url(
         r'^oauth2-test/$',
-        MockView.as_view(authentication_classes=[authentication.OAuth2Authentication])
+        MockView.as_view(authentication_classes=[authentication.BearerAuthentication])
     )
 ]
 
@@ -182,14 +182,6 @@ class OAuth2AllowInActiveUsersTests(TestCase):
         response = self.get_with_bearer_token(self.OAUTH2_BASE_TESTING_URL, token=self.dot_access_token.token)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_post_form_passing_auth_url_transport(self):
-        """Ensure GETing form over OAuth with correct client credentials in form data succeed"""
-        response = self.csrf_client.post(
-            self.OAUTH2_BASE_TESTING_URL,
-            data={'access_token': self.access_token.token}
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
     def test_get_form_failing_auth_url_transport(self):
         """Ensure GETing form over OAuth with correct client credentials in query fails when DEBUG is False"""
         query = urlencode({'access_token': self.access_token.token})
@@ -265,12 +257,12 @@ class OAuth2AllowInActiveUsersTests(TestCase):
         self.check_error_codes(response, status_code=status.HTTP_401_UNAUTHORIZED, error_code=token_error.error_code)
 
 
-class OAuth2AuthenticationTests(OAuth2AllowInActiveUsersTests):  # pylint: disable=test-inherits-tests
+class BearerAuthenticationTests(OAuth2AllowInActiveUsersTests):  # pylint: disable=test-inherits-tests
 
     OAUTH2_BASE_TESTING_URL = '/oauth2-test/'
 
     def setUp(self):
-        super(OAuth2AuthenticationTests, self).setUp()
+        super(BearerAuthenticationTests, self).setUp()
         # Since this is testing back to previous version, user should be set to true
         self.user.is_active = True
         self.user.save()

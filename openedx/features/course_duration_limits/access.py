@@ -17,7 +17,7 @@ from web_fragments.fragment import Fragment
 from course_modes.models import CourseMode
 from lms.djangoapps.courseware.access_response import AccessError
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
-from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
+from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_specific_student
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
