@@ -437,7 +437,10 @@ def get_course_assignment_due_dates(course, user, request, num_return=None, incl
     date_blocks = []
     for (block_key, date_type), date in all_course_dates.items():
         if date_type == 'due' and block_key.block_type == 'sequential':
-            item = store.get_item(block_key)
+            try:
+                item = store.get_item(block_key)
+            except ItemNotFoundError:
+                continue
             if item.graded:
                 date_block = CourseAssignmentDate(course, user)
                 date_block.date = date

@@ -45,6 +45,7 @@ from openedx.features.course_experience import (
     DATE_WIDGET_V2_FLAG, UNIFIED_COURSE_TAB_FLAG, UPGRADE_DEADLINE_MESSAGE, CourseHomeMessages
 )
 from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -207,7 +208,12 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                 due=now + timedelta(days=10),
                 graded=True,
             )
-            dummy_subsection = ItemFactory.create(category='sequential')
+            dummy_subsection = ItemFactory.create(category='sequential', graded=True, due=now + timedelta(days=11))
+
+        # We are deleting this subsection right after creating it because we need to pass in a real
+        # location object (dummy_subsection.location), but do not want this to exist inside of the modulestore
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course.id):
+            self.store.delete_item(dummy_subsection.location, user.id)
 
         with patch('lms.djangoapps.courseware.courses.get_dates_for_course') as mock_get_dates:
             mock_get_dates.return_value = {
@@ -225,7 +231,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                 (subsection_7.location, 'due'): subsection_7.due,
                 (subsection_7.location, 'start'): subsection_7.start,
                 # Adding this in for the case where we return a block that
-                # doesn't actually exist as part of the course. Should just be ignored.
+                # doesn't actually exist in the modulestore. Should just be ignored.
                 (dummy_subsection.location, 'due'): dummy_subsection.due,
             }
             # Standard widget case where we restrict the number of assignments.
