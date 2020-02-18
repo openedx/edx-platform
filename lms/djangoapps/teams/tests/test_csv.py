@@ -3,6 +3,7 @@
 from io import StringIO
 
 from lms.djangoapps.teams import csv
+from lms.djangoapps.teams.models import CourseTeam
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -123,3 +124,47 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
                                'user5,masters,,,,\r\n')
         csv.load_team_membership_csv(self.course, self.buf)
         self.assertEqual(expected_csv_output, self.buf.getvalue())
+
+
+class TeamMembershipImportManagerTests(SharedModuleStoreTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super(TeamMembershipImportManagerTests, cls).setUpClass()
+        teams_config = TeamsConfig({
+            'team_sets': [{
+                    'id': 'teamset_1',
+                    'name': 'teamset_name',
+                    'description': 'teamset_desc',
+            }]
+        })
+        cls.course = CourseFactory(teams_configuration=teams_config)
+
+        # initialize import manager
+        cls.importManager = csv.TeamMembershipImportManager(cls.course)
+        cls.importManager.teamset_ids = {ts.teamset_id for ts in cls.course.teamsets}
+
+    def test_add_user_to_new_protected_team(self):
+        """Adding a masters learner to a new team should create a team with organization protected status"""
+        masters_learner = UserFactory.create(username='masters_learner')
+        CourseEnrollmentFactory.create(user=masters_learner, course_id=self.course.id, mode='masters')
+        row = {
+            'mode': 'masters',
+            'teamset_1': 'new_protected_team',
+            'user': masters_learner
+        }
+
+        self.importManager.add_user_to_team(row)
+        self.assertTrue(CourseTeam.objects.get(team_id__startswith='new_protected_team').organization_protected)
+
+    def test_add_user_to_new_unprotected_team(self):
+        """Adding a non-masters learner to a new team should create a team with no organization protected status"""
+        audit_learner = UserFactory.create(username='audit_learner')
+        CourseEnrollmentFactory.create(user=audit_learner, course_id=self.course.id, mode='audit')
+        row = {
+            'mode': 'audit',
+            'teamset_1': 'new_unprotected_team',
+            'user': audit_learner
+        }
+
+        self.importManager.add_user_to_team(row)
+        self.assertFalse(CourseTeam.objects.get(team_id__startswith='new_unprotected_team').organization_protected)
