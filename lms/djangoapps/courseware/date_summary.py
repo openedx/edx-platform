@@ -28,7 +28,7 @@ from openedx.core.djangoapps.certificates.api import can_show_certificate_availa
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from openedx.features.course_experience import UPGRADE_DEADLINE_MESSAGE, CourseHomeMessages
+from openedx.features.course_experience import DATE_WIDGET_V2_FLAG, UPGRADE_DEADLINE_MESSAGE, CourseHomeMessages
 from student.models import CourseEnrollment
 
 from .context_processor import user_timezone_locale_prefs
@@ -295,7 +295,7 @@ class CourseEndDate(DateSummary):
 
     @property
     def date(self):
-        if self.course.self_paced:
+        if DATE_WIDGET_V2_FLAG.is_enabled(self.course_id) and self.course.self_paced:
             weeks_to_complete = get_course_run_details(self.course.id, ['weeks_to_complete']).get('weeks_to_complete')
             if weeks_to_complete:
                 course_duration = datetime.timedelta(weeks=weeks_to_complete)

@@ -41,7 +41,9 @@ from openedx.core.djangoapps.site_configuration.tests.factories import SiteFacto
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, UPGRADE_DEADLINE_MESSAGE, CourseHomeMessages
+from openedx.features.course_experience import (
+    DATE_WIDGET_V2_FLAG, UNIFIED_COURSE_TAB_FLAG, UPGRADE_DEADLINE_MESSAGE, CourseHomeMessages
+)
 from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -132,6 +134,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
         self.assert_block_types(course, user, expected_blocks)
 
+    @override_waffle_flag(DATE_WIDGET_V2_FLAG, active=True)
     def test_enabled_block_types_with_assignments(self):  # pylint: disable=too-many-statements
         """
         Creates a course with multiple subsections to test all of the different
@@ -286,6 +289,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                     for html_tag in assignment_title_html:
                         self.assertIn(html_tag, assignment_title)
 
+    @override_waffle_flag(DATE_WIDGET_V2_FLAG, active=True)
     def test_enabled_block_types_with_expired_course(self):
         course = create_course_run(days_till_start=-100)
         user = create_user()
@@ -460,6 +464,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         {'weeks_to_complete': 7},  # Weeks to complete > time til end (end date shown)
         {'weeks_to_complete': 4},  # Weeks to complete < time til end (end date not shown)
     )
+    @override_waffle_flag(DATE_WIDGET_V2_FLAG, active=True)
     def test_course_end_date_self_paced(self, cr_details):
         """
         In self-paced courses, the end date will now only show up if the learner

@@ -49,7 +49,7 @@ from openedx.core.djangoapps.enrollments.api import get_course_enrollment_detail
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.view_utils import LazySequence
 from openedx.features.course_duration_limits.access import AuditExpiredError
-from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, DATE_WIDGET_V2_FLAG
 from static_replace import replace_static_urls
 from student.models import CourseEnrollment
 from survey.utils import is_survey_required_and_unanswered
@@ -401,7 +401,6 @@ def get_course_date_blocks(course, user, request=None, include_past_dates=False,
     """
     block_classes = [
         CourseEndDate,
-        CourseExpiredDate,
         CourseStartDate,
         TodaysDate,
         VerificationDeadlineDate,
@@ -411,8 +410,10 @@ def get_course_date_blocks(course, user, request=None, include_past_dates=False,
         block_classes.insert(0, CertificateAvailableDate)
 
     blocks = [cls(course, user) for cls in block_classes]
-    blocks.extend(get_course_assignment_due_dates(
-        course, user, request, num_return=num_assignments, include_past_dates=include_past_dates))
+    if DATE_WIDGET_V2_FLAG.is_enabled(course.id):
+        blocks.append(CourseExpiredDate(course, user))
+        blocks.extend(get_course_assignment_due_dates(
+            course, user, request, num_return=num_assignments, include_past_dates=include_past_dates))
 
     return sorted((b for b in blocks if b.date and (b.is_enabled or include_past_dates)), key=date_block_key_fn)
 
@@ -448,7 +449,7 @@ def get_course_assignment_due_dates(course, user, request, num_return=None, incl
                     block_url = reverse('jump_to', args=[course.id, block_key])
                     block_url = request.build_absolute_uri(block_url) if request else None
                 assignment_title = item.display_name if item.display_name else _('Assignment')
-                date_block.set_title(assignment_title, block_url)
+                date_block.set_title(assignment_title, link=block_url)
 
                 date_blocks.append(date_block)
     date_blocks = sorted((b for b in date_blocks if b.is_enabled or include_past_dates), key=date_block_key_fn)
