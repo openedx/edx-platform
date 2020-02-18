@@ -60,6 +60,7 @@ html_transforms = {
 
 # These should be removed from HTML output, including all subelements
 html_problem_semantics = [
+    "additional_answer",
     "codeparam",
     "responseparam",
     "answer",
