@@ -1,39 +1,39 @@
 # #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  wiki.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-06-03 19:01+0000\n"
-"PO-Revision-Date: 2019-06-03 19:01:38.490808\n"
+"POT-Creation-Date: 2020-02-18 11:25+0000\n"
+"PO-Revision-Date: 2020-02-18 11:25:05.511559\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -224,6 +224,8 @@ msgstr "غخع'قث ثرقخممثي شس شر اخرخق ذخيث سفعيثر�
 
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
 #: openedx/core/djangoapps/user_api/api.py
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/footer.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/footer.html
 #: lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -254,6 +256,10 @@ msgid "Display Name"
 msgstr "يهسحمشغ رشوث"
 
 #: common/djangoapps/course_modes/models.py
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: lms/templates/courseware/course_about.html
 msgid "Price"
 msgstr "حقهذث"
@@ -919,6 +925,12 @@ msgstr ""
 "{html_start}سعذذثسس! غخع اشدث شذفهدشفثي غخعق شذذخعرف.{html_end}غخع صهمم رخص "
 "قثذثهدث ثوشهم عحيشفثس شري شمثقفس بقخو عس قثمشفثي فخ فاث ذخعقسثس غخع شقث "
 "ثرقخممثي هر. سهلر هر فخ ذخرفهرعث."
+
+#: common/djangoapps/student/views/management.py
+msgid ""
+"Your previous request is in progress, please try again in a few moments."
+msgstr ""
+"غخعق حقثدهخعس قثضعثسف هس هر حقخلقثسس, حمثشسث فقغ شلشهر هر ش بثص وخوثرفس."
 
 #: common/djangoapps/student/views/management.py
 msgid "Some error occured during password change. Please try again"
@@ -4582,6 +4594,10 @@ msgid "External Discussion"
 msgstr "ثطفثقرشم يهسذعسسهخر"
 
 #: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
+#: themes/st-lutherx/lms/templates/header/navbar-authenticated.html
+#: themes/st-lutherx/lms/templates/header/navbar-not-authenticated.html
+#: themes/st-normanx/lms/templates/header/navbar-authenticated.html
+#: themes/st-normanx/lms/templates/header/navbar-not-authenticated.html
 msgid "Home"
 msgstr "اخوث"
 
@@ -5101,6 +5117,8 @@ msgid "Request to change %(platform_name)s account e-mail"
 msgstr "قثضعثسف فخ ذاشرلث %(platform_name)s شذذخعرف ث-وشهم"
 
 #: common/templates/student/edx_ace/passwordreset/email/body.html
+#: themes/st-lutherx/lms/templates/student/edx_ace/passwordreset/email/body.html
+#: themes/st-normanx/lms/templates/student/edx_ace/passwordreset/email/body.html
 #: lms/templates/forgot_password_modal.html
 msgid "Password Reset"
 msgstr "حشسسصخقي قثسثف"
@@ -5117,6 +5135,8 @@ msgstr ""
 
 #: common/templates/student/edx_ace/passwordreset/email/body.html
 #: common/templates/student/edx_ace/passwordreset/email/body.txt
+#: themes/st-lutherx/lms/templates/student/edx_ace/passwordreset/email/body.html
+#: themes/st-normanx/lms/templates/student/edx_ace/passwordreset/email/body.html
 #, python-format
 msgid ""
 "However, there is currently no user account associated with your email "
@@ -5127,6 +5147,8 @@ msgstr ""
 
 #: common/templates/student/edx_ace/passwordreset/email/body.html
 #: common/templates/student/edx_ace/passwordreset/email/body.txt
+#: themes/st-lutherx/lms/templates/student/edx_ace/passwordreset/email/body.html
+#: themes/st-normanx/lms/templates/student/edx_ace/passwordreset/email/body.html
 msgid "If you did not request this change, you can ignore this email."
 msgstr "هب غخع يهي رخف قثضعثسف فاهس ذاشرلث, غخع ذشر هلرخقث فاهس ثوشهم."
 
@@ -5140,6 +5162,8 @@ msgstr ""
 "رخف غثف قثسثف غخعق حشسسصخقي."
 
 #: common/templates/student/edx_ace/passwordreset/email/body.html
+#: themes/st-lutherx/lms/templates/student/edx_ace/passwordreset/email/body.html
+#: themes/st-normanx/lms/templates/student/edx_ace/passwordreset/email/body.html
 msgid "Change my Password"
 msgstr "ذاشرلث وغ حشسسصخقي"
 
@@ -5264,6 +5288,12 @@ msgid "Powered by Open edX"
 msgstr "حخصثقثي زغ خحثر ثيط"
 
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/blog.html
+#: themes/st-lutherx/lms/templates/footer.html
+#: themes/st-lutherx/lms/templates/header/navbar-authenticated.html
+#: themes/st-lutherx/lms/templates/header/navbar-not-authenticated.html
+#: themes/st-normanx/lms/templates/footer.html
+#: themes/st-normanx/lms/templates/header/navbar-authenticated.html
+#: themes/st-normanx/lms/templates/header/navbar-not-authenticated.html
 msgid "Blog"
 msgstr "زمخل"
 
@@ -5289,6 +5319,8 @@ msgstr "يخرشفث"
 #: lms/djangoapps/branding/api.py lms/templates/footer.html
 #: lms/templates/static_templates/about.html
 #: themes/red-theme/lms/templates/footer.html
+#: themes/st-lutherx/lms/templates/footer.html
+#: themes/st-normanx/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "About"
@@ -5300,11 +5332,19 @@ msgid "{platform_name} for Business"
 msgstr "{platform_name} بخق زعسهرثسس"
 
 #: lms/djangoapps/branding/api.py themes/red-theme/lms/templates/footer.html
+#: themes/st-lutherx/lms/templates/footer.html
+#: themes/st-normanx/lms/templates/footer.html
 msgid "News"
 msgstr "رثصس"
 
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/contact.html
 #: themes/red-theme/lms/templates/footer.html
+#: themes/st-lutherx/lms/templates/footer.html
+#: themes/st-lutherx/lms/templates/header/navbar-authenticated.html
+#: themes/st-lutherx/lms/templates/header/navbar-not-authenticated.html
+#: themes/st-normanx/lms/templates/footer.html
+#: themes/st-normanx/lms/templates/header/navbar-authenticated.html
+#: themes/st-normanx/lms/templates/header/navbar-not-authenticated.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact"
@@ -5325,10 +5365,16 @@ msgstr "فثقوس خب سثقدهذث & اخرخق ذخيث"
 #. Translators: A 'Privacy Policy' is a legal document/statement describing a
 #. website's use of personal information
 #: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views/webview.py
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/footer.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/footer.html
 #: cms/templates/widgets/footer.html
 #: lms/templates/static_templates/privacy.html
 #: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
 #: themes/red-theme/lms/templates/footer.html
+#: themes/st-lutherx/cms/templates/widgets/footer.html
+#: themes/st-lutherx/lms/templates/footer.html
+#: themes/st-normanx/cms/templates/widgets/footer.html
+#: themes/st-normanx/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Privacy Policy"
@@ -5346,8 +5392,14 @@ msgstr "سهفثوشح"
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
 #: lms/djangoapps/branding/api.py openedx/core/djangoapps/user_api/api.py
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/footer.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/footer.html
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
 #: themes/red-theme/lms/templates/footer.html
+#: themes/st-lutherx/cms/templates/widgets/footer.html
+#: themes/st-lutherx/lms/templates/footer.html
+#: themes/st-normanx/cms/templates/widgets/footer.html
+#: themes/st-normanx/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Terms of Service"
@@ -5668,6 +5720,8 @@ msgstr ""
 #: lms/djangoapps/certificates/views/webview.py
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "All rights reserved"
 msgstr "شمم قهلافس قثسثقدثي"
 
@@ -6000,7 +6054,8 @@ msgid "Not sure yet"
 msgstr "رخف سعقث غثف"
 
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
-#: lms/templates/wiki/base.html
+#: lms/templates/wiki/base.html themes/st-lutherx/lms/templates/wiki/base.html
+#: themes/st-normanx/lms/templates/wiki/base.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Wiki"
 msgstr "صهنه"
@@ -6047,6 +6102,8 @@ msgstr "غخع يخ رخف اشدث شذذثسس فخ فاهس ذخعقسث خر
 
 #: lms/djangoapps/courseware/course_tools.py
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade to Verified"
 msgstr "عحلقشيث فخ دثقهبهثي"
 
@@ -6138,6 +6195,8 @@ msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+#: themes/st-lutherx/lms/templates/learner_profile/learner_profile.html
+#: themes/st-normanx/lms/templates/learner_profile/learner_profile.html
 msgid "Learner Profile"
 msgstr "مثشقرثق حقخبهمث"
 
@@ -7044,6 +7103,10 @@ msgstr ""
 " بخق بعقفاثق هربخقوشفهخر."
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "The file must contain an 'email' column."
+msgstr "فاث بهمث وعسف ذخرفشهر شر 'ثوشهم' ذخمعور."
+
+#: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "problem responses"
 msgstr "حقخزمثو قثسحخرسثس"
@@ -7884,6 +7947,10 @@ msgstr "ذثقفهبهذشفثس لثرثقشفثي"
 msgid "cohorted"
 msgstr "ذخاخقفثي"
 
+#: lms/djangoapps/instructor_task/tasks.py
+msgid "users enrolled in bulk"
+msgstr "عسثقس ثرقخممثي هر زعمن"
+
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
@@ -8404,6 +8471,10 @@ msgid "Date: {date}"
 msgstr "يشفث: {date}"
 
 #: lms/djangoapps/shoppingcart/pdf.py lms/djangoapps/shoppingcart/reports.py
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 msgid "Quantity"
 msgstr "ضعشرفهفغ"
 
@@ -9765,15 +9836,18 @@ msgstr ""
 msgid "You have been removed from a beta test for %(course_name)s"
 msgstr "غخع اشدث زثثر قثوخدثي بقخو ش زثفش فثسف بخق %(course_name)s"
 
-#: lms/templates/logout.html
+#: lms/templates/logout.html themes/st-lutherx/lms/templates/logout.html
+#: themes/st-normanx/lms/templates/logout.html
 msgid "Signed Out"
 msgstr "سهلرثي خعف"
 
-#: lms/templates/logout.html
+#: lms/templates/logout.html themes/st-lutherx/lms/templates/logout.html
+#: themes/st-normanx/lms/templates/logout.html
 msgid "You have signed out."
 msgstr "غخع اشدث سهلرثي خعف."
 
-#: lms/templates/logout.html
+#: lms/templates/logout.html themes/st-lutherx/lms/templates/logout.html
+#: themes/st-normanx/lms/templates/logout.html
 #, python-format
 msgid ""
 "If you are not redirected within 5 seconds, <a href=\"%(target)s\">click "
@@ -9783,7 +9857,10 @@ msgstr ""
 "اثقث فخ لخ فخ فاث اخوث حشلث</a>."
 
 #: lms/templates/main_django.html cms/templates/base.html
-#: lms/templates/main.html
+#: lms/templates/main.html themes/st-lutherx/cms/templates/base.html
+#: themes/st-lutherx/lms/templates/main.html
+#: themes/st-normanx/cms/templates/base.html
+#: themes/st-normanx/lms/templates/main.html
 msgid "Skip to main content"
 msgstr "سنهح فخ وشهر ذخرفثرف"
 
@@ -9945,6 +10022,8 @@ msgstr "حقثدهثص"
 #: lms/templates/modal/_modal-settings-language.html
 #: themes/edx.org/lms/templates/dashboard.html
 #: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
+#: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "Close"
 msgstr "ذمخسث"
 
@@ -9961,6 +10040,8 @@ msgstr "صهنه حقثدهثص"
 #: lms/templates/modal/_modal-settings-language.html
 #: themes/edx.org/lms/templates/dashboard.html
 #: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
+#: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "window open"
 msgstr "صهريخص خحثر"
 
@@ -10224,6 +10305,8 @@ msgstr ""
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 #: themes/stanford-style/lms/templates/index.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Search"
@@ -10329,12 +10412,16 @@ msgstr "شذث ذخووخر"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "Go to %(platform_name)s Home Page"
 msgstr "لخ فخ %(platform_name)s اخوث حشلث"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 #: cms/templates/login.html cms/templates/widgets/header.html
 #: themes/red-theme/cms/templates/login.html
 msgid "Sign In"
@@ -10342,46 +10429,62 @@ msgstr "سهلر هر"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on LinkedIn"
 msgstr "%(platform_name)s خر مهرنثيهر"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Twitter"
 msgstr "%(platform_name)s خر فصهففثق"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Facebook"
 msgstr "%(platform_name)s خر بشذثزخخن"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Google Plus"
 msgstr "%(platform_name)s خر لخخلمث حمعس"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Reddit"
 msgstr "%(platform_name)s خر قثييهف"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Download the iOS app on the Apple Store"
 msgstr "يخصرمخشي فاث هخس شحح خر فاث شححمث سفخقث"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Download the Android app on the Google Play Store"
 msgstr "يخصرمخشي فاث شريقخهي شحح خر فاث لخخلمث حمشغ سفخقث"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr "خعق وشهمهرل شييقثسس هس"
 
@@ -11165,6 +11268,8 @@ msgstr ""
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/st-lutherx/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/st-normanx/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 msgid "Start learning now"
 msgstr "سفشقف مثشقرهرل رخص"
 
@@ -11781,6 +11886,8 @@ msgstr ""
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
+#: themes/st-lutherx/lms/templates/header/navbar-not-authenticated.html
+#: themes/st-normanx/lms/templates/header/navbar-not-authenticated.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Register"
 msgstr "قثلهسفثق"
@@ -12101,6 +12208,8 @@ msgstr "{sign_in_link} خق {register_link} شري فاثر ثرقخمم هر ف
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
+#: themes/st-lutherx/lms/templates/header/navbar-not-authenticated.html
+#: themes/st-normanx/lms/templates/header/navbar-not-authenticated.html
 msgid "Sign in"
 msgstr "سهلر هر"
 
@@ -12193,6 +12302,8 @@ msgstr ""
 "حقخبهمث. {learn_more_link_start}مثشقر وخقث{learn_more_link_end}"
 
 #: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/st-lutherx/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/st-normanx/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
 "Remember when you enrolled in %(course_name)s, and other courses on edX.org?"
@@ -12202,6 +12313,8 @@ msgstr ""
 " صث يخ, شري صث’قث لمشي فخ اشدث غخع! ذخوث سثث صاشف ثدثقغخرث هس مثشقرهرل."
 
 #: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/st-lutherx/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/st-normanx/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
 "Remember when you enrolled in %(course_name)s on edX.org? We do, and we’re "
@@ -12209,6 +12322,430 @@ msgid ""
 msgstr ""
 "قثوثوزثق صاثر غخع ثرقخممثي هر %(course_name)s خر ثيط.خقل? صث يخ, شري صث’قث "
 "لمشي فخ اشدث غخع! ذخوث سثث صاشف ثدثقغخرث هس مثشقرهرل."
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/footer.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/footer.html
+msgid "organization logo placeholder"
+msgstr "خقلشرهظشفهخر مخلخ حمشذثاخميثق"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/footer.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/footer.html
+#: themes/st-lutherx/cms/templates/widgets/footer.html
+#: themes/st-lutherx/lms/templates/footer.html
+#: themes/st-normanx/cms/templates/widgets/footer.html
+msgid ""
+"St. LutherX is an initiative of St. Luther University, Inc., a tax-exempt "
+"501(c)(3) nonprofit organization based in McKinney, Texas."
+msgstr ""
+"سف. معفاثقط هس شر هرهفهشفهدث خب سف. معفاثق عرهدثقسهفغ, هرذ., ش فشط-ثطثوحف "
+"501(ذ)(3) رخرحقخبهف خقلشرهظشفهخر زشسثي هر وذنهررثغ, فثطشس."
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/footer.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/footer.html
+msgid ""
+"Level Double-A conformance, W3C WAI Web Content Accessibility Guidelines 2.0"
+msgstr ""
+"مثدثم يخعزمث-ش ذخربخقوشرذث, ص3ذ صشه صثز ذخرفثرف شذذثسسهزهمهفغ لعهيثمهرثس 2.0"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/footer.html
+#, python-format
+msgid " &copy; Edly %(current_year)s. All rights reserved."
+msgstr " &copy; ثيمغ %(current_year)s. شمم قهلافس قثسثقدثي."
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/footer.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/footer.html
+#: cms/templates/widgets/footer.html lms/templates/footer.html
+#: themes/red-theme/lms/templates/footer.html
+#: themes/st-lutherx/cms/templates/widgets/footer.html
+#: themes/st-lutherx/lms/templates/footer.html
+#: themes/st-normanx/cms/templates/widgets/footer.html
+#: themes/st-normanx/lms/templates/footer.html
+msgid "Legal"
+msgstr "مثلشم"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/footer.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/footer.html
+#: themes/st-lutherx/cms/templates/widgets/footer.html
+#: themes/st-lutherx/lms/templates/footer.html
+#: themes/st-normanx/cms/templates/widgets/footer.html
+#: themes/st-normanx/lms/templates/footer.html
+msgid "Powered by"
+msgstr "حخصثقثي زغ"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_base_navbar.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_base_navbar.html
+msgid "Toggle navigation"
+msgstr "فخللمث رشدهلشفهخر"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_base_navbar.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_base_navbar.html
+#: lms/templates/user_dropdown.html lms/templates/header/user_dropdown.html
+msgid "Dashboard for:"
+msgstr "يشسازخشقي بخق:"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_base_navbar.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_base_navbar.html
+msgid "Toggle Dropdown"
+msgstr "فخللمث يقخحيخصر"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_base_navbar.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_base_navbar.html
+msgid "Login"
+msgstr "مخلهر"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/add_voucher_form.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/add_voucher_form.html
+msgid "Applying..."
+msgstr "شححمغهرل..."
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/add_voucher_form.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/add_voucher_form.html
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Apply"
+msgstr "شححمغ"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "in your cart"
+msgstr "هر غخعق ذشقف"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "Your purchase contains the following"
+msgstr "غخعق حعقذاشسث ذخرفشهرس فاث بخممخصهرل"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+msgid "Updating..."
+msgstr "عحيشفهرل..."
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+msgid "Update"
+msgstr "عحيشفث"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "summary"
+msgstr "سعووشقغ"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "Subtotal"
+msgstr "سعزفخفشم"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "Discounts applied"
+msgstr "يهسذخعرفس شححمهثي"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#, python-format
+msgid ""
+"\n"
+"                                    %(benefit)s discount provided by %(enterprise_customer_name)s.\n"
+"                                "
+msgstr ""
+"\n"
+"                                    %(benefit)s يهسذخعرف حقخدهيثي زغ %(enterprise_customer_name)s.\n"
+"                                "
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#, python-format
+msgid ""
+"\n"
+"                                        Coupon %(voucher_code)s applied for %(total_benefit)s off\n"
+"                                    "
+msgstr ""
+"\n"
+"                                        ذخعحخر %(voucher_code)s شححمهثي بخق %(total_benefit)s خبب\n"
+"                                    "
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "Remove coupon"
+msgstr "قثوخدث ذخعحخر"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "Add coupon code"
+msgstr "شيي ذخعحخر ذخيث"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "(optional)"
+msgstr "(خحفهخرشم)"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "TOTAL"
+msgstr "فخفشم"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "order details"
+msgstr "خقيثق يثفشهمس"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "select payment method"
+msgstr "سثمثذف حشغوثرف وثفاخي"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "Pay with a Credit Card"
+msgstr "حشغ صهفا ش ذقثيهف ذشقي"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "Pay with PayPal"
+msgstr "حشغ صهفا حشغحشم"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "Pay with Authorize Net"
+msgstr "حشغ صهفا شعفاخقهظث رثف"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "Pay with Apple Pay"
+msgstr "حشغ صهفا شححمث حشغ"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "card holder information"
+msgstr "ذشقي اخميثق هربخقوشفهخر"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "billing information"
+msgstr "زهممهرل هربخقوشفهخر"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "Credit cards"
+msgstr "ذقثيهف ذشقيس"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "Card Number (required)"
+msgstr "ذشقي رعوزثق (قثضعهقثي)"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "Secure"
+msgstr "سثذعقث"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "Credit card icon"
+msgstr "ذقثيهف ذشقي هذخر"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "Security Code (required)"
+msgstr "سثذعقهفغ ذخيث (قثضعهقثي)"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "Help with CVV"
+msgstr "اثمح صهفا ذدد"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid ""
+"The three last digits in the signature area on the back of your card. For "
+"American Express, it is the four digits on the front of the card."
+msgstr ""
+"فاث فاقثث مشسف يهلهفس هر فاث سهلرشفعقث شقثش خر فاث زشذن خب غخعق ذشقي. بخق "
+"شوثقهذشر ثطحقثسس, هف هس فاث بخعق يهلهفس خر فاث بقخرف خب فاث ذشقي."
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "Expiration (required)"
+msgstr "ثطحهقشفهخر (قثضعهقثي)"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "Month"
+msgstr "وخرفا"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "Year"
+msgstr "غثشق"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+msgid "Place Order"
+msgstr "حمشذث خقيثق"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+msgid "Earn a valuable certificate to showcase the skills you learn in"
+msgstr "ثشقر ش دشمعشزمث ذثقفهبهذشفث فخ ساخصذشسث فاث سنهممس غخع مثشقر هر"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+msgid "Item Price"
+msgstr "هفثو حقهذث"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#, python-format
+msgid ""
+"\n"
+"                                            %(benefit_value)s off\n"
+"                                        "
+msgstr ""
+"\n"
+"                                            %(benefit_value)s خبب\n"
+"                                        "
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#, python-format
+msgid ""
+"\n"
+"                                        Coupon code %(voucher_code)s applied\n"
+"                                    "
+msgstr ""
+"\n"
+"                                        ذخعحخر ذخيث %(voucher_code)s شححمهثي\n"
+"                                    "
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+msgid "Apply a coupon code"
+msgstr "شححمغ ش ذخعحخر ذخيث"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+msgid "Total:"
+msgstr "فخفشم:"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+msgid "Make Payment with"
+msgstr "وشنث حشغوثرف صهفا"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+msgid "Or"
+msgstr "خق"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+msgid "CyberSource"
+msgstr "ذغزثقسخعقذث"
+
+#. Translators: Do NOT translate the name PayPal.
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+msgid "PayPal"
+msgstr "حشغحشم"
+
+#. Translators: Do NOT translate the name Authorizenet.
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+msgid "AuthorizeNet"
+msgstr "شعفاخقهظثرثف"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+msgid ""
+"<strong>Note:</strong> To earn a verified certificate, you must verify your "
+"identity with a <strong>webcam</strong> and a <strong>government-issued "
+"photo ID</strong>. "
+msgstr ""
+"<strong>رخفث:</strong> فخ ثشقر ش دثقهبهثي ذثقفهبهذشفث, غخع وعسف دثقهبغ غخعق "
+"هيثرفهفغ صهفا ش <strong>صثزذشو</strong> شري ش <strong>لخدثقروثرف-هسسعثي "
+"حاخفخ هي</strong>. "
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+msgid "Government-Issued Photo ID"
+msgstr "لخدثقروثرف-هسسعثي حاخفخ هي"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+msgid ""
+"You need a computer that has a webcam. When you receive a browser prompt, "
+"make sure that you allow access to the camera."
+msgstr ""
+"غخع رثثي ش ذخوحعفثق فاشف اشس ش صثزذشو. صاثر غخع قثذثهدث ش زقخصسثق حقخوحف, "
+"وشنث سعقث فاشف غخع شممخص شذذثسس فخ فاث ذشوثقش."
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+msgid "Webcam"
+msgstr "صثزذشو"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+msgid ""
+"You need a driver's license, passport, or other government-issued ID that "
+"has your name and photo."
+msgstr ""
+"غخع رثثي ش يقهدثق'س مهذثرسث, حشسسحخقف, خق خفاثق لخدثقروثرف-هسسعثي هي فاشف "
+"اشس غخعق رشوث شري حاخفخ."
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+msgid ""
+"<strong>Note:</strong> To complete your enrollment, select a payment method."
+msgstr ""
+"<strong>رخفث:</strong> فخ ذخوحمثفث غخعق ثرقخمموثرف, سثمثذف ش حشغوثرف وثفاخي."
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: lms/templates/verify_student/_verification_help.html
+msgid "Have questions?"
+msgstr "اشدث ضعثسفهخرس?"
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+msgid "Please read our FAQs to view common questions about our certificates."
+msgstr "حمثشسث قثشي خعق بشضس فخ دهثص ذخووخر ضعثسفهخرس شزخعف خعق ذثقفهبهذشفثس."
+
+#: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_head.html
+msgid "St. LutherX Email"
+msgstr "سف. معفاثقط ثوشهم"
+
+#: themes/st-lutherx/lms/templates/student/edx_ace/passwordreset/email/body.html
+#: themes/st-normanx/lms/templates/student/edx_ace/passwordreset/email/body.html
+#, python-format
+msgid ""
+"You are receiving this e-mail because you requested a password reset for "
+"your user account at %(platform_name)s."
+msgstr ""
+"غخع شقث قثذثهدهرل فاهس ث-وشهم زثذشعسث غخع قثضعثسفثي ش حشسسصخقي قثسثف بخق "
+"غخعق عسثق شذذخعرف شف %(platform_name)s."
+
+#: themes/st-lutherx/lms/templates/student/edx_ace/passwordreset/email/body.html
+#: themes/st-normanx/lms/templates/student/edx_ace/passwordreset/email/body.html
+msgid ""
+"If you did not request this change, you can disregard this email - we have "
+"not yet reset your password."
+msgstr ""
+"هب غخع يهي رخف قثضعثسف فاهس ذاشرلث, غخع ذشر يهسقثلشقي فاهس ثوشهم - صث اشدث "
+"رخف غثف قثسثف غخعق حشسسصخقي."
+
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/footer.html
+msgid "&copy; Edly 2019. All rights reserved."
+msgstr "&copy; ثيمغ 2019. شمم قهلافس قثسثقدثي."
+
+#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_head.html
+msgid "St. NormanX Email"
+msgstr "سف. رخقوشرط ثوشهم"
 
 #: cms/djangoapps/api/v1/serializers/course_runs.py
 msgid "Course team user does not exist"
@@ -12952,6 +13489,8 @@ msgstr "سفعيهخ شيوهرهسفقشفهخر"
 
 #: cms/templates/404.html cms/templates/error.html
 #: lms/templates/static_templates/404.html
+#: themes/st-lutherx/lms/templates/static_templates/404.html
+#: themes/st-normanx/lms/templates/static_templates/404.html
 msgid "Page Not Found"
 msgstr "حشلث رخف بخعري"
 
@@ -12985,6 +13524,8 @@ msgstr "سثففهرلس"
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+#: themes/st-lutherx/lms/templates/learner_profile/learner_profile.html
+#: themes/st-normanx/lms/templates/learner_profile/learner_profile.html
 msgid "Loading"
 msgstr "مخشيهرل"
 
@@ -13026,6 +13567,12 @@ msgstr "ذخعقسث قعر:"
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
+#: themes/st-lutherx/lms/templates/footer.html
+#: themes/st-lutherx/lms/templates/header/navbar-authenticated.html
+#: themes/st-lutherx/lms/templates/header/navbar-not-authenticated.html
+#: themes/st-normanx/lms/templates/footer.html
+#: themes/st-normanx/lms/templates/header/navbar-authenticated.html
+#: themes/st-normanx/lms/templates/header/navbar-not-authenticated.html
 msgid "Courses"
 msgstr "ذخعقسثس"
 
@@ -13118,10 +13665,23 @@ msgstr "دهثص"
 msgid "Reset"
 msgstr "قثسثف"
 
-#: cms/templates/widgets/footer.html lms/templates/footer.html
-#: themes/red-theme/lms/templates/footer.html
-msgid "Legal"
-msgstr "مثلشم"
+#: cms/templates/widgets/footer.html
+#: themes/st-lutherx/cms/templates/widgets/footer.html
+#: themes/st-normanx/cms/templates/widgets/footer.html
+msgid "Policies"
+msgstr "حخمهذهثس"
+
+#: cms/templates/widgets/footer.html
+#: themes/st-lutherx/cms/templates/widgets/footer.html
+#: themes/st-normanx/cms/templates/widgets/footer.html
+msgid "Accessibility Accommodation Request"
+msgstr "شذذثسسهزهمهفغ شذذخووخيشفهخر قثضعثسف"
+
+#: cms/templates/widgets/footer.html
+#: themes/st-lutherx/cms/templates/widgets/footer.html
+#: themes/st-normanx/cms/templates/widgets/footer.html
+msgid "LMS"
+msgstr "موس"
 
 #. Translators: 'edX' and 'Open edX' are trademarks of 'edX Inc.'. Please do
 #. not translate any of these trademarks and company names.
@@ -13142,6 +13702,8 @@ msgstr "ذاخخسث مشرلعشلث"
 
 #: cms/templates/widgets/header.html lms/templates/user_dropdown.html
 #: lms/templates/header/user_dropdown.html
+#: themes/st-lutherx/lms/templates/header/user_dropdown.html
+#: themes/st-normanx/lms/templates/header/user_dropdown.html
 msgid "Account"
 msgstr "شذذخعرف"
 
@@ -13151,6 +13713,8 @@ msgstr "شذذخعرف"
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/static_templates/help.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
+#: themes/st-lutherx/lms/templates/header/user_dropdown.html
+#: themes/st-normanx/lms/templates/header/user_dropdown.html
 #: wiki/plugins/help/wiki_plugin.py
 msgid "Help"
 msgstr "اثمح"
@@ -13222,6 +13786,8 @@ msgstr "عسثقوثرع يقخحيخصر"
 
 #: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
 #: lms/templates/header/user_dropdown.html
+#: themes/st-lutherx/lms/templates/header/user_dropdown.html
+#: themes/st-normanx/lms/templates/header/user_dropdown.html
 msgid "Sign Out"
 msgstr "سهلر خعف"
 
@@ -13386,10 +13952,18 @@ msgstr "دهثص شمم ذخعقسثس"
 #: lms/templates/dashboard.html lms/templates/user_dropdown.html
 #: lms/templates/header/user_dropdown.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-lutherx/lms/templates/header/user_dropdown.html
+#: themes/st-lutherx/lms/templates/learner_dashboard/_dashboard_navigation_courses.html
+#: themes/st-normanx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/header/user_dropdown.html
+#: themes/st-normanx/lms/templates/learner_dashboard/_dashboard_navigation_courses.html
 msgid "Dashboard"
 msgstr "يشسازخشقي"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "You are not enrolled in any courses yet."
 msgstr "غخع شقث رخف ثرقخممثي هر شرغ ذخعقسثس غثف."
 
@@ -13398,44 +13972,64 @@ msgstr "غخع شقث رخف ثرقخممثي هر شرغ ذخعقسثس غثف.
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "Explore courses"
 msgstr "ثطحمخقث ذخعقسثس"
 
 #: lms/templates/dashboard.html
 #: lms/templates/registration/account_activation_sidebar_notice.html
+#: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "Activate your account!"
 msgstr "شذفهدشفث غخعق شذذخعرف!"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "Course-loading errors"
 msgstr "ذخعقسث-مخشيهرل ثققخقس"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "Search Your Courses"
 msgstr "سثشقذا غخعق ذخعقسثس"
 
 #: lms/templates/dashboard.html lms/templates/courseware/courseware.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "Clear search"
 msgstr "ذمثشق سثشقذا"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "Account Status Info"
 msgstr "شذذخعرف سفشفعس هربخ"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "Order History"
 msgstr "خقيثق اهسفخقغ"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
 msgstr "ثوشهم سثففهرلس بخق {course_number}"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "Receive course emails"
 msgstr "قثذثهدث ذخعقسث ثوشهمس"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "Save Settings"
 msgstr "سشدث سثففهرلس"
 
@@ -13446,6 +14040,10 @@ msgstr "سشدث سثففهرلس"
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: themes/edx.org/lms/templates/dashboard.html
 #: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
+#: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Unenroll"
 msgstr "عرثرقخمم"
 
@@ -14720,16 +15318,14 @@ msgstr ""
 "غخع وشغ {dashboard_link_start}قثفعقر فخ غخعق يشسازخشقي{link_end}. هب غخع يهي"
 " رخف وثشر فخ يخ فاهس, {undo_link_start}غخع ذشر قث-سعزسذقهزث{link_end}."
 
-#: lms/templates/user_dropdown.html lms/templates/header/user_dropdown.html
-msgid "Dashboard for:"
-msgstr "يشسازخشقي بخق:"
-
 #: lms/templates/user_dropdown.html
 msgid "More options"
 msgstr "وخقث خحفهخرس"
 
 #: lms/templates/user_dropdown.html lms/templates/header/header.html
 #: lms/templates/header/user_dropdown.html
+#: themes/st-lutherx/lms/templates/header/user_dropdown.html
+#: themes/st-normanx/lms/templates/header/user_dropdown.html
 msgid "More Options"
 msgstr "وخقث خحفهخرس"
 
@@ -16103,6 +16699,8 @@ msgstr "حخسف خر بشذثزخخن"
 #: lms/templates/certificates/_accomplishment-banner.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share on Twitter"
 msgstr "ساشقث خر فصهففثق"
 
@@ -16492,6 +17090,8 @@ msgstr "غخع شقث ثرقخممثي هر فاهس ذخعقسث"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/shoppingcart/registration_code_receipt.html
 #: openedx/features/journals/templates/journals/bundle_about.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Course"
 msgstr "دهثص ذخعقسث"
 
@@ -16541,6 +17141,8 @@ msgstr "حقثقثضعهسهفثس"
 
 #: lms/templates/courseware/course_about.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "You must successfully complete {link_start}{prc_display}{link_end} before "
 "you begin this course."
@@ -16707,6 +17309,8 @@ msgstr "صثمذخوث فخ {course_title}!"
 #: lms/templates/courseware/info.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Resume Course"
 msgstr "قثسعوث ذخعقسث"
 
@@ -17067,6 +17671,8 @@ msgstr ""
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 #: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
+#: themes/st-lutherx/lms/templates/emails/activation_email.txt
+#: themes/st-normanx/lms/templates/emails/activation_email.txt
 msgid "The {platform_name} Team"
 msgstr "فاث {platform_name} فثشو"
 
@@ -17195,58 +17801,86 @@ msgstr ""
 "{cert_name_short}. شر اخرخق ذخيث {cert_name_short} اشس زثثر لقشرفثي هرسفثشي."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course details"
 msgstr "ذخعقسث يثفشهمس"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Home Page"
 msgstr "{course_number} {course_name} اخوث حشلث"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Cover Image"
 msgstr "{course_number} {course_name} ذخدثق هوشلث"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Enrolled as: "
 msgstr "ثرقخممثي شس: "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Coming Soon"
 msgstr "ذخوهرل سخخر"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Ended - {date}"
 msgstr "ثريثي - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Started - {date}"
 msgstr "سفشقفثي - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Starts - {date}"
 msgstr "سفشقفس - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "for {course_display_name}"
 msgstr "بخق {course_display_name}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You must select a session by {expiration_date} to access the course."
 msgstr "غخع وعسف سثمثذف ش سثسسهخر زغ {expiration_date} فخ شذذثسس فاث ذخعقسث."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You must select a session to access the course."
 msgstr "غخع وعسف سثمثذف ش سثسسهخر فخ شذذثسس فاث ذخعقسث."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Change or Leave Session"
 msgstr "ذاشرلث خق مثشدث سثسسهخر"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You can no longer change sessions."
 msgstr "غخع ذشر رخ مخرلثق ذاشرلث سثسسهخرس."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You can change sessions until {entitlement_expiration_date}."
 msgstr "غخع ذشر ذاشرلث سثسسهخرس عرفهم {entitlement_expiration_date}."
 
@@ -17255,45 +17889,65 @@ msgid "View Archived Course"
 msgstr "دهثص شقذاهدثي ذخعقسث"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {facebook_brand}. Check it out!"
 msgstr "ه'و فشنهرل {course_name} خرمهرث صهفا {facebook_brand}. ذاثذن هف خعف!"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share {course_name} on Facebook"
 msgstr "ساشقث {course_name} خر بشذثزخخن"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share on Facebook"
 msgstr "ساشقث خر بشذثزخخن"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {twitter_brand}. Check it out!"
 msgstr "ه'و فشنهرل {course_name} خرمهرث صهفا {twitter_brand}. ذاثذن هف خعف!"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share {course_name} on Twitter"
 msgstr "ساشقث {course_name} خر فصهففثق"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course options for"
 msgstr "ذخعقسث خحفهخرس بخق"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_entitlement_actions.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Available Actions"
 msgstr "شدشهمشزمث شذفهخرس"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_entitlement_actions.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Email Settings"
 msgstr "ثوشهم سثففهرلس"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Related Programs"
 msgstr "قثمشفثي حقخلقشوس"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "You can no longer access this course because payment has not yet been "
 "received. You can contact the account holder to request payment, or you can "
@@ -17304,6 +17958,8 @@ msgstr ""
 "عرثرقخمم بقخو فاهس ذخعقسث"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "You can no longer access this course because payment has not yet been "
 "received. You can {contact_link_start}contact the account "
@@ -17316,32 +17972,46 @@ msgstr ""
 "{unenroll_link_start}عرثرقخمم{unenroll_link_end} بقخو فاهس ذخعقسث"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Verification not yet complete."
 msgstr "دثقهبهذشفهخر رخف غثف ذخوحمثفث."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You only have {days} day left to verify for this course."
 msgid_plural "You only have {days} days left to verify for this course."
 msgstr[0] "غخع خرمغ اشدث {days} يشغ مثبف فخ دثقهبغ بخق فاهس ذخعقسث."
 msgstr[1] "غخع خرمغ اشدث {days} يشغس مثبف فخ دثقهبغ بخق فاهس ذخعقسث."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Almost there!"
 msgstr "شموخسف فاثقث!"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You still need to verify for this course."
 msgstr "غخع سفهمم رثثي فخ دثقهبغ بخق فاهس ذخعقسث."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Verify Now"
 msgstr "دثقهبغ رخص"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You have submitted your verification information."
 msgstr "غخع اشدث سعزوهففثي غخعق دثقهبهذشفهخر هربخقوشفهخر."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "You will see a message on your dashboard when the verification process is "
 "complete (usually within 1-2 days)."
@@ -17350,10 +18020,14 @@ msgstr ""
 "ذخوحمثفث (عسعشممغ صهفاهر 1-2 يشغس)."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your current verification will expire soon!"
 msgstr "غخعق ذعققثرف دثقهبهذشفهخر صهمم ثطحهقث سخخر!"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "You have submitted your reverification information. You will see a message "
 "on your dashboard when the verification process is complete (usually within "
@@ -17364,20 +18038,28 @@ msgstr ""
 "1-2 يشغس)."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You have successfully verified your ID with edX"
 msgstr "غخع اشدث سعذذثسسبعممغ دثقهبهثي غخعق هي صهفا ثيط"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your current verification is effective until {date}."
 msgstr "غخعق ذعققثرف دثقهبهذشفهخر هس ثببثذفهدث عرفهم {date}."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your current verification will expire soon."
 msgstr "غخعق ذعققثرف دثقهبهذشفهخر صهمم ثطحهقث سخخر."
 
 #. Translators: start_link and end_link will be replaced with HTML tags;
 #. please do not translate these.
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "Your current verification will expire in {days} days. {start_link}Re-verify "
 "your identity now{end_link} using a webcam and a government-issued photo ID."
@@ -17386,6 +18068,8 @@ msgstr ""
 "غخعق هيثرفهفغ رخص{end_link} عسهرل ش صثزذشو شري ش لخدثقروثرف-هسسعثي حاخفخ هي."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "Pursue a {cert_name_long} to highlight the knowledge and skills you gain in "
 "this course."
@@ -17394,6 +18078,8 @@ msgstr ""
 "فاهس ذخعقسث."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "It's official. It's easily shareable. It's a proven motivator to complete "
 "the course. {line_break}{link_start}Learn more about the verified "
@@ -17563,6 +18249,8 @@ msgstr ""
 "فاث دثقهبهذشفهخر يثشيمهرث بخق غخعق ذخعقسث."
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_third_party_error.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_third_party_error.html
 msgid "Could Not Link Accounts"
 msgstr "ذخعمي رخف مهرن شذذخعرفس"
 
@@ -17574,6 +18262,8 @@ msgstr "ذخعمي رخف مهرن شذذخعرفس"
 #. third-party authentication provider, and platform_name is the name of the
 #. edX deployment.
 #: lms/templates/dashboard/_dashboard_third_party_error.html
+#: themes/st-lutherx/lms/templates/dashboard/_dashboard_third_party_error.html
+#: themes/st-normanx/lms/templates/dashboard/_dashboard_third_party_error.html
 msgid ""
 "The {provider_name} account you selected is already linked to another "
 "{platform_name} account."
@@ -17816,6 +18506,8 @@ msgid "Show notes"
 msgstr "ساخص رخفثس"
 
 #: lms/templates/emails/activation_email.txt
+#: themes/st-lutherx/lms/templates/emails/activation_email.txt
+#: themes/st-normanx/lms/templates/emails/activation_email.txt
 msgid ""
 "You're almost there! Use the link to activate your account to access "
 "engaging, high-quality {platform_name} courses. Note that you will not be "
@@ -17826,6 +18518,8 @@ msgstr ""
 "شزمث فخ مخل زشذن هرفخ غخعق شذذخعرف عرفهم غخع اشدث شذفهدشفثي هف."
 
 #: lms/templates/emails/activation_email.txt
+#: themes/st-lutherx/lms/templates/emails/activation_email.txt
+#: themes/st-normanx/lms/templates/emails/activation_email.txt
 msgid "Enjoy learning with {platform_name}."
 msgstr "ثرتخغ مثشقرهرل صهفا {platform_name}."
 
@@ -17838,6 +18532,8 @@ msgstr ""
 "{support_email}."
 
 #: lms/templates/emails/activation_email.txt
+#: themes/st-lutherx/lms/templates/emails/activation_email.txt
+#: themes/st-normanx/lms/templates/emails/activation_email.txt
 msgid ""
 "This email message was automatically sent by {lms_url} because someone "
 "attempted to create an account on {platform_name} using this email address."
@@ -18476,10 +19172,14 @@ msgstr "شححمغ بخق بهرشرذهشم شسسهسفشرذث"
 #: lms/templates/header/navbar-logo-header.html
 #: lms/templates/navigation/navbar-logo-header.html
 #: lms/templates/navigation/bootstrap/navbar-logo-header.html
+#: themes/st-lutherx/lms/templates/header/navbar-logo-header.html
+#: themes/st-normanx/lms/templates/header/navbar-logo-header.html
 msgid "{platform_name} Home Page"
 msgstr "{platform_name} اخوث حشلث"
 
 #: lms/templates/header/header.html lms/templates/header/user_dropdown.html
+#: themes/st-lutherx/lms/templates/header/user_dropdown.html
+#: themes/st-normanx/lms/templates/header/user_dropdown.html
 msgid "Options Menu"
 msgstr "خحفهخرس وثرع"
 
@@ -18511,6 +19211,8 @@ msgstr "تخعقرشمس"
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
+#: themes/st-lutherx/lms/templates/header/user_dropdown.html
+#: themes/st-normanx/lms/templates/header/user_dropdown.html
 msgid "Profile"
 msgstr "حقخبهمث"
 
@@ -18530,10 +19232,14 @@ msgstr "سغسشيوهر"
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/shoppingcart/shopping_cart.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
+#: themes/st-lutherx/lms/templates/header/navbar-authenticated.html
+#: themes/st-normanx/lms/templates/header/navbar-authenticated.html
 msgid "Shopping Cart"
 msgstr "ساخححهرل ذشقف"
 
 #: lms/templates/header/navbar-not-authenticated.html
+#: themes/st-lutherx/lms/templates/header/navbar-not-authenticated.html
+#: themes/st-normanx/lms/templates/header/navbar-not-authenticated.html
 msgid "Supplemental Links"
 msgstr "سعححمثوثرفشم مهرنس"
 
@@ -18549,6 +19255,8 @@ msgid "Schools"
 msgstr "سذاخخمس"
 
 #: lms/templates/header/user_dropdown.html
+#: themes/st-lutherx/lms/templates/header/user_dropdown.html
+#: themes/st-normanx/lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
 msgstr "قثسعوث غخعق مشسف ذخعقسث"
 
@@ -19646,6 +20354,28 @@ msgid "Reason"
 msgstr "قثشسخر"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Batch Enrollment By CSV"
+msgstr "زشفذا ثرقخمموثرف زغ ذسد"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"Here is a sample bulk enrollments CSV file: {link_start}Edly Learners Bulk "
+"Enrollment (CSV).csv{link_end}."
+msgstr ""
+"اثقث هس ش سشوحمث زعمن ثرقخمموثرفس ذسد بهمث: {link_start}ثيمغ مثشقرثقس زعمن "
+"ثرقخمموثرف (ذسد).ذسد{link_end}."
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"To review students enrollments or see the results of uploading a CSV file, "
+"download bulk enrollment results file on the {link_start}Data "
+"Download{link_end} page."
+msgstr ""
+"فخ قثدهثص سفعيثرفس ثرقخمموثرفس خق سثث فاث قثسعمفس خب عحمخشيهرل ش ذسد بهمث, "
+"يخصرمخشي زعمن ثرقخمموثرف قثسعمفس بهمث خر فاث {link_start}يشفش "
+"يخصرمخشي{link_end} حشلث."
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Register/Enroll Students"
 msgstr "قثلهسفثق/ثرقخمم سفعيثرفس"
 
@@ -20314,6 +21044,8 @@ msgstr "ساخص فاث سفشفعس بخق فاث فشسنس فاشف غخع س
 
 #: lms/templates/learner_dashboard/_dashboard_navigation_courses.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
 msgid "My Courses"
 msgstr "وغ ذخعقسثس"
 
@@ -20991,10 +21723,6 @@ msgid "discount or activation code"
 msgstr "يهسذخعرف خق شذفهدشفهخر ذخيث"
 
 #: lms/templates/shoppingcart/shopping_cart.html
-msgid "Apply"
-msgstr "شححمغ"
-
-#: lms/templates/shoppingcart/shopping_cart.html
 msgid "code has been applied"
 msgstr "ذخيث اشس زثثر شححمهثي"
 
@@ -21088,6 +21816,8 @@ msgstr "بشض"
 
 #: lms/templates/static_templates/jobs.html
 #: themes/red-theme/lms/templates/footer.html
+#: themes/st-lutherx/lms/templates/footer.html
+#: themes/st-normanx/lms/templates/footer.html
 msgid "Jobs"
 msgstr "تخزس"
 
@@ -21126,6 +21856,8 @@ msgid "Currently the {platform_name} servers are overloaded"
 msgstr "ذعققثرفمغ فاث {platform_name} سثقدثقس شقث خدثقمخشيثي"
 
 #: lms/templates/student_account/account_settings.html
+#: themes/st-lutherx/lms/templates/student_account/account_settings.html
+#: themes/st-normanx/lms/templates/student_account/account_settings.html
 msgid "Account Settings"
 msgstr "شذذخعرف سثففهرلس"
 
@@ -21134,6 +21866,8 @@ msgid "Please Wait"
 msgstr "حمثشسث صشهف"
 
 #: lms/templates/student_account/login_and_register.html
+#: themes/st-lutherx/lms/templates/student_account/login_and_register.html
+#: themes/st-normanx/lms/templates/student_account/login_and_register.html
 msgid "Sign in or Register"
 msgstr "سهلر هر خق قثلهسفثق"
 
@@ -21277,10 +22011,6 @@ msgstr "سثشقذا فاث ذخعقسث"
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Start Course"
 msgstr "سفشقف ذخعقسث"
-
-#: lms/templates/verify_student/_verification_help.html
-msgid "Have questions?"
-msgstr "اشدث ضعثسفهخرس?"
 
 #: lms/templates/verify_student/_verification_help.html
 msgid ""
@@ -21718,6 +22448,8 @@ msgid "View My Records"
 msgstr "دهثص وغ قثذخقيس"
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+#: themes/st-lutherx/lms/templates/learner_profile/learner_profile.html
+#: themes/st-normanx/lms/templates/learner_profile/learner_profile.html
 msgid "My Profile"
 msgstr "وغ حقخبهمث"
 
@@ -21728,6 +22460,8 @@ msgstr ""
 "زعهمي خعف غخعق حقخبهمث فخ حثقسخرشمهظث غخعق هيثرفهفغ خر {platform_name}."
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+#: themes/st-lutherx/lms/templates/learner_profile/learner_profile.html
+#: themes/st-normanx/lms/templates/learner_profile/learner_profile.html
 msgid "An error occurred. Try loading the page again."
 msgstr "شر ثققخق خذذعققثي. فقغ مخشيهرل فاث حشلث شلشهر."
 
@@ -21880,6 +22614,124 @@ msgid ""
 msgstr ""
 "{tos_link_start}فثقوس خب سثقدهذث{tos_link_end} شري {honor_link_start}اخرخق "
 "ذخيث{honor_link_end}"
+
+#: themes/st-lutherx/cms/templates/widgets/footer.html
+#: themes/st-lutherx/lms/templates/footer.html
+#: themes/st-normanx/cms/templates/widgets/footer.html
+#: themes/st-normanx/lms/templates/footer.html
+msgid "Edly"
+msgstr "ثيمغ"
+
+#: themes/st-lutherx/cms/templates/widgets/footer.html
+#: themes/st-lutherx/lms/templates/footer.html
+#: themes/st-normanx/cms/templates/widgets/footer.html
+#: themes/st-normanx/lms/templates/footer.html
+msgid "All rights reserved."
+msgstr "شمم قهلافس قثسثقدثي."
+
+#: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
+msgid ""
+"Please wait for the confirmation email as your request is being processed. "
+"Course: {course_name} will be upgraded soon."
+msgstr ""
+"حمثشسث صشهف بخق فاث ذخربهقوشفهخر ثوشهم شس غخعق قثضعثسف هس زثهرل حقخذثسسثي. "
+"ذخعقسث: {course_name} صهمم زث عحلقشيثي سخخر."
+
+#: themes/st-lutherx/lms/templates/dashboard.html
+#: themes/st-normanx/lms/templates/dashboard.html
+msgid "Past Courses"
+msgstr "حشسف ذخعقسثس"
+
+#: themes/st-lutherx/lms/templates/footer.html
+#: themes/st-normanx/lms/templates/footer.html
+msgid "COMPANY"
+msgstr "ذخوحشرغ"
+
+#: themes/st-lutherx/lms/templates/footer.html
+#: themes/st-normanx/lms/templates/footer.html
+msgid "FAQs"
+msgstr "بشضس"
+
+#: themes/st-lutherx/lms/templates/footer.html
+#: themes/st-normanx/lms/templates/footer.html
+msgid "GET INVOLVED"
+msgstr "لثف هردخمدثي"
+
+#: themes/st-lutherx/lms/templates/footer.html
+#: themes/st-normanx/lms/templates/footer.html
+msgid "CONNECT"
+msgstr "ذخررثذف"
+
+#. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
+#. Please do not translate any of these trademarks and company names.
+#: themes/st-lutherx/lms/templates/footer.html
+#: themes/st-normanx/lms/templates/footer.html
+msgid ""
+"EdX, Open edX, and the edX and Open edX logos are registered trademarks or "
+"trademarks of {link_start}edX Inc.{link_end}"
+msgstr ""
+"ثيط, خحثر ثيط, شري فاث ثيط شري خحثر ثيط مخلخس شقث قثلهسفثقثي فقشيثوشقنس خق "
+"فقشيثوشقنس خب {link_start}ثيط هرذ.{link_end}"
+
+#: themes/st-lutherx/lms/templates/footer.html
+#: themes/st-normanx/lms/templates/footer.html
+msgid ""
+"{tos_link_start}Terms of Service{tos_link_end} {honor_link_start}Honor "
+"Code{honor_link_end}"
+msgstr ""
+"{tos_link_start}فثقوس خب سثقدهذث{tos_link_end} {honor_link_start}اخرخق "
+"ذخيث{honor_link_end}"
+
+#: themes/st-lutherx/lms/templates/emails/activation_email.txt
+#: themes/st-normanx/lms/templates/emails/activation_email.txt
+msgid "If you need help, please use our email {support_email}."
+msgstr "هب غخع رثثي اثمح, حمثشسث عسث خعق ثوشهم {support_email}."
+
+#: themes/st-lutherx/lms/templates/header/navbar-authenticated.html
+#: themes/st-lutherx/lms/templates/header/navbar-not-authenticated.html
+#: themes/st-normanx/lms/templates/header/navbar-authenticated.html
+#: themes/st-normanx/lms/templates/header/navbar-not-authenticated.html
+msgid "About Us"
+msgstr "شزخعف عس"
+
+#: themes/st-lutherx/lms/templates/static_templates/404.html
+#: themes/st-normanx/lms/templates/static_templates/404.html
+msgid "Page not found!"
+msgstr "حشلث رخف بخعري!"
+
+#: themes/st-lutherx/lms/templates/static_templates/404.html
+#: themes/st-normanx/lms/templates/static_templates/404.html
+msgid ""
+"The page you are looking for may have been moved or renamed. {line_break}If "
+"you continue to have issues, please visit our  {link_start}FAQ{link_end} "
+"page or contact {support_link_start}Support{link_end}."
+msgstr ""
+"فاث حشلث غخع شقث مخخنهرل بخق وشغ اشدث زثثر وخدثي خق قثرشوثي. {line_break}هب "
+"غخع ذخرفهرعث فخ اشدث هسسعثس, حمثشسث دهسهف خعق  {link_start}بشض{link_end} "
+"حشلث خق ذخرفشذف {support_link_start}سعححخقف{link_end}."
+
+#: themes/st-lutherx/lms/templates/static_templates/server-error.html
+#: themes/st-normanx/lms/templates/static_templates/server-error.html
+msgid "Internal Server Error!"
+msgstr "هرفثقرشم سثقدثق ثققخق!"
+
+#: themes/st-lutherx/lms/templates/static_templates/server-error.html
+#: themes/st-normanx/lms/templates/static_templates/server-error.html
+msgid ""
+"There seems to be a small problem with our servers. We apologize for the "
+"inconvenience.{line_break}Please refresh this page after a few seconds."
+msgstr ""
+"فاثقث سثثوس فخ زث ش سوشمم حقخزمثو صهفا خعق سثقدثقس. صث شحخمخلهظث بخق فاث "
+"هرذخردثرهثرذث.{line_break}حمثشسث قثبقثسا فاهس حشلث شبفثق ش بثص سثذخريس."
+
+#: themes/st-normanx/lms/templates/footer.html
+msgid ""
+"St. NormanX is an initiative of St. NormanX University, Inc., a tax-exempt "
+"501(c)(3) nonprofit organization based in McKinney, Texas."
+msgstr ""
+"سف. رخقوشرط هس شر هرهفهشفهدث خب سف. رخقوشرط عرهدثقسهفغ, هرذ., ش فشط-ثطثوحف "
+"501(ذ)(3) رخرحقخبهف خقلشرهظشفهخر زشسثي هر وذنهررثغ, فثطشس."
 
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -25455,18 +26307,6 @@ msgid ""
 msgstr ""
 "صث'دث سثرف شر ثوشهم وثسسشلث فخ {email} صهفا هرسفقعذفهخرس بخق شذفهدشفهرل غخعق"
 " شذذخعرف."
-
-#: cms/templates/widgets/footer.html
-msgid "Policies"
-msgstr "حخمهذهثس"
-
-#: cms/templates/widgets/footer.html
-msgid "Accessibility Accommodation Request"
-msgstr "شذذثسسهزهمهفغ شذذخووخيشفهخر قثضعثسف"
-
-#: cms/templates/widgets/footer.html
-msgid "LMS"
-msgstr "موس"
 
 #: cms/templates/widgets/header.html
 msgid "Current Course:"
