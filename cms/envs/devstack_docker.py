@@ -9,7 +9,7 @@ LOGGING['handlers']['local'] = LOGGING['handlers']['tracking'] = {
 
 LOGGING['loggers']['tracking']['handlers'] = ['console']
 
-LMS_BASE = 'localhost:18000'
+LMS_BASE = 'edx.devstack.lms:18000'
 CMS_BASE = 'localhost:18010'
 LMS_ROOT_URL = 'http://{}'.format(LMS_BASE)
 
@@ -21,7 +21,7 @@ FEATURES.update({
 
 CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
 
-OAUTH_OIDC_ISSUER = '{}/oauth2'.format(LMS_ROOT_URL)
+OAUTH_OIDC_ISSUER = 'http://localhost:18000/oauth2'
 
 JWT_AUTH.update({
     'JWT_SECRET_KEY': 'lms-secret',
