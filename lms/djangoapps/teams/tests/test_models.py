@@ -15,6 +15,7 @@ from mock import Mock
 from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.teams import TEAM_DISCUSSION_CONTEXT
+from lms.djangoapps.teams.errors import AddToIncompatibleTeamError
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from openedx.core.djangoapps.django_comment_common.signals import (
@@ -81,6 +82,39 @@ class TestModelStrings(SharedModuleStoreTestCase):
             "the-user is member of The Team in edx/the-course/1"
         )
 
+@ddt.ddt
+class CourseTeamTest(SharedModuleStoreTestCase):
+    """Tests for the CourseTeam model."""
+
+    @classmethod
+    def setUpClass(cls):
+        from course_modes.models import CourseMode
+        super(CourseTeamTest, cls).setUpClass()
+
+        cls.audit_learner = UserFactory.create(username="audit")
+        CourseEnrollmentFactory.create(user=cls.audit_learner, course_id="edx/the-course/1", mode=CourseMode.AUDIT)
+        cls.unprotected_team = CourseTeamFactory(
+            course_id="edx/the-course/1",
+            team_id="the-team",
+            topic_id=TEAMSET_1_ID,
+            name="The Team"
+        )
+
+        cls.protected_learner = UserFactory.create(username="masters")
+        CourseEnrollmentFactory.create(user=cls.protected_learner, course_id="edx/the-course/1", mode=CourseMode.MASTERS)
+        cls.protected_team = CourseTeamFactory(
+            course_id="edx/the-course/1",
+            team_id="the-team",
+            topic_id=TEAMSET_1_ID,
+            name="The Team",
+            organization_protected=True
+        )
+
+    def test_add_user_bad_team_access(self):
+        """Test that we are blocked from adding a user to a team of mixed enrollment types"""
+
+        with self.assertRaises(AddToIncompatibleTeamError):
+            self.unprotected_team.add_user(self.protected_learner)
 
 @ddt.ddt
 class TeamMembershipTest(SharedModuleStoreTestCase):
