@@ -1,33 +1,33 @@
 # #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-06-03 18:56+0000\n"
-"PO-Revision-Date: 2019-06-03 19:01:39.336766\n"
+"POT-Creation-Date: 2020-02-18 12:24+0000\n"
+"PO-Revision-Date: 2020-02-18 12:25:03.786639\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -123,6 +123,7 @@ msgstr ""
 #: cms/static/js/views/show_textbook.js cms/static/js/views/tabs.js
 #: cms/static/js/views/validation.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: common/static/bundles/commons.js
@@ -131,6 +132,8 @@ msgstr ""
 #: common/static/common/js/components/utils/view_utils.js
 #: lms/static/js/Markdown.Editor.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -469,9 +472,12 @@ msgid "Unknown"
 msgstr ""
 
 #: cms/static/js/views/manage_users_and_roles.js
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Are you sure?"
 msgstr ""
 
@@ -1021,7 +1027,6 @@ msgstr ""
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "%(num_points)s point possible (graded, results hidden)"
 msgid_plural "%(num_points)s points possible (graded, results hidden)"
 msgstr[0] ""
@@ -1031,7 +1036,6 @@ msgstr[1] ""
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "%(num_points)s point possible (ungraded, results hidden)"
 msgid_plural "%(num_points)s points possible (ungraded, results hidden)"
 msgstr[0] ""
@@ -1041,7 +1045,6 @@ msgstr[1] ""
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "%(num_points)s point possible (graded)"
 msgid_plural "%(num_points)s points possible (graded)"
 msgstr[0] ""
@@ -1051,7 +1054,6 @@ msgstr[1] ""
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "%(num_points)s point possible (ungraded)"
 msgid_plural "%(num_points)s points possible (ungraded)"
 msgstr[0] ""
@@ -1063,7 +1065,6 @@ msgstr[1] ""
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "%(earned)s/%(possible)s point (graded)"
 msgid_plural "%(earned)s/%(possible)s points (graded)"
 msgstr[0] ""
@@ -1075,7 +1076,6 @@ msgstr[1] ""
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "%(earned)s/%(possible)s point (ungraded)"
 msgid_plural "%(earned)s/%(possible)s points (ungraded)"
 msgstr[0] ""
@@ -1083,19 +1083,16 @@ msgstr[1] ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "The grading process is still running. Refresh the page to see updates."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "Could not grade your answer. The submission was aborted."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid ""
 "Submission aborted! Sorry, your browser does not support file uploads. If "
 "you can, please use Chrome or Safari which have been verified to support "
@@ -1104,25 +1101,21 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "You submitted {filename}; only {allowedFiles} are allowed."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "Your file {filename} is too large (max size: {maxSize}MB)."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "You did not submit the required files: {requiredFiles}."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "You did not select any files to submit."
 msgstr ""
 
@@ -1130,19 +1123,16 @@ msgstr ""
 #. associated status.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "{label}: {status}"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "This problem has been reset."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "unsubmitted"
 msgstr ""
 
@@ -1754,9 +1744,7 @@ msgstr ""
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/static/bundles/CapaDescriptor.js
-#: common/static/bundles/ProblemBlockStudio.js
-#: common/static/bundles/commons.js
+#: common/static/bundles/CapaDescriptor.js common/static/bundles/commons.js
 msgid "Header"
 msgstr ""
 
@@ -2598,31 +2586,26 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 #: common/static/bundles/CapaDescriptor.js
-#: common/static/bundles/ProblemBlockStudio.js
 msgid "incorrect"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 #: common/static/bundles/CapaDescriptor.js
-#: common/static/bundles/ProblemBlockStudio.js
 msgid "correct"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 #: common/static/bundles/CapaDescriptor.js
-#: common/static/bundles/ProblemBlockStudio.js
 msgid "answer"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 #: common/static/bundles/CapaDescriptor.js
-#: common/static/bundles/ProblemBlockStudio.js
 msgid "Short explanation"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 #: common/static/bundles/CapaDescriptor.js
-#: common/static/bundles/ProblemBlockStudio.js
 msgid ""
 "If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n"
 "\n"
@@ -2631,7 +2614,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 #: common/static/bundles/CapaDescriptor.js
-#: common/static/bundles/ProblemBlockStudio.js
 msgid "Explanation"
 msgstr ""
 
@@ -2948,6 +2930,195 @@ msgstr ""
 msgid "Collapse All"
 msgstr ""
 
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"You may also lose access to verified certificates and other program "
+"credentials like MicroMasters certificates. If you want to make a copy of "
+"these for your records before proceeding with deletion, follow the "
+"instructions for {htmlStart}printing or downloading a certificate{htmlEnd}."
+msgstr ""
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"Before proceeding, please {htmlStart}unlink all social media "
+"accounts{htmlEnd}."
+msgstr ""
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
+msgstr ""
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read "
+"the above carefully before proceeding. This is an irreversible action, and "
+"{strongStart}you will no longer be able to use the same email on "
+"Edly.{strongEnd}"
+msgstr ""
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid "We’re sorry to see you go!"
+msgstr ""
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"Please note: Deletion of your account and personal data is permanent and "
+"cannot be undone. We will not be able to recover your account or the data "
+"that is deleted."
+msgstr ""
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"Once your account is deleted, you cannot use it to take courses on the Edly "
+"app, edly.io, or any other site hosted by Edly."
+msgstr ""
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
+msgid "Delete My Account"
+msgstr ""
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "Password is incorrect"
+msgstr ""
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "Unable to delete account"
+msgstr ""
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "Please re-enter your password."
+msgstr ""
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"Sorry, there was an error trying to process your request. Please try again "
+"later."
+msgstr ""
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "A Password is required"
+msgstr ""
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"You have selected “Delete my account.” Deletion of your account and personal"
+" data is permanent and cannot be undone. Edly will not be able to recover "
+"your account or the data that is deleted."
+msgstr ""
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"If you proceed, you cannot use it to take courses on the Edly app or any "
+"other site hosted by Edly."
+msgstr ""
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"If you still wish to continue and delete your account, please enter your "
+"account password:"
+msgstr ""
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "Yes, Delete"
+msgstr ""
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "We're sorry to see you go! Your account will be deleted shortly."
+msgstr ""
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"Account deletion, including removal from email lists, may take a few weeks "
+"to fully process through our system. If you want to opt-out of emails before"
+" then, please unsubscribe from the footer of any email."
+msgstr ""
+
 #: common/static/bundles/EntitlementFactory.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/models/course_card_model.js
@@ -3087,6 +3258,8 @@ msgstr ""
 #: common/static/bundles/PasswordResetConfirmation.js
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Reset Your Password"
 msgstr ""
 
@@ -3292,31 +3465,6 @@ msgstr ""
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"You may also lose access to verified certificates and other program "
-"credentials like MicroMasters certificates. If you want to make a copy of "
-"these for your records before proceeding with deletion, follow the "
-"instructions for {htmlStart}printing or downloading a certificate{htmlEnd}."
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid ""
-"Before proceeding, please {htmlStart}unlink all social media "
-"accounts{htmlEnd}."
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
 "{htmlStart}Want to change your email, name, or password instead?{htmlEnd}"
 msgstr ""
@@ -3329,12 +3477,6 @@ msgid ""
 "the above carefully before proceeding. This is an irreversible action, and "
 "{strongStart}you will no longer be able to use the same email on "
 "edX.{strongEnd}"
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "We’re sorry to see you go!"
 msgstr ""
 
 #: common/static/bundles/StudentAccountDeletion.js
@@ -3359,45 +3501,6 @@ msgstr ""
 
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-#: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Delete My Account"
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "Password is incorrect"
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "Unable to delete account"
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "Please re-enter your password."
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"Sorry, there was an error trying to process your request. Please try again "
-"later."
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "A Password is required"
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "You have selected “Delete my account.” Deletion of your account and personal"
@@ -3414,35 +3517,6 @@ msgid ""
 "to edx.org from your employer’s or university’s system and access to private"
 " sites offered by MIT Open Learning, Wharton Executive Education, and "
 "Harvard Medical School."
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"If you still wish to continue and delete your account, please enter your "
-"account password:"
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "Yes, Delete"
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "We're sorry to see you go! Your account will be deleted shortly."
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"Account deletion, including removal from email lists, may take a few weeks "
-"to fully process through our system. If you want to opt-out of emails before"
-" then, please unsubscribe from the footer of any email."
 msgstr ""
 
 #: common/static/bundles/UnenrollmentFactory.js
@@ -3897,6 +3971,8 @@ msgstr ""
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Language"
 msgstr ""
 
@@ -4820,6 +4896,7 @@ msgid "Assign students to cohorts by uploading a CSV file."
 msgstr ""
 
 #: lms/static/js/groups/views/cohorts.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Choose a .csv file"
 msgstr ""
 
@@ -4832,6 +4909,7 @@ msgid "Upload File and Assign Students"
 msgstr ""
 
 #: lms/static/js/groups/views/cohorts.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "Your file '{file}' has been uploaded. Allow a few minutes for processing."
 msgstr ""
@@ -4965,6 +5043,8 @@ msgstr ""
 #: lms/static/js/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: cms/templates/js/transcript-organization-credentials.underscore
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
@@ -5016,6 +5096,23 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "Error: You cannot remove yourself from the Instructor group!"
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid ""
+"Bulk enroll students to this course by uploading a CSV file that contains "
+"the email column. Enrollment emails will be sent to registered students and "
+"registration invitation emails will be sent to new users."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid ""
+"Only properly formatted .csv files will be accepted with max file size of 2 "
+"MB."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Upload File and Bulk Enroll Students"
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/membership.js
@@ -5614,9 +5711,9 @@ msgid ""
 "address is associated with your {platform_name} account, we will send a "
 "message with password reset instructions to this email "
 "address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
-" message, verify that you entered the correct email address, or check your "
-"spam folder.{paragraphEnd}{paragraphStart}If you need further assistance, "
-"{anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
+" message after 1 minute, verify that you entered the correct email address, "
+"or check your spam folder.{paragraphEnd}{paragraphStart}If you need further "
+"assistance, {anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
 msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
@@ -5656,71 +5753,101 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "Your profile settings are managed by {enterprise_name}. Contact your "
 "administrator or {link_start}edX Support{link_end} for help."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Email Address (Sign In)"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "You receive messages from {platform_name} and course teams at this address."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Secondary Email Address"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "You may access your account when single-sign on is not available."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Full Name"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "The name that is used for ID verification and that appears on your "
 "certificates."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Country or Region of Residence"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "The country or region where you live."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Basic Account Information"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "These settings include basic information about your account."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "The name that identifies you on {platform_name}. You cannot change your "
 "username."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: lms/templates/student_account/account.underscore
 msgid "Password"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Check your email account for instructions to reset your password."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "The language used throughout this site. This site is currently available in "
 "a limited number of languages. Changing the value of this field will cause "
@@ -5728,10 +5855,14 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Time Zone"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "Select the time zone for displaying course dates. If you do not specify a "
 "time zone, course dates, including assignment deadlines, will be displayed "
@@ -5739,41 +5870,59 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "All Time Zones"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Default (Local Time Zone)"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Additional Information"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Education Completed"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Gender"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Year of Birth"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Preferred Language"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "We've sent a confirmation message to {new_secondary_email_address}. Click "
 "the link in the message to update your secondary email address."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Social Media Links"
 msgstr ""
 
@@ -5784,45 +5933,67 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid " Link"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Enter your "
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_account/views/account_settings_view.js
+#: themes/st-lutherx/lms/static/js/student_account/views/account_settings_view.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/account_settings_view.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Linked Accounts"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "You can link your social media accounts to simplify signing in to "
 "{platform_name}."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "ORDER NAME"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "ORDER PLACED"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "TOTAL"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "ORDER NUMBER"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "My Orders"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "This page contains information about orders that you have placed with "
 "{platform_name}."
@@ -5887,10 +6058,14 @@ msgid "Successfully unlinked."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_view.js
+#: themes/st-lutherx/lms/static/js/student_account/views/account_settings_view.js
+#: themes/st-normanx/lms/static/js/student_account/views/account_settings_view.js
 msgid "Account Information"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_view.js
+#: themes/st-lutherx/lms/static/js/student_account/views/account_settings_view.js
+#: themes/st-normanx/lms/static/js/student_account/views/account_settings_view.js
 msgid "Order History"
 msgstr ""
 
@@ -6201,6 +6376,13 @@ msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "Profile"
+msgstr ""
+
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
+msgid ""
+"Optionally, link your personal accounts to the social media icons on your "
+"Edly profile."
 msgstr ""
 
 #: cms/static/js/certificates/models/certificate.js
@@ -8586,6 +8768,8 @@ msgid "Account Settings"
 msgstr ""
 
 #: lms/templates/student_account/account_settings_section.underscore
+#: themes/st-lutherx/lms/templates/student_account/account_settings_section.underscore
+#: themes/st-normanx/lms/templates/student_account/account_settings_section.underscore
 msgid "An error occurred. Please reload the page."
 msgstr ""
 

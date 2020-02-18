@@ -55,7 +55,7 @@ locales:
     - ko_KR  # Korean (Korea)
     # - lt_LT  # Lithuanian (Lithuania)
     # - ml  # Malayalam
-    # - mn  # Mongolian
+    - mn  # Mongolian
     # - mr  # Marathi
     # - ms  # Malay
     # - nb  # Norwegian Bokmål
