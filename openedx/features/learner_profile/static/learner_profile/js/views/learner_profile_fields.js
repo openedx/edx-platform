@@ -41,7 +41,7 @@
                 if (this.profileIsPrivate) {
                     this._super(
                         HtmlUtils.interpolateHtml(
-                            gettext('You must specify your birth year before you can share your full profile. To specify your birth year, go to the {account_settings_page_link}'),  // eslint-disable-line max-len
+                            gettext('To share your profile with other UC San Diego Online learners, you must confirm that you are over the age of 13. To confirm, set your Year of Birth on the {account_settings_page_link}'),  // eslint-disable-line max-len
                             {account_settings_page_link: accountSettingsLink}
                         )
                     );
