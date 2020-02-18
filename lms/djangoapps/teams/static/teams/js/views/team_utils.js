@@ -20,14 +20,22 @@
             },
 
             teamCapacityText: function(memberCount, maxMemberCount) {
+                var formatString;
+                var parameters = {memberCount: memberCount};
+                if (maxMemberCount === null) {
+                    formatString = '{memberCount}';
+                } else {
+                    formatString = '{memberCount} / {maxMemberCount}';
+                    parameters.maxMemberCount = maxMemberCount;
+                }
                 return StringUtils.interpolate(
                     // Translators: The following message displays the number of members on a team.
                     ngettext(
-                        '{memberCount} / {maxMemberCount} Member',
-                        '{memberCount} / {maxMemberCount} Members',
-                        maxMemberCount
+                        formatString + ' Member',
+                        formatString + ' Members',
+                        maxMemberCount || memberCount
                     ),
-                    {memberCount: memberCount, maxMemberCount: maxMemberCount}, true
+                    parameters, true
                 );
             },
 

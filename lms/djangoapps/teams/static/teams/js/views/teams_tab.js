@@ -61,7 +61,8 @@
 
             var TeamTabView = Backbone.View.extend({
                 initialize: function(options) {
-                    var router, tabsList;
+                    var view = this,
+                        router, tabsList;
                     this.context = options.context;
                     // This slightly tedious approach is necessary
                     // to use regular expressions within Backbone
@@ -115,7 +116,8 @@
                         router: this.router,
                         teamEvents: this.teamEvents,
                         context: this.context,
-                        collection: this.myTeamsCollection
+                        collection: this.myTeamsCollection,
+                        getTopic: function(topicId) { return view.getTopic(topicId); }
                     });
 
                     this.topicsCollection = new TopicCollection(
