@@ -160,25 +160,25 @@ var StaffDebug = (function() {
 
 // Register click handlers
 $(document).ready(function() {
-    var $courseContent = $('.course-content');
-    $courseContent.on('click', '.staff-debug-reset', function() {
+    var $mainContainer = $('#main');
+    $mainContainer.on('click', '.staff-debug-reset', function() {
         StaffDebug.reset($(this).parent().data('location-name'), $(this).parent().data('location'));
         return false;
     });
-    $courseContent.on('click', '.staff-debug-sdelete', function() {
+    $mainContainer.on('click', '.staff-debug-sdelete', function() {
         StaffDebug.deleteStudentState($(this).parent().data('location-name'), $(this).parent().data('location'));
         return false;
     });
-    $courseContent.on('click', '.staff-debug-rescore', function() {
+    $mainContainer.on('click', '.staff-debug-rescore', function() {
         StaffDebug.rescore($(this).parent().data('location-name'), $(this).parent().data('location'));
         return false;
     });
-    $courseContent.on('click', '.staff-debug-rescore-if-higher', function() {
+    $mainContainer.on('click', '.staff-debug-rescore-if-higher', function() {
         StaffDebug.rescoreIfHigher($(this).parent().data('location-name'), $(this).parent().data('location'));
         return false;
     });
 
-    $courseContent.on('click', '.staff-debug-override-score', function() {
+    $mainContainer.on('click', '.staff-debug-override-score', function() {
         StaffDebug.overrideScore($(this).parent().data('location-name'), $(this).parent().data('location'));
         return false;
     });
