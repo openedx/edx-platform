@@ -72,7 +72,7 @@ django-config-models==2.0.0
 django-cors-headers==2.5.3
 django-countries==5.5
 django-crum==0.7.5
-django-debug-toolbar==1.11
+django-debug-toolbar==2.2
 django-fernet-fields==0.6
 django-filter==2.2.0
 django-ipware==2.1.0
@@ -103,7 +103,7 @@ djangorestframework-xml==1.4.0
 djangorestframework==3.9.4
 docopt==0.6.2
 docutils==0.16
-drf-yasg==1.17.1
+drf-yasg==1.17.0
 edx-ace==0.1.13
 edx-analytics-data-api-client==0.15.3
 edx-api-doc-tools==1.0.2
@@ -289,7 +289,7 @@ social-auth-core==3.2.0
 git+https://github.com/jazzband/sorl-thumbnail.git@13bedfb7d2970809eda597e3ef79318a6fa80ac2#egg=sorl-thumbnail
 sortedcontainers==2.1.0
 soupsieve==1.9.5
-sphinx==2.4.1             # via edx-sphinx-theme, sphinxcontrib-httpdomain
+sphinx==2.4.2             # via edx-sphinx-theme, sphinxcontrib-httpdomain
 sphinxcontrib-applehelp==1.0.1  # via sphinx
 sphinxcontrib-devhelp==1.0.1  # via sphinx
 sphinxcontrib-htmlhelp==1.0.2  # via sphinx
