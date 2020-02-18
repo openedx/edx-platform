@@ -93,28 +93,37 @@ class CourseTeamTest(SharedModuleStoreTestCase):
 
         cls.audit_learner = UserFactory.create(username="audit")
         CourseEnrollmentFactory.create(user=cls.audit_learner, course_id="edx/the-course/1", mode=CourseMode.AUDIT)
-        cls.unprotected_team = CourseTeamFactory(
+        cls.audit_team = CourseTeamFactory(
             course_id="edx/the-course/1",
-            team_id="the-team",
+            team_id="audit-team",
             topic_id=TEAMSET_1_ID,
             name="The Team"
         )
 
-        cls.protected_learner = UserFactory.create(username="masters")
-        CourseEnrollmentFactory.create(user=cls.protected_learner, course_id="edx/the-course/1", mode=CourseMode.MASTERS)
-        cls.protected_team = CourseTeamFactory(
+        cls.masters_learner = UserFactory.create(username="masters")
+        CourseEnrollmentFactory.create(user=cls.masters_learner, course_id="edx/the-course/1", mode=CourseMode.MASTERS)
+        cls.masters_team = CourseTeamFactory(
             course_id="edx/the-course/1",
-            team_id="the-team",
+            team_id="masters-team",
             topic_id=TEAMSET_1_ID,
             name="The Team",
             organization_protected=True
         )
 
+    def test_add_user(self):
+        """Test that we can add users with correct protection status to a team"""
+        self.assertIsNotNone(self.masters_team.add_user(self.masters_learner))
+        self.assertIsNotNone(self.audit_team.add_user(self.audit_learner))
+
     def test_add_user_bad_team_access(self):
         """Test that we are blocked from adding a user to a team of mixed enrollment types"""
 
         with self.assertRaises(AddToIncompatibleTeamError):
-            self.unprotected_team.add_user(self.protected_learner)
+            self.audit_team.add_user(self.masters_learner)
+
+        with self.assertRaises(AddToIncompatibleTeamError):
+            self.masters_team.add_user(self.audit_learner)
+
 
 @ddt.ddt
 class TeamMembershipTest(SharedModuleStoreTestCase):
