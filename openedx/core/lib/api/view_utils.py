@@ -23,7 +23,7 @@ from rest_framework.views import APIView
 from six import text_type, iteritems
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.permissions import IsUserInUrl
 
 
@@ -120,7 +120,7 @@ def view_auth_classes(is_user=False, is_authenticated=True):
         """
         func_or_class.authentication_classes = (
             JwtAuthentication,
-            OAuth2AuthenticationAllowInactiveUser,
+            BearerAuthenticationAllowInactiveUser,
             SessionAuthenticationAllowInactiveUser
         )
         func_or_class.permission_classes = ()

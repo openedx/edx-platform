@@ -68,7 +68,7 @@ from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
 from openedx.core.djangoapps.util.user_utils import SystemUser
 from openedx.core.djangolib.markup import HTML
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.lib.gating.services import GatingService
 from openedx.core.lib.license import wrap_with_license
@@ -1033,7 +1033,7 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     # to avoid introducing backwards-incompatible changes.
     # You can see https://github.com/edx/XBlock/pull/383 for more details.
     else:
-        authentication_classes = (JwtAuthentication, OAuth2AuthenticationAllowInactiveUser)
+        authentication_classes = (JwtAuthentication, BearerAuthenticationAllowInactiveUser)
         authenticators = [auth() for auth in authentication_classes]
 
         for authenticator in authenticators:

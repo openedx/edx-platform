@@ -20,9 +20,9 @@ OAUTH2_USER_NOT_ACTIVE_ERROR = 'user_not_active'
 logger = logging.getLogger(__name__)
 
 
-class OAuth2Authentication(BaseAuthentication):
+class BearerAuthentication(BaseAuthentication):
     """
-    OAuth 2 authentication backend using either `django-oauth2-provider` or 'django-oauth-toolkit'
+    BearerAuthentication backend using either `django-oauth2-provider` or 'django-oauth-toolkit'
     """
 
     www_authenticate_realm = 'api'
@@ -40,7 +40,7 @@ class OAuth2Authentication(BaseAuthentication):
         fails.
         """
 
-        set_custom_metric("OAuth2Authentication", "Failed")  # default value
+        set_custom_metric("BearerAuthentication", "Failed")  # default value
         auth = get_authorization_header(request).split()
 
         if len(auth) == 1:
@@ -54,19 +54,13 @@ class OAuth2Authentication(BaseAuthentication):
 
         if auth and auth[0].lower() == b'bearer':
             access_token = auth[1].decode('utf8')
-            set_custom_metric('OAuth2Authentication_token_location', 'bearer-in-header')
-        elif 'access_token' in request.POST:
-            access_token = request.POST['access_token']
-            set_custom_metric('OAuth2Authentication_token_location', 'post-token')
         else:
-            set_custom_metric("OAuth2Authentication", "None")
+            set_custom_metric("BearerAuthentication", "None")
             return None
-
-        set_custom_metric("OAuth2Authentication_token_parts", len(access_token.split('.')))
 
         user, token = self.authenticate_credentials(access_token)
 
-        set_custom_metric("OAuth2Authentication", "Success")
+        set_custom_metric("BearerAuthentication", "Success")
 
         return user, token
 
@@ -100,13 +94,13 @@ class OAuth2Authentication(BaseAuthentication):
             user = token.user
             # Check to make sure the users have activated their account (by confirming their email)
             if not self.allow_inactive_users and not user.is_active:
-                set_custom_metric("OAuth2Authentication_user_active", False)
+                set_custom_metric("BearerAuthentication_user_active", False)
                 msg = 'User inactive or deleted: %s' % user.get_username()
                 raise AuthenticationFailed({
                     'error_code': OAUTH2_USER_NOT_ACTIVE_ERROR,
                     'developer_message': msg})
             else:
-                set_custom_metric("OAuth2Authentication_user_active", True)
+                set_custom_metric("BearerAuthentication_user_active", True)
 
             return user, token
 
@@ -117,15 +111,15 @@ class OAuth2Authentication(BaseAuthentication):
         """
         dot_token_return = self._get_dot_token(access_token)
         if dot_token_return is not None:
-            set_custom_metric('OAuth2Authentication_token_type', 'dot')
+            set_custom_metric('BearerAuthentication_token_type', 'dot')
             return dot_token_return
 
         dop_token_return = self._get_dop_token(access_token)
         if dop_token_return is not None:
-            set_custom_metric('OAuth2Authentication_token_type', 'dop')
+            set_custom_metric('BearerAuthentication_token_type', 'dop')
             return dop_token_return
 
-        set_custom_metric('OAuth2Authentication_token_type', 'None')
+        set_custom_metric('BearerAuthentication_token_type', 'None')
         return None
 
     def _get_dop_token(self, access_token):
@@ -152,7 +146,7 @@ class OAuth2Authentication(BaseAuthentication):
         return 'Bearer realm="%s"' % self.www_authenticate_realm
 
 
-class OAuth2AuthenticationAllowInactiveUser(OAuth2Authentication):
+class BearerAuthenticationAllowInactiveUser(BearerAuthentication):
     """
     Currently, is_active field on the user is coupled
     with whether or not the user has verified ownership of their claimed email address.
@@ -165,3 +159,17 @@ class OAuth2AuthenticationAllowInactiveUser(OAuth2Authentication):
     """
 
     allow_inactive_users = True
+
+
+class OAuth2Authentication(BearerAuthentication):
+    """
+    Creating temperary class cause things outside of edx-platform need OAuth2Authentication.
+    This will be removed when repos outside edx-platform import BearerAuthentiction instead.
+    """
+
+
+class OAuth2AuthenticationAllowInactiveUser(BearerAuthenticationAllowInactiveUser):
+    """
+    Creating temperary class cause things outside of edx-platform need OAuth2Authentication.
+    This will be removed when repos outside edx-platform import BearerAuthentiction instead.
+    """
