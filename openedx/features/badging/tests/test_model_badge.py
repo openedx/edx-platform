@@ -29,7 +29,7 @@ class BadgeModelTestCases(TestCase):
         Check if get_badges_json returns empty json if no badge exists of provided badge_type
         """
         expected_result = '[]'
-        returned_result = Badge.get_badges_json(badge_type="no_match_")
+        returned_result = Badge.objects.get_badges_json(badge_type="no_match_")
         self.assertEqual(expected_result, returned_result)
 
     def test_get_badges_json_is_ordered(self):
@@ -39,7 +39,7 @@ class BadgeModelTestCases(TestCase):
         BadgeFactory(threshold=20)
         BadgeFactory(threshold=10)
 
-        result = Badge.get_badges_json(badge_type=CONVERSATIONALIST[CONVERSATIONALIST_ENTRY_INDEX])
+        result = Badge.objects.get_badges_json(badge_type=CONVERSATIONALIST[CONVERSATIONALIST_ENTRY_INDEX])
         threshold_index_1 = result.index('"threshold":10')
         threshold_index_2 = result.index('"threshold":20')
         self.assertGreater(threshold_index_2, threshold_index_1)

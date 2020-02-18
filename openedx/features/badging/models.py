@@ -2,6 +2,7 @@ import logging
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.db import transaction
 from rest_framework.renderers import JSONRenderer
 
 from lms.djangoapps.teams.models import CourseTeamMembership
@@ -15,27 +16,10 @@ from . import constants as badge_constants
 log = logging.getLogger('edx.badging')
 
 
-class Badge(models.Model):
-    BADGE_TYPES = (
-        badge_constants.CONVERSATIONALIST,
-        badge_constants.TEAM_PLAYER
-    )
+class BadgeManager(models.Manager):
+    """Custom manager for retrieving badges"""
 
-    name = models.CharField(max_length=255, blank=False, null=False)
-    description = models.TextField(blank=True, null=True)
-    threshold = models.IntegerField(blank=False, null=False)
-    type = models.CharField(max_length=100, blank=False, null=False, choices=BADGE_TYPES)
-    image = models.CharField(max_length=255, blank=False, null=False)
-    date_created = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        app_label = 'badging'
-
-    def __unicode__(self):
-        return self.name
-
-    @classmethod
-    def get_badges_json(cls, badge_type):
+    def get_badges_json(self, badge_type):
         """
         Get json of all badges of provided badge type
 
@@ -53,6 +37,31 @@ class Badge(models.Model):
         return JSONRenderer().render(badges)
 
 
+class Badge(models.Model):
+    BADGE_TYPES = (
+        badge_constants.CONVERSATIONALIST,
+        badge_constants.TEAM_PLAYER
+    )
+
+    name = models.CharField(max_length=255)
+    congrats_message = models.TextField(default='')
+    threshold = models.PositiveIntegerField()
+    type = models.CharField(max_length=100, choices=BADGE_TYPES)
+    image = models.CharField(max_length=255)
+    color_image = models.CharField(max_length=255, default='')
+    date_created = models.DateTimeField(auto_now=True)
+
+    objects = BadgeManager()
+
+    class Meta:
+        app_label = 'badging'
+        unique_together = ('type', 'threshold')
+        ordering = ('type', 'threshold')
+
+    def __unicode__(self):
+        return self.name
+
+
 class UserBadge(models.Model):
     """
         This model represents what badges are assigned to which users in
@@ -68,7 +77,7 @@ class UserBadge(models.Model):
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     badge = models.ForeignKey(Badge, on_delete=models.CASCADE)
     course_id = CourseKeyField(blank=False, max_length=255, db_index=True, db_column='course_id', null=False)
-    community_id = models.IntegerField(blank=False, null=False, db_column='community_id')
+    community_id = models.IntegerField(db_column='community_id')
     date_earned = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -79,6 +88,7 @@ class UserBadge(models.Model):
         return 'User: {}, Badge: {}'.format(self.user.id, self.badge.id)
 
     @classmethod
+    @transaction.atomic
     def assign_badge(cls, user_id, badge_id, community_id):
         """ Save an entry in the UserBadge table specifying a
             specific badge assignment to a user badge in community
@@ -120,13 +130,17 @@ class UserBadge(models.Model):
                 raise Exception(error)
 
             all_team_members = CourseTeamMembership.objects.filter(team_id=team_group_chat['team_id'])
+            all_assigned = bool(all_team_members)
             for member in all_team_members:
-                UserBadge.objects.get_or_create(
+                user_badge, assigned = UserBadge.objects.get_or_create(
                     user_id=member.user_id,
                     badge_id=badge_id,
                     course_id=course_id,
                     community_id=community_id
                 )
+                all_assigned &= assigned
+
+            return all_assigned
         elif badge_type == badge_constants.CONVERSATIONALIST[CONVERSATIONALIST_ENTRY_INDEX]:
             course_id = get_course_id_by_community_id(community_id)
 
@@ -135,12 +149,14 @@ class UserBadge(models.Model):
                 log.exception(error)
                 raise Exception(error)
 
-            UserBadge.objects.get_or_create(
+            user_badge, assigned = UserBadge.objects.get_or_create(
                 user_id=user_id,
                 badge_id=badge_id,
                 course_id=course_id,
                 community_id=community_id
             )
+
+            return assigned
         else:
             error = badge_constants.BADGE_TYPE_ERROR.format(badge_id=badge_id, badge_type=badge_type)
             log.exception(error)

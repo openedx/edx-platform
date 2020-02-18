@@ -9,3 +9,8 @@ def badge_progress(context):
         'community_id': context.get('community_id'),
         'badges': context.get('badges')
     }
+
+
+@register.inclusion_tag('features/badging/badge_congrats_modal.html')
+def badge_congrats_modal():
+    pass
