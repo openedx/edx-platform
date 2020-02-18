@@ -1,8 +1,7 @@
 import logging
 
 from django.contrib.auth.models import User
-from django.db import models
-from django.db import transaction
+from django.db import models, transaction
 from rest_framework.renderers import JSONRenderer
 
 from lms.djangoapps.teams.models import CourseTeamMembership
@@ -12,7 +11,7 @@ from nodebb.models import TeamGroupChat
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 from . import constants as badge_constants
-from .tasks import task_user_badge_email
+from .tasks import task_user_badge_notify
 
 log = logging.getLogger('edx.badging')
 
@@ -108,7 +107,8 @@ class UserBadge(models.Model):
         False: if user badges is already created to any user
         """
         try:
-            badge_type = Badge.objects.get(id=badge_id).type
+            badge_to_assign = Badge.objects.get(id=badge_id)
+            badge_type, badge_name = badge_to_assign.type, badge_to_assign.name
         except Badge.DoesNotExist:
             error = badge_constants.BADGE_NOT_FOUND_ERROR.format(badge_id=badge_id)
             raise Exception(error)
@@ -152,7 +152,7 @@ class UserBadge(models.Model):
 
             for member in members_with_user_badge:
                 # send email and notification to team members who have earned badge
-                task_user_badge_email(member.user.email, course_id)
+                task_user_badge_notify(member.user, course_id, badge_name)
 
             # return true only if badge is assigned to all team members
             return len(members_with_user_badge) == len(all_team_members)
@@ -173,7 +173,7 @@ class UserBadge(models.Model):
 
             if created:
                 # send email and notification to user who have earned conversationalist badge
-                task_user_badge_email(user_badge.user.email, course_id)
+                task_user_badge_notify(user_badge.user, course_id, badge_name)
 
             return created  # return true only if badge is assigned
         else:

@@ -19,3 +19,8 @@ INVALID_COMMUNITY_ERROR = 'Cannot assign badge {badge_id} for invalid community 
 INVALID_TEAM_ERROR = 'Cannot assign badge {badge_id} for invalid team {community_id}'
 TEAM_BADGE_ERROR = 'Cannot assign missing badges to user {user_id} in team {team_id}'
 UNKNOWN_COURSE_ERROR = 'Cannot assign badge {badge_id} for team {community_id} in unknown course'
+
+# philu notification type
+EARNED_BADGE_NOTIFICATION_TYPE = 'philu.badging.user-badge-earned'
+# philu notification renderer
+JSON_NOTIFICATION_RENDERER = 'edx_notifications.renderers.basic.JsonRenderer'
