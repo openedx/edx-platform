@@ -36,13 +36,15 @@
                 'previousLanguageMenuItem', 'nextLanguageMenuItem', 'handleCaptionToggle',
                 'showClosedCaptions', 'hideClosedCaptions', 'toggleClosedCaptions',
                 'updateCaptioningCookie', 'handleCaptioningCookie', 'handleTranscriptToggle',
-                'listenForDragDrop'
+                'listenForDragDrop', 'handleTranscriptCookie', 'updateTranscriptCookie'
             );
+
             this.state = state;
             this.state.videoCaption = this;
             this.renderElements();
             this.handleCaptioningCookie();
             this.listenForDragDrop();
+            this.handleTranscriptCookie();
 
             return $.Deferred().resolve().promise();
         };
@@ -1142,11 +1144,12 @@
             */
             toggle: function(event) {
                 event.preventDefault();
-
                 if (this.state.el.hasClass('closed')) {
                     this.hideCaptions(false, true, true);
+                    this.updateTranscriptCookie(true);
                 } else {
                     this.hideCaptions(true, true, true);
+                    this.updateTranscriptCookie(false);
                 }
             },
 
@@ -1228,6 +1231,31 @@
                     });
                 } else {
                     $.cookie('show_closed_captions', null, {
+                        path: '/'
+                    });
+                }
+            },
+            handleTranscriptCookie: function() {
+                if ($.cookie('show_transcript') === null) {
+                    return;
+                }
+                if ($.cookie('show_transcript') !== 'false') {
+                    this.state.hideCaptions = false;
+                    // keep it going until turned off or in case of null initially change to true
+                    this.updateTranscriptCookie(true);
+                } else {
+                    this.state.hideCaptions = true;
+                }
+                this.hideCaptions(this.state.hideCaptions, true, true);
+            },
+            updateTranscriptCookie: function(showTranscript) {
+                if (showTranscript) {
+                    $.cookie('show_transcript', 'true', {
+                        expires: 3650,
+                        path: '/'
+                    });
+                } else {
+                    $.cookie('show_transcript', 'false', {
                         path: '/'
                     });
                 }
