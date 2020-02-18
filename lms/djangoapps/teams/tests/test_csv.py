@@ -140,8 +140,8 @@ class TeamMembershipImportManagerTests(SharedModuleStoreTestCase):
         cls.course = CourseFactory(teams_configuration=teams_config)
 
         # initialize import manager
-        cls.importManager = csv.TeamMembershipImportManager(cls.course)
-        cls.importManager.teamset_ids = {ts.teamset_id for ts in cls.course.teamsets}
+        cls.import_manager = csv.TeamMembershipImportManager(cls.course)
+        cls.import_manager.teamset_ids = {ts.teamset_id for ts in cls.course.teamsets}
 
     def test_add_user_to_new_protected_team(self):
         """Adding a masters learner to a new team should create a team with organization protected status"""
@@ -153,7 +153,7 @@ class TeamMembershipImportManagerTests(SharedModuleStoreTestCase):
             'user': masters_learner
         }
 
-        self.importManager.add_user_to_team(row)
+        self.import_manager.add_user_to_team(row)
         self.assertTrue(CourseTeam.objects.get(team_id__startswith='new_protected_team').organization_protected)
 
     def test_add_user_to_new_unprotected_team(self):
@@ -166,5 +166,5 @@ class TeamMembershipImportManagerTests(SharedModuleStoreTestCase):
             'user': audit_learner
         }
 
-        self.importManager.add_user_to_team(row)
+        self.import_manager.add_user_to_team(row)
         self.assertFalse(CourseTeam.objects.get(team_id__startswith='new_unprotected_team').organization_protected)

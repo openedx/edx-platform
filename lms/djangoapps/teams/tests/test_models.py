@@ -14,6 +14,7 @@ import six
 from mock import Mock
 from opaque_keys.edx.keys import CourseKey
 
+from course_modes.models import CourseMode
 from lms.djangoapps.teams import TEAM_DISCUSSION_CONTEXT
 from lms.djangoapps.teams.errors import AddToIncompatibleTeamError
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
@@ -88,7 +89,6 @@ class CourseTeamTest(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        from course_modes.models import CourseMode
         super(CourseTeamTest, cls).setUpClass()
 
         cls.audit_learner = UserFactory.create(username="audit")
