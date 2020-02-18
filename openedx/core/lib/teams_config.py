@@ -14,6 +14,7 @@ MANAGED_TEAM_MAX_TEAM_SIZE = 200
 # Arbitrarily arbitrary
 DEFAULT_COURSE_RUN_MAX_TEAM_SIZE = 50
 
+
 class TeamsConfig(object):
     """
     Configuration for the Course Teams feature on a course run.
