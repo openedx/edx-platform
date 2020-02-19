@@ -109,7 +109,12 @@ class Command(BaseCommand):
             SiteTheme.objects.create(site=site, theme_dir_name=theme_dir_name)
 
             LOG.info(u"Creating '{site_name}' SiteConfiguration".format(site_name=site_domain))
-            SiteConfiguration.objects.create(site=site, values=site_configuration, enabled=True)
+            SiteConfiguration.objects.create(
+                site=site,
+                site_values=site_configuration,
+                values=site_configuration,
+                enabled=True
+            )
         else:
             LOG.info(u"'{site_domain}' site already exists".format(site_domain=site_domain))
 
