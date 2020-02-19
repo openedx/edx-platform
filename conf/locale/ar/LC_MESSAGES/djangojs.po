@@ -583,7 +583,7 @@ msgstr "غير معروف "
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Are you sure?"
-msgstr ""
+msgstr "هل أنت واثق؟"
 
 #: cms/static/js/views/metadata.js common/static/bundles/commons.js
 #: lms/static/js/views/file_uploader.js
@@ -3017,6 +3017,10 @@ msgid ""
 "these for your records before proceeding with deletion, follow the "
 "instructions for {htmlStart}printing or downloading a certificate{htmlEnd}."
 msgstr ""
+"قد تفقد أيضًا الوصول إلى الشهادات التي تم التحقق منها والبرنامج الآخر"
+"بيانات الاعتماد مثل شهادات MicroMasters. إذا كنت ترغب في عمل نسخة من"
+"هذه للسجلات الخاصة بك قبل متابعة الحذف ، اتبع"
+"إرشادات {htmlStart} لطباعة أو تنزيل شهادة {htmlEnd}."
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: common/static/bundles/StudentAccountDeletion.js
@@ -3028,6 +3032,8 @@ msgid ""
 "Before proceeding, please {htmlStart}unlink all social media "
 "accounts{htmlEnd}."
 msgstr ""
+"قبل المتابعة ، يرجى {htmlStart} إلغاء ربط جميع وسائل التواصل الاجتماعي"
+"حسابات {htmlEnd}."
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: common/static/bundles/StudentAccountDeletion.js
@@ -3036,7 +3042,7 @@ msgstr ""
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
-msgstr ""
+msgstr "قبل المتابعة ، يرجى {htmlStart} تنشيط حسابك {htmlEnd}."
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
@@ -3047,6 +3053,10 @@ msgid ""
 "{strongStart}you will no longer be able to use the same email on "
 "Edly.{strongEnd}"
 msgstr ""
+"{strongStart} تحذير: حذف الحساب دائم. {strongEnd} يرجى قراءة"
+"ما سبق بعناية قبل المتابعة. هذا عمل لا رجعة فيه ، و"
+"{strongStart} ، لن تتمكن بعد الآن من استخدام نفس البريد الإلكتروني على"
+"أبداها. {strongEnd}"
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: common/static/bundles/StudentAccountDeletion.js
@@ -3055,7 +3065,7 @@ msgstr ""
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "We’re sorry to see you go!"
-msgstr ""
+msgstr "نحن آسفون أن نراك تذهب!"
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
@@ -3065,6 +3075,9 @@ msgid ""
 "cannot be undone. We will not be able to recover your account or the data "
 "that is deleted."
 msgstr ""
+"يرجى ملاحظة: حذف حسابك والبيانات الشخصية دائم و"
+"لا يمكن التراجع. لن نتمكن من استرداد حسابك أو البيانات"
+"هذا محذوف."
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
@@ -3073,6 +3086,8 @@ msgid ""
 "Once your account is deleted, you cannot use it to take courses on the Edly "
 "app, edly.io, or any other site hosted by Edly."
 msgstr ""
+"بمجرد حذف حسابك ، لا يمكنك استخدامه لأخذ دورات في Edly"
+"التطبيق أو edly.io أو أي موقع آخر تستضيفه Edly."
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: common/static/bundles/StudentAccountDeletion.js
@@ -3084,7 +3099,7 @@ msgstr ""
 #: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Delete My Account"
-msgstr ""
+msgstr "احذف حسابي"
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: common/static/bundles/StudentAccountDeletion.js
@@ -3093,7 +3108,7 @@ msgstr ""
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Password is incorrect"
-msgstr ""
+msgstr "كلمة المرور غير صحيحة"
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: common/static/bundles/StudentAccountDeletion.js
@@ -3102,7 +3117,7 @@ msgstr ""
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Unable to delete account"
-msgstr ""
+msgstr "غير قادر على حذف الحساب"
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: common/static/bundles/StudentAccountDeletion.js
@@ -3111,7 +3126,7 @@ msgstr ""
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Please re-enter your password."
-msgstr ""
+msgstr "من فضلك أعد إدخال الرمز السري."
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: common/static/bundles/StudentAccountDeletion.js
@@ -3123,6 +3138,8 @@ msgid ""
 "Sorry, there was an error trying to process your request. Please try again "
 "later."
 msgstr ""
+"عذرًا ، حدث خطأ أثناء محاولة معالجة طلبك. يرجى إعادة المحاولة"
+"في وقت لاحق."
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: common/static/bundles/StudentAccountDeletion.js
@@ -3131,7 +3148,7 @@ msgstr ""
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "A Password is required"
-msgstr ""
+msgstr "كلمة المرور مطلوبة"
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
@@ -3141,6 +3158,9 @@ msgid ""
 " data is permanent and cannot be undone. Edly will not be able to recover "
 "your account or the data that is deleted."
 msgstr ""
+"لقد حددت حذف حسابي. حذف حسابك والشخصية"
+"البيانات دائمة ولا يمكن التراجع عنها. لن يتمكن إدلي من استردادها"
+"حسابك أو البيانات التي تم حذفها."
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
@@ -3149,6 +3169,8 @@ msgid ""
 "If you proceed, you cannot use it to take courses on the Edly app or any "
 "other site hosted by Edly."
 msgstr ""
+"في حالة المتابعة ، لا يمكنك استخدامه لأخذ دورات في تطبيق Edly أو أي"
+"موقع آخر يستضيفه إدلي."
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: common/static/bundles/StudentAccountDeletion.js
@@ -3160,6 +3182,8 @@ msgid ""
 "If you still wish to continue and delete your account, please enter your "
 "account password:"
 msgstr ""
+"إذا كنت لا تزال ترغب في المتابعة وحذف حسابك ، فيرجى إدخال"
+"كلمة مرور الحساب:"
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: common/static/bundles/StudentAccountDeletion.js
@@ -3168,7 +3192,7 @@ msgstr ""
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Yes, Delete"
-msgstr ""
+msgstr "نعم احذف"
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: common/static/bundles/StudentAccountDeletion.js
@@ -3177,7 +3201,7 @@ msgstr ""
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "We're sorry to see you go! Your account will be deleted shortly."
-msgstr ""
+msgstr "نحن آسفون أن نراك تذهب! سيتم حذف حسابك قريبا."
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: common/static/bundles/StudentAccountDeletion.js
@@ -3190,54 +3214,57 @@ msgid ""
 "to fully process through our system. If you want to opt-out of emails before"
 " then, please unsubscribe from the footer of any email."
 msgstr ""
+"قد يستغرق حذف الحساب ، بما في ذلك الإزالة من قوائم البريد الإلكتروني ، بضعة أسابيع"
+"للمعالجة الكاملة من خلال نظامنا. إذا كنت ترغب في إلغاء الاشتراك من رسائل البريد الإلكتروني من قبل"
+"ثم ، الرجاء إلغاء الاشتراك من تذييل أي بريد إلكتروني."
 
 #: common/static/bundles/EntitlementFactory.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "(Self-paced) Starts {start}"
-msgstr ""
+msgstr "(ذاتية السرعة) يبدأ {start}"
 
 #: common/static/bundles/EntitlementFactory.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "(Self-paced) Started {start}"
-msgstr ""
+msgstr "(ذاتية السرعة) بدأت {start}"
 
 #: common/static/bundles/EntitlementFactory.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "(Self-paced) Ends {end}"
-msgstr ""
+msgstr "(ذاتية السرعة) ينتهي {end}"
 
 #: common/static/bundles/EntitlementFactory.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "(Self-paced) Ended {end}"
-msgstr ""
+msgstr "(ذاتية السرعة) منتهية {end}"
 
 #: common/static/bundles/EntitlementFactory.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "Starts {start}"
-msgstr ""
+msgstr "يبدأ {start}"
 
 #: common/static/bundles/EntitlementFactory.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "Started {start}"
-msgstr ""
+msgstr "بدأت {start}"
 
 #: common/static/bundles/EntitlementFactory.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "Ends {end}"
-msgstr ""
+msgstr "ينتهي {end}"
 
 #: common/static/bundles/EntitlementFactory.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "You must select a session to access the course."
-msgstr ""
+msgstr "يجب عليك تحديد جلسة للوصول إلى الدورة التدريبية."
 
 #: common/static/bundles/EntitlementFactory.js
 #: common/static/bundles/ProgramDetailsFactory.js
@@ -6030,31 +6057,33 @@ msgid ""
 "Your profile settings are managed by {enterprise_name}. Contact your "
 "administrator or {link_start}edX Support{link_end} for help."
 msgstr ""
+"تتم إدارة إعدادات ملف التعريف الخاص بك بواسطة {enterprise_name}. اتصل بـ"
+"المسؤول أو {link_start} edX Support {link_end} للحصول على المساعدة."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Email Address (Sign In)"
-msgstr ""
+msgstr "عنوان البريد الإلكتروني (تسجيل الدخول)"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "You receive messages from {platform_name} and course teams at this address."
-msgstr ""
+msgstr "تتلقى رسائل من {platform_name} وفرق الدورة التدريبية على هذا العنوان."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Secondary Email Address"
-msgstr ""
+msgstr "عنوان البريد الإلكتروني الثانوي"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "You may access your account when single-sign on is not available."
-msgstr ""
+msgstr "يمكنك الوصول إلى حسابك عندما لا يكون تسجيل الدخول الفردي متاحًا."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
@@ -6070,18 +6099,20 @@ msgid ""
 "The name that is used for ID verification and that appears on your "
 "certificates."
 msgstr ""
+"الاسم المستخدم للتحقق من الهوية والذي يظهر على هاتفك"
+"شهادات"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Country or Region of Residence"
-msgstr ""
+msgstr "بلد أو منطقة الإقامة"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "The country or region where you live."
-msgstr ""
+msgstr "البلد أو المنطقة التي تعيش فيها."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
@@ -6093,7 +6124,7 @@ msgstr "معلومات الحساب الأساسية"
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "These settings include basic information about your account."
-msgstr ""
+msgstr "تتضمن هذه الإعدادات معلومات أساسية عن حسابك."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
@@ -6102,6 +6133,8 @@ msgid ""
 "The name that identifies you on {platform_name}. You cannot change your "
 "username."
 msgstr ""
+"الاسم الذي يحدد هويتك على {platform_name}. لا يمكنك تغيير اسمك"
+"اسم المستخدم."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
@@ -6114,7 +6147,7 @@ msgstr "كلمة المرور"
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Check your email account for instructions to reset your password."
-msgstr ""
+msgstr "تحقق من حساب البريد الإلكتروني للحصول على تعليمات لإعادة تعيين كلمة المرور الخاصة بك."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
@@ -6124,6 +6157,9 @@ msgid ""
 "a limited number of languages. Changing the value of this field will cause "
 "the page to refresh."
 msgstr ""
+"اللغة المستخدمة في هذا الموقع. هذا الموقع متاح حاليًا في"
+"عدد محدود من اللغات. تغيير قيمة هذا الحقل سوف يسبب"
+"الصفحة للتحديث."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
@@ -6193,30 +6229,34 @@ msgid ""
 "We've sent a confirmation message to {new_secondary_email_address}. Click "
 "the link in the message to update your secondary email address."
 msgstr ""
+"لقد أرسلنا رسالة تأكيد إلى {new_secondary_email_address}. انقر على"
+"الرابط في الرسالة لتحديث عنوان بريدك الإلكتروني الثانوي."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Social Media Links"
-msgstr ""
+msgstr "روابط وسائل التواصل الاجتماعي"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "Optionally, link your personal accounts to the social media icons on your "
 "edX profile."
 msgstr ""
+"اختياريًا ، قم بربط حساباتك الشخصية بأيقونات وسائل التواصل الاجتماعي الموجودة على جهازك"
+"ملف تعريف edX."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid " Link"
-msgstr ""
+msgstr "حلقة الوصل "
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Enter your "
-msgstr ""
+msgstr "ادخل "
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_account/views/account_settings_view.js
@@ -6354,7 +6394,7 @@ msgstr "معلومات الحساب الأساسية"
 #: themes/st-lutherx/lms/static/js/student_account/views/account_settings_view.js
 #: themes/st-normanx/lms/static/js/student_account/views/account_settings_view.js
 msgid "Order History"
-msgstr ""
+msgstr "تاريخ الطلب"
 
 #: lms/static/js/verify_student/views/image_input_view.js
 msgid "Image Upload Error"
@@ -6698,6 +6738,8 @@ msgid ""
 "Optionally, link your personal accounts to the social media icons on your "
 "Edly profile."
 msgstr ""
+"اختياريًا ، قم بربط حساباتك الشخصية بأيقونات وسائل التواصل الاجتماعي الموجودة على جهازك"
+"الملف الشخصي إدي."
 
 #: cms/static/js/certificates/models/certificate.js
 msgid "Certificate name is required."
