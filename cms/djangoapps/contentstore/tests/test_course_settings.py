@@ -503,8 +503,8 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         the view just deleted all the pre requisite courses, including entrance exam,
         despite the fact that the entrance_exam_enabled was True.
         """
-        self.assertFalse(milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id),
-                         msg='The initial empty state should be: no entrance exam')
+        assert not milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id), \
+            'The initial empty state should be: no entrance exam'
 
         settings_details_url = get_url(self.course.id)
         data = {
@@ -525,13 +525,13 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             HTTP_ACCEPT='application/json'
         )
 
-        self.assertEquals(response.status_code, 200)
+        assert response.status_code == 200
         course = modulestore().get_course(self.course.id)
-        self.assertTrue(course.entrance_exam_enabled)
-        self.assertEquals(course.entrance_exam_minimum_score_pct, .60)
+        assert course.entrance_exam_enabled
+        assert course.entrance_exam_minimum_score_pct == .60
 
-        self.assertTrue(milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id),
-                        msg='The entrance exam should be required.')
+        assert milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id), \
+            'The entrance exam should be required.'
 
         # Call the settings handler again then ensure it didn't delete the settings of the entrance exam
         data.update({
@@ -544,10 +544,9 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             content_type='application/json',
             HTTP_ACCEPT='application/json'
         )
-        self.assertEquals(response.status_code, 200)
-
-        self.assertTrue(milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id),
-                        msg='The entrance exam should be required.')
+        assert response.status_code == 200
+        assert milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id), \
+            'The entrance exam should be required.'
 
     def test_editable_short_description_fetch(self):
         settings_details_url = get_url(self.course.id)
