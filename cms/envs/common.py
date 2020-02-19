@@ -53,7 +53,7 @@ from lms.envs.common import (
     # indirectly accessed through the email opt-in API, which is
     # technically accessible through the CMS via legacy URLs.
     PROFILE_IMAGE_BACKEND, PROFILE_IMAGE_DEFAULT_FILENAME, PROFILE_IMAGE_DEFAULT_FILE_EXTENSION,
-    PROFILE_IMAGE_SECRET_KEY, PROFILE_IMAGE_MIN_BYTES, PROFILE_IMAGE_MAX_BYTES, PROFILE_IMAGE_SIZES_MAP,
+    PROFILE_IMAGE_HASH_SEED, PROFILE_IMAGE_MIN_BYTES, PROFILE_IMAGE_MAX_BYTES, PROFILE_IMAGE_SIZES_MAP,
     # The following setting is included as it is used to check whether to
     # display credit eligibility table on the CMS or not.
     COURSE_MODE_DEFAULTS, DEFAULT_COURSE_ABOUT_IMAGE_URL,
