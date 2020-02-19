@@ -6,7 +6,7 @@ import csv
 
 from django.contrib.auth.models import User
 
-from lms.djangoapps.teams.api import ORGANIZATION_PROTECTED_MODES
+from lms.djangoapps.teams.api import OrganizationProtectionStatus, user_organization_protection_status
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from student.models import CourseEnrollment
 from .utils import emit_team_event
@@ -290,13 +290,13 @@ class TeamMembershipImportManager(object):
             if not team_name:
                 continue
             if (team_name, teamset_id) not in self.existing_course_teams:
-                protected = user_row['mode'] in ORGANIZATION_PROTECTED_MODES
+                protection_status = user_organization_protection_status(user, self.course.id)
                 team = CourseTeam.create(
                     name=team_name,
                     course_id=self.course.id,
                     description='Import from csv',
                     topic_id=teamset_id,
-                    organization_protected=protected
+                    organization_protected=protection_status == OrganizationProtectionStatus.protected
                 )
                 team.save()
                 self.existing_course_teams[(team_name, teamset_id)] = team
