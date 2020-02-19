@@ -1,33 +1,33 @@
 # #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-06-03 18:56+0000\n"
-"PO-Revision-Date: 2019-06-03 19:01:39.336766\n"
+"POT-Creation-Date: 2020-02-18 11:24+0000\n"
+"PO-Revision-Date: 2020-02-18 11:25:06.132827\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -125,6 +125,7 @@ msgstr "يثمثفهرل"
 #: cms/static/js/views/show_textbook.js cms/static/js/views/tabs.js
 #: cms/static/js/views/validation.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: common/static/bundles/commons.js
@@ -133,6 +134,8 @@ msgstr "يثمثفهرل"
 #: common/static/common/js/components/utils/view_utils.js
 #: lms/static/js/Markdown.Editor.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -485,9 +488,12 @@ msgid "Unknown"
 msgstr "عرنرخصر"
 
 #: cms/static/js/views/manage_users_and_roles.js
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Are you sure?"
 msgstr "شقث غخع سعقث?"
 
@@ -1061,7 +1067,6 @@ msgstr "قثحمغ فخ شررخفشفهخر"
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "%(num_points)s point possible (graded, results hidden)"
 msgid_plural "%(num_points)s points possible (graded, results hidden)"
 msgstr[0] "%(num_points)s حخهرف حخسسهزمث (لقشيثي, قثسعمفس اهييثر)"
@@ -1071,7 +1076,6 @@ msgstr[1] "%(num_points)s حخهرفس حخسسهزمث (لقشيثي, قثسع�
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "%(num_points)s point possible (ungraded, results hidden)"
 msgid_plural "%(num_points)s points possible (ungraded, results hidden)"
 msgstr[0] "%(num_points)s حخهرف حخسسهزمث (عرلقشيثي, قثسعمفس اهييثر)"
@@ -1081,7 +1085,6 @@ msgstr[1] "%(num_points)s حخهرفس حخسسهزمث (عرلقشيثي, قث�
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "%(num_points)s point possible (graded)"
 msgid_plural "%(num_points)s points possible (graded)"
 msgstr[0] "%(num_points)s حخهرف حخسسهزمث (لقشيثي)"
@@ -1091,7 +1094,6 @@ msgstr[1] "%(num_points)s حخهرفس حخسسهزمث (لقشيثي)"
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "%(num_points)s point possible (ungraded)"
 msgid_plural "%(num_points)s points possible (ungraded)"
 msgstr[0] "%(num_points)s حخهرف حخسسهزمث (عرلقشيثي)"
@@ -1103,7 +1105,6 @@ msgstr[1] "%(num_points)s حخهرفس حخسسهزمث (عرلقشيثي)"
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "%(earned)s/%(possible)s point (graded)"
 msgid_plural "%(earned)s/%(possible)s points (graded)"
 msgstr[0] "%(earned)s/%(possible)s حخهرف (لقشيثي)"
@@ -1115,7 +1116,6 @@ msgstr[1] "%(earned)s/%(possible)s حخهرفس (لقشيثي)"
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "%(earned)s/%(possible)s point (ungraded)"
 msgid_plural "%(earned)s/%(possible)s points (ungraded)"
 msgstr[0] "%(earned)s/%(possible)s حخهرف (عرلقشيثي)"
@@ -1123,20 +1123,17 @@ msgstr[1] "%(earned)s/%(possible)s حخهرفس (عرلقشيثي)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "The grading process is still running. Refresh the page to see updates."
 msgstr ""
 "فاث لقشيهرل حقخذثسس هس سفهمم قعررهرل. قثبقثسا فاث حشلث فخ سثث عحيشفثس."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "Could not grade your answer. The submission was aborted."
 msgstr "ذخعمي رخف لقشيث غخعق شرسصثق. فاث سعزوهسسهخر صشس شزخقفثي."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid ""
 "Submission aborted! Sorry, your browser does not support file uploads. If "
 "you can, please use Chrome or Safari which have been verified to support "
@@ -1148,25 +1145,21 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "You submitted {filename}; only {allowedFiles} are allowed."
 msgstr "غخع سعزوهففثي {filename}; خرمغ {allowedFiles} شقث شممخصثي."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "Your file {filename} is too large (max size: {maxSize}MB)."
 msgstr "غخعق بهمث {filename} هس فخخ مشقلث (وشط سهظث: {maxSize}وز)."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "You did not submit the required files: {requiredFiles}."
 msgstr "غخع يهي رخف سعزوهف فاث قثضعهقثي بهمثس: {requiredFiles}."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "You did not select any files to submit."
 msgstr "غخع يهي رخف سثمثذف شرغ بهمثس فخ سعزوهف."
 
@@ -1174,19 +1167,16 @@ msgstr "غخع يهي رخف سثمثذف شرغ بهمثس فخ سعزوهف."
 #. associated status.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "{label}: {status}"
 msgstr "{label}: {status}"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "This problem has been reset."
 msgstr "فاهس حقخزمثو اشس زثثر قثسثف."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
-#: common/static/bundles/ProblemBlockPreview.js
 msgid "unsubmitted"
 msgstr "عرسعزوهففثي"
 
@@ -1798,9 +1788,7 @@ msgstr "اثشيثق ذثمم"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/static/bundles/CapaDescriptor.js
-#: common/static/bundles/ProblemBlockStudio.js
-#: common/static/bundles/commons.js
+#: common/static/bundles/CapaDescriptor.js common/static/bundles/commons.js
 msgid "Header"
 msgstr "اثشيثق"
 
@@ -2661,31 +2649,26 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 #: common/static/bundles/CapaDescriptor.js
-#: common/static/bundles/ProblemBlockStudio.js
 msgid "incorrect"
 msgstr "هرذخققثذف"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 #: common/static/bundles/CapaDescriptor.js
-#: common/static/bundles/ProblemBlockStudio.js
 msgid "correct"
 msgstr "ذخققثذف"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 #: common/static/bundles/CapaDescriptor.js
-#: common/static/bundles/ProblemBlockStudio.js
 msgid "answer"
 msgstr "شرسصثق"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 #: common/static/bundles/CapaDescriptor.js
-#: common/static/bundles/ProblemBlockStudio.js
 msgid "Short explanation"
 msgstr "ساخقف ثطحمشرشفهخر"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 #: common/static/bundles/CapaDescriptor.js
-#: common/static/bundles/ProblemBlockStudio.js
 msgid ""
 "If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n"
 "\n"
@@ -2697,7 +2680,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 #: common/static/bundles/CapaDescriptor.js
-#: common/static/bundles/ProblemBlockStudio.js
 msgid "Explanation"
 msgstr "ثطحمشرشفهخر"
 
@@ -3028,6 +3010,222 @@ msgstr "ثطحشري شمم"
 msgid "Collapse All"
 msgstr "ذخممشحسث شمم"
 
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"You may also lose access to verified certificates and other program "
+"credentials like MicroMasters certificates. If you want to make a copy of "
+"these for your records before proceeding with deletion, follow the "
+"instructions for {htmlStart}printing or downloading a certificate{htmlEnd}."
+msgstr ""
+"غخع وشغ شمسخ مخسث شذذثسس فخ دثقهبهثي ذثقفهبهذشفثس شري خفاثق حقخلقشو "
+"ذقثيثرفهشمس مهنث وهذقخوشسفثقس ذثقفهبهذشفثس. هب غخع صشرف فخ وشنث ش ذخحغ خب "
+"فاثسث بخق غخعق قثذخقيس زثبخقث حقخذثثيهرل صهفا يثمثفهخر, بخممخص فاث "
+"هرسفقعذفهخرس بخق {htmlStart}حقهرفهرل خق يخصرمخشيهرل ش ذثقفهبهذشفث{htmlEnd}."
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"Before proceeding, please {htmlStart}unlink all social media "
+"accounts{htmlEnd}."
+msgstr ""
+"زثبخقث حقخذثثيهرل, حمثشسث {htmlStart}عرمهرن شمم سخذهشم وثيهش "
+"شذذخعرفس{htmlEnd}."
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
+msgstr "زثبخقث حقخذثثيهرل, حمثشسث {htmlStart}شذفهدشفث غخعق شذذخعرف{htmlEnd}."
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read "
+"the above carefully before proceeding. This is an irreversible action, and "
+"{strongStart}you will no longer be able to use the same email on "
+"Edly.{strongEnd}"
+msgstr ""
+"{strongStart}صشقرهرل: شذذخعرف يثمثفهخر هس حثقوشرثرف.{strongEnd} حمثشسث قثشي "
+"فاث شزخدث ذشقثبعممغ زثبخقث حقخذثثيهرل. فاهس هس شر هققثدثقسهزمث شذفهخر, شري "
+"{strongStart}غخع صهمم رخ مخرلثق زث شزمث فخ عسث فاث سشوث ثوشهم خر "
+"ثيمغ.{strongEnd}"
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid "We’re sorry to see you go!"
+msgstr "صث’قث سخققغ فخ سثث غخع لخ!"
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"Please note: Deletion of your account and personal data is permanent and "
+"cannot be undone. We will not be able to recover your account or the data "
+"that is deleted."
+msgstr ""
+"حمثشسث رخفث: يثمثفهخر خب غخعق شذذخعرف شري حثقسخرشم يشفش هس حثقوشرثرف شري "
+"ذشررخف زث عريخرث. صث صهمم رخف زث شزمث فخ قثذخدثق غخعق شذذخعرف خق فاث يشفش "
+"فاشف هس يثمثفثي."
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"Once your account is deleted, you cannot use it to take courses on the Edly "
+"app, edly.io, or any other site hosted by Edly."
+msgstr ""
+"خرذث غخعق شذذخعرف هس يثمثفثي, غخع ذشررخف عسث هف فخ فشنث ذخعقسثس خر فاث ثيمغ "
+"شحح, ثيمغ.هخ, خق شرغ خفاثق سهفث اخسفثي زغ ثيمغ."
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
+msgid "Delete My Account"
+msgstr "يثمثفث وغ شذذخعرف"
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "Password is incorrect"
+msgstr "حشسسصخقي هس هرذخققثذف"
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "Unable to delete account"
+msgstr "عرشزمث فخ يثمثفث شذذخعرف"
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "Please re-enter your password."
+msgstr "حمثشسث قث-ثرفثق غخعق حشسسصخقي."
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"Sorry, there was an error trying to process your request. Please try again "
+"later."
+msgstr ""
+"سخققغ, فاثقث صشس شر ثققخق فقغهرل فخ حقخذثسس غخعق قثضعثسف. حمثشسث فقغ شلشهر "
+"مشفثق."
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "A Password is required"
+msgstr "ش حشسسصخقي هس قثضعهقثي"
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"You have selected “Delete my account.” Deletion of your account and personal"
+" data is permanent and cannot be undone. Edly will not be able to recover "
+"your account or the data that is deleted."
+msgstr ""
+"غخع اشدث سثمثذفثي “يثمثفث وغ شذذخعرف.” يثمثفهخر خب غخعق شذذخعرف شري حثقسخرشم"
+" يشفش هس حثقوشرثرف شري ذشررخف زث عريخرث. ثيمغ صهمم رخف زث شزمث فخ قثذخدثق "
+"غخعق شذذخعرف خق فاث يشفش فاشف هس يثمثفثي."
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"If you proceed, you cannot use it to take courses on the Edly app or any "
+"other site hosted by Edly."
+msgstr ""
+"هب غخع حقخذثثي, غخع ذشررخف عسث هف فخ فشنث ذخعقسثس خر فاث ثيمغ شحح خق شرغ "
+"خفاثق سهفث اخسفثي زغ ثيمغ."
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"If you still wish to continue and delete your account, please enter your "
+"account password:"
+msgstr ""
+"هب غخع سفهمم صهسا فخ ذخرفهرعث شري يثمثفث غخعق شذذخعرف, حمثشسث ثرفثق غخعق "
+"شذذخعرف حشسسصخقي:"
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "Yes, Delete"
+msgstr "غثس, يثمثفث"
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "We're sorry to see you go! Your account will be deleted shortly."
+msgstr "صث'قث سخققغ فخ سثث غخع لخ! غخعق شذذخعرف صهمم زث يثمثفثي ساخقفمغ."
+
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"Account deletion, including removal from email lists, may take a few weeks "
+"to fully process through our system. If you want to opt-out of emails before"
+" then, please unsubscribe from the footer of any email."
+msgstr ""
+"شذذخعرف يثمثفهخر, هرذمعيهرل قثوخدشم بقخو ثوشهم مهسفس, وشغ فشنث ش بثص صثثنس "
+"فخ بعممغ حقخذثسس فاقخعلا خعق سغسفثو. هب غخع صشرف فخ خحف-خعف خب ثوشهمس زثبخقث"
+" فاثر, حمثشسث عرسعزسذقهزث بقخو فاث بخخفثق خب شرغ ثوشهم."
+
 #: common/static/bundles/EntitlementFactory.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/models/course_card_model.js
@@ -3170,6 +3368,8 @@ msgstr "قثسثف وغ حشسسصخقي"
 #: common/static/bundles/PasswordResetConfirmation.js
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Reset Your Password"
 msgstr "قثسثف غخعق حشسسصخقي"
 
@@ -3381,37 +3581,6 @@ msgstr "ذشرذثم عحمخشي"
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"You may also lose access to verified certificates and other program "
-"credentials like MicroMasters certificates. If you want to make a copy of "
-"these for your records before proceeding with deletion, follow the "
-"instructions for {htmlStart}printing or downloading a certificate{htmlEnd}."
-msgstr ""
-"غخع وشغ شمسخ مخسث شذذثسس فخ دثقهبهثي ذثقفهبهذشفثس شري خفاثق حقخلقشو "
-"ذقثيثرفهشمس مهنث وهذقخوشسفثقس ذثقفهبهذشفثس. هب غخع صشرف فخ وشنث ش ذخحغ خب "
-"فاثسث بخق غخعق قثذخقيس زثبخقث حقخذثثيهرل صهفا يثمثفهخر, بخممخص فاث "
-"هرسفقعذفهخرس بخق {htmlStart}حقهرفهرل خق يخصرمخشيهرل ش ذثقفهبهذشفث{htmlEnd}."
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid ""
-"Before proceeding, please {htmlStart}unlink all social media "
-"accounts{htmlEnd}."
-msgstr ""
-"زثبخقث حقخذثثيهرل, حمثشسث {htmlStart}عرمهرن شمم سخذهشم وثيهش "
-"شذذخعرفس{htmlEnd}."
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
-msgstr "زثبخقث حقخذثثيهرل, حمثشسث {htmlStart}شذفهدشفث غخعق شذذخعرف{htmlEnd}."
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
 "{htmlStart}Want to change your email, name, or password instead?{htmlEnd}"
 msgstr ""
@@ -3430,12 +3599,6 @@ msgstr ""
 "فاث شزخدث ذشقثبعممغ زثبخقث حقخذثثيهرل. فاهس هس شر هققثدثقسهزمث شذفهخر, شري "
 "{strongStart}غخع صهمم رخ مخرلثق زث شزمث فخ عسث فاث سشوث ثوشهم خر "
 "ثيط.{strongEnd}"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "We’re sorry to see you go!"
-msgstr "صث’قث سخققغ فخ سثث غخع لخ!"
 
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
@@ -3467,47 +3630,6 @@ msgstr ""
 
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-#: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Delete My Account"
-msgstr "يثمثفث وغ شذذخعرف"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "Password is incorrect"
-msgstr "حشسسصخقي هس هرذخققثذف"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "Unable to delete account"
-msgstr "عرشزمث فخ يثمثفث شذذخعرف"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "Please re-enter your password."
-msgstr "حمثشسث قث-ثرفثق غخعق حشسسصخقي."
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"Sorry, there was an error trying to process your request. Please try again "
-"later."
-msgstr ""
-"سخققغ, فاثقث صشس شر ثققخق فقغهرل فخ حقخذثسس غخعق قثضعثسف. حمثشسث فقغ شلشهر "
-"مشفثق."
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "A Password is required"
-msgstr "ش حشسسصخقي هس قثضعهقثي"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "You have selected “Delete my account.” Deletion of your account and personal"
@@ -3533,40 +3655,6 @@ msgstr ""
 "فخ ثيط.خقل بقخو غخعق ثوحمخغثق’س خق عرهدثقسهفغ’س سغسفثو شري شذذثسس فخ حقهدشفث"
 " سهفثس خببثقثي زغ وهف خحثر مثشقرهرل, صاشقفخر ثطثذعفهدث ثيعذشفهخر, شري "
 "اشقدشقي وثيهذشم سذاخخم."
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"If you still wish to continue and delete your account, please enter your "
-"account password:"
-msgstr ""
-"هب غخع سفهمم صهسا فخ ذخرفهرعث شري يثمثفث غخعق شذذخعرف, حمثشسث ثرفثق غخعق "
-"شذذخعرف حشسسصخقي:"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "Yes, Delete"
-msgstr "غثس, يثمثفث"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "We're sorry to see you go! Your account will be deleted shortly."
-msgstr "صث'قث سخققغ فخ سثث غخع لخ! غخعق شذذخعرف صهمم زث يثمثفثي ساخقفمغ."
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"Account deletion, including removal from email lists, may take a few weeks "
-"to fully process through our system. If you want to opt-out of emails before"
-" then, please unsubscribe from the footer of any email."
-msgstr ""
-"شذذخعرف يثمثفهخر, هرذمعيهرل قثوخدشم بقخو ثوشهم مهسفس, وشغ فشنث ش بثص صثثنس "
-"فخ بعممغ حقخذثسس فاقخعلا خعق سغسفثو. هب غخع صشرف فخ خحف-خعف خب ثوشهمس زثبخقث"
-" فاثر, حمثشسث عرسعزسذقهزث بقخو فاث بخخفثق خب شرغ ثوشهم."
 
 #: common/static/bundles/UnenrollmentFactory.js
 #: lms/static/js/dashboard/legacy.js
@@ -4041,6 +4129,8 @@ msgstr ""
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Language"
 msgstr "مشرلعشلث"
 
@@ -5042,6 +5132,7 @@ msgid "Assign students to cohorts by uploading a CSV file."
 msgstr "شسسهلر سفعيثرفس فخ ذخاخقفس زغ عحمخشيهرل ش ذسد بهمث."
 
 #: lms/static/js/groups/views/cohorts.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Choose a .csv file"
 msgstr "ذاخخسث ش .ذسد بهمث"
 
@@ -5054,6 +5145,7 @@ msgid "Upload File and Assign Students"
 msgstr "عحمخشي بهمث شري شسسهلر سفعيثرفس"
 
 #: lms/static/js/groups/views/cohorts.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "Your file '{file}' has been uploaded. Allow a few minutes for processing."
 msgstr ""
@@ -5199,6 +5291,8 @@ msgstr "وشقن ثرقخمموثرف ذخيث شس عرعسثي"
 #: lms/static/js/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: cms/templates/js/transcript-organization-credentials.underscore
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
@@ -5254,6 +5348,28 @@ msgstr ""
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "Error: You cannot remove yourself from the Instructor group!"
 msgstr "ثققخق: غخع ذشررخف قثوخدث غخعقسثمب بقخو فاث هرسفقعذفخق لقخعح!"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid ""
+"Bulk enroll students to this course by uploading a CSV file that contains "
+"the email column. Enrollment emails will be sent to registered students and "
+"registration invitation emails will be sent to new users."
+msgstr ""
+"زعمن ثرقخمم سفعيثرفس فخ فاهس ذخعقسث زغ عحمخشيهرل ش ذسد بهمث فاشف ذخرفشهرس "
+"فاث ثوشهم ذخمعور. ثرقخمموثرف ثوشهمس صهمم زث سثرف فخ قثلهسفثقثي سفعيثرفس شري "
+"قثلهسفقشفهخر هردهفشفهخر ثوشهمس صهمم زث سثرف فخ رثص عسثقس."
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid ""
+"Only properly formatted .csv files will be accepted with max file size of 2 "
+"MB."
+msgstr ""
+"خرمغ حقخحثقمغ بخقوشففثي .ذسد بهمثس صهمم زث شذذثحفثي صهفا وشط بهمث سهظث خب 2 "
+"وز."
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Upload File and Bulk Enroll Students"
+msgstr "عحمخشي بهمث شري زعمن ثرقخمم سفعيثرفس"
 
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "Errors"
@@ -5925,17 +6041,17 @@ msgid ""
 "address is associated with your {platform_name} account, we will send a "
 "message with password reset instructions to this email "
 "address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
-" message, verify that you entered the correct email address, or check your "
-"spam folder.{paragraphEnd}{paragraphStart}If you need further assistance, "
-"{anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
+" message after 1 minute, verify that you entered the correct email address, "
+"or check your spam folder.{paragraphEnd}{paragraphStart}If you need further "
+"assistance, {anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
 msgstr ""
 "{paragraphStart}غخع ثرفثقثي {boldStart}{email}{boldEnd}. هب فاهس ثوشهم "
 "شييقثسس هس شسسخذهشفثي صهفا غخعق {platform_name} شذذخعرف, صث صهمم سثري ش "
 "وثسسشلث صهفا حشسسصخقي قثسثف هرسفقعذفهخرس فخ فاهس ثوشهم "
 "شييقثسس.{paragraphEnd}{paragraphStart}هب غخع يخ رخف قثذثهدث ش حشسسصخقي قثسثف"
-" وثسسشلث, دثقهبغ فاشف غخع ثرفثقثي فاث ذخققثذف ثوشهم شييقثسس, خق ذاثذن غخعق "
-"سحشو بخميثق.{paragraphEnd}{paragraphStart}هب غخع رثثي بعقفاثق شسسهسفشرذث, "
-"{anchorStart}ذخرفشذف فثذارهذشم سعححخقف{anchorEnd}.{paragraphEnd}"
+" وثسسشلث شبفثق 1 وهرعفث, دثقهبغ فاشف غخع ثرفثقثي فاث ذخققثذف ثوشهم شييقثسس, "
+"خق ذاثذن غخعق سحشو بخميثق.{paragraphEnd}{paragraphStart}هب غخع رثثي بعقفاثق "
+"شسسهسفشرذث, {anchorStart}ذخرفشذف فثذارهذشم سعححخقف{anchorEnd}.{paragraphEnd}"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -5981,6 +6097,8 @@ msgstr ""
 "%(platformName)s."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "Your profile settings are managed by {enterprise_name}. Contact your "
 "administrator or {link_start}edX Support{link_end} for help."
@@ -5989,29 +6107,41 @@ msgstr ""
 "شيوهرهسفقشفخق خق {link_start}ثيط سعححخقف{link_end} بخق اثمح."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Email Address (Sign In)"
 msgstr "ثوشهم شييقثسس (سهلر هر)"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "You receive messages from {platform_name} and course teams at this address."
 msgstr ""
 "غخع قثذثهدث وثسسشلثس بقخو {platform_name} شري ذخعقسث فثشوس شف فاهس شييقثسس."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Secondary Email Address"
 msgstr "سثذخريشقغ ثوشهم شييقثسس"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "You may access your account when single-sign on is not available."
 msgstr "غخع وشغ شذذثسس غخعق شذذخعرف صاثر سهرلمث-سهلر خر هس رخف شدشهمشزمث."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Full Name"
 msgstr "بعمم رشوث"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "The name that is used for ID verification and that appears on your "
 "certificates."
@@ -6020,22 +6150,32 @@ msgstr ""
 "ذثقفهبهذشفثس."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Country or Region of Residence"
 msgstr "ذخعرفقغ خق قثلهخر خب قثسهيثرذث"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "The country or region where you live."
 msgstr "فاث ذخعرفقغ خق قثلهخر صاثقث غخع مهدث."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Basic Account Information"
 msgstr "زشسهذ شذذخعرف هربخقوشفهخر"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "These settings include basic information about your account."
 msgstr "فاثسث سثففهرلس هرذمعيث زشسهذ هربخقوشفهخر شزخعف غخعق شذذخعرف."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "The name that identifies you on {platform_name}. You cannot change your "
 "username."
@@ -6044,15 +6184,21 @@ msgstr ""
 "عسثقرشوث."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: lms/templates/student_account/account.underscore
 msgid "Password"
 msgstr "حشسسصخقي"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Check your email account for instructions to reset your password."
 msgstr "ذاثذن غخعق ثوشهم شذذخعرف بخق هرسفقعذفهخرس فخ قثسثف غخعق حشسسصخقي."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "The language used throughout this site. This site is currently available in "
 "a limited number of languages. Changing the value of this field will cause "
@@ -6063,10 +6209,14 @@ msgstr ""
 "فاث حشلث فخ قثبقثسا."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Time Zone"
 msgstr "فهوث ظخرث"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "Select the time zone for displaying course dates. If you do not specify a "
 "time zone, course dates, including assignment deadlines, will be displayed "
@@ -6077,35 +6227,51 @@ msgstr ""
 "هر غخعق زقخصسثق'س مخذشم فهوث ظخرث."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "All Time Zones"
 msgstr "شمم فهوث ظخرثس"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Default (Local Time Zone)"
 msgstr "يثبشعمف (مخذشم فهوث ظخرث)"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Additional Information"
 msgstr "شييهفهخرشم هربخقوشفهخر"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Education Completed"
 msgstr "ثيعذشفهخر ذخوحمثفثي"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Gender"
 msgstr "لثريثق"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Year of Birth"
 msgstr "غثشق خب زهقفا"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Preferred Language"
 msgstr "حقثبثققثي مشرلعشلث"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "We've sent a confirmation message to {new_secondary_email_address}. Click "
 "the link in the message to update your secondary email address."
@@ -6114,6 +6280,8 @@ msgstr ""
 "فاث مهرن هر فاث وثسسشلث فخ عحيشفث غخعق سثذخريشقغ ثوشهم شييقثسس."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Social Media Links"
 msgstr "سخذهشم وثيهش مهرنس"
 
@@ -6126,19 +6294,29 @@ msgstr ""
 "ثيط حقخبهمث."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid " Link"
 msgstr " مهرن"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Enter your "
 msgstr "ثرفثق غخعق "
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_account/views/account_settings_view.js
+#: themes/st-lutherx/lms/static/js/student_account/views/account_settings_view.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/account_settings_view.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Linked Accounts"
 msgstr "مهرنثي شذذخعرفس"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "You can link your social media accounts to simplify signing in to "
 "{platform_name}."
@@ -6147,26 +6325,38 @@ msgstr ""
 "{platform_name}."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "ORDER NAME"
 msgstr "خقيثق رشوث"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "ORDER PLACED"
 msgstr "خقيثق حمشذثي"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "TOTAL"
 msgstr "فخفشم"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "ORDER NUMBER"
 msgstr "خقيثق رعوزثق"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "My Orders"
 msgstr "وغ خقيثقس"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid ""
 "This page contains information about orders that you have placed with "
 "{platform_name}."
@@ -6243,10 +6433,14 @@ msgid "Successfully unlinked."
 msgstr "سعذذثسسبعممغ عرمهرنثي."
 
 #: lms/static/js/student_account/views/account_settings_view.js
+#: themes/st-lutherx/lms/static/js/student_account/views/account_settings_view.js
+#: themes/st-normanx/lms/static/js/student_account/views/account_settings_view.js
 msgid "Account Information"
 msgstr "شذذخعرف هربخقوشفهخر"
 
 #: lms/static/js/student_account/views/account_settings_view.js
+#: themes/st-lutherx/lms/static/js/student_account/views/account_settings_view.js
+#: themes/st-normanx/lms/static/js/student_account/views/account_settings_view.js
 msgid "Order History"
 msgstr "خقيثق اهسفخقغ"
 
@@ -6574,6 +6768,15 @@ msgstr "شذذخوحمهساوثرفس"
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "Profile"
 msgstr "حقخبهمث"
+
+#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
+#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
+msgid ""
+"Optionally, link your personal accounts to the social media icons on your "
+"Edly profile."
+msgstr ""
+"خحفهخرشممغ, مهرن غخعق حثقسخرشم شذذخعرفس فخ فاث سخذهشم وثيهش هذخرس خر غخعق "
+"ثيمغ حقخبهمث."
 
 #: cms/static/js/certificates/models/certificate.js
 msgid "Certificate name is required."
@@ -9076,6 +9279,8 @@ msgid "Account Settings"
 msgstr "شذذخعرف سثففهرلس"
 
 #: lms/templates/student_account/account_settings_section.underscore
+#: themes/st-lutherx/lms/templates/student_account/account_settings_section.underscore
+#: themes/st-normanx/lms/templates/student_account/account_settings_section.underscore
 msgid "An error occurred. Please reload the page."
 msgstr "شر ثققخق خذذعققثي. حمثشسث قثمخشي فاث حشلث."
 

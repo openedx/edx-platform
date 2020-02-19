@@ -44,7 +44,7 @@ FEATURES.update({
 })
 
 ENABLE_MKTG_SITE = os.environ.get('ENABLE_MARKETING_SITE', False)
-MARKETING_SITE_ROOT = os.environ.get('MARKETING_SITE_ROOT', 'http://localhost:8080')
+MARKETING_SITE_ROOT = os.environ.get('MARKETING_SITE_ROOT', 'http://wordpress.edx.devstack.lms:8888/')
 
 MKTG_URLS = {
     'ABOUT': '/about',
@@ -70,6 +70,8 @@ MKTG_URLS = {
     'TOS': '/edx-terms-service',
     'TOS_AND_HONOR': '/edx-terms-service',
     'WHAT_IS_VERIFIED_CERT': '/verified-certificate',
+    "NAV_MENU": "wp-json/edly-wp-routes/nav-menu",
+    "ZENDESK-WIDGET": "wp-json/edly-wp-routes/edly-zendesk-widget"
 }
 
 CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
