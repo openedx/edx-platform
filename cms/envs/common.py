@@ -1356,7 +1356,6 @@ INSTALLED_APPS = [
     # other apps that are.  Django 1.8 wants to have imported models supported
     # by installed apps.
     'openedx.core.djangoapps.oauth_dispatch.apps.OAuthDispatchAppConfig',
-    'oauth_provider',
     'lms.djangoapps.courseware',
     'coursewarehistoryextended',
     'survey.apps.SurveyConfig',
