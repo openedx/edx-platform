@@ -138,7 +138,7 @@ class RegistrationView(APIView):
                 "username": accounts.USERNAME_CONFLICT_MSG.format(username=username),
             }
             errors = {
-                field: [{"user_message": conflict_messages[field]}]
+                field: [conflict_messages[field]]
                 for field in conflicts
             }
             return JsonResponse(errors, status=409)
@@ -157,7 +157,7 @@ class RegistrationView(APIView):
             user = create_account_with_params(request, data)
         except AccountValidationError as err:
             errors = {
-                err.field: [{"user_message": text_type(err)}]
+                err.field: [text_type(err)]
             }
             return JsonResponse(errors, status=409)
         except ValidationError as err:
@@ -165,7 +165,7 @@ class RegistrationView(APIView):
             assert NON_FIELD_ERRORS not in err.message_dict
             # Only return first error for each field
             errors = {
-                field: [{"user_message": error} for error in error_list]
+                field: [error for error in error_list]
                 for field, error_list in err.message_dict.items()
             }
             return JsonResponse(errors, status=400)
