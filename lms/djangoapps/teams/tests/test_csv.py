@@ -132,9 +132,9 @@ class TeamMembershipImportManagerTests(SharedModuleStoreTestCase):
         super(TeamMembershipImportManagerTests, cls).setUpClass()
         teams_config = TeamsConfig({
             'team_sets': [{
-                    'id': 'teamset_1',
-                    'name': 'teamset_name',
-                    'description': 'teamset_desc',
+                'id': 'teamset_1',
+                'name': 'teamset_name',
+                'description': 'teamset_desc',
             }]
         })
         cls.course = CourseFactory(teams_configuration=teams_config)

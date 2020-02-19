@@ -83,6 +83,7 @@ class TestModelStrings(SharedModuleStoreTestCase):
             "the-user is member of The Team in edx/the-course/1"
         )
 
+
 @ddt.ddt
 class CourseTeamTest(SharedModuleStoreTestCase):
     """Tests for the CourseTeam model."""
