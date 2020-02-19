@@ -173,8 +173,8 @@ class ThirdPartyAuthTestMixin(object):
         user.save()
 
     @staticmethod
-    def configure_oauth_client():
-        """ Configure a oauth client for testing """
+    def configure_oauth_dop_client():
+        """ Configure an oauth DOP client for testing """
         return OAuth2Client.objects.create(client_type=constants.CONFIDENTIAL)
 
     @staticmethod
