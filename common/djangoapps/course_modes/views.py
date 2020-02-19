@@ -13,6 +13,7 @@ import six.moves.urllib.parse
 import six.moves.urllib.request
 import waffle
 from babel.dates import format_datetime
+from babel.numbers import get_currency_symbol
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -208,6 +209,7 @@ class ChooseModeView(View):
             price_before_discount = verified_mode.min_price
 
             context["currency"] = verified_mode.currency.upper()
+            context["currency_symbol"] = get_currency_symbol(verified_mode.currency.upper())
             context["min_price"] = price_before_discount
             context["verified_name"] = verified_mode.name
             context["verified_description"] = verified_mode.description
