@@ -33,6 +33,13 @@ class SchemaOrNoSchemaURLValidator(URLValidator):
     )
 
 
+class OrgSectorManager(models.Manager):
+    """Custom manager to get choices of org sector"""
+
+    def get_choices(self):
+        return [(org_sector.code, org_sector.label) for org_sector in OrgSector.objects.all()]
+
+
 class OrgSector(models.Model):
     """
     Specifies what sector the organization is working in.
@@ -41,12 +48,10 @@ class OrgSector(models.Model):
     code = models.CharField(max_length=10, unique=True)
     label = models.CharField(max_length=256)
 
+    objects = OrgSectorManager()
+
     def __str__(self):
         return self.label
-
-    @classmethod
-    def get_map(cls):
-        return {os.code: os.label for os in cls.objects.all()}
 
     class Meta:
         ordering = ['order']
@@ -86,6 +91,13 @@ class FocusArea(models.Model):
         ordering = ['order']
 
 
+class TotalEmployeeManager(models.Manager):
+    """Custom manager to get choices of number of employees range"""
+
+    def get_choices(self):
+        return [(te.code, te.label) for te in TotalEmployee.objects.all()]
+
+
 class TotalEmployee(models.Model):
     """
     Total employees in an organization.
@@ -93,6 +105,8 @@ class TotalEmployee(models.Model):
     order = models.SmallIntegerField(unique=True, null=True)
     code = models.CharField(max_length=10, unique=True)
     label = models.CharField(max_length=256)
+
+    objects = TotalEmployeeManager()
 
     def __str__(self):
         return self.label
