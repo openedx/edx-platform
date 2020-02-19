@@ -354,7 +354,7 @@
                 {
                     title: gettext('Linked Accounts'),
                     subtitle: StringUtils.interpolate(
-                        gettext('You can link your social media accounts to simplify signing in to {platform_name}.'),
+                        gettext('You can link your UC San Diego Single Sign On account to simplify signing in to {platform_name}.'),
                         {platform_name: platformName}
                     ),
                     fields: _.map(authData.providers, function(provider) {
