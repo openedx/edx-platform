@@ -9,7 +9,6 @@ TEAM_ID_KEY = 'team_id'
 TEAM_ROOM_ID_KEY = 'team__room_id'
 THRESHOLD_KEY = 'badge__threshold'
 
-BADGE_ROOT_URL = '{root_url}/courses/{course_id}'
 
 BADGE_NOT_FOUND_ERROR = 'There exists no badge with id {badge_id}'
 BADGE_TYPE_ERROR = 'Cannot assign badge {badge_id} of unknown type {badge_type}'
