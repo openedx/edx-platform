@@ -15,7 +15,7 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import utc
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 
-from openedx.core.lib.teams_config import TeamsConfig
+from openedx.core.lib.teams_config import TeamsConfig, DEFAULT_COURSE_RUN_MAX_TEAM_SIZE
 import xmodule.course_module
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 
@@ -318,7 +318,10 @@ class TeamsConfigurationTestCase(unittest.TestCase):
         self.assertTrue(self.course.teams_enabled)
 
     def test_teams_max_size_no_teams_configuration(self):
-        self.assertIsNone(self.course.teams_configuration.default_max_team_size)
+        self.assertEqual(
+            self.course.teams_configuration.default_max_team_size,
+            DEFAULT_COURSE_RUN_MAX_TEAM_SIZE,
+        )
 
     def test_teams_max_size_with_teams_configured(self):
         size = 4

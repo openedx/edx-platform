@@ -18,7 +18,7 @@ from experiments.models import ExperimentData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermissionIsAuthenticated
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 
@@ -59,7 +59,7 @@ class CourseUserDiscount(DeveloperErrorViewMixin, APIView):
             "jwt": xxxxxxxx.xxxxxxxx.xxxxxxx
         }
     """
-    authentication_classes = (JwtAuthentication, OAuth2AuthenticationAllowInactiveUser,
+    authentication_classes = (JwtAuthentication, BearerAuthenticationAllowInactiveUser,
                               SessionAuthenticationAllowInactiveUser,)
     permission_classes = (ApiKeyHeaderPermissionIsAuthenticated,)
 
@@ -130,7 +130,7 @@ class CourseUserDiscountWithUserParam(DeveloperErrorViewMixin, APIView):
             "jwt": xxxxxxxx.xxxxxxxx.xxxxxxx
         }
     """
-    authentication_classes = (JwtAuthentication, OAuth2AuthenticationAllowInactiveUser,
+    authentication_classes = (JwtAuthentication, BearerAuthenticationAllowInactiveUser,
                               SessionAuthenticationAllowInactiveUser,)
     permission_classes = (ApiKeyHeaderPermissionIsAuthenticated, IsAdminUser)
 

@@ -11,12 +11,11 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render_to_response
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
-from django.views import View
 from django_countries import countries
 from edx_rest_framework_extensions.paginators import DefaultPagination, paginate_search_results
 from opaque_keys import InvalidKeyError
@@ -27,7 +26,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
-from openedx.core.lib.api.authentication import OAuth2Authentication
+from openedx.core.lib.api.authentication import BearerAuthentication
 
 from lms.djangoapps.courseware.courses import get_course_with_access, has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
@@ -368,8 +367,8 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             If the specified course does not exist, a 404 error is returned.
     """
 
-    # OAuth2Authentication must come first to return a 401 for unauthenticated users
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    # BearerAuthentication must come first to return a 401 for unauthenticated users
+    authentication_classes = (BearerAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = CourseTeamSerializer
 
@@ -697,7 +696,7 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
             If the user is logged in and the team does not exist, a 404 is returned.
 
     """
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    authentication_classes = (BearerAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsStaffOrPrivilegedOrReadOnly, IsEnrolledOrIsStaff,)
     lookup_field = 'team_id'
     serializer_class = CourseTeamSerializer
@@ -792,7 +791,7 @@ class TopicListView(GenericAPIView):
                   those teams whose members are outside of institutions affliation.
     """
 
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    authentication_classes = (BearerAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
     pagination_class = TopicsPagination
 
@@ -923,7 +922,7 @@ class TopicDetailView(APIView):
                   those teams whose members are outside of institutions affliation.
     """
 
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    authentication_classes = (BearerAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, topic_id, course_id):
@@ -1083,7 +1082,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
             another user to a team.
     """
 
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    authentication_classes = (BearerAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = MembershipSerializer
 
@@ -1296,7 +1295,7 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
             If the membership does not exist, a 404 error is returned.
     """
 
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    authentication_classes = (BearerAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
     serializer_class = MembershipSerializer
@@ -1366,7 +1365,7 @@ class MembershipBulkManagementView(GenericAPIView):
     View for uploading and downloading team membership CSVs.
     """
 
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    authentication_classes = (BearerAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, **_kwargs):
@@ -1387,13 +1386,16 @@ class MembershipBulkManagementView(GenericAPIView):
         Process uploaded CSV to modify team memberships for given course run.
         """
         self.check_access()
+
         inputfile_handle = request.FILES['csv']
         team_import_manager = TeamMembershipImportManager(self.course)
         team_import_manager.set_team_membership_from_csv(inputfile_handle)
+
         if team_import_manager.import_succeeded:
-            return Response(str(team_import_manager.number_of_records_added), status=status.HTTP_201_CREATED)
+            msg = "Successfully added {} students to teams".format(team_import_manager.number_of_records_added)
+            return JsonResponse({'message': msg}, status=status.HTTP_201_CREATED)
         else:
-            return Response({
+            return JsonResponse({
                 'errors': team_import_manager.validation_errors
             }, status=status.HTTP_400_BAD_REQUEST)
 

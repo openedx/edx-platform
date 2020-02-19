@@ -3,7 +3,7 @@
 
 from django.test import TestCase
 from django.urls import reverse
-from six import unichr  # pylint: disable=W0622
+from six import unichr
 
 from contentstore.views.helpers import event as cms_user_track
 
@@ -20,7 +20,7 @@ class CMSLogTest(TestCase):
         """
         requests = [
             {"event": "my_event", "event_type": "my_event_type", "page": "my_page"},
-            {"event": "{'json': 'object'}", "event_type": unichr(512), "page": "my_page"}  # pylint: disable=unicode-format-string
+            {"event": "{'json': 'object'}", "event_type": unichr(512), "page": "my_page"}
         ]
         for request_params in requests:
             response = self.client.post(reverse(cms_user_track), request_params)

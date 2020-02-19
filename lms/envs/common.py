@@ -130,11 +130,6 @@ FEATURES = {
     # Toggles OAuth2 authentication provider
     'ENABLE_OAUTH2_PROVIDER': False,
 
-    # Toggles auth class in discussions djangoapps
-    'DISCUSSION_USE_NEW_OAUTH2_CLASS': False,
-    # Toggles auth class in bookmarks djangoapps
-    'BOOKMARKS_USE_NEW_OAUTH2_CLASS': False,
-
     # Allows to enable an API endpoint to serve XBlock view, used for example by external applications.
     # See jquey-xblock: https://github.com/edx-solutions/jquery-xblock
     'ENABLE_XBLOCK_VIEW_ENDPOINT': False,
@@ -407,6 +402,7 @@ FEATURES = {
 
     # Enable feature to remove enrollments and users. Used to reset state of master's integration environments
     'ENABLE_ENROLLMENT_RESET': False,
+    'DISABLE_MOBILE_COURSE_AVAILABLE': False,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
@@ -2711,11 +2707,6 @@ VERIFICATION_EXPIRY_EMAIL = {
 }
 
 DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH = "verify_student_disable_account_activation_requirement"
-
-### This enables the Metrics tab for the Instructor dashboard ###########
-FEATURES['CLASS_DASHBOARD'] = False
-if FEATURES.get('CLASS_DASHBOARD'):
-    INSTALLED_APPS.append('class_dashboard')
 
 ################ Enable credit eligibility feature ####################
 ENABLE_CREDIT_ELIGIBILITY = True

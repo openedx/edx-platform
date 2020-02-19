@@ -316,6 +316,11 @@ def get_enterprise_learner_generic_name(request):
     """
     # Prevent a circular import. This function makes sense to be in this module though. And see function description.
     from openedx.features.enterprise_support.api import enterprise_customer_for_request
+
+    # ENT-2626: For 404 pages we don't need to perform these actions.
+    if getattr(request, 'view_name', None) == '404':
+        return
+
     enterprise_customer = enterprise_customer_for_request(request)
 
     return (
