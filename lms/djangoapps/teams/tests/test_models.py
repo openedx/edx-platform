@@ -84,7 +84,6 @@ class TestModelStrings(SharedModuleStoreTestCase):
         )
 
 
-@ddt.ddt
 class CourseTeamTest(SharedModuleStoreTestCase):
     """Tests for the CourseTeam model."""
 
