@@ -36,8 +36,8 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
         team3_1 = CourseTeamFactory(course_id=cls.course.id, name='team_3_1', topic_id='teamset_3')
         # protected team
         team3_2 = CourseTeamFactory(
-            course_id=cls.course.id, 
-            name='team_3_2', 
+            course_id=cls.course.id,
+            name='team_3_2',
             topic_id='teamset_3',
             organization_protected=True
         )

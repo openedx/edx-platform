@@ -42,6 +42,7 @@ from .errors import (
     AddToIncompatibleTeamError
 )
 
+
 @receiver(thread_voted)
 @receiver(thread_created)
 @receiver(comment_voted)
