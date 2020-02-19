@@ -1,4 +1,4 @@
-10. More General Scope Filter Support
+11. More General Scope Filter Support
 -------------------------------------
 
 Status
@@ -31,6 +31,8 @@ Consequences
 
   * This enables the removal of the separate ApplicationOrganization model, which was more complex to configure and less clear regarding its impact on the JWT.
 
+*. The new `filters` field must be added to the EdxOAuth2AuthorizationView_ to handle user authorization for OAuth Applications with grant type 'Authorization code'. This work will be done in a future PR detailed in BOM-1291_.
+
 Using the example from `Include Organizations in Tokens`_, we would now simply use the Application Access admin screen to set::
 
   Scopes: grades:read,enrollments:read
@@ -44,9 +46,8 @@ This would result in a JWT that contains the following, assuming these two scope
     ...
   }
 
-Note: All filters defined for an application are always included in every JWT access token, regardless of whether or not scopes were requested.
+Note: Every JWT access token created using a given OAuth Application will include **all filters** defined for that application. This was also true as of the initial introduction of filters.
 
+.. _EdxOAuth2AuthorizationView: https://github.com/edx/edx-platform/blob/9cf2f9f298e5e8be3b3abcaadaf0b7a96d0de0df/openedx/core/djangoapps/oauth_dispatch/dot_overrides/views.py#L16
+.. _BOM-1291: https://openedx.atlassian.net/browse/BOM-1291
 .. _Transport JWT in HTTP Cookies: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0007-include-organizations-in-tokens.rst
-
-
-******** TODO: DO we want to add notes about how to add a new filter or scope in a how to?

@@ -99,7 +99,7 @@ class DOTAdapter(object):
         application = client
 
         filter_set = set()
-        if hasattr(application, 'access'):
+        if hasattr(application, 'access') and application.access.filters:
             filter_set.update(application.access.filters)
         filter_set = self._add_org_relation_filters_to_set(application, filter_set)
 
