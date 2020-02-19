@@ -13,8 +13,13 @@ define(['jquery', 'gettext', 'common/js/components/utils/view_utils', 'js/views/
 
             this.setupOrgAutocomplete = function() {
                 $.getJSON('/organizations', function(data) {
-                    $(selectors.org).autocomplete({
-                        source: data
+                    $.each(data, function(i, item) {
+                    $(selectors.org).append(
+                      $('<option>', {
+                        value: item,
+                        text: item
+                      })
+                     );
                     });
                 });
             };
