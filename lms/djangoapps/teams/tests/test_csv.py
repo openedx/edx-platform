@@ -35,7 +35,12 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
         team2_2 = CourseTeamFactory(course_id=cls.course.id, name='team_2_2', topic_id='teamset_2')
         team3_1 = CourseTeamFactory(course_id=cls.course.id, name='team_3_1', topic_id='teamset_3')
         # protected team
-        team3_2 = CourseTeamFactory(course_id=cls.course.id, name='team_3_2', topic_id='teamset_3', organization_protected=True)
+        team3_2 = CourseTeamFactory(
+            course_id=cls.course.id, 
+            name='team_3_2', 
+            topic_id='teamset_3',
+            organization_protected=True
+        )
         #  No teams in teamset 4
 
         user1 = UserFactory.create(username='user1')
@@ -127,6 +132,7 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
 
 
 class TeamMembershipImportManagerTests(SharedModuleStoreTestCase):
+    """ Tests for TeamMembershipImportManager """
     @classmethod
     def setUpClass(cls):
         super(TeamMembershipImportManagerTests, cls).setUpClass()

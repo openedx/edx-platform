@@ -35,8 +35,12 @@ from openedx.core.djangoapps.django_comment_common.signals import (
 )
 from student.models import CourseEnrollment, LanguageField
 
-from .errors import AlreadyOnTeamInCourse, ImmutableMembershipFieldException, NotEnrolledInCourseForTeam, AddToIncompatibleTeamError
-
+from .errors import (
+    AlreadyOnTeamInCourse,
+    ImmutableMembershipFieldException,
+    NotEnrolledInCourseForTeam,
+    AddToIncompatibleTeamError
+)
 
 @receiver(thread_voted)
 @receiver(thread_created)
