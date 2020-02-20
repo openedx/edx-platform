@@ -87,6 +87,5 @@ _JWT_RESTRICTED_TPA_PERMISSIONS = (
     JwtHasTpaProviderFilterForRequestedProvider
 )
 TPA_PERMISSIONS = (
-    C(IsAuthenticated) &
     (_NOT_JWT_RESTRICTED_TPA_PERMISSIONS | _JWT_RESTRICTED_TPA_PERMISSIONS)
 )

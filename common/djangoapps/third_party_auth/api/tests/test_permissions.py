@@ -120,11 +120,6 @@ class ThirdPartyAuthPermissionTest(TestCase):
         dict(
             is_enforced=False,
             is_restricted=False,
-            expected_response=200,
-        ),
-        dict(
-            is_enforced=False,
-            is_restricted=False,
             expected_response=403,
         ),
 
@@ -132,21 +127,11 @@ class ThirdPartyAuthPermissionTest(TestCase):
         dict(
             is_enforced=False,
             is_restricted=True,
-            expected_response=200,
-        ),
-        dict(
-            is_enforced=False,
-            is_restricted=True,
             expected_response=403,
         ),
 
         # **** Enforced ****
-        # unrestricted
-        dict(
-            is_enforced=True,
-            is_restricted=False,
-            expected_response=200,
-        ),
+        # unrestricted (for example, jwt cookies)
         dict(
             is_enforced=True,
             is_restricted=False,
@@ -154,11 +139,6 @@ class ThirdPartyAuthPermissionTest(TestCase):
         ),
 
         # restricted (note: further test cases for scopes and filters are in tests below)
-        dict(
-            is_enforced=True,
-            is_restricted=True,
-            expected_response=403,
-        ),
         dict(
             is_enforced=True,
             is_restricted=True,
@@ -172,6 +152,8 @@ class ThirdPartyAuthPermissionTest(TestCase):
             is_restricted,
             expected_response,
     ):
+        # Note: Unenforced tests can be retired when rollout waffle switch `oauth2.enforce_jwt_scopes` is retired.
+        # See https://github.com/edx/edx-drf-extensions/blob/609e1dbaa98f476b36e50143de97732f2f6a9b4f/edx_rest_framework_extensions/config.py#L5
         with patch('edx_rest_framework_extensions.permissions.waffle.switch_is_active') as mock_toggle:
             mock_toggle.return_value = is_enforced
             user = self._create_user()
