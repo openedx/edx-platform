@@ -49,8 +49,8 @@ class ThirdPartyAuthProviderApiPermission(BasePermission):
 
 class JwtHasTpaProviderFilterForRequestedProvider(BasePermission):
     """
-    The JWT used to authenticate contains the appropriate tpa_provider
-    filter for the requested provider.
+    Ensures the JWT used to authenticate contains the appropriate tpa_provider
+    filter for the provider_id requested in the view.
     """
     message = 'JWT missing required tpa_provider filter.'
 

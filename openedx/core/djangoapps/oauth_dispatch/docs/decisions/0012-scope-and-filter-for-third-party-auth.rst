@@ -31,7 +31,7 @@ The new scope and filter are::
 
 The scope can be protected using the already existing `JwtHasScope`_ DRF permission class in edx-drf-extensions.
 
-The new filter permission class, ``JwtHasTpaProviderFilterForRequestedProvider``, will be implemented in edx-platform because this permission is currently used by just ``UserMappingView``, and for only a single OAuth Client application in edX's Edge environment at this time. Keeping this permission local to edx-platform keeps this new permission from polluting the more general permission classes available in edx-drf-extensions.
+The new filter permission class, ``JwtHasTpaProviderFilterForRequestedProvider``, will be implemented in edx-platform to start because it is only used by an edx-platform view, ``UserMappingView``.  Additionally, the permission class is used in conjunction with other legacy permissions and it is simpler to keep all the tests together.
 
 .. _JwtHasScope: https://github.com/edx/edx-drf-extensions/blob/64f831d715d14dc2db5a1046201ff14e92fa7c9f/edx_rest_framework_extensions/permissions.py#L70
 
