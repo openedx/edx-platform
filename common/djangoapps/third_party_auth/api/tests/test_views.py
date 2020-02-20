@@ -234,8 +234,8 @@ class UserMappingViewAPITests(TpaAPITestCase):
     """
     @ddt.data(
         (VALID_API_KEY, PROVIDER_ID_TESTSHIB, 200, get_mapping_data_by_usernames(LINKED_USERS)),
-        ("i am an invalid key", PROVIDER_ID_TESTSHIB, 403, None),
-        (None, PROVIDER_ID_TESTSHIB, 403, None),
+        ("i am an invalid key", PROVIDER_ID_TESTSHIB, 401, None),
+        (None, PROVIDER_ID_TESTSHIB, 401, None),
         (VALID_API_KEY, 'non-existing-id', 404, []),
     )
     @ddt.unpack
@@ -336,7 +336,7 @@ class UserMappingViewAPITests(TpaAPITestCase):
         (True, True, 200),
         (False, True, 200),
         (True, False, 200),
-        (False, False, 403)
+        (False, False, 401)
     )
     @ddt.unpack
     def test_user_mapping_permission_logic(self, api_key_permission, token_permission, expect):
