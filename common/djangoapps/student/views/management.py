@@ -601,7 +601,7 @@ def validate_new_email(user, new_email):
         raise ValueError(_('Old email is the same as the new email.'))
 
 
-def validate_secondary_email(account_recovery, new_email):
+def validate_secondary_email(user, new_email):
     """
     Enforce valid email addresses.
     """
@@ -612,11 +612,13 @@ def validate_secondary_email(account_recovery, new_email):
     if get_email_validation_error(new_email):
         raise ValueError(_('Valid e-mail address required.'))
 
-    if new_email == account_recovery.secondary_email:
-        raise ValueError(_('Old email is the same as the new email.'))
+    # Make sure that if there is an active recovery email address, that is not the same as the new one.
+    if hasattr(user, "account_recovery"):
+        if user.account_recovery.is_active and new_email == user.account_recovery.secondary_email:
+            raise ValueError(_('Old email is the same as the new email.'))
 
     # Make sure that secondary email address is not same as user's primary email.
-    if new_email == account_recovery.user.email:
+    if new_email == user.email:
         raise ValueError(_('Cannot be same as your sign in email address.'))
 
     # Make sure that secondary email address is not same as any of the primary emails currently in use or retired
@@ -723,14 +725,19 @@ def activate_secondary_email(request, key):  # pylint: disable=unused-argument
         return render_to_response("invalid_email_key.html", {})
 
     try:
-        account_recovery_obj = AccountRecovery.objects.get(user_id=pending_secondary_email_change.user)
+        account_recovery = pending_secondary_email_change.user.account_recovery
     except AccountRecovery.DoesNotExist:
+        account_recovery = AccountRecovery(user=pending_secondary_email_change.user)
+
+    try:
+        account_recovery.update_recovery_email(pending_secondary_email_change.new_secondary_email)
+    except ValidationError:
         return render_to_response("secondary_email_change_failed.html", {
             'secondary_email': pending_secondary_email_change.new_secondary_email
         })
 
-    account_recovery_obj.is_active = True
-    account_recovery_obj.save()
+    pending_secondary_email_change.delete()
+
     return render_to_response("secondary_email_change_successful.html")
 
 

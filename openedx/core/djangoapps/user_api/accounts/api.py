@@ -15,30 +15,27 @@ from django.utils.translation import override as override_language
 from django.utils.translation import ugettext as _
 from pytz import UTC
 from six import text_type  # pylint: disable=ungrouped-imports
-
-from openedx.core.djangoapps.user_api import accounts, errors, helpers
-from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
-from openedx.core.djangoapps.user_api.errors import (
-    AccountUpdateError,
-    AccountValidationError,
-    PreferenceValidationError
-)
-from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
-from openedx.core.lib.api.view_utils import add_serializer_errors
-from openedx.core.djangoapps.user_authn.views.registration_form import validate_name, validate_username
-from openedx.features.enterprise_support.utils import get_enterprise_readonly_account_fields
 from student import views as student_views
 from student.models import (
     AccountRecovery,
-    Registration,
     User,
     UserProfile,
     email_exists_or_retired,
     username_exists_or_retired
 )
 from util.model_utils import emit_setting_changed_event
-from util.password_policy_validators import normalize_password, validate_password
+from util.password_policy_validators import validate_password
 
+from openedx.core.djangoapps.user_api import accounts, errors, helpers
+from openedx.core.djangoapps.user_api.errors import (
+    AccountUpdateError,
+    AccountValidationError,
+    PreferenceValidationError
+)
+from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
+from openedx.core.djangoapps.user_authn.views.registration_form import validate_name, validate_username
+from openedx.core.lib.api.view_utils import add_serializer_errors
+from openedx.features.enterprise_support.utils import get_enterprise_readonly_account_fields
 from .serializers import AccountLegacyProfileSerializer, AccountUserSerializer, UserReadOnlySerializer, _visible_fields
 
 # Public access point for this function.
@@ -221,16 +218,13 @@ def _validate_secondary_email(user, data, field_errors):
     if "secondary_email" not in data:
         return
 
-    account_recovery = _get_account_recovery(user)
     try:
-        student_views.validate_secondary_email(account_recovery, data["secondary_email"])
+        student_views.validate_secondary_email(user, data["secondary_email"])
     except ValueError as err:
         field_errors["secondary_email"] = {
             "developer_message": u"Error thrown from validate_secondary_email: '{}'".format(text_type(err)),
             "user_message": text_type(err)
         }
-    else:
-        account_recovery.update_recovery_email(data["secondary_email"])
 
 
 def _validate_name_change(user_profile, data, field_errors):
@@ -451,18 +445,6 @@ def _get_user_and_profile(username):
     existing_user_profile, _ = UserProfile.objects.get_or_create(user=existing_user)
 
     return existing_user, existing_user_profile
-
-
-def _get_account_recovery(user):
-    """
-    helper method to return the account recovery object based on user.
-    """
-    try:
-        account_recovery = user.account_recovery
-    except ObjectDoesNotExist:
-        account_recovery = AccountRecovery(user=user)
-
-    return account_recovery
 
 
 def _validate(validation_func, err, *args):
