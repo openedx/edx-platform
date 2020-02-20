@@ -125,6 +125,8 @@ class TeamMembershipImportManager(object):
         self.teamset_ids = reader.fieldnames[2:]
         row_dictionaries = []
         csv_usernames = set()
+        if not self.validate_header(reader.fieldnames):
+            return False
         if not self.validate_teamsets():
             return False
         self.load_user_ids_by_teamset_id()
@@ -132,6 +134,8 @@ class TeamMembershipImportManager(object):
         self.load_course_teams()
         # process student rows:
         for row in reader:
+            if not self.validate_teams_have_matching_teamsets(row):
+                return False
             username = row['user']
             if not username:
                 continue
@@ -141,7 +145,7 @@ class TeamMembershipImportManager(object):
             user = self.get_user(username)
             if user is None:
                 continue
-            if not self.validate_user_enrolled_in_course(user):
+            if not self.validate_user_enrollment_is_valid(user, row['mode']):
                 row['user'] = None
                 continue
             row['user'] = user
@@ -172,6 +176,19 @@ class TeamMembershipImportManager(object):
         """
         for team in CourseTeam.objects.filter(course_id=self.course.id):
             self.existing_course_teams[(team.name, team.topic_id)] = team
+
+    def validate_header(self, header):
+        """
+        Validates header row to ensure that it contains at a minimum columns called 'user', 'mode'.
+        Teamset validation is handled separately
+        """
+        if 'user' not in header:
+            self.validation_errors.append("Header must contain column 'user'.")
+            return False
+        if 'mode' not in header:
+            self.validation_errors.append("Header must contain column 'mode'.")
+            return False
+        return True
 
     def validate_teamsets(self):
         """
@@ -205,13 +222,18 @@ class TeamMembershipImportManager(object):
                 )
             }
 
-    def validate_user_enrolled_in_course(self, user):
+    def validate_user_enrollment_is_valid(self, user, supplied_enrollment):
         """
         Invalid states:
             user not enrolled in course
+            enrollment mode from csv doesn't match actual user enrollment
         """
-        if not CourseEnrollment.is_enrolled(user, self.course.id):
+        actual_enrollment_mode, user_enrolled = CourseEnrollment.enrollment_mode_for_user(user, self.course.id)
+        if not user_enrolled:
             self.validation_errors.append('User ' + user.username + ' is not enrolled in this course.')
+            return False
+        if actual_enrollment_mode != supplied_enrollment.strip():
+            self.validation_errors.append('User ' + user.username + ' enrollment mismatch.')
             return False
 
         return True
@@ -222,6 +244,23 @@ class TeamMembershipImportManager(object):
         """
         if username in usernames_found_so_far:
             error_message = 'Username {} listed more than once in file.'.format(username)
+            if self.add_error_and_check_if_max_exceeded(error_message):
+                return False
+        return True
+
+    def validate_teams_have_matching_teamsets(self, row):
+        """
+        It's possible for a user to create a row that has more team names in it
+        than there are teamset ids provided in the header.
+        In that case, `row` will have one or more null keys mapping to team names, for example:
+        {'teamset-1': 'team-a', 'teamset-2': 'team-beta', None: 'team-37'}
+
+        This method will add a validation error and return False if this is the case.
+        """
+        if None in row:
+            error_message = "Team(s) {0} don't have matching teamsets.".format(
+                row[None]
+            )
             if self.add_error_and_check_if_max_exceeded(error_message):
                 return False
         return True
