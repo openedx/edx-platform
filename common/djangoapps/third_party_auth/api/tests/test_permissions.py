@@ -218,4 +218,3 @@ class ThirdPartyAuthPermissionTest(TestCase):
 
             response = self.SomeTpaClassView().dispatch(request, provider_id='some_tpa_provider')
             self.assertEqual(response.status_code, expected_response)
-
