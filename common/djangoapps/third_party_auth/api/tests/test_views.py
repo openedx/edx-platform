@@ -349,14 +349,14 @@ class UserMappingViewAPITests(TpaAPITestCase):
 
     @ddt.data(
         (True, 200),
-        (False, 401)
+        (False, 401),
     )
     @ddt.unpack
     def test_list_all_user_mappings_tpa_permission_logic(self, has_permission, expect):
         url = reverse('third_party_auth_user_mapping_api', kwargs={'provider_id': PROVIDER_ID_TESTSHIB})
         with patch.object(JwtRestrictedApplication, 'has_permission', return_value=has_permission):
             with patch.object(JwtHasScope, 'has_permission', return_value=has_permission):
-                 with patch.object(JwtHasTpaProviderFilterForRequestedProvider, 'has_permission', return_value=has_permission):
+                with patch.object(JwtHasTpaProviderFilterForRequestedProvider, 'has_permission', return_value=has_permission):
                     response = self.client.get(url)
                     self.assertEqual(response.status_code, expect)
 
