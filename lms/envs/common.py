@@ -1342,6 +1342,8 @@ EDLY_USER_ROLES = {
     'edly_admin': EDLY_WP_ADMIN_USERS_GROUP
 }
 
+STUDIO_DOMAIN_PREFIX = 'studio.'
+
 CSRF_TRUSTED_ORIGINS = ['.edly.io']
 
 # Clickjacking protection can be disbaled by setting this to 'ALLOW'
