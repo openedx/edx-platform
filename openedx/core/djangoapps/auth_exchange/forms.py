@@ -6,7 +6,6 @@ Forms to support third-party to first-party OAuth 2.0 access token exchange
 import provider.constants
 from django.contrib.auth.models import User
 from django.forms import CharField
-from edx_oauth2_provider.constants import SCOPE_NAMES
 from oauth2_provider.models import Application
 from provider.forms import OAuthForm, OAuthValidationError
 from provider.oauth2.forms import ScopeChoiceField, ScopeMixin
@@ -16,6 +15,8 @@ from social_core.backends import oauth as social_oauth
 from social_core.exceptions import AuthException
 
 from third_party_auth import pipeline
+
+from openedx.core.djangoapps.auth_exchange.constants import SCOPE_NAMES
 
 
 class AccessTokenExchangeForm(ScopeMixin, OAuthForm):
