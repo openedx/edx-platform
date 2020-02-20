@@ -31,7 +31,7 @@ from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from django.core.validators import FileExtensionValidator
+from django.core.validators import FileExtensionValidator, RegexValidator
 from django.db import IntegrityError, models
 from django.db.models import Count, Q, Index
 from django.db.models.signals import post_save, pre_save
@@ -431,7 +431,7 @@ class UserProfile(models.Model):
     MITx fall prototype.
 
     .. pii: Contains many PII fields. Retired in AccountRetirementView.
-    .. pii_types: name, location, birth_date, gender, biography
+    .. pii_types: name, location, birth_date, gender, biography, phone_number
     .. pii_retirement: local_api
     """
     # cache key format e.g user.<user_id>.profile.country = 'SG'
@@ -503,6 +503,8 @@ class UserProfile(models.Model):
     allow_certificate = models.BooleanField(default=1)
     bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False)
     profile_image_uploaded_at = models.DateTimeField(null=True, blank=True)
+    phone_regex = RegexValidator(regex=r'^\+?1?\d*$', message="Phone number can only contain numbers.")
+    phone_number = models.CharField(validators=[phone_regex], blank=True, null=True, max_length=50)
 
     @property
     def has_profile_image(self):
