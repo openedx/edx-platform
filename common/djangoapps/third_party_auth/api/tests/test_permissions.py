@@ -28,9 +28,9 @@ PROVIDER_ID_TESTSHIB = 'saml-' + IDP_SLUG_TESTSHIB
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class ThirdPartyAuthApiPermissionTest(ThirdPartyAuthTestMixin, APITestCase):
     """ Tests for third party auth API permission """
-    def setUp(self):  # pylint: disable=arguments-differ
+    def setUp(self):
         """ Create users and oauth client for use in the tests """
-        super(ThirdPartyAuthApiPermissionTest, self).setUp()
+        super(ThirdPartyAuthApiPermissionTest, self).setUp()  # pylint: disable=arguments-differ
 
     @ddt.data(
         (1, PROVIDER_ID_TESTSHIB, True),
