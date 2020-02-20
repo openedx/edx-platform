@@ -27,8 +27,10 @@ $logistration-form-link-color: theme-color("primary") !default;
   @if variable-exists(logistration-form-link-color) {
     color: $logistration-form-link-color;
   }
+
   @if variable-exists(logistration-form-link-hover-color) {
-    &:hover, &:active {
+    &:hover,
+    &:active {
       color: $logistration-form-link-hover-color;
     }
   }
@@ -39,21 +41,27 @@ $logistration-form-link-color: theme-color("primary") !default;
     background: $logistration-form-btn-primary-bg;
     box-shadow: none; // required because there is a blue shadow by default
   }
+
   @if variable-exists(logistration-form-btn-primary-color) {
     color: $logistration-form-btn-primary-color;
   }
+
   @if variable-exists(logistration-form-btn-primary-border-color) {
     border-color: $logistration-form-btn-primary-border-color;
   }
 
-  &:hover, &:focus, &:active {
+  &:hover,
+  &:focus,
+  &:active {
     @if variable-exists(logistration-form-btn-primary-hover-bg) {
-        background: $logistration-form-btn-primary-hover-bg;
-        box-shadow: none; // required because there is a blue shadow by default
+      background: $logistration-form-btn-primary-hover-bg;
+      box-shadow: none; // required because there is a blue shadow by default
     }
+
     @if variable-exists(logistration-form-btn-primary-hover-color) {
       color: $logistration-form-btn-primary-hover-color;
     }
+
     @if variable-exists(logistration-form-btn-primary-hover-border-color) {
       border-color: $logistration-form-btn-primary-hover-border-color;
     }
@@ -70,8 +78,11 @@ $user-dropdown-link-color: theme-color("dark") !default;
   @if variable-exists(dashboard-course-card-title-link-color) {
     color: $dashboard-course-card-title-link-color;
   }
+
   @if variable-exists(dashboard-course-card-title-link-hover-color) {
-    &:hover, &:active, &:focus {
+    &:hover,
+    &:active,
+    &:focus {
       color: $dashboard-course-card-title-link-hover-color;
     }
   }
@@ -81,20 +92,26 @@ $user-dropdown-link-color: theme-color("dark") !default;
   @if variable-exists(dashboard-btn-enter-course-bg) {
     background-color: $dashboard-btn-enter-course-bg;
   }
+
   @if variable-exists(dashboard-btn-enter-course-color) {
     color: $dashboard-btn-enter-course-color;
   }
+
   @if variable-exists(dashboard-btn-enter-course-border-color) {
     border-color: $dashboard-btn-enter-course-border-color;
   }
 
-  &:hover, &:active, &:focus {
+  &:hover,
+  &:active,
+  &:focus {
     @if variable-exists(dashboard-btn-enter-course-hover-bg) {
       background-color: $dashboard-btn-enter-course-hover-bg;
     }
+
     @if variable-exists(dashboard-btn-enter-course-hover-color) {
       color: $dashboard-btn-enter-course-hover-color;
     }
+
     @if variable-exists(dashboard-btn-enter-course-hover-border-color) {
       border-color: $dashboard-btn-enter-course-hover-border-color;
     }
@@ -110,8 +127,11 @@ $courseware-course-tab-nav-link-hover-border-bottom-color: theme-color("primary"
   @if variable-exists(course-outline-link-color) {
     color: $course-outline-link-color;
   }
+
   @if variable-exists(course-outline-link-hover-color) {
-    &:hover, &:focus, &:active {
+    &:hover,
+    &:focus,
+    &:active {
       color: $course-outline-link-hover-color;
     }
   }
@@ -123,8 +143,11 @@ $course-outline-tools-link-hover-color: theme-color("primary") !default;
   @if variable-exists(course-sidebar-link-color) {
     color: $course-sidebar-link-color;
   }
+
   @if variable-exists(course-sidebar-link-hover-color) {
-    &:hover, &:focus, &:active {
+    &:hover,
+    &:focus,
+    &:active {
       color: $course-sidebar-link-hover-color;
     }
   }
@@ -134,20 +157,26 @@ $course-outline-tools-link-hover-color: theme-color("primary") !default;
   @if variable-exists(btn-resume-course-bg) {
     background-color: $btn-resume-course-bg;
   }
+
   @if variable-exists(btn-resume-course-color) {
     color: $btn-resume-course-color;
   }
+
   @if variable-exists(btn-resume-course-border-color) {
     border-color: $btn-resume-course-border-color;
   }
 
-  &:hover, &:active, &:focus {
+  &:hover,
+  &:active,
+  &:focus {
     @if variable-exists(btn-resume-course-hover-bg) {
       background-color: $btn-resume-course-hover-bg;
     }
+
     @if variable-exists(btn-resume-course-hover-color) {
       color: $btn-resume-course-hover-color;
     }
+
     @if variable-exists(btn-resume-course-hover-border-color) {
       border-color: $btn-resume-course-hover-border-color;
     }
@@ -168,8 +197,11 @@ $course-outline-tools-link-hover-color: theme-color("primary") !default;
   @if variable-exists(wiki-nav-tab-link-color) {
     color: $wiki-nav-tab-link-color;
   }
+
   @if variable-exists(wiki-nav-tab-link-hover-color) {
-    &:hover, &:focus, &:active {
+    &:hover,
+    &:focus,
+    &:active {
       color: $wiki-nav-tab-link-hover-color;
     }
   }
@@ -179,8 +211,11 @@ $course-outline-tools-link-hover-color: theme-color("primary") !default;
   @if variable-exists(wiki-article-link-color) {
     color: $wiki-article-link-color;
   }
+
   @if variable-exists(wiki-article-link-hover-color) {
-    &:hover, &:focus, &:active {
+    &:hover,
+    &:focus,
+    &:active {
       color: $wiki-article-link-hover-color;
     }
   }
@@ -190,8 +225,11 @@ $course-outline-tools-link-hover-color: theme-color("primary") !default;
   @if variable-exists(progress-page-link-color) {
     color: $progress-page-link-color;
   }
+
   @if variable-exists(progress-page-link-hover-color) {
-    &:hover, &:focus, &:active {
+    &:hover,
+    &:focus,
+    &:active {
       color: $progress-page-link-hover-color;
     }
   }
@@ -210,7 +248,9 @@ $course-outline-tools-link-hover-color: theme-color("primary") !default;
     border-color: $btn-account-settings-border-color;
   }
 
-  &:hover, &:active, &:focus {
+  &:hover,
+  &:active,
+  &:focus {
     @if variable-exists(btn-account-settings-hover-bg) {
       background-color: $btn-account-settings-hover-bg;
     }

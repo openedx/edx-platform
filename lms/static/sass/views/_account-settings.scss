@@ -88,7 +88,9 @@
 
           @if variable-exists(account-settings-nav-hover-border-bottom-color) {
             border-bottom-color: $account-settings-nav-hover-border-bottom-color;
-          } @else {
+          }
+
+          @else {
             border-bottom-color: $courseware-border-bottom-color;
           }
         }
@@ -96,7 +98,9 @@
         &.active {
           @if variable-exists(account-settings-nav-border-bottom-color) {
             border-bottom-color: $account-settings-nav-border-bottom-color;
-          } @else {
+          }
+
+          @else {
             border-bottom-color: theme-color("dark");
           }
         }
@@ -178,9 +182,12 @@
 
                 @if variable-exists(account-settings-form-caret-color) {
                   border-top: 7px solid $account-settings-form-caret-color;
-                } @else {
+                }
+
+                @else {
                   border-top: 7px solid $blue;
                 }
+
                 position: absolute;
                 right: 10px;
                 bottom: 20px;

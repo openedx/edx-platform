@@ -10,9 +10,12 @@
 
   @if variable-exists(footer-border-top-color) {
     border-top: 1px solid $footer-border-top-color;
-  } @else {
+  }
+
+  @else {
     border-top: 1px solid tint($m-gray, 50%);
   }
+
   padding: 25px ($baseline/2) ($baseline*1.5) ($baseline/2);
   background: $footer-bg;
   clear: both;
@@ -37,17 +40,23 @@
       @include transition(link-color 0.15s ease-in-out 0s, border 0.15s ease-in-out 0s);
 
       border-bottom: none;
+
       @if variable-exists(footer-legal-link-color) {
         color: $footer-legal-link-color;
-      } @else {
+      }
+
+      @else {
         color: $link-color;
       }
+
       text-decoration: none !important;
 
       &:hover, &:focus, &:active {
         @if variable-exists(footer-legal-link-hover-border-bottom-color) {
           border-bottom: 1px dotted $footer-legal-link-hover-border-bottom-color;
-        } @else {
+        }
+
+        @else {
           border-bottom: 1px dotted $link-color;
         }
       }
@@ -84,16 +93,21 @@
           a {
             @if variable-exists(footer-colophon-link-color) {
               color: $footer-colophon-link-color;
-            } @else {
+            }
+
+            @else {
               color: tint($black, 20%);
             }
 
             &:hover, &:focus, &:active {
               @if variable-exists(footer-colophon-link-hover-color) {
                 color: $footer-colophon-link-hover-color;
-              } @else {
+              }
+
+              @else {
                 color: $link-color;
               }
+
               @if variable-exists(footer-colophon-link-hover-border-bottom-color) {
                 border-bottom-color: $footer-colophon-link-hover-border-bottom-color;
               }
@@ -149,10 +163,13 @@
     .copyright {
       margin: -2px 0 8px 0;
       font-size: em(11);
+
       @if variable-exists(footer-color) {
-          color: $footer-color;
-      } @else {
-          color: $gray; // WCAG 2.0 AA requirements
+        color: $footer-color;
+      }
+
+      @else {
+        color: $gray; // WCAG 2.0 AA requirements
       }
 
       @include text-align(left);

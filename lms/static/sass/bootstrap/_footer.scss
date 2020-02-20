@@ -3,11 +3,15 @@
 
 .wrapper-footer {
   box-shadow: 0 -1px 5px 0 $shadow-l1;
+
   @if variable-exists(footer-border-top-color) {
     border-top: 1px solid $footer-border-top-color;
-  } @else {
+  }
+
+  @else {
     border-top: 1px solid $navbar-light-disabled-color;
   }
+
   background-color: $footer-bg;
   margin-top: $baseline/2;
   padding: $baseline;
@@ -27,17 +31,24 @@
         .nav-link {
           text-decoration: none;
           padding: 0;
+
           @if variable-exists(footer-colophon-link-color) {
             color: $footer-colophon-link-color;
-          } @else {
+          }
+
+          @else {
             color: $gray-900;
           }
+
           &:hover {
             @if variable-exists(footer-colophon-link-hover-color) {
               color: $footer-colophon-link-hover-color;
-            } @else {
+            }
+
+            @else {
               color: theme-color("primary");
             }
+
             @if variable-exists(footer-colophon-link-hover-border-bottom-color) {
               border-bottom: 1px dotted $footer-colophon-link-hover-border-bottom-color;
             }
@@ -55,9 +66,11 @@
           padding: 0;
           margin-right: $baseline/4;
           font-size: .8em;
+
           @if variable-exists(footer-legal-link-color) {
             color: $footer-legal-link-color;
           }
+
           @if variable-exists(footer-legal-link-hover-border-bottom-color) {
             &:hover {
               border-bottom: 1px dotted $footer-legal-link-hover-border-bottom-color;
@@ -83,7 +96,9 @@
 
       @if variable-exists(footer-color) {
         color: $footer-color;
-      } else {
+      }
+
+      @else {
         color: $gray;
       }
     }

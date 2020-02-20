@@ -49,9 +49,12 @@
         height: 100%;
         text-overflow: ellipsis;
         white-space: nowrap;
+
         @if variable-exists(wiki-breadcrumb-link-color) {
           color: $wiki-breadcrumb-link-color;
-        } @else {
+        }
+
+        @else {
           color: $link-color;
         }
       }
@@ -157,7 +160,8 @@
 
     @include box-sizing(border-box);
 
-    p a, td a {
+    p a,
+    td a {
       @extend %wiki-article-link;
     }
 
@@ -302,6 +306,7 @@
           background-color: $light-gray1;
           border-color: $uxpl-blue-hover-active;
           border-left: 4px solid;
+
           @extend %wiki-nav-tab-active-link;
         }
       }
@@ -328,6 +333,7 @@
         color: $uxpl-blue-hover-active;
         font-weight: bold;
       }
+
       @extend %wiki-nav-tab-link;
     }
   }

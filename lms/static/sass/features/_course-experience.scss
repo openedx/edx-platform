@@ -314,7 +314,7 @@
 
     // Course outline accordion / link
     a.outline-button {
-        @extend %course-outline-link;
+      @extend %course-outline-link;
     }
 
     .outline-button {
@@ -330,7 +330,9 @@
       .fa {
         @if variable-exists(course-outline-chevron-color) {
           color: $course-outline-chevron-color;
-        } @else {
+        }
+
+        @else {
           color: $blue;
         }
       }
@@ -417,7 +419,9 @@
 
   @if variable-exists(btn-expand-collapse-outline-color) {
     color: $btn-expand-collapse-outline-color;
-  } @else {
+  }
+
+  @else {
     color: $black;
   }
 
