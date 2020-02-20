@@ -155,7 +155,7 @@ class ThirdPartyAuthPermissionTest(TestCase):
     ):
         # pylint: disable=line-too-long
         # Note: Unenforced tests can be retired when rollout waffle switch `oauth2.enforce_jwt_scopes` is retired.
-        # See https://github.com/edx/edx-drf-extensions/blob/609e1dbaa98f476b36e50143de97732f2f6a9b4f/edx_rest_framework_extensions/config.py#L5 pylint
+        # See https://github.com/edx/edx-drf-extensions/blob/609e1dbaa98f476b36e50143de97732f2f6a9b4f/edx_rest_framework_extensions/config.py#L5
         # pylint: enable=line-too-long
         with patch('edx_rest_framework_extensions.permissions.waffle.switch_is_active') as mock_toggle:
             mock_toggle.return_value = is_enforced
