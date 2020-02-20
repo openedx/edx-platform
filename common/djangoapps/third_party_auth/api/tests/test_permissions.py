@@ -28,7 +28,7 @@ PROVIDER_ID_TESTSHIB = 'saml-' + IDP_SLUG_TESTSHIB
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class ThirdPartyAuthApiPermissionTest(ThirdPartyAuthTestMixin, APITestCase):
     """ Tests for third party auth API permission """
-    def setUp(self):
+    def setUp(self):  # pylint: disable=arguments-differ
         """ Create users and oauth client for use in the tests """
         super(ThirdPartyAuthApiPermissionTest, self).setUp()
 
@@ -71,11 +71,12 @@ class ThirdPartyAuthPermissionTest(TestCase):
     """ Tests for third party auth TPA_PERMISSIONS """
 
     class SomeTpaClassView(APIView):
+        """view used to test TPA_permissions"""
         authentication_classes = (JwtAuthentication, SessionAuthentication)
         permission_classes = (TPA_PERMISSIONS,)
         required_scopes = ['tpa:read']
 
-        def get(self, request, provider_id=None):  # pylint: disable=unused-argument
+        def get(self, request, provider_id=None):
             return Response(data="Success")
 
     def _create_user(self, is_superuser=False):
@@ -152,8 +153,10 @@ class ThirdPartyAuthPermissionTest(TestCase):
             is_restricted,
             expected_response,
     ):
+        # pylint: disable=line-too-long
         # Note: Unenforced tests can be retired when rollout waffle switch `oauth2.enforce_jwt_scopes` is retired.
-        # See https://github.com/edx/edx-drf-extensions/blob/609e1dbaa98f476b36e50143de97732f2f6a9b4f/edx_rest_framework_extensions/config.py#L5
+        # See https://github.com/edx/edx-drf-extensions/blob/609e1dbaa98f476b36e50143de97732f2f6a9b4f/edx_rest_framework_extensions/config.py#L5 pylint
+        # pylint: enable=line-too-long
         with patch('edx_rest_framework_extensions.permissions.waffle.switch_is_active') as mock_toggle:
             mock_toggle.return_value = is_enforced
             user = self._create_user()
