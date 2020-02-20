@@ -30,7 +30,7 @@ attrs==19.3.0
 babel==2.8.0
 beautifulsoup4==4.8.2     # via pynliner
 billiard==3.3.0.23        # via celery
-bleach==3.1.0
+bleach==3.1.1
 boto3==1.4.8
 boto==2.39.0
 botocore==1.8.17
@@ -133,7 +133,7 @@ gunicorn==20.0.4
 help-tokens==1.0.5
 html5lib==1.0.1
 httplib2==0.17.0
-idna==2.8
+idna==2.9
 importlib-metadata==1.5.0
 inflection==0.3.1         # via drf-yasg
 ipaddress==1.0.23
@@ -209,7 +209,7 @@ random2==1.0.1
 recommender-xblock==1.4.5
 redis==2.10.6
 requests-oauthlib==1.1.0
-requests==2.22.0
+requests==2.23.0
 rest-condition==1.0.3
 rfc6266-parser==0.0.6
 ruamel.yaml.clib==0.2.0   # via ruamel.yaml

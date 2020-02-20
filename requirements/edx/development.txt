@@ -33,7 +33,7 @@ attrs==19.3.0
 babel==2.8.0
 beautifulsoup4==4.8.2
 billiard==3.3.0.23
-bleach==3.1.0
+bleach==3.1.1
 bok-choy==1.0.1
 boto3==1.4.8
 boto==2.39.0
@@ -156,7 +156,7 @@ help-tokens==1.0.5
 html5lib==1.0.1
 httplib2==0.17.0
 httpretty==0.9.7
-idna==2.8
+idna==2.9
 imagesize==1.2.0          # via sphinx
 importlib-metadata==1.5.0
 importlib-resources==1.0.2
@@ -267,7 +267,7 @@ random2==1.0.1
 recommender-xblock==1.4.5
 redis==2.10.6
 requests-oauthlib==1.1.0
-requests==2.22.0
+requests==2.23.0
 rest-condition==1.0.3
 rfc6266-parser==0.0.6
 ruamel.yaml.clib==0.2.0
