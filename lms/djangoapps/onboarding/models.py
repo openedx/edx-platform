@@ -39,6 +39,9 @@ class OrgSectorManager(models.Manager):
     def get_choices(self):
         return [(org_sector.code, org_sector.label) for org_sector in OrgSector.objects.all()]
 
+    def get_map(self):
+        return {os.code: os.label for os in OrgSector.objects.all()}
+
 
 class OrgSector(models.Model):
     """
@@ -52,10 +55,6 @@ class OrgSector(models.Model):
 
     def __str__(self):
         return self.label
-
-    @classmethod
-    def get_map(cls):
-        return {os.code: os.label for os in cls.objects.all()}
 
     class Meta:
         ordering = ['order']
