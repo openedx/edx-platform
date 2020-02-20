@@ -50,4 +50,4 @@ Note: Every JWT access token created using a given OAuth Application will includ
 
 .. _EdxOAuth2AuthorizationView: https://github.com/edx/edx-platform/blob/9cf2f9f298e5e8be3b3abcaadaf0b7a96d0de0df/openedx/core/djangoapps/oauth_dispatch/dot_overrides/views.py#L16
 .. _BOM-1291: https://openedx.atlassian.net/browse/BOM-1291
-.. _Transport JWT in HTTP Cookies: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0007-include-organizations-in-tokens.rst
+.. _Transport JWT in HTTP Cookies: 0007-include-organizations-in-tokens.rst
