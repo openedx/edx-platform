@@ -85,11 +85,20 @@
         &:hover,
         &:focus {
           text-decoration: none;
-          border-bottom-color: $courseware-border-bottom-color;
+
+          @if variable-exists(account-settings-nav-hover-border-bottom-color) {
+            border-bottom-color: $account-settings-nav-hover-border-bottom-color;
+          } @else {
+            border-bottom-color: $courseware-border-bottom-color;
+          }
         }
 
         &.active {
-          border-bottom-color: theme-color("dark");
+          @if variable-exists(account-settings-nav-border-bottom-color) {
+            border-bottom-color: $account-settings-nav-border-bottom-color;
+          } @else {
+            border-bottom-color: theme-color("dark");
+          }
         }
       }
     }
@@ -166,7 +175,12 @@
                 content: "";
                 border-left: 6px solid transparent;
                 border-right: 6px solid transparent;
-                border-top: 7px solid $blue;
+
+                @if variable-exists(account-settings-form-caret-color) {
+                  border-top: 7px solid $account-settings-form-caret-color;
+                } @else {
+                  border-top: 7px solid $blue;
+                }
                 position: absolute;
                 right: 10px;
                 bottom: 20px;
@@ -213,6 +227,8 @@
             color: $blue;
             padding: 11px 14px;
             line-height: normal;
+
+            @extend %btn-account-settings-page;
           }
         }
 
@@ -502,6 +518,8 @@
         padding: 11px 14px;
         line-height: normal;
         margin: 20px 0;
+
+        @extend %btn-account-settings-page;
       }
 
       .paragon__modal-open {

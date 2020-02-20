@@ -196,3 +196,31 @@ $course-outline-tools-link-hover-color: theme-color("primary") !default;
     }
   }
 }
+
+%btn-account-settings-page {
+  @if variable-exists(btn-account-settings-bg) {
+    background-color: $btn-account-settings-bg;
+  }
+
+  @if variable-exists(btn-account-settings-color) {
+    color: $btn-account-settings-color;
+  }
+
+  @if variable-exists(btn-account-settings-border-color) {
+    border-color: $btn-account-settings-border-color;
+  }
+
+  &:hover, &:active, &:focus {
+    @if variable-exists(btn-account-settings-hover-bg) {
+      background-color: $btn-account-settings-hover-bg;
+    }
+
+    @if variable-exists(btn-account-settings-hover-color) {
+      color: $btn-account-settings-hover-color;
+    }
+
+    @if variable-exists(btn-account-settings-hover-border-color) {
+      border-color: $btn-account-settings-hover-border-color;
+    }
+  }
+}
