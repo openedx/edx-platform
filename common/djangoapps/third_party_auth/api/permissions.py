@@ -13,7 +13,7 @@ from edx_rest_framework_extensions.permissions import (
     NotJwtRestrictedApplication
 )
 from rest_condition import C
-from rest_framework.permissions import BasePermission, IsAuthenticated
+from rest_framework.permissions import BasePermission
 from third_party_auth.models import ProviderApiPermissions
 
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
