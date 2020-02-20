@@ -22,6 +22,7 @@ from opaque_keys.edx.django.models import CourseKeyField
 # create an alias in "user_api".
 
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
+from openedx.core.lib.cache_utils import request_cached
 # pylint: disable=unused-import
 from student.models import (
     PendingEmailChange,
@@ -54,6 +55,7 @@ class UserPreference(models.Model):
         unique_together = ("user", "key")
 
     @staticmethod
+    @request_cached()
     def get_all_preferences(user):
         """
         Gets all preferences for a given user
