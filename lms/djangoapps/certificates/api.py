@@ -469,6 +469,15 @@ def get_active_web_certificate(course, is_preview_mode=None):
     configurations = certificates.get('certificates', [])
     for config in configurations:
         if config.get('is_active') or is_preview_mode:
+            # [UCSD_CUSTOM] remove '/' from signatory image path
+            # "Preview certificate" error fix
+            signatories = config.get('signatories')
+            for signatory in signatories:
+                signatory_image_path = signatory.get('signature_image_path')
+                if signatory_image_path and signatory_image_path.startswith('/'):
+                    signatory.update({
+                        'signature_image_path': signatory_image_path[1:]
+                    })
             return config
     return None
 
