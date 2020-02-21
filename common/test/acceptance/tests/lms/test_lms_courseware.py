@@ -188,7 +188,7 @@ class ProctoredExamTest(UniqueCourseTest):
 
     def _login_as_a_verified_user(self):
         """
-        login as a verififed user
+        login as a verified user
         """
 
         auto_auth(

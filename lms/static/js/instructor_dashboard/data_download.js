@@ -104,8 +104,8 @@
             this.$list_problem_responses_csv_btn = this.$section.find("input[name='list-problem-responses-csv']");
             this.$list_anon_btn = this.$section.find("input[name='list-anon-ids']");
             this.$grade_config_btn = this.$section.find("input[name='dump-gradeconf']");
-            this.$calculate_grades_csv_btn = this.$section.find("input[name='calculate-grades-csv']");
-            this.$problem_grade_report_csv_btn = this.$section.find("input[name='problem-grade-report']");
+            this.$grade_reports_selector = this.$section.find('#grade-reports');
+            this.$async_report_submit_btn = this.$section.find("input[class='async-report-submit']");
             this.$async_report_btn = this.$section.find("input[class='async-report-btn']");
             this.$download = this.$section.find('.data-download-container');
             this.$download_display_text = this.$download.find('.data-display-text');
@@ -113,7 +113,7 @@
             this.$reports = this.$section.find('.reports-download-container');
             this.$download_display_table = this.$reports.find('.profile-data-display-table');
             this.$reports_request_response = this.$reports.find('.request-response');
-            this.$reports_request_response_error = this.$reports.find('.request-response-error');
+            this.$reports_request_response_error = this.$reports.find('#report-request-response-error');
             this.report_downloads = new (ReportDownloads())(this.$section);
             this.instructor_tasks = new (PendingInstructorTasks())(this.$section);
             this.clear_display();
@@ -319,6 +319,42 @@
                     }
                 });
             });
+            this.$async_report_submit_btn.click(function() {
+                var errorMessage = '';
+                var targetName = '';
+                var requestData = {};
+                var selectedOption = dataDownloadObj.$grade_reports_selector.find(':selected');
+                var url = selectedOption.data('endpoint');
+                var isVerifiedReport = selectedOption.data('verified_learners_only');
+                if (selectedOption.data('verified_learners_only') !== undefined) {
+                    requestData.verified_learners_only = isVerifiedReport;
+                }
+                targetName = selectedOption.val();
+                dataDownloadObj.clear_display();
+                return $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: url,
+                    data: requestData,
+                    error: function(error) {
+                        if (error.responseText) {
+                            errorMessage = JSON.parse(error.responseText);
+                        } else {
+                            errorMessage = dataDownloadObj.get_error_by_target_name(targetName);
+                        }
+                        dataDownloadObj.$reports_request_response_error.text(errorMessage);
+                        return dataDownloadObj.$reports_request_response_error.css({
+                            display: 'block'
+                        });
+                    },
+                    success: function(data) {
+                        dataDownloadObj.$reports_request_response.text(data.status);
+                        return $('.msg-confirm').css({
+                            display: 'block'
+                        });
+                    }
+                });
+            });
             this.$async_report_btn.click(function(e) {
                 var url = $(e.target).data('endpoint');
                 var errorMessage = '';
@@ -330,12 +366,8 @@
                     error: function(error) {
                         if (error.responseText) {
                             errorMessage = JSON.parse(error.responseText);
-                        } else if (e.target.name === 'calculate-grades-csv') {
-                            errorMessage = gettext('Error generating grades. Please try again.');
-                        } else if (e.target.name === 'problem-grade-report') {
-                            errorMessage = gettext('Error generating problem grade report. Please try again.');
-                        } else if (e.target.name === 'export-ora2-data') {
-                            errorMessage = gettext('Error generating ORA data report. Please try again.');
+                        } else {
+                            errorMessage = dataDownloadObj.get_error_by_target_name(e.target.name);
                         }
                         dataDownloadObj.$reports_request_response_error.text(errorMessage);
                         return dataDownloadObj.$reports_request_response_error.css({
@@ -375,6 +407,17 @@
             return $('.msg-error').css({
                 display: 'none'
             });
+        };
+        InstructorDashboardDataDownload.prototype.get_error_by_target_name = function(targetName) {
+            var errorMessage = '';
+            if (targetName === 'calculate-grades-csv') {
+                errorMessage = gettext('Error generating grades. Please try again.');
+            } else if (targetName === 'problem-grade-report') {
+                errorMessage = gettext('Error generating problem grade report. Please try again.');
+            } else if (targetName === 'export-ora2-data') {
+                errorMessage = gettext('Error generating ORA data report. Please try again.');
+            }
+            return errorMessage;
         };
 
         return InstructorDashboardDataDownload;

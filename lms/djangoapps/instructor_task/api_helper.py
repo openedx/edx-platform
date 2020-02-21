@@ -425,6 +425,16 @@ def encode_entrance_exam_and_student_input(usage_key, student=None):
     return task_input, task_key
 
 
+def encode_task_input(data):
+    """Encode optional data into task input."""
+    task_input = {}
+
+    if 'verified_learners_only' in data:
+        task_input['verified_learners_only'] = text_type(data.get('verified_learners_only')).lower() == 'true'
+
+    return task_input
+
+
 def submit_task(request, task_type, task_class, course_key, task_input, task_key):
     """
     Helper method to submit a task.

@@ -352,8 +352,8 @@ class TestReportMixin(object):
                 contain data which is the subset of actual csv rows.
         """
         report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
-        report_csv_filename = report_store.links_for(self.course.id)[file_index][0]
-        report_path = report_store.path_to(self.course.id, report_csv_filename)
+        report_csv_filename = report_store.links_for(course_id=self.course.id)[file_index][0]
+        report_path = report_store.path_to(course_id=self.course.id, filename=report_csv_filename)
         with report_store.storage.open(report_path) as csv_file:
             # Expand the dict reader generator so we don't lose it's content
             csv_rows = [row for row in unicodecsv.DictReader(csv_file, encoding='utf-8-sig')]

@@ -32,6 +32,7 @@ from xblock.fields import ScopeIds
 from bulk_email.api import is_bulk_email_feature_enabled
 from course_modes.models import CourseMode, CourseModesArchive
 from edxmako.shortcuts import render_to_response
+from instructor_task.config.waffle import new_ui_for_data_download_csv_reports
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -55,10 +56,7 @@ from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_utils import wrap_xblock
 from shoppingcart.models import Coupon, CourseRegCodeItem, PaidCourseRegistration
 from student.models import CourseEnrollment
-from student.roles import (
-    CourseFinanceAdminRole, CourseInstructorRole,
-    CourseSalesAdminRole, CourseStaffRole
-)
+from student.roles import CourseFinanceAdminRole, CourseInstructorRole, CourseSalesAdminRole, CourseStaffRole
 from util.json_request import JsonResponse
 from xmodule.html_module import HtmlBlock
 from xmodule.modulestore.django import modulestore
@@ -232,7 +230,6 @@ def instructor_dashboard_2(request, course_id):
     )
 
     certificate_invalidations = CertificateInvalidation.get_certificate_invalidations(course_key)
-
     context = {
         'course': course,
         'studio_url': get_studio_url(course, 'course'),
@@ -243,6 +240,7 @@ def instructor_dashboard_2(request, course_id):
         'certificate_invalidations': certificate_invalidations,
         'generate_certificate_exceptions_url': generate_certificate_exceptions_url,
         'generate_bulk_certificate_exceptions_url': generate_bulk_certificate_exceptions_url,
+        'enable_new_ui_for_csv_reports': new_ui_for_data_download_csv_reports(course_key),
         'certificate_exception_view_url': certificate_exception_view_url,
         'certificate_invalidation_view_url': certificate_invalidation_view_url,
         'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),

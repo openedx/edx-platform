@@ -108,7 +108,6 @@ class CourseGradeFactory(object):
         course_data = CourseData(
             user=None, course=course, collected_block_structure=collected_block_structure, course_key=course_key,
         )
-        stats_tags = [u'action:{}'.format(course_data.course_key)]
         for user in users:
             yield self._iter_grade_result(user, course_data, force_update)
 

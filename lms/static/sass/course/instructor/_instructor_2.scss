@@ -275,6 +275,11 @@
     @include idashbutton(#eee);
   }
 
+  select {
+      border: 1px solid $light-gray;
+      height: 34px;
+  }
+
   .instructor_dash_glob_info {
     position: absolute;
 

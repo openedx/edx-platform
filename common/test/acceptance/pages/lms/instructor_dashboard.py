@@ -12,7 +12,12 @@ from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise, Promise
 
 from common.test.acceptance.pages.lms.course_page import CoursePage
-from common.test.acceptance.tests.helpers import get_options, get_selected_option_text, select_option_by_text
+from common.test.acceptance.tests.helpers import (
+    get_options,
+    get_selected_option_text,
+    select_option_by_text,
+    select_option_by_value
+)
 
 
 class InstructorDashboardPage(CoursePage):
@@ -1100,6 +1105,11 @@ class DataDownloadPage(PageObject):
         return self.q(css='input[name=list-profiles]')
 
     @property
+    def submit_grade_report_button(self):
+        """Returns the "Submit" grade report button."""
+        return self.q(css='input[name="submit-grade-report"]')
+
+    @property
     def enrolled_student_profile_button_present(self):
         """
         Checks for the presence of Enrolled Student Profile Button
@@ -1114,32 +1124,55 @@ class DataDownloadPage(PageObject):
         return self.q(css='input[name="dump-gradeconf"]')
 
     @property
-    def generate_grade_report_button(self):
-        """
-        Returns the "Generate Grade Report" button.
-        """
-        return self.q(css='input[name=calculate-grades-csv]')
-
-    @property
-    def generate_problem_report_button(self):
-        """
-        Returns the "Generate Problem Grade Report" button.
-        """
-        return self.q(css='input[name=problem-grade-report]')
-
-    @property
     def report_download_links(self):
         """
         Returns the download links for the current page.
         """
         return self.q(css="#report-downloads-table .file-download-link>a")
 
-    @property
-    def generate_ora2_response_report_button(self):
+    def generate_course_grade_report_for_all_learners(self):
         """
-        Returns the ORA2 response download button for the current page.
+        Select Grade report for all learners from the dropdown and return submit report button.
         """
-        return self.q(css='input[name=export-ora2-data]')
+        self.select_report_from_dropdown(report_value='calculate-grades-csv')
+        return self.submit_grade_report_button.click()
+
+    def generate_course_grade_report_for_verified_learners(self):
+        """
+        Select Grade report for verified learners from the dropdown and return submit report button.
+        """
+        self.select_report_from_dropdown(report_value='calculate-grades-csv-verified')
+        return self.submit_grade_report_button.click()
+
+    def generate_problem_report_for_all_learners(self):
+        """
+        Select Problem report for all learners from the dropdown and return submit report button.
+        """
+        self.select_report_from_dropdown(report_value='problem-grade-report')
+        return self.submit_grade_report_button.click()
+
+    def generate_problem_report_for_verified_learners(self):
+        """
+        Select Problem report for verified learners from the dropdown and return submit report button.
+        """
+        self.select_report_from_dropdown(report_value='problem-grade-report-verified')
+        return self.submit_grade_report_button.click()
+
+    def generate_ora2_response_report(self):
+        """
+        Select ORA2 data report from the dropdown and return submit report button.
+        """
+        self.select_report_from_dropdown(report_value='export-ora2-data')
+        return self.submit_grade_report_button.click()
+
+    def select_report_from_dropdown(self, report_value):
+        """Selects the specified report from the dropdown of grade reports."""
+        reports_select = self.q(css='#grade-reports')
+        select_option_by_value(reports_select, report_value)
+        expected_report_selected = self.q(css='#grade-reports option[value="{}"]'.format(report_value)).selected
+        EmptyPromise(
+            lambda: expected_report_selected is True, 'Grade report is set to {}'.format(report_value)
+        ).fulfill()
 
     def wait_for_available_report(self):
         """

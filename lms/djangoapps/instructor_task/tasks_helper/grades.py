@@ -14,6 +14,7 @@ import six
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from lazy import lazy
+from opaque_keys.edx.keys import UsageKey
 from pytz import UTC
 from six import text_type
 from six.moves import zip, zip_longest
@@ -29,12 +30,11 @@ from lms.djangoapps.grades.api import prefetch_course_and_subsection_grades
 from lms.djangoapps.instructor_analytics.basic import list_problem_responses
 from lms.djangoapps.instructor_analytics.csvs import format_dictlist
 from lms.djangoapps.instructor_task.config.waffle import (
-    generate_grade_report_for_verified_only,
+    new_ui_for_data_download_csv_reports,
     optimize_get_learners_switch_enabled
 )
 from lms.djangoapps.teams.models import CourseTeamMembership
 from lms.djangoapps.verify_student.services import IDVerificationService
-from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.course_groups.cohorts import bulk_cache_cohorts, get_cohort, is_course_cohorted
 from openedx.core.djangoapps.user_api.course_tag.api import BulkCourseTags
@@ -52,6 +52,13 @@ TASK_LOG = logging.getLogger('edx.celery.task')
 ENROLLED_IN_COURSE = 'enrolled'
 
 NOT_ENROLLED_IN_COURSE = 'unenrolled'
+
+VERIFIED_LEARNERS_ONLY = 'verified_learners_only'
+
+
+def report_for_verified_learners_only(task_input, course_id):
+    """Check whether report should be generated for verified learners or all learners."""
+    return new_ui_for_data_download_csv_reports(course_id) and task_input.get(VERIFIED_LEARNERS_ONLY)
 
 
 def _user_enrollment_status(user, course_id):
@@ -90,7 +97,9 @@ class _CourseGradeReportContext(object):
         )
         self.action_name = action_name
         self.course_id = course_id
+        self.task_input = _task_input
         self.task_progress = TaskProgress(self.action_name, total=None, start_time=time())
+        self.verified_learners_only_report = report_for_verified_learners_only(self.task_input, course_id)
 
     @lazy
     def course(self):
@@ -154,6 +163,11 @@ class _CourseGradeReportContext(object):
         """
         TASK_LOG.info(u'%s, Task type: %s, %s', self.task_info_string, self.action_name, message)
         return self.task_progress.update_task_state(extra_meta={'step': message})
+
+    def get_csv_name(self):
+        """Returns csv file name indicating the type of learners it contains in report."""
+        report_for = 'verified' if self.verified_learners_only_report else 'all'
+        return 'grade_report_{}_learners'.format(report_for)
 
 
 class _CertificateBulkContext(object):
@@ -254,10 +268,20 @@ class CourseGradeReport(object):
     def _batched_rows(self, context):
         """
         A generator of batches of (success_rows, error_rows) for this report.
+        In case we get an empty generator, return tuple ([], []) of empty lists.
         """
-        for users in self._batch_users(context):
-            users = [u for u in users if u is not None]
-            yield self._rows_for_users(context, users)
+        empty_generator_sentinel = object()
+        batch_users = self._batch_users(context)
+        first_batch_of_users = next(batch_users, empty_generator_sentinel)
+        the_first_user_batch_is_empty = first_batch_of_users == empty_generator_sentinel
+        if the_first_user_batch_is_empty:
+            yield [], []
+        else:
+            # If the generator was non-empty, return batches of (success_rows, error_rows) rows
+            # for its all iterations (including the first batch).
+            yield self._rows_for_users(context, first_batch_of_users)
+            for users in batch_users:
+                yield self._rows_for_users(context, users)
 
     def _compile(self, context, batched_rows):
         """
@@ -281,10 +305,12 @@ class CourseGradeReport(object):
         Creates and uploads a CSV for the given headers and rows.
         """
         date = datetime.now(UTC)
-        upload_csv_to_report_store([success_headers] + success_rows, 'grade_report', context.course_id, date)
+        csv_name = context.get_csv_name()
+        upload_csv_to_report_store([success_headers] + success_rows, csv_name, context.course_id, date)
         if len(error_rows) > 0:
             error_rows = [error_headers] + error_rows
-            upload_csv_to_report_store(error_rows, 'grade_report_err', context.course_id, date)
+            error_csv_name = '_'.join([csv_name, 'err'])
+            upload_csv_to_report_store(error_rows, error_csv_name, context.course_id, date)
 
     def _grades_header(self, context):
         """
@@ -335,7 +361,10 @@ class CourseGradeReport(object):
                 verified_only=verified_only,
             )
             users = users.select_related('profile')
-            return grouper(users)
+            user_chunks = grouper(users)
+            for users in user_chunks:
+                clean_users = [user for user in users if user is not None]
+                yield clean_users
 
         def users_for_course_v2(course_id, verified_only=False):
             """
@@ -364,9 +393,11 @@ class CourseGradeReport(object):
                 yield users
 
         course_id = context.course_id
-        task_log_message = u'{}, Task type: {}'.format(context.task_info_string, context.action_name)
-        report_for_verified_only = generate_grade_report_for_verified_only()
-        return get_enrolled_learners_for_course(course_id=course_id, verified_only=report_for_verified_only)
+        task_log_message = '{}, Task type: {}'.format(context.task_info_string, context.action_name)
+        return get_enrolled_learners_for_course(
+            course_id=course_id,
+            verified_only=context.verified_learners_only_report
+        )
 
     def _user_grades(self, course_grade, context):
         """
@@ -543,11 +574,11 @@ class ProblemGradeReport(object):
         status_interval = 100
         task_id = _xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None
 
-        report_for_verified_only = generate_grade_report_for_verified_only()
+        verified_learners_only_report = report_for_verified_learners_only(_task_input, course_id)
         enrolled_students = CourseEnrollment.objects.users_enrolled_in(
             course_id=course_id,
             include_inactive=True,
-            verified_only=report_for_verified_only,
+            verified_only=verified_learners_only_report,
         )
         task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 
@@ -557,7 +588,7 @@ class ProblemGradeReport(object):
         header_row = OrderedDict([('id', 'Student ID'), ('email', 'Email'), ('username', 'Username')])
 
         course = get_course_by_id(course_id)
-        log_task_info(u'Retrieving graded scorable blocks')
+        log_task_info('Retrieving graded scorable blocks')
         graded_scorable_blocks = cls._graded_scorable_blocks_to_header(course)
 
         # Just generate the static fields for now.
@@ -568,7 +599,7 @@ class ProblemGradeReport(object):
 
         # Bulk fetch and cache enrollment states so we can efficiently determine
         # whether each user is currently enrolled in the course.
-        log_task_info(u'Fetching enrollment status')
+        log_task_info('Fetching enrollment status')
         CourseEnrollment.bulk_fetch_enrollment_states(enrolled_students, course_id)
 
         for student, course_grade, error in CourseGradeFactory().iter(enrolled_students, course):
@@ -579,7 +610,7 @@ class ProblemGradeReport(object):
                 err_msg = text_type(error)
                 # There was an error grading this student.
                 if not err_msg:
-                    err_msg = u'Unknown error'
+                    err_msg = 'Unknown error'
                 error_rows.append(student_fields + [err_msg])
                 task_progress.failed += 1
                 continue
@@ -591,29 +622,31 @@ class ProblemGradeReport(object):
                 try:
                     problem_score = course_grade.problem_scores[block_location]
                 except KeyError:
-                    earned_possible_values.append([u'Not Available', u'Not Available'])
+                    earned_possible_values.append(['Not Available', 'Not Available'])
                 else:
                     if problem_score.first_attempted:
                         earned_possible_values.append([problem_score.earned, problem_score.possible])
                     else:
-                        earned_possible_values.append([u'Not Attempted', problem_score.possible])
+                        earned_possible_values.append(['Not Attempted', problem_score.possible])
 
             rows.append(student_fields + [enrollment_status, course_grade.percent] + _flatten(earned_possible_values))
 
             task_progress.succeeded += 1
             if task_progress.attempted % status_interval == 0:
-                step = u'Calculating Grades'
+                step = 'Calculating Grades'
                 task_progress.update_task_state(extra_meta={'step': step})
-                log_message = u'{0} {1}/{2}'.format(step, task_progress.attempted, task_progress.total)
+                log_message = '{0} {1}/{2}'.format(step, task_progress.attempted, task_progress.total)
                 log_task_info(log_message)
 
+        report_for = 'verified' if verified_learners_only_report else 'all'
+        csv_name = 'problem_grade_report_{}_learners'.format(report_for)
         log_task_info('Uploading CSV to store')
         # Perform the upload if any students have been successfully graded
-        if len(rows) > 1:
-            upload_csv_to_report_store(rows, 'problem_grade_report', course_id, start_date)
+        upload_csv_to_report_store(rows, csv_name, course_id, start_date)
+
         # If there are any error rows, write them out as well
         if len(error_rows) > 1:
-            upload_csv_to_report_store(error_rows, 'problem_grade_report_err', course_id, start_date)
+            upload_csv_to_report_store(error_rows, '_'.join([csv_name, 'err']), course_id, start_date)
 
         return task_progress.update_task_state(extra_meta={'step': 'Uploading CSV'})
 

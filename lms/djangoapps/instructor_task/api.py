@@ -22,6 +22,7 @@ from lms.djangoapps.instructor_task.api_helper import (
     check_entrance_exam_problems_for_rescoring,
     encode_entrance_exam_and_student_input,
     encode_problem_and_student_input,
+    encode_task_input,
     submit_task
 )
 from lms.djangoapps.instructor_task.models import InstructorTask
@@ -345,7 +346,7 @@ def submit_calculate_grades_csv(request, course_key):
     """
     task_type = 'grade_course'
     task_class = calculate_grades_csv
-    task_input = {}
+    task_input = encode_task_input(request.POST)
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
@@ -358,7 +359,7 @@ def submit_problem_grade_report(request, course_key):
     """
     task_type = 'grade_problems'
     task_class = calculate_problem_grade_report
-    task_input = {}
+    task_input = encode_task_input(request.POST)
     task_key = ""
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 

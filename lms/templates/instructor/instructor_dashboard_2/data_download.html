@@ -5,6 +5,17 @@ from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
 %>
 
+<%
+grade_report_downloads_available = settings.FEATURES.get('ALLOW_COURSE_STAFF_GRADE_DOWNLOADS') or section_data['access']['admin']
+report_urls = {
+    'grade_course': section_data['calculate_grades_csv_url'],
+    'grade_problem': section_data['problem_grade_report_url'],
+    'grade_ora': section_data['export_ora2_data_url'],
+}
+def get_url_for_report(report_type):
+    return report_urls[report_type]
+%>
+
 <div class="data-download-container action-type-container">
   <div class="request-response-error msg msg-error copy" id="data-request-response-error"></div>
 
@@ -91,13 +102,44 @@ from openedx.core.djangolib.markup import HTML, Text
   %endif
   <div class="data-display-table profile-data-display-table" id="data-student-profiles-table"></div>
 
-  %if settings.FEATURES.get('ALLOW_COURSE_STAFF_GRADE_DOWNLOADS') or section_data['access']['admin']:
-    <p>${_("Click to generate a CSV grade report for all currently enrolled students.")}</p>
-    <p>
-      <input type="button" name="calculate-grades-csv" class="async-report-btn" value="${_("Generate Grade Report")}" data-endpoint="${ section_data['calculate_grades_csv_url'] }"/>
-      <input type="button" name="problem-grade-report" class="async-report-btn" value="${_("Generate Problem Grade Report")}" data-endpoint="${ section_data['problem_grade_report_url'] }"/>
-      <input type="button" name="export-ora2-data" class="async-report-btn" value="${_("Generate ORA Data Report")}" data-endpoint="${ section_data['export_ora2_data_url'] }"/>
-    </p>
+  %if grade_report_downloads_available:
+    %if enable_new_ui_for_csv_reports:
+      <p>${_("Generate a grade report of currently enrolled students: ")}</p>
+      <p>
+        <label><span class="sr">${_("Choose Grade Report")}</span>
+          <select id="grade-reports" class="input select report-selector">
+            <option data-endpoint="${ get_url_for_report('grade_course') }"
+              data-verified_learners_only="true"
+              value="calculate-grades-csv-verified">${_('Grade Report: Verified Learners Only')}
+            </option>
+            <option data-endpoint="${ get_url_for_report('grade_course') }"
+              data-verified_learners_only="false"
+              value="calculate-grades-csv">${_('Grade Report: All Learners')}
+            </option>
+            <option data-endpoint="${ get_url_for_report('grade_problem') }"
+              data-verified_learners_only="true"
+              value="problem-grade-report-verified">${_('Problem Report: Verified Learners Only')}
+            </option>
+            <option data-endpoint="${ get_url_for_report('grade_problem') }"
+              data-verified_learners_only="false"
+              value="problem-grade-report">${_('Problem Report: All Learners')}
+            </option>
+            <option data-endpoint="${ get_url_for_report('grade_ora') }"
+              value="export-ora2-data">${_('ORA Data Report')}
+            </option>
+          </select>
+        </label>
+        <input type="button" name="submit-grade-report" class="async-report-submit" value="Generate CSV" />
+      </p>
+
+    %else:
+      <p>${_("Click to generate a CSV grade report for all currently enrolled students.")}</p>
+      <p>
+        <input type="button" name="calculate-grades-csv" class="async-report-btn" value="${_("Generate Grade Report")}" data-endpoint="${ section_data['calculate_grades_csv_url'] }"/>
+        <input type="button" name="problem-grade-report" class="async-report-btn" value="${_("Generate Problem Grade Report")}" data-endpoint="${ section_data['problem_grade_report_url'] }"/>
+        <input type="button" name="export-ora2-data" class="async-report-btn" value="${_("Generate ORA Data Report")}" data-endpoint="${ section_data['export_ora2_data_url'] }"/>
+      </p>
+    %endif
   %endif
 
     <div class="request-response msg msg-confirm copy" id="report-request-response"></div>
