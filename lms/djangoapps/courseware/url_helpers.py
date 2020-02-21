@@ -2,6 +2,7 @@
 Module to define url helpers functions
 """
 
+
 import six
 from django.conf import settings
 from django.urls import reverse
@@ -9,7 +10,6 @@ from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import navigation_index, path_to_location
-from lms.djangoapps.courseware.toggles import should_redirect_to_courseware_microfrontend
 
 
 def get_redirect_url(course_key, usage_key, request=None):
@@ -25,10 +25,6 @@ def get_redirect_url(course_key, usage_key, request=None):
     Returns:
         Redirect url string
     """
-
-    if should_redirect_to_courseware_microfrontend(course_key):
-        path = path_to_location(modulestore(), usage_key, request, full_path=True)
-        return get_microfrontend_redirect_url(course_key, path)
 
     (
         course_key, chapter, section, vertical_unused,
@@ -65,7 +61,9 @@ def get_microfrontend_redirect_url(course_key, path=None):
     a separate API call, so all we need here is the course_key, section, and vertical
     IDs to format it's URL.
 
-    It is also capable of determining our section and vertical if they're not present.  Fully specifying it all is preferable, though, as the micro-frontend can save itself some work, resulting in a better user experience.
+    It is also capable of determining our section and vertical if they're not present.  Fully
+    specifying it all is preferable, though, as the micro-frontend can save itself some work,
+    resulting in a better user experience.
 
     We're building a URL like this:
 
@@ -86,7 +84,8 @@ def get_microfrontend_redirect_url(course_key, path=None):
     # - chapter
     # - sequence
     # - vertical
-    # We skip course because we already have it from our argument above, and we skip chapter because the micro-frontend URL doesn't include it.
+    # We skip course because we already have it from our argument above, and we skip chapter
+    # because the micro-frontend URL doesn't include it.
     if len(path) > 2:
         redirect_url += '/{sequence_key}'.format(
             sequence_key=path[2]

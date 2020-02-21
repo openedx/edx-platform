@@ -4,7 +4,6 @@ Tests courseware views.py
 """
 
 
-import logging
 import itertools
 import json
 import unittest
@@ -37,7 +36,6 @@ from xblock.core import XBlock
 from xblock.fields import Scope, String
 
 import lms.djangoapps.courseware.views.views as views
-from lms.djangoapps.courseware.toggles import REDIRECT_TO_COURSEWARE_MICROFRONTEND
 import shoppingcart
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
@@ -70,7 +68,6 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
-from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
@@ -106,10 +103,9 @@ QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 FEATURES_WITH_DISABLE_HONOR_CERTIFICATE = settings.FEATURES.copy()
 FEATURES_WITH_DISABLE_HONOR_CERTIFICATE['DISABLE_HONOR_CERTIFICATES'] = True
 
-LOGGER = logging.getLogger(__name__)
 
 @ddt.ddt
-class TestJumpTo(ModuleStoreTestCase, SiteMixin):
+class TestJumpTo(ModuleStoreTestCase):
     """
     Check the jumpto link for a course.
     """
@@ -253,51 +249,6 @@ class TestJumpTo(ModuleStoreTestCase, SiteMixin):
         expected_url += "?{}".format(urlencode({'activate_block_id': six.text_type(staff_only_vertical.location)}))
 
         self.assertEqual(expected_url, get_redirect_url(course_key, usage_key, request))
-
-    def test_jump_to_with_microfrontend_enabled(self):
-        course = CourseFactory.create()
-        chapter = ItemFactory.create(category='chapter', parent_location=course.location)
-        section = ItemFactory.create(category='sequential', parent_location=chapter.location)
-        unit = ItemFactory.create(category='vertical', parent_location=section.location)
-        course_key = CourseKey.from_string(six.text_type(course.id))
-
-        # unit position is hard coded here for simplicity - is there a simple way to get it from here?
-        expected = '/courses/{course_id}/courseware/{chapter_id}/{section_id}/1?{activate_block_id}'.format(
-            course_id=six.text_type(course.id),
-            chapter_id=chapter.url_name,
-            section_id=section.url_name,
-            activate_block_id=urlencode({'activate_block_id': six.text_type(unit.location)})
-        )
-        jumpto_url = '{0}/{1}/jump_to/{2}'.format(
-            '/courses',
-            six.text_type(course.id),
-            six.text_type(unit.location),
-        )
-
-        microfrontend_expected = 'http://learning-mfe/course/{course_key}/{section_id}/{unit_id}'.format(
-            course_key=course_key,
-            section_id=section.location,
-            unit_id=unit.location
-        )
-        """
-            http://learning-mfe/course/org.0/course_0/Run_0/i4x://org.0/course_0/sequential/sequential_2/i4x://org.0/course_0/vertical/vertical_3',
-            http://learning-mfe/course/org.0/course_0/Run_0/i4x://org.0/course_0/sequential/sequential_2/vertical_3
-        """
-
-        with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
-            response = self.client.get(jumpto_url)
-            self.assertRedirects(response, expected, status_code=302, target_status_code=302)
-
-            # Test with waffle flag active and site setting enabled, redirects to microfrontend
-            site_domain = 'othersite.example.com'
-            self.set_up_site(site_domain, {
-                'SITE_NAME': site_domain,
-                'ENABLE_COURSEWARE_MICROFRONTEND': True
-            })
-
-            response = self.client.get(jumpto_url)
-            LOGGER.error(response.url) # None/course/org.0/course_0/Run_0/i4x://org.0/course_0/sequential/sequential_2
-            self.assertRedirects(response, microfrontend_expected, fetch_redirect_response=False, status_code=302, target_status_code=302)
 
 
 @ddt.ddt
