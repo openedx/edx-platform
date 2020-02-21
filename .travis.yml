@@ -1,0 +1,20 @@
+language: python
+python:
+- '3.6'
+branches:
+  only:
+  - master
+services:
+- docker
+sudo: required
+env:
+  matrix:
+  - DOCKER_USERNAME=edxbuilder
+  global:
+    # encrypted DOCKER_PASSWORD
+  - secure: cDcQbz+r1gsTGp1RH1/SYXqEeLkLY5HqkXyUGlomVTp9dY/hg0OKp9JRlbVnwDCtNubW/57EcxINi42BsL+AVT9V1i5wHbVfyqC91DBkuoM/GwPdI/QO+M0MQvyrd/gUD6SdVwfOFwSd/AeMWqHyFglToP8+Pt1+2vXT+K54BRo=
+deploy:
+  provider: script
+  script: make docker_push
+  on:
+    branch: master
