@@ -8,7 +8,6 @@ from django.contrib.auth.models import User
 from django.forms import CharField
 from django.conf import settings
 from oauth2_provider.models import Application
-from provider.oauth2.models import Client
 from requests import HTTPError
 from social_core.backends import oauth as social_oauth
 from social_core.exceptions import AuthException
@@ -78,7 +77,7 @@ class AccessTokenExchangeForm(forms.Form):
     """Form for access token exchange endpoint"""
 
     access_token = CharField(required=False)
-    OAUTH2_PROVIDER_setting = getattr(settings, OAUTH2_PROVIDER, {})
+    OAUTH2_PROVIDER_setting = getattr(settings, "OAUTH2_PROVIDER", {})
     if 'SCOPES' in OAUTH2_PROVIDER_setting:
         scope_choices = OAUTH2_PROVIDER_setting['SCOPES'].items()
     scope = ScopeChoiceField(choices=scope_choices, required=False)
@@ -98,7 +97,7 @@ class AccessTokenExchangeForm(forms.Form):
         """
         try:
             super(AccessTokenExchangeForm, self)._clean_fields()
-        except OAuthValidationError, e:
+        except OAuthValidationError as e:
             self._errors.update(e.args[0])
 
     def _clean_form(self):
@@ -107,7 +106,7 @@ class AccessTokenExchangeForm(forms.Form):
         """
         try:
             super(AccessTokenExchangeForm, self)._clean_form()
-        except OAuthValidationError, e:
+        except OAuthValidationError as e:
             self._errors.update(e.args[0])
 
     def _require_oauth_field(self, field_name):
