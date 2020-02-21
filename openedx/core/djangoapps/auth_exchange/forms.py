@@ -6,6 +6,7 @@ import provider.constants  # this will be removed with removal of Client(dop mod
 from django import forms
 from django.contrib.auth.models import User
 from django.forms import CharField
+from django.conf import settings
 from oauth2_provider.models import Application
 from provider.oauth2.models import Client
 from requests import HTTPError
@@ -14,7 +15,6 @@ from social_core.exceptions import AuthException
 
 from third_party_auth import pipeline
 
-from openedx.core.djangoapps.auth_exchange.constants import SCOPE_NAMES
 
 
 class OAuthValidationError(Exception):
@@ -76,8 +76,13 @@ class ScopeChoiceField(forms.ChoiceField):
 
 class AccessTokenExchangeForm(forms.Form):
     """Form for access token exchange endpoint"""
+
     access_token = CharField(required=False)
-    scope = ScopeChoiceField(choices=SCOPE_NAMES, required=False)
+    OAUTH2_PROVIDER_setting = getattr(settings, OAUTH2_PROVIDER, {})
+    if 'SCOPES' in OAUTH2_PROVIDER_setting:
+        scope_choices = OAUTH2_PROVIDER_setting['SCOPES'].items()
+    scope = ScopeChoiceField(choices=scope_choices, required=False)
+
     client_id = CharField(required=False)
 
     def __init__(self, request, oauth2_adapter, *args, **kwargs):
