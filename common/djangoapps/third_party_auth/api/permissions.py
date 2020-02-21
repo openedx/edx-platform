@@ -34,7 +34,7 @@ class ThirdPartyAuthProviderApiPermission(BasePermission):
         the information for provider
         """
         provider_id = view.kwargs.get('provider_id')
-        if not request.auth or not provider_id:
+        if not request.auth or not hasattr(request.auth, 'client_id') or not provider_id:
             # doesn't have access token or no provider_id specified
             return False
 
