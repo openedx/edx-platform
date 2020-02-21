@@ -71,7 +71,7 @@
 #
 # Translators:
 # adem ÖZGÜR <admozgur@gmail.com>, 2015
-# Ali Işıngör <ali@artistanbul.io>, 2017-2019
+# Ali Işıngör <ali@artistanbul.io>, 2017-2020
 # ali selek <aliselek01@gmail.com>, 2015
 # Emrah Emirtekin <eemirtekin@gmail.com>, 2015
 # Erdoğan Şahin, 2016
@@ -90,7 +90,7 @@
 #
 # Translators:
 # adem ÖZGÜR <admozgur@gmail.com>, 2015
-# Ali Işıngör <ali@artistanbul.io>, 2018
+# Ali Işıngör <ali@artistanbul.io>, 2018,2020
 # ali selek <aliselek01@gmail.com>, 2015
 # Berfin Dilbazer <berfindilbazer@gmail.com>, 2016
 # Emrah Emirtekin <eemirtekin@gmail.com>, 2015
@@ -108,7 +108,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2020-02-16 20:42+0000\n"
-"PO-Revision-Date: 2019-12-04 19:20+0000\n"
+"PO-Revision-Date: 2020-02-20 16:22+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
 "Language: tr_TR\n"
@@ -2541,7 +2541,7 @@ msgstr "Yüksek Lisanslar"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "MicroMasters"
-msgstr ""
+msgstr "MicroMaster Programları"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "MicroBachelors"
@@ -3421,7 +3421,7 @@ msgstr[1] "%s ders görüntüleniyor"
 #: lms/static/js/discovery/views/search_form.js
 #, javascript-format
 msgid "We couldn't find any results for \"%s\"."
-msgstr "\"%s\" için hiç bir sonuç bulunamadı."
+msgstr "\"%s\" için hiçbir sonuç bulunamadı."
 
 #: lms/static/js/discovery/views/search_form.js
 #: openedx/features/course_search/static/course_search/templates/search_error.underscore
@@ -9458,8 +9458,8 @@ msgid ""
 "Caution: The last published version of this unit is live. By publishing "
 "changes you will change the student experience."
 msgstr ""
-"Dikkat: Bu birimin son yayınlanan versiyonu canlıdır. Değişiklikleri "
-"yayınlayarak öğrencilerin deneyimlerini değiştirirsiniz."
+"Dikkat: Bu ünitenin son yayınlanan sürümü canlıdadır. Değişiklikleri "
+"yayınladığınızda öğrenci deneyimini değiştirirsiniz."
 
 #: cms/templates/js/content-group-editor.underscore
 msgid "Content Group Name"
@@ -9540,7 +9540,7 @@ msgstr ""
 
 #: cms/templates/js/copy-clipboard-button.underscore
 msgid "Copy Component Location"
-msgstr ""
+msgstr "Bileşen Konumunu Kopyala"
 
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Weekly Highlight Emails"
@@ -9977,7 +9977,7 @@ msgstr "Bir bölüm ekle"
 
 #: cms/templates/js/edit-title-button.underscore
 msgid "Edit Title"
-msgstr ""
+msgstr "Başlığı Düzenle"
 
 #: cms/templates/js/grading-editor.underscore
 msgid "Grading"
