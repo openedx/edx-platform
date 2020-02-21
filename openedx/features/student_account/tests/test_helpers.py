@@ -174,7 +174,7 @@ class TestSetOptInAndAffiliateOrganization(TestCase):
         organization in the UserExtendedProfile and the EmailPreferences are
         also set for that user
         """
-        self.request_data['org_name'] = 'new_organization'
+        self.request_data['organization_name'] = 'new_organization'
         self.request_data['org_size'] = '6-10'
         self.request_data['org_type'] = 'IWRNS'
 
@@ -190,14 +190,14 @@ class TestSetOptInAndAffiliateOrganization(TestCase):
         form.is_valid()
 
         set_opt_in_and_affiliate_user_organization(self.user, form)
-        created_organization = Organization.objects.filter(label=form.cleaned_data.get('org_name')).first()
+        created_organization = Organization.objects.filter(label=form.cleaned_data.get('organization_name')).first()
 
         user_extended_profile_data = {
             'is_first_learner': True,
             'organization_id': created_organization.id
         }
 
-        self.assertEqual(created_organization.label, self.request_data['org_name'])
+        self.assertEqual(created_organization.label, self.request_data['organization_name'])
         self.assertEqual(created_organization.total_employees, self.request_data['org_size'])
         self.assertEqual(created_organization.org_type, self.request_data['org_type'])
         mock_user_extended_profile_create_method.assert_called_once_with(user=self.user, **user_extended_profile_data)
@@ -220,7 +220,7 @@ class TestSetOptInAndAffiliateOrganization(TestCase):
         }
 
         existing_organization = Organization.objects.create(**organization_data)
-        self.request_data['org_name'] = existing_organization.label
+        self.request_data['organization_name'] = existing_organization.label
 
         request = RequestFactory().post('/user_api/v1/account/registration/', self.request_data)
         params = dict(request.POST.copy().items())

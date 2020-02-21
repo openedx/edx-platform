@@ -56,7 +56,7 @@ def update_enrollments_completions_at_mailchimp(list_id):
             log.info("Syncing batch from {} to {}".format(page_start, page_end))
 
             focus_areas = FocusArea.get_map()
-            org_sectors = OrgSector.get_map()
+            org_sectors = OrgSector.objects.get_map()
 
             for user in users:
                 profile = user.profile

@@ -32,7 +32,7 @@ class AccountCreationFormCustom(AccountCreationForm):
         required=False
     )
 
-    org_name = forms.CharField(
+    organization_name = forms.CharField(
         max_length=255,
         required=False
     )
@@ -60,7 +60,7 @@ class AccountCreationFormCustom(AccountCreationForm):
 
     def clean(self):
         """ Enforce organization related field conditions """
-        cleaned_org_name = self.cleaned_data.get('org_name')
+        cleaned_org_name = self.cleaned_data.get('organization_name')
         cleaned_org_size = self.cleaned_data.get('org_size')
         cleaned_org_type = self.cleaned_data.get('org_type')
 
