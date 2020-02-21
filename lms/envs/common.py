@@ -2490,6 +2490,7 @@ INSTALLED_APPS = [
     'lms.djangoapps.course_goals.apps.CourseGoalsConfig',
 
     # Features
+    'openedx.features.calendar_sync',
     'openedx.features.course_bookmarks',
     'openedx.features.course_experience',
     'openedx.features.course_search',
