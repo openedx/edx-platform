@@ -19,6 +19,16 @@ show_preview_menu = course and can_masquerade and supports_preview_menu
     def selected(is_selected):
       return "selected" if is_selected else ""
 
+    def get_mfe_link():
+      if section:
+          mfe_link = '{}course/{}/{}'.format(settings.LEARNING_MICROFRONTEND_URL, course.id, section.location)
+          if unit:
+            mfe_link += '/' + unit
+      else:
+        mfe_link = None
+      return mfe_link
+
+    mfe_link = get_mfe_link()
     course_partitions = get_all_partitions_for_course(course)
     masquerade_user_name = masquerade.user_name if masquerade else None
     masquerade_group_id = masquerade.group_id if masquerade else None
@@ -65,6 +75,12 @@ show_preview_menu = course and can_masquerade and supports_preview_menu
                         )}
                     </p>
                 </div>
+            % endif
+            % if user.is_staff and mfe_link:
+            <div style="text-align: right;float:right;padding-bottom:5px">
+                <p style="color: white; display: inline-block; margin-right: 10px;">We're working on a new learning sequence experience</p>
+                <a class="btn btn-primary" style="border: solid 1px white;" href="${mfe_link}">View this unit in the new experience</a>
+            </div>
             % endif
         </div>
     </nav>
