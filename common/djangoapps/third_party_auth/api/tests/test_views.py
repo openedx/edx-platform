@@ -49,7 +49,7 @@ def get_mapping_data_by_usernames(usernames):
 class TpaAPITestCase(ThirdPartyAuthTestMixin, APITestCase):
     """ Base test class """
 
-    def setUp(self):
+    def setUp(self):  # pylint: disable=arguments-differ
         """ Create users for use in the tests """
         super(TpaAPITestCase, self).setUp()
 
