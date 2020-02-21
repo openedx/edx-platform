@@ -97,7 +97,7 @@ def save_user_utm_info(req, user):
 
 
 def set_opt_in_and_affiliate_user_organization(user, form):
-    org_name = form.cleaned_data.get("organization_name")
+    org_name = form.cleaned_data.get('organization_name')
     org_type = form.cleaned_data.get('org_type')
     user_extended_profile_data = {}
 

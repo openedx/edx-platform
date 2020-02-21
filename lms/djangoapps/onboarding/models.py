@@ -40,7 +40,7 @@ class OrgSectorManager(models.Manager):
         return [(org_sector.code, org_sector.label) for org_sector in OrgSector.objects.all()]
 
     def get_map(self):
-        return {os.code: os.label for os in OrgSector.objects.all()}
+        return {org_sector.code: org_sector.label for org_sector in OrgSector.objects.all()}
 
 
 class OrgSector(models.Model):
@@ -98,7 +98,7 @@ class TotalEmployeeManager(models.Manager):
     """Custom manager to get choices of number of employees range"""
 
     def get_choices(self):
-        return [(te.code, te.label) for te in TotalEmployee.objects.all()]
+        return [(total_emp.code, total_emp.label) for total_emp in TotalEmployee.objects.all()]
 
 
 class TotalEmployee(models.Model):
