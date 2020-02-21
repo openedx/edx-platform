@@ -24,8 +24,8 @@ from third_party_auth.api.permissions import ThirdPartyAuthProviderApiPermission
 from third_party_auth.models import ProviderApiPermissions
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
 from third_party_auth.api.permissions import (JwtRestrictedApplication,
-    JwtHasScope,
-    JwtHasTpaProviderFilterForRequestedProvider)
+                                              JwtHasScope,
+                                            JwtHasTpaProviderFilterForRequestedProvider)
 
 VALID_API_KEY = "i am a key"
 IDP_SLUG_TESTSHIB = 'testshib'
@@ -356,11 +356,11 @@ class UserMappingViewAPITests(TpaAPITestCase):
     @ddt.unpack
     def test_list_all_user_mappings_tpa_permission_logic(self, has_permission, expect):
         url = reverse('third_party_auth_user_mapping_api', kwargs={'provider_id': PROVIDER_ID_TESTSHIB})
-        with patch.object(JwtRestrictedApplication, 'has_permission', return_value=has_permission) \
-        and patch.object(JwtHasScope, 'has_permission', return_value=has_permission) \
-        and patch.object(JwtHasTpaProviderFilterForRequestedProvider, 'has_permission', return_value=has_permission):
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, expect)
+        with patch.object(JwtHasTpaProviderFilterForRequestedProvider, 'has_permission', return_value=has_permission):
+            with patch.object(JwtRestrictedApplication, 'has_permission', return_value=has_permission):
+                with patch.object(JwtHasScope, 'has_permission', return_value=has_permission):
+                    response = self.client.get(url)
+                    self.assertEqual(response.status_code, expect)
 
     def _verify_response(self, response, expect_code, expect_result):
         """ verify the items in data_list exists in response and data_results matches results in response """
