@@ -2,7 +2,6 @@
 Forms to support third-party to first-party OAuth 2.0 access token exchange
 """
 
-
 import provider.constants  # this will be removed with removal of Client(dop model) below
 from django import forms
 from django.contrib.auth.models import User
@@ -73,6 +72,7 @@ class ScopeChoiceField(forms.ChoiceField):
                     'error': 'invalid_request',
                     'error_description': _("'%s' is not a valid scope.") % \
                             val})
+
 
 class AccessTokenExchangeForm(forms.Form):
     """Form for access token exchange endpoint"""
