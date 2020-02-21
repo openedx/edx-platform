@@ -15,9 +15,9 @@ from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from edx_when import api
 from edx_when.field_data import DateLookupFieldData
 from openedx.core.djangoapps.course_date_signals import handlers
+from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from student.tests.factories import UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -228,6 +228,8 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         self.week3 = week3
         self.user = user
 
+        ScheduleFactory.create(enrollment__user=self.user, enrollment__course_id=self.course.id)
+
         inject_field_data((course, week1, week2, week3, homework, assignment), course, user)
 
     def _clear_field_data_cache(self):
@@ -241,7 +243,6 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
             block._field_data._load_dates(self.course.id, self.user, use_cached=False)  # pylint: disable=protected-access
             block.fields['due']._del_cached_value(block)  # pylint: disable=protected-access
 
-    @api.override_enabled()
     def test_set_due_date_extension(self):
         extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=UTC)
         tools.set_due_date_extension(self.course, self.week1, self.user, extended)
@@ -297,6 +298,8 @@ class TestDataDumps(ModuleStoreTestCase):
         self.week2 = week2
         self.user1 = user1
         self.user2 = user2
+        ScheduleFactory.create(enrollment__user=self.user1, enrollment__course_id=self.course.id)
+        ScheduleFactory.create(enrollment__user=self.user2, enrollment__course_id=self.course.id)
         handlers.extract_dates(None, course.id)
 
     def test_dump_module_extensions(self):

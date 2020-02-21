@@ -65,10 +65,13 @@ from openedx.core.djangoapps.course_date_signals.handlers import extract_dates
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
+from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.lib.teams_config import TeamsConfig
 from openedx.core.lib.xblock_utils import grade_histogram
+from openedx.features.course_experience import RELATIVE_DATES_FLAG
 from shoppingcart.models import (
     Coupon,
     CouponRedemption,
@@ -4478,6 +4481,8 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self.user1 = user1
         self.user2 = user2
+        ScheduleFactory.create(enrollment__user=self.user1, enrollment__course_id=self.course.id)
+        ScheduleFactory.create(enrollment__user=self.user2, enrollment__course_id=self.course.id)
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
         extract_dates(None, self.course.id)
@@ -4519,6 +4524,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             get_extended_due(self.course, self.week3, self.user1)
         )
 
+    @override_waffle_flag(RELATIVE_DATES_FLAG, True)
     def test_reset_date(self):
         self.test_change_due_date()
         url = reverse('reset_due_date', kwargs={'course_id': text_type(self.course.id)})
@@ -4637,10 +4643,13 @@ class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestC
 
         self.user1 = user1
         self.user2 = user2
+        ScheduleFactory.create(enrollment__user=self.user1, enrollment__course_id=self.course.id)
+        ScheduleFactory.create(enrollment__user=self.user2, enrollment__course_id=self.course.id)
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
         extract_dates(None, self.course.id)
 
+    @override_waffle_flag(RELATIVE_DATES_FLAG, True)
     def test_reset_extension_to_deleted_date(self):
         """
         Test that we can delete a due date extension after deleting the normal
