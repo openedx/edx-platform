@@ -25,7 +25,7 @@ from third_party_auth.models import ProviderApiPermissions
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
 from third_party_auth.api.permissions import (JwtRestrictedApplication,
                                               JwtHasScope,
-                                            JwtHasTpaProviderFilterForRequestedProvider)
+                                              JwtHasTpaProviderFilterForRequestedProvider)
 
 VALID_API_KEY = "i am a key"
 IDP_SLUG_TESTSHIB = 'testshib'
