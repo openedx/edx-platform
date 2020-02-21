@@ -80,7 +80,7 @@ class ApplicationAccessAdmin(ModelAdmin):
     """
     ModelAdmin for ApplicationAccess
     """
-    list_display = [u'application', u'scopes']
+    list_display = ['application', 'scopes', 'filters']
 
 
 class ApplicationOrganizationAdmin(ModelAdmin):
