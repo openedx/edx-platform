@@ -13,6 +13,7 @@ from social_core.backends import oauth as social_oauth
 from social_core.exceptions import AuthException
 
 from third_party_auth import pipeline
+import pdb
 
 
 
@@ -145,7 +146,7 @@ class AccessTokenExchangeForm(forms.Form):
         default = SCOPES[0][0]
 
         flags = self.cleaned_data.get('scope', [])
-
+        pdb.set_trace()
         return scope.to_int(default=default, *flags)
 
     def clean(self):
