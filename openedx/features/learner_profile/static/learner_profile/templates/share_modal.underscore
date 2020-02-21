@@ -2,7 +2,7 @@
 <div class="badges-modal" tabindex="0">
         <button class="close"><span class="fa fa-close" aria-hidden="true"></span><span class="sr"><%- gettext("Close") %></span></button>
     <h1 class="modal-header"><%- gettext("Share on Mozilla Backpack") %></h1>
-    <p class="explanation"><%- gettext("To share your certificate on Mozilla Backpack, you must first have a Backpack account. Complete the following steps to add your certificate to Backpack.") %>
+    <p class="explanation"><%- gettext("To share your statement of accomplishment on Mozilla Backpack, you must first have a Backpack account. Complete the following steps to add your statement of accomplishment to Backpack.") %>
     </p>
     <hr class="modal-hr"/>
     <img class="backpack-logo" src="<%- badgeMeta.badges_logo %>" alt="">

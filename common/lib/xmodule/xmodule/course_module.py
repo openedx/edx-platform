@@ -580,34 +580,34 @@ class CourseFields(object):
     ## Course level Certificate Name overrides.
     cert_name_short = String(
         help=_(
-            'Use this setting only when generating PDF certificates. '
-            'Between quotation marks, enter the short name of the type of certificate that '
-            'students receive when they complete the course. For instance, "Certificate".'
+            'Use this setting only when generating PDF statements of accomplishment. '
+            'Between quotation marks, enter the short name of the type of statement of accomplishment that '
+            'students receive when they complete the course. For instance, "Statement of Accomplishment".'
         ),
-        display_name=_("Certificate Name (Short)"),
+        display_name=_("Statement of Accomplishment Name (Short)"),
         scope=Scope.settings,
         default=""
     )
     cert_name_long = String(
         help=_(
-            'Use this setting only when generating PDF certificates. '
-            'Between quotation marks, enter the long name of the type of certificate that students '
-            'receive when they complete the course. For instance, "Certificate of Achievement".'
+            'Use this setting only when generating PDF statements of accomplishment. '
+            'Between quotation marks, enter the long name of the type of statement of accomplishment that students '
+            'receive when they complete the course. For instance, "Statement of Accomplishment".'
         ),
-        display_name=_("Certificate Name (Long)"),
+        display_name=_("Statement of Accomplishment Name (Long)"),
         scope=Scope.settings,
         default=""
     )
     cert_html_view_enabled = Boolean(
-        display_name=_("Certificate Web/HTML View Enabled"),
-        help=_("If true, certificate Web/HTML views are enabled for the course."),
+        display_name=_("Statement of Accomplishment Web/HTML View Enabled"),
+        help=_("If true, statement of accomplishment Web/HTML views are enabled for the course."),
         scope=Scope.settings,
         default=True,
         deprecated=True
     )
     cert_html_view_overrides = Dict(
         # Translators: This field is the container for course-specific certificate configuration values
-        display_name=_("Certificate Web/HTML View Overrides"),
+        display_name=_("Statement of Accomplishment Web/HTML View Overrides"),
         # Translators: These overrides allow for an alternative configuration of the certificate web view
         help=_("Enter course-specific overrides for the Web/HTML template parameters here (JSON format)"),
         scope=Scope.settings,
@@ -616,7 +616,7 @@ class CourseFields(object):
     # Specific certificate information managed via Studio (should eventually fold other cert settings into this)
     certificates = Dict(
         # Translators: This field is the container for course-specific certificate configuration values
-        display_name=_("Certificate Configuration"),
+        display_name=_("Statement of Accomplishment Configuration"),
         # Translators: These overrides allow for an alternative configuration of the certificate web view
         help=_("Enter course-specific configuration information here (JSON format)"),
         scope=Scope.settings,

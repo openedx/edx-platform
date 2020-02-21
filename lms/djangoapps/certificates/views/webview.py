@@ -72,13 +72,14 @@ def get_certificate_description(mode, certificate_type, platform_name):
     elif mode == 'verified':
         # Translators:  This text describes the 'ID Verified' course certificate type, which is a higher level of
         # verification offered by edX.  This type of verification is useful for professional education/certifications
-        certificate_type_description = _("A {cert_type} certificate signifies that a "
+        # [UCSD_CUSTOM] EDS-104 Here I am removing {cert_type} as ucsd is only using verified certificates so we
+        # can replace it with statement of accomplishment
+        certificate_type_description = _("A statement of accomplishment signifies that a "
                                          "learner has agreed to abide by the honor code established by {platform_name} "
                                          "and has completed all of the required tasks for this course under its "
-                                         "guidelines. A {cert_type} certificate also indicates that the "
+                                         "guidelines. A statement of accomplishment also indicates that the "
                                          "identity of the learner has been checked and "
-                                         "is valid.").format(cert_type=certificate_type,
-                                                             platform_name=platform_name)
+                                         "is valid.").format(platform_name=platform_name)
     elif mode == 'xseries':
         # Translators:  This text describes the 'XSeries' course certificate type.  An XSeries is a collection of
         # courses related to each other in a meaningful way, such as a specific topic or theme, or even an organization
@@ -113,7 +114,7 @@ def _update_certificate_context(context, course, user_certificate, platform_name
     )
 
     # Translators:  This text represents the verification of the certificate
-    context['document_meta_description'] = _('This is a valid {platform_name} certificate for {user_name}, '
+    context['document_meta_description'] = _('This is a valid {platform_name} statement of accomplishment for {user_name}, '
                                              'who participated in {partner_short_name} {course_number}').format(
         platform_name=platform_name,
         user_name=context['accomplishment_copy_name'],
@@ -122,7 +123,7 @@ def _update_certificate_context(context, course, user_certificate, platform_name
     )
 
     # Translators:  This text is bound to the HTML 'title' element of the page and appears in the browser title bar
-    context['document_title'] = _("{partner_short_name} {course_number} Certificate | {platform_name}").format(
+    context['document_title'] = _("{partner_short_name} {course_number} Statement of Accomplishment | {platform_name}").format(
         partner_short_name=context['organization_short_name'],
         course_number=context['course_number'],
         platform_name=platform_name
@@ -131,10 +132,8 @@ def _update_certificate_context(context, course, user_certificate, platform_name
     # Translators:  This text fragment appears after the student's name (displayed in a large font) on the certificate
     # screen.  The text describes the accomplishment represented by the certificate information displayed to the user
     context['accomplishment_copy_description_full'] = _("successfully completed, received a passing grade, and was "
-                                                        "awarded this {platform_name} {certificate_type} "
-                                                        "Certificate of Completion in ").format(
-        platform_name=platform_name,
-        certificate_type=context.get("certificate_type"))
+                                                        "awarded this {platform_name} "
+                                                        "Statement of Accomplishment in ").format(platform_name=platform_name)
 
     certificate_type_description = get_certificate_description(user_certificate.mode, certificate_type, platform_name)
     if certificate_type_description:
@@ -142,7 +141,7 @@ def _update_certificate_context(context, course, user_certificate, platform_name
 
     # Translators: This text describes the purpose (and therefore, value) of a course certificate
     context['certificate_info_description'] = _("{platform_name} acknowledges achievements through "
-                                                "certificates, which are awarded for course activities "
+                                                "statements of accomplishment, which are awarded for course activities "
                                                 "that {platform_name} students complete.").format(
         platform_name=platform_name,
         tos_url=context.get('company_tos_url'),
@@ -170,7 +169,7 @@ def _update_context_with_basic_info(context, course_id, platform_name, configura
 
     # Translators:  This text is bound to the HTML 'title' element of the page and appears
     # in the browser title bar when a requested certificate is not found or recognized
-    context['document_title'] = _("Invalid Certificate")
+    context['document_title'] = _("Invalid Statement of Accomplishment")
 
     context['company_tos_urltext'] = _("Terms of Service & Honor Code")
 
@@ -178,7 +177,7 @@ def _update_context_with_basic_info(context, course_id, platform_name, configura
     context['company_privacy_urltext'] = _("Privacy Policy")
 
     # Translators: This line appears as a byline to a header image and describes the purpose of the page
-    context['logo_subtitle'] = _("Certificate Validation")
+    context['logo_subtitle'] = _("Statement of Accomplishment Validation")
 
     # Translators: Accomplishments describe the awards/certifications obtained by students on this platform
     context['accomplishment_copy_about'] = _('About {platform_name} Accomplishments').format(
@@ -189,24 +188,24 @@ def _update_context_with_basic_info(context, course_id, platform_name, configura
     context['certificate_date_issued_title'] = _("Issued On:")
 
     # Translators:  The Certificate ID Number is an alphanumeric value unique to each individual certificate
-    context['certificate_id_number_title'] = _('Certificate ID Number')
+    context['certificate_id_number_title'] = _('Statement of Accomplishment ID Number')
 
-    context['certificate_info_title'] = _('About {platform_name} Certificates').format(
+    context['certificate_info_title'] = _('About {platform_name} Statements of Accomplishment').format(
         platform_name=platform_name
     )
 
-    context['certificate_verify_title'] = _("How {platform_name} Validates Student Certificates").format(
+    context['certificate_verify_title'] = _("How {platform_name} Validates Student Statements of Accomplishment").format(
         platform_name=platform_name
     )
 
     # Translators:  This text describes the validation mechanism for a certificate file (known as GPG security)
-    context['certificate_verify_description'] = _('Certificates issued by {platform_name} are signed by a gpg key so '
+    context['certificate_verify_description'] = _('Statements of Accomplishment issued by {platform_name} are signed by a gpg key so '
                                                   'that they can be validated independently by anyone with the '
                                                   '{platform_name} public key. For independent verification, '
                                                   '{platform_name} uses what is called a '
                                                   '"detached signature"&quot;".').format(platform_name=platform_name)
 
-    context['certificate_verify_urltext'] = _("Validate this certificate for yourself")
+    context['certificate_verify_urltext'] = _("Validate this statement of accomplishment for yourself")
 
     # Translators:  This text describes (at a high level) the mission and charter the edX platform and organization
     context['company_about_description'] = _("{platform_name} offers interactive online classes and MOOCs.").format(
@@ -271,7 +270,7 @@ def _update_social_context(request, context, course, user, user_certificate, pla
     context['twitter_share_enabled'] = share_settings.get('CERTIFICATE_TWITTER', False)
     context['twitter_share_text'] = share_settings.get(
         'CERTIFICATE_TWITTER_TEXT',
-        _("I completed a course at {platform_name}. Take a look at my certificate.").format(
+        _("I completed a course at {platform_name}. Take a look at my statement of accomplishment.").format(
             platform_name=platform_name
         )
     )
@@ -311,11 +310,11 @@ def _update_context_with_user_info(context, user, user_certificate):
     context['accomplishment_copy_name'] = user_fullname
     context['accomplishment_copy_username'] = user.username
 
-    context['accomplishment_more_title'] = _("More Information About {user_name}'s Certificate:").format(
+    context['accomplishment_more_title'] = _("More Information About {user_name}'s Statement of Accomplishment:").format(
         user_name=user_fullname
     )
     # Translators: This line is displayed to a user who has completed a course and achieved a certification
-    context['accomplishment_banner_opening'] = _("{fullname}, you earned a certificate!").format(
+    context['accomplishment_banner_opening'] = _("{fullname}, you earned a statement of accomplishment!").format(
         fullname=user_fullname
     )
 

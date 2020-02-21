@@ -2,8 +2,8 @@
 {% load i18n %}
 
 {% if course_ids|length > 1 %}
-{% blocktrans %}Upgrade to earn a verified certificate on {{ platform_name }}{% endblocktrans %}
+{% blocktrans %}Upgrade to earn a statement of accomplishment on {{ platform_name }}{% endblocktrans %}
 {% else %}
-{% blocktrans %}Upgrade to earn a verified certificate in {{ first_course_name }}{% endblocktrans %}
+{% blocktrans %}Upgrade to earn a statement of accomplishment in {{ first_course_name }}{% endblocktrans %}
 {% endif %}
 {% endautoescape %}
