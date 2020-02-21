@@ -10,6 +10,7 @@ from completion import waffle as completion_waffle
 from django.contrib.auth.models import User
 from django.template.context_processors import csrf
 from django.template.loader import render_to_string
+import edx_when.api as edx_when_api
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from waffle.models import Switch
@@ -70,6 +71,10 @@ class CourseOutlineFragmentView(EdxFragmentView):
         page_context = kwargs.get('page_context', None)
         if page_context:
             context['self_paced'] = page_context.get('pacing_type', 'instructor_paced') == 'self_paced'
+
+        # We're using this flag to prevent old self-paced dates from leaking out on courses not
+        # managed by edx-when.
+        context['in_edx_when'] = edx_when_api.is_enabled_for_course(course_key)
 
         html = render_to_string('course_experience/course-outline-fragment.html', context)
         return Fragment(html)
