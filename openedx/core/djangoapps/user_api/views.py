@@ -165,7 +165,7 @@ class RegistrationView(APIView):
             assert NON_FIELD_ERRORS not in err.message_dict
             # Only return first error for each field
             errors = {
-                field: [{"user_message": error}  for error in error_list]
+                field: [{"user_message": error} for error in error_list]
                 for field, error_list in err.message_dict.items()
             }
             return JsonResponse(errors, status=400)
