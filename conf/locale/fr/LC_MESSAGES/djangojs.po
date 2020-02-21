@@ -201,7 +201,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-02-09 20:42+0000\n"
+"POT-Creation-Date: 2020-02-16 20:42+0000\n"
 "PO-Revision-Date: 2019-12-13 16:54+0000\n"
 "Last-Translator: Sébastien Vigneau <sebastien.vigneau@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
@@ -2618,6 +2618,10 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Masters"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "MicroMasters"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
@@ -7461,6 +7465,10 @@ msgstr ""
 
 #: lms/djangoapps/teams/static/teams/templates/manage.underscore
 msgid "Upload Memberships"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Error assigning team memberships"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/templates/team-actions.underscore

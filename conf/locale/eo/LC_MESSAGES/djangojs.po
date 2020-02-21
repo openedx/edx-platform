@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-02-16 20:52+0000\n"
-"PO-Revision-Date: 2020-02-16 20:52:24.412547\n"
+"POT-Creation-Date: 2020-02-21 08:11+0000\n"
+"PO-Revision-Date: 2020-02-21 08:11:35.487397\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -2941,11 +2941,10 @@ msgstr ""
 "Çännöt jöïn ïnstrüçtör mänägéd téäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
-msgid "{memberCount} / {maxMemberCount} Member"
-msgid_plural "{memberCount} / {maxMemberCount} Members"
-msgstr[0] "{memberCount} / {maxMemberCount} Mémßér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-msgstr[1] ""
-"{memberCount} / {maxMemberCount} Mémßérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+msgid " Member"
+msgid_plural " Members"
+msgstr[0] " Mémßér Ⱡ'σяєм ιρѕυм #"
+msgstr[1] " Mémßérs Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "All teams"
@@ -5954,32 +5953,6 @@ msgid ""
 msgstr ""
 "Ýöü çännöt vïéw thé çöürsé äs ä stüdént ör ßétä téstér ßéföré thé çöürsé "
 "réléäsé däté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "%(num_students)s student opened Subsection"
-msgid_plural "%(num_students)s students opened Subsection"
-msgstr[0] ""
-"%(num_students)s stüdént öpénéd Süßséçtïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢#"
-msgstr[1] ""
-"%(num_students)s stüdénts öpénéd Süßséçtïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢т#"
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "%(num_students)s student"
-msgid_plural "%(num_students)s students"
-msgstr[0] "%(num_students)s stüdént Ⱡ'σяєм ιρѕυм ∂σłσя #"
-msgstr[1] "%(num_students)s stüdénts Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "%(num_questions)s question"
-msgid_plural "%(num_questions)s questions"
-msgstr[0] "%(num_questions)s qüéstïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-msgstr[1] "%(num_questions)s qüéstïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "Number of Students"
-msgstr "Nümßér öf Stüdénts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/templates/courseware/progress_graph.js
 msgid "Overall Score"

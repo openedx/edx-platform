@@ -169,7 +169,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-02-09 20:42+0000\n"
+"POT-Creation-Date: 2020-02-16 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019\n"
 "Language-Team: German (Germany) (https://www.transifex.com/open-edx/teams/6205/de_DE/)\n"
@@ -6554,14 +6554,6 @@ msgid "This course is ending in {time_remaining_string} at {course_end_time}."
 msgstr "Dieser Kurs endet in {time_remaining_string} um {course_end_time}."
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "You lose all access to this course, including your progress."
-msgstr ""
-
-#: lms/djangoapps/courseware/date_summary.py
-msgid "Audit Access Expires"
-msgstr ""
-
-#: lms/djangoapps/courseware/date_summary.py
 msgid "Certificate Available"
 msgstr "Zertifikat erhältlich"
 
@@ -10232,21 +10224,26 @@ msgid "Signed Out"
 msgstr "Abgemeldet"
 
 #: lms/templates/logout.html
+msgid "You have signed out."
+msgstr "Sie sind ausgeloggt. "
+
+#: lms/templates/logout.html
+#, python-brace-format
+msgid ""
+"{start_anchor}Click here{end_anchor} to delete your single signed on (SSO) "
+"session."
+msgstr ""
+
+#: lms/templates/logout.html
 msgid "We are signing you in."
 msgstr "Wir melden Sie an."
 
 #: lms/templates/logout.html
 msgid ""
 "\n"
-"              This may take a minute. If you are not redirected, go to the home page.\n"
-"            "
+"                  This may take a minute. If you are not redirected, go to the home page.\n"
+"                "
 msgstr ""
-"\n"
-"Dies kann eine Minute dauern. Wenn Sie nicht weitergeleitet werden, gehen Sie auf die Startseite."
-
-#: lms/templates/logout.html
-msgid "You have signed out."
-msgstr "Sie sind ausgeloggt. "
 
 #: lms/templates/logout.html
 #, python-brace-format

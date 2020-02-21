@@ -7997,7 +7997,7 @@ msgstr "Okunabilir durum bilgisi bulunmuyor"
 
 #: lms/djangoapps/instructor_task/views.py
 msgid "No message provided"
-msgstr "Hiç bir mesaj verilmedi"
+msgstr "Hiçbir mesaj verilmedi"
 
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
@@ -8064,7 +8064,7 @@ msgstr "Öğrenci '{student}' için giriş sınavı başarıyla {action} "
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid "Unable to find any students with submissions to be {action}"
-msgstr "Teslimi {action} olan hiç bir öğrenci bulunamadı"
+msgstr "Teslimi {action} olan hiçbir öğrenci bulunamadı"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
@@ -11254,6 +11254,12 @@ msgid ""
 " An %(platform_name)s certificate is official and easily shareable. Upgrade "
 "by %(user_schedule_upgrade_deadline_time)s."
 msgstr ""
+"Umarız şu ana dek %(first_course_name)s eğitiminde bizimle birlikte "
+"öğrenmekten keyif alıyorsunuzdur! Onaylı bir sertifika, yeni bilgi ve "
+"becerilerinizi öne çıkarmanızı sağlar. %(platform_name)s sertifikası "
+"resmidir ve kolaylıkla paylaşılabilir. "
+"%(user_schedule_upgrade_deadline_time)s tarihine dek bu sertifikayı "
+"edinebilirsiniz."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
 msgid "Upgrade now"
@@ -11797,7 +11803,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "No email address provided."
-msgstr "Hiç bir e-posta adresi verilmedi."
+msgstr "Hiçbir e-posta adresi verilmedi."
 
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
@@ -12189,7 +12195,7 @@ msgstr "Erişim {expiration_date} tarihinde sonlandı"
 #: openedx/features/course_duration_limits/access.py
 #, python-brace-format
 msgid "Access to {course_name} expired on {expiration_date}"
-msgstr ""
+msgstr "{course_name} dersine erişim {expiration_date} tarihinde sonlandı"
 
 #: openedx/features/course_duration_limits/access.py
 #, python-brace-format
@@ -13557,7 +13563,7 @@ msgstr "Ana Panel"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "results successfully populated,"
-msgstr ""
+msgstr "sonuçlar başarıyla dolduruldu,"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Click to load all enrolled courses"
@@ -20015,6 +20021,10 @@ msgid ""
 " your password, go to the {start_link}sign-in{end_link} page and select "
 "{start_strong}Forgot password{end_strong}."
 msgstr ""
+"Bu parola sıfırlama bağlantısı geçersizdir. Daha önceden kullanılmış "
+"olabilir. Parolanızı sıfırlamak için, {start_link}giriş yap{end_link} "
+"sayfasına gidin ve {start_strong}Parolanı mı unuttun?{end_strong} "
+"bağlantısına tıklayın."
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"
@@ -20067,8 +20077,8 @@ msgid ""
 "If no additional billing details are populated the payment confirmation will"
 " be sent to the user making the purchase."
 msgstr ""
-"Eğer hiçbir fatura detayları nüfuslandırılmamışsa ödeme onayı satın alan "
-"kullanıcıya gönderilecektir."
+"Eğer ek fatura detayları doldurulmazsa, ödeme onayı satın alan kullanıcıya "
+"gönderilecektir."
 
 #: lms/templates/shoppingcart/billing_details.html
 msgid "Payment processing occurs on a separate secure site."
@@ -21439,8 +21449,8 @@ msgid ""
 msgstr ""
 "Eğer bunu talep etmediyseniz, hiçbir şey yapmanıza gerek yok; bizden daha "
 "fazla e-posta almayacaksınız. Lütfen bu e-postayı cevaplamayın; eğer yardıma"
-" ihtiyaç duyarsanız, {platform_name} Dersler web sitesinin hakkında bölümünü"
-" kontrol edin."
+" ihtiyaç duyarsanız, {platform_name} Dersleri web sitesinin hakkında "
+"bölümünü kontrol edin."
 
 #: themes/stanford-style/lms/templates/emails/confirm_email_change.txt
 msgid ""
