@@ -5,8 +5,8 @@
 #    make upgrade
 #
 cffi==1.14.0              # via cryptography
-cryptography==2.8
-lxml==4.5.0
-nltk==3.4.5
+cryptography==2.8         # via -r requirements/edx-sandbox/shared.in (line 12)
+lxml==4.5.0               # via -r requirements/edx-sandbox/shared.in (line 13)
+nltk==3.4.5               # via -r requirements/edx-sandbox/shared.in (line 14)
 pycparser==2.19           # via cffi
 six==1.14.0               # via cryptography, nltk
