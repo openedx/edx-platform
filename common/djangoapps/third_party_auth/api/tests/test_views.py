@@ -1,7 +1,7 @@
 """
 Tests for the Third Party Auth REST API
 """
-from __future__ import absolute_import
+
 
 import unittest
 
@@ -23,6 +23,9 @@ from student.tests.factories import UserFactory
 from third_party_auth.api.permissions import ThirdPartyAuthProviderApiPermission
 from third_party_auth.models import ProviderApiPermissions
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
+from third_party_auth.api.permissions import (JwtRestrictedApplication,
+                                              JwtHasScope,
+                                              JwtHasTpaProviderFilterForRequestedProvider)
 
 VALID_API_KEY = "i am a key"
 IDP_SLUG_TESTSHIB = 'testshib'
@@ -46,7 +49,7 @@ def get_mapping_data_by_usernames(usernames):
 class TpaAPITestCase(ThirdPartyAuthTestMixin, APITestCase):
     """ Base test class """
 
-    def setUp(self):
+    def setUp(self):  # pylint: disable=arguments-differ
         """ Create users for use in the tests """
         super(TpaAPITestCase, self).setUp()
 
@@ -234,8 +237,8 @@ class UserMappingViewAPITests(TpaAPITestCase):
     """
     @ddt.data(
         (VALID_API_KEY, PROVIDER_ID_TESTSHIB, 200, get_mapping_data_by_usernames(LINKED_USERS)),
-        ("i am an invalid key", PROVIDER_ID_TESTSHIB, 403, None),
-        (None, PROVIDER_ID_TESTSHIB, 403, None),
+        ("i am an invalid key", PROVIDER_ID_TESTSHIB, 401, None),
+        (None, PROVIDER_ID_TESTSHIB, 401, None),
         (VALID_API_KEY, 'non-existing-id', 404, []),
     )
     @ddt.unpack
@@ -336,7 +339,7 @@ class UserMappingViewAPITests(TpaAPITestCase):
         (True, True, 200),
         (False, True, 200),
         (True, False, 200),
-        (False, False, 403)
+        (False, False, 401)
     )
     @ddt.unpack
     def test_user_mapping_permission_logic(self, api_key_permission, token_permission, expect):
@@ -345,6 +348,19 @@ class UserMappingViewAPITests(TpaAPITestCase):
             with patch.object(ThirdPartyAuthProviderApiPermission, 'has_permission', return_value=token_permission):
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, expect)
+
+    @ddt.data(
+        (True, 200),
+        (False, 401),
+    )
+    @ddt.unpack
+    def test_list_all_user_mappings_tpa_permission_logic(self, has_permission, expect):
+        url = reverse('third_party_auth_user_mapping_api', kwargs={'provider_id': PROVIDER_ID_TESTSHIB})
+        with patch.object(JwtHasTpaProviderFilterForRequestedProvider, 'has_permission', return_value=has_permission):
+            with patch.object(JwtRestrictedApplication, 'has_permission', return_value=has_permission):
+                with patch.object(JwtHasScope, 'has_permission', return_value=has_permission):
+                    response = self.client.get(url)
+                    self.assertEqual(response.status_code, expect)
 
     def _verify_response(self, response, expect_code, expect_result):
         """ verify the items in data_list exists in response and data_results matches results in response """

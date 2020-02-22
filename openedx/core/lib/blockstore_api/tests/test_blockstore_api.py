@@ -2,7 +2,7 @@
 """
 Tests for xblock_utils.py
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 import unittest
 from uuid import UUID
 
@@ -112,31 +112,31 @@ class BlockstoreApiClientTest(unittest.TestCase):
         self.assertEqual(draft, draft3)
 
         # Write a file into the bundle:
-        api.write_draft_file(draft.uuid, "test.txt", "initial version")
+        api.write_draft_file(draft.uuid, "test.txt", b"initial version")
         # Now the file should be visible in the draft:
         draft_contents = api.get_bundle_file_data(bundle.uuid, "test.txt", use_draft=draft.name)
-        self.assertEqual(draft_contents, "initial version")
+        self.assertEqual(draft_contents, b"initial version")
         api.commit_draft(draft.uuid)
 
         # Write a new version into the draft:
-        api.write_draft_file(draft.uuid, "test.txt", "modified version")
+        api.write_draft_file(draft.uuid, "test.txt", b"modified version")
         published_contents = api.get_bundle_file_data(bundle.uuid, "test.txt")
-        self.assertEqual(published_contents, "initial version")
+        self.assertEqual(published_contents, b"initial version")
         draft_contents2 = api.get_bundle_file_data(bundle.uuid, "test.txt", use_draft=draft.name)
-        self.assertEqual(draft_contents2, "modified version")
+        self.assertEqual(draft_contents2, b"modified version")
         # Now delete the draft:
         api.delete_draft(draft.uuid)
         draft_contents3 = api.get_bundle_file_data(bundle.uuid, "test.txt", use_draft=draft.name)
         # Confirm the file is now reset:
-        self.assertEqual(draft_contents3, "initial version")
+        self.assertEqual(draft_contents3, b"initial version")
 
         # Finaly, test the get_bundle_file* methods:
         file_info1 = api.get_bundle_file_metadata(bundle.uuid, "test.txt")
         self.assertEqual(file_info1.path, "test.txt")
-        self.assertEqual(file_info1.size, len("initial version"))
+        self.assertEqual(file_info1.size, len(b"initial version"))
         self.assertEqual(file_info1.hash_digest, "a45a5c6716276a66c4005534a51453ab16ea63c4")
 
-        self.assertEqual(api.get_bundle_files(bundle.uuid), [file_info1])
+        self.assertEqual(list(api.get_bundle_files(bundle.uuid)), [file_info1])
         self.assertEqual(api.get_bundle_files_dict(bundle.uuid), {
             "test.txt": file_info1,
         })

@@ -3,7 +3,6 @@
 Unit tests for embargo app admin forms.
 """
 
-from __future__ import absolute_import
 
 import six
 # Explicitly import the cache from ConfigurationModel so we can reset it after each test
@@ -50,7 +49,7 @@ class RestrictedCourseFormTest(ModuleStoreTestCase):
         msg = 'COURSE NOT FOUND'
         self.assertIn(msg, form._errors['course_key'][0])  # pylint: disable=protected-access
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError, "The RestrictedCourse could not be created because the data didn't validate."
         ):
             form.save()
@@ -123,7 +122,7 @@ class IPFilterFormTest(TestCase):
         else:
             wmsg = "Invalid IP Address(es): ['.0.0.1', ':dead:beef:::', '1.0.0.0/55']" \
                    " Please fix the error(s) and try again."
-        self.assertEquals(wmsg, form._errors['whitelist'][0])  # pylint: disable=protected-access
+        self.assertEqual(wmsg, form._errors['whitelist'][0])  # pylint: disable=protected-access
 
         if six.PY2:
             bmsg = "Invalid IP Address(es): [u'18.244.*', u'999999:c0a8:101::42', u'1.0.0.0/']" \
@@ -131,7 +130,7 @@ class IPFilterFormTest(TestCase):
         else:
             bmsg = "Invalid IP Address(es): ['18.244.*', '999999:c0a8:101::42', '1.0.0.0/']" \
                    " Please fix the error(s) and try again."
-        self.assertEquals(bmsg, form._errors['blacklist'][0])  # pylint: disable=protected-access
+        self.assertEqual(bmsg, form._errors['blacklist'][0])  # pylint: disable=protected-access
 
-        with self.assertRaisesRegexp(ValueError, "The IPFilter could not be created because the data didn't validate."):
+        with self.assertRaisesRegex(ValueError, "The IPFilter could not be created because the data didn't validate."):
             form.save()

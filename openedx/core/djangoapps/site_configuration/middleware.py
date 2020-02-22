@@ -1,14 +1,15 @@
 """
 This file contains Django middleware related to the site_configuration app.
 """
-from __future__ import absolute_import
+
 
 from django.conf import settings
+from django.utils.deprecation import MiddlewareMixin
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
-class SessionCookieDomainOverrideMiddleware(object):
+class SessionCookieDomainOverrideMiddleware(MiddlewareMixin):
     """
     Special case middleware which should be at the very end of the MIDDLEWARE list (so that it runs first
     on the process_response chain). This middleware will define a wrapper function for the set_cookie() function

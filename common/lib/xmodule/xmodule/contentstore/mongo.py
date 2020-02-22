@@ -1,7 +1,7 @@
 """
 MongoDB/GridFS-level code for the contentstore.
 """
-from __future__ import absolute_import
+
 
 import json
 import os
@@ -56,7 +56,7 @@ class MongoContentStore(ContentStore):
         """
         Closes any open connections to the underlying databases
         """
-        self.fs_files.database.connection.close()
+        self.fs_files.database.client.close()
 
     def _drop_database(self, database=True, collections=True, connections=True):
         """
@@ -70,10 +70,10 @@ class MongoContentStore(ContentStore):
 
         If connections is True, then close the connection to the database as well.
         """
-        connection = self.fs_files.database.connection
+        connection = self.fs_files.database.client
 
         if database:
-            connection.drop_database(self.fs_files.database)
+            connection.drop_database(self.fs_files.database.name)
         elif collections:
             self.fs_files.drop()
             self.chunks.drop()
@@ -245,9 +245,9 @@ class MongoContentStore(ContentStore):
                 ('{}.name'.format(prefix), {'$regex': ASSET_IGNORE_REGEX}),
             ])
             items = self.fs_files.find(query)
-            assets_to_delete = assets_to_delete + items.count()
             for asset in items:
                 self.fs.delete(asset[prefix])
+                assets_to_delete += 1
 
             self.fs_files.remove(query)
         return assets_to_delete
@@ -320,15 +320,18 @@ class MongoContentStore(ContentStore):
                 }
             })
 
-        items = self.fs_files.aggregate(pipeline_stages)
-        if items['result']:
-            result = items['result'][0]
-            count = result['count']
-            assets = list(result['results'])
-        else:
-            # no results
-            count = 0
-            assets = []
+        cursor = self.fs_files.aggregate(pipeline_stages)
+        # Set values if result of query is empty
+        count = 0
+        assets = []
+        try:
+            result = cursor.next()
+            if result:
+                count = result['count']
+                assets = list(result['results'])
+        except StopIteration:
+            # Skip if no assets were returned
+            pass
 
         # We're constructing the asset key immediately after retrieval from the database so that
         # callers are insulated from knowing how our identifiers are stored.
@@ -377,8 +380,8 @@ class MongoContentStore(ContentStore):
                 raise AttributeError("{} is a protected attribute.".format(attr))
         asset_db_key, __ = self.asset_db_key(location)
         # catch upsert error and raise NotFoundError if asset doesn't exist
-        result = self.fs_files.update({'_id': asset_db_key}, {"$set": attr_dict}, upsert=False)
-        if not result.get('updatedExisting', True):
+        result = self.fs_files.update_one({'_id': asset_db_key}, {"$set": attr_dict}, upsert=False)
+        if result.matched_count == 0:
             raise NotFoundError(asset_db_key)
 
     @autoretry_read()

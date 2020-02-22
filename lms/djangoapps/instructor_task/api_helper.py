@@ -4,7 +4,7 @@ Helper lib for instructor_tasks API.
 Includes methods to check args for rescoring task, encoding student input,
 and task submission logic, including handling the Celery backend.
 """
-from __future__ import absolute_import
+
 
 import hashlib
 import json

@@ -2,7 +2,6 @@
 Bok choy acceptance tests for conditionals in the LMS
 """
 
-from __future__ import absolute_import
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc

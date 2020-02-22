@@ -2,7 +2,6 @@
 Instructor Dashboard Views
 """
 
-from __future__ import absolute_import
 
 import datetime
 import logging
@@ -31,7 +30,6 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from bulk_email.api import is_bulk_email_feature_enabled
-from class_dashboard.dashboard_data import get_array_section_has_problem, get_section_display_name
 from course_modes.models import CourseMode, CourseModesArchive
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.certificates import api as certs_api
@@ -57,7 +55,10 @@ from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_utils import wrap_xblock
 from shoppingcart.models import Coupon, CourseRegCodeItem, PaidCourseRegistration
 from student.models import CourseEnrollment
-from student.roles import CourseFinanceAdminRole, CourseInstructorRole, CourseSalesAdminRole, CourseStaffRole
+from student.roles import (
+    CourseFinanceAdminRole, CourseInstructorRole,
+    CourseSalesAdminRole, CourseStaffRole
+)
 from util.json_request import JsonResponse
 from xmodule.html_module import HtmlBlock
 from xmodule.modulestore.django import modulestore
@@ -119,6 +120,7 @@ def instructor_dashboard_2(request, course_id):
         'sales_admin': CourseSalesAdminRole(course_key).has_user(request.user),
         'staff': bool(has_access(request.user, 'staff', course)),
         'forum_admin': has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR),
+        'data_researcher': request.user.has_perm('student.can_research', course_key),
     }
 
     if not access['staff']:
@@ -170,10 +172,6 @@ def instructor_dashboard_2(request, course_id):
     # Gate access to course email by feature flag & by course-specific authorization
     if is_bulk_email_feature_enabled(course_key):
         sections.append(_section_send_email(course, access))
-
-    # Gate access to Metrics tab by featue flag and staff authorization
-    if settings.FEATURES['CLASS_DASHBOARD'] and access['staff']:
-        sections.append(_section_metrics(course, access))
 
     # Gate access to Ecommerce tab
     if course_mode_has_price and (access['finance_admin'] or access['sales_admin']):
@@ -247,6 +245,7 @@ def instructor_dashboard_2(request, course_id):
         'generate_bulk_certificate_exceptions_url': generate_bulk_certificate_exceptions_url,
         'certificate_exception_view_url': certificate_exception_view_url,
         'certificate_invalidation_view_url': certificate_invalidation_view_url,
+        'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
     }
 
     return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)
@@ -550,7 +549,8 @@ def _section_membership(course, access):
             'update_forum_role_membership',
             kwargs={'course_id': six.text_type(course_key)}
         ),
-        'enrollment_role_choices': enrollment_role_choices
+        'enrollment_role_choices': enrollment_role_choices,
+        'is_reason_field_enabled': configuration_helpers.get_value('ENABLE_MANUAL_ENROLLMENT_REASON_FIELD', False)
     }
     return section_data
 
@@ -709,6 +709,8 @@ def _section_data_download(course, access):
         ),
         'export_ora2_data_url': reverse('export_ora2_data', kwargs={'course_id': six.text_type(course_key)}),
     }
+    if not access.get('data_researcher'):
+        section_data['is_hidden'] = True
     return section_data
 
 
@@ -791,23 +793,6 @@ def _section_analytics(course, access):
     return section_data
 
 
-def _section_metrics(course, access):
-    """Provide data for the corresponding dashboard section """
-    course_key = course.id
-    section_data = {
-        'section_key': 'metrics',
-        'section_display_name': _('Metrics'),
-        'access': access,
-        'course_id': six.text_type(course_key),
-        'sub_section_display_name': get_section_display_name(course_key),
-        'section_has_problem': get_array_section_has_problem(course_key),
-        'get_students_opened_subsection_url': reverse('get_students_opened_subsection'),
-        'get_students_problem_grades_url': reverse('get_students_problem_grades'),
-        'post_metrics_data_csv_url': reverse('post_metrics_data_csv'),
-    }
-    return section_data
-
-
 def _section_open_response_assessment(request, course, openassessment_blocks, access):
     """Provide data for the corresponding dashboard section """
     course_key = course.id
@@ -820,10 +805,10 @@ def _section_open_response_assessment(request, course, openassessment_blocks, ac
         result_item_id = six.text_type(block.location)
         if block_parent_id not in parents:
             parents[block_parent_id] = modulestore().get_item(block.parent)
-
+        assessment_name = _("Team") + " : " + block.display_name if block.teams_enabled else block.display_name
         ora_items.append({
             'id': result_item_id,
-            'name': block.display_name,
+            'name': assessment_name,
             'parent_id': block_parent_id,
             'parent_name': parents[block_parent_id].display_name,
             'staff_assessment': 'staff-assessment' in block.assessment_steps,

@@ -1,5 +1,5 @@
 """Utilities to assist with commerce tasks."""
-from __future__ import absolute_import
+
 
 import json
 import logging
@@ -208,7 +208,7 @@ def refund_entitlement(course_entitlement):
             always_notify=True,
         )
     else:
-        log.warn(u'No refund opened for user [%s], course entitlement [%s]', enrollee.id, entitlement_uuid)
+        log.warning(u'No refund opened for user [%s], course entitlement [%s]', enrollee.id, entitlement_uuid)
         return False
 
 

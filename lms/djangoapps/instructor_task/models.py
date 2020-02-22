@@ -12,7 +12,7 @@ file and check it in at the same time as your model changes. To do that,
 ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
-from __future__ import absolute_import
+
 
 import codecs
 import csv
@@ -212,7 +212,7 @@ class ReportStore(object):
         storage_type = config.get('STORAGE_TYPE', '').lower()
         if storage_type == 's3':
             return DjangoStorageReportStore(
-                storage_class='openedx.core.storage.S3ReportStorage',
+                storage_class='storages.backends.s3boto.S3BotoStorage',
                 storage_kwargs={
                     'bucket': config['BUCKET'],
                     'location': config['ROOT_PATH'],
@@ -279,6 +279,11 @@ class DjangoStorageReportStore(ReportStore):
         object, ready to be read from the beginning.
         """
         path = self.path_to(course_id, filename)
+        # See https://github.com/boto/boto/issues/2868
+        # Boto doesn't play nice with unicod in python3
+        if not six.PY2:
+            buff = ContentFile(buff.read().encode('utf-8'))
+
         self.storage.save(path, buff)
 
     def store_rows(self, course_id, filename, rows):
@@ -317,7 +322,7 @@ class DjangoStorageReportStore(ReportStore):
             )
             return []
         files = [(filename, os.path.join(course_dir, filename)) for filename in filenames]
-        files.sort(key=lambda f: self.storage.modified_time(f[1]), reverse=True)
+        files.sort(key=lambda f: self.storage.get_modified_time(f[1]), reverse=True)
         return [
             (filename, self.storage.url(full_path))
             for filename, full_path in files

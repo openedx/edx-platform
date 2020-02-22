@@ -2,7 +2,6 @@
 Tests i18n in courseware
 """
 
-from __future__ import absolute_import
 
 import json
 import re

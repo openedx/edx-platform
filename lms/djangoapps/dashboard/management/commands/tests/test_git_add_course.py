@@ -1,7 +1,7 @@
 """
 Provide tests for git_add_course management command.
 """
-from __future__ import absolute_import
+
 
 import logging
 import os
@@ -66,7 +66,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
         """
         Convenience function for testing command failures
         """
-        with self.assertRaisesRegexp(CommandError, regex):
+        with self.assertRaisesRegex(CommandError, regex):
             call_command('git_add_course', *args, stderr=StringIO())
 
     def test_command_args(self):

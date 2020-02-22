@@ -1,7 +1,6 @@
 """Tests covering utilities for integrating with the catalog service."""
 # pylint: disable=missing-docstring
 
-from __future__ import absolute_import
 
 from collections import defaultdict
 from datetime import timedelta
@@ -440,7 +439,7 @@ class TestGetLocalizedPriceText(TestCase):
 
 @skip_unless_lms
 @mock.patch(UTILS_MODULE + '.get_edx_api_data')
-class TestGetCourseRuns(CatalogIntegrationMixin, TestCase):
+class TestGetCourseRuns(CatalogIntegrationMixin, CacheIsolationTestCase):
     """
     Tests covering retrieval of course runs from the catalog service.
     """
@@ -475,6 +474,7 @@ class TestGetCourseRuns(CatalogIntegrationMixin, TestCase):
         Verify that no errors occur when catalog config is missing.
         """
         CatalogIntegration.objects.all().delete()
+        self.clear_caches()
 
         data = get_course_runs()
         self.assertFalse(mock_get_edx_api_data.called)

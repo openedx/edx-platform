@@ -1,7 +1,7 @@
 """
 Exceptions raised by functions exposed by program_enrollments Django app.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 # Every `__init__` here calls empty Exception() constructor.
 # pylint: disable=super-init-not-called

@@ -1,7 +1,7 @@
 """
 Add and create new modes for running courses on this particular LMS
 """
-from __future__ import absolute_import
+
 
 from collections import defaultdict, namedtuple
 from datetime import timedelta
@@ -54,7 +54,7 @@ class CourseMode(models.Model):
         db_constraint=False,
         db_index=True,
         related_name='modes',
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
     )
 
     # Django sets the `course_id` property in __init__ with the value from the database
@@ -84,7 +84,7 @@ class CourseMode(models.Model):
     min_price = models.IntegerField(default=0, verbose_name=_("Price"))
 
     # the currency these prices are in, using lower case ISO currency codes
-    currency = models.CharField(default="usd", max_length=8)
+    currency = models.CharField(default=u"usd", max_length=8)
 
     # The datetime at which the course mode will expire.
     # This is used to implement "upgrade" deadlines.
@@ -98,7 +98,7 @@ class CourseMode(models.Model):
             u"OPTIONAL: After this date/time, users will no longer be able to enroll in this mode. "
             u"Leave this blank if users can enroll in this mode until enrollment closes for the course."
         ),
-        db_column='expiration_datetime',
+        db_column=u'expiration_datetime',
     )
 
     # The system prefers to set this automatically based on default settings. But
@@ -112,7 +112,7 @@ class CourseMode(models.Model):
     # DEPRECATED: the suggested prices for this mode
     # We used to allow users to choose from a set of prices, but we now allow only
     # a single price.  This field has been deprecated by `min_price`
-    suggested_prices = models.CharField(max_length=255, blank=True, default='',
+    suggested_prices = models.CharField(max_length=255, blank=True, default=u'',
                                         validators=[validate_comma_separated_integer_list])
 
     # optional description override
@@ -124,7 +124,7 @@ class CourseMode(models.Model):
         max_length=255,
         null=True,
         blank=True,
-        verbose_name="SKU",
+        verbose_name=u"SKU",
         help_text=_(
             u"OPTIONAL: This is the SKU (stock keeping unit) of this mode in the external ecommerce service.  "
             u"Leave this blank if the course has not yet been migrated to the ecommerce service."
@@ -137,7 +137,7 @@ class CourseMode(models.Model):
         null=True,
         blank=True,
         default=None,  # Need this in order to set DEFAULT NULL on the database column
-        verbose_name="Bulk SKU",
+        verbose_name=u"Bulk SKU",
         help_text=_(
             u"This is the bulk SKU (stock keeping unit) of this mode in the external ecommerce service."
         )
@@ -145,13 +145,13 @@ class CourseMode(models.Model):
 
     history = HistoricalRecords()
 
-    HONOR = 'honor'
-    PROFESSIONAL = 'professional'
-    VERIFIED = 'verified'
-    AUDIT = 'audit'
-    NO_ID_PROFESSIONAL_MODE = 'no-id-professional'
-    CREDIT_MODE = 'credit'
-    MASTERS = 'masters'
+    HONOR = u'honor'
+    PROFESSIONAL = u'professional'
+    VERIFIED = u'verified'
+    AUDIT = u'audit'
+    NO_ID_PROFESSIONAL_MODE = u'no-id-professional'
+    CREDIT_MODE = u'credit'
+    MASTERS = u'masters'
 
     DEFAULT_MODE = Mode(
         settings.COURSE_MODE_DEFAULTS['slug'],
@@ -254,6 +254,14 @@ class CourseMode(models.Model):
         if new_datetime is not None:
             self.expiration_datetime_is_explicit = True
         self._expiration_datetime = new_datetime
+
+    @classmethod
+    def get_default_mode_slug(cls):
+        """
+        Returns the default mode slug to be used in the CourseEnrollment model mode field
+        as the default value.
+        """
+        return cls.DEFAULT_MODE_SLUG
 
     @classmethod
     def all_modes_for_courses(cls, course_id_list):
@@ -757,7 +765,7 @@ class CourseMode(models.Model):
         return min(mode.min_price for mode in modes if mode.currency.lower() == currency.lower())
 
     @classmethod
-    def is_eligible_for_certificate(cls, mode_slug):
+    def is_eligible_for_certificate(cls, mode_slug, status=None):
         """
         Returns whether or not the given mode_slug is eligible for a
         certificate. Currently all modes other than 'audit' grant a
@@ -769,7 +777,11 @@ class CourseMode(models.Model):
         ineligible_modes = [cls.AUDIT]
 
         if settings.FEATURES['DISABLE_HONOR_CERTIFICATES']:
-            ineligible_modes.append(cls.HONOR)
+            # Adding check so that we can regenerate the certificate for learners who have
+            # already earned the certificate using honor mode
+            from lms.djangoapps.certificates.models import CertificateStatuses
+            if mode_slug == cls.HONOR and status != CertificateStatuses.downloadable:
+                ineligible_modes.append(cls.HONOR)
 
         return mode_slug not in ineligible_modes
 
@@ -892,11 +904,11 @@ class CourseModesArchive(models.Model):
     min_price = models.IntegerField(default=0)
 
     # the suggested prices for this mode
-    suggested_prices = models.CharField(max_length=255, blank=True, default='',
+    suggested_prices = models.CharField(max_length=255, blank=True, default=u'',
                                         validators=[validate_comma_separated_integer_list])
 
     # the currency these prices are in, using lower case ISO currency codes
-    currency = models.CharField(default="usd", max_length=8)
+    currency = models.CharField(default=u"usd", max_length=8)
 
     # turn this mode off after the given expiration date
     expiration_date = models.DateField(default=None, null=True, blank=True)

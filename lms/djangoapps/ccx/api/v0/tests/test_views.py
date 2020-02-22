@@ -1,7 +1,7 @@
 """
 Tests for the CCX REST APIs.
 """
-from __future__ import absolute_import
+
 
 import json
 import math

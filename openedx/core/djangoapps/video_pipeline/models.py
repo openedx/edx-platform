@@ -1,7 +1,7 @@
 """
 Model to hold edx-video-pipeline configurations.
 """
-from __future__ import absolute_import
+
 from config_models.models import ConfigurationModel
 from django.contrib.auth import get_user_model
 from django.db import models
@@ -19,7 +19,7 @@ class VideoPipelineIntegration(ConfigurationModel):
     """
     client_name = models.CharField(
         max_length=100,
-        default='VEDA-Prod',
+        default=u'VEDA-Prod',
         null=False,
         blank=False,
         help_text=_('Oauth client name of video pipeline service.')
@@ -32,7 +32,7 @@ class VideoPipelineIntegration(ConfigurationModel):
 
     service_username = models.CharField(
         max_length=100,
-        default='veda_service_user',
+        default=u'veda_service_user',
         null=False,
         blank=False,
         help_text=_('Username created for Video Pipeline Integration, e.g. veda_service_user.')

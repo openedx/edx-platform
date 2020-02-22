@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Tests for the XQueue certificates interface. """
-from __future__ import absolute_import
+
 
 import json
 from contextlib import contextmanager
@@ -10,6 +10,7 @@ import ddt
 import freezegun
 import pytz
 import six
+from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 from mock import Mock, patch
@@ -109,8 +110,14 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
         mock_send = self.add_cert_to_queue(mode)
         self.assert_certificate_generated(mock_send, 'verified', template_name)
 
-    def test_ineligible_cert_whitelisted(self):
-        """Test that audit mode students can receive a certificate if they are whitelisted."""
+    @ddt.data((True, CertificateStatuses.audit_passing), (False, CertificateStatuses.generating))
+    @ddt.unpack
+    @override_settings(AUDIT_CERT_CUTOFF_DATE=datetime.now(pytz.UTC) - timedelta(days=1))
+    def test_ineligible_cert_whitelisted(self, disable_audit_cert, status):
+        """
+        Test that audit mode students receive a certificate if DISABLE_AUDIT_CERTIFICATES
+        feature is set to false
+        """
         # Enroll as audit
         CourseEnrollmentFactory(
             user=self.user_2,
@@ -121,17 +128,17 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
         # Whitelist student
         CertificateWhitelistFactory(course_id=self.course.id, user=self.user_2)
 
-        # Generate certs
-        with mock_passing_grade():
+        features = settings.FEATURES
+        features['DISABLE_AUDIT_CERTIFICATES'] = disable_audit_cert
+        with override_settings(FEATURES=features) and mock_passing_grade():
             with patch.object(XQueueInterface, 'send_to_queue') as mock_send:
                 mock_send.return_value = (0, None)
                 self.xqueue.add_cert(self.user_2, self.course.id)
 
-        # Assert cert generated correctly
-        self.assertTrue(mock_send.called)
         certificate = GeneratedCertificate.certificate_for_student(self.user_2, self.course.id)
         self.assertIsNotNone(certificate)
         self.assertEqual(certificate.mode, 'audit')
+        self.assertEqual(certificate.status, status)
 
     def add_cert_to_queue(self, mode):
         """

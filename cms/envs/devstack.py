@@ -2,7 +2,6 @@
 Specific overrides to the base prod settings to make development easier.
 """
 
-from __future__ import absolute_import
 
 import logging
 from os.path import abspath, dirname, join
@@ -73,7 +72,7 @@ CELERY_ALWAYS_EAGER = True
 
 INSTALLED_APPS += ['debug_toolbar']
 
-MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
+MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 INTERNAL_IPS = ('127.0.0.1',)
 
 DEBUG_TOOLBAR_PANELS = (

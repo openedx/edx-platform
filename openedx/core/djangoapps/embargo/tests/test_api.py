@@ -1,7 +1,7 @@
 """
 Tests for EmbargoMiddleware
 """
-from __future__ import absolute_import
+
 from contextlib import contextmanager
 
 import geoip2.database

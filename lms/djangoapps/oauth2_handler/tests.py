@@ -1,5 +1,5 @@
 # pylint: disable=missing-docstring
-from __future__ import absolute_import
+
 
 import mock
 import six
@@ -140,11 +140,13 @@ class IDTokenTest(BaseTestMixin, IDTokenTestCase):
         self.assertTrue(claims['administrator'])
 
     def test_rate_limit_token(self):
-        with mock.patch('openedx.core.djangoapps.oauth_dispatch.views.AccessTokenView.ratelimit_rate', '1/m'):
-            response = self.get_access_token_response('openid profile permissions')
-            self.assertEqual(response.status_code, 200)
-            response = self.get_access_token_response('openid profile permissions')
-            self.assertEqual(response.status_code, 403)
+
+        response = self.get_access_token_response('openid profile permissions')
+        self.assertEqual(response.status_code, 200)
+        response = self.get_access_token_response('openid profile permissions')
+        self.assertEqual(response.status_code, 200)
+        response = self.get_access_token_response('openid profile permissions')
+        self.assertEqual(response.status_code, 403)
 
 
 class UserInfoTest(BaseTestMixin, UserInfoTestCase):

@@ -1,7 +1,7 @@
 """
 Views for the course_mode module
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import decimal
 import json
@@ -13,6 +13,7 @@ import six.moves.urllib.parse
 import six.moves.urllib.request
 import waffle
 from babel.dates import format_datetime
+from babel.numbers import get_currency_symbol
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -36,7 +37,6 @@ from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from openedx.features.discounts.utils import get_first_purchase_offer_banner_fragment
 from openedx.features.discounts.applicability import discount_percentage
 from student.models import CourseEnrollment
 from util.db import outer_atomic
@@ -191,9 +191,11 @@ class ChooseModeView(View):
             )
         )
 
-        title_content = _("Congratulations!  You are now enrolled in {course_name}").format(
-            course_name=course.display_name_with_default
-        )
+        title_content = ''
+        if enrollment_mode:
+            title_content = _("Congratulations!  You are now enrolled in {course_name}").format(
+                course_name=course.display_name_with_default
+            )
 
         context["title_content"] = title_content
 
@@ -207,18 +209,10 @@ class ChooseModeView(View):
             price_before_discount = verified_mode.min_price
 
             context["currency"] = verified_mode.currency.upper()
+            context["currency_symbol"] = get_currency_symbol(verified_mode.currency.upper())
             context["min_price"] = price_before_discount
             context["verified_name"] = verified_mode.name
             context["verified_description"] = verified_mode.description
-
-            offer_banner_fragment = get_first_purchase_offer_banner_fragment(
-                request.user, course
-            )
-            if offer_banner_fragment:
-                context['offer_banner_fragment'] = offer_banner_fragment
-                discounted_price = "{:0.2f}".format(price_before_discount * ((100.0 - discount_percentage()) / 100))
-                context["min_price"] = discounted_price
-                context["price_before_discount"] = price_before_discount
 
             if verified_mode.sku:
                 context["use_ecommerce_payment_flow"] = ecommerce_service.is_enabled(request.user)

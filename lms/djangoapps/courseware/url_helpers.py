@@ -1,7 +1,7 @@
 """
 Module to define url helpers functions
 """
-from __future__ import absolute_import
+
 
 import six
 from django.urls import reverse
@@ -11,7 +11,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import navigation_index, path_to_location
 
 
-def get_redirect_url(course_key, usage_key):
+def get_redirect_url(course_key, usage_key, request=None):
     """ Returns the redirect url back to courseware
 
     Args:
@@ -28,7 +28,7 @@ def get_redirect_url(course_key, usage_key):
     (
         course_key, chapter, section, vertical_unused,
         position, final_target_id
-    ) = path_to_location(modulestore(), usage_key)
+    ) = path_to_location(modulestore(), usage_key, request)
 
     # choose the appropriate view (and provide the necessary args) based on the
     # args provided by the redirect.

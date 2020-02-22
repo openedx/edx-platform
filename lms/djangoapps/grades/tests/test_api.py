@@ -1,6 +1,5 @@
 """ Tests calling the grades api directly """
 
-from __future__ import absolute_import
 
 import ddt
 from mock import patch
@@ -106,8 +105,8 @@ class OverrideSubsectionGradeTests(ModuleStoreTestCase):
         self.assertEqual(5, len(override_obj.history.all()))
         for history_entry in override_obj.history.all():
             if history_entry.override_reason.startswith('Test Override Comment'):
-                self.assertEquals(self.overriding_user, history_entry.history_user)
-                self.assertEquals(self.overriding_user.id, history_entry.history_user_id)
+                self.assertEqual(self.overriding_user, history_entry.history_user)
+                self.assertEqual(self.overriding_user.id, history_entry.history_user_id)
             else:
                 self.assertIsNone(history_entry.history_user)
                 self.assertIsNone(history_entry.history_user_id)

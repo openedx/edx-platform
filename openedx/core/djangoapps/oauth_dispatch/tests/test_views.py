@@ -2,7 +2,6 @@
 Tests for Blocks Views
 """
 
-from __future__ import absolute_import
 
 import json
 import unittest
@@ -349,6 +348,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         dot_app_access = models.ApplicationAccess.objects.create(
             application=dot_app,
             scopes=['grades:read'],
+            filters=['test:filter'],
         )
         models.ApplicationOrganization.objects.create(
             application=dot_app,
@@ -356,6 +356,8 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         )
         scopes = dot_app_access.scopes
         filters = self.dot_adapter.get_authorization_filters(dot_app)
+        assert 'test:filter' in filters
+
         response = self._post_request(self.user, dot_app, token_type='jwt', scope=scopes)
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
@@ -512,7 +514,7 @@ class TestAuthorizationView(_DispatchingViewTestCase):
         Check that django-oauth2-provider gives an appropriate authorization response.
         """
         # django-oauth-provider redirects to a confirmation page
-        self.assertRedirects(response, u'http://testserver/oauth2/authorize/confirm', target_status_code=200)
+        self.assertRedirects(response, u'/oauth2/authorize/confirm', target_status_code=200)
 
         context = response.context_data
         form = context['form']
@@ -641,6 +643,11 @@ class TestViewDispatch(TestCase):
     def test_get_view_for_no_backend(self):
         view_object = views.AccessTokenView()
         self.assertRaises(KeyError, view_object.get_view_for_backend, None)
+
+    def test_dop_toggle_enforced(self):
+        with self.settings(ENABLE_DOP_ADAPTER=False):
+            request = self._get_request('dop-id')
+            self.assertEqual(self.view.select_backend(request), self.dot_adapter.backend)
 
 
 class TestRevokeTokenView(AccessTokenLoginMixin, _DispatchingViewTestCase):  # pylint: disable=abstract-method

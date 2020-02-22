@@ -1,5 +1,5 @@
 """Utilities for writing unit tests that involve course embargos. """
-from __future__ import absolute_import
+
 import contextlib
 
 import maxminddb

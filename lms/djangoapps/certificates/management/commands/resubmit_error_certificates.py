@@ -16,7 +16,7 @@ Example usage:
     $ ./manage.py lms resubmit_error_certificates -c edX/DemoX/Fall_2015 -c edX/DemoX/Spring_2016
 
 """
-from __future__ import absolute_import
+
 
 import logging
 from textwrap import dedent

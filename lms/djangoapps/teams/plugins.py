@@ -1,7 +1,7 @@
 """
 Definition of the course team feature.
 """
-from __future__ import absolute_import
+
 
 from django.utils.translation import ugettext_noop
 

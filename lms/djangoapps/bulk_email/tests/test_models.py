@@ -1,7 +1,7 @@
 """
 Unit tests for bulk-email-related models.
 """
-from __future__ import absolute_import
+
 
 import datetime
 
@@ -188,6 +188,7 @@ class CourseEmailTemplateTest(TestCase):
             'email_settings_url': "/location/of/email/settings/url",
             'platform_name': 'edX',
             'email': 'your-email@test.com',
+            'unsubscribe_link': '/bulk_email/email/optout/dummy'
         }
         return context
 

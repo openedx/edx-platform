@@ -2,7 +2,6 @@
 Models for credentials support for the LMS and Studio.
 """
 
-from __future__ import absolute_import
 
 import six
 from config_models.models import ConfigurationModel
@@ -35,11 +34,11 @@ class CredentialsApiConfig(ConfigurationModel):
 
     internal_service_url = models.URLField(
         verbose_name=_('Internal Service URL'),
-        help_text='DEPRECATED: Use the setting CREDENTIALS_INTERNAL_SERVICE_URL.'
+        help_text=u'DEPRECATED: Use the setting CREDENTIALS_INTERNAL_SERVICE_URL.'
     )
     public_service_url = models.URLField(
         verbose_name=_('Public Service URL'),
-        help_text='DEPRECATED: Use the setting CREDENTIALS_PUBLIC_SERVICE_URL.'
+        help_text=u'DEPRECATED: Use the setting CREDENTIALS_PUBLIC_SERVICE_URL.'
     )
 
     enable_learner_issuance = models.BooleanField(

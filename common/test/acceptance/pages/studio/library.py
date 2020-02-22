@@ -1,7 +1,7 @@
 """
 Library edit page in Studio
 """
-from __future__ import absolute_import
+
 
 import six
 from bok_choy.javascript import js_defined, wait_for_js

@@ -2,7 +2,7 @@
 Toggles for Course API.
 """
 
-from __future__ import absolute_import
+
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlag, WaffleFlagNamespace
 
 
@@ -41,5 +41,5 @@ HIDE_ACCESS_DENIALS_FLAG = WaffleFlag(
 ENABLE_VIDEO_URL_REWRITE = CourseWaffleFlag(
     waffle_namespace=COURSE_BLOCKS_API_NAMESPACE,
     flag_name="enable_video_url_rewrite",
-    flag_undefined_default=False
+    flag_undefined_default=True
 )

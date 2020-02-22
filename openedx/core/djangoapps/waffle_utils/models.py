@@ -1,7 +1,7 @@
 """
 Models for configuring waffle utils.
 """
-from __future__ import absolute_import
+
 from django.db.models import CharField
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
@@ -20,7 +20,7 @@ class WaffleFlagCourseOverrideModel(ConfigurationModel):
 
     .. no_pii:
     """
-    OVERRIDE_CHOICES = Choices(('on', _('Force On')), ('off', _('Force Off')))
+    OVERRIDE_CHOICES = Choices((u'on', _(u'Force On')), (u'off', _(u'Force Off')))
     ALL_CHOICES = OVERRIDE_CHOICES + Choices('unset')
 
     KEY_FIELDS = ('waffle_flag', 'course_id')

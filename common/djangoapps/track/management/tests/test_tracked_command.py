@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 import json
 from six import StringIO
@@ -24,4 +24,4 @@ class CommandsTestBase(TestCase):
         args = ['whee']
         kwargs = {'key1': 'default', 'key2': True}
         json_out = self._run_dummy_command(*args, **kwargs)
-        self.assertEquals(json_out['command'].strip(), 'tracked_dummy_command')
+        self.assertEqual(json_out['command'].strip(), 'tracked_dummy_command')

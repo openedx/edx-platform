@@ -2,7 +2,6 @@
 Third Party Auth REST API views
 """
 
-from __future__ import absolute_import
 
 from collections import namedtuple
 
@@ -17,14 +16,16 @@ from rest_framework import exceptions, permissions, status, throttling
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_oauth.authentication import OAuth2Authentication
 from social_django.models import UserSocialAuth
 
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import (
+    BearerAuthentication,
+    BearerAuthenticationAllowInactiveUser
+)
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from third_party_auth import pipeline
 from third_party_auth.api import serializers
-from third_party_auth.api.permissions import ThirdPartyAuthProviderApiPermission
+from third_party_auth.api.permissions import TPA_PERMISSIONS
 from third_party_auth.provider import Registry
 
 
@@ -66,7 +67,7 @@ class BaseUserView(APIView):
     authentication_classes = (
         # Users may want to view/edit the providers used for authentication before they've
         # activated their account, so we allow inactive users.
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     throttle_classes = [ProviderSustainedThrottle, ProviderBurstThrottle]
@@ -333,22 +334,15 @@ class UserMappingView(ListAPIView):
 
             * remote_id: The Id from third party auth provider
     """
-    authentication_classes = (
-        OAuth2Authentication,
-    )
+    authentication_classes = (JwtAuthentication, BearerAuthentication, )
+    permission_classes = (TPA_PERMISSIONS, )
+    required_scopes = ['tpa:read']
 
     serializer_class = serializers.UserMappingSerializer
     provider = None
 
     def get_queryset(self):
         provider_id = self.kwargs.get('provider_id')
-
-        # permission checking. We allow both API_KEY access and OAuth2 client credential access
-        if not (
-                self.request.user.is_superuser or ApiKeyHeaderPermission().has_permission(self.request, self) or
-                ThirdPartyAuthProviderApiPermission(provider_id).has_permission(self.request, self)
-        ):
-            raise exceptions.PermissionDenied()
 
         # provider existence checking
         self.provider = Registry.get(provider_id)
@@ -401,7 +395,7 @@ class ThirdPartyAuthUserStatusView(APIView):
     user with respect to the third party auth providers configured in the system.
     """
     authentication_classes = (
-        JwtAuthentication, OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser
+        JwtAuthentication, BearerAuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser
     )
     permission_classes = (permissions.IsAuthenticated,)
 

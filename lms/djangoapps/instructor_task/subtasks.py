@@ -1,7 +1,7 @@
 """
 This module contains celery task functions for handling the management of subtasks.
 """
-from __future__ import absolute_import
+
 
 import json
 import logging

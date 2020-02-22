@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 
-from __future__ import absolute_import
+
+
 from django.db import migrations, models
 
 
@@ -15,11 +15,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='videopipelineintegration',
             name='client_name',
-            field=models.CharField(default=b'VEDA-Prod', help_text='Oauth client name of video pipeline service.', max_length=100),
+            field=models.CharField(default=u'VEDA-Prod', help_text='Oauth client name of video pipeline service.', max_length=100),
         ),
         migrations.AlterField(
             model_name='videopipelineintegration',
             name='service_username',
-            field=models.CharField(default=b'veda_service_user', help_text='Username created for Video Pipeline Integration, e.g. veda_service_user.', max_length=100),
+            field=models.CharField(default=u'veda_service_user', help_text='Username created for Video Pipeline Integration, e.g. veda_service_user.', max_length=100),
         ),
     ]

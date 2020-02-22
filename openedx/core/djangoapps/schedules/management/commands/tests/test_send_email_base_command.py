@@ -1,7 +1,7 @@
 """
 Tests for send_email_base_command
 """
-from __future__ import absolute_import
+
 
 import datetime
 from unittest import skipUnless

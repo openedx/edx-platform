@@ -2,7 +2,7 @@
 """
 End-to-end tests for Student's Profile Page.
 """
-from __future__ import absolute_import
+
 
 from contextlib import contextmanager
 from datetime import datetime
@@ -648,15 +648,6 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTes
         profile_page.wait_for_public_fields()
         self.verify_profile_page_is_public(profile_page, is_editable=False)
         self.verify_profile_page_view_event(username, different_user_id, visibility=self.PRIVACY_PUBLIC)
-
-    def test_badge_share_modal(self):
-        username = 'testcert'
-        AutoAuthPage(self.browser, username=username).visit()
-        profile_page = self.visit_profile_page(username)
-        profile_page.display_accomplishments()
-        badge = profile_page.badges[0]
-        badge.display_modal()
-        badge.close_modal()
 
 
 class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):

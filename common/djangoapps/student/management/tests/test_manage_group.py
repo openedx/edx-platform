@@ -1,7 +1,7 @@
 """
 Unit tests for user_management management commands.
 """
-from __future__ import absolute_import
+
 
 import sys
 

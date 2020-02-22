@@ -2,7 +2,7 @@
 Defines concrete class for cybersource  Enrollment Report.
 
 """
-from __future__ import absolute_import
+
 
 import collections
 

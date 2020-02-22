@@ -3,7 +3,7 @@ Management command to sync platform users with hubspot
 ./manage.py lms sync_hubspot_contacts
 ./manage.py lms sync_hubspot_contacts --initial-sync-days=7 --batch-size=20
 """
-from __future__ import absolute_import
+
 
 import json
 import time

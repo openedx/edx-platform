@@ -1,7 +1,7 @@
 """
 Test helpers for Site Configuration.
 """
-from __future__ import absolute_import
+
 
 from functools import wraps
 import contextlib
@@ -29,9 +29,10 @@ def with_site_configuration(domain="test.localhost", configuration=None):
             site, __ = Site.objects.get_or_create(domain=domain, name=domain)
             site_configuration, created = SiteConfiguration.objects.get_or_create(
                 site=site,
-                defaults={"enabled": True, "values": configuration},
+                defaults={"enabled": True, "site_values": configuration, "values": configuration},
             )
             if not created:
+                site_configuration.site_values = configuration
                 site_configuration.values = configuration
                 site_configuration.save()
 
@@ -56,9 +57,10 @@ def with_site_configuration_context(domain="test.localhost", configuration=None)
     site, __ = Site.objects.get_or_create(domain=domain, name=domain)
     site_configuration, created = SiteConfiguration.objects.get_or_create(
         site=site,
-        defaults={"enabled": True, "values": configuration},
+        defaults={"enabled": True, "site_values": configuration, "values": configuration},
     )
     if not created:
+        site_configuration.site_values = configuration
         site_configuration.values = configuration
         site_configuration.save()
 

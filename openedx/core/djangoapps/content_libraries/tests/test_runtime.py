@@ -2,41 +2,28 @@
 """
 Test the Blockstore-based XBlock runtime and content libraries together.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-import json
-import unittest
 
-from django.conf import settings
-from django.test import TestCase
+import json
+
+from completion.test_utils import CompletionWaffleTestMixin
+from django.test import TestCase, override_settings
 from organizations.models import Organization
 from rest_framework.test import APIClient
-from xblock.core import XBlock, Scope
-from xblock import fields
+from xblock.core import XBlock
 
 from lms.djangoapps.courseware.model_data import get_score
 from openedx.core.djangoapps.content_libraries import api as library_api
-from openedx.core.djangoapps.content_libraries.tests.test_content_libraries import (
+from openedx.core.djangoapps.content_libraries.tests.base import (
+    requires_blockstore,
     URL_BLOCK_RENDER_VIEW,
     URL_BLOCK_GET_HANDLER_URL,
 )
+from openedx.core.djangoapps.content_libraries.tests.user_state_block import UserStateTestBlock
 from openedx.core.djangoapps.xblock import api as xblock_api
+from openedx.core.djangolib.testing.utils import skip_unless_lms, skip_unless_cms
 from openedx.core.lib import blockstore_api
 from student.tests.factories import UserFactory
 from xmodule.unit_block import UnitBlock
-
-
-class UserStateTestBlock(XBlock):
-    """
-    Block for testing variously scoped XBlock fields.
-    """
-    BLOCK_TYPE = "user-state-test"
-
-    display_name = fields.String(scope=Scope.content, name='User State Test Block')
-    # User-specific fields:
-    user_str = fields.String(scope=Scope.user_state, default='default value')  # This usage, one user
-    uss_str = fields.String(scope=Scope.user_state_summary, default='default value')  # This usage, all users
-    pref_str = fields.String(scope=Scope.preferences, default='default value')  # Block type, one user
-    user_info_str = fields.String(scope=Scope.user_info, default='default value')  # All blocks, one user
 
 
 class ContentLibraryContentTestMixin(object):
@@ -66,20 +53,54 @@ class ContentLibraryContentTestMixin(object):
         )
 
 
-@unittest.skipUnless(settings.RUN_BLOCKSTORE_TESTS, "Requires a running Blockstore server")
+@requires_blockstore
+# EphemeralKeyValueStore requires a working cache, and the default test cache doesn't work:
+@override_settings(XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE='blockstore')
 class ContentLibraryRuntimeTest(ContentLibraryContentTestMixin, TestCase):
     """
     Basic tests of the Blockstore-based XBlock runtime using XBlocks in a
     content library.
     """
 
+    @skip_unless_cms  # creating child blocks only works properly in Studio
+    def test_identical_olx(self):
+        """
+        Test library blocks with children that also have identical OLX. Since
+        the blockstore runtime caches authored field data based on the hash of
+        the OLX, this can catch some potential bugs, especially given that the
+        "children" field stores usage IDs, not definition IDs.
+        """
+        # Create a unit containing a <problem>
+        unit_block_key = library_api.create_library_block(self.library.key, "unit", "u1").usage_key
+        library_api.create_library_block_child(unit_block_key, "problem", "p1")
+        library_api.publish_changes(self.library.key)
+        # Now do the same in a different library:
+        library2 = library_api.create_library(
+            collection_uuid=self.collection.uuid,
+            org=self.organization,
+            slug="idolx",
+            title=("Identical OLX Test Lib 2"),
+            description="",
+        )
+        unit_block2_key = library_api.create_library_block(library2.key, "unit", "u1").usage_key
+        library_api.create_library_block_child(unit_block2_key, "problem", "p1")
+        library_api.publish_changes(library2.key)
+        # Load both blocks:
+        unit_block = xblock_api.load_block(unit_block_key, self.student_a)
+        unit_block2 = xblock_api.load_block(unit_block2_key, self.student_a)
+        self.assertEqual(
+            library_api.get_library_block_olx(unit_block_key),
+            library_api.get_library_block_olx(unit_block2_key),
+        )
+        self.assertNotEqual(unit_block.children, unit_block2.children)
+
     def test_has_score(self):
         """
         Test that the LMS-specific 'has_score' attribute is getting added to
         blocks.
         """
-        unit_block_key = library_api.create_library_block(self.library.key, "unit", "u1").usage_key
-        problem_block_key = library_api.create_library_block(self.library.key, "problem", "p1").usage_key
+        unit_block_key = library_api.create_library_block(self.library.key, "unit", "score-unit1").usage_key
+        problem_block_key = library_api.create_library_block(self.library.key, "problem", "score-prob1").usage_key
         library_api.publish_changes(self.library.key)
         unit_block = xblock_api.load_block(unit_block_key, self.student_a)
         problem_block = xblock_api.load_block(problem_block_key, self.student_a)
@@ -90,10 +111,10 @@ class ContentLibraryRuntimeTest(ContentLibraryContentTestMixin, TestCase):
         self.assertEqual(problem_block.has_score, True)
 
 
-@unittest.skipUnless(settings.RUN_BLOCKSTORE_TESTS, "Requires a running Blockstore server")
+@requires_blockstore
 # We can remove the line below to enable this in Studio once we implement a session-backed
 # field data store which we can use for both studio users and anonymous users
-@unittest.skipUnless(settings.ROOT_URLCONF == "lms.urls", "Student State is only saved in the LMS")
+@skip_unless_lms
 class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase):
     """
     Test that the Blockstore-based XBlock runtime can store and retrieve student
@@ -167,12 +188,100 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
         self.assertEqual(block1_bob.user_info_str, 'default value')
 
     @XBlock.register_temp_plugin(UserStateTestBlock, UserStateTestBlock.BLOCK_TYPE)
+    def test_state_for_anonymous_users(self):
+        """
+        Test that anonymous users can interact with XBlocks and get/set their
+        state via handlers.
+        """
+        # Create two XBlocks, block1 and block2
+        block1_metadata = library_api.create_library_block(self.library.key, UserStateTestBlock.BLOCK_TYPE, "b3-1")
+        block1_usage_key = block1_metadata.usage_key
+        block2_metadata = library_api.create_library_block(self.library.key, UserStateTestBlock.BLOCK_TYPE, "b3-2")
+        block2_usage_key = block2_metadata.usage_key
+        library_api.publish_changes(self.library.key)
+        # Create two clients (anonymous user's browsers)
+        client1 = APIClient()
+        client2 = APIClient()
+
+        def call_handler(client, block_key, handler_name, method, data=None):
+            """ Call an XBlock handler """
+            url_result = client.get(URL_BLOCK_GET_HANDLER_URL.format(block_key=block_key, handler_name=handler_name))
+            url = url_result.data["handler_url"]
+            data_json = json.dumps(data) if data else None
+            response = getattr(client, method)(url, data_json, content_type="application/json")
+            self.assertEqual(response.status_code, 200)
+            return response.json()
+
+        # Now client1 sets all the fields via a handler:
+        call_handler(client1, block1_usage_key, "set_user_state", "post", {
+            "user_str": "1 was here",
+            "uss_str": "1 was here (USS)",
+            "pref_str": "1 was here (prefs)",
+            "user_info_str": "1 was here (user info)",
+        })
+
+        # Now load it back and expect the same data:
+        data = call_handler(client1, block1_usage_key, "get_user_state", "get")
+        self.assertEqual(data["user_str"], "1 was here")
+        self.assertEqual(data["uss_str"], "1 was here (USS)")
+        self.assertEqual(data["pref_str"], "1 was here (prefs)")
+        self.assertEqual(data["user_info_str"], "1 was here (user info)")
+
+        # Now load a different XBlock and expect only pref_str and user_info_str to be set:
+        data = call_handler(client1, block2_usage_key, "get_user_state", "get")
+        self.assertEqual(data["user_str"], "default value")
+        self.assertEqual(data["uss_str"], "default value")
+        self.assertEqual(data["pref_str"], "1 was here (prefs)")
+        self.assertEqual(data["user_info_str"], "1 was here (user info)")
+
+        # Now a different anonymous user loading the first block should see only the uss_str set:
+        data = call_handler(client2, block1_usage_key, "get_user_state", "get")
+        self.assertEqual(data["user_str"], "default value")
+        self.assertEqual(data["uss_str"], "1 was here (USS)")
+        self.assertEqual(data["pref_str"], "default value")
+        self.assertEqual(data["user_info_str"], "default value")
+
+        # The "user state summary" should not be shared between registered and anonymous users:
+        client_registered = APIClient()
+        client_registered.login(username=self.student_a.username, password='edx')
+        data = call_handler(client_registered, block1_usage_key, "get_user_state", "get")
+        self.assertEqual(data["user_str"], "default value")
+        self.assertEqual(data["uss_str"], "default value")
+        self.assertEqual(data["pref_str"], "default value")
+        self.assertEqual(data["user_info_str"], "default value")
+
+    def test_views_for_anonymous_users(self):
+        """
+        Test that anonymous users can view XBlock's 'public_view' but not other
+        views
+        """
+        # Create an XBlock
+        block_metadata = library_api.create_library_block(self.library.key, "html", "html1")
+        block_usage_key = block_metadata.usage_key
+        library_api.set_library_block_olx(block_usage_key, "<html>Hello world</html>")
+        library_api.publish_changes(self.library.key)
+
+        anon_client = APIClient()
+        # View the public_view:
+        public_view_result = anon_client.get(
+            URL_BLOCK_RENDER_VIEW.format(block_key=block_usage_key, view_name='public_view'),
+        )
+        self.assertEqual(public_view_result.status_code, 200)
+        self.assertIn("Hello world", public_view_result.data["content"])
+
+        # Try to view the student_view:
+        public_view_result = anon_client.get(
+            URL_BLOCK_RENDER_VIEW.format(block_key=block_usage_key, view_name='student_view'),
+        )
+        self.assertEqual(public_view_result.status_code, 403)
+
+    @XBlock.register_temp_plugin(UserStateTestBlock, UserStateTestBlock.BLOCK_TYPE)
     def test_independent_instances(self):
         """
         Test that independent instances of the same block don't share field data
         until .save() and re-loading, even when they're using the same runtime.
         """
-        block_metadata = library_api.create_library_block(self.library.key, UserStateTestBlock.BLOCK_TYPE, "b3")
+        block_metadata = library_api.create_library_block(self.library.key, UserStateTestBlock.BLOCK_TYPE, "b4")
         block_usage_key = block_metadata.usage_key
         library_api.publish_changes(self.library.key)
 
@@ -195,7 +304,7 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
         # Now they should be equal, because we've saved and re-loaded instance2:
         self.assertEqual(block_instance1.user_str, block_instance2.user_str)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == "lms.urls", "Scores are only used in the LMS")
+    @skip_unless_lms  # Scores are only used in the LMS
     def test_scores_persisted(self):
         """
         Test that a block's emitted scores are cached in StudentModule
@@ -233,7 +342,7 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
 
         submit_result = client.post(problem_check_url, data={problem_key: "choice_3"})
         self.assertEqual(submit_result.status_code, 200)
-        submit_data = json.loads(submit_result.content)
+        submit_data = json.loads(submit_result.content.decode('utf-8'))
         self.assertDictContainsSubset({
             "current_score": 0,
             "total_possible": 1,
@@ -249,7 +358,7 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
         # And submit a correct answer:
         submit_result = client.post(problem_check_url, data={problem_key: "choice_1"})
         self.assertEqual(submit_result.status_code, 200)
-        submit_data = json.loads(submit_result.content)
+        submit_data = json.loads(submit_result.content.decode('utf-8'))
         self.assertDictContainsSubset({
             "current_score": 1,
             "total_possible": 1,
@@ -260,3 +369,58 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
         sm = get_score(self.student_a, block_id)
         self.assertEqual(sm.grade, 1)
         self.assertEqual(sm.max_grade, 1)
+
+
+@requires_blockstore
+@skip_unless_lms  # No completion tracking in Studio
+class ContentLibraryXBlockCompletionTest(ContentLibraryContentTestMixin, CompletionWaffleTestMixin, TestCase):
+    """
+    Test that the Blockstore-based XBlocks can track their completion status
+    using the completion library.
+    """
+
+    def setUp(self):
+        super(ContentLibraryXBlockCompletionTest, self).setUp()
+        # Enable the completion waffle flag for these tests
+        self.override_waffle_switch(True)
+
+    def test_mark_complete_via_handler(self):
+        """
+        Test that a "complete on view" XBlock like the HTML block can be marked
+        as complete using the LmsBlockMixin.publish_completion handler.
+        """
+        block_id = library_api.create_library_block(self.library.key, "html", "completable_html").usage_key
+        new_olx = """
+        <html display_name="Read this HTML">
+            <![CDATA[
+                <p>This is some <strong>HTML</strong>.</p>
+            ]]>
+        </html>
+        """.strip()
+        library_api.set_library_block_olx(block_id, new_olx)
+        library_api.publish_changes(self.library.key)
+
+        # We should get a REST API for retrieving completion data; for now use python
+
+        def get_block_completion_status():
+            """ Get block completion status (0 to 1) """
+            block = xblock_api.load_block(block_id, self.student_a)
+            assert hasattr(block, 'publish_completion')
+            service = block.runtime.service(block, 'completion')
+            return service.get_completions([block_id])[block_id]
+
+        # At first the block is not completed
+        self.assertEqual(get_block_completion_status(), 0)
+
+        # Now call the 'publish_completion' handler:
+        client = APIClient()
+        client.login(username=self.student_a.username, password='edx')
+        result = client.get(URL_BLOCK_GET_HANDLER_URL.format(block_key=block_id, handler_name='publish_completion'))
+        publish_completion_url = result.data["handler_url"]
+
+        # This will test the 'completion' service and the completion event handler:
+        result2 = client.post(publish_completion_url, {"completion": 1.0}, format='json')
+        self.assertEqual(result2.status_code, 200)
+
+        # Now the block is completed
+        self.assertEqual(get_block_completion_status(), 1)

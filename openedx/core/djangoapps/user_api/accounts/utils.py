@@ -1,11 +1,9 @@
 """
 Utility methods for the account settings.
 """
-from __future__ import absolute_import, unicode_literals
 
-import random
+
 import re
-import string
 
 import waffle
 from completion import waffle as completion_waffle
@@ -18,6 +16,10 @@ from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings, get_current_site
+from openedx.core.djangoapps.user_api.config.waffle import (
+    ENABLE_MULTIPLE_USER_ENTERPRISES_FEATURE,
+    waffle as user_api_waffle
+)
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -180,20 +182,6 @@ def retrieve_last_sitewide_block_completed(user):
     )
 
 
-def generate_password(length=12, chars=string.ascii_letters + string.digits):
-    """Generate a valid random password"""
-    if length < 8:
-        raise ValueError("password must be at least 8 characters")
-
-    choice = random.SystemRandom().choice
-
-    password = ''
-    password += choice(string.digits)
-    password += choice(string.ascii_letters)
-    password += ''.join([choice(chars) for _i in range(length - 2)])
-    return password
-
-
 def is_secondary_email_feature_enabled():
     """
     Checks to see if the django-waffle switch for enabling the secondary email feature is active
@@ -214,3 +202,13 @@ def is_secondary_email_feature_enabled_for_user(user):
     # import is placed here to avoid cyclic import.
     from openedx.features.enterprise_support.utils import is_enterprise_learner
     return is_secondary_email_feature_enabled() and is_enterprise_learner(user)
+
+
+def is_multiple_user_enterprises_feature_enabled():
+    """
+    Checks to see if the django-waffle switch for enabling the multiple user enterprises feature is active
+
+    Returns:
+        Boolean value representing switch status
+    """
+    return user_api_waffle().is_enabled(ENABLE_MULTIPLE_USER_ENTERPRISES_FEATURE)

@@ -2,7 +2,6 @@
 Views for the verification flow
 """
 
-from __future__ import absolute_import
 
 import datetime
 import decimal

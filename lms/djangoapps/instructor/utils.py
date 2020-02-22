@@ -2,7 +2,6 @@
 Helpers for instructor app.
 """
 
-from __future__ import absolute_import
 
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module

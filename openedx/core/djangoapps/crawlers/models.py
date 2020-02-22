@@ -2,7 +2,7 @@
 This module handles the detection of crawlers, so that we can handle them
 appropriately in other parts of the code.
 """
-from __future__ import absolute_import
+
 
 import six
 from config_models.models import ConfigurationModel
@@ -22,8 +22,8 @@ class CrawlersConfig(ConfigurationModel):
 
     known_user_agents = models.TextField(
         blank=True,
-        help_text="A comma-separated list of known crawler user agents.",
-        default='edX-downloader',
+        help_text=u"A comma-separated list of known crawler user agents.",
+        default=u'edX-downloader',
     )
 
     def __str__(self):

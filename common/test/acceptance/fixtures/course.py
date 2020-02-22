@@ -2,7 +2,6 @@
 Fixture to create a course and course components (XBlocks).
 """
 
-from __future__ import absolute_import
 
 import datetime
 import json

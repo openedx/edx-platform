@@ -11,7 +11,6 @@ In two separate processes on devstack:
     ./manage.py cms celery worker --settings=devstack_with_worker
 """
 
-from __future__ import absolute_import
 
 import os
 

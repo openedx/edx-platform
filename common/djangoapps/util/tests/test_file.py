@@ -2,7 +2,7 @@
 """
 Tests for file.py
 """
-from __future__ import absolute_import
+
 
 import os
 from datetime import datetime

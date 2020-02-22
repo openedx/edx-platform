@@ -1,5 +1,5 @@
 """Tests covering Credentials signals."""
-from __future__ import absolute_import
+
 
 import ddt
 import mock
@@ -110,6 +110,7 @@ class TestCredentialsSignalsSendGrade(TestCase):
     def test_send_grade_records_enabled(self, _mock_is_course_run_in_a_program, mock_send_grade_to_credentials,
                                         _mock_is_learner_issuance_enabled):
         site_config = SiteConfigurationFactory.create(
+            site_values={'course_org_filter': [self.key.org]},
             values={'course_org_filter': [self.key.org]},
         )
 

@@ -3,7 +3,7 @@
 A mixin class for LTI 2.0 functionality.  This is really just done to refactor the code to
 keep the LTIModule class from getting too big
 """
-from __future__ import absolute_import
+
 
 import base64
 import hashlib
@@ -18,6 +18,7 @@ from oauthlib.oauth1 import Client
 from six import text_type
 from webob import Response
 from xblock.core import XBlock
+from openedx.core.lib.grade_utils import round_away_from_zero
 
 log = logging.getLogger(__name__)
 
@@ -177,7 +178,7 @@ class LTI20ModuleMixin(object):
             return Response(json.dumps(base_json_obj).encode('utf-8'), content_type=LTI_2_0_JSON_CONTENT_TYPE)
 
         # Fall through to returning grade and comment
-        base_json_obj['resultScore'] = round(self.module_score, 2)
+        base_json_obj['resultScore'] = round_away_from_zero(self.module_score, 2)
         base_json_obj['comment'] = self.score_comment
         return Response(json.dumps(base_json_obj).encode('utf-8'), content_type=LTI_2_0_JSON_CONTENT_TYPE)
 

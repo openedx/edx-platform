@@ -1,6 +1,5 @@
 """Util methods for Waffle checks"""
 
-from __future__ import absolute_import
 
 from cms.djangoapps.contentstore.config.waffle import ENABLE_CHECKLISTS_QUALITY
 

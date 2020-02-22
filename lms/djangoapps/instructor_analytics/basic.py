@@ -3,7 +3,7 @@ Student and course analytics.
 
 Serve miscellaneous course and student data
 """
-from __future__ import absolute_import
+
 
 import datetime
 import json
@@ -39,7 +39,8 @@ from student.models import CourseEnrollment, CourseEnrollmentAllowed
 log = logging.getLogger(__name__)
 
 
-STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
+STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email',
+                    'date_joined', 'last_login')
 PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender',
                     'level_of_education', 'mailing_address', 'goals', 'meta',
                     'city', 'country')

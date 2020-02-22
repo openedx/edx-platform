@@ -1,6 +1,5 @@
 """Mock data for SAMLIdentityProvider"""
 
-from __future__ import absolute_import
 
 from social_core.backends.saml import OID_MAIL, OID_GIVEN_NAME, OID_SURNAME, OID_COMMON_NAME, OID_USERID
 

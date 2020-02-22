@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Helper functions for working with Programs."""
-from __future__ import absolute_import
+
 
 import datetime
 import logging
@@ -45,9 +45,14 @@ DEFAULT_ENROLLMENT_START_DATE = datetime.datetime(1900, 1, 1, tzinfo=utc)
 log = logging.getLogger(__name__)
 
 
-def get_program_marketing_url(programs_config):
+def get_program_marketing_url(programs_config, mobile_only=False):
     """Build a URL used to link to programs on the marketing site."""
-    return urljoin(settings.MKTG_URLS.get('ROOT'), programs_config.marketing_path).rstrip('/')
+    if mobile_only:
+        marketing_url = 'edxapp://course?programs'
+    else:
+        marketing_url = urljoin(settings.MKTG_URLS.get('ROOT'), programs_config.marketing_path).rstrip('/')
+
+    return marketing_url
 
 
 def attach_program_detail_url(programs, mobile_only=False):

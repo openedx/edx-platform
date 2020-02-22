@@ -18,15 +18,24 @@
             paginationLabel: gettext('Teams Pagination'),
 
             initialize: function(options) {
+                var view = this;
                 this.context = options.context;
                 this.itemViewClass = TeamCardView.extend({
                     router: options.router,
                     maxTeamSize: this.context.maxTeamSize,
                     srInfo: this.srInfo,
                     countries: TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.countries),
-                    languages: TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.languages)
+                    languages: TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.languages),
+                    getTopicType: function(topicId) { return view.getTopicType(topicId); }
                 });
                 PaginatedView.prototype.initialize.call(this);
+            },
+
+            // eslint-disable-next-line no-unused-vars
+            getTopicType: function(topicId) {
+                var deferred = $.Deferred();
+                deferred.resolve('open');
+                return deferred.promise();
             }
         });
         return TeamsView;

@@ -2,7 +2,6 @@
 Specialized models for oauth_dispatch djangoapp
 """
 
-from __future__ import absolute_import
 
 from datetime import datetime
 
@@ -66,15 +65,28 @@ class ApplicationAccess(models.Model):
     """
     Specifies access control information for the associated Application.
 
+    For usage details, see:
+    - openedx/core/djangoapps/oauth_dispatch/docs/decisions/0007-include-organizations-in-tokens.rst
+
     .. no_pii:
     """
 
-    application = models.OneToOneField(oauth2_settings.APPLICATION_MODEL, related_name='access')
+    application = models.OneToOneField(oauth2_settings.APPLICATION_MODEL, related_name='access',
+                                       on_delete=models.CASCADE)
     scopes = ListCharField(
         base_field=models.CharField(max_length=32),
         size=25,
         max_length=(25 * 33),  # 25 * 32 character scopes, plus commas
         help_text=_('Comma-separated list of scopes that this application will be allowed to request.'),
+    )
+
+    filters = ListCharField(
+        base_field=models.CharField(max_length=32),
+        size=25,
+        max_length=(25 * 33),  # 25 * 32 character filters, plus commas
+        help_text=_('Comma-separated list of filters that this application will be allowed to request.'),
+        null=True,
+        blank=True,
     )
 
     class Meta:
@@ -84,13 +96,18 @@ class ApplicationAccess(models.Model):
     def get_scopes(cls, application):
         return cls.objects.get(application=application).scopes
 
+    @classmethod
+    def get_filters(cls, application):
+        return cls.objects.get(application=application).filters
+
     def __str__(self):
         """
         Return a unicode representation of this object.
         """
-        return u"{application_name}:{scopes}".format(
+        return u"{application_name}:{scopes}:{filters}".format(
             application_name=self.application.name,
             scopes=self.scopes,
+            filters=self.filters,
         )
 
 
@@ -102,15 +119,18 @@ class ApplicationOrganization(models.Model):
     See openedx/core/djangoapps/oauth_dispatch/docs/decisions/0007-include-organizations-in-tokens.rst
     for the intended use of this model.
 
+    Deprecated: Use filters in ApplicationAccess instead.
+
     .. no_pii:
     """
-    RELATION_TYPE_CONTENT_ORG = 'content_org'
+    RELATION_TYPE_CONTENT_ORG = u'content_org'
     RELATION_TYPES = (
         (RELATION_TYPE_CONTENT_ORG, _('Content Provider')),
     )
 
-    application = models.ForeignKey(oauth2_settings.APPLICATION_MODEL, related_name='organizations')
-    organization = models.ForeignKey(Organization)
+    application = models.ForeignKey(oauth2_settings.APPLICATION_MODEL, related_name='organizations',
+                                    on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
     relation_type = models.CharField(
         max_length=32,
         choices=RELATION_TYPES,

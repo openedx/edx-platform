@@ -1,7 +1,7 @@
 """
 Helper functions for loading environment settings.
 """
-from __future__ import absolute_import, print_function
+
 
 import io
 import json
@@ -77,6 +77,9 @@ class Env(object):
         REPO_ROOT / "node_modules" / "edx-custom-a11y-rules" /
         "lib" / "custom_a11y_rules.js"
     )
+
+    # Which Python version should be used in xdist workers?
+    PYTHON_VERSION = os.environ.get("PYTHON_VERSION", "2.7")
 
     # If set, put reports for run in "unique" directories.
     # The main purpose of this is to ensure that the reports can be 'slurped'
@@ -281,7 +284,7 @@ class Env(object):
         """
         django_setting_value = cls.get_django_setting(django_setting, system, settings)
         pattern = re.compile(
-            u"[\"']{setting}[\"']: [\"'](?P<setting_value>.*)[\"']".format(setting=nested_django_setting)
+            u"[\"']{setting}[\"']: [\"'](?P<setting_value>.*?)[\"']".format(setting=nested_django_setting)
         )
         match = pattern.search(django_setting_value)
         if match:

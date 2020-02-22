@@ -1,7 +1,7 @@
 """
 Delete course tests.
 """
-from __future__ import absolute_import
+
 
 import mock
 from django.core.management import CommandError, call_command
@@ -25,13 +25,13 @@ class DeleteCourseTests(ModuleStoreTestCase):
     def test_invalid_course_key(self):
         course_run_key = 'foo/TestX/TS01/2015_Q7'
         expected_error_message = 'Invalid course_key: ' + course_run_key
-        with self.assertRaisesRegexp(CommandError, expected_error_message):
+        with self.assertRaisesRegex(CommandError, expected_error_message):
             call_command('delete_course', course_run_key)
 
     def test_course_not_found(self):
         course_run_key = 'TestX/TS01/2015_Q7'
         expected_error_message = 'Course not found: ' + course_run_key
-        with self.assertRaisesRegexp(CommandError, expected_error_message):
+        with self.assertRaisesRegex(CommandError, expected_error_message):
             call_command('delete_course', course_run_key)
 
     def test_asset_and_course_deletion(self):

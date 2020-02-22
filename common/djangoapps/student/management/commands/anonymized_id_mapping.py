@@ -8,7 +8,6 @@ the following:
 ./manage.py lms anonymized_id_mapping COURSE_ID
 """
 
-from __future__ import absolute_import
 
 import csv
 

@@ -1,6 +1,5 @@
 """ Command line script to change user enrollments. """
 
-from __future__ import absolute_import
 
 import logging
 

@@ -3,7 +3,7 @@
 """
 Certificates Tests.
 """
-from __future__ import absolute_import
+
 
 import itertools
 import json
@@ -267,7 +267,7 @@ class CertificatesListHandlerTestCase(
             course_key=self.course.id,
             mode='honor'
         )
-        self.assertEquals(test_link, None)
+        self.assertEqual(test_link, None)
 
     @override_settings(LMS_BASE="lms_base_url")
     def test_lms_link_for_certificate_web_view(self):
@@ -278,7 +278,7 @@ class CertificatesListHandlerTestCase(
             course_key=self.course.id,
             mode='honor'
         )
-        self.assertEquals(link, test_url)
+        self.assertEqual(link, test_url)
 
     @mock.patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     def test_certificate_info_in_response(self):
@@ -301,7 +301,7 @@ class CertificatesListHandlerTestCase(
         # in JSON response
         response = self.client.get_json(self._url())
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEquals(len(data), 1)
+        self.assertEqual(len(data), 1)
         self.assertEqual(data[0]['name'], 'Test certificate')
         self.assertEqual(data[0]['description'], 'Test description')
         self.assertEqual(data[0]['version'], CERTIFICATE_SCHEMA_VERSION)
@@ -784,7 +784,7 @@ class CertificatesDetailHandlerTestCase(
                 HTTP_ACCEPT="application/json",
                 HTTP_X_REQUESTED_WITH="XMLHttpRequest"
             )
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             course = self.store.get_course(self.course.id)
             certificates = course.certificates['certificates']
             self.assertEqual(certificates[0].get('is_active'), is_active)
@@ -812,7 +812,7 @@ class CertificatesDetailHandlerTestCase(
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
     @ddt.data(C4X_SIGNATORY_PATH, SIGNATORY_PATH)
     def test_certificate_activation_failure(self, signatory_path):
@@ -831,7 +831,7 @@ class CertificatesDetailHandlerTestCase(
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
         course = self.store.get_course(self.course.id)
         certificates = course.certificates['certificates']
         self.assertEqual(certificates[0].get('is_active'), False)

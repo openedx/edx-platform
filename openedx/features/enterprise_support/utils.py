@@ -1,18 +1,20 @@
 """
 Utility methods for Enterprise
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import hashlib
 import json
 
 import six
 
+from crum import get_current_request
 import third_party_auth
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import TieredCache
 from enterprise.models import EnterpriseCustomerUser
+from lms.djangoapps.branding.api import get_privacy_url
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings
 from openedx.core.djangolib.markup import HTML, Text
@@ -118,7 +120,7 @@ def get_enterprise_sidebar_context(enterprise_customer):
         enterprise_name=enterprise_customer['name'],
         platform_name=platform_name,
         privacy_policy_link_start=HTML("<a href='{pp_url}' rel='noopener' target='_blank'>").format(
-            pp_url=settings.MKTG_URLS.get('PRIVACY', 'https://www.edx.org/edx-privacy-policy')
+            pp_url=get_privacy_url()
         ),
         privacy_policy_link_end=HTML("</a>"),
     )
@@ -258,8 +260,8 @@ def get_enterprise_readonly_account_fields(user):
     Returns a set of account fields that are read-only for enterprise users.
     """
     # TODO circular dependency between enterprise_support.api and enterprise_support.utils
-    from openedx.features.enterprise_support.api import get_enterprise_customer_for_learner
-    enterprise_customer = get_enterprise_customer_for_learner(user)
+    from openedx.features.enterprise_support.api import enterprise_customer_for_request
+    enterprise_customer = enterprise_customer_for_request(get_current_request())
 
     enterprise_readonly_account_fields = list(settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS)
 
@@ -314,6 +316,11 @@ def get_enterprise_learner_generic_name(request):
     """
     # Prevent a circular import. This function makes sense to be in this module though. And see function description.
     from openedx.features.enterprise_support.api import enterprise_customer_for_request
+
+    # ENT-2626: For 404 pages we don't need to perform these actions.
+    if getattr(request, 'view_name', None) == '404':
+        return
+
     enterprise_customer = enterprise_customer_for_request(request)
 
     return (

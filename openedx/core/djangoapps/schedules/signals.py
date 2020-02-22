@@ -1,4 +1,6 @@
-from __future__ import absolute_import
+"""
+CourseEnrollment related signal handlers.
+"""
 
 import datetime
 import logging
@@ -175,10 +177,6 @@ def _create_schedule(enrollment, enrollment_created):
         log.debug('Schedules: Creation not enabled for this course or for this site')
         return
 
-    if not enrollment.course_overview.self_paced:
-        log.debug('Schedules: Creation only enabled for self-paced courses')
-        return
-
     # This represents the first date at which the learner can access the content. This will be the latter of
     # either the enrollment date or the course's start date.
     content_availability_date = max(enrollment.created, enrollment.course_overview.start)
@@ -196,7 +194,9 @@ def _create_schedule(enrollment, enrollment_created):
 
     schedule = Schedule.objects.create(
         enrollment=enrollment,
+        # TODO remove 'start' field in removing writes from old field step in column renaming release
         start=content_availability_date,
+        start_date=content_availability_date,
         upgrade_deadline=upgrade_deadline
     )
 

@@ -2,9 +2,9 @@
 Views for the course home page.
 """
 
-from __future__ import absolute_import
 
 import six
+from django.conf import settings
 from django.template.context_processors import csrf
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -146,6 +146,7 @@ class CourseHomeFragmentView(EdxFragmentView):
         resume_course_url = None
         handouts_html = None
 
+        course_overview = CourseOverview.get_from_id(course.id)
         if user_access['is_enrolled'] or user_access['is_staff']:
             outline_fragment = CourseOutlineFragmentView().render_to_fragment(
                 request, course_id=course_id, **kwargs
@@ -158,10 +159,11 @@ class CourseHomeFragmentView(EdxFragmentView):
                 update_message_fragment = WelcomeMessageFragmentView().render_to_fragment(
                     request, course_id=course_id, **kwargs
                 )
-            course_sock_fragment = CourseSockFragmentView().render_to_fragment(request, course=course, **kwargs)
+            course_sock_fragment = CourseSockFragmentView().render_to_fragment(
+                request, course=course_overview, **kwargs
+            )
             has_visited_course, resume_course_url = self._get_resume_course_info(request, course_id)
             handouts_html = self._get_course_handouts(request, course)
-            course_overview = CourseOverview.get_from_id(course.id)
             offer_banner_fragment = get_first_purchase_offer_banner_fragment(
                 request.user,
                 course_overview
@@ -209,8 +211,12 @@ class CourseHomeFragmentView(EdxFragmentView):
         # TODO Add switch to control deployment
         if SHOW_UPGRADE_MSG_ON_COURSE_HOME.is_enabled(course_key) and enrollment and enrollment.upgrade_deadline:
             upgrade_url = EcommerceService().upgrade_url(request.user, course_key)
-            upgrade_price, has_discount = format_strikeout_price(request.user, course)
+            upgrade_price, has_discount = format_strikeout_price(request.user, course_overview)
 
+        show_search = (
+            settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH') or
+            (settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF') and user_access['is_staff'])
+        )
         # Render the course home fragment
         context = {
             'request': request,
@@ -238,6 +244,7 @@ class CourseHomeFragmentView(EdxFragmentView):
             'upgrade_price': upgrade_price,
             'upgrade_url': upgrade_url,
             'has_discount': has_discount,
+            'show_search': show_search,
         }
         html = render_to_string('course_experience/course-home-fragment.html', context)
         return Fragment(html)

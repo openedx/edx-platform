@@ -2,7 +2,6 @@
 This module contains tests for programs-related signals and signal handlers.
 """
 
-from __future__ import absolute_import
 
 import mock
 from django.test import TestCase
@@ -147,6 +146,7 @@ class CertChangedReceiverTest(TestCase):
         mock_is_learner_issuance_enabled.return_value = True
 
         site_config = SiteConfigurationFactory.create(
+            site_values={'course_org_filter': ['edX']},
             values={'course_org_filter': ['edX']},
         )
 

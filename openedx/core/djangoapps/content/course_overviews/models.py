@@ -1,7 +1,7 @@
 """
 Declaration of CourseOverview model
 """
-from __future__ import absolute_import
+
 
 import json
 import logging
@@ -11,10 +11,13 @@ from ccx_keys.locator import CCXLocator
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.db import models, transaction
+from django.db.models import Q
 from django.db.models.fields import BooleanField, DateTimeField, DecimalField, FloatField, IntegerField, TextField
+from django.db.models.signals import post_save, post_delete
 from django.db.utils import IntegrityError
 from django.template import defaultfilters
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.functional import cached_property
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from six import text_type  # pylint: disable=ungrouped-imports
@@ -25,11 +28,14 @@ from lms.djangoapps.discussion import django_comment_client
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.models.course_details import CourseDetails
+from openedx.core.lib.cache_utils import request_cached, RequestCache
 from static_replace.models import AssetBaseUrlConfig
 from xmodule import block_metadata_utils, course_metadata_utils
 from xmodule.course_module import DEFAULT_START_DATE, CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
+from xmodule.tabs import CourseTab
+
 
 log = logging.getLogger(__name__)
 
@@ -53,7 +59,7 @@ class CourseOverview(TimeStampedModel):
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 6
+    VERSION = 8
 
     # Cache entry versioning.
     version = IntegerField()
@@ -61,14 +67,17 @@ class CourseOverview(TimeStampedModel):
     # Course identification
     id = CourseKeyField(db_index=True, primary_key=True, max_length=255)
     _location = UsageKeyField(max_length=255)
-    org = TextField(max_length=255, default='outdated_entry')
+    org = TextField(max_length=255, default=u'outdated_entry')
     display_name = TextField(null=True)
     display_number_with_default = TextField()
     display_org_with_default = TextField()
 
     # Start/end dates
+    # TODO Remove 'start' & 'end' in removing field in column renaming, DE-1822
     start = DateTimeField(null=True)
     end = DateTimeField(null=True)
+    start_date = DateTimeField(null=True)
+    end_date = DateTimeField(null=True)
     advertised_start = TextField(null=True)
     announcement = DateTimeField(null=True)
 
@@ -228,6 +237,10 @@ class CourseOverview(TimeStampedModel):
             - IOError if some other error occurs while trying to load the
                 course from the module store.
         """
+        log.info(
+            "Attempting to load CourseOverview for course %s from modulestore.",
+            course_id,
+        )
         store = modulestore()
         with store.bulk_operations(course_id):
             course = store.get_course(course_id)
@@ -239,7 +252,12 @@ class CourseOverview(TimeStampedModel):
                         # Remove and recreate all the course tabs
                         CourseOverviewTab.objects.filter(course_overview=course_overview).delete()
                         CourseOverviewTab.objects.bulk_create([
-                            CourseOverviewTab(tab_id=tab.tab_id, course_overview=course_overview)
+                            CourseOverviewTab(
+                                tab_id=tab.tab_id,
+                                type=tab.type,
+                                name=tab.name,
+                                course_staff_only=tab.course_staff_only,
+                                course_overview=course_overview)
                             for tab in course.tabs
                         ])
                         # Remove and recreate course images
@@ -255,10 +273,15 @@ class CourseOverview(TimeStampedModel):
                     # other one will cause an IntegrityError because it tries
                     # to save a duplicate.
                     # (see: https://openedx.atlassian.net/browse/TNL-2854).
-                    pass
+                    log.info(
+                        "Multiple CourseOverviews for course %s requested "
+                        "simultaneously; will only save one.",
+                        course_id,
+                    )
                 except Exception:
                     log.exception(
-                        u"CourseOverview for course %s failed!",
+                        "Saving CourseOverview for course %s failed with "
+                        "unexpected exception!",
                         course_id,
                     )
                     raise
@@ -266,11 +289,16 @@ class CourseOverview(TimeStampedModel):
                 return course_overview
             elif course is not None:
                 raise IOError(
-                    u"Error while loading course {} from the module store: {}",
+                    "Error while loading CourseOverview for course {} "
+                    "from the module store: {}",
                     six.text_type(course_id),
                     course.error_msg if isinstance(course, ErrorDescriptor) else six.text_type(course)
                 )
             else:
+                log.info(
+                    "Could not create CourseOverview for non-existent course: %s",
+                    course_id,
+                )
                 raise cls.DoesNotExist()
 
     @classmethod
@@ -293,6 +321,7 @@ class CourseOverview(TimeStampedModel):
         return modulestore().has_course(course_id)
 
     @classmethod
+    @request_cached('course_overview')
     def get_from_id(cls, course_id):
         """
         Load a CourseOverview object for a given course ID.
@@ -317,9 +346,8 @@ class CourseOverview(TimeStampedModel):
         try:
             course_overview = cls.objects.select_related('image_set').get(id=course_id)
             if course_overview.version < cls.VERSION:
-                # Throw away old versions of CourseOverview, as they might contain stale data.
-                course_overview.delete()
-                course_overview = None
+                # Reload the overview from the modulestore to update the version
+                course_overview = cls.load_from_module_store(course_id)
         except cls.DoesNotExist:
             course_overview = None
 
@@ -332,48 +360,34 @@ class CourseOverview(TimeStampedModel):
         return course_overview or cls.load_from_module_store(course_id)
 
     @classmethod
-    def get_from_ids_if_exists(cls, course_ids):
+    def get_from_ids(cls, course_ids):
         """
-        Return a dict mapping course_ids to CourseOverviews, if they exist.
+        Return a dict mapping course_ids to CourseOverviews.
 
-        This method will *not* generate new CourseOverviews or delete outdated
-        ones. It exists only as a small optimization used when CourseOverviews
-        are known to exist, for common situations like the student dashboard.
+        Tries to select all CourseOverviews in one query,
+        then fetches remaining (uncached) overviews from the modulestore.
 
-        Callers should assume that this list is incomplete and fall back to
-        get_from_id if they need to guarantee CourseOverview generation.
+        Course IDs for non-existant courses will map to None.
+
+        Arguments:
+            course_ids (iterable[CourseKey])
+
+        Returns: dict[CourseKey, CourseOverview|None]
         """
-        return {
+        overviews = {
             overview.id: overview
-            for overview
-            in cls.objects.select_related('image_set').filter(
+            for overview in cls.objects.select_related('image_set').filter(
                 id__in=course_ids,
                 version__gte=cls.VERSION
             )
         }
-
-    @classmethod
-    def get_from_id_if_exists(cls, course_id):
-        """
-        Return a CourseOverview for the provided course_id if it exists.
-        Returns None if no CourseOverview exists with the provided course_id
-
-        This method will *not* generate new CourseOverviews or delete outdated
-        ones. It exists only as a small optimization used when CourseOverviews
-        are known to exist, for common situations like the student dashboard.
-
-        Callers should assume that this list is incomplete and fall back to
-        get_from_id if they need to guarantee CourseOverview generation.
-        """
-        try:
-            course_overview = cls.objects.select_related('image_set').get(
-                id=course_id,
-                version__gte=cls.VERSION
-            )
-        except cls.DoesNotExist:
-            course_overview = None
-
-        return course_overview
+        for course_id in course_ids:
+            if course_id not in overviews:
+                try:
+                    overviews[course_id] = cls.load_from_module_store(course_id)
+                except CourseOverview.DoesNotExist:
+                    overviews[course_id] = None
+        return overviews
 
     def clean_id(self, padding_char='='):
         """
@@ -605,7 +619,10 @@ class CourseOverview(TimeStampedModel):
             # In rare cases, courses belonging to the same org may be accidentally assigned
             # an org code with a different casing (e.g., Harvardx as opposed to HarvardX).
             # Case-insensitive matching allows us to deal with this kind of dirty data.
-            course_overviews = course_overviews.filter(org__iregex=r'(^' + '$|^'.join(orgs) + '$)')
+            org_filter = Q()  # Avoiding the `reduce()` for more readability, so a no-op filter starter is needed.
+            for org in orgs:
+                org_filter |= Q(org__iexact=org)
+            course_overviews = course_overviews.filter(org_filter)
 
         if filter_:
             course_overviews = course_overviews.filter(**filter_)
@@ -623,12 +640,24 @@ class CourseOverview(TimeStampedModel):
         """
         Returns True if course has discussion tab and is enabled
         """
-        tabs = self.tabs.all()
+        tabs = self.tab_set.all()
         # creates circular import; hence explicitly referenced is_discussion_enabled
         for tab in tabs:
             if tab.tab_id == "discussion" and django_comment_client.utils.is_discussion_enabled(self.id):
                 return True
         return False
+
+    @property
+    def tabs(self):
+        """
+        Returns an iterator of CourseTabs.
+        """
+        for tab_dict in self.tab_set.all().values():
+            tab = CourseTab.from_json(tab_dict)
+            if tab is None:
+                log.warning("Can't instantiate CourseTab from %r", tab_dict)
+            else:
+                yield tab
 
     @property
     def image_urls(self):
@@ -727,6 +756,56 @@ class CourseOverview(TimeStampedModel):
 
         return urlunparse(('', base_url, path, params, query, fragment))
 
+    @cached_property
+    def _original_course(self):
+        """
+        Returns the course from the modulestore.
+        """
+        log.warning('Falling back on modulestore to get course information for %s', self.id)
+        return modulestore().get_course(self.id)
+
+    @property
+    def allow_public_wiki_access(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.allow_public_wiki_access
+
+    @property
+    def textbooks(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.textbooks
+
+    @property
+    def hide_progress_tab(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.hide_progress_tab
+
+    @property
+    def edxnotes(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.edxnotes
+
+    @property
+    def enable_ccx(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.enable_ccx
+
+    @property
+    def course_visibility(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.course_visibility
+
     def __str__(self):
         """Represent ourselves with the course key."""
         return six.text_type(self.id)
@@ -739,7 +818,13 @@ class CourseOverviewTab(models.Model):
     .. no_pii:
     """
     tab_id = models.CharField(max_length=50)
-    course_overview = models.ForeignKey(CourseOverview, db_index=True, related_name="tabs", on_delete=models.CASCADE)
+    course_overview = models.ForeignKey(CourseOverview, db_index=True, related_name="tab_set", on_delete=models.CASCADE)
+    type = models.CharField(max_length=50, null=True)
+    name = models.TextField(null=True)
+    course_staff_only = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.tab_id
 
 
 @python_2_unicode_compatible
@@ -815,8 +900,8 @@ class CourseOverviewImageSet(TimeStampedModel):
     """
     course_overview = models.OneToOneField(CourseOverview, db_index=True, related_name="image_set",
                                            on_delete=models.CASCADE)
-    small_url = models.TextField(blank=True, default="")
-    large_url = models.TextField(blank=True, default="")
+    small_url = models.TextField(blank=True, default=u"")
+    large_url = models.TextField(blank=True, default=u"")
 
     @classmethod
     def create(cls, course_overview, course=None):
@@ -935,10 +1020,23 @@ class SimulateCoursePublishConfig(ConfigurationModel):
 
     arguments = models.TextField(
         blank=True,
-        help_text='Useful for manually running a Jenkins job. Specify like "--delay 10 --receivers A B C \
+        help_text=u'Useful for manually running a Jenkins job. Specify like "--delay 10 --receivers A B C \
         --courses X Y Z".',
-        default='',
+        default=u'',
     )
 
     def __str__(self):
         return six.text_type(self.arguments)
+
+
+def _invalidate_overview_cache(**kwargs):  # pylint: disable=unused-argument
+    """
+    Invalidate the course overview request cache.
+    """
+    RequestCache('course_overview').clear()
+
+
+post_save.connect(_invalidate_overview_cache, sender=CourseOverview)
+post_save.connect(_invalidate_overview_cache, sender=CourseOverviewImageConfig)
+post_delete.connect(_invalidate_overview_cache, sender=CourseOverview)
+post_delete.connect(_invalidate_overview_cache, sender=CourseOverviewImageConfig)

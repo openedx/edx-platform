@@ -5,7 +5,7 @@ Runs tasks on answers to course problems to validate that code
 paths actually work.
 
 """
-from __future__ import absolute_import
+
 
 import json
 import logging
@@ -134,7 +134,7 @@ class TestRescoringTask(TestIntegrationTask):
         expected_subsection_grade = expected_score
 
         course_grade = CourseGradeFactory().read(user, self.course)
-        self.assertEquals(
+        self.assertEqual(
             course_grade.graded_subsections_by_format['Homework'][self.problem_section.location].graded_total.earned,
             expected_subsection_grade,
         )
@@ -473,12 +473,12 @@ class TestResetAttemptsTask(TestIntegrationTask):
                 self.submit_student_answer(username, problem_url_name, [OPTION_1, OPTION_1])
 
         for username in self.userlist:
-            self.assertEquals(self.get_num_attempts(username, descriptor), num_attempts)
+            self.assertEqual(self.get_num_attempts(username, descriptor), num_attempts)
 
         self.reset_problem_attempts('instructor', location)
 
         for username in self.userlist:
-            self.assertEquals(self.get_num_attempts(username, descriptor), 0)
+            self.assertEqual(self.get_num_attempts(username, descriptor), 0)
 
     def test_reset_failure(self):
         """Simulate a failure in resetting attempts on a problem"""

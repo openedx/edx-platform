@@ -1,7 +1,7 @@
 """
 API for managing user preferences.
 """
-from __future__ import absolute_import
+
 
 import logging
 
@@ -13,7 +13,6 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
 from django_countries import countries
 from pytz import common_timezones, common_timezones_set, country_timezones
-from six import text_type
 
 from openedx.core.lib.time_zone_utils import get_display_time_zone
 from student.models import User, UserProfile
@@ -118,6 +117,9 @@ def update_user_preferences(requesting_user, update, user=None):
     # First validate each preference setting
     errors = {}
     serializers = {}
+    if u'pref-lang' in update.keys():
+        log.info(u"Updating site language to {pref_lang} for the user: {username}"
+                 .format(pref_lang=update['pref-lang'], username=user))
     for preference_key in update.keys():
         preference_value = update[preference_key]
         if preference_value is not None:
@@ -147,6 +149,7 @@ def update_user_preferences(requesting_user, update, user=None):
             except Exception as error:
                 raise _create_preference_update_error(preference_key, preference_value, error)
         else:
+            log.info(u"Deleting language preference  for the user: {username}".format(username=user))
             delete_user_preference(requesting_user, preference_key)
 
 
@@ -275,7 +278,9 @@ def update_email_opt_in(user, org, opt_in):
         if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
             _track_update_email_opt_in(user.id, org, opt_in)
     except IntegrityError as err:
-        log.warning(u"Could not update organization wide preference due to IntegrityError: {}".format(text_type(err)))
+        log.warning(
+            u"Could not update organization wide preference due to IntegrityError: {}".format(six.text_type(err))
+        )
 
 
 def _track_update_email_opt_in(user_id, organization, opt_in):
@@ -382,8 +387,13 @@ def validate_user_preference_serializer(serializer, preference_key, preference_v
             }
         })
     if not serializer.is_valid():
+        errors = serializer.errors
+        # DRF error messages are of type ErrorDetail and serialize out as such. We want to coerce those
+        # messages into the strings only.
+        for key in errors:
+            errors[key] = [six.text_type(el) for el in errors[key]]
         developer_message = u"Value '{preference_value}' not valid for preference '{preference_key}': {error}".format(
-            preference_key=preference_key, preference_value=preference_value, error=serializer.errors
+            preference_key=preference_key, preference_value=preference_value, error=errors
         )
         if "key" in serializer.errors:
             user_message = _(u"Invalid user preference key '{preference_key}'.").format(

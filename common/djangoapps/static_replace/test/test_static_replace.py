@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Tests for static_replace"""
-from __future__ import absolute_import, print_function
+
 
 import re
 from six import BytesIO

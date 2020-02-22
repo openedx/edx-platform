@@ -3,7 +3,7 @@
 End-to-end tests for the LMS that utilize the
 progress page.
 """
-from __future__ import absolute_import
+
 
 from contextlib import contextmanager
 

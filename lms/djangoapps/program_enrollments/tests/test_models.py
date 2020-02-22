@@ -1,7 +1,7 @@
 """
 Unit tests for ProgramEnrollment models.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 from uuid import uuid4
 
@@ -76,21 +76,21 @@ class ProgramEnrollmentModelTests(TestCase):
         self.enrollment.save()
 
         # Ensure that all the records had values for external_user_key
-        self.assertEquals(self.enrollment.external_user_key, 'abc')
+        self.assertEqual(self.enrollment.external_user_key, 'abc')
 
         self.assertTrue(self.enrollment.historical_records.all())
         for record in self.enrollment.historical_records.all():
-            self.assertEquals(record.external_user_key, 'abc')
+            self.assertEqual(record.external_user_key, 'abc')
 
         ProgramEnrollment.retire_user(self.user.id)
         self.enrollment.refresh_from_db()
 
         # Ensure those values are retired
-        self.assertEquals(self.enrollment.external_user_key, None)
+        self.assertEqual(self.enrollment.external_user_key, None)
 
         self.assertTrue(self.enrollment.historical_records.all())
         for record in self.enrollment.historical_records.all():
-            self.assertEquals(record.external_user_key, None)
+            self.assertEqual(record.external_user_key, None)
 
 
 @ddt.ddt

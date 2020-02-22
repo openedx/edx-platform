@@ -2,7 +2,6 @@
 :class:`~xblock.field_data.FieldData` subclasses used by the LMS
 """
 
-from __future__ import absolute_import
 
 from xblock.field_data import ReadOnlyFieldData, SplitFieldData
 from xblock.fields import Scope

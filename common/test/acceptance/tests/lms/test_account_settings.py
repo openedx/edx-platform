@@ -2,7 +2,7 @@
 """
 End-to-end tests for the Account Settings page.
 """
-from __future__ import absolute_import
+
 
 from datetime import datetime
 from unittest import skip
@@ -408,12 +408,20 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         """
         Test behaviour of one of the social media links field.
         """
+        first_social_media_link = self.account_settings_page.get_social_first_element()
+
+        valid_value = 'https://www.twitter.com/edX'
+        if 'face' in first_social_media_link.lower():
+            valid_value = 'https://www.facebook.com/edX'
+        elif 'linked' in first_social_media_link.lower():
+            valid_value = 'https://www.linkedin.com/in/edX'
+
         self._test_text_field(
-            six.u('social_links'),
-            six.u('Facebook Link'),
+            'social_links',
+            first_social_media_link,
             self.social_link,
-            six.u('www.google.com/invalidlink)'),
-            [six.u('https://www.twitter.com/edX'), self.social_link],
+            'www.google.com/invalidlink)',
+            [valid_value, self.social_link],
         )
 
     def test_linked_accounts(self):

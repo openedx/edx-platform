@@ -2,7 +2,6 @@
 Test the enterprise support APIs.
 """
 
-from __future__ import absolute_import
 
 import mock
 
@@ -253,6 +252,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
         # Verify that the method `enterprise_customer_for_request` returns no
         # enterprise customer if the enterprise customer API throws 404.
+        del dummy_request.session['enterprise_customer']
         self.mock_get_enterprise_customer('real-ent-uuid', {'detail': 'Not found.'}, 404)
         enterprise_customer = enterprise_customer_for_request(dummy_request)
         self.assertIsNone(enterprise_customer)
@@ -288,6 +288,52 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         )
         self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
 
+    def test_enterprise_customer_for_request_with_session(self):
+        """
+        Verify enterprise_customer_for_request stores and retrieves data from session appropriately
+        """
+        dummy_request = mock.MagicMock(session={}, user=self.user)
+        enterprise_data = {'name': 'dummy-enterprise-customer', 'uuid': '8dc65e66-27c9-447b-87ff-ede6d66e3a5d'}
+
+        # Verify enterprise customer data fetched from API when it is not available in session
+        with mock.patch(
+                'openedx.features.enterprise_support.api.enterprise_customer_from_api',
+                return_value=enterprise_data
+        ):
+            self.assertEqual(dummy_request.session.get('enterprise_customer'), None)
+            enterprise_customer = enterprise_customer_for_request(dummy_request)
+            self.assertEqual(enterprise_customer, enterprise_data)
+            self.assertEqual(dummy_request.session.get('enterprise_customer'), enterprise_data)
+
+        # Verify enterprise customer data fetched from session for subsequent calls
+        with mock.patch(
+                'openedx.features.enterprise_support.api.enterprise_customer_from_api',
+                return_value=enterprise_data
+        ) as mock_enterprise_customer_from_api, mock.patch(
+                'openedx.features.enterprise_support.api.enterprise_customer_from_cache',
+                return_value=enterprise_data
+        ) as mock_enterprise_customer_from_cache:
+            enterprise_customer = enterprise_customer_for_request(dummy_request)
+            self.assertEqual(enterprise_customer, enterprise_data)
+            self.assertEqual(mock_enterprise_customer_from_api.called, False)
+            self.assertEqual(mock_enterprise_customer_from_cache.called, True)
+
+        # Verify enterprise customer data fetched from session for subsequent calls
+        # with unauthenticated user in SAML case
+        del dummy_request.user
+
+        with mock.patch(
+            'openedx.features.enterprise_support.api.enterprise_customer_from_api',
+            return_value=enterprise_data
+        ) as mock_enterprise_customer_from_api, mock.patch(
+            'openedx.features.enterprise_support.api.enterprise_customer_from_cache',
+            return_value=enterprise_data
+        ) as mock_enterprise_customer_from_cache:
+            enterprise_customer = enterprise_customer_for_request(dummy_request)
+            self.assertEqual(enterprise_customer, enterprise_data)
+            self.assertEqual(mock_enterprise_customer_from_api.called, False)
+            self.assertEqual(mock_enterprise_customer_from_cache.called, True)
+
     def check_data_sharing_consent(self, consent_required=False, consent_url=None):
         """
         Used to test the data_sharing_consent_required view decorator.
@@ -310,7 +356,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         # not be called.
         if consent_required:
             self.assertIsInstance(response, HttpResponseRedirect)
-            self.assertEquals(response.url, consent_url)  # pylint: disable=no-member
+            self.assertEqual(response.url, consent_url)  # pylint: disable=no-member
 
         # Otherwise, the view function should have been called with the expected arguments.
         else:
@@ -337,7 +383,6 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
     def test_no_course_data_consent_required(self,
                                              mock_consent_necessary,
                                              mock_enterprise_enabled):
-
         """
         Verify that the wrapped view is called directly when enterprise integration is enabled,
         and no course consent is required.

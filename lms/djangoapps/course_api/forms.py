@@ -2,7 +2,6 @@
 Course API forms
 """
 
-from __future__ import absolute_import
 
 from collections import namedtuple
 
@@ -12,7 +11,7 @@ from django.forms import CharField, Form
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.util.forms import ExtendedNullBooleanField, MultiValueField
+from openedx.core.djangoapps.util.forms import ExtendedNullBooleanField
 
 
 class UsernameValidatorMixin(object):
@@ -54,7 +53,6 @@ class CourseListGetForm(UsernameValidatorMixin, Form):
     search_term = CharField(required=False)
     username = CharField(required=False)
     org = CharField(required=False)
-    role = MultiValueField(required=False)
 
     # white list of all supported filter fields
     filter_type = namedtuple('filter_type', ['param_name', 'field_name'])
@@ -77,3 +75,11 @@ class CourseListGetForm(UsernameValidatorMixin, Form):
         cleaned_data['filter_'] = filter_ or None
 
         return cleaned_data
+
+
+class CourseIdListGetForm(UsernameValidatorMixin, Form):
+    """
+    A form to validate query parameters in the course list retrieval endpoint
+    """
+    username = CharField(required=False)
+    role = CharField(required=True)

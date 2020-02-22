@@ -5,7 +5,6 @@ This app consists solely of a ready method in its AppConfig, and should be
 included early in the INSTALLED_APPS list.
 """
 
-from __future__ import absolute_import
 
 import analytics
 from django.apps import AppConfig

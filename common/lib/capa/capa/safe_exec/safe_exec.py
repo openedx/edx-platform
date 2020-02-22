@@ -1,6 +1,5 @@
 """Capa's specialized use of codejail.safe_exec."""
 
-from __future__ import absolute_import
 
 import hashlib
 
@@ -47,7 +46,8 @@ lazymod_py_file = lazymod.__file__
 if lazymod_py_file.endswith("c"):
     lazymod_py_file = lazymod_py_file[:-1]
 
-lazymod_py = open(lazymod_py_file).read()
+with open(lazymod_py_file) as f:
+    lazymod_py = f.read()
 
 LAZY_IMPORTS = [lazymod_py]
 for name, modname in ASSUMED_IMPORTS:

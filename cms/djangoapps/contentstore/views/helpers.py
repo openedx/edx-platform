@@ -2,7 +2,6 @@
 Helper methods for Studio views.
 """
 
-from __future__ import absolute_import
 
 from uuid import uuid4
 

@@ -1,7 +1,7 @@
 """
 Acceptance tests for discussion component in studio
 """
-from __future__ import absolute_import
+
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.studio.container import ContainerPage

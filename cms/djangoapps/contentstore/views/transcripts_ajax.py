@@ -5,7 +5,7 @@ Actions manager for transcripts ajax calls.
 Module do not support rollback (pressing "Cancel" button in Studio)
 All user changes are saved immediately.
 """
-from __future__ import absolute_import
+
 
 import copy
 import json
@@ -264,7 +264,7 @@ def download_transcripts(request):
 
     # Construct an HTTP response
     response = HttpResponse(content, content_type=mimetype)
-    response['Content-Disposition'] = u'attachment; filename="{filename}"'.format(filename=filename.encode('utf-8'))
+    response['Content-Disposition'] = u'attachment; filename="{filename}"'.format(filename=filename)
     return response
 
 
@@ -375,7 +375,9 @@ def check_transcripts(request):
             except NotFoundError:
                 log.debug(u"Can't find transcripts in storage for non-youtube video_id: %s", html5_id)
             if len(html5_subs) == 2:  # check html5 transcripts for equality
-                transcripts_presence['html5_equal'] = json.loads(html5_subs[0]) == json.loads(html5_subs[1])
+                transcripts_presence['html5_equal'] = (
+                    json.loads(html5_subs[0].decode('utf-8')) == json.loads(html5_subs[1].decode('utf-8'))
+                )
 
         command, __ = _transcripts_logic(transcripts_presence, videos)
 

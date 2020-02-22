@@ -1,7 +1,7 @@
 """
 Tests the forum notification views.
 """
-from __future__ import absolute_import
+
 
 import json
 import logging
@@ -53,6 +53,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
 from openedx.core.djangoapps.django_comment_common.utils import ThreadContext, seed_permissions_roles
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
+from openedx.core.lib.teams_config import TeamsConfig
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from student.roles import CourseStaffRole, UserBasedRole
@@ -332,11 +333,11 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             "test_thread_id"
         )
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content.decode('utf-8'))
         # strip_none is being used to perform the same transform that the
         # django view performs prior to writing thread data to the response
-        self.assertEquals(
+        self.assertEqual(
             response_data["content"],
             strip_none(make_mock_thread_data(course=self.course, text=text, thread_id=thread_id, num_children=1))
         )
@@ -368,11 +369,11 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             "dummy_discussion_id",
             "test_thread_id"
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content.decode('utf-8'))
         # strip_none is being used to perform the same transform that the
         # django view performs prior to writing thread data to the response
-        self.assertEquals(
+        self.assertEqual(
             response_data["content"],
             strip_none(make_mock_thread_data(course=self.course, text=text, thread_id=thread_id, num_children=1))
         )
@@ -399,7 +400,7 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             "dummy_discussion_id",
             "dummy_thread_id"
         )
-        self.assertEquals(response.status_code, 405)
+        self.assertEqual(response.status_code, 405)
 
     def test_not_found(self, mock_request):
         request = RequestFactory().get("dummy_url")
@@ -438,7 +439,7 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
                     'thread_id': thread_id,
                 })
             )
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
             html = response.content.decode('utf-8')
             # Verify that the access denied error message is in the HTML
@@ -464,18 +465,18 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         # course is outside the context manager that is verifying the number of queries,
         # and with split mongo, that method ends up querying disabled_xblocks (which is then
         # cached and hence not queried as part of call_single_thread).
-        (ModuleStoreEnum.Type.mongo, False, 1, 5, 2, 24, 9),
-        (ModuleStoreEnum.Type.mongo, False, 50, 5, 2, 24, 9),
+        (ModuleStoreEnum.Type.mongo, False, 1, 5, 2, 23, 7),
+        (ModuleStoreEnum.Type.mongo, False, 50, 5, 2, 23, 7),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, False, 1, 3, 3, 24, 9),
-        (ModuleStoreEnum.Type.split, False, 50, 3, 3, 24, 9),
+        (ModuleStoreEnum.Type.split, False, 1, 3, 3, 23, 7),
+        (ModuleStoreEnum.Type.split, False, 50, 3, 3, 23, 7),
 
         # Enabling Enterprise integration should have no effect on the number of mongo queries made.
-        (ModuleStoreEnum.Type.mongo, True, 1, 5, 2, 24, 9),
-        (ModuleStoreEnum.Type.mongo, True, 50, 5, 2, 24, 9),
+        (ModuleStoreEnum.Type.mongo, True, 1, 5, 2, 23, 7),
+        (ModuleStoreEnum.Type.mongo, True, 50, 5, 2, 23, 7),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, True, 1, 3, 3, 24, 9),
-        (ModuleStoreEnum.Type.split, True, 50, 3, 3, 24, 9),
+        (ModuleStoreEnum.Type.split, True, 1, 3, 3, 23, 7),
+        (ModuleStoreEnum.Type.split, True, 50, 3, 3, 23, 7),
     )
     @ddt.unpack
     def test_number_of_mongo_queries(
@@ -517,8 +518,8 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
                     "dummy_discussion_id",
                     test_thread_id
                 )
-            self.assertEquals(response.status_code, 200)
-            self.assertEquals(
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(
                 len(json.loads(response.content.decode('utf-8'))["content"]["children"]),
                 num_thread_responses
             )
@@ -563,9 +564,9 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
             mock_thread_id
         )
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content.decode('utf-8'))
-        self.assertEquals(
+        self.assertEqual(
             response_data["content"],
             make_mock_thread_data(
                 course=self.course,
@@ -591,12 +592,12 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
             })
         )
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
         html = response.content.decode('utf-8')
 
         # Verify that the group name is correctly included in the HTML
-        self.assertRegexpMatches(html, r'"group_name": "student_cohort"')
+        self.assertRegex(html, r'"group_name": "student_cohort"')
 
 
 @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
@@ -700,7 +701,10 @@ class SingleThreadAccessTestCase(CohortedTestCase):
                 None
             )
             self.assertEqual(403, response.status_code)
-            self.assertEqual(views.TEAM_PERMISSION_MESSAGE, response.content)
+            self.assertEqual(
+                views.TEAM_PERMISSION_MESSAGE,
+                response.content.decode('utf-8'),
+            )
 
 
 @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
@@ -1302,7 +1306,18 @@ class InlineDiscussionTestCase(ForumsEnableMixin, ModuleStoreTestCase):
     def setUp(self):
         super(InlineDiscussionTestCase, self).setUp()
 
-        self.course = CourseFactory.create(org="TestX", number="101", display_name="Test Course")
+        self.course = CourseFactory.create(
+            org="TestX",
+            number="101",
+            display_name="Test Course",
+            teams_configuration=TeamsConfig({
+                'topics': [{
+                    'id': 'topic_id',
+                    'name': 'A topic',
+                    'description': 'A topic',
+                }]
+            })
+        )
         self.student = UserFactory.create()
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
         self.discussion1 = ItemFactory.create(
@@ -1331,7 +1346,7 @@ class InlineDiscussionTestCase(ForumsEnableMixin, ModuleStoreTestCase):
     def test_context(self, mock_request):
         team = CourseTeamFactory(
             name='Team Name',
-            topic_id='A topic',
+            topic_id='topic_id',
             course_id=self.course.id,
             discussion_topic_id=self.discussion1.discussion_id
         )
@@ -1391,17 +1406,17 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
         html = response.content.decode('utf-8')
-        self.assertRegexpMatches(html, r'data-page="1"')
-        self.assertRegexpMatches(html, r'data-num-pages="1"')
-        self.assertRegexpMatches(html, r'<span class="discussion-count">1</span> discussion started')
-        self.assertRegexpMatches(html, r'<span class="discussion-count">2</span> comments')
-        self.assertRegexpMatches(html, u'&#39;id&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_ID))
-        self.assertRegexpMatches(html, u'&#39;title&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_TEXT))
-        self.assertRegexpMatches(html, u'&#39;body&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_TEXT))
+        self.assertRegex(html, r'data-page="1"')
+        self.assertRegex(html, r'data-num-pages="1"')
+        self.assertRegex(html, r'<span class="discussion-count">1</span> discussion started')
+        self.assertRegex(html, r'<span class="discussion-count">2</span> comments')
+        self.assertRegex(html, u'&#39;id&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_ID))
+        self.assertRegex(html, u'&#39;title&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_TEXT))
+        self.assertRegex(html, u'&#39;body&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_TEXT))
         if six.PY2:
-            self.assertRegexpMatches(html, u'&#39;username&#39;: u&#39;{}&#39;'.format(self.student.username))
+            self.assertRegex(html, u'&#39;username&#39;: u&#39;{}&#39;'.format(self.student.username))
         else:
-            self.assertRegexpMatches(html, u'&#39;username&#39;: &#39;{}&#39;'.format(self.student.username))
+            self.assertRegex(html, u'&#39;username&#39;: &#39;{}&#39;'.format(self.student.username))
 
     def check_ajax(self, mock_request, **params):
         response = self.get_response(mock_request, params, HTTP_X_REQUESTED_WITH="XMLHttpRequest")
@@ -2145,7 +2160,15 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
     def setUp(self):  # pylint: disable=arguments-differ
         super(ThreadViewedEventTestCase, self).setUp('eventtracking.tracker')
 
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(
+            teams_configuration=TeamsConfig({
+                'topics': [{
+                    'id': 'arbitrary-topic-id',
+                    'name': 'arbitrary-topic-name',
+                    'description': 'arbitrary-topic-desc'
+                }]
+            })
+        )
         seed_permissions_roles(self.course.id)
 
         PASSWORD = 'test'

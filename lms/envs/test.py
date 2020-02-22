@@ -12,7 +12,7 @@ sessions. Assumes structure:
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
-from __future__ import absolute_import
+
 
 import logging
 import os
@@ -81,8 +81,6 @@ FEATURES['ENABLE_VERIFIED_CERTIFICATES'] = True
 
 # Toggles embargo on for testing
 FEATURES['EMBARGO'] = True
-
-FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
 
 # Enable the milestones app in tests to be consistent with it being enabled in production
 FEATURES['MILESTONES_APP'] = True
@@ -241,6 +239,7 @@ CACHES = {
 RUN_BLOCKSTORE_TESTS = os.environ.get('EDXAPP_RUN_BLOCKSTORE_TESTS', 'no').lower() in ('true', 'yes', '1')
 BLOCKSTORE_API_URL = os.environ.get('EDXAPP_BLOCKSTORE_API_URL', "http://edx.devstack.blockstore-test:18251/api/v1/")
 BLOCKSTORE_API_AUTH_TOKEN = os.environ.get('EDXAPP_BLOCKSTORE_API_AUTH_TOKEN', 'edxapp-test-key')
+XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'blockstore'  # This must be set to a working cache for the tests to pass
 
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
@@ -477,7 +476,7 @@ FEATURES['CUSTOM_COURSES_EDX'] = True
 
 # Set dummy values for profile image settings.
 PROFILE_IMAGE_BACKEND = {
-    'class': 'storages.backends.overwrite.OverwriteStorage',
+    'class': 'openedx.core.storage.OverwriteStorage',
     'options': {
         'location': MEDIA_ROOT,
         'base_url': 'http://example-storage.com/profile-images/',
@@ -485,7 +484,7 @@ PROFILE_IMAGE_BACKEND = {
 }
 PROFILE_IMAGE_DEFAULT_FILENAME = 'default'
 PROFILE_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
-PROFILE_IMAGE_SECRET_KEY = 'secret'
+PROFILE_IMAGE_HASH_SEED = 'secret'
 PROFILE_IMAGE_MAX_BYTES = 1024 * 1024
 PROFILE_IMAGE_MIN_BYTES = 100
 
@@ -508,7 +507,10 @@ ENABLE_COMPREHENSIVE_THEMING = True
 
 LMS_ROOT_URL = "http://localhost:8000"
 
-FRONTEND_LOGOUT_URL = LMS_ROOT_URL + '/logout'
+# Needed for derived settings used by cms only.
+FRONTEND_LOGIN_URL = '/login'
+FRONTEND_LOGOUT_URL = '/logout'
+FRONTEND_REGISTER_URL = '/register'
 
 ECOMMERCE_API_URL = 'https://ecommerce.example.com/api/v2/'
 ECOMMERCE_PUBLIC_URL_ROOT = None
@@ -597,3 +599,7 @@ ACCOUNT_MICROFRONTEND_URL = "http://account-mfe/"
 DASHBOARD_COURSE_LIMIT = 250
 
 PROCTORING_SETTINGS = {}
+
+############### Settings for Django Rate limit #####################
+
+RATELIMIT_RATE = '2/m'

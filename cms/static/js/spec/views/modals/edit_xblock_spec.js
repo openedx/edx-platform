@@ -61,7 +61,7 @@ describe('EditXBlockModal', function() {
         it('shows the correct title', function() {
             var requests = AjaxHelpers.requests(this);
             modal = showModal(requests, mockXBlockEditorHtml);
-            expect(modal.$('.modal-window-title span.modal-button-title').text()).toBe('Editing: Component');
+            expect(modal.$('.modal-window-title').text()).toBe('Editing: Component');
         });
 
         it('does not show any editor mode buttons', function() {

@@ -1,7 +1,6 @@
 """Tests of openedx.features.discounts.applicability"""
 # -*- coding: utf-8 -*-
 
-from __future__ import absolute_import
 
 from datetime import datetime, timedelta
 
@@ -15,9 +14,11 @@ from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from enterprise.models import EnterpriseCustomer, EnterpriseCustomerUser
 from entitlements.tests.factories import CourseEntitlementFactory
+from experiments.models import ExperimentData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.discounts.models import DiscountRestrictionConfig
+from openedx.features.discounts.utils import REV1008_EXPERIMENT_ID
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -38,6 +39,10 @@ class TestApplicability(ModuleStoreTestCase):
         self.user = UserFactory.create()
         self.course = CourseFactory.create(run='test', display_name='test')
         CourseModeFactory.create(course_id=self.course.id, mode_slug='verified')
+        now_time = datetime.now(tz=pytz.UTC).strftime(u"%Y-%m-%d %H:%M:%S%z")
+        ExperimentData.objects.create(
+            user=self.user, experiment_id=REV1008_EXPERIMENT_ID, key=str(self.course), value=now_time
+        )
 
         holdback_patcher = patch('openedx.features.discounts.applicability._is_in_holdback', return_value=False)
         self.mock_holdback = holdback_patcher.start()

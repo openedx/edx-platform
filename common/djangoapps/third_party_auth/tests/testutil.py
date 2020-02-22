@@ -4,7 +4,6 @@ Utilities for writing third_party_auth tests.
 Used by Django and non-Django tests; must not have Django deps.
 """
 
-from __future__ import absolute_import
 
 import os.path
 from contextlib import contextmanager
@@ -18,7 +17,8 @@ from django.contrib.sites.models import Site
 from mako.template import Template
 from provider import constants
 from provider.oauth2.models import Client as OAuth2Client
-from storages.backends.overwrite import OverwriteStorage
+from openedx.core.djangolib.testing.utils import CacheIsolationMixin
+from openedx.core.storage import OverwriteStorage
 
 from third_party_auth.models import (
     LTIProviderConfig,
@@ -173,8 +173,8 @@ class ThirdPartyAuthTestMixin(object):
         user.save()
 
     @staticmethod
-    def configure_oauth_client():
-        """ Configure a oauth client for testing """
+    def configure_oauth_dop_client():
+        """ Configure an oauth DOP client for testing """
         return OAuth2Client.objects.create(client_type=constants.CONFIDENTIAL)
 
     @staticmethod
@@ -189,7 +189,7 @@ class ThirdPartyAuthTestMixin(object):
             return f.read()
 
 
-class TestCase(ThirdPartyAuthTestMixin, django.test.TestCase):
+class TestCase(ThirdPartyAuthTestMixin, CacheIsolationMixin, django.test.TestCase):
     """Base class for auth test cases."""
     def setUp(self):
         super(TestCase, self).setUp()

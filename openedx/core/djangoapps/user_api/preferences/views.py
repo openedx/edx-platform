@@ -4,7 +4,7 @@ An API for retrieving user preference information.
 For additional information and historical context, see:
 https://openedx.atlassian.net/wiki/display/TNL/User+API
 """
-from __future__ import absolute_import
+
 
 from django.db import transaction
 from django.utils.translation import ugettext as _
@@ -14,7 +14,7 @@ from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.permissions import IsUserInUrlOrStaff
 
@@ -91,7 +91,7 @@ class PreferencesView(APIView):
     """
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (permissions.IsAuthenticated, IsUserInUrlOrStaff)
@@ -202,7 +202,7 @@ class PreferencesDetailView(APIView):
             If the update is successful, an HTTP 204 "No Content" response is
             returned with no additional content.
     """
-    authentication_classes = (OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)
+    authentication_classes = (BearerAuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)
     permission_classes = (permissions.IsAuthenticated, IsUserInUrlOrStaff)
 
     def get(self, request, username, preference_key):

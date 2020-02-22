@@ -1,6 +1,5 @@
 """Unit tests for the Paver server tasks."""
 
-from __future__ import absolute_import
 
 import ddt
 from paver.easy import call_task
@@ -160,7 +159,7 @@ class TestPaverServerTasks(PaverTestCase):
         """
         settings = options.get("settings", "devstack_with_worker")
         call_task("pavelib.servers.celery", options=options)
-        self.assertEquals(self.task_messages, [EXPECTED_CELERY_COMMAND.format(settings=settings)])
+        self.assertEqual(self.task_messages, [EXPECTED_CELERY_COMMAND.format(settings=settings)])
 
     @ddt.data(
         [{}],
@@ -175,7 +174,7 @@ class TestPaverServerTasks(PaverTestCase):
         call_task("pavelib.servers.update_db", options=options)
         # pylint: disable=line-too-long
         db_command = u"NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{server} --traceback --pythonpath=. "
-        self.assertEquals(
+        self.assertEqual(
             self.task_messages,
             [
                 db_command.format(server="lms", settings=settings),
@@ -196,7 +195,7 @@ class TestPaverServerTasks(PaverTestCase):
         """
         settings = options.get("settings", Env.DEVSTACK_SETTINGS)
         call_task("pavelib.servers.check_settings", args=[system, settings])
-        self.assertEquals(
+        self.assertEqual(
             self.task_messages,
             [
                 u"echo 'import {system}.envs.{settings}' "
@@ -275,7 +274,7 @@ class TestPaverServerTasks(PaverTestCase):
         if not no_contracts:
             expected_run_server_command += " --contracts"
         expected_messages.append(expected_run_server_command)
-        self.assertEquals(self.task_messages, expected_messages)
+        self.assertEqual(self.task_messages, expected_messages)
 
     def verify_run_all_servers_task(self, options):
         """
@@ -334,7 +333,7 @@ class TestPaverServerTasks(PaverTestCase):
             )
         )
         expected_messages.append(EXPECTED_CELERY_COMMAND.format(settings="devstack_with_worker"))
-        self.assertEquals(self.task_messages, expected_messages)
+        self.assertEqual(self.task_messages, expected_messages)
 
     def expected_sass_commands(self, system=None, asset_settings=u"test_static_optimized"):
         """

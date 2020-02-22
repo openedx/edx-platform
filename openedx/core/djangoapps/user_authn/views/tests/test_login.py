@@ -2,8 +2,9 @@
 """
 Tests for student activation and login
 """
-from __future__ import absolute_import
 
+
+import datetime
 import json
 import unicodedata
 
@@ -13,7 +14,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
 from django.core.cache import cache
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, reverse
@@ -25,14 +26,22 @@ from openedx.core.djangoapps.password_policy.compliance import (
     NonCompliantPasswordWarning
 )
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, waffle
+from openedx.core.djangoapps.user_api.accounts import EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH
 from openedx.core.djangoapps.user_authn.cookies import jwt_cookies
+from openedx.core.djangoapps.user_authn.views.login import (
+    AllowedAuthUser,
+    ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
+)
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.lib.api.test_utils import ApiTestCase
 from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
+from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 
 
 @ddt.ddt
-class LoginTest(CacheIsolationTestCase):
+class LoginTest(SiteMixin, CacheIsolationTestCase):
     """
     Test login_user() view
     """
@@ -47,9 +56,7 @@ class LoginTest(CacheIsolationTestCase):
     def setUp(self):
         """Setup a test user along with its registration and profile"""
         super(LoginTest, self).setUp()
-        self.user = UserFactory.build(username=self.username, email=self.user_email)
-        self.user.set_password(self.password)
-        self.user.save()
+        self.user = self._create_user(self.username, self.user_email)
 
         RegistrationFactory(user=self.user)
         UserProfileFactory(user=self.user)
@@ -57,10 +64,13 @@ class LoginTest(CacheIsolationTestCase):
         self.client = Client()
         cache.clear()
 
-        try:
-            self.url = reverse('login_post')
-        except NoReverseMatch:
-            self.url = reverse('login')
+        self.url = reverse('login_api')
+
+    def _create_user(self, username, user_email):
+        user = UserFactory.build(username=username, email=user_email)
+        user.set_password(self.password)
+        user.save()
+        return user
 
     def test_login_success(self):
         response, mock_audit_log = self._login_response(
@@ -68,6 +78,86 @@ class LoginTest(CacheIsolationTestCase):
         )
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success', self.user_email])
+
+    FEATURES_WITH_LOGIN_MFE_ENABLED = settings.FEATURES.copy()
+    FEATURES_WITH_LOGIN_MFE_ENABLED['ENABLE_LOGIN_MICROFRONTEND'] = True
+
+    @ddt.data(
+        # Default redirect is dashboard.
+        {
+            'next_url': None,
+            'course_id': None,
+            'expected_redirect': '/dashboard',
+        },
+        # A relative path is an acceptable redirect.
+        {
+            'next_url': '/harmless-relative-page',
+            'course_id': None,
+            'expected_redirect': '/harmless-relative-page',
+        },
+        # Paths without trailing slashes are also considered relative.
+        {
+            'next_url': 'courses',
+            'course_id': None,
+            'expected_redirect': 'courses',
+        },
+        # An absolute URL to a non-whitelisted domain is not an acceptable redirect.
+        {
+            'next_url': 'https://evil.sketchysite',
+            'course_id': None,
+            'expected_redirect': '/dashboard',
+        },
+        # An absolute URL to a whitelisted domain is acceptable.
+        {
+            'next_url': 'https://openedx.service/coolpage',
+            'course_id': None,
+            'expected_redirect': 'https://openedx.service/coolpage',
+        },
+        # If course_id is provided, redirect to finish_auth with dashboard as next.
+        {
+            'next_url': None,
+            'course_id': 'coursekey',
+            'expected_redirect': (
+                '/account/finish_auth?course_id=coursekey&next=%2Fdashboard'
+            ),
+        },
+        # If valid course_id AND next_url are provided, redirect to finish_auth with
+        # provided next URL.
+        {
+            'next_url': 'freshpage',
+            'course_id': 'coursekey',
+            'expected_redirect': (
+                '/account/finish_auth?course_id=coursekey&next=freshpage'
+            )
+        },
+        # If course_id is provided with invalid next_url, redirect to finish_auth with
+        # course_id and dashboard as next URL.
+        {
+            'next_url': 'http://scam.scam',
+            'course_id': 'coursekey',
+            'expected_redirect': (
+                '/account/finish_auth?course_id=coursekey&next=%2Fdashboard'
+            ),
+        },
+    )
+    @ddt.unpack
+    @override_settings(LOGIN_REDIRECT_WHITELIST=['openedx.service'])
+    @override_settings(FEATURES=FEATURES_WITH_LOGIN_MFE_ENABLED)
+    @skip_unless_lms
+    def test_login_success_with_redirect(self, next_url, course_id, expected_redirect):
+        post_params = {}
+        if next_url:
+            post_params['next'] = next_url
+        if course_id:
+            post_params['course_id'] = course_id
+        response, _ = self._login_response(
+            self.user_email,
+            self.password,
+            extra_post_params=post_params,
+            HTTP_ACCEPT='*/*',
+        )
+        self._assert_response(response, success=True)
+        self._assert_redirect_url(response, expected_redirect)
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_success_no_pii(self):
@@ -108,7 +198,9 @@ class LoginTest(CacheIsolationTestCase):
             nonexistent_email,
             self.password,
         )
-        self._assert_response(response, success=False, value=self.LOGIN_FAILED_WARNING)
+        self._assert_response(
+            response, success=False, value=self.LOGIN_FAILED_WARNING, status_code=400
+        )
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', nonexistent_email])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
@@ -410,38 +502,6 @@ class LoginTest(CacheIsolationTestCase):
         response = client1.get(url)
         self.assertEqual(response.status_code, 200)
 
-    def test_change_enrollment_400(self):
-        """
-        Tests that a 400 in change_enrollment doesn't lead to a 404
-        and in fact just logs in the user without incident
-        """
-        # add this post param to trigger a call to change_enrollment
-        extra_post_params = {"enrollment_action": "enroll"}
-        with patch('student.views.change_enrollment') as mock_change_enrollment:
-            mock_change_enrollment.return_value = HttpResponseBadRequest("I am a 400")
-            response, _ = self._login_response(
-                self.user_email, self.password, extra_post_params=extra_post_params,
-            )
-        response_content = json.loads(response.content.decode('utf-8'))
-        self.assertIsNone(response_content["redirect_url"])
-        self._assert_response(response, success=True)
-
-    def test_change_enrollment_200_no_redirect(self):
-        """
-        Tests "redirect_url" is None if change_enrollment returns a HttpResponse
-        with no content
-        """
-        # add this post param to trigger a call to change_enrollment
-        extra_post_params = {"enrollment_action": "enroll"}
-        with patch('student.views.change_enrollment') as mock_change_enrollment:
-            mock_change_enrollment.return_value = HttpResponse()
-            response, _ = self._login_response(
-                self.user_email, self.password, extra_post_params=extra_post_params,
-            )
-        response_content = json.loads(response.content.decode('utf-8'))
-        self.assertIsNone(response_content["redirect_url"])
-        self._assert_response(response, success=True)
-
     @override_settings(PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG={'ENFORCE_COMPLIANCE_ON_LOGIN': True})
     def test_check_password_policy_compliance(self):
         """
@@ -503,7 +563,9 @@ class LoginTest(CacheIsolationTestCase):
         response, _ = self._login_response(self.user.email, password_entered)
         self._assert_response(response, success=login_success)
 
-    def _login_response(self, email, password, patched_audit_log=None, extra_post_params=None):
+    def _login_response(
+            self, email, password, patched_audit_log=None, extra_post_params=None, **extra
+    ):
         """
         Post the login info
         """
@@ -513,12 +575,12 @@ class LoginTest(CacheIsolationTestCase):
         if extra_post_params is not None:
             post_params.update(extra_post_params)
         with patch(patched_audit_log) as mock_audit_log:
-            result = self.client.post(self.url, post_params)
+            result = self.client.post(self.url, post_params, **extra)
         return result, mock_audit_log
 
-    def _assert_response(self, response, success=None, value=None):
+    def _assert_response(self, response, success=None, value=None, status_code=None):
         """
-        Assert that the response had status 200 and returned a valid
+        Assert that the response has the expected status code and returned a valid
         JSON-parseable dict.
 
         If success is provided, assert that the response had that
@@ -527,7 +589,8 @@ class LoginTest(CacheIsolationTestCase):
         If value is provided, assert that the response contained that
         value for 'value' in the JSON dict.
         """
-        self.assertEqual(response.status_code, 200)
+        expected_status_code = status_code or (400 if success is False else 200)
+        self.assertEqual(response.status_code, expected_status_code)
 
         try:
             response_dict = json.loads(response.content.decode('utf-8'))
@@ -543,14 +606,29 @@ class LoginTest(CacheIsolationTestCase):
                    (six.text_type(response_dict['value']), six.text_type(value)))
             self.assertIn(value, response_dict['value'], msg)
 
+    def _assert_redirect_url(self, response, expected_redirect_url):
+        """
+        Assert that the redirect URL is in the response and has the expected value.
+
+        Assumes that response content is well-formed JSON
+        (you can call `_assert_response` first to assert this).
+        """
+        response_dict = json.loads(response.content.decode('utf-8'))
+        assert 'redirect_url' in response_dict, (
+            "Response JSON unexpectedly does not have redirect_url: {!r}".format(
+                response_dict
+            )
+        )
+        assert response_dict['redirect_url'] == expected_redirect_url
+
     def _assert_audit_log(self, mock_audit_log, level, log_strings):
         """
         Check that the audit log has received the expected call as its last call.
         """
         method_calls = mock_audit_log.method_calls
         name, args, _kwargs = method_calls[-1]
-        self.assertEquals(name, level)
-        self.assertEquals(len(args), 1)
+        self.assertEqual(name, level)
+        self.assertEqual(len(args), 1)
         format_string = args[0]
         for log_string in log_strings:
             self.assertIn(log_string, format_string)
@@ -561,8 +639,312 @@ class LoginTest(CacheIsolationTestCase):
         """
         method_calls = mock_audit_log.method_calls
         name, args, _kwargs = method_calls[-1]
-        self.assertEquals(name, level)
-        self.assertEquals(len(args), 1)
+        self.assertEqual(name, level)
+        self.assertEqual(len(args), 1)
         format_string = args[0]
         for log_string in log_strings:
             self.assertNotIn(log_string, format_string)
+
+    @ddt.data(
+        {
+            'switch_enabled': False,
+            'whitelisted': False,
+            'allowed_domain': 'edx.org',
+            'user_domain': 'edx.org',
+            'success': True,
+            'is_third_party_authenticated': False
+        },
+        {
+            'switch_enabled': False,
+            'whitelisted': True,
+            'allowed_domain': 'edx.org',
+            'user_domain': 'edx.org',
+            'success': True,
+            'is_third_party_authenticated': False
+        },
+        {
+            'switch_enabled': True,
+            'whitelisted': False,
+            'allowed_domain': 'edx.org',
+            'user_domain': 'edx.org',
+            'success': False,
+            'is_third_party_authenticated': False
+        },
+        {
+            'switch_enabled': True,
+            'whitelisted': False,
+            'allowed_domain': 'fake.org',
+            'user_domain': 'edx.org',
+            'success': True,
+            'is_third_party_authenticated': False
+        },
+        {
+            'switch_enabled': True,
+            'whitelisted': True,
+            'allowed_domain': 'edx.org',
+            'user_domain': 'edx.org',
+            'success': True,
+            'is_third_party_authenticated': False
+        },
+        {
+            'switch_enabled': True,
+            'whitelisted': False,
+            'allowed_domain': 'batman.gotham',
+            'user_domain': 'batman.gotham',
+            'success': False,
+            'is_third_party_authenticated': False
+        },
+        {
+            'switch_enabled': True,
+            'whitelisted': True,
+            'allowed_domain': 'edx.org',
+            'user_domain': 'edx.org',
+            'success': True,
+            'is_third_party_authenticated': True
+        },
+        {
+            'switch_enabled': False,
+            'whitelisted': False,
+            'allowed_domain': 'edx.org',
+            'user_domain': 'fake.org',
+            'success': True,
+            'is_third_party_authenticated': True
+        },
+    )
+    @ddt.unpack
+    @skip_unless_lms
+    def test_login_for_user_auth_flow(
+        self,
+        switch_enabled,
+        whitelisted,
+        allowed_domain,
+        user_domain,
+        success,
+        is_third_party_authenticated
+    ):
+        """
+        Verify that `login._check_user_auth_flow` works as expected.
+        """
+        provider = 'Google'
+        provider_tpa_hint = 'saml-test'
+        username = 'batman'
+        user_email = '{username}@{domain}'.format(username=username, domain=user_domain)
+        user = self._create_user(username, user_email)
+        default_site_configuration_values = {
+            'SITE_NAME': allowed_domain,
+            'THIRD_PARTY_AUTH_ONLY_DOMAIN': allowed_domain,
+            'THIRD_PARTY_AUTH_ONLY_PROVIDER': provider,
+            'THIRD_PARTY_AUTH_ONLY_HINT': provider_tpa_hint,
+        }
+
+        with ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY.override(switch_enabled):
+            if not is_third_party_authenticated:
+                site = self.set_up_site(allowed_domain, default_site_configuration_values)
+
+                if whitelisted:
+                    AllowedAuthUser.objects.create(site=site, email=user.email)
+                else:
+                    AllowedAuthUser.objects.filter(site=site, email=user.email).delete()
+
+                if success:
+                    value = None
+                else:
+                    value = u'As {0} user, You must login with your {0} <a href=\'{1}\'>{2} account</a>.'.format(
+                        allowed_domain,
+                        '{}?tpa_hint={}'.format(reverse("dashboard"), provider_tpa_hint),
+                        provider,
+                    )
+                response, __ = self._login_response(user.email, self.password)
+                self._assert_response(
+                    response,
+                    success=success,
+                    value=value,
+                )
+            else:
+                default_site_configuration_values.update({'ENABLE_THIRD_PARTY_AUTH': True})
+                self.set_up_site(allowed_domain, default_site_configuration_values)
+                with patch('openedx.core.djangoapps.user_authn.views.login.pipeline'):
+                    with patch(
+                        'openedx.core.djangoapps.user_authn.views.login._check_user_auth_flow'
+                    ) as mock_check_user_auth_flow:
+                        # user is already authenticated by third_party_auth then
+                        # we should by-pass _check_user_auth_flow function
+                        response, __ = self._login_response(user.email, self.password)
+                        self._assert_response(
+                            response,
+                            success=success
+                        )
+                        self.assertFalse(mock_check_user_auth_flow.called)
+
+
+@ddt.ddt
+@skip_unless_lms
+class LoginSessionViewTest(ApiTestCase):
+    """Tests for the login end-points of the user API. """
+
+    USERNAME = "bob"
+    EMAIL = "bob@example.com"
+    PASSWORD = "password"
+
+    def setUp(self):
+        super(LoginSessionViewTest, self).setUp()
+        self.url = reverse("user_api_login_session")
+
+    @ddt.data("get", "post")
+    def test_auth_disabled(self, method):
+        self.assertAuthDisabled(method, self.url)
+
+    def test_allowed_methods(self):
+        self.assertAllowedMethods(self.url, ["GET", "POST", "HEAD", "OPTIONS"])
+
+    def test_put_not_allowed(self):
+        response = self.client.put(self.url)
+        self.assertHttpMethodNotAllowed(response)
+
+    def test_delete_not_allowed(self):
+        response = self.client.delete(self.url)
+        self.assertHttpMethodNotAllowed(response)
+
+    def test_patch_not_allowed(self):
+        response = self.client.patch(self.url)
+        self.assertHttpMethodNotAllowed(response)
+
+    def test_login_form(self):
+        # Retrieve the login form
+        response = self.client.get(self.url, content_type="application/json")
+        self.assertHttpOK(response)
+
+        # Verify that the form description matches what we expect
+        form_desc = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(form_desc["method"], "post")
+        self.assertEqual(form_desc["submit_url"], reverse("user_api_login_session"))
+        self.assertEqual(form_desc["fields"], [
+            {
+                "name": "email",
+                "defaultValue": "",
+                "type": "email",
+                "required": True,
+                "label": "Email",
+                "placeholder": "username@domain.com",
+                "instructions": u"The email address you used to register with {platform_name}".format(
+                    platform_name=settings.PLATFORM_NAME
+                ),
+                "restrictions": {
+                    "min_length": EMAIL_MIN_LENGTH,
+                    "max_length": EMAIL_MAX_LENGTH
+                },
+                "errorMessages": {},
+                "supplementalText": "",
+                "supplementalLink": "",
+            },
+            {
+                "name": "password",
+                "defaultValue": "",
+                "type": "password",
+                "required": True,
+                "label": "Password",
+                "placeholder": "",
+                "instructions": "",
+                "restrictions": {
+                    "max_length": DEFAULT_MAX_PASSWORD_LENGTH,
+                },
+                "errorMessages": {},
+                "supplementalText": "",
+                "supplementalLink": "",
+            },
+        ])
+
+    @ddt.data(True, False)
+    @patch('openedx.core.djangoapps.user_authn.views.login.segment')
+    def test_login(self, include_analytics, mock_segment):
+        # Create a test user
+        user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
+
+        data = {
+            "email": self.EMAIL,
+            "password": self.PASSWORD,
+        }
+        if include_analytics:
+            track_label = "edX/DemoX/Fall"
+            data.update({
+                "analytics": json.dumps({"enroll_course_id": track_label})
+            })
+        else:
+            track_label = None
+
+        # Login
+        response = self.client.post(self.url, data)
+        self.assertHttpOK(response)
+
+        # Verify that we logged in successfully by accessing
+        # a page that requires authentication.
+        response = self.client.get(reverse("dashboard"))
+        self.assertHttpOK(response)
+
+        # Verify events are called
+        expected_user_id = user.id
+        mock_segment.identify.assert_called_once_with(
+            expected_user_id,
+            {'username': self.USERNAME, 'email': self.EMAIL},
+            {'MailChimp': False}
+        )
+        mock_segment.track.assert_called_once_with(
+            expected_user_id,
+            'edx.bi.user.account.authenticated',
+            {'category': 'conversion', 'provider': None, 'label': track_label}
+        )
+
+    def test_session_cookie_expiry(self):
+        # Create a test user
+        UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
+
+        # Login and remember me
+        data = {
+            "email": self.EMAIL,
+            "password": self.PASSWORD,
+        }
+
+        response = self.client.post(self.url, data)
+        self.assertHttpOK(response)
+
+        # Verify that the session expiration was set correctly
+        cookie = self.client.cookies[settings.SESSION_COOKIE_NAME]
+        expected_expiry = datetime.datetime.utcnow() + datetime.timedelta(weeks=4)
+        self.assertIn(expected_expiry.strftime('%d-%b-%Y'), cookie.get('expires'))
+
+    def test_invalid_credentials(self):
+        # Create a test user
+        UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
+
+        # Invalid password
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "password": "invalid"
+        })
+        self.assertHttpBadRequest(response)
+
+        # Invalid email address
+        response = self.client.post(self.url, {
+            "email": "invalid@example.com",
+            "password": self.PASSWORD,
+        })
+        self.assertHttpBadRequest(response)
+
+    def test_missing_login_params(self):
+        # Create a test user
+        UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
+
+        # Missing password
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+        })
+        self.assertHttpBadRequest(response)
+
+        # Missing email
+        response = self.client.post(self.url, {
+            "password": self.PASSWORD,
+        })
+        self.assertHttpBadRequest(response)
+
+        # Missing both email and password
+        response = self.client.post(self.url, {})

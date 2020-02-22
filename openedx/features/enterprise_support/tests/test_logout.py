@@ -1,7 +1,7 @@
 """
 Tests for logout for enterprise flow
 """
-from __future__ import absolute_import
+
 
 import ddt
 import mock

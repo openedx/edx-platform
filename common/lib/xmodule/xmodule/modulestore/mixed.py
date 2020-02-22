@@ -5,7 +5,6 @@ In this way, courses can be served up via either SplitMongoModuleStore or MongoM
 
 """
 
-from __future__ import absolute_import
 
 import functools
 import itertools

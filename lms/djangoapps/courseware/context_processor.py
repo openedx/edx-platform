@@ -5,7 +5,7 @@ This is meant to simplify the process of sending user preferences (espec. time_z
 to the templates without having to append every view file.
 
 """
-from __future__ import absolute_import
+
 
 import six
 

@@ -1,7 +1,7 @@
 """
 Test cases for catalog_integrations command.
 """
-from __future__ import absolute_import
+
 from django.test import TestCase
 from django.core.management import call_command, CommandError
 

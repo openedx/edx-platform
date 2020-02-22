@@ -1,5 +1,5 @@
 """ Management command to link program enrollments and external student_keys to an LMS user """
-from __future__ import absolute_import, unicode_literals
+
 
 from uuid import UUID
 

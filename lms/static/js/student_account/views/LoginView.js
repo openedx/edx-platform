@@ -189,12 +189,19 @@
             },
 
             saveError: function(error) {
-                var msg = error.responseText;
+                var errorCode;
+                var msg;
                 if (error.status === 0) {
                     msg = gettext('An error has occurred. Check your Internet connection and try again.');
                 } else if (error.status === 500) {
                     msg = gettext('An error has occurred. Try refreshing the page, or check your Internet connection.'); // eslint-disable-line max-len
+                } else if (error.responseJSON !== undefined) {
+                    msg = error.responseJSON.value;
+                    errorCode = error.responseJSON.error_code;
+                } else {
+                    msg = gettext('An unexpected error has occurred.');
                 }
+
                 this.errors = [
                     StringUtils.interpolate(
                         '<li>{msg}</li>', {
@@ -204,18 +211,13 @@
                 ];
                 this.clearPasswordResetSuccess();
 
-            /* If we've gotten a 403 error, it means that we've successfully
-             * authenticated with a third-party provider, but we haven't
-             * linked the account to an EdX account.  In this case,
-             * we need to prompt the user to enter a little more information
-             * to complete the registration process.
-             */
-                if (error.status === 403 &&
-                 error.responseText === 'third-party-auth' &&
-                 this.currentProvider) {
+                /* If the user successfully authenticated with a third-party provider, but they haven't
+                 * linked the accounts, instruct the user on how to link the accounts.
+                 */
+                if (errorCode === 'third-party-auth-with-no-linked-account' && this.currentProvider) {
                     if (!this.hideAuthWarnings) {
                         this.clearFormErrors();
-                        this.renderAuthWarning();
+                        this.renderThirdPartyAuthWarning();
                     }
                 } else {
                     this.renderErrors(this.defaultFormErrorsTitle, this.errors);
@@ -223,7 +225,7 @@
                 this.toggleDisableButton(false);
             },
 
-            renderAuthWarning: function() {
+            renderThirdPartyAuthWarning: function() {
                 var message = _.sprintf(
                     gettext('You have successfully signed into %(currentProvider)s, but your %(currentProvider)s' +
                             ' account does not have a linked %(platformName)s account. To link your accounts,' +

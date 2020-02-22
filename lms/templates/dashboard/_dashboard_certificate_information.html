@@ -4,6 +4,7 @@
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
 from course_modes.models import CourseMode
+from util.course import should_display_grade
 %>
 <%namespace name='static' file='../static_content.html'/>
 
@@ -44,9 +45,16 @@ else:
     </div>
   % else:
     <div class="message message-status ${status_css_class} is-shown">
-      <p class="message-copy">${_("Your final grade:")}
-        <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>.
-
+      <p class="message-copy">
+        % if should_display_grade(course_overview):
+            ${_("Your final grade:")}
+            <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>.
+        % elif course_overview.certificate_available_date:
+          <%
+            cert_available_date = course_overview.certificate_available_date.strftime('%Y-%m-%d')
+          %>
+          ${_("Grades will be finalized on {cert_available_date}".format(cert_available_date=cert_available_date))}
+        % endif
         % if cert_status['status'] == 'notpassing':
           % if enrollment.mode != 'audit':
             ${_("Grade required for a {cert_name_short}:").format(cert_name_short=cert_name_short)}

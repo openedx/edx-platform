@@ -7,7 +7,7 @@ This is okay for now because they are all used in
 Eventually it would be good to directly test the Python API function and just use
 mocks in the view tests.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 from uuid import UUID
 

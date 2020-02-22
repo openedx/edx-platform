@@ -1,7 +1,7 @@
 """
 Test cases for tabs.
 """
-from __future__ import absolute_import
+
 
 import six
 from crum import set_current_request
@@ -136,17 +136,17 @@ class TabTestCase(SharedModuleStoreTestCase):
 
     def check_tab_equality(self, tab, dict_tab):
         """Tests the equality methods on the given tab"""
-        self.assertEquals(tab, dict_tab)  # test __eq__
+        self.assertEqual(tab, dict_tab)  # test __eq__
         ne_dict_tab = dict_tab
         ne_dict_tab['type'] = 'fake_type'
-        self.assertNotEquals(tab, ne_dict_tab)  # test __ne__: incorrect type
-        self.assertNotEquals(tab, {'fake_key': 'fake_value'})  # test __ne__: missing type
+        self.assertNotEqual(tab, ne_dict_tab)  # test __ne__: incorrect type
+        self.assertNotEqual(tab, {'fake_key': 'fake_value'})  # test __ne__: missing type
 
     def check_tab_json_methods(self, tab):
         """Tests the json from and to methods on the given tab"""
         serialized_tab = tab.to_json()
         deserialized_tab = tab.from_json(serialized_tab)
-        self.assertEquals(serialized_tab, deserialized_tab)
+        self.assertEqual(serialized_tab, deserialized_tab)
 
     def check_can_display_results(
             self,
@@ -159,22 +159,22 @@ class TabTestCase(SharedModuleStoreTestCase):
         """Checks can display results for various users"""
         if for_staff_only:
             user = self.create_mock_user(is_staff=True, is_enrolled=True)
-            self.assertEquals(expected_value, self.is_tab_enabled(tab, self.course, user))
+            self.assertEqual(expected_value, self.is_tab_enabled(tab, self.course, user))
         if for_authenticated_users_only:
             user = self.create_mock_user(is_staff=False, is_enrolled=False)
-            self.assertEquals(expected_value, self.is_tab_enabled(tab, self.course, user))
+            self.assertEqual(expected_value, self.is_tab_enabled(tab, self.course, user))
             assert False
         if not for_staff_only and not for_authenticated_users_only and not for_enrolled_users_only:
             user = AnonymousUser()
-            self.assertEquals(expected_value, self.is_tab_enabled(tab, self.course, user))
+            self.assertEqual(expected_value, self.is_tab_enabled(tab, self.course, user))
         if for_enrolled_users_only:
             user = self.create_mock_user(is_staff=False, is_enrolled=True)
-            self.assertEquals(expected_value, self.is_tab_enabled(tab, self.course, user))
+            self.assertEqual(expected_value, self.is_tab_enabled(tab, self.course, user))
 
     def check_get_and_set_methods(self, tab):
         """Test __getitem__ and __setitem__ calls"""
-        self.assertEquals(tab['type'], tab.type)
-        self.assertEquals(tab['tab_id'], tab.tab_id)
+        self.assertEqual(tab['type'], tab.type)
+        self.assertEqual(tab['tab_id'], tab.tab_id)
         with self.assertRaises(KeyError):
             _ = tab['invalid_key']
 
@@ -188,9 +188,9 @@ class TabTestCase(SharedModuleStoreTestCase):
         old_value = tab[key]
         new_value = 'New Value'
         tab[key] = new_value
-        self.assertEquals(tab[key], new_value)
+        self.assertEqual(tab[key], new_value)
         tab[key] = old_value
-        self.assertEquals(tab[key], old_value)
+        self.assertEqual(tab[key], old_value)
 
 
 class TextbooksTestCase(TabTestCase):
@@ -230,7 +230,7 @@ class TextbooksTestCase(TabTestCase):
                 self.assertEqual(tab.link_func(self.course, self.reverse), expected_link)
                 self.assertTrue(tab.name.startswith('Book{0}'.format(book_index)))
                 num_textbooks_found = num_textbooks_found + 1
-        self.assertEquals(num_textbooks_found, self.num_textbooks)
+        self.assertEqual(num_textbooks_found, self.num_textbooks)
 
 
 class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
@@ -385,7 +385,6 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
             'description': 'Testing Courseware Tabs'
         }
         self.user.is_staff = False
-        request = get_mock_request(self.user)
         self.course.entrance_exam_enabled = True
         self.course.entrance_exam_id = six.text_type(entrance_exam.location)
         milestone = add_milestone(milestone)
@@ -400,7 +399,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
             self.relationship_types['FULFILLS'],
             milestone
         )
-        course_tab_list = get_course_tab_list(request, self.course)
+        course_tab_list = get_course_tab_list(self.user, self.course)
         self.assertEqual(len(course_tab_list), 1)
         self.assertEqual(course_tab_list[0]['tab_id'], 'courseware')
         self.assertEqual(course_tab_list[0]['name'], 'Entrance Exam')
@@ -425,8 +424,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
         # log in again as student
         self.client.logout()
         self.login(self.email, self.password)
-        request = get_mock_request(self.user)
-        course_tab_list = get_course_tab_list(request, self.course)
+        course_tab_list = get_course_tab_list(self.user, self.course)
         self.assertEqual(len(course_tab_list), 4)
 
     def test_course_tabs_list_for_staff_members(self):
@@ -438,8 +436,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
         self.client.logout()
         staff_user = StaffFactory(course_key=self.course.id)
         self.client.login(username=staff_user.username, password='test')
-        request = get_mock_request(staff_user)
-        course_tab_list = get_course_tab_list(request, self.course)
+        course_tab_list = get_course_tab_list(staff_user, self.course)
         self.assertEqual(len(course_tab_list), 4)
 
 
@@ -480,8 +477,7 @@ class TextBookCourseViewsTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         """
         type_to_reverse_name = {'textbook': 'book', 'pdftextbook': 'pdf_book', 'htmltextbook': 'html_book'}
         self.addCleanup(set_current_request, None)
-        request = get_mock_request(self.user)
-        course_tab_list = get_course_tab_list(request, self.course)
+        course_tab_list = get_course_tab_list(self.user, self.course)
         num_of_textbooks_found = 0
         for tab in course_tab_list:
             # Verify links of all textbook type tabs.
@@ -579,7 +575,7 @@ class ValidateTabsTestCase(TabListTestCase):
 
         for valid_tab_list in self.valid_tabs:
             from_json_result = tab_list.from_json(valid_tab_list)
-            self.assertEquals(len(from_json_result), len(valid_tab_list))
+            self.assertEqual(len(from_json_result), len(valid_tab_list))
 
     def test_invalid_tab_type(self):
         """
@@ -587,7 +583,7 @@ class ValidateTabsTestCase(TabListTestCase):
         the tabs to be undisplayable.
         """
         tab_list = xmodule_tabs.CourseTabList()
-        self.assertEquals(
+        self.assertEqual(
             len(tab_list.from_json([
                 {'type': CoursewareTab.type},
                 {'type': CourseInfoTab.type, 'name': 'fake_name'},
@@ -666,7 +662,7 @@ class CourseTabListTestCase(TabListTestCase):
                 self.assertTrue(getattr(self.course.tabs[i], 'is_collection', False))
             else:
                 # all other tabs must match the expected type
-                self.assertEquals(tab.type, self.course.tabs[i].type)
+                self.assertEqual(tab.type, self.course.tabs[i].type)
 
         # test including non-empty collections
         self.assertIn(
@@ -687,10 +683,10 @@ class CourseTabListTestCase(TabListTestCase):
         for tab in self.course.tabs:
 
             # get tab by type
-            self.assertEquals(xmodule_tabs.CourseTabList.get_tab_by_type(self.course.tabs, tab.type), tab)
+            self.assertEqual(xmodule_tabs.CourseTabList.get_tab_by_type(self.course.tabs, tab.type), tab)
 
             # get tab by id
-            self.assertEquals(xmodule_tabs.CourseTabList.get_tab_by_id(self.course.tabs, tab.tab_id), tab)
+            self.assertEqual(xmodule_tabs.CourseTabList.get_tab_by_id(self.course.tabs, tab.tab_id), tab)
 
     def test_course_tabs_staff_only(self):
         """
@@ -706,8 +702,7 @@ class CourseTabListTestCase(TabListTestCase):
 
         user = self.create_mock_user(is_staff=False, is_enrolled=True)
         self.addCleanup(set_current_request, None)
-        request = get_mock_request(user)
-        course_tab_list = get_course_tab_list(request, self.course)
+        course_tab_list = get_course_tab_list(user, self.course)
         name_list = [x.name for x in course_tab_list]
         self.assertIn('Static Tab Free', name_list)
         self.assertNotIn('Static Tab Instructors Only', name_list)
@@ -716,8 +711,7 @@ class CourseTabListTestCase(TabListTestCase):
         self.client.logout()
         staff_user = StaffFactory(course_key=self.course.id)
         self.client.login(username=staff_user.username, password='test')
-        request = get_mock_request(staff_user)
-        course_tab_list_staff = get_course_tab_list(request, self.course)
+        course_tab_list_staff = get_course_tab_list(staff_user, self.course)
         name_list_staff = [x.name for x in course_tab_list_staff]
         self.assertIn('Static Tab Free', name_list_staff)
         self.assertIn('Static Tab Instructors Only', name_list_staff)
@@ -775,18 +769,17 @@ class CourseInfoTabTestCase(TabTestCase):
     def setUp(self):
         self.user = self.create_mock_user()
         self.addCleanup(set_current_request, None)
-        self.request = get_mock_request(self.user)
 
     @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
     def test_default_tab(self):
         # Verify that the course info tab is the first tab
-        tabs = get_course_tab_list(self.request, self.course)
+        tabs = get_course_tab_list(self.user, self.course)
         self.assertEqual(tabs[0].type, 'course_info')
 
     @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_default_tab_for_new_course_experience(self):
         # Verify that the unified course experience hides the course info tab
-        tabs = get_course_tab_list(self.request, self.course)
+        tabs = get_course_tab_list(self.user, self.course)
         self.assertEqual(tabs[0].type, 'courseware')
 
     # TODO: LEARNER-611 - remove once course_info is removed.
@@ -834,7 +827,7 @@ class DiscussionLinkTestCase(TabTestCase):
         user = self.create_mock_user(is_staff=is_staff, is_enrolled=is_enrolled)
         with patch('student.models.CourseEnrollment.is_enrolled') as check_is_enrolled:
             check_is_enrolled.return_value = is_enrolled
-            self.assertEquals(
+            self.assertEqual(
                 (
                     discussion_tab is not None and
                     self.is_tab_enabled(discussion_tab, self.course, user) and

@@ -1,17 +1,19 @@
 """ API v0 views. """
-from __future__ import absolute_import
+
 
 import logging
 
 import six
 from django.contrib.auth import get_user_model
+import edx_api_doc_tools as apidocs
 from edx_rest_framework_extensions import permissions
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_condition import C
-from rest_framework.generics import GenericAPIView
+from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -19,15 +21,14 @@ from lms.djangoapps.certificates.api import get_certificate_for_user, get_certif
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.user_api.accounts.api import visible_fields
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
-from openedx.core import apidocs
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
 
 log = logging.getLogger(__name__)
 User = get_user_model()
 
 
-class CertificatesDetailView(GenericAPIView):
+class CertificatesDetailView(APIView):
     """
         **Use Case**
 
@@ -84,7 +85,7 @@ class CertificatesDetailView(GenericAPIView):
 
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
 
@@ -119,6 +120,15 @@ class CertificatesDetailView(GenericAPIView):
                 status=404,
                 data={'error_code': 'no_certificate_for_user'}
             )
+
+        course_overview = CourseOverview.get_from_id(course_id)
+        # return 404 if it's not a PDF certificates and there is no active certificate configuration.
+        if not user_cert['is_pdf_certificate'] and not course_overview.has_any_active_web_certificate:
+            return Response(
+                status=404,
+                data={'error_code': 'no_certificate_configuration_for_course'}
+            )
+
         return Response(
             {
                 "username": user_cert.get('username'),
@@ -133,14 +143,13 @@ class CertificatesDetailView(GenericAPIView):
         )
 
 
-class CertificatesListView(GenericAPIView):
+class CertificatesListView(APIView):
     """REST API endpoints for listing certificates."""
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
-
     permission_classes = (
         C(IsAuthenticated) & (
             C(permissions.NotJwtRestrictedApplication) |
@@ -229,7 +238,6 @@ class CertificatesListView(GenericAPIView):
                     'download_url': user_cert.get('download_url'),
                     'grade': user_cert.get('grade'),
                 })
-
         return Response(user_certs)
 
     def _viewable_by_requestor(self, request, username):
@@ -259,14 +267,17 @@ class CertificatesListView(GenericAPIView):
                 passing_certificates[course_key] = course_certificate
 
         viewable_certificates = []
-        for course_key, course_overview in CourseOverview.get_from_ids_if_exists(
+        for course_key, course_overview in CourseOverview.get_from_ids(
             list(passing_certificates.keys())
         ).items():
             if certificates_viewable_for_course(course_overview):
                 course_certificate = passing_certificates[course_key]
-                course_certificate['course_display_name'] = course_overview.display_name_with_default
-                course_certificate['course_organization'] = course_overview.display_org_with_default
-                viewable_certificates.append(course_certificate)
+                # add certificate into viewable certificate list only if it's a PDF certificate
+                # or there is an active certificate configuration.
+                if course_certificate['is_pdf_certificate'] or course_overview.has_any_active_web_certificate:
+                    course_certificate['course_display_name'] = course_overview.display_name_with_default
+                    course_certificate['course_organization'] = course_overview.display_org_with_default
+                    viewable_certificates.append(course_certificate)
 
         viewable_certificates.sort(key=lambda certificate: certificate['created'])
         return viewable_certificates

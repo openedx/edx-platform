@@ -2,7 +2,7 @@
 Implementation of the APIs required for XBlock runtimes to work with
 our newer Open edX-specific opaque key formats.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 from opaque_keys.edx.keys import UsageKeyV2
 from xblock.runtime import IdReader

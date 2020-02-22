@@ -2,7 +2,7 @@
 """
 Django model specifications for the Program Enrollments API
 """
-from __future__ import absolute_import, unicode_literals
+
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -40,7 +40,7 @@ class ProgramEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unic
     user = models.ForeignKey(
         User,
         null=True,
-        blank=True
+        blank=True, on_delete=models.CASCADE
     )
     external_user_key = models.CharField(
         db_index=True,

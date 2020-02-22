@@ -1,7 +1,7 @@
 """
 Helper functions for the accounts API.
 """
-from __future__ import absolute_import
+
 
 import hashlib
 
@@ -35,7 +35,7 @@ def _make_profile_image_name(username):
     Returns the user-specific part of the image filename, based on a hash of
     the username.
     """
-    hash_input = settings.PROFILE_IMAGE_SECRET_KEY + username
+    hash_input = settings.PROFILE_IMAGE_HASH_SEED + username
     return hashlib.md5(hash_input.encode('utf-8')).hexdigest()
 
 

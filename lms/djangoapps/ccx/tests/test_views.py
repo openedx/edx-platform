@@ -1,7 +1,7 @@
 """
 test views
 """
-from __future__ import absolute_import
+
 
 import datetime
 import json
@@ -1156,9 +1156,7 @@ class CCXCoachTabTestCase(CcxTestCase):
 
     def check_ccx_tab(self, course, user):
         """Helper function for verifying the ccx tab."""
-        request = RequestFactory().request()
-        request.user = user
-        all_tabs = get_course_tab_list(request, course)
+        all_tabs = get_course_tab_list(user, course)
         return any(tab.type == 'ccx_coach' for tab in all_tabs)
 
     @ddt.data(
@@ -1175,7 +1173,7 @@ class CCXCoachTabTestCase(CcxTestCase):
         """
         with self.settings(FEATURES={'CUSTOM_COURSES_EDX': ccx_feature_flag}):
             course = self.ccx_enabled_course if enable_ccx else self.ccx_disabled_course
-            self.assertEquals(
+            self.assertEqual(
                 expected_result,
                 self.check_ccx_tab(course, self.user)
             )

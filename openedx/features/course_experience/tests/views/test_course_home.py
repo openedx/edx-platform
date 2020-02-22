@@ -2,7 +2,7 @@
 """
 Tests for the course home page.
 """
-from __future__ import absolute_import
+
 
 from datetime import datetime, timedelta
 
@@ -25,7 +25,7 @@ from experiments.models import ExperimentData
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.api import add_course_goal, remove_course_goal
-from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
+from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
     GlobalStaffFactory,
@@ -36,7 +36,7 @@ from lms.djangoapps.courseware.tests.factories import (
 )
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from openedx.features.discounts.applicability import get_discount_expiration_date
-from openedx.features.discounts.utils import format_strikeout_price
+from openedx.features.discounts.utils import format_strikeout_price, REV1008_EXPERIMENT_ID
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.django_comment_common.models import (
@@ -48,7 +48,6 @@ from openedx.core.djangoapps.django_comment_common.models import (
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
 from openedx.core.djangolib.markup import HTML
-from openedx.features.course_duration_limits.config import EXPERIMENT_DATA_HOLDBACK_KEY, EXPERIMENT_ID
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
@@ -56,7 +55,7 @@ from openedx.features.course_experience import (
     SHOW_UPGRADE_MSG_ON_COURSE_HOME,
     UNIFIED_COURSE_TAB_FLAG
 )
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, FBEEnrollmentExclusion
 from student.tests.factories import UserFactory
 from util.date_utils import strftime_localized
 from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
@@ -71,7 +70,6 @@ from .test_course_updates import create_course_update, remove_course_updates
 TEST_PASSWORD = 'test'
 TEST_CHAPTER_NAME = 'Test Chapter'
 TEST_COURSE_TOOLS = 'Course Tools'
-TEST_COURSE_TODAY = 'Today is'
 TEST_BANNER_CLASS = '<div class="course-expiration-message">'
 TEST_WELCOME_MESSAGE = '<h2>Welcome!</h2>'
 TEST_UPDATE_MESSAGE = '<h2>Test Update!</h2>'
@@ -220,7 +218,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
 
         # Fetch the view and verify the query counts
         # TODO: decrease query count as part of REVO-28
-        with self.assertNumQueries(97, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(73, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
@@ -312,7 +310,6 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
         # Verify that the course tools and dates are always shown
         self.assertContains(response, TEST_COURSE_TOOLS)
-        self.assertContains(response, TEST_COURSE_TODAY)
 
         is_anonymous = user_type is CourseUserType.ANONYMOUS
         is_enrolled = user_type is CourseUserType.ENROLLED
@@ -366,7 +363,6 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
         # Verify that the course tools and dates are always shown
         self.assertContains(response, TEST_COURSE_TOOLS)
-        self.assertContains(response, TEST_COURSE_TODAY)
 
         # Verify that welcome messages are never shown
         self.assertNotContains(response, TEST_WELCOME_MESSAGE)
@@ -432,15 +428,19 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         can_receive_discount_mock.return_value = applicability
         discount_percentage_mock.return_value = percentage
         user = self.create_user_for_course(self.course, CourseUserType.ENROLLED)
+        now_time = datetime.now(tz=UTC).strftime(u"%Y-%m-%d %H:%M:%S%z")
+        ExperimentData.objects.create(
+            user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(self.course), value=now_time
+        )
         self.client.login(username=user.username, password=self.TEST_PASSWORD)
         url = course_home_url(self.course)
         response = self.client.get(url)
         discount_expiration_date = get_discount_expiration_date(user, self.course).strftime(u'%B %d')
         upgrade_link = verified_upgrade_deadline_link(user=user, course=self.course)
-        bannerText = u'''<div class="first-purchase-offer-banner">
+        bannerText = u'''<div class="first-purchase-offer-banner" role="note">
              <span class="first-purchase-offer-banner-bold">
              Upgrade by {discount_expiration_date} and save {percentage}% [{strikeout_price}]</span>
-             <br>Discount will be automatically applied at checkout. <a href="{upgrade_link}">Upgrade Now</a>
+             <br>Use code <b>EDXWELCOME</b> at checkout! <a href="{upgrade_link}">Upgrade Now</a>
              </div>'''.format(
             discount_expiration_date=discount_expiration_date,
             percentage=percentage,
@@ -465,7 +465,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
         user = UserFactory.create(password=self.TEST_PASSWORD)
         ScheduleFactory(
-            start=THREE_YEARS_AGO,
+            start_date=THREE_YEARS_AGO,
             enrollment__mode=CourseMode.VERIFIED,
             enrollment__course_id=course.id,
             enrollment__user=user
@@ -499,7 +499,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
         user = role_factory.create(password=self.TEST_PASSWORD, course_key=course.id)
         ScheduleFactory(
-            start=THREE_YEARS_AGO,
+            start_date=THREE_YEARS_AGO,
             enrollment__mode=CourseMode.AUDIT,
             enrollment__course_id=course.id,
             enrollment__user=user
@@ -555,7 +555,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
         user = role_factory.create(password=self.TEST_PASSWORD)
         ScheduleFactory(
-            start=THREE_YEARS_AGO,
+            start_date=THREE_YEARS_AGO,
             enrollment__mode=CourseMode.AUDIT,
             enrollment__course_id=course.id,
             enrollment__user=user
@@ -587,7 +587,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         audit_user = UserFactory(password=self.TEST_PASSWORD)
         self.client.login(username=audit_user.username, password=self.TEST_PASSWORD)
         audit_enrollment = CourseEnrollment.enroll(audit_user, course.id, mode=CourseMode.AUDIT)
-        ScheduleFactory(start=THREE_YEARS_AGO + timedelta(days=1), enrollment=audit_enrollment)
+        ScheduleFactory(start_date=THREE_YEARS_AGO + timedelta(days=1), enrollment=audit_enrollment)
 
         response = self.client.get(url)
 
@@ -636,7 +636,6 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         response = self.client.get(course_home_url(audit_only_course))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, TEST_COURSE_TOOLS)
-        self.assertContains(response, TEST_COURSE_TODAY)
         self.assertNotContains(response, TEST_BANNER_CLASS)
 
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
@@ -658,12 +657,9 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         audit_user = UserFactory(password=self.TEST_PASSWORD)
         self.client.login(username=audit_user.username, password=self.TEST_PASSWORD)
         audit_enrollment = CourseEnrollment.enroll(audit_user, course.id, mode=CourseMode.AUDIT)
-        ScheduleFactory(start=THREE_YEARS_AGO, enrollment=audit_enrollment)
-        ExperimentData.objects.create(
-            user=audit_user,
-            experiment_id=EXPERIMENT_ID,
-            key=EXPERIMENT_DATA_HOLDBACK_KEY,
-            value='True'
+        ScheduleFactory(start_date=THREE_YEARS_AGO, enrollment=audit_enrollment)
+        FBEEnrollmentExclusion.objects.create(
+            enrollment=audit_enrollment
         )
 
         response = self.client.get(url)

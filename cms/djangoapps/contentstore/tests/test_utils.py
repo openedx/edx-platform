@@ -1,5 +1,5 @@
 """ Tests for utils. """
-from __future__ import absolute_import
+
 
 import collections
 from datetime import datetime, timedelta
@@ -27,12 +27,12 @@ class LMSLinksTestCase(TestCase):
         course_key = CourseLocator('mitX', '101', 'test')
         location = course_key.make_usage_key('vertical', 'contacting_us')
         link = utils.get_lms_link_for_item(location, False)
-        self.assertEquals(link, "//localhost:8000/courses/course-v1:mitX+101+test/jump_to/block-v1:mitX+101+test+type"
-                                "@vertical+block@contacting_us")
+        self.assertEqual(link, "//localhost:8000/courses/course-v1:mitX+101+test/jump_to/block-v1:mitX+101+test+type"
+                         "@vertical+block@contacting_us")
 
         # test preview
         link = utils.get_lms_link_for_item(location, True)
-        self.assertEquals(
+        self.assertEqual(
             link,
             "//preview.localhost/courses/course-v1:mitX+101+test/jump_to/block-v1:mitX+101+test+type@vertical+block"
             "@contacting_us "
@@ -41,8 +41,8 @@ class LMSLinksTestCase(TestCase):
         # now test with the course' location
         location = course_key.make_usage_key('course', 'test')
         link = utils.get_lms_link_for_item(location)
-        self.assertEquals(link, "//localhost:8000/courses/course-v1:mitX+101+test/jump_to/block-v1:mitX+101+test+type"
-                                "@course+block@test")
+        self.assertEqual(link, "//localhost:8000/courses/course-v1:mitX+101+test/jump_to/block-v1:mitX+101+test+type"
+                         "@course+block@test")
 
     def lms_link_for_certificate_web_view_test(self):
         """ Tests get_lms_link_for_certificate_web_view. """
@@ -50,7 +50,7 @@ class LMSLinksTestCase(TestCase):
         dummy_user = ModuleStoreEnum.UserID.test
         mode = 'professional'
 
-        self.assertEquals(
+        self.assertEqual(
             utils.get_lms_link_for_certificate_web_view(dummy_user, course_key, mode),
             "//localhost:8000/certificates/user/{user_id}/course/{course_key}?preview={mode}".format(
                 user_id=dummy_user,
@@ -60,7 +60,7 @@ class LMSLinksTestCase(TestCase):
         )
 
         with with_site_configuration_context(configuration={"course_org_filter": "mitX", "LMS_BASE": "dummyhost:8000"}):
-            self.assertEquals(
+            self.assertEqual(
                 utils.get_lms_link_for_certificate_web_view(dummy_user, course_key, mode),
                 "//dummyhost:8000/certificates/user/{user_id}/course/{course_key}?preview={mode}".format(
                     user_id=dummy_user,

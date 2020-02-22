@@ -1,5 +1,5 @@
 # pylint: disable=missing-docstring
-from __future__ import absolute_import
+
 
 import json
 import re
@@ -170,7 +170,10 @@ class NonCohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
         self._assert_comments_service_called_without_group_id(mock_request)
 
     def test_team_discussion_id_not_cohorted(self, mock_request):
-        team = CourseTeamFactory(course_id=self.course.id)
+        team = CourseTeamFactory(
+            course_id=self.course.id,
+            topic_id='topic-id'
+        )
 
         team.add_user(self.student)
         self.call_view(mock_request, team.discussion_topic_id, self.student, None)

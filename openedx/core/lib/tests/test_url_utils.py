@@ -1,7 +1,7 @@
 """
 Tests for url_utils module.
 """
-from __future__ import absolute_import
+
 from ddt import data, ddt
 from django.test import TestCase
 
@@ -27,7 +27,7 @@ class TestQuoteSlashes(TestCase):
 
     @data(*TEST_STRINGS)
     def test_inverse(self, test_string):
-        self.assertEquals(test_string, unquote_slashes(quote_slashes(test_string)))
+        self.assertEqual(test_string, unquote_slashes(quote_slashes(test_string)))
 
     @data(*TEST_STRINGS)
     def test_escaped(self, test_string):

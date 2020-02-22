@@ -3,7 +3,6 @@
 Video xmodule tests in mongo.
 """
 
-from __future__ import absolute_import
 
 import io
 import json
@@ -112,6 +111,7 @@ class TestVideoYouTube(TestVideo):  # pylint: disable=test-inherits-tests
                 'end': 3610.0,
                 'transcriptLanguage': 'en',
                 'transcriptLanguages': OrderedDict({'en': 'English', 'uk': u'Українська'}),
+                'ytMetadataEndpoint': '',
                 'ytTestTimeout': 1500,
                 'ytApiUrl': 'https://www.youtube.com/iframe_api',
                 'lmsRootURL': settings.LMS_ROOT_URL,
@@ -195,6 +195,7 @@ class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
                 'end': 3610.0,
                 'transcriptLanguage': 'en',
                 'transcriptLanguages': OrderedDict({'en': 'English'}),
+                'ytMetadataEndpoint': '',
                 'ytTestTimeout': 1500,
                 'ytApiUrl': 'https://www.youtube.com/iframe_api',
                 'lmsRootURL': settings.LMS_ROOT_URL,
@@ -258,6 +259,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'end': 3610.0,
             'transcriptLanguage': 'en',
             'transcriptLanguages': OrderedDict({'en': 'English'}),
+            'ytMetadataEndpoint': '',
             'ytTestTimeout': 1500,
             'ytApiUrl': 'https://www.youtube.com/iframe_api',
             'lmsRootURL': settings.LMS_ROOT_URL,
@@ -2237,6 +2239,7 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
                 'end': 3610.0,
                 'transcriptLanguage': 'en',
                 'transcriptLanguages': OrderedDict({'en': 'English', 'uk': u'Українська'}),
+                'ytMetadataEndpoint': '',
                 'ytTestTimeout': 1500,
                 'ytApiUrl': 'https://www.youtube.com/iframe_api',
                 'lmsRootURL': settings.LMS_ROOT_URL,
@@ -2312,6 +2315,7 @@ class TestAutoAdvanceVideo(TestVideo):
                 'end': 3610.0,
                 'transcriptLanguage': 'en',
                 'transcriptLanguages': OrderedDict({'en': 'English', 'uk': u'Українська'}),
+                'ytMetadataEndpoint': '',
                 'ytTestTimeout': 1500,
                 'ytApiUrl': 'https://www.youtube.com/iframe_api',
                 'lmsRootURL': settings.LMS_ROOT_URL,

@@ -4,7 +4,7 @@ when you run "manage.py test".
 
 Replace this with more appropriate tests for your application.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import itertools
 from datetime import timedelta
@@ -21,6 +21,7 @@ from six.moves import zip
 from course_modes.helpers import enrollment_mode_display
 from course_modes.models import CourseMode, Mode, get_cosmetic_display_price, invalidate_course_mode_cache
 from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -521,6 +522,19 @@ class CourseModeModelTest(TestCase):
             self.create_mode(mode, mode, 10)
 
         self.assertEqual(CourseMode.is_masters_only(self.course_key), expected_is_masters_only)
+
+
+class TestCourseOverviewIntegration(ModuleStoreTestCase):
+    def test_course_overview_version_update(self):
+        course = CourseFactory.create()
+        course_overview = CourseOverview.get_from_id(course.id)
+        course_overview.version -= 1
+        course_overview.save()
+        course_mode = CourseModeFactory.create(course_id=course_overview.id)
+
+        assert CourseMode.objects.filter(pk=course_mode.pk).exists()
+        CourseOverview.get_from_id(course.id)
+        assert CourseMode.objects.filter(pk=course_mode.pk).exists()
 
 
 class TestDisplayPrices(ModuleStoreTestCase):

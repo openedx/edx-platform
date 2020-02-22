@@ -2,7 +2,7 @@
 """
 Tests courseware views.py
 """
-from __future__ import absolute_import
+
 
 import itertools
 import json
@@ -25,7 +25,6 @@ from freezegun import freeze_time
 from markupsafe import escape
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import MagicMock, PropertyMock, create_autospec, patch
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC
 from six import text_type
@@ -62,6 +61,7 @@ from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
 from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
 from lms.djangoapps.verify_student.services import IDVerificationService
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -104,6 +104,7 @@ FEATURES_WITH_DISABLE_HONOR_CERTIFICATE = settings.FEATURES.copy()
 FEATURES_WITH_DISABLE_HONOR_CERTIFICATE['DISABLE_HONOR_CERTIFICATES'] = True
 
 
+@ddt.ddt
 class TestJumpTo(ModuleStoreTestCase):
     """
     Check the jumpto link for a course.
@@ -191,7 +192,6 @@ class TestJumpTo(ModuleStoreTestCase):
         module2 = ItemFactory.create(category='html', parent_location=nested_vertical2.location)
 
         # internal position of module2 will be 1_2 (2nd item withing 1st item)
-
         expected = '/courses/{course_id}/courseware/{chapter_id}/{section_id}/1?{activate_block_id}'.format(
             course_id=six.text_type(course.id),
             chapter_id=chapter.url_name,
@@ -215,6 +215,41 @@ class TestJumpTo(ModuleStoreTestCase):
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)
 
+    @ddt.data(
+        (False, '1'),
+        (True, '2')
+    )
+    @ddt.unpack
+    def test_jump_to_for_learner_with_staff_only_content(self, is_staff_user, position):
+        """
+        Test for checking correct position in redirect_url for learner when a course has staff-only units.
+        """
+        course = CourseFactory.create()
+        request = RequestFactory().get('/')
+        request.user = UserFactory(is_staff=is_staff_user, username="staff")
+        request.session = {}
+        course_key = CourseKey.from_string(six.text_type(course.id))
+        chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+        section = ItemFactory.create(category='sequential', parent_location=chapter.location)
+        __ = ItemFactory.create(category='vertical', parent_location=section.location)
+        staff_only_vertical = ItemFactory.create(category='vertical', parent_location=section.location,
+                                                 metadata=dict(visible_to_staff_only=True))
+        __ = ItemFactory.create(category='vertical', parent_location=section.location)
+
+        usage_key = UsageKey.from_string(six.text_type(staff_only_vertical.location)).replace(course_key=course_key)
+        expected_url = reverse(
+            'courseware_position',
+            kwargs={
+                'course_id': six.text_type(course.id),
+                'chapter': chapter.url_name,
+                'section': section.url_name,
+                'position': position,
+            }
+        )
+        expected_url += "?{}".format(urlencode({'activate_block_id': six.text_type(staff_only_vertical.location)}))
+
+        self.assertEqual(expected_url, get_redirect_url(course_key, usage_key, request))
+
 
 @ddt.ddt
 class IndexQueryTestCase(ModuleStoreTestCase):
@@ -225,8 +260,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 185),
-        (ModuleStoreEnum.Type.split, 4, 179),
+        (ModuleStoreEnum.Type.mongo, 10, 172),
+        (ModuleStoreEnum.Type.split, 4, 170),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
@@ -1237,6 +1272,7 @@ class ProgressPageBaseTests(ModuleStoreTestCase):
 
 
 # pylint: disable=protected-access
+@patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
 @ddt.ddt
 class ProgressPageTests(ProgressPageBaseTests):
     """
@@ -1291,7 +1327,6 @@ class ProgressPageTests(ProgressPageBaseTests):
         """
         # Create a new course, a user which will not be enrolled in course, admin user for staff access
         course = CourseFactory.create(default_store=default_store)
-        not_enrolled_user = UserFactory.create()
         admin = AdminFactory.create()
         self.assertTrue(self.client.login(username=admin.username, password='test'))
 
@@ -1336,7 +1371,6 @@ class ProgressPageTests(ProgressPageBaseTests):
         resp = self._get_progress_page()
         self.assertNotContains(resp, 'Request Certificate')
 
-    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     def test_view_certificate_for_unverified_student(self):
         """
@@ -1368,7 +1402,6 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertNotContains(resp, u"Certificate unavailable")
             self.assertContains(resp, u"Your certificate is available")
 
-    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     def test_view_certificate_link(self):
         """
@@ -1430,7 +1463,6 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, "Your certificate is available")
             self.assertContains(resp, "earned a certificate for this course.")
 
-    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
     def test_view_certificate_link_hidden(self):
         """
@@ -1460,8 +1492,8 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        (True, 56),
-        (False, 55)
+        (True, 57),
+        (False, 56)
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
@@ -1474,8 +1506,8 @@ class ProgressPageTests(ProgressPageBaseTests):
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 64, 44),
-        (True, 55, 39)
+        (False, 65, 44),
+        (True, 56, 39)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
@@ -1494,7 +1526,6 @@ class ProgressPageTests(ProgressPageBaseTests):
                 ), check_mongo_calls(1):
                     self._get_progress_page()
 
-    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     @ddt.data(
         *itertools.product(
             (
@@ -1616,7 +1647,6 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, u"View Certificate")
             self.assert_invalidate_certificate(generated_certificate)
 
-    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     def test_page_with_invalidated_certificate_with_pdf(self):
         """
         Verify that for pdf certs if certificate is marked as invalidated than
@@ -1699,7 +1729,6 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.assertNotContains(response, bannerText, html=True)
 
     @patch('lms.djangoapps.courseware.views.views.is_course_passed', PropertyMock(return_value=True))
-    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     @override_settings(FEATURES=FEATURES_WITH_DISABLE_HONOR_CERTIFICATE)
     @ddt.data(CourseMode.AUDIT, CourseMode.HONOR)
     def test_message_for_ineligible_mode(self, course_mode):
@@ -1739,16 +1768,18 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.assertEqual(response.cert_status, 'invalidated')
         self.assertEqual(response.title, 'Your certificate has been invalidated')
 
+    @override_settings(FEATURES=FEATURES_WITH_DISABLE_HONOR_CERTIFICATE)
     def test_downloadable_get_cert_data(self):
         """
-        Verify that downloadable cert data is returned if cert is downloadable.
+        Verify that downloadable cert data is returned if cert is downloadable even
+        when DISABLE_HONOR_CERTIFICATES feature flag is turned ON.
         """
         self.generate_certificate(
             "http://www.example.com/certificate.pdf", "honor"
         )
-        with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
-                   return_value=self.mock_certificate_downloadable_status(is_downloadable=True)):
-            response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
+        response = views._get_cert_data(
+            self.user, self.course, CourseMode.HONOR, MagicMock(passed=True)
+        )
 
         self.assertEqual(response.cert_status, 'downloadable')
         self.assertEqual(response.title, 'Your certificate is available')

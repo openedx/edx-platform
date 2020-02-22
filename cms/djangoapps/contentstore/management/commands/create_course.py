@@ -1,7 +1,7 @@
 """
 Django management command to create a course in a specific modulestore
 """
-from __future__ import absolute_import
+
 
 from datetime import datetime, timedelta
 

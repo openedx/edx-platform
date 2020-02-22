@@ -10,18 +10,18 @@ decorator `django.utils.decorators.decorator_from_middleware(middleware_class)`
 
 """
 
-from __future__ import absolute_import
 
 import logging
 import geoip2.database
 
 from django.conf import settings
+from django.utils.deprecation import MiddlewareMixin
 from ipware.ip import get_real_ip
 
 log = logging.getLogger(__name__)
 
 
-class CountryMiddleware(object):
+class CountryMiddleware(MiddlewareMixin):
     """
     Identify the country by IP address.
     """
@@ -41,7 +41,6 @@ class CountryMiddleware(object):
             reader = geoip2.database.Reader(settings.GEOIP_PATH)
             try:
                 response = reader.country(new_ip_address)
-                # pylint: disable=no-member
                 country_code = response.country.iso_code
             except geoip2.errors.AddressNotFoundError:
                 country_code = ""

@@ -1,7 +1,7 @@
 """
 E-commerce Tab Instructor Dashboard Query Registration Code Status.
 """
-from __future__ import absolute_import
+
 
 import logging
 

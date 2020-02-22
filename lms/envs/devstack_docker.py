@@ -34,12 +34,12 @@ JWT_AUTH.update({
 FEATURES.update({
     'AUTOMATIC_AUTH_FOR_TESTING': True,
     'ENABLE_COURSEWARE_SEARCH': False,
+    'ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF': True,
     'ENABLE_COURSE_DISCOVERY': False,
     'ENABLE_DASHBOARD_SEARCH': False,
     'ENABLE_DISCUSSION_SERVICE': True,
     'SHOW_HEADER_LANGUAGE_SELECTOR': True,
     'ENABLE_ENTERPRISE_INTEGRATION': False,
-    'ENABLE_COMBINED_LOGIN_REGISTRATION': True,
 })
 
 ENABLE_MKTG_SITE = os.environ.get('ENABLE_MARKETING_SITE', False)
@@ -86,3 +86,22 @@ SYSTEM_WIDE_ROLE_CLASSES.extend(['system_wide_roles.SystemWideRoleAssignment'])
 
 if FEATURES['ENABLE_ENTERPRISE_INTEGRATION']:
     SYSTEM_WIDE_ROLE_CLASSES.extend(['enterprise.SystemWideEnterpriseUserRoleAssignment'])
+
+########################## THEMING  #######################
+# If you want to enable theming in devstack, uncomment this section and add any relevant
+# theme directories to COMPREHENSIVE_THEME_DIRS
+
+# We have to import the private method here because production.py calls
+# derive_settings('lms.envs.production') which runs _make_mako_template_dirs with
+# the settings from production, which doesn't include these theming settings. Thus,
+# the templating engine is unable to find the themed templates because they don't exist
+# in it's path. Re-calling derive_settings doesn't work because the settings was already
+# changed from a function to a list, and it can't be derived again.
+
+# from .common import _make_mako_template_dirs
+# ENABLE_COMPREHENSIVE_THEMING = True
+# COMPREHENSIVE_THEME_DIRS = [
+#     "/edx/app/edxapp/edx-platform/themes/"
+# ]
+# TEMPLATES[1]["DIRS"] = _make_mako_template_dirs
+# derive_settings(__name__)

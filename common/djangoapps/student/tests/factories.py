@@ -1,6 +1,5 @@
 """Provides factories for student models."""
 
-from __future__ import absolute_import
 
 from datetime import datetime
 from uuid import uuid4

@@ -2,7 +2,6 @@
 Unit tests for Ecommerce feature flag in new instructor dashboard.
 """
 
-from __future__ import absolute_import
 
 import datetime
 

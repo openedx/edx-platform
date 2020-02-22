@@ -1,7 +1,7 @@
 """
 Tests for Blocks Views
 """
-from __future__ import absolute_import
+
 
 from datetime import datetime
 
@@ -77,7 +77,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         if params:
             self.query_params.update(params)
         response = self.client.get(url or self.url, self.query_params)
-        self.assertEquals(response.status_code, expected_status_code)
+        self.assertEqual(response.status_code, expected_status_code)
         return response
 
     def verify_response_block_list(self, response):
@@ -181,13 +181,13 @@ class TestBlocksView(SharedModuleStoreTestCase):
 
     def test_basic(self):
         response = self.verify_response()
-        self.assertEquals(response.data['root'], six.text_type(self.course_usage_key))
+        self.assertEqual(response.data['root'], six.text_type(self.course_usage_key))
         self.verify_response_block_dict(response)
         for block_key_string, block_data in six.iteritems(response.data['blocks']):
             block_key = deserialize_usage_key(block_key_string, self.course_key)
-            self.assertEquals(block_data['id'], block_key_string)
-            self.assertEquals(block_data['type'], block_key.block_type)
-            self.assertEquals(block_data['display_name'], self.store.get_item(block_key).display_name or '')
+            self.assertEqual(block_data['id'], block_key_string)
+            self.assertEqual(block_data['type'], block_key.block_type)
+            self.assertEqual(block_data['display_name'], self.store.get_item(block_key).display_name or '')
 
     def test_return_type_param(self):
         response = self.verify_response(params={'return_type': 'list'})
@@ -197,11 +197,11 @@ class TestBlocksView(SharedModuleStoreTestCase):
         response = self.verify_response(params={'block_counts': ['course', 'chapter']})
         self.verify_response_block_dict(response)
         for block_data in six.itervalues(response.data['blocks']):
-            self.assertEquals(
+            self.assertEqual(
                 block_data['block_counts']['course'],
                 1 if block_data['type'] == 'course' else 0,
             )
-            self.assertEquals(
+            self.assertEqual(
                 block_data['block_counts']['chapter'],
                 (
                     1 if block_data['type'] == 'chapter' else

@@ -1,7 +1,7 @@
 """
 Test the user course tag API.
 """
-from __future__ import absolute_import
+
 
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator

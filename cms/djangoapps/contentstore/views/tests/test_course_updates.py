@@ -1,7 +1,7 @@
 """
 unit tests for course_info views and models.
 """
-from __future__ import absolute_import
+
 
 import json
 

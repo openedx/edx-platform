@@ -1,7 +1,7 @@
 """
 Tests for the force_publish management command
 """
-from __future__ import absolute_import
+
 
 import mock
 import six
@@ -34,7 +34,7 @@ class TestForcePublish(SharedModuleStoreTestCase):
         else:
             errstring = "Error: the following arguments are required: course_key"
 
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('force_publish')
 
     def test_invalid_course_key(self):
@@ -42,7 +42,7 @@ class TestForcePublish(SharedModuleStoreTestCase):
         Test 'force_publish' command with invalid course key
         """
         errstring = "Invalid course key."
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('force_publish', 'TestX/TS01')
 
     def test_too_many_arguments(self):
@@ -50,7 +50,7 @@ class TestForcePublish(SharedModuleStoreTestCase):
         Test 'force_publish' command with more than 2 arguments
         """
         errstring = "Error: unrecognized arguments: invalid-arg"
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('force_publish', six.text_type(self.course.id), '--commit', 'invalid-arg')
 
     def test_course_key_not_found(self):
@@ -58,7 +58,7 @@ class TestForcePublish(SharedModuleStoreTestCase):
         Test 'force_publish' command with non-existing course key
         """
         errstring = "Course not found."
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('force_publish', six.text_type('course-v1:org+course+run'))
 
     def test_force_publish_non_split(self):
@@ -67,7 +67,7 @@ class TestForcePublish(SharedModuleStoreTestCase):
         """
         course = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
         errstring = 'The owning modulestore does not support this command.'
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('force_publish', six.text_type(course.id))
 
 

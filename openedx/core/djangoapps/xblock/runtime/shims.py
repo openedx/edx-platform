@@ -2,7 +2,7 @@
 Code to implement backwards compatibility
 """
 # pylint: disable=no-member
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 import hashlib
 import warnings
 
@@ -11,9 +11,9 @@ from django.core.cache import cache
 from django.template import TemplateDoesNotExist
 from django.utils.functional import cached_property
 from fs.memoryfs import MemoryFS
+import six
 
 from edxmako.shortcuts import render_to_string
-import six
 
 
 class RuntimeShim(object):
@@ -62,10 +62,14 @@ class RuntimeShim(object):
         """
         Get an anonymized identifier for this user.
         """
-        # TODO: Change this to a runtime service or method so that we can have
+        # To do? Change this to a runtime service or method so that we can have
         # access to the context_key without relying on self._active_block.
-        if self.user_id is None:
-            raise NotImplementedError("TODO: anonymous ID for anonymous users.")
+        if self.user.is_anonymous:
+            # This is an anonymous user, and the self.user_id value is already
+            # an anonymous string. It's not anonymized per course, but we don't
+            # really care since this user's XBlock data is ephemeral and is only
+            # kept around for a day or two anyways.
+            return self.user_id
         #### TEMPORARY IMPLEMENTATION:
         # TODO: Update student.models.AnonymousUserId to have a 'context_key'
         # column instead of 'course_key' (no DB migration needed). Then change
@@ -76,8 +80,8 @@ class RuntimeShim(object):
         # class in opaque-keys that accepts either old CourseKeys or new
         # LearningContextKeys.
         hasher = hashlib.md5()
-        hasher.update(settings.SECRET_KEY)
-        hasher.update(six.text_type(self.user_id))
+        hasher.update(settings.SECRET_KEY.encode('utf-8'))
+        hasher.update(six.text_type(self.user_id).encode('utf-8'))
         digest = hasher.hexdigest()
         return digest
 
@@ -184,17 +188,24 @@ class RuntimeShim(object):
 
     def replace_urls(self, html_str):
         """
-        Given an HTML string, replace any static file URLs like
+        Deprecated precursor to transform_static_paths_to_urls
+
+        Given an HTML string, replace any static file paths like
             /static/foo.png
-        with working URLs like
-            https://s3.example.com/course/this/assets/foo.png
+        (which are really pointing to block-specific assets stored in blockstore)
+        with working absolute URLs like
+            https://s3.example.com/blockstore/bundle17/this-block/assets/324.png
         See common/djangoapps/static_replace/__init__.py
+
+        This is generally done automatically for the HTML rendered by XBlocks,
+        but if an XBlock wants to have correct URLs in data returned by its
+        handlers, the XBlock must call this API directly.
+
+        Note that the paths are only replaced if they are in "quotes" such as if
+        they are an HTML attribute or JSON data value. Thus, to transform only a
+        single path string on its own, you must pass html_str=f'"{path}"'
         """
-        # TODO: implement or deprecate.
-        # Can we replace this with a filesystem service that has a .get_url
-        # method on all files? See comments in the 'resources_fs' property.
-        # See also the version in openedx/core/lib/xblock_utils/__init__.py
-        return html_str  # For now just return without changes.
+        return self.transform_static_paths_to_urls(self._active_block, html_str)
 
     def replace_course_urls(self, html_str):
         """
@@ -272,13 +283,8 @@ class RuntimeShim(object):
             "    is_staff = user.opt_attrs.get('edx-platform.user_is_staff')",
             DeprecationWarning, stacklevel=2,
         )
-        if self.user_id:
-            from django.contrib.auth import get_user_model
-            try:
-                user = get_user_model().objects.get(id=self.user_id)
-            except get_user_model().DoesNotExist:
-                return False
-            return user.is_staff
+        if self.user and self.user.is_authenticated:
+            return self.user.is_staff
         return False
 
     @cached_property
@@ -361,7 +367,7 @@ class RuntimeShim(object):
         # Many CSS styles for former XModules use
         # .xmodule_display.xmodule_VideoBlock
         # as their selector, so add those classes:
-        if view == 'student_view':
+        if view in ('student_view', 'public_view'):
             css_classes.append('xmodule_display')
         elif view == 'studio_view':
             css_classes.append('xmodule_edit')

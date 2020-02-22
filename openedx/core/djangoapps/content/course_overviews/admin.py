@@ -3,7 +3,7 @@ Django admin page for CourseOverviews, the basic metadata about a course that
 is used in user dashboard queries and other places where you need info like
 name, and start dates, but don't actually need to crawl into course content.
 """
-from __future__ import absolute_import
+
 
 from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin

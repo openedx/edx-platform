@@ -1,7 +1,7 @@
 """
 Unit tests for ProgramEnrollment views.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import json
 from collections import defaultdict
@@ -1425,18 +1425,52 @@ class UserProgramReadOnlyAccessGetTests(EnrollmentsDataMixin, APITestCase):
         assert len(response.data) == 1
         mock_get_programs.assert_called_once_with(course=self.course_id)
 
-    def test_course_staff_of_multiple_courses(self):
-        other_course_key = CourseKey.from_string('course-v1:edX+ToyX+Other_Course')
+    @ddt.data(
+        (
+            ['garbage-program'],
+            ['garbage-life']
+        ),
+        (
+            ['garbage-program', 'garbage-life'],
+            ['garbage-program', 'garbage-life']
+        )
+    )
+    @ddt.unpack
+    def test_course_staff_of_multiple_courses(
+        self,
+        program_slugs_to_return_first,
+        program_slugs_to_return_second
+    ):
+        def find_program_by_marketing_slug(slug, program_list):
+            for program in program_list:
+                if program['marketing_slug'] == slug:
+                    return program
+            return None
 
+        other_course_key = CourseKey.from_string('course-v1:edX+ToyX+Other_Course')
+        CourseOverviewFactory(id=other_course_key)
+        CourseRunFactory.create(key=text_type(other_course_key))
         CourseEnrollmentFactory.create(course_id=other_course_key, user=self.course_staff)
         CourseStaffRole(other_course_key).add_users(self.course_staff)
-
         self.client.login(username=self.course_staff.username, password=self.password)
+
+        programs_to_return_first = [
+            find_program_by_marketing_slug(
+                p_slug,
+                self.mock_program_data
+            ) for p_slug in program_slugs_to_return_first
+        ]
+        programs_to_return_second = [
+            find_program_by_marketing_slug(
+                p_slug,
+                self.mock_program_data
+            ) for p_slug in program_slugs_to_return_second
+        ]
 
         with mock.patch(
             _VIEW_PATCH_FORMAT.format('get_programs'),
             autospec=True,
-            side_effect=[[self.mock_program_data[0]], [self.mock_program_data[2]]]
+            side_effect=[programs_to_return_first, programs_to_return_second]
         ) as mock_get_programs:
             response = self.client.get(reverse(self.view_name) + '?type=masters')
 

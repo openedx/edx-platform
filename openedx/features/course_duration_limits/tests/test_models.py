@@ -2,7 +2,6 @@
 Tests of CourseDurationLimitConfig.
 """
 
-from __future__ import absolute_import
 
 import itertools
 from datetime import datetime, timedelta
@@ -39,18 +38,15 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         super(TestCourseDurationLimitConfig, self).setUp()
 
     @ddt.data(
-        (True, True, True),
-        (True, True, False),
-        (True, False, True),
-        (True, False, False),
-        (False, False, True),
-        (False, False, False),
+        (True, True),
+        (True, False),
+        (False, True),
+        (False, False),
     )
     @ddt.unpack
     def test_enabled_for_enrollment(
         self,
         already_enrolled,
-        pass_enrollment,
         enrolled_before_enabled,
     ):
 
@@ -75,22 +71,13 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         else:
             existing_enrollment = None
 
-        if pass_enrollment:
-            enrollment = existing_enrollment
-            user = None
-            course_key = None
-        else:
-            enrollment = None
-            user = self.user
-            course_key = self.course_overview.id
+        user = self.user
+        course_key = self.course_overview.id
 
-        query_count = 7
-        if pass_enrollment and already_enrolled:
-            query_count = 6
+        query_count = 6
 
         with self.assertNumQueries(query_count):
             enabled = CourseDurationLimitConfig.enabled_for_enrollment(
-                enrollment=enrollment,
                 user=user,
                 course_key=course_key,
             )
@@ -98,16 +85,14 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
 
     def test_enabled_for_enrollment_failure(self):
         with self.assertRaises(ValueError):
-            CourseDurationLimitConfig.enabled_for_enrollment(None, None, None)
+            CourseDurationLimitConfig.enabled_for_enrollment(None, None)
         with self.assertRaises(ValueError):
             CourseDurationLimitConfig.enabled_for_enrollment(
-                Mock(name='enrollment'),
                 Mock(name='user'),
                 None
             )
         with self.assertRaises(ValueError):
             CourseDurationLimitConfig.enabled_for_enrollment(
-                Mock(name='enrollment'),
                 None,
                 Mock(name='course_key')
             )
@@ -157,9 +142,11 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         non_test_course_enabled = CourseOverviewFactory.create(org='non-test-org-enabled')
         non_test_course_disabled = CourseOverviewFactory.create(org='non-test-org-disabled')
         non_test_site_cfg_enabled = SiteConfigurationFactory.create(
+            site_values={'course_org_filter': non_test_course_enabled.org},
             values={'course_org_filter': non_test_course_enabled.org}
         )
         non_test_site_cfg_disabled = SiteConfigurationFactory.create(
+            site_values={'course_org_filter': non_test_course_disabled.org},
             values={'course_org_filter': non_test_course_disabled.org}
         )
 
@@ -172,7 +159,10 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
 
         # Set up test objects
         test_course = CourseOverviewFactory.create(org='test-org')
-        test_site_cfg = SiteConfigurationFactory.create(values={'course_org_filter': test_course.org})
+        test_site_cfg = SiteConfigurationFactory.create(
+            site_values={'course_org_filter': test_course.org},
+            values={'course_org_filter': test_course.org}
+        )
 
         if reverse_order:
             CourseDurationLimitConfig.objects.create(site=test_site_cfg.site, enabled=site_setting)
@@ -200,7 +190,10 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         for global_setting in (True, False, None):
             CourseDurationLimitConfig.objects.create(enabled=global_setting, enabled_as_of=datetime(2018, 1, 1))
             for site_setting in (True, False, None):
-                test_site_cfg = SiteConfigurationFactory.create(values={'course_org_filter': []})
+                test_site_cfg = SiteConfigurationFactory.create(
+                    site_values={'course_org_filter': []},
+                    values={'course_org_filter': []}
+                )
                 CourseDurationLimitConfig.objects.create(
                     site=test_site_cfg.site, enabled=site_setting, enabled_as_of=datetime(2018, 1, 1)
                 )
@@ -316,7 +309,10 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
 
     def test_caching_org(self):
         course = CourseOverviewFactory.create(org='test-org')
-        site_cfg = SiteConfigurationFactory.create(values={'course_org_filter': course.org})
+        site_cfg = SiteConfigurationFactory.create(
+            site_values={'course_org_filter': course.org},
+            values={'course_org_filter': course.org}
+        )
         org_config = CourseDurationLimitConfig(org=course.org, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         org_config.save()
 
@@ -361,7 +357,10 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
 
     def test_caching_course(self):
         course = CourseOverviewFactory.create(org='test-org')
-        site_cfg = SiteConfigurationFactory.create(values={'course_org_filter': course.org})
+        site_cfg = SiteConfigurationFactory.create(
+            site_values={'course_org_filter': course.org},
+            values={'course_org_filter': course.org}
+        )
         course_config = CourseDurationLimitConfig(course=course, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         course_config.save()
 

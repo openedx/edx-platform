@@ -2,7 +2,7 @@
 Open edX Documentation Builder
 Ties into Sphinx to generate files at the specified location(s)
 """
-from __future__ import absolute_import, print_function
+
 
 import sys
 

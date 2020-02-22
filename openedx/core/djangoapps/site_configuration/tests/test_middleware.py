@@ -2,11 +2,8 @@
 """
 Test site_configuration middleware.
 """
-from __future__ import absolute_import
 
-from mock import patch
 
-from django.conf import settings
 from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
@@ -41,6 +38,9 @@ class SessionCookieDomainTests(TestCase):
         )
         self.site_configuration = SiteConfigurationFactory.create(
             site=self.site,
+            site_values={
+                "SESSION_COOKIE_DOMAIN": self.site.domain,
+            },
             values={
                 "SESSION_COOKIE_DOMAIN": self.site.domain,
             }
@@ -76,6 +76,9 @@ class SessionCookieDomainSiteConfigurationOverrideTests(TestCase):
         )
         self.site_configuration = SiteConfigurationFactory.create(
             site=self.site,
+            site_values={
+                "SESSION_COOKIE_DOMAIN": self.site.domain,
+            },
             values={
                 "SESSION_COOKIE_DOMAIN": self.site.domain,
             }

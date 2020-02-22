@@ -1,7 +1,7 @@
 """
 Views related to operations on course objects
 """
-from __future__ import absolute_import
+
 
 import copy
 import json
@@ -102,6 +102,7 @@ from .item import create_xblock_info
 from .library import LIBRARIES_ENABLED, get_library_creator_status
 
 log = logging.getLogger(__name__)
+
 
 __all__ = ['course_info_handler', 'course_handler', 'course_listing',
            'course_info_update_handler', 'course_search_index_handler',
@@ -627,7 +628,8 @@ def course_index(request, course_key):
         lms_link = get_lms_link_for_item(course_module.location)
         reindex_link = None
         if settings.FEATURES.get('ENABLE_COURSEWARE_INDEX', False):
-            reindex_link = "/course/{course_id}/search_reindex".format(course_id=six.text_type(course_key))
+            if GlobalStaff().has_user(request.user):
+                reindex_link = "/course/{course_id}/search_reindex".format(course_id=six.text_type(course_key))
         sections = course_module.get_children()
         course_structure = _course_outline_json(request, course_module)
         locator_to_show = request.GET.get('show', None)
@@ -1311,6 +1313,11 @@ def advanced_settings_handler(request, course_key_string):
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)
+
+        advanced_dict = CourseMetadata.fetch(course_module)
+        if settings.FEATURES.get('DISABLE_MOBILE_COURSE_AVAILABLE', False):
+            advanced_dict.get('mobile_available')['deprecated'] = True
+
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
             publisher_enabled = configuration_helpers.get_value_for_org(
                 course_module.location.org,
@@ -1320,7 +1327,7 @@ def advanced_settings_handler(request, course_key_string):
 
             return render_to_response('settings_advanced.html', {
                 'context_course': course_module,
-                'advanced_dict': CourseMetadata.fetch(course_module),
+                'advanced_dict': advanced_dict,
                 'advanced_settings_url': reverse_course_url('advanced_settings_handler', course_key),
                 'publisher_enabled': publisher_enabled,
 

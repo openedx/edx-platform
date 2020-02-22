@@ -85,15 +85,27 @@ except:
 <%def name="include(path)"><%
 from django.conf import settings
 from django.template.engine import Engine
+from django.template import TemplateDoesNotExist
 from django.template.loaders.filesystem import Loader
 from openedx.core.djangoapps.theming.helpers import get_current_theme
 dirs = settings.DEFAULT_TEMPLATE_ENGINE['DIRS']
 theme = get_current_theme()
 if theme:
     dirs = list(dirs)
-    dirs.insert(0, theme.path / 'templates')
+    dirs.append(theme.path / 'templates')
 engine = Engine(dirs=dirs)
-source, template_path = Loader(engine).load_template_source(path)
+loader = Loader(engine)
+
+source = None
+for origin in loader.get_template_sources(path, dirs):
+    try:
+        source = loader.get_contents(origin)
+    except TemplateDoesNotExist:
+        pass
+
+if not source:
+    raise TemplateDoesNotExist(path)
+
 %>${source | n, decode.utf8}</%def>
 
 <%def name="studiofrontend(entry)">

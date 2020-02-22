@@ -1,7 +1,7 @@
 """
 Defines a form for providing validation of HLS Playback course-specific configuration.
 """
-from __future__ import absolute_import
+
 import logging
 
 from django import forms

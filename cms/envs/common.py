@@ -39,7 +39,6 @@ When refering to XBlocks, we use the entry-point name. For example,
 # want to import all variables from base settings files
 # pylint: disable=unused-import
 
-from __future__ import absolute_import
 
 import imp
 import os
@@ -54,7 +53,7 @@ from lms.envs.common import (
     # indirectly accessed through the email opt-in API, which is
     # technically accessible through the CMS via legacy URLs.
     PROFILE_IMAGE_BACKEND, PROFILE_IMAGE_DEFAULT_FILENAME, PROFILE_IMAGE_DEFAULT_FILE_EXTENSION,
-    PROFILE_IMAGE_SECRET_KEY, PROFILE_IMAGE_MIN_BYTES, PROFILE_IMAGE_MAX_BYTES, PROFILE_IMAGE_SIZES_MAP,
+    PROFILE_IMAGE_HASH_SEED, PROFILE_IMAGE_MIN_BYTES, PROFILE_IMAGE_MAX_BYTES, PROFILE_IMAGE_SIZES_MAP,
     # The following setting is included as it is used to check whether to
     # display credit eligibility table on the CMS or not.
     COURSE_MODE_DEFAULTS, DEFAULT_COURSE_ABOUT_IMAGE_URL,
@@ -103,6 +102,9 @@ from lms.envs.common import (
     DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH,
 
     GENERATE_PROFILE_SCORES,
+
+    # Enterprise service settings
+    ENTERPRISE_CATALOG_INTERNAL_ROOT_URL,
 
     # Methods to derive settings
     _make_mako_template_dirs,
@@ -315,7 +317,6 @@ FEATURES = {
     'ENABLE_GRADE_DOWNLOADS': True,
     'ENABLE_MKTG_SITE': False,
     'ENABLE_DISCUSSION_HOME_PANEL': True,
-    'ENABLE_COMBINED_LOGIN_REGISTRATION': True,
     'ENABLE_CORS_HEADERS': False,
     'ENABLE_CROSS_DOMAIN_CSRF_COOKIE': False,
     'ENABLE_COUNTRY_ACCESS': False,
@@ -327,6 +328,20 @@ FEATURES = {
     'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True,
     'SHOW_FOOTER_LANGUAGE_SELECTOR': False,
     'ENABLE_ENROLLMENT_RESET': False,
+    'DISABLE_MOBILE_COURSE_AVAILABLE': False,
+
+    # .. toggle_name: ENABLE_CHANGE_USER_PASSWORD_ADMIN
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to enable changing a user password through django admin. This is disabled by default because enabling allows a method to bypass password policy.
+    # .. toggle_category: admin
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2020-02-21
+    # .. toggle_expiration_date: None
+    # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/21616'
+    # .. toggle_status: supported
+    # .. toggle_warnings: None
+    'ENABLE_CHANGE_USER_PASSWORD_ADMIN': False,
 }
 
 ENABLE_JASMINE = False
@@ -476,8 +491,6 @@ AWS_S3_CUSTOM_DOMAIN = 'SET-ME-PLEASE (ex. bucket-name.s3.amazonaws.com)'
 ##############################################################################
 
 EDX_ROOT_URL = ''
-LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/home/'
-LOGIN_URL = reverse_lazy('login_redirect_to_lms')
 
 # use the ratelimit backend to prevent brute force attacks
 AUTHENTICATION_BACKENDS = [
@@ -497,14 +510,23 @@ LOGGING_ENV = 'sandbox'
 LMS_BASE = 'localhost:18000'
 LMS_ROOT_URL = "https://localhost:18000"
 LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
+
+LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/home/'
+# TODO: Determine if LOGIN_URL could be set to the FRONTEND_LOGIN_URL value instead.
+LOGIN_URL = reverse_lazy('login_redirect_to_lms')
+FRONTEND_LOGIN_URL = lambda settings: settings.LMS_ROOT_URL + '/login'
+derived('FRONTEND_LOGIN_URL')
+FRONTEND_LOGOUT_URL = lambda settings: settings.LMS_ROOT_URL + '/logout'
+derived('FRONTEND_LOGOUT_URL')
+FRONTEND_REGISTER_URL = lambda settings: settings.LMS_ROOT_URL + '/register'
+derived('FRONTEND_REGISTER_URL')
+
 LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
 ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
 ENTERPRISE_CONSENT_API_URL = LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
-FRONTEND_LOGIN_URL = LOGIN_URL
-FRONTEND_LOGOUT_URL = lambda settings: settings.LMS_ROOT_URL + '/logout'
-derived('FRONTEND_LOGOUT_URL')
 
+# Public domain name of Studio (should be resolvable from the end-user's browser)
 CMS_BASE = 'localhost:18010'
 
 LOG_DIR = '/edx/var/log/edx'
@@ -558,7 +580,7 @@ XQUEUE_INTERFACE = {
 
 ################################# Middleware ###################################
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
 
     'crum.CurrentRequestUserMiddleware',
@@ -689,7 +711,7 @@ DOC_STORE_CONFIG = {
     # https://api.mongodb.com/python/2.9.1/api/pymongo/mongo_client.html#module-pymongo.mongo_client
     # default is never timeout while the connection is open,
     #this means it needs to explicitly close raising pymongo.errors.NetworkTimeout
-    'socketTimeoutMS': 3000,
+    'socketTimeoutMS': 6000,
     'connectTimeoutMS': 2000,  # default is 20000, I believe raises pymongo.errors.ConnectionFailure
     # Not setting waitQueueTimeoutMS and waitQueueMultiple since pymongo defaults to nobody being allowed to wait
     'auth_source': None,
@@ -829,7 +851,7 @@ COURSES_WITH_UNSAFE_CODE = []
 DEBUG = False
 SESSION_COOKIE_SECURE = False
 SESSION_SAVE_EVERY_REQUEST = False
-SESSION_SERIALIZER = 'openedx.core.lib.session_serializers.PickleV2Serializer'
+SESSION_SERIALIZER = 'openedx.core.lib.session_serializers.PickleSerializer'
 SESSION_COOKIE_DOMAIN = ""
 SESSION_COOKIE_NAME = 'sessionid'
 
@@ -901,6 +923,7 @@ CERTIFICATE_TEMPLATE_LANGUAGES = {
 USE_I18N = True
 USE_L10N = True
 
+STATICI18N_FILENAME_FUNCTION = 'statici18n.utils.legacy_filename'
 STATICI18N_ROOT = PROJECT_ROOT / "static"
 
 LOCALE_PATHS = _make_locale_paths
@@ -930,6 +953,7 @@ PIPELINE = {
 }
 
 STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
+STATICFILES_STORAGE_KWARGS = {}
 
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
@@ -1345,7 +1369,6 @@ INSTALLED_APPS = [
     # other apps that are.  Django 1.8 wants to have imported models supported
     # by installed apps.
     'openedx.core.djangoapps.oauth_dispatch.apps.OAuthDispatchAppConfig',
-    'oauth_provider',
     'lms.djangoapps.courseware',
     'coursewarehistoryextended',
     'survey.apps.SurveyConfig',
@@ -1407,6 +1430,9 @@ INSTALLED_APPS = [
 
     # so sample_task is available to celery workers
     'openedx.core.djangoapps.heartbeat',
+
+    # signal handlers to capture course dates into edx-when
+    'openedx.core.djangoapps.course_date_signals',
 ]
 
 
@@ -1845,6 +1871,12 @@ ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = {}
 
 BASE_COOKIE_DOMAIN = 'localhost'
+
+# This limits the type of roles that are submittable via the `student` app's manual enrollment
+# audit API. While this isn't used in CMS, it is used via Enterprise which is installed in
+# the CMS. Without this, we get errors.
+MANUAL_ENROLLMENT_ROLE_CHOICES = ['Learner', 'Support', 'Partner']
+
 ############## Settings for the Discovery App ######################
 
 COURSE_CATALOG_API_URL = 'http://localhost:8008/api/v1'
@@ -1888,6 +1920,9 @@ VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
 
 ########## Settings youtube thumbnails scraper tasks ############
 SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
+
+########## Settings update search index task ############
+UPDATE_SEARCH_INDEX_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
 
 ###################### VIDEO IMAGE STORAGE ######################
 
@@ -2081,7 +2116,10 @@ PROCTORING_SETTINGS = {}
 
 ################## BLOCKSTORE RELATED SETTINGS  #########################
 BLOCKSTORE_PUBLIC_URL_ROOT = 'http://localhost:18250'
-BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1'
+BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
+# Which of django's caches to use for storing anonymous user state for XBlocks
+# in the blockstore-based XBlock runtime
+XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
 
 ###################### LEARNER PORTAL ################################
 LEARNER_PORTAL_URL_ROOT = 'https://learner-portal-localhost:18000'
@@ -2116,3 +2154,31 @@ REGISTRATION_EXTRA_FIELDS = {
     'country': 'hidden',
 }
 EDXAPP_PARSE_KEYS = {}
+
+###################### DEPRECATED URLS ##########################
+
+# .. toggle_name: DISABLE_DEPRECATED_SIGNIN_URL
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Toggle for removing the deprecated /signin url.
+# .. toggle_category: n/a
+# .. toggle_use_cases: incremental_release
+# .. toggle_creation_date: 2019-12-02
+# .. toggle_expiration_date: 2020-06-01
+# .. toggle_warnings: This url can be removed once it no longer has any real traffic.
+# .. toggle_tickets: ARCH-1253
+# .. toggle_status: supported
+DISABLE_DEPRECATED_SIGNIN_URL = False
+
+# .. toggle_name: DISABLE_DEPRECATED_SIGNUP_URL
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Toggle for removing the deprecated /signup url.
+# .. toggle_category: n/a
+# .. toggle_use_cases: incremental_release
+# .. toggle_creation_date: 2019-12-02
+# .. toggle_expiration_date: 2020-06-01
+# .. toggle_warnings: This url can be removed once it no longer has any real traffic.
+# .. toggle_tickets: ARCH-1253
+# .. toggle_status: supported
+DISABLE_DEPRECATED_SIGNUP_URL = False

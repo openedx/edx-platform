@@ -2,7 +2,6 @@
 Tests for Blocks api.py
 """
 
-from __future__ import absolute_import
 
 from itertools import product
 
@@ -48,10 +47,10 @@ class TestGetBlocks(SharedModuleStoreTestCase):
 
     def test_basic(self):
         blocks = get_blocks(self.request, self.course.location, self.user)
-        self.assertEquals(blocks['root'], six.text_type(self.course.location))
+        self.assertEqual(blocks['root'], six.text_type(self.course.location))
 
         # subtract for (1) the orphaned course About block and (2) the hidden Html block
-        self.assertEquals(len(blocks['blocks']), len(self.store.get_items(self.course.id)) - 2)
+        self.assertEqual(len(blocks['blocks']), len(self.store.get_items(self.course.id)) - 2)
         self.assertNotIn(six.text_type(self.html_block.location), blocks['blocks'])
 
     def test_no_user(self):
@@ -76,8 +75,8 @@ class TestGetBlocks(SharedModuleStoreTestCase):
         sequential_block = self.store.get_item(self.course.id.make_usage_key('sequential', 'sequential_y1'))
 
         blocks = get_blocks(self.request, sequential_block.location, self.user)
-        self.assertEquals(blocks['root'], six.text_type(sequential_block.location))
-        self.assertEquals(len(blocks['blocks']), 5)
+        self.assertEqual(blocks['root'], six.text_type(sequential_block.location))
+        self.assertEqual(len(blocks['blocks']), 5)
 
         for block_type, block_name, is_inside_of_structure in (
                 ('vertical', 'vertical_y1a', True),
@@ -96,7 +95,7 @@ class TestGetBlocks(SharedModuleStoreTestCase):
 
         # not filtered blocks
         blocks = get_blocks(self.request, sequential_block.location, self.user, requested_fields=['type'])
-        self.assertEquals(len(blocks['blocks']), 5)
+        self.assertEqual(len(blocks['blocks']), 5)
         found_not_problem = False
         for block in six.itervalues(blocks['blocks']):
             if block['type'] != 'problem':
@@ -106,7 +105,7 @@ class TestGetBlocks(SharedModuleStoreTestCase):
         # filtered blocks
         blocks = get_blocks(self.request, sequential_block.location, self.user,
                             block_types_filter=['problem'], requested_fields=['type'])
-        self.assertEquals(len(blocks['blocks']), 3)
+        self.assertEqual(len(blocks['blocks']), 3)
         for block in six.itervalues(blocks['blocks']):
             self.assertEqual(block['type'], 'problem')
 

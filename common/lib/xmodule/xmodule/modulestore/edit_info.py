@@ -1,7 +1,7 @@
 """
 Access methods to get EditInfo for xblocks
 """
-from __future__ import absolute_import
+
 
 from abc import ABCMeta, abstractmethod
 

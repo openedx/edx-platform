@@ -1,7 +1,7 @@
 """
 Dummy backend, for use in testing.
 """
-from __future__ import absolute_import
+
 
 from lms.djangoapps.badges.backends.base import BadgeBackend
 from lms.djangoapps.badges.tests.factories import BadgeAssertionFactory

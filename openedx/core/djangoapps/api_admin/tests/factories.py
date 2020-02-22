@@ -1,5 +1,5 @@
 """Factories for API management."""
-from __future__ import absolute_import
+
 
 import factory
 from factory.django import DjangoModelFactory

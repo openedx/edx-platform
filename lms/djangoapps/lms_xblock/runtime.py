@@ -1,7 +1,7 @@
 """
 Module implementing `xblock.runtime.Runtime` functionality for the LMS
 """
-from __future__ import absolute_import
+
 
 import six
 import xblock.reference.plugins
@@ -13,13 +13,14 @@ from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
 from badges.service import BadgingService
 from badges.utils import badges_enabled
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
+from lms.djangoapps.teams.services import TeamsService
 from openedx.core.djangoapps.user_api.course_tag import api as user_course_tag_api
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_utils import wrap_xblock_aside, xblock_local_resource_url
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.partitions.partitions_service import PartitionService
-from xmodule.services import SettingsService
+from xmodule.services import SettingsService, TeamsConfigurationService
 from xmodule.x_module import ModuleSystem
 
 
@@ -142,7 +143,7 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         services = kwargs.setdefault('services', {})
         user = kwargs.get('user')
         if user and user.is_authenticated:
-            services['completion'] = CompletionService(user=user, course_key=kwargs.get('course_id'))
+            services['completion'] = CompletionService(user=user, context_key=kwargs.get('course_id'))
         services['fs'] = xblock.reference.plugins.FSService()
         services['i18n'] = ModuleI18nService
         services['library_tools'] = LibraryToolsService(store)
@@ -155,6 +156,8 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         if badges_enabled():
             services['badging'] = BadgingService(course_id=kwargs.get('course_id'), modulestore=store)
         self.request_token = kwargs.pop('request_token', None)
+        services['teams'] = TeamsService()
+        services['teams_configuration'] = TeamsConfigurationService()
         super(LmsModuleSystem, self).__init__(**kwargs)
 
     def handler_url(self, *args, **kwargs):

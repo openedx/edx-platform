@@ -16,7 +16,7 @@ To start this stub server on its own from Vagrant:
 3.) Locally, try accessing http://localhost:8031/ and see that
     you get "Unused url" message inside the browser.
 """
-from __future__ import absolute_import
+
 
 import json
 import time

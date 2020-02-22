@@ -1,7 +1,7 @@
 """
 Views for the credit Django app.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import datetime
 import logging
@@ -18,7 +18,7 @@ from rest_framework import generics, mixins, permissions, views, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from rest_framework_oauth.authentication import OAuth2Authentication
+from openedx.core.lib.api.authentication import BearerAuthentication
 from six import text_type
 
 from openedx.core.djangoapps.credit.api import create_credit_request
@@ -45,7 +45,7 @@ from openedx.core.lib.api.mixins import PutAsCreateMixin
 from openedx.core.lib.api.permissions import IsStaffOrOwner
 
 log = logging.getLogger(__name__)
-AUTHENTICATION_CLASSES = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
+AUTHENTICATION_CLASSES = (JwtAuthentication, BearerAuthentication, SessionAuthentication,)
 
 
 class CreditProviderViewSet(viewsets.ReadOnlyModelViewSet):

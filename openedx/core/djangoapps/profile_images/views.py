@@ -1,7 +1,7 @@
 """
 This module implements the upload and remove endpoints of the profile image api.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import itertools
@@ -20,7 +20,7 @@ from six import text_type
 
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
 from openedx.core.djangoapps.user_api.errors import UserNotFound
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import TypedFileUploadParser
 from openedx.core.lib.api.permissions import IsUserInUrl
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
@@ -115,7 +115,7 @@ class ProfileImageView(DeveloperErrorViewMixin, APIView):
     parser_classes = (MultiPartParser, FormParser, TypedFileUploadParser)
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (permissions.IsAuthenticated, IsUserInUrl)

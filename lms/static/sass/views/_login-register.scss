@@ -87,7 +87,8 @@
     color: $uxpl-gray-dark;
   }
 
-  a, label {
+  a,
+  label {
     @extend %expand-clickable-area;
   }
 
@@ -445,12 +446,13 @@
 
     select {
       background: transparent;
-      opacity: 0.85;
-      border: none;
-      outline: solid 1px $gray-l3;
+      border: 1px solid $gray;
       cursor: pointer;
+      -webkit-appearance: none;
+      -webkit-border-radius: 0;
 
-      &:active, &:focus {
+      &:active,
+      &:focus {
         outline: auto;
       }
     }
@@ -481,6 +483,7 @@
 
   .input-block {
     width: 100%;
+    border-color: $gray;
   }
 
   .input-inline {

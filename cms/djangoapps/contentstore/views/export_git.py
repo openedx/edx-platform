@@ -3,7 +3,6 @@ This views handles exporting the course xml to a git repository if
 the giturl attribute is set.
 """
 
-from __future__ import absolute_import
 
 import logging
 

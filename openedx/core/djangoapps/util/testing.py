@@ -1,5 +1,5 @@
 """ Mixins for setting up particular course structures (such as split tests or cohorted content) """
-from __future__ import absolute_import
+
 
 from datetime import datetime
 
@@ -10,6 +10,7 @@ from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.django_comment_common.models import Role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
+from openedx.core.lib.teams_config import TeamsConfig
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -51,7 +52,14 @@ class ContentGroupTestCase(ModuleStoreTestCase):
                 }]
             },
             cohort_config={'cohorted': True},
-            discussion_topics={}
+            discussion_topics={},
+            teams_configuration=TeamsConfig({
+                'topics': [{
+                    'id': 'topic_id',
+                    'name': 'topic_name',
+                    'description': 'topic_desc',
+                }]
+            })
         )
 
         seed_permissions_roles(self.course.id)

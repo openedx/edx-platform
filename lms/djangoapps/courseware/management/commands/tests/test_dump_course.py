@@ -4,7 +4,6 @@
 Tests for Django management commands
 """
 
-from __future__ import absolute_import
 
 import json
 from six import StringIO

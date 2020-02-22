@@ -1,7 +1,7 @@
 """
 Tests for experimentation views
 """
-from __future__ import absolute_import
+
 
 from datetime import timedelta
 from uuid import uuid4

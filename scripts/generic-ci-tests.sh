@@ -194,7 +194,7 @@ case "$TEST_SUITE" in
                 ;;
 
             25|"noshard")
-                $TOX paver test_bokchoy --eval-attr="(shard>=$SHARD or not shard) and not a11y" $PAVER_ARGS
+                $TOX paver test_bokchoy --eval-attr="(not shard or shard>=$SHARD) and not a11y" $PAVER_ARGS
                 ;;
 
             # Default case because if we later define another bok-choy shard on Jenkins

@@ -1,7 +1,7 @@
 """
 Helper functions for test tasks
 """
-from __future__ import absolute_import, print_function
+
 
 import os
 import re
@@ -179,5 +179,6 @@ def upload_coverage_to_s3():
     upload_to_s3(
         COVERAGE_CACHE_BASELINE,
         'reports/{}.coverage'.format(os.environ.get('TEST_SUITE', '')),
-        COVERAGE_CACHE_BUCKET
+        COVERAGE_CACHE_BUCKET,
+        replace=True,
     )

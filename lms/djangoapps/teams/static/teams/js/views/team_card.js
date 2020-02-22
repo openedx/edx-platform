@@ -10,7 +10,9 @@
         'teams/js/views/team_utils',
         'text!teams/templates/team-membership-details.underscore',
         'text!teams/templates/team-country-language.underscore',
-        'text!teams/templates/date.underscore'
+        'text!teams/templates/date.underscore',
+        'edx-ui-toolkit/js/utils/html-utils',
+        'edx-ui-toolkit/js/utils/string-utils'
     ], function(
         $,
         Backbone,
@@ -21,40 +23,56 @@
         TeamUtils,
         teamMembershipDetailsTemplate,
         teamCountryLanguageTemplate,
-        dateTemplate
+        dateTemplate,
+        HtmlUtils,
+        StringUtils
     ) {
         var TeamMembershipView, TeamCountryLanguageView, TeamActivityView, TeamCardView;
 
         TeamMembershipView = Backbone.View.extend({
             tagName: 'div',
             className: 'team-members',
-            template: _.template(teamMembershipDetailsTemplate),
 
             initialize: function(options) {
+                this.getTopicType = options.getTopicType;
+                this.topicId = options.topicId;
                 this.maxTeamSize = options.maxTeamSize;
                 this.memberships = options.memberships;
             },
 
             render: function() {
+                var view = this;
+                this.getTopicType(this.topicId).done(function(topicType) {
+                    view.renderMessage(topicType !== 'open');
+                }).fail(function() {
+                    view.renderMessage(false);
+                });
+                return view;
+            },
+
+            renderMessage: function(topicIsManaged) {
                 var allMemberships = _(this.memberships).sortBy(function(member) {
                         return new Date(member.last_activity_at);
                     }).reverse(),
                     displayableMemberships = allMemberships.slice(0, 5),
                     maxMemberCount = this.maxTeamSize;
-                this.$el.html(this.template({
-                    membership_message: TeamUtils.teamCapacityText(allMemberships.length, maxMemberCount),
-                    memberships: displayableMemberships,
-                    has_additional_memberships: displayableMemberships.length < allMemberships.length,
-                    // Translators: "and others" refers to fact that additional members of a team exist that are not displayed.
-                    sr_message: gettext('and others')
-                }));
-                return this;
+                HtmlUtils.setHtml(
+                    this.$el,
+                    HtmlUtils.template(teamMembershipDetailsTemplate)({
+                        membership_message: TeamUtils.teamCapacityText(
+                            allMemberships.length,
+                            topicIsManaged ? null : maxMemberCount),
+                        memberships: displayableMemberships,
+                        has_additional_memberships: displayableMemberships.length < allMemberships.length,
+                        /* Translators: "and others" refers to fact that additional
+                         * members of a team exist that are not displayed. */
+                        sr_message: gettext('and others')
+                    })
+                );
             }
         });
 
         TeamCountryLanguageView = Backbone.View.extend({
-            template: _.template(teamCountryLanguageTemplate),
-
             initialize: function(options) {
                 this.countries = options.countries;
                 this.languages = options.languages;
@@ -62,10 +80,13 @@
 
             render: function() {
                 // this.$el should be the card meta div
-                this.$el.append(this.template({
-                    country: this.countries[this.model.get('country')],
-                    language: this.languages[this.model.get('language')]
-                }));
+                HtmlUtils.append(
+                    this.$el,
+                    HtmlUtils.template(teamCountryLanguageTemplate)({
+                        country: this.countries[this.model.get('country')],
+                        language: this.languages[this.model.get('language')]
+                    })
+                );
             }
         });
 
@@ -82,12 +103,17 @@
                 var lastActivity = moment(this.date),
                     currentLanguage = $('html').attr('lang');
                 lastActivity.locale(currentLanguage);
-                this.$el.html(
-                    interpolate(
-                        // Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see: http://momentjs.com/)
-                        gettext('Last activity %(date)s'),
-                        {date: this.template({date: lastActivity.format('MMMM Do YYYY, h:mm:ss a')})},
-                        true
+                HtmlUtils.setHtml(
+                    this.$el,
+                    HtmlUtils.HTML(
+                        StringUtils.interpolate(
+                            /* Translators: 'date' is a placeholder for a fuzzy,
+                             * relative timestamp (see: http://momentjs.com/)
+                             */
+                            gettext('Last activity {date}'),
+                            {date: this.template({date: lastActivity.format('MMMM Do YYYY, h:mm:ss a')})},
+                            true
+                        )
                     )
                 );
                 this.$('abbr').text(lastActivity.fromNow());
@@ -99,7 +125,12 @@
                 CardView.prototype.initialize.apply(this, arguments);
                 // TODO: show last activity detail view
                 this.detailViews = [
-                    new TeamMembershipView({memberships: this.model.get('membership'), maxTeamSize: this.maxTeamSize}),
+                    new TeamMembershipView({
+                        memberships: this.model.get('membership'),
+                        maxTeamSize: this.maxTeamSize,
+                        topicId: this.model.get('topic_id'),
+                        getTopicType: this.getTopicType
+                    }),
                     new TeamCountryLanguageView({
                         model: this.model,
                         countries: this.countries,
@@ -119,14 +150,22 @@
             details: function() { return this.detailViews; },
             actionClass: 'action-view',
             actionContent: function() {
-                return interpolate(
-                    gettext('View %(span_start)s %(team_name)s %(span_end)s'),
+                return StringUtils.interpolate(
+                    gettext('View {span_start} {team_name} {span_end}'),
                     {span_start: '<span class="sr">', team_name: _.escape(this.model.get('name')), span_end: '</span>'},
                     true
                 );
             },
             actionUrl: function() {
                 return '#teams/' + this.model.get('topic_id') + '/' + this.model.get('id');
+            },
+            // eslint-disable-next-line no-unused-vars
+            getTopicType: function(topicId) {
+                // This function will be overrwritten in the extended class in TeamsView
+                // That will in turn be overwritten by functions in TopicTeamsView and MyTeamsView
+                var deferred = $.Deferred();
+                deferred.resolve('open');
+                return deferred.promise();
             }
         });
         return TeamCardView;

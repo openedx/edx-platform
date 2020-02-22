@@ -1,7 +1,7 @@
 """
 Test helpers for Comprehensive Theming.
 """
-from __future__ import absolute_import
+
 
 import six
 from django.conf import settings
@@ -153,16 +153,12 @@ class TestHelpersLMS(TestCase):
 
 @skip_unless_cms
 class TestHelpersCMS(TestCase):
-    """Test comprehensive theming helper functions."""
+    """
+    Test comprehensive theming helper functions.
 
-    @with_comprehensive_theme('red-theme')
-    def test_get_template_path_with_theme_enabled(self):
-        """
-        Tests template paths are returned from enabled theme.
-        """
-        template_path = get_template_path_with_theme('login.html')
-        self.assertEqual(template_path, 'red-theme/cms/templates/login.html')
-
+    Note: There is no `test_get_template_path_with_theme_enabled` because there currently
+    is no template to be themed.
+    """
     @with_comprehensive_theme('red-theme')
     def test_get_template_path_with_theme_for_missing_template(self):
         """

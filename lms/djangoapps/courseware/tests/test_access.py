@@ -2,7 +2,7 @@
 """
 Test the access control framework
 """
-from __future__ import absolute_import
+
 
 import datetime
 import itertools
@@ -407,7 +407,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
                 (self.course_staff, expected_staff),
                 (self.course_instructor, expected_instructor)
         ):
-            self.assertEquals(
+            self.assertEqual(
                 bool(access._has_access_error_desc(user, action, descriptor, self.course.id)),
                 expected_response
             )
@@ -849,7 +849,7 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
                 num_queries = 1
         elif user_attr_name == 'user_normal' and action == 'see_exists':
             if course_attr_name == 'course_started':
-                num_queries = 7
+                num_queries = 6
             else:
                 # checks staff role and enrollment data
                 num_queries = 2

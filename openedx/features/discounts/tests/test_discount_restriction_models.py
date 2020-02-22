@@ -1,7 +1,7 @@
 """
 Test discount restriction config
 """
-from __future__ import absolute_import
+
 
 import itertools
 
@@ -59,9 +59,11 @@ class TestDiscountRestrictionConfig(CacheIsolationTestCase):
         non_test_course_disabled = CourseOverviewFactory.create(org='non-test-org-disabled')
         non_test_course_enabled = CourseOverviewFactory.create(org='non-test-org-enabled')
         non_test_site_cfg_disabled = SiteConfigurationFactory.create(
+            site_values={'course_org_filter': non_test_course_disabled.org},
             values={'course_org_filter': non_test_course_disabled.org}
         )
         non_test_site_cfg_enabled = SiteConfigurationFactory.create(
+            site_values={'course_org_filter': non_test_course_enabled.org},
             values={'course_org_filter': non_test_course_enabled.org}
         )
 
@@ -74,7 +76,10 @@ class TestDiscountRestrictionConfig(CacheIsolationTestCase):
 
         # Set up test objects
         test_course = CourseOverviewFactory.create(org='test-org')
-        test_site_cfg = SiteConfigurationFactory.create(values={'course_org_filter': test_course.org})
+        test_site_cfg = SiteConfigurationFactory.create(
+            site_values={'course_org_filter': test_course.org},
+            values={'course_org_filter': test_course.org}
+        )
 
         DiscountRestrictionConfig.objects.create(disabled=global_setting)
         DiscountRestrictionConfig.objects.create(course=test_course, disabled=course_setting)

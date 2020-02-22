@@ -1,5 +1,5 @@
 """Utilities for working with ID tokens."""
-from __future__ import absolute_import
+
 
 import json
 from time import time

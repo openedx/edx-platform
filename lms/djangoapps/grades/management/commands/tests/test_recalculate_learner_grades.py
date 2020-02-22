@@ -2,7 +2,6 @@
 Tests for recalculate_learner_grades management command.
 """
 
-from __future__ import absolute_import
 
 from tempfile import NamedTemporaryFile
 

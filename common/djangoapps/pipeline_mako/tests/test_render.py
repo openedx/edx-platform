@@ -1,6 +1,5 @@
 """ Tests for rendering functions in the mako pipeline. """
 
-from __future__ import absolute_import
 
 import ddt
 from mock import patch

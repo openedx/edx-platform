@@ -2,7 +2,6 @@
 Course API Views
 """
 
-from __future__ import absolute_import
 
 from django.core.exceptions import ValidationError
 from edx_rest_framework_extensions.paginators import NamespacedPageNumberPagination
@@ -12,9 +11,9 @@ from rest_framework.throttling import UserRateThrottle
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 
 from . import USE_RATE_LIMIT_2_FOR_COURSE_LIST_API, USE_RATE_LIMIT_10_FOR_COURSE_LIST_API
-from .api import course_detail, list_courses
-from .forms import CourseDetailGetForm, CourseListGetForm
-from .serializers import CourseDetailSerializer, CourseSerializer
+from .api import course_detail, list_course_keys, list_courses
+from .forms import CourseDetailGetForm, CourseIdListGetForm, CourseListGetForm
+from .serializers import CourseDetailSerializer, CourseKeySerializer, CourseSerializer
 
 
 @view_auth_classes(is_authenticated=False)
@@ -160,6 +159,25 @@ class CourseListUserThrottle(UserRateThrottle):
         return super(CourseListUserThrottle, self).allow_request(request, view)
 
 
+class LazyPageNumberPagination(NamespacedPageNumberPagination):
+    """
+    NamespacedPageNumberPagination that works with a LazySequence queryset.
+
+    The paginator cache uses ``@cached_property`` to cache the property values for
+    count and num_pages.  It assumes these won't change, but in the case of a
+    LazySquence, its count gets updated as we move through it.  This class clears
+    the cached property values before reporting results so they will be recalculated.
+
+    """
+
+    def get_paginated_response(self, data):
+        # Clear the cached property values to recalculate the estimated count from the LazySequence
+        del self.page.paginator.__dict__['count']
+        del self.page.paginator.__dict__['num_pages']
+
+        return super(LazyPageNumberPagination, self).get_paginated_response(data)
+
+
 @view_auth_classes(is_authenticated=False)
 class CourseListView(DeveloperErrorViewMixin, ListAPIView):
     """
@@ -176,6 +194,7 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
         Body comprises a list of objects as returned by `CourseDetailView`.
 
     **Parameters**
+
         search_term (optional):
             Search term to filter courses (used by ElasticSearch).
 
@@ -188,12 +207,6 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
             If specified, visible `CourseOverview` objects are filtered
             such that only those belonging to the organization with the
             provided org code (e.g., "HarvardX") are returned.
-            Case-insensitive.
-
-        role (optional):
-            If specified, visible `CourseOverview` objects are filtered
-            such that only those for which the user has the specified role
-            are returned. Multiple role parameters can be specified.
             Case-insensitive.
 
     **Returns**
@@ -232,9 +245,10 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
               }
             ]
     """
+    class CourseListPageNumberPagination(LazyPageNumberPagination):
+        max_page_size = 100
 
-    pagination_class = NamespacedPageNumberPagination
-    pagination_class.max_page_size = 100
+    pagination_class = CourseListPageNumberPagination
     serializer_class = CourseSerializer
     throttle_classes = (CourseListUserThrottle,)
 
@@ -250,7 +264,101 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
             self.request,
             form.cleaned_data['username'],
             org=form.cleaned_data['org'],
-            roles=form.cleaned_data['role'],
             filter_=form.cleaned_data['filter_'],
             search_term=form.cleaned_data['search_term']
+        )
+
+
+class CourseIdListUserThrottle(UserRateThrottle):
+    """Limit the number of requests users can make to the course list id API."""
+
+    THROTTLE_RATES = {
+        'user': '20/minute',
+        'staff': '40/minute',
+    }
+
+    def allow_request(self, request, view):
+        # Use a special scope for staff to allow for a separate throttle rate
+        user = request.user
+        if user.is_authenticated and (user.is_staff or user.is_superuser):
+            self.scope = 'staff'
+            self.rate = self.get_rate()
+            self.num_requests, self.duration = self.parse_rate(self.rate)
+
+        return super(CourseIdListUserThrottle, self).allow_request(request, view)
+
+
+@view_auth_classes()
+class CourseIdListView(DeveloperErrorViewMixin, ListAPIView):
+    """
+    **Use Cases**
+
+        Request a list of course IDs for all courses the specified user can
+        access based on the provided parameters.
+
+    **Example Requests**
+
+        GET /api/courses/v1/courses_ids/
+
+    **Response Values**
+
+        Body comprises a list of course ids and pagination details.
+
+    **Parameters**
+
+        username (optional):
+            The username of the specified user whose visible courses we
+            want to see.
+
+        role (required):
+            Course ids are filtered such that only those for which the
+            user has the specified role are returned. Role can be "staff"
+            or "instructor".
+            Case-insensitive.
+
+    **Returns**
+
+        * 200 on success, with a list of course ids and pagination details
+        * 400 if an invalid parameter was sent or the username was not provided
+          for an authenticated request.
+        * 403 if a user who does not have permission to masquerade as
+          another user who specifies a username other than their own.
+        * 404 if the specified user does not exist, or the requesting user does
+          not have permission to view their courses.
+
+        Example response:
+
+            {
+                "results":
+                    [
+                        "course-v1:edX+DemoX+Demo_Course"
+                    ],
+                "pagination": {
+                    "previous": null,
+                    "num_pages": 1,
+                    "next": null,
+                    "count": 1
+                }
+            }
+
+    """
+    class CourseIdListPageNumberPagination(LazyPageNumberPagination):
+        max_page_size = 1000
+
+    pagination_class = CourseIdListPageNumberPagination
+    serializer_class = CourseKeySerializer
+    throttle_classes = (CourseIdListUserThrottle,)
+
+    def get_queryset(self):
+        """
+        Returns CourseKeys for courses which the user has the provided role.
+        """
+        form = CourseIdListGetForm(self.request.query_params, initial={'requesting_user': self.request.user})
+        if not form.is_valid():
+            raise ValidationError(form.errors)
+
+        return list_course_keys(
+            self.request,
+            form.cleaned_data['username'],
+            role=form.cleaned_data['role'],
         )

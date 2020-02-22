@@ -1,8 +1,7 @@
 """
 Courseware views functions
 """
-from __future__ import absolute_import
-from __future__ import division
+
 
 import json
 import logging
@@ -36,6 +35,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from django.views.generic import View
 from edx_django_utils.monitoring import set_custom_metrics_for_course_key
+from edxnotes.helpers import is_feature_enabled
 from ipware.ip import get_ip
 from markupsafe import escape
 from opaque_keys import InvalidKeyError
@@ -281,10 +281,21 @@ def yt_video_metadata(request):
     Will hit the youtube API if the key is available in settings
     :return: youtube video metadata
     """
-    response = {}
-    status_code = 500
     video_id = request.GET.get('id', None)
-    if settings.YOUTUBE_API_KEY and video_id:
+    metadata, status_code = load_metadata_from_youtube(video_id)
+    return Response(metadata, status=status_code, content_type='application/json')
+
+
+def load_metadata_from_youtube(video_id):
+    """
+    Get metadata about a YouTube video.
+
+    This method is used via the standalone /courses/yt_video_metadata REST API
+    endpoint, or via the video XBlock as a its 'yt_video_metadata' handler.
+    """
+    metadata = {}
+    status_code = 500
+    if video_id and settings.YOUTUBE_API_KEY and settings.YOUTUBE_API_KEY != 'PUT_YOUR_API_KEY_HERE':
         yt_api_key = settings.YOUTUBE_API_KEY
         yt_metadata_url = settings.YOUTUBE['METADATA_URL']
         yt_timeout = settings.YOUTUBE.get('TEST_TIMEOUT', 1500) / 1000  # converting milli seconds to seconds
@@ -294,9 +305,9 @@ def yt_video_metadata(request):
             status_code = res.status_code
             if res.status_code == 200:
                 try:
-                    res = res.json()
-                    if res.get('items', []):
-                        response = res
+                    res_json = res.json()
+                    if res_json.get('items', []):
+                        metadata = res_json
                     else:
                         logging.warning(u'Unable to find the items in response. Following response '
                                         u'was received: {res}'.format(res=res.text))
@@ -311,7 +322,7 @@ def yt_video_metadata(request):
     else:
         logging.warning(u'YouTube API key or video id is None. Please make sure API key and video id is not None')
 
-    return Response(response, status=status_code, content_type='application/json')
+    return metadata, status_code
 
 
 @ensure_csrf_cookie
@@ -355,7 +366,7 @@ def jump_to(_request, course_id, location):
     except InvalidKeyError:
         raise Http404(u"Invalid course_key or usage_key")
     try:
-        redirect_url = get_redirect_url(course_key, usage_key)
+        redirect_url = get_redirect_url(course_key, usage_key, _request)
     except ItemNotFoundError:
         raise Http404(u"No data at this location: {0}".format(usage_key))
     except NoPathToItem:
@@ -905,15 +916,18 @@ def course_about(request, course_id):
         ecommerce_checkout = ecomm_service.is_enabled(request.user)
         ecommerce_checkout_link = ''
         ecommerce_bulk_checkout_link = ''
-        professional_mode = None
-        is_professional_mode = CourseMode.PROFESSIONAL in modes or CourseMode.NO_ID_PROFESSIONAL_MODE in modes
-        if ecommerce_checkout and is_professional_mode:
-            professional_mode = modes.get(CourseMode.PROFESSIONAL, '') or \
-                modes.get(CourseMode.NO_ID_PROFESSIONAL_MODE, '')
-            if professional_mode.sku:
-                ecommerce_checkout_link = ecomm_service.get_checkout_page_url(professional_mode.sku)
-            if professional_mode.bulk_sku:
-                ecommerce_bulk_checkout_link = ecomm_service.get_checkout_page_url(professional_mode.bulk_sku)
+        single_paid_mode = None
+        if ecommerce_checkout:
+            if len(modes) == 1 and list(modes.values())[0].min_price:
+                single_paid_mode = list(modes.values())[0]
+            else:
+                # have professional ignore other modes for historical reasons
+                single_paid_mode = modes.get(CourseMode.PROFESSIONAL)
+
+            if single_paid_mode and single_paid_mode.sku:
+                ecommerce_checkout_link = ecomm_service.get_checkout_page_url(single_paid_mode.sku)
+            if single_paid_mode and single_paid_mode.bulk_sku:
+                ecommerce_bulk_checkout_link = ecomm_service.get_checkout_page_url(single_paid_mode.bulk_sku)
 
         registration_price, course_price = get_course_prices(course)
 
@@ -964,7 +978,7 @@ def course_about(request, course_id):
             'ecommerce_checkout': ecommerce_checkout,
             'ecommerce_checkout_link': ecommerce_checkout_link,
             'ecommerce_bulk_checkout_link': ecommerce_bulk_checkout_link,
-            'professional_mode': professional_mode,
+            'single_paid_mode': single_paid_mode,
             'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
             'show_courseware_link': show_courseware_link,
             'is_course_full': is_course_full,
@@ -1098,9 +1112,9 @@ def _progress(request, course_key, student_id):
         'student': student,
         'credit_course_requirements': _credit_course_requirements(course_key, student),
         'course_expiration_fragment': course_expiration_fragment,
+        'certificate_data': _get_cert_data(student, course, enrollment_mode, course_grade)
     }
-    if certs_api.get_active_web_certificate(course):
-        context['certificate_data'] = _get_cert_data(student, course, enrollment_mode, course_grade)
+
     context.update(
         get_experiment_user_metadata_context(
             course,
@@ -1123,7 +1137,7 @@ def _downloadable_certificate_message(course, cert_downloadable_status):
                     course_id=course.id, uuid=cert_downloadable_status['uuid']
                 )
             )
-        else:
+        elif not cert_downloadable_status['is_pdf_certificate']:
             return GENERATING_CERT_DATA
 
     return _downloadable_cert_data(download_url=cert_downloadable_status['download_url'])
@@ -1166,7 +1180,8 @@ def _get_cert_data(student, course, enrollment_mode, course_grade=None):
     Returns:
         returns dict if course certificate is available else None.
     """
-    if not CourseMode.is_eligible_for_certificate(enrollment_mode):
+    cert_data = _certificate_message(student, course, enrollment_mode)
+    if not CourseMode.is_eligible_for_certificate(enrollment_mode, status=cert_data.cert_status):
         return INELIGIBLE_PASSING_CERT_DATA.get(enrollment_mode)
 
     certificates_enabled_for_course = certs_api.cert_generation_enabled(course.id)
@@ -1176,7 +1191,10 @@ def _get_cert_data(student, course, enrollment_mode, course_grade=None):
     if not auto_certs_api.can_show_certificate_message(course, student, course_grade, certificates_enabled_for_course):
         return
 
-    return _certificate_message(student, course, enrollment_mode)
+    if not certs_api.get_active_web_certificate(course) and not auto_certs_api.is_valid_pdf_certificate(cert_data):
+        return
+
+    return cert_data
 
 
 def _credit_course_requirements(course_key, student):
@@ -1569,7 +1587,8 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
         )
 
         student_view_context = request.GET.dict()
-        student_view_context['show_bookmark_button'] = False
+        student_view_context['show_bookmark_button'] = request.GET.get('show_bookmark_button', '0') == '1'
+        student_view_context['show_title'] = request.GET.get('show_title', '1') == '1'
 
         enable_completion_on_view_service = False
         completion_service = block.runtime.service(block, 'completion')
@@ -1589,6 +1608,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'disable_footer': True,
             'disable_window_wrap': True,
             'enable_completion_on_view_service': enable_completion_on_view_service,
+            'edx_notes_enabled': is_feature_enabled(course, request.user),
             'staff_access': bool(request.user.has_perm(VIEW_XQA_INTERFACE, course)),
             'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
         }
@@ -1619,7 +1639,7 @@ FA_GOALS_LABEL = 'Tell us about your learning or professional goals. How will a 
 FA_EFFORT_LABEL = 'Tell us about your plans for this course. What steps will you take to help you complete ' \
                   'the course work and receive a certificate?'
 
-FA_SHORT_ANSWER_INSTRUCTIONS = _('Use between 250 and 500 words or so in your response.')
+FA_SHORT_ANSWER_INSTRUCTIONS = _('Use between 1250 and 2500 characters or so in your response.')
 
 
 @login_required
@@ -1703,7 +1723,10 @@ def financial_assistance_form(request):
     """Render the financial assistance application form page."""
     user = request.user
     enrolled_courses = get_financial_aid_courses(user)
-    incomes = ['Less than $5,000', '$5,000 - $10,000', '$10,000 - $15,000', '$15,000 - $20,000', '$20,000 - $25,000']
+    incomes = ['Less than $5,000', '$5,000 - $10,000', '$10,000 - $15,000', '$15,000 - $20,000', '$20,000 - $25,000',
+               '$25,000 - $40,000', '$40,000 - $55,000', '$55,000 - $70,000', '$70,000 - $85,000',
+               '$85,000 - $100,000', 'More than $100,000']
+
     annual_incomes = [
         {'name': _(income), 'value': income} for income in incomes
     ]

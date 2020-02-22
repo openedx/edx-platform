@@ -1,7 +1,7 @@
 """
 Tools to create catalog-related data for use in bok choy tests.
 """
-from __future__ import absolute_import
+
 
 import json
 

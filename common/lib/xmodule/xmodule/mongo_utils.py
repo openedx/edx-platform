@@ -1,15 +1,24 @@
 """
 Common MongoDB connection functions.
 """
-from __future__ import absolute_import
+
 
 import logging
 
 import pymongo
 from mongodb_proxy import MongoProxy
-from pymongo import ReadPreference
+from pymongo.read_preferences import (
+    ReadPreference,
+    read_pref_mode_from_name,
+    _MONGOS_MODES,
+    _MODES
+)
+
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
+
+# This will yeld a map of all available Mongo modes and their name
+MONGO_READ_PREFERENCE_MAP = dict(zip(_MONGOS_MODES, _MODES))
 
 
 # pylint: disable=bad-continuation
@@ -39,10 +48,16 @@ def connect_to_mongodb(
     # If the MongoDB server uses a separate authentication database that should be specified here
     auth_source = kwargs.pop('auth_source', '') or None
 
-    # If read_preference is given as a name of a valid ReadPreference.<NAME> constant
-    # such as "SECONDARY_PREFERRED", convert it. Otherwise pass it through unchanged.
+    # If read_preference is given as a name of a valid ReadPreference.<NAME>
+    # constant such as "SECONDARY_PREFERRED" or a mongo mode such as
+    # "secondaryPreferred", convert it. Otherwise pass it through unchanged.
     if 'read_preference' in kwargs:
-        read_preference = getattr(ReadPreference, kwargs['read_preference'], None)
+        read_preference = MONGO_READ_PREFERENCE_MAP.get(
+            kwargs['read_preference'],
+            kwargs['read_preference']
+        )
+
+        read_preference = getattr(ReadPreference, read_preference, None)
         if read_preference is not None:
             kwargs['read_preference'] = read_preference
 

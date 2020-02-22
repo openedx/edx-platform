@@ -2,7 +2,6 @@
 Code used to calculate learner grades.
 """
 
-from __future__ import absolute_import, division
 
 import abc
 import inspect

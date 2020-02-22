@@ -1,7 +1,7 @@
 """
 Acceptance tests for course in studio
 """
-from __future__ import absolute_import
+
 
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.index import DashboardPage

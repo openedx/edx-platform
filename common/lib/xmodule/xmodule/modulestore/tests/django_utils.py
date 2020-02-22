@@ -2,7 +2,7 @@
 """
 Modulestore configuration for test cases.
 """
-from __future__ import absolute_import
+
 
 import copy
 import functools

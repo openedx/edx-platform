@@ -4,7 +4,6 @@ Allow course staff to see a student or staff view of courseware.
 Which kind of view has been selected is stored in the session state.
 '''
 
-from __future__ import absolute_import
 
 import logging
 from datetime import datetime

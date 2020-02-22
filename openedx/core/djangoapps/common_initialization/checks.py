@@ -5,7 +5,7 @@ Only populate this module with general settings validators which do not fit in
 other, more specific djangoapps.  Usually, settings which are widely used
 across the entire LMS or CMS can be validated here.
 """
-from __future__ import absolute_import
+
 
 from django.conf import settings
 from django.core.checks import Error, Tags, register

@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 from config_models.models import ConfigurationModel
 from django.contrib.sites.models import Site
@@ -18,7 +18,12 @@ class Schedule(TimeStampedModel):
         default=True,
         help_text=_('Indicates if this schedule is actively used')
     )
+    # TODO Delete this field during last stage of rolling out field renames
     start = models.DateTimeField(
+        db_index=True,
+        help_text=_('Date this schedule went into effect')
+    )
+    start_date = models.DateTimeField(
         db_index=True,
         help_text=_('Date this schedule went into effect')
     )
@@ -62,8 +67,8 @@ class ScheduleExperience(models.Model):
     .. no_pii:
     """
     EXPERIENCES = Choices(
-        (0, 'default', 'Recurring Nudge and Upgrade Reminder'),
-        (1, 'course_updates', 'Course Updates')
+        (0, 'default', u'Recurring Nudge and Upgrade Reminder'),
+        (1, 'course_updates', u'Course Updates')
     )
 
     schedule = models.OneToOneField(Schedule, related_name='experience', on_delete=models.CASCADE)

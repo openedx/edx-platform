@@ -55,7 +55,7 @@ SSL-protected channel.  Otherwise, a session hijacker could copy
 the entire cookie and use it to impersonate the victim.
 
 """
-from __future__ import absolute_import, unicode_literals
+
 
 from base64 import b64encode
 from contextlib import contextmanager
@@ -70,6 +70,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.core import signing
 from django.http import HttpResponse
 from django.utils.crypto import get_random_string
+from django.utils.deprecation import MiddlewareMixin
 from django.utils.encoding import python_2_unicode_compatible
 
 from six import text_type  # pylint: disable=ungrouped-imports
@@ -238,7 +239,7 @@ class SafeCookieData(object):
             )
 
 
-class SafeSessionMiddleware(SessionMiddleware):
+class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
     """
     A safer middleware implementation that uses SafeCookieData instead
     of just the session id to lookup and verify a user's session.

@@ -1,8 +1,7 @@
 """
 Course API
 """
-
-from __future__ import absolute_import
+import logging
 
 from edx_when.api import get_dates_for_course
 from django.conf import settings
@@ -18,10 +17,19 @@ from lms.djangoapps.courseware.courses import (
     get_courses,
     get_permission_for_course_about
 )
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.view_utils import LazySequence
+from student.roles import GlobalStaff
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from .permissions import can_view_courses_for_username
+
+
+logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
+
+
+UNKNOWN_BLOCK_DISPLAY_NAME = 'UNKNOWN'
 
 
 def get_effective_user(requesting_user, target_username):
@@ -58,30 +66,13 @@ def course_detail(request, username, course_key):
         `CourseOverview` object representing the requested course
     """
     user = get_effective_user(request.user, username)
-    return get_course_overview_with_access(
+    overview = get_course_overview_with_access(
         user,
         get_permission_for_course_about(),
         course_key,
     )
-
-
-def _filter_by_role(course_queryset, user, roles):
-    """
-    Filters a course queryset by the roles for which the user has access.
-    """
-    # Global staff have access to all courses. Filter course roles for non-global staff only.
-    if not user.is_staff:
-        if roles:
-            for role in roles:
-                # Filter the courses again to return only the courses for which the user has each specified role.
-                course_queryset = LazySequence(
-                    (
-                        course for course in course_queryset
-                        if has_access(user, role, course.id)
-                    ),
-                    est_len=len(course_queryset)
-                )
-    return course_queryset
+    overview.effective_user = user
+    return overview
 
 
 def _filter_by_search(course_queryset, search_term):
@@ -112,7 +103,7 @@ def _filter_by_search(course_queryset, search_term):
     )
 
 
-def list_courses(request, username, org=None, roles=None, filter_=None, search_term=None):
+def list_courses(request, username, org=None, filter_=None, search_term=None):
     """
     Yield all available courses.
 
@@ -133,10 +124,6 @@ def list_courses(request, username, org=None, roles=None, filter_=None, search_t
             If specified, visible `CourseOverview` objects are filtered
             such that only those belonging to the organization with the provided
             org code (e.g., "HarvardX") are returned. Case-insensitive.
-        roles (list of strings):
-            If specified, visible `CourseOverview` objects are filtered
-            such that only those for which the user has the specified role(s)
-            are returned. Multiple role parameters can be specified.
         filter_ (dict):
             If specified, visible `CourseOverview` objects are filtered
             by the given key-value pairs.
@@ -148,9 +135,52 @@ def list_courses(request, username, org=None, roles=None, filter_=None, search_t
     """
     user = get_effective_user(request.user, username)
     course_qs = get_courses(user, org=org, filter_=filter_)
-    course_qs = _filter_by_role(course_qs, user, roles)
     course_qs = _filter_by_search(course_qs, search_term)
     return course_qs
+
+
+def list_course_keys(request, username, role):
+    """
+    Yield all available CourseKeys for the user having the given role.
+
+    The courses returned include those for which the user identified by
+    `username` has the given role.  Additionally, the logged in user
+    should have permission to view courses available to that user.
+
+    Note: This function does not use branding to determine courses.
+
+    Arguments:
+        request (HTTPRequest):
+            Used to identify the logged-in user and to instantiate the course
+            module to retrieve the course about description
+        username (string):
+            The name of the user the logged-in user would like to be
+            identified as
+
+    Keyword Arguments:
+        role (string):
+            Course keys are filtered such that only those for which the
+            user has the specified role are returned.
+
+    Return value:
+        Yield `CourseKey` objects representing the collection of courses.
+
+    """
+    user = get_effective_user(request.user, username)
+
+    course_keys = CourseOverview.get_all_course_keys()
+
+    # Global staff have access to all courses. Filter courses for non-global staff.
+    if GlobalStaff().has_user(user):
+        return course_keys
+
+    return LazySequence(
+        (
+            course_key for course_key in course_keys
+            if has_access(user, role, course_key)
+        ),
+        est_len=len(course_keys)
+    )
 
 
 def get_due_dates(request, course_key, user):
@@ -179,14 +209,18 @@ def get_due_dates(request, course_key, user):
     due_dates = []
     for (block_key, date_type), date in six.iteritems(dates):
         if date_type == 'due':
-            block = store.get_item(block_key)
+            try:
+                block_display_name = store.get_item(block_key).display_name
+            except ItemNotFoundError:
+                logger.exception('Failed to get block for due date item with key: {}'.format(block_key))
+                block_display_name = UNKNOWN_BLOCK_DISPLAY_NAME
 
             # get url to the block in the course
             block_url = reverse('jump_to', args=[course_key, block_key])
             block_url = request.build_absolute_uri(block_url)
 
             due_dates.append({
-                'name': block.display_name,
+                'name': block_display_name,
                 'url': block_url,
                 'date': date,
             })

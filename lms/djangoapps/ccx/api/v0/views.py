@@ -1,6 +1,5 @@
 """ API v0 views. """
 
-from __future__ import absolute_import
 
 import datetime
 import json
@@ -354,7 +353,7 @@ class CCXListView(GenericAPIView):
     """
     authentication_classes = (
         JwtAuthentication,
-        authentication.OAuth2AuthenticationAllowInactiveUser,
+        authentication.BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (IsAuthenticated, permissions.IsMasterCourseStaffInstructor)
@@ -613,7 +612,7 @@ class CCXDetailView(GenericAPIView):
 
     authentication_classes = (
         JwtAuthentication,
-        authentication.OAuth2AuthenticationAllowInactiveUser,
+        authentication.BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (IsAuthenticated, permissions.IsCourseStaffInstructor)

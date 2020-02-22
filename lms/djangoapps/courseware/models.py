@@ -12,7 +12,7 @@ file and check it in at the same time as your model changes. To do that,
 ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
-from __future__ import absolute_import
+
 
 import itertools
 import logging
@@ -112,9 +112,9 @@ class StudentModule(models.Model):
     grade = models.FloatField(null=True, blank=True, db_index=True)
     max_grade = models.FloatField(null=True, blank=True)
     DONE_TYPES = (
-        ('na', 'NOT_APPLICABLE'),
-        ('f', 'FINISHED'),
-        ('i', 'INCOMPLETE'),
+        (u'na', u'NOT_APPLICABLE'),
+        (u'f', u'FINISHED'),
+        (u'i', u'INCOMPLETE'),
     )
     done = models.CharField(max_length=8, choices=DONE_TYPES, default='na')
 
@@ -168,7 +168,7 @@ class StudentModule(models.Model):
 
     @classmethod
     def save_state(cls, student, course_id, module_state_key, defaults):
-        if not student.is_authenticated():
+        if not student.is_authenticated:
             return
         else:
             cls.objects.update_or_create(

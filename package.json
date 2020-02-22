@@ -9,7 +9,7 @@
     "@edx/frontend-enterprise": "^1.0.2",
     "@edx/frontend-logging": "^3.0.1",
     "@edx/paragon": "2.6.4",
-    "@edx/studio-frontend": "1.16.17",
+    "@edx/studio-frontend": "^1.16.19",
     "babel-core": "6.26.0",
     "babel-loader": "6.4.1",
     "babel-plugin-transform-class-properties": "6.24.1",

@@ -1,7 +1,7 @@
 """
 Acceptance tests for Home Page (My Courses / My Libraries).
 """
-from __future__ import absolute_import
+
 
 import datetime
 

@@ -3,7 +3,6 @@ Command to recalculate grades for all subsections with problem submissions
 in the specified time range.
 """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
 
 import logging
 from datetime import datetime

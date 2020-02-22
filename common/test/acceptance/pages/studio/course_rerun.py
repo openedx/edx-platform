@@ -2,7 +2,6 @@
 Course rerun page in Studio
 """
 
-from __future__ import absolute_import
 
 from common.test.acceptance.pages.studio.course_page import CoursePage
 from common.test.acceptance.pages.studio.utils import set_input_value

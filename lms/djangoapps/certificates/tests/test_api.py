@@ -1,5 +1,5 @@
 """Tests for the certificates Python API. """
-from __future__ import absolute_import
+
 
 import uuid
 from contextlib import contextmanager
@@ -173,6 +173,7 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
                 'is_generating': False,
                 'is_unverified': False,
                 'download_url': 'www.google.com',
+                'is_pdf_certificate': True,
                 'uuid': cert.verify_uuid
             }
         )
@@ -202,6 +203,7 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
                     user_id=self.student.id,
                     course_id=self.course.id,
                 ),
+                'is_pdf_certificate': False,
                 'uuid': cert_status['uuid']
             }
         )

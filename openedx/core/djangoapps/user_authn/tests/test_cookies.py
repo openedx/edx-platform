@@ -1,5 +1,5 @@
 # pylint: disable=missing-docstring
-from __future__ import absolute_import, unicode_literals
+
 
 import six
 from django.conf import settings
@@ -13,6 +13,7 @@ from mock import MagicMock, patch
 from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from openedx.core.djangoapps.user_authn import cookies as cookies_api
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.models import CourseEnrollment
 from student.tests.factories import AnonymousUserFactory, UserFactory
 
@@ -33,15 +34,10 @@ class CookieTests(TestCase):
     def _get_expected_header_urls(self):
         expected_header_urls = {
             'logout': reverse('logout'),
-            'resume_block': retrieve_last_sitewide_block_completed(self.user)
+            'resume_block': retrieve_last_sitewide_block_completed(self.user),
+            'account_settings': reverse('account_settings'),
+            'learner_profile': reverse('learner_profile', kwargs={'username': self.user.username}),
         }
-
-        # Studio (CMS) does not have the URLs below
-        if settings.ROOT_URLCONF == 'lms.urls':
-            expected_header_urls.update({
-                'account_settings': reverse('account_settings'),
-                'learner_profile': reverse('learner_profile', kwargs={'username': self.user.username}),
-            })
 
         # Convert relative URL paths to absolute URIs
         for url_name, url_path in six.iteritems(expected_header_urls):
@@ -87,6 +83,7 @@ class CookieTests(TestCase):
             len(set([response.cookies[c]['expires'] for c in response.cookies])),
         )
 
+    @skip_unless_lms
     def test_get_user_info_cookie_data(self):
         actual = cookies_api._get_user_info_cookie_data(self.request, self.user)  # pylint: disable=protected-access
 

@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 import datetime
 import json
@@ -15,7 +15,6 @@ from ipware.ip import get_ip
 
 from edxmako.shortcuts import render_to_response
 from track import contexts, shim, tracker
-from track.models import TrackingLog
 
 
 def log_event(event):
@@ -159,8 +158,7 @@ def task_track(request_info, task_info, event_type, event, page=None):
     # about the task in which it is running.
     full_event = dict(event, **task_info)
 
-    # All fields must be specified, in case the tracking information is
-    # also saved to the TrackingLog model.  Get values from the task-level
+    # Get values from the task-level
     # information, or just add placeholder values.
     with eventtracker.get_tracker().context('edx.course.task', contexts.course_context_from_url(page)):
         event = {
@@ -177,31 +175,3 @@ def task_track(request_info, task_info, event_type, event, page=None):
         }
 
     log_event(event)
-
-
-@login_required
-@ensure_csrf_cookie
-def view_tracking_log(request, args=''):
-    """View to output contents of TrackingLog model.  For staff use only."""
-    if not request.user.is_staff:
-        return redirect('/')
-    nlen = 100
-    username = ''
-    if args:
-        for arg in args.split('/'):
-            if arg.isdigit():
-                nlen = int(arg)
-            if arg.startswith('username='):
-                username = arg[9:]
-
-    record_instances = TrackingLog.objects.all().order_by('-time')
-    if username:
-        record_instances = record_instances.filter(username=username)
-    record_instances = record_instances[0:nlen]
-
-    # fix dtstamp
-    fmt = '%a %d-%b-%y %H:%M:%S'  # "%Y-%m-%d %H:%M:%S %Z%z"
-    for rinst in record_instances:
-        rinst.dtstr = rinst.time.replace(tzinfo=pytz.utc).astimezone(pytz.timezone('US/Eastern')).strftime(fmt)
-
-    return render_to_response('tracking_log.html', {'records': record_instances})

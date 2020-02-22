@@ -1,8 +1,7 @@
 """
 Tests for Course API forms.
 """
-
-from __future__ import absolute_import
+# pylint: disable=missing-docstring
 
 from itertools import product
 
@@ -17,7 +16,7 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..forms import CourseDetailGetForm, CourseListGetForm
+from ..forms import CourseDetailGetForm, CourseIdListGetForm, CourseListGetForm
 
 
 class UsernameTestMixin(object):
@@ -69,7 +68,6 @@ class TestCourseListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreT
         self.cleaned_data = {
             'username': user.username,
             'org': '',
-            'role': set([]),
             'mobile': None,
             'search_term': '',
             'filter_': None,
@@ -100,6 +98,42 @@ class TestCourseListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreT
         if field_value is not None:
             self.cleaned_data['filter_'] = {field_name: field_value}
 
+        self.assert_valid(self.cleaned_data)
+
+
+class TestCourseIdListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreTestCase):
+    FORM_CLASS = CourseIdListGetForm
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestCourseIdListGetForm, cls).setUpClass()
+
+        cls.course = CourseFactory.create()
+
+    def setUp(self):
+        super(TestCourseIdListGetForm, self).setUp()
+
+        self.student = UserFactory.create()
+        self.set_up_data(self.student)
+
+    def set_up_data(self, user):
+        """
+        Sets up the initial form data and the expected clean data.
+        """
+        self.initial = {'requesting_user': user}
+        self.form_data = QueryDict(
+            urlencode({
+                'username': user.username,
+                'role': 'staff',
+            }),
+            mutable=True,
+        )
+        self.cleaned_data = {
+            'username': user.username,
+            'role': 'staff',
+        }
+
+    def test_basic(self):
         self.assert_valid(self.cleaned_data)
 
 

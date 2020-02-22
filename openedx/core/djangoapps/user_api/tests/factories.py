@@ -1,5 +1,5 @@
 """Provides factories for User API models."""
-from __future__ import absolute_import
+
 
 from factory import SubFactory
 from factory.django import DjangoModelFactory

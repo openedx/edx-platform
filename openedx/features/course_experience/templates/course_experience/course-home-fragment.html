@@ -30,7 +30,7 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REV
             </nav>
         </div>
         <div class="page-header-secondary">
-            % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+            % if show_search:
                 <div class="page-header-search">
                     <form class="search-form input-group" role="search" action="${reverse('openedx.course_search.course_search_results', args=[course_key])}">
                         <label class="field-label sr-only" for="search" id="search-hint">${_('Search the course')}</label>

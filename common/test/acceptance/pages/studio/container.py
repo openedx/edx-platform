@@ -2,14 +2,13 @@
 Container page in Studio
 """
 
-from __future__ import absolute_import
 
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise, Promise
 
 from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
 from common.test.acceptance.pages.studio import BASE_URL
-from common.test.acceptance.pages.studio.utils import HelpMixin, type_in_codemirror
+from common.test.acceptance.pages.studio.utils import HelpMixin, set_input_value_and_save, type_in_codemirror
 from common.test.acceptance.tests.helpers import click_and_wait_for_window
 
 
@@ -18,8 +17,8 @@ class ContainerPage(PageObject, HelpMixin):
     Container page in Studio
     """
     NAME_SELECTOR = '.page-header-title'
-    NAME_INPUT_SELECTOR = '.page-header .xblock-field-input'
-    NAME_FIELD_WRAPPER_SELECTOR = '.page-header .wrapper-xblock-field'
+    NAME_INPUT_SELECTOR = '.wrapper-xblock-field .xblock-field-input'
+    NAME_FIELD_WRAPPER_SELECTOR = '.wrapper-xblock-field'
     ADD_MISSING_GROUPS_SELECTOR = '.notification-action-button[data-notification-action="add-missing-groups"]'
 
     def __init__(self, browser, locator):
@@ -410,6 +409,13 @@ class ContainerPage(PageObject, HelpMixin):
         )
         return self.q(css=css).html
 
+    def set_name(self, name):
+        """
+        Set the name of the unit.
+        """
+        set_input_value_and_save(self, self.NAME_INPUT_SELECTOR, name)
+        self.wait_for_ajax()
+
 
 class XBlockWrapper(PageObject):
     """
@@ -660,7 +666,7 @@ class XBlockWrapper(PageObject):
 
     @property
     def editor_selector(self):
-        return '.xblock-studio_view'
+        return u'.xblock-studio_view'
 
     def _click_button(self, button_name):
         """

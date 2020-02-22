@@ -2,7 +2,7 @@
 """
 End-to-end tests for LibraryContent block in LMS
 """
-from __future__ import absolute_import
+
 
 import textwrap
 

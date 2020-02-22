@@ -11,7 +11,7 @@ Provides sympy representation.
 # Author: I. Chuang <ichuang@mit.edu>
 #
 
-from __future__ import absolute_import
+
 import logging
 import operator
 import os

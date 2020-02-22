@@ -2,7 +2,6 @@
 Course info page.
 """
 
-from __future__ import absolute_import
 
 from common.test.acceptance.pages.lms.course_page import CoursePage
 

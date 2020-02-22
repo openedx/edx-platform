@@ -1,7 +1,7 @@
 """
 Emits course grade events.
 """
-from __future__ import absolute_import
+
 
 import six
 from crum import get_current_user

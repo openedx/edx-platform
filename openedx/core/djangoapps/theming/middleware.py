@@ -5,15 +5,16 @@ Note:
     This middleware depends on "django_sites_extensions" app
     So it must be added to INSTALLED_APPS in django settings files.
 """
-from __future__ import absolute_import
+
 
 from django.conf import settings
+from django.utils.deprecation import MiddlewareMixin
 
 from .models import SiteTheme
 from .views import get_user_preview_site_theme
 
 
-class CurrentSiteThemeMiddleware(object):
+class CurrentSiteThemeMiddleware(MiddlewareMixin):
     """
     Middleware that sets `site_theme` attribute to request object.
     """

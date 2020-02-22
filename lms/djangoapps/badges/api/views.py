@@ -1,7 +1,7 @@
 """
 API views for badges
 """
-from __future__ import absolute_import
+
 
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
@@ -12,7 +12,7 @@ from rest_framework.exceptions import APIException
 
 from badges.models import BadgeAssertion
 from openedx.core.djangoapps.user_api.permissions import is_field_shared_factory
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
 from .serializers import BadgeAssertionSerializer
 
@@ -94,7 +94,7 @@ class UserBadgeAssertions(generics.ListAPIView):
     """
     serializer_class = BadgeAssertionSerializer
     authentication_classes = (
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser
     )
     permission_classes = (is_field_shared_factory("accomplishments_shared"),)

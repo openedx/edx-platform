@@ -3,7 +3,6 @@
 End-to-end tests for the LMS Instructor Dashboard.
 """
 
-from __future__ import absolute_import
 
 import ddt
 from bok_choy.promise import EmptyPromise
@@ -180,7 +179,7 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
             favorite_movie="Harry Potter",
         )
         course_names = self.dashboard_page.wait_for_page().available_courses
-        self.assertEquals(len(course_names), 1)
+        self.assertEqual(len(course_names), 1)
         self.assertIn(self.course_info["display_name"], course_names)
 
     def test_clicking_file_upload_button_without_file_shows_error(self):
@@ -592,7 +591,9 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
     def setUp(self):
         super(DataDownloadsTest, self).setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
-        self.instructor_username, self.instructor_id, __, __ = self.log_in_as_instructor()
+        self.instructor_username, self.instructor_id, __, __ = self.log_in_as_instructor(
+            course_access_roles=['data_researcher']
+        )
         instructor_dashboard_page = self.visit_instructor_dashboard()
         self.data_download_section = instructor_dashboard_page.select_data_download()
 
@@ -617,7 +618,7 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         Verifies that a report can be downloaded and an event fired.
         """
         download_links = self.data_download_section.report_download_links
-        self.assertEquals(len(download_links), 1)
+        self.assertEqual(len(download_links), 1)
         download_links[0].click()
         expected_url = download_links.attrs('href')[0]
         self.assertIn(report_name, expected_url)

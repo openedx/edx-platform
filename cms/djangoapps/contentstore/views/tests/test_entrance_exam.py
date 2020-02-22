@@ -1,7 +1,7 @@
 """
 Test module for Entrance Exams AJAX callback handler workflows
 """
-from __future__ import absolute_import
+
 
 import json
 

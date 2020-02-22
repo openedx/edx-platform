@@ -8,7 +8,7 @@ of a student over a period of time. Right now, the only models are the abstract
 `SoftwareSecurePhotoVerification`. The hope is to keep as much of the
 photo verification process as generic as possible.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import base64
 import codecs
@@ -16,13 +16,14 @@ import functools
 import json
 import logging
 import os.path
-import simplejson
 import uuid
 from datetime import timedelta
 from email.utils import formatdate
 
 import requests
+import simplejson
 import six
+from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
@@ -44,6 +45,7 @@ from lms.djangoapps.verify_student.ssencrypt import (
 )
 from openedx.core.djangoapps.signals.signals import LEARNER_NOW_VERIFIED
 from openedx.core.storage import get_storage
+
 from .utils import earliest_allowed_verification_date
 
 log = logging.getLogger(__name__)
@@ -101,7 +103,7 @@ class IDVerificationAttempt(StatusModel):
     .. pii_types: name
     .. pii_retirement: retained
     """
-    STATUS = Choices('created', 'ready', 'submitted', 'must_retry', 'approved', 'denied')
+    STATUS = Choices(u'created', u'ready', u'submitted', u'must_retry', u'approved', u'denied')
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
 
     # They can change their name later on, so we want to copy the value here so
@@ -160,7 +162,7 @@ class ManualVerification(IDVerificationAttempt):
         max_length=255,
         blank=True,
         help_text=(
-            'Specifies the reason for manual verification of the user.'
+            u'Specifies the reason for manual verification of the user.'
         )
     )
 
@@ -190,13 +192,13 @@ class SSOVerification(IDVerificationAttempt):
     .. no_pii:
     """
 
-    OAUTH2 = 'third_party_auth.models.OAuth2ProviderConfig'
-    SAML = 'third_party_auth.models.SAMLProviderConfig'
-    LTI = 'third_party_auth.models.LTIProviderConfig'
+    OAUTH2 = u'third_party_auth.models.OAuth2ProviderConfig'
+    SAML = u'third_party_auth.models.SAMLProviderConfig'
+    LTI = u'third_party_auth.models.LTIProviderConfig'
     IDENTITY_PROVIDER_TYPE_CHOICES = (
-        (OAUTH2, 'OAuth2 Provider'),
-        (SAML, 'SAML Provider'),
-        (LTI, 'LTI Provider'),
+        (OAUTH2, u'OAuth2 Provider'),
+        (SAML, u'SAML Provider'),
+        (LTI, u'LTI Provider'),
     )
 
     identity_provider_type = models.CharField(
@@ -205,14 +207,14 @@ class SSOVerification(IDVerificationAttempt):
         choices=IDENTITY_PROVIDER_TYPE_CHOICES,
         default=SAML,
         help_text=(
-            'Specifies which type of Identity Provider this verification originated from.'
+            u'Specifies which type of Identity Provider this verification originated from.'
         )
     )
 
     identity_provider_slug = models.SlugField(
-        max_length=30, db_index=True, default='default',
+        max_length=30, db_index=True, default=u'default',
         help_text=(
-            'The slug uniquely identifying the Identity Provider this verification originated from.'
+            u'The slug uniquely identifying the Identity Provider this verification originated from.'
         ))
 
     class Meta(object):
@@ -686,7 +688,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
         # Update our record fields
         if six.PY3:
-            self.photo_id_key = codecs.encode(rsa_encrypted_aes_key, 'base64')
+            self.photo_id_key = codecs.encode(rsa_encrypted_aes_key, 'base64').decode('utf-8')
         else:
             self.photo_id_key = rsa_encrypted_aes_key.encode('base64')
 
@@ -835,7 +837,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         face_aes_key = codecs.decode(face_aes_key_str, 'hex')
         rsa_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["RSA_PUBLIC_KEY"]
         rsa_encrypted_face_aes_key = rsa_encrypt(face_aes_key, rsa_key_str)
-        return base64.b64encode(rsa_encrypted_face_aes_key)
+        return base64.b64encode(rsa_encrypted_face_aes_key).decode('utf-8')
 
     def create_request(self, copy_id_photo_from=None):
         """
@@ -1108,3 +1110,23 @@ class VerificationDeadline(TimeStampedModel):
             return deadline.deadline
         except cls.DoesNotExist:
             return None
+
+
+class SSPVerificationRetryConfig(ConfigurationModel):  # pylint: disable=model-missing-unicode, useless-suppression
+    """
+        SSPVerificationRetryConfig used to inject arguments
+        to retry_failed_photo_verifications management command
+    """
+
+    class Meta(object):
+        app_label = 'verify_student'
+        verbose_name = 'sspv retry student argument'
+
+    arguments = models.TextField(
+        blank=True,
+        help_text='Useful for manually running a Jenkins job. Specify like --verification-ids 1 2 3',
+        default=''
+    )
+
+    def __str__(self):
+        return six.text_type(self.arguments)

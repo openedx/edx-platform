@@ -1,7 +1,7 @@
 """
 Slightly customized python-social-auth backend for SAML 2.0 support
 """
-from __future__ import absolute_import
+
 
 import logging
 from copy import deepcopy
@@ -11,7 +11,6 @@ from django.contrib.sites.models import Site
 from django.http import Http404
 from django.utils.functional import cached_property
 from django_countries import countries
-from enterprise.models import EnterpriseCustomerIdentityProvider, EnterpriseCustomerUser, PendingEnterpriseCustomerUser
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from six import text_type
 from social_core.backends.saml import OID_EDU_PERSON_ENTITLEMENT, SAMLAuth, SAMLIdentityProvider
@@ -20,8 +19,8 @@ from social_core.exceptions import AuthForbidden
 from openedx.core.djangoapps.theming.helpers import get_current_request
 from third_party_auth.exceptions import IncorrectConfigurationException
 
-STANDARD_SAML_PROVIDER_KEY = 'standard_saml_provider'
-SAP_SUCCESSFACTORS_SAML_KEY = 'sap_success_factors'
+STANDARD_SAML_PROVIDER_KEY = u'standard_saml_provider'
+SAP_SUCCESSFACTORS_SAML_KEY = u'sap_success_factors'
 log = logging.getLogger(__name__)
 
 
@@ -134,28 +133,9 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         """
         Override of SAMLAuth.disconnect to unlink the learner from enterprise customer if associated.
         """
-        from . import pipeline, provider
-        running_pipeline = pipeline.get(self.strategy.request)
-        provider_id = provider.Registry.get_from_pipeline(running_pipeline).provider_id
-        try:
-            user_email = kwargs.get('user').email
-        except AttributeError:
-            user_email = None
-
-        try:
-            enterprise_customer_idp = EnterpriseCustomerIdentityProvider.objects.get(provider_id=provider_id)
-        except EnterpriseCustomerIdentityProvider.DoesNotExist:
-            enterprise_customer_idp = None
-
-        if enterprise_customer_idp and user_email:
-            try:
-                # Unlink user email from Enterprise Customer.
-                EnterpriseCustomerUser.objects.unlink_user(
-                    enterprise_customer=enterprise_customer_idp.enterprise_customer, user_email=user_email
-                )
-            except (EnterpriseCustomerUser.DoesNotExist, PendingEnterpriseCustomerUser.DoesNotExist):
-                pass
-
+        from openedx.features.enterprise_support.api import unlink_enterprise_user_from_idp
+        user = kwargs.get('user', None)
+        unlink_enterprise_user_from_idp(self.strategy.request, user, self.name)
         return super(SAMLAuthBackend, self).disconnect(*args, **kwargs)
 
     def _check_entitlements(self, idp, attributes):

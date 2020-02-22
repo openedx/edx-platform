@@ -1,5 +1,5 @@
 """ Tests for course reindex command """
-from __future__ import absolute_import
+
 
 import ddt
 import mock
@@ -50,25 +50,25 @@ class TestReindexCourse(ModuleStoreTestCase):
 
     def test_given_no_arguments_raises_command_error(self):
         """ Test that raises CommandError for incorrect arguments """
-        with self.assertRaisesRegexp(CommandError, ".* requires one or more *"):
+        with self.assertRaisesRegex(CommandError, ".* requires one or more *"):
             call_command('reindex_course')
 
     @ddt.data('qwerty', 'invalid_key', 'xblockv1:qwerty')
     def test_given_invalid_course_key_raises_not_found(self, invalid_key):
         """ Test that raises InvalidKeyError for invalid keys """
         err_string = u"Invalid course_key: '{0}'".format(invalid_key)
-        with self.assertRaisesRegexp(CommandError, err_string):
+        with self.assertRaisesRegex(CommandError, err_string):
             call_command('reindex_course', invalid_key)
 
     def test_given_library_key_raises_command_error(self):
         """ Test that raises CommandError if library key is passed """
-        with self.assertRaisesRegexp(CommandError, ".* is not a course key"):
+        with self.assertRaisesRegex(CommandError, ".* is not a course key"):
             call_command('reindex_course', text_type(self._get_lib_key(self.first_lib)))
 
-        with self.assertRaisesRegexp(CommandError, ".* is not a course key"):
+        with self.assertRaisesRegex(CommandError, ".* is not a course key"):
             call_command('reindex_course', text_type(self._get_lib_key(self.second_lib)))
 
-        with self.assertRaisesRegexp(CommandError, ".* is not a course key"):
+        with self.assertRaisesRegex(CommandError, ".* is not a course key"):
             call_command(
                 'reindex_course',
                 text_type(self.second_course.id),

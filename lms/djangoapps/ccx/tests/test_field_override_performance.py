@@ -2,7 +2,7 @@
 """
 Performance tests for field overrides.
 """
-from __future__ import absolute_import
+
 
 import itertools
 from datetime import datetime
@@ -244,7 +244,7 @@ class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     # TODO: decrease query count as part of REVO-28
-    QUERY_COUNT = 36
+    QUERY_COUNT = 33
     TEST_DATA = {
         # (providers, course_width, enable_ccx, view_as_ccx): (
         #     # of sql queries to default,
@@ -273,7 +273,7 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     # TODO: decrease query count as part of REVO-28
-    QUERY_COUNT = 36
+    QUERY_COUNT = 33
 
     TEST_DATA = {
         ('no_overrides', 1, True, False): (QUERY_COUNT, 3),

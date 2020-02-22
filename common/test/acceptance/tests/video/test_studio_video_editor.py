@@ -3,7 +3,7 @@
 """
 Acceptance tests for CMS Video Editor.
 """
-from __future__ import absolute_import
+
 
 import ddt
 
@@ -110,7 +110,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.save_unit_settings()
         self.assertTrue(self.video.is_captions_visible())
         self.assertIn(unicode_text, self.video.captions_text)
-        self.assertEqual(list(self.video.caption_languages.keys()), ['zh', 'uk'])
+        self.assertEqual(set(self.video.caption_languages.keys()), {'zh', 'uk'})
 
     def test_save_language_upload_no_transcript(self):
         """

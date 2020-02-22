@@ -1,7 +1,7 @@
 """
 Tests authz.py
 """
-from __future__ import absolute_import
+
 
 import mock
 from ccx_keys.locator import CCXLocator

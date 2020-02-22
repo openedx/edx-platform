@@ -1,10 +1,11 @@
 """Tests for account activation"""
-from __future__ import absolute_import
+
 
 import unittest
 from uuid import uuid4
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from mock import patch
@@ -103,6 +104,10 @@ class TestActivateAccount(TestCase):
         response = self.client.get(reverse('dashboard'))
         self.assertNotContains(response, expected_message)
 
+    def _assert_user_active_state(self, expected_active_state):
+        user = User.objects.get(username=self.user.username)
+        self.assertEqual(user.is_active, expected_active_state)
+
     def test_account_activation_notification_on_logistration(self):
         """
         Verify that logistration page displays success/error/info messages
@@ -112,15 +117,19 @@ class TestActivateAccount(TestCase):
             login_url=reverse('signin_user'),
             redirect_url=reverse('dashboard'),
         )
+        self._assert_user_active_state(expected_active_state=False)
+
         # Access activation link, message should say that account has been activated.
         response = self.client.get(reverse('activate', args=[self.registration.activation_key]), follow=True)
         self.assertRedirects(response, login_page_url)
         self.assertContains(response, 'Success! You have activated your account.')
+        self._assert_user_active_state(expected_active_state=True)
 
         # Access activation link again, message should say that account is already active.
         response = self.client.get(reverse('activate', args=[self.registration.activation_key]), follow=True)
         self.assertRedirects(response, login_page_url)
         self.assertContains(response, 'This account has already been activated.')
+        self._assert_user_active_state(expected_active_state=True)
 
         # Open account activation page with an invalid activation link,
         # there should be an error message displayed.
@@ -137,4 +146,4 @@ class TestActivateAccount(TestCase):
             response = self.client.get(reverse('activate', args=[self.registration.activation_key]), follow=True)
             self.assertRedirects(response, login_page_url)
             self.assertContains(response, SYSTEM_MAINTENANCE_MSG)
-            assert not self.user.is_active
+            self._assert_user_active_state(expected_active_state=False)

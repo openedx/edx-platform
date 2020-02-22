@@ -2,7 +2,6 @@
 Helper methods for testing cohorts.
 """
 
-from __future__ import absolute_import
 
 import json
 

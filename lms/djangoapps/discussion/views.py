@@ -1,7 +1,7 @@
 """
 Views handling read (GET) requests for the Discussion tab and inline discussions.
 """
-from __future__ import absolute_import, print_function
+
 
 import logging
 from functools import wraps

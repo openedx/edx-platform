@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import absolute_import, print_function
 
 import copy
 import shutil
@@ -1352,7 +1351,7 @@ class ContentStoreTest(ContentStoreTestCase):
         resp = self.client.ajax_post('/course/', self.course_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
-        self.assertRegexpMatches(data['ErrMsg'], error_message)
+        self.assertRegex(data['ErrMsg'], error_message)
         if test_enrollment:
             # One test case involves trying to create the same course twice. Hence for that course,
             # the user will be enrolled. In the other cases, initially_enrolled will be False.
@@ -1518,7 +1517,7 @@ class ContentStoreTest(ContentStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
         retarget = text_type(course.id.make_usage_key('chapter', 'REPLACE')).replace('REPLACE', r'([0-9]|[a-f]){3,}')
-        self.assertRegexpMatches(data['locator'], retarget)
+        self.assertRegex(data['locator'], retarget)
 
     def test_capa_module(self):
         """Test that a problem treats markdown specially."""
@@ -2186,10 +2185,12 @@ class EntryPageTestCase(TestCase):
         self._test_page("/howitworks")
 
     def test_signup(self):
-        self._test_page("/signup")
+        # deprecated signup url redirects to LMS register.
+        self._test_page("/signup", 301)
 
     def test_login(self):
-        self._test_page("/signin")
+        # deprecated signin url redirects to LMS login.
+        self._test_page("/signin", 302)
 
     def test_logout(self):
         # Logout redirects.
@@ -2200,36 +2201,6 @@ class EntryPageTestCase(TestCase):
         active=True)
     def test_accessibility(self):
         self._test_page('/accessibility')
-
-
-class SigninPageTestCase(TestCase):
-    """
-    Tests that the CSRF token is directly included in the signin form. This is
-    important to make sure that the script is functional independently of any
-    other script.
-    """
-
-    def test_csrf_token_is_present_in_form(self):
-        # Expected html:
-        # <form>
-        #   ...
-        #   <fieldset>
-        #       ...
-        #       <input name="csrfmiddlewaretoken" value="...">
-        #       ...
-        #       </fieldset>
-        #       ...
-        # </form>
-        response = self.client.get("/signin")
-        csrf_token = response.cookies.get("csrftoken")
-        form = lxml.html.fromstring(response.content).get_element_by_id("login_form")
-        csrf_input_field = form.find(".//input[@name='csrfmiddlewaretoken']")
-
-        self.assertIsNotNone(csrf_token)
-        self.assertIsNotNone(csrf_token.value)
-        self.assertIsNotNone(csrf_input_field)
-
-        self.assertTrue(_compare_salted_tokens(csrf_token.value, csrf_input_field.attrib["value"]))
 
 
 def _create_course(test, course_key, course_data):

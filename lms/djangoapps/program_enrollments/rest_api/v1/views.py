@@ -2,7 +2,7 @@
 """
 ProgramEnrollment Views
 """
-from __future__ import absolute_import, unicode_literals
+
 
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
@@ -47,7 +47,7 @@ from openedx.core.djangoapps.catalog.utils import (
     normalize_program_type
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, PaginatedAPIView
 from student.helpers import get_resume_urls_for_enrollments
 from student.models import CourseEnrollment
@@ -328,7 +328,7 @@ class ProgramEnrollmentsView(
     """
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (permissions.JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS,)
@@ -472,7 +472,7 @@ class ProgramCourseEnrollmentsView(
     """
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (permissions.JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS,)
@@ -614,7 +614,7 @@ class ProgramCourseGradesView(
     """
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (permissions.JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS,)
@@ -695,7 +695,7 @@ class UserProgramReadOnlyAccessView(DeveloperErrorViewMixin, PaginatedAPIView):
     """
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (IsAuthenticated,)
@@ -763,14 +763,14 @@ class UserProgramReadOnlyAccessView(DeveloperErrorViewMixin, PaginatedAPIView):
         This function would take a list of course runs the user is staff of, and then
         try to get the Masters program associated with each course_runs.
         """
-        program_list = []
+        program_dict = {}
         for course_key in self.get_course_keys_user_is_staff_for(user):
             course_run_programs = get_programs(course=course_key)
             for course_run_program in course_run_programs:
                 if course_run_program and course_run_program.get('type').lower() == program_type_filter:
-                    program_list.append(course_run_program)
+                    program_dict[course_run_program['uuid']] = course_run_program
 
-        return program_list
+        return program_dict.values()
 
 
 class ProgramCourseEnrollmentOverviewView(
@@ -874,7 +874,7 @@ class ProgramCourseEnrollmentOverviewView(
     """
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (IsAuthenticated,)
@@ -900,7 +900,7 @@ class ProgramCourseEnrollmentOverviewView(
             is_active=True,
         )
 
-        overviews = CourseOverview.get_from_ids_if_exists(course_run_keys)
+        overviews = CourseOverview.get_from_ids(course_run_keys)
 
         course_run_resume_urls = get_resume_urls_for_enrollments(user, course_enrollments)
 
@@ -983,7 +983,7 @@ class EnrollmentDataResetView(APIView):
     """
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (permissions.JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS,)

@@ -90,16 +90,16 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/modals/base_mod
 
                     // Update the custom editor's title
                     editorView.$('.component-name').text(title);
-                } else {
+                } else if (editorView.getDataEditor() && editorView.getMetadataEditor()) {
                     this.createTitleEditor(title);
-                    if (editorView.getDataEditor() && editorView.getMetadataEditor()) {
-                        this.addDefaultModes();
-                        // If the plugins content element exists, add a button to reveal it.
-                        if (this.$('.wrapper-comp-plugins').length > 0) {
-                            this.addModeButton('plugins', gettext('Plugins'));
-                        }
-                        this.selectMode(editorView.mode);
+                    this.addDefaultModes();
+                    // If the plugins content element exists, add a button to reveal it.
+                    if (this.$('.wrapper-comp-plugins').length > 0) {
+                        this.addModeButton('plugins', gettext('Plugins'));
                     }
+                    this.selectMode(editorView.mode);
+                } else {
+                    this.$('.modal-window-title').text(title);
                 }
 
                 // If the xblock is not using custom buttons then choose which buttons to show

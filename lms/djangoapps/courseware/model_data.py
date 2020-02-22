@@ -21,7 +21,6 @@ UserInfoCache: A cache for Scope.user_info
 DjangoOrmFieldCache: A base-class for single-row-per-field caches.
 """
 
-from __future__ import absolute_import
 
 import json
 import logging

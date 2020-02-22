@@ -1,7 +1,7 @@
 """
 Tests the forum notification signals.
 """
-from __future__ import absolute_import
+
 
 import mock
 from django.test import TestCase
@@ -28,7 +28,9 @@ class SendMessageHandlerTestCase(TestCase):
     @mock.patch('lms.djangoapps.discussion.signals.handlers.send_message')
     def test_comment_created_signal_sends_message(self, mock_send_message, mock_get_current_site):
         site_config = SiteConfigurationFactory.create(site=self.site)
-        site_config.values[ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY] = True
+        enable_notifications_cfg = {ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY: True}
+        site_config.site_values = enable_notifications_cfg
+        site_config.values = enable_notifications_cfg
         site_config.save()
         mock_get_current_site.return_value = self.site
         signals.comment_created.send(sender=self.sender, user=self.user, post=self.post)
@@ -56,7 +58,9 @@ class SendMessageHandlerTestCase(TestCase):
             self, mock_send_message, mock_get_current_site
     ):
         site_config = SiteConfigurationFactory.create(site=self.site)
-        site_config.values[ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY] = False
+        enable_notifications_cfg = {ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY: False}
+        site_config.site_values = enable_notifications_cfg
+        site_config.values = enable_notifications_cfg
         site_config.save()
         mock_get_current_site.return_value = self.site
         signals.comment_created.send(sender=self.sender, user=self.user, post=self.post)

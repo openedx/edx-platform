@@ -1,7 +1,7 @@
 """
 Envirement setuo for studio video tests.
 """
-from __future__ import absolute_import
+
 
 import os
 

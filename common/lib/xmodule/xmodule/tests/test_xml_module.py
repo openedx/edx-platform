@@ -1,7 +1,6 @@
 # disable missing docstring
 # pylint: disable=missing-docstring
 
-from __future__ import absolute_import
 
 import unittest
 
@@ -382,7 +381,8 @@ class TestSerialize(unittest.TestCase):
         assert serialize_field('false') == 'false'
         assert serialize_field('fAlse') == 'fAlse'
         assert serialize_field('hat box') == 'hat box'
-        assert serialize_field({'bar': 'hat', 'frog': 'green'}) == '{"bar": "hat", "frog": "green"}'
+        serialized_dict = serialize_field({'bar': 'hat', 'frog': 'green'})
+        assert serialized_dict == '{"bar": "hat", "frog": "green"}' or serialized_dict == '{"frog": "green", "bar": "hat"}'
         assert serialize_field([3.5, 5.6]) == '[3.5, 5.6]'
         assert serialize_field(['foo', 'bar']) == '["foo", "bar"]'
         assert serialize_field("2012-12-31T23:59:59Z") == '2012-12-31T23:59:59Z'

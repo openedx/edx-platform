@@ -1,6 +1,6 @@
 # pylint: disable=missing-docstring,unused-argument,broad-except
 """" Common utilities for comment client wrapper """
-from __future__ import absolute_import
+
 
 import logging
 from uuid import uuid4

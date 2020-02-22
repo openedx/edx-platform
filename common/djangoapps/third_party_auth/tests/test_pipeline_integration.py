@@ -1,6 +1,5 @@
 """Integration tests for pipeline.py."""
 
-from __future__ import absolute_import
 
 import datetime
 import unittest
@@ -82,7 +81,7 @@ class GetProviderUserStatesTestCase(testutil.TestCase, test.TestCase):
 
     def test_returns_empty_list_if_no_enabled_providers(self):
         self.assertFalse(provider.Registry.enabled())
-        self.assertEquals([], pipeline.get_provider_user_states(self.user))
+        self.assertEqual([], pipeline.get_provider_user_states(self.user))
 
     def test_state_not_returned_for_disabled_provider(self):
         disabled_provider = self.configure_google_provider(enabled=False)

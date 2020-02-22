@@ -1,5 +1,5 @@
 """Interface for adding certificate generation tasks to the XQueue. """
-from __future__ import absolute_import
+
 
 import json
 import logging
@@ -174,7 +174,6 @@ class XQueueCertInterface(object):
         )
 
     def del_cert(self, student, course_id):
-
         """
         Arguments:
           student - User.object
@@ -291,7 +290,13 @@ class XQueueCertInterface(object):
         mode_is_verified = enrollment_mode in GeneratedCertificate.VERIFIED_CERTS_MODES
         user_is_verified = IDVerificationService.user_is_verified(student)
         cert_mode = enrollment_mode
-        is_eligible_for_certificate = is_whitelisted or CourseMode.is_eligible_for_certificate(enrollment_mode)
+
+        is_eligible_for_certificate = CourseMode.is_eligible_for_certificate(enrollment_mode, cert_status)
+        if is_whitelisted and not is_eligible_for_certificate:
+            # check if audit certificates are enabled for audit mode
+            is_eligible_for_certificate = enrollment_mode != CourseMode.AUDIT or \
+                not settings.FEATURES['DISABLE_AUDIT_CERTIFICATES']
+
         unverified = False
         # For credit mode generate verified certificate
         if cert_mode in (CourseMode.CREDIT_MODE, CourseMode.MASTERS):
@@ -327,7 +332,7 @@ class XQueueCertInterface(object):
             mode_is_verified,
             generate_pdf
         )
-
+        # pylint: disable=no-member
         cert, created = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)
 
         cert.mode = cert_mode

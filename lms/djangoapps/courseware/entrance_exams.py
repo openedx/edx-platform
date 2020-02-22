@@ -2,7 +2,6 @@
 This file contains all entrance exam related utils/logic.
 """
 
-from __future__ import absolute_import
 
 from opaque_keys.edx.keys import UsageKey
 
@@ -18,7 +17,8 @@ def course_has_entrance_exam(course):
     """
     if not is_entrance_exams_enabled():
         return False
-    if not course.entrance_exam_enabled:
+    entrance_exam_enabled = getattr(course, 'entrance_exam_enabled', None)
+    if not entrance_exam_enabled:
         return False
     if not course.entrance_exam_id:
         return False

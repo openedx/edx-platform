@@ -5,7 +5,6 @@ Integration tests for submitting problem responses and getting grades.
 
 # pylint: disable=attribute-defined-outside-init
 
-from __future__ import absolute_import
 
 import json
 import os
@@ -324,8 +323,8 @@ class TestCourseGrades(TestSubmittingProblems):
         """
         hw_grade = self.hw_grade('homework')
         problem_score = list(hw_grade.problem_scores.values())[0]
-        self.assertEquals((problem_score.earned, problem_score.possible), expected_problem_score)
-        self.assertEquals((hw_grade.graded_total.earned, hw_grade.graded_total.possible), expected_hw_grade)
+        self.assertEqual((problem_score.earned, problem_score.possible), expected_problem_score)
+        self.assertEqual((hw_grade.graded_total.earned, hw_grade.graded_total.possible), expected_hw_grade)
 
     def test_basic(self):
         self._submit_correct_answer()

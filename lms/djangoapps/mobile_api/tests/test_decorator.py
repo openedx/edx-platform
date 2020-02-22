@@ -3,7 +3,6 @@
 Tests for mobile API utilities.
 """
 
-from __future__ import absolute_import
 
 import ddt
 from django.test import TestCase
@@ -27,5 +26,5 @@ class TestMobileAPIDecorators(TestCase):
             pass
 
         self.assertIn("Test docstring of decorated function.", decorated_func.__doc__)
-        self.assertEquals(decorated_func.__name__, "decorated_func")
+        self.assertEqual(decorated_func.__name__, "decorated_func")
         self.assertTrue(decorated_func.__module__.endswith("test_decorator"))

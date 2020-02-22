@@ -6,17 +6,23 @@ define([
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
 ], function(Backbone, MyTeamsCollection, MyTeamsView, TeamSpecHelpers, AjaxHelpers) {
     'use strict';
+    var createMyTeamsView, mockGetTopic;
     describe('My Teams View', function() {
         beforeEach(function() {
             setFixtures('<div class="teams-container"></div>');
         });
 
-        var createMyTeamsView = function(myTeams) {
+        mockGetTopic = function(topicId) {
+            return $.Deferred().resolve(TeamSpecHelpers.createMockTopic({id: topicId}));
+        };
+
+        createMyTeamsView = function(myTeams) {
             return new MyTeamsView({
                 el: '.teams-container',
                 collection: myTeams,
                 showActions: true,
-                context: TeamSpecHelpers.testContext
+                context: TeamSpecHelpers.testContext,
+                getTopic: mockGetTopic
             }).render();
         };
 

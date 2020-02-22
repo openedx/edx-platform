@@ -1,7 +1,7 @@
 """
 Test audit user's access to various content based on content-gating features.
 """
-from __future__ import absolute_import
+
 
 import json
 import os
@@ -48,8 +48,7 @@ from openedx.core.lib.url_utils import quote_slashes
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, CONTENT_TYPE_GATE_GROUP_IDS
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import ContentTypeGatingPartition
-from openedx.features.course_duration_limits.config import EXPERIMENT_DATA_HOLDBACK_KEY, EXPERIMENT_ID
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, FBEEnrollmentExclusion
 from student.roles import CourseInstructorRole
 from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -400,7 +399,11 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
 
         for mode in modes:
             if expired_upgrade_deadline and mode == 'verified':
-                CourseModeFactory.create(course_id=course.id, mode_slug=mode, expiration_datetime=datetime(2020, 1, 1))
+                CourseModeFactory.create(
+                    course_id=course.id,
+                    mode_slug=mode,
+                    expiration_datetime=start_date + timedelta(days=365),
+                )
             else:
                 CourseModeFactory.create(course_id=course.id, mode_slug=mode)
 
@@ -638,15 +641,9 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         Test that putting a user in the content gating holdback disables content gating.
         """
         user = UserFactory.create()
+        enrollment = CourseEnrollment.enroll(user, self.course.id)
         if put_user_in_holdback:
-            ExperimentData.objects.create(
-                user=user,
-                experiment_id=EXPERIMENT_ID,
-                key=EXPERIMENT_DATA_HOLDBACK_KEY,
-                value='True'
-            )
-
-        CourseEnrollment.enroll(user, self.course.id)
+            FBEEnrollmentExclusion.objects.create(enrollment=enrollment)
 
         graded, has_score, weight = True, True, 1
         block = self.graded_score_weight_blocks[(graded, has_score, weight)]
@@ -689,9 +686,9 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         block_view_url = reverse('render_xblock', kwargs={'usage_key_string': six.text_type(block.scope_ids.usage_id)})
         response = self.client.get(block_view_url)
         if is_gated:
-            self.assertEquals(response.status_code, 404)
+            self.assertEqual(response.status_code, 404)
         else:
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
 
     def update_masquerade(self, role='student', group_id=None, username=None, user_partition_id=None):
         """
@@ -748,7 +745,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         block = self.blocks_dict['problem']
         block_view_url = reverse('render_xblock', kwargs={'usage_key_string': six.text_type(block.scope_ids.usage_id)})
         response = self.client.get(block_view_url)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     @ddt.data(
         FORUM_ROLE_COMMUNITY_TA,

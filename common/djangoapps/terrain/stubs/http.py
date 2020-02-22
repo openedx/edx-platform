@@ -2,7 +2,6 @@
 Stub implementation of an HTTP service.
 """
 
-from __future__ import absolute_import
 
 import json
 import threading

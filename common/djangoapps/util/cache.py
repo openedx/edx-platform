@@ -5,7 +5,7 @@ invalidation. Import these instead of django.core.cache.
 Note that 'default' is being preserved for user session caching, which we're
 not migrating so as not to inconvenience users by logging them all out.
 """
-from __future__ import absolute_import
+
 
 from functools import wraps
 
@@ -76,7 +76,14 @@ def cache_if_anonymous(*get_parameters):
                         })
 
                 response = cache.get(cache_key)  # pylint: disable=maybe-no-member
-                if not response:
+
+                if response:
+                    # A hack to ensure that the response data is a valid text type for both Python 2 and 3.
+                    response_content = list(response._container)  # pylint: disable=protected-member
+                    response.content = b''
+                    for item in response_content:
+                        response.write(item)
+                else:
                     response = view_func(request, *args, **kwargs)
                     cache.set(cache_key, response, 60 * 3)  # pylint: disable=maybe-no-member
 

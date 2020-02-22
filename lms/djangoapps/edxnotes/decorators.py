@@ -2,7 +2,6 @@
 Decorators related to edXNotes.
 """
 
-from __future__ import absolute_import
 
 import json
 
@@ -23,7 +22,9 @@ def edxnotes(cls):
         Returns raw html for the component.
         """
         # Import is placed here to avoid model import at project startup.
-        from edxnotes.helpers import generate_uid, get_edxnotes_id_token, get_public_endpoint, get_token_url, is_feature_enabled
+        from edxnotes.helpers import (
+            generate_uid, get_edxnotes_id_token, get_public_endpoint, get_token_url, is_feature_enabled
+        )
 
         runtime = getattr(self, 'descriptor', self).runtime
         if not hasattr(runtime, 'modulestore'):

@@ -2,7 +2,7 @@
 Manages the creation and termination of EC2 workers, to be used with pytest-xdist
 as part of the CI process on Jenkins.
 """
-from __future__ import absolute_import
+
 import argparse
 import logging
 import time
@@ -29,7 +29,7 @@ class PytestWorkerManager():
     """
     Responsible for spinning up and terminating EC2 workers to be used with pytest-xdist
     """
-    WORKER_BOOTUP_TIMEOUT_MINUTES = 5
+    WORKER_BOOTUP_TIMEOUT_MINUTES = 10
     WORKER_SSH_ATTEMPTS = 10
     MAX_RUN_WORKER_RETRIES = 7
 

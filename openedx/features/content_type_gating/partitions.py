@@ -5,7 +5,6 @@ These are used together to allow course content to be blocked for a subset
 of audit learners.
 """
 
-from __future__ import absolute_import
 
 import datetime
 import logging
@@ -66,7 +65,9 @@ def create_content_gating_partition(course):
 
     partition = content_gate_scheme.create_user_partition(
         id=CONTENT_GATING_PARTITION_ID,
-        name=_(u"Feature-based Enrollments"),
+        # Content gating partition name should not be marked for translations
+        # edX mobile apps expect it in english
+        name=u"Feature-based Enrollments",
         description=_(u"Partition for segmenting users by access to gated content types"),
         parameters={"course_id": six.text_type(course.id)}
     )

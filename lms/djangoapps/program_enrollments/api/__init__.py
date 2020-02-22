@@ -12,7 +12,7 @@ We use explicit imports here because (1) it hides internal variables in the
 sub-modules and (2) it provides a nice catalog of functions for someone
 using this API.
 """
-from __future__ import absolute_import
+
 
 from .grades import iter_program_course_grades
 from .linking import link_program_enrollment_to_lms_user, link_program_enrollments

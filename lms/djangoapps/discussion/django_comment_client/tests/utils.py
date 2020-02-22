@@ -1,7 +1,7 @@
 """
 Utilities for tests within the django_comment_client module.
 """
-from __future__ import absolute_import
+
 
 from mock import patch
 
@@ -12,6 +12,7 @@ from openedx.core.djangoapps.django_comment_common.utils import (
     seed_permissions_roles,
     set_course_discussion_settings
 )
+from openedx.core.lib.teams_config import TeamsConfig
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
@@ -44,7 +45,14 @@ class CohortedTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCa
             cohort_config={
                 "cohorted": True,
                 "cohorted_discussions": ["cohorted_topic"]
-            }
+            },
+            teams_configuration=TeamsConfig({
+                'topics': [{
+                    'id': 'topic-id',
+                    'name': 'Topic Name',
+                    'description': 'Topic',
+                }]
+            })
         )
         cls.course.discussion_topics["cohorted topic"] = {"id": "cohorted_topic"}
         cls.course.discussion_topics["non-cohorted topic"] = {"id": "non_cohorted_topic"}

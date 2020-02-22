@@ -2,7 +2,7 @@
 Utility functions for transcripts.
 ++++++++++++++++++++++++++++++++++
 """
-from __future__ import absolute_import
+
 
 import copy
 import simplejson as json
@@ -20,10 +20,12 @@ from six import text_type
 from six.moves import range, zip
 from six.moves.html_parser import HTMLParser  # pylint: disable=import-error
 
-from opaque_keys.edx.locator import CourseLocator, LibraryLocator
+from opaque_keys.edx.locator import BundleDefinitionLocator
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
+from openedx.core.djangolib import blockstore_cache
+from openedx.core.lib import blockstore_api
 
 from .bumper_utils import get_bumper_settings
 
@@ -652,18 +654,19 @@ class Transcript(object):
             return content
 
         if input_format == 'srt':
+            # Standardize content into bytes for later decoding.
+            if isinstance(content, text_type):
+                content = content.encode('utf-8')
 
             if output_format == 'txt':
-                text = SubRipFile.from_string(content).text
+                text = SubRipFile.from_string(content.decode('utf-8')).text
                 return HTMLParser().unescape(text)
 
             elif output_format == 'sjson':
                 try:
-                    # With error handling (set to 'ERROR_RAISE'), we will be getting
-                    # the exception if something went wrong in parsing the transcript.
                     srt_subs = SubRipFile.from_string(
                         # Skip byte order mark(BOM) character
-                        content.encode('utf-8').decode('utf-8-sig'),
+                        content.decode('utf-8-sig'),
                         error_handling=SubRipFile.ERROR_RAISE
                     )
                 except Error as ex:   # Base exception from pysrt
@@ -994,6 +997,77 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
     return transcript_content, transcript_name, Transcript.mime_types[output_format]
 
 
+def get_transcript_from_blockstore(video_block, language, output_format, transcripts_info):
+    """
+    Get video transcript from Blockstore.
+
+    Blockstore expects video transcripts to be placed into the 'static/'
+    subfolder of the XBlock's folder in a Blockstore bundle. For example, if the
+    video XBlock's definition is in the standard location of
+        video/video1/definition.xml
+    Then the .srt files should be placed at e.g.
+        video/video1/static/video1-en.srt
+    This is the same place where other public static files are placed for other
+    XBlocks, such as image files used by HTML blocks.
+
+    Video XBlocks in Blockstore must set the 'transcripts' XBlock field to a
+    JSON dictionary listing the filename of the transcript for each language:
+        <video
+            youtube_id_1_0="3_yD_cEKoCk"
+            transcripts='{"en": "3_yD_cEKoCk-en.srt"}'
+            display_name="Welcome Video with Transcript"
+            download_track="true"
+        />
+
+    This method is tested in openedx/core/djangoapps/content_libraries/tests/test_static_assets.py
+
+    Arguments:
+        video_block (Video XBlock): The video XBlock
+        language (str): transcript language
+        output_format (str): transcript output format
+        transcripts_info (dict): transcript info for a video, from video_block.get_transcripts_info()
+
+    Returns:
+        tuple containing content, filename, mimetype
+    """
+    if output_format not in (Transcript.SRT, Transcript.SJSON, Transcript.TXT):
+        raise NotFoundError('Invalid transcript format `{output_format}`'.format(output_format=output_format))
+    transcripts = transcripts_info['transcripts']
+    if language not in transcripts:
+        raise NotFoundError("Video {} does not have a transcript file defined for the '{}' language in its OLX.".format(
+            video_block.scope_ids.usage_id,
+            language,
+        ))
+    filename = transcripts[language]
+    if not filename.endswith('.srt'):
+        # We want to standardize on .srt
+        raise NotFoundError("Video XBlocks in Blockstore only support .srt transcript files.")
+    # Try to load the transcript file out of Blockstore
+    # In lieu of an XBlock API for this (like block.runtime.resources_fs), we use the blockstore API directly.
+    bundle_uuid = video_block.scope_ids.def_id.bundle_uuid
+    path = video_block.scope_ids.def_id.olx_path.rpartition('/')[0] + '/static/' + filename
+    bundle_version = video_block.scope_ids.def_id.bundle_version  # Either bundle_version or draft_name will be set.
+    draft_name = video_block.scope_ids.def_id.draft_name
+    try:
+        content_binary = blockstore_cache.get_bundle_file_data_with_cache(bundle_uuid, path, bundle_version, draft_name)
+    except blockstore_api.BundleFileNotFound:
+        raise NotFoundError("Transcript file '{}' missing for video XBlock {}".format(
+            path,
+            video_block.scope_ids.usage_id,
+        ))
+    # Now convert the transcript data to the requested format:
+    filename_no_extension = os.path.splitext(filename)[0]
+    output_filename = '{}.{}'.format(filename_no_extension, output_format)
+    output_transcript = Transcript.convert(
+        content_binary.decode('utf-8'),
+        input_format=Transcript.SRT,
+        output_format=output_format,
+    )
+    if not output_transcript.strip():
+        raise NotFoundError('No transcript content')
+    return output_transcript, output_filename, Transcript.mime_types[output_format]
+
+
 def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=None):
     """
     Get video transcript from edx-val or content store.
@@ -1011,18 +1085,18 @@ def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=No
     if not lang:
         lang = video.get_default_transcript_language(transcripts_info)
 
+    if isinstance(video.scope_ids.def_id, BundleDefinitionLocator):
+        # This block is in Blockstore.
+        # For Blockstore, VAL is considered deprecated and we can load the transcript file
+        # directly using the Blockstore API:
+        return get_transcript_from_blockstore(video, lang, output_format, transcripts_info)
+
     try:
         edx_video_id = clean_video_id(video.edx_video_id)
         if not edx_video_id:
             raise NotFoundError
         return get_transcript_from_val(edx_video_id, lang, output_format)
     except NotFoundError:
-        # If this is not in a modulestore course or library, don't try loading from contentstore:
-        if not isinstance(video.scope_ids.usage_id.course_key, (CourseLocator, LibraryLocator)):
-            raise NotFoundError(
-                u'Video transcripts cannot yet be loaded from Blockstore (block: {})'.format(video.scope_ids.usage_id),
-            )
-
         return get_transcript_from_contentstore(
             video,
             lang,

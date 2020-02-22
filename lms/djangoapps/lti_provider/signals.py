@@ -1,7 +1,7 @@
 """
 Signals handlers for the lti_provider Django app.
 """
-from __future__ import absolute_import
+
 import logging
 
 from django.conf import settings

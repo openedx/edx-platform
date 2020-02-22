@@ -2,7 +2,7 @@
 """
 Discussion API URLs
 """
-from __future__ import absolute_import
+
 
 from django.conf import settings
 from django.conf.urls import include, url
@@ -20,8 +20,8 @@ from lms.djangoapps.discussion.rest_api.views import (
 )
 
 ROUTER = SimpleRouter()
-ROUTER.register("threads", ThreadViewSet, base_name="thread")
-ROUTER.register("comments", CommentViewSet, base_name="comment")
+ROUTER.register("threads", ThreadViewSet, basename="thread")
+ROUTER.register("comments", CommentViewSet, basename="comment")
 
 urlpatterns = [
     url(

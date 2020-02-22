@@ -1,5 +1,5 @@
 """Views for the branding app. """
-from __future__ import absolute_import
+
 
 import logging
 
@@ -43,7 +43,7 @@ def index(request):
         if configuration_helpers.get_value(
                 'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER',
                 settings.FEATURES.get('ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER', True)):
-            return redirect(reverse('dashboard'))
+            return redirect('dashboard')
 
     enable_mktg_site = configuration_helpers.get_value(
         'ENABLE_MKTG_SITE',
@@ -62,7 +62,7 @@ def index(request):
     # keep specialized logic for Edge until we can migrate over Edge to fully use
     # configuration.
     if domain and 'edge.edx.org' in domain:
-        return redirect(reverse("signin_user"))
+        return redirect("signin_user")
 
     #  we do not expect this case to be reached in cases where
     #  marketing and edge are enabled

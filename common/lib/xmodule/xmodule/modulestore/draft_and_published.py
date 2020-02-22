@@ -2,7 +2,6 @@
 This module provides an abstraction for Module Stores that support Draft and Published branches.
 """
 
-from __future__ import absolute_import
 
 import logging
 import threading

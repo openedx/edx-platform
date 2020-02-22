@@ -2,7 +2,6 @@
 Code used to get and cache the requested course-data
 """
 
-from __future__ import absolute_import
 
 from django.utils.encoding import python_2_unicode_compatible
 

@@ -2,7 +2,7 @@
 Module for the Storage of BlockStructure objects.
 """
 # pylint: disable=protected-access
-from __future__ import absolute_import
+
 
 from logging import getLogger
 
@@ -207,7 +207,15 @@ class BlockStructureStore(object):
         """
         Deserializes the given data and returns the parsed block_structure.
         """
-        block_relations, transformer_data, block_data_map = zunpickle(serialized_data)
+
+        try:
+            block_relations, transformer_data, block_data_map = zunpickle(serialized_data)
+        except Exception:
+            # Somehow failed to de-serialized the data, assume it's corrupt.
+            bs_model = self._get_model(root_block_usage_key)
+            logger.exception(u"BlockStructure: Failed to load data from cache for %s", bs_model)
+            raise BlockStructureNotFound(bs_model.data_usage_key)
+
         return BlockStructureFactory.create_new(
             root_block_usage_key,
             block_relations,

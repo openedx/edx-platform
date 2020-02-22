@@ -3,7 +3,6 @@ Provides a function for importing a git repository into the lms
 instance when using a mongo modulestore
 """
 
-from __future__ import absolute_import
 
 import logging
 import os
@@ -350,4 +349,4 @@ def add_repo(repo, rdir_in, branch=None):
     cil.save()
 
     log.debug(u'saved CourseImportLog for %s', cil.course_id)
-    mdb.disconnect()
+    mdb.close()

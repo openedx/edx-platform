@@ -1,7 +1,7 @@
 """
 Views to show a course outline.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import re

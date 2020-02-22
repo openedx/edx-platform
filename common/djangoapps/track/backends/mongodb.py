@@ -1,6 +1,5 @@
 """MongoDB event tracker backend."""
 
-from __future__ import absolute_import
 
 import logging
 

@@ -1,5 +1,5 @@
 """Grading policy"""
-from __future__ import absolute_import
+
 
 import json
 from base64 import b64encode

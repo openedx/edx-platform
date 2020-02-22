@@ -2,7 +2,6 @@
 Override admin configuration for django-oauth-toolkit
 """
 
-from __future__ import absolute_import
 
 from django.contrib.admin import ModelAdmin, site
 from oauth2_provider import models
@@ -81,7 +80,7 @@ class ApplicationAccessAdmin(ModelAdmin):
     """
     ModelAdmin for ApplicationAccess
     """
-    list_display = [u'application', u'scopes']
+    list_display = ['application', 'scopes', 'filters']
 
 
 class ApplicationOrganizationAdmin(ModelAdmin):

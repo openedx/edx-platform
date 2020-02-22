@@ -2,7 +2,6 @@
 API for initiating and tracking requests for credit from a provider.
 """
 
-from __future__ import absolute_import
 
 import datetime
 import logging

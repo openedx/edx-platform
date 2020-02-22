@@ -1,7 +1,7 @@
 """
 Command to scrape thumbnails and add them to the course-videos.
 """
-from __future__ import absolute_import
+
 
 import logging
 

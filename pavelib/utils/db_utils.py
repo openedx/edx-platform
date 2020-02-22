@@ -1,7 +1,7 @@
 """
 Utility methods for bokchoy database manipulation.
 """
-from __future__ import absolute_import, print_function
+
 
 import os
 import tarfile
@@ -159,7 +159,7 @@ def get_file_from_s3(bucket_name, zipfile_name, path):
     """
     Get the file from s3 and save it to disk.
     """
-    print (u"Retrieving {} from bucket {}.".format(zipfile_name, bucket_name))
+    print(u"Retrieving {} from bucket {}.".format(zipfile_name, bucket_name))
     conn = boto.connect_s3(anon=True)
     bucket = conn.get_bucket(bucket_name)
     key = boto.s3.key.Key(bucket=bucket, name=zipfile_name)
@@ -194,7 +194,7 @@ def refresh_bokchoy_db_cache_from_s3(fingerprint, bucket_name, bokchoy_db_files)
         zipfile_name = '{}.tar.gz'.format(fingerprint)
         get_file_from_s3(bucket_name, zipfile_name, path)
         zipfile_path = os.path.join(path, zipfile_name)
-        print ("Extracting db cache files.")
+        print("Extracting db cache files.")
         extract_files_from_zip(bokchoy_db_files, zipfile_path, path)
         os.remove(zipfile_path)
 
@@ -211,7 +211,7 @@ def create_tarfile_from_db_cache(fingerprint, files, path):
     return zipfile_name, zipfile_path
 
 
-def upload_to_s3(file_name, file_path, bucket_name):
+def upload_to_s3(file_name, file_path, bucket_name, replace=False):
     """
     Upload the specified files to an s3 bucket.
     """
@@ -229,7 +229,7 @@ def upload_to_s3(file_name, file_path, bucket_name):
               "Continuing without uploading the new cache to S3.")
         return
     key = boto.s3.key.Key(bucket=bucket, name=file_name)
-    bytes_written = key.set_contents_from_filename(file_path, replace=False, policy='public-read')
+    bytes_written = key.set_contents_from_filename(file_path, replace=replace, policy='public-read')
     if bytes_written:
         msg = u"Wrote {} bytes to {}.".format(bytes_written, key.name)
     else:

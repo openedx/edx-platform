@@ -1,7 +1,7 @@
 """
 Tests for branding page
 """
-from __future__ import absolute_import
+
 
 import datetime
 
@@ -81,7 +81,7 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
 
         # check to see that the override value is honored
         resp = self.client.get('/')
-        self.assertEquals(resp['X-Frame-Options'], 'ALLOW')
+        self.assertEqual(resp['X-Frame-Options'], 'ALLOW')
 
     def test_deny_x_frame_options(self):
         """
@@ -90,7 +90,7 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
 
         # check to see that the default setting is to DENY iframing
         resp = self.client.get('/')
-        self.assertEquals(resp['X-Frame-Options'], 'DENY')
+        self.assertEqual(resp['X-Frame-Options'], 'DENY')
 
     def test_edge_redirect_to_login(self):
         """

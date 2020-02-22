@@ -1,7 +1,7 @@
 """
 Test the sync_hubspot_contacts management command
 """
-from __future__ import absolute_import
+
 
 import json
 from datetime import timedelta
@@ -31,6 +31,7 @@ class TestHubspotSyncCommand(TestCase):
         super(TestHubspotSyncCommand, cls).setUpClass()
         cls.site_config = SiteConfigurationFactory()
         cls.hubspot_site_config = SiteConfigurationFactory.create(
+            site_values={'HUBSPOT_API_KEY': 'test_key'},
             values={'HUBSPOT_API_KEY': 'test_key'},
         )
         cls.users = []

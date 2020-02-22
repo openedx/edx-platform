@@ -13,12 +13,10 @@ sessions. Assumes structure:
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-order
 
-from __future__ import absolute_import
 
 from .common import *
 import os
 from uuid import uuid4
-
 
 from django.utils.translation import ugettext_lazy
 from path import Path as path
@@ -142,8 +140,6 @@ if os.environ.get('DISABLE_MIGRATIONS'):
 LMS_BASE = "localhost:8000"
 LMS_ROOT_URL = "http://{}".format(LMS_BASE)
 FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost"
-LOGIN_URL = EDX_ROOT_URL + '/signin'
-
 
 CACHES = {
     # This is the cache used for most things. Askbot will not work without a
@@ -221,8 +217,6 @@ FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 # Toggles embargo on for testing
 FEATURES['EMBARGO'] = True
-
-FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
 
 TEST_THEME = COMMON_ROOT / "test" / "test-theme"
 

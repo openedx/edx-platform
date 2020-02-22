@@ -1,7 +1,7 @@
 """
 Unit tests for Video stub server implementation.
 """
-from __future__ import absolute_import
+
 
 import unittest
 

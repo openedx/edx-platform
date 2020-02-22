@@ -1,7 +1,7 @@
 """
 Problem Page.
 """
-from __future__ import absolute_import
+
 
 from bok_choy.page_object import PageObject
 from selenium.webdriver import ActionChains

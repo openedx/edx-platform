@@ -1,7 +1,7 @@
 """
 Class for manipulating groups configuration on a course object.
 """
-from __future__ import absolute_import
+
 
 import json
 import logging

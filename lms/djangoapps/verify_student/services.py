@@ -2,7 +2,6 @@
 Implementation of abstraction layer for other parts of the system to make queries related to ID Verification.
 """
 
-from __future__ import absolute_import
 
 import logging
 from itertools import chain
@@ -12,6 +11,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from course_modes.models import CourseMode
+from lms.djangoapps.verify_student.utils import is_verification_expiring_soon
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from student.models import User
 
@@ -171,6 +171,7 @@ class IDVerificationService(object):
             'status': 'none',
             'error': '',
             'should_display': True,
+            'verification_expiry': '',
         }
 
         # We need to check the user's most recent attempt.
@@ -212,6 +213,9 @@ class IDVerificationService(object):
 
         elif attempt.status == 'approved':
             user_status['status'] = 'approved'
+            expiration_datetime = cls.get_expiration_datetime(user, ['approved'])
+            if getattr(attempt, 'expiry_date', None) and is_verification_expiring_soon(expiration_datetime):
+                user_status['verification_expiry'] = attempt.expiry_date.date().strftime("%m/%d/%Y")
 
         elif attempt.status in ['submitted', 'approved', 'must_retry']:
             # user_has_valid_or_pending does include 'approved', but if we are

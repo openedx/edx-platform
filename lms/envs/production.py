@@ -17,7 +17,6 @@ Common traits:
 # and throws spurious errors. Therefore, we disable invalid-name checking.
 # pylint: disable=invalid-name
 
-from __future__ import absolute_import
 
 import codecs
 import datetime
@@ -55,6 +54,18 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
     # Removing them may break plugins that rely on them.
     ENV_TOKENS = __config__
     AUTH_TOKENS = __config__
+
+# A file path to a YAML file from which to load all the code revisions currently deployed
+REVISION_CONFIG_FILE = get_env_setting('REVISION_CFG')
+
+try:
+    with codecs.open(REVISION_CONFIG_FILE, encoding='utf-8') as f:
+        REVISION_CONFIG = yaml.safe_load(f)
+except Exception:  # pylint: disable=broad-except
+    REVISION_CONFIG = {}
+
+# Do NOT calculate this dynamically at startup with git because it's *slow*.
+EDX_PLATFORM_REVISION = REVISION_CONFIG.get('EDX_PLATFORM_REVISION', EDX_PLATFORM_REVISION)
 
 # SERVICE_VARIANT specifies name of the variant used, which decides what JSON
 # configuration files are read during startup.
@@ -229,6 +240,22 @@ if 'loc_cache' not in CACHES:
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'edx_location_mem_cache',
     }
+
+if 'staticfiles' in CACHES:
+    CACHES['staticfiles']['KEY_PREFIX'] = EDX_PLATFORM_REVISION
+
+# In order to transition from local disk asset storage to S3 backed asset storage,
+# we need to run asset collection twice, once for local disk and once for S3.
+# Once we have migrated to service assets off S3, then we can convert this back to
+# managed by the yaml file contents
+STATICFILES_STORAGE = os.environ.get('STATICFILES_STORAGE', ENV_TOKENS.get('STATICFILES_STORAGE', STATICFILES_STORAGE))
+STATICFILES_STORAGE_KWARGS = ENV_TOKENS.get('STATICFILES_STORAGE_KWARGS', STATICFILES_STORAGE_KWARGS)
+
+# Load all AWS_ prefixed variables to allow an S3Boto3Storage to be configured
+_locals = locals()
+for key, value in ENV_TOKENS.items():
+    if key.startswith('AWS_'):
+        _locals[key] = value
 
 # Email overrides
 DEFAULT_FROM_EMAIL = ENV_TOKENS.get('DEFAULT_FROM_EMAIL', DEFAULT_FROM_EMAIL)
@@ -861,7 +888,7 @@ MODULESTORE_FIELD_OVERRIDE_PROVIDERS += (
 
 # PROFILE IMAGE CONFIG
 PROFILE_IMAGE_BACKEND = ENV_TOKENS.get('PROFILE_IMAGE_BACKEND', PROFILE_IMAGE_BACKEND)
-PROFILE_IMAGE_SECRET_KEY = AUTH_TOKENS.get('PROFILE_IMAGE_SECRET_KEY', PROFILE_IMAGE_SECRET_KEY)
+PROFILE_IMAGE_HASH_SEED = AUTH_TOKENS.get('PROFILE_IMAGE_HASH_SEED', PROFILE_IMAGE_HASH_SEED)
 PROFILE_IMAGE_MAX_BYTES = ENV_TOKENS.get('PROFILE_IMAGE_MAX_BYTES', PROFILE_IMAGE_MAX_BYTES)
 PROFILE_IMAGE_MIN_BYTES = ENV_TOKENS.get('PROFILE_IMAGE_MIN_BYTES', PROFILE_IMAGE_MIN_BYTES)
 PROFILE_IMAGE_DEFAULT_FILENAME = 'images/profiles/default'
@@ -874,6 +901,7 @@ PROFILE_IMAGE_SIZES_MAP = ENV_TOKENS.get(
 
 EDXNOTES_PUBLIC_API = ENV_TOKENS.get('EDXNOTES_PUBLIC_API', EDXNOTES_PUBLIC_API)
 EDXNOTES_INTERNAL_API = ENV_TOKENS.get('EDXNOTES_INTERNAL_API', EDXNOTES_INTERNAL_API)
+EDXNOTES_CLIENT_NAME = ENV_TOKENS.get('EDXNOTES_CLIENT_NAME', EDXNOTES_CLIENT_NAME)
 
 EDXNOTES_CONNECT_TIMEOUT = ENV_TOKENS.get('EDXNOTES_CONNECT_TIMEOUT', EDXNOTES_CONNECT_TIMEOUT)
 EDXNOTES_READ_TIMEOUT = ENV_TOKENS.get('EDXNOTES_READ_TIMEOUT', EDXNOTES_READ_TIMEOUT)
@@ -997,6 +1025,11 @@ ENTERPRISE_API_CACHE_TIMEOUT = ENV_TOKENS.get(
     'ENTERPRISE_API_CACHE_TIMEOUT',
     ENTERPRISE_API_CACHE_TIMEOUT
 )
+ENTERPRISE_CATALOG_INTERNAL_ROOT_URL = ENV_TOKENS.get(
+    'ENTERPRISE_CATALOG_INTERNAL_ROOT_URL',
+    ENTERPRISE_CATALOG_INTERNAL_ROOT_URL
+)
+
 
 ############## ENTERPRISE SERVICE LMS CONFIGURATION ##################################
 # The LMS has some features embedded that are related to the Enterprise service, but
@@ -1056,13 +1089,10 @@ PARENTAL_CONSENT_AGE_LIMIT = ENV_TOKENS.get(
     PARENTAL_CONSENT_AGE_LIMIT
 )
 
-# Do NOT calculate this dynamically at startup with git because it's *slow*.
-EDX_PLATFORM_REVISION = ENV_TOKENS.get('EDX_PLATFORM_REVISION', EDX_PLATFORM_REVISION)
-
 ########################## Extra middleware classes  #######################
 
 # Allow extra middleware classes to be added to the app through configuration.
-MIDDLEWARE_CLASSES.extend(ENV_TOKENS.get('EXTRA_MIDDLEWARE_CLASSES', []))
+MIDDLEWARE.extend(ENV_TOKENS.get('EXTRA_MIDDLEWARE_CLASSES', []))
 
 ########################## Settings for Completion API #####################
 
@@ -1103,6 +1133,8 @@ WRITABLE_GRADEBOOK_URL = ENV_TOKENS.get('WRITABLE_GRADEBOOK_URL', WRITABLE_GRADE
 PROFILE_MICROFRONTEND_URL = ENV_TOKENS.get('PROFILE_MICROFRONTEND_URL', PROFILE_MICROFRONTEND_URL)
 ORDER_HISTORY_MICROFRONTEND_URL = ENV_TOKENS.get('ORDER_HISTORY_MICROFRONTEND_URL', ORDER_HISTORY_MICROFRONTEND_URL)
 ACCOUNT_MICROFRONTEND_URL = ENV_TOKENS.get('ACCOUNT_MICROFRONTEND_URL', ACCOUNT_MICROFRONTEND_URL)
+LEARNING_MICROFRONTEND_URL = ENV_TOKENS.get('LEARNING_MICROFRONTEND_URL', LEARNING_MICROFRONTEND_URL)
+LEARNER_PORTAL_URL_ROOT = ENV_TOKENS.get('LEARNER_PORTAL_URL_ROOT', LEARNER_PORTAL_URL_ROOT)
 
 ############### Settings for edx-rbac  ###############
 SYSTEM_WIDE_ROLE_CLASSES = ENV_TOKENS.get('SYSTEM_WIDE_ROLE_CLASSES') or SYSTEM_WIDE_ROLE_CLASSES

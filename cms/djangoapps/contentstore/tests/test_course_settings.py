@@ -1,7 +1,7 @@
 """
 Tests for Studio Course Settings.
 """
-from __future__ import absolute_import
+
 
 import copy
 import datetime
@@ -87,8 +87,35 @@ class CourseSettingsEncoderTest(CourseTestCase):
         jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
         jsondetails = json.loads(jsondetails)
 
-        self.assertEquals(1, jsondetails['number'])
+        self.assertEqual(1, jsondetails['number'])
         self.assertEqual(jsondetails['string'], 'string')
+
+
+class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
+    """
+    Tests for AdvanceSettings View.
+    """
+
+    def setUp(self):
+        super(CourseAdvanceSettingViewTest, self).setUp()
+        self.fullcourse = CourseFactory.create()
+        self.course_setting_url = get_url(self.course.id, 'advanced_settings_handler')
+
+    @override_settings(FEATURES={'DISABLE_MOBILE_COURSE_AVAILABLE': True})
+    def test_mobile_field_available(self):
+
+        """
+        Test to check `Mobile Course Available` field is not viewable in Studio
+        when DISABLE_MOBILE_COURSE_AVAILABLE is true.
+        """
+
+        response = self.client.get_html(self.course_setting_url)
+        start = response.content.decode('utf-8').find("mobile_available")
+        end = response.content.decode('utf-8').find("}", start)
+        settings_fields = json.loads(response.content.decode('utf-8')[start + len("mobile_available: "):end + 1])
+
+        self.assertEqual(settings_fields["display_name"], "Mobile Course Available")
+        self.assertEqual(settings_fields["deprecated"], True)
 
 
 @ddt.ddt
@@ -335,10 +362,10 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         }
         response = self.client.post(settings_details_url, data=json.dumps(data), content_type='application/json',
                                     HTTP_ACCEPT='application/json')
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         course = modulestore().get_course(self.course.id)
         self.assertTrue(course.entrance_exam_enabled)
-        self.assertEquals(course.entrance_exam_minimum_score_pct, .60)
+        self.assertEqual(course.entrance_exam_minimum_score_pct, .60)
 
         # Update the entrance exam
         data['entrance_exam_enabled'] = "true"
@@ -349,10 +376,10 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             content_type='application/json',
             HTTP_ACCEPT='application/json'
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         course = modulestore().get_course(self.course.id)
         self.assertTrue(course.entrance_exam_enabled)
-        self.assertEquals(course.entrance_exam_minimum_score_pct, .80)
+        self.assertEqual(course.entrance_exam_minimum_score_pct, .80)
 
         self.assertTrue(milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id),
                         msg='The entrance exam should be required.')
@@ -366,9 +393,9 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             HTTP_ACCEPT='application/json'
         )
         course = modulestore().get_course(self.course.id)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertFalse(course.entrance_exam_enabled)
-        self.assertEquals(course.entrance_exam_minimum_score_pct, None)
+        self.assertEqual(course.entrance_exam_minimum_score_pct, None)
 
         self.assertFalse(milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id),
                          msg='The entrance exam should not be required anymore')
@@ -396,12 +423,12 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             content_type='application/json',
             HTTP_ACCEPT='application/json'
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         course = modulestore().get_course(self.course.id)
         self.assertTrue(course.entrance_exam_enabled)
 
         # entrance_exam_minimum_score_pct is not present in the request so default value should be saved.
-        self.assertEquals(course.entrance_exam_minimum_score_pct, .5)
+        self.assertEqual(course.entrance_exam_minimum_score_pct, .5)
 
         #add entrance_exam_minimum_score_pct with empty value in json request.
         test_data_2 = {
@@ -422,10 +449,10 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             content_type='application/json',
             HTTP_ACCEPT='application/json'
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         course = modulestore().get_course(self.course.id)
         self.assertTrue(course.entrance_exam_enabled)
-        self.assertEquals(course.entrance_exam_minimum_score_pct, .5)
+        self.assertEqual(course.entrance_exam_minimum_score_pct, .5)
 
     def test_editable_short_description_fetch(self):
         settings_details_url = get_url(self.course.id)

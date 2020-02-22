@@ -1,7 +1,7 @@
 """
 Signal handler for enabling/disabling self-generated certificates based on the course-pacing.
 """
-from __future__ import absolute_import
+
 
 import logging
 

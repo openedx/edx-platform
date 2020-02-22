@@ -1,7 +1,7 @@
 """
 Support tool for changing course enrollments.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import csv
 from uuid import UUID

@@ -1,7 +1,7 @@
 """
 This file contains celery tasks for contentstore views
 """
-from __future__ import absolute_import
+
 
 import base64
 import json
@@ -32,7 +32,7 @@ from opaque_keys.edx.locator import LibraryLocator, BlockUsageLocator
 from organizations.models import OrganizationCourse
 from path import Path as path
 from pytz import UTC
-from six import iteritems, text_type
+from six import iteritems, text_type, binary_type
 from six.moves import range
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.tasks import UserTask
@@ -528,7 +528,7 @@ def _parse_time(time_isoformat):
     ).replace(tzinfo=UTC)
 
 
-@task()
+@task(routing_key=settings.UPDATE_SEARCH_INDEX_JOB_QUEUE)
 def update_search_index(course_id, triggered_time_isoformat):
     """ Updates course search index. """
     try:

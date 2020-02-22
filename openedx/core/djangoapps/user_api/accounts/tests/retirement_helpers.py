@@ -1,7 +1,7 @@
 """
 Helpers for testing retirement functionality
 """
-from __future__ import absolute_import
+
 
 import datetime
 

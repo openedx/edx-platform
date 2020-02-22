@@ -1,5 +1,5 @@
 # pylint: disable=missing-docstring
-from __future__ import absolute_import
+
 
 from unittest import TestCase
 
@@ -122,6 +122,9 @@ class TestGoogleAnalyticsTrackingPixel(QueryStringAssertionMixin, CacheIsolation
     @override_settings(GOOGLE_ANALYTICS_TRACKING_ID='UA-123456-1')
     def test_site_config_override(self):
         site_config = SiteConfigurationFactory.create(
+            site_values=dict(
+                GOOGLE_ANALYTICS_ACCOUNT='UA-654321-1'
+            ),
             values=dict(
                 GOOGLE_ANALYTICS_ACCOUNT='UA-654321-1'
             )

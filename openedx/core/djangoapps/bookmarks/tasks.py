@@ -1,7 +1,7 @@
 """
 Tasks for bookmarks.
 """
-from __future__ import absolute_import
+
 
 import logging
 
@@ -144,7 +144,7 @@ def _update_xblocks_cache(course_key):
                 update_block_cache_if_needed(block_cache, block_data)
 
 
-@task(name=u'openedx.core.djangoapps.bookmarks.tasks.update_xblock_cache')
+@task(name=u'openedx.core.djangoapps.bookmarks.tasks.update_xblocks_cache')
 def update_xblocks_cache(course_id):
     """
     Update the XBlocks cache for a course.

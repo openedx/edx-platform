@@ -1,25 +1,15 @@
 """
 Common utilities for the course experience, including course outline.
 """
-from __future__ import absolute_import
+
 
 from completion.models import BlockCompletion
-from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import CourseKey
 from six.moves import range
-from web_fragments.fragment import Fragment
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
-from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
-from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.cache_utils import request_cached
-from openedx.features.discounts.applicability import (
-    can_receive_discount,
-    get_discount_expiration_date,
-    discount_percentage
-)
-from openedx.features.discounts.utils import format_strikeout_price
 from xmodule.modulestore.django import modulestore
 
 
@@ -69,7 +59,7 @@ def get_course_outline_block_tree(request, course_id, user=None):
         if last_completed_child_position:
             # Mutex w/ NOT 'course_block_completions'
             recurse_mark_complete(
-                course_block_completions=BlockCompletion.get_course_completions(user, course_key),
+                course_block_completions=BlockCompletion.get_learning_context_completions(user, course_key),
                 latest_completion=last_completed_child_position,
                 block=block
             )

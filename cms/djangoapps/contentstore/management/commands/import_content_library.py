@@ -1,7 +1,7 @@
 """
 Script for importing a content library from a tar.gz file
 """
-from __future__ import absolute_import, print_function
+
 
 import base64
 import os

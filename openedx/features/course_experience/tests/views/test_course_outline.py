@@ -1,7 +1,7 @@
 """
 Tests for the Course Outline view and supporting views.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import json
@@ -131,8 +131,6 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
                         self.assertContains(response, sequential.due.strftime(u'%Y-%m-%d %H:%M:%S'))
                         self.assertContains(response, sequential.format)
                     self.assertTrue(sequential.children)
-                    for vertical in sequential.children:
-                        self.assertContains(response, vertical.display_name)
 
 
 class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
@@ -318,14 +316,22 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         course = CourseFactory.create()
         with cls.store.bulk_operations(course.id):
             chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+            chapter2 = ItemFactory.create(category='chapter', parent_location=course.location)
             sequential = ItemFactory.create(category='sequential', parent_location=chapter.location)
             sequential2 = ItemFactory.create(category='sequential', parent_location=chapter.location)
+            sequential3 = ItemFactory.create(category='sequential', parent_location=chapter2.location)
+            sequential4 = ItemFactory.create(category='sequential', parent_location=chapter2.location)
             vertical = ItemFactory.create(category='vertical', parent_location=sequential.location)
             vertical2 = ItemFactory.create(category='vertical', parent_location=sequential2.location)
-        course.children = [chapter]
+            vertical3 = ItemFactory.create(category='vertical', parent_location=sequential3.location)
+            vertical4 = ItemFactory.create(category='vertical', parent_location=sequential4.location)
+        course.children = [chapter, chapter2]
         chapter.children = [sequential, sequential2]
+        chapter2.children = [sequential3, sequential4]
         sequential.children = [vertical]
         sequential2.children = [vertical2]
+        sequential3.children = [vertical3]
+        sequential4.children = [vertical4]
         if hasattr(cls, 'user'):
             CourseEnrollment.enroll(cls.user, course.id)
         return course
@@ -364,10 +370,12 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         course_key = CourseKey.from_string(str(course.id))
         # Fake a visit to sequence2/vertical2
         block_key = UsageKey.from_string(six.text_type(sequential.location))
+        if block_key.course_key.run is None:
+            # Old mongo keys must be annotated with course run info before calling submit_completion:
+            block_key = block_key.replace(course_key=course_key)
         completion = 1.0
         BlockCompletion.objects.submit_completion(
             user=self.user,
-            course_key=course_key,
             block_key=block_key,
             completion=completion
         )
@@ -405,8 +413,8 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         response = self.client.get(course_home_url(course))
         content = pq(response.content)
 
-        # vertical and its parent should be checked
-        self.assertEqual(len(content('.fa-check')), 2)
+        # Subsection should be checked
+        self.assertEqual(len(content('.fa-check')), 1)
 
     def test_start_course(self):
         """
@@ -432,7 +440,6 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
 
         # Course tree
         course = self.course
-        course_key = CourseKey.from_string(str(course.id))
         vertical1 = course.children[0].children[0].children[0]
         vertical2 = course.children[0].children[1].children[0]
 
@@ -532,9 +539,9 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
     )
     def test_course_outline_auto_open(self):
         """
-        Tests that the course outline auto-opens to the first unit
+        Tests that the course outline auto-opens to the first subsection
         in a course if a user has no completion data, and to the
-        last-accessed unit if a user does have completion data.
+        last-accessed subsection if a user does have completion data.
         """
         def get_sequential_button(url, is_hidden):
             is_hidden_string = "is-hidden" if is_hidden else ""
@@ -545,15 +552,14 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
                    ">"
         # Course tree
         course = self.course
-        chapter = course.children[0]
-        sequential1 = chapter.children[0]
-        sequential2 = chapter.children[1]
+        chapter1 = course.children[0]
+        chapter2 = course.children[1]
 
         response_content = self.client.get(course_home_url(course)).content
         stripped_response = text_type(re.sub(b"\\s+", b"", response_content), "utf-8")
 
-        self.assertTrue(get_sequential_button(text_type(sequential1.location), False) in stripped_response)
-        self.assertTrue(get_sequential_button(text_type(sequential2.location), True) in stripped_response)
+        self.assertIn(get_sequential_button(text_type(chapter1.location), False), stripped_response)
+        self.assertIn(get_sequential_button(text_type(chapter2.location), True), stripped_response)
 
         content = pq(response_content)
         button = content('#expand-collapse-outline-all-button')
