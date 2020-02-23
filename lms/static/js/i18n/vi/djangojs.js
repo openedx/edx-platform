@@ -39,15 +39,6 @@
     "%(field)s can only contain up to %(count)d characters.": "%(field)s ch\u1ec9 \u0111\u01b0\u1ee3c c\u00f3 t\u1ed1i \u0111a %(count)d k\u00ed t\u1ef1.",
     "%(field)s must have at least %(count)d characters.": "%(field)s ph\u1ea3i c\u00f3 \u00edt nh\u1ea5t %(count)d k\u00ed t\u1ef1.",
     "%(new_item_message)s": "%(new_item_message)s",
-    "%(num_questions)s question": [
-      "%(num_questions)s c\u00e2u h\u1ecfi"
-    ],
-    "%(num_students)s student": [
-      "%(num_students)s h\u1ecdc vi\u00ean"
-    ],
-    "%(num_students)s student opened Subsection": [
-      "%(num_students)s h\u1ecdc vi\u00ean m\u1edf Ti\u1ec3u m\u1ee5c"
-    ],
     "%(sel)s of %(cnt)s selected": [
       " %(sel)s  c\u1ee7a %(cnt)s \u0111\u01b0\u1ee3c ch\u1ecdn"
     ],
@@ -906,7 +897,6 @@
     "Now": "B\u00e2y gi\u1edd",
     "Number Sent": "S\u1ed1 L\u01b0\u1ee3ng \u0110\u00e3 G\u1eedi",
     "Number of Droppable": "S\u1ed1 l\u01b0\u1ee3ng Lo\u1ea1i b\u1ecf",
-    "Number of Students": "S\u1ed1 L\u01b0\u1ee3ng H\u1ecdc Vi\u00ean",
     "Numbered List (Ctrl+O)": "Danh S\u00e1ch \u0110\u00e1nh S\u1ed1 (Ctrl+O)",
     "Numbered list": "Danh s\u00e1ch c\u00f3 th\u1ee9 t\u1ef1",
     "OK": "OK",

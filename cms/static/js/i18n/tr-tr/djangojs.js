@@ -595,6 +595,7 @@
     "Deleted Content Group": "Silinmi\u015f \u0130\u00e7erik Grubu",
     "Deleted Group": "Silinmi\u015f Grup",
     "Deleting": "Siliniyor",
+    "Deleting a team is permanent and cannot be undone.All members are removed from the team, and team discussions can no longer be accessed.": "Bir tak\u0131m\u0131 silmek kal\u0131c\u0131d\u0131r ve geri al\u0131namaz. Tak\u0131mdan t\u00fcm \u00fcyeler \u00e7\u0131kart\u0131lacak, ve tak\u0131m tart\u0131\u015fmalar\u0131 art\u0131k eri\u015filebilir olmayacak.",
     "Deleting a textbook cannot be undone and once deleted any reference to it in your courseware's navigation will also be removed.": "Ders kitab\u0131n\u0131 silmek geri d\u00f6n\u00fc\u015f\u00fc olmayan bir i\u015flemdir. Sildi\u011fin anda i\u00e7indeki ders referanslar\u0131 ve materyalleri de silinecektir.",
     "Deleting this %(item_display_name)s is permanent and cannot be undone.": "%(item_display_name)s silmek kal\u0131c\u0131d\u0131r ve geri al\u0131namaz.",
     "Deleting this {xblock_type} is permanent and cannot be undone.": "Bu {xblock_type} t\u00fcr\u00fcn\u00fc silmek kal\u0131c\u0131d\u0131r ve geri al\u0131namaz.",
@@ -1155,7 +1156,6 @@
     "Now": "\u015eimdi",
     "Number Sent": "G\u00f6nderim Say\u0131s\u0131",
     "Number of Droppable": "At\u0131labilir Olanlar\u0131n Say\u0131s\u0131",
-    "Number of Students": "\u00d6\u011frencilerin Say\u0131s\u0131",
     "Numbered List (Ctrl+O)": "Numaral\u0131 Liste (Ctrl+O)",
     "Numbered list": "Numaral\u0131 liste",
     "OK": "Tamam",
@@ -1249,6 +1249,7 @@
     "Please enter your %(field)s.": "L\u00fctfen %(field)s bilgisini girin.",
     "Please fix the following errors:": "L\u00fctfen bu hatalar\u0131 \u00e7\u00f6z\u00fcn:",
     "Please follow the instructions here to upload a file elsewhere and link to it: {maxFileSizeRedirectUrl}": "L\u00fctfen y\u00f6nergeleri takip ederek dosyan\u0131z\u0131 ba\u015fka bir yere y\u00fckleyin ve ve sadece dosyaya eri\u015fim i\u00e7in kullan\u0131labilecek ba\u011flant\u0131 adresini buraya y\u00fckleyin: {maxFileSizeRedirectUrl}",
+    "Please note: Deletion of your account and personal data is permanent and cannot be undone. {platformName} will not be able to recover your account or the data that is deleted.": "L\u00fctfen dikkate al\u0131n: Hesab\u0131n\u0131z\u0131n ve ki\u015fisel verilerinizin silinmesi kal\u0131c\u0131 olup, sonradan geri d\u00f6nd\u00fcr\u00fclemez. {platformName} platformu silinen hesap ya da verilerinizi hi\u00e7bir \u015fekilde geri getiremez.",
     "Please print this page for your records; it serves as your receipt. You will also receive an email with the same information.": "L\u00fctfen kay\u0131tlar\u0131n\u0131z i\u00e7in bu sayfan\u0131n \u00e7\u0131kt\u0131s\u0131n\u0131 fatura olarak al\u0131n. Ayn\u0131 bilgileri i\u00e7eren bir de e-posta alacaks\u0131n\u0131z.",
     "Please provide a description of the link destination.": "L\u00fctfen ba\u011flant\u0131 konumuna dair bir a\u00e7\u0131klama yaz\u0131n.",
     "Please provide a valid URL.": "L\u00fctfen ge\u00e7erli bir URL belirtin.",
@@ -2239,6 +2240,10 @@
       "{possible} \u00fczerinden {earned} puan (notland\u0131r\u0131lan)",
       "{possible} \u00fczerinden {earned} puan (notland\u0131r\u0131lan)"
     ],
+    "{earned}/{possible} point (ungraded)": [
+      "{possible} \u00fczerinden {earned} puan (notland\u0131r\u0131lmayan)",
+      "{possible} \u00fczerinden {earned} puan (notland\u0131r\u0131lmayan)"
+    ],
     "{email}": "{email}",
     "{email} is already on the {container} team. Recheck the email address if you want to add a new member.": "{email} zaten {container} tak\u0131m\u0131nda bulunuyor. E\u011fer yeni bir \u00fcye eklemek isitiyorsan\u0131z, e-posta adreslerini tekrar kontrol ediniz.",
     "{filename} exceeds maximum size of {maxFileSizeInGB} GB.": "{filename} dosyas\u0131 maksimum boyut olan {maxFileSizeInGB} GB'\u0131 a\u015f\u0131yor.",
@@ -2247,10 +2252,6 @@
     "{htmlStart}Want to change your email, name, or password instead?{htmlEnd}": "{htmlStart}Bunun yerine e-posta adresinizi, ad\u0131n\u0131z\u0131 veya parolan\u0131z\u0131 m\u0131 de\u011fi\u015ftirmek istiyorsunuz?{htmlEnd}",
     "{label}: {status}": "{label}: {status}",
     "{maxWidth}x{maxHeight} pixels": "{maxWidth}x{maxHeight} piksel",
-    "{memberCount} / {maxMemberCount} Member": [
-      "{memberCount} / {maxMemberCount} \u00dcye",
-      "{memberCount} / {maxMemberCount} \u00dcye"
-    ],
     "{minutes} {unit}": "\u00a0{unit} {minutes}",
     "{numMoved} learner was moved from {prevCohort}": [
       "{prevCohort} toplulu\u011fundan {numMoved} \u00f6\u011frenci \u00e7\u0131kar\u0131ld\u0131",
@@ -2272,9 +2273,21 @@
     "{num_of_hours} hours": "{num_of_hours} saat",
     "{num_of_minutes} minute": "{num_of_minutes} dakika",
     "{num_of_minutes} minutes": "{num_of_minutes} dakika",
+    "{num_points} point possible (graded)": [
+      "{num_points} al\u0131nabilir puan (notland\u0131r\u0131lan)",
+      "{num_points} al\u0131nabilir puan (notland\u0131r\u0131lan)"
+    ],
+    "{num_points} point possible (graded, results hidden)": [
+      "{num_points} al\u0131nabilir puan (notland\u0131r\u0131lan, sonu\u00e7lar gizli)",
+      "{num_points} al\u0131nabilir puan (notland\u0131r\u0131lan, sonu\u00e7lar gizli)"
+    ],
     "{num_points} point possible (ungraded)": [
       "{num_points} al\u0131nabilir puan (notland\u0131r\u0131lmayan)",
       "{num_points} al\u0131nabilir puan (notland\u0131r\u0131lmayan)"
+    ],
+    "{num_points} point possible (ungraded, results hidden)": [
+      "{num_points} al\u0131nabilir puan (notland\u0131r\u0131lmayan, sonu\u00e7lar gizli)",
+      "{num_points} al\u0131nabilir puan (notland\u0131r\u0131lmayan, sonu\u00e7lar gizli)"
     ],
     "{organization}\\'s logo": "{organization} logosu",
     "{screen_reader_start}Warning:{screen_reader_end} No content groups exist.": "{screen_reader_start}Uyar\u0131:{screen_reader_end} \u0130\u00e7erik gruplar\u0131 mevcut de\u011fil.",
@@ -2283,6 +2296,7 @@
     "{sessionDates} (Open until {enrollmentEnd})": "{sessionDates} ({enrollmentEnd} tarihine dek a\u00e7\u0131kt\u0131r)",
     "{sessionDates} - Currently Selected": "{sessionDates} - Se\u00e7ilen Oturum",
     "{start_strong}{total}{end_strong} words submitted in total.": "Toplamda {start_strong}{total}{end_strong} kelime g\u00f6nderildi.",
+    "{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read the above carefully before proceeding. This is an irreversible action, and {strongStart}you will no longer be able to use the same email on {platformName}.{strongEnd}": "{strongStart}Uyar\u0131: Hesap silme i\u015flemi kal\u0131c\u0131d\u0131r.{strongEnd} L\u00fctfen i\u015fleme devam etmeden \u00f6nce yukar\u0131da yaz\u0131lanlar\u0131 dikkatle okuyun. Bu bir geri d\u00f6nd\u00fcr\u00fclemez i\u015flemdir, ve {strongStart}{platformName} platformunda bu e-posta hesab\u0131n\u0131 bir daha kullanamazs\u0131n\u0131z.{strongEnd}",
     "{team_count} Team": [
       "{team_count} Tak\u0131m",
       "{team_count} Tak\u0131m"

@@ -119,15 +119,6 @@
     "%(field)s can only contain up to %(count)d characters.": "%(field)s \u6700\u591a\u53ea\u80fd\u6709 %(count)d \u4e2a\u5b57\u7b26\u3002",
     "%(field)s must have at least %(count)d characters.": "%(field)s \u81f3\u5c11\u8981\u6709 %(count)d \u5b57\u7b26\u3002",
     "%(new_item_message)s": "%(new_item_message)s",
-    "%(num_questions)s question": [
-      "%(num_questions)s \u4e2a\u95ee\u9898"
-    ],
-    "%(num_students)s student": [
-      "%(num_students)s \u4e2a\u5b66\u751f"
-    ],
-    "%(num_students)s student opened Subsection": [
-      "%(num_students)s \u4e2a\u5b66\u751f\u5df2\u6253\u5f00\u5206\u9879"
-    ],
     "%(programName)s Home Page.": "%(programName)s\u4e3b\u9875",
     "%(type)s Component Template Menu": "%(type)s \u7ec4\u4ef6\u6a21\u677f\u83dc\u5355",
     "%(value)s hour": [
@@ -1155,7 +1146,6 @@
     "Notes visible": "\u6ce8\u91ca\u53ef\u89c1",
     "Number Sent": "\u53d1\u9001\u6570\u76ee",
     "Number of Droppable": "\u53ef\u653e\u5f03\u7684\u6570\u91cf",
-    "Number of Students": "\u5b66\u751f\u6570\u76ee",
     "Numbered List (Ctrl+O)": "\u6709\u5e8f\u5217\u8868(Ctrl+O)",
     "Numbered list": "\u7f16\u53f7\u5217\u8868",
     "OK": "\u662f\u7684",

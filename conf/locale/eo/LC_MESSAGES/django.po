@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-02-21 08:11+0000\n"
-"PO-Revision-Date: 2020-02-21 08:11:35.626553\n"
+"POT-Creation-Date: 2020-02-23 20:53+0000\n"
+"PO-Revision-Date: 2020-02-23 20:53:06.530881\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -12187,6 +12187,40 @@ msgstr ""
 "Mäxïmüm nümßér öf réçörds ïn pägïnätéd réspönsé öf ä sïnglé réqüést tö "
 "çätälög sérvïçé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
+#: openedx/core/djangoapps/config_model_utils/admin.py
+#, python-brace-format
+msgid ""
+"These define the context to enable this configuration on. If no values are "
+"set, then the configuration applies globally. If a single value is set, then"
+" the configuration applies to all courses within that context. At most one "
+"value can be set at a time.{br}If multiple contexts apply to a course (for "
+"example, if configuration is specified for the course specifically, and for "
+"the org that the course is in, then the more specific context overrides the "
+"more general context."
+msgstr ""
+"Thésé défïné thé çöntéxt tö énäßlé thïs çönfïgürätïön ön. Ìf nö välüés äré "
+"sét, thén thé çönfïgürätïön äpplïés glößällý. Ìf ä sïnglé välüé ïs sét, thén"
+" thé çönfïgürätïön äpplïés tö äll çöürsés wïthïn thät çöntéxt. Àt möst öné "
+"välüé çän ßé sét ät ä tïmé.{br}Ìf mültïplé çöntéxts äpplý tö ä çöürsé (för "
+"éxämplé, ïf çönfïgürätïön ïs spéçïfïéd för thé çöürsé spéçïfïçällý, änd för "
+"thé örg thät thé çöürsé ïs ïn, thén thé möré spéçïfïç çöntéxt övérrïdés thé "
+"möré généräl çöntéxt.#"
+
+#: openedx/core/djangoapps/config_model_utils/admin.py
+msgid ""
+"If any of these values are left empty or \"Unknown\", then their value at "
+"runtime will be retrieved from the next most specific context that applies. "
+"For example, if \"Enabled\" is left as \"Unknown\" in the course context, "
+"then that course will be Enabled only if the org that it is in is Enabled."
+msgstr ""
+"Ìf äný öf thésé välüés äré léft émptý ör \"Ûnknöwn\", thén théïr välüé ät "
+"rüntïmé wïll ßé rétrïévéd fröm thé néxt möst spéçïfïç çöntéxt thät äpplïés. "
+"För éxämplé, ïf \"Énäßléd\" ïs léft äs \"Ûnknöwn\" ïn thé çöürsé çöntéxt, "
+"thén thät çöürsé wïll ßé Énäßléd önlý ïf thé örg thät ït ïs ïn ïs Énäßléd. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
+"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
+" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσ#"
+
 #: openedx/core/djangoapps/config_model_utils/models.py
 #, python-format
 msgid "%(value)s should have the form ORG+COURSE"
@@ -12636,6 +12670,14 @@ msgid ""
 "request."
 msgstr ""
 "Çömmä-sépärätéd lïst öf sçöpés thät thïs äpplïçätïön wïll ßé ällöwéd tö "
+"réqüést. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: openedx/core/djangoapps/oauth_dispatch/models.py
+msgid ""
+"Comma-separated list of filters that this application will be allowed to "
+"request."
+msgstr ""
+"Çömmä-sépärätéd lïst öf fïltérs thät thïs äpplïçätïön wïll ßé ällöwéd tö "
 "réqüést. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
@@ -14061,41 +14103,6 @@ msgid ""
 msgstr ""
 "Ýöü äré nöt sïgnéd ïn. Tö vïéw thé dïsçüssïön çöntént, {sign_in_link} ör "
 "{register_link}, änd énröll ïn thïs çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: openedx/features/content_type_gating/admin.py
-#: openedx/features/course_duration_limits/admin.py
-msgid ""
-"These define the context to enable course duration limits on. If no values "
-"are set, then the configuration applies globally. If a single value is set, "
-"then the configuration applies to all courses within that context. At most "
-"one value can be set at a time.<br>If multiple contexts apply to a course "
-"(for example, if configuration is specified for the course specifically, and"
-" for the org that the course is in, then the more specific context overrides"
-" the more general context."
-msgstr ""
-"Thésé défïné thé çöntéxt tö énäßlé çöürsé dürätïön lïmïts ön. Ìf nö välüés "
-"äré sét, thén thé çönfïgürätïön äpplïés glößällý. Ìf ä sïnglé välüé ïs sét, "
-"thén thé çönfïgürätïön äpplïés tö äll çöürsés wïthïn thät çöntéxt. Àt möst "
-"öné välüé çän ßé sét ät ä tïmé.<br>Ìf mültïplé çöntéxts äpplý tö ä çöürsé "
-"(för éxämplé, ïf çönfïgürätïön ïs spéçïfïéd för thé çöürsé spéçïfïçällý, änd"
-" för thé örg thät thé çöürsé ïs ïn, thén thé möré spéçïfïç çöntéxt övérrïdés"
-" thé möré généräl çöntéxt.#"
-
-#: openedx/features/content_type_gating/admin.py
-#: openedx/features/course_duration_limits/admin.py
-msgid ""
-"If any of these values is left empty or \"Unknown\", then their value at "
-"runtime will be retrieved from the next most specific context that applies. "
-"For example, if \"Enabled\" is left as \"Unknown\" in the course context, "
-"then that course will be Enabled only if the org that it is in is Enabled."
-msgstr ""
-"Ìf äný öf thésé välüés ïs léft émptý ör \"Ûnknöwn\", thén théïr välüé ät "
-"rüntïmé wïll ßé rétrïévéd fröm thé néxt möst spéçïfïç çöntéxt thät äpplïés. "
-"För éxämplé, ïf \"Énäßléd\" ïs léft äs \"Ûnknöwn\" ïn thé çöürsé çöntéxt, "
-"thén thät çöürsé wïll ßé Énäßléd önlý ïf thé örg thät ït ïs ïn ïs Énäßléd. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
-" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяι#"
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
