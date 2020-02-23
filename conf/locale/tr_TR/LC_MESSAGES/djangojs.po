@@ -107,7 +107,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-02-16 20:42+0000\n"
+"POT-Creation-Date: 2020-02-23 20:42+0000\n"
 "PO-Revision-Date: 2020-02-20 16:22+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
@@ -398,24 +398,24 @@ msgstr "İpuçlarına Yanıt Ver"
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{num_points} point possible (graded, results hidden)"
 msgid_plural "{num_points} points possible (graded, results hidden)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num_points} alınabilir puan (notlandırılan, sonuçlar gizli)"
+msgstr[1] "{num_points} alınabilir puan (notlandırılan, sonuçlar gizli)"
 
 #. Translators: {num_points} is the number of points possible (examples: 1, 3,
 #. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{num_points} point possible (ungraded, results hidden)"
 msgid_plural "{num_points} points possible (ungraded, results hidden)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num_points} alınabilir puan (notlandırılmayan, sonuçlar gizli)"
+msgstr[1] "{num_points} alınabilir puan (notlandırılmayan, sonuçlar gizli)"
 
 #. Translators: {num_points} is the number of points possible (examples: 1, 3,
 #. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{num_points} point possible (graded)"
 msgid_plural "{num_points} points possible (graded)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num_points} alınabilir puan (notlandırılan)"
+msgstr[1] "{num_points} alınabilir puan (notlandırılan)"
 
 #. Translators: {num_points} is the number of points possible (examples: 1, 3,
 #. 10).;
@@ -442,8 +442,8 @@ msgstr[1] "{possible} üzerinden {earned} puan (notlandırılan)"
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{earned}/{possible} point (ungraded)"
 msgid_plural "{earned}/{possible} points (ungraded)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{possible} üzerinden {earned} puan (notlandırılmayan)"
+msgstr[1] "{possible} üzerinden {earned} puan (notlandırılmayan)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "The grading process is still running. Refresh the page to see updates."
@@ -2787,6 +2787,8 @@ msgid ""
 "Deleting a team is permanent and cannot be undone.All members are removed "
 "from the team, and team discussions can no longer be accessed."
 msgstr ""
+"Bir takımı silmek kalıcıdır ve geri alınamaz. Takımdan tüm üyeler "
+"çıkartılacak, ve takım tartışmaları artık erişilebilir olmayacak."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Team \"{team}\" successfully deleted."
@@ -2851,10 +2853,10 @@ msgid "Cannot join instructor managed team"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
-msgid "{memberCount} / {maxMemberCount} Member"
-msgid_plural "{memberCount} / {maxMemberCount} Members"
-msgstr[0] "{memberCount} / {maxMemberCount} Üye"
-msgstr[1] "{memberCount} / {maxMemberCount} Üye"
+msgid " Member"
+msgid_plural " Members"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "All teams"
@@ -4667,6 +4669,10 @@ msgid ""
 "{strongStart}you will no longer be able to use the same email on "
 "{platformName}.{strongEnd}"
 msgstr ""
+"{strongStart}Uyarı: Hesap silme işlemi kalıcıdır.{strongEnd} Lütfen işleme "
+"devam etmeden önce yukarıda yazılanları dikkatle okuyun. Bu bir geri "
+"döndürülemez işlemdir, ve {strongStart}{platformName} platformunda bu "
+"e-posta hesabını bir daha kullanamazsınız.{strongEnd}"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -4674,6 +4680,9 @@ msgid ""
 "cannot be undone. {platformName} will not be able to recover your account or"
 " the data that is deleted."
 msgstr ""
+"Lütfen dikkate alın: Hesabınızın ve kişisel verilerinizin silinmesi kalıcı "
+"olup, sonradan geri döndürülemez. {platformName} platformu silinen hesap ya "
+"da verilerinizi hiçbir şekilde geri getiremez."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -5347,28 +5356,6 @@ msgid ""
 msgstr ""
 "Dersin yayımlanma tarihinden önce öğrenci veya beta tester olarak dersi "
 "inceleyemezsiniz."
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "%(num_students)s student opened Subsection"
-msgid_plural "%(num_students)s students opened Subsection"
-msgstr[0] ""
-msgstr[1] "%(num_students)s öğrenciler alt bölüm açtı."
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "%(num_students)s student"
-msgid_plural "%(num_students)s students"
-msgstr[0] ""
-msgstr[1] "%(num_students)s öğrenci"
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "%(num_questions)s question"
-msgid_plural "%(num_questions)s questions"
-msgstr[0] ""
-msgstr[1] "%(num_questions)s soru"
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "Number of Students"
-msgstr "Öğrencilerin Sayısı"
 
 #: lms/templates/courseware/progress_graph.js
 msgid "Overall Score"

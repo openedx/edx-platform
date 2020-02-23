@@ -27,18 +27,6 @@
     "%(field)s can only contain up to %(count)d characters.": "%(field)s pode conter somente at\u00e9 %(count)d caracteres.",
     "%(field)s must have at least %(count)d characters.": "%(field)s deve ter no m\u00ednimo %(count)d caracteres.",
     "%(new_item_message)s": "%(new_item_message)s",
-    "%(num_questions)s question": [
-      "%(num_questions)s quest\u00e3o",
-      "%(num_questions)s quest\u00f5es"
-    ],
-    "%(num_students)s student": [
-      "%(num_students)s estudante",
-      "%(num_students)s estudantes"
-    ],
-    "%(num_students)s student opened Subsection": [
-      "%(num_students)s aluno abriu Subse\u00e7\u00e3o",
-      "%(num_students)s alunos abriram a Subse\u00e7\u00e3o"
-    ],
     "%(sel)s of %(cnt)s selected": [
       "%(sel)s de %(cnt)s selecionado",
       "%(sel)s de %(cnt)s selecionados"
@@ -567,7 +555,6 @@
     "Now": "Agora",
     "Number Sent": "N\u00famero enviado",
     "Number of Droppable": "N\u00famero de Cancel\u00e1veis",
-    "Number of Students": "N\u00famero de alunos",
     "Numbered List (Ctrl+O)": "Lista numerada (Ctrl+O)",
     "OK": "OK",
     "October": "Outubro",

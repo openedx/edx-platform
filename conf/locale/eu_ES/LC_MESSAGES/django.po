@@ -12694,7 +12694,7 @@ msgstr "Ikusi unitatea Studio-n"
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
-msgstr "E-posta aldaketak kale egin du"
+msgstr "Posta elektronikoaren aldaketak kale egin du"
 
 #: lms/templates/email_change_failed.html
 msgid "We were unable to send a confirmation email to {email}"
@@ -12708,7 +12708,7 @@ msgstr "Itzuli {link_start}hasiera-orrira{link_end}."
 
 #: lms/templates/email_change_successful.html
 msgid "E-mail change successful!"
-msgstr "E-posta aldaketa ondo gertatu da"
+msgstr "Posta elektronikoaren aldaketa ondo gertatu da"
 
 #: lms/templates/email_change_successful.html
 msgid "You should see your new email in your {link_start}dashboard{link_end}."

@@ -44,24 +44,6 @@
     "%(field)s can only contain up to %(count)d characters.": "%(field)s mo\u017ce sk\u0142ada\u0107 si\u0119 z maksymalnie %(count)d znak\u00f3w.",
     "%(field)s must have at least %(count)d characters.": "%(field)s musi sk\u0142ada\u0107 si\u0119 z co najmniej %(count)d znak\u00f3w.",
     "%(new_item_message)s": "%(new_item_message)s",
-    "%(num_questions)s question": [
-      "%(num_questions)s pytanie",
-      "%(num_questions)s pytania",
-      "%(num_questions)s pyta\u0144",
-      "%(num_questions)s pyta\u0144"
-    ],
-    "%(num_students)s student": [
-      "%(num_students)s student",
-      "%(num_students)s student\u00f3w",
-      "%(num_students)s student\u00f3w",
-      "%(num_students)s student\u00f3w"
-    ],
-    "%(num_students)s student opened Subsection": [
-      "%(num_students)s student otworzy\u0142 lekcj\u0119",
-      "%(num_students)s student\u00f3w otworzy\u0142o lekcj\u0119",
-      "%(num_students)s student\u00f3w otworzy\u0142o lekcj\u0119",
-      "%(num_students)s student\u00f3w otworzy\u0142o lekcj\u0119"
-    ],
     "%(programName)s Home Page.": "Strona g\u0142\u00f3wna programu %(programName)s.",
     "%(sel)s of %(cnt)s selected": [
       "Zaznaczono %(sel)s z %(cnt)s",
@@ -854,7 +836,6 @@
     "Now": "Teraz",
     "Number Sent": "Liczba wys\u0142anych",
     "Number of Droppable": "Liczba mo\u017cliwych do pomini\u0119cia",
-    "Number of Students": "Liczba student\u00f3w",
     "Numbered List (Ctrl+O)": "Lista numerowana (Ctrl+O)",
     "OK": "OK",
     "ORDER NAME": "NAZWA ZAM\u00d3WIENIA",
