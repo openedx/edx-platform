@@ -20,8 +20,7 @@ Recurring Nudges encourage learners to return to self-paced courses at
 regular intervals. The app sends nudges three days and ten days after a
 learner enrolls in a course.
 
-Upgrade Reminders ask learners to purchase their course’s Verified
-certificate. The reminders are sent two days before their course’s upgrade
+Upgrade Reminders ask learners to purchase their course’s Statement of Accomplishment. The reminders are sent two days before their course’s upgrade
 deadline, or two days before the course’s end date (whichever date occurs
 sooner).
 
@@ -53,7 +52,7 @@ Glossary
    -  “Course Updates”
 
 -  **Upgrade Deadline**: The date before which a learner is encouraged to
-   purchase a verified certificate. By default, a Schedule imposes a "soft"
+   purchase a statement of accomplishment. By default, a Schedule imposes a "soft"
    upgrade deadline (meaning, a suggested, but not final, date) 21 days from
    when a learner enrolled in a course. A self-paced course imposes a "hard"
    upgrade deadline that is the course-wide expiration date for upgrading on the
@@ -463,10 +462,10 @@ To begin using Litmus, follow these steps:
 1. Make sure that ACE is configured to use Sailthru (see instructions above).
 2. Go to the `Litmus checklist page <https://litmus.com/checklist>`__ and start
    a new checklist.
-3. The checklist will provide you with an email address to which you will send 
+3. The checklist will provide you with an email address to which you will send
    a test email.
-4. Send an email. Use one of the management commands with the 
-   `--override-recipient-email` flag. Use the Litmus email you got in step 3 
+4. Send an email. Use one of the management commands with the
+   `--override-recipient-email` flag. Use the Litmus email you got in step 3
    as the flag value.
 
 ::

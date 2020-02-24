@@ -278,7 +278,7 @@ class CourseEndDate(DateSummary):
         if self.current_time <= self.date:
             mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course_id)
             if is_active and CourseMode.is_eligible_for_certificate(mode):
-                return _('To earn a certificate, you must complete all requirements before this date.')
+                return _('To earn a statement of accomplishment, you must complete all requirements before this date.')
             else:
                 return _('After this date, course content will be archived.')
         return _('This course is archived, which means you can review course content but it is no longer active.')
@@ -321,7 +321,7 @@ class CertificateAvailableDate(DateSummary):
     Displays the certificate available date of the course.
     """
     css_class = 'certificate-available-date'
-    title = ugettext_lazy('Certificate Available')
+    title = ugettext_lazy('Statement of Accomplishment Available')
 
     @property
     def active_certificates(self):
@@ -342,7 +342,7 @@ class CertificateAvailableDate(DateSummary):
 
     @property
     def description(self):
-        return _('Day certificates will become available for passing verified learners.')
+        return _('Day statements of accomplishment will become available for passing verified learners.')
 
     @property
     def date(self):
@@ -367,8 +367,8 @@ class CertificateAvailableDate(DateSummary):
             CourseHomeMessages.register_info_message(
                 request,
                 Text(_(
-                    'If you have earned a certificate, you will be able to access it {time_remaining_string}'
-                    ' from now. You will also be able to view your certificates on your {learner_profile_link}.'
+                    'If you have earned a statement of accomplishment, you will be able to access it {time_remaining_string}'
+                    ' from now. You will also be able to view your statements of accomplishment on your {learner_profile_link}.'
                 )).format(
                     time_remaining_string=self.time_remaining_string,
                     learner_profile_link=HTML(
@@ -378,7 +378,7 @@ class CertificateAvailableDate(DateSummary):
                         learner_profile_name=_('Learner Profile'),
                     ),
                 ),
-                title=Text(_('We are working on generating course certificates.'))
+                title=Text(_('We are working on generating course statements of accomplishment.'))
             )
 
 
@@ -515,16 +515,16 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
         days_left_to_upgrade = (self.date - self.current_time).days
         if self.date > self.current_time and days_left_to_upgrade <= settings.COURSE_MESSAGE_ALERT_DURATION_IN_DAYS:
             upgrade_message = _(
-                "Don't forget, you have {time_remaining_string} left to upgrade to a Verified Certificate."
+                "Don't forget, you have {time_remaining_string} left to upgrade to a Statement of Accomplishment."
             ).format(time_remaining_string=self.time_remaining_string)
             if self._dynamic_deadline() is not None:
                 upgrade_message = _(
-                    "Don't forget to upgrade to a verified certificate by {localized_date}."
+                    "Don't forget to upgrade to a statement of accomplishment by {localized_date}."
                 ).format(localized_date=date_format(self.date))
             CourseHomeMessages.register_info_message(
                 request,
                 Text(_(
-                    'In order to qualify for a certificate, you must meet all course grading '
+                    'In order to qualify for a statement of accomplishment, you must meet all course grading '
                     'requirements, upgrade before the course deadline, and successfully verify '
                     'your identity on {platform_name} if you have not done so already.{button_panel}'
                 )).format(
@@ -595,7 +595,7 @@ class VerificationDeadlineDate(DateSummary):
             )
         return _(
             "You must successfully complete verification before"
-            " this date to qualify for a Verified Certificate."
+            " this date to qualify for a Statement of Accomplishment."
         )
 
     @lazy

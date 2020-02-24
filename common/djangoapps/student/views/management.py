@@ -425,7 +425,7 @@ def change_enrollment(request, check_access=True):
 
         certificate_info = cert_info(user, enrollment.course_overview)
         if certificate_info.get('status') in DISABLE_UNENROLL_CERT_STATES:
-            return HttpResponseBadRequest(_("Your certificate prevents you from unenrolling from this course"))
+            return HttpResponseBadRequest(_("Your statement of accomplishment prevents you from unenrolling from this course"))
 
         CourseEnrollment.unenroll(user, course_id)
         REFUND_ORDER.send(sender=None, course_enrollment=enrollment)

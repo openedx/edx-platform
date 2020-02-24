@@ -44,7 +44,7 @@ export class PortfolioExperimentUpsellModal extends React.Component {
                 <img
                     className="upsell-certificate"
                     src="https://courses.edx.org/static/images/edx-verified-mini-cert.png"
-                    alt="Sample verified certificate"
+                    alt="Sample statement of accomplishment"
                 />
             </div>
         );

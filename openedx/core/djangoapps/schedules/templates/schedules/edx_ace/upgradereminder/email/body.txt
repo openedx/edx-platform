@@ -3,8 +3,8 @@
 {% load ace %}
 {% if course_ids|length > 1 %}
 {% blocktrans trimmed %}
-We hope you are enjoying learning with us so far on {{ platform_name }}! A verified certificate
-allows you to highlight your new knowledge and skills. An {{ platform_name }} certificate is
+We hope you are enjoying learning with us so far on {{ platform_name }}! A statement of accomplishment
+allows you to highlight your new knowledge and skills. An {{ platform_name }} statement of accomplishment is
 official and easily shareable.
 
 Upgrade by {{ user_schedule_upgrade_deadline_time }}.
@@ -19,8 +19,8 @@ Upgrade by {{ user_schedule_upgrade_deadline_time }}.
 {% trans "Upgrade now at" %} <{% with_link_tracking dashboard_url %}>
 {% else %}
 {% blocktrans trimmed %}
-We hope you are enjoying learning with us so far in {{ first_course_name }}! A verified certificate
-allows you to highlight your new knowledge and skills. An {{ platform_name }} certificate is
+We hope you are enjoying learning with us so far in {{ first_course_name }}! A statement of accomplishment
+allows you to highlight your new knowledge and skills. An {{ platform_name }} statement of accomplishment is
 official and easily shareable.
 
 Upgrade by {{ user_schedule_upgrade_deadline_time }}.

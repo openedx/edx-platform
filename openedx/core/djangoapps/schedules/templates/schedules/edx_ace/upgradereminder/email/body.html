@@ -6,16 +6,16 @@
 {% block preview_text %}
     {% if course_ids|length > 1 %}
         {% blocktrans trimmed %}
-            We hope you are enjoying learning with us so far on {{ platform_name }}! A verified certificate allows you to
-            highlight your new knowledge and skills. An {{ platform_name }} certificate is official and easily
+            We hope you are enjoying learning with us so far on {{ platform_name }}! A statement of accomplishment allows you to
+            highlight your new knowledge and skills. An {{ platform_name }} statement of accomplishment is official and easily
             shareable.
 
             Upgrade by {{ user_schedule_upgrade_deadline_time }}.
         {% endblocktrans %}
     {% else %}
         {% blocktrans trimmed %}
-            We hope you are enjoying learning with us so far in {{ first_course_name }}! A verified certificate allows
-            you to highlight your new knowledge and skills. An {{ platform_name }} certificate is official and easily
+            We hope you are enjoying learning with us so far in {{ first_course_name }}! A statement of accomplishment allows
+            you to highlight your new knowledge and skills. An {{ platform_name }} statement of accomplishment is official and easily
             shareable.
 
             Upgrade by {{ user_schedule_upgrade_deadline_time }}.
@@ -33,14 +33,14 @@
                 {% if course_ids|length > 1 %}
                     {% blocktrans trimmed %}
                         We hope you are enjoying learning with us so far on <strong>{{ platform_name }}</strong>! A
-                        verified certificate allows you to highlight your new knowledge and skills. An
-                        {{ platform_name }} certificate is official and easily shareable.
+                        statement of accomplishment allows you to highlight your new knowledge and skills. An
+                        {{ platform_name }} statement of accomplishment is official and easily shareable.
                     {% endblocktrans %}
                 {% else %}
                     {% blocktrans trimmed %}
                         We hope you are enjoying learning with us so far in <strong>{{ first_course_name }}</strong>! A
-                        verified certificate allows you to highlight your new knowledge and skills. An
-                        {{ platform_name }} certificate is official and easily shareable.
+                        statement of accomplishment allows you to highlight your new knowledge and skills. An
+                        {{ platform_name }} statement of accomplishment is official and easily shareable.
                     {% endblocktrans %}
                 {% endif %}
             </p>
@@ -65,7 +65,7 @@
 
             <img
                 src="{{ cert_image }}"
-                alt="{% trans 'Example of a verified certificate' %}"
+                alt="{% trans 'Example of a statement of accomplishment' %}"
                 style="
                     display: block;
                     margin-right: auto;
@@ -76,7 +76,7 @@
                     border-bottom: 3px solid lightgray;
                     border-right: 3px solid lightgray;
                     border-left: 1px solid lightgray;
-                    " 
+                    "
             />
 
             <p>
