@@ -31,10 +31,10 @@ api-docs-sphinx: swagger	## generate the sphinx source files for api-docs
 	python docs/sw2sphinxopenapi.py $(SWAGGER) docs/api/gen
 
 api-docs: api-docs-sphinx	## build the REST api docs
-	cd docs/api; make html
+	$(MAKE) --directory=docs/api html
 
-guides:	## build the developer guide docs
-	cd docs/guides; make clean html
+guides: ## build the developer guide docs
+	$(MAKE) --directory=docs/guides clean html
 
 extract_translations: ## extract localizable strings from sources
 	i18n_tool extract -v
