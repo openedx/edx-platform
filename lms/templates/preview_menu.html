@@ -21,7 +21,7 @@ show_preview_menu = course and can_masquerade and supports_preview_menu
 
     def get_mfe_link():
       if section:
-          mfe_link = '{}course/{}/{}'.format(settings.LEARNING_MICROFRONTEND_URL, course.id, section.location)
+          mfe_link = '{}/course/{}/{}'.format(settings.LEARNING_MICROFRONTEND_URL, course.id, section.location)
           if unit:
             mfe_link += '/' + unit
       else:
