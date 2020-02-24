@@ -38,10 +38,6 @@ to test other grant types if they are substituted in the appropriate places.
 
    iii. Click Save.
 
-   iv. If the temporary waffle switch `oauth2.enforce_jwt_scopes`_ is still defined in your codebase, you will need to enable this switch in the LMS under http://localhost:18000/admin/waffle/switch/add/
-
-.. _oauth2.enforce_jwt_scopes: https://github.com/edx/edx-drf-extensions/blob/609e1dbaa98f476b36e50143de97732f2f6a9b4f/edx_rest_framework_extensions/config.py#L5-L18
-
 3. Create a publicly accessible URL to the LMS if you are testing on devstack. This step is needed to support the redirecting handshake in the Authorization Code protocol from Google's server back to localhost.
 
    i. Install `localtunnel`_:

@@ -113,32 +113,14 @@ class ThirdPartyAuthPermissionTest(TestCase):
         self.assertEqual(response.status_code, 403)
 
     @ddt.data(
-        # **** Unenforced ****
-        # unrestricted
-        dict(
-            is_enforced=False,
-            is_restricted=False,
-            expected_response=403,
-        ),
-
-        # restricted
-        dict(
-            is_enforced=False,
-            is_restricted=True,
-            expected_response=403,
-        ),
-
-        # **** Enforced ****
         # unrestricted (for example, jwt cookies)
         dict(
-            is_enforced=True,
             is_restricted=False,
             expected_response=403,
         ),
 
         # restricted (note: further test cases for scopes and filters are in tests below)
         dict(
-            is_enforced=True,
             is_restricted=True,
             expected_response=403,
         ),
@@ -146,25 +128,18 @@ class ThirdPartyAuthPermissionTest(TestCase):
     @ddt.unpack
     def test_jwt_without_scopes_and_filters(
             self,
-            is_enforced,
             is_restricted,
             expected_response,
     ):
-        # pylint: disable=line-too-long
-        # Note: Unenforced tests can be retired when rollout waffle switch `oauth2.enforce_jwt_scopes` is retired.
-        # See https://github.com/edx/edx-drf-extensions/blob/609e1dbaa98f476b36e50143de97732f2f6a9b4f/edx_rest_framework_extensions/config.py#L5
-        # pylint: enable=line-too-long
-        with patch('edx_rest_framework_extensions.permissions.waffle.switch_is_active') as mock_toggle:
-            mock_toggle.return_value = is_enforced
-            user = self._create_user()
+        user = self._create_user()
 
-            auth_header = self._create_jwt_header(user, is_restricted=is_restricted)
-            request = self._create_request(
-                auth_header=auth_header,
-            )
+        auth_header = self._create_jwt_header(user, is_restricted=is_restricted)
+        request = self._create_request(
+            auth_header=auth_header,
+        )
 
-            response = self.SomeTpaClassView().dispatch(request)
-            self.assertEqual(response.status_code, expected_response)
+        response = self.SomeTpaClassView().dispatch(request)
+        self.assertEqual(response.status_code, expected_response)
 
     @ddt.data(
         # valid scopes
@@ -177,7 +152,7 @@ class ThirdPartyAuthPermissionTest(TestCase):
     )
     @ddt.unpack
     def test_jwt_scopes(self, scopes, expected_response):
-        self._assert_jwt_enforced_restricted_case(
+        self._assert_jwt_restricted_case(
             scopes=scopes,
             filters=['tpa_provider:some_tpa_provider'],
             expected_response=expected_response,
@@ -202,19 +177,17 @@ class ThirdPartyAuthPermissionTest(TestCase):
     )
     @ddt.unpack
     def test_jwt_org_filters(self, filters, expected_response):
-        self._assert_jwt_enforced_restricted_case(
+        self._assert_jwt_restricted_case(
             scopes=['tpa:read'],
             filters=filters,
             expected_response=expected_response,
         )
 
-    def _assert_jwt_enforced_restricted_case(self, scopes, filters, expected_response):
-        with patch('edx_rest_framework_extensions.permissions.waffle.switch_is_active') as mock_toggle:
-            mock_toggle.return_value = True
-            user = self._create_user()
+    def _assert_jwt_restricted_case(self, scopes, filters, expected_response):
+        user = self._create_user()
 
-            auth_header = self._create_jwt_header(user, is_restricted=True, scopes=scopes, filters=filters)
-            request = self._create_request(auth_header=auth_header)
+        auth_header = self._create_jwt_header(user, is_restricted=True, scopes=scopes, filters=filters)
+        request = self._create_request(auth_header=auth_header)
 
-            response = self.SomeTpaClassView().dispatch(request, provider_id='some_tpa_provider')
-            self.assertEqual(response.status_code, expected_response)
+        response = self.SomeTpaClassView().dispatch(request, provider_id='some_tpa_provider')
+        self.assertEqual(response.status_code, expected_response)

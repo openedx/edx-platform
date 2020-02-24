@@ -18,7 +18,6 @@ from oauth2_provider import models as dot_models
 from organizations.tests.factories import OrganizationFactory
 from provider import constants
 
-from openedx.core.djangoapps.oauth_dispatch.toggles import ENFORCE_JWT_SCOPES
 from student.tests.factories import UserFactory
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinGoogle
 
@@ -213,24 +212,22 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         self.assertIn('scope', data)
         self.assertIn('token_type', data)
 
-    @ddt.data(False, True)
-    def test_restricted_non_jwt_access_token_fields(self, enforce_jwt_scopes_enabled):
-        with ENFORCE_JWT_SCOPES.override(enforce_jwt_scopes_enabled):
-            response = self._post_request(self.user, self.restricted_dot_app)
-            self.assertEqual(response.status_code, 200)
-            data = json.loads(response.content.decode('utf-8'))
-            self.assertIn('access_token', data)
-            self.assertIn('expires_in', data)
-            self.assertIn('scope', data)
-            self.assertIn('token_type', data)
+    def test_restricted_non_jwt_access_token_fields(self):
+        response = self._post_request(self.user, self.restricted_dot_app)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertIn('access_token', data)
+        self.assertIn('expires_in', data)
+        self.assertIn('scope', data)
+        self.assertIn('token_type', data)
 
-            # Verify token expiration.
-            self.assertEqual(data['expires_in'] < 0, True)
-            access_token = dot_models.AccessToken.objects.get(token=data['access_token'])
-            self.assertEqual(
-                models.RestrictedApplication.verify_access_token_as_expired(access_token),
-                True
-            )
+        # Verify token expiration.
+        self.assertEqual(data['expires_in'] < 0, True)
+        access_token = dot_models.AccessToken.objects.get(token=data['access_token'])
+        self.assertEqual(
+            models.RestrictedApplication.verify_access_token_as_expired(access_token),
+            True
+        )
 
     @ddt.data('dop_app', 'dot_app')
     def test_jwt_access_token_from_parameter(self, client_attr):
@@ -273,33 +270,28 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         ]
         mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
 
-    @ddt.data(
-        (False, True),
-        (True, False),
-    )
-    @ddt.unpack
-    def test_restricted_jwt_access_token(self, enforce_jwt_scopes_enabled, expiration_expected):
+    @ddt.data((True, False))
+    def test_restricted_jwt_access_token(self, expiration_expected):
         """
         Verify that when requesting a JWT token from a restricted Application
         within the DOT subsystem, that our claims is marked as already expired
         (i.e. expiry set to Jan 1, 1970)
         """
-        with ENFORCE_JWT_SCOPES.override(enforce_jwt_scopes_enabled):
-            response = self._post_request(self.user, self.restricted_dot_app, token_type='jwt')
-            self.assertEqual(response.status_code, 200)
-            data = json.loads(response.content.decode('utf-8'))
+        response = self._post_request(self.user, self.restricted_dot_app, token_type='jwt')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content.decode('utf-8'))
 
-            self.assertIn('expires_in', data)
-            self.assertEqual(data['expires_in'] < 0, expiration_expected)
-            self.assertEqual(data['token_type'], 'JWT')
-            self.assert_valid_jwt_access_token(
-                data['access_token'],
-                self.user,
-                data['scope'].split(' '),
-                should_be_expired=expiration_expected,
-                should_be_asymmetric_key=enforce_jwt_scopes_enabled,
-                should_be_restricted=True,
-            )
+        self.assertIn('expires_in', data)
+        self.assertEqual(data['expires_in'] < 0, expiration_expected)
+        self.assertEqual(data['token_type'], 'JWT')
+        self.assert_valid_jwt_access_token(
+            data['access_token'],
+            self.user,
+            data['scope'].split(' '),
+            should_be_expired=expiration_expected,
+            should_be_asymmetric_key=True,
+            should_be_restricted=True,
+        )
 
     def test_restricted_access_token(self):
         """

@@ -19,7 +19,6 @@ from course_modes.api.v1.views import CourseModesView
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from openedx.core.djangoapps.oauth_dispatch.toggles import ENFORCE_JWT_SCOPES
 from openedx.core.djangoapps.user_authn.tests.utils import JWT_AUTH_TYPES, AuthAndScopesTestMixin, AuthType
 from student.tests.factories import UserFactory
 
@@ -81,21 +80,19 @@ class CourseModesViewTestBase(AuthAndScopesTestMixin):
         """
         pass
 
-    @ddt.data(*product(JWT_AUTH_TYPES, (True, False)))
-    @ddt.unpack
-    def test_jwt_on_behalf_of_user(self, auth_type, scopes_enforced):
+    @ddt.data(JWT_AUTH_TYPES)
+    def test_jwt_on_behalf_of_user(self, auth_type):
         """
         We have to override this super method due to this API
         being restricted to staff users only.
         """
-        with ENFORCE_JWT_SCOPES.override(active=scopes_enforced):
-            jwt_token = self._create_jwt_token(self.student, auth_type, include_me_filter=True)
-            # include_me_filter=True means a JWT filter will require the username
-            # of the requesting user to be in the requested URL
-            url = self.get_url(self.student) + '?username={}'.format(self.student.username)
+        jwt_token = self._create_jwt_token(self.student, auth_type, include_me_filter=True)
+        # include_me_filter=True means a JWT filter will require the username
+        # of the requesting user to be in the requested URL
+        url = self.get_url(self.student) + '?username={}'.format(self.student.username)
 
-            resp = self.get_response(AuthType.jwt, token=jwt_token, url=url)
-            assert status.HTTP_200_OK == resp.status_code
+        resp = self.get_response(AuthType.jwt, token=jwt_token, url=url)
+        assert status.HTTP_200_OK == resp.status_code
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
