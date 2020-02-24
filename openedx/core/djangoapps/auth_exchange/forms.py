@@ -6,14 +6,13 @@ from django import forms
 from django.contrib.auth.models import User
 from django.forms import CharField
 from django.conf import settings
+from django.utils.encoding import smart_text
 from oauth2_provider.models import Application
 from requests import HTTPError
 from social_core.backends import oauth as social_oauth
 from social_core.exceptions import AuthException
 
 from third_party_auth import pipeline
-import pdb
-
 
 
 class OAuthValidationError(Exception):
@@ -55,7 +54,7 @@ class ScopeChoiceField(forms.ChoiceField):
             value = value.split(' ')
 
         # Split values into list
-        return u' '.join([smart_unicode(val) for val in value]).split(u' ')
+        return u' '.join([smart_text(val) for val in value]).split(u' ')
 
     def validate(self, value):
         """
@@ -73,7 +72,7 @@ class ScopeChoiceField(forms.ChoiceField):
                             val})
 
 
-class DOTAccessTokenExchangeForm(forms.Form):
+class AccessTokenExchangeForm(forms.Form):
     """Form for access token exchange endpoint"""
 
     access_token = CharField(required=False)
@@ -169,7 +168,7 @@ class DOTAccessTokenExchangeForm(forms.Form):
                     "error_description": u"{} is not a valid client_id".format(client_id),
                 }
             )
-        if client.client_type is Application.CLIENT_PUBLIC:
+        if client.client_type != Application.CLIENT_PUBLIC:
             raise OAuthValidationError(
                 {
                     # invalid_client isn't really the right code, but this mirrors
