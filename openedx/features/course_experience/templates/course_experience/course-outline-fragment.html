@@ -91,7 +91,7 @@ self_paced = context.get('self_paced', False)
                 ##
                 ## Exam subsections expose exam status message field as well as a status icon
                 <%
-                if subsection.get('due') is None or self_paced:
+                if subsection.get('due') is None or (self_paced and not in_edx_when):
                     # examples: Homework, Lab, etc.
                     data_string = subsection.get('format')
                     data_datetime = ""

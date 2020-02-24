@@ -5,6 +5,7 @@ import datetime
 
 import ddt
 from django.core.cache import cache
+from django.core.exceptions import ValidationError
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.models import UserProfile
@@ -13,7 +14,7 @@ from student.tests.factories import UserFactory
 
 @ddt.ddt
 class UserProfilePropertiesTest(CacheIsolationTestCase):
-    """Unit tests for age, gender_display, and level_of_education_display properties ."""
+    """Unit tests for age, gender_display, phone_number, and level_of_education_display properties ."""
 
     password = "test"
 
@@ -105,3 +106,24 @@ class UserProfilePropertiesTest(CacheIsolationTestCase):
 
         self.assertNotEqual(cache.get(cache_key), country)
         self.assertIsNone(cache.get(cache_key))
+
+    def test_phone_number_can_only_contain_digits(self):
+        # validating the profile will fail, because there are letters
+        # in the phone number
+        self.profile.phone_number = 'abc'
+        self.assertRaises(ValidationError, self.profile.full_clean)
+        # fail if mixed digits/letters
+        self.profile.phone_number = '1234gb'
+        self.assertRaises(ValidationError, self.profile.full_clean)
+        # fail if whitespace
+        self.profile.phone_number = '   123'
+        self.assertRaises(ValidationError, self.profile.full_clean)
+        # fail with special characters
+        self.profile.phone_number = '123!@#$%^&*'
+        self.assertRaises(ValidationError, self.profile.full_clean)
+        # valid phone number
+        self.profile.phone_number = '123456789'
+        try:
+            self.profile.full_clean()
+        except ValidationError:
+            self.fail("This phone number should  be valid.")

@@ -14,7 +14,9 @@ import six
 from mock import Mock
 from opaque_keys.edx.keys import CourseKey
 
+from course_modes.models import CourseMode
 from lms.djangoapps.teams import TEAM_DISCUSSION_CONTEXT
+from lms.djangoapps.teams.errors import AddToIncompatibleTeamError
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from openedx.core.djangoapps.django_comment_common.signals import (
@@ -80,6 +82,47 @@ class TestModelStrings(SharedModuleStoreTestCase):
         assert six.text_type(self.team_membership) == (
             "the-user is member of The Team in edx/the-course/1"
         )
+
+
+class CourseTeamTest(SharedModuleStoreTestCase):
+    """Tests for the CourseTeam model."""
+
+    @classmethod
+    def setUpClass(cls):
+        super(CourseTeamTest, cls).setUpClass()
+
+        cls.audit_learner = UserFactory.create(username="audit")
+        CourseEnrollmentFactory.create(user=cls.audit_learner, course_id="edx/the-course/1", mode=CourseMode.AUDIT)
+        cls.audit_team = CourseTeamFactory(
+            course_id="edx/the-course/1",
+            team_id="audit-team",
+            topic_id=TEAMSET_1_ID,
+            name="The Team"
+        )
+
+        cls.masters_learner = UserFactory.create(username="masters")
+        CourseEnrollmentFactory.create(user=cls.masters_learner, course_id="edx/the-course/1", mode=CourseMode.MASTERS)
+        cls.masters_team = CourseTeamFactory(
+            course_id="edx/the-course/1",
+            team_id="masters-team",
+            topic_id=TEAMSET_1_ID,
+            name="The Team",
+            organization_protected=True
+        )
+
+    def test_add_user(self):
+        """Test that we can add users with correct protection status to a team"""
+        self.assertIsNotNone(self.masters_team.add_user(self.masters_learner))
+        self.assertIsNotNone(self.audit_team.add_user(self.audit_learner))
+
+    def test_add_user_bad_team_access(self):
+        """Test that we are blocked from adding a user to a team of mixed enrollment types"""
+
+        with self.assertRaises(AddToIncompatibleTeamError):
+            self.audit_team.add_user(self.masters_learner)
+
+        with self.assertRaises(AddToIncompatibleTeamError):
+            self.masters_team.add_user(self.audit_learner)
 
 
 @ddt.ddt

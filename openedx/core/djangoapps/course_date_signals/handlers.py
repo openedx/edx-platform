@@ -7,6 +7,8 @@ from django.dispatch import receiver
 from six import text_type
 from xblock.fields import Scope
 from xmodule.modulestore.django import SignalHandler, modulestore
+from .models import SelfPacedRelativeDatesConfig
+from .utils import get_expected_duration
 from edx_when.api import FIELDS_TO_EXTRACT, set_dates_for_course
 
 log = logging.getLogger(__name__)
@@ -44,6 +46,21 @@ def extract_dates_from_course(course):
         # self-paced courses may accidentally have a course due date
         metadata.pop('due', None)
         date_items = [(course.location, metadata)]
+
+        if SelfPacedRelativeDatesConfig.current(course_key=course.id).enabled:
+            duration = get_expected_duration(course)
+            sections = course.get_children()
+            time_per_week = duration / len(sections)
+            # Apply the same relative due date to all content inside a section,
+            # unless that item already has a relative date set
+            for idx, section in enumerate(sections):
+                items = [section]
+                while items:
+                    next_item = items.pop()
+                    # TODO: Once studio can manually set relative dates,
+                    # we would need to manually check for them here
+                    date_items.append((next_item.location, {'due': time_per_week * (idx + 1)}))
+                    items.extend(next_item.get_children())
     else:
         date_items = []
         items = modulestore().get_items(course.id)

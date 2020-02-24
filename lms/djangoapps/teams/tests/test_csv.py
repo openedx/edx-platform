@@ -3,6 +3,7 @@
 from io import StringIO
 
 from lms.djangoapps.teams import csv
+from lms.djangoapps.teams.models import CourseTeam
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -33,7 +34,13 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
         team2_1 = CourseTeamFactory(course_id=cls.course.id, name='team_2_1', topic_id='teamset_2')
         team2_2 = CourseTeamFactory(course_id=cls.course.id, name='team_2_2', topic_id='teamset_2')
         team3_1 = CourseTeamFactory(course_id=cls.course.id, name='team_3_1', topic_id='teamset_3')
-        team3_2 = CourseTeamFactory(course_id=cls.course.id, name='team_3_2', topic_id='teamset_3')
+        # protected team
+        team3_2 = CourseTeamFactory(
+            course_id=cls.course.id,
+            name='team_3_2',
+            topic_id='teamset_3',
+            organization_protected=True
+        )
         #  No teams in teamset 4
 
         user1 = UserFactory.create(username='user1')
@@ -57,9 +64,8 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
         team3_1.add_user(user2)
 
         team2_1.add_user(user3)
-        team3_2.add_user(user3)
+        team3_1.add_user(user3)
 
-        team1_1.add_user(user4)
         team3_2.add_user(user4)
 
     def setUp(self):
@@ -89,8 +95,8 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
         self.assertEqual(len(data), 5)
         self.assert_teamset_membership(data[0], 'user1', 'audit', 'team_1_1', 'team_2_2', 'team_3_1')
         self.assert_teamset_membership(data[1], 'user2', 'verified', 'team_1_1', 'team_2_2', 'team_3_1')
-        self.assert_teamset_membership(data[2], 'user3', 'honors', None, 'team_2_1', 'team_3_2')
-        self.assert_teamset_membership(data[3], 'user4', 'masters', 'team_1_1', None, 'team_3_2')
+        self.assert_teamset_membership(data[2], 'user3', 'honors', None, 'team_2_1', 'team_3_1')
+        self.assert_teamset_membership(data[3], 'user4', 'masters', None, None, 'team_3_2')
         self.assert_teamset_membership(data[4], 'user5', 'masters', None, None, None)
 
     def assert_teamset_membership(
@@ -118,8 +124,53 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
         expected_csv_output = ('user,mode,teamset_1,teamset_2,teamset_3,teamset_4\r\n'
                                'user1,audit,team_1_1,team_2_2,team_3_1,\r\n'
                                'user2,verified,team_1_1,team_2_2,team_3_1,\r\n'
-                               'user3,honors,,team_2_1,team_3_2,\r\n'
-                               'user4,masters,team_1_1,,team_3_2,\r\n'
+                               'user3,honors,,team_2_1,team_3_1,\r\n'
+                               'user4,masters,,,team_3_2,\r\n'
                                'user5,masters,,,,\r\n')
         csv.load_team_membership_csv(self.course, self.buf)
         self.assertEqual(expected_csv_output, self.buf.getvalue())
+
+
+class TeamMembershipImportManagerTests(SharedModuleStoreTestCase):
+    """ Tests for TeamMembershipImportManager """
+    @classmethod
+    def setUpClass(cls):
+        super(TeamMembershipImportManagerTests, cls).setUpClass()
+        teams_config = TeamsConfig({
+            'team_sets': [{
+                'id': 'teamset_1',
+                'name': 'teamset_name',
+                'description': 'teamset_desc',
+            }]
+        })
+        cls.course = CourseFactory(teams_configuration=teams_config)
+
+        # initialize import manager
+        cls.import_manager = csv.TeamMembershipImportManager(cls.course)
+        cls.import_manager.teamset_ids = {ts.teamset_id for ts in cls.course.teamsets}
+
+    def test_add_user_to_new_protected_team(self):
+        """Adding a masters learner to a new team should create a team with organization protected status"""
+        masters_learner = UserFactory.create(username='masters_learner')
+        CourseEnrollmentFactory.create(user=masters_learner, course_id=self.course.id, mode='masters')
+        row = {
+            'mode': 'masters',
+            'teamset_1': 'new_protected_team',
+            'user': masters_learner
+        }
+
+        self.import_manager.add_user_to_team(row)
+        self.assertTrue(CourseTeam.objects.get(team_id__startswith='new_protected_team').organization_protected)
+
+    def test_add_user_to_new_unprotected_team(self):
+        """Adding a non-masters learner to a new team should create a team with no organization protected status"""
+        audit_learner = UserFactory.create(username='audit_learner')
+        CourseEnrollmentFactory.create(user=audit_learner, course_id=self.course.id, mode='audit')
+        row = {
+            'mode': 'audit',
+            'teamset_1': 'new_unprotected_team',
+            'user': audit_learner
+        }
+
+        self.import_manager.add_user_to_team(row)
+        self.assertFalse(CourseTeam.objects.get(team_id__startswith='new_unprotected_team').organization_protected)

@@ -1712,7 +1712,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
     def test_upload_valid_csv_simple(self):
         self.create_and_enroll_student(username='a_user')
         csv_content = 'user,mode,topic_0' + '\n'
-        csv_content += 'a_user, masters, team wind power'
+        csv_content += 'a_user,audit,team wind power'
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
         self.make_call(reverse('team_membership_bulk_management', args=[self.good_course_id]),
@@ -1723,7 +1723,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
     def test_upload_invalid_teamset(self):
         self.create_and_enroll_student(username='a_user')
         csv_content = 'user,mode,topic_0_bad' + '\n'
-        csv_content += 'a_user, masters, team wind power'
+        csv_content += 'a_user,audit,team wind power'
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
         self.make_call(reverse('team_membership_bulk_management', args=[self.good_course_id]),
@@ -1746,15 +1746,19 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         self.create_and_enroll_student(username='b_user')
         self.create_and_enroll_student(username='c_user')
         csv_content = 'user,mode,topic_0,topic_1,topic_2' + '\n'
-        csv_content += 'a_user, masters,team wind power,team 2' + '\n'
-        csv_content += 'b_user, masters,,team 2' + '\n'
-        csv_content += 'c_user, masters,,,team 3'
+        csv_content += 'a_user,audit,team wind power,team 2' + '\n'
+        csv_content += 'b_user,audit,,team 2' + '\n'
+        csv_content += 'c_user,audit,,,team 3'
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
         self.make_call(reverse('team_membership_bulk_management', args=[self.good_course_id]),
                        201, method='post',
                        data={'csv': csv_file}, user='staff'
                        )
+        self.assertEqual(
+            CourseTeam.objects.filter(name='team 2', course_id=self.test_course_1.id).count(),
+            1
+        )
 
     def test_upload_non_existing_user(self):
         csv_content = 'user,mode,topic_0' + '\n'
@@ -1765,3 +1769,74 @@ class TestBulkMembershipManagement(TeamAPITestCase):
                        400, method='post',
                        data={'csv': csv_file}, user='staff'
                        )
+
+    def test_upload_only_existing_courses(self):
+        self.create_and_enroll_student(username='a_user', mode=CourseMode.MASTERS)
+        self.create_and_enroll_student(username='b_user', mode=CourseMode.MASTERS)
+        existing_team_1 = CourseTeamFactory.create(
+            course_id=self.test_course_1.id,
+            topic_id='topic_1',
+            organization_protected=True
+        )
+        existing_team_2 = CourseTeamFactory.create(
+            course_id=self.test_course_1.id,
+            topic_id='topic_2',
+            organization_protected=True
+        )
+
+        csv_content = 'user,mode,topic_1,topic_2' + '\n'
+        csv_content += 'a_user,masters,{},{}'.format(
+            existing_team_1.name,
+            existing_team_2.name
+        ) + '\n'
+        csv_content += 'b_user,masters,{},{}'.format(
+            existing_team_1.name,
+            existing_team_2.name
+        ) + '\n'
+        csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
+        self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
+        self.make_call(
+            reverse('team_membership_bulk_management', args=[self.good_course_id]),
+            201,
+            method='post',
+            data={'csv': csv_file},
+            user='staff'
+        )
+
+    def test_upload_invalid_header(self):
+        self.create_and_enroll_student(username='a_user')
+        csv_content = 'mode,topic_1' + '\n'
+        csv_content += 'a_user,audit, team wind power'
+        csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
+        self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
+        self.make_call(reverse(
+            'team_membership_bulk_management', args=[self.good_course_id]),
+            400, method='post',
+            data={'csv': csv_file}, user='staff'
+        )
+
+    def test_upload_invalid_more_teams_than_teamsets(self):
+        self.create_and_enroll_student(username='a_user')
+        csv_content = 'user,mode,topic_1' + '\n'
+        csv_content += 'a_user, masters, team wind power, extra1, extra2'
+        csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
+        self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
+        self.make_call(reverse(
+            'team_membership_bulk_management',
+            args=[self.good_course_id]),
+            400, method='post',
+            data={'csv': csv_file}, user='staff'
+        )
+
+    def test_upload_invalid_student_enrollment_mismatch(self):
+        self.create_and_enroll_student(username='a_user', mode=CourseMode.AUDIT)
+        csv_content = 'user,mode,topic_1' + '\n'
+        csv_content += 'a_user,masters,team wind power'
+        csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
+        self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
+        self.make_call(reverse(
+            'team_membership_bulk_management',
+            args=[self.good_course_id]),
+            400, method='post',
+            data={'csv': csv_file}, user='staff'
+        )

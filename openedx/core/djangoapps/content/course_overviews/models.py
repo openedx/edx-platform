@@ -13,6 +13,7 @@ from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Q
 from django.db.models.fields import BooleanField, DateTimeField, DecimalField, FloatField, IntegerField, TextField
+from django.db.models.signals import post_save, post_delete
 from django.db.utils import IntegrityError
 from django.template import defaultfilters
 from django.utils.encoding import python_2_unicode_compatible
@@ -27,6 +28,7 @@ from lms.djangoapps.discussion import django_comment_client
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.models.course_details import CourseDetails
+from openedx.core.lib.cache_utils import request_cached, RequestCache
 from static_replace.models import AssetBaseUrlConfig
 from xmodule import block_metadata_utils, course_metadata_utils
 from xmodule.course_module import DEFAULT_START_DATE, CourseDescriptor
@@ -319,6 +321,7 @@ class CourseOverview(TimeStampedModel):
         return modulestore().has_course(course_id)
 
     @classmethod
+    @request_cached('course_overview')
     def get_from_id(cls, course_id):
         """
         Load a CourseOverview object for a given course ID.
@@ -796,6 +799,13 @@ class CourseOverview(TimeStampedModel):
         """
         return self._original_course.enable_ccx
 
+    @property
+    def course_visibility(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.course_visibility
+
     def __str__(self):
         """Represent ourselves with the course key."""
         return six.text_type(self.id)
@@ -1017,3 +1027,16 @@ class SimulateCoursePublishConfig(ConfigurationModel):
 
     def __str__(self):
         return six.text_type(self.arguments)
+
+
+def _invalidate_overview_cache(**kwargs):  # pylint: disable=unused-argument
+    """
+    Invalidate the course overview request cache.
+    """
+    RequestCache('course_overview').clear()
+
+
+post_save.connect(_invalidate_overview_cache, sender=CourseOverview)
+post_save.connect(_invalidate_overview_cache, sender=CourseOverviewImageConfig)
+post_delete.connect(_invalidate_overview_cache, sender=CourseOverview)
+post_delete.connect(_invalidate_overview_cache, sender=CourseOverviewImageConfig)

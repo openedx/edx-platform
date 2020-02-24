@@ -130,11 +130,6 @@ FEATURES = {
     # Toggles OAuth2 authentication provider
     'ENABLE_OAUTH2_PROVIDER': False,
 
-    # Toggles auth class in discussions djangoapps
-    'DISCUSSION_USE_NEW_OAUTH2_CLASS': False,
-    # Toggles auth class in bookmarks djangoapps
-    'BOOKMARKS_USE_NEW_OAUTH2_CLASS': False,
-
     # Allows to enable an API endpoint to serve XBlock view, used for example by external applications.
     # See jquey-xblock: https://github.com/edx-solutions/jquery-xblock
     'ENABLE_XBLOCK_VIEW_ENDPOINT': False,
@@ -407,6 +402,20 @@ FEATURES = {
 
     # Enable feature to remove enrollments and users. Used to reset state of master's integration environments
     'ENABLE_ENROLLMENT_RESET': False,
+    'DISABLE_MOBILE_COURSE_AVAILABLE': False,
+
+    # .. toggle_name: ENABLE_CHANGE_USER_PASSWORD_ADMIN
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to enable changing a user password through django admin. This is disabled by default because enabling allows a method to bypass password policy.
+    # .. toggle_category: admin
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2020-02-21
+    # .. toggle_expiration_date: None
+    # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/21616'
+    # .. toggle_status: supported
+    # .. toggle_warnings: None
+    'ENABLE_CHANGE_USER_PASSWORD_ADMIN': False,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
@@ -589,9 +598,10 @@ OAUTH2_PROVIDER = {
     'REFRESH_TOKEN_EXPIRE_SECONDS': 7776000,
     'SCOPES_BACKEND_CLASS': 'openedx.core.djangoapps.oauth_dispatch.scopes.ApplicationModelScopes',
     'SCOPES': dict(OAUTH2_DEFAULT_SCOPES, **{
-        'user_id': _('Retrieve your user identifier'),
-        'grades:read': _('Retrieve your grades for your enrolled courses'),
         'certificates:read': _('Retrieve your course certificates'),
+        'grades:read': _('Retrieve your grades for your enrolled courses'),
+        'tpa:read': _('Retrieve your third-party authentication username mapping'),
+        'user_id': _('Know your user identifier'),
     }),
     'DEFAULT_SCOPES': OAUTH2_DEFAULT_SCOPES,
     'REQUEST_APPROVAL_PROMPT': 'auto_even_if_expired',
@@ -2310,12 +2320,6 @@ INSTALLED_APPS = [
 
     'third_party_auth',
 
-    # We don't use this directly (since we use OAuth2), but we need to install it anyway.
-    # When a user is deleted, Django queries all tables with a FK to the auth_user table,
-    # and since django-rest-framework-oauth imports this, it will try to access tables
-    # defined by oauth_provider.  If those tables don't exist, an error can occur.
-    'oauth_provider',
-
     # System Wide Roles
     'openedx.core.djangoapps.system_wide_roles',
 
@@ -2486,6 +2490,7 @@ INSTALLED_APPS = [
     'lms.djangoapps.course_goals.apps.CourseGoalsConfig',
 
     # Features
+    'openedx.features.calendar_sync',
     'openedx.features.course_bookmarks',
     'openedx.features.course_experience',
     'openedx.features.course_search',
@@ -2711,11 +2716,6 @@ VERIFICATION_EXPIRY_EMAIL = {
 }
 
 DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH = "verify_student_disable_account_activation_requirement"
-
-### This enables the Metrics tab for the Instructor dashboard ###########
-FEATURES['CLASS_DASHBOARD'] = False
-if FEATURES.get('CLASS_DASHBOARD'):
-    INSTALLED_APPS.append('class_dashboard')
 
 ################ Enable credit eligibility feature ####################
 ENABLE_CREDIT_ELIGIBILITY = True
@@ -3337,11 +3337,10 @@ PROFILE_IMAGE_BACKEND = {
 }
 PROFILE_IMAGE_DEFAULT_FILENAME = 'images/profiles/default'
 PROFILE_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
-# This secret key is used in generating unguessable URLs to users'
-# profile images.  Once it has been set, changing it will make the
-# platform unaware of current image URLs, resulting in reverting all
-# users' profile images to the default placeholder image.
-PROFILE_IMAGE_SECRET_KEY = 'placeholder secret key'
+# This key is used in generating unguessable URLs to users'
+# profile images. Once it has been set, changing it will make the
+# platform unaware of current image URLs.
+PROFILE_IMAGE_HASH_SEED = 'placeholder_secret_key'
 PROFILE_IMAGE_MAX_BYTES = 1024 * 1024
 PROFILE_IMAGE_MIN_BYTES = 100
 PROFILE_IMAGE_SIZES_MAP = {

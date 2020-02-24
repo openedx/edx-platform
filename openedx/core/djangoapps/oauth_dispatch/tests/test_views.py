@@ -348,6 +348,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         dot_app_access = models.ApplicationAccess.objects.create(
             application=dot_app,
             scopes=['grades:read'],
+            filters=['test:filter'],
         )
         models.ApplicationOrganization.objects.create(
             application=dot_app,
@@ -355,6 +356,8 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         )
         scopes = dot_app_access.scopes
         filters = self.dot_adapter.get_authorization_filters(dot_app)
+        assert 'test:filter' in filters
+
         response = self._post_request(self.user, dot_app, token_type='jwt', scope=scopes)
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))

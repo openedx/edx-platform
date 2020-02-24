@@ -18,31 +18,30 @@ import logging
 import uuid
 from collections import OrderedDict, defaultdict, namedtuple
 from datetime import datetime, timedelta
-from django.core.validators import FileExtensionValidator
 from functools import total_ordering
 from importlib import import_module
 
 import six
 from config_models.models import ConfigurationModel
+from course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from django.apps import apps
 from django.conf import settings
-from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.core.validators import FileExtensionValidator, RegexValidator
 from django.db import IntegrityError, models
 from django.db.models import Count, Q, Index
 from django.db.models.signals import post_save, pre_save
 from django.db.utils import ProgrammingError
 from django.dispatch import receiver
-from django.utils import timezone
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django_countries.fields import CountryField
-from django.utils.encoding import python_2_unicode_compatible
 from edx_django_utils.cache import RequestCache
 from edx_rest_api_client.exceptions import SlumberBaseException
 from eventtracking import tracker
@@ -55,18 +54,22 @@ from six import text_type
 from six.moves import range
 from six.moves.urllib.parse import urlencode
 from slumber.exceptions import HttpClientError, HttpServerError
+from student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
+from track import contexts, segment
 from user_util import user_util
+from util.milestones_helpers import is_entrance_exams_enabled
+from util.model_utils import emit_field_changed_events, get_changed_fields_dict
+from util.query import use_read_replica_if_available
 
-from course_modes.models import CourseMode, get_cosmetic_verified_display_price
+import openedx.core.djangoapps.django_comment_common.comment_client as cc
+from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
     DynamicUpgradeDeadlineConfiguration,
     OrgDynamicUpgradeDeadlineConfiguration
 )
-from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from openedx.core.djangoapps.enrollments.api import (
     _default_course_mode,
     get_enrollment_attributes,
@@ -75,11 +78,6 @@ from openedx.core.djangoapps.enrollments.api import (
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
-from student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
-from track import contexts, segment
-from util.milestones_helpers import is_entrance_exams_enabled
-from util.model_utils import emit_field_changed_events, get_changed_fields_dict
-from util.query import use_read_replica_if_available
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
@@ -433,7 +431,7 @@ class UserProfile(models.Model):
     MITx fall prototype.
 
     .. pii: Contains many PII fields. Retired in AccountRetirementView.
-    .. pii_types: name, location, birth_date, gender, biography
+    .. pii_types: name, location, birth_date, gender, biography, phone_number
     .. pii_retirement: local_api
     """
     # cache key format e.g user.<user_id>.profile.country = 'SG'
@@ -505,6 +503,8 @@ class UserProfile(models.Model):
     allow_certificate = models.BooleanField(default=1)
     bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False)
     profile_image_uploaded_at = models.DateTimeField(null=True, blank=True)
+    phone_regex = RegexValidator(regex=r'^\+?1?\d*$', message="Phone number can only contain numbers.")
+    phone_number = models.CharField(validators=[phone_regex], blank=True, null=True, max_length=50)
 
     @property
     def has_profile_image(self):
@@ -2983,7 +2983,7 @@ class AccountRecovery(models.Model):
             email (str): New email address to be set as the secondary email address.
         """
         self.secondary_email = email
-        self.is_active = False
+        self.is_active = True
         self.save()
 
     @classmethod

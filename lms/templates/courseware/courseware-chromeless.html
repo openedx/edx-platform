@@ -3,10 +3,10 @@
 <%namespace name='static' file='/static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
-from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
 
 from openedx.core.djangolib.markup import HTML
 from openedx.core.djangolib.js_utils import js_escaped_string
+
 %>
 <%def name="course_name()">
  <% return _("{course_number} Courseware").format(course_number=course.display_number_with_default) %>
@@ -36,7 +36,7 @@ ${static.get_page_title_breadcrumbs(course_name())}
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
 ## Utility: Notes
-% if is_edxnotes_enabled(course, request.user):
+% if edx_notes_enabled:
 <%static:css group='style-student-notes'/>
 % endif
 
@@ -92,10 +92,10 @@ ${HTML(fragment.foot_html())}
       </main>
   </section>
 </div>
-% if course.show_calculator or is_edxnotes_enabled(course, request.user):
+% if course.show_calculator or edx_notes_enabled:
     <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
       ## Utility: Notes
-      % if is_edxnotes_enabled(course, request.user):
+      % if edx_notes_enabled:
         <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
       % endif
 

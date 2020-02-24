@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-02-02 20:52+0000\n"
-"PO-Revision-Date: 2020-02-02 20:52:08.673750\n"
+"POT-Creation-Date: 2020-02-24 10:50+0000\n"
+"PO-Revision-Date: 2020-02-24 10:50:21.581602\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -61,11 +61,6 @@ msgid "Discussion"
 msgstr "يهسذعسسهخر"
 
 #: cms/djangoapps/contentstore/views/component.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "Problem"
-msgstr "حقخزمثو"
-
-#: cms/djangoapps/contentstore/views/component.py
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Advanced"
 msgstr "شيدشرذثي"
@@ -74,20 +69,6 @@ msgstr "شيدشرذثي"
 #: lms/djangoapps/courseware/tabs.py cms/templates/settings.html
 msgid "Entrance Exam"
 msgstr "ثرفقشرذث ثطشو"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: cms/templates/course_outline.html lms/templates/seq_module.html
-#: lms/templates/ccx/schedule.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Section"
-msgstr "سثذفهخر"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/templates/ccx/schedule.html
-msgid "Subsection"
-msgstr "سعزسثذفهخر"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: common/lib/xmodule/xmodule/unit_block.py
@@ -130,10 +111,8 @@ msgstr ""
 "بهمث."
 
 #: cms/djangoapps/contentstore/views/videos.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/instructor/views/api.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/shoppingcart/billing_details.html
 #: lms/templates/shoppingcart/receipt.html
 msgid "Name"
@@ -3410,8 +3389,9 @@ msgid ""
 "for each topic, and another comma after the closing square brackets. For "
 "example, to specify that teams should have a maximum of 5 participants and "
 "provide a list of 2 topics, enter the configuration in this format: "
-"{example_format}. In \"id\" values, the only supported special characters "
-"are underscore, hyphen, and period."
+"{example_format}. If no max_size is provided, it will default to "
+"{default_max}In \"id\" values, the only supported special characters are "
+"underscore, hyphen, and period."
 msgstr ""
 "سحثذهبغ فاث وشطهوعو فثشو سهظث شري فخحهذس بخق فثشوس هرسهيث فاث حقخدهيثي سثف "
 "خب ذعقمغ زقشذثس. وشنث سعقث فاشف غخع ثرذمخسث شمم خب فاث سثفس خب فخحهذ دشمعثس "
@@ -3419,8 +3399,9 @@ msgstr ""
 "بخق ثشذا فخحهذ, شري شرخفاثق ذخووش شبفثق فاث ذمخسهرل سضعشقث زقشذنثفس. بخق "
 "ثطشوحمث, فخ سحثذهبغ فاشف فثشوس ساخعمي اشدث ش وشطهوعو خب 5 حشقفهذهحشرفس شري "
 "حقخدهيث ش مهسف خب 2 فخحهذس, ثرفثق فاث ذخربهلعقشفهخر هر فاهس بخقوشف: "
-"{example_format}. هر \"هي\" دشمعثس, فاث خرمغ سعححخقفثي سحثذهشم ذاشقشذفثقس "
-"شقث عريثقسذخقث, اغحاثر, شري حثقهخي."
+"{example_format}. هب رخ وشط_سهظث هس حقخدهيثي, هف صهمم يثبشعمف فخ "
+"{default_max}هر \"هي\" دشمعثس, فاث خرمغ سعححخقفثي سحثذهشم ذاشقشذفثقس شقث "
+"عريثقسذخقث, اغحاثر, شري حثقهخي."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable Proctored Exams"
@@ -4959,7 +4940,6 @@ msgstr "عرمخذن شذذخعرف"
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: themes/edx.org/lms/templates/dashboard.html
@@ -5881,53 +5861,6 @@ msgstr ""
 msgid "More about {fullname}'s accomplishment"
 msgstr "وخقث شزخعف {fullname}'س شذذخوحمهساوثرف"
 
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor/views/tools.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/schedules/admin.py
-#: lms/templates/staff_problem_info.html
-#: lms/templates/api_admin/catalogs/search.html
-#: lms/templates/ccx/enrollment.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Username"
-msgstr "عسثقرشوث"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Grade"
-msgstr "لقشيث"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Percent"
-msgstr "حثقذثرف"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "Opened by this number of students"
-msgstr "خحثرثي زغ فاهس رعوزثق خب سفعيثرفس"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "subsections"
-msgstr "سعزسثذفهخرس"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "Count of Students"
-msgstr "ذخعرف خب سفعيثرفس"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "Percent of Students"
-msgstr "حثقذثرف خب سفعيثرفس"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Score"
-msgstr "سذخقث"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "problems"
-msgstr "حقخزمثوس"
-
 #: lms/djangoapps/commerce/api/v1/serializers.py
 #, python-brace-format
 msgid "{course_id} is not a valid course key."
@@ -6101,6 +6034,10 @@ msgstr "غخع يخ رخف اشدث شذذثسس فخ فاهس ذخعقسث خر
 msgid "Upgrade to Verified"
 msgstr "عحلقشيث فخ دثقهبهثي"
 
+#: lms/djangoapps/courseware/courses.py
+msgid "Assignment"
+msgstr "شسسهلروثرف"
+
 #. Translators: 'absolute' is a date such as "Jan 01,
 #. 2020". 'relative' is a fuzzy description of the time until
 #. 'absolute'. For example, 'absolute' might be "Jan 01, 2020",
@@ -6167,6 +6104,14 @@ msgstr ""
 msgid "This course is ending in {time_remaining_string} at {course_end_time}."
 msgstr ""
 "فاهس ذخعقسث هس ثريهرل هر {time_remaining_string} شف {course_end_time}."
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "You lose all access to this course, including your progress."
+msgstr "غخع مخسث شمم شذذثسس فخ فاهس ذخعقسث, هرذمعيهرل غخعق حقخلقثسس."
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "Audit Access Expires"
+msgstr "شعيهف شذذثسس ثطحهقثس"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Certificate Available"
@@ -7098,6 +7043,16 @@ msgstr "ثرقخممثي مثشقرثق حقخبهمث"
 msgid "User ID"
 msgstr "عسثق هي"
 
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/tools.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: openedx/core/djangoapps/schedules/admin.py
+#: lms/templates/staff_problem_info.html
+#: lms/templates/api_admin/catalogs/search.html
+#: lms/templates/ccx/enrollment.html
+msgid "Username"
+msgstr "عسثقرشوث"
+
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This label appears above a field on the login form
 #. meant to hold the user's email address.
@@ -7668,10 +7623,6 @@ msgstr "يشفش يخصرمخشي"
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Analytics"
 msgstr "شرشمغفهذس"
-
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "Metrics"
-msgstr "وثفقهذس"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Open Responses"
@@ -9728,22 +9679,31 @@ msgid "Signed Out"
 msgstr "سهلرثي خعف"
 
 #: lms/templates/logout.html
+msgid "You have signed out."
+msgstr "غخع اشدث سهلرثي خعف."
+
+#: lms/templates/logout.html
+#, python-brace-format
+msgid ""
+"{start_anchor}Click here{end_anchor} to delete your single signed on (SSO) "
+"session."
+msgstr ""
+"{start_anchor}ذمهذن اثقث{end_anchor} فخ يثمثفث غخعق سهرلمث سهلرثي خر (سسخ) "
+"سثسسهخر."
+
+#: lms/templates/logout.html
 msgid "We are signing you in."
 msgstr "صث شقث سهلرهرل غخع هر."
 
 #: lms/templates/logout.html
 msgid ""
 "\n"
-"              This may take a minute. If you are not redirected, go to the home page.\n"
-"            "
+"                  This may take a minute. If you are not redirected, go to the home page.\n"
+"                "
 msgstr ""
 "\n"
-"              فاهس وشغ فشنث ش وهرعفث. هب غخع شقث رخف قثيهقثذفثي, لخ فخ فاث اخوث حشلث.\n"
-"            "
-
-#: lms/templates/logout.html
-msgid "You have signed out."
-msgstr "غخع اشدث سهلرثي خعف."
+"                  فاهس وشغ فشنث ش وهرعفث. هب غخع شقث رخف قثيهقثذفثي, لخ فخ فاث اخوث حشلث.\n"
+"                "
 
 #: lms/templates/logout.html
 #, python-brace-format
@@ -10607,6 +10567,37 @@ msgstr ""
 "وشطهوعو رعوزثق خب قثذخقيس هر حشلهرشفثي قثسحخرسث خب ش سهرلمث قثضعثسف فخ "
 "ذشفشمخل سثقدهذث."
 
+#: openedx/core/djangoapps/config_model_utils/admin.py
+#, python-brace-format
+msgid ""
+"These define the context to enable this configuration on. If no values are "
+"set, then the configuration applies globally. If a single value is set, then"
+" the configuration applies to all courses within that context. At most one "
+"value can be set at a time.{br}If multiple contexts apply to a course (for "
+"example, if configuration is specified for the course specifically, and for "
+"the org that the course is in, then the more specific context overrides the "
+"more general context."
+msgstr ""
+"فاثسث يثبهرث فاث ذخرفثطف فخ ثرشزمث فاهس ذخربهلعقشفهخر خر. هب رخ دشمعثس شقث "
+"سثف, فاثر فاث ذخربهلعقشفهخر شححمهثس لمخزشممغ. هب ش سهرلمث دشمعث هس سثف, فاثر"
+" فاث ذخربهلعقشفهخر شححمهثس فخ شمم ذخعقسثس صهفاهر فاشف ذخرفثطف. شف وخسف خرث "
+"دشمعث ذشر زث سثف شف ش فهوث.{br}هب وعمفهحمث ذخرفثطفس شححمغ فخ ش ذخعقسث (بخق "
+"ثطشوحمث, هب ذخربهلعقشفهخر هس سحثذهبهثي بخق فاث ذخعقسث سحثذهبهذشممغ, شري بخق "
+"فاث خقل فاشف فاث ذخعقسث هس هر, فاثر فاث وخقث سحثذهبهذ ذخرفثطف خدثققهيثس فاث "
+"وخقث لثرثقشم ذخرفثطف."
+
+#: openedx/core/djangoapps/config_model_utils/admin.py
+msgid ""
+"If any of these values are left empty or \"Unknown\", then their value at "
+"runtime will be retrieved from the next most specific context that applies. "
+"For example, if \"Enabled\" is left as \"Unknown\" in the course context, "
+"then that course will be Enabled only if the org that it is in is Enabled."
+msgstr ""
+"هب شرغ خب فاثسث دشمعثس شقث مثبف ثوحفغ خق \"عرنرخصر\", فاثر فاثهق دشمعث شف "
+"قعرفهوث صهمم زث قثفقهثدثي بقخو فاث رثطف وخسف سحثذهبهذ ذخرفثطف فاشف شححمهثس. "
+"بخق ثطشوحمث, هب \"ثرشزمثي\" هس مثبف شس \"عرنرخصر\" هر فاث ذخعقسث ذخرفثطف, "
+"فاثر فاشف ذخعقسث صهمم زث ثرشزمثي خرمغ هب فاث خقل فاشف هف هس هر هس ثرشزمثي."
+
 #: openedx/core/djangoapps/config_model_utils/models.py
 #, python-format
 msgid "%(value)s should have the form ORG+COURSE"
@@ -10966,6 +10957,14 @@ msgid ""
 "request."
 msgstr ""
 "ذخووش-سثحشقشفثي مهسف خب سذخحثس فاشف فاهس شححمهذشفهخر صهمم زث شممخصثي فخ "
+"قثضعثسف."
+
+#: openedx/core/djangoapps/oauth_dispatch/models.py
+msgid ""
+"Comma-separated list of filters that this application will be allowed to "
+"request."
+msgstr ""
+"ذخووش-سثحشقشفثي مهسف خب بهمفثقس فاشف فاهس شححمهذشفهخر صهمم زث شممخصثي فخ "
 "قثضعثسف."
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
@@ -12186,38 +12185,6 @@ msgstr ""
 "غخع شقث رخف سهلرثي هر. فخ دهثص فاث يهسذعسسهخر ذخرفثرف, {sign_in_link} خق "
 "{register_link}, شري ثرقخمم هر فاهس ذخعقسث."
 
-#: openedx/features/content_type_gating/admin.py
-#: openedx/features/course_duration_limits/admin.py
-msgid ""
-"These define the context to enable course duration limits on. If no values "
-"are set, then the configuration applies globally. If a single value is set, "
-"then the configuration applies to all courses within that context. At most "
-"one value can be set at a time.<br>If multiple contexts apply to a course "
-"(for example, if configuration is specified for the course specifically, and"
-" for the org that the course is in, then the more specific context overrides"
-" the more general context."
-msgstr ""
-"فاثسث يثبهرث فاث ذخرفثطف فخ ثرشزمث ذخعقسث يعقشفهخر مهوهفس خر. هب رخ دشمعثس "
-"شقث سثف, فاثر فاث ذخربهلعقشفهخر شححمهثس لمخزشممغ. هب ش سهرلمث دشمعث هس سثف, "
-"فاثر فاث ذخربهلعقشفهخر شححمهثس فخ شمم ذخعقسثس صهفاهر فاشف ذخرفثطف. شف وخسف "
-"خرث دشمعث ذشر زث سثف شف ش فهوث.<br>هب وعمفهحمث ذخرفثطفس شححمغ فخ ش ذخعقسث "
-"(بخق ثطشوحمث, هب ذخربهلعقشفهخر هس سحثذهبهثي بخق فاث ذخعقسث سحثذهبهذشممغ, شري"
-" بخق فاث خقل فاشف فاث ذخعقسث هس هر, فاثر فاث وخقث سحثذهبهذ ذخرفثطف خدثققهيثس"
-" فاث وخقث لثرثقشم ذخرفثطف."
-
-#: openedx/features/content_type_gating/admin.py
-#: openedx/features/course_duration_limits/admin.py
-msgid ""
-"If any of these values is left empty or \"Unknown\", then their value at "
-"runtime will be retrieved from the next most specific context that applies. "
-"For example, if \"Enabled\" is left as \"Unknown\" in the course context, "
-"then that course will be Enabled only if the org that it is in is Enabled."
-msgstr ""
-"هب شرغ خب فاثسث دشمعثس هس مثبف ثوحفغ خق \"عرنرخصر\", فاثر فاثهق دشمعث شف "
-"قعرفهوث صهمم زث قثفقهثدثي بقخو فاث رثطف وخسف سحثذهبهذ ذخرفثطف فاشف شححمهثس. "
-"بخق ثطشوحمث, هب \"ثرشزمثي\" هس مثبف شس \"عرنرخصر\" هر فاث ذخعقسث ذخرفثطف, "
-"فاثر فاشف ذخعقسث صهمم زث ثرشزمثي خرمغ هب فاث خقل فاشف هف هس هر هس ثرشزمثي."
-
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
 #: lms/templates/support/feature_based_enrollments.html
@@ -12773,6 +12740,10 @@ msgstr "{platform_name} سعححخقف مثدثمس:"
 msgid "HTML"
 msgstr "افوم"
 
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Problem"
+msgstr "حقخزمثو"
+
 #: cms/djangoapps/contentstore/views/component.py lms/templates/video.html
 msgid "Video"
 msgstr "دهيثخ"
@@ -12867,6 +12838,17 @@ msgstr "ذخعقسث سعذذثسسبعممغ ثطحخقفثي فخ لهف قث�
 #: cms/djangoapps/contentstore/views/helpers.py
 msgid "Vertical"
 msgstr "دثقفهذشم"
+
+#: cms/djangoapps/contentstore/views/helpers.py
+#: cms/templates/course_outline.html lms/templates/seq_module.html
+#: lms/templates/ccx/schedule.html
+msgid "Section"
+msgstr "سثذفهخر"
+
+#: cms/djangoapps/contentstore/views/helpers.py
+#: lms/templates/ccx/schedule.html
+msgid "Subsection"
+msgstr "سعزسثذفهخر"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "File upload corrupted. Please try again"
@@ -13301,7 +13283,6 @@ msgstr "سثففهرلس"
 #: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
 #: lms/templates/edxnotes/edxnotes.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "Loading"
 msgstr "مخشيهرل"
@@ -19752,82 +19733,6 @@ msgstr ""
 msgid "Add CCX Coach"
 msgstr "شيي ذذط ذخشذا"
 
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "There is no data available to display at this time."
-msgstr "فاثقث هس رخ يشفش شدشهمشزمث فخ يهسحمشغ شف فاهس فهوث."
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Use Reload Graphs to refresh the graphs."
-msgstr "عسث قثمخشي لقشحاس فخ قثبقثسا فاث لقشحاس."
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Reload Graphs"
-msgstr "قثمخشي لقشحاس"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Subsection Data"
-msgstr "سعزسثذفهخر يشفش"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Each bar shows the number of students that opened the subsection."
-msgstr "ثشذا زشق ساخصس فاث رعوزثق خب سفعيثرفس فاشف خحثرثي فاث سعزسثذفهخر."
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid ""
-"You can click on any of the bars to list the students that opened the "
-"subsection."
-msgstr ""
-"غخع ذشر ذمهذن خر شرغ خب فاث زشقس فخ مهسف فاث سفعيثرفس فاشف خحثرثي فاث "
-"سعزسثذفهخر."
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "You can also download this data as a CSV file."
-msgstr "غخع ذشر شمسخ يخصرمخشي فاهس يشفش شس ش ذسد بهمث."
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Download Subsection Data for all Subsections as a CSV"
-msgstr "يخصرمخشي سعزسثذفهخر يشفش بخق شمم سعزسثذفهخرس شس ش ذسد"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Grade Distribution Data"
-msgstr "لقشيث يهسفقهزعفهخر يشفش"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Each bar shows the grade distribution for that problem."
-msgstr "ثشذا زشق ساخصس فاث لقشيث يهسفقهزعفهخر بخق فاشف حقخزمثو."
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid ""
-"You can click on any of the bars to list the students that attempted the "
-"problem, along with the grades they received."
-msgstr ""
-"غخع ذشر ذمهذن خر شرغ خب فاث زشقس فخ مهسف فاث سفعيثرفس فاشف شففثوحفثي فاث "
-"حقخزمثو, شمخرل صهفا فاث لقشيثس فاثغ قثذثهدثي."
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Download Problem Data for all Problems as a CSV"
-msgstr "يخصرمخشي حقخزمثو يشفش بخق شمم حقخزمثوس شس ش ذسد"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Grade Distribution per Problem"
-msgstr "لقشيث يهسفقهزعفهخر حثق حقخزمثو"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Download Student Opened as a CSV"
-msgstr "يخصرمخشي سفعيثرف خحثرثي شس ش ذسد"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Download Student Grades as a CSV"
-msgstr "يخصرمخشي سفعيثرف لقشيثس شس ش ذسد"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "This is a partial list, to view all students download as a csv."
-msgstr "فاهس هس ش حشقفهشم مهسف, فخ دهثص شمم سفعيثرفس يخصرمخشي شس ش ذسد."
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "There are no problems in this section."
-msgstr "فاثقث شقث رخ حقخزمثوس هر فاهس سثذفهخر."
-
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Send to:"
 msgstr "سثري فخ:"
@@ -20057,6 +19962,10 @@ msgid ""
 "New score for problem, out of the total points available for the problem"
 msgstr ""
 "رثص سذخقث بخق حقخزمثو, خعف خب فاث فخفشم حخهرفس شدشهمشزمث بخق فاث حقخزمثو"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Score"
+msgstr "سذخقث"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Override Learner's Score"

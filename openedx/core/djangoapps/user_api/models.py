@@ -22,6 +22,7 @@ from opaque_keys.edx.django.models import CourseKeyField
 # create an alias in "user_api".
 
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
+from openedx.core.lib.cache_utils import request_cached
 # pylint: disable=unused-import
 from student.models import (
     PendingEmailChange,
@@ -54,6 +55,7 @@ class UserPreference(models.Model):
         unique_together = ("user", "key")
 
     @staticmethod
+    @request_cached()
     def get_all_preferences(user):
         """
         Gets all preferences for a given user
@@ -92,7 +94,7 @@ def pre_save_callback(sender, **kwargs):
     Event changes to user preferences.
     """
     user_preference = kwargs["instance"]
-    user_preference._old_value = get_changed_fields_dict(user_preference, sender).get("value", None)
+    user_preference._old_value = get_changed_fields_dict(user_preference, sender).get("value", None)  # pylint: disable=protected-access
 
 
 @receiver(post_save, sender=UserPreference)
@@ -107,9 +109,9 @@ def post_save_callback(sender, **kwargs):
             username=user_preference.user.username, new=user_preference.value))
     emit_setting_changed_event(
         user_preference.user, sender._meta.db_table, user_preference.key,
-        user_preference._old_value, user_preference.value
+        user_preference._old_value, user_preference.value  # pylint: disable=protected-access
     )
-    user_preference._old_value = None
+    user_preference._old_value = None  # pylint: disable=protected-access
 
 
 @receiver(post_delete, sender=UserPreference)
@@ -139,7 +141,7 @@ class UserCourseTag(models.Model):
         unique_together = ("user", "course_id", "key")
 
 
-class UserOrgTag(TimeStampedModel, DeletableByUserValue):  # pylint: disable=model-missing-unicode
+class UserOrgTag(TimeStampedModel, DeletableByUserValue):
     """
     Per-Organization user tags.
 
@@ -172,7 +174,6 @@ class RetirementState(models.Model):
     required = models.BooleanField(default=False)
 
     def __str__(self):
-        # pylint: disable=unicode-format-string
         return '{} (step {})'.format(self.state_name, self.state_execution_order)
 
     class Meta(object):
@@ -293,7 +294,9 @@ class UserRetirementStatus(TimeStampedModel):
             if new_state_index <= states.index(self.current_state.state_name):
                 raise ValueError()
         except ValueError:
-            err = u'{} does not exist or is an eariler state than current state {}'.format(new_state, self.current_state)
+            err = u'{} does not exist or is an eariler state than current state {}'.format(
+                new_state, self.current_state
+            )
             raise RetirementStateError(err)
 
     def _validate_update_data(self, data):
@@ -306,7 +309,9 @@ class UserRetirementStatus(TimeStampedModel):
 
         for required_key in required_keys:
             if required_key not in data:
-                raise RetirementStateError(u'RetirementStatus: Required key {} missing from update'.format(required_key))
+                raise RetirementStateError(u'RetirementStatus: Required key {} missing from update'.format(
+                    required_key
+                ))
 
         for key in data:
             if key not in known_keys:

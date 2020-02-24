@@ -25,12 +25,23 @@ class SiteConfiguration(models.Model):
 
     Fields:
         site (OneToOneField): one to one field relating each configuration to a single site
-        values (JSONField):  json field to store configurations for a site
+        site_values (JSONField):  json field to store configurations for a site
 
     .. no_pii:
     """
     site = models.OneToOneField(Site, related_name='configuration', on_delete=models.CASCADE)
     enabled = models.BooleanField(default=False, verbose_name=u"Enabled")
+    site_values = JSONField(
+        null=False,
+        blank=True,
+        # The actual default value is determined by calling the given callable.
+        # Therefore, the default here is just {}, since that is the result of
+        # calling `dict`.
+        default=dict,
+        load_kwargs={'object_pairs_hook': collections.OrderedDict}
+    )
+    # TODO: Delete this deprecated field during the later stages of the rollout
+    # which renames 'values' to 'site_values'.
     values = JSONField(
         null=False,
         blank=True,
@@ -146,12 +157,19 @@ class SiteConfigurationHistory(TimeStampedModel):
 
     Fields:
         site (ForeignKey): foreign-key to django Site
-        values (JSONField): json field to store configurations for a site
+        site_values (JSONField): json field to store configurations for a site
 
     .. no_pii:
     """
     site = models.ForeignKey(Site, related_name='configuration_histories', on_delete=models.CASCADE)
     enabled = models.BooleanField(default=False, verbose_name=u"Enabled")
+    site_values = JSONField(
+        null=False,
+        blank=True,
+        load_kwargs={'object_pairs_hook': collections.OrderedDict}
+    )
+    # TODO: Delete this deprecated field during the later stages of the rollout
+    # which renames 'values' to 'site_values'.
     values = JSONField(
         null=False,
         blank=True,
@@ -185,6 +203,7 @@ def update_site_configuration_history(sender, instance, **kwargs):  # pylint: di
     """
     SiteConfigurationHistory.objects.create(
         site=instance.site,
+        site_values=instance.values,
         values=instance.values,
         enabled=instance.enabled,
     )

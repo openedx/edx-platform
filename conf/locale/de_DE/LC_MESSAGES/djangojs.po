@@ -127,7 +127,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-01-26 20:42+0000\n"
+"POT-Creation-Date: 2020-02-23 20:42+0000\n"
 "PO-Revision-Date: 2020-01-06 08:48+0000\n"
 "Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>\n"
 "Language-Team: German (Germany) (http://www.transifex.com/open-edx/edx-platform/language/de_DE/)\n"
@@ -2587,6 +2587,10 @@ msgid "Masters"
 msgstr "Master"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "MicroMasters"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "MicroBachelors"
 msgstr "MicroBachelors"
 
@@ -2903,10 +2907,10 @@ msgid "Cannot join instructor managed team"
 msgstr "Kann nicht dem von einem Dozenten verwalteten Team beitreten"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
-msgid "{memberCount} / {maxMemberCount} Member"
-msgid_plural "{memberCount} / {maxMemberCount} Members"
-msgstr[0] "{memberCount} / {maxMemberCount} Mitglied"
-msgstr[1] "{memberCount} / {maxMemberCount} Mitglieder"
+msgid " Member"
+msgid_plural " Members"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "All teams"
@@ -5558,28 +5562,6 @@ msgstr ""
 "Du kannst dir diesen Kurs nicht als Student oder Beta-Tester anschauen bevor"
 " er freigegeben wurde."
 
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "%(num_students)s student opened Subsection"
-msgid_plural "%(num_students)s students opened Subsection"
-msgstr[0] "%(num_students)s Teilnehmer habt diesen Unterabschnitt geöffnet"
-msgstr[1] "%(num_students)s Teilnehmer haben diesen Unterabschnitt geöffnet"
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "%(num_students)s student"
-msgid_plural "%(num_students)s students"
-msgstr[0] "%(num_students)s Teilnehmer"
-msgstr[1] "%(num_students)s Teilnehmer"
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "%(num_questions)s question"
-msgid_plural "%(num_questions)s questions"
-msgstr[0] "%(num_questions)s Frage"
-msgstr[1] "%(num_questions)s Fragen"
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "Number of Students"
-msgstr "Anzahl der Teilnehmer"
-
 #: lms/templates/courseware/progress_graph.js
 msgid "Overall Score"
 msgstr "Gesamtpunkte"
@@ -7643,6 +7625,10 @@ msgstr "Team-Mitgliedschaft zuweisen"
 #: lms/djangoapps/teams/static/teams/templates/manage.underscore
 msgid "Upload Memberships"
 msgstr "Mitgliedschaft hochladen"
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Error assigning team memberships"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
 msgid "Are you having trouble finding a team to join?"

@@ -35,7 +35,12 @@ from openedx.core.djangoapps.django_comment_common.signals import (
 )
 from student.models import CourseEnrollment, LanguageField
 
-from .errors import AlreadyOnTeamInCourse, ImmutableMembershipFieldException, NotEnrolledInCourseForTeam
+from .errors import (
+    AlreadyOnTeamInCourse,
+    ImmutableMembershipFieldException,
+    NotEnrolledInCourseForTeam,
+    AddToIncompatibleTeamError
+)
 
 
 @receiver(thread_voted)
@@ -195,10 +200,14 @@ class CourseTeam(models.Model):
 
     def add_user(self, user):
         """Adds the given user to the CourseTeam."""
+        from lms.djangoapps.teams.api import has_specific_team_access
+
         if not CourseEnrollment.is_enrolled(user, self.course_id):
             raise NotEnrolledInCourseForTeam
         if CourseTeamMembership.user_in_team_for_course(user, self.course_id, self.topic_id):
             raise AlreadyOnTeamInCourse
+        if not has_specific_team_access(user, self):
+            raise AddToIncompatibleTeamError
         return CourseTeamMembership.objects.create(
             user=user,
             team=self

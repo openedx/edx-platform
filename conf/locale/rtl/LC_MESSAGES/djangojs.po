@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-02-02 20:51+0000\n"
-"PO-Revision-Date: 2020-02-02 20:52:08.190508\n"
+"POT-Creation-Date: 2020-02-24 10:50+0000\n"
+"PO-Revision-Date: 2020-02-24 10:50:21.302096\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2455,6 +2455,10 @@ msgid "Masters"
 msgstr "وشسفثقس"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "MicroMasters"
+msgstr "وهذقخوشسفثقس"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "MicroBachelors"
 msgstr "وهذقخزشذاثمخقس"
 
@@ -2760,10 +2764,10 @@ msgid "Cannot join instructor managed team"
 msgstr "ذشررخف تخهر هرسفقعذفخق وشرشلثي فثشو"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
-msgid "{memberCount} / {maxMemberCount} Member"
-msgid_plural "{memberCount} / {maxMemberCount} Members"
-msgstr[0] "{memberCount} / {maxMemberCount} وثوزثق"
-msgstr[1] "{memberCount} / {maxMemberCount} وثوزثقس"
+msgid " Member"
+msgid_plural " Members"
+msgstr[0] " وثوزثق"
+msgstr[1] " وثوزثقس"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "All teams"
@@ -5299,28 +5303,6 @@ msgstr ""
 "غخع ذشررخف دهثص فاث ذخعقسث شس ش سفعيثرف خق زثفش فثسفثق زثبخقث فاث ذخعقسث "
 "قثمثشسث يشفث."
 
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "%(num_students)s student opened Subsection"
-msgid_plural "%(num_students)s students opened Subsection"
-msgstr[0] "%(num_students)s سفعيثرف خحثرثي سعزسثذفهخر"
-msgstr[1] "%(num_students)s سفعيثرفس خحثرثي سعزسثذفهخر"
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "%(num_students)s student"
-msgid_plural "%(num_students)s students"
-msgstr[0] "%(num_students)s سفعيثرف"
-msgstr[1] "%(num_students)s سفعيثرفس"
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "%(num_questions)s question"
-msgid_plural "%(num_questions)s questions"
-msgstr[0] "%(num_questions)s ضعثسفهخر"
-msgstr[1] "%(num_questions)s ضعثسفهخرس"
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "Number of Students"
-msgstr "رعوزثق خب سفعيثرفس"
-
 #: lms/templates/courseware/progress_graph.js
 msgid "Overall Score"
 msgstr "خدثقشمم سذخقث"
@@ -7323,6 +7305,10 @@ msgstr "شسسهلر فثشو وثوزثقساهحس"
 #: lms/djangoapps/teams/static/teams/templates/manage.underscore
 msgid "Upload Memberships"
 msgstr "عحمخشي وثوزثقساهحس"
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Error assigning team memberships"
+msgstr "ثققخق شسسهلرهرل فثشو وثوزثقساهحس"
 
 #: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
 msgid "Are you having trouble finding a team to join?"

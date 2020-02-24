@@ -6,6 +6,7 @@ import csv
 
 from django.contrib.auth.models import User
 
+from lms.djangoapps.teams.api import OrganizationProtectionStatus, user_organization_protection_status
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from student.models import CourseEnrollment
 from .utils import emit_team_event
@@ -70,7 +71,7 @@ def _lookup_team_membership_data(course):
 def _group_teamset_memberships_by_user(course_team_memberships):
     """
     Parameters:
-        - course_team_memberships: a collection of CourseTeamMemberships
+        - course_team_memberships: a collection of CourseTeamMemberships.
 
     Returns:
         {
@@ -124,6 +125,8 @@ class TeamMembershipImportManager(object):
         self.teamset_ids = reader.fieldnames[2:]
         row_dictionaries = []
         csv_usernames = set()
+        if not self.validate_header(reader.fieldnames):
+            return False
         if not self.validate_teamsets():
             return False
         self.load_user_ids_by_teamset_id()
@@ -131,6 +134,8 @@ class TeamMembershipImportManager(object):
         self.load_course_teams()
         # process student rows:
         for row in reader:
+            if not self.validate_teams_have_matching_teamsets(row):
+                return False
             username = row['user']
             if not username:
                 continue
@@ -140,7 +145,7 @@ class TeamMembershipImportManager(object):
             user = self.get_user(username)
             if user is None:
                 continue
-            if not self.validate_user_enrolled_in_course(user):
+            if not self.validate_user_enrollment_is_valid(user, row['mode']):
                 row['user'] = None
                 continue
             row['user'] = user
@@ -172,6 +177,19 @@ class TeamMembershipImportManager(object):
         for team in CourseTeam.objects.filter(course_id=self.course.id):
             self.existing_course_teams[(team.name, team.topic_id)] = team
 
+    def validate_header(self, header):
+        """
+        Validates header row to ensure that it contains at a minimum columns called 'user', 'mode'.
+        Teamset validation is handled separately
+        """
+        if 'user' not in header:
+            self.validation_errors.append("Header must contain column 'user'.")
+            return False
+        if 'mode' not in header:
+            self.validation_errors.append("Header must contain column 'mode'.")
+            return False
+        return True
+
     def validate_teamsets(self):
         """
         Validates team set ids. Returns true if there are no errors.
@@ -192,6 +210,10 @@ class TeamMembershipImportManager(object):
         return True
 
     def load_user_ids_by_teamset_id(self):
+        """
+        Get users associations with each teamset in a course and
+        save to `self.user_ids_by_teamset_id`
+        """
         for teamset_id in self.teamset_ids:
             self.user_ids_by_teamset_id[teamset_id] = {
                 membership.user_id for membership in
@@ -200,13 +222,18 @@ class TeamMembershipImportManager(object):
                 )
             }
 
-    def validate_user_enrolled_in_course(self, user):
+    def validate_user_enrollment_is_valid(self, user, supplied_enrollment):
         """
         Invalid states:
             user not enrolled in course
+            enrollment mode from csv doesn't match actual user enrollment
         """
-        if not CourseEnrollment.is_enrolled(user, self.course.id):
+        actual_enrollment_mode, user_enrolled = CourseEnrollment.enrollment_mode_for_user(user, self.course.id)
+        if not user_enrolled:
             self.validation_errors.append('User ' + user.username + ' is not enrolled in this course.')
+            return False
+        if actual_enrollment_mode != supplied_enrollment.strip():
+            self.validation_errors.append('User ' + user.username + ' enrollment mismatch.')
             return False
 
         return True
@@ -216,7 +243,24 @@ class TeamMembershipImportManager(object):
         Ensures that username exists only once in an input file
         """
         if username in usernames_found_so_far:
-            error_message = 'Username {} was found more than once in input file.'.format(username)
+            error_message = 'Username {} listed more than once in file.'.format(username)
+            if self.add_error_and_check_if_max_exceeded(error_message):
+                return False
+        return True
+
+    def validate_teams_have_matching_teamsets(self, row):
+        """
+        It's possible for a user to create a row that has more team names in it
+        than there are teamset ids provided in the header.
+        In that case, `row` will have one or more null keys mapping to team names, for example:
+        {'teamset-1': 'team-a', 'teamset-2': 'team-beta', None: 'team-37'}
+
+        This method will add a validation error and return False if this is the case.
+        """
+        if None in row:
+            error_message = "Team(s) {0} don't have matching teamsets.".format(
+                row[None]
+            )
             if self.add_error_and_check_if_max_exceeded(error_message):
                 return False
         return True
@@ -240,7 +284,7 @@ class TeamMembershipImportManager(object):
             except KeyError:
                 # if a team doesn't exists, the validation doesn't apply to it.
                 all_teamset_user_ids = self.user_ids_by_teamset_id[teamset_id]
-                error_message = 'The user {0} is already a member of a team inside teamset {1} in this course.'.format(
+                error_message = 'User {0} is already on a team in teamset {1}.'.format(
                     user.username, teamset_id
                 )
                 if user.id in all_teamset_user_ids and self.add_error_and_check_if_max_exceeded(error_message):
@@ -250,11 +294,11 @@ class TeamMembershipImportManager(object):
                     continue
             max_team_size = self.course.teams_configuration.default_max_team_size
             if max_team_size is not None and team.users.count() >= max_team_size:
-                if self.add_error_and_check_if_max_exceeded('Team ' + team.team_id + ' is already full.'):
+                if self.add_error_and_check_if_max_exceeded('Team ' + team.team_id + ' is full.'):
                     return False
 
             if (user.id, team.topic_id) in self.existing_course_team_memberships:
-                error_message = 'The user {0} is already a member of a team inside teamset {1} in this course.'.format(
+                error_message = 'User {0} is already on a team in teamset {1}.'.format(
                     user.username, team.topic_id
                 )
                 if self.add_error_and_check_if_max_exceeded(error_message):
@@ -285,13 +329,18 @@ class TeamMembershipImportManager(object):
             if not team_name:
                 continue
             if (team_name, teamset_id) not in self.existing_course_teams:
+                protection_status = user_organization_protection_status(user, self.course.id)
                 team = CourseTeam.create(
                     name=team_name,
                     course_id=self.course.id,
                     description='Import from csv',
-                    topic_id=teamset_id
+                    topic_id=teamset_id,
+                    organization_protected=protection_status == OrganizationProtectionStatus.protected
                 )
                 team.save()
+                self.existing_course_teams[(team_name, teamset_id)] = team
+            else:
+                team = self.existing_course_teams[(team_name, teamset_id)]
             team.add_user(user)
             emit_team_event(
                 'edx.team.learner_added',
@@ -315,6 +364,6 @@ class TeamMembershipImportManager(object):
             try:
                 return User.objects.get(email=user_name)
             except User.DoesNotExist:
-                self.validation_errors.append('Username or email ' + user_name + ' does not exist.')
+                self.validation_errors.append('User ' + user_name + ' does not exist.')
                 return None
                 # TODO - handle user key case

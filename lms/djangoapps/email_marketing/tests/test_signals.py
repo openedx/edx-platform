@@ -620,32 +620,6 @@ class SailthruTests(TestCase):
     @patch('sailthru.sailthru_client.SailthruClient.purchase')
     @patch('sailthru.sailthru_client.SailthruClient.api_get')
     @patch('sailthru.sailthru_client.SailthruClient.api_post')
-    def test_update_course_enrollment(self, mock_sailthru_api_post,
-                                      mock_sailthru_api_get, mock_sailthru_purchase):
-        """test update sailthru user record"""
-
-        # create mocked Sailthru API responses
-        mock_sailthru_api_post.return_value = MockSailthruResponse({'ok': True})
-        mock_sailthru_api_get.return_value = MockSailthruResponse({'user': {"id": TEST_EMAIL, "fields": {"vars": 1}}})
-        mock_sailthru_purchase.return_value = MockSailthruResponse({'ok': True})
-        self.user.email = TEST_EMAIL
-        CourseEnrollmentFactory(user=self.user, course_id=self.course_id)
-        with patch('email_marketing.tasks.build_course_url') as m:
-            m.return_value = self.course_url
-            update_course_enrollment(TEST_EMAIL, self.course_id, 'audit')
-        item = [{
-            'vars': {'course_run_id': u'edX/toy/2012_Fall', 'mode': 'audit'},
-            'url': self.course_url,
-            'price': 0,
-            'qty': 1,
-            'id': 'edX/toy/2012_Fall-audit',
-            'title': 'Course edX/toy/2012_Fall mode: audit'
-        }]
-        mock_sailthru_purchase.assert_called_with(TEST_EMAIL, item, options={})
-
-    @patch('sailthru.sailthru_client.SailthruClient.purchase')
-    @patch('sailthru.sailthru_client.SailthruClient.api_get')
-    @patch('sailthru.sailthru_client.SailthruClient.api_post')
     @patch('openedx.core.djangoapps.waffle_utils.WaffleSwitchNamespace.is_enabled')
     def test_update_course_enrollment_whitelabel(
             self,

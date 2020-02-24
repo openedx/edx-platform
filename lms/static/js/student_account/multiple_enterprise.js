@@ -18,7 +18,7 @@
              * @param  {string} nextUrl The URL to redirect to after multiple enterprise selection.
              */
             check: function(nextUrl) {
-                var redirectUrl = this.urls.multipleEnterpriseUrl + encodeURI(nextUrl);
+                var redirectUrl = this.urls.multipleEnterpriseUrl + encodeURIComponent(nextUrl);
                 var username = Utils.userFromEdxUserCookie().username;
                 var next = nextUrl || '/';
                 $.ajax({
