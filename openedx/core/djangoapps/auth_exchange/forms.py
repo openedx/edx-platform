@@ -2,7 +2,6 @@
 Forms to support third-party to first-party OAuth 2.0 access token exchange
 """
 
-import provider.constants  # this will be removed with removal of Client(dop model) below
 from django import forms
 from django.contrib.auth.models import User
 from django.forms import CharField
