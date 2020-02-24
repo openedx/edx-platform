@@ -28,6 +28,7 @@ from openedx.core.djangoapps.auth_exchange.forms import AccessTokenExchangeForm
 from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+import pdb
 
 
 class AccessTokenExchangeBase(APIView):
@@ -57,6 +58,8 @@ class AccessTokenExchangeBase(APIView):
         user = form.cleaned_data["user"]
         scope = form.cleaned_data["scope"]
         client = form.cleaned_data["client"]
+
+        return self.exchange_access_token(request, user, scope, client)
 
     def exchange_access_token(self, request, user, scope, client):
         """
