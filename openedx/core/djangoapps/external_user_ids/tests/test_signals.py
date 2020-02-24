@@ -7,12 +7,17 @@ from django.conf import settings
 from django.core.cache import cache
 from edx_django_utils.cache import RequestCache
 
+from entitlements.models import CourseEntitlement
 from openedx.core.djangoapps.catalog.tests.factories import (
     CourseFactory,
     ProgramFactory,
 )
 from student.tests.factories import TEST_PASSWORD, UserFactory
-from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL, COURSE_PROGRAMS_CACHE_KEY_TPL
+from openedx.core.djangoapps.catalog.cache import (
+    CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL,
+    COURSE_PROGRAMS_CACHE_KEY_TPL,
+    PROGRAM_CACHE_KEY_TPL,
+)
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 from openedx.core.djangolib.testing.utils import skip_unless_lms
@@ -64,6 +69,12 @@ class MicrobachelorsExternalIDTest(ModuleStoreTestCase, CacheIsolationTestCase):
         program['type_attrs']['coaching_supported'] = True
 
         for course in program['courses']:
+            cache.set(
+                CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_uuid=course['uuid']),
+                [program['uuid']],
+                None
+            )
+
             course_run = course['course_runs'][0]['key']
             cache.set(
                 COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_run_id=course_run),
@@ -119,6 +130,64 @@ class MicrobachelorsExternalIDTest(ModuleStoreTestCase, CacheIsolationTestCase):
         enrollments = CourseEnrollment.objects.filter(user=self.user)
 
         assert len(enrollments) == 2
+
+        external_ids = ExternalId.objects.filter(
+            user=self.user
+        )
+
+        assert len(external_ids) == 1
+        assert external_ids[0].external_id_type.name == ExternalIdType.MICROBACHELORS_COACHING
+        assert original_external_user_uuid == external_ids[0].external_user_id
+
+    def test_entitlement_mb_create_external_id(self):
+        catalog_course = self.program['courses'][0]
+
+        assert ExternalId.objects.filter(
+            user=self.user
+        ).count() == 0
+
+        entitlement = CourseEntitlement.objects.create(
+            course_uuid=catalog_course['uuid'],
+            mode=CourseMode.VERIFIED,
+            user=self.user,
+            order_number='TEST-12345'
+        )
+        entitlement.save()
+
+        external_id = ExternalId.objects.get(
+            user=self.user
+        )
+        assert external_id is not None
+        assert external_id.external_id_type.name == ExternalIdType.MICROBACHELORS_COACHING
+
+    def test_second_entitlement_mb_no_new_external_id(self):
+        catalog_course1 = self.program['courses'][0]
+        catalog_course2 = self.program['courses'][1]
+
+        # Enroll user
+        entitlement = CourseEntitlement.objects.create(
+            course_uuid=catalog_course1['uuid'],
+            mode=CourseMode.VERIFIED,
+            user=self.user,
+            order_number='TEST-12345'
+        )
+        entitlement.save()
+        external_id = ExternalId.objects.get(
+            user=self.user
+        )
+        assert external_id is not None
+        assert external_id.external_id_type.name == ExternalIdType.MICROBACHELORS_COACHING
+        original_external_user_uuid = external_id.external_user_id
+
+        CourseEntitlement.objects.create(
+            course_uuid=catalog_course2['uuid'],
+            mode=CourseMode.VERIFIED,
+            user=self.user,
+            order_number='TEST-12345'
+        )
+        entitlements = CourseEntitlement.objects.filter(user=self.user)
+
+        assert len(entitlements) == 2
 
         external_ids = ExternalId.objects.filter(
             user=self.user
