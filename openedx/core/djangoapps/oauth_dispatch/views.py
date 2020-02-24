@@ -10,7 +10,6 @@ from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 from edx_django_utils import monitoring as monitoring_utils
-from edx_oauth2_provider import views as dop_views  # django-oauth2-provider views
 from oauth2_provider import models as dot_models  # django-oauth-toolkit
 from oauth2_provider import views as dot_views
 from ratelimit import ALL
@@ -71,9 +70,6 @@ class _DispatchingView(View):
         if backend == self.dot_adapter.backend:
             monitoring_utils.set_custom_metric('oauth_view', 'dot')
             return self.dot_view.as_view()
-        elif backend == self.dop_adapter.backend:
-            monitoring_utils.set_custom_metric('oauth_view', 'dop')
-            return self.dop_view.as_view()
         else:
             raise KeyError('Failed to dispatch view. Invalid backend {}'.format(backend))
 
@@ -98,7 +94,6 @@ class AccessTokenView(_DispatchingView):
     Handle access token requests.
     """
     dot_view = dot_views.TokenView
-    dop_view = dop_views.AccessTokenView
 
     def dispatch(self, request, *args, **kwargs):  # pylint: disable=arguments-differ
         response = super(AccessTokenView, self).dispatch(request, *args, **kwargs)
@@ -128,7 +123,6 @@ class AuthorizationView(_DispatchingView):
     """
     Part of the authorization flow.
     """
-    dop_view = dop_views.Capture
     dot_view = dot_overrides_views.EdxOAuth2AuthorizationView
 
 
@@ -136,7 +130,6 @@ class AccessTokenExchangeView(_DispatchingView):
     """
     Exchange a third party auth token.
     """
-    dop_view = auth_exchange_views.DOPAccessTokenExchangeView
     dot_view = auth_exchange_views.DOTAccessTokenExchangeView
 
 

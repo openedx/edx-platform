@@ -70,43 +70,6 @@ class AccessTokenExchangeBase(APIView):
         edx_access_token = self.create_access_token(request, user, scope, client)
         return self.access_token_response(edx_access_token)
 
-
-
-class DOPAccessTokenExchangeView(AccessTokenExchangeBase, DOPAccessTokenView):
-    """
-    View for token exchange from 3rd party OAuth access token to 1st party
-    OAuth access token.  Uses django-oauth2-provider (DOP) to manage access
-    tokens.
-    """
-
-    oauth2_adapter = adapters.DOPAdapter()
-
-    def post(self, request, _backend):
-        """
-        Handle POST requests to get a first-party access token.
-        """
-        form = DOPAccessTokenExchangeForm(request=request, oauth2_adapter=self.oauth2_adapter, data=request.POST)
-        if not form.is_valid():
-            return self.error_response(form.errors)
-
-        user = form.cleaned_data["user"]
-        scope = form.cleaned_data["scope"]
-        client = form.cleaned_data["client"]
-
-        return self.exchange_access_token(request, user, scope, client)
-
-    def exchange_access_token(self, request, user, scope, client):
-        """
-        Exchange third party credentials for an edx access token, and return a
-        serialized access token response.
-        """
-        if constants.SINGLE_ACCESS_TOKEN:
-            edx_access_token = self.get_access_token(request, user, scope, client)
-        else:
-            edx_access_token = self.create_access_token(request, user, scope, client)
-        return self.access_token_response(edx_access_token)
-
-
 class DOTAccessTokenExchangeView(AccessTokenExchangeBase, DOTAccessTokenView):
     """
     View for token exchange from 3rd party OAuth access token to 1st party
