@@ -23,7 +23,6 @@ from django.middleware.csrf import get_token
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
-from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from edx_proctoring.api import create_exam, create_exam_attempt, update_attempt_status
 from edx_proctoring.runtime import set_runtime_service
 from edx_proctoring.tests.test_services import MockCertificateService, MockCreditService, MockGradesService
@@ -63,6 +62,7 @@ from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.credit.api import set_credit_requirement_status, set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory, AccessTokenFactory
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.url_utils import quote_slashes
@@ -349,7 +349,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     def test_oauth_authentication(self):
         """ Test that the xblock endpoint supports OAuth authentication."""
         dispatch_url = self._get_dispatch_url()
-        access_token = AccessTokenFactory(user=self.mock_user, client=ClientFactory()).token
+        access_token = AccessTokenFactory(user=self.mock_user, application=ApplicationFactory()).token
         headers = {'HTTP_AUTHORIZATION': 'Bearer ' + access_token}
         response = self.client.post(dispatch_url, {}, **headers)
         self.assertEqual(200, response.status_code)

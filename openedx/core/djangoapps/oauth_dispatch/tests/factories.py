@@ -22,7 +22,7 @@ class ApplicationFactory(DjangoModelFactory):
     client_id = factory.Sequence(u'client_{0}'.format)
     client_secret = 'some_secret'
     client_type = 'confidential'
-    authorization_grant_type = 'Client credentials'
+    authorization_grant_type = Application.CLIENT_CONFIDENTIAL
     name = FuzzyText(prefix='name', length=8)
 
 

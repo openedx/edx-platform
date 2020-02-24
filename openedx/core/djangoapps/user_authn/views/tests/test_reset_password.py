@@ -22,10 +22,8 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.http import int_to_base36
-from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory, RefreshTokenFactory
 from mock import Mock, patch
 from oauth2_provider import models as dot_models
-from provider.oauth2 import models as dop_models
 from six.moves import range
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
@@ -154,16 +152,11 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         good_req = self.request_factory.post('/password_reset/', {'email': self.user.email})
         good_req.user = self.user
         good_req.site = Mock(domain='example.com')
-        dop_client = ClientFactory()
-        dop_access_token = AccessTokenFactory(user=self.user, client=dop_client)
-        RefreshTokenFactory(user=self.user, client=dop_client, access_token=dop_access_token)
         dot_application = dot_factories.ApplicationFactory(user=self.user)
         dot_access_token = dot_factories.AccessTokenFactory(user=self.user, application=dot_application)
         dot_factories.RefreshTokenFactory(user=self.user, application=dot_application, access_token=dot_access_token)
         good_resp = password_reset(good_req)
         self.assertEqual(good_resp.status_code, 200)
-        self.assertFalse(dop_models.AccessToken.objects.filter(user=self.user).exists())
-        self.assertFalse(dop_models.RefreshToken.objects.filter(user=self.user).exists())
         self.assertFalse(dot_models.AccessToken.objects.filter(user=self.user).exists())
         self.assertFalse(dot_models.RefreshToken.objects.filter(user=self.user).exists())
         obj = json.loads(good_resp.content.decode('utf-8'))
