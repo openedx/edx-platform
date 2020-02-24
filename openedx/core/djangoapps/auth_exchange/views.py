@@ -24,7 +24,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from openedx.core.djangoapps.auth_exchange.forms import DOTAccessTokenExchangeForm
+from openedx.core.djangoapps.auth_exchange.forms import AccessTokenExchangeForm
 from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
@@ -50,7 +50,7 @@ class AccessTokenExchangeBase(APIView):
         """
         Handle POST requests to get a first-party access token.
         """
-        form = DOTAccessTokenExchangeForm(request=request, oauth2_adapter=self.oauth2_adapter, data=request.POST)
+        form = AccessTokenExchangeForm(request=request, oauth2_adapter=self.oauth2_adapter, data=request.POST)
         if not form.is_valid():
             return self.error_response(form.errors)
 

@@ -50,23 +50,7 @@ class AccessTokenExchangeFormTest(AccessTokenExchangeTestMixin):
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data["user"], self.user)
         self.assertEqual(form.cleaned_data["client"], self.oauth_client)
-        self.assertEqual(set(scope.to_names(form.cleaned_data["scope"])), set(expected_scopes))
-
-
-# This is necessary because cms does not implement third party auth
-@unittest.skipUnless(TPA_FEATURE_ENABLED, TPA_FEATURES_KEY + " not enabled")
-@httpretty.activate
-class DOPAccessTokenExchangeFormTestFacebook(
-        DOPAdapterMixin,
-        AccessTokenExchangeFormTest,
-        ThirdPartyOAuthTestMixinFacebook,
-        TestCase,
-):
-    """
-    Tests for AccessTokenExchangeForm used with Facebook, tested against
-    django-oauth2-provider (DOP).
-    """
-    pass
+        self.assertEqual(set(form.cleaned_data["scope"]), set(expected_scopes))
 
 
 # This is necessary because cms does not implement third party auth
@@ -83,23 +67,6 @@ class DOTAccessTokenExchangeFormTestFacebook(
     django-oauth-toolkit (DOT).
     """
     pass
-
-
-# This is necessary because cms does not implement third party auth
-@unittest.skipUnless(TPA_FEATURE_ENABLED, TPA_FEATURES_KEY + " not enabled")
-@httpretty.activate
-class DOPAccessTokenExchangeFormTestGoogle(
-        DOPAdapterMixin,
-        AccessTokenExchangeFormTest,
-        ThirdPartyOAuthTestMixinGoogle,
-        TestCase,
-):
-    """
-    Tests for AccessTokenExchangeForm used with Google, tested against
-    django-oauth2-provider (DOP).
-    """
-    pass
-
 
 # This is necessary because cms does not implement third party auth
 @unittest.skipUnless(TPA_FEATURE_ENABLED, TPA_FEATURES_KEY + " not enabled")
