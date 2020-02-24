@@ -19,7 +19,6 @@ from student.models import User, UserProfile
 from track import segment
 
 from ..errors import (
-    CountryCodeError,
     PreferenceUpdateError,
     PreferenceValidationError,
     UserAPIInternalError,

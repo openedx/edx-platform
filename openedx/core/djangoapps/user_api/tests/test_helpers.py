@@ -6,7 +6,6 @@ Tests for helper functions.
 import json
 import re
 
-import ddt
 import mock
 import pytest
 from django import forms

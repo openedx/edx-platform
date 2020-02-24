@@ -9,7 +9,6 @@ from selenium.webdriver.common.keys import Keys
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.studio import LMS_URL
 from common.test.acceptance.pages.studio.asset_index import AssetIndexPageStudioFrontend
 from common.test.acceptance.pages.studio.course_info import CourseUpdatesPage
 from common.test.acceptance.pages.studio.edit_tabs import PagesPage

@@ -10,7 +10,7 @@ import mock
 from django.conf import settings
 from mock import patch
 from opaque_keys.edx.locator import CourseKey, LibraryLocator
-from six import binary_type, text_type
+from six import text_type
 from six.moves import range
 
 from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, parse_json

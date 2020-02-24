@@ -5,8 +5,6 @@ and course access based on these limits.
 """
 
 
-from datetime import timedelta
-
 import six
 from django.utils import timezone
 from django.utils.translation import get_language
@@ -19,7 +17,6 @@ from lms.djangoapps.courseware.access_response import AccessError
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_specific_student
-from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_date_signals.utils import get_expected_duration
 from openedx.core.djangolib.markup import HTML

@@ -2,7 +2,6 @@
 
 
 import json
-from io import BytesIO
 
 import ddt
 import six

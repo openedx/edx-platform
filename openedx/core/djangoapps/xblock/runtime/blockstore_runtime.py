@@ -11,7 +11,6 @@ from opaque_keys.edx.locator import BundleDefinitionLocator
 from xblock.exceptions import NoSuchDefinition, NoSuchUsage
 from xblock.fields import ScopeIds
 
-from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
 from openedx.core.djangoapps.xblock.runtime.runtime import XBlockRuntime
 from openedx.core.djangoapps.xblock.runtime.olx_parsing import parse_xblock_include
 from openedx.core.djangoapps.xblock.runtime.serializer import serialize_xblock

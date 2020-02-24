@@ -3,7 +3,6 @@
 Tests for Blockstore-based Content Libraries
 """
 
-import unittest
 from uuid import UUID
 
 from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest

@@ -40,10 +40,8 @@ from common.test.acceptance.tests.helpers import (
     EventsTestMixin,
     UniqueCourseTest,
     element_has_text,
-    get_selected_option_text,
     load_data_str,
-    remove_file,
-    select_option_by_text
+    remove_file
 )
 from openedx.core.lib.tests import attr
 

@@ -16,7 +16,7 @@ from mock import patch
 from rest_framework.test import APITestCase
 
 from experiments.factories import ExperimentDataFactory, ExperimentKeyValueFactory
-from experiments.models import ExperimentData, ExperimentKeyValue
+from experiments.models import ExperimentData
 from experiments.serializers import ExperimentDataSerializer
 from student.tests.factories import UserFactory
 

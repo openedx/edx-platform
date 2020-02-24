@@ -5,10 +5,8 @@ Lots of imports from verify_student's model tests, since they cover similar grou
 """
 
 
-import boto
 from django.conf import settings
 from django.core.management import call_command
-from django.core.management.base import CommandError
 from django.test import TestCase
 from mock import patch
 from testfixtures import LogCapture

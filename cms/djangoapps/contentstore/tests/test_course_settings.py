@@ -36,7 +36,6 @@ from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.tabs import InvalidTabsException
 
 from .utils import AjaxEnabledTestClient, CourseTestCase
 

@@ -9,7 +9,6 @@ import ddt
 import six
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from mock import patch

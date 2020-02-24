@@ -13,7 +13,6 @@ import pytz
 import six
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.translation import override as override_language

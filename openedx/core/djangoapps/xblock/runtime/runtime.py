@@ -18,7 +18,7 @@ import track.views
 from xblock.exceptions import NoSuchServiceError
 from xblock.field_data import SplitFieldData
 from xblock.fields import Scope
-from xblock.runtime import DictKeyValueStore, KvsFieldData, NullI18nService, MemoryIdManager, Runtime
+from xblock.runtime import KvsFieldData, NullI18nService, MemoryIdManager, Runtime
 from web_fragments.fragment import Fragment
 
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache

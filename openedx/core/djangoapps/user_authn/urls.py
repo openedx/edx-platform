@@ -1,7 +1,6 @@
 """ URLs for User Authentication """
 
 
-from django.conf import settings
 from django.conf.urls import include, url
 
 from .views import login, login_form

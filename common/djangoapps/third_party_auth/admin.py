@@ -7,7 +7,7 @@ Admin site configuration for third party authentication
 from config_models.admin import KeyedConfigurationModelAdmin
 from django import forms
 from django.contrib import admin
-from django.db import DatabaseError, transaction
+from django.db import transaction
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 

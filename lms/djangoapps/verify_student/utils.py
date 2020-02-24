@@ -9,7 +9,6 @@ import logging
 
 from django.conf import settings
 from django.utils.timezone import now
-from sailthru import SailthruClient
 
 log = logging.getLogger(__name__)
 

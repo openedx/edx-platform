@@ -10,7 +10,7 @@ from django.contrib.auth import get_user_model
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import permissions
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import PermissionDenied, AuthenticationFailed
 from rest_framework.response import Response
 from xblock.django.request import DjangoWebobRequest, webob_to_django_response
