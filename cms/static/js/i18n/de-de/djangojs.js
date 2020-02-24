@@ -120,18 +120,6 @@
     "%(field)s can only contain up to %(count)d characters.": "%(field)s darf maximal %(count)d Zeichen beinhalten.",
     "%(field)s must have at least %(count)d characters.": "%(field)s muss mindestens %(count)d Zeichen beinhalten.",
     "%(new_item_message)s": "%(new_item_message)s",
-    "%(num_questions)s question": [
-      "%(num_questions)s Frage",
-      "%(num_questions)s Fragen"
-    ],
-    "%(num_students)s student": [
-      "%(num_students)s Teilnehmer",
-      "%(num_students)s Teilnehmer"
-    ],
-    "%(num_students)s student opened Subsection": [
-      "%(num_students)s Teilnehmer habt diesen Unterabschnitt ge\u00f6ffnet",
-      "%(num_students)s Teilnehmer haben diesen Unterabschnitt ge\u00f6ffnet"
-    ],
     "%(programName)s Home Page.": "%(programName)s Home Page.",
     "%(sel)s of %(cnt)s selected": [
       "%(sel)s von %(cnt)s ausgew\u00e4hlt",
@@ -1237,7 +1225,6 @@
     "Now": "Jetzt",
     "Number Sent": "Anzahl gesendet",
     "Number of Droppable": "Zahl der ablegbaren Objekte",
-    "Number of Students": "Anzahl der Teilnehmer",
     "Numbered List (Ctrl+O)": "Nummerierte Liste (STRG+O)",
     "Numbered list": "Nummerierte Liste",
     "OK": "OK",
@@ -2412,10 +2399,6 @@
     "{htmlStart}Want to change your email, name, or password instead?{htmlEnd}": "{htmlStart}Wollen Sie stattdessen Ihre E-Mail-Adresse, Ihren Namen oder Ihr Passwort \u00e4ndern?{htmlEnd}",
     "{label}: {status}": "{label}: {status}",
     "{maxWidth}x{maxHeight} pixels": "{maxWidth}x{maxHeight} Pixel",
-    "{memberCount} / {maxMemberCount} Member": [
-      "{memberCount} / {maxMemberCount} Mitglied",
-      "{memberCount} / {maxMemberCount} Mitglieder"
-    ],
     "{minutes} {unit}": "{minutes} {unit}",
     "{numMoved} learner was moved from {prevCohort}": [
       "{numMoved} Teilnehmer wurde von {prevCohort} bewegt.",

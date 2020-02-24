@@ -44,15 +44,6 @@
     "%(field)s can only contain up to %(count)d characters.": "%(field)s hanya dapat memiliki maksimal %(count)d karakter.",
     "%(field)s must have at least %(count)d characters.": "%(field)s harus memiliki setidaknya %(count)d karakter.",
     "%(new_item_message)s": "%(new_item_message)s",
-    "%(num_questions)s question": [
-      "%(num_questions)s pertanyaan"
-    ],
-    "%(num_students)s student": [
-      "%(num_students)s siswa"
-    ],
-    "%(num_students)s student opened Subsection": [
-      "%(num_students)s siswa membuka Subseksi"
-    ],
     "%(programName)s Home Page.": "%(programName)s Beranda.",
     "%(sel)s of %(cnt)s selected": [
       "%(sel)s dari %(cnt)s terpilih"
@@ -927,7 +918,6 @@
     "Now": "Sekarang",
     "Number Sent": "Jumlah Terkirim",
     "Number of Droppable": "Jumlah dari Droppable",
-    "Number of Students": "Jumlah Siswa",
     "Numbered List (Ctrl+O)": "Numbered List (Ctrl+O)",
     "Numbered list": "Daftar nomor",
     "OK": "OK",
