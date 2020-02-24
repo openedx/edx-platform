@@ -218,13 +218,21 @@ def _validate_secondary_email(user, data, field_errors):
     if "secondary_email" not in data:
         return
 
+    secondary_email = data["secondary_email"]
+
     try:
-        student_views.validate_secondary_email(user, data["secondary_email"])
+        student_views.validate_secondary_email(user, secondary_email)
     except ValueError as err:
         field_errors["secondary_email"] = {
             "developer_message": u"Error thrown from validate_secondary_email: '{}'".format(text_type(err)),
             "user_message": text_type(err)
         }
+    else:
+        # Don't process with sending email to given new email, if it is already associated with
+        # an account. User must see same success message with no error.
+        # This is so that this endpoint cannot be used to determine if an email is valid or not.
+        if email_exists_or_retired(secondary_email):
+            del data["secondary_email"]
 
 
 def _validate_name_change(user_profile, data, field_errors):
