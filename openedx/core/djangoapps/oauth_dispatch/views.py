@@ -136,8 +136,17 @@ class AccessTokenExchangeView(_DispatchingView):
     """
     Exchange a third party auth token.
     """
-    dop_view = auth_exchange_views.DOPAccessTokenExchangeView
     dot_view = auth_exchange_views.DOTAccessTokenExchangeView
+
+    def get_view_for_backend(self, backend):
+        """
+        Return the appropriate view from the requested backend.
+        """
+        if backend == self.dot_adapter.backend:
+            monitoring_utils.set_custom_metric('oauth_view', 'dot')
+            return self.dot_view.as_view()
+        else:
+            raise KeyError('Failed to dispatch view. Invalid backend {}'.format(backend))
 
 
 class RevokeTokenView(_DispatchingView):
