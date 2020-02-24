@@ -4,7 +4,7 @@ from django.utils.translation import ugettext as _
 <%page args="course_date" expression_filter="h"/>
 <div class="date-summary date-summary-${course_date.css_class}">
     <div class="left-column">
-        <div class="calendar-icon"></div>
+        <span class="icon fa fa-calendar" aria-hidden="true"></span>
     </div>
     <div class="right-column">
         % if course_date.date:

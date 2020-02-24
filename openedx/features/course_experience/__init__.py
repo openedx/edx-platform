@@ -82,6 +82,9 @@ COURSE_ENABLE_UNENROLLED_ACCESS_FLAG = CourseWaffleFlag(SEO_WAFFLE_FLAG_NAMESPAC
 # Waffle flag to enable relative dates for course content
 RELATIVE_DATES_FLAG = ExperimentWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'relative_dates', experiment_id=17)
 
+# Waffle flag to enable user calendar syncing
+CALENDAR_SYNC_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'calendar_sync')
+
 
 def course_home_page_title(course):  # pylint: disable=unused-argument
     """

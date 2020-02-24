@@ -37,6 +37,7 @@ setup(
             "wiki = lms.djangoapps.course_wiki.tab:WikiTab",
         ],
         "openedx.course_tool": [
+            "calendar_sync_toggle = openedx.features.calendar_sync.plugins:CalendarSyncToggleTool",
             "course_bookmarks = openedx.features.course_bookmarks.plugins:CourseBookmarksTool",
             "course_updates = openedx.features.course_experience.plugins:CourseUpdatesTool",
             "course_reviews = openedx.features.course_experience.plugins:CourseReviewsTool",
