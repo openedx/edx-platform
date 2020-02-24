@@ -31,6 +31,7 @@ class EnterpriseCustomerFactory(factory.django.DjangoModelFactory):
 
     uuid = factory.LazyAttribute(lambda x: UUID(FAKER.uuid4()))  # pylint: disable=no-member
     name = factory.LazyAttribute(lambda x: FAKER.company())  # pylint: disable=no-member
+    slug = factory.LazyAttribute(lambda x: FAKER.slug())  # pylint: disable=no-member
     active = True
     site = factory.SubFactory(SiteFactory)
     enable_data_sharing_consent = True
