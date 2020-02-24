@@ -21,7 +21,6 @@ from provider import constants
 from openedx.core.djangoapps.oauth_dispatch.toggles import ENFORCE_JWT_SCOPES
 from student.tests.factories import UserFactory
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinGoogle
-import pdb
 
 from . import mixins
 
@@ -88,6 +87,7 @@ class _DispatchingViewTestCase(TestCase):
     """
     def setUp(self):
         super(_DispatchingViewTestCase, self).setUp()
+        self.dop_adapter = adapters.DOPAdapter()
         self.dot_adapter = adapters.DOTAdapter()
         self.user = UserFactory()
         self.dot_app = self.dot_adapter.create_public_client(
@@ -95,6 +95,12 @@ class _DispatchingViewTestCase(TestCase):
             user=self.user,
             redirect_uri=DUMMY_REDIRECT_URL,
             client_id='dot-app-client-id',
+        )
+        self.dop_app = self.dop_adapter.create_public_client(
+            name='test dop client',
+            user=self.user,
+            redirect_uri=DUMMY_REDIRECT_URL,
+            client_id='dop-app-client-id',
         )
 
         self.dot_app_access = models.ApplicationAccess.objects.create(
@@ -196,7 +202,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
             should_be_restricted=False,
         )
 
-    @ddt.data('dot_app')
+    @ddt.data('dop_app', 'dot_app')
     def test_access_token_fields(self, client_attr):
         client = getattr(self, client_attr)
         response = self._post_request(self.user, client)
@@ -226,15 +232,15 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
                 True
             )
 
-    @ddt.data('dot_app')
+    @ddt.data('dop_app', 'dot_app')
     def test_jwt_access_token_from_parameter(self, client_attr):
         self._test_jwt_access_token(client_attr, token_type='jwt')
 
-    @ddt.data('dot_app')
+    @ddt.data('dop_app', 'dot_app')
     def test_jwt_access_token_from_header(self, client_attr):
         self._test_jwt_access_token(client_attr, headers={'HTTP_X_TOKEN_TYPE': 'jwt'})
 
-    @ddt.data('dot_app')
+    @ddt.data('dop_app', 'dot_app')
     def test_jwt_access_token_from_parameter_not_header(self, client_attr):
         self._test_jwt_access_token(client_attr, token_type='jwt', headers={'HTTP_X_TOKEN_TYPE': 'invalid'})
 
@@ -255,18 +261,17 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
 
     @patch('edx_django_utils.monitoring.set_custom_metric')
     def test_access_token_metrics_for_bad_request(self, mock_set_custom_metric):
-        with self.settings(ENABLE_DOP_ADAPTER=False):
-            grant_type = dot_models.Application.GRANT_PASSWORD
-            invalid_body = {
-                'grant_type': grant_type.replace('-', '_'),
-            }
-            bad_response = self.client.post(self.url, invalid_body)
-            self.assertEqual(bad_response.status_code, 400)
-            expected_calls = [
-                call('oauth_token_type', 'no_token_type_supplied'),
-                call('oauth_grant_type', 'password'),
-            ]
-            mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
+        grant_type = dot_models.Application.GRANT_PASSWORD
+        invalid_body = {
+            'grant_type': grant_type.replace('-', '_'),
+        }
+        bad_response = self.client.post(self.url, invalid_body)
+        self.assertEqual(bad_response.status_code, 400)
+        expected_calls = [
+            call('oauth_token_type', 'no_token_type_supplied'),
+            call('oauth_grant_type', 'password'),
+        ]
+        mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
 
     @ddt.data(
         (False, True),
@@ -322,6 +327,12 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         data = json.loads(response.content.decode('utf-8'))
         self.assertIn('refresh_token', data)
 
+    def test_dop_public_client_access_token(self):
+        response = self._post_request(self.user, self.dop_app)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertNotIn('refresh_token', data)
+
     @ddt.data(dot_models.Application.GRANT_CLIENT_CREDENTIALS, dot_models.Application.GRANT_PASSWORD)
     def test_jwt_access_token_scopes_and_filters(self, grant_type):
         """
@@ -376,7 +387,7 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
             'access_token': self.access_token,
         }
 
-    @ddt.data('dot_app')
+    @ddt.data('dop_app', 'dot_app')
     def test_access_token_exchange_calls_dispatched_view(self, client_attr):
         client = getattr(self, client_attr)
         self.oauth_client = client
@@ -394,6 +405,7 @@ class TestAuthorizationView(_DispatchingViewTestCase):
 
     def setUp(self):
         super(TestAuthorizationView, self).setUp()
+        self.dop_adapter = adapters.DOPAdapter()
         self.user = UserFactory()
         self.dot_app = self.dot_adapter.create_confidential_client(
             name='test dot application',
@@ -409,9 +421,16 @@ class TestAuthorizationView(_DispatchingViewTestCase):
             application=self.dot_app,
             organization=OrganizationFactory()
         )
+        self.dop_app = self.dop_adapter.create_confidential_client(
+            name='test dop client',
+            user=self.user,
+            redirect_uri=DUMMY_REDIRECT_URL,
+            client_id='confidential-dop-app-client-id',
+        )
 
     @ddt.data(
-        ('dot', 'allow'),
+        ('dop', 'authorize'),
+        ('dot', 'allow')
     )
     @ddt.unpack
     def test_post_authorization_view(self, client_type, allow_field):
@@ -490,6 +509,23 @@ class TestAuthorizationView(_DispatchingViewTestCase):
         expected_redirect_prefix = u'{}?'.format(DUMMY_REDIRECT_URL)
         self._assert_startswith(self._redirect_destination(response), expected_redirect_prefix)
 
+    def _check_dop_response(self, response):
+        """
+        Check that django-oauth2-provider gives an appropriate authorization response.
+        """
+        # django-oauth-provider redirects to a confirmation page
+        self.assertRedirects(response, u'/oauth2/authorize/confirm', target_status_code=200)
+
+        context = response.context_data
+        form = context['form']
+        self.assertIsNone(form['authorize'].value())
+
+        oauth_data = context['oauth_data']
+        self.assertEqual(oauth_data['redirect_uri'], DUMMY_REDIRECT_URL)
+        self.assertEqual(oauth_data['state'], 'random_state_string')
+        # TODO: figure out why it chooses this scope.
+        self.assertEqual(oauth_data['scope'], constants.READ_WRITE)
+
     def _assert_startswith(self, string, prefix):
         """
         Assert that the string starts with the specified prefix.
@@ -512,9 +548,16 @@ class TestViewDispatch(TestCase):
 
     def setUp(self):
         super(TestViewDispatch, self).setUp()
+        self.dop_adapter = adapters.DOPAdapter()
         self.dot_adapter = adapters.DOTAdapter()
         self.user = UserFactory()
         self.view = views._DispatchingView()  # pylint: disable=protected-access
+        self.dop_adapter.create_public_client(
+            name='',
+            user=self.user,
+            client_id='dop-id',
+            redirect_uri=DUMMY_REDIRECT_URL
+        )
         self.dot_adapter.create_public_client(
             name='',
             user=self.user,
@@ -555,7 +598,6 @@ class TestViewDispatch(TestCase):
             mock_set_custom_metric: MagicMock of set_custom_metric
             expected_oauth_adapter: Either 'dot' or 'dop'
         """
-        #TODO(jinder): check what this function does
         expected_calls = [
             call('oauth_client_id', '{}-id'.format(expected_oauth_adapter)),
             call('oauth_adapter', expected_oauth_adapter),
@@ -568,13 +610,35 @@ class TestViewDispatch(TestCase):
         self.assertEqual(self.view.select_backend(request), self.dot_adapter.backend)
         self._verify_oauth_metrics_calls(mock_set_custom_metric, 'dot')
 
+    @patch('edx_django_utils.monitoring.set_custom_metric')
+    def test_dispatching_post_to_dop(self, mock_set_custom_metric):
+        request = self._post_request('dop-id')
+        self.assertEqual(self.view.select_backend(request), self.dop_adapter.backend)
+        self._verify_oauth_metrics_calls(mock_set_custom_metric, 'dop')
+
     def test_dispatching_get_to_dot(self):
         request = self._get_request('dot-id')
         self.assertEqual(self.view.select_backend(request), self.dot_adapter.backend)
 
+    def test_dispatching_get_to_dop(self):
+        request = self._get_request('dop-id')
+        self.assertEqual(self.view.select_backend(request), self.dop_adapter.backend)
+
+    def test_dispatching_with_no_client(self):
+        request = self._post_request(None)
+        self.assertEqual(self.view.select_backend(request), self.dop_adapter.backend)
+
+    def test_dispatching_with_invalid_client(self):
+        request = self._post_request('abcesdfljh')
+        self.assertEqual(self.view.select_backend(request), self.dop_adapter.backend)
+
     def test_get_view_for_dot(self):
         view_object = views.AccessTokenView()
         self.assert_is_view(view_object.get_view_for_backend(self.dot_adapter.backend))
+
+    def test_get_view_for_dop(self):
+        view_object = views.AccessTokenView()
+        self.assert_is_view(view_object.get_view_for_backend(self.dop_adapter.backend))
 
     def test_get_view_for_no_backend(self):
         view_object = views.AccessTokenView()
