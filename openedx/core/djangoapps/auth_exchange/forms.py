@@ -201,6 +201,3 @@ class DOTAccessTokenExchangeForm(forms.Form):
 
         return self.cleaned_data
 
-
-class DOPAccessTokenExchangeForm(DOTAccessTokenExchangeForm):
-    """ ADDing to put back DOP functionality"""
