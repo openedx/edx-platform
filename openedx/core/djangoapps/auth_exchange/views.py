@@ -27,7 +27,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from openedx.core.djangoapps.auth_exchange.forms import AccessTokenExchangeForm
+from openedx.core.djangoapps.auth_exchange.forms import DOPAccessTokenExchangeForm, DOTAccessTokenExchangeForm
 from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
@@ -53,7 +53,39 @@ class AccessTokenExchangeBase(APIView):
         """
         Handle POST requests to get a first-party access token.
         """
-        form = AccessTokenExchangeForm(request=request, oauth2_adapter=self.oauth2_adapter, data=request.POST)
+        form = DOTAccessTokenExchangeForm(request=request, oauth2_adapter=self.oauth2_adapter, data=request.POST)
+        if not form.is_valid():
+            return self.error_response(form.errors)
+
+        user = form.cleaned_data["user"]
+        scope = form.cleaned_data["scope"]
+        client = form.cleaned_data["client"]
+
+    def exchange_access_token(self, request, user, scope, client):
+        """
+        Exchange third party credentials for an edx access token, and return a
+        serialized access token response.
+        """
+
+        edx_access_token = self.create_access_token(request, user, scope, client)
+        return self.access_token_response(edx_access_token)
+
+
+
+class DOPAccessTokenExchangeView(AccessTokenExchangeBase, DOPAccessTokenView):
+    """
+    View for token exchange from 3rd party OAuth access token to 1st party
+    OAuth access token.  Uses django-oauth2-provider (DOP) to manage access
+    tokens.
+    """
+
+    oauth2_adapter = adapters.DOPAdapter()
+
+    def post(self, request, _backend):
+        """
+        Handle POST requests to get a first-party access token.
+        """
+        form = DOPAccessTokenExchangeForm(request=request, oauth2_adapter=self.oauth2_adapter, data=request.POST)
         if not form.is_valid():
             return self.error_response(form.errors)
 
@@ -75,16 +107,6 @@ class AccessTokenExchangeBase(APIView):
         return self.access_token_response(edx_access_token)
 
 
-class DOPAccessTokenExchangeView(AccessTokenExchangeBase, DOPAccessTokenView):
-    """
-    View for token exchange from 3rd party OAuth access token to 1st party
-    OAuth access token.  Uses django-oauth2-provider (DOP) to manage access
-    tokens.
-    """
-
-    oauth2_adapter = adapters.DOPAdapter()
-
-
 class DOTAccessTokenExchangeView(AccessTokenExchangeBase, DOTAccessTokenView):
     """
     View for token exchange from 3rd party OAuth access token to 1st party
@@ -100,18 +122,12 @@ class DOTAccessTokenExchangeView(AccessTokenExchangeBase, DOTAccessTokenView):
             'error_description': 'Only POST requests allowed.',
         })
 
-    def get_access_token(self, request, user, scope, client):
-        """
-        TODO: MA-2122: Reusing access tokens is not yet supported for DOT.
-        Just return a new access token.
-        """
-        return self.create_access_token(request, user, scope, client)
+        return self.exchange_access_token(request, user, scope, client)
 
-    def create_access_token(self, request, user, scope, client):
+    def create_access_token(self, request, user, scopes, client):
         """
         Create and return a new access token.
         """
-        scopes = dop_scope.to_names(scope)
         return create_dot_access_token(request, user, client, scopes=scopes)
 
     def access_token_response(self, token):

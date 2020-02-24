@@ -74,7 +74,7 @@ class ScopeChoiceField(forms.ChoiceField):
                             val})
 
 
-class AccessTokenExchangeForm(forms.Form):
+class DOTAccessTokenExchangeForm(forms.Form):
     """Form for access token exchange endpoint"""
 
     access_token = CharField(required=False)
@@ -89,7 +89,6 @@ class AccessTokenExchangeForm(forms.Form):
         super(AccessTokenExchangeForm, self).__init__(*args, **kwargs)
         self.request = request
         self.oauth2_adapter = oauth2_adapter
-        self.client = kwargs.pop('client', None)
 
     def _clean_fields(self):
         """
@@ -143,11 +142,8 @@ class AccessTokenExchangeForm(forms.Form):
         If *no* scope is set, we return the default scope which is the first
         defined scope in :attr:`provider.constants.SCOPES`.
         """
-        default = SCOPES[0][0]
-
         flags = self.cleaned_data.get('scope', [])
-        pdb.set_trace()
-        return scope.to_int(default=default, *flags)
+        return flags
 
     def clean(self):
         if self._errors:
@@ -167,14 +163,14 @@ class AccessTokenExchangeForm(forms.Form):
         client_id = self.cleaned_data["client_id"]
         try:
             client = self.oauth2_adapter.get_client(client_id=client_id)
-        except (Client.DoesNotExist, Application.DoesNotExist):
+        except (Application.DoesNotExist):
             raise OAuthValidationError(
                 {
                     "error": "invalid_client",
                     "error_description": u"{} is not a valid client_id".format(client_id),
                 }
             )
-        if client.client_type not in [provider.constants.PUBLIC, Application.CLIENT_PUBLIC]:
+        if client.client_type is Application.CLIENT_PUBLIC:
             raise OAuthValidationError(
                 {
                     # invalid_client isn't really the right code, but this mirrors
@@ -204,3 +200,7 @@ class AccessTokenExchangeForm(forms.Form):
             )
 
         return self.cleaned_data
+
+
+class DOPAccessTokenExchangeForm(DOTAccessTokenExchangeForm):
+    """ ADDing to put back DOP functionality"""
