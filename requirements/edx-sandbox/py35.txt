@@ -4,30 +4,30 @@
 #
 #    make upgrade
 #
-common/lib/sandbox-packages
-common/lib/symmath
-git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
-cffi==1.14.0
-git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
-cryptography==2.8
+common/lib/sandbox-packages  # via -r requirements/edx-sandbox/py35.in (line 24)
+common/lib/symmath  # via -r requirements/edx-sandbox/py35.in (line 25)
+git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4  # via -r requirements/edx-sandbox/py35.in (line 18)
+cffi==1.14.0              # via -r requirements/edx-sandbox/shared.txt (line 7), cryptography
+git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0  # via -r requirements/edx-sandbox/py35.in (line 19)
+cryptography==2.8         # via -r requirements/edx-sandbox/shared.txt (line 8)
 cycler==0.10.0            # via matplotlib
 decorator==4.4.1          # via networkx
 kiwisolver==1.1.0         # via matplotlib
-lxml==4.5.0
-markupsafe==1.1.1
-matplotlib==2.2.4
+lxml==4.5.0               # via -r requirements/edx-sandbox/shared.txt (line 9)
+markupsafe==1.1.1         # via chem
+matplotlib==2.2.4         # via -r requirements/edx-sandbox/py35.in (line 11)
 mpmath==1.1.0             # via sympy
-networkx==2.2
-nltk==3.4.5
-numpy==1.16.5
-pycparser==2.19
-pyparsing==2.2.0
+networkx==2.2             # via -r requirements/edx-sandbox/py35.in (line 12)
+nltk==3.4.5               # via -r requirements/edx-sandbox/shared.txt (line 10), chem
+numpy==1.16.5             # via -r requirements/edx-sandbox/py35.in (line 13), calc, chem, matplotlib, scipy
+pycparser==2.19           # via -r requirements/edx-sandbox/shared.txt (line 11), cffi
+pyparsing==2.2.0          # via -r requirements/edx-sandbox/py35.in (line 14), calc, chem, matplotlib
 python-dateutil==2.8.1    # via matplotlib
 pytz==2019.3              # via matplotlib
-random2==1.0.1
-scipy==1.2.1
-six==1.14.0
-sympy==1.4
+random2==1.0.1            # via -r requirements/edx-sandbox/py35.in (line 15)
+scipy==1.2.1              # via -r requirements/edx-sandbox/py35.in (line 16), calc, chem
+six==1.14.0               # via -r requirements/edx-sandbox/shared.txt (line 12), calc, cryptography, cycler, matplotlib, nltk, python-dateutil
+sympy==1.4                # via -r requirements/edx-sandbox/py35.in (line 17), symmath
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
