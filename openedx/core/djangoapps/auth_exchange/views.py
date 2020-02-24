@@ -19,15 +19,12 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from oauth2_provider import models as dot_models
 from oauth2_provider.views.base import TokenView as DOTAccessTokenView
-from provider import constants
-from provider import scope as dop_scope
-from provider.oauth2.views import AccessTokenView as DOPAccessTokenView
 from rest_framework import permissions
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from openedx.core.djangoapps.auth_exchange.forms import DOPAccessTokenExchangeForm, DOTAccessTokenExchangeForm
+from openedx.core.djangoapps.auth_exchange.forms import DOTAccessTokenExchangeForm
 from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
