@@ -4,10 +4,10 @@ Basically the LMS devstack settings plus a few items needed to successfully
 import all the Studio code.
 """
 
-
 import os
 
-if os.environ['EDX_PLATFORM_SETTINGS'] == 'devstack_docker':
+# pylint: disable=wildcard-import,unused-import
+if os.environ.get('EDX_PLATFORM_SETTINGS') == 'devstack_docker':
     from lms.envs.devstack_docker import *
     from cms.envs.devstack_docker import (
         ADVANCED_PROBLEM_TYPES,
