@@ -24,7 +24,7 @@ from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factor
 from student.tests.factories import UserFactory
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 
-from .mixins import DOPAdapterMixin, DOTAdapterMixin
+from .mixins import DOTAdapterMixin
 from .utils import TPA_FEATURE_ENABLED, TPA_FEATURES_KEY, AccessTokenExchangeTestMixin
 
 
@@ -112,21 +112,6 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
         self.assertEqual(response.status_code, 404)
 
 
-# This is necessary because cms does not implement third party auth
-@unittest.skipUnless(TPA_FEATURE_ENABLED, TPA_FEATURES_KEY + " not enabled")
-@httpretty.activate
-class DOPAccessTokenExchangeViewTestFacebook(
-        DOPAdapterMixin,
-        AccessTokenExchangeViewTest,
-        ThirdPartyOAuthTestMixinFacebook,
-        TestCase,
-):
-    """
-    Tests for AccessTokenExchangeView used with Facebook
-    """
-    pass
-
-
 @unittest.skipUnless(TPA_FEATURE_ENABLED, TPA_FEATURES_KEY + " not enabled")
 @httpretty.activate
 class DOTAccessTokenExchangeViewTestFacebook(
@@ -137,22 +122,6 @@ class DOTAccessTokenExchangeViewTestFacebook(
 ):
     """
     Rerun AccessTokenExchangeViewTestFacebook tests against DOT backend
-    """
-    pass
-
-
-# This is necessary because cms does not implement third party auth
-@unittest.skipUnless(TPA_FEATURE_ENABLED, TPA_FEATURES_KEY + " not enabled")
-@httpretty.activate
-class DOPAccessTokenExchangeViewTestGoogle(
-        DOPAdapterMixin,
-        AccessTokenExchangeViewTest,
-        ThirdPartyOAuthTestMixinGoogle,
-        TestCase,
-):
-    """
-    Tests for AccessTokenExchangeView used with Google using
-    django-oauth2-provider backend.
     """
     pass
 
@@ -199,20 +168,6 @@ class TestLoginWithAccessTokenView(TestCase):
         """
         dot_application = dot_factories.ApplicationFactory(user=self.user, authorization_grant_type=grant_type)
         return dot_factories.AccessTokenFactory(user=self.user, application=dot_application)
-
-    def _create_dop_access_token(self):
-        """
-        Create dop based access token
-        """
-        return AccessToken.objects.create(
-            token="test_access_token",
-            client=self.oauth2_client,
-            user=self.user,
-        )
-
-    def test_dop_unsupported(self):
-        access_token = self._create_dop_access_token()
-        self._verify_response(access_token, expected_status_code=401)
 
     def test_invalid_token(self):
         self._verify_response("invalid_token", expected_status_code=401)

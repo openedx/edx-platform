@@ -13,6 +13,7 @@ from social_core.backends import oauth as social_oauth
 from social_core.exceptions import AuthException
 
 from third_party_auth import pipeline
+import pdb
 
 
 class OAuthValidationError(Exception):
@@ -77,6 +78,7 @@ class AccessTokenExchangeForm(forms.Form):
 
     access_token = CharField(required=False)
     OAUTH2_PROVIDER_setting = getattr(settings, "OAUTH2_PROVIDER", {})
+    scope_choices = ()
     if 'SCOPES' in OAUTH2_PROVIDER_setting:
         scope_choices = OAUTH2_PROVIDER_setting['SCOPES'].items()
     scope = ScopeChoiceField(choices=scope_choices, required=False)
