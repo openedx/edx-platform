@@ -100,18 +100,6 @@
     "%(field)s can only contain up to %(count)d characters.": "Les %(field)s ne peuvent pas d\u00e9passer %(count)d caract\u00e8res.",
     "%(field)s must have at least %(count)d characters.": "Les %(field)s doivent avoir au moins %(count)d caract\u00e8res.",
     "%(new_item_message)s": "%(new_item_message)s",
-    "%(num_questions)s question": [
-      "%(num_questions)s question",
-      "%(num_questions)s questions"
-    ],
-    "%(num_students)s student": [
-      "%(num_students)s \u00e9tudiant",
-      "%(num_students)s \u00e9tudiants"
-    ],
-    "%(num_students)s student opened Subsection": [
-      "%(num_students)s \u00e9tudiant a ouvert cette sous-section",
-      "%(num_students)s \u00e9tudiants ont ouvert la sous-section"
-    ],
     "%(programName)s Home Page.": "Page d'accueil %(programName)s.",
     "%(sel)s of %(cnt)s selected": [
       "%(sel)s sur %(cnt)s s\u00e9lectionn\u00e9",
@@ -1040,7 +1028,6 @@
     "Now": "Maintenant",
     "Number Sent": "Nombre envoy\u00e9",
     "Number of Droppable": "Nombre d'\u00e9l\u00e9ments qui peuvent \u00eatre ignor\u00e9s",
-    "Number of Students": "Nombre d'\u00e9tudiants",
     "Numbered List (Ctrl+O)": "Liste num\u00e9rot\u00e9e (Ctrl+O)",
     "Numbered list": "Liste num\u00e9rot\u00e9e",
     "OK": "OK",

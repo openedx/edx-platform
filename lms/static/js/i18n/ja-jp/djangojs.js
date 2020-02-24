@@ -43,15 +43,6 @@
     "%(field)s can only contain up to %(count)d characters.": "%(field)s \u306f\u6700\u5927 %(count)d \u6587\u5b57\u307e\u3067\u3067\u3059\u3002",
     "%(field)s must have at least %(count)d characters.": "%(field)s \u306b\u306f\u6700\u4f4e %(count)d \u6587\u5b57\u5fc5\u8981\u3067\u3059\u3002",
     "%(new_item_message)s": "%(new_item_message)s",
-    "%(num_questions)s question": [
-      "%(num_questions)s\u4ef6\u306e\u8cea\u554f"
-    ],
-    "%(num_students)s student": [
-      "%(num_students)s\u540d\u306e\u53d7\u8b1b\u8005"
-    ],
-    "%(num_students)s student opened Subsection": [
-      "%(num_students)s\u540d\u306e\u53d7\u8b1b\u8005\u304c\u30b5\u30d6\u30bb\u30af\u30b7\u30e7\u30f3\u3092\u958b\u304d\u307e\u3057\u305f"
-    ],
     "%(programName)s Home Page.": "%(programName)s\u30db\u30fc\u30e0\u30da\u30fc\u30b8\u3002",
     "%(sel)s of %(cnt)s selected": [
       "%(cnt)s\u500b\u4e2d%(sel)s\u500b\u9078\u629e"
@@ -778,7 +769,6 @@
     "Now": "\u73fe\u5728",
     "Number Sent": "\u9001\u4fe1\u6570",
     "Number of Droppable": "\u843d\u7b2c\u3057\u3066\u3082\u3088\u3044\u6570",
-    "Number of Students": "\u53d7\u8b1b\u8005\u6570",
     "Numbered List (Ctrl+O)": "\u6570\u5b57\u4ed8\u304d\u30ea\u30b9\u30c8 (Ctrl+O)",
     "OK": "OK",
     "ORDER NAME": "\u6ce8\u6587\u540d",

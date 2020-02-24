@@ -120,18 +120,6 @@
     "%(field)s can only contain up to %(count)d characters.": "%(field)s solo puede contener hasta %(count)d caracteres.",
     "%(field)s must have at least %(count)d characters.": "%(field)s debe tener al menos %(count)d caracteres.",
     "%(new_item_message)s": "%(new_item_message)s",
-    "%(num_questions)s question": [
-      "%(num_questions)s pregunta",
-      "%(num_questions)s preguntas"
-    ],
-    "%(num_students)s student": [
-      "%(num_students)s estudiante",
-      "%(num_students)s estudiantes"
-    ],
-    "%(num_students)s student opened Subsection": [
-      "%(num_students)s estudiante abri\u00f3 la subsecci\u00f3n",
-      "%(num_students)s estudiantes abrieron la subsecci\u00f3n"
-    ],
     "%(programName)s Home Page.": "P\u00e1gina de inicio de %(programName)s.",
     "%(sel)s of %(cnt)s selected": [
       "%(sel)s de %(cnt)s seleccionado",
@@ -1215,7 +1203,6 @@
     "Now": "Ahora",
     "Number Sent": "Cantidad enviada",
     "Number of Droppable": "Cantidad de ejercicios excluibles",
-    "Number of Students": "N\u00famero de estudiantes",
     "Numbered List (Ctrl+O)": "Lista numerada (Ctrl+O)",
     "Numbered list": "Lista numerada",
     "OK": "Aceptar",
