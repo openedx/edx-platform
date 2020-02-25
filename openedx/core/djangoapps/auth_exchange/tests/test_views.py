@@ -17,7 +17,7 @@ import provider.constants
 from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
-from provider.oauth2.models import AccessToken, Client
+from oauth2_provider.models import Application
 from rest_framework.test import APIClient
 from social_django.models import Partial
 
@@ -167,7 +167,7 @@ class TestLoginWithAccessTokenView(TestCase):
     def setUp(self):
         super(TestLoginWithAccessTokenView, self).setUp()
         self.user = UserFactory()
-        self.oauth2_client = Client.objects.create(client_type=provider.constants.CONFIDENTIAL)
+        self.oauth2_client = Application.objects.create(client_type=Application.CLIENT_CONFIDENTIAL)
 
     def _verify_response(self, access_token, expected_status_code, expected_cookie_name=None):
         """

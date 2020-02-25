@@ -7,14 +7,13 @@ from django.contrib.auth.models import User
 from django.forms import CharField
 from django.conf import settings
 from django.utils.encoding import smart_text
+from django.utils.translation import ugettext as _
 from oauth2_provider.models import Application
 from requests import HTTPError
 from social_core.backends import oauth as social_oauth
 from social_core.exceptions import AuthException
 
 from third_party_auth import pipeline
-import pdb
-
 
 class OAuthValidationError(Exception):
     """
@@ -69,8 +68,8 @@ class ScopeChoiceField(forms.ChoiceField):
             if not self.valid_value(val):
                 raise OAuthValidationError({
                     'error': 'invalid_request',
-                    'error_description': _("'%s' is not a valid scope.") % \
-                            val})
+                    'error_description': _("'%s' is not a valid scope.") %
+                    val})
 
 
 class AccessTokenExchangeForm(forms.Form):
@@ -163,7 +162,7 @@ class AccessTokenExchangeForm(forms.Form):
         client_id = self.cleaned_data["client_id"]
         try:
             client = self.oauth2_adapter.get_client(client_id=client_id)
-        except (Application.DoesNotExist):
+        except Application.DoesNotExist:
             raise OAuthValidationError(
                 {
                     "error": "invalid_client",
@@ -200,4 +199,3 @@ class AccessTokenExchangeForm(forms.Form):
             )
 
         return self.cleaned_data
-

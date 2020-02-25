@@ -11,13 +11,12 @@ import social_django.utils as social_utils
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
 from django.test.client import RequestFactory
-from provider import scope
 from social_django.models import Partial
 
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 
 from ..forms import AccessTokenExchangeForm
-from .mixins import DOPAdapterMixin, DOTAdapterMixin
+from .mixins import DOTAdapterMixin
 from .utils import TPA_FEATURE_ENABLED, TPA_FEATURES_KEY, AccessTokenExchangeTestMixin
 
 
