@@ -38,7 +38,7 @@ show_preview_menu = course and can_masquerade and supports_preview_menu
     student_selected = selected(not staff_selected and not specific_student_selected and not masquerade_group_id)
     %>
     <nav class="wrapper-preview-menu" aria-label="${_('Course View')}">
-        <div class="preview-menu">
+        <div class="preview-menu" style="display: flex; align-items: center;">
             <ol class="preview-actions">
                 <li class="action-preview">
                     <form action="#" class="action-preview-form" method="post">
@@ -77,8 +77,8 @@ show_preview_menu = course and can_masquerade and supports_preview_menu
                 </div>
             % endif
             % if user.is_staff and mfe_link:
-            <div style="text-align: right;float:right;padding-bottom:5px">
-                <p style="color: white; display: inline-block; margin-right: 10px;">We're working on a new learning sequence experience</p>
+            <div style="flex-grow: 1; text-align: right;">
+                <p style="color: white; margin: .5em .5em .5em 0; display: inline-block;">We're working on a new learning sequence experience</p>
                 <a class="btn btn-primary" style="border: solid 1px white;" href="${mfe_link}">View this unit in the new experience</a>
             </div>
             % endif
