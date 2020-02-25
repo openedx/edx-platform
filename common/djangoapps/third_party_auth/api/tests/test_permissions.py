@@ -10,56 +10,16 @@ from django.conf import settings
 from django.test import RequestFactory, TestCase
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.jwt.tests.utils import generate_jwt
-from mock import Mock, patch
+from mock import patch
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
-from rest_framework.test import APITestCase
 from rest_framework.views import APIView
 from student.tests.factories import UserFactory
 
-from third_party_auth.api.permissions import ThirdPartyAuthProviderApiPermission, TPA_PERMISSIONS
-from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
+from third_party_auth.api.permissions import TPA_PERMISSIONS
 
 IDP_SLUG_TESTSHIB = 'testshib'
 PROVIDER_ID_TESTSHIB = 'saml-' + IDP_SLUG_TESTSHIB
-
-
-@ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class ThirdPartyAuthApiPermissionTest(ThirdPartyAuthTestMixin, APITestCase):
-    """ Tests for third party auth API permission """
-
-    @ddt.data(
-        (1, PROVIDER_ID_TESTSHIB, True),
-        (1, 'invalid-provider-id', False),
-        (999, PROVIDER_ID_TESTSHIB, False),
-        (999, 'invalid-provider-id', False),
-        (1, None, False),
-    )
-    @ddt.unpack
-    def test_api_permission(self, client_pk, provider_id, expect):
-        dop_client = self.configure_oauth_dop_client()
-        self.configure_api_permission(dop_client, PROVIDER_ID_TESTSHIB)
-
-        request = Mock()
-        request.auth = Mock()
-        request.auth.client_id = client_pk
-        view = Mock(kwargs={'provider_id': provider_id})
-
-        result = ThirdPartyAuthProviderApiPermission().has_permission(request, view)
-        self.assertEqual(result, expect)
-
-    def test_api_permission_unauthorized_client(self):
-        dop_client = self.configure_oauth_dop_client()
-        self.configure_api_permission(dop_client, 'saml-anotherprovider')
-
-        request = Mock()
-        request.auth = Mock()
-        request.auth.client_id = dop_client.pk
-        view = Mock(kwargs={'provider_id': PROVIDER_ID_TESTSHIB})
-
-        result = ThirdPartyAuthProviderApiPermission().has_permission(request, view)
-        self.assertEqual(result, False)
 
 
 @ddt.ddt
