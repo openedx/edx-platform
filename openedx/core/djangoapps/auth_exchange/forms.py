@@ -15,6 +15,7 @@ from social_core.exceptions import AuthException
 
 from third_party_auth import pipeline
 
+
 class OAuthValidationError(Exception):
     """
     Exception to throw inside :class:`AccessTokenExchangeForm` if any OAuth2 related errors
