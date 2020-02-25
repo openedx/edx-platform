@@ -566,14 +566,12 @@ OAUTH_OIDC_ID_TOKEN_HANDLERS = (
     'edx_oauth2_provider.oidc.handlers.BasicIDTokenHandler',
     'edx_oauth2_provider.oidc.handlers.ProfileHandler',
     'edx_oauth2_provider.oidc.handlers.EmailHandler',
-    'oauth2_handler.IDTokenHandler'
 )
 
 OAUTH_OIDC_USERINFO_HANDLERS = (
     'edx_oauth2_provider.oidc.handlers.BasicUserInfoHandler',
     'edx_oauth2_provider.oidc.handlers.ProfileHandler',
     'edx_oauth2_provider.oidc.handlers.EmailHandler',
-    'oauth2_handler.UserInfoHandler'
 )
 
 OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS = 365
