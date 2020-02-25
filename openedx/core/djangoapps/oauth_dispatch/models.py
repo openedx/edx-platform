@@ -114,12 +114,16 @@ class ApplicationAccess(models.Model):
 @python_2_unicode_compatible
 class ApplicationOrganization(models.Model):
     """
-    Associates a DOT Application to an Organization.
+    DEPRECATED: Associates a DOT Application to an Organization.
 
-    See openedx/core/djangoapps/oauth_dispatch/docs/decisions/0007-include-organizations-in-tokens.rst
-    for the intended use of this model.
+    This model is no longer in use.
 
-    Deprecated: Use filters in ApplicationAccess instead.
+    TODO: BOM-1270: This model and table will be removed post-Juniper
+    so Open edX instances can migrate data if necessary.
+
+    To migrate, use ApplicationAccess and add a ``filter`` of the form
+    ``content_org:<ORG NAME>`` (e.g. content_org:edx), for each record
+    in this model's table.
 
     .. no_pii:
     """
@@ -140,31 +144,3 @@ class ApplicationOrganization(models.Model):
     class Meta:
         app_label = 'oauth_dispatch'
         unique_together = ('application', 'relation_type', 'organization')
-
-    @classmethod
-    def get_related_org_names(cls, application, relation_type=None):
-        """
-        Return the names of the Organizations related to the given DOT Application.
-
-        Filter by relation_type if provided.
-        """
-        queryset = application.organizations.all()
-        if relation_type:
-            queryset = queryset.filter(relation_type=relation_type)
-        return [r.organization.name for r in queryset]
-
-    def __str__(self):
-        """
-        Return a unicode representation of this object.
-        """
-        return u"{application_name}:{organization}:{relation_type}".format(
-            application_name=self.application.name,
-            organization=self.organization.short_name,
-            relation_type=self.relation_type,
-        )
-
-    def to_jwt_filter_claim(self):
-        """
-        Serialize for use in JWT filter claim.
-        """
-        return six.text_type(':'.join([self.relation_type, self.organization.short_name]))

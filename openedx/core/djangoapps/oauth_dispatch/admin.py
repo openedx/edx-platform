@@ -6,7 +6,7 @@ Override admin configuration for django-oauth-toolkit
 from django.contrib.admin import ModelAdmin, site
 from oauth2_provider import models
 
-from .models import ApplicationAccess, ApplicationOrganization, RestrictedApplication
+from .models import ApplicationAccess, RestrictedApplication
 
 
 def reregister(model_class):
@@ -83,13 +83,6 @@ class ApplicationAccessAdmin(ModelAdmin):
     list_display = ['application', 'scopes', 'filters']
 
 
-class ApplicationOrganizationAdmin(ModelAdmin):
-    """
-    ModelAdmin for ApplicationOrganization
-    """
-    list_display = [u'application', u'organization', u'relation_type']
-
-
 class RestrictedApplicationAdmin(ModelAdmin):
     """
     ModelAdmin for the Restricted Application
@@ -98,5 +91,4 @@ class RestrictedApplicationAdmin(ModelAdmin):
 
 
 site.register(ApplicationAccess, ApplicationAccessAdmin)
-site.register(ApplicationOrganization, ApplicationOrganizationAdmin)
 site.register(RestrictedApplication, RestrictedApplicationAdmin)

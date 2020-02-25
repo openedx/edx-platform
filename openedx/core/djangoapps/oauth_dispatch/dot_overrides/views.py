@@ -10,19 +10,15 @@ from oauth2_provider.scopes import get_scopes_backend
 from oauth2_provider.settings import oauth2_settings
 from oauth2_provider.views import AuthorizationView
 
-from openedx.core.djangoapps.oauth_dispatch.models import ApplicationOrganization
 
-
-# TODO (ARCH-83) remove once we have full support of OAuth Scopes
 class EdxOAuth2AuthorizationView(AuthorizationView):
     """
     Override the AuthorizationView's GET method so the user isn't
     prompted to approve the application if they have already in
     the past, even if their access token is expired.
 
-    This is a temporary override of the base implementation
-    in order to accommodate our Restricted Applications support
-    until OAuth Scopes are fully supported.
+    This is override of the base implementation accommodates our
+    Restricted Applications support and custom filters.
     """
     def get(self, request, *args, **kwargs):
         # Note: This code is copied from https://github.com/evonove/django-oauth-toolkit/blob/34f3b7b3511c15686039079026165feaadb1b87d/oauth2_provider/views/base.py#L111
@@ -43,6 +39,10 @@ class EdxOAuth2AuthorizationView(AuthorizationView):
             all_scopes = get_scopes_backend().get_all_scopes()
             kwargs["scopes_descriptions"] = [all_scopes[scope] for scope in scopes]
             kwargs['scopes'] = scopes
+
+            # TODO: ROBERT:
+            # 1. Replace the below ApplicationOrganization code using filters instead!
+            # 2. Search for ApplicationOrganization and remove the rest.
 
             # at this point we know an Application instance with such client_id exists in the database
             application = get_application_model().objects.get(client_id=credentials['client_id'])
