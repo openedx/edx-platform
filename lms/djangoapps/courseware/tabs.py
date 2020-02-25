@@ -332,7 +332,7 @@ class DatesTab(CourseTab):
         """Returns true if this tab is enabled."""
         # We want to only limit this feature to instructor led courses for now
         if ENABLE_DATES_TAB.is_enabled(course.id):
-            return CourseOverview.get_from_id(course.id) == 'instructor'
+            return not CourseOverview.get_from_id(course.id).self_paced
         return False
 
 
