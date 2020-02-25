@@ -882,9 +882,18 @@ class LTIProviderConfig(ProviderConfig):
 
 class ProviderApiPermissions(models.Model):
     """
-    This model links OAuth2 client with provider Id.
+    DEPRECATED: This model links OAuth2 client with provider Id.
 
     It gives permission for a OAuth2 client to access the information under certain IdPs.
+
+    This model is no longer in use.
+
+    TODO: BOM-1270: This model and table will be removed post-Juniper
+    so Open edX instances can migrate data if necessary.
+    To migrate, use ApplicationAccess and add a ``filter`` of the form
+    ``content_org:<ORG NAME>`` (e.g. content_org:edx), for each record
+    in this model's table.
+
 
     .. no_pii:
     """
