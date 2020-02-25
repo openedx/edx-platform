@@ -202,8 +202,16 @@ def get_bundle_file_data_with_cache(bundle_uuid, path, bundle_version=None, draf
     cached list of files in each bundle if available.
     """
     file_info = get_bundle_file_metadata_with_cache(bundle_uuid, path, bundle_version, draft_name)
-    with requests.get(file_info.url, stream=True) as r:
-        return r.content
+    response = requests.get(file_info.url)
+    if response.status_code != 200:
+        try:
+            error_response = response.content.decode('utf-8')[:500]
+        except UnicodeDecodeError:
+            error_response = '(error details unavailable - response was not a [unicode] string)'
+        raise blockstore_api.BundleStorageError(
+            "Unexpected error trying to read {} from bundle {}: \n{}".format(path, bundle_uuid, error_response)
+        )
+    return response.content
 
 
 @lru_cache(maxsize=200)
