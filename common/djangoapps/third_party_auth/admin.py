@@ -7,12 +7,11 @@ Admin site configuration for third party authentication
 from config_models.admin import KeyedConfigurationModelAdmin
 from django import forms
 from django.contrib import admin
-from django.db import DatabaseError, transaction
+from django.db import transaction
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from openedx.core.djangolib.markup import HTML
-from third_party_auth.provider import Registry
 
 from .models import (
     _PSA_OAUTH2_BACKENDS,

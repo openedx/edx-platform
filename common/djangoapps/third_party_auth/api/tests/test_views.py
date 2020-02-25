@@ -12,13 +12,10 @@ from django.http import QueryDict
 from django.test.utils import override_settings
 from django.urls import reverse
 from mock import patch
-from provider.constants import CONFIDENTIAL
-from provider.oauth2.models import AccessToken, Client
 from rest_framework.test import APITestCase
 from six.moves import range
 from social_django.models import UserSocialAuth
 
-from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from student.tests.factories import UserFactory
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
 from third_party_auth.api.permissions import (JwtRestrictedApplication,

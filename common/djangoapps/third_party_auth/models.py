@@ -879,3 +879,24 @@ class LTIProviderConfig(ProviderConfig):
         verbose_name = u"Provider Configuration (LTI)"
         verbose_name_plural = verbose_name
 
+
+class ProviderApiPermissions(models.Model):
+    """
+    This model links OAuth2 client with provider Id.
+
+    It gives permission for a OAuth2 client to access the information under certain IdPs.
+
+    .. no_pii:
+    """
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    provider_id = models.CharField(
+        max_length=255,
+        help_text=(
+            u'Uniquely identify a provider. This is different from backend_name.'
+        )
+    )
+
+    class Meta(object):
+        app_label = "third_party_auth"
+        verbose_name = u"Provider API Permission"
+        verbose_name_plural = verbose_name + 's'

@@ -185,7 +185,8 @@ class ThirdPartyAuthTestMixin(object):
 
 class TestCase(ThirdPartyAuthTestMixin, CacheIsolationMixin, django.test.TestCase):
     """Base class for auth test cases."""
-    def setUp(self):
+
+    def setUp(self):  # pylint: disable=arguments-differ
         super(TestCase, self).setUp()
         # Explicitly set a server name that is compatible with all our providers:
         # (The SAML lib we use doesn't like the default 'testserver' as a domain)
