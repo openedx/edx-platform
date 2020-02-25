@@ -3,7 +3,6 @@
 
 from datetime import datetime, timedelta
 from enum import Enum
-from itertools import product
 
 import ddt
 import pytz
@@ -142,19 +141,19 @@ class AuthAndScopesTestMixin(object):
         resp = self.client.get(self.get_url(self.student.username))
         self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    @ddt.data(JWT_AUTH_TYPES)
+    @ddt.data(*JWT_AUTH_TYPES)
     def test_self_user(self, auth_type):
         resp = self.get_response(auth_type)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assert_success_response_for_student(resp)
 
-    @ddt.data(list(AuthType))
+    @ddt.data(*list(AuthType))
     def test_staff_user(self, auth_type):
         resp = self.get_response(auth_type, requesting_user=self.global_staff)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assert_success_response_for_student(resp)
 
-    @ddt.data(list(AuthType))
+    @ddt.data(*list(AuthType))
     def test_inactive_user(self, auth_type):
         self.student.is_active = False
         self.student.save()
@@ -162,8 +161,7 @@ class AuthAndScopesTestMixin(object):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
     @patch('edx_rest_framework_extensions.permissions.log')
-    @ddt.data(list(AuthType))
-    @ddt.unpack
+    @ddt.data(*list(AuthType))
     def test_another_user(self, auth_type, mock_log):
         """
         Returns 403 for OAuth, Session, and JWT auth with IsUserInUrl.
@@ -182,7 +180,7 @@ class AuthAndScopesTestMixin(object):
             self._assert_in_log("IsUserInUrl", mock_log.info)
 
     @patch('edx_rest_framework_extensions.permissions.log')
-    @ddt.data(JWT_AUTH_TYPES)
+    @ddt.data(*JWT_AUTH_TYPES)
     def test_jwt_no_scopes(self, auth_type, mock_log):
         """ Returns 403 when scopes are enforced with JwtHasScope. """
         jwt_token = self._create_jwt_token(self.student, auth_type, scopes=[])
@@ -195,7 +193,7 @@ class AuthAndScopesTestMixin(object):
             self._assert_in_log("JwtHasScope", mock_log.warning)
 
     @patch('edx_rest_framework_extensions.permissions.log')
-    @ddt.data(JWT_AUTH_TYPES)
+    @ddt.data(*JWT_AUTH_TYPES)
     def test_jwt_no_filter(self, auth_type, mock_log):
         """ Returns 403 when scopes are enforced with JwtHasContentOrgFilterForRequestedCourse. """
         jwt_token = self._create_jwt_token(self.student, auth_type, include_org_filter=False)
@@ -207,7 +205,7 @@ class AuthAndScopesTestMixin(object):
         if is_enforced:
             self._assert_in_log("JwtHasContentOrgFilterForRequestedCourse", mock_log.warning)
 
-    @ddt.data(JWT_AUTH_TYPES)
+    @ddt.data(*JWT_AUTH_TYPES)
     def test_jwt_on_behalf_of_user(self, auth_type):
         jwt_token = self._create_jwt_token(self.student, auth_type, include_me_filter=True)
 
@@ -215,7 +213,7 @@ class AuthAndScopesTestMixin(object):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
     @patch('edx_rest_framework_extensions.permissions.log')
-    @ddt.data(JWT_AUTH_TYPES)
+    @ddt.data(*JWT_AUTH_TYPES)
     def test_jwt_on_behalf_of_other_user(self, auth_type, mock_log):
         """ Returns 403 when scopes are enforced with JwtHasUserFilterForRequestedUser. """
         jwt_token = self._create_jwt_token(self.other_student, auth_type, include_me_filter=True)

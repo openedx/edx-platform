@@ -80,7 +80,7 @@ class CourseModesViewTestBase(AuthAndScopesTestMixin):
         """
         pass
 
-    @ddt.data(JWT_AUTH_TYPES)
+    @ddt.data(*JWT_AUTH_TYPES)
     def test_jwt_on_behalf_of_user(self, auth_type):
         """
         We have to override this super method due to this API

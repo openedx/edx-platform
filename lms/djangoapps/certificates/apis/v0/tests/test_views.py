@@ -201,8 +201,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
         )
 
     @patch('edx_rest_framework_extensions.permissions.log')
-    @ddt.data(*product(list(AuthType)))
-    @ddt.unpack
+    @ddt.data(*list(AuthType))
     def test_another_user(self, auth_type, mock_log):
         """
         Returns 200 with empty list for OAuth, Session, and JWT auth.
@@ -213,8 +212,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp.data), 0)
 
-    @ddt.data(*product(list(AuthType)))
-    @ddt.unpack
+    @ddt.data(*list(AuthType))
     def test_another_user_with_certs_shared_public(self, auth_type):
         """
         Returns 200 with cert list for OAuth, Session, and JWT auth.
@@ -233,8 +231,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp.data), 1)
 
-    @ddt.data(*product(list(AuthType)))
-    @ddt.unpack
+    @ddt.data(*list(AuthType))
     def test_another_user_with_certs_shared_custom(self, auth_type):
         """
         Returns 200 with cert list for OAuth, Session, and JWT auth.
@@ -259,7 +256,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
         self.assertEqual(len(resp.data), 1)
 
     @patch('edx_rest_framework_extensions.permissions.log')
-    @ddt.data(JWT_AUTH_TYPES)
+    @ddt.data(*JWT_AUTH_TYPES)
     def test_jwt_on_behalf_of_other_user(self, auth_type, mock_log):
         """ Returns 403 when scopes are enforced with JwtHasUserFilterForRequestedUser. """
         jwt_token = self._create_jwt_token(self.other_student, auth_type, include_me_filter=True)

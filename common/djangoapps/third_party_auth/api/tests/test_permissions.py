@@ -184,6 +184,10 @@ class ThirdPartyAuthPermissionTest(TestCase):
         )
 
     def _assert_jwt_restricted_case(self, scopes, filters, expected_response):
+        """
+        Asserts the provided scopes and filters result in the expected response
+        for a restricted JWT.
+        """
         user = self._create_user()
 
         auth_header = self._create_jwt_header(user, is_restricted=True, scopes=scopes, filters=filters)
