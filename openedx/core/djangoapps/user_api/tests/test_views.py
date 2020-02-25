@@ -1663,7 +1663,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         )
 
     @override_settings(
-        MKTG_URLS={"ROOT": "https://www.test.com/", "HONOR": "honor"},
+        MKTG_URLS={"ROOT": "https://www.test.com/", "TOS": "honor"},
     )
     @mock.patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": True})
     def test_registration_honor_code_mktg_site_enabled(self):
@@ -1677,7 +1677,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "label": (u"By creating an account with {platform_name}, you agree {spacing}"
                           u"to abide by our {platform_name} {spacing}"
                           u"{link_label} {spacing}"
-                          u"and agree to our {link_label2}.").format(
+                          u"and read, acknowledge, and understand our {link_label2}.").format(
                     platform_name=settings.PLATFORM_NAME,
                     link_label=link_template.format(link_label=link_label),
                     link_label2=link_template2.format(link_label=link_label2),
@@ -1696,7 +1696,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             }
         )
 
-    @override_settings(MKTG_URLS_LINK_MAP={"HONOR": "honor"})
+    @override_settings(MKTG_URL_LINK_MAP={"TOS": "honor", "PRIVACY": "privacy"})
     @mock.patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": False})
     def test_registration_honor_code_mktg_site_disabled(self):
         link_template = "<a href='/privacy' target='_blank'>{link_label}</a>"
@@ -1708,7 +1708,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "label": (u"By creating an account with {platform_name}, you agree {spacing}"
                           u"to abide by our {platform_name} {spacing}"
                           u"{link_label} {spacing}"
-                          u"and agree to our {link_label2}.").format(
+                          u"and read, acknowledge, and understand our {link_label2}.").format(
                     platform_name=settings.PLATFORM_NAME,
                     link_label=self.link_template.format(link_label=link_label),
                     link_label2=link_template.format(link_label=link_label2),

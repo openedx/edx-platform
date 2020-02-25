@@ -229,14 +229,17 @@ class TestRefundSignal(TestCase):
             self.assertTrue(mock_send_notification.called)
             self.assertTrue(mock_log_warning.called)
 
-    @mock.patch('openedx.core.djangoapps.theming.helpers.is_request_in_themed_site', return_value=True)
-    def test_notification_themed_site(self, mock_is_request_in_themed_site):  # pylint: disable=unused-argument
-        """
-        Ensure the notification function raises an Exception if used in the
-        context of themed site.
-        """
-        with self.assertRaises(NotImplementedError):
-            _send_refund_notification(self.course_enrollment.user, [1, 2, 3])
+    # [UCSD_CUSTOM] These changes are only for UCSD to send refund failure notification on unenroll
+    # The check required for this test has been disabled for UCSD
+
+    # @mock.patch('openedx.core.djangoapps.theming.helpers.is_request_in_themed_site', return_value=True)
+    # def test_notification_themed_site(self, mock_is_request_in_themed_site):  # pylint: disable=unused-argument
+    #     """
+    #     Ensure the notification function raises an Exception if used in the
+    #     context of themed site.
+    #     """
+    #     with self.assertRaises(NotImplementedError):
+    #         _send_refund_notification(self.course_enrollment.user, [1, 2, 3])
 
     @ddt.data('email@example.com', 'üñîcode.email@example.com')
     @mock.patch('lms.djangoapps.commerce.utils.create_zendesk_ticket')
