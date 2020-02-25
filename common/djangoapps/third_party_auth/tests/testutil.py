@@ -23,7 +23,6 @@ from openedx.core.storage import OverwriteStorage
 from third_party_auth.models import (
     LTIProviderConfig,
     OAuth2ProviderConfig,
-    ProviderApiPermissions,
     SAMLConfiguration,
     SAMLProviderConfig
 )

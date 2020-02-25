@@ -20,8 +20,6 @@ from social_django.models import UserSocialAuth
 
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from student.tests.factories import UserFactory
-from third_party_auth.api.permissions import ThirdPartyAuthProviderApiPermission
-from third_party_auth.models import ProviderApiPermissions
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
 from third_party_auth.api.permissions import (JwtRestrictedApplication,
                                               JwtHasScope,
@@ -248,26 +246,6 @@ class UserMappingViewAPITests(TpaAPITestCase):
         self._verify_response(response, expect_code, expect_data)
 
     @ddt.data(
-        (PROVIDER_ID_TESTSHIB, 'valid-token', 200, get_mapping_data_by_usernames(LINKED_USERS)),
-        ('non-existing-id', 'valid-token', 404, []),
-        (PROVIDER_ID_TESTSHIB, 'invalid-token', 401, []),
-    )
-    @ddt.unpack
-    def test_list_all_user_mappings_oauth2(self, provider_id, access_token, expect_code, expect_data):
-        url = reverse('third_party_auth_user_mapping_api', kwargs={'provider_id': provider_id})
-        # create oauth2 auth data
-        user = UserFactory.create(username='api_user')
-        client = Client.objects.create(name='oauth2_client', client_type=CONFIDENTIAL)
-        token = AccessToken.objects.create(user=user, client=client)
-        ProviderApiPermissions.objects.create(client=client, provider_id=provider_id)
-
-        if access_token == 'valid-token':
-            access_token = token.token
-
-        response = self.client.get(url, HTTP_AUTHORIZATION=u'Bearer {}'.format(access_token))
-        self._verify_response(response, expect_code, expect_data)
-
-    @ddt.data(
         ({'username': [ALICE_USERNAME, STAFF_USERNAME]}, 200,
          get_mapping_data_by_usernames([ALICE_USERNAME, STAFF_USERNAME])),
         ({'remote_id': ['remote_' + ALICE_USERNAME, 'remote_' + STAFF_USERNAME, 'remote_' + CARL_USERNAME]}, 200,
@@ -334,20 +312,6 @@ class UserMappingViewAPITests(TpaAPITestCase):
         response = self.client.get(url, HTTP_X_EDX_API_KEY=VALID_API_KEY)
         self.assertEqual(response.status_code, 200)
         self._verify_response(response, 200, get_mapping_data_by_usernames(LINKED_USERS))
-
-    @ddt.data(
-        (True, True, 200),
-        (False, True, 200),
-        (True, False, 200),
-        (False, False, 401)
-    )
-    @ddt.unpack
-    def test_user_mapping_permission_logic(self, api_key_permission, token_permission, expect):
-        url = reverse('third_party_auth_user_mapping_api', kwargs={'provider_id': PROVIDER_ID_TESTSHIB})
-        with patch.object(ApiKeyHeaderPermission, 'has_permission', return_value=api_key_permission):
-            with patch.object(ThirdPartyAuthProviderApiPermission, 'has_permission', return_value=token_permission):
-                response = self.client.get(url)
-                self.assertEqual(response.status_code, expect)
 
     @ddt.data(
         (True, 200),
