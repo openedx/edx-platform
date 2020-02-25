@@ -100,7 +100,7 @@ class AccessTokenView(_DispatchingView):
     dot_view = dot_views.TokenView
     dop_view = dop_views.AccessTokenView
 
-    def dispatch(self, request, *args, **kwargs):  # pylint: disable=arguments-differ
+    def dispatch(self, request, *args, **kwargs):
         response = super(AccessTokenView, self).dispatch(request, *args, **kwargs)
 
         token_type = request.POST.get('token_type',
@@ -141,6 +141,9 @@ class AccessTokenExchangeView(_DispatchingView):
     def get_view_for_backend(self, backend):
         """
         Return the appropriate view from the requested backend.
+        Since AccessTokenExchangeView no longer supports dop, this function needed to
+        be overwritten from _DispatchingView, it was decided that the dop path should not be removed
+        from _DispatchingView due to it still being used in other views(AuthorizationView, AccessTokenView)
         """
         if backend == self.dot_adapter.backend:
             monitoring_utils.set_custom_metric('oauth_view', 'dot')

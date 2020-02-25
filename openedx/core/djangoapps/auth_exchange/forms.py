@@ -77,10 +77,10 @@ class AccessTokenExchangeForm(forms.Form):
     """Form for access token exchange endpoint"""
 
     access_token = CharField(required=False)
-    OAUTH2_PROVIDER_setting = getattr(settings, "OAUTH2_PROVIDER", {})
+    OAUTH2_PROVIDER = getattr(settings, "OAUTH2_PROVIDER", {})
     scope_choices = ()
-    if 'SCOPES' in OAUTH2_PROVIDER_setting:
-        scope_choices = OAUTH2_PROVIDER_setting['SCOPES'].items()
+    if 'SCOPES' in OAUTH2_PROVIDER:
+        scope_choices = OAUTH2_PROVIDER['SCOPES'].items()
     scope = ScopeChoiceField(choices=scope_choices, required=False)
 
     client_id = CharField(required=False)
