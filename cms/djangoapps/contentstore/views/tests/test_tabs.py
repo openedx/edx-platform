@@ -203,7 +203,7 @@ class PrimitiveTabEdit(ModuleStoreTestCase):
         with self.assertRaises(ValueError):
             tabs.primitive_delete(course, 1)
         with self.assertRaises(IndexError):
-            tabs.primitive_delete(course, 6)
+            tabs.primitive_delete(course, 7)
         tabs.primitive_delete(course, 2)
         self.assertNotIn({u'type': u'textbooks'}, course.tabs)
         # Check that discussion has shifted up

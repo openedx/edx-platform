@@ -1,0 +1,120 @@
+.date-wrapper {
+  @extend .content;
+
+  font-family: $helvetica;
+
+  .date-title {
+    color: #414141;
+    font-weight: 500;
+    border-bottom: 0;
+  }
+
+  .timeline-item {
+    border-left: solid 1px #2d323e;
+    color: #2d323e;
+    position: relative;
+    padding-left: 18px;
+    margin-left: 6px;
+    padding-bottom: 32px;
+
+    &:first-of-type {
+      margin-top: 24px;
+    }
+
+    &:last-of-type {
+      border-left: solid 1px transparent;
+    }
+  }
+
+  .date-circle {
+    width: 7px;
+    height: 7px;
+    position: absolute;
+    left: -4px;
+    background-color: #2d323e;
+    border-radius: 50%;
+
+    &.active {
+      width: 14px;
+      height: 14px;
+      left: -7px;
+      background-color: #2d323e;
+    }
+  }
+
+  .date-content {
+    display: flex;
+    flex-wrap: wrap;
+    position: relative;
+    top: -7px;
+    flex: 100%;
+    line-height: 1.25;
+
+    &.active {
+      top: -3px;
+    }
+  }
+
+  .timeline-date-content {
+    @include font-size(16);
+
+    display: flex;
+    flex: 100%;
+    font-weight: bold;
+    margin-bottom: 8px;
+    align-items: center;
+  }
+
+  .timeline-title {
+    @include font-size(14);
+
+    display: flex;
+    flex: 100%;
+    margin-bottom: 4px;
+    font-weight: bold;
+    line-height: 1.25;
+
+    a {
+      color: #2d323e;
+      text-decoration: underline;
+    }
+  }
+
+  .timeline-description {
+    @include font-size(14);
+
+    display: flex;
+    flex: 100%;
+    line-height: 1.25;
+
+    a {
+      color: #2d323e;
+      text-decoration: underline;
+    }
+  }
+
+  .pill {
+    @include font-size(12);
+
+    padding: 2px 8px 2px 8px;
+    border-radius: 5px;
+    margin-left: 8px;
+    font-style: italic;
+    font-weight: bold;
+    vertical-align: top;
+
+    &.due {
+      background-color: #ffdb87;
+      color: #2d323e;
+    }
+
+    &.verified {
+      background-color: #2d323e;
+      color: $white;
+    }
+  }
+
+  .verified-icon {
+    padding-right: 8px;
+  }
+}

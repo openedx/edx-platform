@@ -1,0 +1,73 @@
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from lms.djangoapps.courseware.date_summary import CourseAssignmentDate, VerificationDeadlineDate, VerifiedUpgradeDeadlineDate
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<%block name="bodyclass">view-in-course view-progress</%block>
+
+<%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+</%block>
+
+<%block name="pagetitle">${_("{course.display_number_with_default} Course Info").format(course=course)}</%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='dates'" />
+
+<main id="main" aria-label="Content" tabindex="-1">
+    <div class="container">
+        <div class="date-wrapper">
+            <section class="course-info" id="course-info-dates">
+                <h2 class="hd hd-2 date-title">
+                    ${_("Important Dates")}
+                </h2>
+                % for block in course_date_blocks:
+                    <% active = 'active' if block.date and (block.date.strftime(block.date_format) == block.current_time.strftime(block.date_format)) else '' %>
+                    <% block_is_verified = (hasattr(block, 'requires_full_access') and block.requires_full_access) or isinstance(block, VerificationDeadlineDate) %>
+                    <% is_assignment = isinstance(block, CourseAssignmentDate) %>
+                    % if not (learner_is_verified and isinstance(block, VerifiedUpgradeDeadlineDate)):
+                        <div class="timeline-item ${active}">
+                            <div class="date-circle ${active}"></div>
+                            <div class="date-content ${active}">
+                                <div class="timeline-date-content">
+                                        % if block.date:
+                                            <div class="timeline-date">
+                                                ${block.date.strftime(block.date_format)}
+                                            </div>
+                                            % if active:
+                                                <div class="pill due">${_('Due Today')}</div>
+                                            % endif
+                                            % if block_is_verified and not learner_is_verified:
+                                                <div class="pill verified"><span class="fa fa-lock verified-icon" aria-hidden="true"></span>${_('Verified Only')}</div>
+                                            % endif
+                                        % endif
+                                </div>
+                                <div class="timeline-title ">
+                                    % if block.title_html and is_assignment:
+                                        ${block.title_html}
+                                    % else:
+                                        ${block.title}
+                                    % endif
+                                </div>
+                                <div class="timeline-description">
+                                    ${block.description}
+                                    % if block_is_verified and verified_upgrade_link and not learner_is_verified:
+                                        ${Text(_('{a_start}Upgrade{a_end}{space}to a Verified Certificate for full access.')).format(
+                                            a_start=HTML('<a href={link}>').format(link=verified_upgrade_link),
+                                            a_end=HTML('</a>'),
+                                            space=HTML('&nbsp'),
+                                        )}
+                                    % endif
+                                </div>
+                            </div>
+                        </div>
+                    % endif
+                % endfor
+            </section>
+        </div>
+    </div>
+</main>

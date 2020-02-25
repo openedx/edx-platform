@@ -346,6 +346,7 @@ class CourseAssignmentDate(DateSummary):
         self.assignment_date = None
         self.assignment_title = None
         self.assignment_title_html = None
+        self.requires_full_access = None
 
     @property
     def date(self):
