@@ -178,11 +178,6 @@ class ThirdPartyAuthTestMixin(object):
         return OAuth2Client.objects.create(client_type=constants.CONFIDENTIAL)
 
     @staticmethod
-    def configure_api_permission(client, provider_id):
-        """ Configure the client and provider_id pair. This will give the access to a client for that provider. """
-        return ProviderApiPermissions.objects.create(client=client, provider_id=provider_id)
-
-    @staticmethod
     def read_data_file(filename):
         """ Read the contents of a file in the data folder """
         with open(os.path.join(os.path.dirname(__file__), 'data', filename)) as f:
