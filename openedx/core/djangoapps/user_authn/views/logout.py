@@ -3,7 +3,6 @@
 
 import re
 
-import edx_oauth2_provider
 import six.moves.urllib.parse as parse  # pylint: disable=import-error
 from django.conf import settings
 from django.contrib.auth import logout
@@ -74,9 +73,6 @@ class LogoutView(TemplateView):
 
         # Get third party auth provider's logout url
         self.tpa_logout_url = tpa_pipeline.get_idp_logout_url_from_running_pipeline(request)
-
-        # Get the list of authorized clients before we clear the session.
-        self.oauth_client_ids = request.session.get(edx_oauth2_provider.constants.AUTHORIZED_CLIENTS_SESSION_KEY, [])
 
         logout(request)
 
