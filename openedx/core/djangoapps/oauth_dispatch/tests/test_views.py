@@ -387,7 +387,7 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
             'access_token': self.access_token,
         }
 
-    @ddt.data('dop_app', 'dot_app')
+    @ddt.data('dot_app')
     def test_access_token_exchange_calls_dispatched_view(self, client_attr):
         client = getattr(self, client_attr)
         self.oauth_client = client
