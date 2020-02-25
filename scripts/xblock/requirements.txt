@@ -7,5 +7,5 @@
 certifi==2019.11.28       # via requests
 chardet==3.0.4            # via requests
 idna==2.9                 # via requests
-requests==2.23.0
+requests==2.23.0          # via -r scripts/xblock/requirements.in (line 1)
 urllib3==1.25.8           # via requests

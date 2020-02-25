@@ -5,5 +5,5 @@
 #    make upgrade
 #
 click==7.0                # via pip-tools
-pip-tools==4.5.0
-six==1.14.0
+pip-tools==4.5.0          # via -r requirements/edx/pip-tools.in (line 12)
+six==1.14.0               # via -r requirements/edx/pip-tools.in (line 13), pip-tools
