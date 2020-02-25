@@ -5,7 +5,7 @@ courseware.
 
 
 import logging
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 from datetime import datetime
 
 import pytz
@@ -61,6 +61,10 @@ import lms.djangoapps.course_blocks.api as course_blocks_api
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID
 
 log = logging.getLogger(__name__)
+
+
+# Used by get_course_assignments below. You shouldn't need to use this type directly.
+_Assignment = namedtuple('Assignment', ['block_key', 'title', 'url', 'date', 'requires_full_access'])
 
 
 def get_course(course_id, depth=0):
@@ -415,7 +419,7 @@ def get_course_date_blocks(course, user, request=None, include_access=False,
     blocks = [cls(course, user) for cls in block_classes]
     if RELATIVE_DATES_FLAG.is_enabled(course.id):
         blocks.append(CourseExpiredDate(course, user))
-        blocks.extend(get_course_assignment_due_dates(
+        blocks.extend(get_course_assignment_date_blocks(
             course, user, request, num_return=num_assignments,
             include_access=include_access, include_past_dates=include_past_dates,
         ))
@@ -431,43 +435,59 @@ def date_block_key_fn(block):
     return block.date or datetime.max.replace(tzinfo=pytz.UTC)
 
 
-def get_course_assignment_due_dates(course, user, request, num_return=None,
-                                    include_past_dates=False, include_access=False):
+def get_course_assignment_date_blocks(course, user, request, num_return=None,
+                                      include_past_dates=False, include_access=False):
     """
     Returns a list of assignment (at the subsection/sequential level) due date
     blocks for the given course. Will return num_return results or all results
     if num_return is None in date increasing order.
     """
-    store = modulestore()
-    all_course_dates = get_dates_for_course(course.id, user)
     date_blocks = []
-    for (block_key, date_type), date in all_course_dates.items():
-        if date_type == 'due' and block_key.block_type == 'sequential':
-            try:
-                item = store.get_item(block_key)
-            except ItemNotFoundError:
-                continue
-            if item.graded:
-                date_block = CourseAssignmentDate(course, user)
-                date_block.date = date
-
-                if include_access:
-                    date_block.requires_full_access = _requires_full_access(store, user, block_key)
-
-                block_url = None
-                now = datetime.now().replace(tzinfo=pytz.UTC)
-                assignment_released = item.start < now if item.start else True
-                if assignment_released:
-                    block_url = reverse('jump_to', args=[course.id, block_key])
-                    block_url = request.build_absolute_uri(block_url) if request else None
-                assignment_title = item.display_name if item.display_name else _('Assignment')
-                date_block.set_title(assignment_title, link=block_url)
-
-                date_blocks.append(date_block)
+    for assignment in get_course_assignments(course.id, user, request, include_access=include_access):
+        date_block = CourseAssignmentDate(course, user)
+        date_block.date = assignment.date
+        date_block.requires_full_access = assignment.requires_full_access
+        date_block.set_title(assignment.title, link=assignment.url)
+        date_blocks.append(date_block)
     date_blocks = sorted((b for b in date_blocks if b.is_enabled or include_past_dates), key=date_block_key_fn)
     if num_return:
         return date_blocks[:num_return]
     return date_blocks
+
+
+def get_course_assignments(course_key, user, request, include_access=False):
+    """
+    Returns a list of assignment (at the subsection/sequential level) due dates for the given course.
+
+    Each returned object is a namedtuple with fields: block_key, title, url, date, requires_full_access
+    """
+    store = modulestore()
+    all_course_dates = get_dates_for_course(course_key, user)
+    assignments = []
+    for (block_key, date_type), date in all_course_dates.items():
+        if date_type != 'due' or block_key.block_type != 'sequential':
+            continue
+
+        try:
+            item = store.get_item(block_key)
+        except ItemNotFoundError:
+            continue
+
+        if not item.graded:
+            continue
+
+        requires_full_access = include_access and _requires_full_access(store, user, block_key)
+        title = item.display_name or _('Assignment')
+
+        url = None
+        assignment_released = not item.start or item.start < datetime.now(pytz.UTC)
+        if assignment_released:
+            url = reverse('jump_to', args=[course_key, block_key])
+            url = request and request.build_absolute_uri(url)
+
+        assignments.append(_Assignment(block_key, title, url, date, requires_full_access))
+
+    return assignments
 
 
 def _requires_full_access(store, user, block_key):
