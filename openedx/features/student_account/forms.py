@@ -24,11 +24,11 @@ class AccountCreationFormCustom(AccountCreationForm):
         required=True
     )
 
-    org_size = forms.CharField(
+    organization_size = forms.CharField(
         required=False
     )
 
-    org_type = forms.CharField(
+    organization_type = forms.CharField(
         required=False
     )
 
@@ -61,17 +61,17 @@ class AccountCreationFormCustom(AccountCreationForm):
     def clean(self):
         """ Enforce organization related field conditions """
         cleaned_org_name = self.cleaned_data.get('organization_name')
-        cleaned_org_size = self.cleaned_data.get('org_size')
-        cleaned_org_type = self.cleaned_data.get('org_type')
+        cleaned_org_size = self.cleaned_data.get('organization_size')
+        cleaned_org_type = self.cleaned_data.get('organization_type')
 
         valid_org_type = OrgSector.objects.filter(code=cleaned_org_type).exists()
         valid_org_size = TotalEmployee.objects.filter(code=cleaned_org_size).exists()
 
         if cleaned_org_type and not valid_org_type:
-            self.errors.update({'org_type': [_('Invalid organization type option provided'), ]})
+            self.errors.update({'organization_type': [_('Invalid organization type option provided'), ]})
 
         if cleaned_org_size and not valid_org_size:
-            self.errors.update({'org_size': [_('Invalid organization size option provided'), ]})
+            self.errors.update({'organization_size': [_('Invalid organization size option provided'), ]})
 
         # User is affiliated with some organization
         if cleaned_org_name:
@@ -82,20 +82,20 @@ class AccountCreationFormCustom(AccountCreationForm):
                 existing_org_size = existing_org.total_employees
                 existing_org_type = existing_org.org_type
                 if not existing_org_size and not cleaned_org_size:
-                    self.errors.update({'org_size': [_('Organization size not provided.'), ]})
+                    self.errors.update({'organization_size': [_('Organization size not provided.'), ]})
                 elif existing_org_size and cleaned_org_size:
-                    self.errors.update({'org_size': [_('Organization size provided for existing organization'), ]})
+                    self.errors.update({'organization_size': [_('Organization size provided for existing organization'), ]})
 
                 if not existing_org_type and not cleaned_org_type:
-                    self.errors.update({'org_type': [_('Organization type not provided.'), ]})
+                    self.errors.update({'organization_type': [_('Organization type not provided.'), ]})
                 elif existing_org_type and cleaned_org_type:
-                    self.errors.update({'org_type': [_('Organization type provided for existing organization'), ]})
+                    self.errors.update({'organization_type': [_('Organization type provided for existing organization'), ]})
 
             else:
                 if not cleaned_org_size:
-                    self.errors.update({'org_size': [_('Organization size not provided for new organization'), ]})
+                    self.errors.update({'organization_size': [_('Organization size not provided for new organization'), ]})
                 if not cleaned_org_type:
-                    self.errors.update({'org_type': [_('Organization type not provided for new organization'), ]})
+                    self.errors.update({'organization_type': [_('Organization type not provided for new organization'), ]})
 
         return self.cleaned_data
 
