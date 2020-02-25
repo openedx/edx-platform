@@ -27,6 +27,9 @@ def parse_xblock_include(include_node):
     # An XBlock include looks like:
     # <xblock-include source="link_id" definition="block_type/definition_id" usage="alias" />
     # Where "source" and "usage" are optional.
+    if include_node.tag != 'xblock-include':
+        # xss-lint: disable=python-wrap-html
+        raise BundleFormatException("Expected an <xblock-include /> XML node, but got <{}>".format(include_node.tag))
     try:
         definition_path = include_node.attrib['definition']
     except KeyError:
