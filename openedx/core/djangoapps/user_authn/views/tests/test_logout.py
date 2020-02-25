@@ -12,8 +12,7 @@ from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
-from edx_oauth2_provider.constants import AUTHORIZED_CLIENTS_SESSION_KEY
-from edx_oauth2_provider.tests.factories import ClientFactory, TrustedClientFactory
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
 
 from student.tests.factories import UserFactory
 
@@ -31,9 +30,7 @@ class LogoutTests(TestCase):
 
     def _create_oauth_client(self):
         """ Creates a trusted OAuth client. """
-        client = ClientFactory(logout_uri='https://www.example.com/logout/')
-        TrustedClientFactory(client=client)
-        return client
+        return ApplicationFactory(redirect_uris='https://www.example.com/logout/', skip_authorization=True)
 
     def _assert_session_logged_out(self, oauth_client, **logout_headers):
         """ Authenticates a user via OAuth 2.0, logs out, and verifies the session is logged out. """
@@ -43,14 +40,11 @@ class LogoutTests(TestCase):
         # The template will handle loading those URLs and redirecting the user. That functionality is not tested here.
         response = self.client.get(reverse('logout'), **logout_headers)
         self.assertEqual(response.status_code, 200)
-        self.assertNotIn(AUTHORIZED_CLIENTS_SESSION_KEY, self.client.session)
 
         return response
 
     def _authenticate_with_oauth(self, oauth_client):
         """ Perform an OAuth authentication using the current web client.
-
-        This should add an AUTHORIZED_CLIENTS_SESSION_KEY entry to the current session.
         """
         data = {
             'client_id': oauth_client.client_id,
@@ -58,8 +52,8 @@ class LogoutTests(TestCase):
             'response_type': 'code'
         }
         # Authenticate with OAuth to set the appropriate session values
-        self.client.post(reverse('oauth2:capture'), data, follow=True)
-        self.assertListEqual(self.client.session[AUTHORIZED_CLIENTS_SESSION_KEY], [oauth_client.client_id])
+        response = self.client.post(reverse('oauth2_provider:authorize'), data, follow=True)
+        self.assertEqual(response.status_code, 200)
 
     @ddt.data(
         ('%2Fcourses', 'testserver'),
@@ -115,7 +109,7 @@ class LogoutTests(TestCase):
         client = self._create_oauth_client()
         response = self._assert_session_logged_out(client)
         expected = {
-            'logout_uris': [client.logout_uri + '?no_redirect=1'],
+            'logout_uris': [],
             'target': '/',
         }
         self.assertDictContainsSubset(expected, response.context_data)
@@ -134,10 +128,8 @@ class LogoutTests(TestCase):
         """
         client = self._create_oauth_client()
         response = self._assert_session_logged_out(client)
-        # Add the logout endpoints for the IDAs where auth was established via OIDC.
-        expected_logout_uris = [client.logout_uri + '?no_redirect=1']
         # Add the logout endpoints for the IDAs where auth was established via DOT/OAuth2.
-        expected_logout_uris += [
+        expected_logout_uris = [
             'http://fake.ida1/logout?no_redirect=1',
             'http://fake.ida2/accounts/logout?no_redirect=1',
         ]
@@ -175,7 +167,7 @@ class LogoutTests(TestCase):
         is not included in the context sent to the template.
         """
         client = self._create_oauth_client()
-        response = self._assert_session_logged_out(client, HTTP_REFERER=client.logout_uri)
+        response = self._assert_session_logged_out(client, HTTP_REFERER=client.redirect_uris)
         expected = {
             'logout_uris': [],
             'target': '/',

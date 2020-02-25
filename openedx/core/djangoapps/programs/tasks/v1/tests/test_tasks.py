@@ -14,7 +14,6 @@ import pytz
 from celery.exceptions import MaxRetriesExceededError
 from django.conf import settings
 from django.test import TestCase, override_settings
-from edx_oauth2_provider.tests.factories import ClientFactory
 from edx_rest_api_client import exceptions
 from edx_rest_api_client.client import EdxRestApiClient
 from waffle.testutils import override_switch
@@ -24,6 +23,7 @@ from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
 from openedx.core.djangoapps.programs.tasks.v1 import tasks
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
@@ -131,7 +131,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         self.site = SiteFactory()
         self.site_configuration = SiteConfigurationFactory(site=self.site)
         self.catalog_integration = self.create_catalog_integration()
-        ClientFactory.create(name='credentials')
+        ApplicationFactory.create(name='credentials')
         UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)
 
     def test_completion_check(
@@ -506,7 +506,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         self.create_credentials_config()
         self.site = SiteFactory()
 
-        ClientFactory.create(name='credentials')
+        ApplicationFactory.create(name='credentials')
         UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)
 
     @ddt.data(

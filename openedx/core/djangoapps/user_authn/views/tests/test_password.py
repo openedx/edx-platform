@@ -16,7 +16,6 @@ from django.test.client import RequestFactory
 from django.urls import reverse
 from testfixtures import LogCapture
 
-from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory, RefreshTokenFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.user_api.accounts.tests.test_api import CreateAccountMixin
@@ -25,10 +24,6 @@ from openedx.core.djangoapps.user_authn.views.password_reset import request_pass
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from oauth2_provider.models import AccessToken as dot_access_token
 from oauth2_provider.models import RefreshToken as dot_refresh_token
-from provider.oauth2.models import AccessToken as dop_access_token
-from provider.oauth2.models import RefreshToken as dop_refresh_token
-
-from student.models import Registration
 
 LOGGER_NAME = 'audit'
 User = get_user_model()  # pylint:disable=invalid-name
@@ -228,7 +223,6 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
     def test_access_token_invalidation_logged_out(self):
         self.client.logout()
         user = User.objects.get(email=self.OLD_EMAIL)
-        self._create_dop_tokens(user)
         self._create_dot_tokens(user)
         response = self._change_password(email=self.OLD_EMAIL)
         self.assertEqual(response.status_code, 200)
@@ -236,7 +230,6 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
 
     def test_access_token_invalidation_logged_in(self):
         user = User.objects.get(email=self.OLD_EMAIL)
-        self._create_dop_tokens(user)
         self._create_dot_tokens(user)
         response = self._change_password()
         self.assertEqual(response.status_code, 200)
@@ -308,15 +301,6 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
 
         return self.client.post(path=reverse('password_change_request'), data=data)
 
-    def _create_dop_tokens(self, user=None):
-        """Create dop access token for given user if user provided else for default user."""
-        if not user:
-            user = User.objects.get(email=self.OLD_EMAIL)
-
-        client = ClientFactory()
-        access_token = AccessTokenFactory(user=user, client=client)
-        RefreshTokenFactory(user=user, client=client, access_token=access_token)
-
     def _create_dot_tokens(self, user=None):
         """Create dot access token for given user if user provided else for default user."""
         if not user:
@@ -330,5 +314,3 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
         """Assert all access tokens are destroyed."""
         self.assertFalse(dot_access_token.objects.filter(user=user).exists())
         self.assertFalse(dot_refresh_token.objects.filter(user=user).exists())
-        self.assertFalse(dop_access_token.objects.filter(user=user).exists())
-        self.assertFalse(dop_refresh_token.objects.filter(user=user).exists())
