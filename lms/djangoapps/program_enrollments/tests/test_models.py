@@ -116,22 +116,19 @@ class ProgramCourseEnrollmentModelTests(TestCase):
         self.course_key = CourseKey.from_string(generate_course_run_key())
         CourseOverviewFactory(id=self.course_key)
 
-    def test_unique_completed_enrollment(self):
+    def test_duplicate_enrollments_allowed(self):
         """
         A record with the same (program_enrollment, course_enrollment)
-        cannot be created.
+        can be created as long as only one record is active for the
+        same course_enrollment
         """
         pce = self._create_completed_program_course_enrollment()
-        with self.assertRaises(IntegrityError):
-            # Purposefully mis-set the course_key in order to test
-            # that there is a constraint on
-            # (program_enrollment, course_enrollment) alone.
-            ProgramCourseEnrollment.objects.create(
-                program_enrollment=pce.program_enrollment,
-                course_key="course-v1:dummy+value+101",
-                course_enrollment=pce.course_enrollment,
-                status="inactive",
-            )
+        ProgramCourseEnrollment.objects.create(
+            program_enrollment=pce.program_enrollment,
+            course_key="course-v1:dummy+value+101",
+            course_enrollment=pce.course_enrollment,
+            status="inactive",
+        )
 
     def test_unique_waiting_enrollment(self):
         """

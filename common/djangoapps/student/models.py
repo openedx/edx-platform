@@ -1241,26 +1241,6 @@ class CourseEnrollment(models.Model):
             return None
 
     @classmethod
-    def get_program_enrollment(cls, user, course_id):
-        """
-        Return the ProgramEnrollment associated with the CourseEnrollment specified
-        by the user and course_id.
-        Return None if there is no ProgramEnrollment.
-
-        Arguments:
-            user (User): the user for whom we want the program enrollment
-            course_id (CourseKey): the id of the course the user has a course enrollment in
-
-        Returns:
-            ProgramEnrollment object or None
-        """
-        try:
-            course_enrollment = cls.objects.get(user=user, course_id=course_id)
-            return course_enrollment.programcourseenrollment.program_enrollment
-        except (ObjectDoesNotExist):
-            return None
-
-    @classmethod
     def is_enrollment_closed(cls, user, course):
         """
         Returns a boolean value regarding whether the user has access to enroll in the course. Returns False if the

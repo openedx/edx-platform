@@ -34,9 +34,10 @@ from third_party_auth.tests.factories import SAMLProviderConfigFactory
 
 from ..reading import (
     fetch_program_course_enrollments,
-    fetch_program_course_enrollments_by_student,
+    fetch_program_course_enrollments_by_students,
     fetch_program_enrollments,
     fetch_program_enrollments_by_student,
+    get_external_key_by_user_and_course,
     get_program_course_enrollment,
     get_program_enrollment,
     get_users_by_external_keys
@@ -368,14 +369,14 @@ class ProgramEnrollmentReadingTests(TestCase):
 
         # User with no program enrollments
         (
-            {'username': username_0},
+            {'usernames': [username_0]},
             set(),
         ),
 
         # Course keys and active-only filters
         (
             {
-                'external_user_key': ext_4,
+                'external_user_keys': [ext_4],
                 'course_keys': {course_key_p, course_key_q},
                 'active_only': True,
             },
@@ -384,26 +385,26 @@ class ProgramEnrollmentReadingTests(TestCase):
 
         # Curriculum filter
         (
-            {'username': username_3, 'curriculum_uuids': {curriculum_uuid_b}},
+            {'usernames': [username_3], 'curriculum_uuids': {curriculum_uuid_b}},
             {5},
         ),
 
         # Program filter
         (
-            {'username': username_3, 'program_uuids': {program_uuid_y}},
+            {'usernames': [username_3], 'program_uuids': {program_uuid_y}},
             {12},
         ),
 
         # Realized-only filter
         (
-            {'external_user_key': ext_4, 'realized_only': True},
+            {'external_user_keys': [ext_4], 'realized_only': True},
             set(),
         ),
 
         # Waiting-only and inactive-only filter
         (
             {
-                'external_user_key': ext_4,
+                'external_user_keys': [ext_4],
                 'waiting_only': True,
                 'inactive_only': True,
             },
@@ -411,9 +412,9 @@ class ProgramEnrollmentReadingTests(TestCase):
         ),
     )
     @ddt.unpack
-    def test_fetch_program_course_enrollments_by_student(self, kwargs, expected_enrollment_ids):
-        kwargs = self._username_to_user(kwargs)
-        actual_enrollments = fetch_program_course_enrollments_by_student(**kwargs)
+    def test_fetch_program_course_enrollments_by_students(self, kwargs, expected_enrollment_ids):
+        kwargs = self._usernames_to_users(kwargs)
+        actual_enrollments = fetch_program_course_enrollments_by_students(**kwargs)
         actual_enrollment_ids = {enrollment.id for enrollment in actual_enrollments}
         assert actual_enrollment_ids == expected_enrollment_ids
 
@@ -442,6 +443,42 @@ class ProgramEnrollmentReadingTests(TestCase):
             )
             del result['usernames']
         return result
+
+    @ddt.data(
+        (
+            {'username': username_0, 'course_key': course_key_p},
+            None
+        ),
+        (
+            {'username': username_1, 'course_key': course_key_p},
+            None
+        ),
+        (
+            {'username': username_1, 'course_key': course_key_r},
+            None
+        ),
+        (
+            {'username': username_2, 'course_key': course_key_p},
+            None
+        ),
+        (
+            {'username': username_3, 'course_key': course_key_p},
+            ext_3
+        ),
+        (
+            {'username': username_3, 'course_key': course_key_r},
+            None
+        ),
+        (
+            {'username': username_4, 'course_key': course_key_p},
+            None
+        )
+    )
+    @ddt.unpack
+    def test_get_external_key_by_user_and_course(self, kwargs, expected_external_user_key):
+        kwarg = self._username_to_user(kwargs)
+        external_user_key = get_external_key_by_user_and_course(**kwarg)
+        assert expected_external_user_key == external_user_key
 
 
 class GetUsersByExternalKeysTests(CacheIsolationTestCase):

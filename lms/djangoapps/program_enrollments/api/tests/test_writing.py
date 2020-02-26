@@ -11,8 +11,8 @@ mocks in the view tests.
 
 from uuid import UUID
 
-from organizations.tests.factories import OrganizationFactory
 from django.core.cache import cache
+from organizations.tests.factories import OrganizationFactory
 
 from lms.djangoapps.program_enrollments.constants import ProgramEnrollmentStatuses as PEStatuses
 from lms.djangoapps.program_enrollments.models import ProgramEnrollment
@@ -22,9 +22,7 @@ from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from third_party_auth.tests.factories import SAMLProviderConfigFactory
 
-from ..writing import (
-    write_program_enrollments
-)
+from ..writing import write_program_enrollments
 
 
 class WritingProgramEnrollmentTest(CacheIsolationTestCase):
