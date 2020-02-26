@@ -124,9 +124,6 @@ class TestGoogleAnalyticsTrackingPixel(QueryStringAssertionMixin, CacheIsolation
         site_config = SiteConfigurationFactory.create(
             site_values=dict(
                 GOOGLE_ANALYTICS_ACCOUNT='UA-654321-1'
-            ),
-            values=dict(
-                GOOGLE_ANALYTICS_ACCOUNT='UA-654321-1'
             )
         )
         pixel = GoogleAnalyticsTrackingPixel(site=site_config.site)

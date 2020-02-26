@@ -308,12 +308,10 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
         filtered_org = 'filtered_org'
         unfiltered_org = 'unfiltered_org'
         this_config = SiteConfigurationFactory.create(
-            site_values={'course_org_filter': this_org_list},
-            values={'course_org_filter': this_org_list}
+            site_values={'course_org_filter': this_org_list}
         )
         other_config = SiteConfigurationFactory.create(
-            site_values={'course_org_filter': other_org_list},
-            values={'course_org_filter': other_org_list}
+            site_values={'course_org_filter': other_org_list}
         )
 
         for config in (this_config, other_config):
