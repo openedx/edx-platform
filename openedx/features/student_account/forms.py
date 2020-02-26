@@ -58,6 +58,15 @@ class AccountCreationFormCustom(AccountCreationForm):
             raise forms.ValidationError(_('Invalid email opt in option provided'))
         return cleaned_opt_in
 
+    def clean_organization_name(self):
+        org_name = self.cleaned_data.get('organization_name')
+        try:
+            Organization.objects.get_or_create(label=org_name)
+            raise forms.ValidationError(_('Organization already exists, either choose existing from list '
+                                          'or try a different name'))
+        except Organization.DoesNotExist:
+            return org_name
+
     def clean(self):
         """ Enforce organization related field conditions """
         cleaned_org_name = self.cleaned_data.get('organization_name')
