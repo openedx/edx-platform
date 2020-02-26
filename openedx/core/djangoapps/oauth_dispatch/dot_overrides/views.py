@@ -10,6 +10,8 @@ from oauth2_provider.scopes import get_scopes_backend
 from oauth2_provider.settings import oauth2_settings
 from oauth2_provider.views import AuthorizationView
 
+from openedx.core.djangoapps.oauth_dispatch.models import ApplicationOrganization
+
 
 class EdxOAuth2AuthorizationView(AuthorizationView):
     """
