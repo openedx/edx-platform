@@ -282,7 +282,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
     def test_query_counts(self):
         # Test student with no certificates
         student_no_cert = UserFactory.create(password=self.user_password)
-        with self.assertNumQueries(21):
+        with self.assertNumQueries(20):
             resp = self.get_response(
                 AuthType.jwt,
                 requesting_user=student_no_cert,

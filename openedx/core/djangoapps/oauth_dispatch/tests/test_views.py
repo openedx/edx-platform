@@ -270,7 +270,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         ]
         mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
 
-    @ddt.data((True, False))
+    @ddt.data(True, False)
     def test_restricted_jwt_access_token(self, expiration_expected):
         """
         Verify that when requesting a JWT token from a restricted Application
