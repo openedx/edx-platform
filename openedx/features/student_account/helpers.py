@@ -98,12 +98,12 @@ def save_user_utm_info(req, user):
 
 def set_opt_in_and_affiliate_user_organization(user, form):
     org_name = form.cleaned_data.get('organization_name')
-    org_type = form.cleaned_data.get('org_type')
+    org_type = form.cleaned_data.get('organization_type')
     user_extended_profile_data = {}
 
     if org_name:
         user_organization, org_created = Organization.objects.get_or_create(label=org_name)
-        org_size = form.cleaned_data.get('org_size')
+        org_size = form.cleaned_data.get('organization_size')
         if org_created:
             user_organization.total_employees = org_size
             user_organization.org_type = org_type

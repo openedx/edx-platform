@@ -175,8 +175,8 @@ class TestSetOptInAndAffiliateOrganization(TestCase):
         also set for that user
         """
         self.request_data['organization_name'] = 'new_organization'
-        self.request_data['org_size'] = '6-10'
-        self.request_data['org_type'] = 'IWRNS'
+        self.request_data['organization_size'] = '6-10'
+        self.request_data['organization_type'] = 'IWRNS'
 
         request = RequestFactory().post('/user_api/v1/account/registration/', self.request_data)
         params = dict(request.POST.copy().items())
@@ -198,8 +198,8 @@ class TestSetOptInAndAffiliateOrganization(TestCase):
         }
 
         self.assertEqual(created_organization.label, self.request_data['organization_name'])
-        self.assertEqual(created_organization.total_employees, self.request_data['org_size'])
-        self.assertEqual(created_organization.org_type, self.request_data['org_type'])
+        self.assertEqual(created_organization.total_employees, self.request_data['organization_size'])
+        self.assertEqual(created_organization.org_type, self.request_data['organization_type'])
         mock_user_extended_profile_create_method.assert_called_once_with(user=self.user, **user_extended_profile_data)
         mock_email_preferences_create_method.assert_called_once_with(user=self.user,
                                                                      opt_in=form.cleaned_data.get('opt_in'))
