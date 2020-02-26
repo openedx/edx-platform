@@ -3263,6 +3263,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
         "requires_parental_consent",
         "secondary_email",
         "year_of_birth",
+        "phone_number",
     ]
 )
 

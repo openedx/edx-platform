@@ -115,6 +115,7 @@ class UserAPITestCase(APITestCase):
         legacy_profile.bio = TEST_BIO_VALUE
         legacy_profile.profile_image_uploaded_at = TEST_PROFILE_IMAGE_UPLOADED_AT
         legacy_profile.language_proficiencies.create(code=TEST_LANGUAGE_PROFICIENCY_CODE)
+        legacy_profile.phone_number = "+18005555555"
         legacy_profile.save()
 
     def _verify_profile_image_data(self, data, has_profile_image):
@@ -265,7 +266,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         Verify that all account fields are returned (even those that are not shareable).
         """
         data = response.data
-        self.assertEqual(22, len(data))
+        self.assertEqual(23, len(data))
 
         # public fields (3)
         expected_account_privacy = (
@@ -474,7 +475,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             with self.assertNumQueries(queries):
                 response = self.send_get(self.client)
             data = response.data
-            self.assertEqual(22, len(data))
+            self.assertEqual(23, len(data))
             self.assertEqual(self.user.username, data["username"])
             self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
             for empty_field in ("year_of_birth", "level_of_education", "mailing_address", "bio"):
@@ -885,7 +886,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         response = self.send_get(client)
         if has_full_access:
             data = response.data
-            self.assertEqual(22, len(data))
+            self.assertEqual(23, len(data))
             self.assertEqual(self.user.username, data["username"])
             self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
             self.assertEqual(self.user.email, data["email"])

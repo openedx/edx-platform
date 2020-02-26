@@ -227,6 +227,9 @@ class AccountViewSet(ViewSet):
             * accomplishments_shared: Signals whether badges are enabled on the
               platform and should be fetched.
 
+            * phone_number: The phone number for the user. String of numbers with
+              an optional `+` sign at the start.
+
             For all text fields, plain text instead of HTML is supported. The
             data is stored exactly as specified. Clients must HTML escape
             rendered values to avoid script injections.

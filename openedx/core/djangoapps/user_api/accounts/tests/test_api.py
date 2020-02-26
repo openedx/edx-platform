@@ -536,6 +536,7 @@ class AccountSettingsOnCreationTest(CreateAccountMixin, TestCase):
             'secondary_email': None,
             'time_zone': None,
             'course_certificates': None,
+            'phone_number': None,
         })
 
     def test_normalize_password(self):
