@@ -15,12 +15,17 @@ from mock import patch
 from rest_framework.test import APITestCase
 from six.moves import range
 from social_django.models import UserSocialAuth
+from oauth2_provider.models import Application, AccessToken
 
 from student.tests.factories import UserFactory
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
 from third_party_auth.api.permissions import (JwtRestrictedApplication,
                                               JwtHasScope,
                                               JwtHasTpaProviderFilterForRequestedProvider)
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
+from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
+from edx_rest_framework_extensions.auth.jwt.tests.utils import generate_jwt
+import pdb
 
 VALID_API_KEY = "i am a key"
 IDP_SLUG_TESTSHIB = 'testshib'
@@ -240,6 +245,36 @@ class UserMappingViewAPITests(TpaAPITestCase):
     def test_list_all_user_mappings_withapi_key(self, api_key, provider_id, expect_code, expect_data):
         url = reverse('third_party_auth_user_mapping_api', kwargs={'provider_id': provider_id})
         response = self.client.get(url, HTTP_X_EDX_API_KEY=api_key)
+        self._verify_response(response, expect_code, expect_data)
+
+    def _create_dot_access_token_with_scope(self, grant_type='Client credentials'):
+        """
+        Create dot based access token
+        """
+        dot_application = dot_factories.ApplicationFactory(user=self.user, authorization_grant_type=grant_type)
+        return dot_factories.AccessTokenFactory(user=self.user, application=dot_application)
+
+    def _create_jwt_header(self, user, is_restricted=False, scopes=None, filters=None):
+        token = generate_jwt(user, is_restricted=is_restricted, scopes=scopes, filters=filters)
+        return "JWT {}".format(token)
+
+    @ddt.data(
+        (True, 200, get_mapping_data_by_usernames(LINKED_USERS)),
+        (False, 401, []),
+    )
+    @ddt.unpack
+    def test_list_all_user_mappings_oauth2(self, valid_call, expect_code, expect_data):
+        url = reverse('third_party_auth_user_mapping_api', kwargs={'provider_id': PROVIDER_ID_TESTSHIB})
+        provider_filter = 'tpa_provider:' + PROVIDER_ID_TESTSHIB
+        filters=[provider_filter, 'tpa_provider:another_tpa_provider']
+        # create oauth2 auth data
+        user = UserFactory.create(username='api_user')
+        if valid_call:
+            auth_header = self._create_jwt_header(user, is_restricted=True, scopes=['tpa:read'], filters=filters)
+        else:
+            auth_header = ''
+        pdb.set_trace()
+        response = self.client.get(url, HTTP_AUTHORIZATION=auth_header)
         self._verify_response(response, expect_code, expect_data)
 
     @ddt.data(

@@ -905,9 +905,10 @@ class ProviderApiPermissions(models.Model):
 
     # pylint: disable==line-too-long
     The first steps regarding DOP will need to review to use SQL from the DB,
-    because admin will be gone. Please look at:
-    https://github.com/edx/edx-platform/blob/372d2e927c9eec2a5342ab120f84cc290578aa90/openedx/core/djangoapps/oauth_dispatch/docs/how_tos/testing_manually.rst
-    for additional help.
+    because admin will be gone.  third_party_auth_providerapipermissions contains 
+    the data that needs to be migrated
+    For additional help, see:
+    - https://github.com/edx/edx-platform/blob/372d2e927c9eec2a5342ab120f84cc290578aa90/openedx/core/djangoapps/oauth_dispatch/docs/how_tos/testing_manually.rst
     # pylint: enable==line-too-long
 
 
