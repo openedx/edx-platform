@@ -21,6 +21,7 @@ class EdxOAuth2AuthorizationView(AuthorizationView):
     Restricted Applications support and custom filters.
     """
     def get(self, request, *args, **kwargs):
+        # pylint: disable=line-too-long
         # Note: This code is copied from https://github.com/evonove/django-oauth-toolkit/blob/34f3b7b3511c15686039079026165feaadb1b87d/oauth2_provider/views/base.py#L111
         # Places that we have changed are noted with ***.
         application = None
