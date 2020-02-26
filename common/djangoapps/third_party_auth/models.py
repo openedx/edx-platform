@@ -894,6 +894,20 @@ class ProviderApiPermissions(models.Model):
     ``content_org:<ORG NAME>`` (e.g. content_org:edx), for each record
     in this model's table.
 
+    This model was used by ThirdPartyAuthProviderApiPermission for authorization.
+    The permission class was removed as part of the effort to move from
+    DOP(django-oauth-provider) to DOT(django-oauth-toolkit). TPA_PERMISSIONS class works as
+    a replacement for ThirdPartyAuthProviderApiPermission. To switch over, Open edX instances
+    will need to move their OAuth2 application from DOP to DOT, create the Application Access with the filter,
+    and also create a record in Restricted Application for the DOT application.
+
+    # pylint: disable==line-too-long
+    The first steps regarding DOP will need to review to use SQL from the DB,
+    because admin will be gone. Please look at:
+    https://github.com/edx/edx-platform/blob/372d2e927c9eec2a5342ab120f84cc290578aa90/openedx/core/djangoapps/oauth_dispatch/docs/how_tos/testing_manually.rst
+    for additional help.
+    # pylint: enable==line-too-long
+
 
     .. no_pii:
     """
