@@ -12,7 +12,6 @@ from mock import patch
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.common.utils import add_enrollment_course_modes
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 from common.test.acceptance.pages.studio.settings import SettingsPage
 from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
@@ -265,7 +264,7 @@ class EnrollmentTrackModeTest(StudioCourseTest):
         self.assertFalse(group_configurations_page.enrollment_track_edit_present)
         groups = group_configurations_page.get_enrollment_groups()
         for g in [self.audit_track, self.verified_track]:
-            self.assertTrue(g in groups)
+            assert g in groups
 
     def test_one_course_mode(self):
         """
@@ -283,80 +282,6 @@ class EnrollmentTrackModeTest(StudioCourseTest):
         self.assertFalse(group_configurations_page.enrollment_track_section_present)
         groups = group_configurations_page.get_enrollment_groups()
         self.assertEqual(len(groups), 0)
-
-
-@attr(shard=16)
-class ContentLicenseTest(StudioCourseTest):
-    """
-    Tests for course-level licensing (that is, setting the license,
-    for an entire course's content, to All Rights Reserved or Creative Commons)
-    """
-    def setUp(self):  # pylint: disable=arguments-differ
-        super(ContentLicenseTest, self).setUp()
-        self.outline_page = CourseOutlinePage(
-            self.browser,
-            self.course_info['org'],
-            self.course_info['number'],
-            self.course_info['run']
-        )
-        self.settings_page = SettingsPage(
-            self.browser,
-            self.course_info['org'],
-            self.course_info['number'],
-            self.course_info['run']
-        )
-        self.lms_courseware = CoursewarePage(
-            self.browser,
-            self.course_id,
-        )
-        self.settings_page.visit()
-
-    def test_empty_license(self):
-        """
-        When I visit the Studio settings page,
-        I see that the course license is "All Rights Reserved" by default.
-        Then I visit the LMS courseware page,
-        and I see that the default course license is displayed.
-        """
-        self.assertEqual(self.settings_page.course_license, "All Rights Reserved")
-        self.lms_courseware.visit()
-        self.assertEqual(self.lms_courseware.course_license, "© All Rights Reserved")
-
-    def test_arr_license(self):
-        """
-        When I visit the Studio settings page,
-        and I set the course license to "All Rights Reserved",
-        and I refresh the page,
-        I see that the course license is "All Rights Reserved".
-        Then I visit the LMS courseware page,
-        and I see that the course license is "All Rights Reserved".
-        """
-        self.settings_page.course_license = "All Rights Reserved"
-        self.settings_page.save_changes()
-        self.settings_page.refresh_and_wait_for_load()
-        self.assertEqual(self.settings_page.course_license, "All Rights Reserved")
-
-        self.lms_courseware.visit()
-        self.assertEqual(self.lms_courseware.course_license, "© All Rights Reserved")
-
-    def test_cc_license(self):
-        """
-        When I visit the Studio settings page,
-        and I set the course license to "Creative Commons",
-        and I refresh the page,
-        I see that the course license is "Creative Commons".
-        Then I visit the LMS courseware page,
-        and I see that the course license is "Some Rights Reserved".
-        """
-        self.settings_page.course_license = "Creative Commons"
-        self.settings_page.save_changes()
-        self.settings_page.refresh_and_wait_for_load()
-        self.assertEqual(self.settings_page.course_license, "Creative Commons")
-
-        self.lms_courseware.visit()
-        # The course_license text will include a bunch of screen reader text to explain
-        # the selected options
-        self.assertIn("Some Rights Reserved", self.lms_courseware.course_license)
 
 
 @attr('a11y')
