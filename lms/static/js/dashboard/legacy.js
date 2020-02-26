@@ -103,11 +103,11 @@
                  diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from %(courseName)s ' +
                                                    '(%(courseNumber)s)?');
              } else if (showRefundOption) {
-                 diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from the verified ' +
+                 diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from the ' +
                                                    '%(certNameLong)s  track of %(courseName)s  (%(courseNumber)s)?');
                  diagAttr['data-refund-info'] = gettext('You will be refunded the amount you paid.');
              } else {
-                 diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from the verified ' +
+                 diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from the ' +
                                                    '%(certNameLong)s track of %(courseName)s (%(courseNumber)s)?');
                  diagAttr['data-refund-info'] = gettext('The refund deadline for this course has passed,' +
                      'so you will not receive a refund.');
