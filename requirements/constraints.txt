@@ -34,6 +34,9 @@ edx-drf-extensions<3.0.0
 # Upgrading to 2.12.0 breaks several test classes due to API changes, need to update our code accordingly
 factory-boy==2.8.1
 
+# Newer versions need a more recent version of python-dateutil
+freezegun==0.3.12
+
 # 4.0.0 dropped support for Python 3.5
 inflect<4.0.0
 
