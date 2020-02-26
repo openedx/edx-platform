@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations
 
+from ..models import save_siteconfig_without_historical_record
 
 def copy_column_values(apps, schema_editor):
     """
@@ -17,7 +18,7 @@ def copy_column_values(apps, schema_editor):
         # It would be incorrect to record these saves in the history table since it is
         # just backfilling data.  Use save_without_historical_record() instead of
         # save().
-        site_configuration.save_without_historical_record()
+        save_siteconfig_without_historical_record(site_configuration)
 
     # Update all values in the history model.
     SiteConfigurationHistory = apps.get_model('site_configuration', 'SiteConfigurationHistory')

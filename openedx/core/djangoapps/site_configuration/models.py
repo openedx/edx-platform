@@ -141,20 +141,21 @@ class SiteConfiguration(models.Model):
         """
         return org in cls.get_all_orgs()
 
-    def save_without_historical_record(self, *args, **kwargs):
-        """
-        Save model without saving a historical record
 
-        Make sure you know what you're doing before you use this method.
+def save_siteconfig_without_historical_record(siteconfig, *args, **kwargs):
+    """
+    Save model without saving a historical record
 
-        Note: this method is copied verbatim from django-simple-history.
-        """
-        self.skip_history_when_saving = True  # pylint: disable=attribute-defined-outside-init
-        try:
-            ret = self.save(*args, **kwargs)
-        finally:
-            del self.skip_history_when_saving
-        return ret
+    Make sure you know what you're doing before you use this method.
+
+    Note: this method is copied verbatim from django-simple-history.
+    """
+    siteconfig.skip_history_when_saving = True
+    try:
+        ret = siteconfig.save(*args, **kwargs)
+    finally:
+        del siteconfig.skip_history_when_saving
+    return ret
 
 
 @python_2_unicode_compatible
