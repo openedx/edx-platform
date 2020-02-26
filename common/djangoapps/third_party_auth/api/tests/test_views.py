@@ -25,7 +25,6 @@ from third_party_auth.api.permissions import (JwtRestrictedApplication,
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from edx_rest_framework_extensions.auth.jwt.tests.utils import generate_jwt
-import pdb
 
 VALID_API_KEY = "i am a key"
 IDP_SLUG_TESTSHIB = 'testshib'
@@ -273,7 +272,6 @@ class UserMappingViewAPITests(TpaAPITestCase):
             auth_header = self._create_jwt_header(user, is_restricted=True, scopes=['tpa:read'], filters=filters)
         else:
             auth_header = ''
-        pdb.set_trace()
         response = self.client.get(url, HTTP_AUTHORIZATION=auth_header)
         self._verify_response(response, expect_code, expect_data)
 
