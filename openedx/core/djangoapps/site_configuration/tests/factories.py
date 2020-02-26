@@ -33,5 +33,5 @@ class SiteConfigurationFactory(DjangoModelFactory):
     site = SubFactory(SiteFactory)
 
     @lazy_attribute
-    def site_values(self):
+    def values(self):
         return {}
