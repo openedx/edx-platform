@@ -196,7 +196,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         mock_get_certified_programs.return_value = [1]
 
         # programs to be skipped
-        self.site_configuration.site_values = {
+        self.site_configuration.values = {
             "programs_without_certificates": [2]
         }
         self.site_configuration.save()
