@@ -101,6 +101,11 @@ class OAuth2AllowInActiveUsersTests(TestCase):
             token = self.dot_access_token.token
         return "Bearer {0}".format(token)
 
+    def _create_authorization_header(self, token=None):
+        if token is None:
+            token = self.dot_access_token.token
+        return "Bearer {0}".format(token)
+
     def get_with_bearer_token(self, target_url, params=None, token=None):
         """
         Make a GET request to the specified URL with an OAuth2 bearer token.  If
