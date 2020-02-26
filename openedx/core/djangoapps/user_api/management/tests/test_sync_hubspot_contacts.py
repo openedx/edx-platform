@@ -31,8 +31,7 @@ class TestHubspotSyncCommand(TestCase):
         super(TestHubspotSyncCommand, cls).setUpClass()
         cls.site_config = SiteConfigurationFactory()
         cls.hubspot_site_config = SiteConfigurationFactory.create(
-            site_values={'HUBSPOT_API_KEY': 'test_key'},
-            values={'HUBSPOT_API_KEY': 'test_key'},
+            site_values={'HUBSPOT_API_KEY': 'test_key'}
         )
         cls.users = []
         cls._create_users(cls.hubspot_site_config)  # users for a site with hubspot integration enabled
@@ -64,8 +63,8 @@ class TestHubspotSyncCommand(TestCase):
         """
         Test no _sync_site call is made if hubspot integration is not enabled for any site
         """
-        orig_values = self.hubspot_site_config.values
-        self.hubspot_site_config.values = {}
+        orig_values = self.hubspot_site_config.site_values
+        self.hubspot_site_config.site_values = {}
         self.hubspot_site_config.save()
         sync_site = patch.object(sync_command, '_sync_site')
         mock_sync_site = sync_site.start()
@@ -73,7 +72,7 @@ class TestHubspotSyncCommand(TestCase):
         self.assertFalse(mock_sync_site.called, "_sync_site should not be called")
         sync_site.stop()
         # put values back
-        self.hubspot_site_config.values = orig_values
+        self.hubspot_site_config.site_values = orig_values
         self.hubspot_site_config.save()
 
     def test_with_initial_sync_days(self):
