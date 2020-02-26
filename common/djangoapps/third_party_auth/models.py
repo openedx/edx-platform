@@ -890,16 +890,18 @@ class ProviderApiPermissions(models.Model):
 
     TODO: BOM-1270: This model and table will be removed post-Juniper
     so Open edX instances can migrate data if necessary.
-    To migrate, use ApplicationAccess and add a ``filter`` of the form
-    ``content_org:<ORG NAME>`` (e.g. content_org:edx), for each record
-    in this model's table.
 
     This model was used by ThirdPartyAuthProviderApiPermission for authorization.
     The permission class was removed as part of the effort to move from
     DOP(django-oauth-provider) to DOT(django-oauth-toolkit). TPA_PERMISSIONS class works as
-    a replacement for ThirdPartyAuthProviderApiPermission. To switch over, Open edX instances
-    will need to move their OAuth2 application from DOP to DOT, create the Application Access with the filter,
-    and also create a record in Restricted Application for the DOT application.
+    a replacement for ThirdPartyAuthProviderApiPermission. 
+
+    To switch over, Open edX instances will need to:
+    - move their OAuth2 application from DOP to DOT 
+    - To migrate, use ApplicationAccess and add a ``filter`` of the form
+      ``content_org:<ORG NAME>`` (e.g. content_org:edx), for each record
+      in this model's table.
+    - create a record in Restricted Application for the DOT application
 
     # pylint: disable==line-too-long
     The first steps regarding DOP will need to review to use SQL from the DB,
