@@ -8,6 +8,7 @@ import urllib
 
 import waffle
 from babel.dates import format_datetime
+from edx_rest_api_client import exceptions
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -32,6 +33,9 @@ from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramP
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from openedx.features.ucsd_features.ecommerce.utils import is_user_eligible_for_discount
+from openedx.features.ucsd_features.ecommerce.EcommerceClient import EcommerceRestAPIClient
+from openedx.features.ucsd_features.ecommerce.constants import IS_DISCOUNT_AVAILABLE_QUERY_PARAM
 from student.models import CourseEnrollment
 from util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
@@ -228,6 +232,8 @@ class ChooseModeView(View):
                 context["ecommerce_payment_page"] = ecommerce_service.payment_page_url()
                 context["sku"] = verified_mode.sku
                 context["bulk_sku"] = verified_mode.bulk_sku
+                if request.GET.get(IS_DISCOUNT_AVAILABLE_QUERY_PARAM):
+                    context['is_request_for_voucher_sent'] = True
 
         context['currency_data'] = []
         if waffle.switch_is_active('local_currency'):
