@@ -10,7 +10,7 @@ from oauth2_provider.scopes import get_scopes_backend
 from oauth2_provider.settings import oauth2_settings
 from oauth2_provider.views import AuthorizationView
 
-from openedx.core.djangoapps.oauth_dispatch.models import ApplicationOrganization
+from openedx.core.djangoapps.oauth_dispatch.models import ApplicationAccess
 
 
 class EdxOAuth2AuthorizationView(AuthorizationView):
@@ -43,16 +43,15 @@ class EdxOAuth2AuthorizationView(AuthorizationView):
             kwargs["scopes_descriptions"] = [all_scopes[scope] for scope in scopes]
             kwargs['scopes'] = scopes
 
-            # TODO: ROBERT:
-            # 1. Replace the below ApplicationOrganization code using filters instead!
-            # 2. Search for ApplicationOrganization and remove the rest.
-
             # at this point we know an Application instance with such client_id exists in the database
             application = get_application_model().objects.get(client_id=credentials['client_id'])
-            content_orgs = ApplicationOrganization.get_related_org_names(
-                application,
-                relation_type=ApplicationOrganization.RELATION_TYPE_CONTENT_ORG
-            )
+            try:
+                content_orgs = list(ApplicationAccess.get_filter_values(application, ApplicationAccess.CONTENT_ORG_FILTER_NAME))
+            except ApplicationAccess.DoesNotExist:
+                # No application access policy for this application exists.
+                # so we have no content orgs.
+                content_orgs = []
+
             kwargs['application'] = application
             kwargs['content_orgs'] = content_orgs
             kwargs['client_id'] = credentials['client_id']

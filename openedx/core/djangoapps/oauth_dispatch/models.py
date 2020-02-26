@@ -70,6 +70,12 @@ class ApplicationAccess(models.Model):
     .. no_pii:
     """
 
+    # Content org filters are of the form "content_org:<org_name>" eg. "content_org:SchoolX"
+    # and indicate that for anything that cares about the content_org filter, that the response
+    # should be filtered based on the filter value.  ie. We should only get responses pertain
+    # to objects that are relevant to the SchoolX organization.
+    CONTENT_ORG_FILTER_NAME = 'content_org'
+
     application = models.OneToOneField(oauth2_settings.APPLICATION_MODEL, related_name='access',
                                        on_delete=models.CASCADE)
     scopes = ListCharField(
@@ -98,6 +104,14 @@ class ApplicationAccess(models.Model):
     @classmethod
     def get_filters(cls, application):
         return cls.objects.get(application=application).filters
+
+    @classmethod
+    def get_filter_values(cls, application, filter_name):
+        filters = cls.get_filters(application=application)
+        for filter_constraint in filters:
+            name, filter_value = filter_constraint.split(':', 1)
+            if name == filter_name:
+                yield filter_value
 
     def __str__(self):
         """

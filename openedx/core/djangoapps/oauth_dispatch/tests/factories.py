@@ -8,9 +8,8 @@ import pytz
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyText
 from oauth2_provider.models import AccessToken, Application, RefreshToken
-from organizations.tests.factories import OrganizationFactory
 
-from openedx.core.djangoapps.oauth_dispatch.models import ApplicationAccess, ApplicationOrganization
+from openedx.core.djangoapps.oauth_dispatch.models import ApplicationAccess
 from student.tests.factories import UserFactory
 
 
@@ -32,15 +31,6 @@ class ApplicationAccessFactory(DjangoModelFactory):
 
     application = factory.SubFactory(ApplicationFactory)
     scopes = ['grades:read']
-
-
-class ApplicationOrganizationFactory(DjangoModelFactory):
-    class Meta(object):
-        model = ApplicationOrganization
-
-    application = factory.SubFactory(ApplicationFactory)
-    organization = factory.SubFactory(OrganizationFactory)
-    relation_type = ApplicationOrganization.RELATION_TYPE_CONTENT_ORG
 
 
 class AccessTokenFactory(DjangoModelFactory):
