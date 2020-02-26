@@ -15,6 +15,7 @@ from rest_condition import C
 from rest_framework.permissions import BasePermission
 
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
+import pdb
 
 log = logging.getLogger(__name__)
 
@@ -31,6 +32,7 @@ class JwtHasTpaProviderFilterForRequestedProvider(BasePermission):
         Ensure that the provider_id kwarg provided to the view exists exists
         in the tpa_provider filters in the JWT used to authenticate.
         """
+        pdb.set_trace()
         provider_id = view.kwargs.get('provider_id')
         if not provider_id:
             log.warning("Permission JwtHasTpaProviderFilterForRequestedProvider requires a view with provider_id.")
