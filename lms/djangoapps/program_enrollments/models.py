@@ -107,7 +107,10 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
         on_delete=models.CASCADE,
         related_name="program_course_enrollments"
     )
-    course_enrollment = models.OneToOneField(
+    # In Django 2.x, we should add a conditional unique constraint to this field so
+    # no duplicated tuple of (course_enrollment_id, status=active) exists
+    # MST-168 is the Jira ticket to accomplish this once Django is upgraded
+    course_enrollment = models.ForeignKey(
         CourseEnrollment,
         null=True,
         blank=True,
@@ -115,6 +118,10 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
     course_key = CourseKeyField(max_length=255)
     status = models.CharField(max_length=9, choices=STATUS_CHOICES)
     historical_records = HistoricalRecords()
+
+    @property
+    def is_active(self):
+        return self.status == ProgramCourseEnrollmentStatuses.ACTIVE
 
     def __str__(self):
         return '[ProgramCourseEnrollment id={}]'.format(self.id)

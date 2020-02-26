@@ -18,7 +18,7 @@ from ..constants import ProgramEnrollmentStatuses
 from ..constants import ProgramOperationStatuses as ProgramOpStatuses
 from ..exceptions import ProviderDoesNotExistException
 from ..models import ProgramCourseEnrollment, ProgramEnrollment
-from .reading import fetch_program_course_enrollments, fetch_program_enrollments, get_users_by_external_keys
+from .reading import fetch_program_course_enrollments_by_students, fetch_program_enrollments, get_users_by_external_keys
 
 logger = logging.getLogger(__name__)
 
@@ -193,30 +193,59 @@ def write_program_course_enrollments(
     if not (create or update):
         raise ValueError("At least one of (create, update) must be True")
     requests_by_key, duplicated_keys = _organize_requests_by_external_key(enrollment_requests)
-    external_keys = set(requests_by_key)
+    processable_external_keys = set(requests_by_key)
+
+    results = {}
+    results.update({
+        key: ProgramCourseOpStatuses.DUPLICATED for key in duplicated_keys
+    })
+
+    if not processable_external_keys:
+        return results
+
     program_enrollments = fetch_program_enrollments(
         program_uuid=program_uuid,
-        external_user_keys=external_keys,
+        external_user_keys=processable_external_keys,
     ).prefetch_related('program_course_enrollments')
     program_enrollments_by_key = {
         enrollment.external_user_key: enrollment for enrollment in program_enrollments
     }
 
-    # Fetch existing program-course enrollments.
-    existing_course_enrollments = fetch_program_course_enrollments(
-        program_uuid, course_key, program_enrollments=program_enrollments,
+    # Fetch enrollments regardless of anchored Program Enrollments
+    existing_course_enrollments = fetch_program_course_enrollments_by_students(
+        external_user_keys=processable_external_keys,
+        course_keys=[course_key],
+    ).select_related('program_enrollment')
+
+    conflicting_user_key_and_status = _get_conflicting_active_course_enrollments(
+        requests_by_key,
+        existing_course_enrollments,
+        program_uuid,
+        course_key
     )
-    existing_course_enrollments_by_key = {key: None for key in external_keys}
+
+    # Remove the conflicted items from the requests dictionary,
+    # so we can continue our processing below
+    for conflicting_user_key in conflicting_user_key_and_status:
+        del requests_by_key[conflicting_user_key]
+
+    results.update(conflicting_user_key_and_status)
+
+    # Now, limit the course enrollments to the same program uuid
+    existing_course_enrollments_of_program_enrollment = existing_course_enrollments.filter(
+        program_enrollment__program_uuid=program_uuid
+    )
+
+    existing_course_enrollments_by_key = {key: None for key in processable_external_keys}
     existing_course_enrollments_by_key.update({
         enrollment.program_enrollment.external_user_key: enrollment
-        for enrollment in existing_course_enrollments
+        for enrollment in existing_course_enrollments_of_program_enrollment
     })
 
     # For each enrollment request, try to create/update.
     # For creates, build up list `to_save`, which we will bulk-create afterwards.
     # For updates, do them in place (Django 2.2 will add bulk-update support).
     # For each operation, update `results` with the new status or an error status.
-    results = {}
     to_save = []
     for external_key, request in requests_by_key.items():
         status = request['status']
@@ -251,9 +280,6 @@ def write_program_course_enrollments(
     if to_save:
         ProgramCourseEnrollment.objects.bulk_create(to_save)
 
-    results.update({
-        key: ProgramCourseOpStatuses.DUPLICATED for key in duplicated_keys
-    })
     return results
 
 
@@ -424,3 +450,53 @@ def _organize_requests_by_external_key(enrollment_requests):
             continue
         requests_by_key[key] = request
     return requests_by_key, duplicated_keys
+
+
+def _get_conflicting_active_course_enrollments(
+    requests_by_key,
+    existing_course_enrollments,
+    program_uuid,
+    course_key
+):
+    """
+    Process the list of existing course enrollments together with
+    the enrollment request list stored in 'requests_by_key'. Detect
+    whether we have conflicting ACTIVE ProgramCourseEnrollment entries.
+    When detected, log about it and return the conflicting entry with
+    duplicated status.
+
+    Arguments:
+        requests_by_key (dict)
+        existing_course_enrollments (queryset[ProgramCourseEnrollment]),
+        program_uuid (UUID|str),
+        course_key (str)
+
+    Returns:
+        results (dict) with detected conflict entry, or empty dict.
+    """
+    conflicted_by_user_key = {}
+
+    requested_statuses_by_user_key = {
+        key: request.get('status') for key, request in requests_by_key.items()
+    }
+
+    for existing_enrollment in existing_course_enrollments:
+        external_user_key = existing_enrollment.program_enrollment.external_user_key
+        requested_status = requested_statuses_by_user_key.get(
+            existing_enrollment.program_enrollment.external_user_key
+        )
+        if (
+            requested_status
+            and requested_status == ProgramCourseEnrollmentStatuses.ACTIVE
+            and existing_enrollment.is_active
+            and str(existing_enrollment.program_enrollment.program_uuid) != str(program_uuid)
+        ):
+            logger.error(
+                u'Detected conflicting active ProgramCourseEnrollment. This is happening on'
+                u' The program_uuid [{}] with course_key [{}] for external_user_key [{}]'.format(
+                    program_uuid,
+                    course_key,
+                    external_user_key
+                ))
+            conflicted_by_user_key[external_user_key] = ProgramCourseOpStatuses.CONFLICT
+    return conflicted_by_user_key
