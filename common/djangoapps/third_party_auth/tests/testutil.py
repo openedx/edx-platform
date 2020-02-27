@@ -15,8 +15,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from mako.template import Template
-from provider import constants
-from provider.oauth2.models import Client as OAuth2Client
+from oauth2_provider.models import Application
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin
 from openedx.core.storage import OverwriteStorage
 
@@ -172,9 +171,9 @@ class ThirdPartyAuthTestMixin(object):
         user.save()
 
     @staticmethod
-    def configure_oauth_dop_client():
+    def configure_oauth_dot_client():
         """ Configure an oauth DOP client for testing """
-        return OAuth2Client.objects.create(client_type=constants.CONFIDENTIAL)
+        return Application.objects.create(client_type=Application.CLIENT_CONFIDENTIAL)
 
     @staticmethod
     def read_data_file(filename):
