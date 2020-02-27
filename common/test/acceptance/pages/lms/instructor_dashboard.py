@@ -1347,24 +1347,6 @@ class StudentSpecificAdmin(StudentAdminPage):
     TASK_HISTORY_TABLE_NAME = "task-history-single-table"
 
 
-class CourseSpecificAdmin(StudentAdminPage):
-    """
-    Course specific section of the Student Admin page.
-    """
-    CONTAINER = ".course-specific-container"
-
-    PROBLEM_INPUT_NAME = "problem-select-all"
-    STUDENT_EMAIL_INPUT_NAME = None
-
-    RESET_ATTEMPTS_BUTTON_NAME = "reset-attempts-all"
-    RESCORE_BUTTON_NAME = "rescore-problem-all"
-    RESCORE_IF_HIGHER_BUTTON_NAME = "rescore-problem-all-if-higher"
-    DELETE_STATE_BUTTON_NAME = None
-
-    BACKGROUND_TASKS_BUTTON_NAME = "task-history-all"
-    TASK_HISTORY_TABLE_NAME = "task-history-all-table"
-
-
 class EntranceExamAdmin(StudentAdminPage):
     """
     Entrance exam section of the Student Admin page.
