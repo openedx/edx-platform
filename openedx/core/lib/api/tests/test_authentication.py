@@ -24,11 +24,9 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.test import APIClient, APIRequestFactory
 from rest_framework.views import APIView
-import provider as oauth2_provider
 
 from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.lib.api import authentication
-from provider import constants, scope
 
 factory = APIRequestFactory()  # pylint: disable=invalid-name
 
@@ -98,14 +96,6 @@ class OAuth2AllowInActiveUsersTests(TestCase):
         self.user.is_active = False
         self.user.save()
 
-        # This is the a change we've made from the django-rest-framework-oauth version
-        # of these tests.
-        # Override the SCOPE_NAME_DICT setting for tests for oauth2-with-scope-test.  This is
-        # needed to support READ and WRITE scopes as they currently aren't supported by the
-        # edx-auth2-provider, and their scope values collide with other scopes defined in the
-        # edx-auth2-provider.
-        scope.SCOPE_NAME_DICT = {'read': constants.READ, 'write': constants.WRITE}
-
     def _create_authorization_header(self, token=None):
         if token is None:
             token = self.dot_access_token.token
@@ -138,7 +128,6 @@ class OAuth2AllowInActiveUsersTests(TestCase):
         self.assertEqual(response_dict['error_code'], error_code)
 
     @ddt.data(None, {})
-    @unittest.skipUnless(oauth2_provider, 'django-oauth2-provider not installed')
     def test_get_form_with_wrong_authorization_header_token_type_failing(self, params):
         """Ensure that a wrong token type lead to the correct HTTP error status code"""
         response = self.csrf_client.get(
