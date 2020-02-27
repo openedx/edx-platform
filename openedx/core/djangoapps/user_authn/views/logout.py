@@ -131,7 +131,7 @@ class LogoutView(TemplateView):
         # Add the logout URIs for IDAs that the user was logged into (according to the session).  This line is specific
         # to DOP.
         uris += Application.objects.filter(client_id__in=self.oauth_client_ids,
-                                        redirect_uris__isnull=False).values_list('redirect_uris', flat=True)
+                                           redirect_uris__isnull=False).values_list('redirect_uris', flat=True)
 
         # Add the extra logout URIs from settings.  This is added as a stop-gap solution for sessions that were
         # established via DOT.
