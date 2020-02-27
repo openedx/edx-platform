@@ -2,8 +2,7 @@
 Mixins to test video pipeline integration.
 """
 
-from provider.constants import CONFIDENTIAL
-from provider.oauth2.models import Client
+from oauth2_provider.models import Application
 
 from openedx.core.djangoapps.video_pipeline.models import VideoPipelineIntegration
 
@@ -26,7 +25,7 @@ class VideoPipelineIntegrationMixin(object):
         'logout_uri': 'https://video-pipeline.example.com/api/v1/logout',
         'client_id': 'video_pipeline_client_id',
         'client_secret': 'video_pipeline_client_secret',
-        'client_type': CONFIDENTIAL
+        'client_type': Application.CLIENT_CONFIDENTIAL
     }
 
     def create_video_pipeline_integration(self, **kwargs):
@@ -44,4 +43,4 @@ class VideoPipelineIntegrationMixin(object):
         """
         fields = dict(self.video_pipelien_oauth_client_defaults, **kwargs)
         fields['user'] = user
-        return Client.objects.create(**fields)
+        return Application.objects.create(**fields)
