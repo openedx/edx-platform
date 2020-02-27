@@ -138,9 +138,9 @@ def get_badge_url(course_id, badge_type, team_id):
     :param course_id: Course Id
     :param badge_type: Badge type can be communicator or team
     :param team_id: Team Id
-    :return: URL of badge in String format. Return "#" if user hasn't join any team.
+    :return: URL of badge in String format. Return "browse team" if user hasn't join any team.
     """
-    badge_url = '#'
+    badge_url = reverse('teams_dashboard', kwargs={'course_id': course_id})
     if badge_type == CONVERSATIONALIST[CONVERSATIONALIST_ENTRY_INDEX]:
         badge_url = reverse('nodebb_forum_discussion', kwargs={'course_id': course_id})
     elif badge_type == TEAM_PLAYER[TEAM_PLAYER_ENTRY_INDEX] and team_id:
