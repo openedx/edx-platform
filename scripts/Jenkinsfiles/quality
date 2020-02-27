@@ -74,7 +74,7 @@ pipeline {
         stage('Run Tests') {
             parallel {
                 stage("commonlib pylint") {
-                    agent { label "jenkins-worker" }
+                    agent { label "js-worker" }
                     environment {
                         TEST_SUITE = "quality"
                         SHARD = 1

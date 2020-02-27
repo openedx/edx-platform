@@ -143,9 +143,11 @@ def _get_pylint_violations(systems=ALL_SYSTEMS.split(','), errors_only=False, cl
         system_report = report_dir / 'pylint.report'
         if clean or not system_report.exists():
             sh(
-                u"pylint {flags} --output-format=parseable {apps}".format(
+                u"pylint {flags} --output-format=parseable {apps} "
+                "> {report_dir}/pylint.report".format(
                     flags=" ".join(flags),
                     apps=apps_list,
+                    report_dir=report_dir
                 ),
                 ignore_error=True,
             )
