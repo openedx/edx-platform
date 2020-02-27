@@ -244,7 +244,7 @@ watchdog==0.10.2          # via -r requirements/edx/paver.txt
 web-fragments==0.3.1      # via -r requirements/edx/base.in, staff-graded-xblock, xblock, xblock-utils
 webencodings==0.5.1       # via bleach, html5lib
 webob==1.8.6              # via xblock, xmodule
-wrapt==1.12.0             # via -r requirements/edx/paver.txt
+wrapt==1.11.2             # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.txt
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.8#egg=xblock-drag-and-drop-v2==2.2.8  # via -r requirements/edx/github.in
 git+https://github.com/open-craft/xblock-poll@3c7dcaf6c933d914188f0740a60711603f948d26#egg=xblock-poll==1.9.1  # via -r requirements/edx/github.in
 xblock-utils==1.2.4       # via -r requirements/edx/base.in, edx-sga, lti-consumer-xblock, staff-graded-xblock, xblock-drag-and-drop-v2, xblock-google-drive

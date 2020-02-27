@@ -26,5 +26,5 @@ six==1.14.0               # via edx-opaque-keys, libsass, mock, paver, python-me
 stevedore==1.32.0         # via -r requirements/edx/paver.in, edx-opaque-keys
 urllib3==1.25.8           # via requests
 watchdog==0.10.2          # via -r requirements/edx/paver.in
-wrapt==1.12.0             # via -r requirements/edx/paver.in
+wrapt==1.11.2             # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.in
 zipp==1.0.0               # via -c requirements/edx/../constraints.txt, importlib-metadata
