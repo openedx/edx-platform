@@ -108,10 +108,11 @@ class ApplicationAccess(models.Model):
     @classmethod
     def get_filter_values(cls, application, filter_name):
         filters = cls.get_filters(application=application)
-        for filter_constraint in filters:
-            name, filter_value = filter_constraint.split(':', 1)
-            if name == filter_name:
-                yield filter_value
+        if filters:
+            for filter_constraint in filters:
+                name, filter_value = filter_constraint.split(':', 1)
+                if name == filter_name:
+                    yield filter_value
 
     def __str__(self):
         """
