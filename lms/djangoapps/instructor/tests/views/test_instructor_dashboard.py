@@ -169,6 +169,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         SiteConfiguration.objects.create(
             site=site,
             site_values=configuration_values,
+            values=configuration_values,
             enabled=True
         )
 
@@ -201,6 +202,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         SiteConfiguration.objects.create(
             site=site,
             site_values=configuration_values,
+            values=configuration_values,
             enabled=True
         )
         url = reverse(
