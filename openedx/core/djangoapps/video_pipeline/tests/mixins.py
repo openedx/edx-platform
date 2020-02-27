@@ -21,8 +21,7 @@ class VideoPipelineIntegrationMixin(object):
     video_pipelien_oauth_client_defaults = {
         'name': 'video_pipeline',
         'url': 'https://video-pipeline.example.com/api/v1/',
-        'redirect_uri': 'https://video-pipeline.example.com/api/v1/redirect',
-        'logout_uri': 'https://video-pipeline.example.com/api/v1/logout',
+        'redirect_uris': 'https://video-pipeline.example.com/api/v1/logout https://video-pipeline.example.com/api/v1/redirect',
         'client_id': 'video_pipeline_client_id',
         'client_secret': 'video_pipeline_client_secret',
         'client_type': Application.CLIENT_CONFIDENTIAL
