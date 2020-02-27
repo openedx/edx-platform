@@ -1,23 +1,19 @@
 import factory
 import mock
-
 from django.db.models import signals
 
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
-from nodebb.constants import (
-    TEAM_PLAYER_ENTRY_INDEX,
-    CONVERSATIONALIST_ENTRY_INDEX
-)
-from openedx.features.badging.constants import CONVERSATIONALIST, TEAM_PLAYER
+from nodebb.constants import CONVERSATIONALIST_ENTRY_INDEX, TEAM_PLAYER_ENTRY_INDEX
+from openedx.features.badging.constants import CONVERSATIONALIST, EARNED_BADGE_NOTIFICATION_TYPE, TEAM_PLAYER
 from openedx.features.teams.tests.factories import TeamGroupChatFactory
-from student.tests.factories import CourseEnrollmentFactory
-from student.tests.factories import UserFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from .factories import BadgeFactory, UserBadgeFactory
 from .. import helpers as badge_helpers
+from ..handlers import register_notification_types
 from ..models import Badge
+from .factories import BadgeFactory, UserBadgeFactory
 
 
 class BadgeHelperTestCases(ModuleStoreTestCase):
@@ -279,3 +275,28 @@ class BadgeHelperTestCases(ModuleStoreTestCase):
 
         self.assertIsNone(course_team)
         self.assertEqual(earned_badges, list())
+
+    @mock.patch('openedx.features.badging.helpers.render_to_string')
+    @mock.patch('openedx.features.badging.helpers.publish_notification_to_user')
+    def test_send_user_badge_notification(self, mock_publish_notification_to_user,
+                                          mock_render_to_string):
+        """
+        Test newly earned badge notification is sent to user
+        :param mock_publish_notification_to_user: mock and send notification through edx_notifications
+        :param mock_render_to_string: mock and return message body that appear in notification
+        :return: None
+        """
+        # register badge notification type
+        register_notification_types(None)
+        mock_render_to_string.return_value = 'You have earned a new badge:<br><strong>newly_earned_badge_name</strong>'
+
+        badge_helpers.send_user_badge_notification(self.user, 'dummy_badge_url', 'newly_earned_badge_name')
+
+        expected_context = {
+            'badge_name': 'newly_earned_badge_name'
+        }
+
+        mock_render_to_string.assert_called_once_with('philu_notifications/templates/user_badge_earned.html',
+                                                      expected_context)
+
+        mock_publish_notification_to_user.assert_called_once_with(self.user.id, mock.ANY)
