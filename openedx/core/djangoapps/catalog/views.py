@@ -27,8 +27,7 @@ def cache_programs(request):
         SiteConfiguration.objects.create(
             site=request.site,
             enabled=True,
-            site_values={"COURSE_CATALOG_API_URL": "{catalog_url}/api/v1/".format(catalog_url=CATALOG_STUB_URL)},
-            values={"COURSE_CATALOG_API_URL": "{catalog_url}/api/v1/".format(catalog_url=CATALOG_STUB_URL)}
+            site_values={"COURSE_CATALOG_API_URL": "{catalog_url}/api/v1/".format(catalog_url=CATALOG_STUB_URL)}
         )
 
     if settings.FEATURES.get('EXPOSE_CACHE_PROGRAMS_ENDPOINT'):
