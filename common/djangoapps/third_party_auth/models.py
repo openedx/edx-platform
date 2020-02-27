@@ -17,7 +17,6 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from organizations.models import Organization
-from django.contrib.auth.tokens import default_token_generator
 from social_core.backends.base import BaseAuth
 from social_core.backends.oauth import OAuthAuth
 from social_core.backends.saml import SAMLAuth
@@ -26,6 +25,7 @@ from social_core.utils import module_member
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_request
+from openedx.core.lib.hash_utils import create_hash256
 
 from .lti import LTI_PARAMS_KEY, LTIAuthBackend
 from .saml import STANDARD_SAML_PROVIDER_KEY, get_saml_idp_choices, get_saml_idp_class
@@ -825,7 +825,7 @@ class LTIProviderConfig(ProviderConfig):
     )
 
     lti_consumer_secret = models.CharField(
-        default=default_token_generator,
+        default=create_hash256,
         max_length=255,
         help_text=(
             u'The shared secret that the LTI Tool Consumer will use to '
