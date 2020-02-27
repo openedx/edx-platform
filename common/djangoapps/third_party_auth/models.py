@@ -17,7 +17,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from organizations.models import Organization
-from django.contrib.auth.token import default_token_generator
+from django.contrib.auth.tokens import default_token_generator
 from social_core.backends.base import BaseAuth
 from social_core.backends.oauth import OAuthAuth
 from social_core.backends.saml import SAMLAuth
