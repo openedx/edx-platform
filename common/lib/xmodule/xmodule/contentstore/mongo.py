@@ -11,7 +11,7 @@ import pymongo
 import six
 from bson.son import SON
 from fs.osfs import OSFS
-from gridfs.errors import NoFile
+from gridfs.errors import NoFile, FileExists
 from mongodb_proxy import autoretry_read
 from opaque_keys.edx.keys import AssetKey
 
@@ -431,18 +431,32 @@ class MongoContentStore(ContentStore):
                 asset_id = six.text_type(
                     dest_course_key.make_asset_key(asset_key['category'], asset_key['name']).for_branch(None)
                 )
+            try:
+                self.create_asset(source_content, asset_id, asset, asset_key)
+            except FileExists:
+                self.fs.delete(file_id=asset_id)
+                self.create_asset(source_content, asset_id, asset, asset_key)
 
-            self.fs.put(
-                source_content.read(),
-                _id=asset_id, filename=asset['filename'], content_type=asset['contentType'],
-                displayname=asset['displayname'], content_son=asset_key,
-                # thumbnail is not technically correct but will be functionally correct as the code
-                # only looks at the name which is not course relative.
-                thumbnail_location=asset['thumbnail_location'],
-                import_path=asset['import_path'],
-                # getattr b/c caching may mean some pickled instances don't have attr
-                locked=asset.get('locked', False)
-            )
+    def create_asset(self, source_content, asset_id, asset, asset_key):
+        """
+        Creates a new asset
+        :param source_content:
+        :param asset_id:
+        :param asset:
+        :param asset_key:
+        :return:
+        """
+        self.fs.put(
+            source_content.read(),
+            _id=asset_id, filename=asset['filename'], content_type=asset['contentType'],
+            displayname=asset['displayname'], content_son=asset_key,
+            # thumbnail is not technically correct but will be functionally correct as the code
+            # only looks at the name which is not course relative.
+            thumbnail_location=asset['thumbnail_location'],
+            import_path=asset['import_path'],
+            # getattr b/c caching may mean some pickled instances don't have attr
+            locked=asset.get('locked', False)
+        )
 
     def delete_all_course_assets(self, course_key):
         """
