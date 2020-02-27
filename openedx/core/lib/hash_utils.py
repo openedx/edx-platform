@@ -11,10 +11,10 @@ def create_hash256(max_length=None):
     hash = hashlib.sha256(force_bytes(shortuuid.uuid()))
     hash.update(force_bytes(settings.SECRET_KEY))
     output_hash = hash.hexdigest()
-    if max_length is not None and len(output_hash)>max_length:
+    if max_length is not None and len(output_hash) > max_length:
         return output_hash[:max_length]
     return output_hash
 
+
 def short_token():
     return create_hash256(max_length=32)
-
