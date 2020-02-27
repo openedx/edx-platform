@@ -15,15 +15,13 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from mako.template import Template
-from provider import constants
-from provider.oauth2.models import Client as OAuth2Client
+from oauth2_provider.models import Application
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin
 from openedx.core.storage import OverwriteStorage
 
 from third_party_auth.models import (
     LTIProviderConfig,
     OAuth2ProviderConfig,
-    ProviderApiPermissions,
     SAMLConfiguration,
     SAMLProviderConfig
 )
@@ -173,14 +171,9 @@ class ThirdPartyAuthTestMixin(object):
         user.save()
 
     @staticmethod
-    def configure_oauth_dop_client():
+    def configure_oauth_dot_client():
         """ Configure an oauth DOP client for testing """
-        return OAuth2Client.objects.create(client_type=constants.CONFIDENTIAL)
-
-    @staticmethod
-    def configure_api_permission(client, provider_id):
-        """ Configure the client and provider_id pair. This will give the access to a client for that provider. """
-        return ProviderApiPermissions.objects.create(client=client, provider_id=provider_id)
+        return Application.objects.create(client_type=Application.CLIENT_CONFIDENTIAL)
 
     @staticmethod
     def read_data_file(filename):
@@ -191,7 +184,8 @@ class ThirdPartyAuthTestMixin(object):
 
 class TestCase(ThirdPartyAuthTestMixin, CacheIsolationMixin, django.test.TestCase):
     """Base class for auth test cases."""
-    def setUp(self):
+
+    def setUp(self):  # pylint: disable=arguments-differ
         super(TestCase, self).setUp()
         # Explicitly set a server name that is compatible with all our providers:
         # (The SAML lib we use doesn't like the default 'testserver' as a domain)

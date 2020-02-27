@@ -4,7 +4,6 @@ Third party auth API related permissions
 
 import logging
 
-from edx_django_utils.monitoring import set_custom_metric
 from edx_rest_framework_extensions.auth.jwt.decoder import decode_jwt_filters
 from edx_rest_framework_extensions.permissions import (
     IsSuperuser,
@@ -14,37 +13,10 @@ from edx_rest_framework_extensions.permissions import (
 )
 from rest_condition import C
 from rest_framework.permissions import BasePermission
-from third_party_auth.models import ProviderApiPermissions
 
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 
 log = logging.getLogger(__name__)
-
-
-class ThirdPartyAuthProviderApiPermission(BasePermission):
-    """
-    Allow someone to access the view if they have valid OAuth client credential.
-
-    Deprecated: Only works for DOP oauth applications. To be removed as part of DOPrecation.
-
-    """
-    def has_permission(self, request, view):
-        """
-        Check if the OAuth client associated with auth token in current request has permission to access
-        the information for provider
-        """
-        provider_id = view.kwargs.get('provider_id')
-        if not request.auth or not provider_id:
-            # doesn't have access token or no provider_id specified
-            return False
-
-        try:
-            ProviderApiPermissions.objects.get(client__pk=request.auth.client_id, provider_id=provider_id)
-        except ProviderApiPermissions.DoesNotExist:
-            return False
-
-        set_custom_metric('deprecated_ThirdPartyAuthProviderApiPermission', True)
-        return True
 
 
 class JwtHasTpaProviderFilterForRequestedProvider(BasePermission):
@@ -79,7 +51,7 @@ class JwtHasTpaProviderFilterForRequestedProvider(BasePermission):
 # TODO: Remove ApiKeyHeaderPermission. Check deprecated_api_key_header custom metric for active usage.
 _NOT_JWT_RESTRICTED_TPA_PERMISSIONS = (
     C(NotJwtRestrictedApplication) &
-    (C(IsSuperuser) | ApiKeyHeaderPermission | ThirdPartyAuthProviderApiPermission)
+    (C(IsSuperuser) | ApiKeyHeaderPermission)
 )
 _JWT_RESTRICTED_TPA_PERMISSIONS = (
     C(JwtRestrictedApplication) &

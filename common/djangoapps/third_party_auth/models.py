@@ -17,8 +17,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from organizations.models import Organization
-from provider.oauth2.models import Client
-from provider.utils import long_token
+from django.contrib.auth.tokens import default_token_generator
 from social_core.backends.base import BaseAuth
 from social_core.backends.oauth import OAuthAuth
 from social_core.backends.saml import SAMLAuth
@@ -826,7 +825,7 @@ class LTIProviderConfig(ProviderConfig):
     )
 
     lti_consumer_secret = models.CharField(
-        default=long_token,
+        default=default_token_generator,
         max_length=255,
         help_text=(
             u'The shared secret that the LTI Tool Consumer will use to '
@@ -878,25 +877,3 @@ class LTIProviderConfig(ProviderConfig):
         app_label = "third_party_auth"
         verbose_name = u"Provider Configuration (LTI)"
         verbose_name_plural = verbose_name
-
-
-class ProviderApiPermissions(models.Model):
-    """
-    This model links OAuth2 client with provider Id.
-
-    It gives permission for a OAuth2 client to access the information under certain IdPs.
-
-    .. no_pii:
-    """
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    provider_id = models.CharField(
-        max_length=255,
-        help_text=(
-            u'Uniquely identify a provider. This is different from backend_name.'
-        )
-    )
-
-    class Meta(object):
-        app_label = "third_party_auth"
-        verbose_name = u"Provider API Permission"
-        verbose_name_plural = verbose_name + 's'
