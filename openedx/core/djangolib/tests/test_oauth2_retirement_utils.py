@@ -14,12 +14,6 @@ from oauth2_provider.models import (
     RefreshToken as DOTRefreshToken,
     Grant as DOTGrant,
 )
-from provider.oauth2.models import (
-    AccessToken as DOPAccessToken,
-    RefreshToken as DOPRefreshToken,
-    Grant as DOPGrant,
-    Client as DOPClient,
-)
 
 from ..oauth2_retirement_utils import (
     retire_dot_oauth2_models,
