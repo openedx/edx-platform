@@ -9,7 +9,7 @@ import sys
 from paver.easy import call_task, cmdopts, consume_args, needs, sh, task
 
 from .assets import collect_assets
-from .utils.cmd import django_cmd
+from .utils.cmd import cmd, django_cmd
 from .utils.envs import Env
 from .utils.process import run_multi_processes, run_process
 from .utils.timer import timed
@@ -159,7 +159,8 @@ def celery(options):
     Runs Celery workers.
     """
     settings = getattr(options, 'settings', 'devstack_with_worker')
-    run_process(django_cmd('lms', settings, 'celery', 'worker', '--beat', '--loglevel=INFO', '--pythonpath=.'))
+    run_process(cmd('celery', 'worker', '--app=lms.envs.{}'.format(settings),
+                    '--beat', '--loglevel=INFO', '--pythonpath=.'))
 
 
 @task
@@ -234,8 +235,9 @@ def run_all_servers(options):
         django_cmd(
             'studio', settings_cms, 'runserver', '--traceback', '--pythonpath=.', *cms_runserver_args
         ),
-        django_cmd(
-            'lms', worker_settings, 'celery', 'worker', '--beat', '--loglevel=INFO', '--pythonpath=.'
+        cmd(
+            'celery', 'worker', "--app=lms.envs.{}".format(worker_settings),
+            '--beat', '--loglevel=INFO', '--pythonpath=.'
         )
     ])
 
