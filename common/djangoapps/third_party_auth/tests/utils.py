@@ -6,8 +6,7 @@ from base64 import b64encode
 
 import httpretty
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
-from provider.constants import PUBLIC
-from provider.oauth2.models import Client
+from oauth2_provider.models import Application
 from social_core.backends.facebook import API_VERSION as FACEBOOK_API_VERSION
 from social_core.backends.facebook import FacebookOAuth2
 from social_django.models import Partial, UserSocialAuth
@@ -52,9 +51,9 @@ class ThirdPartyOAuthTestMixin(ThirdPartyAuthTestMixin):
         """
         Create an OAuth2 client application
         """
-        return Client.objects.create(
+        return Application.objects.create(
             client_id=self.client_id,
-            client_type=PUBLIC,
+            client_type=Application.CLIENT_PUBLIC,
         )
 
     def _setup_provider_response(self, success=False, email=''):
