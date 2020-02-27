@@ -82,8 +82,6 @@ class SiteConfigurationTests(TestCase):
             site=self.site,
         )
 
-        site_configuration.site_values = {'test': 'test'}
-        # TODO: Remove this deprecated value eventually.
         site_configuration.values = {'test': 'test'}
         site_configuration.save()
 
@@ -133,8 +131,6 @@ class SiteConfigurationTests(TestCase):
         # add SiteConfiguration to database
         site_configuration = SiteConfigurationFactory.create(
             site=self.site,
-            site_values=self.test_config1,
-            # TODO: Remove this deprecated value eventually.
             values=self.test_config1,
         )
 
@@ -183,8 +179,6 @@ class SiteConfigurationTests(TestCase):
         # add SiteConfiguration to database
         site_configuration = SiteConfigurationFactory.create(
             site=self.site,
-            site_values=invalid_data,
-            # TODO: Remove this deprecated value eventually.
             values=invalid_data,
         )
 
@@ -206,14 +200,10 @@ class SiteConfigurationTests(TestCase):
         # add SiteConfiguration to database
         SiteConfigurationFactory.create(
             site=self.site,
-            site_values=self.test_config1,
-            # TODO: Remove this deprecated value eventually.
             values=self.test_config1,
         )
         SiteConfigurationFactory.create(
             site=self.site2,
-            site_values=self.test_config2,
-            # TODO: Remove this deprecated value eventually.
             values=self.test_config2,
         )
 
@@ -295,14 +285,10 @@ class SiteConfigurationTests(TestCase):
         # add SiteConfiguration to database
         config1 = SiteConfigurationFactory.create(
             site=self.site,
-            site_values=self.test_config1,
-            # TODO: Remove this deprecated value eventually.
             values=self.test_config1,
         )
         config2 = SiteConfigurationFactory.create(
             site=self.site2,
-            site_values=self.test_config2,
-            # TODO: Remove this deprecated value eventually.
             values=self.test_config2,
         )
 
@@ -328,14 +314,10 @@ class SiteConfigurationTests(TestCase):
         # add SiteConfiguration to database
         SiteConfigurationFactory.create(
             site=self.site,
-            site_values=self.test_config1,
-            # TODO: Remove this deprecated value eventually.
             values=self.test_config1,
         )
         SiteConfigurationFactory.create(
             site=self.site2,
-            site_values=self.test_config2,
-            # TODO: Remove this deprecated value eventually.
             values=self.test_config2,
         )
 
@@ -350,15 +332,11 @@ class SiteConfigurationTests(TestCase):
         # add SiteConfiguration to database
         SiteConfigurationFactory.create(
             site=self.site,
-            site_values=self.test_config1,
-            # TODO: Remove this deprecated value eventually.
             values=self.test_config1,
             enabled=False,
         )
         SiteConfigurationFactory.create(
             site=self.site2,
-            site_values=self.test_config2,
-            # TODO: Remove this deprecated value eventually.
             values=self.test_config2,
         )
 
