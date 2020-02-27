@@ -270,25 +270,22 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         ]
         mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
 
-    @ddt.data(True, False)
-    def test_restricted_jwt_access_token(self, expiration_expected):
+    def test_restricted_jwt_access_token(self):
         """
-        Verify that when requesting a JWT token from a restricted Application
-        within the DOT subsystem, that our claims is marked as already expired
-        (i.e. expiry set to Jan 1, 1970)
+        Verify that we get a restricted JWT that is not expired.
         """
         response = self._post_request(self.user, self.restricted_dot_app, token_type='jwt')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
 
         self.assertIn('expires_in', data)
-        self.assertEqual(data['expires_in'] < 0, expiration_expected)
+        assert data['expires_in'] > 0
         self.assertEqual(data['token_type'], 'JWT')
         self.assert_valid_jwt_access_token(
             data['access_token'],
             self.user,
             data['scope'].split(' '),
-            should_be_expired=expiration_expected,
+            should_be_expired=False,
             should_be_asymmetric_key=True,
             should_be_restricted=True,
         )
