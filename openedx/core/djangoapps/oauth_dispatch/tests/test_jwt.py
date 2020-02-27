@@ -10,7 +10,7 @@ from django.utils.timezone import now
 from mock import patch
 
 from openedx.core.djangoapps.oauth_dispatch import jwt as jwt_api
-from openedx.core.djangoapps.oauth_dispatch.adapters import DOPAdapter, DOTAdapter
+from openedx.core.djangoapps.oauth_dispatch.adapters import DOTAdapter
 from openedx.core.djangoapps.oauth_dispatch.models import RestrictedApplication
 from openedx.core.djangoapps.oauth_dispatch.tests.mixins import AccessTokenMixin
 from openedx.core.djangoapps.oauth_dispatch.toggles import ENFORCE_JWT_SCOPES
@@ -61,9 +61,8 @@ class TestCreateJWTs(AccessTokenMixin, TestCase):
             jwt_token, self.user, self.default_scopes, should_be_asymmetric_key=should_be_asymmetric_key,
         )
 
-    @ddt.data(DOPAdapter, DOPAdapter)
-    def test_create_jwt_for_token(self, oauth_adapter_cls):
-        oauth_adapter = oauth_adapter_cls()
+    def test_create_jwt_for_token(self):
+        oauth_adapter = DOTAdapter()
         jwt_token = self._create_jwt_for_token(oauth_adapter, use_asymmetric_key=False)
         self._assert_jwt_is_valid(jwt_token, should_be_asymmetric_key=False)
 

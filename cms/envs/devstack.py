@@ -137,9 +137,6 @@ REQUIRE_DEBUG = DEBUG
 
 ########################### OAUTH2 #################################
 OAUTH_OIDC_ISSUER = 'http://127.0.0.1:8000/oauth2'
-ENABLE_DOP_ADAPTER = False
-
-# pylint: disable=unicode-format-string
 
 JWT_AUTH.update({
     'JWT_SECRET_KEY': 'lms-secret',
