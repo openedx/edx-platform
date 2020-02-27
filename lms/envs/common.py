@@ -616,20 +616,6 @@ OAUTH_ENFORCE_SECURE = True
 OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS = 365
 OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 
-
-# .. toggle_name: ENABLE_DOP_ADAPTER
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: True
-# .. toggle_description: A switch toggle for controlling whether or not we allow usage of the DOP OAuth adapter with the goal of removing the DOP adapter once we're confident it won't be used.
-# .. toggle_category: n/a
-# .. toggle_use_cases: incremental_release
-# .. toggle_creation_date: 2020-02-06
-# .. toggle_expiration_date: 2020-02-29
-# .. toggle_warnings: None
-# .. toggle_tickets: BOM-1160
-# .. toggle_status: supported
-ENABLE_DOP_ADAPTER = True
-
 ################################## THIRD_PARTY_AUTH CONFIGURATION #############################
 TPA_PROVIDER_BURST_THROTTLE = '10/min'
 TPA_PROVIDER_SUSTAINED_THROTTLE = '50/hr'

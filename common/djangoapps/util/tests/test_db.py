@@ -222,7 +222,7 @@ class MigrationTests(TestCase):
     Tests for migrations.
     """
     @unittest.skip(
-        "Need to skip as part of renaming a field in schedules app. This will be unskipped in DE-1825.  ALSO need to skip as part of renaming a field in the site_configuration app.  This will be unskipped in DENG-18. Also need to skip as part of removal of ProviderApiPermissions.This will be unskipped in BOM-1350"
+        "Need to skip as part of renaming a field in schedules app. This will be unskipped in DE-1825. Also need to skip as part of removal of ProviderApiPermissions.This will be unskipped in BOM-1350"
     )
     @override_settings(MIGRATION_MODULES={})
     def test_migrations_are_in_sync(self):
@@ -238,6 +238,6 @@ class MigrationTests(TestCase):
         release afterwards, this test doesn't fail.
         """
         out = StringIO()
-        call_command("makemigrations", dry_run=True, verbosity=3, stdout=out)
+        call_command('makemigrations', dry_run=True, verbosity=3, stdout=out)
         output = out.getvalue()
-        self.assertIn("No changes detected", output)
+        self.assertIn('No changes detected', output)

@@ -21,8 +21,6 @@ from django.urls import Resolver404, resolve, reverse
 from django.utils.timezone import now
 from oauth2_provider import models as dot_models
 from opaque_keys.edx.keys import CourseKey
-from provider.constants import CONFIDENTIAL
-from provider.oauth2.models import Client, Grant
 from rest_framework import status
 from rest_framework.test import APITestCase
 from six.moves import range, zip
@@ -40,7 +38,6 @@ from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffR
 from student.tests.factories import AdminFactory, UserFactory
 
 USER_PASSWORD = 'test'
-AUTH_ATTRS = ('auth', 'auth_header_oauth2_provider')
 
 
 class CcxRestApiTest(CcxTestCase, APITestCase):
@@ -74,51 +71,17 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
         instructor = UserFactory()
         allow_access(self.course, instructor, 'instructor')
 
-        # FIXME: Testing for multiple authentication types in multiple test cases is overkill. Stop it!
-        self.auth, self.auth_header_oauth2_provider = self.prepare_auth_token(app_user)
+        self.auth = self.prepare_auth_token(app_user)
 
         self.course.enable_ccx = True
         self.mstore.update_item(self.course, self.coach.id)
         # making the master course chapters easily available
         self.master_course_chapters = courses.get_course_chapter_ids(self.master_course_key)
 
-    def get_auth_token(self, app_grant, app_client):
-        """
-        Helper method to get the oauth token
-        """
-        token_data = {
-            'grant_type': 'authorization_code',
-            'code': app_grant.code,
-            'client_id': app_client.client_id,
-            'client_secret': app_client.client_secret
-        }
-        token_resp = self.client.post(reverse('oauth2:access_token'), data=token_data, format='multipart')
-        self.assertEqual(token_resp.status_code, status.HTTP_200_OK)
-        token_resp_json = json.loads(token_resp.content.decode('utf-8'))
-        return u'{token_type} {token}'.format(
-            token_type=token_resp_json['token_type'],
-            token=token_resp_json['access_token']
-        )
-
     def prepare_auth_token(self, user):
         """
         creates auth token for users
         """
-        # create an oauth client app entry
-        app_client = Client.objects.create(
-            user=user,
-            name='test client',
-            url='http://localhost//',
-            redirect_uri='http://localhost//',
-            client_type=CONFIDENTIAL
-        )
-        # create an authorization code
-        app_grant = Grant.objects.create(
-            user=user,
-            client=app_client,
-            redirect_uri='http://localhost//'
-        )
-
         # create an oauth2 provider client app entry
         app_client_oauth2_provider = dot_models.Application.objects.create(
             name='test client 2',
@@ -137,9 +100,8 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
         )
 
         auth_header_oauth2_provider = u"Bearer {0}".format(auth_oauth2_provider)
-        auth = self.get_auth_token(app_grant, app_client)
 
-        return auth, auth_header_oauth2_provider
+        return auth_header_oauth2_provider
 
     def expect_error(self, http_code, error_code_str, resp_obj):
         """
@@ -186,8 +148,7 @@ class CcxListTest(CcxRestApiTest):
             '?master_course_id={0}'.format(six.moves.urllib.parse.quote_plus(self.master_course_key_str))
         )
 
-    @ddt.data(*AUTH_ATTRS)
-    def test_authorization(self, auth_attr):
+    def test_authorization(self):
         """
         Test that only the right token is authorized
         """
@@ -203,7 +164,7 @@ class CcxListTest(CcxRestApiTest):
             resp = self.client.get(self.list_url_master_course, {}, HTTP_AUTHORIZATION=auth)
             self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
 
-        resp = self.client.get(self.list_url_master_course, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.get(self.list_url_master_course, {}, HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
     def test_authorization_no_oauth_staff(self):
@@ -281,8 +242,7 @@ class CcxListTest(CcxRestApiTest):
         resp = self.client.post(self.list_url, data, format='json')
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
-    @ddt.data(*AUTH_ATTRS)
-    def test_get_list_wrong_master_course(self, auth_attr):
+    def test_get_list_wrong_master_course(self):
         """
         Test for various get requests with wrong master course string
         """
@@ -291,31 +251,30 @@ class CcxListTest(CcxRestApiTest):
         with mock.patch(mock_class_str, autospec=True) as mocked_perm_class:
             mocked_perm_class.return_value = True
             # case with no master_course_id provided
-            resp = self.client.get(self.list_url, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
+            resp = self.client.get(self.list_url, {}, HTTP_AUTHORIZATION=self.auth)
             self.expect_error(status.HTTP_400_BAD_REQUEST, 'master_course_id_not_provided', resp)
 
             base_url = six.moves.urllib.parse.urljoin(self.list_url, '?master_course_id=')
             # case with empty master_course_id
-            resp = self.client.get(base_url, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
+            resp = self.client.get(base_url, {}, HTTP_AUTHORIZATION=self.auth)
             self.expect_error(status.HTTP_400_BAD_REQUEST, 'course_id_not_valid', resp)
 
             # case with invalid master_course_id
             url = '{0}invalid_master_course_str'.format(base_url)
-            resp = self.client.get(url, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
+            resp = self.client.get(url, {}, HTTP_AUTHORIZATION=self.auth)
             self.expect_error(status.HTTP_400_BAD_REQUEST, 'course_id_not_valid', resp)
 
             # case with inexistent master_course_id
             url = '{0}course-v1%3Aorg_foo.0%2Bcourse_bar_0%2BRun_0'.format(base_url)
-            resp = self.client.get(url, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
+            resp = self.client.get(url, {}, HTTP_AUTHORIZATION=self.auth)
             self.expect_error(status.HTTP_404_NOT_FOUND, 'course_id_does_not_exist', resp)
 
-    @ddt.data(*AUTH_ATTRS)
-    def test_get_list(self, auth_attr):
+    def test_get_list(self):
         """
         Tests the API to get a list of CCX Courses
         """
         # there are no CCX courses
-        resp = self.client.get(self.list_url_master_course, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.get(self.list_url_master_course, {}, HTTP_AUTHORIZATION=self.auth)
         self.assertIn('count', resp.data)
         self.assertEqual(resp.data['count'], 0)
 
@@ -323,15 +282,14 @@ class CcxListTest(CcxRestApiTest):
         num_ccx = 10
         for _ in range(num_ccx):
             self.make_ccx()
-        resp = self.client.get(self.list_url_master_course, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.get(self.list_url_master_course, {}, HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertIn('count', resp.data)
         self.assertEqual(resp.data['count'], num_ccx)
         self.assertIn('results', resp.data)
         self.assertEqual(len(resp.data['results']), num_ccx)
 
-    @ddt.data(*AUTH_ATTRS)
-    def test_get_sorted_list(self, auth_attr):
+    def test_get_sorted_list(self):
         """
         Tests the API to get a sorted list of CCX Courses
         """
@@ -350,7 +308,7 @@ class CcxListTest(CcxRestApiTest):
 
         # sort by display name
         url = '{0}&order_by=display_name'.format(self.list_url_master_course)
-        resp = self.client.get(url, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.get(url, {}, HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp.data['results']), num_ccx)
         # the display_name should be sorted as "Title CCX x", "Title CCX y", "Title CCX z"
@@ -359,14 +317,13 @@ class CcxListTest(CcxRestApiTest):
 
         # add sort order desc
         url = '{0}&order_by=display_name&sort_order=desc'.format(self.list_url_master_course)
-        resp = self.client.get(url, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.get(url, {}, HTTP_AUTHORIZATION=self.auth)
         # the only thing I can check is that the display name is in alphabetically reversed order
         # in the same way when the field has been updated above, so with the id asc
         for num, ccx in enumerate(resp.data['results']):
             self.assertEqual(title_str.format(string.ascii_lowercase[-(num + 1)]), ccx['display_name'])
 
-    @ddt.data(*AUTH_ATTRS)
-    def test_get_paginated_list(self, auth_attr):
+    def test_get_paginated_list(self):
         """
         Tests the API to get a paginated list of CCX Courses
         """
@@ -377,7 +334,7 @@ class CcxListTest(CcxRestApiTest):
         page_size = settings.REST_FRAMEWORK.get('PAGE_SIZE', 10)
         num_pages = int(math.ceil(num_ccx / float(page_size)))
         # get first page
-        resp = self.client.get(self.list_url_master_course, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.get(self.list_url_master_course, {}, HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.data['count'], num_ccx)
         self.assertEqual(resp.data['num_pages'], num_pages)
@@ -388,7 +345,7 @@ class CcxListTest(CcxRestApiTest):
 
         # get a page in the middle
         url = '{0}&page=24'.format(self.list_url_master_course)
-        resp = self.client.get(url, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.get(url, {}, HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.data['count'], num_ccx)
         self.assertEqual(resp.data['num_pages'], num_pages)
@@ -399,7 +356,7 @@ class CcxListTest(CcxRestApiTest):
 
         # get last page
         url = '{0}&page={1}'.format(self.list_url_master_course, num_pages)
-        resp = self.client.get(url, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.get(url, {}, HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.data['count'], num_ccx)
         self.assertEqual(resp.data['num_pages'], num_pages)
@@ -410,7 +367,7 @@ class CcxListTest(CcxRestApiTest):
 
         # last page + 1
         url = '{0}&page={1}'.format(self.list_url_master_course, num_pages + 1)
-        resp = self.client.get(url, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.get(url, {}, HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     @ddt.data(
@@ -418,65 +375,30 @@ class CcxListTest(CcxRestApiTest):
             {},
             status.HTTP_400_BAD_REQUEST,
             'master_course_id_not_provided',
-            'auth_header_oauth2_provider'
-        ),
-        (
-            {},
-            status.HTTP_400_BAD_REQUEST,
-            'master_course_id_not_provided',
-            'auth'
         ),
         (
             {'master_course_id': None},
             status.HTTP_400_BAD_REQUEST,
             'master_course_id_not_provided',
-            'auth_header_oauth2_provider'
-        ),
-        (
-            {'master_course_id': None},
-            status.HTTP_400_BAD_REQUEST,
-            'master_course_id_not_provided',
-            'auth'
         ),
         (
             {'master_course_id': ''},
             status.HTTP_400_BAD_REQUEST,
             'course_id_not_valid',
-            'auth_header_oauth2_provider'
-        ),
-        (
-            {'master_course_id': ''},
-            status.HTTP_400_BAD_REQUEST,
-            'course_id_not_valid',
-            'auth'
         ),
         (
             {'master_course_id': 'invalid_master_course_str'},
             status.HTTP_400_BAD_REQUEST,
             'course_id_not_valid',
-            'auth'
-        ),
-        (
-            {'master_course_id': 'invalid_master_course_str'},
-            status.HTTP_400_BAD_REQUEST,
-            'course_id_not_valid',
-            'auth_header_oauth2_provider'
         ),
         (
             {'master_course_id': 'course-v1:org_foo.0+course_bar_0+Run_0'},
             status.HTTP_404_NOT_FOUND,
             'course_id_does_not_exist',
-            'auth'
-        ),
-        (
-            {'master_course_id': 'course-v1:org_foo.0+course_bar_0+Run_0'},
-            status.HTTP_404_NOT_FOUND,
-            'course_id_does_not_exist',
-            'auth_header_oauth2_provider'
         ),
     )
     @ddt.unpack
-    def test_post_list_wrong_master_course(self, data, expected_http_error, expected_error_string, auth_attr):
+    def test_post_list_wrong_master_course(self, data, expected_http_error, expected_error_string):
         """
         Test for various post requests with wrong master course string
         """
@@ -485,11 +407,10 @@ class CcxListTest(CcxRestApiTest):
         with mock.patch(mock_class_str, autospec=True) as mocked_perm_class:
             mocked_perm_class.return_value = True
             # case with no master_course_id provided
-            resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+            resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
             self.expect_error(expected_http_error, expected_error_string, resp)
 
-    @ddt.data(*AUTH_ATTRS)
-    def test_post_list_wrong_master_course_special_cases(self, auth_attr):
+    def test_post_list_wrong_master_course_special_cases(self):
         """
         Same as test_post_list_wrong_master_course,
         but different ways to test the wrong master_course_id
@@ -499,7 +420,7 @@ class CcxListTest(CcxRestApiTest):
         self.mstore.update_item(self.course, self.coach.id)
         data = {'master_course_id': self.master_course_key_str}
 
-        resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
         self.expect_error(status.HTTP_403_FORBIDDEN, 'ccx_not_enabled_for_master_course', resp)
         self.course.enable_ccx = True
         self.mstore.update_item(self.course, self.coach.id)
@@ -507,7 +428,7 @@ class CcxListTest(CcxRestApiTest):
         # case with deprecated  master_course_id
         with mock.patch('lms.djangoapps.courseware.courses.get_course_by_id', autospec=True) as mocked:
             mocked.return_value.id.deprecated = True
-            resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+            resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
 
         self.expect_error(status.HTTP_400_BAD_REQUEST, 'deprecated_master_course_id', resp)
 
@@ -519,16 +440,6 @@ class CcxListTest(CcxRestApiTest):
                 'display_name': 'missing_field_display_name',
                 'coach_email': 'missing_field_coach_email'
             },
-            'auth'
-        ),
-        (
-            {},
-            {
-                'max_students_allowed': 'missing_field_max_students_allowed',
-                'display_name': 'missing_field_display_name',
-                'coach_email': 'missing_field_coach_email'
-            },
-            'auth_header_oauth2_provider'
         ),
         (
             {
@@ -538,17 +449,6 @@ class CcxListTest(CcxRestApiTest):
             {
                 'coach_email': 'missing_field_coach_email'
             },
-            'auth'
-        ),
-        (
-            {
-                'max_students_allowed': 10,
-                'display_name': 'CCX Title'
-            },
-            {
-                'coach_email': 'missing_field_coach_email'
-            },
-            'auth_header_oauth2_provider'
         ),
         (
             {
@@ -561,20 +461,6 @@ class CcxListTest(CcxRestApiTest):
                 'display_name': 'null_field_display_name',
                 'coach_email': 'null_field_coach_email'
             },
-            'auth'
-        ),
-        (
-            {
-                'max_students_allowed': None,
-                'display_name': None,
-                'coach_email': None
-            },
-            {
-                'max_students_allowed': 'null_field_max_students_allowed',
-                'display_name': 'null_field_display_name',
-                'coach_email': 'null_field_coach_email'
-            },
-            'auth_header_oauth2_provider'
         ),
         (
             {
@@ -583,16 +469,6 @@ class CcxListTest(CcxRestApiTest):
                 'coach_email': 'this is not an email@test.com'
             },
             {'coach_email': 'invalid_coach_email'},
-            'auth'
-        ),
-        (
-            {
-                'max_students_allowed': 10,
-                'display_name': 'CCX Title',
-                'coach_email': 'this is not an email@test.com'
-            },
-            {'coach_email': 'invalid_coach_email'},
-            'auth_header_oauth2_provider'
         ),
         (
             {
@@ -601,16 +477,6 @@ class CcxListTest(CcxRestApiTest):
                 'coach_email': 'email@test.com'
             },
             {'display_name': 'invalid_display_name'},
-            'auth'
-        ),
-        (
-            {
-                'max_students_allowed': 10,
-                'display_name': '',
-                'coach_email': 'email@test.com'
-            },
-            {'display_name': 'invalid_display_name'},
-            'auth_header_oauth2_provider'
         ),
         (
             {
@@ -619,16 +485,6 @@ class CcxListTest(CcxRestApiTest):
                 'coach_email': 'email@test.com'
             },
             {'max_students_allowed': 'invalid_max_students_allowed'},
-            'auth'
-        ),
-        (
-            {
-                'max_students_allowed': 'a',
-                'display_name': 'CCX Title',
-                'coach_email': 'email@test.com'
-            },
-            {'max_students_allowed': 'invalid_max_students_allowed'},
-            'auth_header_oauth2_provider'
         ),
         (
             {
@@ -638,17 +494,6 @@ class CcxListTest(CcxRestApiTest):
                 'course_modules': {'foo': 'bar'}
             },
             {'course_modules': 'invalid_course_module_list'},
-            'auth'
-        ),
-        (
-            {
-                'max_students_allowed': 10,
-                'display_name': 'CCX Title',
-                'coach_email': 'email@test.com',
-                'course_modules': {'foo': 'bar'}
-            },
-            {'course_modules': 'invalid_course_module_list'},
-            'auth_header_oauth2_provider'
         ),
         (
             {
@@ -658,17 +503,6 @@ class CcxListTest(CcxRestApiTest):
                 'course_modules': 'block-v1:org.0+course_0+Run_0+type@chapter+block@chapter_1'
             },
             {'course_modules': 'invalid_course_module_list'},
-            'auth'
-        ),
-        (
-            {
-                'max_students_allowed': 10,
-                'display_name': 'CCX Title',
-                'coach_email': 'email@test.com',
-                'course_modules': 'block-v1:org.0+course_0+Run_0+type@chapter+block@chapter_1'
-            },
-            {'course_modules': 'invalid_course_module_list'},
-            'auth_header_oauth2_provider'
         ),
         (
             {
@@ -678,31 +512,19 @@ class CcxListTest(CcxRestApiTest):
                 'course_modules': ['foo', 'bar']
             },
             {'course_modules': 'invalid_course_module_keys'},
-            'auth'
-        ),
-        (
-            {
-                'max_students_allowed': 10,
-                'display_name': 'CCX Title',
-                'coach_email': 'email@test.com',
-                'course_modules': ['foo', 'bar']
-            },
-            {'course_modules': 'invalid_course_module_keys'},
-            'auth_header_oauth2_provider'
-        ),
+        )
     )
     @ddt.unpack
-    def test_post_list_wrong_input_data(self, data, expected_errors, auth_attr):
+    def test_post_list_wrong_input_data(self, data, expected_errors):
         """
         Test for various post requests with wrong input data
         """
         # add the master_course_key_str to the request data
         data['master_course_id'] = self.master_course_key_str
-        resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
         self.expect_error_fields(expected_errors, resp)
 
-    @ddt.data(*AUTH_ATTRS)
-    def test_post_list_coach_does_not_exist(self, auth_attr):
+    def test_post_list_coach_does_not_exist(self):
         """
         Specific test for the case when the input data is valid but the coach does not exist.
         """
@@ -712,11 +534,10 @@ class CcxListTest(CcxRestApiTest):
             'display_name': 'CCX Title',
             'coach_email': 'inexisting_email@test.com'
         }
-        resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
         self.expect_error(status.HTTP_404_NOT_FOUND, 'coach_user_does_not_exist', resp)
 
-    @ddt.data(*AUTH_ATTRS)
-    def test_post_list_wrong_modules(self, auth_attr):
+    def test_post_list_wrong_modules(self):
         """
         Specific test for the case when the input data is valid but the
         course modules do not belong to the master course
@@ -731,11 +552,10 @@ class CcxListTest(CcxRestApiTest):
                 'block-v1:org.0+course_0+Run_0+type@chapter+block@chapter_bar'
             ]
         }
-        resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
         self.expect_error(status.HTTP_400_BAD_REQUEST, 'course_module_list_not_belonging_to_master_course', resp)
 
-    @ddt.data(*AUTH_ATTRS)
-    def test_post_list_mixed_wrong_and_valid_modules(self, auth_attr):
+    def test_post_list_mixed_wrong_and_valid_modules(self):
         """
         Specific test for the case when the input data is valid but some of
         the course modules do not belong to the master course
@@ -748,11 +568,10 @@ class CcxListTest(CcxRestApiTest):
             'coach_email': self.coach.email,
             'course_modules': modules
         }
-        resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
         self.expect_error(status.HTTP_400_BAD_REQUEST, 'course_module_list_not_belonging_to_master_course', resp)
 
-    @ddt.data(*AUTH_ATTRS)
-    def test_post_list(self, auth_attr):
+    def test_post_list(self):
         """
         Test the creation of a CCX
         """
@@ -764,7 +583,7 @@ class CcxListTest(CcxRestApiTest):
             'coach_email': self.coach.email,
             'course_modules': self.master_course_chapters[0:1]
         }
-        resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         # check if the response has at least the same data of the request
         for key, val in six.iteritems(data):
@@ -790,13 +609,10 @@ class CcxListTest(CcxRestApiTest):
         self.assertIn(self.coach.email, outbox[0].recipients())
 
     @ddt.data(
-        ('auth', True),
-        ('auth', False),
-        ('auth_header_oauth2_provider', True),
-        ('auth_header_oauth2_provider', False)
+        True,
+        False
     )
-    @ddt.unpack
-    def test_post_list_on_active_state(self, auth_attr, user_is_active):
+    def test_post_list_on_active_state(self, user_is_active):
         """
         Test the creation of a CCX on user's active states.
         """
@@ -810,15 +626,14 @@ class CcxListTest(CcxRestApiTest):
             'coach_email': self.coach.email,
             'course_modules': self.master_course_chapters[0:1]
         }
-        resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
 
         if not user_is_active:
             self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
         else:
             self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
-    @ddt.data(*AUTH_ATTRS)
-    def test_post_list_duplicated_modules(self, auth_attr):
+    def test_post_list_duplicated_modules(self):
         """
         Test the creation of a CCX, but with duplicated modules
         """
@@ -831,12 +646,11 @@ class CcxListTest(CcxRestApiTest):
             'coach_email': self.coach.email,
             'course_modules': duplicated_chapters
         }
-        resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         self.assertEqual(resp.data.get('course_modules'), chapters)
 
-    @ddt.data(*AUTH_ATTRS)
-    def test_post_list_staff_master_course_in_ccx(self, auth_attr):
+    def test_post_list_staff_master_course_in_ccx(self):
         """
         Specific test to check that the staff and instructor of the master
         course are assigned to the CCX.
@@ -848,7 +662,7 @@ class CcxListTest(CcxRestApiTest):
             'display_name': 'CCX Test Title',
             'coach_email': self.coach.email
         }
-        resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         # check that only one email has been sent and it is to to the coach
         self.assertEqual(len(outbox), 1)
@@ -929,8 +743,7 @@ class CcxDetailTest(CcxRestApiTest):
         )
         return ccx
 
-    @ddt.data(*AUTH_ATTRS)
-    def test_authorization(self, auth_attr):
+    def test_authorization(self):
         """
         Test that only the right token is authorized
         """
@@ -946,7 +759,7 @@ class CcxDetailTest(CcxRestApiTest):
             resp = self.client.get(self.detail_url, {}, HTTP_AUTHORIZATION=auth)
             self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
 
-        resp = self.client.get(self.detail_url, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.get(self.detail_url, {}, HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
     def test_authorization_no_oauth_staff(self):
@@ -1037,15 +850,11 @@ class CcxDetailTest(CcxRestApiTest):
         self.assertEqual(views.CCXDetailView.__module__, resolver.func.__module__)
 
     @ddt.data(
-        ('get', AUTH_ATTRS[0]),
-        ('get', AUTH_ATTRS[1]),
-        ('delete', AUTH_ATTRS[0]),
-        ('delete', AUTH_ATTRS[1]),
-        ('patch', AUTH_ATTRS[0]),
-        ('patch', AUTH_ATTRS[1])
+        'get',
+        'delete',
+        'patch',
     )
-    @ddt.unpack
-    def test_detail_wrong_ccx(self, http_method, auth_attr):
+    def test_detail_wrong_ccx(self, http_method):
         """
         Test for different methods for detail of a ccx course.
         All check the validity of the ccx course id
@@ -1056,46 +865,45 @@ class CcxDetailTest(CcxRestApiTest):
         url = reverse('ccx_api:v0:ccx:detail', kwargs={'ccx_course_id': self.master_course_key_str})
 
         # the permission class will give a 403 error because will not find the CCX
-        resp = client_request(url, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = client_request(url, {}, HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
         # bypassing the permission class we get another kind of error
         with mock.patch(mock_class_str, autospec=True) as mocked_perm_class:
             mocked_perm_class.return_value = True
-            resp = client_request(url, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
+            resp = client_request(url, {}, HTTP_AUTHORIZATION=self.auth)
             self.expect_error(status.HTTP_400_BAD_REQUEST, 'course_id_not_valid_ccx_id', resp)
 
         # use an non existing ccx id
         url = reverse('ccx_api:v0:ccx:detail', kwargs={'ccx_course_id': 'ccx-v1:foo.0+course_bar_0+Run_0+ccx@1'})
         # the permission class will give a 403 error because will not find the CCX
-        resp = client_request(url, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = client_request(url, {}, HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
         # bypassing the permission class we get another kind of error
         with mock.patch(mock_class_str, autospec=True) as mocked_perm_class:
             mocked_perm_class.return_value = True
-            resp = client_request(url, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
+            resp = client_request(url, {}, HTTP_AUTHORIZATION=self.auth)
             self.expect_error(status.HTTP_404_NOT_FOUND, 'ccx_course_id_does_not_exist', resp)
 
         # get a valid ccx key and add few 0s to get a non existing ccx for a valid course
         ccx_key_str = '{0}000000'.format(self.ccx_key_str)
         url = reverse('ccx_api:v0:ccx:detail', kwargs={'ccx_course_id': ccx_key_str})
         # the permission class will give a 403 error because will not find the CCX
-        resp = client_request(url, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = client_request(url, {}, HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
         # bypassing the permission class we get another kind of error
         with mock.patch(mock_class_str, autospec=True) as mocked_perm_class:
             mocked_perm_class.return_value = True
-            resp = client_request(url, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
+            resp = client_request(url, {}, HTTP_AUTHORIZATION=self.auth)
             self.expect_error(status.HTTP_404_NOT_FOUND, 'ccx_course_id_does_not_exist', resp)
 
-    @ddt.data(*AUTH_ATTRS)
-    def test_get_detail(self, auth_attr):
+    def test_get_detail(self):
         """
         Test for getting detail of a ccx course
         """
-        resp = self.client.get(self.detail_url, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.get(self.detail_url, {}, HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.data.get('ccx_course_id'), self.ccx_key_str)
         self.assertEqual(resp.data.get('display_name'), self.ccx.display_name)
@@ -1107,15 +915,14 @@ class CcxDetailTest(CcxRestApiTest):
         self.assertEqual(resp.data.get('master_course_id'), six.text_type(self.ccx.course_id))
         six.assertCountEqual(self, resp.data.get('course_modules'), self.master_course_chapters)
 
-    @ddt.data(*AUTH_ATTRS)
-    def test_delete_detail(self, auth_attr):
+    def test_delete_detail(self):
         """
         Test for deleting a ccx course
         """
         # check that there are overrides
         self.assertGreater(CcxFieldOverride.objects.filter(ccx=self.ccx).count(), 0)
         self.assertGreater(CourseEnrollment.objects.filter(course_id=self.ccx_key).count(), 0)
-        resp = self.client.delete(self.detail_url, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.delete(self.detail_url, {}, HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertIsNone(resp.data)
         # the CCX does not exist any more
@@ -1125,15 +932,14 @@ class CcxDetailTest(CcxRestApiTest):
         self.assertEqual(CcxFieldOverride.objects.filter(ccx=self.ccx).count(), 0)
         self.assertEqual(CourseEnrollment.objects.filter(course_id=self.ccx_key).count(), 0)
 
-    @ddt.data(*AUTH_ATTRS)
-    def test_patch_detail_change_master_course(self, auth_attr):
+    def test_patch_detail_change_master_course(self):
         """
         Test to patch a ccx course to change a master course
         """
         data = {
             'master_course_id': 'changed_course_id'
         }
-        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
         self.expect_error(status.HTTP_403_FORBIDDEN, 'master_course_id_change_not_allowed', resp)
 
     @ddt.data(
@@ -1148,94 +954,41 @@ class CcxDetailTest(CcxRestApiTest):
                 'display_name': 'null_field_display_name',
                 'coach_email': 'null_field_coach_email'
             },
-            AUTH_ATTRS[0]
-        ),
-        (
-            {
-                'max_students_allowed': None,
-                'display_name': None,
-                'coach_email': None
-            },
-            {
-                'max_students_allowed': 'null_field_max_students_allowed',
-                'display_name': 'null_field_display_name',
-                'coach_email': 'null_field_coach_email'
-            },
-            AUTH_ATTRS[1]
         ),
         (
             {'coach_email': 'this is not an email@test.com'},
             {'coach_email': 'invalid_coach_email'},
-            AUTH_ATTRS[0]
-        ),
-        (
-            {'coach_email': 'this is not an email@test.com'},
-            {'coach_email': 'invalid_coach_email'},
-            AUTH_ATTRS[1]
         ),
         (
             {'display_name': ''},
             {'display_name': 'invalid_display_name'},
-            AUTH_ATTRS[0]
-        ),
-        (
-            {'display_name': ''},
-            {'display_name': 'invalid_display_name'},
-            AUTH_ATTRS[1]
         ),
         (
             {'max_students_allowed': 'a'},
             {'max_students_allowed': 'invalid_max_students_allowed'},
-            AUTH_ATTRS[0]
-        ),
-        (
-            {'max_students_allowed': 'a'},
-            {'max_students_allowed': 'invalid_max_students_allowed'},
-            AUTH_ATTRS[1]
         ),
         (
             {'course_modules': {'foo': 'bar'}},
             {'course_modules': 'invalid_course_module_list'},
-            AUTH_ATTRS[0]
-        ),
-        (
-            {'course_modules': {'foo': 'bar'}},
-            {'course_modules': 'invalid_course_module_list'},
-            AUTH_ATTRS[1]
         ),
         (
             {'course_modules': 'block-v1:org.0+course_0+Run_0+type@chapter+block@chapter_1'},
             {'course_modules': 'invalid_course_module_list'},
-            AUTH_ATTRS[0]
-
-        ),
-        (
-            {'course_modules': 'block-v1:org.0+course_0+Run_0+type@chapter+block@chapter_1'},
-            {'course_modules': 'invalid_course_module_list'},
-            AUTH_ATTRS[1]
-
         ),
         (
             {'course_modules': ['foo', 'bar']},
             {'course_modules': 'invalid_course_module_keys'},
-            AUTH_ATTRS[0]
-        ),
-        (
-            {'course_modules': ['foo', 'bar']},
-            {'course_modules': 'invalid_course_module_keys'},
-            AUTH_ATTRS[1]
         ),
     )
     @ddt.unpack
-    def test_patch_detail_wrong_input_data(self, data, expected_errors, auth_attr):
+    def test_patch_detail_wrong_input_data(self, data, expected_errors):
         """
         Test for different wrong inputs for the patch method
         """
-        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
         self.expect_error_fields(expected_errors, resp)
 
-    @ddt.data(*AUTH_ATTRS)
-    def test_empty_patch(self, auth_attr):
+    def test_empty_patch(self):
         """
         An empty patch does not modify anything
         """
@@ -1243,7 +996,7 @@ class CcxDetailTest(CcxRestApiTest):
         max_students_allowed = self.ccx.max_student_enrollments_allowed
         coach_email = self.ccx.coach.email  # pylint: disable=no-member
         ccx_structure = self.ccx.structure
-        resp = self.client.patch(self.detail_url, {}, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.patch(self.detail_url, {}, format='json', HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         ccx = CustomCourseForEdX.objects.get(id=self.ccx.id)
         self.assertEqual(display_name, ccx.display_name)
@@ -1251,8 +1004,7 @@ class CcxDetailTest(CcxRestApiTest):
         self.assertEqual(coach_email, ccx.coach.email)
         self.assertEqual(ccx_structure, ccx.structure)
 
-    @ddt.data(*AUTH_ATTRS)
-    def test_patch_detail_coach_does_not_exist(self, auth_attr):
+    def test_patch_detail_coach_does_not_exist(self):
         """
         Specific test for the case when the input data is valid but the coach does not exist.
         """
@@ -1261,11 +1013,10 @@ class CcxDetailTest(CcxRestApiTest):
             'display_name': 'CCX Title',
             'coach_email': 'inexisting_email@test.com'
         }
-        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
         self.expect_error(status.HTTP_404_NOT_FOUND, 'coach_user_does_not_exist', resp)
 
-    @ddt.data(*AUTH_ATTRS)
-    def test_patch_detail_wrong_modules(self, auth_attr):
+    def test_patch_detail_wrong_modules(self):
         """
         Specific test for the case when the input data is valid but the
         course modules do not belong to the master course
@@ -1276,11 +1027,10 @@ class CcxDetailTest(CcxRestApiTest):
                 'block-v1:org.0+course_0+Run_0+type@chapter+block@chapter_bar'
             ]
         }
-        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
         self.expect_error(status.HTTP_400_BAD_REQUEST, 'course_module_list_not_belonging_to_master_course', resp)
 
-    @ddt.data(*AUTH_ATTRS)
-    def test_patch_detail_mixed_wrong_and_valid_modules(self, auth_attr):
+    def test_patch_detail_mixed_wrong_and_valid_modules(self):
         """
         Specific test for the case when the input data is valid but some of
         the course modules do not belong to the master course
@@ -1289,11 +1039,10 @@ class CcxDetailTest(CcxRestApiTest):
         data = {
             'course_modules': modules
         }
-        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
         self.expect_error(status.HTTP_400_BAD_REQUEST, 'course_module_list_not_belonging_to_master_course', resp)
 
-    @ddt.data(*AUTH_ATTRS)
-    def test_patch_detail(self, auth_attr):
+    def test_patch_detail(self):
         """
         Test for successful patch
         """
@@ -1305,7 +1054,7 @@ class CcxDetailTest(CcxRestApiTest):
             'display_name': 'CCX Title',
             'coach_email': new_coach.email
         }
-        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         ccx_from_db = CustomCourseForEdX.objects.get(id=self.ccx.id)
         self.assertEqual(ccx_from_db.max_student_enrollments_allowed, data['max_students_allowed'])
@@ -1323,50 +1072,46 @@ class CcxDetailTest(CcxRestApiTest):
         self.assertEqual(len(outbox), 1)
         self.assertIn(new_coach.email, outbox[0].recipients())
 
-    @ddt.data(*AUTH_ATTRS)
-    def test_patch_detail_modules(self, auth_attr):
+    def test_patch_detail_modules(self):
         """
         Specific test for successful patch of the course modules
         """
         data = {'course_modules': self.master_course_chapters[0:1]}
-        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         ccx_from_db = CustomCourseForEdX.objects.get(id=self.ccx.id)
         six.assertCountEqual(self, ccx_from_db.structure, data['course_modules'])
 
         data = {'course_modules': []}
-        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         ccx_from_db = CustomCourseForEdX.objects.get(id=self.ccx.id)
         six.assertCountEqual(self, ccx_from_db.structure, [])
 
         data = {'course_modules': self.master_course_chapters}
-        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         ccx_from_db = CustomCourseForEdX.objects.get(id=self.ccx.id)
         six.assertCountEqual(self, ccx_from_db.structure, self.master_course_chapters)
 
         data = {'course_modules': None}
-        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         ccx_from_db = CustomCourseForEdX.objects.get(id=self.ccx.id)
         self.assertEqual(ccx_from_db.structure, None)
 
         chapters = self.master_course_chapters[0:1]
         data = {'course_modules': chapters * 3}
-        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         ccx_from_db = CustomCourseForEdX.objects.get(id=self.ccx.id)
         six.assertCountEqual(self, ccx_from_db.structure, chapters)
 
     @ddt.data(
-        ('auth', True),
-        ('auth', False),
-        ('auth_header_oauth2_provider', True),
-        ('auth_header_oauth2_provider', False)
+        True,
+        False
     )
-    @ddt.unpack
-    def test_patch_user_on_active_state(self, auth_attr, user_is_active):
+    def test_patch_user_on_active_state(self, user_is_active):
         """
         Test patch ccx course on user's active state.
         """
@@ -1375,7 +1120,7 @@ class CcxDetailTest(CcxRestApiTest):
 
         chapters = self.master_course_chapters[0:1]
         data = {'course_modules': chapters * 3}
-        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
         if not user_is_active:
             self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
         else:
@@ -1384,13 +1129,10 @@ class CcxDetailTest(CcxRestApiTest):
             six.assertCountEqual(self, ccx_from_db.structure, chapters)
 
     @ddt.data(
-        ('auth', True),
-        ('auth', False),
-        ('auth_header_oauth2_provider', True),
-        ('auth_header_oauth2_provider', False)
+        True,
+        False
     )
-    @ddt.unpack
-    def test_delete_detail_on_active_state(self, auth_attr, user_is_active):
+    def test_delete_detail_on_active_state(self, user_is_active):
         """
         Test for deleting a ccx course on user's active state.
         """
@@ -1400,7 +1142,7 @@ class CcxDetailTest(CcxRestApiTest):
         # check that there are overrides
         self.assertGreater(CcxFieldOverride.objects.filter(ccx=self.ccx).count(), 0)
         self.assertGreater(CourseEnrollment.objects.filter(course_id=self.ccx_key).count(), 0)
-        resp = self.client.delete(self.detail_url, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        resp = self.client.delete(self.detail_url, {}, HTTP_AUTHORIZATION=self.auth)
 
         if not user_is_active:
             self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
