@@ -8,7 +8,7 @@ of tasks onto the appropriate workers.
 
 In two separate processes on devstack:
     paver devstack studio --settings=devstack_with_worker
-    ./manage.py cms celery worker --settings=devstack_with_worker
+    celery worker --app=cms.envs.devstack_with_worker
 """
 
 

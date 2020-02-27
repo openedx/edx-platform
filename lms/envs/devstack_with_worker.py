@@ -8,7 +8,7 @@ of tasks onto the appropriate workers.
 
 In two separate processes on devstack:
     paver devstack lms --settings=devstack_with_worker
-    ./manage.py lms celery worker --settings=devstack_with_worker
+    celery worker --app=lms.envs.devstack_with_worker
 """
 
 
