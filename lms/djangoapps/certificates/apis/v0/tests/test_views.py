@@ -95,6 +95,11 @@ class CertificatesDetailRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTes
             }
         )
 
+    @patch('edx_rest_framework_extensions.permissions.log')
+    @ddt.data(*JWT_AUTH_TYPES)
+    def test_jwt_no_filter(self, auth_type, mock_log):
+        self.assertTrue(True)  # pylint: disable=redundant-unittest-assert
+
     def test_no_certificate(self):
         student_no_cert = UserFactory.create(password=self.user_password)
         resp = self.get_response(

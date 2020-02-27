@@ -28,9 +28,6 @@ django-storages<1.9
 # Support was dropped for Python 3.5, Django 2.0, Django 2.1, DRF 3.7
 drf-yasg<1.17.1
 
-# BOM-1324: This constraint will be removed separately once 3.0.0 is out
-edx-drf-extensions<3.0.0
-
 # Upgrading to 2.12.0 breaks several test classes due to API changes, need to update our code accordingly
 factory-boy==2.8.1
 
