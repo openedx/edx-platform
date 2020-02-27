@@ -107,7 +107,7 @@ edx-bulk-grades==0.6.6    # via -r requirements/edx/base.txt, staff-graded-xbloc
 edx-ccx-keys==1.0.0       # via -r requirements/edx/base.txt
 edx-celeryutils==0.3.2    # via -r requirements/edx/base.txt, super-csv
 edx-completion==3.1.1     # via -r requirements/edx/base.txt
-edx-django-oauth2-provider==1.3.5  # via -r requirements/edx/base.txt, edx-oauth2-provider, edx-organizations, edxval
+edx-django-oauth2-provider==1.3.5  # via -r requirements/edx/base.txt, edx-organizations, edxval
 edx-django-release-util==0.3.6  # via -r requirements/edx/base.txt
 edx-django-sites-extensions==2.4.3  # via -r requirements/edx/base.txt
 edx-django-utils==3.0     # via -r requirements/edx/base.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client
@@ -116,7 +116,6 @@ edx-enterprise==2.4.1     # via -r requirements/edx/base.txt
 edx-i18n-tools==0.5.0     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, ora2
 edx-lint==1.4.1           # via -r requirements/edx/testing.in
 edx-milestones==0.2.6     # via -r requirements/edx/base.txt
-edx-oauth2-provider==1.3.1  # via -r requirements/edx/base.txt
 edx-opaque-keys[django]==2.0.1  # via -r requirements/edx/base.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, xmodule
 edx-organizations==3.0.0  # via -r requirements/edx/base.txt
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/base.txt
@@ -221,7 +220,7 @@ pycryptodomex==3.9.7      # via -r requirements/edx/base.txt, edx-proctoring, py
 pyflakes==2.1.1           # via flake8
 pygments==2.5.2           # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, diff-cover
 pyjwkest==1.3.2           # via -r requirements/edx/base.txt, edx-drf-extensions
-pyjwt==1.5.2              # via -r requirements/edx/base.txt, djangorestframework-jwt, edx-oauth2-provider, edx-rest-api-client, social-auth-core
+pyjwt==1.5.2              # via -r requirements/edx/base.txt, djangorestframework-jwt, edx-rest-api-client, social-auth-core
 pylint-celery==0.3        # via edx-lint
 pylint-django==2.0.11     # via edx-lint
 pylint-plugin-utils==0.6  # via pylint-celery, pylint-django

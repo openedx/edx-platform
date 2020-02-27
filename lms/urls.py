@@ -836,14 +836,10 @@ if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
         # These URLs dispatch to django-oauth-toolkit or django-oauth2-provider as appropriate.
         # Developers should use these routes, to maintain compatibility for existing client code
         url(r'^oauth2/', include('openedx.core.djangoapps.oauth_dispatch.urls')),
-        # These URLs contain the django-oauth2-provider default behavior.  It exists to provide
-        # URLs for django-oauth2-provider to call using reverse() with the oauth2 namespace, and
-        # also to maintain support for views that have not yet been wrapped in dispatch views.
-        url(r'^oauth2/', include(('edx_oauth2_provider.urls', 'edx_oauth2_provider'), namespace='oauth2')),
         # The /_o/ prefix exists to provide a target for code in django-oauth-toolkit that
         # uses reverse() with the 'oauth2_provider' namespace.  Developers should not access these
         # views directly, but should rather use the wrapped views at /oauth2/
-        url(r'^_o/', include(('oauth2_provider.urls', 'edx_oauth2_provider'), namespace='oauth2_provider')),
+        url(r'^_o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     ]
 
 
