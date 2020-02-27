@@ -40,8 +40,8 @@ class SendEmailBaseCommand(PrefixedDebugLoggerMixin, BaseCommand):
     def handle(self, *args, **options):
         self.log_debug('Args = %r', options)
 
-        if 'weeks' in options:
-            num_weeks = options['weeks']
+        num_weeks = options.get('weeks')
+        if num_weeks:
             num_days = (7 * num_weeks) + 1
             self.offsets = range(-7, -num_days, -7)
 
