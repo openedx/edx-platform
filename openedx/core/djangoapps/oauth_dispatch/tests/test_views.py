@@ -15,7 +15,6 @@ from django.urls import reverse
 from jwkest import jwk
 from mock import call, patch
 from oauth2_provider import models as dot_models
-from organizations.tests.factories import OrganizationFactory
 from provider import constants
 
 from openedx.core.djangoapps.oauth_dispatch.toggles import ENFORCE_JWT_SCOPES
@@ -106,10 +105,6 @@ class _DispatchingViewTestCase(TestCase):
         self.dot_app_access = models.ApplicationAccess.objects.create(
             application=self.dot_app,
             scopes=['grades:read'],
-        )
-        self.dot_app_org = models.ApplicationOrganization.objects.create(
-            application=self.dot_app,
-            organization=OrganizationFactory()
         )
 
         # Create a "restricted" DOT Application which means any AccessToken/JWT
@@ -350,10 +345,6 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
             scopes=['grades:read'],
             filters=['test:filter'],
         )
-        models.ApplicationOrganization.objects.create(
-            application=dot_app,
-            organization=OrganizationFactory()
-        )
         scopes = dot_app_access.scopes
         filters = self.dot_adapter.get_authorization_filters(dot_app)
         assert 'test:filter' in filters
@@ -416,10 +407,10 @@ class TestAuthorizationView(_DispatchingViewTestCase):
         models.ApplicationAccess.objects.create(
             application=self.dot_app,
             scopes=['grades:read'],
-        )
-        self.dot_app_org = models.ApplicationOrganization.objects.create(
-            application=self.dot_app,
-            organization=OrganizationFactory()
+            filters=[
+                'content_org:test content org',
+                'other_filter:filter_val',
+            ]
         )
         self.dop_app = self.dop_adapter.create_confidential_client(
             name='test dop client',
@@ -497,7 +488,13 @@ class TestAuthorizationView(_DispatchingViewTestCase):
         # Are the content provider organizations listed on the page?
         self.assertContains(
             response,
-            '<li>{org}</li>'.format(org=self.dot_app_org.organization.name)
+            '<li>{org}</li>'.format(org='test content org')
+        )
+
+        # Make sure other filters don't show up as orgs.
+        self.assertNotContains(
+            response,
+            '<li>{org}</li>'.format(org='filter_val')
         )
 
     def _check_dot_response(self, response):
