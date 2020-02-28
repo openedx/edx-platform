@@ -31,7 +31,7 @@ import capa.xqueue_interface as xqueue_interface
 from capa.correctmap import CorrectMap
 from capa.safe_exec import safe_exec
 from capa.util import contextualize_text, convert_files_to_filenames
-from openedx.core.djangolib.markup import HTML
+from openedx.core.djangolib.markup import HTML, Text
 from xmodule.stringify import stringify_children
 
 # extra things displayed after "show answers" is pressed
@@ -60,6 +60,7 @@ html_transforms = {
 
 # These should be removed from HTML output, including all subelements
 html_problem_semantics = [
+    "additional_answer",
     "codeparam",
     "responseparam",
     "answer",
@@ -884,7 +885,7 @@ class LoncapaProblem(object):
                 )
             except Exception as err:
                 log.exception("Error while execing script code: " + all_code)
-                msg = "Error while executing script code: %s" % str(err).replace('<', '&lt;')
+                msg = Text("Error while executing script code: %s" % str(err))
                 raise responsetypes.LoncapaProblemError(msg)
 
         # Store code source in context, along with the Python path needed to run it correctly.
