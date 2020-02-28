@@ -1890,6 +1890,7 @@ CREATE TABLE `course_overviews_courseoverviewtab` (
   `course_staff_only` tinyint(1) NOT NULL,
   `name` longtext,
   `type` varchar(50) DEFAULT NULL,
+  `url_slug` longtext,
   PRIMARY KEY (`id`),
   KEY `course_overviews_cou_course_overview_id_71fa6321_fk_course_ov` (`course_overview_id`),
   CONSTRAINT `course_overviews_cou_course_overview_id_71fa6321_fk_course_ov` FOREIGN KEY (`course_overview_id`) REFERENCES `course_overviews_courseoverview` (`id`)
@@ -2612,7 +2613,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=665 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=666 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
