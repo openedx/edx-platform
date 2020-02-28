@@ -1,5 +1,9 @@
 """
 Utilities related to hashing
+
+This duplicates functionality in django-oauth-provider,
+specifically long_token and short token functions which was used to create
+random tokens
 """
 import hashlib
 import shortuuid
@@ -10,6 +14,8 @@ from django.conf import settings
 def create_hash256(max_length=None):
     """
     Generate a hash that can be used as an application secret
+    Warning: this is not sufficiently secure for tasks like encription
+    Currently, this is just meant to create sufficiently random tokens
     """
     hash_object = hashlib.sha256(force_bytes(shortuuid.uuid()))
     hash_object.update(force_bytes(settings.SECRET_KEY))
@@ -20,4 +26,9 @@ def create_hash256(max_length=None):
 
 
 def short_token():
+    """
+    Generates a hash of length 32
+    Warning: this is not sufficiently secure for tasks like encription
+    Currently, this is just meant to create sufficiently random tokens
+    """
     return create_hash256(max_length=32)
