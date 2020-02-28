@@ -282,7 +282,7 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
                     if request:
                         value = flag_is_active(request, namespaced_flag_name)
                     else:
-                        log.warn(u"%sFlag '%s' accessed without a request", self.log_prefix, namespaced_flag_name)
+                        log.warning(u"%sFlag '%s' accessed without a request", self.log_prefix, namespaced_flag_name)
                         # Return the default value if not in a request context.
                         # Note: this skips the cache as the value might be different
                         # in a normal request context. This case seems to occur when
