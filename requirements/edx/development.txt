@@ -64,13 +64,13 @@ defusedxml==0.5.0         # via -r requirements/edx/testing.txt, djangorestframe
 diff-cover==2.6.0         # via -r requirements/edx/testing.txt
 distlib==0.3.0            # via -r requirements/edx/testing.txt, virtualenv
 git+https://github.com/django-compressor/django-appconf@1526a842ee084b791aa66c931b3822091a442853#egg=django-appconf  # via -r requirements/edx/testing.txt, django-statici18n
-django-babel-underscore==0.5.2  # via -r requirements/edx/testing.txt
-django-babel==0.6.2       # via -r requirements/edx/testing.txt, django-babel-underscore
+git+https://github.com/edx/django-babel-underscore.git@37705f7377a4d0a4e673f1431895ce28a8860cd7#egg=django-babel-underscore==0.6.0  # via -r requirements/edx/testing.txt
+git+https://github.com/Zegocover/enmerkar.git@dbc113798aa4beabdfa2d00e6fef48248eb0f185#egg=django-babel==0.6.3.dev0  # via -r requirements/edx/testing.txt
 git+https://github.com/edx/django-celery.git@756cb57aad765cb2b0d37372c1855b8f5f37e6b0#egg=django-celery==3.2.1+edx.2  # via -r requirements/edx/testing.txt, edx-celeryutils, super-csv
 django-classy-tags==1.0.0  # via -r requirements/edx/testing.txt, django-sekizai
 django-config-models==2.0.0  # via -r requirements/edx/testing.txt, edx-enterprise
 django-cors-headers==2.5.3  # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
-django-countries==5.5     # via -r requirements/edx/testing.txt, edx-enterprise
+django-countries==6.0     # via -r requirements/edx/testing.txt, edx-enterprise
 django-crum==0.7.5        # via -r requirements/edx/testing.txt, edx-enterprise, edx-proctoring, edx-rbac, super-csv
 django-debug-toolbar==2.2  # via -r requirements/edx/development.in
 django-fernet-fields==0.6  # via -r requirements/edx/testing.txt, edx-enterprise
@@ -282,7 +282,7 @@ shapely==1.7.0            # via -r requirements/edx/testing.txt
 shortuuid==0.5.0          # via -r requirements/edx/testing.txt, edx-django-oauth2-provider
 simplejson==3.17.0        # via -r requirements/edx/testing.txt, sailthru-client, super-csv, xblock-utils
 singledispatch==3.4.0.3   # via -r requirements/edx/testing.txt
-six==1.14.0               # via -r requirements/edx/pip-tools.txt, -r requirements/edx/testing.txt, analytics-python, astroid, bleach, bok-choy, calc, cryptography, diff-cover, django-appconf, django-classy-tags, django-countries, django-pyfs, django-sekizai, django-simple-history, django-statici18n, drf-yasg, edx-ace, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-lint, edx-milestones, edx-opaque-keys, edx-rbac, edx-search, edx-sphinx-theme, event-tracking, freezegun, fs, fs-s3fs, help-tokens, html5lib, httpretty, isodate, jsonschema, libsass, mando, mock, nltk, packaging, pathlib2, paver, pip-tools, pycontracts, pyjwkest, pylint, pytest-xdist, python-dateutil, python-memcached, python-swiftclient, singledispatch, social-auth-app-django, social-auth-core, sphinxcontrib-httpdomain, stevedore, tox, transifex-client, virtualenv, xblock
+six==1.14.0               # via -r requirements/edx/pip-tools.txt, -r requirements/edx/testing.txt, analytics-python, astroid, bleach, bok-choy, calc, cryptography, diff-cover, django-appconf, django-classy-tags, django-pyfs, django-sekizai, django-simple-history, django-statici18n, drf-yasg, edx-ace, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-lint, edx-milestones, edx-opaque-keys, edx-rbac, edx-search, edx-sphinx-theme, event-tracking, freezegun, fs, fs-s3fs, help-tokens, html5lib, httpretty, isodate, jsonschema, libsass, mando, mock, nltk, packaging, pathlib2, paver, pip-tools, pycontracts, pyjwkest, pylint, pytest-xdist, python-dateutil, python-memcached, python-swiftclient, singledispatch, social-auth-app-django, social-auth-core, sphinxcontrib-httpdomain, stevedore, tox, transifex-client, virtualenv, xblock
 slumber==0.7.1            # via -r requirements/edx/testing.txt, edx-bulk-grades, edx-enterprise, edx-rest-api-client
 snowballstemmer==2.0.0    # via sphinx
 social-auth-core==3.2.0   # via -r requirements/edx/testing.txt, social-auth-app-django
