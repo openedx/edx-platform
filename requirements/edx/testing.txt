@@ -69,7 +69,7 @@ git+https://github.com/edx/django-celery.git@756cb57aad765cb2b0d37372c1855b8f5f3
 django-classy-tags==1.0.0  # via -r requirements/edx/base.txt, django-sekizai
 django-config-models==2.0.0  # via -r requirements/edx/base.txt, edx-enterprise
 django-cors-headers==2.5.3  # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
-django-countries==5.5     # via -r requirements/edx/base.txt, edx-enterprise
+django-countries==6.0     # via -r requirements/edx/base.txt, edx-enterprise
 django-crum==0.7.5        # via -r requirements/edx/base.txt, edx-enterprise, edx-proctoring, edx-rbac, super-csv
 django-fernet-fields==0.6  # via -r requirements/edx/base.txt, edx-enterprise
 django-filter==2.2.0      # via -r requirements/edx/base.txt, edx-enterprise
@@ -270,7 +270,7 @@ shapely==1.7.0            # via -r requirements/edx/base.txt
 shortuuid==0.5.0          # via -r requirements/edx/base.txt, edx-django-oauth2-provider
 simplejson==3.17.0        # via -r requirements/edx/base.txt, sailthru-client, super-csv, xblock-utils
 singledispatch==3.4.0.3   # via -r requirements/edx/testing.in
-six==1.14.0               # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, analytics-python, astroid, bleach, bok-choy, calc, cryptography, diff-cover, django-appconf, django-classy-tags, django-countries, django-pyfs, django-sekizai, django-simple-history, django-statici18n, drf-yasg, edx-ace, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-lint, edx-milestones, edx-opaque-keys, edx-rbac, edx-search, event-tracking, freezegun, fs, fs-s3fs, help-tokens, html5lib, httpretty, isodate, libsass, mando, mock, nltk, packaging, pathlib2, paver, pycontracts, pyjwkest, pylint, pytest-xdist, python-dateutil, python-memcached, python-swiftclient, singledispatch, social-auth-app-django, social-auth-core, stevedore, tox, transifex-client, virtualenv, xblock
+six==1.14.0               # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, analytics-python, astroid, bleach, bok-choy, calc, cryptography, diff-cover, django-appconf, django-classy-tags, django-pyfs, django-sekizai, django-simple-history, django-statici18n, drf-yasg, edx-ace, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-lint, edx-milestones, edx-opaque-keys, edx-rbac, edx-search, event-tracking, freezegun, fs, fs-s3fs, help-tokens, html5lib, httpretty, isodate, libsass, mando, mock, nltk, packaging, pathlib2, paver, pycontracts, pyjwkest, pylint, pytest-xdist, python-dateutil, python-memcached, python-swiftclient, singledispatch, social-auth-app-django, social-auth-core, stevedore, tox, transifex-client, virtualenv, xblock
 slumber==0.7.1            # via -r requirements/edx/base.txt, edx-bulk-grades, edx-enterprise, edx-rest-api-client
 social-auth-core==3.2.0   # via -r requirements/edx/base.txt, social-auth-app-django
 git+https://github.com/jazzband/sorl-thumbnail.git@13bedfb7d2970809eda597e3ef79318a6fa80ac2#egg=sorl-thumbnail  # via -r requirements/edx/base.txt
