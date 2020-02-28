@@ -32,6 +32,11 @@ class AccountCreationFormCustom(AccountCreationForm):
         required=False
     )
 
+    # field to check if organization is selected from dropdown or not
+    is_org_selected = forms.BooleanField(
+        required=False
+    )
+
     organization_name = forms.CharField(
         max_length=255,
         required=False
@@ -60,12 +65,16 @@ class AccountCreationFormCustom(AccountCreationForm):
 
     def clean_organization_name(self):
         org_name = self.cleaned_data.get('organization_name')
-        try:
-            Organization.objects.get_or_create(label=org_name)
-            raise forms.ValidationError(_('Organization already exists, either choose existing from list '
-                                          'or try a different name'))
-        except Organization.DoesNotExist:
-            return org_name
+        is_org_selected = self.cleaned_data.get('is_org_selected')
+
+        if not is_org_selected:
+            try:
+                Organization.objects.get(label=org_name)
+                raise forms.ValidationError(_('Organization already exists, either select existing from list '
+                                              'or try a different name'))
+            except Organization.DoesNotExist:
+                return org_name
+        return org_name
 
     def clean(self):
         """ Enforce organization related field conditions """
