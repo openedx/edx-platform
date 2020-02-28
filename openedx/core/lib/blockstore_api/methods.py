@@ -264,7 +264,7 @@ def get_bundle_version_links(bundle_uuid, version_number):
     Get a dictionary of the links in the specified bundle version
     """
     if version_number == 0:
-        return []
+        return {}
     version_url = api_url('bundle_versions', str(bundle_uuid) + ',' + str(version_number))
     version_info = api_request('get', version_url)
     return {

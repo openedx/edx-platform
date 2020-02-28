@@ -1,8 +1,39 @@
 """
 Python API for content libraries.
 
-Unless otherwise specified, all APIs in this file deal with the DRAFT version
-of the content library.
+Via 'views.py', most of these API methods are also exposed as a REST API.
+
+The API methods in this file are focused on authoring and specific to content
+libraries; they wouldn't necessarily apply or work in other learning contexts
+such as courses, blogs, "pathways," etc.
+
+** As this is an authoring-focused API, all API methods in this file deal with
+the DRAFT version of the content library. **
+
+Some of these methods will work and may be used from the LMS if needed (mostly
+for test setup; other use is discouraged), but some of the implementation
+details rely on Studio so other methods will raise errors if called from the
+LMS. (The REST API is not available at all from the LMS.)
+
+Any APIs that use/affect content libraries but are generic enough to work in
+other learning contexts too are in the core XBlock python/REST API at
+    openedx.core.djangoapps.xblock.api/rest_api
+
+For example, to render a content library XBlock as HTML, one can use the generic
+    render_block_view(block, view_name, user)
+API in openedx.core.djangoapps.xblock.api (use it from Studio for the draft
+version, from the LMS for published version).
+
+There are one or two methods in this file that have some overlap with the core
+XBlock API; for example, this content library API provides a get_library_block()
+which returns metadata about an XBlock; it's in this API because it also returns
+data about whether or not the XBlock has unpublished edits, which is an
+authoring-only concern. Likewise, APIs for getting/setting an individual
+XBlock's OLX directly seem more appropriate for small, reusable components in
+content libraries and may not be appropriate for other learning contexts so they
+are implemented here in the library API only. In the future, if we find a need
+for these in most other learning contexts then those methods could be promoted
+to the core XBlock API and made generic.
 """
 from uuid import UUID
 import logging
@@ -13,6 +44,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.validators import validate_unicode_slug
 from django.db import IntegrityError
 from lxml import etree
+from opaque_keys.edx.keys import LearningContextKey
 from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryLocatorV2, LibraryUsageLocatorV2
 from organizations.models import Organization
 import six
@@ -34,6 +66,7 @@ from openedx.core.lib.blockstore_api import (
     update_bundle,
     delete_bundle,
     write_draft_file,
+    set_draft_link,
     commit_draft,
     delete_draft,
 )
@@ -69,7 +102,7 @@ class InvalidNameError(ValueError):
 # Models:
 
 @attr.s
-class ContentLibraryMetadata(object):
+class ContentLibraryMetadata:
     """
     Class that represents the metadata about a content library.
     """
@@ -90,7 +123,7 @@ class ContentLibraryMetadata(object):
     allow_public_read = attr.ib(False)
 
 
-class AccessLevel(object):
+class AccessLevel:
     """ Enum defining library access levels/permissions """
     ADMIN_LEVEL = ContentLibraryPermission.ADMIN_LEVEL
     AUTHOR_LEVEL = ContentLibraryPermission.AUTHOR_LEVEL
@@ -99,7 +132,7 @@ class AccessLevel(object):
 
 
 @attr.s
-class ContentLibraryPermissionEntry(object):
+class ContentLibraryPermissionEntry:
     """
     A user or group granted permission to use a content library.
     """
@@ -109,7 +142,7 @@ class ContentLibraryPermissionEntry(object):
 
 
 @attr.s
-class LibraryXBlockMetadata(object):
+class LibraryXBlockMetadata:
     """
     Class that represents the metadata about an XBlock in a content library.
     """
@@ -120,7 +153,7 @@ class LibraryXBlockMetadata(object):
 
 
 @attr.s
-class LibraryXBlockStaticFile(object):
+class LibraryXBlockStaticFile:
     """
     Class that represents a static file in a content library, associated with
     a particular XBlock.
@@ -135,12 +168,39 @@ class LibraryXBlockStaticFile(object):
 
 
 @attr.s
-class LibraryXBlockType(object):
+class LibraryXBlockType:
     """
     An XBlock type that can be added to a content library
     """
     block_type = attr.ib("")
     display_name = attr.ib("")
+
+
+@attr.s
+class LibraryBundleLink:
+    """
+    A link from a content library blockstore bundle to another blockstore bundle
+    """
+    # Bundle that is linked to
+    bundle_uuid = attr.ib(type=UUID)
+    # Link name (slug)
+    id = attr.ib("")
+    # What version of this bundle we are currently linking to.
+    version = attr.ib(0)
+    # What the latest version of the linked bundle is:
+    # (if latest_version > version), the link can be "updated" to the latest version.
+    latest_version = attr.ib(0)
+    # Opaque key: If the linked bundle is a library or other learning context whose opaque key we can deduce, then this
+    # is the key. If we don't know what type of blockstore bundle this link is pointing to, then this is blank.
+    opaque_key = attr.ib(type=LearningContextKey, default=None)
+
+
+class AccessLevel:
+    """ Enum defining library access levels/permissions """
+    ADMIN_LEVEL = ContentLibraryPermission.ADMIN_LEVEL
+    AUTHOR_LEVEL = ContentLibraryPermission.AUTHOR_LEVEL
+    READ_LEVEL = ContentLibraryPermission.READ_LEVEL
+    NO_ACCESS = None
 
 
 def list_libraries_for_user(user):
@@ -641,6 +701,93 @@ def get_allowed_block_types(library_key):  # pylint: disable=unused-argument
         if display_name:
             info.append(LibraryXBlockType(block_type=block_type, display_name=display_name))
     return info
+
+
+def get_bundle_links(library_key):
+    """
+    Get the list of bundles/libraries linked to this content library.
+
+    Returns LibraryBundleLink objects (defined above).
+
+    Because every content library is a blockstore bundle, it can have "links" to
+    other bundles, which may or may not be content libraries. This allows using
+    XBlocks (or perhaps even static assets etc.) from another bundle without
+    needing to duplicate/copy the data.
+
+    Links always point to a specific published version of the target bundle.
+    Links are identified by a slug-like ID, e.g. "link1"
+    """
+    ref = ContentLibrary.objects.get_by_key(library_key)
+    links = blockstore_cache.get_bundle_draft_direct_links_cached(ref.bundle_uuid, DRAFT_NAME)
+    results = []
+    # To be able to quickly get the library ID from the bundle ID for links which point to other libraries, build a map:
+    bundle_uuids = set(link_data.bundle_uuid for link_data in links.values())
+    libraries_linked = {
+        lib.bundle_uuid: lib
+        for lib in ContentLibrary.objects.select_related('org').filter(bundle_uuid__in=bundle_uuids)
+    }
+    for link_name, link_data in links.items():
+        # Is this linked bundle a content library?
+        try:
+            opaque_key = libraries_linked[link_data.bundle_uuid].library_key
+        except KeyError:
+            opaque_key = None
+        # Append the link information:
+        results.append(LibraryBundleLink(
+            id=link_name,
+            bundle_uuid=link_data.bundle_uuid,
+            version=link_data.version,
+            latest_version=blockstore_cache.get_bundle_version_number(link_data.bundle_uuid),
+            opaque_key=opaque_key,
+        ))
+    return results
+
+
+def create_bundle_link(library_key, link_id, target_opaque_key, version=None):
+    """
+    Create a new link to the resource with the specified opaque key.
+
+    For now, only LibraryLocatorV2 opaque keys are supported.
+    """
+    ref = ContentLibrary.objects.get_by_key(library_key)
+    # Make sure this link ID/name is not already in use:
+    links = blockstore_cache.get_bundle_draft_direct_links_cached(ref.bundle_uuid, DRAFT_NAME)
+    if link_id in links:
+        raise InvalidNameError("That link ID is already in use.")
+    # Determine the target:
+    if not isinstance(target_opaque_key, LibraryLocatorV2):
+        raise TypeError("For now, only LibraryLocatorV2 opaque keys are supported by create_bundle_link")
+    target_bundle_uuid = ContentLibrary.objects.get_by_key(target_opaque_key).bundle_uuid
+    if version is None:
+        version = get_bundle(target_bundle_uuid).latest_version
+    # Create the new link:
+    draft = get_or_create_bundle_draft(ref.bundle_uuid, DRAFT_NAME)
+    set_draft_link(draft.uuid, link_id, target_bundle_uuid, version)
+    # Clear the cache:
+    LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME).cache.clear()
+
+
+def update_bundle_link(library_key, link_id, version=None, delete=False):
+    """
+    Update a bundle's link to point to the specified version of its target
+    bundle. Use version=None to automatically point to the latest version.
+    Use delete=True to delete the link.
+    """
+    ref = ContentLibrary.objects.get_by_key(library_key)
+    draft = get_or_create_bundle_draft(ref.bundle_uuid, DRAFT_NAME)
+    if delete:
+        set_draft_link(draft.uuid, link_id, None, None)
+    else:
+        links = blockstore_cache.get_bundle_draft_direct_links_cached(ref.bundle_uuid, DRAFT_NAME)
+        try:
+            link = links[link_id]
+        except KeyError:
+            raise InvalidNameError("That link does not exist.")
+        if version is None:
+            version = get_bundle(link.bundle_uuid).latest_version
+        set_draft_link(draft.uuid, link_id, link.bundle_uuid, version)
+    # Clear the cache:
+    LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME).cache.clear()
 
 
 def publish_changes(library_key):
