@@ -17,7 +17,7 @@ class VideoPipelineIntegrationMixin(object):
         'service_username': u'cms_video_pipeline_service_user',
         'client_name': 'video_pipeline'
     }
-    
+
     request_uris = 'https://video-pipeline.example.com/api/v1/logout'
     request_uris += ' https://video-pipeline.example.com/api/v1/redirect'
     video_pipelien_oauth_client_defaults = {
