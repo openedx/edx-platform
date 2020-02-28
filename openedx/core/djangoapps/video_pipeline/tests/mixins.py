@@ -22,7 +22,6 @@ class VideoPipelineIntegrationMixin(object):
     request_uris += ' https://video-pipeline.example.com/api/v1/redirect'
     video_pipelien_oauth_client_defaults = {
         'name': 'video_pipeline',
-        'url': 'https://video-pipeline.example.com/api/v1/',
         'redirect_uris': request_uris,
         'client_id': 'video_pipeline_client_id',
         'client_secret': 'video_pipeline_client_secret',
