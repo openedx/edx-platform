@@ -11,7 +11,7 @@ cffi==1.14.0              # via -r requirements/edx-sandbox/shared.txt, cryptogr
 git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0  # via -r requirements/edx-sandbox/py35.in
 cryptography==2.8         # via -r requirements/edx-sandbox/shared.txt
 cycler==0.10.0            # via matplotlib
-decorator==4.4.1          # via networkx
+decorator==4.4.2          # via networkx
 kiwisolver==1.1.0         # via matplotlib
 lxml==4.5.0               # via -r requirements/edx-sandbox/shared.txt
 markupsafe==1.1.1         # via chem

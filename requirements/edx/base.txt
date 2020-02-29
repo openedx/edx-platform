@@ -50,7 +50,7 @@ git+https://github.com/edx/crowdsourcehinter.git@a7ffc85b134b7d8909bf1fefd23dbdb
 cryptography==2.8         # via -r requirements/edx/../edx-sandbox/shared.txt, django-fernet-fields, edx-enterprise
 cssutils==1.0.2           # via pynliner
 ddt==1.2.2                # via xblock-drag-and-drop-v2, xblock-poll
-decorator==4.4.1          # via pycontracts
+decorator==4.4.2          # via pycontracts
 defusedxml==0.5.0         # via -r requirements/edx/base.in, djangorestframework-xml, ora2, python3-openid, python3-saml, safe-lxml, social-auth-core
 git+https://github.com/django-compressor/django-appconf@1526a842ee084b791aa66c931b3822091a442853#egg=django-appconf  # via -r requirements/edx/github.in, django-statici18n
 django-babel-underscore==0.5.2  # via -r requirements/edx/base.in
@@ -59,7 +59,7 @@ git+https://github.com/edx/django-celery.git@756cb57aad765cb2b0d37372c1855b8f5f3
 django-classy-tags==1.0.0  # via django-sekizai
 django-config-models==2.0.0  # via -r requirements/edx/base.in, edx-enterprise
 django-cors-headers==2.5.3  # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
-django-countries==5.5     # via -r requirements/edx/base.in, edx-enterprise
+django-countries==6.0     # via -r requirements/edx/base.in, edx-enterprise
 django-crum==0.7.5        # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring, edx-rbac, super-csv
 django-fernet-fields==0.6  # via -r requirements/edx/base.in, edx-enterprise
 django-filter==2.2.0      # via -r requirements/edx/base.in, edx-enterprise
@@ -119,7 +119,7 @@ edx-sga==0.10.0           # via -r requirements/edx/base.in
 edx-submissions==3.0.4    # via -r requirements/edx/base.in, ora2
 edx-tincan-py35==0.0.5    # via edx-enterprise
 edx-user-state-client==1.1.2  # via -r requirements/edx/base.in
-edx-when==1.0.2           # via -r requirements/edx/base.in, edx-proctoring
+edx-when==1.0.3           # via -r requirements/edx/base.in, edx-proctoring
 edxval==1.2.3             # via -r requirements/edx/base.in
 elasticsearch==1.9.0      # via edx-search
 enum34==1.1.9             # via edxval
@@ -222,7 +222,7 @@ semantic-version==2.8.4   # via edx-drf-extensions
 shapely==1.7.0            # via -r requirements/edx/base.in
 shortuuid==0.5.0          # via edx-django-oauth2-provider
 simplejson==3.17.0        # via -r requirements/edx/base.in, sailthru-client, super-csv, xblock-utils
-six==1.14.0               # via -r requirements/edx/../edx-sandbox/shared.txt, -r requirements/edx/base.in, -r requirements/edx/paver.txt, analytics-python, bleach, calc, cryptography, django-appconf, django-classy-tags, django-countries, django-pyfs, django-sekizai, django-simple-history, django-statici18n, drf-yasg, edx-ace, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-milestones, edx-opaque-keys, edx-rbac, edx-search, event-tracking, fs, fs-s3fs, help-tokens, html5lib, isodate, libsass, mock, nltk, packaging, paver, pycontracts, pyjwkest, python-dateutil, python-memcached, python-swiftclient, social-auth-app-django, social-auth-core, stevedore, xblock
+six==1.14.0               # via -r requirements/edx/../edx-sandbox/shared.txt, -r requirements/edx/base.in, -r requirements/edx/paver.txt, analytics-python, bleach, calc, cryptography, django-appconf, django-classy-tags, django-pyfs, django-sekizai, django-simple-history, django-statici18n, drf-yasg, edx-ace, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-milestones, edx-opaque-keys, edx-rbac, edx-search, event-tracking, fs, fs-s3fs, help-tokens, html5lib, isodate, libsass, mock, nltk, packaging, paver, pycontracts, pyjwkest, python-dateutil, python-memcached, python-swiftclient, social-auth-app-django, social-auth-core, stevedore, xblock
 slumber==0.7.1            # via edx-bulk-grades, edx-enterprise, edx-rest-api-client
 social-auth-core==3.2.0   # via -r requirements/edx/base.in, social-auth-app-django
 git+https://github.com/jazzband/sorl-thumbnail.git@13bedfb7d2970809eda597e3ef79318a6fa80ac2#egg=sorl-thumbnail  # via -r requirements/edx/github.in
