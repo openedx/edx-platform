@@ -342,6 +342,44 @@ def _remove_none_values(dictionary):
     }
 
 
+def get_users_by_external_keys_and_org_key(external_user_keys, org_key):
+    """
+    Given an organization_key and a set of external keys,
+    return a dict from external user keys to Users.
+
+    Args:
+        external_user_keys (sequence[str]):
+            external user keys used by the program creator's IdP.
+        org_key (str):
+            The organization short name of which the external_user_key belongs to
+
+    Returns: dict[str: User|None]
+        A dict mapping external user keys to Users.
+        If an external user key is not registered, then None is returned instead
+            of a User for that key.
+
+    Raises:
+        BadOrganizationShortNameException
+        ProviderDoesNotExistsException
+        ProviderConfigurationException
+    """
+    saml_provider = get_saml_provider_by_org_key(org_key)
+    social_auth_uids = {
+        saml_provider.get_social_auth_uid(external_user_key)
+        for external_user_key in external_user_keys
+    }
+    social_auths = UserSocialAuth.objects.filter(uid__in=social_auth_uids)
+    found_users_by_external_keys = {
+        saml_provider.get_remote_id_from_social_auth(social_auth): social_auth.user
+        for social_auth in social_auths
+    }
+    # Default all external keys to None, because external keys
+    # without a User will not appear in `found_users_by_external_keys`.
+    users_by_external_keys = {key: None for key in external_user_keys}
+    users_by_external_keys.update(found_users_by_external_keys)
+    return users_by_external_keys
+
+
 def get_users_by_external_keys(program_uuid, external_user_keys):
     """
     Given a program and a set of external keys,
@@ -365,21 +403,8 @@ def get_users_by_external_keys(program_uuid, external_user_keys):
         ProviderDoesNotExistsException
         ProviderConfigurationException
     """
-    saml_provider = get_saml_provider_for_program(program_uuid)
-    social_auth_uids = {
-        saml_provider.get_social_auth_uid(external_user_key)
-        for external_user_key in external_user_keys
-    }
-    social_auths = UserSocialAuth.objects.filter(uid__in=social_auth_uids)
-    found_users_by_external_keys = {
-        saml_provider.get_remote_id_from_social_auth(social_auth): social_auth.user
-        for social_auth in social_auths
-    }
-    # Default all external keys to None, because external keys
-    # without a User will not appear in `found_users_by_external_keys`.
-    users_by_external_keys = {key: None for key in external_user_keys}
-    users_by_external_keys.update(found_users_by_external_keys)
-    return users_by_external_keys
+    org_key = get_org_key_for_program(program_uuid)
+    return get_users_by_external_keys_and_org_key(external_user_keys, org_key)
 
 
 def get_external_key_by_user_and_course(user, course_key):
@@ -409,20 +434,38 @@ def get_external_key_by_user_and_course(user, course_key):
     return relevant_pce.program_enrollment.external_user_key
 
 
-def get_saml_provider_for_program(program_uuid):
+def get_saml_provider_by_org_key(org_key):
     """
-    Return currently configured SAML provider for the Organization
+    Returns the SAML provider associated with the provided org_key
+
+    Arguments:
+        org_key (str)
+
+    Returns: SAMLProvider
+
+    Raises:
+        BadOrganizationShortNameException
+    """
+    try:
+        organization = Organization.objects.get(short_name=org_key)
+    except Organization.DoesNotExist:
+        raise BadOrganizationShortNameException(org_key)
+    return get_saml_provider_for_organization(organization)
+
+
+def get_org_key_for_program(program_uuid):
+    """
+    Return the key of the first Organization
     administering the given program.
 
     Arguments:
         program_uuid (UUID|str)
 
-    Returns: SAMLProvider
+    Returns: org_key (str)
 
     Raises:
         ProgramDoesNotExistException
         ProgramHasNoAuthoringOrganizationException
-        BadOrganizationShortNameException
     """
     program = get_programs(uuid=program_uuid)
     if program is None:
@@ -431,11 +474,7 @@ def get_saml_provider_for_program(program_uuid):
     org_key = authoring_orgs[0].get('key') if authoring_orgs else None
     if not org_key:
         raise ProgramHasNoAuthoringOrganizationException(program_uuid)
-    try:
-        organization = Organization.objects.get(short_name=org_key)
-    except Organization.DoesNotExist:
-        raise BadOrganizationShortNameException(org_key)
-    return get_saml_provider_for_organization(organization)
+    return org_key
 
 
 def get_saml_provider_for_organization(organization):
