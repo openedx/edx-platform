@@ -4,17 +4,14 @@ import { Button, InputText, StatusAlert, InputSelect } from '@edx/paragon';
 
 export const ProgramEnrollmentsInspectorPage = props => (
   <form method="get">
-    {props.successes.length > 0 && (
+    {props.errors.map(errorItem => (
       <StatusAlert
         open
-        alertType="success"
-        dialog={(
-          <div>
-            <span></span>
-          </div>
-        )}
+        dismissible={false}
+        alertType="danger"
+        dialog={errorItem}
       />
-    )}
+    ))}
     <div key="edX_accounts">
       <InputText
         name="edx_user"
@@ -43,15 +40,21 @@ export const ProgramEnrollmentsInspectorPage = props => (
 );
 
 ProgramEnrollmentsInspectorPage.propTypes = {
-  successes: PropTypes.arrayOf(PropTypes.string),
   errors: PropTypes.arrayOf(PropTypes.string),
-  learnerInfo: PropTypes.string,
+  learnerInfo: PropTypes.shape({
+    user: PropTypes.shape({
+      external_user_key: PropTypes.string,
+      username: PropTypes.string,
+    }),
+    enrollments: PropTypes.arrayOf(
+      PropTypes.string,
+    ),
+  }),
   orgKeys: PropTypes.arrayOf(PropTypes.object),
 };
 
 ProgramEnrollmentsInspectorPage.defaultProps = {
-  successes: [],
   errors: [],
-  learnerInfo: '',
+  learnerInfo: {},
   orgKeys: [],
 };
