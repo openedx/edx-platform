@@ -794,6 +794,7 @@ class TopicListView(GenericAPIView):
     authentication_classes = (BearerAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
     pagination_class = TopicsPagination
+    queryset = []
 
     def get(self, request):
         """GET /api/team/v0/topics/?course_id={course_id}"""
