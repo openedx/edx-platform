@@ -1,5 +1,10 @@
 """HTTP end-points for the User API. """
 
+import urllib
+import urllib2
+import json
+
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError
 from django.db import transaction
@@ -30,7 +35,8 @@ from openedx.core.djangoapps.user_api.api import (
 from openedx.core.djangoapps.user_api.helpers import require_post_params, shim_student_view
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.preferences.api import get_country_time_zones, update_email_opt_in
-from openedx.core.djangoapps.user_api.serializers import CountryTimeZoneSerializer, UserPreferenceSerializer, UserSerializer
+from openedx.core.djangoapps.user_api.serializers import CountryTimeZoneSerializer, UserPreferenceSerializer, \
+    UserSerializer
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.views.register import create_account_with_params
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
@@ -129,6 +135,25 @@ class RegistrationView(APIView):
 
         email = data.get('email')
         username = data.get('username')
+
+        # Begin reCAPTCHA validation #
+        recaptcha_response = data.get('g-recaptcha-response')
+        url = 'https://www.google.com/recaptcha/api/siteverify'
+        values = {
+            'secret': settings.CAPTCHA_SECRET_KEY,
+            'response': recaptcha_response
+        }
+        data = urllib.urlencode(values)
+        req = urllib2.Request(url, data)
+        response = urllib2.urlopen(req)
+        result = json.load(response)
+        # End reCAPTCHA validation #
+
+        if not result['success']:
+            errors = {
+                'g_recaptcha': [{"user_message": "Invalid reCaptcha"}]
+            }
+            return JsonResponse(errors, status=400)
 
         # Handle duplicate email/username
         conflicts = check_account_exists(email=email, username=username)
