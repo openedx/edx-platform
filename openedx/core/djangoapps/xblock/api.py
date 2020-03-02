@@ -79,15 +79,46 @@ def load_block(usage_key, user):
     return runtime.get_block(usage_key)
 
 
-def get_block_metadata(block):
+def get_block_metadata(block, includes=()):
     """
-    Get metadata about the specified XBlock
+    Get metadata about the specified XBlock.
+
+    This metadata is the same for all users. Any data which varies per-user must
+    be served from a different API.
+
+    Optionally provide a list or set of metadata keys to include. Valid keys are:
+        index_dictionary: a dictionary of data used to add this XBlock's content
+            to a search index.
+        student_view_data: data needed to render the XBlock on mobile or in
+            custom frontends.
+        children: list of usage keys of the XBlock's children
+        editable_children: children in the same bundle, as opposed to linked
+            children in other bundles.
     """
-    return {
+    data = {
         "block_id": six.text_type(block.scope_ids.usage_id),
         "block_type": block.scope_ids.block_type,
         "display_name": get_block_display_name(block),
     }
+
+    if "index_dictionary" in includes:
+        data["index_dictionary"] = block.index_dictionary()
+
+    if "student_view_data" in includes:
+        data["student_view_data"] = block.student_view_data() if hasattr(block, 'student_view_data') else None
+
+    if "children" in includes:
+        data["children"] = block.children if hasattr(block, 'children') else []  # List of usage keys of children
+
+    if "editable_children" in includes:
+        # "Editable children" means children in the same bundle, as opposed to linked children in other bundles.
+        data["editable_children"] = []
+        child_includes = block.runtime.child_includes_of(block)
+        for idx, include in enumerate(child_includes):
+            if include.link_id is None:
+                data["editable_children"].append(block.children[idx])
+
+    return data
 
 
 def resolve_definition(block_or_key):

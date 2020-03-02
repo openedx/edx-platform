@@ -32,6 +32,7 @@ URL_LIB_BLOCK_ASSET_FILE = URL_LIB_BLOCK + 'assets/{file_name}'  # Get, delete, 
 
 URL_BLOCK_RENDER_VIEW = '/api/xblock/v2/xblocks/{block_key}/view/{view_name}/'
 URL_BLOCK_GET_HANDLER_URL = '/api/xblock/v2/xblocks/{block_key}/handler_url/{handler_name}/'
+URL_BLOCK_METADATA_URL = '/api/xblock/v2/xblocks/{block_key}/'
 
 
 # Decorator for tests that require blockstore
@@ -72,9 +73,9 @@ class ContentLibrariesRestApiTest(APITestCase):
         # is not yet any Studio REST API for doing so:
         cls.collection = blockstore_api.create_collection("Content Library Test Collection")
         # Create an organization
-        cls.organization = Organization.objects.create(
-            name="Content Libraries Tachyon Exploration & Survey Team",
+        cls.organization, _ = Organization.objects.get_or_create(
             short_name="CL-TEST",
+            defaults={"name": "Content Libraries Tachyon Exploration & Survey Team"},
         )
 
     def setUp(self):
