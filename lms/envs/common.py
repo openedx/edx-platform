@@ -3552,3 +3552,6 @@ OEF_RENEWAL_DAYS = 180
 # CDN LINK
 
 CDN_LINK = "https://static.philanthropyu.org/"
+
+# Google reCaptcha verify URL
+CAPTCHA_VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify"

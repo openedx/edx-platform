@@ -133,12 +133,12 @@ class RegistrationView(APIView):
         """
         data = request.POST.copy()
 
-        email = data.get('email')
+        email = data.get('email')gi
         username = data.get('username')
 
         # Begin reCAPTCHA validation #
         recaptcha_response = data.get('g-recaptcha-response')
-        url = 'https://www.google.com/recaptcha/api/siteverify'
+        url = settings.CAPTCHA_VERIFY_URL
         values = {
             'secret': settings.CAPTCHA_SECRET_KEY,
             'response': recaptcha_response

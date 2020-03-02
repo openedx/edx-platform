@@ -926,7 +926,7 @@ if FEATURES.get('ENABLE_CSMH_EXTENDED'):
 
 API_ACCESS_MANAGER_EMAIL = ENV_TOKENS.get('API_ACCESS_MANAGER_EMAIL')
 API_ACCESS_FROM_EMAIL = ENV_TOKENS.get('API_ACCESS_FROM_EMAIL')
-CAPTCHA_SECRET_KEY = ENV_TOKENS.get('CAPTCHA_SECRET_KEY')
+
 
 
 # Mobile App Version Upgrade config
@@ -1156,3 +1156,8 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_c
 ########################## Derive Any Derived Settings  #######################
 
 derive_settings(__name__)
+
+
+######################### Secret Key for Google reCaptcha #####################
+
+CAPTCHA_SECRET_KEY = ENV_TOKENS.get('CAPTCHA_SECRET_KEY', None)

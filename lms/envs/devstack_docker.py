@@ -79,3 +79,7 @@ COURSE_CATALOG_API_URL = 'http://edx.devstack.discovery:18381/api/v1/'
 # Uncomment the lines below if you'd like to see SQL statements in your devstack LMS log.
 # LOGGING['handlers']['console']['level'] = 'DEBUG'
 # LOGGING['loggers']['django.db.backends'] = {'handlers': ['console'], 'level': 'DEBUG', 'propagate': False}
+
+######################### Secret Key for Google reCaptcha #####################
+
+CAPTCHA_SECRET_KEY = ENV_TOKENS.get('CAPTCHA_SECRET_KEY', None)
