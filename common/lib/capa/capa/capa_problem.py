@@ -565,7 +565,6 @@ class LoncapaProblem(object):
         try:
             prompt = self.problem_data[answer_id].get('label')
         except KeyError:
-            prompt = self.problem_data.get(answer_id, {}).get('label')
             log.error(
                 'KeyError: answer_id: %s, Problem data: %s, problem: %s',
                 (answer_id, self.problem_data, etree.tostring(self.tree))
