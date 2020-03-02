@@ -117,7 +117,7 @@ edx-sga==0.10.0           # via -r requirements/edx/base.in
 edx-submissions==3.0.4    # via -r requirements/edx/base.in, ora2
 edx-tincan-py35==0.0.5    # via edx-enterprise
 edx-user-state-client==1.1.2  # via -r requirements/edx/base.in
-edx-when==1.0.3           # via -r requirements/edx/base.in, edx-proctoring
+edx-when==1.0.2           # via -r requirements/edx/base.in, edx-proctoring
 edxval==1.2.4             # via -r requirements/edx/base.in
 elasticsearch==1.9.0      # via edx-search
 enum34==1.1.9             # via edxval
