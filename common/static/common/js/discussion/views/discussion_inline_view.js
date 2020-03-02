@@ -58,7 +58,7 @@
             DiscussionUtil.safeAjax({
                 $elem: this.$el,
                 $loading: this.$el,
-                takeFocus: true,
+                takeFocus: false,
                 url: url,
                 type: 'GET',
                 dataType: 'json',
@@ -212,7 +212,6 @@
                     });
                 }
             }
-            this.toggleDiscussionBtn.focus();
         },
 
         toggleNewPost: function(event) {
