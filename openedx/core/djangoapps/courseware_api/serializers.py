@@ -2,10 +2,15 @@
 Course API Serializers.  Representing course catalog data
 """
 
+from babel.numbers import get_currency_symbol
+
 from django.urls import reverse
 from rest_framework import serializers
 
+from course_modes.models import CourseMode
 from lms.djangoapps.courseware.tabs import get_course_tab_list
+from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
+
 from openedx.core.lib.api.fields import AbsoluteURLField
 
 
@@ -80,6 +85,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     enrollment = serializers.DictField()
     user_has_access = serializers.BooleanField()
     tabs = serializers.SerializerMethodField()
+    verified_mode = serializers.SerializerMethodField()
 
     def __init__(self, *args, **kwargs):
         """
@@ -108,3 +114,17 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
                 'url': tab.link_func(course_overview, reverse),
             })
         return tabs
+
+    def get_verified_mode(self, course_overview):
+        """
+        Return verified mode information, or None.
+        """
+        mode = CourseMode.verified_mode_for_course(course_overview.id)
+        if mode:
+            return {
+                'price': mode.min_price,
+                'currency': mode.currency.upper(),
+                'currency_symbol': get_currency_symbol(mode.currency.upper()),
+                'sku': mode.sku,
+                'upgrade_url': verified_upgrade_deadline_link(course_overview.effective_user, course_overview),
+            }
