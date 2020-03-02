@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib.auth import logout
 from django.utils.http import urlencode
 from django.views.generic import TemplateView
-from provider.oauth2.models import Client
+from oauth2_provider.models import Application
 from six.moves.urllib.parse import parse_qs, urlsplit, urlunsplit  # pylint: disable=import-error
 
 from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
@@ -130,8 +130,8 @@ class LogoutView(TemplateView):
 
         # Add the logout URIs for IDAs that the user was logged into (according to the session).  This line is specific
         # to DOP.
-        uris += Client.objects.filter(client_id__in=self.oauth_client_ids,
-                                      logout_uri__isnull=False).values_list('logout_uri', flat=True)
+        uris += Application.objects.filter(client_id__in=self.oauth_client_ids,
+                                           redirect_uris__isnull=False).values_list('redirect_uris', flat=True)
 
         # Add the extra logout URIs from settings.  This is added as a stop-gap solution for sessions that were
         # established via DOT.

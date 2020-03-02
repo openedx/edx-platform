@@ -4,7 +4,6 @@ import logging
 
 import django.utils.timezone
 from oauth2_provider import models as dot_models
-from provider.oauth2 import models as dop_models
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.authentication import BaseAuthentication, get_authorization_header
 from edx_django_utils.monitoring import set_custom_metric
@@ -105,32 +104,6 @@ class BearerAuthentication(BaseAuthentication):
             return user, token
 
     def get_access_token(self, access_token):
-        """
-        Return a valid access token that exists in one of our OAuth2 libraries,
-        or None if no matching token is found.
-        """
-        dot_token_return = self._get_dot_token(access_token)
-        if dot_token_return is not None:
-            set_custom_metric('BearerAuthentication_token_type', 'dot')
-            return dot_token_return
-
-        dop_token_return = self._get_dop_token(access_token)
-        if dop_token_return is not None:
-            set_custom_metric('BearerAuthentication_token_type', 'dop')
-            return dop_token_return
-
-        set_custom_metric('BearerAuthentication_token_type', 'None')
-        return None
-
-    def _get_dop_token(self, access_token):
-        """
-        Return a valid access token stored by django-oauth2-provider (DOP), or
-        None if no matching token is found.
-        """
-        token_query = dop_models.AccessToken.objects.select_related('user')
-        return token_query.filter(token=access_token).first()
-
-    def _get_dot_token(self, access_token):
         """
         Return a valid access token stored by django-oauth-toolkit (DOT), or
         None if no matching token is found.
