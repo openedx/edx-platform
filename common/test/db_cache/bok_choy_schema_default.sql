@@ -2613,7 +2613,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=666 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=667 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5206,8 +5206,7 @@ CREATE TABLE `schedules_scheduleexperience` (
   `experience_type` smallint(5) unsigned NOT NULL,
   `schedule_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `schedule_id` (`schedule_id`),
-  CONSTRAINT `schedules_scheduleex_schedule_id_ed95c8e7_fk_schedules` FOREIGN KEY (`schedule_id`) REFERENCES `schedules_schedule` (`id`)
+  UNIQUE KEY `schedule_id` (`schedule_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `self_paced_selfpacedconfiguration`;
