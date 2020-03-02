@@ -6,8 +6,8 @@ specifically long_token and short token functions which was used to create
 random tokens
 """
 import hashlib
-import random
 from django.utils.encoding import force_bytes
+from django.utils.crypto import get_random_string
 from django.conf import settings
 
 
@@ -17,7 +17,7 @@ def create_hash256(max_length=None):
     Warning: this is not sufficiently secure for tasks like encription
     Currently, this is just meant to create sufficiently random tokens
     """
-    hash_object = hashlib.sha256(force_bytes(str(random.random())))
+    hash_object = hashlib.sha256(force_bytes(get_random_string(32)))
     hash_object.update(force_bytes(settings.SECRET_KEY))
     output_hash = hash_object.hexdigest()
     if max_length is not None and len(output_hash) > max_length:
