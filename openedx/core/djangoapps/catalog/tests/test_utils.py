@@ -19,6 +19,7 @@ from course_modes.tests.factories import CourseModeFactory
 from entitlements.tests.factories import CourseEntitlementFactory
 from openedx.core.constants import COURSE_UNPUBLISHED
 from openedx.core.djangoapps.catalog.cache import (
+    CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL,
     COURSE_PROGRAMS_CACHE_KEY_TPL,
     PATHWAY_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
@@ -237,6 +238,28 @@ class TestGetPrograms(CacheIsolationTestCase):
         assert first_program in results
         assert second_program in results
         assert not mock_warning.called
+
+    def test_get_from_catalog_course(self, mock_warning, _mock_info):
+        expected_program = ProgramFactory()
+        expected_catalog_course = expected_program['courses'][0]
+
+        self.assertEqual(get_programs(catalog_course_uuid=expected_catalog_course['uuid']), [])
+
+        cache.set(
+            CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_uuid=expected_catalog_course['uuid']),
+            [expected_program['uuid']],
+            None
+        )
+        cache.set(
+            PROGRAM_CACHE_KEY_TPL.format(uuid=expected_program['uuid']),
+            expected_program,
+            None
+        )
+
+        actual_program = get_programs(catalog_course_uuid=expected_catalog_course['uuid'])
+
+        self.assertEqual(actual_program, [expected_program])
+        self.assertFalse(mock_warning.called)
 
 
 @skip_unless_lms

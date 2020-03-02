@@ -61,10 +61,6 @@ class ExternalId(TimeStampedModel):
             user=user,
             external_id_type__name=type_name
         ).exists():
-            LOGGER.info('No external id for user id {user} with type of {type}'.format(
-                user=user.id,
-                type=type_name
-            ))
             return False
         return True
 
