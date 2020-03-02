@@ -13,7 +13,7 @@ class Schedule(TimeStampedModel):
     .. no_pii:
     """
 
-    enrollment = models.OneToOneField('student.CourseEnrollment', null=False, on_delete=models.CASCADE)
+    enrollment = models.OneToOneField('student.CourseEnrollment', null=False, on_delete=models.CASCADE, db_constraint=False)
     active = models.BooleanField(
         default=True,
         help_text=_('Indicates if this schedule is actively used')
