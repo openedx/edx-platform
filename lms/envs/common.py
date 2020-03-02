@@ -560,20 +560,6 @@ OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net']
 
 OAUTH_OIDC_ISSUER = 'http://127.0.0.1:8000/oauth2'
 
-# OpenID Connect claim handlers
-
-OAUTH_OIDC_ID_TOKEN_HANDLERS = (
-    'edx_oauth2_provider.oidc.handlers.BasicIDTokenHandler',
-    'edx_oauth2_provider.oidc.handlers.ProfileHandler',
-    'edx_oauth2_provider.oidc.handlers.EmailHandler',
-)
-
-OAUTH_OIDC_USERINFO_HANDLERS = (
-    'edx_oauth2_provider.oidc.handlers.BasicUserInfoHandler',
-    'edx_oauth2_provider.oidc.handlers.ProfileHandler',
-    'edx_oauth2_provider.oidc.handlers.EmailHandler',
-)
-
 OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS = 365
 OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 
@@ -2292,11 +2278,6 @@ INSTALLED_APPS = [
 
     # Student support tools
     'support',
-
-    # django-oauth2-provider (deprecated)
-    'provider',
-    'provider.oauth2',
-    'edx_oauth2_provider',
 
     # django-oauth-toolkit
     'oauth2_provider',

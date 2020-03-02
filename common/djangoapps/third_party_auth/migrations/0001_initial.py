@@ -11,7 +11,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('oauth2', '0001_initial'),
     ]
 
     operations = [
@@ -57,18 +56,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Provider Configuration (OAuth)',
                 'verbose_name_plural': 'Provider Configuration (OAuth)',
-            },
-        ),
-        migrations.CreateModel(
-            name='ProviderApiPermissions',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('provider_id', models.CharField(help_text=u'Uniquely identify a provider. This is different from backend_name.', max_length=255)),
-                ('client', models.ForeignKey(to='oauth2.Client', on_delete=models.CASCADE)),
-            ],
-            options={
-                'verbose_name': 'Provider API Permission',
-                'verbose_name_plural': 'Provider API Permissions',
             },
         ),
         migrations.CreateModel(

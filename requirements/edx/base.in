@@ -71,14 +71,12 @@ edx-bulk-grades                     # LMS REST API for managing bulk grading ope
 edx-ccx-keys
 edx-celeryutils
 edx-completion
-edx-django-oauth2-provider
 edx-django-release-util             # Release utils for the edx release pipeline
 edx-django-sites-extensions
 edx-django-utils
 edx-drf-extensions
 edx-enterprise
 edx-milestones
-edx-oauth2-provider
 edx-organizations
 edx-proctoring>=2.0.1
 edx-proctoring-proctortrack==1.0.5  # Intentionally and permanently pinned to ensure code changes are reviewed
