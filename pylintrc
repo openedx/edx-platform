@@ -356,6 +356,11 @@ disable =
 	xrange-builtin,
 	zip-builtin-not-iterating,
 	native-string,
+	import-outside-toplevel,
+	inconsistent-return-statements,
+	no-else-break,
+	no-else-continue,
+	useless-object-inheritance,
 
 [REPORTS]
 output-format = text
@@ -455,4 +460,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# 40eae2f3b3491a12ea2f2c98c632d7cb43904d56
+# e89c3d2722e0389b5f94fdaba1c1501a3f855af9

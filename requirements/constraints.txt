@@ -77,5 +77,8 @@ oauthlib==2.1.0
 #   https://github.com/transifex/transifex-client/issues/252
 transifex-client==0.13.4
 
+# Constraint from astroid 2.3.3
+wrapt==1.11.*
+
 # zipp 2.0.0 requires Python >= 3.6
 zipp==1.0.0
