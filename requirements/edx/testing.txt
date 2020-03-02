@@ -63,8 +63,8 @@ defusedxml==0.5.0         # via -r requirements/edx/base.txt, djangorestframewor
 diff-cover==2.6.0         # via -r requirements/edx/coverage.txt
 distlib==0.3.0            # via virtualenv
 git+https://github.com/django-compressor/django-appconf@1526a842ee084b791aa66c931b3822091a442853#egg=django-appconf  # via -r requirements/edx/base.txt, django-statici18n
-django-babel-underscore==0.5.2  # via -r requirements/edx/base.txt
-django-babel==0.6.2       # via -r requirements/edx/base.txt, django-babel-underscore
+git+https://github.com/edx/django-babel-underscore.git@37705f7377a4d0a4e673f1431895ce28a8860cd7#egg=django-babel-underscore==0.6.0  # via -r requirements/edx/base.txt
+git+https://github.com/Zegocover/enmerkar.git@dbc113798aa4beabdfa2d00e6fef48248eb0f185#egg=django-babel==0.6.3.dev0  # via -r requirements/edx/base.txt
 django-celery==3.3.1      # via -r requirements/edx/base.txt, super-csv
 django-classy-tags==1.0.0  # via -r requirements/edx/base.txt, django-sekizai
 django-config-models==2.0.0  # via -r requirements/edx/base.txt, edx-enterprise
@@ -100,7 +100,7 @@ docopt==0.6.2             # via -r requirements/edx/base.txt, xmodule
 docutils==0.16            # via -r requirements/edx/base.txt, botocore
 drf-jwt==1.14.0           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edx-drf-extensions
 drf-yasg==1.17.0          # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edx-api-doc-tools
-edx-ace==0.1.13           # via -r requirements/edx/base.txt
+edx-ace==0.1.14           # via -r requirements/edx/base.txt
 edx-analytics-data-api-client==0.15.5  # via -r requirements/edx/base.txt
 edx-api-doc-tools==1.0.2  # via -r requirements/edx/base.txt
 edx-bulk-grades==0.6.6    # via -r requirements/edx/base.txt, staff-graded-xblock
