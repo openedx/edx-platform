@@ -133,7 +133,7 @@ class RegistrationView(APIView):
         """
         data = request.POST.copy()
 
-        email = data.get('email')gi
+        email = data.get('email')
         username = data.get('username')
 
         # Begin reCAPTCHA validation #
