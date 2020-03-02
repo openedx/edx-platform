@@ -1138,7 +1138,7 @@ class VideoBlock(
 
         available_translations = self.available_translations(self.get_transcripts_info())
         transcripts = {
-            lang: self.runtime.handler_url(self, 'transcript', 'download', query="lang=" + lang, thirdparty=True)
+            lang: self.runtime.handler_url(self, 'transcript', 'download', query="lang=" + lang)
             for lang in available_translations
         }
 
