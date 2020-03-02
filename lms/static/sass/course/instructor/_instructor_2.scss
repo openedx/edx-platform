@@ -674,7 +674,7 @@
       display: block;
       position: absolute;
       top: ($baseline/2);
-      left: -9999em;
+      @include left(-9999em);
       padding: ($baseline/2);
       width: 50%;
       background-color: $light-gray3;
