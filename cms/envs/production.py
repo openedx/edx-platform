@@ -8,6 +8,7 @@ This is the default template for our main set of AWS servers.
 
 
 import codecs
+import copy
 import os
 import yaml
 
@@ -38,13 +39,20 @@ CONFIG_FILE = get_env_setting('STUDIO_CFG')
 with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
     __config__ = yaml.safe_load(f)
 
-    # Add the key/values from config into the global namespace of this module.
-    vars().update(__config__)
-
     # ENV_TOKENS and AUTH_TOKENS are included for reverse compatability.
     # Removing them may break plugins that rely on them.
     ENV_TOKENS = __config__
     AUTH_TOKENS = __config__
+
+    # Add the key/values from config into the global namespace of this module.
+    # But don't override the FEATURES dict because we do that in an additive way.
+    __config_copy__ = copy.deepcopy(__config__)
+    if 'FEATURES' in __config_copy__:
+        del __config_copy__['FEATURES']
+
+    if 'EVENT_TRACKING_BACKENDS' in __config_copy__:
+        del __config_copy__['EVENT_TRACKING_BACKENDS']
+    vars().update(__config_copy__)
 
 
 # A file path to a YAML file from which to load all the code revisions currently deployed
