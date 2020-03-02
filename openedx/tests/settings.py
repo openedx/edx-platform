@@ -94,6 +94,7 @@ INSTALLED_APPS = (
     'celery_utils',
     'waffle',
     'edx_when',
+    'rest_framework_jwt',
 
     # Django 1.11 demands to have imported models supported by installed apps.
     'completion',

@@ -2493,6 +2493,7 @@ INSTALLED_APPS = [
 
     # Management of per-user schedules
     'openedx.core.djangoapps.schedules',
+    'rest_framework_jwt',
 ]
 
 ######################### CSRF #########################################
@@ -3426,6 +3427,7 @@ JWT_AUTH = {
     ],
     'JWT_AUTH_COOKIE_HEADER_PAYLOAD': 'edx-jwt-cookie-header-payload',
     'JWT_AUTH_COOKIE_SIGNATURE': 'edx-jwt-cookie-signature',
+    'JWT_AUTH_HEADER_PREFIX': 'JWT',
 }
 
 EDX_DRF_EXTENSIONS = {
