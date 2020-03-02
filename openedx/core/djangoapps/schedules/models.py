@@ -71,5 +71,5 @@ class ScheduleExperience(models.Model):
         (1, 'course_updates', u'Course Updates')
     )
 
-    schedule = models.OneToOneField(Schedule, related_name='experience', on_delete=models.CASCADE)
+    schedule = models.OneToOneField(Schedule, related_name='experience', on_delete=models.CASCADE, db_constraint=False)
     experience_type = models.PositiveSmallIntegerField(choices=EXPERIENCES, default=EXPERIENCES.default)
