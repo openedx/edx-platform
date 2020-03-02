@@ -25,6 +25,10 @@ ENTERPRISE_API_URL = '{}/enterprise/api/v1/'.format(LMS_INTERNAL_ROOT_URL)
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://edx.devstack.credentials:18150'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 
+JWT_AUTH.update({
+    'JWT_ISSUER': '{}/oauth2'.format(LMS_ROOT_URL),
+})
+
 FEATURES.update({
     'AUTOMATIC_AUTH_FOR_TESTING': True,
     'ENABLE_COURSEWARE_SEARCH': False,
