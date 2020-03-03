@@ -86,7 +86,7 @@ ${HTML(fragment.foot_html())}
     % else:
       data-enable-completion-on-view-service="false" \
     % endif
-    style="display: block; width: auto;"
+    style="display: block; width: auto; margin: 0;"
   >
       <main id="main" tabindex="-1" aria-label="Content">
         ${HTML(fragment.body_html())}
@@ -139,6 +139,14 @@ ${HTML(fragment.foot_html())}
 
         lastHeight = newHeight;
         lastWidth = newWidth;
+
+        // Within the learning microfrontend the iframe resizes to match the
+        // height of this document and it should never scroll. It does scroll
+        // ocassionally when javascript is used to focus elements on the page
+        // before the parent iframe has been resized to match the content
+        // height. This window.scrollTo is an attempt to keep the content at the
+        // top of the page. See TNL-7094
+        window.scrollTo(0, 0);
       }
 
       // Create an observer instance linked to the callback function
