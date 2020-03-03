@@ -103,11 +103,11 @@ class TeamMembershipImportManager(object):
         self.validation_errors = []
         self.teamset_ids = []
         self.user_ids_by_teamset_id = {}
-        self.number_of_records_added = 0
         self.course = course
         self.max_errors = 0
         self.existing_course_team_memberships = {}
         self.existing_course_teams = {}
+        self.number_of_learners_assigned = 0
 
     @property
     def import_succeeded(self):
@@ -157,6 +157,7 @@ class TeamMembershipImportManager(object):
         if not self.validation_errors:
             for row in row_dictionaries:
                 self.add_user_to_team(row)
+            self.number_of_learners_assigned = len(row_dictionaries)
             return True
         else:
             return False
@@ -351,7 +352,6 @@ class TeamMembershipImportManager(object):
                     'add_method': 'team_csv_import'
                 }
             )
-            self.number_of_records_added += 1
 
     def get_user(self, user_name):
         """
