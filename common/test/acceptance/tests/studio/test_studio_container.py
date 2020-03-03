@@ -537,23 +537,6 @@ class ContentGroupVisibilityModalTest(BaseGroupConfigurationsTest):
         """
         self.select_and_verify_saved(self.html_component, self.CONTENT_GROUP_PARTITION, ['Dogs', 'Cats'])
 
-    def test_select_zero_content_groups(self):
-        """
-        Scenario: The component visibility modal can not be set to be visible to 'Specific Content Groups' without
-                selecting those specific groups.
-            Given I have a unit with one component
-            When I go to the container page for that unit
-            And I open the visibility editor modal for that unit's component
-            And I select 'Specific Content Groups'
-            And I save the modal
-            Then the visibility selection should be 'All Students and Staff'
-            And the container page should not display the content visibility warning
-        """
-        self.select_and_verify_saved(
-            self.html_component, self.CONTENT_GROUP_PARTITION
-        )
-        self.verify_visibility_set(self.html_component, False)
-
     def test_missing_groups(self):
         """
         Scenario: The component visibility modal shows a validation error when visibility is set to multiple unknown
@@ -1354,29 +1337,6 @@ class MoveComponentTest(ContainerBase):
             source_component=components[0],
             operation='move',
             component_display_names_after_operation=['HTML 21', 'HTML 22', 'HTML 11']
-        )
-
-    def test_undo_move_component_successfully(self):
-        """
-        Test if we can undo move a component successfully.
-
-        Given I am a staff user
-        And I go to unit page in first section
-        And I open the move modal
-        When I click on the move button
-        Then I see move operation successful message
-        And When I clicked on undo move link
-        Then I see that undo move operation is successful
-        """
-        unit_page = self.go_to_unit_page(unit_name='Test Unit 1')
-        components = unit_page.displayed_children
-        self.assertEqual(len(components), 2)
-
-        self.verify_move_opertions(
-            unit_page=unit_page,
-            source_component=components[0],
-            operation='undo_move',
-            component_display_names_after_operation=['HTML 11', 'HTML 12']
         )
 
     @ddt.data('publish', 'discard')

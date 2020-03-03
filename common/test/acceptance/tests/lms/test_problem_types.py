@@ -1563,25 +1563,6 @@ class ScriptProblemResetAfterAnswerTest(ScriptProblemTypeBase):
         self.answer_problem(other_correctness)
         self.assertTrue(self.problem_status('unanswered'))
 
-    @ddt.data(['correct', '2/2 points (ungraded)'], ['incorrect', '0/2 points (ungraded)'])
-    @ddt.unpack
-    def test_script_score_after_answer_and_reset(self, correctness, score):
-        """
-        Scenario: I can see my score on a script problem when I answer it and after I reset it
-
-        Given I am viewing a script problem
-        When I answer a script problem correct/incorrect
-        Then I should see a score
-        When I reset the problem
-        Then I should see a score of points possible: 0/2 points (ungraded)
-        """
-        self.answer_problem(correctness)
-        self.problem_page.click_submit()
-        self.assertEqual(self.problem_page.problem_progress_graded_value, score)
-        self.problem_page.click_reset()
-        self.assertEqual(self.problem_page.problem_progress_graded_value, '0/2 points (ungraded)')
-
-
 class ScriptProblemTypeTestNonRandomized(ScriptProblemTypeBase, NonRandomizedProblemTypeTestMixin):
     """
     Tests for non-randomized Script problem
