@@ -429,6 +429,50 @@ FEATURES = {
     # .. toggle_status: supported
     # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and see REDIRECT_TO_COURSEWARE_MICROFRONTEND for rollout.
     'ENABLE_COURSEWARE_MICROFRONTEND': False,
+
+    ### ORA Feature Flags ###
+
+    # .. toggle_name: ENABLE_ORA_TEAM_SUBMISSIONS
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to enable team-based ORA submissions.
+    # .. toggle_category: ora
+    # .. toggle_use_cases: incremental_release
+    # .. toggle_creation_date: 2020-03-03
+    # .. toggle_expiration_date: None
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
+    # .. toggle_status: supported
+    # .. toggle_warnings: None
+    'ENABLE_ORA_TEAM_SUBMISSIONS': False,
+
+    # .. toggle_name: ENABLE_ORA_ALL_FILE_URLS
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: A "work-around" feature toggle meant to help in cases where some file uploads are not
+    #      discoverable.  If enabled, will iterate through all possible file key suffixes up to the max for displaying
+    #      file metadata in staff assessments.
+    # .. toggle_category: ora
+    # .. toggle_use_cases: graceful_degradation
+    # .. toggle_creation_date: 2020-03-03
+    # .. toggle_expiration_date: None
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
+    # .. toggle_status: supported
+    # .. toggle_warnings: None
+    'ENABLE_ORA_ALL_FILE_URLS': False,
+
+    # .. toggle_name: ENABLE_ORA_USER_STATE_UPLOAD_DATA
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: A "work-around" feature toggle meant to help in cases where some file uploads are not
+    #      discoverable.  If enabled, will pull file metadata from StudentModule.state for display in staff assessments.
+    # .. toggle_category: ora
+    # .. toggle_use_cases: graceful_degradation
+    # .. toggle_creation_date: 2020-03-03
+    # .. toggle_expiration_date: None
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
+    # .. toggle_status: supported
+    # .. toggle_warnings: None
+    'ENABLE_ORA_USER_STATE_UPLOAD_DATA': False,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
