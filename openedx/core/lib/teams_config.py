@@ -308,6 +308,13 @@ class TeamsetConfig(object):
         except (KeyError, ValueError):
             return TeamsetType.get_default()
 
+    @cached_property
+    def is_private_managed(self):
+        """
+        Returns true if teamsettype is private_managed
+        """
+        return self.teamset_type == TeamsetType.private_managed
+
 
 class TeamsetType(Enum):
     """
