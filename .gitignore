@@ -7,6 +7,7 @@
 # and so should not be destroyed by "make clean".
 # start-noclean
 requirements/private.txt
+requirements/edx/private.txt
 lms/envs/private.py
 cms/envs/private.py
 # end-noclean
