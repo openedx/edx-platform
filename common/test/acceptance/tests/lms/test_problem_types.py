@@ -1563,6 +1563,7 @@ class ScriptProblemResetAfterAnswerTest(ScriptProblemTypeBase):
         self.answer_problem(other_correctness)
         self.assertTrue(self.problem_status('unanswered'))
 
+
 class ScriptProblemTypeTestNonRandomized(ScriptProblemTypeBase, NonRandomizedProblemTypeTestMixin):
     """
     Tests for non-randomized Script problem
