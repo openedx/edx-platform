@@ -2613,7 +2613,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=668 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=671 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3162,7 +3162,6 @@ CREATE TABLE `enterprise_enterprisecustomer` (
   `customer_type_id` int(11) NOT NULL,
   `enable_portal_code_management_screen` tinyint(1) NOT NULL,
   `enable_learner_portal` tinyint(1) NOT NULL,
-  `learner_portal_hostname` varchar(255) NOT NULL,
   `enable_portal_reporting_config_screen` tinyint(1) NOT NULL,
   `contact_email` varchar(254) DEFAULT NULL,
   PRIMARY KEY (`uuid`),
@@ -3414,7 +3413,6 @@ CREATE TABLE `enterprise_historicalenterprisecustomer` (
   `customer_type_id` int(11) DEFAULT NULL,
   `enable_portal_code_management_screen` tinyint(1) NOT NULL,
   `enable_learner_portal` tinyint(1) NOT NULL,
-  `learner_portal_hostname` varchar(255) NOT NULL,
   `enable_portal_reporting_config_screen` tinyint(1) NOT NULL,
   `contact_email` varchar(254) DEFAULT NULL,
   PRIMARY KEY (`history_id`),
