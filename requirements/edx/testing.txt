@@ -126,7 +126,7 @@ edx-sga==0.10.0           # via -r requirements/edx/base.txt
 edx-submissions==3.0.4    # via -r requirements/edx/base.txt, ora2
 edx-tincan-py35==0.0.5    # via -r requirements/edx/base.txt, edx-enterprise
 edx-user-state-client==1.1.2  # via -r requirements/edx/base.txt
-edx-when==1.0.2           # via -r requirements/edx/base.txt, edx-proctoring
+edx-when==1.0.3           # via -r requirements/edx/base.txt, edx-proctoring
 edxval==1.2.4             # via -r requirements/edx/base.txt
 elasticsearch==1.9.0      # via -r requirements/edx/base.txt, edx-search
 entrypoints==0.3          # via flake8
@@ -150,8 +150,8 @@ html5lib==1.0.1           # via -r requirements/edx/base.txt, ora2
 httplib2==0.17.0          # via -r requirements/edx/base.txt, oauth2
 httpretty==0.9.7          # via -r requirements/edx/testing.in
 idna==2.9                 # via -r requirements/edx/base.txt, requests
-importlib-metadata==1.5.0  # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, inflect, path, pluggy, pytest, pytest-randomly, tox, virtualenv
-importlib-resources==1.1.0  # via virtualenv
+importlib-metadata==1.5.0  # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, importlib-resources, inflect, path, pluggy, pytest, pytest-randomly, tox, virtualenv
+importlib-resources==1.2.0  # via virtualenv
 inflect==3.0.2            # via -c requirements/edx/../constraints.txt, -r requirements/edx/coverage.txt, jinja2-pluralize
 inflection==0.3.1         # via -r requirements/edx/base.txt, drf-yasg
 ipaddress==1.0.23         # via -r requirements/edx/base.txt
