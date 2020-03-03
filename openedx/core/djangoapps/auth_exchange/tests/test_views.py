@@ -13,7 +13,6 @@ import pytest
 import ddt
 import httpretty
 import mock
-import provider.constants
 from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
@@ -61,7 +60,7 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
         self.assertEqual(content["token_type"], "Bearer")
         self.assertLessEqual(
             timedelta(seconds=int(content["expires_in"])),
-            provider.constants.EXPIRE_DELTA_PUBLIC
+            timedelta(days=30)
         )
         actual_scopes = content["scope"]
         if actual_scopes:
