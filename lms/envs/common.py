@@ -551,9 +551,6 @@ CACHES = {
     },
 }
 
-############################ OpenID Provider  ##################################
-OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net']
-
 ############################ OAUTH2 Provider ###################################
 OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS = 365
 OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
