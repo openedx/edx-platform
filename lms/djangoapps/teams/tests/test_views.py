@@ -207,16 +207,30 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
     def setUpClass(cls):
         # pylint: disable=super-method-not-called
         with super(TeamAPITestCase, cls).setUpClassAndTestData():
+            base_topics = [{
+                'id': 'topic_{}'.format(i), 'name': name,
+                'description': u'Description for topic {}.'.format(i)
+            } for i, name in enumerate([u'Sólar power', 'Wind Power', 'Nuclear Power', 'Coal Power'])]
+            base_topics.append(
+                {
+                    'id': 'private_topic_1_id',
+                    'name': 'private_topic_1_name',
+                    'description': u'Description for topic private topic 1.',
+                    'type': u'private_managed'
+                }
+            )
+            base_topics.append(
+                {
+                    'id': 'private_topic_2_id',
+                    'name': 'private_topic_2_name',
+                    'description': u'Description for topic private topic 2.',
+                    'type': u'private_managed'
+                }
+            )
             teams_configuration_1 = TeamsConfig({
-                'topics':
-                [
-                    {
-                        'id': 'topic_{}'.format(i),
-                        'name': name,
-                        'description': u'Description for topic {}.'.format(i)
-                    } for i, name in enumerate([u'Sólar power', 'Wind Power', 'Nuclear Power', 'Coal Power'])
-                ]
+                'topics': base_topics
             })
+
             cls.test_course_1 = CourseFactory.create(
                 org='TestX',
                 course='TS101',
@@ -255,12 +269,14 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
     @classmethod
     def setUpTestData(cls):
         super(TeamAPITestCase, cls).setUpTestData()
-        cls.topics_count = 4
+        cls.topics_count = 6
         cls.users = {
             'staff': AdminFactory.create(password=cls.test_password),
             'course_staff': StaffFactory.create(course_key=cls.test_course_1.id, password=cls.test_password)
         }
         cls.create_and_enroll_student(username='student_enrolled')
+        cls.create_and_enroll_student(username='student_on_team_1_private_set_1', mode=CourseMode.MASTERS)
+        cls.create_and_enroll_student(username='student_not_member_of_private_teams', mode=CourseMode.MASTERS)
         cls.create_and_enroll_student(username='student_enrolled_not_on_team')
         cls.create_and_enroll_student(username='student_unenrolled', courses=[])
 
@@ -346,6 +362,36 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                 organization_protected=True
             )
 
+            cls.team_1_in_private_teamset_1 = CourseTeamFactory.create(
+                name='team 1 in private teamset 1',
+                description='team 1 in private teamset 1 desc',
+                country='US',
+                language='EN',
+                course_id=cls.test_course_1.id,
+                topic_id='private_topic_1_id',
+                organization_protected=True
+            )
+
+            cls.team_2_in_private_teamset_1 = CourseTeamFactory.create(
+                name='team 2 in private teamset 1',
+                description='team 2 in private teamset 1 desc',
+                country='US',
+                language='EN',
+                course_id=cls.test_course_1.id,
+                topic_id='private_topic_1_id',
+                organization_protected=True
+            )
+
+            cls.team_1_in_private_teamset_2 = CourseTeamFactory.create(
+                name='team 1 in private teamset 2',
+                description='team 1 in private teamset 2 desc',
+                country='US',
+                language='EN',
+                course_id=cls.test_course_1.id,
+                topic_id='private_topic_2_id',
+                organization_protected=True
+            )
+
         cls.test_team_name_id_map = {team.name: team for team in (
             cls.solar_team,
             cls.wind_team,
@@ -370,6 +416,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         cls.another_team.add_user(cls.users['student_enrolled_both_courses_other_team'])
         cls.public_profile_team.add_user(cls.users['student_enrolled_public_profile'])
         cls.masters_only_team.add_user(cls.users['student_masters'])
+        cls.team_1_in_private_teamset_1.add_user(cls.users['student_on_team_1_private_set_1'])
 
     def build_membership_data_raw(self, username, team):
         """Assembles a membership creation payload based on the raw values provided."""
@@ -581,8 +628,8 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         ('student_inactive', 401),
         ('student_unenrolled', 403),
         ('student_enrolled', 200, 3),
-        ('staff', 200, 4),
-        ('course_staff', 200, 4),
+        ('staff', 200, 7),
+        ('course_staff', 200, 7),
         ('community_ta', 200, 3),
         ('student_masters', 200, 1)
     )
@@ -661,6 +708,25 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
     def test_page_size(self):
         result = self.get_teams_list(200, {'page_size': 2})
         self.assertEqual(2, result['num_pages'])
+
+    def test_non_member_trying_to_get_private_topic(self):
+        """
+        Verifies that when a student that is enrolled in a course, but is NOT a member of
+        a private team set, asks for information about that team set, an empty list is returned.
+        """
+        result = self.get_teams_list(data={'topic_id': 'private_topic_1_id'})
+        self.assertEqual([], result['results'])
+
+    def test_member_trying_to_get_private_topic(self):
+        """
+        Verifies that when a student that is enrolled in a course, and IS a member of
+        a private team set, asks for information about that team set, information about the teamset is returned.
+        """
+        result = self.get_teams_list(data={'topic_id': 'private_topic_1_id'},
+                                     user='student_on_team_1_private_set_1')
+        self.assertEqual(1, len(result['results']))
+        self.assertEqual('private_topic_1_id', result['results'][0]['topic_id'])
+        self.assertNotEqual([], result['results'])
 
     def test_page(self):
         result = self.get_teams_list(200, {'page_size': 1, 'page': 3})
@@ -1141,11 +1207,14 @@ class TestListTopicsAPI(TeamAPITestCase):
         self.get_topics_list(400)
 
     @ddt.data(
-        (None, 200, ['Coal Power', 'Nuclear Power', u'Sólar power', 'Wind Power'], 'name'),
-        ('name', 200, ['Coal Power', 'Nuclear Power', u'Sólar power', 'Wind Power'], 'name'),
+        (None, 200, ['Coal Power', 'Nuclear Power', 'private_topic_1_name', 'private_topic_2_name',
+                     u'Sólar power', 'Wind Power'], 'name'),
+        ('name', 200, ['Coal Power', 'Nuclear Power', 'private_topic_1_name', 'private_topic_2_name',
+                       u'Sólar power', 'Wind Power'], 'name'),
         # Note that "Nuclear Power" and "Solar power" both have 2 teams. "Coal Power" and "Window Power"
         # both have 0 teams. The secondary sort is alphabetical by name.
-        ('team_count', 200, ['Nuclear Power', u'Sólar power', 'Coal Power', 'Wind Power'], 'team_count'),
+        ('team_count', 200, ['Nuclear Power', u'Sólar power', 'Coal Power', 'private_topic_1_name',
+                             'private_topic_2_name', 'Wind Power'], 'team_count'),
         ('no_such_field', 400, [], None),
     )
     @ddt.unpack

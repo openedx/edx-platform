@@ -419,6 +419,9 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                     topic_id=topic_id
                 )
                 return Response(error, status=status.HTTP_400_BAD_REQUEST)
+
+            if course_module.teamsets_by_id[topic_id].is_private_managed:
+                result_filter.update({'membership__user__username': request.user})
             result_filter.update({'topic_id': topic_id})
 
         organization_protection_status = user_organization_protection_status(
@@ -467,7 +470,19 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             'open_slots': ('team_size', '-last_activity_at'),
             'last_activity_at': ('-last_activity_at', 'team_size'),
         }
-        queryset = CourseTeam.objects.filter(**result_filter)
+
+        if not has_access(request.user, 'staff', course_key):
+            # hide private_managed courses from non-admin users that aren't members of those teams
+            private_topic_ids = [ts.teamset_id for ts in course_module.teamsets if
+                                 ts.is_private_managed]
+            public_teams = CourseTeam.objects.filter(**result_filter).exclude(
+                topic_id__in=private_topic_ids)
+            private_managed_teams_of_user = CourseTeam.objects.filter(topic_id__in=private_topic_ids,
+                                                                      membership__user__username=request.user)
+            queryset = public_teams | private_managed_teams_of_user
+        else:
+            queryset = CourseTeam.objects.filter(**result_filter)
+
         order_by_input = request.query_params.get('order_by', 'name')
         if order_by_input not in ordering_schemes:
             return Response(
