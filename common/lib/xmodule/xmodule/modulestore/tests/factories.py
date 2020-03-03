@@ -600,10 +600,10 @@ def check_sum_of_calls(object_, methods, maximum_calls, minimum_calls=1, include
         print("".join(messages))
 
     # verify the counter actually worked by ensuring we have counted greater than (or equal to) the minimum calls
-    assert call_count >= minimum_calls
+    assert call_count >= minimum_calls, call_count
 
     # now verify the number of actual calls is less than (or equal to) the expected maximum
-    assert call_count <= maximum_calls
+    assert call_count <= maximum_calls, call_count
 
 
 def mongo_uses_error_check(store):
