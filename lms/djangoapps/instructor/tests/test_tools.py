@@ -268,6 +268,16 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         tools.set_due_date_extension(self.course, self.week1, self.user, None)
         self.assertEqual(self.week1.due, self.due)
 
+    def test_reset_due_date_extension_with_no_enrollment(self):
+        """
+        Tests that DashboardError is raised when trying to extend due date
+        for a block given the user is not enrolled in the course.
+        """
+        user = UserFactory.create()
+        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=UTC)
+        with self.assertRaises(tools.DashboardError):
+            tools.set_due_date_extension(self.course, self.week3, user, extended)
+
 
 class TestDataDumps(ModuleStoreTestCase):
     """
