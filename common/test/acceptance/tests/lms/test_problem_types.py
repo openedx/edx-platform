@@ -1450,34 +1450,6 @@ class FormulaProblemTypeBase(ProblemTypeTestBase):
         self.problem_page.fill_answer(textvalue)
 
 
-@ddt.ddt
-class FormulaProblemTypeTest(FormulaProblemTypeBase, ProblemTypeTestMixin, ChangingAnswerOfProblemTestMixin):
-    """
-    Standard tests for the Formula Problem Type
-    """
-    shard = 24
-    pass
-
-
-class FormulaProblemTypeTestNonRandomized(FormulaProblemTypeBase, NonRandomizedProblemTypeTestMixin):
-    """
-    Tests for non-randomized Formula problem
-    """
-    shard = 24
-
-    def get_problem(self):
-        """
-        Creates a {problem_type} problem
-        """
-        # Generate the problem XML using capa.tests.response_xml_factory
-        return XBlockFixtureDesc(
-            'problem',
-            self.problem_name,
-            data=self.factory.build_xml(**self.factory_kwargs),
-            metadata={'rerandomize': 'never', 'show_reset_button': True}
-        )
-
-
 class FormulaProblemTypeNeverShowCorrectnessTest(FormulaProblemTypeBase, ProblemNeverShowCorrectnessMixin):
     """
     Ensure that correctness can be withheld for Formula Problem Type problems.
@@ -1590,24 +1562,6 @@ class ScriptProblemResetAfterAnswerTest(ScriptProblemTypeBase):
 
         self.answer_problem(other_correctness)
         self.assertTrue(self.problem_status('unanswered'))
-
-    @ddt.data(['correct', '2/2 points (ungraded)'], ['incorrect', '0/2 points (ungraded)'])
-    @ddt.unpack
-    def test_script_score_after_answer_and_reset(self, correctness, score):
-        """
-        Scenario: I can see my score on a script problem when I answer it and after I reset it
-
-        Given I am viewing a script problem
-        When I answer a script problem correct/incorrect
-        Then I should see a score
-        When I reset the problem
-        Then I should see a score of points possible: 0/2 points (ungraded)
-        """
-        self.answer_problem(correctness)
-        self.problem_page.click_submit()
-        self.assertEqual(self.problem_page.problem_progress_graded_value, score)
-        self.problem_page.click_reset()
-        self.assertEqual(self.problem_page.problem_progress_graded_value, '0/2 points (ungraded)')
 
 
 class ScriptProblemTypeTestNonRandomized(ScriptProblemTypeBase, NonRandomizedProblemTypeTestMixin):

@@ -88,29 +88,3 @@ class TestCohortHelp(ContainerBase, CohortTestMixin):
             '/course_features/cohorts/cohorts_overview.html#all-automated-assignment',
         )
         self.verify_help_link(href)
-
-
-@skip_unless_master         # See note at the top of the file.
-class InstructorDashboardHelp(BaseInstructorDashboardTest):
-    """
-    Tests opening help from the general Help button in the instructor dashboard.
-    """
-    shard = 2
-
-    def setUp(self):
-        super(InstructorDashboardHelp, self).setUp()
-        self.course_fixture = CourseFixture(**self.course_info).install()
-        self.log_in_as_instructor()
-        self.instructor_dashboard_page = self.visit_instructor_dashboard()
-
-    def test_instructor_dashboard_help(self):
-        """
-        Scenario: Help button opens staff help
-        Given that I am viewing the Instructor Dashboard
-        When I click "Help"
-        Then I see help about the instructor dashboard in a new tab
-        """
-        href = url_for_help('course_author', '/CA_instructor_dash_help.html')
-        help_element = self.instructor_dashboard_page.get_help_element()
-        click_and_wait_for_window(self, help_element)
-        assert_opened_help_link_is_correct(self, href)
