@@ -1450,34 +1450,6 @@ class FormulaProblemTypeBase(ProblemTypeTestBase):
         self.problem_page.fill_answer(textvalue)
 
 
-@ddt.ddt
-class FormulaProblemTypeTest(FormulaProblemTypeBase, ProblemTypeTestMixin, ChangingAnswerOfProblemTestMixin):
-    """
-    Standard tests for the Formula Problem Type
-    """
-    shard = 24
-    pass
-
-
-class FormulaProblemTypeTestNonRandomized(FormulaProblemTypeBase, NonRandomizedProblemTypeTestMixin):
-    """
-    Tests for non-randomized Formula problem
-    """
-    shard = 24
-
-    def get_problem(self):
-        """
-        Creates a {problem_type} problem
-        """
-        # Generate the problem XML using capa.tests.response_xml_factory
-        return XBlockFixtureDesc(
-            'problem',
-            self.problem_name,
-            data=self.factory.build_xml(**self.factory_kwargs),
-            metadata={'rerandomize': 'never', 'show_reset_button': True}
-        )
-
-
 class FormulaProblemTypeNeverShowCorrectnessTest(FormulaProblemTypeBase, ProblemNeverShowCorrectnessMixin):
     """
     Ensure that correctness can be withheld for Formula Problem Type problems.
