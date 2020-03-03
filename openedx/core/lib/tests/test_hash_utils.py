@@ -1,10 +1,12 @@
 """
 Tests for hash_utils.py
 """
-import ddt
 from unittest import TestCase
 
+import ddt
+
 from openedx.core.lib.hash_utils import create_hash256, short_token
+
 
 @ddt.ddt
 class TestHashUtils(TestCase):
@@ -29,5 +31,3 @@ class TestHashUtils(TestCase):
     def test_create_hash256_default(self):
         token = create_hash256()
         self.assertIsNotNone(token)
-
-
