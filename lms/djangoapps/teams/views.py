@@ -31,6 +31,7 @@ from openedx.core.lib.api.authentication import BearerAuthentication
 from lms.djangoapps.courseware.courses import get_course_with_access, has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
+from openedx.core.lib.teams_config import TeamsetType
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.permissions import IsStaffOrReadOnly
 from openedx.core.lib.api.view_utils import (
@@ -136,6 +137,19 @@ class TeamsDashboardView(GenericAPIView):
         topics = get_alphabetical_topics(course)
         organization_protection_status = user_organization_protection_status(request.user, course_key)
 
+        # We have some frontend logic that needs to know if we have any open, public, or managed teamsets,
+        # and it's easier to just figure that out here when we have them all already
+        has_open_teamset = False
+        has_public_managed_teamset = False
+        has_private_managed_teamset = False
+        for topic in topics:
+            has_open_teamset |= topic.type == TeamsetType.open
+            has_public_managed_teamset |= topic.type == TeamsetType.public_managed
+            has_private_managed_teamset |= topic.type == TeamsetType.private_managed
+            if has_open_teamset and has_public_managed_teamset and has_private_managed_teamset:
+                break
+        has_managed_teamset = has_private_managed_teamset or has_public_managed_teamset
+
         # Paginate and serialize topic data
         # BulkTeamCountPaginatedTopicSerializer will add team counts to the topics in a single
         # bulk operation per page.
@@ -180,6 +194,9 @@ class TeamsDashboardView(GenericAPIView):
                 "staff": bool(has_access(user, 'staff', course_key)),
                 "teams": user_teams_data
             },
+            "has_open_teamset": has_open_teamset,
+            "has_public_teamset": has_public_managed_teamset,
+            "has_managed_teamset": has_managed_teamset,
             "topic_url": reverse(
                 'topics_detail', kwargs={'topic_id': 'topic_id', 'course_id': str(course_id)}, request=request
             ),
