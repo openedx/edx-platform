@@ -603,7 +603,10 @@ CONTEXT_PROCESSORS = [
     'openedx.core.djangoapps.site_configuration.context_processors.configuration_context',
 
     # Mobile App processor (Detects if request is from the mobile app)
-    'mobile_api.context_processor.is_from_mobile_app'
+    'mobile_api.context_processor.is_from_mobile_app',
+
+    # edly context processor to apply dynamic theming
+    'edly_panel_app.context_processor.dynamic_theming_context'
 ]
 
 # Django templating
