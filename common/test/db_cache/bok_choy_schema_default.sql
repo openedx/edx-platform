@@ -2613,7 +2613,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=668 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=672 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3162,7 +3162,6 @@ CREATE TABLE `enterprise_enterprisecustomer` (
   `customer_type_id` int(11) NOT NULL,
   `enable_portal_code_management_screen` tinyint(1) NOT NULL,
   `enable_learner_portal` tinyint(1) NOT NULL,
-  `learner_portal_hostname` varchar(255) NOT NULL,
   `enable_portal_reporting_config_screen` tinyint(1) NOT NULL,
   `contact_email` varchar(254) DEFAULT NULL,
   PRIMARY KEY (`uuid`),
@@ -3414,7 +3413,6 @@ CREATE TABLE `enterprise_historicalenterprisecustomer` (
   `customer_type_id` int(11) DEFAULT NULL,
   `enable_portal_code_management_screen` tinyint(1) NOT NULL,
   `enable_learner_portal` tinyint(1) NOT NULL,
-  `learner_portal_hostname` varchar(255) NOT NULL,
   `enable_portal_reporting_config_screen` tinyint(1) NOT NULL,
   `contact_email` varchar(254) DEFAULT NULL,
   PRIMARY KEY (`history_id`),
@@ -5019,9 +5017,9 @@ CREATE TABLE `program_enrollments_programcourseenrollment` (
   `course_key` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `program_enrollments_prog_program_enrollment_id_co_7d2701fb_uniq` (`program_enrollment_id`,`course_key`),
-  UNIQUE KEY `course_enrollment_id` (`course_enrollment_id`),
   KEY `program_enrollments__course_id_4f564456_fk_course_ov` (`course_id`),
   KEY `program_enrollments__program_enrollment_i_02ce2c32_fk_program_e` (`program_enrollment_id`),
+  KEY `program_enrollments_program_course_enrollment_id_d7890690` (`course_enrollment_id`),
   CONSTRAINT `program_enrollments__course_enrollment_id_d7890690_fk_student_c` FOREIGN KEY (`course_enrollment_id`) REFERENCES `student_courseenrollment` (`id`),
   CONSTRAINT `program_enrollments__course_id_4f564456_fk_course_ov` FOREIGN KEY (`course_id`) REFERENCES `course_overviews_courseoverview` (`id`),
   CONSTRAINT `program_enrollments__program_enrollment_i_02ce2c32_fk_program_e` FOREIGN KEY (`program_enrollment_id`) REFERENCES `program_enrollments_programenrollment` (`id`)
