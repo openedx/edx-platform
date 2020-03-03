@@ -7,6 +7,7 @@ Required in Django 1.9+ due to imports of models in stock Django apps.
 import sys
 import tempfile
 
+from django.utils.translation import ugettext_lazy as _
 from path import Path
 
 # TODO: Remove the rest of the sys.path modification here and in (cms|lms)/envs/common.py
@@ -64,6 +65,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'djcelery',
+    'django_sites_extensions',
     'openedx.core.djangoapps.django_comment_common',
     'openedx.core.djangoapps.video_config',
     'openedx.core.djangoapps.video_pipeline',
@@ -82,6 +84,8 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.content.block_structure.apps.BlockStructureConfig',
     'openedx.core.djangoapps.catalog',
     'openedx.core.djangoapps.self_paced',
+    'openedx.core.djangoapps.schedules.apps.SchedulesConfig',
+    'openedx.core.djangoapps.theming.apps.ThemingConfig',
     'experiments',
     'openedx.features.content_type_gating',
     'openedx.features.course_duration_limits',
@@ -107,9 +111,10 @@ POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
 
 SECRET_KEY = 'insecure-secret-key'
 SITE_ID = 1
-
+SITE_NAME = "localhost"
+PLATFORM_NAME = _('Your Platform Name Here')
+DEFAULT_FROM_EMAIL = 'registration@example.com'
 TRACK_MAX_EVENT = 50000
-
 USE_TZ = True
 
 RETIREMENT_SERVICE_WORKER_USERNAME = 'RETIREMENT_SERVICE_USER'
