@@ -23,7 +23,7 @@ define(['jquery', 'backbone', 'teams/js/teams_tab_factory', 'teams/js/views/team
 
             describe('can render the "Teams" tab', function() {
                 it('when there are no private or open teamsets', function() {
-                    initializeTeamsTabFactory(false, true);
+                    initializeTeamsTabFactory(false, false);
                     expect($('.teams-content').text()).toContain('See all teams you belong to');
                     expect($('.teams-content').text()).not.toContain('and all public teams in your course');
                     expect($('.teams-content').text()).not.toContain('Join an open public team');
