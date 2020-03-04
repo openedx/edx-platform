@@ -4,6 +4,7 @@ HTTP endpoints for the Teams API.
 
 
 import logging
+from collections import Counter
 
 import six
 from django.conf import settings
@@ -139,12 +140,7 @@ class TeamsDashboardView(GenericAPIView):
 
         # We have some frontend logic that needs to know if we have any open, public, or managed teamsets,
         # and it's easier to just figure that out here when we have them all already
-        has_open_teamset = any(topic for topic in topics if topic['type'] == TeamsetType.open.value)
-        has_public_managed_teamset = any(topic for topic in topics if topic['type'] == TeamsetType.public_managed.value)
-        has_private_managed_teamset = any(
-            topic for topic in topics if topic['type'] == TeamsetType.private_managed.value
-        )
-        has_managed_teamset = has_private_managed_teamset or has_public_managed_teamset
+        teamset_counts_by_type = Counter([topic['type'] for topic in topics])
 
         # Paginate and serialize topic data
         # BulkTeamCountPaginatedTopicSerializer will add team counts to the topics in a single
@@ -190,9 +186,12 @@ class TeamsDashboardView(GenericAPIView):
                 "staff": bool(has_access(user, 'staff', course_key)),
                 "teams": user_teams_data
             },
-            "has_open_teamset": has_open_teamset,
-            "has_public_managed_teamset": has_public_managed_teamset,
-            "has_managed_teamset": has_managed_teamset,
+            "has_open_teamset": bool(teamset_counts_by_type[TeamsetType.open.value]),
+            "has_public_managed_teamset": bool(teamset_counts_by_type[TeamsetType.public_managed.value]),
+            "has_managed_teamset": bool(
+                teamset_counts_by_type[TeamsetType.public_managed.value] +
+                teamset_counts_by_type[TeamsetType.private_managed.value]
+            ),
             "topic_url": reverse(
                 'topics_detail', kwargs={'topic_id': 'topic_id', 'course_id': str(course_id)}, request=request
             ),
