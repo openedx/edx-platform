@@ -16,4 +16,6 @@ def configuration_context(request):  # pylint: disable=unused-argument
         'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
         'current_url': urlquote_plus(request.build_absolute_uri(request.path)),
         'current_site_url': urlquote_plus(request.build_absolute_uri('/')),
+        'settings': settings,
+        'zendesk_widget': settings.MKTG_URLS.get('ZENDESK-WIDGET'),
     }
