@@ -139,15 +139,11 @@ class TeamsDashboardView(GenericAPIView):
 
         # We have some frontend logic that needs to know if we have any open, public, or managed teamsets,
         # and it's easier to just figure that out here when we have them all already
-        has_open_teamset = False
-        has_public_managed_teamset = False
-        has_private_managed_teamset = False
-        for topic in topics:
-            has_open_teamset |= topic.type == TeamsetType.open
-            has_public_managed_teamset |= topic.type == TeamsetType.public_managed
-            has_private_managed_teamset |= topic.type == TeamsetType.private_managed
-            if has_open_teamset and has_public_managed_teamset and has_private_managed_teamset:
-                break
+        has_open_teamset = any(topic for topic in topics if topic['type'] == TeamsetType.open.value)
+        has_public_managed_teamset = any(topic for topic in topics if topic['type'] == TeamsetType.public_managed.value)
+        has_private_managed_teamset = any(
+            topic for topic in topics if topic['type'] == TeamsetType.private_managed.value
+        )
         has_managed_teamset = has_private_managed_teamset or has_public_managed_teamset
 
         # Paginate and serialize topic data
@@ -195,7 +191,7 @@ class TeamsDashboardView(GenericAPIView):
                 "teams": user_teams_data
             },
             "has_open_teamset": has_open_teamset,
-            "has_public_teamset": has_public_managed_teamset,
+            "has_public_managed_teamset": has_public_managed_teamset,
             "has_managed_teamset": has_managed_teamset,
             "topic_url": reverse(
                 'topics_detail', kwargs={'topic_id': 'topic_id', 'course_id': str(course_id)}, request=request
