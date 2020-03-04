@@ -31,7 +31,6 @@ Longer TODO:
 import imp
 import sys
 import os
-import json
 
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from path import Path as path
