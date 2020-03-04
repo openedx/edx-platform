@@ -328,7 +328,7 @@ class StudioSubsectionSettingsA11yTest(StudioCourseTest):
         self.course_outline.a11y_audit.check_for_accessibility_errors()
 
 
-@attr(shard=16)
+@attr(shard=15)
 class StudioSettingsImageUploadTest(StudioCourseTest):
     """
     Class to test course settings image uploads.
