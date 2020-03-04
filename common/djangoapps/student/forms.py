@@ -45,7 +45,7 @@ def send_password_reset_email_for_user(user, request, preferred_email=None):
         'SITE_NAME',
         settings.SITE_NAME
     )
-    
+
     password_reset_link = '{protocol}://{site_name}{reset_link}'.format(
         protocol='https' if request.is_secure() else 'http',
         site_name=site_name,

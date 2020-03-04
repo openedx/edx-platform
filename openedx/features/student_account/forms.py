@@ -1,7 +1,11 @@
 """
 Utility functions for validating custom form
 """
+import json
+import requests
+
 from django import forms
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from lms.djangoapps.onboarding.models import Organization, OrgSector, TotalEmployee
@@ -48,6 +52,10 @@ class AccountCreationFormCustom(AccountCreationForm):
         }
     )
 
+    recaptcha = forms.CharField(
+        required=True
+    )
+
     def __init__(self, data=None, extended_profile_fields=None, do_third_party_auth=True):
         super(AccountCreationFormCustom, self).__init__(data, tos_required=False)
         self.extended_profile_fields = extended_profile_fields or {}
@@ -75,6 +83,21 @@ class AccountCreationFormCustom(AccountCreationForm):
             except Organization.DoesNotExist:
                 return org_name
         return org_name
+
+    def clean_g_recaptcha(self):
+        g_recaptcha = self.cleaned_data.get('recaptcha')
+        response = requests.post(
+            settings.CAPTCHA_VERIFY_URL,
+            data={
+                'secret': settings.CAPTCHA_SECRET_KEY,
+                'response': g_recaptcha
+            }).content
+        result = json.loads(response)
+
+        if not result['success']:
+            raise forms.ValidationError(_('The reCaptcha response is invalid. Please try again.'))
+
+        return g_recaptcha
 
     def clean(self):
         """ Enforce organization related field conditions """
