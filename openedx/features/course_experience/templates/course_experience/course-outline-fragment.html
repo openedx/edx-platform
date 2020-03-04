@@ -6,8 +6,10 @@
 
 <%!
 import json
-from datetime import date
+import pytz
+from datetime import date, datetime, timedelta
 
+from django.utils import timezone
 from django.utils.translation import ugettext as _
 
 from openedx.core.djangolib.markup import HTML, Text
@@ -16,6 +18,7 @@ from openedx.core.djangolib.markup import HTML, Text
 <%
 course_sections = blocks.get('children')
 self_paced = context.get('self_paced', False)
+reset_deadlines_banner_displayed = False
 %>
 <main role="main" class="course-outline" id="main" tabindex="-1">
     % if course_sections is not None:
@@ -56,6 +59,12 @@ self_paced = context.get('self_paced', False)
                 scored = 'scored' if subsection.get('scored', False) else ''
                 graded = 'graded' if subsection.get('graded') else ''
                 %>
+                % if not subsection.get('complete', True) and subsection.get('due', timezone.now() + timedelta(1)) < timezone.now() and not reset_deadlines_banner_displayed:
+                    <% reset_deadlines_banner_displayed = True %>
+                    <script type="text/javascript">
+                        $('.reset-deadlines-banner').css('display', 'flex');
+                    </script>
+                % endif
                         <li class="subsection accordion ${ 'current' if subsection.get('resume_block') else '' } ${graded} ${scored}">
                             <a
                             % if enable_links:

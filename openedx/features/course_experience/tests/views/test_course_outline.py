@@ -14,6 +14,7 @@ from completion.test_utils import CompletionWaffleTestMixin
 from django.contrib.sites.models import Site
 from django.test import override_settings
 from django.urls import reverse
+from django.utils import timezone
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -25,6 +26,8 @@ from waffle.testutils import override_switch
 from lms.djangoapps.courseware.tests.factories import StaffFactory
 from gating import api as lms_gating_api
 from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesAndSpecialExamsTransformer
+from openedx.core.djangoapps.schedules.models import Schedule
+from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.lib.gating import api as gating_api
 from openedx.features.course_experience.views.course_outline import (
     DEFAULT_COMPLETION_TRACKING_START,
@@ -55,7 +58,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
         # pylint: disable=super-method-not-called
         with super(TestCourseOutlinePage, cls).setUpClassAndTestData():
             cls.courses = []
-            course = CourseFactory.create()
+            course = CourseFactory.create(self_paced=True)
             with cls.store.bulk_operations(course.id):
                 chapter = ItemFactory.create(category='chapter', parent_location=course.location)
                 sequential = ItemFactory.create(category='sequential', parent_location=chapter.location)
@@ -131,6 +134,18 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
                         self.assertContains(response, sequential.due.strftime(u'%Y-%m-%d %H:%M:%S'))
                         self.assertContains(response, sequential.format)
                     self.assertTrue(sequential.children)
+
+    def test_reset_course_deadlines(self):
+        course = self.courses[0]
+        enrollment = CourseEnrollment.objects.get(course_id=course.id)
+        ScheduleFactory(
+            start_date=timezone.now() - datetime.timedelta(1),
+            enrollment=enrollment
+        )
+        url = '{}{}'.format(course_home_url(course), 'reset_deadlines')
+        self.client.post(url)
+        updated_schedule = Schedule.objects.get(enrollment=enrollment)
+        self.assertEqual(updated_schedule.start_date.day, datetime.datetime.today().day)
 
 
 class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, MilestonesTestCaseMixin):

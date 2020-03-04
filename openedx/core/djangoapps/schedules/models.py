@@ -6,6 +6,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
+from simple_history.models import HistoricalRecords
 
 
 class Schedule(TimeStampedModel):
@@ -33,6 +34,7 @@ class Schedule(TimeStampedModel):
         null=True,
         help_text=_('Deadline by which the learner must upgrade to a verified seat')
     )
+    history = HistoricalRecords()
 
     def get_experience_type(self):
         try:

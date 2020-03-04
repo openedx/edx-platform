@@ -51,6 +51,7 @@ from openedx.core.djangolib.markup import HTML
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
+    RELATIVE_DATES_FLAG,
     SHOW_REVIEWS_TOOL_FLAG,
     SHOW_UPGRADE_MSG_ON_COURSE_HOME,
     UNIFIED_COURSE_TAB_FLAG
@@ -948,6 +949,7 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         self.course = CourseFactory(
             start=now() - timedelta(days=30),
             end=end,
+            self_paced=True,
         )
         self.url = course_home_url(self.course)
 
@@ -1020,3 +1022,8 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
             response = self.client.get(self.url)
 
         self.assertContains(response, "<span>DISCOUNT_PRICE</span>")
+
+    @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
+    def test_reset_deadline_banner_is_present_on_course_tab(self):
+        response = self.client.get(self.url)
+        self.assertContains(response, '<div class="reset-deadlines-banner">')
