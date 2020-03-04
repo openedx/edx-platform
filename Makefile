@@ -85,10 +85,13 @@ REQ_FILES = \
 upgrade: export CUSTOM_COMPILE_COMMAND=make upgrade
 upgrade: ## update the pip requirements files to use the latest releases satisfying our constraints
 	pip install -qr requirements/edx/pip-tools.txt
-	@for f in $(REQ_FILES); do \
+	@ export REBUILD='--rebuild'; \
+	for f in $(REQ_FILES); do \
 		echo ; \
 		echo "== $$f ===============================" ; \
-		pip-compile -v --no-emit-trusted-host --no-index --rebuild --upgrade -o $$f.txt $$f.in || exit 1; \
+		echo "pip-compile -v --no-emit-trusted-host --no-index $$REBUILD --upgrade -o $$f.txt $$f.in"; \
+		pip-compile -v --no-emit-trusted-host --no-index $$REBUILD --upgrade -o $$f.txt $$f.in || exit 1; \
+		export REBUILD=''; \
 	done
 	# Post process all of the files generated above to work around open pip-tools issues
 	scripts/post-pip-compile.sh $(REQ_FILES:=.txt)
