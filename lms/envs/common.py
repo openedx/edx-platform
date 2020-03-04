@@ -551,15 +551,7 @@ CACHES = {
     },
 }
 
-############################ OpenID Provider  ##################################
-OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net']
-
 ############################ OAUTH2 Provider ###################################
-
-# OpenID Connect issuer ID. Normally the URL of the authentication endpoint.
-
-OAUTH_OIDC_ISSUER = 'http://127.0.0.1:8000/oauth2'
-
 OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS = 365
 OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 

@@ -25,10 +25,8 @@ ENTERPRISE_API_URL = '{}/enterprise/api/v1/'.format(LMS_INTERNAL_ROOT_URL)
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://edx.devstack.credentials:18150'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 
-OAUTH_OIDC_ISSUER = '{}/oauth2'.format(LMS_ROOT_URL)
-
 JWT_AUTH.update({
-    'JWT_ISSUER': OAUTH_OIDC_ISSUER,
+    'JWT_ISSUER': '{}/oauth2'.format(LMS_ROOT_URL),
 })
 
 FEATURES.update({

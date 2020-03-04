@@ -1826,8 +1826,6 @@ CACHES = {
 
 ############################ OAUTH2 Provider ###################################
 
-# OpenID Connect issuer ID. Normally the URL of the authentication endpoint.
-OAUTH_OIDC_ISSUER = 'http://127.0.0.1:8000/oauth2'
 
 # 5 minute expiration time for JWT id tokens issued for external API requests.
 OAUTH_ID_TOKEN_EXPIRATION = 5 * 60

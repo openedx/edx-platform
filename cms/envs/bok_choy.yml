@@ -112,7 +112,6 @@ MODULESTORE:
       - ENGINE: xmodule.modulestore.xml.XMLModuleStore
         NAME: xml
         OPTIONS: {data_dir: '** OVERRIDDEN **', default_class: xmodule.hidden_module.HiddenDescriptor}
-OAUTH_OIDC_ISSUER: https://www.example.com/oauth2
 SECRET_KEY: ''
 SERVER_EMAIL: devops@example.com
 SESSION_COOKIE_DOMAIN: null

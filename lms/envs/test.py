@@ -281,8 +281,6 @@ OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
 
 ############################## OAUTH2 Provider ################################
 FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
-# don't cache courses for testing
-OIDC_COURSE_HANDLER_CACHE_TIMEOUT = 0
 OAUTH_ENFORCE_SECURE = False
 
 ########################### External REST APIs #################################
