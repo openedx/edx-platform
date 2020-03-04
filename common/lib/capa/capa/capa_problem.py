@@ -562,12 +562,14 @@ class LoncapaProblem(object):
         """
         _ = get_gettext(self.capa_system.i18n)
         # Some questions define a prompt with this format:   >>This is a prompt<<
-        log_error = False
         try:
             prompt = self.problem_data[answer_id].get('label')
         except KeyError:
-            log_error = True
-            prompt = self.problem_data.get(answer_id, {}).get('label')
+            log.error(
+                'KeyError: answer_id: %s, Problem data: %s, problem: %s',
+                (answer_id, self.problem_data, etree.tostring(self.tree))
+            )
+            raise
 
         if prompt:
             question_text = prompt.striptags()
@@ -612,11 +614,6 @@ class LoncapaProblem(object):
                 question_nr = int(answer_id.split('_')[-2]) - 1
                 question_text = _("Question {0}").format(question_nr)
 
-        if log_error:
-            log.error(
-                'KeyError: answer_id: %s, Problem data: %s, question_text: %s',
-                (answer_id, self.problem_data, question_text)
-            )
         return question_text
 
     def find_answer_text(self, answer_id, current_answer):
