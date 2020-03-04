@@ -59,12 +59,10 @@ class TestDiscountRestrictionConfig(CacheIsolationTestCase):
         non_test_course_disabled = CourseOverviewFactory.create(org='non-test-org-disabled')
         non_test_course_enabled = CourseOverviewFactory.create(org='non-test-org-enabled')
         non_test_site_cfg_disabled = SiteConfigurationFactory.create(
-            site_values={'course_org_filter': non_test_course_disabled.org},
-            values={'course_org_filter': non_test_course_disabled.org}
+            site_values={'course_org_filter': non_test_course_disabled.org}
         )
         non_test_site_cfg_enabled = SiteConfigurationFactory.create(
-            site_values={'course_org_filter': non_test_course_enabled.org},
-            values={'course_org_filter': non_test_course_enabled.org}
+            site_values={'course_org_filter': non_test_course_enabled.org}
         )
 
         DiscountRestrictionConfig.objects.create(course=non_test_course_disabled, disabled=True)
@@ -77,8 +75,7 @@ class TestDiscountRestrictionConfig(CacheIsolationTestCase):
         # Set up test objects
         test_course = CourseOverviewFactory.create(org='test-org')
         test_site_cfg = SiteConfigurationFactory.create(
-            site_values={'course_org_filter': test_course.org},
-            values={'course_org_filter': test_course.org}
+            site_values={'course_org_filter': test_course.org}
         )
 
         DiscountRestrictionConfig.objects.create(disabled=global_setting)

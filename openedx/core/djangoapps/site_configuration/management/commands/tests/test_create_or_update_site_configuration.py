@@ -56,7 +56,7 @@ class CreateOrUpdateSiteConfigurationTest(TestCase):
     def create_fixture_site_configuration(self, enabled):
         SiteConfiguration.objects.update_or_create(
             site=self.site,
-            defaults={'enabled': enabled, 'values': {'ABC': 'abc', 'B': 'b'}}
+            defaults={'enabled': enabled, 'site_values': {'ABC': 'abc', 'B': 'b'}}
         )
 
     def test_command_no_args(self):
@@ -105,7 +105,7 @@ class CreateOrUpdateSiteConfigurationTest(TestCase):
 
         call_command(self.command, *self.site_id_arg)
         site_configuration = SiteConfiguration.objects.get(site=self.site)
-        self.assertFalse(site_configuration.values)
+        self.assertFalse(site_configuration.site_values)
         self.assertFalse(site_configuration.enabled)
 
     def test_both_enabled_disabled_flags(self):
@@ -126,7 +126,7 @@ class CreateOrUpdateSiteConfigurationTest(TestCase):
         self.assert_site_configuration_does_not_exist()
         call_command(self.command, '--{}'.format(flag), *self.site_id_arg)
         site_configuration = SiteConfiguration.objects.get(site=self.site)
-        self.assertFalse(site_configuration.values)
+        self.assertFalse(site_configuration.site_values)
         self.assertEqual(enabled, site_configuration.enabled)
 
     def test_site_configuration_created_with_parameters(self):
@@ -136,7 +136,7 @@ class CreateOrUpdateSiteConfigurationTest(TestCase):
         self.assert_site_configuration_does_not_exist()
         call_command(self.command, '--configuration', json.dumps(self.input_configuration), *self.site_id_arg)
         site_configuration = self.get_site_configuration()
-        self.assertDictEqual(site_configuration.values, self.input_configuration)
+        self.assertDictEqual(site_configuration.site_values, self.input_configuration)
 
     def test_site_configuration_created_with_json_file_parameters(self):
         """
@@ -145,7 +145,7 @@ class CreateOrUpdateSiteConfigurationTest(TestCase):
         self.assert_site_configuration_does_not_exist()
         call_command(self.command, '-f', str(self.json_file_path.abspath()), *self.site_id_arg)
         site_configuration = self.get_site_configuration()
-        self.assertEqual(site_configuration.values, {'ABC': 123, 'XYZ': '789'})
+        self.assertEqual(site_configuration.site_values, {'ABC': 123, 'XYZ': '789'})
 
     @ddt.data(True, False)
     def test_site_configuration_updated_with_parameters(self, enabled):
@@ -156,7 +156,7 @@ class CreateOrUpdateSiteConfigurationTest(TestCase):
         call_command(self.command, '--configuration', json.dumps(self.input_configuration), *self.site_id_arg)
         site_configuration = self.get_site_configuration()
         self.assertEqual(
-            site_configuration.values,
+            site_configuration.site_values,
             {'ABC': 123, 'B': 'b', 'FEATURE_FLAG': True, 'SERVICE_URL': 'https://foo.bar'}
         )
         self.assertEqual(site_configuration.enabled, enabled)
@@ -172,5 +172,5 @@ class CreateOrUpdateSiteConfigurationTest(TestCase):
         expected_site_configuration = {'ABC': 'abc', 'B': 'b'}
         with codecs.open(self.json_file_path, encoding='utf-8') as f:
             expected_site_configuration.update(json.load(f))
-        self.assertEqual(site_configuration.values, expected_site_configuration)
+        self.assertEqual(site_configuration.site_values, expected_site_configuration)
         self.assertEqual(site_configuration.enabled, enabled)
