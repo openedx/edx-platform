@@ -147,7 +147,7 @@
                         url: 'my-teams',
                         view: this.myTeamsView
                     }];
-                    if (this.canViewBrowseTab()) {
+                    if (this.shouldSeeBrowseTab()) {
                         tabsList.push({
                             title: gettext('Browse'),
                             url: 'browse',
@@ -185,7 +185,7 @@
                     // 2. If the user will not see a "Browse" page, jump to the "My Teams" page
                     // 3. Otherwise, jump to the "Browse" page
                     if (Backbone.history.getFragment() === '') {
-                        if (this.myTeamsCollection.length > 0 || !this.canViewBrowseTab()) {
+                        if (this.myTeamsCollection.length > 0 || !this.shouldSeeBrowseTab()) {
                             this.router.navigate('my-teams', {trigger: true});
                         } else {
                             this.router.navigate('browse', {trigger: true});
@@ -501,7 +501,7 @@
                     return this.canEditTeam();
                 },
 
-                canViewBrowseTab: function() {
+                shouldSeeBrowseTab: function() {
                     return this.context.hasOpenTopic || this.context.hasPublicManagedTopic;
                 },
 
