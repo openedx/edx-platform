@@ -311,7 +311,6 @@ FEATURES = {
     # Prevent auto auth from creating superusers or modifying existing users
     'RESTRICT_AUTOMATIC_AUTH': True,
 
-    'AUTH_USE_OPENID_PROVIDER': True,
     'ENABLE_INSTRUCTOR_ANALYTICS': False,
     'PREVIEW_LMS_BASE': "preview.localhost:18000",
     'ENABLE_GRADE_DOWNLOADS': True,
@@ -1590,7 +1589,6 @@ for app_name, insert_before in OPTIONAL_APPS:
 
 ### External auth usage -- prefixes for ENROLLMENT_DOMAIN
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
-OPENID_DOMAIN_PREFIX = 'openid:'
 
 # Set request limits for maximum size of a request body and maximum number of GET/POST parameters. (>=Django 1.10)
 # Limits are currently disabled - but can be used for finer-grained denial-of-service protection.
