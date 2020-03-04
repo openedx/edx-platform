@@ -2477,6 +2477,9 @@ INSTALLED_APPS = [
 
     # Management of external user ids
     'openedx.core.djangoapps.external_user_ids',
+
+    # Management of per-user schedules
+    'openedx.core.djangoapps.schedules',
 ]
 
 ######################### CSRF #########################################

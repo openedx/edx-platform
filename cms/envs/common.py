@@ -1428,6 +1428,9 @@ INSTALLED_APPS = [
 
     # signal handlers to capture course dates into edx-when
     'openedx.core.djangoapps.course_date_signals',
+
+    # Management of per-user schedules
+    'openedx.core.djangoapps.schedules',
 ]
 
 

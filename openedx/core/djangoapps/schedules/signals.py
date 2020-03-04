@@ -17,6 +17,7 @@ from lms.djangoapps.courseware.models import (
     DynamicUpgradeDeadlineConfiguration,
     OrgDynamicUpgradeDeadlineConfiguration
 )
+from openedx.core.djangoapps.content.course_overviews.signals import COURSE_START_DATE_CHANGED
 from openedx.core.djangoapps.schedules.content_highlights import course_has_highlights
 from openedx.core.djangoapps.schedules.models import ScheduleExperience
 from openedx.core.djangoapps.theming.helpers import get_current_site
@@ -58,6 +59,7 @@ def create_schedule(sender, **kwargs):  # pylint: disable=unused-argument
         ))
 
 
+@receiver(COURSE_START_DATE_CHANGED)
 def update_schedules_on_course_start_changed(sender, updated_course_overview, previous_start_date, **kwargs):   # pylint: disable=unused-argument
     """
     Updates all course schedules start and upgrade_deadline dates based off of
