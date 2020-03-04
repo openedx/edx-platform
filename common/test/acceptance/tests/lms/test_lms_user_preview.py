@@ -102,6 +102,7 @@ class StaffViewToggleTest(CourseWithoutContentGroupsTest):
         self.assertFalse(course_page.has_tab('Instructor'))
 
 
+@attr(shard=20)
 class CourseWithContentGroupsTest(StaffViewTest):
     """
     Verifies that changing the "View this course as" selector works properly for content groups.
@@ -182,7 +183,6 @@ class CourseWithContentGroupsTest(StaffViewTest):
             )
         )
 
-    @attr(shard=20)
     def test_staff_sees_all_problems(self):
         """
         Scenario: Staff see all problems
@@ -198,7 +198,6 @@ class CourseWithContentGroupsTest(StaffViewTest):
             [self.alpha_text, self.beta_text, self.audit_text, self.everyone_text]
         )
 
-    @attr(shard=3)
     def test_student_not_in_content_group(self):
         """
         Scenario: When previewing as a learner, only content visible to all is shown
@@ -212,7 +211,6 @@ class CourseWithContentGroupsTest(StaffViewTest):
         course_page.set_staff_view_mode('Learner')
         verify_expected_problem_visibility(self, course_page, [self.everyone_text])
 
-    @attr(shard=3)
     def test_as_student_in_alpha(self):
         """
         Scenario: When previewing as a learner in group alpha, only content visible to alpha is shown
@@ -226,7 +224,6 @@ class CourseWithContentGroupsTest(StaffViewTest):
         course_page.set_staff_view_mode('Learner in alpha')
         verify_expected_problem_visibility(self, course_page, [self.alpha_text, self.everyone_text])
 
-    @attr(shard=3)
     def test_as_student_in_beta(self):
         """
         Scenario: When previewing as a learner in group beta, only content visible to beta is shown
@@ -240,7 +237,6 @@ class CourseWithContentGroupsTest(StaffViewTest):
         course_page.set_staff_view_mode('Learner in beta')
         verify_expected_problem_visibility(self, course_page, [self.beta_text, self.everyone_text])
 
-    @attr(shard=3)
     def test_as_student_in_audit(self):
         """
         Scenario: When previewing as a learner in the audit enrollment track, only content visible to audit is shown

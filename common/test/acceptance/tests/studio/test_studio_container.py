@@ -185,7 +185,7 @@ class DeleteComponentTest(NestedVerticalTest):
         self.delete_and_verify(group_a_item_1_delete_index, expected_ordering)
 
 
-@attr(shard=16)
+@attr(shard=19)
 class EditContainerTest(NestedVerticalTest):
     """
     Tests of editing a container.
@@ -621,7 +621,7 @@ class ContentGroupVisibilityModalTest(BaseGroupConfigurationsTest):
         self.remove_missing_groups(visibility_editor, self.html_component)
 
 
-@attr(shard=3)
+@attr(shard=20)
 class EnrollmentTrackVisibilityModalTest(BaseGroupConfigurationsTest):
     """
     Tests of the visibility settings modal for components on the unit
@@ -1120,7 +1120,7 @@ class UnitPublishingTest(ContainerBase):
     #     self.assertEqual('discussion', self.courseware.xblock_component_type(1))
 
 
-@attr(shard=3)
+@attr(shard=20)
 class DisplayNameTest(ContainerBase):
     """
     Test consistent use of display_name_with_default

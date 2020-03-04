@@ -619,7 +619,7 @@ class AnnotationProblemTypeTest(AnnotationProblemTypeBase, ProblemTypeTestMixin)
     """
     Standard tests for the Annotation Problem Type
     """
-    shard = 24
+    shard = 20
     pass
 
 
@@ -668,7 +668,7 @@ class CheckboxProblemTypeTest(CheckboxProblemTypeBase, ProblemTypeTestMixin, Cha
     """
     Standard tests for the Checkbox Problem Type
     """
-    shard = 24
+    shard = 18
 
     def test_can_show_answer(self):
         """
@@ -803,7 +803,7 @@ class MultipleChoiceProblemResetCorrectnessAfterChangingAnswerTest(MultipleChoic
     """
     Tests for Multiple choice problem with changing answers
     """
-    shard = 24
+    shard = 18
 
     @ddt.data(['correct', '1/1 point (ungraded)'], ['incorrect', '0/1 point (ungraded)'])
     @ddt.unpack
@@ -1105,7 +1105,7 @@ class RadioProblemTypeTestNonRandomized(RadioProblemTypeBase, NonRandomizedProbl
     """
     Tests for non-randomized radio problem
     """
-    shard = 24
+    shard = 8
 
     def get_problem(self):
         """
@@ -1159,7 +1159,7 @@ class DropdownProblemTypeTest(DropDownProblemTypeBase, ProblemTypeTestMixin, Cha
     """
     Standard tests for the Dropdown Problem Type
     """
-    shard = 24
+    shard = 8
     pass
 
 
@@ -1168,7 +1168,7 @@ class DropDownProblemTypeTestNonRandomized(DropDownProblemTypeBase, NonRandomize
     """
     Tests for non-randomized Dropdown problem
     """
-    shard = 24
+    shard = 8
 
     def get_problem(self):
         """
@@ -1243,7 +1243,7 @@ class StringProblemTypeTest(StringProblemTypeBase, ProblemTypeTestMixin):
     """
     Standard tests for the String Problem Type
     """
-    shard = 24
+    shard = 8
     pass
 
 
@@ -1559,7 +1559,7 @@ class ScriptProblemTypeTest(ScriptProblemTypeBase, ProblemTypeTestMixin):
     """
     Standard tests for the Script Problem Type
     """
-    shard = 24
+    shard = 20
     pass
 
 
@@ -1568,7 +1568,7 @@ class ScriptProblemResetAfterAnswerTest(ScriptProblemTypeBase):
     """
     Test Script problem by resetting answers
     """
-    shard = 24
+    shard = 8
 
     @ddt.data(['correct', 'incorrect'], ['incorrect', 'correct'])
     @ddt.unpack
@@ -1614,7 +1614,7 @@ class ScriptProblemTypeTestNonRandomized(ScriptProblemTypeBase, NonRandomizedPro
     """
     Tests for non-randomized Script problem
     """
-    shard = 24
+    shard = 8
 
     def get_problem(self):
         """
@@ -1841,7 +1841,7 @@ class RadioTextProblemTypeTest(RadioTextProblemTypeBase, ProblemTypeTestMixin):
     """
     Standard tests for the Radio Text Problem Type
     """
-    shard = 24
+    shard = 8
     pass
 
 
@@ -1850,7 +1850,7 @@ class RadioTextProblemResetCorrectnessAfterChangingAnswerTest(RadioTextProblemTy
     """
     Tests for Radio Text problem with changing answers
     """
-    shard = 24
+    shard = 18
 
     @ddt.data(['correct', '1/1 point (ungraded)'], ['incorrect', '0/1 point (ungraded)'])
     @ddt.unpack
