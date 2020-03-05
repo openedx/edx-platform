@@ -1,8 +1,6 @@
 """
 URL configuration for Studio's Content Libraries REST API
 """
-
-
 from django.conf.urls import include, url
 
 from . import views
@@ -26,6 +24,12 @@ urlpatterns = [
             url(r'^blocks/$', views.LibraryBlocksView.as_view()),
             # Commit (POST) or revert (DELETE) all pending changes to this library:
             url(r'^commit/$', views.LibraryCommitView.as_view()),
+            # Get the list of users/groups who have permission to view/edit/administer this library:
+            url(r'^team/$', views.LibraryTeamView.as_view()),
+            # Add/Edit (PUT) or remove (DELETE) a user's permission to use this library
+            url(r'^team/user/(?P<user_id>\d+)/$', views.LibraryTeamUserView.as_view()),
+            # Add/Edit (PUT) or remove (DELETE) a group's permission to use this library
+            url(r'^team/group/(?P<group_name>[^/]+)/$', views.LibraryTeamGroupView.as_view()),
         ])),
         url(r'^blocks/(?P<usage_key_str>[^/]+)/', include([
             # Get metadata about a specific XBlock in this library, or delete the block:

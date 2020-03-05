@@ -10,7 +10,7 @@ class ContentLibraryPermissionInline(admin.TabularInline):
     Inline form for a content library's permissions
     """
     model = ContentLibraryPermission
-    raw_id_fields = ("user", )
+    raw_id_fields = ("user", "group", )
     extra = 0
 
 

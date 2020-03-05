@@ -2,7 +2,6 @@
 """
 Test the Blockstore-based XBlock runtime and content libraries together.
 """
-
 import json
 
 from completion.test_utils import CompletionWaffleTestMixin
@@ -50,6 +49,8 @@ class ContentLibraryContentTestMixin(object):
             slug=cls.__name__,
             title=(cls.__name__ + " Test Lib"),
             description="",
+            allow_public_learning=True,
+            allow_public_read=False,
         )
 
 
@@ -81,6 +82,8 @@ class ContentLibraryRuntimeTest(ContentLibraryContentTestMixin, TestCase):
             slug="idolx",
             title=("Identical OLX Test Lib 2"),
             description="",
+            allow_public_learning=True,
+            allow_public_read=False,
         )
         unit_block2_key = library_api.create_library_block(library2.key, "unit", "u1").usage_key
         library_api.create_library_block_child(unit_block2_key, "problem", "p1")
