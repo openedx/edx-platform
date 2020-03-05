@@ -304,19 +304,9 @@ class IndexQueryTestCase(ModuleStoreTestCase):
                 self.assertEqual(response.status_code, 200)
 
 
-@ddt.ddt
-class ViewsTestCase(ModuleStoreTestCase):
-    """
-    Tests for views.py methods.
-    """
-    YESTERDAY = 'yesterday'
-    DATES = {
-        YESTERDAY: datetime.now(UTC) - timedelta(days=1),
-        None: None,
-    }
-
+class BaseViewsTestCase(ModuleStoreTestCase):
     def setUp(self):
-        super(ViewsTestCase, self).setUp()
+        super(BaseViewsTestCase, self).setUp()
         self.course = CourseFactory.create(display_name=u'teꜱᴛ course', run="Testing_course")
         with self.store.bulk_operations(self.course.id):
             self.chapter = ItemFactory.create(
@@ -375,6 +365,25 @@ class ViewsTestCase(ModuleStoreTestCase):
 
         # refresh the course from the modulestore so that it has children
         self.course = modulestore().get_course(self.course.id)
+
+    def _create_global_staff_user(self):
+        """
+        Create global staff user and log them in
+        """
+        self.global_staff = GlobalStaffFactory.create()  # pylint: disable=attribute-defined-outside-init
+        self.assertTrue(self.client.login(username=self.global_staff.username, password=TEST_PASSWORD))
+
+
+@ddt.ddt
+class ViewsTestCase(BaseViewsTestCase):
+    """
+    Tests for views.py methods.
+    """
+    YESTERDAY = 'yesterday'
+    DATES = {
+        YESTERDAY: datetime.now(UTC) - timedelta(days=1),
+        None: None,
+    }
 
     def test_index_success(self):
         response = self._verify_index_response()
@@ -442,13 +451,6 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'Problem 1')
         self.assertNotContains(response, 'Problem 2')
-
-    def _create_global_staff_user(self):
-        """
-        Create global staff user and log them in
-        """
-        self.global_staff = GlobalStaffFactory.create()  # pylint: disable=attribute-defined-outside-init
-        self.assertTrue(self.client.login(username=self.global_staff.username, password=TEST_PASSWORD))
 
     def _create_url_for_enroll_staff(self):
         """
@@ -3348,3 +3350,50 @@ class TestShowCoursewareMFE(TestCase):
             '/block-v1:OpenEdX+MFE+2020+type@sequential+block@Introduction'
             '/block-v1:OpenEdX+MFE+2020+type@vertical+block@Getting_To_Know_You'
         )
+
+
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSEWARE_MICROFRONTEND': True})
+@ddt.ddt
+class MFERedirectTests(BaseViewsTestCase):
+    def _get_urls(self):
+        lms_url = reverse(
+            'courseware_section',
+            kwargs={
+                'course_id': str(self.course_key),
+                'chapter': str(self.chapter.location.block_id),
+                'section': str(self.section2.location.block_id),
+            }
+        )
+        mfe_url = '{}/course/{}/{}'.format(
+            settings.LEARNING_MICROFRONTEND_URL,
+            self.course_key,
+            self.section2.location
+        )
+        return lms_url, mfe_url
+
+    def test_learner_redirect(self):
+        # learners will be redirected when the waffle flag is set
+        lms_url, mfe_url = self._get_urls()
+
+        with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, True):
+            assert self.client.get(lms_url).url == mfe_url
+
+    def test_staff_no_redirect(self):
+        # global staff will never be redirected
+        lms_url, mfe_url = self._get_urls()
+
+        self._create_global_staff_user()
+        assert self.client.get(lms_url).status_code == 200
+
+        with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, True):
+            assert self.client.get(lms_url).status_code == 200
+
+    def test_exam_no_redirect(self):
+        # exams will not redirect to the mfe, for the time being
+        self.section2.is_time_limited = True
+        self.store.update_item(self.section2, self.user.id)
+
+        lms_url, mfe_url = self._get_urls()
+
+        with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, True):
+            assert self.client.get(lms_url).status_code == 200
