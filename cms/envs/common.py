@@ -1478,6 +1478,9 @@ INSTALLED_APPS = [
     # Management of per-user schedules
     'openedx.core.djangoapps.schedules',
     'rest_framework_jwt',
+
+    # Learning Sequence Navigation
+    'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
 ]
 
 
