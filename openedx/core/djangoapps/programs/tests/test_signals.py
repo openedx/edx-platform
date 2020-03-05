@@ -146,8 +146,7 @@ class CertChangedReceiverTest(TestCase):
         mock_is_learner_issuance_enabled.return_value = True
 
         site_config = SiteConfigurationFactory.create(
-            site_values={'course_org_filter': ['edX']},
-            values={'course_org_filter': ['edX']},
+            site_values={'course_org_filter': ['edX']}
         )
 
         # Correctly sent
@@ -156,7 +155,7 @@ class CertChangedReceiverTest(TestCase):
         mock_task.reset_mock()
 
         # Correctly not sent
-        site_config.values['ENABLE_LEARNER_RECORDS'] = False
+        site_config.site_values['ENABLE_LEARNER_RECORDS'] = False
         site_config.save()
         handle_course_cert_changed(**self.signal_kwargs)
         self.assertFalse(mock_task.called)
