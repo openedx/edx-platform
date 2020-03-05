@@ -4,6 +4,7 @@
 
 from datetime import datetime, timedelta
 
+import crum
 import ddt
 import waffle
 from django.contrib.messages.middleware import MessageMiddleware
@@ -42,7 +43,7 @@ from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
-    DATE_WIDGET_V2_FLAG, UNIFIED_COURSE_TAB_FLAG, UPGRADE_DEADLINE_MESSAGE, CourseHomeMessages
+    RELATIVE_DATES_FLAG, UNIFIED_COURSE_TAB_FLAG, UPGRADE_DEADLINE_MESSAGE, CourseHomeMessages
 )
 from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
@@ -57,6 +58,13 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     def setUp(self):
         super(CourseDateSummaryTest, self).setUp()
         SelfPacedConfiguration.objects.create(enable_course_home_improvements=True)
+
+    def make_request(self, user):
+        request = RequestFactory().request()
+        request.user = user
+        self.addCleanup(crum.set_current_request, None)
+        crum.set_current_request(request)
+        return request
 
     def test_course_info_feature_flag(self):
         SelfPacedConfiguration(enable_course_home_improvements=False).save()
@@ -135,7 +143,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
         self.assert_block_types(course, user, expected_blocks)
 
-    @override_waffle_flag(DATE_WIDGET_V2_FLAG, active=True)
+    @RELATIVE_DATES_FLAG.override(active=True)
     def test_enabled_block_types_with_assignments(self):  # pylint: disable=too-many-statements
         """
         Creates a course with multiple subsections to test all of the different
@@ -144,8 +152,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         """
         course = create_course_run(days_till_start=-100)
         user = create_user()
-        request = RequestFactory().request()
-        request.user = user
+        request = self.make_request(user)
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
         now = datetime.now(utc)
         assignment_title_html = ['<a href=', '</a>']
@@ -295,10 +302,11 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                     for html_tag in assignment_title_html:
                         self.assertIn(html_tag, assignment_title)
 
-    @override_waffle_flag(DATE_WIDGET_V2_FLAG, active=True)
+    @RELATIVE_DATES_FLAG.override(active=True)
     def test_enabled_block_types_with_expired_course(self):
         course = create_course_run(days_till_start=-100)
         user = create_user()
+        self.make_request(user)
         # These two lines are to trigger the course expired block to be rendered
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.AUDIT)
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=utc))
@@ -470,7 +478,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         {'weeks_to_complete': 7},  # Weeks to complete > time til end (end date shown)
         {'weeks_to_complete': 4},  # Weeks to complete < time til end (end date not shown)
     )
-    @override_waffle_flag(DATE_WIDGET_V2_FLAG, active=True)
+    @RELATIVE_DATES_FLAG.override(active=True)
     def test_course_end_date_self_paced(self, cr_details):
         """
         In self-paced courses, the end date will now only show up if the learner
@@ -484,6 +492,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         course = CourseFactory.create(
             start=now + timedelta(days=-7), end=now + timedelta(weeks=end_timedelta_number), self_paced=True)
         user = create_user()
+        self.make_request(user)
         with patch('lms.djangoapps.courseware.date_summary.get_course_run_details') as mock_get_cr_details:
             mock_get_cr_details.return_value = cr_details
             block = CourseEndDate(course, user)

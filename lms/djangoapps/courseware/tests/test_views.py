@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 from pytz import utc
 from uuid import uuid4
 
+import crum
 import ddt
 import six
 from completion.test_utils import CompletionWaffleTestMixin
@@ -79,7 +80,7 @@ from openedx.features.course_duration_limits.models import CourseDurationLimitCo
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
     COURSE_OUTLINE_PAGE_FLAG,
-    DATE_WIDGET_V2_FLAG,
+    RELATIVE_DATES_FLAG,
     UNIFIED_COURSE_TAB_FLAG
 )
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
@@ -3156,10 +3157,12 @@ class DatesTabTestCase(ModuleStoreTestCase):
         """ Returns the HTML for the progress page """
         return self.client.get(reverse('dates', args=[six.text_type(course.id)]))
 
-    @override_waffle_flag(DATE_WIDGET_V2_FLAG, active=True)
+    @RELATIVE_DATES_FLAG.override(active=True)
     def test_defaults(self):
         request = RequestFactory().request()
         request.user = self.user
+        self.addCleanup(crum.set_current_request, None)
+        crum.set_current_request(request)
         enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.VERIFIED)
         now = datetime.now(utc)
         with self.store.bulk_operations(self.course.id):
