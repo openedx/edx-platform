@@ -159,7 +159,7 @@ class TeamsDashboardView(GenericAPIView):
             is_user_org_protected = organization_protection_status == OrganizationProtectionStatus.protected
             filter_query['organization_protected'] = is_user_org_protected
 
-        user_teams = CourseTeam.objects.filter(**filter_query)
+        user_teams = CourseTeam.objects.filter(**filter_query).order_by('-last_activity_at', 'team_size')
         user_teams_data = self._serialize_and_paginate(
             MyTeamsPagination,
             user_teams,
