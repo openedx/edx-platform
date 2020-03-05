@@ -39,6 +39,7 @@ from ..search_indexes import CourseTeam, CourseTeamIndexer, course_team_post_sav
 from .factories import LAST_ACTIVITY_AT, CourseTeamFactory
 
 
+@ddt.ddt
 class TestDashboard(SharedModuleStoreTestCase):
     """Tests for the Teams dashboard."""
     test_password = "test"
@@ -196,6 +197,54 @@ class TestDashboard(SharedModuleStoreTestCase):
         course_two_teams_url = reverse('teams_dashboard', args=[course_two.id])
         response = self.client.get(course_two_teams_url)
         self.assertContains(response, '"teams": {"count": 0')
+
+    @ddt.unpack
+    @ddt.data(
+        (True, False, False),
+        (False, True, False),
+        (False, False, True),
+        (True, True, True),
+        (False, True, True),
+    )
+    def test_teamset_counts(self, has_open, has_private, has_public):
+        topics = []
+        if has_open:
+            topics.append({
+                "name": "test topic 1",
+                "id": 1,
+                "description": "Desc1",
+                "type": "open"
+            })
+        if has_private:
+            topics.append({
+                "name": "test topic 2",
+                "id": 2,
+                "description": "Desc2",
+                "type": "private_managed"
+            })
+        if has_public:
+            topics.append({
+                "name": "test topic 3",
+                "id": 3,
+                "description": "Desc3",
+                "type": "public_managed"
+            })
+
+        course = CourseFactory.create(
+            teams_configuration=TeamsConfig({"topics": topics})
+        )
+        teams_url = reverse('teams_dashboard', args=[course.id])
+        CourseEnrollmentFactory.create(user=self.user, course_id=course.id)
+        self.client.login(username=self.user.username, password=self.test_password)
+        response = self.client.get(teams_url)
+
+        expected_has_open = "hasOpenTopic: " + "true" if has_open else "false"
+        expected_has_public = "hasPublicManagedTopic: " + "true" if has_public else "false"
+        expected_has_managed = "hasManagedTopic: " + "true" if has_public or has_private else "false"
+
+        self.assertContains(response, expected_has_open)
+        self.assertContains(response, expected_has_public)
+        self.assertContains(response, expected_has_managed)
 
 
 class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
