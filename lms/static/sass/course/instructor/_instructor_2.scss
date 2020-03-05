@@ -251,7 +251,7 @@
     @include margin-left(1px);
     @include font-size(14);
 
-    font-family: verdana,arial,sans-serif;
+    font-family: verdana, arial, sans-serif;
     color: #333;
 
     .slick-cell {
@@ -276,8 +276,8 @@
   }
 
   select {
-      border: 1px solid $light-gray;
-      height: 34px;
+    border: 1px solid $light-gray;
+    height: 34px;
   }
 
   .instructor_dash_glob_info {
