@@ -49,7 +49,7 @@ from openedx.core.djangoapps.enrollments.api import get_course_enrollment_detail
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.view_utils import LazySequence
 from openedx.features.course_duration_limits.access import AuditExpiredError
-from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, DATE_WIDGET_V2_FLAG
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, RELATIVE_DATES_FLAG
 from static_replace import replace_static_urls
 from student.models import CourseEnrollment
 from survey.utils import is_survey_required_and_unanswered
@@ -413,7 +413,7 @@ def get_course_date_blocks(course, user, request=None, include_access=False,
         block_classes.insert(0, CertificateAvailableDate)
 
     blocks = [cls(course, user) for cls in block_classes]
-    if DATE_WIDGET_V2_FLAG.is_enabled(course.id):
+    if RELATIVE_DATES_FLAG.is_enabled(course.id):
         blocks.append(CourseExpiredDate(course, user))
         blocks.extend(get_course_assignment_due_dates(
             course, user, request, num_return=num_assignments,

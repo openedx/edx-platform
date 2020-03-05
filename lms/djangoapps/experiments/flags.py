@@ -3,9 +3,10 @@ Feature flag support for experiments
 """
 
 import logging
-import pytz
+from contextlib import contextmanager
 
 import dateutil
+import pytz
 from crum import get_current_request
 from edx_django_utils.cache import RequestCache
 
@@ -130,4 +131,11 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         return self.get_bucket(course_key) != 0
 
     def is_enabled_without_course_context(self):
-        return self.get_bucket() != 0
+        return self.is_enabled()
+
+    @contextmanager
+    def override(self, active=True, bucket=1):  # pylint: disable=arguments-differ
+        from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+        with override_waffle_flag(self, active):
+            with override_waffle_flag(self.bucket_flags[bucket], True):
+                yield
