@@ -100,7 +100,7 @@ def has_ccx_coach_role(user, course_key):
     return False
 
 
-def has_access(user, action, obj, course_key=None):
+def has_access(user, action, obj, course_key=None, check_user_activation=True):
     """
     Check whether a user has the access to do action on obj.  Handles any magic
     switching based on various settings.
@@ -158,7 +158,7 @@ def has_access(user, action, obj, course_key=None):
         return _has_access_descriptor(user, action, obj, course_key)
 
     if isinstance(obj, CourseKey):
-        return _has_access_course_key(user, action, obj)
+        return _has_access_course_key(user, action, obj, check_user_activation)
 
     if isinstance(obj, UsageKey):
         return _has_access_location(user, action, obj, course_key)
@@ -606,7 +606,7 @@ def _has_access_location(user, action, location, course_key):
     return _dispatch(checkers, action, user, location)
 
 
-def _has_access_course_key(user, action, course_key):
+def _has_access_course_key(user, action, course_key, check_user_activation=True):
     """
     Check if user has access to the course with this course_key
 
@@ -615,8 +615,8 @@ def _has_access_course_key(user, action, course_key):
     'instructor' : True if the user has staff access to this location
     """
     checkers = {
-        'staff': lambda: _has_staff_access_to_location(user, None, course_key),
-        'instructor': lambda: _has_instructor_access_to_location(user, None, course_key),
+        'staff': lambda: _has_staff_access_to_location(user, None, course_key, check_user_activation),
+        'instructor': lambda: _has_instructor_access_to_location(user, None, course_key, check_user_activation),
     }
 
     return _dispatch(checkers, action, user, course_key)
@@ -706,19 +706,19 @@ def _adjust_start_date_for_beta_testers(user, descriptor, course_key):
     return adjust_start_date(user, descriptor.days_early_for_beta, descriptor.start, course_key)
 
 
-def _has_instructor_access_to_location(user, location, course_key=None):
+def _has_instructor_access_to_location(user, location, course_key=None, check_user_activation=True):
     if course_key is None:
         course_key = location.course_key
-    return _has_access_to_course(user, 'instructor', course_key)
+    return _has_access_to_course(user, 'instructor', course_key, check_user_activation)
 
 
-def _has_staff_access_to_location(user, location, course_key=None):
+def _has_staff_access_to_location(user, location, course_key=None, check_user_activation=True):
     if course_key is None:
         course_key = location.course_key
-    return _has_access_to_course(user, 'staff', course_key)
+    return _has_access_to_course(user, 'staff', course_key, check_user_activation)
 
 
-def _has_access_to_course(user, access_level, course_key):
+def _has_access_to_course(user, access_level, course_key, check_user_activation=True):
     """
     Returns True if the given user has access_level (= staff or
     instructor) access to the course with the given course_key.
@@ -734,7 +734,7 @@ def _has_access_to_course(user, access_level, course_key):
     if is_masquerading_as_student(user, course_key):
         return ACCESS_DENIED
 
-    global_staff, staff_access, instructor_access = administrative_accesses_to_course_for_user(user, course_key)
+    global_staff, staff_access, instructor_access = administrative_accesses_to_course_for_user(user, course_key, check_user_activation)
 
     if global_staff:
         debug("Allow: user.is_staff")
@@ -757,20 +757,20 @@ def _has_access_to_course(user, access_level, course_key):
     return ACCESS_DENIED
 
 
-def administrative_accesses_to_course_for_user(user, course_key):
+def administrative_accesses_to_course_for_user(user, course_key, check_user_activation=True):
     """
     Returns types of access a user have for given course.
     """
     global_staff = GlobalStaff().has_user(user)
 
     staff_access = (
-        CourseStaffRole(course_key).has_user(user) or
-        OrgStaffRole(course_key.org).has_user(user)
+        CourseStaffRole(course_key).has_user(user, check_user_activation) or
+        OrgStaffRole(course_key.org).has_user(user, check_user_activation)
     )
 
     instructor_access = (
-        CourseInstructorRole(course_key).has_user(user) or
-        OrgInstructorRole(course_key.org).has_user(user)
+        CourseInstructorRole(course_key).has_user(user, check_user_activation) or
+        OrgInstructorRole(course_key.org).has_user(user, check_user_activation)
     )
 
     return global_staff, staff_access, instructor_access

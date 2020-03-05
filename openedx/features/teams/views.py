@@ -176,7 +176,7 @@ def view_team(request, course_id, team_id):
     room_id = team_group_chat.room_id
     leave_team_url = reverse('team_membership_detail', args=[team_id, user.username])
 
-    team_administrator = (has_access(user, 'staff', course.id)
+    team_administrator = (has_access(user, 'staff', course.id, check_user_activation=False)
                           or has_discussion_privileges(user, course.id))
 
     is_member_of_any_team = CourseTeamMembership.user_in_team_for_course(user, course.id)
@@ -211,7 +211,7 @@ def update_team(request, course_id, team_id):
     user = request.user
     course = get_user_course_with_access(course_id, user)
 
-    team_administrator = (has_access(user, 'staff', course.id)
+    team_administrator = (has_access(user, 'staff', course.id, check_user_activation=False)
                           or has_discussion_privileges(user, course.id))
     if not team_administrator:
         raise Http404
@@ -239,7 +239,7 @@ def edit_team_memberships(request, course_id, team_id):
     user = request.user
     course = get_user_course_with_access(course_id, user)
 
-    team_administrator = (has_access(user, 'staff', course.id)
+    team_administrator = (has_access(user, 'staff', course.id, check_user_activation=False)
                           or has_discussion_privileges(user, course.id))
     if not team_administrator:
         raise Http404

@@ -49,6 +49,7 @@ from .serializers import (
     add_team_count
 )
 from openedx.features.teams.serializers import CustomCourseTeamCreationSerializer
+from openedx.features.teams.mixins import AllowInActiveUserAuthMixin
 from .utils import emit_team_event
 
 TEAM_MEMBERSHIPS_PER_PAGE = 2
@@ -225,7 +226,7 @@ def has_team_api_access(user, course_key, access_username=None):
     return False
 
 
-class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
+class TeamsListView(AllowInActiveUserAuthMixin, ExpandableFieldViewMixin, GenericAPIView):
     """
         **Use Cases**
 
@@ -352,8 +353,6 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             If the specified course does not exist, a 404 error is returned.
     """
 
-    # OAuth2Authentication must come first to return a 401 for unauthenticated users
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = CourseTeamSerializer
 
@@ -556,11 +555,11 @@ class IsStaffOrPrivilegedOrReadOnly(IsStaffOrReadOnly):
     def has_object_permission(self, request, view, obj):
         return (
             has_discussion_privileges(request.user, obj.course_id) or
-            super(IsStaffOrPrivilegedOrReadOnly, self).has_object_permission(request, view, obj)
+            super(IsStaffOrPrivilegedOrReadOnly, self).has_object_permission(request, view, obj, False)
         )
 
 
-class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
+class TeamsDetailView(AllowInActiveUserAuthMixin, ExpandableFieldViewMixin, RetrievePatchAPIView):
     """
         **Use Cases**
 
@@ -654,7 +653,6 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
             If the user is logged in and the team does not exist, a 404 is returned.
 
     """
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsStaffOrPrivilegedOrReadOnly, IsEnrolledOrIsStaff,)
     lookup_field = 'team_id'
     serializer_class = CourseTeamSerializer
@@ -886,7 +884,7 @@ class TopicDetailView(APIView):
         return Response(serializer.data)
 
 
-class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
+class MembershipListView(AllowInActiveUserAuthMixin, ExpandableFieldViewMixin, GenericAPIView):
     """
         **Use Cases**
 
@@ -1011,8 +1009,6 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
             when a staff or discussion privileged user posts a request adding
             another user to a team.
     """
-
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = MembershipSerializer
 
@@ -1143,7 +1139,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         return Response(serializer.data)
 
 
-class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
+class MembershipDetailView(AllowInActiveUserAuthMixin, ExpandableFieldViewMixin, GenericAPIView):
     """
         **Use Cases**
 
@@ -1212,7 +1208,6 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
             If the membership does not exist, a 404 error is returned.
     """
 
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
     serializer_class = MembershipSerializer
