@@ -31,18 +31,6 @@
                         deferred.resolve(topic.get('type'));
                     });
                     return deferred.promise();
-                },
-
-                createHeaderView: function() {
-                    // Never show a pagination header for the "My Team" tab
-                    // because there is only ever one team.
-                    return null;
-                },
-
-                createFooterView: function() {
-                    // Never show a pagination footer for the "My Team" tab
-                    // because there is only ever one team.
-                    return null;
                 }
             });
 
