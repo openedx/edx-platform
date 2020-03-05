@@ -274,6 +274,9 @@ define([
             start: 0,
             results: createMockTopicData(1, 5)
         },
+        hasOpenTopic: true,
+        hasPublicManagedTopic: false,
+        hasManagedTopic: false,
         maxTeamSize: 6,
         languages: testLanguages,
         countries: testCountries,

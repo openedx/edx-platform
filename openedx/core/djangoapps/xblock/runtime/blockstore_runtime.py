@@ -120,6 +120,13 @@ class BlockstoreXBlockRuntime(XBlockRuntime):
                 "The Blockstore runtime does not support saving changes to blockstore without a draft. "
                 "Are you making changes to UserScope.NONE fields from the LMS rather than Studio?"
             )
+        # Verify that the user has permission to write to authored data in this
+        # learning context:
+        if self.user is not None:
+            learning_context = get_learning_context_impl(block.scope_ids.usage_id)
+            if not learning_context.can_edit_block(self.user, block.scope_ids.usage_id):
+                log.warning("User %s does not have permission to edit %s", self.user.username, block.scope_ids.usage_id)
+                raise RuntimeError("You do not have permission to edit this XBlock")
         olx_str, static_files = serialize_xblock(block)
         # Write the OLX file to the bundle:
         draft_uuid = blockstore_api.get_or_create_bundle_draft(

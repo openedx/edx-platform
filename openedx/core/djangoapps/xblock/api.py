@@ -62,14 +62,9 @@ def load_block(usage_key, user):
     # Is this block part of a course, a library, or what?
     # Get the Learning Context Implementation based on the usage key
     context_impl = get_learning_context_impl(usage_key)
-    # Now, using the LearningContext and the Studio/LMS-specific logic, check if
-    # the block exists in this context and if the user has permission to render
-    # this XBlock view:
-    if get_xblock_app_config().require_edit_permission:
-        authorized = context_impl.can_edit_block(user, usage_key)
-    else:
-        authorized = context_impl.can_view_block(user, usage_key)
-    if not authorized:
+    # Now, check if the block exists in this context and if the user has
+    # permission to render this XBlock view:
+    if user is not None and not context_impl.can_view_block(user, usage_key):
         # We do not know if the block was not found or if the user doesn't have
         # permission, but we want to return the same result in either case:
         raise NotFound("XBlock {} does not exist, or you don't have permission to view it.".format(usage_key))

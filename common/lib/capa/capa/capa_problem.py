@@ -560,15 +560,22 @@ class LoncapaProblem(object):
         Returns:
             a string with the question text
         """
+
+        def log_error():
+            """
+            Temporary method for logging
+            """
+            log.error(
+                'KeyError: answer_id: {}, Problem data: {}, problem: {}'
+                .format(answer_id, self.problem_data, etree.tostring(self.tree))
+            )
+
         _ = get_gettext(self.capa_system.i18n)
         # Some questions define a prompt with this format:   >>This is a prompt<<
         try:
             prompt = self.problem_data[answer_id].get('label')
         except KeyError:
-            log.error(
-                'KeyError: answer_id: %s, Problem data: %s, problem: %s',
-                (answer_id, self.problem_data, etree.tostring(self.tree))
-            )
+            log_error()
             raise
 
         if prompt:
@@ -585,7 +592,11 @@ class LoncapaProblem(object):
             #
             # Starting from  answer (the optioninput in this example) we go up and backwards
             xml_elems = self.tree.xpath('//*[@id="' + answer_id + '"]')
+
+            if len(xml_elems) != 1:
+                log_error()
             assert len(xml_elems) == 1
+
             xml_elem = xml_elems[0].getparent()
 
             # Get the element that probably contains the question text

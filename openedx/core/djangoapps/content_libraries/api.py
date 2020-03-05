@@ -4,11 +4,12 @@ Python API for content libraries.
 Unless otherwise specified, all APIs in this file deal with the DRAFT version
 of the content library.
 """
-
 from uuid import UUID
 import logging
 
 import attr
+from django.contrib.auth.models import AbstractUser, Group
+from django.core.exceptions import PermissionDenied
 from django.core.validators import validate_unicode_slug
 from django.db import IntegrityError
 from lxml import etree
@@ -18,7 +19,9 @@ import six
 from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
 
+from openedx.core.djangoapps.content_libraries import permissions
 from openedx.core.djangoapps.content_libraries.library_bundle import LibraryBundle
+from openedx.core.djangoapps.content_libraries.models import ContentLibrary, ContentLibraryPermission
 from openedx.core.djangoapps.xblock.api import get_block_display_name, load_block
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
 from openedx.core.djangoapps.xblock.runtime.olx_parsing import XBlockInclude
@@ -36,7 +39,6 @@ from openedx.core.lib.blockstore_api import (
 )
 from openedx.core.djangolib import blockstore_cache
 from openedx.core.djangolib.blockstore_cache import BundleCache
-from .models import ContentLibrary, ContentLibraryPermission
 
 log = logging.getLogger(__name__)
 
@@ -80,6 +82,30 @@ class ContentLibraryMetadata(object):
     # has_unpublished_deletes will be true when the draft version of the library's bundle
     # contains deletes of any XBlocks that were in the most recently published version
     has_unpublished_deletes = attr.ib(False)
+    # Allow any user (even unregistered users) to view and interact directly
+    # with this library's content in the LMS
+    allow_public_learning = attr.ib(False)
+    # Allow any user with Studio access to view this library's content in
+    # Studio, use it in their courses, and copy content out of this library.
+    allow_public_read = attr.ib(False)
+
+
+class AccessLevel(object):
+    """ Enum defining library access levels/permissions """
+    ADMIN_LEVEL = ContentLibraryPermission.ADMIN_LEVEL
+    AUTHOR_LEVEL = ContentLibraryPermission.AUTHOR_LEVEL
+    READ_LEVEL = ContentLibraryPermission.READ_LEVEL
+    NO_ACCESS = None
+
+
+@attr.s
+class ContentLibraryPermissionEntry(object):
+    """
+    A user or group granted permission to use a content library.
+    """
+    user = attr.ib(type=AbstractUser, default=None)
+    group = attr.ib(type=Group, default=None)
+    access_level = attr.ib(AccessLevel.NO_ACCESS)
 
 
 @attr.s
@@ -117,23 +143,32 @@ class LibraryXBlockType(object):
     display_name = attr.ib("")
 
 
-class AccessLevel(object):
-    """ Enum defining library access levels/permissions """
-    ADMIN_LEVEL = ContentLibraryPermission.ADMIN_LEVEL
-    AUTHOR_LEVEL = ContentLibraryPermission.AUTHOR_LEVEL
-    READ_LEVEL = ContentLibraryPermission.READ_LEVEL
-    NO_ACCESS = None
+def list_libraries_for_user(user):
+    """
+    Lists up to 50 content libraries that the user has permission to view.
+
+    This method makes at least one HTTP call per library so should only be used
+    for development until we have something more efficient.
+    """
+    qs = ContentLibrary.objects.all()
+    filtered_qs = permissions.perms[permissions.CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, qs)
+    return [get_library(ref.library_key) for ref in filtered_qs[:50]]
 
 
-def list_libraries():
+def require_permission_for_library_key(library_key, user, permission):
     """
-    TEMPORARY method for testing. Lists all content libraries.
-    This should be replaced with a method for listing all libraries that belong
-    to a particular user, and/or has permission to view. This method makes at
-    least one HTTP call per library so should only be used for development.
+    Given any of the content library permission strings defined in
+    openedx.core.djangoapps.content_libraries.permissions,
+    check if the given user has that permission for the library with the
+    specified library ID.
+
+    Raises django.core.exceptions.PermissionDenied if the user doesn't have
+    permission.
     """
-    refs = ContentLibrary.objects.all()[:1000]
-    return [get_library(ref.library_key) for ref in refs]
+    assert isinstance(library_key, LibraryLocatorV2)
+    library_obj = ContentLibrary.objects.get_by_key(library_key)
+    if not user.has_perm(permission, obj=library_obj):
+        raise PermissionDenied
 
 
 def get_library(library_key):
@@ -154,12 +189,14 @@ def get_library(library_key):
         title=bundle_metadata.title,
         description=bundle_metadata.description,
         version=bundle_metadata.latest_version,
+        allow_public_learning=ref.allow_public_learning,
+        allow_public_read=ref.allow_public_read,
         has_unpublished_changes=has_unpublished_changes,
         has_unpublished_deletes=has_unpublished_deletes,
     )
 
 
-def create_library(collection_uuid, org, slug, title, description):
+def create_library(collection_uuid, org, slug, title, description, allow_public_learning, allow_public_read):
     """
     Create a new content library.
 
@@ -170,6 +207,10 @@ def create_library(collection_uuid, org, slug, title, description):
     title: title for this library
 
     description: description of this library
+
+    allow_public_learning: Allow anyone to read/learn from blocks in the LMS
+
+    allow_public_read: Allow anyone to view blocks (including source) in Studio?
 
     Returns a ContentLibraryMetadata instance.
     """
@@ -189,8 +230,8 @@ def create_library(collection_uuid, org, slug, title, description):
             org=org,
             slug=slug,
             bundle_uuid=bundle.uuid,
-            allow_public_learning=True,
-            allow_public_read=True,
+            allow_public_learning=allow_public_learning,
+            allow_public_read=allow_public_read,
         )
     except IntegrityError:
         delete_bundle(bundle.uuid)
@@ -201,7 +242,20 @@ def create_library(collection_uuid, org, slug, title, description):
         title=title,
         description=description,
         version=0,
+        allow_public_learning=ref.allow_public_learning,
+        allow_public_read=ref.allow_public_read,
     )
+
+
+def get_library_team(library_key):
+    """
+    Get the list of users/groups granted permission to use this library.
+    """
+    ref = ContentLibrary.objects.get_by_key(library_key)
+    return [
+        ContentLibraryPermissionEntry(user=entry.user, group=entry.group, access_level=entry.access_level)
+        for entry in ref.permission_grants.all()
+    ]
 
 
 def set_library_user_permissions(library_key, user, access_level):
@@ -212,12 +266,39 @@ def set_library_user_permissions(library_key, user, access_level):
     """
     ref = ContentLibrary.objects.get_by_key(library_key)
     if access_level is None:
-        ref.authorized_users.filter(user=user).delete()
+        ref.permission_grants.filter(user=user).delete()
     else:
-        ContentLibraryPermission.objects.update_or_create(user=user, library=ref, access_level=access_level)
+        ContentLibraryPermission.objects.update_or_create(
+            library=ref,
+            user=user,
+            defaults={"access_level": access_level},
+        )
 
 
-def update_library(library_key, title=None, description=None):
+def set_library_group_permissions(library_key, group, access_level):
+    """
+    Change the specified group's level of access to this library.
+
+    access_level should be one of the AccessLevel values defined above.
+    """
+    ref = ContentLibrary.objects.get_by_key(library_key)
+    if access_level is None:
+        ref.permission_grants.filter(group=group).delete()
+    else:
+        ContentLibraryPermission.objects.update_or_create(
+            library=ref,
+            group=group,
+            defaults={"access_level": access_level},
+        )
+
+
+def update_library(
+    library_key,
+    title=None,
+    description=None,
+    allow_public_learning=None,
+    allow_public_read=None,
+):
     """
     Update a library's title or description.
     (Slug cannot be changed as it would break IDs throughout the system.)
@@ -225,6 +306,17 @@ def update_library(library_key, title=None, description=None):
     A value of None means "don't change".
     """
     ref = ContentLibrary.objects.get_by_key(library_key)
+    # Update MySQL model:
+    changed = False
+    if allow_public_learning is not None:
+        ref.allow_public_learning = allow_public_learning
+        changed = True
+    if allow_public_read is not None:
+        ref.allow_public_read = allow_public_read
+        changed = True
+    if changed:
+        ref.save()
+    # Update Blockstore:
     fields = {
         # We don't ever read the "slug" value from the Blockstore bundle, but
         # we might as well always do our best to keep it in sync with the "slug"

@@ -193,7 +193,7 @@ class TaskTestCase(ModuleStoreTestCase):
         comment = cc.Comment.find(id=self.comment['id']).retrieve()
         site = Site.objects.get_current()
         site_config = SiteConfigurationFactory.create(site=site)
-        site_config.values[ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY] = True
+        site_config.site_values[ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY] = True
         site_config.save()
         with mock.patch('lms.djangoapps.discussion.signals.handlers.get_current_site', return_value=site):
             comment_created.send(sender=None, user=user, post=comment)

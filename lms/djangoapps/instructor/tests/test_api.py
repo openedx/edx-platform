@@ -4000,8 +4000,8 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
         self.assertEqual(response.status_code, 400)
 
     def test_send_email_with_site_template_and_from_addr(self):
-        site_email = self.site_configuration.values.get('course_email_from_addr')
-        site_template = self.site_configuration.values.get('course_email_template_name')
+        site_email = self.site_configuration.site_values.get('course_email_from_addr')
+        site_template = self.site_configuration.site_values.get('course_email_template_name')
         CourseEmailTemplate.objects.create(name=site_template)
         url = reverse('send_email', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, self.full_test_message)
@@ -4019,7 +4019,7 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
         org_email = 'fake_org@example.com'
         org_template = 'fake_org_email_template'
         CourseEmailTemplate.objects.create(name=org_template)
-        self.site_configuration.values.update({
+        self.site_configuration.site_values.update({
             'course_email_from_addr': {self.course.id.org: org_email},
             'course_email_template_name': {self.course.id.org: org_template}
         })
@@ -4524,7 +4524,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             get_extended_due(self.course, self.week3, self.user1)
         )
 
-    @override_waffle_flag(RELATIVE_DATES_FLAG, True)
+    @RELATIVE_DATES_FLAG.override(True)
     def test_reset_date(self):
         self.test_change_due_date()
         url = reverse('reset_due_date', kwargs={'course_id': text_type(self.course.id)})
@@ -4649,7 +4649,7 @@ class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestC
         self.client.login(username=self.instructor.username, password='test')
         extract_dates(None, self.course.id)
 
-    @override_waffle_flag(RELATIVE_DATES_FLAG, True)
+    @RELATIVE_DATES_FLAG.override(True)
     def test_reset_extension_to_deleted_date(self):
         """
         Test that we can delete a due date extension after deleting the normal

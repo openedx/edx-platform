@@ -81,7 +81,7 @@ class CourseOutlineTest(StudioCourseTest):
         verify_ordering(self, outline_page, expected_ordering)
 
 
-@attr(shard=3)
+@attr(shard=20)
 class CourseOutlineDragAndDropTest(CourseOutlineTest):
     """
     Tests of drag and drop within the outline page.
@@ -924,7 +924,7 @@ class StaffLockTest(CourseOutlineTest):
         self._remove_staff_lock_and_verify_warning(subsection, False)
 
 
-@attr(shard=14)
+@attr(shard=20)
 class EditNamesTest(CourseOutlineTest):
     """
     Feature: Click-to-edit section/subsection names
@@ -1127,7 +1127,7 @@ class CreateSectionsTest(CourseOutlineTest):
         self.assertTrue(unit_page.is_inline_editing_display_name())
 
 
-@attr(shard=14)
+@attr(shard=4)
 class DeleteContentTest(CourseOutlineTest):
     """
     Feature: Deleting sections/subsections/units
@@ -1453,7 +1453,7 @@ class ExpandCollapseEmptyTest(CourseOutlineTest):
         self.assertFalse(self.course_outline_page.section_at(0).is_collapsed)
 
 
-@attr(shard=14)
+@attr(shard=20)
 class DefaultStatesEmptyTest(CourseOutlineTest):
     """
     Feature: Misc course outline default states/actions when starting with an empty course
@@ -1478,7 +1478,7 @@ class DefaultStatesEmptyTest(CourseOutlineTest):
         self.assertTrue(self.course_outline_page.bottom_add_section_button.is_present())
 
 
-@attr(shard=14)
+@attr(shard=4)
 class DefaultStatesContentTest(CourseOutlineTest):
     """
     Feature: Misc course outline default states/actions when starting with a course with content
@@ -1876,7 +1876,7 @@ class SelfPacedOutlineTest(CourseOutlineTest):
 
 class CourseStatusOutlineTest(CourseOutlineTest):
     """Test the course outline status section."""
-    shard = 6
+    shard = 8
 
     def setUp(self):
         super(CourseStatusOutlineTest, self).setUp()

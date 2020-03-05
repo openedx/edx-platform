@@ -1,11 +1,10 @@
 """
 Models for new Content Libraries
 """
-
-
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
+from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from opaque_keys.edx.locator import LibraryLocatorV2
 from organizations.models import Organization
@@ -26,7 +25,6 @@ class ContentLibraryManager(models.Manager):
         return self.get(org__short_name=library_key.org, slug=library_key.slug)
 
 
-@python_2_unicode_compatible
 class ContentLibrary(models.Model):
     """
     A Content Library is a collection of content (XBlocks and/or static assets)
@@ -68,8 +66,6 @@ class ContentLibrary(models.Model):
         """),
     )
 
-    authorized_users = models.ManyToManyField(User, through='ContentLibraryPermission')
-
     class Meta:
         verbose_name_plural = "Content Libraries"
         unique_together = ("org", "slug")
@@ -85,14 +81,15 @@ class ContentLibrary(models.Model):
         return "ContentLibrary ({})".format(six.text_type(self.library_key))
 
 
-@python_2_unicode_compatible
 class ContentLibraryPermission(models.Model):
     """
     Row recording permissions for a content library
     """
-    library = models.ForeignKey(ContentLibrary, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    # TODO: allow permissions to be assign to a group, not just a user
+    library = models.ForeignKey(ContentLibrary, on_delete=models.CASCADE, related_name="permission_grants")
+    # One of the following must be set (but not both):
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, null=True, blank=True, on_delete=models.CASCADE)
+    # What level of access is granted to the above user or group:
     ADMIN_LEVEL = 'admin'
     AUTHOR_LEVEL = 'author'
     READ_LEVEL = 'read'
@@ -103,5 +100,25 @@ class ContentLibraryPermission(models.Model):
     )
     access_level = models.CharField(max_length=30, choices=ACCESS_LEVEL_CHOICES)
 
+    class Meta:
+        ordering = ('user__username', 'group__name')
+        unique_together = [
+            ('library', 'user'),
+            ('library', 'group'),
+        ]
+
+    def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
+        """
+        Validate any constraints on the model.
+
+        We can remove this and replace it with a proper database constraint
+        once we're upgraded to Django 2.2+
+        """
+        # if both are nonexistent or both are existing, error
+        if (not self.user) == (not self.group):
+            raise ValidationError(_("One and only one of 'user' and 'group' must be set."))
+        return super().save(*args, **kwargs)
+
     def __str__(self):
-        return "ContentLibraryPermission ({} for {})".format(self.access_level, self.user.username)
+        who = self.user.username if self.user else self.group.name
+        return "ContentLibraryPermission ({} for {})".format(self.access_level, who)

@@ -2477,6 +2477,9 @@ INSTALLED_APPS = [
 
     # Management of external user ids
     'openedx.core.djangoapps.external_user_ids',
+
+    # Management of per-user schedules
+    'openedx.core.djangoapps.schedules',
 ]
 
 ######################### CSRF #########################################
@@ -3110,7 +3113,6 @@ for app_name, insert_before in OPTIONAL_APPS:
 
 ### External auth usage -- prefixes for ENROLLMENT_DOMAIN
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
-OPENID_DOMAIN_PREFIX = 'openid:'
 
 ### Analytics API
 ANALYTICS_API_KEY = ""

@@ -110,7 +110,8 @@ from openedx.features.course_duration_limits.access import generate_course_expir
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
     UNIFIED_COURSE_TAB_FLAG,
-    course_home_url_name
+    course_home_url_name,
+    RELATIVE_DATES_FLAG,
 )
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
@@ -728,6 +729,10 @@ class CourseTabView(EdxFragmentView):
         else:
             masquerade = None
 
+        reset_deadlines_url = reverse(
+            'openedx.course_experience.reset_course_deadlines', kwargs={'course_id': text_type(course.id)}
+        )
+
         context = {
             'course': course,
             'tab': tab,
@@ -738,6 +743,8 @@ class CourseTabView(EdxFragmentView):
             'uses_bootstrap': uses_bootstrap,
             'uses_pattern_library': not uses_bootstrap,
             'disable_courseware_js': True,
+            'relative_dates_is_enabled': RELATIVE_DATES_FLAG.is_enabled(course.id),
+            'reset_deadlines_url': reset_deadlines_url,
         }
         # Avoid Multiple Mathjax loading on the 'user_profile'
         if 'profile_page_context' in kwargs:
