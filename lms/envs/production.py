@@ -1124,8 +1124,14 @@ NODEBB_RETRY_DELAY = 60
 # SurveyGizmo settings
 SURVEY_GIZMO_TOKEN = AUTH_TOKENS.get('SURVEY_GIZMO_TOKEN', None)
 SURVEY_GIZMO_TOKEN_SECRET = AUTH_TOKENS.get('SURVEY_GIZMO_TOKEN_SECRET', None)
-	# Django channels settings
+
+# Django channels settings
 CELERY_BROKER_HOSTNAME = ENV_TOKENS.get('CELERY_BROKER_HOSTNAME', None)
+
+# Settings for Google reCaptcha
+CAPTCHA_VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify"
+CAPTCHA_SECRET_KEY = AUTH_TOKENS.get('CAPTCHA_SECRET_KEY', None)
+CAPTCHA_SITE_KEY = AUTH_TOKENS.get('CAPTCHA_SITE_KEY', None)
 
 # django channel/sockets settings
 # Notifications plus chats
