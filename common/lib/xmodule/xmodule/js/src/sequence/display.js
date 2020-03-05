@@ -293,7 +293,7 @@
                 // content is at the top of the viewport. Note: we do a hard
                 // scroll rather than a smooth animation since this is on page
                 // load and we dont need any visual transition.
-                $('html > body').scrollTo(this.content_container.offset().top,0);
+                $('html > body').scrollTo(this.content_container.offset().top, 0);
 
                 this.sr_container.focus();
             }
