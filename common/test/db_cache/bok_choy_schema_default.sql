@@ -1336,10 +1336,15 @@ CREATE TABLE `content_libraries_contentlibrarypermission` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `access_level` varchar(30) NOT NULL,
   `library_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `group_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `content_libraries_conten_library_id_user_id_81babe29_uniq` (`library_id`,`user_id`),
+  UNIQUE KEY `content_libraries_conten_library_id_group_id_3ecc38b9_uniq` (`library_id`,`group_id`),
   KEY `content_libraries_co_library_id_51247096_fk_content_l` (`library_id`),
   KEY `content_libraries_co_user_id_b071c54d_fk_auth_user` (`user_id`),
+  KEY `content_libraries_co_group_id_c2a4b6a1_fk_auth_grou` (`group_id`),
+  CONSTRAINT `content_libraries_co_group_id_c2a4b6a1_fk_auth_grou` FOREIGN KEY (`group_id`) REFERENCES `auth_group` (`id`),
   CONSTRAINT `content_libraries_co_library_id_51247096_fk_content_l` FOREIGN KEY (`library_id`) REFERENCES `content_libraries_contentlibrary` (`id`),
   CONSTRAINT `content_libraries_co_user_id_b071c54d_fk_auth_user` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -2613,7 +2618,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=675 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=676 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
