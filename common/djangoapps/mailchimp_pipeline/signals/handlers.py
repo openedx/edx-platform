@@ -36,25 +36,26 @@ def update_mailchimp(email, data):
 @receiver(post_save, sender=EmailPreference)
 def sync_email_preference_with_mailchimp(sender, instance, **kwargs):
     email_preferences = instance
+    opt_in = ''
 
     if email_preferences.opt_in == 'yes':
         opt_in = 'TRUE'
     elif email_preferences.opt_in == 'no':
         opt_in = 'FALSE'
-    else:
-        opt_in = ''
+
     user_json = {
         "merge_fields": {
             "OPTIN": opt_in
         }
     }
 
-    update_mailchimp(instance.user.email, user_json)
+    update_mailchimp(email_preferences.user.email, user_json)
 
 
 @receiver(post_save, sender=UserProfile)
 def sync_user_profile_with_mailchimp(sender, instance, **kwargs):
     profile = instance
+
     user_json = {
         "merge_fields": {
             "LANG": profile.language if profile.language else "",
@@ -63,7 +64,7 @@ def sync_user_profile_with_mailchimp(sender, instance, **kwargs):
         }
     }
 
-    update_mailchimp(instance.user.email, user_json)
+    update_mailchimp(profile.user.email, user_json)
 
 
 @receiver(post_save, sender=UserExtendedProfile)
@@ -71,6 +72,7 @@ def sync_extended_profile_with_mailchimp(sender, instance, **kwargs):
     extended_profile = instance
     org_label, org_type, work_area = get_org_data_for_mandrill(
         extended_profile.organization)
+
     user_json = {
         "merge_fields": {
             "ORG": org_label,
@@ -79,7 +81,7 @@ def sync_extended_profile_with_mailchimp(sender, instance, **kwargs):
         }
     }
 
-    update_mailchimp(instance.user.email, user_json)
+    update_mailchimp(extended_profile.user.email, user_json)
 
 
 @receiver(post_save, sender=GranteeOptIn)
@@ -96,10 +98,11 @@ def sync_grantee_optin_with_mailchimp(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=Organization)
-def sync_organization_with_mailchimp(sender, instance, **kwargs):
-    org_label, org_type, work_area = get_org_data_for_mandrill(instance)
-    update_org_details_at_mailchimp.delay(
-        org_label, org_type, work_area, settings.MAILCHIMP_LEARNERS_LIST_ID)
+def sync_organization_with_mailchimp(sender, instance, created, **kwargs):
+    if not created:
+        org_label, org_type, work_area = get_org_data_for_mandrill(instance)
+        update_org_details_at_mailchimp.delay(
+            org_label, org_type, work_area, instance.id, settings.MAILCHIMP_LEARNERS_LIST_ID)
 
 
 def sync_metric_update_prompt_with_mail_chimp(update_prompt):

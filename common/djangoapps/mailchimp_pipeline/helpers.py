@@ -41,12 +41,9 @@ def get_org_data_for_mandrill(organization):
     if organization:
         focus_areas = FocusArea.get_map()
         org_sectors = OrgSector.objects.get_map()
-        org_label = organization.label if organization else ""
 
-        org_type = ""
-        if organization.org_type:
-            org_type = org_sectors.get(organization.org_type, "")
-
-        focus_area = str(focus_areas.get(organization.focus_area, "")) if organization else ""
+        org_label = organization.label
+        org_type = org_sectors.get(organization.org_type, "") if organization.org_type else ""
+        focus_area = str(focus_areas.get(organization.focus_area, "")) if organization.focus_area else ""
 
     return org_label, org_type, focus_area
