@@ -92,9 +92,9 @@ class AccountCreationFormCustom(AccountCreationForm):
                 'secret': settings.CAPTCHA_SECRET_KEY,
                 'response': recaptcha
             }).content
-        result = json.loads(response)
+        response_json = json.loads(response)
 
-        if not result['success']:
+        if not response_json['success']:
             raise forms.ValidationError(_('The reCaptcha response is invalid. Please try again.'))
 
         return recaptcha
