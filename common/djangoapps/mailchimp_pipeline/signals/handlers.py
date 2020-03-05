@@ -56,15 +56,16 @@ def sync_email_preference_with_mailchimp(sender, instance, **kwargs):
 def sync_user_profile_with_mailchimp(sender, instance, **kwargs):
     profile = instance
 
-    user_json = {
-        "merge_fields": {
-            "LANG": profile.language if profile.language else "",
-            "COUNTRY": profile.country.name.format() if profile.country else "",
-            "CITY": profile.city if profile.city else "",
+    if profile.language or profile.country or profile.city:
+        user_json = {
+            "merge_fields": {
+                "LANG": profile.language if profile.language else "",
+                "COUNTRY": profile.country.name.format() if profile.country else "",
+                "CITY": profile.city if profile.city else "",
+            }
         }
-    }
 
-    update_mailchimp(profile.user.email, user_json)
+        update_mailchimp(profile.user.email, user_json)
 
 
 @receiver(post_save, sender=UserExtendedProfile)
