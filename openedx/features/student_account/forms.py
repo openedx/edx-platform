@@ -84,20 +84,20 @@ class AccountCreationFormCustom(AccountCreationForm):
                 return org_name
         return org_name
 
-    def clean_g_recaptcha(self):
-        g_recaptcha = self.cleaned_data.get('recaptcha')
+    def clean_recaptcha(self):
+        recaptcha = self.cleaned_data.get('recaptcha')
         response = requests.post(
             settings.CAPTCHA_VERIFY_URL,
             data={
                 'secret': settings.CAPTCHA_SECRET_KEY,
-                'response': g_recaptcha
+                'response': recaptcha
             }).content
         result = json.loads(response)
 
         if not result['success']:
             raise forms.ValidationError(_('The reCaptcha response is invalid. Please try again.'))
 
-        return g_recaptcha
+        return recaptcha
 
     def clean(self):
         """ Enforce organization related field conditions """
