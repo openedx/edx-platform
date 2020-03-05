@@ -2,7 +2,7 @@
 Toggles for courseware in-course experience.
 """
 
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from django.conf import settings
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace
 
 # Namespace for courseware waffle flags.
@@ -25,6 +25,6 @@ REDIRECT_TO_COURSEWARE_MICROFRONTEND = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, '
 
 def should_redirect_to_courseware_microfrontend(course_key):
     return (
-        configuration_helpers.get_value('ENABLE_COURSEWARE_MICROFRONTEND') and
+        settings.FEATURES.get('ENABLE_COURSEWARE_MICROFRONTEND') and
         REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled(course_key)
     )
