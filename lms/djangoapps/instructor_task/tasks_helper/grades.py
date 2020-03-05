@@ -270,18 +270,28 @@ class CourseGradeReport(object):
         A generator of batches of (success_rows, error_rows) for this report.
         In case we get an empty generator, return tuple ([], []) of empty lists.
         """
-        empty_generator_sentinel = object()
-        batch_users = self._batch_users(context)
-        first_batch_of_users = next(batch_users, empty_generator_sentinel)
-        the_first_user_batch_is_empty = first_batch_of_users == empty_generator_sentinel
-        if the_first_user_batch_is_empty:
-            yield [], []
-        else:
-            # If the generator was non-empty, return batches of (success_rows, error_rows) rows
-            # for its all iterations (including the first batch).
-            yield self._rows_for_users(context, first_batch_of_users)
-            for users in batch_users:
-                yield self._rows_for_users(context, users)
+
+        def _handle_empty_generator(generator, default):
+            """
+            Handle empty generator.
+
+            Return default if the generator is emtpy, otherwise return all
+            its iterations (including the first which was used for validation).
+            """
+            empty_generator_sentinel = object()
+            first_iteration_output = next(generator, empty_generator_sentinel)
+            generator_is_empty = first_iteration_output == empty_generator_sentinel
+
+            if generator_is_empty:
+                yield default
+
+            else:
+                yield first_iteration_output
+                for element in generator:
+                    yield element
+
+        for users in _handle_empty_generator(self._batch_users(context), default=[]):
+            yield self._rows_for_users(context, users)
 
     def _compile(self, context, batched_rows):
         """
