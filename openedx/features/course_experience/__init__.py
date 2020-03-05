@@ -82,10 +82,6 @@ COURSE_ENABLE_UNENROLLED_ACCESS_FLAG = CourseWaffleFlag(SEO_WAFFLE_FLAG_NAMESPAC
 # Waffle flag to enable relative dates for course content
 RELATIVE_DATES_FLAG = ExperimentWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'relative_dates', experiment_id=17)
 
-# Waffle flag to enable showing FBE messaging, assignment due dates, and modified
-# end date logic (for self-paced courses) in the date widget
-DATE_WIDGET_V2_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'date_widget_v2')
-
 
 def course_home_page_title(course):  # pylint: disable=unused-argument
     """
