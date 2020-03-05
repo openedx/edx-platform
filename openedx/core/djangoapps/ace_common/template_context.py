@@ -15,6 +15,15 @@ DEFAULT_COLOR_DICT = {
     'primary': '#3E99D4',
     'secondary': '#1197EA'
 }
+DEFAULT_FONTS_DICT = {
+    'base-font': "'Open Sans', sans-serif",
+    'heading-font': "'Open Sans', sans-serif",
+    'font-path': "<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap' rel='stylesheet' />",
+}
+DEFAULT_BRANDING_DICT = {
+    'logo': "https://edly-edx-theme-files.s3.amazonaws.com/st-lutherx-logo.png",
+    'favicon': "https://edly-edx-theme-files.s3.amazonaws.com/favicon.ico",
+}
 
 
 def get_base_template_context(site):
@@ -47,8 +56,8 @@ def get_base_template_context(site):
 
         # Context processor values for dynamic theming
         'edly_colors_config': get_theme_colors(),
-        'edly_fonts_config': configuration_helpers.get_dict('FONTS', {}),
-        'edly_branding_config': configuration_helpers.get_dict('BRANDING', {}),
+        'edly_fonts_config': configuration_helpers.get_dict('FONTS', DEFAULT_FONTS_DICT),
+        'edly_branding_config': configuration_helpers.get_dict('BRANDING', DEFAULT_BRANDING_DICT),
     }
 
 
