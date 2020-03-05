@@ -159,7 +159,8 @@ def celery(options):
     Runs Celery workers.
     """
     settings = getattr(options, 'settings', 'devstack_with_worker')
-    run_process(cmd('celery', 'worker', '--app=lms.envs.{}'.format(settings),
+    run_process(cmd('DJANGO_SETTINGS_MODULE=lms.envs.{}'.format(settings),
+                    'celery', 'worker', '--app=lms.celery:APP',
                     '--beat', '--loglevel=INFO', '--pythonpath=.'))
 
 
@@ -236,7 +237,8 @@ def run_all_servers(options):
             'studio', settings_cms, 'runserver', '--traceback', '--pythonpath=.', *cms_runserver_args
         ),
         cmd(
-            'celery', 'worker', "--app=lms.envs.{}".format(worker_settings),
+            'DJANGO_SETTINGS_MODULE=lms.envs.{}'.format(worker_settings),
+            'celery', 'worker', '--app=lms.celery:APP',
             '--beat', '--loglevel=INFO', '--pythonpath=.'
         )
     ])
