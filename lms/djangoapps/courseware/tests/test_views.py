@@ -1495,8 +1495,8 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        (True, 57),
-        (False, 56)
+        (True, 54),
+        (False, 53),
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
@@ -1509,8 +1509,8 @@ class ProgressPageTests(ProgressPageBaseTests):
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 65, 44),
-        (True, 56, 39)
+        (False, 62, 41),
+        (True, 53, 36)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
