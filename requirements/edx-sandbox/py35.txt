@@ -20,7 +20,7 @@ mpmath==1.1.0             # via sympy
 networkx==2.2             # via -r requirements/edx-sandbox/py35.in
 nltk==3.4.5               # via -r requirements/edx-sandbox/shared.txt, chem
 numpy==1.16.5             # via -r requirements/edx-sandbox/py35.in, calc, chem, matplotlib, scipy
-pycparser==2.19           # via -r requirements/edx-sandbox/shared.txt, cffi
+pycparser==2.20           # via -r requirements/edx-sandbox/shared.txt, cffi
 pyparsing==2.2.0          # via -r requirements/edx-sandbox/py35.in, calc, chem, matplotlib
 python-dateutil==2.8.1    # via matplotlib
 pytz==2019.3              # via matplotlib
