@@ -89,6 +89,7 @@ git+https://github.com/edx/crowdsourcehinter.git@a7ffc85b134b7d8909bf1fefd23dbdb
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive
 git+https://github.com/edx/xblock-lti-consumer.git@v1.2.4#egg=lti_consumer-xblock==1.2.4
 
+-e git+https://github.com/edx/edx-proctoring.git@4d8555ffe5e16a4d02e9384c082cbb78e81b2d13#egg=edx-proctoring
 
 # Third Party XBlocks
 
