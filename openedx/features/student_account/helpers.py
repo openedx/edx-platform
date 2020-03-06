@@ -150,6 +150,12 @@ def compose_and_send_activation_email_custom(request, registration, user):
 
 
 def check_and_add_third_party_params(request, params):
+    """
+    Adds backend and access token from current running third_party_auth
+    provider to the params.
+    :param request: request object
+    :param params: params dictionary
+    """
     if third_party_auth.is_enabled() and third_party_auth.pipeline.running(request):
         running_pipeline = third_party_auth.pipeline.get(request)
 

@@ -38,7 +38,7 @@ from student.helpers import AccountValidationError
 from util.json_request import JsonResponse
 
 # PhilU imports
-from openedx.features.student_account.helpers import save_user_utm_info, check_and_add_third_party_params
+from openedx.features.student_account.helpers import check_and_add_third_party_params, save_user_utm_info
 
 
 class LoginSessionView(APIView):

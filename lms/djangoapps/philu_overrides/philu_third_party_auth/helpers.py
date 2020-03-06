@@ -4,6 +4,10 @@ from student.forms import validate_username
 
 
 def normalize_pipeline_kwargs(pipeline_kwargs):
+    """
+    validates username (replaces with empty string if validation fails) given
+     in the pipeline kwargs returns the dictionary with updated username
+    """
     username = pipeline_kwargs.get('username')
     if username:
         try:

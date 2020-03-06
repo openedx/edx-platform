@@ -5,6 +5,10 @@ from .helpers import normalize_pipeline_kwargs
 
 
 def get_third_party_auth_urls(request):
+    """
+    Since registration popups can be on any page, this context processor adds
+    third_party_auth_context to the context
+    """
     if request.user.is_authenticated:
         return dict()
 
