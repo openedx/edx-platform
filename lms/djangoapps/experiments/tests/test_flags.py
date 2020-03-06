@@ -104,6 +104,7 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
                 'bucket': 1,
                 'course_id': 'a/b/c',
                 'is_staff': self.user.is_staff,
+                'nonInteraction': 1,
             },
         }))
 

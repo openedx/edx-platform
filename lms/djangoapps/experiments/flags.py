@@ -119,6 +119,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
                     'course_id': str(course_key) if course_key else None,
                     'bucket': bucket,
                     'is_staff': request.user.is_staff,
+                    'nonInteraction': 1,
                 }
             )
 
