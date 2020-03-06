@@ -107,7 +107,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
         tabs = []
         for priority, tab in enumerate(get_course_tab_list(course_overview.effective_user, course_overview)):
             tabs.append({
-                'title': tab.title,
+                'title': tab.title or tab.get('name'),
                 'slug': tab.tab_id,
                 'priority': priority,
                 'type': tab.type,
