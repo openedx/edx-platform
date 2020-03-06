@@ -76,3 +76,19 @@ class PluginSignals(object):
 
     RELATIVE_PATH = u'relative_path'
     DEFAULT_RELATIVE_PATH = u'signals'
+
+
+class PluginContextsViews(object):
+    STUDENT_DASHBOARD = u'student_dashboard'
+
+
+class PluginContexts(object):
+    """
+    The PluginContexts enum defines dictionary field names (and defaults)
+    that can be specified by a Plugin App in order to configure the
+    additional views it would like to add context into.
+    """
+    CONFIG = u"context_config"
+
+    VIEWS = PluginContextsViews
+
