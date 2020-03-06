@@ -55,7 +55,7 @@ defusedxml==0.5.0         # via -r requirements/edx/base.in, djangorestframework
 git+https://github.com/django-compressor/django-appconf@1526a842ee084b791aa66c931b3822091a442853#egg=django-appconf  # via -r requirements/edx/github.in, django-statici18n
 django-babel-underscore==0.5.2  # via -r requirements/edx/base.in
 django-babel==0.6.2       # via django-babel-underscore
-git+https://github.com/edx/django-celery.git@756cb57aad765cb2b0d37372c1855b8f5f37e6b0#egg=django-celery==3.2.1+edx.2  # via -r requirements/edx/github.in
+django-celery==3.3.1      # via -r requirements/edx/base.in
 django-classy-tags==1.0.0  # via django-sekizai
 django-config-models==2.0.0  # via -r requirements/edx/base.in, edx-enterprise
 django-cors-headers==2.5.3  # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
@@ -117,7 +117,7 @@ edx-sga==0.10.0           # via -r requirements/edx/base.in
 edx-submissions==3.0.4    # via -r requirements/edx/base.in, ora2
 edx-tincan-py35==0.0.5    # via edx-enterprise
 edx-user-state-client==1.1.2  # via -r requirements/edx/base.in
-edx-when==1.0.4           # via -r requirements/edx/base.in, edx-proctoring
+edx-when==1.0.5           # via -r requirements/edx/base.in, edx-proctoring
 edxval==1.2.4             # via -r requirements/edx/base.in
 elasticsearch==1.9.0      # via edx-search
 enum34==1.1.9             # via edxval
