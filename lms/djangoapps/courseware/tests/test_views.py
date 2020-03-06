@@ -60,6 +60,9 @@ from lms.djangoapps.certificates.models import (
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.courseware.views.index import show_courseware_mfe_link
+from lms.djangoapps.courseware.toggles import REDIRECT_TO_COURSEWARE_MICROFRONTEND
+from lms.djangoapps.courseware.url_helpers import get_microfrontend_url
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
 from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
 from lms.djangoapps.verify_student.models import VerificationDeadline
@@ -3213,3 +3216,59 @@ class DatesTabTestCase(ModuleStoreTestCase):
                 self.assertNotContains(response, '<div class="pill due">')
                 # Should have verified pills for audit enrollments
                 self.assertContains(response, '<div class="pill verified">')
+
+
+class TestShowCoursewareMFE(TestCase):
+    """
+    Make sure we're showing the Courseware MFE link when appropriate.
+    """
+    def test_when_to_show(self):
+        course_key = CourseKey.from_string("course-v1:OpenEdX+MFE+2020")
+        global_staff_user = UserFactory(username="global_staff", is_staff=True)
+        user = UserFactory(username="normal", is_staff=False)
+
+        # We never show when the feature is entirely disabled.
+        with patch.dict(settings.FEATURES, {'ENABLE_COURSEWARE_MICROFRONTEND': False}):
+            self.assertFalse(show_courseware_mfe_link(global_staff_user, True, course_key))
+            self.assertFalse(show_courseware_mfe_link(user, True, course_key))
+            self.assertFalse(show_courseware_mfe_link(user, False, course_key))
+
+        # If it's enabled at the platform level, what we do depends on the
+        # CourseWaffleFlag and type of user...
+        with patch.dict(settings.FEATURES, {'ENABLE_COURSEWARE_MICROFRONTEND': True}):
+            # If the feature is enabled at the platform level, we always display
+            # the MFE link to global staff. But course staff only see it if the
+            # CourseWaffleFlag is also enabled for that course. Regular users
+            # never see the link.
+            with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, False):
+                self.assertTrue(show_courseware_mfe_link(global_staff_user, True, course_key))
+                self.assertFalse(show_courseware_mfe_link(user, True, course_key))
+                self.assertFalse(show_courseware_mfe_link(user, False, course_key))
+
+            # If both the feature flag and CourseWaffleFlag are enabled, we should show
+            # to global and course staff, but not normal users.
+            with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, True):
+                self.assertTrue(show_courseware_mfe_link(global_staff_user, True, course_key))
+                self.assertTrue(show_courseware_mfe_link(user, True, course_key))
+                self.assertFalse(show_courseware_mfe_link(user, False, course_key))
+
+    @override_settings(LEARNING_MICROFRONTEND_URL='https://learningmfe.openedx.org')
+    def test_url_generation(self):
+        course_key = CourseKey.from_string("course-v1:OpenEdX+MFE+2020")
+        section_key = UsageKey.from_string("block-v1:OpenEdX+MFE+2020+type@sequential+block@Introduction")
+        unit_id = "block-v1:OpenEdX+MFE+2020+type@vertical+block@Getting_To_Know_You"
+        assert get_microfrontend_url(course_key) == (
+            'https://learningmfe.openedx.org'
+            '/course/course-v1:OpenEdX+MFE+2020'
+        )
+        assert get_microfrontend_url(course_key, section_key, '') == (
+            'https://learningmfe.openedx.org'
+            '/course/course-v1:OpenEdX+MFE+2020'
+            '/block-v1:OpenEdX+MFE+2020+type@sequential+block@Introduction'
+        )
+        assert get_microfrontend_url(course_key, section_key, unit_id) == (
+            'https://learningmfe.openedx.org'
+            '/course/course-v1:OpenEdX+MFE+2020'
+            '/block-v1:OpenEdX+MFE+2020+type@sequential+block@Introduction'
+            '/block-v1:OpenEdX+MFE+2020+type@vertical+block@Getting_To_Know_You'
+        )
