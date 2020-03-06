@@ -56,3 +56,7 @@ class UCSDCustomRegistration(models.Model):
         (b'print', b'Print advertisement'),
         (b'other', b'Other'), 
         ])
+
+    class Meta:
+        verbose_name = "Demographic Information"
+        verbose_name_plural = "Demographic Information"
