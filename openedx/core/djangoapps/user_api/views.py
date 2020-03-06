@@ -38,7 +38,7 @@ from student.helpers import AccountValidationError
 from util.json_request import JsonResponse
 
 # PhilU imports
-from openedx.features.student_account.helpers import save_user_utm_info
+from openedx.features.student_account.helpers import save_user_utm_info, check_and_add_third_party_params
 
 
 class LoginSessionView(APIView):
@@ -154,6 +154,9 @@ class RegistrationView(APIView):
             data["terms_of_service"] = data["honor_code"]
 
         try:
+            # PhilU hook for adding third party params
+            check_and_add_third_party_params(request, data)
+
             user = create_account_with_params(request, data)
         except AccountValidationError as err:
             errors = {

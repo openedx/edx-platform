@@ -640,7 +640,11 @@ CONTEXT_PROCESSORS = [
     'lms.djangoapps.philu_overrides.context_processor.get_cdn_link',
 
     # Mobile App processor (Detects if request is from the mobile app)
-    'mobile_api.context_processor.is_from_mobile_app'
+    'mobile_api.context_processor.is_from_mobile_app',
+
+    # Generic third party auth urls on all public pages
+    'lms.djangoapps.philu_overrides.philu_third_party_auth.context_processor.get_third_party_auth_urls'
+
 ]
 
 # Django templating
