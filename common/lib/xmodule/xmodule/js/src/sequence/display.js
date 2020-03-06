@@ -285,14 +285,14 @@
 
                 // Some Xblocks may cause the window to scroll to the bottom of
                 // the page on initialization (probably a bug). The call to
-                // focus() bellow generally brings the main content back onto
+                // focus() below generally brings the main content back onto
                 // screen, however, this behaviour is inconsistent both within
                 // and between different browsers. 
                 //
                 // To make this consistent we automatically scroll so the unit
                 // content is at the top of the viewport. Note: we do a hard
                 // scroll rather than a smooth animation since this is on page
-                // load and we dont need any visual transition.
+                // load and we don't need any visual transition.
                 $('html > body').scrollTo(this.content_container.offset().top, 0);
 
                 this.sr_container.focus();
