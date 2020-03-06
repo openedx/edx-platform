@@ -38,6 +38,7 @@ from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_f
         authData = ${ auth | n, dump_js_escaped_json },
         platformName = '${ static.get_platform_name() | n, js_escaped_string }',
         contactEmail = '${ static.get_contact_email_address() | n, js_escaped_string }',
+        registrationExtraFields = ${ settings.REGISTRATION_EXTRA_FIELDS | n, dump_js_escaped_json },
         allowEmailChange = ${ bool(settings.FEATURES['ALLOW_EMAIL_ADDRESS_CHANGE']) | n, dump_js_escaped_json },
         socialPlatforms = ${ settings.SOCIAL_PLATFORMS | n, dump_js_escaped_json },
 
@@ -68,7 +69,8 @@ from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_f
         edxSupportUrl,
         extendedProfileFields,
         displayAccountDeletion,
-        isSecondaryEmailFeatureEnabled
+        isSecondaryEmailFeatureEnabled,
+		registrationExtraFields
     );
 </%static:require_module>
 

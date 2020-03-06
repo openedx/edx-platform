@@ -28,7 +28,8 @@
             edxSupportUrl,
             extendedProfileFields,
             displayAccountDeletion,
-            isSecondaryEmailFeatureEnabled
+            isSecondaryEmailFeatureEnabled,
+            registrationExtraFields
         ) {
             var $accountSettingsElement, userAccountModel, userPreferencesModel, aboutSectionsData,
                 accountsSectionData, ordersSectionData, accountSettingsView, showAccountSettingsPage,
@@ -199,10 +200,13 @@
                             })
                         }
                     ]
-                },
-                {
+                }
+            ];
+			
+			var addlInfo = {
                     title: gettext('Additional Information'),
-                    fields: [
+                    fields: [],
+                    defined_fields: [
                         {
                             view: new AccountSettingsFieldViews.DropdownFieldView({
                                 model: userAccountModel,
@@ -240,8 +244,17 @@
                             })
                         }
                     ]
-                }
-            ];
+                };
+
+			addlInfo.defined_fields.forEach(function(field) {
+				var field_id = field.view.options.valueAttribute;
+				if(field_id in registrationExtraFields && registrationExtraFields[field_id] != 'hidden')
+					addlInfo.fields.push(field);
+			})
+
+			if(addlInfo.fields.length > 0) {
+				aboutSectionsData.push(addlInfo);
+			}
 
 			// Secondary email address
             if (isSecondaryEmailFeatureEnabled) {
