@@ -34,7 +34,8 @@ EXPECTED_COLLECT_STATIC_COMMAND = (
     u'--noinput {log_string}'
 )
 EXPECTED_CELERY_COMMAND = (
-    u"celery worker --app=lms.envs.{settings} --beat --loglevel=INFO --pythonpath=."
+    u"DJANGO_SETTINGS_MODULE=lms.envs.{settings} celery worker "
+    u"--app=lms.celery:APP --beat --loglevel=INFO --pythonpath=."
 )
 EXPECTED_RUN_SERVER_COMMAND = (
     u"python manage.py {system} --settings={settings} runserver --traceback --pythonpath=. 0.0.0.0:{port}"
