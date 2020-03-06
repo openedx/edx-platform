@@ -191,12 +191,17 @@ class CoursewareIndex(View):
         """
         Redirect to the new courseware micro frontend,
         unless this is a time limited exam.
-
-        TODO: remove this once exams work in the new MFE.
         """
-        if (not getattr(self.section, 'is_time_limited', False)) \
-                and should_redirect_to_courseware_microfrontend(self.course_key) \
-                and not request.user.is_staff:
+        # learners should redirect, if the waffle flag is set
+        if should_redirect_to_courseware_microfrontend(self.course_key):
+            # but exams should not redirect to the mfe until they're supported
+            if getattr(self.section, 'is_time_limited', False):
+                return
+
+            # and staff will not redirect, either
+            if self.is_staff:
+                return
+
             url = get_microfrontend_url(
                 self.course_key,
                 self.section.location

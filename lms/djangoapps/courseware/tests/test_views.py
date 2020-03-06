@@ -92,6 +92,7 @@ from openedx.features.course_experience import (
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from student.models import CourseEnrollment
+from student.roles import CourseStaffRole
 from student.tests.factories import TEST_PASSWORD, AdminFactory, CourseEnrollmentFactory, UserFactory
 from util.tests.test_date_utils import fake_pgettext, fake_ugettext
 from util.url import reload_django_url_config
@@ -100,8 +101,10 @@ from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_P
 from xmodule.graders import ShowCorrectness
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MIXED_MODULESTORE,
+    TEST_DATA_SPLIT_MODULESTORE,
     CourseUserType,
     ModuleStoreTestCase,
     SharedModuleStoreTestCase
@@ -3355,6 +3358,8 @@ class TestShowCoursewareMFE(TestCase):
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSEWARE_MICROFRONTEND': True})
 @ddt.ddt
 class MFERedirectTests(BaseViewsTestCase):
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
     def _get_urls(self):
         lms_url = reverse(
             'courseware_section',
@@ -3379,9 +3384,18 @@ class MFERedirectTests(BaseViewsTestCase):
             assert self.client.get(lms_url).url == mfe_url
 
     def test_staff_no_redirect(self):
-        # global staff will never be redirected
         lms_url, mfe_url = self._get_urls()
 
+        # course staff will not redirect
+        course_staff = UserFactory.create(is_staff=False)
+        CourseStaffRole(self.course_key).add_users(course_staff)
+        self.client.login(username=course_staff.username, password='test')
+
+        assert self.client.get(lms_url).status_code == 200
+        with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, True):
+            assert self.client.get(lms_url).status_code == 200
+
+        # global staff will never be redirected
         self._create_global_staff_user()
         assert self.client.get(lms_url).status_code == 200
 
