@@ -194,7 +194,7 @@ class CoursewareIndex(View):
 
         TODO: remove this once exams work in the new MFE.
         """
-        if (not self.section.is_time_limited) \
+        if (not getattr(self.section, 'is_time_limited', False)) \
                 and should_redirect_to_courseware_microfrontend(self.course_key) \
                 and not request.user.is_staff:
             url = get_microfrontend_url(
