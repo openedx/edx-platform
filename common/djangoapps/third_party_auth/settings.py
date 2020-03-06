@@ -18,7 +18,7 @@ def apply_settings(django_settings):
 
     # Whitelisted URL query parameters retrained in the pipeline session.
     # Params not in this whitelist will be silently dropped.
-    django_settings.FIELDS_STORED_IN_SESSION = ['auth_entry', 'next']
+    django_settings.FIELDS_STORED_IN_SESSION = ['auth_entry', 'next', 'opt_in', 'utm_params']
 
     # Inject exception middleware to make redirects fire.
     django_settings.MIDDLEWARE_CLASSES.extend(

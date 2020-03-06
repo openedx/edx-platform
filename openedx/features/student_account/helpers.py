@@ -3,6 +3,8 @@ import logging
 from datetime import datetime
 from pytz import utc
 
+import third_party_auth
+
 from mailchimp_pipeline.signals.handlers import task_send_account_activation_email
 
 from constants import NON_ACTIVE_COURSE_NOTIFICATION
@@ -146,3 +148,18 @@ def compose_and_send_activation_email_custom(request, registration, user):
 
     task_send_account_activation_email.delay(data)
 
+
+def check_and_add_third_party_params(request, params):
+    """
+    Adds backend and access token from current running third_party_auth
+    provider to the params.
+    :param request: request object
+    :param params: params dictionary
+    """
+    if third_party_auth.is_enabled() and third_party_auth.pipeline.running(request):
+        running_pipeline = third_party_auth.pipeline.get(request)
+
+        if running_pipeline.get('backend'):
+            params['provider'] = running_pipeline.get('backend')
+
+        params['access_token'] = running_pipeline['kwargs']['response']['access_token']
