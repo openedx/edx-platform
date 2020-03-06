@@ -25,7 +25,8 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
 from edx_django_utils.monitoring import set_custom_metrics_for_course_key
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from web_fragments.fragment import Fragment
 
 from edxmako.shortcuts import render_to_response, render_to_string
@@ -485,8 +486,6 @@ class CoursewareIndex(View):
                 table_of_contents['previous_of_active_section'],
                 table_of_contents['next_of_active_section'],
             )
-            unit_id = section_context.get('activate_block_id', '')
-            courseware_context['unit'] = unit_id
             courseware_context['fragment'] = self.section.render(self.view, section_context)
 
             if self.section.position and self.section.has_children:
@@ -495,8 +494,18 @@ class CoursewareIndex(View):
         # Courseware MFE link
         if show_courseware_mfe_link(request.user, staff_access, self.course.id):
             if self.section:
+                try:
+                    unit_key = UsageKey.from_string(request.GET.get('activate_block_id', ''))
+                    # `activate_block_id` is typically a Unit (a.k.a. Vertical),
+                    # but it can technically be any block type. Do a check to
+                    # make sure it's really a Unit before we use it for the MFE.
+                    if unit_key.block_type != 'vertical':
+                        unit_key = None
+                except InvalidKeyError:
+                    unit_key = None
+
                 courseware_context['microfrontend_link'] = get_microfrontend_url(
-                    self.course.id, self.section.location, unit_id
+                    self.course.id, self.section.location, unit_key
                 )
             else:
                 courseware_context['microfrontend_link'] = get_microfrontend_url(self.course.id)
