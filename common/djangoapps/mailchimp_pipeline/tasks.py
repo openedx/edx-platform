@@ -2,7 +2,7 @@ from celery import task
 from django.contrib.auth.models import User
 from django.db import connection
 from lms.djangoapps.certificates import api as certificate_api
-from lms.djangoapps.onboarding.models import (FocusArea, Organization, OrgSector, UserExtendedProfile)
+from lms.djangoapps.onboarding.models import (FocusArea, OrgSector, UserExtendedProfile)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from mailchimp_pipeline.client import ChimpClient, MailChimpException
 from mailchimp_pipeline.helpers import get_user_active_enrollements, get_enrollements_course_short_ids

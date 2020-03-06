@@ -34,16 +34,12 @@ def get_enrollements_course_short_ids(username):
 
 
 def get_org_data_for_mandrill(organization):
-    org_label = ""
-    org_type = ""
-    focus_area = ""
+    org_label = org_type = focus_area = ""
 
     if organization:
-        focus_areas = FocusArea.get_map()
-        org_sectors = OrgSector.objects.get_map()
 
         org_label = organization.label
-        org_type = org_sectors.get(organization.org_type, "") if organization.org_type else ""
-        focus_area = str(focus_areas.get(organization.focus_area, "")) if organization.focus_area else ""
+        org_type = OrgSector.objects.get_map().get(organization.org_type, "")
+        focus_area = FocusArea.get_map().get(organization.focus_area, "")
 
     return org_label, org_type, focus_area
