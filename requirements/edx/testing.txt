@@ -110,7 +110,7 @@ edx-completion==3.1.1     # via -r requirements/edx/base.txt
 edx-django-release-util==0.3.6  # via -r requirements/edx/base.txt
 edx-django-sites-extensions==2.4.3  # via -r requirements/edx/base.txt
 edx-django-utils==3.0     # via -r requirements/edx/base.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client
-edx-drf-extensions==3.0.0  # via -r requirements/edx/base.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
+edx-drf-extensions==4.0.0  # via -r requirements/edx/base.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
 edx-enterprise==2.5.1     # via -r requirements/edx/base.txt
 edx-i18n-tools==0.5.0     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, ora2
 edx-lint==1.4.1           # via -r requirements/edx/testing.in
@@ -151,7 +151,7 @@ httplib2==0.17.0          # via -r requirements/edx/base.txt, oauth2
 httpretty==0.9.7          # via -r requirements/edx/testing.in
 idna==2.9                 # via -r requirements/edx/base.txt, requests
 importlib-metadata==1.5.0  # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, importlib-resources, inflect, path, pluggy, pytest, pytest-randomly, tox, virtualenv
-importlib-resources==1.2.0  # via virtualenv
+importlib-resources==1.3.1  # via virtualenv
 inflect==3.0.2            # via -c requirements/edx/../constraints.txt, -r requirements/edx/coverage.txt, jinja2-pluralize
 inflection==0.3.1         # via -r requirements/edx/base.txt, drf-yasg
 ipaddress==1.0.23         # via -r requirements/edx/base.txt
@@ -207,7 +207,7 @@ pillow==7.0.0             # via -r requirements/edx/base.txt, edx-enterprise, ed
 pkgconfig==1.5.1          # via -r requirements/edx/base.txt, xmlsec
 pluggy==0.13.1            # via -r requirements/edx/coverage.txt, diff-cover, pytest, tox
 polib==1.1.0              # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, edx-i18n-tools
-psutil==1.2.1             # via -r requirements/edx/base.txt, edx-django-utils, edx-drf-extensions
+psutil==1.2.1             # via -r requirements/edx/base.txt, edx-django-utils
 py2neo==3.1.2             # via -r requirements/edx/base.txt
 py==1.8.1                 # via pytest, tox
 pycodestyle==2.5.0        # via -r requirements/edx/testing.in, flake8
