@@ -61,7 +61,10 @@ from lms.djangoapps.certificates.tests.factories import CertificateInvalidationF
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.views.index import show_courseware_mfe_link
-from lms.djangoapps.courseware.toggles import REDIRECT_TO_COURSEWARE_MICROFRONTEND
+from lms.djangoapps.courseware.toggles import (
+    COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW,
+    REDIRECT_TO_COURSEWARE_MICROFRONTEND,
+)
 from lms.djangoapps.courseware.url_helpers import get_microfrontend_url
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
 from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
@@ -3221,36 +3224,109 @@ class DatesTabTestCase(ModuleStoreTestCase):
 class TestShowCoursewareMFE(TestCase):
     """
     Make sure we're showing the Courseware MFE link when appropriate.
+
+    There are an unfortunate number of state permutations here since we have
+    the product of the following binary states:
+
+    * the ENABLE_COURSEWARE_MICROFRONTEND Django setting
+    * user is global staff member
+    * user is member of the course team
+    * whether the course_key is an old Mongo style of key
+    * the COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW CourseWaffleFlag
+    * the REDIRECT_TO_COURSEWARE_MICROFRONTEND CourseWaffleFlag
+
+    Giving us theoretically 2^6 = 64 states. >_<
     """
-    def test_when_to_show(self):
-        course_key = CourseKey.from_string("course-v1:OpenEdX+MFE+2020")
+    @patch.dict(settings.FEATURES, {'ENABLE_COURSEWARE_MICROFRONTEND': False})
+    def test_disabled_at_platform_level(self):
+        """Test every permutation where the platform feature is disabled."""
+        old_course_key = CourseKey.from_string("OpenEdX/Old/2020")
+        new_course_key = CourseKey.from_string("course-v1:OpenEdX+New+2020")
         global_staff_user = UserFactory(username="global_staff", is_staff=True)
-        user = UserFactory(username="normal", is_staff=False)
+        regular_user = UserFactory(username="normal", is_staff=False)
 
-        # We never show when the feature is entirely disabled.
-        with patch.dict(settings.FEATURES, {'ENABLE_COURSEWARE_MICROFRONTEND': False}):
-            self.assertFalse(show_courseware_mfe_link(global_staff_user, True, course_key))
-            self.assertFalse(show_courseware_mfe_link(user, True, course_key))
-            self.assertFalse(show_courseware_mfe_link(user, False, course_key))
+        # We never show when the feature is entirely disabled, no matter what
+        # the waffle flags are set to, who the user is, or what the course_key
+        # type is.
+        combos = itertools.product(
+            [regular_user, global_staff_user],  # User (is global staff)
+            [old_course_key, new_course_key],   # Course Key (old vs. new)
+            [True, False],  # is_course_staff
+            [True, False],  # preview_active (COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW)
+            [True, False],  # redirect_active (REDIRECT_TO_COURSEWARE_MICROFRONTEND)
+        )
+        for user, course_key, is_course_staff, preview_active, redirect_active in combos:
+            with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, preview_active):
+                with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, redirect_active):
+                    assert show_courseware_mfe_link(user, is_course_staff, course_key) is False
 
-        # If it's enabled at the platform level, what we do depends on the
-        # CourseWaffleFlag and type of user...
-        with patch.dict(settings.FEATURES, {'ENABLE_COURSEWARE_MICROFRONTEND': True}):
-            # If the feature is enabled at the platform level, we always display
-            # the MFE link to global staff. But course staff only see it if the
-            # CourseWaffleFlag is also enabled for that course. Regular users
-            # never see the link.
-            with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, False):
-                self.assertTrue(show_courseware_mfe_link(global_staff_user, True, course_key))
-                self.assertFalse(show_courseware_mfe_link(user, True, course_key))
-                self.assertFalse(show_courseware_mfe_link(user, False, course_key))
+    @patch.dict(settings.FEATURES, {'ENABLE_COURSEWARE_MICROFRONTEND': True})
+    def test_enabled_at_platform_level(self):
+        """Test every permutation where the platform feature is enabled."""
+        old_course_key = CourseKey.from_string("OpenEdX/Old/2020")
+        new_course_key = CourseKey.from_string("course-v1:OpenEdX+New+2020")
+        global_staff_user = UserFactory(username="global_staff", is_staff=True)
+        regular_user = UserFactory(username="normal", is_staff=False)
 
-            # If both the feature flag and CourseWaffleFlag are enabled, we should show
-            # to global and course staff, but not normal users.
+        # Old style course keys are never supported and should always return false...
+        old_mongo_combos = itertools.product(
+            [regular_user, global_staff_user],  # User (is global staff)
+            [True, False],  # is_course_staff
+            [True, False],  # preview_active (COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW)
+            [True, False],  # redirect_active (REDIRECT_TO_COURSEWARE_MICROFRONTEND)
+        )
+        for user, is_course_staff, preview_active, redirect_active in old_mongo_combos:
+            with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, preview_active):
+                with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, redirect_active):
+                    assert show_courseware_mfe_link(user, is_course_staff, old_course_key) is False
+
+        # We've checked all old-style course keys now, so we can test only the
+        # new ones going forward. Now we check combinations of waffle flags and
+        # user permissions...
+        with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, True):
             with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, True):
-                self.assertTrue(show_courseware_mfe_link(global_staff_user, True, course_key))
-                self.assertTrue(show_courseware_mfe_link(user, True, course_key))
-                self.assertFalse(show_courseware_mfe_link(user, False, course_key))
+                # (preview=on, redirect=on)
+                # Global and Course Staff can see the link.
+                self.assertTrue(show_courseware_mfe_link(global_staff_user, True, new_course_key))
+                self.assertTrue(show_courseware_mfe_link(global_staff_user, False, new_course_key))
+                self.assertTrue(show_courseware_mfe_link(regular_user, True, new_course_key))
+
+                # Regular users don't see the link.
+                self.assertFalse(show_courseware_mfe_link(regular_user, False, new_course_key))
+            with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, False):
+                # (preview=on, redirect=off)
+                # Global and Course Staff can see the link.
+                self.assertTrue(show_courseware_mfe_link(global_staff_user, True, new_course_key))
+                self.assertTrue(show_courseware_mfe_link(global_staff_user, False, new_course_key))
+                self.assertTrue(show_courseware_mfe_link(regular_user, True, new_course_key))
+
+                # Regular users don't see the link.
+                self.assertFalse(show_courseware_mfe_link(regular_user, False, new_course_key))
+
+        with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, False):
+            with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, True):
+                # (preview=off, redirect=on)
+                # Global staff see the link anyway
+                self.assertTrue(show_courseware_mfe_link(global_staff_user, True, new_course_key))
+                self.assertTrue(show_courseware_mfe_link(global_staff_user, False, new_course_key))
+
+                # If redirect is active for their students, course staff see the link even
+                # if preview=off.
+                self.assertTrue(show_courseware_mfe_link(regular_user, True, new_course_key))
+
+                # Regular users don't see the link.
+                self.assertFalse(show_courseware_mfe_link(regular_user, False, new_course_key))
+            with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, False):
+                # (preview=off, redirect=off)
+                # Global staff see the link anyway
+                self.assertTrue(show_courseware_mfe_link(global_staff_user, True, new_course_key))
+                self.assertTrue(show_courseware_mfe_link(global_staff_user, False, new_course_key))
+
+                # Course teams can NOT see the link because both rollout waffle flags are false.
+                self.assertFalse(show_courseware_mfe_link(regular_user, True, new_course_key))
+
+                # Regular users don't see the link.
+                self.assertFalse(show_courseware_mfe_link(regular_user, False, new_course_key))
 
     @override_settings(LEARNING_MICROFRONTEND_URL='https://learningmfe.openedx.org')
     def test_url_generation(self):

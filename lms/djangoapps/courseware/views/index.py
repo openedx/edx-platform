@@ -32,7 +32,10 @@ from web_fragments.fragment import Fragment
 from edxmako.shortcuts import render_to_response, render_to_string
 from lms.djangoapps.courseware.courses import allow_public_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
-from lms.djangoapps.courseware.toggles import should_redirect_to_courseware_microfrontend
+from lms.djangoapps.courseware.toggles import (
+    COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW,
+    should_redirect_to_courseware_microfrontend,
+)
 from lms.djangoapps.courseware.url_helpers import get_microfrontend_url
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.gating.api import get_entrance_exam_score_ratio, get_entrance_exam_usage_key
@@ -640,16 +643,22 @@ def show_courseware_mfe_link(user, staff_access, course_key):
     if not settings.FEATURES.get('ENABLE_COURSEWARE_MICROFRONTEND'):
         return False
 
-    # Global staff members always get to see the courseware MFE button if
-    # the basic feature is enabled at all, regardless of whether a course
-    # has enabled it via flag.
+    # MFE does not work for Old Mongo courses.
+    if course_key.deprecated:
+        return False
+
+    # Global staff members always get to see the courseware MFE button if the
+    # platform and course are capable, regardless of rollout waffle flags.
     if user.is_staff:
         return True
 
-    # If you have course staff access, you see this link only if your
-    # students would be redirected to the new experience (course staff are
-    # never automatically redirected).
-    if staff_access and should_redirect_to_courseware_microfrontend(course_key):
+    # If you have course staff access, you see this link if we've enabled the
+    # course team preview CourseWaffleFlag for this course *or* if we've turned
+    # on the redirect for your students.
+    mfe_enabled_for_course_team = COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW.is_enabled(course_key)
+    mfe_enabled_for_students = should_redirect_to_courseware_microfrontend(course_key)
+
+    if staff_access and (mfe_enabled_for_course_team or mfe_enabled_for_students):
         return True
 
     return False
