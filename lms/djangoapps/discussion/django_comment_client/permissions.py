@@ -201,9 +201,5 @@ VIEW_PERMISSIONS = {
 
 def check_permissions_by_view(user, course_id, content, name, group_id=None, content_user_group=None):
     assert isinstance(course_id, CourseKey)
-    p = None
-    try:
-        p = VIEW_PERMISSIONS[name]
-    except KeyError:
-        logging.warning(u"Permission for view named %s does not exist in permissions.py", name)
+    p = VIEW_PERMISSIONS.get(name)
     return _check_conditions_permissions(user, p, course_id, content, group_id, content_user_group)
