@@ -375,9 +375,7 @@ class UserInfoModelForm(BaseOnboardingModelForm):
 
             prev_org = user_info_survey.organization
             user_info_survey.organization = organization_to_assign
-
-            if organization_to_assign.users_count() == 0:
-                user_info_survey.is_first_learner = True
+            user_info_survey.is_first_learner = organization_to_assign.users_count() == 0
 
             # Reset organizations under my administrations if i updated my organization & ask for org details
             if not prev_org == organization_to_assign:
@@ -404,6 +402,7 @@ class UserInfoModelForm(BaseOnboardingModelForm):
                     log.info(ex.args)
                     pass
 
+            # If user wants to remove h/er-self as admin from any organization.
             if not is_poc == '1':
                 if organization_to_assign.admin == user:
                     organization_to_assign.admin = None

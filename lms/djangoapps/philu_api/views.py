@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 from util.json_request import expect_json
 from wsgiref.util import FileWrapper
 
+from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse, Http404
 from django.views.decorators.http import require_POST
@@ -20,6 +21,7 @@ from celery.result import AsyncResult
 from common.lib.mandrill_client.client import MandrillClient
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.features.badging.models import Badge, UserBadge
+from openedx.features.partners.helpers import get_partner_from_user, user_has_performance_access
 
 from lms.djangoapps.oef.decorators import eligible_for_oef
 from lms.djangoapps.onboarding.helpers import get_org_metric_update_prompt
@@ -100,10 +102,13 @@ class PlatformSyncService(APIView):
             return JsonResponse({"message": "Invalid Session token"}, status=status.HTTP_400_BAD_REQUEST)
 
         user_extended_profile = user.extended_profile
+        partner = get_partner_from_user(user)
         return JsonResponse({
             "is_admin": user_extended_profile.is_organization_admin,
             "eligible_for_oef": eligible_for_oef(user_extended_profile),
-            "help_center": configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK)
+            "help_center": configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
+            "can_access_partner_performance":  user_has_performance_access(user, partner),
+            "partner_performance_url": partner and reverse('partner_performance', args=[partner.slug])
         }, status=status.HTTP_200_OK)
 
     def post(self, request):
@@ -185,10 +190,8 @@ def assign_user_badge(request):
                             status=status.HTTP_403_FORBIDDEN)
 
     try:
-        UserBadge.assign_badge(user_id=user_id,
-                               badge_id=badge_id,
-                               community_id=community_id)
-        return JsonResponse({'success': True})
+        assigned = UserBadge.assign_badge(user_id=user_id, badge_id=badge_id, community_id=community_id)
+        return JsonResponse({'success': True}, status=status.HTTP_201_CREATED if assigned else status.HTTP_409_CONFLICT)
     except Exception as e:
         logging.exception(e)
         return JsonResponse({'success': False, 'message': str(e)},

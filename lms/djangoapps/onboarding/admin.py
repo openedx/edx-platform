@@ -6,24 +6,27 @@ import onboarding.handlers
 
 
 from lms.djangoapps.onboarding.models import (
-    RoleInsideOrg,
     Currency,
-    OrgSector,
-    OperationLevel,
-    FocusArea,
-    TotalEmployee,
-    PartnerNetwork,
+    Education,
     EducationLevel,
-    EnglishProficiency,
-    Organization,
-    UserExtendedProfile,
     EmailPreference,
+    EnglishProficiency,
+    Experience,
+    FocusArea,
     FunctionArea,
-    OrganizationPartner,
+    GranteeOptIn,
+    MetricUpdatePromptRecord,
+    OperationLevel,
+    OrgSector,
+    Organization,
     OrganizationMetric,
     OrganizationMetricUpdatePrompt,
-    MetricUpdatePromptRecord,
-    GranteeOptIn
+    OrganizationPartner,
+    PartnerNetwork,
+    RoleInsideOrg,
+    Skill,
+    TotalEmployee,
+    UserExtendedProfile
 )
 
 
@@ -112,6 +115,20 @@ class GranteeOptInAdmin(admin.ModelAdmin):
     list_display = ('id', 'organization_partner', 'user', 'agreed', 'created_at')
 
 
+class EducationAdmin(admin.ModelAdmin):
+    list_display = ('id', 'linkedin_id', 'user', 'school_name', 'degree_name', 'start_month_year',
+                    'end_month_year', 'description')
+
+
+class ExperienceAdmin(admin.ModelAdmin):
+    list_display = ('id', 'linkedin_id', 'start_date', 'end_date', 'is_current', 'title',
+                    'company', 'summary')
+
+
+class SkillAdmin(admin.ModelAdmin):
+    list_display = ('id', 'linkedin_id', 'name')
+
+
 admin.site.register(Currency, CurrencyAdmin)
 admin.site.register(RoleInsideOrg, RoleInsideOrgAdmin)
 admin.site.register(OrgSector, OrgSectorAdmin)
@@ -130,3 +147,6 @@ admin.site.register(OrganizationMetric, OrganizationMetricAdmin)
 admin.site.register(OrganizationMetricUpdatePrompt, OrganizationMetricUpdatePromptAdmin)
 admin.site.register(MetricUpdatePromptRecord, MetricUpdatePromptRecordAdmin)
 admin.site.register(GranteeOptIn, GranteeOptInAdmin)
+admin.site.register(Education, EducationAdmin)
+admin.site.register(Experience, ExperienceAdmin)
+admin.site.register(Skill, SkillAdmin)

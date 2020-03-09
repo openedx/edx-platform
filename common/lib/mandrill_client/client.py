@@ -31,6 +31,8 @@ class MandrillClient(object):
     ON_DEMAND_WEEKLY_MODULE_SKIP_TEMPLATE = 'on-demand-module-skip'
     ON_DEMAND_REMINDER_EMAIL_TEMPLATE = 'on-demand-reminder-email'
     CHANGE_USER_EMAIL_ALERT = 'change-user-email-alert'
+    DOWNLOAD_CERTIFICATE = 'download-certificate'
+    USER_BADGE_EMAIL_TEMPLATE = 'user-badge-email'
 
     def __init__(self):
         self.mandrill_client = mandrill.Mandrill(settings.MANDRILL_API_KEY)
@@ -68,4 +70,3 @@ class MandrillClient(object):
             log.error('A mandrill error occurred: %s - %s' % (e.__class__, e))
             raise
         return result
-

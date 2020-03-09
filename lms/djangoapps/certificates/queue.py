@@ -25,6 +25,8 @@ from lms.djangoapps.verify_student.services import IDVerificationService
 from student.models import CourseEnrollment, UserProfile
 from xmodule.modulestore.django import modulestore
 
+from openedx.features.student_certificates.helpers import fire_send_email_signal
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -180,7 +182,8 @@ class XQueueCertInterface(object):
         raise NotImplementedError
 
     # pylint: disable=too-many-statements
-    def add_cert(self, student, course_id, course=None, forced_grade=None, template_file=None, generate_pdf=True):
+    def add_cert(self, student, course_id, course=None, forced_grade=None, template_file=None, generate_pdf=True,
+                 send_email=False):
         """
         Request a new certificate for a student.
 
@@ -417,9 +420,10 @@ class XQueueCertInterface(object):
             return cert
 
         # Finally, generate the certificate and send it off.
-        return self._generate_cert(cert, course, student, grade_contents, template_pdf, generate_pdf)
+        return self._generate_cert(cert, course, student, grade_contents, template_pdf, generate_pdf,
+                                   send_email=send_email)
 
-    def _generate_cert(self, cert, course, student, grade_contents, template_pdf, generate_pdf):
+    def _generate_cert(self, cert, course, student, grade_contents, template_pdf, generate_pdf, send_email=False):
         """
         Generate a certificate for the student. If `generate_pdf` is True,
         sends a request to XQueue.
@@ -472,6 +476,8 @@ class XQueueCertInterface(object):
                     cert.status,
                     key
                 )
+        if send_email:
+            fire_send_email_signal(course, cert)
         return cert
 
     def add_example_cert(self, example_cert):

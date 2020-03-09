@@ -2388,6 +2388,9 @@ INSTALLED_APPS = [
     # Badges app
     'openedx.features.badging',
 
+    # Specializations app
+    'openedx.features.specializations',
+
     # On demand course email preferences
     'openedx.features.ondemand_email_preferences',
 
@@ -2926,6 +2929,7 @@ OPTIONAL_APPS = [
     ('submissions', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
     ('openassessment', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
     ('openassessment.assessment', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
+    ('openassessment.table_prompts', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
     ('openassessment.fileupload', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
     ('openassessment.workflow', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
     ('openassessment.xblock', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),

@@ -1,4 +1,3 @@
-import json
 from w3lib.url import add_or_replace_parameter
 
 from django.conf import settings
@@ -183,10 +182,6 @@ def view_team(request, course_id, team_id):
 
     is_user_member_of_this_team = bool(CourseTeamMembership.objects.filter(team=team, user=user).first())
 
-    unearned_badges_dict = Badge.get_unearned_badges(user_id=request.user.id,
-                                                     community_id=room_id,
-                                                     community_type=TEAM_PLAYER[TEAM_PLAYER_ENTRY_INDEX])
-
     context = {
         'course': course,
         'user_has_team': is_member_of_any_team,
@@ -199,7 +194,8 @@ def view_team(request, course_id, team_id):
         'leave_team_url': leave_team_url,
         'country': str(countries.countries[team.country]),
         'language': dict(settings.ALL_LANGUAGES)[team.language],
-        'unearned_badges': json.dumps(unearned_badges_dict),
+        'community_id': room_id,
+        'badges': Badge.objects.get_badges_json(badge_type=TEAM_PLAYER[TEAM_PLAYER_ENTRY_INDEX]),
     }
 
     return render_to_response("teams/view_team.html", context)

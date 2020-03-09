@@ -1,26 +1,32 @@
 import base64
-import boto
-import requests
 import shutil
-
-from boto.s3.key import Key
-from django.conf import settings
-from PIL import Image
+from importlib import import_module
 from tempfile import TemporaryFile
 
-from lms.djangoapps.philu_api.helpers import get_course_custom_settings, get_social_sharing_urls
+import boto
+import requests
+from PIL import Image
+from boto.s3.key import Key
+from django.conf import settings
+from django.urls import reverse
+
 from constants import (
     PAGE_HEIGHT,
     PAGE_WIDTH,
     PDFKIT_HTML_STRING,
     PDFKIT_IMAGE_TAG,
     PDFKIT_OPTIONS,
+    PREVIEW_CERTIFICATE_VERIFICATION_URL,
     SOCIAL_MEDIA_SHARE_URL_FMT,
     TMPDIR,
     TWITTER_META_TITLE_FMT,
     TWITTER_TWEET_TEXT_FMT
 )
+from lms.djangoapps.certificates.models import GeneratedCertificate
+from lms.djangoapps.philu_api.helpers import get_course_custom_settings, get_social_sharing_urls
+from openedx.features.student_certificates.signals import USER_CERTIFICATE_DOWNLOADABLE
 
+certs_api = import_module('lms.djangoapps.certificates.api')
 CERTIFICATE_IMG_PREFIX = 'certificates_images'
 
 
@@ -128,7 +134,7 @@ def get_image_and_size_from_url(url):
         with TemporaryFile(dir=TMPDIR) as certificate_image_file:
             # copy the contents of image request to our temporary file
             shutil.copyfileobj(response.raw, certificate_image_file)
-            certificate_image_file.seek(0) # file will be read from beginning
+            certificate_image_file.seek(0)  # file will be read from beginning
             image_base64 = base64.b64encode(certificate_image_file.read())
             image_file = Image.open(certificate_image_file)
             page_width, page_height = image_file.size
@@ -156,3 +162,41 @@ def get_pdfkit_html(image_base64):
     :return: html
     """
     return PDFKIT_HTML_STRING.format(image_tag=PDFKIT_IMAGE_TAG.format(base64_img=image_base64))
+
+
+def override_update_certificate_context(request, context, course, user_certificate):
+    """
+    This method adds custom context to the certificate
+    :return: Updated context
+    """
+    border = request.GET.get('border', None)
+    if border and border == 'hide':
+        context['border_class'] = 'certificate-border-hide'
+    else:
+        context['border_class'] = ''
+
+    context['download_pdf'] = reverse('download_certificate_pdf',
+                                      kwargs={'certificate_uuid': user_certificate.verify_uuid})
+    context['social_sharing_urls'] = get_philu_certificate_social_context(course, user_certificate)
+
+    context['verification_url'] = get_verification_url(user_certificate)
+
+
+def get_verification_url(user_certificate):
+    verification_url = PREVIEW_CERTIFICATE_VERIFICATION_URL
+    if user_certificate.pk:
+        verification_url = '{}{}'.format(
+            settings.LMS_ROOT_URL,
+            user_certificate.certificate_verification_key.verification_url
+        )
+    return verification_url
+
+
+def fire_send_email_signal(course, cert):
+    certificate_reverse_url = certs_api.get_certificate_url(user_id=cert.user.id, course_id=course.id,
+                                                            uuid=cert.verify_uuid)
+    certificate_url = settings.LMS_ROOT_URL + certificate_reverse_url
+    USER_CERTIFICATE_DOWNLOADABLE.send(sender=GeneratedCertificate, first_name=cert.name,
+                                       display_name=course.display_name,
+                                       certificate_reverse_url=certificate_url,
+                                       user_email=cert.user.email)

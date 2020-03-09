@@ -8,6 +8,7 @@ from .constants import COMPETENCY_ASSESSMENT_TYPE_CHOICES, CORRECTNESS_CHOICES
 
 
 class CompetencyAssessmentRecord(TimeStampedModel):
+    chapter_id = models.TextField(max_length=255)
     problem_id = UsageKeyField(max_length=255)
     problem_text = models.TextField(null=False)
     assessment_type = models.CharField(max_length=4, choices=COMPETENCY_ASSESSMENT_TYPE_CHOICES)
@@ -18,7 +19,6 @@ class CompetencyAssessmentRecord(TimeStampedModel):
     choice_id = models.CharField(max_length=255)
     choice_text = models.TextField()
     score = models.FloatField()
-
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
 
     def __unicode__(self):

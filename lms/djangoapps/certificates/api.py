@@ -131,7 +131,7 @@ def get_certificate_for_user(username, course_key):
 
 
 def generate_user_certificates(student, course_key, course=None, insecure=False, generation_mode='batch',
-                               forced_grade=None):
+                               forced_grade=None,send_email=False):
     """
     It will add the add-cert request into the xqueue.
 
@@ -159,7 +159,7 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
 
     if not course:
         course = modulestore().get_course(course_key, depth=0)
-
+    # email will sent on completion of certificate generation to the student only if generate_pdf = True
     generate_pdf = not has_html_certificates_enabled(course)
 
     cert = xqueue.add_cert(
@@ -167,7 +167,8 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
         course_key,
         course=course,
         generate_pdf=generate_pdf,
-        forced_grade=forced_grade
+        forced_grade=forced_grade,
+        send_email=send_email
     )
     # If cert_status is not present in certificate valid_statuses (for example unverified) then
     # add_cert returns None and raises AttributeError while accesing cert attributes.

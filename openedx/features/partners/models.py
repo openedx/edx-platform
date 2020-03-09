@@ -7,6 +7,7 @@ class Partner(TimeStampedModel):
     """
     This model represents white-labelled partners.
     """
+    performance_url = models.URLField(blank=True, default=None)
     label = models.CharField(max_length=100)
     main_logo = models.CharField(max_length=255)
     small_logo = models.CharField(max_length=255)
