@@ -836,7 +836,6 @@
     "Mute": "T\u1eaft ti\u1ebfng",
     "Muted": "Ch\u1ebf \u0111\u1ed9 c\u00e2m",
     "My Orders": "Nh\u1eefng \u0111\u01a1n h\u00e0ng c\u1ee7a t\u00f4i",
-    "My Team": "Nh\u00f3m c\u1ee7a t\u00f4i",
     "Name": "T\u00ean",
     "Name ": "T\u00ean",
     "Name of the certificate": "T\u00ean c\u1ee7a ch\u1ee9ng ch\u1ec9",

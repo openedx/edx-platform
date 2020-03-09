@@ -709,7 +709,6 @@
     "More": "\u305d\u306e\u4ed6",
     "Must complete verification checkpoint": "\u8a8d\u8a3c\u30c1\u30a7\u30c3\u30af\u30dd\u30a4\u30f3\u30c8\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044",
     "My Orders": "\u6ce8\u6587\u4e00\u89a7",
-    "My Team": "\u53c2\u52a0\u3057\u3066\u3044\u308b\u30c1\u30fc\u30e0",
     "N/A": "\u306a\u3057",
     "Name": "\u540d\u524d",
     "Name ": "\u540d\u524d",
