@@ -68,7 +68,7 @@ from .serializers import (
 )
 from .utils import emit_team_event
 
-TEAM_MEMBERSHIPS_PER_PAGE = 2
+TEAM_MEMBERSHIPS_PER_PAGE = 5
 TOPICS_PER_PAGE = 12
 MAXIMUM_SEARCH_SIZE = 100000
 
