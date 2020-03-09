@@ -416,6 +416,19 @@ FEATURES = {
     # .. toggle_status: supported
     # .. toggle_warnings: None
     'ENABLE_CHANGE_USER_PASSWORD_ADMIN': False,
+
+    # .. toggle_name: ENABLE_COURSEWARE_MICROFRONTEND
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to enable the Courseware MFE at the platform level for global staff (see REDIRECT_TO_COURSEWARE_MICROFRONTEND for course rollout)
+    # .. toggle_category: admin
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2020-03-05
+    # .. toggle_expiration_date: None
+    # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/23317'
+    # .. toggle_status: supported
+    # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and see REDIRECT_TO_COURSEWARE_MICROFRONTEND for rollout.
+    'ENABLE_COURSEWARE_MICROFRONTEND': False,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews

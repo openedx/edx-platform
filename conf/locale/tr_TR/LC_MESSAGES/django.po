@@ -128,7 +128,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-02-23 20:42+0000\n"
+"POT-Creation-Date: 2020-03-08 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -477,7 +477,7 @@ msgstr[1] "%(count)d öğrenci hesabının kilidi açıldı."
 #, python-brace-format
 msgid ""
 "Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' in"
-" SiteConfiguration model's values field."
+" SiteConfiguration model's site_values field."
 msgstr ""
 
 #: common/djangoapps/student/admin.py
@@ -820,6 +820,8 @@ msgid ""
 "Add a recovery email to retain access when single-sign on is not available. "
 "Go to {link_start}your Account Settings{link_end}."
 msgstr ""
+"Single-sign mevcut olmadığında erişimi sağlamak için bir kurtarma e-posta "
+"adresi ekleyin. {link_start}Hesap Ayarları{link_end} sayfasına gidin."
 
 #: common/djangoapps/student/views/dashboard.py
 msgid ""
@@ -936,16 +938,6 @@ msgstr "Eski e-posta adresi yenisiyle aynıdır."
 #: common/djangoapps/student/views/management.py
 msgid "Cannot be same as your sign in email address."
 msgstr "Giriş e-postası adresinizle aynı olamaz"
-
-#: common/djangoapps/student/views/management.py
-#: openedx/core/djangoapps/user_authn/views/registration_form.py
-#, python-brace-format
-msgid ""
-"It looks like {email} belongs to an existing account. Try again with a "
-"different email address."
-msgstr ""
-"Görünüşe göre {email} varolan bir hesaba ait. Farklı bir e-posta adresiyle "
-"tekrar deneyin."
 
 #: common/djangoapps/student/views/management.py
 msgid "Unable to send email activation link. Please try again later."
@@ -5623,6 +5615,9 @@ msgid ""
 "the honor code established by {platform_name} and has completed all of the "
 "required tasks for this course under its guidelines."
 msgstr ""
+"{cert_type} sertifikası bir öğrencinin {platform_name} tarafından belirlenen"
+" etik kurallarına uymayı kabul ettiğini ve dersin tüm yönergelerine uyarak "
+"gerekli görevlerin hepsini tamamladığını belirtir."
 
 #. Translators:  This text describes the 'ID Verified' course certificate
 #. type, which is a higher level of
@@ -5637,6 +5632,11 @@ msgid ""
 "certificate also indicates that the identity of the learner has been checked"
 " and is valid."
 msgstr ""
+"{cert_type} sertifikası bir öğrencinin {platform_name} tarafından belirlenen"
+" etik kurallarına uymayı kabul ettiğini ve dersin tüm yönergelerine uyarak "
+"gerekli görevlerin hepsini tamamladığını belirtir. {cert_type} sertifikası "
+"aynı zamanda öğrencinin kimliğinin kontrol edilerek doğrulandığına da işaret"
+" eder."
 
 #. Translators:  This text describes the 'XSeries' course certificate type.
 #. An XSeries is a collection of
@@ -6302,6 +6302,10 @@ msgstr "İlerleme"
 #: cms/templates/widgets/header.html
 msgid "Textbooks"
 msgstr "Ders Kitapları"
+
+#: lms/djangoapps/courseware/tabs.py
+msgid "Dates"
+msgstr ""
 
 #: lms/djangoapps/courseware/views/index.py
 #, python-brace-format
@@ -7703,6 +7707,10 @@ msgstr "Tarih okunamadı:"
 #, python-brace-format
 msgid "Couldn't find module for url: {0}"
 msgstr "url: {0} için modül bulunamadı"
+
+#: lms/djangoapps/instructor/views/tools.py
+msgid "Could not find student enrollment in the course."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
 #, python-brace-format
@@ -9347,6 +9355,10 @@ msgid "It is recommended that you change your password."
 msgstr "Parolanı değiştirmen önerilmektedir."
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
+msgid "You may access your course."
+msgstr ""
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
 msgid "Sincerely yours, The %(course_name)s Team"
@@ -9360,6 +9372,11 @@ msgid ""
 msgstr ""
 "Başlamak için, lütfen https://%(site_name)s adresini ziyaret edin. "
 "Hesabınızın giriş bilgileri aşağıda belirtildiği gibidir. "
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
+#, python-format
+msgid "You may access your course at: %(course_url)s."
+msgstr ""
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/subject.txt
 #: lms/templates/instructor/edx_ace/enrollenrolled/email/subject.txt
@@ -9579,6 +9596,8 @@ msgid ""
 "You have been unenrolled from the course %(course_name)s by a member of the "
 "course staff. Please disregard the invitation previously sent."
 msgstr ""
+"Bir ders görevlisi tarafından %(course_name)s dersinden kaydınız silindi. "
+"Lütfen daha önce gönderilen davetiyeyi dikkate almayın. "
 
 #: lms/templates/instructor/edx_ace/allowedunenroll/email/body.txt
 msgid "Dear Student,"
@@ -10461,6 +10480,11 @@ msgstr ""
 "Ben, ve şirketim, {link_start}{platform_name} API Kullanım "
 "Koşulları'nı{link_end} kabul ediyoruz."
 
+#: openedx/core/djangoapps/auth_exchange/forms.py
+#, python-format
+msgid "'%s' is not a valid scope."
+msgstr ""
+
 #: openedx/core/djangoapps/bookmarks/apps.py
 #: openedx/features/course_bookmarks/plugins.py
 #: openedx/features/course_bookmarks/views/course_bookmarks.py
@@ -10517,6 +10541,8 @@ msgid ""
 "Specified in seconds. Enable caching of API responses by setting this to a "
 "value greater than 0."
 msgstr ""
+"Saniyelerle belirtilmiştir. Bu değeri 0'dan fazla bir değer belirleyerek API"
+" cevaplarını önbelleklemeyi etkinleştirin."
 
 #: openedx/core/djangoapps/catalog/models.py
 msgid "Long Term Cache Time To Live"
@@ -10621,6 +10647,10 @@ msgstr ""
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "Read-only"
 msgstr "Salt-okunur"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "One and only one of 'user' and 'group' must be set."
+msgstr ""
 
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
@@ -11867,6 +11897,15 @@ msgstr "Bir veya daha fazla doldurulması gereken alanı boş bıraktınız"
 msgid "Unauthorized email address."
 msgstr "Yetkisiz e-posta adresi."
 
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid ""
+"It looks like {email} belongs to an existing account. Try again with a "
+"different email address."
+msgstr ""
+"Görünüşe göre {email} varolan bir hesaba ait. Farklı bir e-posta adresiyle "
+"tekrar deneyin."
+
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's email address.
@@ -12613,7 +12652,7 @@ msgstr "HTML"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Problem"
-msgstr ""
+msgstr "Problem"
 
 #: cms/djangoapps/contentstore/views/component.py lms/templates/video.html
 msgid "Video"
@@ -12707,11 +12746,13 @@ msgstr "Ders git deposuna başarıyla aktarıldı"
 msgid "Vertical"
 msgstr "Dikey"
 
+#: cms/djangoapps/contentstore/views/helpers.py
 #: cms/templates/course_outline.html lms/templates/seq_module.html
 #: lms/templates/ccx/schedule.html
 msgid "Section"
 msgstr "Bölüm"
 
+#: cms/djangoapps/contentstore/views/helpers.py
 #: lms/templates/ccx/schedule.html
 msgid "Subsection"
 msgstr "Altbölüm"
@@ -13941,6 +13982,10 @@ msgstr "Önizleme modunu düzenle"
 msgid "You are now viewing the course as {i_start}{user_name}{i_end}."
 msgstr "Dersi {i_start}{user_name}{i_end} kullanıcısı olarak inceliyorsunuz."
 
+#: lms/templates/preview_menu.html
+msgid "View this unit in the new experience"
+msgstr ""
+
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
 msgid_plural "You have used {num_used} of {num_total} attempts"
@@ -14004,6 +14049,16 @@ msgstr "E-posta"
 #, python-format
 msgid "Return To %s"
 msgstr "%s e Geri Dön"
+
+#: lms/templates/reset_deadlines_banner.html
+msgid ""
+"It looks like you've missed some important deadlines. Reset your deadlines "
+"and get started today."
+msgstr ""
+
+#: lms/templates/reset_deadlines_banner.html
+msgid "Reset my deadlines"
+msgstr ""
 
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
@@ -16101,6 +16156,27 @@ msgstr ""
 msgid "Your score is {current_score}%. You have passed the entrance exam."
 msgstr "Puanınız {current_score}%. Giriş sınavını geçtiniz."
 
+#: lms/templates/courseware/dates.html lms/templates/courseware/syllabus.html
+msgid "{course.display_number_with_default} Course Info"
+msgstr "{course.display_number_with_default} Ders Bilgisi"
+
+#: lms/templates/courseware/dates.html
+msgid "Important Dates"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid "Due Today"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid "Verified Only"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid ""
+"{a_start}Upgrade{a_end}{space}to a Verified Certificate for full access."
+msgstr ""
+
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
 msgstr "Karne"
@@ -16418,10 +16494,6 @@ msgstr "Alıştırma skorları gizlidir."
 #: lms/templates/courseware/progress.html
 msgid "No problem scores in this section"
 msgstr "Bu bölümde problemlerin notları bulunmuyor"
-
-#: lms/templates/courseware/syllabus.html
-msgid "{course.display_number_with_default} Course Info"
-msgstr "{course.display_number_with_default} Ders Bilgisi"
 
 #: lms/templates/courseware/welcome-back.html
 msgid ""
@@ -19853,42 +19925,6 @@ msgstr "İşareti Tut"
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Go Back"
 msgstr "Geri Dön"
-
-#: lms/templates/provider/authorize.html
-msgid ""
-"{start_strong}{application_name}{end_strong} would like to access your data "
-"with the following permissions:"
-msgstr ""
-"{start_strong}{application_name}{end_strong} uygulaması verilerinize erişmek"
-" için aşağıdaki izinleri istiyor:"
-
-#: lms/templates/provider/authorize.html
-msgid "Read your user ID"
-msgstr "Kullanıcı ID'nizi okuyun"
-
-#: lms/templates/provider/authorize.html
-msgid "Read your user profile"
-msgstr "Kullanıcı profilinizi okuyun"
-
-#: lms/templates/provider/authorize.html
-msgid "Read your email address"
-msgstr "E-posta adresinizi okuyun"
-
-#: lms/templates/provider/authorize.html
-msgid "Read the list of courses in which you are a staff member."
-msgstr "Ekip üyesi olduğunuz derslerin listesini okuyun."
-
-#: lms/templates/provider/authorize.html
-msgid "Read the list of courses in which you are an instructor."
-msgstr "Eğitmeni olduğunuz derslerin listesini okuyun."
-
-#: lms/templates/provider/authorize.html
-msgid "To see if you are a global staff user"
-msgstr "Global personel kullanıcısı olup olmadığınızı görün"
-
-#: lms/templates/provider/authorize.html
-msgid "Manage your data: {permission}"
-msgstr "Verilerinizi yönetin: {permission}"
 
 #: lms/templates/registration/account_activation_sidebar_notice.html
 msgid "Account Activation Info"

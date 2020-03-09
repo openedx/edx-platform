@@ -66,10 +66,6 @@ git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752
 # This can be removed once an official social-auth-app-django Pypi release with Django 2.2 support is available in the future.
 -e git+https://github.com/python-social-auth/social-app-django.git@c00d23c2b45c3317bd35b15ad1b959338689cef8#egg=social-auth-app-django
 
-# Why a django-celery fork? To add Django 1.11 compatibility to the abandoned repo.
-# This dependency will be removed by the Celery 4 upgrade: https://openedx.atlassian.net/browse/PLAT-1684
-git+https://github.com/edx/django-celery.git@756cb57aad765cb2b0d37372c1855b8f5f37e6b0#egg=django-celery==3.2.1+edx.2
-
 # Why install sorl-thumbnail directly from github? To use the latest, Django 2.2 compatible version that is not available on PyPi yet.
 # This dependency will be removed after package is updated at PyPi
 git+https://github.com/jazzband/sorl-thumbnail.git@13bedfb7d2970809eda597e3ef79318a6fa80ac2#egg=sorl-thumbnail

@@ -66,7 +66,7 @@ distlib==0.3.0            # via -r requirements/edx/testing.txt, virtualenv
 git+https://github.com/django-compressor/django-appconf@1526a842ee084b791aa66c931b3822091a442853#egg=django-appconf  # via -r requirements/edx/testing.txt, django-statici18n
 django-babel-underscore==0.5.2  # via -r requirements/edx/testing.txt
 django-babel==0.6.2       # via -r requirements/edx/testing.txt, django-babel-underscore
-git+https://github.com/edx/django-celery.git@756cb57aad765cb2b0d37372c1855b8f5f37e6b0#egg=django-celery==3.2.1+edx.2  # via -r requirements/edx/testing.txt
+django-celery==3.3.1      # via -r requirements/edx/testing.txt
 django-classy-tags==1.0.0  # via -r requirements/edx/testing.txt, django-sekizai
 django-config-models==2.0.0  # via -r requirements/edx/testing.txt, edx-enterprise
 django-cors-headers==2.5.3  # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
@@ -122,7 +122,7 @@ edx-milestones==0.2.6     # via -r requirements/edx/testing.txt
 edx-opaque-keys[django]==2.0.1  # via -r requirements/edx/testing.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, xmodule
 edx-organizations==4.0.0  # via -r requirements/edx/testing.txt
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/testing.txt
-edx-proctoring==2.3.0     # via -r requirements/edx/testing.txt, edx-proctoring-proctortrack
+edx-proctoring==2.3.2     # via -r requirements/edx/testing.txt, edx-proctoring-proctortrack
 edx-rbac==1.1.1           # via -r requirements/edx/testing.txt, edx-enterprise
 edx-rest-api-client==4.0.1  # via -r requirements/edx/testing.txt, edx-enterprise, edx-proctoring
 edx-search==1.3.3         # via -r requirements/edx/testing.txt
@@ -131,7 +131,7 @@ edx-sphinx-theme==1.5.0   # via -r requirements/edx/development.in
 edx-submissions==3.0.4    # via -r requirements/edx/testing.txt, ora2
 edx-tincan-py35==0.0.5    # via -r requirements/edx/testing.txt, edx-enterprise
 edx-user-state-client==1.1.2  # via -r requirements/edx/testing.txt
-edx-when==1.0.4           # via -r requirements/edx/testing.txt, edx-proctoring
+edx-when==1.0.5           # via -r requirements/edx/testing.txt, edx-proctoring
 edxval==1.2.4             # via -r requirements/edx/testing.txt
 elasticsearch==1.9.0      # via -r requirements/edx/testing.txt, edx-search
 entrypoints==0.3          # via -r requirements/edx/testing.txt, flake8
@@ -277,7 +277,7 @@ scipy==1.4.1              # via -r requirements/edx/testing.txt, calc, chem
 selenium==3.141.0         # via -r requirements/edx/testing.txt, bok-choy
 semantic-version==2.8.4   # via -r requirements/edx/testing.txt, edx-drf-extensions
 shapely==1.7.0            # via -r requirements/edx/testing.txt
-shortuuid==0.5.1          # via -r requirements/edx/testing.txt
+shortuuid==1.0.1          # via -r requirements/edx/testing.txt
 simplejson==3.17.0        # via -r requirements/edx/testing.txt, sailthru-client, super-csv, xblock-utils
 singledispatch==3.4.0.3   # via -r requirements/edx/testing.txt
 six==1.14.0               # via -r requirements/edx/pip-tools.txt, -r requirements/edx/testing.txt, analytics-python, astroid, bleach, bok-choy, calc, cryptography, diff-cover, django-appconf, django-classy-tags, django-countries, django-pyfs, django-sekizai, django-simple-history, django-statici18n, drf-yasg, edx-ace, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-lint, edx-milestones, edx-opaque-keys, edx-rbac, edx-search, edx-sphinx-theme, event-tracking, freezegun, fs, fs-s3fs, help-tokens, html5lib, httpretty, isodate, jsonschema, libsass, mando, mock, nltk, packaging, pathlib2, paver, pip-tools, pycontracts, pyjwkest, pytest-xdist, python-dateutil, python-memcached, python-swiftclient, singledispatch, social-auth-app-django, social-auth-core, sphinxcontrib-httpdomain, stevedore, tox, transifex-client, virtualenv, xblock

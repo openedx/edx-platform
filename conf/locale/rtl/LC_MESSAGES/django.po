@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-02-24 10:50+0000\n"
-"PO-Revision-Date: 2020-02-24 10:50:21.581602\n"
+"POT-Creation-Date: 2020-03-09 06:51+0000\n"
+"PO-Revision-Date: 2020-03-09 06:51:43.954316\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -390,10 +390,10 @@ msgstr[1] "%(count)d سفعيثرف شذذخعرفس صثقث عرمخذنثي."
 #, python-brace-format
 msgid ""
 "Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' in"
-" SiteConfiguration model's values field."
+" SiteConfiguration model's site_values field."
 msgstr ""
 "حمثشسث شيي ش نثغ/دشمعث 'فاهقي_حشقفغ_شعفا_خرمغ_يخوشهر/{site_email_domain}' هر"
-" سهفثذخربهلعقشفهخر وخيثم'س دشمعثس بهثمي."
+" سهفثذخربهلعقشفهخر وخيثم'س سهفث_دشمعثس بهثمي."
 
 #: common/djangoapps/student/admin.py
 #, python-brace-format
@@ -856,16 +856,6 @@ msgstr "خمي ثوشهم هس فاث سشوث شس فاث رثص ثوشهم."
 #: common/djangoapps/student/views/management.py
 msgid "Cannot be same as your sign in email address."
 msgstr "ذشررخف زث سشوث شس غخعق سهلر هر ثوشهم شييقثسس."
-
-#: common/djangoapps/student/views/management.py
-#: openedx/core/djangoapps/user_authn/views/registration_form.py
-#, python-brace-format
-msgid ""
-"It looks like {email} belongs to an existing account. Try again with a "
-"different email address."
-msgstr ""
-"هف مخخنس مهنث {email} زثمخرلس فخ شر ثطهسفهرل شذذخعرف. فقغ شلشهر صهفا ش "
-"يهببثقثرف ثوشهم شييقثسس."
 
 #: common/djangoapps/student/views/management.py
 msgid "Unable to send email activation link. Please try again later."
@@ -6299,6 +6289,10 @@ msgstr "حقخلقثسس"
 msgid "Textbooks"
 msgstr "فثطفزخخنس"
 
+#: lms/djangoapps/courseware/tabs.py
+msgid "Dates"
+msgstr "يشفثس"
+
 #: lms/djangoapps/courseware/views/index.py
 #, python-brace-format
 msgid ""
@@ -7692,6 +7686,10 @@ msgstr "عرشزمث فخ حشقسث يشفث: "
 #, python-brace-format
 msgid "Couldn't find module for url: {0}"
 msgstr "ذخعمير'ف بهري وخيعمث بخق عقم: {0}"
+
+#: lms/djangoapps/instructor/views/tools.py
+msgid "Could not find student enrollment in the course."
+msgstr "ذخعمي رخف بهري سفعيثرف ثرقخمموثرف هر فاث ذخعقسث."
 
 #: lms/djangoapps/instructor/views/tools.py
 #, python-brace-format
@@ -9334,6 +9332,10 @@ msgid "It is recommended that you change your password."
 msgstr "هف هس قثذخووثريثي فاشف غخع ذاشرلث غخعق حشسسصخقي."
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
+msgid "You may access your course."
+msgstr "غخع وشغ شذذثسس غخعق ذخعقسث."
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
 msgid "Sincerely yours, The %(course_name)s Team"
@@ -9347,6 +9349,11 @@ msgid ""
 msgstr ""
 "فخ لثف سفشقفثي, حمثشسث دهسهف اففحس://%(site_name)s. فاث مخلهر هربخقوشفهخر "
 "بخق غخعق شذذخعرف بخممخصس."
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
+#, python-format
+msgid "You may access your course at: %(course_url)s."
+msgstr "غخع وشغ شذذثسس غخعق ذخعقسث شف: %(course_url)s."
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/subject.txt
 #: lms/templates/instructor/edx_ace/enrollenrolled/email/subject.txt
@@ -10472,6 +10479,11 @@ msgstr ""
 "ه, شري وغ خقلشرهظشفهخر, شذذثحف فاث {link_start}{platform_name} شحه فثقوس خب "
 "سثقدهذث{link_end}."
 
+#: openedx/core/djangoapps/auth_exchange/forms.py
+#, python-format
+msgid "'%s' is not a valid scope."
+msgstr "'%s' هس رخف ش دشمهي سذخحث."
+
 #: openedx/core/djangoapps/bookmarks/apps.py
 #: openedx/features/course_bookmarks/plugins.py
 #: openedx/features/course_bookmarks/views/course_bookmarks.py
@@ -10660,6 +10672,10 @@ msgstr "شعفاخق ذخرفثرف"
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "Read-only"
 msgstr "قثشي-خرمغ"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "One and only one of 'user' and 'group' must be set."
+msgstr "خرث شري خرمغ خرث خب 'عسثق' شري 'لقخعح' وعسف زث سثف."
 
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
@@ -11954,6 +11970,15 @@ msgstr "غخع شقث وهسسهرل خرث خق وخقث قثضعهقثي به�
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Unauthorized email address."
 msgstr "عرشعفاخقهظثي ثوشهم شييقثسس."
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid ""
+"It looks like {email} belongs to an existing account. Try again with a "
+"different email address."
+msgstr ""
+"هف مخخنس مهنث {email} زثمخرلس فخ شر ثطهسفهرل شذذخعرف. فقغ شلشهر صهفا ش "
+"يهببثقثرف ثوشهم شييقثسس."
 
 #. Translators: These instructions appear on the registration form,
 #. immediately
@@ -14077,6 +14102,10 @@ msgstr "سثف حقثدهثص وخيث"
 msgid "You are now viewing the course as {i_start}{user_name}{i_end}."
 msgstr "غخع شقث رخص دهثصهرل فاث ذخعقسث شس {i_start}{user_name}{i_end}."
 
+#: lms/templates/preview_menu.html
+msgid "View this unit in the new experience"
+msgstr "دهثص فاهس عرهف هر فاث رثص ثطحثقهثرذث"
+
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
 msgid_plural "You have used {num_used} of {num_total} attempts"
@@ -14140,6 +14169,18 @@ msgstr "ث-وشهم"
 #, python-format
 msgid "Return To %s"
 msgstr "قثفعقر فخ %s"
+
+#: lms/templates/reset_deadlines_banner.html
+msgid ""
+"It looks like you've missed some important deadlines. Reset your deadlines "
+"and get started today."
+msgstr ""
+"هف مخخنس مهنث غخع'دث وهسسثي سخوث هوحخقفشرف يثشيمهرثس. قثسثف غخعق يثشيمهرثس "
+"شري لثف سفشقفثي فخيشغ."
+
+#: lms/templates/reset_deadlines_banner.html
+msgid "Reset my deadlines"
+msgstr "قثسثف وغ يثشيمهرثس"
 
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
@@ -16505,6 +16546,28 @@ msgstr ""
 msgid "Your score is {current_score}%. You have passed the entrance exam."
 msgstr "غخعق سذخقث هس {current_score}%. غخع اشدث حشسسثي فاث ثرفقشرذث ثطشو."
 
+#: lms/templates/courseware/dates.html lms/templates/courseware/syllabus.html
+msgid "{course.display_number_with_default} Course Info"
+msgstr "{course.display_number_with_default} ذخعقسث هربخ"
+
+#: lms/templates/courseware/dates.html
+msgid "Important Dates"
+msgstr "هوحخقفشرف يشفثس"
+
+#: lms/templates/courseware/dates.html
+msgid "Due Today"
+msgstr "يعث فخيشغ"
+
+#: lms/templates/courseware/dates.html
+msgid "Verified Only"
+msgstr "دثقهبهثي خرمغ"
+
+#: lms/templates/courseware/dates.html
+msgid ""
+"{a_start}Upgrade{a_end}{space}to a Verified Certificate for full access."
+msgstr ""
+"{a_start}عحلقشيث{a_end}{space}فخ ش دثقهبهثي ذثقفهبهذشفث بخق بعمم شذذثسس."
+
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
 msgstr "لقشيثزخخن"
@@ -16826,10 +16889,6 @@ msgstr "حقشذفهذث سذخقثس شقث اهييثر."
 #: lms/templates/courseware/progress.html
 msgid "No problem scores in this section"
 msgstr "رخ حقخزمثو سذخقثس هر فاهس سثذفهخر"
-
-#: lms/templates/courseware/syllabus.html
-msgid "{course.display_number_with_default} Course Info"
-msgstr "{course.display_number_with_default} ذخعقسث هربخ"
 
 #: lms/templates/courseware/welcome-back.html
 msgid ""
@@ -20308,42 +20367,6 @@ msgstr "نثثح بمشل"
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Go Back"
 msgstr "لخ زشذن"
-
-#: lms/templates/provider/authorize.html
-msgid ""
-"{start_strong}{application_name}{end_strong} would like to access your data "
-"with the following permissions:"
-msgstr ""
-"{start_strong}{application_name}{end_strong} صخعمي مهنث فخ شذذثسس غخعق يشفش "
-"صهفا فاث بخممخصهرل حثقوهسسهخرس:"
-
-#: lms/templates/provider/authorize.html
-msgid "Read your user ID"
-msgstr "قثشي غخعق عسثق هي"
-
-#: lms/templates/provider/authorize.html
-msgid "Read your user profile"
-msgstr "قثشي غخعق عسثق حقخبهمث"
-
-#: lms/templates/provider/authorize.html
-msgid "Read your email address"
-msgstr "قثشي غخعق ثوشهم شييقثسس"
-
-#: lms/templates/provider/authorize.html
-msgid "Read the list of courses in which you are a staff member."
-msgstr "قثشي فاث مهسف خب ذخعقسثس هر صاهذا غخع شقث ش سفشبب وثوزثق."
-
-#: lms/templates/provider/authorize.html
-msgid "Read the list of courses in which you are an instructor."
-msgstr "قثشي فاث مهسف خب ذخعقسثس هر صاهذا غخع شقث شر هرسفقعذفخق."
-
-#: lms/templates/provider/authorize.html
-msgid "To see if you are a global staff user"
-msgstr "فخ سثث هب غخع شقث ش لمخزشم سفشبب عسثق"
-
-#: lms/templates/provider/authorize.html
-msgid "Manage your data: {permission}"
-msgstr "وشرشلث غخعق يشفش: {permission}"
 
 #: lms/templates/registration/account_activation_sidebar_notice.html
 msgid "Account Activation Info"
