@@ -20,6 +20,7 @@ from django.urls import reverse
 from django.utils.http import urlquote_plus
 from django.utils.translation import ugettext as _
 from django.utils.translation import get_language_bidi
+from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.release import RELEASE_LINE
@@ -184,7 +185,8 @@ from pipeline_mako import render_require_js_path_overrides
         <%include file="/preview_menu.html" />
     % endif
 
-    % if course and course.self_paced and tab and relative_dates_is_enabled:
+    <% is_course_staff = bool(user and course and has_access(user, 'staff', course, course.id)) %>
+    % if course and course.self_paced and tab and not is_course_staff and relative_dates_is_enabled:
         <%include file="/reset_deadlines_banner.html" />
     % endif
 
