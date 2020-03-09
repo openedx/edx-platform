@@ -768,7 +768,6 @@
     "More sessions coming soon.": "Kolejne sesje kursu pojawi\u0105 si\u0119 wkr\u00f3tce.",
     "Must complete verification checkpoint": "Musi przej\u015b\u0107 przez punkt kontrolny weryfikacji",
     "My Orders": "Moje zam\u00f3wienia",
-    "My Team": "M\u00f3j zesp\u00f3\u0142",
     "N/A": "Nie dotyczy",
     "Name": "Nazwa",
     "Name ": "Imi\u0119 i nazwisko",

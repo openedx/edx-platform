@@ -962,7 +962,6 @@
     "Mute": "Couper le son",
     "Muted": "Son coup\u00e9",
     "My Orders": "Mes Commandes",
-    "My Team": "Mon \u00e9quipe",
     "N/A": "N/A",
     "Name": "Nom",
     "Name ": "Nom",

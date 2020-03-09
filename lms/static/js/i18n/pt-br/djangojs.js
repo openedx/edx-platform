@@ -504,7 +504,6 @@
     "More": "Mais",
     "Move cancelled. \"{sourceDisplayName}\" has been moved back to its original location.": "Mover cancelado. \"{sourceDisplayName}\" foi movido de volta \u00e0 sua localiza\u00e7\u00e3o original.",
     "Must complete verification checkpoint": "Necess\u00e1rio completar o ponto de verifica\u00e7\u00e3o. ",
-    "My Team": "Minha equipe",
     "N/A": "N/A",
     "Name": "Nome",
     "Name ": "Nome",
