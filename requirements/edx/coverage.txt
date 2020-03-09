@@ -15,7 +15,7 @@ more-itertools==8.2.0     # via zipp
 numpy==1.18.1             # via pandas
 pandas==0.22.0            # via -c requirements/edx/../constraints.txt, -r requirements/edx/coverage.in
 pluggy==0.13.1            # via diff-cover
-pygments==2.5.2           # via diff-cover
+pygments==2.6.1           # via diff-cover
 python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, pandas
 pytz==2019.3              # via pandas
 six==1.14.0               # via diff-cover, python-dateutil
