@@ -31,6 +31,24 @@
                         deferred.resolve(topic.get('type'));
                     });
                     return deferred.promise();
+                },
+
+                createHeaderView: function() {
+                    // hide pagination when learner isn't a member of any teams
+                    if (!this.collection.length) {
+                        return null;
+                    } else {
+                        return TeamsView.prototype.createHeaderView.call(this);
+                    }
+                },
+
+                createFooterView: function() {
+                    // hide pagination when learner isn't a member of any teams
+                    if (!this.collection.length) {
+                        return null;
+                    } else {
+                        return TeamsView.prototype.createFooterView.call(this);
+                    }
                 }
             });
 
