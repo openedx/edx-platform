@@ -79,7 +79,7 @@ class PluginSignals(object):
 
 
 class PluginContextsViews(object):
-    STUDENT_DASHBOARD = u'student_dashboard'
+    COURSE_DASHBOARD = u'course_dashboard'
 
 
 class PluginContexts(object):
