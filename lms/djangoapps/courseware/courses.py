@@ -456,7 +456,7 @@ def get_course_assignment_due_dates(course, user, request, num_return=None,
 
                 block_url = None
                 now = datetime.now().replace(tzinfo=pytz.UTC)
-                assignment_released = item.start < now if item.start else None
+                assignment_released = item.start < now if item.start else True
                 if assignment_released:
                     block_url = reverse('jump_to', args=[course.id, block_key])
                     block_url = request.build_absolute_uri(block_url) if request else None
