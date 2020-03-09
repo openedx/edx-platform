@@ -50,6 +50,7 @@ from entitlements.models import CourseEntitlement
 
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.catalog.utils import get_programs_with_type
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.oauth_dispatch.api import destroy_oauth_tokens
@@ -66,6 +67,7 @@ from openedx.features.ucsd_features.ecommerce.utils import is_user_eligible_for_
 from openedx.features.ucsd_features.ecommerce.EcommerceClient import EcommerceRestAPIClient
 from openedx.features.ucsd_features.ecommerce.tasks import assign_course_voucher_to_user
 from openedx.features.ucsd_features.ecommerce.constants import IS_DISCOUNT_AVAILABLE_QUERY_PARAM
+from openedx.features.ucsd_features.utils import add_to_ga_events_cookie
 
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.journals.api import get_journals_context
@@ -415,6 +417,9 @@ def change_enrollment(request, check_access=True):
         # then send the user to the choose your track page.
         # (In the case of no-id-professional/professional ed, this will redirect to a page that
         # funnels users directly into the verification / payment flow)
+
+        response = HttpResponse()
+
         if CourseMode.has_verified_mode(available_modes) or CourseMode.has_professional_mode(available_modes):
             # [UCSD_CUSTOM] Enable geographic country based discounts on course enrollments
             redirect_url = reverse("course_modes_choose", kwargs={'course_id': text_type(course_id)})
@@ -450,10 +455,28 @@ def change_enrollment(request, check_access=True):
                                       error=ex.message
                                   ))
 
-            return HttpResponse(redirect_url)
+            response = HttpResponse(redirect_url)
+
+        if hasattr(settings, 'GOOGLE_ANALYTICS_ACCOUNT'):
+            domain = getattr(settings, 'BASE_COOKIE_DOMAIN')
+            event_action = 'enrollment'
+
+            try:
+                course_overview = CourseOverview.get_from_id(course_id)
+                course_title = course_overview.display_name
+            except CourseOverview.DoesNotExist:
+                log.exception('CourseOverview object not found for key: {}'.format(course_id))
+                course_title = str(course_id)
+
+            ga_event = {
+                'event_category': 'course_audit',
+                'event_label': course_title,
+                'value': str(course_id)
+            }
+            add_to_ga_events_cookie(request, response, 'enroll', ga_event, domain=domain)
 
         # Otherwise, there is only one mode available (the default)
-        return HttpResponse()
+        return response
     elif action == "unenroll":
         enrollment = CourseEnrollment.get_enrollment(user, course_id)
         if not enrollment:
