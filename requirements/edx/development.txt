@@ -66,7 +66,7 @@ distlib==0.3.0            # via -r requirements/edx/testing.txt, virtualenv
 git+https://github.com/django-compressor/django-appconf@1526a842ee084b791aa66c931b3822091a442853#egg=django-appconf  # via -r requirements/edx/testing.txt, django-statici18n
 django-babel-underscore==0.5.2  # via -r requirements/edx/testing.txt
 django-babel==0.6.2       # via -r requirements/edx/testing.txt, django-babel-underscore
-django-celery==3.3.1      # via -r requirements/edx/testing.txt
+django-celery==3.3.1      # via -r requirements/edx/testing.txt, super-csv
 django-classy-tags==1.0.0  # via -r requirements/edx/testing.txt, django-sekizai
 django-config-models==2.0.0  # via -r requirements/edx/testing.txt, edx-enterprise
 django-cors-headers==2.5.3  # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
@@ -299,7 +299,7 @@ sphinxcontrib-serializinghtml==1.1.4  # via sphinx
 sqlparse==0.3.1           # via -r requirements/edx/testing.txt, django-debug-toolbar
 staff-graded-xblock==0.7  # via -r requirements/edx/testing.txt
 stevedore==1.32.0         # via -r requirements/edx/testing.txt, code-annotations, edx-ace, edx-enterprise, edx-opaque-keys
-super-csv==0.9.7          # via -r requirements/edx/testing.txt, edx-bulk-grades
+super-csv==0.9.6          # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, edx-bulk-grades
 sympy==1.5.1              # via -r requirements/edx/testing.txt, symmath
 testfixtures==6.14.0      # via -r requirements/edx/testing.txt, edx-enterprise
 text-unidecode==1.3       # via -r requirements/edx/testing.txt, faker, python-slugify
