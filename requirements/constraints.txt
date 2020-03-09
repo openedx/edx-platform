@@ -67,6 +67,9 @@ python-dateutil==2.4.0
 # python3-saml 1.6.0 breaks unittests in common/djangoapps/third_party_auth/tests/test_views.py::SAMLMetadataTest
 python3-saml==1.5.0
 
+# CR-1912: Check if super-csv 0.9.7 is breaking grade export
+super-csv==0.9.6
+
 # Bumping requests-oauthlib to 1.2 updates oauthlib to 3.0.0, which changes a response code in certain cases
 # This causes a test to fail. Before fixing, we would need to make sure mobile apps are functional with this change
 # See https://github.com/oauthlib/oauthlib/issues/264 for more context

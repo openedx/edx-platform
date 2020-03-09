@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from lms.djangoapps.course_api.api import course_detail
+from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import allow_public_access
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from student.models import CourseEnrollment
@@ -105,6 +106,7 @@ class CoursewareInformation(RetrieveAPIView):
         else:
             user_has_access = True
         overview.user_has_access = user_has_access
+        overview.user_has_staff_access = has_access(self.request.user, 'staff', overview).has_access
         return overview
 
     def get_serializer_context(self):
