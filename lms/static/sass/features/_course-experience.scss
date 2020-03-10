@@ -11,7 +11,6 @@
 
     .icon {
       width: 20px;
-      text-align: center;
     }
 
     &:not(:last-child) {
@@ -275,21 +274,31 @@
         }
       }
     }
+  }
 
-    .section-tools .course-tool {
-      .course-tool-link:visited {
-        color: theme-color("primary");
-      }
-
-      &:not(:first-child) {
-        margin-top: ($baseline / 5);
-      }
+  .section-tools .course-tool {
+    .course-tool-link:visited {
+      color: theme-color("primary");
     }
 
-    @media print {
-      .section-tools {
-        display: none !important;
-      }
+    &:not(:first-child) {
+      margin-top: ($baseline / 5);
+    }
+
+    .course-tool-button {
+      background: none;
+      border: none;
+      color: theme-color("primary");
+      cursor: pointer;
+      font-size: 1em;
+      padding: 0;
+      text-align: left;
+    }
+  }
+
+  @media print {
+    .section-tools {
+      display: none !important;
     }
   }
 
@@ -422,20 +431,9 @@
     padding-bottom: 0;
   }
 
-  .left-column {
-    flex: 0 0 24px;
-
-    .calendar-icon {
-      margin-top: 4px;
-      height: 1em;
-      width: 16px;
-      background: url('#{$static-path}/images/calendar-alt-regular.svg');
-      background-repeat: no-repeat;
-    }
-  }
-
   .right-column {
     flex: auto;
+    padding-left: 4px;
 
     .localized-datetime {
       font-weight: $font-weight-bold;
