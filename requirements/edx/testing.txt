@@ -110,8 +110,8 @@ edx-completion==3.1.1     # via -r requirements/edx/base.txt
 edx-django-release-util==0.3.6  # via -r requirements/edx/base.txt
 edx-django-sites-extensions==2.4.3  # via -r requirements/edx/base.txt
 edx-django-utils==3.0     # via -r requirements/edx/base.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client
-edx-drf-extensions==4.0.1  # via -r requirements/edx/base.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==2.5.1     # via -r requirements/edx/base.txt
+edx-drf-extensions==4.0.2  # via -r requirements/edx/base.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
+edx-enterprise==2.5.2     # via -r requirements/edx/base.txt
 edx-i18n-tools==0.5.0     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, ora2
 edx-lint==1.4.1           # via -r requirements/edx/testing.in
 edx-milestones==0.2.6     # via -r requirements/edx/base.txt
@@ -138,7 +138,7 @@ faker==4.0.1              # via factory-boy
 filelock==3.0.12          # via tox, virtualenv
 flake8-polyfill==1.0.2    # via radon
 flake8==3.7.9             # via flake8-polyfill
-freezegun==0.3.12         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
+freezegun==0.3.15         # via -r requirements/edx/testing.in
 fs-s3fs==0.1.8            # via -r requirements/edx/base.txt, django-pyfs
 fs==2.0.18                # via -r requirements/edx/base.txt, django-pyfs, fs-s3fs, xblock
 future==0.18.2            # via -r requirements/edx/base.txt, django-ses, edx-celeryutils, edx-enterprise, pycontracts, pyjwkest, radon
@@ -238,7 +238,7 @@ pytest-metadata==1.8.0    # via pytest-json-report
 pytest-randomly==3.2.1    # via -r requirements/edx/testing.in
 pytest-xdist==1.31.0      # via -r requirements/edx/testing.in
 pytest==5.3.5             # via -r requirements/edx/testing.in, pytest-attrib, pytest-cov, pytest-django, pytest-forked, pytest-json-report, pytest-metadata, pytest-randomly, pytest-xdist
-python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, analytics-python, botocore, edx-ace, edx-drf-extensions, edx-enterprise, edx-proctoring, faker, freezegun, ora2, pandas, xblock
+python-dateutil==2.8.1    # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, analytics-python, botocore, edx-ace, edx-drf-extensions, edx-enterprise, edx-proctoring, faker, freezegun, ora2, pandas, xblock
 python-levenshtein==0.12.0  # via -r requirements/edx/base.txt
 python-memcached==1.59    # via -r requirements/edx/base.txt
 python-slugify==4.0.0     # via -r requirements/edx/base.txt, code-annotations, transifex-client
@@ -291,7 +291,7 @@ unidiff==0.5.5            # via -r requirements/edx/testing.in, coverage-pytest-
 uritemplate==3.0.1        # via -r requirements/edx/base.txt, coreapi, drf-yasg
 urllib3==1.25.8           # via -r requirements/edx/base.txt, elasticsearch, geoip2, requests, selenium, transifex-client
 user-util==0.1.5          # via -r requirements/edx/base.txt
-virtualenv==20.0.9        # via tox
+virtualenv==20.0.10       # via tox
 voluptuous==0.11.7        # via -r requirements/edx/base.txt, ora2
 watchdog==0.10.2          # via -r requirements/edx/base.txt
 wcwidth==0.1.8            # via pytest
