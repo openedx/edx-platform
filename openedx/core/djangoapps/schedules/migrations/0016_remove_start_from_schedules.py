@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('schedules', '0010_remove_null_blank_from_schedules_date'),
+        ('schedules', '0015_schedules_start_nullable'),
     ]
 
     operations = [
