@@ -2,6 +2,7 @@
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 <%!
+
 from django.utils.translation import ugettext as _
 from lms.djangoapps.courseware.date_summary import CourseAssignmentDate, VerificationDeadlineDate, VerifiedUpgradeDeadlineDate
 from openedx.core.djangolib.markup import HTML, Text
@@ -36,7 +37,7 @@ from openedx.core.djangolib.markup import HTML, Text
                                 <div class="timeline-date-content">
                                         % if block.date:
                                             <div class="timeline-date">
-                                                ${block.date.strftime(block.date_format)}
+                                                <div class="course-date localized_datetime" aria-hidden="true" data-format="shortDate" data-datetime="${block.date}" data-language="${user_language}" data-timezone="${user_timezone}"></div>
                                             </div>
                                             % if active:
                                                 <div class="pill due">${_('Due Today')}</div>
@@ -71,3 +72,7 @@ from openedx.core.djangolib.markup import HTML, Text
         </div>
     </div>
 </main>
+
+<%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
+    DateUtilFactory.transform(iterationKey=".localized_datetime");
+</%static:require_module_async>
