@@ -110,18 +110,7 @@
                             field.errorMessages = this.escapeStrings(field.errorMessages);
                         }
 
-                        if (field.required) {
-                            requiredFields.push(field);
-                        } else {
-                            if (field.type !== 'hidden') {
-                                // For the purporse of displaying the optional field toggle,
-                                // the form should be considered to have optional fields
-                                // only if all of the optional fields are being rendering as
-                                // input elements that are visible on the page.
-                                this.hasOptionalFields = true;
-                            }
-                            optionalFields.push(field);
-                        }
+						requiredFields.push(field);
                     }
 
                     html = this.renderFields(requiredFields, 'required-fields');
