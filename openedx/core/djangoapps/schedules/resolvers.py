@@ -5,6 +5,8 @@ import logging
 from itertools import groupby
 
 import attr
+from completion import waffle as completion_waffle
+from completion.models import BlockCompletion
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.templatetags.staticfiles import static
@@ -16,6 +18,7 @@ from edx_django_utils.monitoring import function_trace, set_custom_metric
 
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
 from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher
+from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH
 from openedx.core.djangoapps.schedules.content_highlights import get_week_highlights
@@ -71,6 +74,7 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
     day_offset = attr.ib()
     bin_num = attr.ib()
     override_recipient_email = attr.ib(default=None)
+    check_completion = attr.ib(default=False)
 
     schedule_date_field = None
     num_bins = DEFAULT_NUM_BINS
@@ -382,6 +386,15 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
             enrollment = schedule.enrollment
             course = schedule.enrollment.course
             user = enrollment.user
+            course_id = schedule.enrollment.course_id
+            course_key = CourseKey.from_string(course_id)
+            if self.check_completion:
+                if completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+                    last_block_completed = BlockCompletion.get_latest_block_completed(user, course_key)
+                    if not last_block_completed:
+                        week_num = 1
+                        self.day_offset = 1
+                        continue
 
             try:
                 week_highlights = get_week_highlights(user, enrollment.course_id, week_num)

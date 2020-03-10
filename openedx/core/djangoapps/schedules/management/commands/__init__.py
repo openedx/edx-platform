@@ -19,6 +19,7 @@ class SendEmailBaseCommand(PrefixedDebugLoggerMixin, BaseCommand):
     # An iterable of day offsets (e.g. -7, -14, -21, -28, ...) that defines the days for
     # which emails are sent out, relative to the 'date' parameter
     offsets = range(-7, -77, -7)
+    check_completion = False
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -36,6 +37,11 @@ class SendEmailBaseCommand(PrefixedDebugLoggerMixin, BaseCommand):
             type=int,
             help='Number of weekly emails to be sent',
         )
+        parser.add_argument(
+            '--check-completion',
+            deafult=False,
+            help='Check if the student has completed atleast one block'
+        )
 
     def handle(self, *args, **options):
         self.log_debug('Args = %r', options)
@@ -44,6 +50,10 @@ class SendEmailBaseCommand(PrefixedDebugLoggerMixin, BaseCommand):
         if num_weeks:
             num_days = (7 * num_weeks) + 1
             self.offsets = range(-7, -num_days, -7)
+
+        check_completion = options.get('check-completion')
+        if check_completion:
+            self.check_completion = check_completion
 
         current_date = datetime.datetime(
             *[int(x) for x in options['date'].split('-')],
