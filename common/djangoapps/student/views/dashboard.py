@@ -619,10 +619,11 @@ def student_dashboard(request):
 
     # Display activation message
     activate_account_message = ''
+    activation_email_support_link = 'http://edtech.ucsd.edu/uc-san-diego-online-help'
     if not user.is_active:
         activate_account_message = Text(_(
             "Check your {email_start}{email}{email_end} inbox for an account activation link from {platform_name}. "
-            "If you need help, contact <a href='https://edtech.ucsd.edu/uc-san-diego-online-help'> {platform_name} Support</a>."
+            "If you need help, visit the {link_start}{platform_name} Help Center{link_end}."
         )).format(
             platform_name=platform_name,
             email_start=HTML("<strong>"),
