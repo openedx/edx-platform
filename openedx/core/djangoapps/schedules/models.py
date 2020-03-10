@@ -22,7 +22,9 @@ class Schedule(TimeStampedModel):
     # TODO Delete this field during last stage of rolling out field renames
     start = models.DateTimeField(
         db_index=True,
-        help_text=_('Date this schedule went into effect')
+        help_text=_('Date this schedule went into effect'),
+        null=True,
+        default=None
     )
     start_date = models.DateTimeField(
         db_index=True,
