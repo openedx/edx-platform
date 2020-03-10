@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.http import HttpResponse
 from .models import UCSDCustomRegistration
 
+
 class ExportCsvMixin:
     def export_as_csv(self, request, queryset):
 
@@ -21,7 +22,8 @@ class ExportCsvMixin:
 
     export_as_csv.short_description = "Export Selected"
 
+
 @admin.register(UCSDCustomRegistration)
 class UCSDCustomRegistrationAdmin(admin.ModelAdmin, ExportCsvMixin):
-    list_display = ('user','gender_nb', 'ethnicity', 'age','education','howheard')
+    list_display = ('user', 'gender_nb', 'ethnicity', 'age', 'education', 'howheard')
     actions = ["export_as_csv"]
