@@ -12,48 +12,49 @@ class UCSDCustomRegistration(models.Model):
     """
     user = models.OneToOneField(USER_MODEL, null=True)
 
-    gender_nb = models.CharField(blank=False, max_length=16, verbose_name=b'Gender', choices=[
-        (b'female', b'Female'), 
+    gender_nb = models.CharField(blank=False, max_length=32, verbose_name=b'Gender', choices=[
         (b'male', b'Male'), 
+        (b'female', b'Female'), 
         (b'nonbinary', b'Non-Binary'),
 
-        (b'decline', b'Decline to state'), 
+        (b'decline', b'Decline to State'), 
         ])
 
-    ethnicity = models.CharField(blank=False, max_length=16, verbose_name=b'Ethnicity', choices=[
-        (b'aab', b'African American and black'), 
-        (b'aian', b'American Indian / Alaska Native'), 
-        (b'a', b'Asian'),
-        (b'hl', b'Hispanic / Latinx'),
-        (b'sana', b'Southwest Asia / North African'),
-        (b'w', b'White'),
+    ethnicity = models.CharField(blank=False, max_length=128, verbose_name=b'Ethnicity', choices=[
+        (b'african-american-and-black', b'African American and Black'), 
+        (b'american-indian-alaska-native', b'American Indian / Alaska Native'), 
+        (b'asian', b'Asian'),
+        (b'hispanic-latinx', b'Hispanic / Latinx'),
+        (b'native-hawaiian-and-pacific-islander', b'Native Hawaiian and Pacific Islander'),
+        (b'southwest-asia-north-african', b'Southwest Asia / North African'),
+        (b'white', b'White'),
 
-        (b'decline', b'Decline to state'), 
+        (b'decline', b'Decline to State'), 
         ])
 
-    age = models.CharField(blank=False, max_length=16, verbose_name=b'Age', choices=[
-        (b'1317', b'13 - 17 years old'), 
-        (b'1822', b'18 - 22 years old'), 
-        (b'2329', b'23 - 29 years old'),
-        (b'3049', b'30 - 49 years old'),
-        (b'50plus', b'50+ years old'),
+    age = models.CharField(blank=False, max_length=32, verbose_name=b'Age', choices=[
+        (b'13-17', b'13 - 17 years old'), 
+        (b'18-22', b'18 - 22 years old'), 
+        (b'23-29', b'23 - 29 years old'),
+        (b'30-49', b'30 - 49 years old'),
+        (b'50-plus', b'50+ years old'),
 
-        (b'decline', b'Decline to state'), 
+        (b'decline', b'Decline to State'), 
         ])
 
-    education = models.CharField(blank=False, max_length=16, verbose_name=b'Highest level of education completed', choices=[
-        (b'grad', b'Graduate'), 
-        (b'undergrad', b'Undergrad'), 
-        (b'highschool', b'Up to high school'),
+    education = models.CharField(blank=False, max_length=64, verbose_name=b'Highest level of education completed', choices=[
+        (b'graduate', b'Graduate'), 
+        (b'undergraduate', b'Undergraduate'), 
+        (b'up-to-high-school', b'Up to High School'),
 
-        (b'decline', b'Decline to state'), 
+        (b'decline', b'Decline to State'), 
         ])
 
-    howheard = models.CharField(blank=False, max_length=16, verbose_name=b'How did you hear about UC San Diego Online', choices=[
-        (b'socialmedia', b'Social media'), 
+    howheard = models.CharField(blank=False, max_length=64, verbose_name=b'How did you hear about UC San Diego Online', choices=[
+        (b'social-media', b'Social Media'), 
         (b'email', b'Email'), 
-        (b'wom', b'Word-of-mouth'),
-        (b'print', b'Print advertisement'),
+        (b'word-of-mouth', b'Word-of-Mouth'),
+        (b'print-advertisement', b'Print Advertisement'),
         (b'other', b'Other'), 
         ])
 
