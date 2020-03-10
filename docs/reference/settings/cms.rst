@@ -1,3 +1,5 @@
+.. _settings_cms:
+
 CMS settings
 ============
 

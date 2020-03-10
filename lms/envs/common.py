@@ -1133,11 +1133,12 @@ CODE_JAIL = {
 #: Some courses are allowed to run unsafe code. This is a list of regexes, one
 #: of them must match the course id for that course to run unsafe code.
 #:
-#: For example:
+#: For example::
 #:
-#:   COURSES_WITH_UNSAFE_CODE = [
-#:       r"Harvard/XY123.1/.*"
-#:   ]
+#:    COURSES_WITH_UNSAFE_CODE = [
+#:        r"Harvard/XY123.1/.*"
+#:    ]
+#:
 COURSES_WITH_UNSAFE_CODE = []
 
 ############################### DJANGO BUILT-INS ###############################

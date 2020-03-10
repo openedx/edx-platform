@@ -1660,10 +1660,10 @@ DEFAULT_COURSE_LANGUAGE = "en"
 
 #: Specify XBlocks that should be treated as advanced problems. Each entry is a
 #: dict:
-#:       'component': the entry-point name of the XBlock.
-#:       'boilerplate_name': an optional YAML template to be used.  Specify as
-#:               None to omit.
 #:
+#: - ``component``: the entry-point name of the XBlock.
+#: - ``boilerplate_name``: an optional YAML template to be used. Specify as None to
+#:   omit.
 ADVANCED_PROBLEM_TYPES = [
     {
         'component': 'openassessment',

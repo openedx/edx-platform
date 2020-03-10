@@ -1,3 +1,5 @@
+.. _settings_lms:
+
 LMS settings
 ============
 

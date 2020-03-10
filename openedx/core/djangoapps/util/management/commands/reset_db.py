@@ -1,16 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-reset_db
-========
+This Django command will drop and recreate the default database. This isu seful when
+running tests against a database which may previously have had different migrations applied to it.
 
-Django command to drop and recreate a database.
-Useful when running tests against a database which may previously have
-had different migrations applied to it.
+This handles the one specific use case of the "reset_db" command from django-extensions
+that we were actually using.
 
-This handles the one specific use case of the "reset_db" command from
-django-extensions that we were actually using.
-
-originally from http://www.djangosnippets.org/snippets/828/ by dnordberg
+Originally from http://www.djangosnippets.org/snippets/828/ by dnordberg
 """
 
 
