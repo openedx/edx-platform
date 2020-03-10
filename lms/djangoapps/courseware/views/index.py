@@ -7,6 +7,7 @@ View for Courseware Index
 
 import logging
 
+from datetime import timedelta
 import six
 import six.moves.urllib as urllib  # pylint: disable=import-error
 import six.moves.urllib.error  # pylint: disable=import-error
@@ -18,6 +19,7 @@ from django.contrib.auth.views import redirect_to_login
 from django.http import Http404
 from django.template.context_processors import csrf
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
@@ -29,6 +31,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from web_fragments.fragment import Fragment
 
+from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response, render_to_string
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
@@ -44,11 +47,14 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
     COURSE_OUTLINE_PAGE_FLAG,
-    default_course_url_name
+    default_course_url_name,
+    RELATIVE_DATES_FLAG,
 )
+from openedx.features.course_experience.utils import get_course_outline_block_tree
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from shoppingcart.models import CourseRegistrationCode
+from student.models import CourseEnrollment
 from student.views import is_course_blocked
 from util.views import ensure_valid_course_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
@@ -446,6 +452,32 @@ class CoursewareIndex(View):
         )
         staff_access = self.is_staff
 
+        reset_deadlines_url = reverse(
+            'openedx.course_experience.reset_course_deadlines', kwargs={'course_id': six.text_type(self.course.id)}
+        )
+
+        allow_anonymous = allow_public_access(self.course, [COURSE_VISIBILITY_PUBLIC])
+        display_reset_dates_banner = False
+        if not allow_anonymous:  # pylint: disable=too-many-nested-blocks
+            course_overview = CourseOverview.objects.get(id=str(self.course_key))
+            end_date = getattr(course_overview, 'end_date')
+            if not end_date or timezone.now() < end_date:
+                if (CourseEnrollment.objects.filter(
+                    course=course_overview, user=request.user, mode=CourseMode.VERIFIED
+                ).exists()):
+                    course_block_tree = get_course_outline_block_tree(
+                        request, str(self.course_key), request.user
+                    )
+                    course_sections = course_block_tree.get('children')
+                    for section in course_sections:
+                        if display_reset_dates_banner:
+                            break
+                        for subsection in section.get('children', []):
+                            if (not subsection.get('complete', True)
+                                    and subsection.get('due', timezone.now() + timedelta(1)) < timezone.now()):
+                                display_reset_dates_banner = True
+                                break
+
         courseware_context = {
             'csrf': csrf(self.request)['csrf_token'],
             'course': self.course,
@@ -467,6 +499,9 @@ class CoursewareIndex(View):
             'sequence_title': None,
             'disable_accordion': COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id),
             'show_search': show_search,
+            'relative_dates_is_enabled': RELATIVE_DATES_FLAG.is_enabled(self.course.id),
+            'reset_deadlines_url': reset_deadlines_url,
+            'display_reset_dates_banner': display_reset_dates_banner,
         }
         courseware_context.update(
             get_experiment_user_metadata_context(

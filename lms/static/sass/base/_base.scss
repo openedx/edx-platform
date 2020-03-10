@@ -304,3 +304,26 @@ mark {
     }
   }
 }
+
+div.reset-deadlines-banner {
+  background-color: theme-color("primary");
+  display: none;
+  flex-wrap: wrap;
+  padding: 15px 20px;
+  margin-top: 5px;
+
+  div.reset-deadlines-text {
+    color: theme-color("inverse");
+    padding-top: 10px;
+    margin-right: 10px;
+    flex: 0 0 auto;
+  }
+
+  form {
+    button {
+      color: #0075b4;
+      background-color: theme-color("inverse");
+      cursor: pointer;
+    }
+  }
+}

@@ -58,8 +58,10 @@ reset_deadlines_banner_displayed = False
                 needs_prereqs = not gated_content[subsection['id']]['completed_prereqs'] if gated_subsection else False
                 scored = 'scored' if subsection.get('scored', False) else ''
                 graded = 'graded' if subsection.get('graded') else ''
+                due_date = subsection.get('due')
+                overdue = due_date is not None and due_date < timezone.now() and not subsection.get('complete', True)
                 %>
-                % if not subsection.get('complete', True) and subsection.get('due', timezone.now() + timedelta(1)) < timezone.now() and not reset_deadlines_banner_displayed:
+                % if overdue and not reset_deadlines_banner_displayed:
                     <% reset_deadlines_banner_displayed = True %>
                     <script type="text/javascript">
                         $('.reset-deadlines-banner').css('display', 'flex');
