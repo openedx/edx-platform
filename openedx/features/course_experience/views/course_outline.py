@@ -21,7 +21,9 @@ from pytz import UTC
 from waffle.models import Switch
 from web_fragments.fragment import Fragment
 
+from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_overview_with_access
+from lms.djangoapps.courseware.masquerade import setup_masquerade
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from student.models import CourseEnrollment
@@ -168,11 +170,22 @@ def reset_course_deadlines(request, course_id):
     Set the start_date of a schedule to today, which in turn will adjust due dates for
     sequentials belonging to a self paced course
     """
-    course = CourseOverview.objects.get(id=course_id)
+    course_key = CourseKey.from_string(course_id)
+    course = CourseOverview.objects.get(id=course_key)
     if course.self_paced:
-        enrollment = CourseEnrollment.objects.get(user=request.user, course=course_id)
+        masquerade_details, masquerade_user = setup_masquerade(
+            request,
+            course_key,
+            has_access(request.user, 'staff', course, course_key)
+        )
+        if masquerade_details and masquerade_details.role == 'student' and masquerade_details.user_name:
+            # Masquerading as a specific student, so reset that student's schedule
+            user = masquerade_user
+        else:
+            user = request.user
+        enrollment = CourseEnrollment.objects.get(user=user, course=course_key)
         schedule = enrollment.schedule
         if schedule:
             schedule.start_date = datetime.datetime.now(pytz.utc)
             schedule.save()
-    return redirect(reverse('openedx.course_experience.course_home', args=[six.text_type(course_id)]))
+    return redirect(reverse('openedx.course_experience.course_home', args=[six.text_type(course_key)]))
