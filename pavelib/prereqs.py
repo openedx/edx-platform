@@ -205,6 +205,7 @@ PACKAGES_TO_UNINSTALL = [
     "python-saml",                  # Because python3-saml shares the same directory name
     "pdfminer",                     # Replaced by pdfminer.six, which shares the same directory name
     "pytest-faulthandler",          # Because it was bundled into pytest
+    "djangorestframework-jwt",      # Because now its called drf-jwt.
 ]
 
 
