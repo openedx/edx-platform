@@ -93,7 +93,7 @@ docutils==0.16            # via botocore
 drf-jwt==1.14.0           # via -c requirements/edx/../constraints.txt, edx-drf-extensions
 drf-yasg==1.17.0          # via -c requirements/edx/../constraints.txt, edx-api-doc-tools
 edx-ace==0.1.13           # via -r requirements/edx/base.in
-edx-analytics-data-api-client==0.15.3  # via -r requirements/edx/base.in
+edx-analytics-data-api-client==0.15.5  # via -r requirements/edx/base.in
 edx-api-doc-tools==1.0.2  # via -r requirements/edx/base.in
 edx-bulk-grades==0.6.6    # via -r requirements/edx/base.in, staff-graded-xblock
 edx-ccx-keys==1.0.0       # via -r requirements/edx/base.in
@@ -120,7 +120,7 @@ edx-user-state-client==1.1.2  # via -r requirements/edx/base.in
 edx-when==1.0.5           # via -r requirements/edx/base.in, edx-proctoring
 edxval==1.2.4             # via -r requirements/edx/base.in
 elasticsearch==1.9.0      # via edx-search
-enum34==1.1.9             # via edxval
+enum34==1.1.10            # via edxval
 event-tracking==0.3.0     # via -r requirements/edx/base.in, edx-proctoring, edx-search
 fs-s3fs==0.1.8            # via -r requirements/edx/base.in, django-pyfs
 fs==2.0.18                # via -r requirements/edx/base.in, django-pyfs, fs-s3fs, xblock

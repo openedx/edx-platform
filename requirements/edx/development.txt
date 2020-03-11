@@ -105,7 +105,7 @@ docutils==0.16            # via -r requirements/edx/testing.txt, botocore, m2r, 
 drf-jwt==1.14.0           # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, edx-drf-extensions
 drf-yasg==1.17.0          # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, edx-api-doc-tools
 edx-ace==0.1.13           # via -r requirements/edx/testing.txt
-edx-analytics-data-api-client==0.15.3  # via -r requirements/edx/testing.txt
+edx-analytics-data-api-client==0.15.5  # via -r requirements/edx/testing.txt
 edx-api-doc-tools==1.0.2  # via -r requirements/edx/testing.txt
 edx-bulk-grades==0.6.6    # via -r requirements/edx/testing.txt, staff-graded-xblock
 edx-ccx-keys==1.0.0       # via -r requirements/edx/testing.txt
@@ -135,7 +135,7 @@ edx-when==1.0.5           # via -r requirements/edx/testing.txt, edx-proctoring
 edxval==1.2.4             # via -r requirements/edx/testing.txt
 elasticsearch==1.9.0      # via -r requirements/edx/testing.txt, edx-search
 entrypoints==0.3          # via -r requirements/edx/testing.txt, flake8
-enum34==1.1.9             # via -r requirements/edx/testing.txt, edxval
+enum34==1.1.10            # via -r requirements/edx/testing.txt, edxval
 event-tracking==0.3.0     # via -r requirements/edx/testing.txt, edx-proctoring, edx-search
 execnet==1.7.1            # via -r requirements/edx/testing.txt, pytest-xdist
 factory-boy==2.8.1        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
