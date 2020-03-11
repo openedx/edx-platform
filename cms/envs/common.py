@@ -886,6 +886,9 @@ CELERY_IMPORTS = (
     'cms.djangoapps.contentstore.tasks',
     'openedx.core.djangoapps.bookmarks.tasks',
     'openedx.core.djangoapps.ccxcon.tasks',
+
+    # TODO: Remove after Hawthorn because the `course_structures` app will no longer exist.
+    'openedx.core.djangoapps.content.course_structures.tasks',
 )
 
 # Message configuration
