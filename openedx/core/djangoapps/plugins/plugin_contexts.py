@@ -21,7 +21,7 @@ def get_plugins_view_context(project_type, view_name, existing_context={}):
             module_path, _, name = context_function_path.rpartition('.')
             try:
                 module = import_module(module_path)
-            except ImportError, ModuleNotFoundError:
+            except (ImportError, ModuleNotFoundError):
                 log.exception("Failed to import %s plugin when creating %s context", module_path, view_name)
                 continue
             context_function = getattr(module, name, None)
