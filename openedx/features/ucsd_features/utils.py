@@ -1,3 +1,4 @@
+import base64
 import json
 import logging
 
@@ -92,3 +93,36 @@ def get_course_name(custom_fields):
     except InvalidKeyError:
         return None
     return course_name
+
+
+def add_to_ga_events_cookie(request, response, event_name, event_data, **cookie_options):
+    """
+    Adds the provided event_data to a cookie whose name is configured through GOOGLE_ANALYTICS_EVENTS_COOKIE_NAME
+    settings variable. If there is already a cookie with this name, append the event to `events` list in that cookie.
+    Otherwise, make a new cookie.
+
+
+    Arguments:
+        request: Request object from which we can get the already set cookie
+        response: Response object using which the cookie will be set
+        event_name: the will be used as event action when emitting GA event from browser
+        event_data: event data that will be emitted
+        **cookie_options: Any other options that can be used while setting the cookie, e.g. domain of the cookie
+    """
+    cookie_name = settings.GOOGLE_ANALYTICS_EVENTS_COOKIE_NAME
+
+    ga_events_cookie = request.COOKIES.get(cookie_name)
+
+    if ga_events_cookie:
+        decoded_cookie = base64.b64decode(ga_events_cookie)
+        events_data = json.loads(decoded_cookie)
+    else:
+        events_data = {}
+
+    events_data['events'] = events_data.get('events') or []
+    events_data['events'].append({
+        'event_name': event_name,
+        'event_data': event_data
+    })
+    encoded_cookie = base64.b64encode(json.dumps(events_data))
+    response.set_cookie(cookie_name, encoded_cookie, **cookie_options)
