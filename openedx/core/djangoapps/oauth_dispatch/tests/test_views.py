@@ -630,7 +630,7 @@ class TestRevokeTokenView(AccessTokenLoginMixin, _DispatchingViewTestCase):  # p
 
         self.revoke_token(self.refresh_token)
 
-        self.assert_refresh_token_status_code(self.refresh_token, expected_status_code=401)
+        self.assert_refresh_token_status_code(self.refresh_token, expected_status_code=400)
 
     def test_revoke_access_token_dot(self):
         """
