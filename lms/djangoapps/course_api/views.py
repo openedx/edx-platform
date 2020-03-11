@@ -4,9 +4,11 @@ Course API Views
 
 
 from django.core.exceptions import ValidationError
+from django.core.paginator import InvalidPage
 from edx_rest_framework_extensions.paginators import NamespacedPageNumberPagination
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.throttling import UserRateThrottle
+from rest_framework.exceptions import NotFound
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 
@@ -174,6 +176,20 @@ class LazyPageNumberPagination(NamespacedPageNumberPagination):
         # Clear the cached property values to recalculate the estimated count from the LazySequence
         del self.page.paginator.__dict__['count']
         del self.page.paginator.__dict__['num_pages']
+
+        # Paginate queryset function is using cached number of pages and sometime after
+        # deleting from cache when we recalculate number of pages are different and it raises
+        # EmptyPage error while accessing the previous page link. So we are catching that exception
+        # and raising 404. For more detail checkout PROD-1222
+        page_number = self.request.query_params.get(self.page_query_param, 1)
+        try:
+            self.page.paginator.validate_number(page_number)
+        except InvalidPage as exc:
+            msg = self.invalid_page_message.format(
+                page_number=page_number, message=str(exc)
+            )
+            self.page.number = self.page.paginator.num_pages
+            raise NotFound(msg)
 
         return super(LazyPageNumberPagination, self).get_paginated_response(data)
 
