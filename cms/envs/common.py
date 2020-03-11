@@ -1141,6 +1141,7 @@ CELERY_IMPORTS = (
     'cms.djangoapps.contentstore.tasks',
     'openedx.core.djangoapps.bookmarks.tasks',
     'openedx.core.djangoapps.ccxcon.tasks',
+    'openedx.core.djangoapps.content.course_structures.tasks',
 )
 
 # Message configuration

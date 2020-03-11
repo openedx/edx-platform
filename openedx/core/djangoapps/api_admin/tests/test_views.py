@@ -5,6 +5,7 @@ import json
 
 import ddt
 import httpretty
+from mock import patch
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -367,7 +368,8 @@ class CatalogEditViewTest(CatalogTest):
         self.assertRedirects(response, reverse('api_admin:catalog-edit', kwargs={'catalog_id': self.catalog.id}))
 
     @httpretty.activate
-    def test_edit_invalid(self):
+    @patch('openedx.core.djangoapps.content.course_structures.tasks.update_course_structure')
+    def test_edit_invalid(self, _mock_task):
         self.mock_catalog_endpoint(self.catalog.attributes, catalog_id=self.catalog.id)
         new_attributes = dict(self.catalog.attributes, **{'delete-catalog': 'off', 'name': ''})
         response = self.client.post(self.url, new_attributes)
