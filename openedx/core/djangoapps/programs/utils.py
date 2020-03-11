@@ -326,10 +326,11 @@ class ProgramProgressMeter(object):
                     continue
 
                 course_run_mode = self._course_run_mode_translation(course_run['type'])
-
+                certificate_mode = self._certificate_mode_translation(certificate.mode)
+                modes_are_valid = course_run_mode in program_data['applicable_seat_types'] and \
+                    certificate_mode in program_data['applicable_seat_types']
                 # Grab the available date and keep it if it's the earliest one for this catalog course.
-                if course_run_mode in program_data['applicable_seat_types'] and certificate_api.is_passing_status(
-                            certificate.status):
+                if modes_are_valid and certificate_api.is_passing_status(certificate.status):
                     course_overview = CourseOverview.get_from_id(key)
                     available_date = available_date_for_certificate(course_overview, certificate)
                     earliest_course_run_date = min(
