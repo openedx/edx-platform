@@ -67,7 +67,7 @@
 ignore = ,.git,.tox,migrations,node_modules,.pycharm_helpers
 persistent = yes
 load-plugins = edx_lint.pylint,pylint_django,pylint_celery
-init-hook = "import sys; sys.path.extend(['lms/djangoapps', 'cms/djangoapps', 'common/djangoapps'])"
+init-hook = "import sys; sys.path.extend(['cms/djangoapps', 'common/djangoapps'])"
 
 [MESSAGES CONTROL]
 enable = 
@@ -460,4 +460,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# e89c3d2722e0389b5f94fdaba1c1501a3f855af9
+# e8dd9e4cd32fb127b07e42b1c186418d27960ca0
