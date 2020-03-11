@@ -492,7 +492,8 @@ class TestProgramProgressMeter(TestCase):
                     CourseFactory(course_runs=[
                         CourseRunFactory(key=second_course_run_key),
                     ]),
-                ]
+                ],
+                applicable_seat_types=MODES.verified
             ),
             ProgramFactory(),
         ]
@@ -594,7 +595,8 @@ class TestProgramProgressMeter(TestCase):
                         CourseRunFactory(key=course_run_key, type='honor'),
                         CourseRunFactory(),
                     ]),
-                ]
+                ],
+                applicable_seat_types=MODES.honor
             ),
             ProgramFactory(),
         ]
@@ -692,7 +694,8 @@ class TestProgramProgressMeter(TestCase):
         # These runs are of type 'professional' because there is no seat type for no-id-professional;
         # it uses professional as the seat type instead.
         course_runs = CourseRunFactory.create_batch(2, type=CourseMode.PROFESSIONAL)
-        program = ProgramFactory(courses=[CourseFactory(course_runs=course_runs)])
+        program = ProgramFactory(courses=[CourseFactory(course_runs=course_runs)],
+                                 applicable_seat_types=CourseMode.NO_ID_PROFESSIONAL_MODE)
         mock_get_programs.return_value = [program]
 
         # Verify that the test program is not complete.
