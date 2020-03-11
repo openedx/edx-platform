@@ -68,7 +68,7 @@ from .serializers import (
 )
 from .utils import emit_team_event
 
-TEAM_MEMBERSHIPS_PER_PAGE = 2
+TEAM_MEMBERSHIPS_PER_PAGE = 5
 TOPICS_PER_PAGE = 12
 MAXIMUM_SEARCH_SIZE = 100000
 
@@ -165,7 +165,7 @@ class TeamsDashboardView(GenericAPIView):
             is_user_org_protected = organization_protection_status == OrganizationProtectionStatus.protected
             filter_query['organization_protected'] = is_user_org_protected
 
-        user_teams = CourseTeam.objects.filter(**filter_query)
+        user_teams = CourseTeam.objects.filter(**filter_query).order_by('-last_activity_at', 'team_size')
         user_teams_data = self._serialize_and_paginate(
             MyTeamsPagination,
             user_teams,
