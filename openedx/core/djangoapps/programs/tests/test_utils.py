@@ -631,7 +631,7 @@ class TestProgramProgressMeter(TestCase):
 
         program_incomplete_no_cert = ProgramFactory(courses=[course_no_cert, course1, course2])
         program_incomplete_wrong_mode = ProgramFactory(courses=[course_wrong_mode])
-        program_complete = ProgramFactory(courses=[course1, course2])
+        program_complete = ProgramFactory(courses=[course1, course2], applicable_seat_types=MODES.verified)
         mock_get_programs.return_value = [program_incomplete_no_cert, program_incomplete_wrong_mode, program_complete]
 
         self._create_enrollments(run_no_cert['key'], run_wrong_mode['key'], run_course1_1['key'], run_course1_2['key'],
