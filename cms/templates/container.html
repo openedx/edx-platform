@@ -90,7 +90,7 @@ from openedx.core.djangolib.markup import HTML, Text
                 <ol>
                 % for block in ancestor_xblocks:
                     <li class="nav-item">
-                        <span class="title label">${block['block'].display_name_with_default}
+                        <span class="title label">${block['title']}
                             <span class="icon fa fa-caret-down ui-toggle-dd" aria-hidden="true"></span>
                         </span>
                         % if not block['is_last']:
