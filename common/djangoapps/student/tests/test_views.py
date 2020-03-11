@@ -783,6 +783,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             user=self.user,
             course_id=course.id
         )
+
+        # pylint: disable=unused-variable
         schedule = ScheduleFactory(start_date=self.THREE_YEARS_AGO + timedelta(days=1), enrollment=enrollment)
 
         response = self.client.get(reverse('dashboard'))
