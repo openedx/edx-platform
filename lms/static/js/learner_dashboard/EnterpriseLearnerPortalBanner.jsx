@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { getAuthenticatedUser } from '@edx/frontend-auth';
 import { getLearnerPortalLinks } from '@edx/frontend-enterprise';
 import { StatusAlert } from '@edx/paragon';
 
@@ -40,7 +41,8 @@ class EnterpriseLearnerPortalBanner extends Component {
 
   componentDidMount() {
     if (!hasViewedBanner()) {
-      getLearnerPortalLinks(apiClient).then((learnerPortalLinks) => {
+      const authenticatedUser = getAuthenticatedUser();
+      getLearnerPortalLinks(apiClient, authenticatedUser).then((learnerPortalLinks) => {
         this.setState({
           open: true,
           alertHtml: getAlertHtml(learnerPortalLinks),
