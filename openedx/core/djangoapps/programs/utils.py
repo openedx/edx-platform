@@ -325,10 +325,8 @@ class ProgramProgressMeter(object):
                 if certificate is None:
                     continue
 
-                course_run_mode = self._course_run_mode_translation(course_run['type'])
-                certificate_mode = self._certificate_mode_translation(certificate.mode)
-                modes_are_valid = course_run_mode in program_data['applicable_seat_types'] and \
-                    certificate_mode in program_data['applicable_seat_types']
+                modes_are_valid = self._is_course_run_mode_valid(course_run['type'], program_data) and \
+                    self._is_certificate_mode_valid(certificate.mode, program_data)
                 # Grab the available date and keep it if it's the earliest one for this catalog course.
                 if modes_are_valid and certificate_api.is_passing_status(certificate.status):
                     course_overview = CourseOverview.get_from_id(key)
@@ -346,30 +344,19 @@ class ProgramProgressMeter(object):
 
         return program_available_date
 
-    def _course_run_mode_translation(self, course_run_mode):
+    def _is_course_run_mode_valid(self, course_run_mode, program_data):
         """
-        Returns a canonical mode for a course run (whose data is coming from the program cache).
-        This mode must match the certificate mode to be counted as complete.
+        would return true if the course run mode is in program seats types
+        otherwise false
         """
-        mappings = {
-            # Runs of type 'credit' are counted as 'verified' since verified
-            # certificates are earned when credit runs are completed. LEARNER-1274
-            # tracks a cleaner way to do this using the discovery service's
-            # applicable_seat_types field.
-            CourseMode.CREDIT_MODE: CourseMode.VERIFIED,
-        }
-        return mappings.get(course_run_mode, course_run_mode)
+        return course_run_mode in program_data['applicable_seat_types']
 
-    def _certificate_mode_translation(self, certificate_mode):
+    def _is_certificate_mode_valid(self, certificate_mode, program_data):
         """
-        Returns a canonical mode for a certificate (whose data is coming from the database).
-        This mode must match the course run mode to be counted as complete.
+        would return true if the course run mode is in program seats types
+        otherwise false.
         """
-        mappings = {
-            # Treat "no-id-professional" certificates as "professional" certificates
-            CourseMode.NO_ID_PROFESSIONAL_MODE: CourseMode.PROFESSIONAL,
-        }
-        return mappings.get(certificate_mode, certificate_mode)
+        return certificate_mode in program_data['applicable_seat_types']
 
     def _is_course_complete(self, course):
         """Check if a user has completed a course.
@@ -384,24 +371,24 @@ class ProgramProgressMeter(object):
             bool, indicating whether the course is complete.
         """
 
-        def reshape(course_run):
-            """
-            Modify the structure of a course run dict to facilitate comparison
-            with course run certificates.
-            """
-            return {
-                'course_run_id': course_run['key'],
-                # A course run's type is assumed to indicate which mode must be
-                # completed in order for the run to count towards program completion.
-                # This supports the same flexible program construction allowed by the
-                # old programs service (e.g., completion of an old honor-only run may
-                # count towards completion of a course in a program). This may change
-                # in the future to make use of the more rigid set of "applicable seat
-                # types" associated with each program type in the catalog.
-                'type': self._course_run_mode_translation(course_run['type']),
-            }
+        # def reshape(course_run):
+        #     """
+        #     Modify the structure of a course run dict to facilitate comparison
+        #     with course run certificates.
+        #     """
+        #     return {
+        #         'course_run_id': course_run['key'],
+        #         # A course run's type is assumed to indicate which mode must be
+        #         # completed in order for the run to count towards program completion.
+        #         # This supports the same flexible program construction allowed by the
+        #         # old programs service (e.g., completion of an old honor-only run may
+        #         # count towards completion of a course in a program). This may change
+        #         # in the future to make use of the more rigid set of "applicable seat
+        #         # types" associated with each program type in the catalog.
+        #         'type': self._course_run_mode_translation(course_run['type']),
+        #     }
 
-        return any(reshape(course_run) in self.completed_course_runs for course_run in course['course_runs'])
+        return any(course_run in self.completed_course_runs for course_run in course['course_runs'])
 
     @cached_property
     def completed_course_runs(self):
@@ -437,7 +424,7 @@ class ProgramProgressMeter(object):
         for certificate in course_run_certificates:
             course_data = {
                 'course_run_id': six.text_type(certificate['course_key']),
-                'type': self._certificate_mode_translation(certificate['type']),
+                'type': certificate['type'],
             }
 
             if certificate_api.is_passing_status(certificate['status']):
