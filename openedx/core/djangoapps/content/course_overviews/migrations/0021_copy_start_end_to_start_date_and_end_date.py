@@ -19,7 +19,7 @@ def copy_column_values(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('course_overviews', '0018_add_start_end_in_CourseOverview'),
+        ('course_overviews', '0020_courseoverviewtab_url_slug'),
     ]
 
     operations = [
