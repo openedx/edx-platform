@@ -109,3 +109,43 @@ $shadow-l1: rgba(0, 0, 0, 0.1) !default;
 $shadow-l2: rgba(0, 0, 0, 0.05) !default;
 $shadow-d1: rgba(0, 0, 0, 0.4) !default;
 $shadow-d2: rgba($black, 0.6) !default;
+
+// Blues
+$blue-d: rgba(6, 86, 131, 100) !default;
+$blue-d1: mix($black, $blue, 20%) !default;
+$blue-d3: desaturate($blue, 15%) !default;
+$blue-b: rgba(0, 117, 180, 100) !default;
+$blue-a: rgba(41, 145, 195, 100) !default;
+
+// Grays
+$gray-d: rgba(17, 17, 17, 100) !default;
+$gray-b: rgba(65, 65, 65, 100) !default;
+$gray-a: rgba(160, 160, 160, 100) !default;
+$gray-l1: rgb(252, 252, 252) !default;
+$gray-l2: mix($white, $gray, 60%) !default;
+$gray-l3: mix($white, $gray, 80%) !default
+
+// ----------------------------
+// #COLORS- Bootstrap-style
+// ----------------------------
+$state-success-text: $black !default;
+$state-success-bg: #dff0d8 !default;
+$state-success-border: darken($state-success-bg, 5%) !default;
+
+$state-info-text: #31708f !default;
+$state-info-text-link: #245269 !default;
+$state-info-bg: #d9edf7 !default;
+$state-info-border: darken($state-info-bg, 7%) !default;
+
+$state-warning-text: $black !default;
+$state-warning-bg: #fcf8e3 !default;
+$state-warning-border: darken($state-warning-bg, 5%) !default;
+
+$state-danger-text: $black !default;
+$state-danger-bg: #f2dede !default;
+$state-danger-border: darken($state-danger-bg, 5%) !default;
+
+// logo colors
+$micromasters-color: #005585 !default;
+$zebra-stripe-color: rgb(249, 250, 252) !default;
+$divider-color: rgb(226, 231, 236) !default;
