@@ -338,7 +338,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
             expired_staff = role_factory.create(password=TEST_PASSWORD, course_key=self.course.id)
 
         ScheduleFactory(
-            start=self.THREE_YEARS_AGO,
+            start_date=self.THREE_YEARS_AGO,
             enrollment__mode=CourseMode.AUDIT,
             enrollment__course_id=self.course.id,
             enrollment__user=expired_staff
@@ -386,7 +386,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         role.users.add(expired_staff)
 
         ScheduleFactory(
-            start=self.THREE_YEARS_AGO,
+            start_date=self.THREE_YEARS_AGO,
             enrollment__mode=CourseMode.AUDIT,
             enrollment__course_id=self.course.id,
             enrollment__user=expired_staff
