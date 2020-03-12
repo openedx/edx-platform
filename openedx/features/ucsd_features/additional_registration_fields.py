@@ -84,17 +84,31 @@ class AdditionalRegistrationFieldsForm(ModelForm):
 # Admin Customization
 class ExportCsvMixin:
     def export_as_csv(self, request, queryset):
-
         meta = self.model._meta
-        field_names = [field.name for field in meta.fields]
 
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename={}.csv'.format(meta)
         writer = csv.writer(response)
 
-        writer.writerow(field_names)
+        field_map = {field.name: field for field in meta.fields}
+
+        header = []
+        for field in self.list_display:
+            if field in field_map:
+                header.append(field_map[field].verbose_name)
+            else:
+                header.append(field.title())
+
+        writer.writerow(header)
         for obj in queryset:
-            row = writer.writerow([getattr(obj, field) for field in field_names])
+            row = []
+            for field in self.list_display:
+                if field in field_map:
+                    row.append(getattr(obj, field))
+                else:
+                    row.append(getattr(self, field)(obj))
+
+            writer.writerow(row)
 
         return response
 
@@ -103,5 +117,14 @@ class ExportCsvMixin:
 
 @admin.register(AdditionalRegistrationFields)
 class AdditionalRegistrationFieldsAdmin(admin.ModelAdmin, ExportCsvMixin):
-    list_display = ('user', 'gender_nb', 'ethnicity', 'age', 'education', 'howheard')
+    list_display = ('user_id', 'username', 'email', 'gender_nb', 'ethnicity', 'age', 'education', 'howheard')
     actions = ["export_as_csv"]
+
+    def user_id(self, x):
+        return x.user.id
+
+    def username(self, x):
+        return x.user.username
+
+    def email(self, x):
+        return x.user.email
