@@ -2618,7 +2618,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=683 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=684 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3473,6 +3473,7 @@ CREATE TABLE `enterprise_historicalpendingenrollment` (
   `user_id` int(11) DEFAULT NULL,
   `source_id` int(11) DEFAULT NULL,
   `discount_percentage` decimal(8,5) NOT NULL,
+  `sales_force_id` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`history_id`),
   KEY `enterprise_historica_history_user_id_894ad7d0_fk_auth_user` (`history_user_id`),
   KEY `enterprise_historicalpendingenrollment_id_27077b0b` (`id`),
@@ -3516,6 +3517,7 @@ CREATE TABLE `enterprise_pendingenrollment` (
   `cohort_name` varchar(255) DEFAULT NULL,
   `source_id` int(11) DEFAULT NULL,
   `discount_percentage` decimal(8,5) NOT NULL,
+  `sales_force_id` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `enterprise_pendingenrollment_user_id_course_id_6d4141c7_uniq` (`user_id`,`course_id`),
   KEY `enterprise_pendingen_source_id_7b6fed0c_fk_enterpris` (`source_id`),
