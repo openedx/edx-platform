@@ -13,7 +13,7 @@ from xblock.fields import ScopeIds
 
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
 from openedx.core.djangoapps.xblock.runtime.runtime import XBlockRuntime
-from openedx.core.djangoapps.xblock.runtime.olx_parsing import parse_xblock_include, BundleFormatException
+from openedx.core.djangoapps.xblock.runtime.olx_parsing import parse_xblock_include
 from openedx.core.djangoapps.xblock.runtime.serializer import serialize_xblock
 from openedx.core.djangolib.blockstore_cache import (
     BundleCache,
@@ -85,12 +85,7 @@ class BlockstoreXBlockRuntime(XBlockRuntime):
         This runtime API should normally be used via
         runtime.get_block() -> block.parse_xml() -> runtime.add_node_as_child
         """
-        try:
-            parsed_include = parse_xblock_include(node)
-        except BundleFormatException:
-            # We need to log the XBlock ID or this will be hard to debug
-            log.error("BundleFormatException when parsing XBlock %s", block.scope_ids.usage_id)
-            raise  # Also log details and stack trace
+        parsed_include = parse_xblock_include(node)
         self.add_child_include(block, parsed_include)
 
     def add_child_include(self, block, parsed_include):
