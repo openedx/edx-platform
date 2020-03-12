@@ -67,9 +67,6 @@ python-dateutil==2.4.0
 # python3-saml 1.6.0 breaks unittests in common/djangoapps/third_party_auth/tests/test_views.py::SAMLMetadataTest
 python3-saml==1.5.0
 
-# CR-1912: Check if super-csv 0.9.7 is breaking grade export
-super-csv==0.9.6
-
 # oauthlib>3.0.1 causes test failures
 oauthlib==3.0.1
 
