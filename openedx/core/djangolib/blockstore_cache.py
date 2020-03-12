@@ -13,6 +13,7 @@ from datetime import datetime
 from uuid import UUID
 
 from django.core.cache import caches, InvalidCacheBackendError
+from django.utils.lru_cache import lru_cache
 from pytz import UTC
 import requests
 
@@ -32,7 +33,7 @@ except InvalidCacheBackendError:
 # (Note that we do usually explicitly invalidate this cache during write
 # operations though, so this setting mostly affects actions by external systems
 # on Blockstore or bugs where we left out the cache invalidation step.)
-MAX_BLOCKSTORE_CACHE_DELAY = 60 * 5
+MAX_BLOCKSTORE_CACHE_DELAY = 60
 
 
 class BundleCache(object):
@@ -143,19 +144,18 @@ def get_bundle_version_number(bundle_uuid, draft_name=None):
     return version
 
 
+@lru_cache(maxsize=200)
 def get_bundle_version_files_cached(bundle_uuid, bundle_version):
     """
     Get the files in the specified BundleVersion. Since BundleVersions are
-    immutable, this should be cached as aggressively as possible.
+    immutable, this should be cached as aggressively as possible (ideally
+    it would be infinitely but we don't want to use up all available memory).
+    So this method uses lru_cache() to cache results in process-local memory.
+
+    (Note: This can't use BundleCache because BundleCache only associates data
+    with the most recent bundleversion, not a specified bundleversion)
     """
-    # Use the blockstore django cache directly; this can't use BundleCache because BundleCache only associates data
-    # with the most recent bundleversion, not a specified bundleversion
-    cache_key = 'bundle_version_files:{}:{}'.format(bundle_uuid, bundle_version)
-    result = cache.get(cache_key)
-    if result is None:
-        result = blockstore_api.get_bundle_version_files(bundle_uuid, bundle_version)
-        cache.set(cache_key, result, timeout=None)  # Cache forever since bundle versions are immutable
-    return result
+    return blockstore_api.get_bundle_version_files(bundle_uuid, bundle_version)
 
 
 def get_bundle_draft_files_cached(bundle_uuid, draft_name):
@@ -202,34 +202,24 @@ def get_bundle_file_data_with_cache(bundle_uuid, path, bundle_version=None, draf
     cached list of files in each bundle if available.
     """
     file_info = get_bundle_file_metadata_with_cache(bundle_uuid, path, bundle_version, draft_name)
-    response = requests.get(file_info.url)
-    if response.status_code != 200:
-        try:
-            error_response = response.content.decode('utf-8')[:500]
-        except UnicodeDecodeError:
-            error_response = '(error details unavailable - response was not a [unicode] string)'
-        raise blockstore_api.BundleStorageError(
-            "Unexpected error trying to read {} from bundle {}: \n{}".format(path, bundle_uuid, error_response)
-        )
-    return response.content
+    with requests.get(file_info.url, stream=True) as r:
+        return r.content
 
 
+@lru_cache(maxsize=200)
 def get_bundle_version_direct_links_cached(bundle_uuid, bundle_version):
     """
     Get the direct links in the specified BundleVersion. Since BundleVersions
-    are immutable, this should be cached as aggressively as possible.
+    are immutable, this should be cached as aggressively as possible (ideally
+    it would be infinitely but we don't want to use up all available memory).
+    So this method uses lru_cache() to cache results in process-local memory.
+
+    (Note: This can't use BundleCache because BundleCache only associates data
+    with the most recent bundleversion, not a specified bundleversion)
     """
-    # Use the blockstore django cache directly; this can't use BundleCache because BundleCache only associates data
-    # with the most recent bundleversion, not a specified bundleversion
-    cache_key = 'bundle_version_direct_links:{}:{}'.format(bundle_uuid, bundle_version)
-    result = cache.get(cache_key)
-    if result is None:
-        result = {
-            link.name: link.direct
-            for link in blockstore_api.get_bundle_version_links(bundle_uuid, bundle_version).values()
-        }
-        cache.set(cache_key, result, timeout=None)  # Cache forever since bundle versions are immutable
-    return result
+    return {
+        link.name: link.direct for link in blockstore_api.get_bundle_version_links(bundle_uuid, bundle_version).values()
+    }
 
 
 def get_bundle_draft_direct_links_cached(bundle_uuid, draft_name):

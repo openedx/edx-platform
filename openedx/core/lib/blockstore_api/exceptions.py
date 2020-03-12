@@ -25,7 +25,3 @@ class DraftNotFound(NotFound):
 
 class BundleFileNotFound(NotFound):
     pass
-
-
-class BundleStorageError(BlockstoreException):
-    pass
