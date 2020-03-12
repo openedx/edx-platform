@@ -2293,9 +2293,6 @@ INSTALLED_APPS = [
 
     # edx-drf-extensions
     'csrf.apps.CsrfAppConfig',  # Enables frontend apps to retrieve CSRF tokens.
-
-    # UCSD custom apps
-    'ucsd_registration_form'
 ]
 
 ######################### CSRF #########################################

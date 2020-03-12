@@ -1,11 +1,16 @@
+import csv
 from django.conf import settings
+from django.contrib import admin
 from django.db import models
+from django.forms import ModelForm
+from django.http import HttpResponse
 
 # Backwards compatible settings.AUTH_USER_MODEL
 USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
 
-class UCSDCustomRegistration(models.Model):
+# Models
+class AdditionalRegistrationFields(models.Model):
     """
     This model contains two extra fields that will be saved when a user registers.
     The form that wraps this model is in the forms.py file.
@@ -59,5 +64,44 @@ class UCSDCustomRegistration(models.Model):
     ])
 
     class Meta:
-        verbose_name = "Demographic Information"
-        verbose_name_plural = "Demographic Information"
+        verbose_name = "Additional Registration Information"
+        verbose_name_plural = "Additional Registration Information"
+
+
+# Form
+class AdditionalRegistrationFieldsForm(ModelForm):
+    """
+    The fields on this form are derived from the AdditionalRegistrationFields model in models.py.
+    """
+    def __init__(self, *args, **kwargs):
+        super(AdditionalRegistrationFieldsForm, self).__init__(*args, **kwargs)
+
+    class Meta(object):
+        model = AdditionalRegistrationFields
+        fields = ('gender_nb', 'ethnicity', 'age', 'education', 'howheard')
+
+
+# Admin Customization
+class ExportCsvMixin:
+    def export_as_csv(self, request, queryset):
+
+        meta = self.model._meta
+        field_names = [field.name for field in meta.fields]
+
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename={}.csv'.format(meta)
+        writer = csv.writer(response)
+
+        writer.writerow(field_names)
+        for obj in queryset:
+            row = writer.writerow([getattr(obj, field) for field in field_names])
+
+        return response
+
+    export_as_csv.short_description = "Export Selected"
+
+
+@admin.register(AdditionalRegistrationFields)
+class AdditionalRegistrationFieldsAdmin(admin.ModelAdmin, ExportCsvMixin):
+    list_display = ('user', 'gender_nb', 'ethnicity', 'age', 'education', 'howheard')
+    actions = ["export_as_csv"]
