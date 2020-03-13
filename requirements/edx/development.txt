@@ -114,7 +114,7 @@ edx-django-release-util==0.3.6  # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==2.4.3  # via -r requirements/edx/testing.txt
 edx-django-utils==3.0     # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client
 edx-drf-extensions==4.0.2  # via -r requirements/edx/testing.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==2.5.3     # via -r requirements/edx/testing.txt
+edx-enterprise==2.5.5     # via -r requirements/edx/testing.txt
 edx-i18n-tools==0.5.0     # via -r requirements/edx/testing.txt, ora2
 edx-lint==1.4.1           # via -r requirements/edx/testing.txt
 edx-milestones==0.2.6     # via -r requirements/edx/testing.txt
@@ -138,7 +138,7 @@ enum34==1.1.10            # via -r requirements/edx/testing.txt, edxval
 event-tracking==0.3.0     # via -r requirements/edx/testing.txt, edx-proctoring, edx-search
 execnet==1.7.1            # via -r requirements/edx/testing.txt, pytest-xdist
 factory-boy==2.8.1        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
-faker==4.0.1              # via -r requirements/edx/testing.txt, factory-boy
+faker==4.0.2              # via -r requirements/edx/testing.txt, factory-boy
 filelock==3.0.12          # via -r requirements/edx/testing.txt, tox, virtualenv
 flake8-polyfill==1.0.2    # via -r requirements/edx/testing.txt, radon
 flake8==3.7.9             # via -r requirements/edx/testing.txt, flake8-polyfill
@@ -249,7 +249,7 @@ pytest-json-report==1.2.1  # via -r requirements/edx/testing.txt
 pytest-metadata==1.8.0    # via -r requirements/edx/testing.txt, pytest-json-report
 pytest-randomly==3.2.1    # via -r requirements/edx/testing.txt
 pytest-xdist==1.31.0      # via -r requirements/edx/testing.txt
-pytest==5.4.0             # via -r requirements/edx/testing.txt, pytest-attrib, pytest-cov, pytest-django, pytest-forked, pytest-json-report, pytest-metadata, pytest-randomly, pytest-xdist
+pytest==5.4.1             # via -r requirements/edx/testing.txt, pytest-attrib, pytest-cov, pytest-django, pytest-forked, pytest-json-report, pytest-metadata, pytest-randomly, pytest-xdist
 python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, analytics-python, botocore, edx-ace, edx-drf-extensions, edx-enterprise, edx-proctoring, faker, freezegun, ora2, pandas, xblock
 python-levenshtein==0.12.0  # via -r requirements/edx/testing.txt
 python-memcached==1.59    # via -r requirements/edx/testing.txt
