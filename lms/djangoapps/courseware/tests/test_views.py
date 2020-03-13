@@ -273,8 +273,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 172),
-        (ModuleStoreEnum.Type.split, 4, 170),
+        (ModuleStoreEnum.Type.mongo, 10, 174),
+        (ModuleStoreEnum.Type.split, 4, 172),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
@@ -2599,6 +2599,33 @@ class TestIndexView(ModuleStoreTestCase):
                 views.CourseTabView.course_open_for_learner_enrollment(course),
                 expected_should_show_enroll_button
             )
+
+    def test_reset_deadlines_banner_is_present_when_viewing_courseware(self):
+        user = UserFactory()
+        course = CourseFactory.create(self_paced=True)
+        with self.store.bulk_operations(course.id):
+            chapter = ItemFactory.create(parent=course, category='chapter')
+            section = ItemFactory.create(
+                parent=chapter, category='sequential',
+                display_name="Sequence",
+                due=datetime.today() - timedelta(1),
+            )
+
+        CourseOverview.load_from_module_store(course.id)
+        CourseEnrollmentFactory(user=user, course_id=course.id, mode=CourseMode.VERIFIED)
+        self.client.login(username=user.username, password='test')
+        response = self.client.get(
+            reverse(
+                'courseware_section',
+                kwargs={
+                    'course_id': six.text_type(course.id),
+                    'chapter': chapter.url_name,
+                    'section': section.url_name,
+                }
+            ) + '?activate_block_id=test_block_id'
+        )
+
+        self.assertContains(response, '<div class="reset-deadlines-banner">')
 
 
 @ddt.ddt

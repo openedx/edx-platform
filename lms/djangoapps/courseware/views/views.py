@@ -24,6 +24,7 @@ from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpRespo
 from django.shortcuts import redirect
 from django.template.context_processors import csrf
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.http import urlquote_plus
 from django.utils.text import slugify
@@ -734,6 +735,15 @@ class CourseTabView(EdxFragmentView):
             'openedx.course_experience.reset_course_deadlines', kwargs={'course_id': text_type(course.id)}
         )
 
+        display_reset_dates_banner = False
+        if RELATIVE_DATES_FLAG.is_enabled(course.id):
+            course_overview = CourseOverview.get_from_id(course.id)
+            end_date = getattr(course_overview, 'end_date', None)
+            if (not end_date or timezone.now() < end_date and CourseEnrollment.objects.filter(
+                course=course_overview, user=request.user, mode=CourseMode.VERIFIED
+            ).exists()):
+                display_reset_dates_banner = True
+
         context = {
             'course': course,
             'tab': tab,
@@ -744,8 +754,8 @@ class CourseTabView(EdxFragmentView):
             'uses_bootstrap': uses_bootstrap,
             'uses_pattern_library': not uses_bootstrap,
             'disable_courseware_js': True,
-            'relative_dates_is_enabled': RELATIVE_DATES_FLAG.is_enabled(course.id),
             'reset_deadlines_url': reset_deadlines_url,
+            'display_reset_dates_banner': display_reset_dates_banner,
         }
         # Avoid Multiple Mathjax loading on the 'user_profile'
         if 'profile_page_context' in kwargs:
