@@ -17,7 +17,7 @@
             },
 
             events: {
-                'click #download-team-csv-input': ViewUtils.withDisabledElement('downloadCsv'),
+                'click #download-team-csv-input': 'downloadCsv',
                 'change #upload-team-csv-input': ViewUtils.withDisabledElement('uploadCsv')
             },
 
