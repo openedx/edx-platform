@@ -52,7 +52,6 @@
 
 
 # Python libraries to install directly from github
-git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
 git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
 
 # Third-party:
@@ -62,13 +61,15 @@ git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
 -e git+https://github.com/jsocol/django-ratelimit.git@72edbe8949fbf6699848e5847645a1998f121d46#egg=ratelimit
 
+# This fork adds django>1.11 and django<3 compatibility for django-babel-underscore. Enmerkar is
+# being installed from github to add backward compatibility for django1.11 as named versions are not
+# backward compatible.
+git+https://github.com/edx/django-babel-underscore.git@37705f7377a4d0a4e673f1431895ce28a8860cd7#egg=django-babel-underscore==0.6.0
+git+https://github.com/Zegocover/enmerkar.git@dbc113798aa4beabdfa2d00e6fef48248eb0f185#egg=django-babel==0.6.3.dev0
+
 # Forked to get Django 2.2 support from unreleased master branch from social-app-django repo.
 # This can be removed once an official social-auth-app-django Pypi release with Django 2.2 support is available in the future.
 -e git+https://github.com/python-social-auth/social-app-django.git@c00d23c2b45c3317bd35b15ad1b959338689cef8#egg=social-auth-app-django
-
-# Why a django-celery fork? To add Django 1.11 compatibility to the abandoned repo.
-# This dependency will be removed by the Celery 4 upgrade: https://openedx.atlassian.net/browse/PLAT-1684
-git+https://github.com/edx/django-celery.git@756cb57aad765cb2b0d37372c1855b8f5f37e6b0#egg=django-celery==3.2.1+edx.2
 
 # Why install sorl-thumbnail directly from github? To use the latest, Django 2.2 compatible version that is not available on PyPi yet.
 # This dependency will be removed after package is updated at PyPi
@@ -86,7 +87,7 @@ git+https://gitlab.com/Ayub-khan/django-method-override.git@5270af321be2e576d8e8
 # Our libraries:
 -e git+https://github.com/edx/codejail.git@4127fc4bd5775cc72aee8d7f0a70e31405e22439#egg=codejail
 -e git+https://github.com/edx/acid-block.git@98aecba94ecbfa934e2d00262741c0ea9f557fc9#egg=acid-xblock
-git+https://github.com/edx/edx-ora2.git@2.6.17#egg=ora2==2.6.17
+git+https://github.com/edx/edx-ora2.git@2.6.18#egg=ora2==2.6.18
 git+https://github.com/edx/crowdsourcehinter.git@a7ffc85b134b7d8909bf1fefd23dbdb8eb28e467#egg=crowdsourcehinter-xblock==0.2
 -e git+https://github.com/edx/RateXBlock.git@2.0#egg=rate-xblock
 -e git+https://github.com/edx/DoneXBlock.git@2.0.1#egg=done-xblock

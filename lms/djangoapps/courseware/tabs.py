@@ -321,8 +321,7 @@ class DatesTab(CourseTab):
     @classmethod
     def is_enabled(cls, course, user=None):
         """Returns true if this tab is enabled."""
-        # We want to only limit this feature to instructor led courses for now (and limit to relative dates experiment)
-        return not CourseOverview.get_from_id(course.id).self_paced and RELATIVE_DATES_FLAG.is_enabled(course.id)
+        return RELATIVE_DATES_FLAG.is_enabled(course.id)
 
 
 def get_course_tab_list(user, course):

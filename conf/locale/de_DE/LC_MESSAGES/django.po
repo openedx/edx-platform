@@ -169,7 +169,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-02-23 20:42+0000\n"
+"POT-Creation-Date: 2020-03-08 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019\n"
 "Language-Team: German (Germany) (https://www.transifex.com/open-edx/teams/6205/de_DE/)\n"
@@ -522,10 +522,8 @@ msgstr[1] "%(count)d Teilnehmerkonten wurden entsperrt."
 #, python-brace-format
 msgid ""
 "Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' in"
-" SiteConfiguration model's values field."
+" SiteConfiguration model's site_values field."
 msgstr ""
-"Bitte fügen Sie im Wertefeld des SiteConfiguration-Modells einen "
-"Schlüssel/Wert 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' hinzu."
 
 #: common/djangoapps/student/admin.py
 #, python-brace-format
@@ -1002,16 +1000,6 @@ msgstr "Die alte E-Mail-Adresse ist identisch mit der neuen."
 #: common/djangoapps/student/views/management.py
 msgid "Cannot be same as your sign in email address."
 msgstr "Kann nicht die gleiche sein, wie Ihre Anmelde-E-Mail-Adresse."
-
-#: common/djangoapps/student/views/management.py
-#: openedx/core/djangoapps/user_authn/views/registration_form.py
-#, python-brace-format
-msgid ""
-"It looks like {email} belongs to an existing account. Try again with a "
-"different email address."
-msgstr ""
-"Es scheint, dass {email} bereits einem anderen Konto zugeordnet ist. "
-"Versuchen Sie ein mit einer anderen E-Mail-Adresse noch einmal."
 
 #: common/djangoapps/student/views/management.py
 msgid "Unable to send email activation link. Please try again later."
@@ -6680,6 +6668,10 @@ msgstr "Fortschritt"
 msgid "Textbooks"
 msgstr "Lehrbücher"
 
+#: lms/djangoapps/courseware/tabs.py
+msgid "Dates"
+msgstr ""
+
 #: lms/djangoapps/courseware/views/index.py
 #, python-brace-format
 msgid ""
@@ -8134,6 +8126,10 @@ msgstr "Verarbeiten des Datums nicht möglich:"
 #, python-brace-format
 msgid "Couldn't find module for url: {0}"
 msgstr "Konnte Modul für URL nicht finden: {0}"
+
+#: lms/djangoapps/instructor/views/tools.py
+msgid "Could not find student enrollment in the course."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
 #, python-brace-format
@@ -9809,6 +9805,10 @@ msgid "It is recommended that you change your password."
 msgstr "Es wird empfohlen, dass du dein Passwort änderst."
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
+msgid "You may access your course."
+msgstr ""
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
 msgid "Sincerely yours, The %(course_name)s Team"
@@ -9822,6 +9822,11 @@ msgid ""
 msgstr ""
 "Um zu beginnen, besuchen Sie bitte https://%(site_name)s. Die Zugangsdaten "
 "für Ihr Konto folgen."
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
+#, python-format
+msgid "You may access your course at: %(course_url)s."
+msgstr ""
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/subject.txt
 #: lms/templates/instructor/edx_ace/enrollenrolled/email/subject.txt
@@ -10963,6 +10968,11 @@ msgstr ""
 "Ich und mein Unternehmen akzeptieren die {link_start}{platform_name} API "
 "Nutzungsbedingungen{link_end}."
 
+#: openedx/core/djangoapps/auth_exchange/forms.py
+#, python-format
+msgid "'%s' is not a valid scope."
+msgstr ""
+
 #: openedx/core/djangoapps/bookmarks/apps.py
 #: openedx/features/course_bookmarks/plugins.py
 #: openedx/features/course_bookmarks/views/course_bookmarks.py
@@ -11145,6 +11155,10 @@ msgstr "Autoren Inhalt"
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "Read-only"
 msgstr "Nur Lesezugriff"
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "One and only one of 'user' and 'group' must be set."
+msgstr ""
 
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
@@ -12482,6 +12496,15 @@ msgstr "Du hast ein oder mehrere benötigte Felder ausgelassen"
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Unauthorized email address."
 msgstr "Unautorisierte E-Mail-Adresse."
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid ""
+"It looks like {email} belongs to an existing account. Try again with a "
+"different email address."
+msgstr ""
+"Es scheint, dass {email} bereits einem anderen Konto zugeordnet ist. "
+"Versuchen Sie ein mit einer anderen E-Mail-Adresse noch einmal."
 
 #. Translators: These instructions appear on the registration form,
 #. immediately
@@ -14644,6 +14667,10 @@ msgstr "Vorschaumodus"
 msgid "You are now viewing the course as {i_start}{user_name}{i_end}."
 msgstr "Sie sehen den Kurs aus der Sicht von {i_start}{user_name}{i_end}."
 
+#: lms/templates/preview_menu.html
+msgid "View this unit in the new experience"
+msgstr ""
+
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
 msgid_plural "You have used {num_used} of {num_total} attempts"
@@ -14708,6 +14735,16 @@ msgstr "E-Mail"
 #, python-format
 msgid "Return To %s"
 msgstr "Zurück zu %s"
+
+#: lms/templates/reset_deadlines_banner.html
+msgid ""
+"It looks like you've missed some important deadlines. Reset your deadlines "
+"and get started today."
+msgstr ""
+
+#: lms/templates/reset_deadlines_banner.html
+msgid "Reset my deadlines"
+msgstr ""
 
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
@@ -17174,6 +17211,27 @@ msgid "Your score is {current_score}%. You have passed the entrance exam."
 msgstr ""
 "Deine Punktzahl ist {current_score}%. Du hast die Eingangsprüfung bestanden."
 
+#: lms/templates/courseware/dates.html lms/templates/courseware/syllabus.html
+msgid "{course.display_number_with_default} Course Info"
+msgstr "{course.display_number_with_default} Kursinformationen"
+
+#: lms/templates/courseware/dates.html
+msgid "Important Dates"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid "Due Today"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid "Verified Only"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid ""
+"{a_start}Upgrade{a_end}{space}to a Verified Certificate for full access."
+msgstr ""
+
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
 msgstr "Notenbuch"
@@ -17501,10 +17559,6 @@ msgstr "Übungsergebnisse werden ausgeblendet."
 #: lms/templates/courseware/progress.html
 msgid "No problem scores in this section"
 msgstr "Keine Fragestellungspunkte in diesem Abschnitt"
-
-#: lms/templates/courseware/syllabus.html
-msgid "{course.display_number_with_default} Course Info"
-msgstr "{course.display_number_with_default} Kursinformationen"
 
 #: lms/templates/courseware/welcome-back.html
 msgid ""
@@ -21108,42 +21162,6 @@ msgstr "Markierung beibehalten"
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Go Back"
 msgstr "Gehe zurück"
-
-#: lms/templates/provider/authorize.html
-msgid ""
-"{start_strong}{application_name}{end_strong} would like to access your data "
-"with the following permissions:"
-msgstr ""
-"{start_strong}{application_name}{end_strong} möchte mit den folgenden "
-"Berechtigungen auf Ihre Daten zugreifen:"
-
-#: lms/templates/provider/authorize.html
-msgid "Read your user ID"
-msgstr "Lesen Sie Ihre Benutzer-ID"
-
-#: lms/templates/provider/authorize.html
-msgid "Read your user profile"
-msgstr "Lesen Sie Ihr Benutzerprofil"
-
-#: lms/templates/provider/authorize.html
-msgid "Read your email address"
-msgstr "Lesen Sie Ihre E-Mail-Adresse"
-
-#: lms/templates/provider/authorize.html
-msgid "Read the list of courses in which you are a staff member."
-msgstr "Lesen Sie die Liste der Kurse, in denen Sie Mitarbeiter sind."
-
-#: lms/templates/provider/authorize.html
-msgid "Read the list of courses in which you are an instructor."
-msgstr "Lesen Sie die Liste der Kurse, in denen Sie Dozent sind."
-
-#: lms/templates/provider/authorize.html
-msgid "To see if you are a global staff user"
-msgstr "Um zu sehen, ob Sie ein globaler Mitarbeiterbenutzer sind."
-
-#: lms/templates/provider/authorize.html
-msgid "Manage your data: {permission}"
-msgstr "Verwalten Sie Ihre Daten: {permission} "
 
 #: lms/templates/registration/account_activation_sidebar_notice.html
 msgid "Account Activation Info"

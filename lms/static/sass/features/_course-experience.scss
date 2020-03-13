@@ -11,7 +11,6 @@
 
     .icon {
       width: 20px;
-      text-align: center;
     }
 
     &:not(:last-child) {
@@ -275,21 +274,31 @@
         }
       }
     }
+  }
 
-    .section-tools .course-tool {
-      .course-tool-link:visited {
-        color: theme-color("primary");
-      }
-
-      &:not(:first-child) {
-        margin-top: ($baseline / 5);
-      }
+  .section-tools .course-tool {
+    .course-tool-link:visited {
+      color: theme-color("primary");
     }
 
-    @media print {
-      .section-tools {
-        display: none !important;
-      }
+    &:not(:first-child) {
+      margin-top: ($baseline / 5);
+    }
+
+    .course-tool-button {
+      background: none;
+      border: none;
+      color: theme-color("primary");
+      cursor: pointer;
+      font-size: 1em;
+      padding: 0;
+      text-align: left;
+    }
+  }
+
+  @media print {
+    .section-tools {
+      display: none !important;
     }
   }
 
@@ -412,69 +421,62 @@
 }
 
 // date summary
-.date-summary {
-  @include clearfix;
+.date-summary-container {
+  .date-summary {
+    @include clearfix;
 
-  display: flex;
-  justify-content: space-between;
-  padding: 12px 0;
-  &:last-of-type {
-    padding-bottom: 0;
-  }
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
 
-  .left-column {
-    flex: 0 0 24px;
-
-    .calendar-icon {
-      margin-top: 4px;
-      height: 1em;
-      width: 16px;
-      background: url('#{$static-path}/images/calendar-alt-regular.svg');
-      background-repeat: no-repeat;
-    }
-  }
-
-  .right-column {
-    flex: auto;
-
-    .localized-datetime {
-      font-weight: $font-weight-bold;
-      margin-bottom: 8px;
+    &:last-of-type {
+      padding-bottom: 0;
     }
 
-    .heading {
-      font: -apple-system-body;
-      line-height: 1.5;
-      font-weight: $font-bold;
-      color: theme-color("dark");
+    .right-column {
+      flex: auto;
+      padding-left: 4px;
 
-      a {
-        font-weight: $font-semibold;
+      .localized-datetime {
+        font-weight: $font-weight-bold;
+        margin-bottom: 8px;
       }
-    }
 
-    .description {
-      margin-bottom: 0;
-      display: inline-block;
-    }
+      .heading {
+        font: -apple-system-body;
+        line-height: 1.5;
+        font-weight: $font-bold;
+        color: theme-color("dark");
 
-    .heading, .description {
-      font-size: 0.9rem;
-    }
+        a {
+          font-weight: $font-semibold;
+        }
+      }
 
-    .date-summary-link {
-      font-weight: $font-semibold;
+      .description {
+        margin-bottom: 0;
+        display: inline-block;
+      }
 
-      a {
-        color: $link-color;
+      .heading,
+      .description {
         font-size: 0.9rem;
       }
-    }
-  }
 
-  .date {
-    color: theme-color("dark");
-    font: -apple-system-body;
+      .date-summary-link {
+        font-weight: $font-semibold;
+
+        a {
+          color: $link-color;
+          font-size: 0.9rem;
+        }
+      }
+    }
+
+    .date {
+      color: theme-color("dark");
+      font: -apple-system-body;
+    }
   }
 }
 

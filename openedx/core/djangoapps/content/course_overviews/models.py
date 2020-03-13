@@ -780,6 +780,20 @@ class CourseOverview(TimeStampedModel):
         return self._original_course.textbooks
 
     @property
+    def pdf_textbooks(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.pdf_textbooks
+
+    @property
+    def html_textbooks(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.html_textbooks
+
+    @property
     def hide_progress_tab(self):
         """
         TODO: move this to the model.
@@ -806,6 +820,13 @@ class CourseOverview(TimeStampedModel):
         TODO: move this to the model.
         """
         return self._original_course.course_visibility
+
+    @property
+    def teams_enabled(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.teams_enabled
 
     def __str__(self):
         """Represent ourselves with the course key."""

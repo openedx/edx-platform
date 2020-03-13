@@ -145,7 +145,79 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
         url = '{}{}'.format(course_home_url(course), 'reset_deadlines')
         self.client.post(url)
         updated_schedule = Schedule.objects.get(enrollment=enrollment)
-        self.assertEqual(updated_schedule.start_date.day, datetime.datetime.today().day)
+        self.assertEqual(updated_schedule.start_date.date(), datetime.datetime.today().date())
+
+    def test_reset_course_deadlines_masquerade_specific_student(self):
+        course = self.courses[0]
+
+        student_schedule = ScheduleFactory(
+            start_date=timezone.now() - datetime.timedelta(1),
+            enrollment=CourseEnrollment.objects.get(course_id=course.id, user=self.user),
+        )
+        staff = StaffFactory(course_key=course.id)
+        staff_schedule = ScheduleFactory(
+            start_date=timezone.now() - datetime.timedelta(1),
+            enrollment__course__id=course.id,
+            enrollment__user=staff,
+        )
+
+        self.client.login(username=staff.username, password=TEST_PASSWORD)
+        masquerade_url = reverse(
+            'masquerade_update',
+            kwargs={
+                'course_key_string': six.text_type(course.id),
+            }
+        )
+        response = self.client.post(
+            masquerade_url,
+            json.dumps({"role": 'student', "group_id": None, "user_name": self.user.username}),
+            "application/json"
+        )
+
+        assert response.status_code == 200
+
+        url = '{}{}'.format(course_home_url(course), 'reset_deadlines')
+        self.client.post(url)
+        updated_schedule = Schedule.objects.get(id=student_schedule.id)
+        self.assertEqual(updated_schedule.start_date.date(), datetime.datetime.today().date())
+        updated_staff_schedule = Schedule.objects.get(id=staff_schedule.id)
+        self.assertEqual(updated_staff_schedule.start_date, staff_schedule.start_date)
+
+    def test_reset_course_deadlines_masquerade_generic_student(self):
+        course = self.courses[0]
+
+        student_schedule = ScheduleFactory(
+            start_date=timezone.now() - datetime.timedelta(1),
+            enrollment=CourseEnrollment.objects.get(course_id=course.id, user=self.user),
+        )
+        staff = StaffFactory(course_key=course.id)
+        staff_schedule = ScheduleFactory(
+            start_date=timezone.now() - datetime.timedelta(1),
+            enrollment__course__id=course.id,
+            enrollment__user=staff,
+        )
+
+        self.client.login(username=staff.username, password=TEST_PASSWORD)
+        masquerade_url = reverse(
+            'masquerade_update',
+            kwargs={
+                'course_key_string': six.text_type(course.id),
+            }
+        )
+        response = self.client.post(
+            masquerade_url,
+            json.dumps({"role": 'student', "group_id": None, "user_name": None}),
+            "application/json"
+        )
+
+        assert response.status_code == 200
+
+        url = '{}{}'.format(course_home_url(course), 'reset_deadlines')
+        self.client.post(url)
+        updated_student_schedule = Schedule.objects.get(id=student_schedule.id)
+        self.assertEqual(updated_student_schedule.start_date, student_schedule.start_date)
+        updated_staff_schedule = Schedule.objects.get(id=staff_schedule.id)
+        self.assertEqual(updated_staff_schedule.start_date.date(), datetime.datetime.today().date())
 
 
 class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, MilestonesTestCaseMixin):

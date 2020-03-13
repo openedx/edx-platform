@@ -8,6 +8,7 @@ StudioViewHandlers are handlers for video descriptor instance.
 
 import json
 import logging
+import math
 
 import six
 from django.core.files.base import ContentFile
@@ -88,6 +89,11 @@ class VideoStudentViewHandlers(object):
 
                     if key == 'bumper_last_view_date':
                         value = now()
+
+                    if key == 'speed' and math.isnan(value):
+                        message = u"Invalid speed value {}, must be a float.".format(value)
+                        log.warning(message)
+                        return json.dumps({'success': False, 'error': message})
 
                     setattr(self, key, value)
 

@@ -219,6 +219,9 @@ FEATURES['ENABLE_COSMETIC_DISPLAY_PRICE'] = True
 ######################### Program Enrollments #####################
 FEATURES['ENABLE_ENROLLMENT_RESET'] = True
 
+######################### New Courseware MFE #####################
+FEATURES['ENABLE_COURSEWARE_MICROFRONTEND'] = True
+
 ########################## Third Party Auth #######################
 
 if FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and 'third_party_auth.dummy.DummyBackend' not in AUTHENTICATION_BACKENDS:

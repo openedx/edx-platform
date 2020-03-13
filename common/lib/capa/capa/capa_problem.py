@@ -561,22 +561,22 @@ class LoncapaProblem(object):
             a string with the question text
         """
 
-        def log_error():
+        def generate_default_question_label():
             """
-            Temporary method for logging
+            To create question string like "Question 2" by adding "Question" and its position number.
+            For instance 'd2e35c1d294b4ba0b3b1048615605d2a_2_1' contains 2,
+            which is used in question number 1 (see example XML in comment above)
+            There's no question 0 (question IDs start at 1, answer IDs at 2)
             """
-            log.error(
-                'KeyError: answer_id: {}, Problem data: {}, problem: {}'
-                .format(answer_id, self.problem_data, etree.tostring(self.tree))
-            )
+            question_nr = int(answer_id.split('_')[-2]) - 1
+            return _("Question {}").format(question_nr)
 
         _ = get_gettext(self.capa_system.i18n)
         # Some questions define a prompt with this format:   >>This is a prompt<<
         try:
             prompt = self.problem_data[answer_id].get('label')
         except KeyError:
-            log_error()
-            raise
+            prompt = None
 
         if prompt:
             question_text = prompt.striptags()
@@ -592,10 +592,8 @@ class LoncapaProblem(object):
             #
             # Starting from  answer (the optioninput in this example) we go up and backwards
             xml_elems = self.tree.xpath('//*[@id="' + answer_id + '"]')
-
             if len(xml_elems) != 1:
-                log_error()
-            assert len(xml_elems) == 1
+                return generate_default_question_label()
 
             xml_elem = xml_elems[0].getparent()
 
@@ -619,11 +617,7 @@ class LoncapaProblem(object):
             if questiontext_elem is not None and questiontext_elem.tag in LABEL_ELEMS:
                 question_text = questiontext_elem.text
             else:
-                # For instance 'd2e35c1d294b4ba0b3b1048615605d2a_2_1' contains 2,
-                # which is used in question number 1 (see example XML in comment above)
-                # There's no question 0 (question IDs start at 1, answer IDs at 2)
-                question_nr = int(answer_id.split('_')[-2]) - 1
-                question_text = _("Question {0}").format(question_nr)
+                question_text = generate_default_question_label()
 
         return question_text
 

@@ -1082,7 +1082,6 @@
     "Mute": "\u9759\u97f3",
     "Muted": "\u9759\u97f3",
     "My Orders": "\u6211\u7684\u8ba2\u5355",
-    "My Team": "\u6211\u7684\u56e2\u961f",
     "N/A": "\u4e0d\u9002\u7528",
     "Name": "\u59d3\u540d",
     "Name ": "\u59d3\u540d",

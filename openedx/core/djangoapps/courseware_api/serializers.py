@@ -84,6 +84,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     pacing = serializers.CharField()
     enrollment = serializers.DictField()
     user_has_access = serializers.BooleanField()
+    user_has_staff_access = serializers.BooleanField()
     tabs = serializers.SerializerMethodField()
     verified_mode = serializers.SerializerMethodField()
 
@@ -107,7 +108,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
         tabs = []
         for priority, tab in enumerate(get_course_tab_list(course_overview.effective_user, course_overview)):
             tabs.append({
-                'title': tab.title,
+                'title': tab.title or tab.get('name', ''),
                 'slug': tab.tab_id,
                 'priority': priority,
                 'type': tab.type,

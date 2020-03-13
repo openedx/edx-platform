@@ -648,6 +648,12 @@ urlpatterns += [
         include('openedx.features.course_bookmarks.urls'),
     ),
 
+    # Calendar Sync UI in LMS
+    url(
+        r'^courses/{}/'.format(settings.COURSE_ID_PATTERN,),
+        include('openedx.features.calendar_sync.urls'),
+    ),
+
     # Course search
     url(
         r'^courses/{}/search/'.format(

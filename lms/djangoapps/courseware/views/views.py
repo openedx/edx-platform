@@ -131,6 +131,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.tabs import CourseTabList
 from xmodule.x_module import STUDENT_VIEW
 
+from ..context_processor import user_timezone_locale_prefs
 from ..entrance_exams import user_can_skip_entrance_exam
 from ..module_render import get_module, get_module_by_usage_id, get_module_for_descriptor
 
@@ -1050,6 +1051,12 @@ def dates(request, course_id):
                                                 include_access=True, include_past_dates=True)
     enrollment = get_enrollment(request.user.username, course_id)
     learner_is_verified = False
+
+    # User locale settings
+    user_timezone_locale = user_timezone_locale_prefs(request)
+    user_timezone = user_timezone_locale['user_timezone']
+    user_language = user_timezone_locale['user_language']
+
     if enrollment:
         learner_is_verified = enrollment.get('mode') == 'verified'
 
@@ -1058,6 +1065,8 @@ def dates(request, course_id):
         'course_date_blocks': [block for block in course_date_blocks if block.title != 'current_datetime'],
         'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
         'learner_is_verified': learner_is_verified,
+        'user_timezone': user_timezone,
+        'user_language': user_language,
     }
 
     return render_to_response('courseware/dates.html', context)

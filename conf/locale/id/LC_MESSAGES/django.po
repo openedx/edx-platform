@@ -99,7 +99,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-02-23 20:42+0000\n"
+"POT-Creation-Date: 2020-03-08 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019\n"
 "Language-Team: Indonesian (https://www.transifex.com/open-edx/teams/6205/id/)\n"
@@ -444,7 +444,7 @@ msgstr[0] "%(count)d akun siswa sudah tidak terkunci."
 #, python-brace-format
 msgid ""
 "Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' in"
-" SiteConfiguration model's values field."
+" SiteConfiguration model's site_values field."
 msgstr ""
 
 #: common/djangoapps/student/admin.py
@@ -903,16 +903,6 @@ msgstr "Email lama sama dengan email baru."
 #: common/djangoapps/student/views/management.py
 msgid "Cannot be same as your sign in email address."
 msgstr "Tidak boleh sama dengan alamat email sign in Anda."
-
-#: common/djangoapps/student/views/management.py
-#: openedx/core/djangoapps/user_authn/views/registration_form.py
-#, python-brace-format
-msgid ""
-"It looks like {email} belongs to an existing account. Try again with a "
-"different email address."
-msgstr ""
-"Tampaknya {email} sudah terhubung dengan salah satu akun. Coba lagi dengan "
-"alamat email yang berbeda."
 
 #: common/djangoapps/student/views/management.py
 msgid "Unable to send email activation link. Please try again later."
@@ -6323,6 +6313,10 @@ msgstr "Kemajuan"
 msgid "Textbooks"
 msgstr "Buku teks"
 
+#: lms/djangoapps/courseware/tabs.py
+msgid "Dates"
+msgstr ""
+
 #: lms/djangoapps/courseware/views/index.py
 #, python-brace-format
 msgid ""
@@ -7735,6 +7729,10 @@ msgstr "Nonaktifkan untuk menguraikan tanggal:"
 #, python-brace-format
 msgid "Couldn't find module for url: {0}"
 msgstr "Tidak dapat menemukan modul untuk url: {0}"
+
+#: lms/djangoapps/instructor/views/tools.py
+msgid "Could not find student enrollment in the course."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
 #, python-brace-format
@@ -9226,6 +9224,10 @@ msgid "It is recommended that you change your password."
 msgstr "Kami merekomendasikan Anda untuk mengganti sandi."
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
+msgid "You may access your course."
+msgstr ""
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
 msgid "Sincerely yours, The %(course_name)s Team"
@@ -9239,6 +9241,11 @@ msgid ""
 msgstr ""
 "Untuk mulai, silakan buka https://%(site_name)s. Informasi login Anda akan "
 "mengikuti."
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
+#, python-format
+msgid "You may access your course at: %(course_url)s."
+msgstr ""
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/subject.txt
 #: lms/templates/instructor/edx_ace/enrollenrolled/email/subject.txt
@@ -10319,6 +10326,11 @@ msgid ""
 "Service{link_end}."
 msgstr ""
 
+#: openedx/core/djangoapps/auth_exchange/forms.py
+#, python-format
+msgid "'%s' is not a valid scope."
+msgstr ""
+
 #: openedx/core/djangoapps/bookmarks/apps.py
 #: openedx/features/course_bookmarks/plugins.py
 #: openedx/features/course_bookmarks/views/course_bookmarks.py
@@ -10481,6 +10493,10 @@ msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "Read-only"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "One and only one of 'user' and 'group' must be set."
 msgstr ""
 
 #: openedx/core/djangoapps/cors_csrf/models.py
@@ -11691,6 +11707,15 @@ msgstr "Terdapat satu field atau lebih yang belum diisi"
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Unauthorized email address."
 msgstr "Alamat email tidak dizinkan."
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid ""
+"It looks like {email} belongs to an existing account. Try again with a "
+"different email address."
+msgstr ""
+"Tampaknya {email} sudah terhubung dengan salah satu akun. Coba lagi dengan "
+"alamat email yang berbeda."
 
 #. Translators: These instructions appear on the registration form,
 #. immediately
@@ -13710,6 +13735,10 @@ msgstr "Atur mode preview"
 msgid "You are now viewing the course as {i_start}{user_name}{i_end}."
 msgstr "Anda sekarang mengikuti kursus sebagai {i_start} {user_name} {i_end}."
 
+#: lms/templates/preview_menu.html
+msgid "View this unit in the new experience"
+msgstr ""
+
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
 msgid_plural "You have used {num_used} of {num_total} attempts"
@@ -13772,6 +13801,16 @@ msgstr "Email"
 #, python-format
 msgid "Return To %s"
 msgstr "Kembali ke %s"
+
+#: lms/templates/reset_deadlines_banner.html
+msgid ""
+"It looks like you've missed some important deadlines. Reset your deadlines "
+"and get started today."
+msgstr ""
+
+#: lms/templates/reset_deadlines_banner.html
+msgid "Reset my deadlines"
+msgstr ""
 
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
@@ -16174,6 +16213,27 @@ msgstr ""
 "Nilai Anda adalah {current_score}%. Anda telah berhasil melewati ujian "
 "masuk."
 
+#: lms/templates/courseware/dates.html lms/templates/courseware/syllabus.html
+msgid "{course.display_number_with_default} Course Info"
+msgstr "Info Kursus {course.display_number_with_default}"
+
+#: lms/templates/courseware/dates.html
+msgid "Important Dates"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid "Due Today"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid "Verified Only"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid ""
+"{a_start}Upgrade{a_end}{space}to a Verified Certificate for full access."
+msgstr ""
+
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
 msgstr "Buku nilai"
@@ -16499,10 +16559,6 @@ msgstr "Skor pelatihan disembunyikan."
 #: lms/templates/courseware/progress.html
 msgid "No problem scores in this section"
 msgstr "Tidak ada nilai tes di bagian ini"
-
-#: lms/templates/courseware/syllabus.html
-msgid "{course.display_number_with_default} Course Info"
-msgstr "Info Kursus {course.display_number_with_default}"
 
 #: lms/templates/courseware/welcome-back.html
 msgid ""
@@ -20021,42 +20077,6 @@ msgstr "Simpan Bendera"
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Go Back"
 msgstr "Kembali"
-
-#: lms/templates/provider/authorize.html
-msgid ""
-"{start_strong}{application_name}{end_strong} would like to access your data "
-"with the following permissions:"
-msgstr ""
-"{start_strong} {application_name} {end_strong} ingin mengakses data Anda "
-"dengan izin berikut:"
-
-#: lms/templates/provider/authorize.html
-msgid "Read your user ID"
-msgstr "Baca ID pengguna milik Anda"
-
-#: lms/templates/provider/authorize.html
-msgid "Read your user profile"
-msgstr "Baca profil pengguna milik Anda"
-
-#: lms/templates/provider/authorize.html
-msgid "Read your email address"
-msgstr "Baca alamat email Anda"
-
-#: lms/templates/provider/authorize.html
-msgid "Read the list of courses in which you are a staff member."
-msgstr "Baca daftar pelatihan yang di mana Anda merupakan anggota staf."
-
-#: lms/templates/provider/authorize.html
-msgid "Read the list of courses in which you are an instructor."
-msgstr "Baca daftar pelatihan yang di mana Anda merupakan instruktur."
-
-#: lms/templates/provider/authorize.html
-msgid "To see if you are a global staff user"
-msgstr "Untuk memeriksa apakah Anda adalah pengguna staf global"
-
-#: lms/templates/provider/authorize.html
-msgid "Manage your data: {permission}"
-msgstr "Kelola data Anda: {permission}"
 
 #: lms/templates/registration/account_activation_sidebar_notice.html
 msgid "Account Activation Info"

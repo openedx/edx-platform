@@ -1128,7 +1128,6 @@
     "Mute": "Silenciar",
     "Muted": "En silencio",
     "My Orders": "Mis Pedidos",
-    "My Team": "Mi equipo",
     "N/A": "N/D",
     "Name": "Nombre",
     "Name ": "Nombre",

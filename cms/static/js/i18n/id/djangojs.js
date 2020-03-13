@@ -852,7 +852,6 @@
     "Mute": "Matikan Suara",
     "Muted": "Muted",
     "My Orders": "Pesanan Saya",
-    "My Team": "Tim Saya",
     "N/A": "N/A",
     "Name": "Nama",
     "Name ": "Nama",

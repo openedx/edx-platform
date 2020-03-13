@@ -85,7 +85,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-02-23 20:42+0000\n"
+"POT-Creation-Date: 2020-03-08 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Swahili (Kenya) (https://www.transifex.com/open-edx/teams/6205/sw_KE/)\n"
@@ -430,7 +430,7 @@ msgstr[1] ""
 #, python-brace-format
 msgid ""
 "Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' in"
-" SiteConfiguration model's values field."
+" SiteConfiguration model's site_values field."
 msgstr ""
 
 #: common/djangoapps/student/admin.py
@@ -875,16 +875,6 @@ msgstr "Barua pepe ya zamani ni sawa na \"barua pepe\" mpya."
 #: common/djangoapps/student/views/management.py
 msgid "Cannot be same as your sign in email address."
 msgstr ""
-
-#: common/djangoapps/student/views/management.py
-#: openedx/core/djangoapps/user_authn/views/registration_form.py
-#, python-brace-format
-msgid ""
-"It looks like {email} belongs to an existing account. Try again with a "
-"different email address."
-msgstr ""
-"Ni kama {email} inatumiwa na mtu mwingine. Jaribu tena kwakutumia anwani ya "
-"barua pepe tofauti."
 
 #: common/djangoapps/student/views/management.py
 msgid "Unable to send email activation link. Please try again later."
@@ -5836,6 +5826,10 @@ msgstr "Maendeleo"
 msgid "Textbooks"
 msgstr "Vitabu vya kiada"
 
+#: lms/djangoapps/courseware/tabs.py
+msgid "Dates"
+msgstr ""
+
 #: lms/djangoapps/courseware/views/index.py
 #, python-brace-format
 msgid ""
@@ -7160,6 +7154,10 @@ msgstr ""
 #: lms/djangoapps/instructor/views/tools.py
 #, python-brace-format
 msgid "Couldn't find module for url: {0}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/tools.py
+msgid "Could not find student enrollment in the course."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
@@ -8665,6 +8663,10 @@ msgid "It is recommended that you change your password."
 msgstr ""
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
+msgid "You may access your course."
+msgstr ""
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
 msgid "Sincerely yours, The %(course_name)s Team"
@@ -8675,6 +8677,11 @@ msgstr ""
 msgid ""
 "To get started, please visit https://%(site_name)s. The login information "
 "for your account follows."
+msgstr ""
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
+#, python-format
+msgid "You may access your course at: %(course_url)s."
 msgstr ""
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/subject.txt
@@ -9673,6 +9680,11 @@ msgid ""
 "Service{link_end}."
 msgstr ""
 
+#: openedx/core/djangoapps/auth_exchange/forms.py
+#, python-format
+msgid "'%s' is not a valid scope."
+msgstr ""
+
 #: lms/templates/courseware/courseware.html
 #: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
 msgid "Bookmarks"
@@ -9835,6 +9847,10 @@ msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "Read-only"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "One and only one of 'user' and 'group' must be set."
 msgstr ""
 
 #: openedx/core/djangoapps/cors_csrf/models.py
@@ -11023,6 +11039,15 @@ msgstr "Hujajaza moja au zaidi ya vipengele vinavyohitajika"
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Unauthorized email address."
 msgstr "Anwani ya barua pepe isiyoidhinishwa/kubalika."
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid ""
+"It looks like {email} belongs to an existing account. Try again with a "
+"different email address."
+msgstr ""
+"Ni kama {email} inatumiwa na mtu mwingine. Jaribu tena kwakutumia anwani ya "
+"barua pepe tofauti."
 
 #. Translators: These instructions appear on the registration form,
 #. immediately
@@ -13042,6 +13067,10 @@ msgstr "Weka mtindo wa 'kutazama' ukurasa"
 msgid "You are now viewing the course as {i_start}{user_name}{i_end}."
 msgstr "Sasa Unaangalia kozi kama{i_start}{user_name}{i_end}."
 
+#: lms/templates/preview_menu.html
+msgid "View this unit in the new experience"
+msgstr ""
+
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
 msgid_plural "You have used {num_used} of {num_total} attempts"
@@ -13105,6 +13134,16 @@ msgstr "Barua pepe"
 #, python-format
 msgid "Return To %s"
 msgstr "Rudi Kwenye %s"
+
+#: lms/templates/reset_deadlines_banner.html
+msgid ""
+"It looks like you've missed some important deadlines. Reset your deadlines "
+"and get started today."
+msgstr ""
+
+#: lms/templates/reset_deadlines_banner.html
+msgid "Reset my deadlines"
+msgstr ""
 
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
@@ -15257,6 +15296,27 @@ msgstr ""
 msgid "Your score is {current_score}%. You have passed the entrance exam."
 msgstr "Alama ulizopata ni %{current_score}. Umefaulu mtihani wa kujiunga."
 
+#: lms/templates/courseware/dates.html lms/templates/courseware/syllabus.html
+msgid "{course.display_number_with_default} Course Info"
+msgstr "{course.display_number_with_default} Taarifa ya Kozi"
+
+#: lms/templates/courseware/dates.html
+msgid "Important Dates"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid "Due Today"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid "Verified Only"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid ""
+"{a_start}Upgrade{a_end}{space}to a Verified Certificate for full access."
+msgstr ""
+
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
 msgstr "Kitabu cha madaraja"
@@ -15573,10 +15633,6 @@ msgstr "Matokeo ya zoezi yamefichwa."
 #: lms/templates/courseware/progress.html
 msgid "No problem scores in this section"
 msgstr "Hakuna matokeo ya swali katika kifungu hiki"
-
-#: lms/templates/courseware/syllabus.html
-msgid "{course.display_number_with_default} Course Info"
-msgstr "{course.display_number_with_default} Taarifa ya Kozi"
 
 #: lms/templates/courseware/welcome-back.html
 msgid ""
@@ -18976,42 +19032,6 @@ msgstr "Weka Alama"
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Go Back"
 msgstr "Rudi Nyuma"
-
-#: lms/templates/provider/authorize.html
-msgid ""
-"{start_strong}{application_name}{end_strong} would like to access your data "
-"with the following permissions:"
-msgstr ""
-"{start_strong}{application_name}{end_strong} ingependa kupata taarifa zako "
-"kwa kuruhusu yafuatayo:"
-
-#: lms/templates/provider/authorize.html
-msgid "Read your user ID"
-msgstr "Soma namba ya Kitambulisho chako cha utumiaji"
-
-#: lms/templates/provider/authorize.html
-msgid "Read your user profile"
-msgstr "Soma wasifu wako wa mtumiaji"
-
-#: lms/templates/provider/authorize.html
-msgid "Read your email address"
-msgstr "Soma anwani yako ya barua pepe"
-
-#: lms/templates/provider/authorize.html
-msgid "Read the list of courses in which you are a staff member."
-msgstr "Soma orodha yako ya kozi ambazo wewe ni mfanyakazi."
-
-#: lms/templates/provider/authorize.html
-msgid "Read the list of courses in which you are an instructor."
-msgstr "Soma orodha ya kozi ambayo wewe ni mkufunzi."
-
-#: lms/templates/provider/authorize.html
-msgid "To see if you are a global staff user"
-msgstr "Kuona kama wewe ni mtumiaji wa kimataifa"
-
-#: lms/templates/provider/authorize.html
-msgid "Manage your data: {permission}"
-msgstr "Mudu habari zako:{permission}"
 
 #: lms/templates/registration/account_activation_sidebar_notice.html
 msgid "Account Activation Info"

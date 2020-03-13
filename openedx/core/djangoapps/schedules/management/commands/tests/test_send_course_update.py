@@ -75,7 +75,6 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
         self.assertEqual(enrollment.schedule.get_experience_type(), ScheduleExperience.EXPERIENCES.course_updates)
 
         _, offset, target_day, _ = self._get_dates(offset=self.expected_offsets[0])
-        enrollment.schedule.start = target_day
         enrollment.schedule.start_date = target_day
         enrollment.schedule.save()
 

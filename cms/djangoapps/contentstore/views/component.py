@@ -121,23 +121,10 @@ def container_handler(request, usage_key_string):
 
             component_templates = get_component_templates(course)
             ancestor_xblocks = []
-            parent = get_parent_xblock(xblock)
             action = request.GET.get('action', 'view')
 
             is_unit_page = is_unit(xblock)
-            unit = xblock if is_unit_page else None
-
-            is_first = True
-            while parent:
-                if unit is None and is_unit(parent):
-                    unit = parent
-                elif parent.category != 'sequential':
-                    current_block = {'block': parent, 'children': parent.get_children(), 'is_last': is_first}
-                    is_first = False
-                    ancestor_xblocks.append(current_block)
-                parent = get_parent_xblock(parent)
-
-            ancestor_xblocks.reverse()
+            unit = xblock if is_unit_page else get_parent_xblock(xblock)
 
             assert unit is not None, "Could not determine unit page"
             subsection = get_parent_xblock(unit)
@@ -145,6 +132,15 @@ def container_handler(request, usage_key_string):
                 unit.location)
             section = get_parent_xblock(subsection)
             assert section is not None, "Could not determine ancestor section from unit " + six.text_type(unit.location)
+
+            # build the breadcrumbs
+            for block in (section, subsection):
+                parent = get_parent_xblock(block)
+                ancestor_xblocks.append({
+                    'title': block.display_name_with_default,
+                    'children': parent.get_children(),
+                    'is_last': block.category == 'sequential'
+                })
 
             # for the sequence navigator
             prev_url, next_url = get_sibling_urls(subsection)

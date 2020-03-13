@@ -1336,10 +1336,15 @@ CREATE TABLE `content_libraries_contentlibrarypermission` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `access_level` varchar(30) NOT NULL,
   `library_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `group_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `content_libraries_conten_library_id_user_id_81babe29_uniq` (`library_id`,`user_id`),
+  UNIQUE KEY `content_libraries_conten_library_id_group_id_3ecc38b9_uniq` (`library_id`,`group_id`),
   KEY `content_libraries_co_library_id_51247096_fk_content_l` (`library_id`),
   KEY `content_libraries_co_user_id_b071c54d_fk_auth_user` (`user_id`),
+  KEY `content_libraries_co_group_id_c2a4b6a1_fk_auth_grou` (`group_id`),
+  CONSTRAINT `content_libraries_co_group_id_c2a4b6a1_fk_auth_grou` FOREIGN KEY (`group_id`) REFERENCES `auth_group` (`id`),
   CONSTRAINT `content_libraries_co_library_id_51247096_fk_content_l` FOREIGN KEY (`library_id`) REFERENCES `content_libraries_contentlibrary` (`id`),
   CONSTRAINT `content_libraries_co_user_id_b071c54d_fk_auth_user` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -2613,7 +2618,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=675 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=684 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3468,6 +3473,7 @@ CREATE TABLE `enterprise_historicalpendingenrollment` (
   `user_id` int(11) DEFAULT NULL,
   `source_id` int(11) DEFAULT NULL,
   `discount_percentage` decimal(8,5) NOT NULL,
+  `sales_force_id` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`history_id`),
   KEY `enterprise_historica_history_user_id_894ad7d0_fk_auth_user` (`history_user_id`),
   KEY `enterprise_historicalpendingenrollment_id_27077b0b` (`id`),
@@ -3511,6 +3517,7 @@ CREATE TABLE `enterprise_pendingenrollment` (
   `cohort_name` varchar(255) DEFAULT NULL,
   `source_id` int(11) DEFAULT NULL,
   `discount_percentage` decimal(8,5) NOT NULL,
+  `sales_force_id` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `enterprise_pendingenrollment_user_id_course_id_6d4141c7_uniq` (`user_id`,`course_id`),
   KEY `enterprise_pendingen_source_id_7b6fed0c_fk_enterpris` (`source_id`),
@@ -5182,7 +5189,7 @@ CREATE TABLE `schedules_historicalschedule` (
   `created` datetime(6) NOT NULL,
   `modified` datetime(6) NOT NULL,
   `active` tinyint(1) NOT NULL,
-  `start` datetime(6) NOT NULL,
+  `start` datetime(6) DEFAULT NULL,
   `start_date` datetime(6) NOT NULL,
   `upgrade_deadline` datetime(6) DEFAULT NULL,
   `history_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -5197,8 +5204,7 @@ CREATE TABLE `schedules_historicalschedule` (
   KEY `schedules_historicalschedule_start_50753b08` (`start`),
   KEY `schedules_historicalschedule_start_date_8c02ff20` (`start_date`),
   KEY `schedules_historicalschedule_upgrade_deadline_ba67bbd9` (`upgrade_deadline`),
-  KEY `schedules_historicalschedule_enrollment_id_cd620413` (`enrollment_id`),
-  CONSTRAINT `schedules_historical_history_user_id_6f5d6d7b_fk_auth_user` FOREIGN KEY (`history_user_id`) REFERENCES `auth_user` (`id`)
+  KEY `schedules_historicalschedule_enrollment_id_cd620413` (`enrollment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `schedules_schedule`;
@@ -5209,7 +5215,7 @@ CREATE TABLE `schedules_schedule` (
   `created` datetime(6) NOT NULL,
   `modified` datetime(6) NOT NULL,
   `active` tinyint(1) NOT NULL,
-  `start` datetime(6) NOT NULL,
+  `start` datetime(6) DEFAULT NULL,
   `upgrade_deadline` datetime(6) DEFAULT NULL,
   `enrollment_id` int(11) NOT NULL,
   `start_date` datetime(6) NOT NULL,
@@ -5605,7 +5611,6 @@ DROP TABLE IF EXISTS `site_configuration_siteconfiguration`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `site_configuration_siteconfiguration` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `values` longtext NOT NULL,
   `site_id` int(11) NOT NULL,
   `enabled` tinyint(1) NOT NULL,
   `site_values` longtext NOT NULL,
@@ -5621,7 +5626,6 @@ CREATE TABLE `site_configuration_siteconfigurationhistory` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `created` datetime(6) NOT NULL,
   `modified` datetime(6) NOT NULL,
-  `values` longtext NOT NULL,
   `site_id` int(11) NOT NULL,
   `enabled` tinyint(1) NOT NULL,
   `site_values` longtext NOT NULL,
