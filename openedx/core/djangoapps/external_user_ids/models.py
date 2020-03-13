@@ -11,7 +11,6 @@ from django.db import models
 from model_utils.models import TimeStampedModel
 from simple_history.models import HistoricalRecords
 
-
 LOGGER = getLogger(__name__)
 
 
@@ -27,6 +26,9 @@ class ExternalIdType(TimeStampedModel):
     name = models.CharField(max_length=32, blank=False, unique=True, db_index=True)
     description = models.TextField()
     history = HistoricalRecords()
+
+    def __str__(self):
+        return self.name
 
 
 class ExternalId(TimeStampedModel):
