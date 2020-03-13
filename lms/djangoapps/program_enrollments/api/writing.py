@@ -8,6 +8,8 @@ from `lms.djangoapps.program_enrollments.api`.
 
 import logging
 
+from simple_history.utils import bulk_create_with_history
+
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment, NonExistentCourseError
@@ -67,7 +69,6 @@ def write_program_enrollments(program_uuid, enrollment_requests, create, update)
     # For each enrollment request, try to create/update:
     # * For creates, build up list `to_save`, which we will bulk-create afterwards.
     # * For updates, do them in place.
-    #     (TODO: Django 2.2 will add bulk-update support, which we could use here)
     # Update `results` with the new status or an error status for each operation.
     results = {}
     to_save = []
@@ -100,11 +101,11 @@ def write_program_enrollments(program_uuid, enrollment_requests, create, update)
             to_save.append(new_enrollment)
             results[external_key] = new_enrollment.status
 
-    # Bulk-create all new program enrollments.
+    # Bulk-create all new program enrollments and corresponding history records
     # Note: this will NOT invoke `save()` or `pre_save`/`post_save` signals!
     # See https://docs.djangoproject.com/en/1.11/ref/models/querysets/#bulk-create.
     if to_save:
-        ProgramEnrollment.objects.bulk_create(to_save)
+        bulk_create_with_history(to_save, ProgramEnrollment)
 
     results.update({key: ProgramOpStatuses.DUPLICATED for key in duplicated_keys})
     return results
@@ -274,11 +275,11 @@ def write_program_course_enrollments(
             to_save.append(new_course_enrollment)
             results[external_key] = new_course_enrollment.status
 
-    # Bulk-create all new program-course enrollments.
+    # Bulk-create all new program-course enrollments and corresponding history records.
     # Note: this will NOT invoke `save()` or `pre_save`/`post_save` signals!
     # See https://docs.djangoproject.com/en/1.11/ref/models/querysets/#bulk-create.
     if to_save:
-        ProgramCourseEnrollment.objects.bulk_create(to_save)
+        bulk_create_with_history(to_save, ProgramCourseEnrollment)
 
     return results
 
