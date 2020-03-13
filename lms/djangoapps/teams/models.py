@@ -100,6 +100,10 @@ def handle_activity(user, post, original_author_id=None):
         CourseTeamMembership.update_last_activity(user, post.commentable_id)
 
 
+def utc_now():
+    return datetime.utcnow().replace(tzinfo=pytz.utc)
+
+
 @python_2_unicode_compatible
 class CourseTeam(models.Model):
     """
@@ -128,15 +132,17 @@ class CourseTeam(models.Model):
     discussion_topic_id = models.SlugField(max_length=255, unique=True)
     name = models.CharField(max_length=255, db_index=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
-    topic_id = models.CharField(max_length=255, db_index=True, blank=True)
+    topic_id = models.CharField(default='', max_length=255, db_index=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
     description = models.CharField(max_length=300)
-    country = CountryField(blank=True)
+    country = CountryField(default='', blank=True)
     language = LanguageField(
+        default='',
         blank=True,
         help_text=ugettext_lazy("Optional language the team uses as ISO 639-1 code."),
     )
-    last_activity_at = models.DateTimeField(db_index=True)  # indexed for ordering
+    # indexed for ordering
+    last_activity_at = models.DateTimeField(default=utc_now, db_index=True)
     users = models.ManyToManyField(User, db_index=True, related_name='teams', through='CourseTeamMembership')
     team_size = models.IntegerField(default=0, db_index=True)  # indexed for ordering
 
@@ -157,9 +163,9 @@ class CourseTeam(models.Model):
         name,
         course_id,
         description,
-        topic_id=None,
-        country=None,
-        language=None,
+        topic_id='',
+        country='',
+        language='',
         organization_protected=False
     ):
         """Create a complete CourseTeam object.
@@ -188,11 +194,10 @@ class CourseTeam(models.Model):
             discussion_topic_id=discussion_topic_id,
             name=name,
             course_id=course_id,
-            topic_id=topic_id if topic_id else '',
+            topic_id=topic_id,
             description=description,
-            country=country if country else '',
-            language=language if language else '',
-            last_activity_at=datetime.utcnow().replace(tzinfo=pytz.utc),
+            country=country,
+            language=language,
             organization_protected=organization_protected
         )
 
