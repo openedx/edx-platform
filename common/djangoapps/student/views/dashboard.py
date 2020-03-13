@@ -25,6 +25,7 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
 from six import iteritems, text_type
+from student.api import COURSE_DASHBOARD_PLUGIN_VIEW_NAME
 from student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
 from student.models import (
     AccountRecovery,
@@ -884,7 +885,7 @@ def student_dashboard(request):
 
     context_from_plugins = get_plugins_view_context(
         plugin_constants.ProjectType.LMS,
-        plugin_constants.PluginContexts.VIEWS.STUDENT_DASHBOARD,
+        COURSE_DASHBOARD_PLUGIN_VIEW_NAME,
         context
     )
     context.update(context_from_plugins)

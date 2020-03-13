@@ -42,6 +42,7 @@ MANUAL_ENROLLMENT_ROLE_CHOICES = configuration_helpers.get_value(
     settings.MANUAL_ENROLLMENT_ROLE_CHOICES
 )
 
+COURSE_DASHBOARD_PLUGIN_VIEW_NAME = "course_dashboard"
 
 def create_manual_enrollment_audit(
     enrolled_by,
