@@ -8,6 +8,7 @@ from django.db.models import F, Subquery
 from django.db.models.functions import Greatest
 
 from openedx.core.djangoapps.schedules.models import Schedule
+from student.models import CourseEnrollment
 
 LOG = logging.getLogger(__name__)
 
@@ -54,7 +55,18 @@ def reset_self_paced_schedule(user, course_key, use_availability_date=False):
     )
 
     if use_availability_date:
-        schedule = schedule.annotate(start_of_access=Greatest(F('enrollment__created'), F('enrollment__course__start')))
-        schedule.update(start_date=Subquery(schedule.values('start_of_access')[:1]))
+        # Query enrollments to find availability date -- very similar to query above, but we can't reuse that query
+        # object because mysql doesn't like a subquery of an update to reference the same table being updated.
+        # Be careful attempting to remove this logic because you can't reproduce a problem locally -- in my own testing,
+        # I could not reproduce in devstack, but it was happening on prod databases. So implementations vary.
+        # See https://dev.mysql.com/doc/refman/8.0/en/subquery-restrictions.html
+        enrollments = CourseEnrollment.objects.filter(
+            user=user,
+            course__id=course_key,
+            course__self_paced=True,
+        ).annotate(
+            availability=Greatest(F('created'), F('course__start')),
+        )
+        schedule.update(start_date=Subquery(enrollments.values('availability')[:1]))
     else:
         schedule.update(start_date=datetime.datetime.now(pytz.utc))
