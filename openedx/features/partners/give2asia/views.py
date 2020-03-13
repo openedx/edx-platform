@@ -137,14 +137,16 @@ def create_account_with_params_custom(request, params, partner):
             organization_to_assign = Organization.objects.filter(label__iexact=organization_name).first()
 
             if not organization_to_assign:
-
-                # making user first learner
-                extended_profile_data[g2a_constants.IS_FIRST_LEARNER] = True
-                extended_profile_data[g2a_constants.IS_ORGANIZATION_METRICS_SUBMITTED] = True
-
-                # Create organization if not already exists and make user first learner
+                # Create organization if not already exists
                 organization_to_assign = Organization.objects.create(label=organization_name, **organization_data)
                 organization_to_assign.save()
+
+            # Make user first learner either if his organization is new or his organization is orphan
+            extended_profile_data[g2a_constants.IS_FIRST_LEARNER] = organization_to_assign.users_count() == 0
+
+            if extended_profile_data[g2a_constants.IS_FIRST_LEARNER]:
+                # submit organization detail form
+                extended_profile_data[g2a_constants.IS_ORGANIZATION_METRICS_SUBMITTED] = True
 
             # create User Extended Profile
             extended_profile = UserExtendedProfile.objects.create(
