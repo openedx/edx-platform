@@ -24,7 +24,8 @@ def run_dircheck(script_name, args):
     repo_root_dir = get_repo_root_dir(invoked_dir)
     target_dir = Path(args[0] if args else ".")
     issues_by_type = run_pylint(invoke_dir=repo_root_dir, target_dir=target_dir)
-    print(issues_by_type)
+
+
     logger.critical("Warning: not fully implemented")
     return 0
 
@@ -44,11 +45,11 @@ def run_pylint(invoke_dir, target_dir):
             Path('/home/bob/edx-platform'),
             Path('/home/bob/edx-platform/lms'),
         ) == {
-            'C': [...], 'R': [...], 'W':[...]0, 'E':[...] 'F': [...]
+            'I': [...], 'C': [...], 'R': [...], 'W':[...]0, 'E':[...] 'F': [...]
         }
     """
     logger.info("Running pylint on '%s' from '%s'", target_dir, invoke_dir)
-    issues_by_type = {'C': [], 'R': [], 'W': [], 'E': [], 'F': []}
+    issues_by_type = {'I': [], 'C': [], 'R': [], 'W': [], 'E': [], 'F': []}
     os.chdir(str(invoke_dir))
     command = 'pylint {target_dir}'.format(target_dir=target_dir)
     with os.popen(command) as pipe:
@@ -60,20 +61,25 @@ def run_pylint(invoke_dir, target_dir):
     return issues_by_type
 
 
-PylintIssue = namedtuple(
-    'PylintIssue',
-    'path line_num column_num hint message_type message_num message_code message_text'
-)
+PylintIssue = namedtuple('PylintIssue', [
+    'path',
+    'line_num',
+    'column_num',
+    'message_type',
+    'message_num',
+    'message_symbol',
+    'message',
+    'full_text',
+])
 
-PYLINT_ISSUE_REGEX = re.compile(
-    r"^(?P<path>.+?)"
-    r":(?P<line_num>[0-9]+)"
-    r":(?P<column_num>[0-9]+)"
-    r": (?P<message_num>(?P<message_type>[CRWEF])\d+)"
-    r": (?P<message_text>.+?)"
-    r" \((?P<message_code>)\)",
-    re.VERBOSE
-)
+PYLINT_ISSUE_REGEX = re.compile(r"""
+    ^(?P<path>.+?)
+    :(?P<line_num>\d+)
+    :(?P<column_num>\d+)
+    :\ (?P<message_num>(?P<message_type>[CRWEF])\d\d\d\d)
+    :\ (?P<message>.+?)
+    \ \((?P<message_symbol>[a-z0-9-]+)\)$
+""", re.VERBOSE)
 
 
 def parse_pylint_issue(issue_string):
@@ -94,13 +100,15 @@ def parse_pylint_issue(issue_string):
         return None
     if stripped.startswith('---'):
         return None
-    if stripped.startswith('Your code has'):
+    if stripped.startswith('Your code has been rated'):
         return None
     match = PYLINT_ISSUE_REGEX.match(stripped)
-    if match:
-        return PylintIssue(**match.groupdict())
-    logger.warning('Pylint output line not understood: %s', stripped)
-    return None
+    if not match:
+        logger.warning('Pylint output line not understood: %s', stripped)
+    issue_dict = match.groupdict().copy()
+    issue_dict['line_num'] = int(issue_dict['line_num'])
+    issue_dict['column_num'] = int(issue_dict['column_num'])
+    return PylintIssue(full_text=stripped, **issue_dict)
 
 
 def get_repo_root_dir(repo_sub_dir):
