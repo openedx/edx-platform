@@ -275,11 +275,11 @@ def write_program_course_enrollments(
             to_save.append(new_course_enrollment)
             results[external_key] = new_course_enrollment.status
 
-    # Bulk-create all new program-course enrollments.
+    # Bulk-create all new program-course enrollments and corresponding history records.
     # Note: this will NOT invoke `save()` or `pre_save`/`post_save` signals!
     # See https://docs.djangoproject.com/en/1.11/ref/models/querysets/#bulk-create.
     if to_save:
-        ProgramCourseEnrollment.objects.bulk_create(to_save)
+        bulk_create_with_history(to_save, ProgramCourseEnrollment)
 
     return results
 
