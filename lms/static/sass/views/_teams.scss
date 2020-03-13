@@ -550,6 +550,9 @@
   .action-primary {
     @extend %btn-primary-blue;
 
+    &:focus {
+      border: inherit;
+    }
     display: inline-block;
     text-shadow: none;
   }
