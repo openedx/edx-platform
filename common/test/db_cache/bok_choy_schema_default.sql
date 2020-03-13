@@ -2618,7 +2618,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=684 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=687 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3169,6 +3169,7 @@ CREATE TABLE `enterprise_enterprisecustomer` (
   `enable_learner_portal` tinyint(1) NOT NULL,
   `enable_portal_reporting_config_screen` tinyint(1) NOT NULL,
   `contact_email` varchar(254) DEFAULT NULL,
+  `enable_portal_subscription_management_screen` tinyint(1) NOT NULL,
   PRIMARY KEY (`uuid`),
   UNIQUE KEY `enterprise_enterprisecustomer_slug_80411f46_uniq` (`slug`),
   KEY `enterprise_enterprisecustomer_site_id_947ed084_fk_django_site_id` (`site_id`),
@@ -3420,6 +3421,7 @@ CREATE TABLE `enterprise_historicalenterprisecustomer` (
   `enable_learner_portal` tinyint(1) NOT NULL,
   `enable_portal_reporting_config_screen` tinyint(1) NOT NULL,
   `contact_email` varchar(254) DEFAULT NULL,
+  `enable_portal_subscription_management_screen` tinyint(1) NOT NULL,
   PRIMARY KEY (`history_id`),
   KEY `enterprise_historica_history_user_id_bbd9b0d6_fk_auth_user` (`history_user_id`),
   KEY `enterprise_historicalenterprisecustomer_uuid_75c3528e` (`uuid`),
@@ -5189,7 +5191,6 @@ CREATE TABLE `schedules_historicalschedule` (
   `created` datetime(6) NOT NULL,
   `modified` datetime(6) NOT NULL,
   `active` tinyint(1) NOT NULL,
-  `start` datetime(6) DEFAULT NULL,
   `start_date` datetime(6) NOT NULL,
   `upgrade_deadline` datetime(6) DEFAULT NULL,
   `history_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -5201,7 +5202,6 @@ CREATE TABLE `schedules_historicalschedule` (
   PRIMARY KEY (`history_id`),
   KEY `schedules_historical_history_user_id_6f5d6d7b_fk_auth_user` (`history_user_id`),
   KEY `schedules_historicalschedule_id_f1648c81` (`id`),
-  KEY `schedules_historicalschedule_start_50753b08` (`start`),
   KEY `schedules_historicalschedule_start_date_8c02ff20` (`start_date`),
   KEY `schedules_historicalschedule_upgrade_deadline_ba67bbd9` (`upgrade_deadline`),
   KEY `schedules_historicalschedule_enrollment_id_cd620413` (`enrollment_id`)
@@ -5215,13 +5215,11 @@ CREATE TABLE `schedules_schedule` (
   `created` datetime(6) NOT NULL,
   `modified` datetime(6) NOT NULL,
   `active` tinyint(1) NOT NULL,
-  `start` datetime(6) DEFAULT NULL,
   `upgrade_deadline` datetime(6) DEFAULT NULL,
   `enrollment_id` int(11) NOT NULL,
   `start_date` datetime(6) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `enrollment_id` (`enrollment_id`),
-  KEY `schedules_schedule_start_8685ed8e` (`start`),
   KEY `schedules_schedule_upgrade_deadline_0079081d` (`upgrade_deadline`),
   KEY `schedules_schedule_start_date_3a1c341e` (`start_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
