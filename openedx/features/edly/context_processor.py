@@ -14,7 +14,7 @@ DEFAULT_COLOR_DICT = {
 DEFAULT_FONTS_DICT = {
     'base-font': "'Open Sans', sans-serif",
     'heading-font': "'Open Sans', sans-serif",
-    'font-path': "<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap' rel='stylesheet' />",
+    'font-path': "https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap",
 }
 DEFAULT_BRANDING_DICT = {
     'logo': "https://edly-edx-theme-files.s3.amazonaws.com/st-lutherx-logo.png",
