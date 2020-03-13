@@ -3,14 +3,18 @@
 @@TODO
 """
 import logging
+import json
 import os
 import re
 import sys
 from collections import namedtuple
-from pathlib import Path
+from pathlib import Path, PurePath
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+
+
+CONFIG_FNAME = "dircheck.json"
 
 
 def run_dircheck(script_name, args):
@@ -20,14 +24,52 @@ def run_dircheck(script_name, args):
     if len(args) > 1:
         logger.critical("Invalid usage.\n%s", get_usage(script_name))
         return 123
-    invoked_dir = Path.cwd()
-    repo_root_dir = get_repo_root_dir(invoked_dir)
     target_dir = Path(args[0] if args else ".")
+    repo_root_dir, config = get_repo_root_and_config(target_dir)
     issues_by_type = run_pylint(invoke_dir=repo_root_dir, target_dir=target_dir)
-
-
+    print(config, issues_by_type)
     logger.critical("Warning: not fully implemented")
     return 0
+
+
+def get_repo_root_and_config(start_dir):
+    """
+    Find root of Git repository and load dircheck configuration.
+
+    Start in `start_dir` and walk upwards until we reach root of repository,
+    which is identified by the presence of a .git/ folder.
+    If we find one dircheck.json, load it.
+    If we find more than one dircheck.json, raise an Exception.
+    If we find no dircheck.json, return None as dircheck dircheck_config.
+
+    This function assumes that (1) `start_dir` is within a git repo
+    and (2) there are no git submodules in this repository.
+
+    Arguments:
+        start_dir (Path)
+
+    Returns: (repo_root: Path, dircheck_config: dict)
+    """
+    def walk_up(current_dir, dircheck_config):
+        """
+        @@TODO
+        """
+        if (current_dir / CONFIG_FNAME).is_file():
+            if dircheck_config:
+                error_message = (
+                    "{current_dir} has {config_fname}, "
+                    "but also contains subdirectory with {config_fname}."
+                ).format(current_dir=current_dir, config_fname=CONFIG_FNAME)
+                raise Exception(error_message)
+            with open(str(current_dir / CONFIG_FNAME)) as dircheck_file:
+                dircheck_config = json.load(dircheck_file)
+        if (current_dir / '.git').is_dir():
+            return current_dir, dircheck_config
+        else:
+            return walk_up(
+                current_dir=current_dir.parent, dircheck_config=dircheck_config
+            )
+    return walk_up(current_dir=start_dir, dircheck_config=None)
 
 
 def run_pylint(invoke_dir, target_dir):
@@ -109,26 +151,6 @@ def parse_pylint_issue(issue_string):
     issue_dict['line_num'] = int(issue_dict['line_num'])
     issue_dict['column_num'] = int(issue_dict['column_num'])
     return PylintIssue(full_text=stripped, **issue_dict)
-
-
-def get_repo_root_dir(repo_sub_dir):
-    """
-    Get the root of a git repo given it or one its subdirectories.
-
-    Assumes that we are within a git repo.
-    If not, we will end up raising on OSError when we try to cd too high.
-
-    Assumes that we are not in a git submodule
-    (i.e., a subfolder of a repo that has a `.git` folder).
-
-    Arguments:
-        repo_sub_dir (Path)
-
-    Returns: Path
-    """
-    if (repo_sub_dir / '.git').is_dir():
-        return repo_sub_dir
-    return get_repo_root_dir(repo_sub_dir.parent)
 
 
 def get_usage(script_name):
