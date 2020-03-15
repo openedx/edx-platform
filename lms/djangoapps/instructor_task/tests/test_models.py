@@ -5,7 +5,7 @@ import copy
 import time
 from cStringIO import StringIO
 
-import boto
+import boto3
 from django.conf import settings
 from django.test import SimpleTestCase, TestCase, override_settings
 from mock import patch
@@ -64,7 +64,11 @@ class LocalFSReportStoreTestCase(ReportStoreTestMixin, TestReportMixin, SimpleTe
         return ReportStore.from_config(config_name='GRADES_DOWNLOAD')
 
 
-@patch.dict(settings.GRADES_DOWNLOAD, {'STORAGE_TYPE': 's3'})
+@patch.dict(settings.GRADES_DOWNLOAD, {
+    'STORAGE_TYPE': 's3',
+    # Strip the leading `/`, because boto doesn't want it
+    'ROOT_PATH': settings.GRADES_DOWNLOAD['ROOT_PATH'].lstrip('/')
+})
 class S3ReportStoreTestCase(MockS3Mixin, ReportStoreTestMixin, TestReportMixin, SimpleTestCase):
     """
     Test the old S3ReportStore configuration.
@@ -74,8 +78,8 @@ class S3ReportStoreTestCase(MockS3Mixin, ReportStoreTestMixin, TestReportMixin, 
         Create and return a DjangoStorageReportStore using the old
         S3ReportStore configuration.
         """
-        connection = boto.connect_s3()
-        connection.create_bucket(settings.GRADES_DOWNLOAD['BUCKET'])
+        client = boto3.client('s3')
+        client.create_bucket(Bucket=settings.GRADES_DOWNLOAD['BUCKET'])
         return ReportStore.from_config(config_name='GRADES_DOWNLOAD')
 
 
@@ -105,14 +109,14 @@ class DjangoStorageReportStoreS3TestCase(MockS3Mixin, ReportStoreTestMixin, Test
         storage.
         """
         test_settings = copy.deepcopy(settings.GRADES_DOWNLOAD)
-        test_settings['STORAGE_CLASS'] = 'openedx.core.storage.S3ReportStorage'
+        test_settings['STORAGE_CLASS'] = 'storages.backends.s3boto3.S3Boto3Storage'
         test_settings['STORAGE_KWARGS'] = {
             'bucket': settings.GRADES_DOWNLOAD['BUCKET'],
             'location': settings.GRADES_DOWNLOAD['ROOT_PATH'],
         }
         with override_settings(GRADES_DOWNLOAD=test_settings):
-            connection = boto.connect_s3()
-            connection.create_bucket(settings.GRADES_DOWNLOAD['STORAGE_KWARGS']['bucket'])
+            client = boto3.client('s3')
+            client.create_bucket(Bucket=settings.GRADES_DOWNLOAD['STORAGE_KWARGS']['bucket'])
             return ReportStore.from_config(config_name='GRADES_DOWNLOAD')
 
 

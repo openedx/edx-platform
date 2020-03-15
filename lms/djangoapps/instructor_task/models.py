@@ -20,7 +20,7 @@ import logging
 import os.path
 from uuid import uuid4
 
-from boto.exception import BotoServerError
+from botocore.exceptions import ClientError
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
@@ -287,16 +287,17 @@ class DjangoStorageReportStore(ReportStore):
         course_dir = self.path_to(course_id)
         try:
             _, filenames = self.storage.listdir(course_dir)
+        # Django's FileSystemStorage fails with an OSError if the course
+        # dir does not exist
         except OSError:
-            # Django's FileSystemStorage fails with an OSError if the course
-            # dir does not exist; other storage types return an empty list.
             return []
-        except BotoServerError as ex:
+        # S3Boto3Storage fails with a ClientError if the course dir does not exist
+        except ClientError as ex:
             logger.error(
-                u'Fetching files failed for course: %s, status: %s, reason: %s',
+                u'Fetching files failed for course: %s, code: %s, message: %s',
                 course_id,
-                ex.status,
-                ex.reason
+                ex.response["Error"]["Code"],
+                ex.response["Error"]["Message"]
             )
             return []
         files = [(filename, os.path.join(course_dir, filename)) for filename in filenames]

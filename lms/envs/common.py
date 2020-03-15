@@ -1103,7 +1103,7 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 TRANSLATORS_GUIDE = 'https://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/internationalization/i18n_translators_guide.html'  # pylint: disable=line-too-long
 
 #################################### AWS #######################################
-# S3BotoStorage insists on a timeout for uploaded assets. We should make it
+# S3Boto3Storage insists on a timeout for uploaded assets. We should make it
 # permanent instead, but rather than trying to figure out exactly where that
 # setting is, I'm just bumping the expiration time to something absurd (100
 # years). This is only used if DEFAULT_FILE_STORAGE is overriden to use S3
@@ -2639,7 +2639,7 @@ VIDEO_IMAGE_SETTINGS = dict(
     VIDEO_IMAGE_MAX_BYTES=2 * 1024 * 1024,    # 2 MB
     VIDEO_IMAGE_MIN_BYTES=2 * 1024,       # 2 KB
     # Backend storage
-    # STORAGE_CLASS='storages.backends.s3boto.S3BotoStorage',
+    # STORAGE_CLASS='storages.backends.s3boto3.S3Boto3Storage',
     # STORAGE_KWARGS=dict(bucket='video-image-bucket'),
     STORAGE_KWARGS=dict(
         location=MEDIA_ROOT,
@@ -2653,7 +2653,7 @@ VIDEO_IMAGE_SETTINGS = dict(
 VIDEO_TRANSCRIPTS_SETTINGS = dict(
     VIDEO_TRANSCRIPTS_MAX_BYTES=3 * 1024 * 1024,    # 3 MB
     # Backend storage
-    # STORAGE_CLASS='storages.backends.s3boto.S3BotoStorage',
+    # STORAGE_CLASS='storages.backends.s3boto3.S3Boto3Storage',
     # STORAGE_KWARGS=dict(bucket='video-transcripts-bucket'),
     STORAGE_KWARGS=dict(
         location=MEDIA_ROOT,
