@@ -2,7 +2,7 @@
 import json
 from datetime import datetime, timedelta
 
-import boto
+import boto3
 import ddt
 import mock
 import pytz
@@ -126,8 +126,8 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
 
     def setUp(self):
         super(TestPhotoVerification, self).setUp()
-        connection = boto.connect_s3()
-        connection.create_bucket(FAKE_SETTINGS['SOFTWARE_SECURE']['S3_BUCKET'])
+        client = boto3.client('s3')
+        client.create_bucket(Bucket=FAKE_SETTINGS['SOFTWARE_SECURE']['S3_BUCKET'])
 
     def test_state_transitions(self):
         """

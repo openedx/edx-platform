@@ -52,9 +52,9 @@ backports.functools-lru-cache==1.5  # via soupsieve
 beautifulsoup4==4.7.1     # via pynliner
 billiard==3.3.0.23        # via celery
 bleach==2.1.4
-boto3==1.4.8
 boto==2.39.0
-botocore==1.8.17
+boto3==1.12.21            # Amazon Web Services SDK for Python
+botocore==1.15.21         # via boto3, s3transfer
 celery==3.1.25
 certifi==2018.11.29
 cffi==1.11.5

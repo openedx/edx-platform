@@ -5,7 +5,8 @@ from __future__ import print_function
 import os
 import tarfile
 
-import boto
+import boto3
+import botocore
 from paver.easy import BuildFailure, sh
 
 from pavelib.prereqs import compute_fingerprint
@@ -125,21 +126,26 @@ def does_fingerprint_on_disk_match(fingerprint):
     return fingerprint == cache_fingerprint
 
 
-def is_fingerprint_in_bucket(fingerprint, bucket_name):
+def is_fingerprint_in_bucket(fingerprint, s3_bucket_name):
     """
-    Test if a zip file matching the given fingerprint is present within an s3 bucket.
-    If there is any issue reaching the bucket, show the exception but continue by
+    Test if the fingerprint is stored as a object in an S3 bucket.
+    If there is any issue reaching the S3 object, show the exception but continue by
     returning False
     """
-    zipfile_name = '{}.tar.gz'.format(fingerprint)
+    s3_key = '{}.tar.gz'.format(fingerprint)
+    client = boto3.client('s3')
     try:
-        conn = boto.connect_s3(anon=True)
-        bucket = conn.get_bucket(bucket_name)
-    except Exception as e:  # pylint: disable=broad-except
-        print("Exception caught trying to reach S3 bucket {}: {}".format(bucket_name, e))
+        client.head_object(Bucket=s3_bucket_name, Key=s3_key)
+    except botocore.exceptions.ClientError as e:
+        if e.response["Error"]["Code"] == "NoSuchBucket":
+            print("S3 bucket {} does not exist".format(s3_bucket_name))
+        elif e.response["Error"]["Code"] == "NoSuchKey":
+            print("S3 key {} does not exist in S3 bucket {}".format(s3_key, s3_bucket_name))
+        else:
+            print("Error trying to reach S3 key {} in S3 bucket {}: {}".format(s3_bucket_name, s3_key, e))
         return False
-    key = boto.s3.key.Key(bucket=bucket, name=zipfile_name)
-    return key.exists()
+
+    return True
 
 
 def get_bokchoy_db_fingerprint_from_file():
@@ -154,22 +160,30 @@ def get_bokchoy_db_fingerprint_from_file():
     return cached_fingerprint
 
 
-def get_file_from_s3(bucket_name, zipfile_name, path):
+def get_file_from_s3(s3_bucket_name, file_name, path):
     """
     Get the file from s3 and save it to disk.
     """
-    print ("Retrieving {} from bucket {}.".format(zipfile_name, bucket_name))
-    conn = boto.connect_s3(anon=True)
-    bucket = conn.get_bucket(bucket_name)
-    key = boto.s3.key.Key(bucket=bucket, name=zipfile_name)
-    if not key.exists():
-        msg = "Did not find expected file {} in the S3 bucket {}".format(
-            zipfile_name, bucket_name
-        )
-        raise BuildFailure(msg)
+    print("Retrieving {} from bucket {}.".format(file_name, s3_bucket_name))
+    client = boto3.client("s3")
 
-    zipfile_path = os.path.join(path, zipfile_name)
-    key.get_contents_to_filename(zipfile_path)
+    if not os.path.exists(path):
+        os.makedirs(path)
+    file_path = os.path.join(path, file_name)
+    try:
+        client.download_file(Bucket=s3_bucket_name, Key=file_name, Filename=file_path)
+    except botocore.exceptions.ClientError as e:
+        if e.response["Error"]["Code"] == "NoSuchBucket":
+            msg = "Did not find S3 bucket {}".format(s3_bucket_name)
+        elif e.response["Error"]["Code"] == "NoSuchKey":
+            msg = "Did not find expected file {} in the S3 bucket {}".format(
+                file_name, s3_bucket_name
+            )
+        else:
+            msg = "Error downloading file {} from S3 bucket {}: {}".format(
+                file_name, s3_bucket_name, e.response["Error"]["Code"]
+            )
+        raise BuildFailure(msg)
 
 
 def extract_files_from_zip(files, zipfile_path, to_path):
@@ -193,7 +207,7 @@ def refresh_bokchoy_db_cache_from_s3(fingerprint, bucket_name, bokchoy_db_files)
         zipfile_name = '{}.tar.gz'.format(fingerprint)
         get_file_from_s3(bucket_name, zipfile_name, path)
         zipfile_path = os.path.join(path, zipfile_name)
-        print ("Extracting db cache files.")
+        print("Extracting db cache files.")
         extract_files_from_zip(bokchoy_db_files, zipfile_path, path)
         os.remove(zipfile_path)
 
@@ -207,33 +221,36 @@ def create_tarfile_from_db_cache(fingerprint, files, path):
     with tarfile.open(name=zipfile_path, mode='w:gz') as tar_file:
         for name in files:
             tar_file.add(os.path.join(path, name), arcname=name)
-    return zipfile_name, zipfile_path
+    return zip_file_name, zip_file_path
 
 
-def upload_to_s3(file_name, file_path, bucket_name):
+def upload_to_s3(file_name, file_path, s3_bucket_name):
     """
-    Upload the specified files to an s3 bucket.
+    Upload the specified file to an s3 bucket.
     """
-    print("Uploading {} to s3 bucket {}".format(file_name, bucket_name))
+
+    with open(file_path) as f:
+        file_content = f.read()
+
+    client = boto3.client("s3")
+    s3_key = file_name
+    print("Uploading cache file {} to s3 at bucket {}, key {}".format(file_name, s3_bucket_name, s3_key))
     try:
-        conn = boto.connect_s3()
-    except boto.exception.NoAuthHandlerFound:
+        client.put_object(Bucket=s3_bucket_name, Key=s3_key, ACL='public-read', Body=file_content)
+    except botocore.exceptions.NoCredentialsError:
         print("No AWS credentials found. "
               "Continuing without uploading the new cache to S3.")
         return
-    try:
-        bucket = conn.get_bucket(bucket_name)
-    except boto.exception.S3ResponseError:
-        print("Unable to connect to cache bucket with these credentials. "
-              "Continuing without uploading the new cache to S3.")
+    except botocore.exceptions.ClientError as e:
+        if e.response["Error"]["Code"] == "NoSuchBucket":
+            print("S3 bucket {} does not exist".format(s3_bucket_name))
+        else:
+            print("Unable to upload cache file to S3. "
+                  "Continuing without uploading the new cache to S3. Code: %s, Message: %s" % (
+                      e.response["Error"]["Code"], e.response["Error"]["Message"]
+                  ))
         return
-    key = boto.s3.key.Key(bucket=bucket, name=file_name)
-    bytes_written = key.set_contents_from_filename(file_path, replace=False, policy='public-read')
-    if bytes_written:
-        msg = "Wrote {} bytes to {}.".format(bytes_written, key.name)
-    else:
-        msg = "File {} already existed in bucket {}.".format(key.name, bucket_name)
-    print(msg)
+    print("Cache file {} saved to S3 at bucket {}, key {}.".format(file_name, s3_bucket_name, s3_key))
 
 
 def upload_db_cache_to_s3(fingerprint, bokchoy_db_files, bucket_name):

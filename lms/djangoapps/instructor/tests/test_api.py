@@ -13,7 +13,7 @@ import tempfile
 
 import ddt
 import pytest
-from boto.exception import BotoServerError
+from botocore.exceptions import ClientError
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
@@ -3282,21 +3282,27 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         )
 
     @patch('lms.djangoapps.instructor_task.models.logger.error')
-    @patch.dict(settings.GRADES_DOWNLOAD, {'STORAGE_TYPE': 's3'})
+    @patch.dict(settings.GRADES_DOWNLOAD, {
+        'STORAGE_TYPE': 's3',
+        # Strip the leading `/`, because boto doesn't want it
+        'ROOT_PATH': settings.GRADES_DOWNLOAD['ROOT_PATH'][1:]
+    })
     def test_list_report_downloads_error(self, mock_error):
         """
         Tests the Rate-Limit exceeded is handled and does not raise 500 error.
         """
-        ex_status = 503
-        ex_reason = 'Slow Down'
+        # fake error code and message
+        ex_code = 'RateLimitExceeded'
+        ex_msg = 'Slow Down'
         url = reverse('list_report_downloads', kwargs={'course_id': text_type(self.course.id)})
-        with patch('openedx.core.storage.S3ReportStorage.listdir', side_effect=BotoServerError(ex_status, ex_reason)):
+        boto_client_error = ClientError({"Error": {"Code": ex_code, "Message": ex_msg}}, "ListObjects")
+        with patch('storages.backends.s3boto3.S3Boto3Storage.listdir', side_effect=boto_client_error):
             response = self.client.post(url, {})
         mock_error.assert_called_with(
-            u'Fetching files failed for course: %s, status: %s, reason: %s',
+            u'Fetching files failed for course: %s, code: %s, message: %s',
             self.course.id,
-            ex_status,
-            ex_reason,
+            ex_code,
+            ex_msg,
         )
 
         res_json = json.loads(response.content)

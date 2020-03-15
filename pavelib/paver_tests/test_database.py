@@ -7,7 +7,7 @@ from tempfile import mkdtemp
 import os
 from unittest import TestCase
 
-import boto
+import boto3
 from mock import patch, call
 
 from common.test.utils import MockS3Mixin
@@ -24,19 +24,22 @@ class TestPaverDbS3Utils(MockS3Mixin, TestCase):
     """ Tests for paver bokchoy database utils related to s3 """
     def setUp(self):
         super(TestPaverDbS3Utils, self).setUp()
-        conn = boto.connect_s3()
-        conn.create_bucket('moto_test_bucket')
-        self.bucket = conn.get_bucket('moto_test_bucket')
+        client = boto3.client('s3')
+        self.bucket_name = 'moto_test_bucket'
+        client.create_bucket(Bucket=self.bucket_name)
+        client.head_bucket(Bucket=self.bucket_name)
 
     def test_fingerprint_in_bucket(self):
-        key = boto.s3.key.Key(bucket=self.bucket, name='testfile.tar.gz')
-        key.set_contents_from_string('this is a test')
-        self.assertTrue(is_fingerprint_in_bucket('testfile', 'moto_test_bucket'))
+        fingerprint = 'test_fingerprint'
+        s3_key = '{}.tar.gz'.format(fingerprint)
+        client = boto3.client('s3')
+        client.put_object(Bucket=self.bucket_name, Key=s3_key, Body='this is a test')
+        self.assertTrue(is_fingerprint_in_bucket(fingerprint, self.bucket_name))
 
     def test_fingerprint_not_in_bucket(self):
-        key = boto.s3.key.Key(bucket=self.bucket, name='testfile.tar.gz')
-        key.set_contents_from_string('this is a test')
-        self.assertFalse(is_fingerprint_in_bucket('otherfile', 'moto_test_bucket'))
+        client = boto3.client('s3')
+        client.put_object(Bucket=self.bucket_name, Key='testfile.tar.gz', Body='this is a test')
+        self.assertFalse(is_fingerprint_in_bucket('otherfile', self.bucket_name))
 
 
 class TestPaverDbUtils(TestCase):
@@ -85,9 +88,9 @@ class TestPaverDatabaseTasks(MockS3Mixin, PaverTestCase):
 
     def setUp(self):
         super(TestPaverDatabaseTasks, self).setUp()
-        conn = boto.connect_s3()
-        conn.create_bucket('moto_test_bucket')
-        self.bucket = conn.get_bucket('moto_test_bucket')
+        client = boto3.client('s3')
+        self.bucket_name = 'moto_test_bucket'
+        client.create_bucket(Bucket=self.bucket_name)
         # This value is the actual sha1 fingerprint calculated for the dummy
         # files used in these tests
         self.expected_fingerprint = 'ccaa8d8dcc7d030cd6a6768db81f90d0ef976c3d'
@@ -140,8 +143,10 @@ class TestPaverDatabaseTasks(MockS3Mixin, PaverTestCase):
         with tarfile.open(name=zipfile_path, mode='w:gz') as tar_file:
             for name in database.ALL_DB_FILES:
                 tar_file.add(os.path.join(db_utils.CACHE_FOLDER, name), arcname=name)
-        key = boto.s3.key.Key(bucket=self.bucket, name=self.fingerprint_filename)
-        key.set_contents_from_filename(zipfile_path, replace=False)
+        with open(zipfile_path) as f:
+            zipfile_content = f.read()
+        client = boto3.client('s3')
+        client.put_object(Bucket=self.bucket_name, Key=self.fingerprint_filename, Body=zipfile_content)
 
         # write the local fingerprint file with a different value than
         # the computed fingerprint
@@ -153,7 +158,7 @@ class TestPaverDatabaseTasks(MockS3Mixin, PaverTestCase):
             database.update_local_bokchoy_db_from_s3()  # pylint: disable=no-value-for-parameter
             # Make sure that the fingerprint file is downloaded from s3
             _mock_get_file.assert_called_once_with(
-                'moto_test_bucket', self.fingerprint_filename, db_utils.CACHE_FOLDER
+                self.bucket_name, self.fingerprint_filename, db_utils.CACHE_FOLDER
             )
         calls = [
             call('{}/scripts/reset-test-db.sh --calculate_migrations'.format(Env.REPO_ROOT)),
@@ -210,4 +215,7 @@ class TestPaverDatabaseTasks(MockS3Mixin, PaverTestCase):
             fingerprint_file.write(local_fingerprint)
 
         database.update_local_bokchoy_db_from_s3()  # pylint: disable=no-value-for-parameter
-        self.assertTrue(self.bucket.get_key(self.fingerprint_filename))
+
+        # check if fingerprint was saved in S3 in database.update_local_bokchoy_db_from_s3()
+        client = boto3.client('s3')
+        client.head_object(Bucket=self.bucket_name, Key=self.fingerprint_filename)

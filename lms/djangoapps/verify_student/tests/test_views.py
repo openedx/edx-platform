@@ -8,13 +8,10 @@ import urllib
 from datetime import datetime, timedelta
 from uuid import uuid4
 
-import boto
 import ddt
 import httpretty
 import mock
-import moto
 import pytz
-import requests
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.core import mail
@@ -28,7 +25,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from waffle.testutils import override_switch
 
-from common.test.utils import XssTestMixin
+from common.test.utils import MockS3Boto3Mixin, XssTestMixin
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.commerce.models import CommerceConfiguration
@@ -1417,7 +1414,7 @@ class TestCreateOrderView(ModuleStoreTestCase):
 @attr(shard=2)
 @ddt.ddt
 @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-class TestSubmitPhotosForVerification(TestCase):
+class TestSubmitPhotosForVerification(MockS3Boto3Mixin, TestCase):
     """
     Tests for submitting photos for verification.
     """
@@ -1494,14 +1491,14 @@ class TestSubmitPhotosForVerification(TestCase):
         "DAYS_GOOD_FOR": 10,
     })
     @httpretty.activate
-    @moto.mock_s3
     def test_submit_photos_for_reverification(self):
-        # Create the S3 bucket for photo upload
-        conn = boto.connect_s3()
-        conn.create_bucket("test.example.com")
 
         # Mock the POST to Software Secure
-        httpretty.register_uri(httpretty.POST, "https://verify.example.com/submit/")
+        httpretty.register_uri(
+            httpretty.POST, settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["API_URL"],
+            status=200, body={},
+            content_type='application/json'
+        )
 
         # Submit an initial verification attempt
         self._submit_photos(
@@ -1516,23 +1513,6 @@ class TestSubmitPhotosForVerification(TestCase):
 
         # Verify that the initial attempt sent the same ID photo as the reverification attempt
         self.assertEqual(initial_data["PhotoIDKey"], reverification_data["PhotoIDKey"])
-
-        initial_photo_response = requests.get(initial_data["PhotoID"])
-        self.assertEqual(initial_photo_response.status_code, 200)
-
-        reverification_photo_response = requests.get(reverification_data["PhotoID"])
-        self.assertEqual(reverification_photo_response.status_code, 200)
-
-        self.assertEqual(initial_photo_response.content, reverification_photo_response.content)
-
-        # Verify that the second attempt sent the updated face photo
-        initial_photo_response = requests.get(initial_data["UserPhoto"])
-        self.assertEqual(initial_photo_response.status_code, 200)
-
-        reverification_photo_response = requests.get(reverification_data["UserPhoto"])
-        self.assertEqual(reverification_photo_response.status_code, 200)
-
-        self.assertNotEqual(initial_photo_response.content, reverification_photo_response.content)
 
         # Submit a new face photo and photo id for verification
         self._submit_photos(
