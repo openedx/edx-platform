@@ -395,7 +395,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-03-08 20:42+0000\n"
+"POT-Creation-Date: 2020-03-15 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/open-edx/teams/6205/zh_CN/)\n"
@@ -1858,9 +1858,8 @@ msgid "Cannot rescore problems with possible file submissions"
 msgstr "无法对可能的文件提交重新评分"
 
 #: common/lib/capa/capa/capa_problem.py
-#, python-brace-format
-msgid "Question {0}"
-msgstr "问题{0}"
+msgid "Question {}"
+msgstr ""
 
 #: common/lib/capa/capa/capa_problem.py
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -11531,6 +11530,18 @@ msgid ""
 "{register_link}, and enroll in this course."
 msgstr "您尚未登录，如需查看此讨论内容，请{sign_in_link}或{register_link}，并加入此门课程。"
 
+#: openedx/features/calendar_sync/plugins.py
+msgid "Calendar Sync"
+msgstr ""
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Unsubscribe from calendar updates"
+msgstr ""
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Subscribe to calendar updates"
+msgstr ""
+
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
 #: lms/templates/support/feature_based_enrollments.html
@@ -19470,6 +19481,10 @@ msgstr "未找到结果"
 #: lms/templates/support/manage_user.html
 msgid "Student Support: Manage User"
 msgstr "学员帮助：管理用户"
+
+#: lms/templates/support/program_enrollments_inspector.html
+msgid "Program Enrollments Inspector"
+msgstr ""
 
 #: lms/templates/support/refund.html
 msgid "About to refund this order:"

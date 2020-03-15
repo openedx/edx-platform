@@ -177,7 +177,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-03-08 20:42+0000\n"
+"POT-Creation-Date: 2020-03-15 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Chinese (Taiwan) (https://www.transifex.com/open-edx/teams/6205/zh_TW/)\n"
@@ -1619,8 +1619,7 @@ msgid "Cannot rescore problems with possible file submissions"
 msgstr "對於可能的提交文件無法重新計分"
 
 #: common/lib/capa/capa/capa_problem.py
-#, python-brace-format
-msgid "Question {0}"
+msgid "Question {}"
 msgstr ""
 
 #: common/lib/capa/capa/capa_problem.py
@@ -11157,6 +11156,18 @@ msgid ""
 "{register_link}, and enroll in this course."
 msgstr ""
 
+#: openedx/features/calendar_sync/plugins.py
+msgid "Calendar Sync"
+msgstr ""
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Unsubscribe from calendar updates"
+msgstr ""
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Subscribe to calendar updates"
+msgstr ""
+
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
 #: lms/templates/support/feature_based_enrollments.html
@@ -18965,6 +18976,10 @@ msgstr ""
 
 #: lms/templates/support/manage_user.html
 msgid "Student Support: Manage User"
+msgstr ""
+
+#: lms/templates/support/program_enrollments_inspector.html
+msgid "Program Enrollments Inspector"
 msgstr ""
 
 #: lms/templates/support/refund.html

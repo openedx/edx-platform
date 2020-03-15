@@ -121,7 +121,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-03-08 20:42+0000\n"
+"POT-Creation-Date: 2020-03-15 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Ukrainian (https://www.transifex.com/open-edx/teams/6205/uk/)\n"
@@ -1737,9 +1737,8 @@ msgid "Cannot rescore problems with possible file submissions"
 msgstr "Неможливо переоцінити задачі з можливими завантаженими файлами"
 
 #: common/lib/capa/capa/capa_problem.py
-#, python-brace-format
-msgid "Question {0}"
-msgstr "Запитання {0}"
+msgid "Question {}"
+msgstr ""
 
 #: common/lib/capa/capa/capa_problem.py
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -12190,6 +12189,18 @@ msgstr ""
 "Ви не ввійшли. Щоб переглянути зміст дискусії, {sign_in_link} або "
 "{register_link}, та зареєструйтесь на цьому курсі."
 
+#: openedx/features/calendar_sync/plugins.py
+msgid "Calendar Sync"
+msgstr ""
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Unsubscribe from calendar updates"
+msgstr ""
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Subscribe to calendar updates"
+msgstr ""
+
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
 msgid "Enabled As Of"
@@ -20154,6 +20165,10 @@ msgstr ""
 
 #: lms/templates/support/manage_user.html
 msgid "Student Support: Manage User"
+msgstr ""
+
+#: lms/templates/support/program_enrollments_inspector.html
+msgid "Program Enrollments Inspector"
 msgstr ""
 
 #: lms/templates/support/refund.html

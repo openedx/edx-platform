@@ -1722,8 +1722,7 @@ msgstr ""
 "Nie można ponownie ocenić ćwiczeń, które mogą zawierać załączone pliki"
 
 #: common/lib/capa/capa/capa_problem.py
-#, python-brace-format
-msgid "Question {0}"
+msgid "Question {}"
 msgstr ""
 
 #: common/lib/capa/capa/capa_problem.py
@@ -12074,6 +12073,18 @@ msgstr ""
 msgid ""
 "You are not signed in. To view the discussion content, {sign_in_link} or "
 "{register_link}, and enroll in this course."
+msgstr ""
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Calendar Sync"
+msgstr ""
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Unsubscribe from calendar updates"
+msgstr ""
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Subscribe to calendar updates"
 msgstr ""
 
 #: openedx/features/content_type_gating/models.py
