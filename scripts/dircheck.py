@@ -129,13 +129,19 @@ def run_checks(check_classes, dir_config, invoke_dir, target_dir, stop_on_failur
             output_warning("Check {key} not enabled; skipping.".format(key=key))
             continue
         start_check_message = (
-            "Running check ({key}) on '{target_dir}' from '{invoke_dir}' "
-            "with effective config: {check_dir_config}"
+            "Running check:\n"
+            "  {key}\n"
+            "on:\n"
+            "  {target_dir}\n"
+            "from:\n"
+            "  {invoke_dir}\n"
+            "with effective config:\n"
+            "   {check_dir_config}"
         ).format(
             key=key,
            target_dir=target_dir,
            invoke_dir=invoke_dir,
-           check_dir_config=check.dir_config,
+           check_dir_config=pprint.pformat(check.dir_config, indent=4, width=50)
         )
         output_info(start_check_message)
         result = CheckResult.success if check.run() else CheckResult.failure
@@ -301,7 +307,8 @@ class PylintCheck(Check):
                 "E": 0,
                 "F": 0,
             },
-            "canonical_lms_imports": dir_config.get("canonical_lms_imports", False)
+            # @@TODO handle canonical_lms_imports
+            "canonical_lms_imports": False  # dir_config.get("canonical_lms_imports", False)
         }
 
     @property
