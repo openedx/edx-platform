@@ -17120,7 +17120,7 @@ msgstr "Chương trình học"
 #: lms/templates/header/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
-msgstr ""
+msgstr "Khám phá mới"
 
 #. Translators: This is short for "System administration".
 #: lms/templates/header/navbar-authenticated.html
