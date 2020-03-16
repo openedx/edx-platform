@@ -140,6 +140,7 @@ JWT_AUTH.update({
     'JWT_SECRET_KEY': 'lms-secret',
     'JWT_ISSUER': 'http://127.0.0.1:8000/oauth2',
     'JWT_AUDIENCE': 'lms-key',
+    'JWT_AUTH_HEADER_PREFIX': 'JWT',
     'JWT_PUBLIC_SIGNING_JWK_SET': (
         '{"keys": [{"kid": "devstack_key", "e": "AQAB", "kty": "RSA", "n": "smKFSYowG6nNUAdeqH1jQQnH1PmIHphzBmwJ5vRf1vu'
         '48BUI5VcVtUWIPqzRK_LDSlZYh9D0YFL0ZTxIrlb6Tn3Xz7pYvpIAeYuQv3_H5p8tbz7Fb8r63c1828wXPITVTv8f7oxx5W3lFFgpFAyYMmROC'

@@ -25,4 +25,5 @@ JWT_AUTH.update({
     'JWT_ISSUER': '{}/oauth2'.format(LMS_ROOT_URL),
     'JWT_SECRET_KEY': 'lms-secret',
     'JWT_AUDIENCE': 'lms-key',
+    'JWT_AUTH_HEADER_PREFIX': 'JWT',
 })
