@@ -153,6 +153,7 @@ help-tokens==1.0.5        # via -r requirements/edx/testing.txt
 html5lib==1.0.1           # via -r requirements/edx/testing.txt, ora2
 httplib2==0.17.0          # via -r requirements/edx/testing.txt, oauth2
 httpretty==0.9.7          # via -r requirements/edx/testing.txt
+icalendar==4.0.4          # via -r requirements/edx/testing.txt
 idna==2.9                 # via -r requirements/edx/testing.txt, requests
 imagesize==1.2.0          # via sphinx
 importlib-metadata==1.5.0  # via -r requirements/edx/testing.txt, importlib-resources, inflect, jsonschema, path, pluggy, pytest, pytest-randomly, tox, virtualenv
@@ -250,14 +251,14 @@ pytest-metadata==1.8.0    # via -r requirements/edx/testing.txt, pytest-json-rep
 pytest-randomly==3.2.1    # via -r requirements/edx/testing.txt
 pytest-xdist==1.31.0      # via -r requirements/edx/testing.txt
 pytest==5.4.1             # via -r requirements/edx/testing.txt, pytest-attrib, pytest-cov, pytest-django, pytest-forked, pytest-json-report, pytest-metadata, pytest-randomly, pytest-xdist
-python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, analytics-python, botocore, edx-ace, edx-drf-extensions, edx-enterprise, edx-proctoring, faker, freezegun, ora2, pandas, xblock
+python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, analytics-python, botocore, edx-ace, edx-drf-extensions, edx-enterprise, edx-proctoring, faker, freezegun, icalendar, ora2, pandas, xblock
 python-levenshtein==0.12.0  # via -r requirements/edx/testing.txt
 python-memcached==1.59    # via -r requirements/edx/testing.txt
 python-slugify==4.0.0     # via -r requirements/edx/testing.txt, code-annotations, transifex-client
 python-swiftclient==3.9.0  # via -r requirements/edx/testing.txt, ora2
 python3-openid==3.1.0 ; python_version >= "3"  # via -r requirements/edx/testing.txt, social-auth-core
 python3-saml==1.5.0       # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
-pytz==2019.3              # via -r requirements/edx/testing.txt, babel, capa, celery, django, django-ses, edx-completion, edx-enterprise, edx-proctoring, edx-submissions, edx-tincan-py35, event-tracking, fs, ora2, pandas, xblock
+pytz==2019.3              # via -r requirements/edx/testing.txt, babel, capa, celery, django, django-ses, edx-completion, edx-enterprise, edx-proctoring, edx-submissions, edx-tincan-py35, event-tracking, fs, icalendar, ora2, pandas, xblock
 pyuca==1.2                # via -r requirements/edx/testing.txt
 pyyaml==5.3               # via -r requirements/edx/testing.txt, code-annotations, edx-django-release-util, edx-i18n-tools, sphinxcontrib-openapi, xblock
 radon==4.1.0              # via -r requirements/edx/testing.txt
