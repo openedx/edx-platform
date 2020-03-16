@@ -134,28 +134,35 @@ class ProgramEnrollmentsInspectorView(View):
         Search the data store for information about ProgramEnrollment and
         SSO linkage with the user.
         """
-        errors = []
+        search_error = ''
         edx_username_or_email = request.GET.get('edx_user', '').strip()
-        org_key = request.GET.get('IdPSelect', '').strip()
+        org_key = request.GET.get('org_key', '').strip()
         external_user_key = request.GET.get('external_user_key', '').strip()
         learner_program_enrollments = {}
+        saml_providers_with_org_key = self._get_org_keys_and_idps()
+        selected_provider = None
+        if org_key:
+            selected_provider = saml_providers_with_org_key.get(org_key)
         if edx_username_or_email:
-            learner_program_enrollments, error = self._get_account_info(edx_username_or_email)
-            if error:
-                errors.append(error)
+            learner_program_enrollments, search_error = self._get_account_info(
+                edx_username_or_email,
+                selected_provider,
+            )
         elif org_key and external_user_key:
             learner_program_enrollments = self._get_external_user_info(
                 external_user_key,
-                org_key
+                org_key,
+                selected_provider,
             )
             if not learner_program_enrollments:
-                errors.append(
-                    'No user found for external key {} for institution {}'.format(
-                        external_user_key, org_key
-                    )
+                search_error = 'No user found for external key {} for institution {}'.format(
+                    external_user_key, org_key
                 )
+        elif not org_key and not external_user_key:
+            # This is initial rendering state.
+            pass
         else:
-            errors.append(
+            search_error = (
                 "To perform a search, you must provide either the student's "
                 "(a) edX username, "
                 "(b) email address associated with their edX account, or "
@@ -165,38 +172,39 @@ class ProgramEnrollmentsInspectorView(View):
         return render_to_response(
             self.CONSOLE_TEMPLATE_PATH,
             {
-                'errors': errors,
+                'error': search_error,
                 'learner_program_enrollments': learner_program_enrollments,
-                'org_keys': self._get_org_keys_with_idp(),
+                'org_keys': sorted(saml_providers_with_org_key.keys()),
             }
         )
 
-    def _get_org_keys_with_idp(self):
+    def _get_org_keys_and_idps(self):
         """
-        From our Third_party_auth models, return a list
-        of organizations whose SAMLProviders are active and configured
+        From our Third_party_auth models, return a dictionary of
+        of organizations keys and their correspondingactive and configured SAMLProviders
         """
         saml_providers = SAMLProviderConfig.objects.current_set().filter(
             enabled=True,
             organization__isnull=False
         ).select_related('organization')
 
-        return [saml_provider.organization.short_name for saml_provider in saml_providers]
+        return {
+            saml_provider.organization.short_name: saml_provider for saml_provider in saml_providers
+        }
 
-    def _get_account_info(self, username_or_email):
+    def _get_account_info(self, username_or_email, idp_provider=None):
         """
-        Provided the edx account username or email, return edx account info
-        and program_enrollments_info. If we cannot identify the user, return
-        empty object and error.
+        Provided the edx account username or email, and the SAML provider selected,
+        return edx account info and program_enrollments_info.
+        If we cannot identify the user, return empty object and error.
         """
         try:
             user = User.objects.get(Q(username=username_or_email) | Q(email=username_or_email))
-            user_social_auth = None
-            try:
-                user_social_auth = UserSocialAuth.objects.get(user=user)
-            except UserSocialAuth.DoesNotExist:
-                pass
-            user_info = serialize_user_info(user, user_social_auth)
+            user_social_auths = None
+            user_social_auths = UserSocialAuth.objects.filter(user=user)
+            if idp_provider:
+                user_social_auths = user_social_auths.filter(provider=idp_provider.backend_name)
+            user_info = serialize_user_info(user, user_social_auths)
             enrollments = self._get_enrollments(user=user)
             result = {'user': user_info}
             if enrollments:
@@ -207,7 +215,7 @@ class ProgramEnrollmentsInspectorView(View):
         except User.DoesNotExist:
             return {}, 'Could not find edx account with {}'.format(username_or_email)
 
-    def _get_external_user_info(self, external_user_key, org_key):
+    def _get_external_user_info(self, external_user_key, org_key, idp_provider=None):
         """
         Provided the external_user_key and org_key, return edx account info
         and program_enrollments_info if any. If we cannot identify the data,
@@ -229,17 +237,19 @@ class ProgramEnrollmentsInspectorView(View):
             # We cannot identify edX user from external_user_key and org_key pair
             pass
 
-        if found_user:
-            try:
-                user_social_auth = UserSocialAuth.objects.get(user=found_user)
-            except UserSocialAuth.DoesNotExist:
-                user_social_auth = None
-            user_info = serialize_user_info(found_user, user_social_auth)
-            result['user'] = user_info
-            result['id_verification'] = IDVerificationService.user_status(found_user)
         enrollments = self._get_enrollments(external_user_key=external_user_key)
         if enrollments:
             result['enrollments'] = enrollments
+        if found_user:
+            user_social_auths = UserSocialAuth.objects.filter(user=found_user)
+            if idp_provider:
+                user_social_auths = user_social_auths.filter(provider=idp_provider.backend_name)
+            user_info = serialize_user_info(found_user, user_social_auths)
+            result['user'] = user_info
+            result['id_verification'] = IDVerificationService.user_status(found_user)
+        elif 'enrollments' in result:
+            result['user'] = {'external_user_key': external_user_key}
+
         return result
 
     def _get_enrollments(self, user=None, external_user_key=None):
