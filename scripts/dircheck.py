@@ -304,7 +304,7 @@ class PylintCheck(Check):
                 "C": allowances.get("C"),
                 "R": allowances.get("R"),
                 "W": allowances.get("W"),
-                "E": 0,
+                "E": allowances.get("E"),
                 "F": 0,
             },
             # @@TODO handle canonical_lms_imports
