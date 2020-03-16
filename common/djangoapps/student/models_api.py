@@ -14,7 +14,7 @@ from student.models import (
     ALLOWEDTOENROLL_TO_UNENROLLED as _ALLOWEDTOENROLL_TO_UNENROLLED,
     DEFAULT_TRANSITION_STATE as _DEFAULT_TRANSITION_STATE,
 )
-from student.models  import UserProfile
+from student.models import UserProfile
 
 # This is done so that if these strings change within the app, we can keep exported constants the same
 ENROLLED_TO_ENROLLED = _ENROLLED_TO_ENROLLED
@@ -48,6 +48,10 @@ def create_manual_enrollment_audit(
 def get_course_enrollment(user, course_run_key):
     return _CourseEnrollment.get_enrollment(user, course_run_key)
 
-def get_phone_number(user):
-    student = UserProfile.objects.get(user_id=3)
-    return student.phone_number
+
+def get_phone_number(user_id):
+    try:
+        student = UserProfile.objects.get(user_id=user_id)
+        return student.phone_number
+    except UserProfile.phone_number.DoesNotExist as exception:
+        raise exception
