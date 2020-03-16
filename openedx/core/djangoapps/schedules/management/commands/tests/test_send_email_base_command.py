@@ -11,6 +11,7 @@ import pytz
 from django.conf import settings
 from mock import DEFAULT, Mock, patch
 
+from completion.test_utils import CompletionWaffleTestMixin
 from openedx.core.djangoapps.schedules.management.commands import SendEmailBaseCommand
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
@@ -20,7 +21,7 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_un
 @skip_unless_lms
 @skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
             "Can't test schedules if the app isn't installed")
-class TestSendEmailBaseCommand(CacheIsolationTestCase):
+class TestSendEmailBaseCommand(CacheIsolationTestCase, CompletionWaffleTestMixin):
 
     def setUp(self):
         self.command = SendEmailBaseCommand()
@@ -40,6 +41,16 @@ class TestSendEmailBaseCommand(CacheIsolationTestCase):
         with patch.object(self.command, 'enqueue') as enqueue:
             self.command.handle(site_domain_name=self.site.domain, date='2017-09-29', weeks=12)
             self.assertEqual(enqueue.call_count, 12)
+
+    def test_check_completion_option_with_completion_enabled(self):
+        self.override_waffle_switch(True)
+        with patch.object(self.command, 'send_emails') as send_emails:
+            self.command.handle(site_domain_name=self.site.domain, date='2017-09-29', check_completion=True)
+            send_emails.assert_called_once_with(
+                self.site.domain,
+                datetime.datetime(2017, 9, 29, tzinfo=pytz.UTC),
+                True
+            )
 
     def test_send_emails(self):
         with patch.multiple(

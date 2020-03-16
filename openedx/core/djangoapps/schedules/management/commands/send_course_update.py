@@ -17,4 +17,3 @@ class Command(SendEmailBaseCommand):
     help = dedent(__doc__).strip()
     async_send_task = ScheduleCourseUpdate
     log_prefix = 'Course Update'
-    check_completion = False

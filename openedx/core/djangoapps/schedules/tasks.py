@@ -85,7 +85,7 @@ class ScheduleMessageBaseTask(LoggedTask):
         LOG.info(cls.log_prefix + ': ' + message, *args, **kwargs)
 
     @classmethod
-    def enqueue(cls, site, current_date, day_offset, override_recipient_email=None):
+    def enqueue(cls, site, current_date, day_offset, override_recipient_email=None, check_completion=False):
         current_date = resolvers._get_datetime_beginning_of_day(current_date)
 
         if not cls.is_enqueue_enabled(site):
@@ -101,6 +101,7 @@ class ScheduleMessageBaseTask(LoggedTask):
                 day_offset,
                 bin,
                 override_recipient_email,
+                check_completion,
             )
             cls.log_info(u'Launching task with args = %r', task_args)
             cls().apply_async(
@@ -115,7 +116,7 @@ class ScheduleMessageBaseTask(LoggedTask):
         return False
 
     def run(
-        self, site_id, target_day_str, day_offset, bin_num, override_recipient_email=None,
+        self, site_id, target_day_str, day_offset, bin_num, override_recipient_email=None, check_completion=False,
     ):
         site = Site.objects.select_related('configuration').get(id=site_id)
         with emulate_http_request(site=site):
@@ -128,6 +129,7 @@ class ScheduleMessageBaseTask(LoggedTask):
                 day_offset,
                 bin_num,
                 override_recipient_email=override_recipient_email,
+                check_completion=check_completion,
             ).send(msg_type)
 
     def make_message_type(self, day_offset):

@@ -19,7 +19,6 @@ class SendEmailBaseCommand(PrefixedDebugLoggerMixin, BaseCommand):
     # An iterable of day offsets (e.g. -7, -14, -21, -28, ...) that defines the days for
     # which emails are sent out, relative to the 'date' parameter
     offsets = range(-7, -77, -7)
-    check_completion = False
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -39,7 +38,8 @@ class SendEmailBaseCommand(PrefixedDebugLoggerMixin, BaseCommand):
         )
         parser.add_argument(
             '--check-completion',
-            deafult=False,
+            default=False,
+            action='store_true',
             help='Check if the student has completed atleast one block'
         )
 
@@ -51,10 +51,6 @@ class SendEmailBaseCommand(PrefixedDebugLoggerMixin, BaseCommand):
             num_days = (7 * num_weeks) + 1
             self.offsets = range(-7, -num_days, -7)
 
-        check_completion = options.get('check-completion')
-        if check_completion:
-            self.check_completion = check_completion
-
         current_date = datetime.datetime(
             *[int(x) for x in options['date'].split('-')],
             tzinfo=pytz.UTC
@@ -65,14 +61,16 @@ class SendEmailBaseCommand(PrefixedDebugLoggerMixin, BaseCommand):
         self.log_debug(u'Running for site %s', site.domain)
 
         override_recipient_email = options.get('override_recipient_email')
-        self.send_emails(site, current_date, override_recipient_email)
+        check_completion = options.get('check_completion')
+        self.send_emails(site, current_date, override_recipient_email, check_completion)
 
-    def enqueue(self, day_offset, site, current_date, override_recipient_email=None):
+    def enqueue(self, day_offset, site, current_date, override_recipient_email=None, check_completion=False):
         self.async_send_task.enqueue(
             site,
             current_date,
             day_offset,
             override_recipient_email,
+            check_completion,
         )
 
     def send_emails(self, *args, **kwargs):
