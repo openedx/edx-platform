@@ -46,8 +46,8 @@ def main(script_name, args):
     @@TODO
     """
     if len(args) > 1:
-        output("Invalid usage.", status='error')
-        output(get_usage(script_name), status='error')
+        output_error("Invalid usage.")
+        output_error(get_usage(script_name))
         return 123
     target_dir = Path(args[0] if args else ".")
     repo_root_dir, dir_config = get_repo_root_and_config(target_dir)
@@ -108,7 +108,7 @@ def get_repo_root_and_config(start_dir):
             return walk_up(
                 current_dir=current_dir.parent, dircheck_config=dircheck_config
             )
-    return walk_up(current_dir=start_dir, dircheck_config=None)
+    return walk_up(current_dir=start_dir, dircheck_config={})
 
 
 def run_checks(check_classes, dir_config, invoke_dir, target_dir, stop_on_failure=False):
@@ -121,12 +121,23 @@ def run_checks(check_classes, dir_config, invoke_dir, target_dir, stop_on_failur
         results_by_check[key] = CheckResult.skipped
         dir_config_for_check = dir_config.get(key)
         check = check_class(
-            config=dir_config_for_check,
+            dir_config=dir_config_for_check,
             invoke_dir=invoke_dir,
             target_dir=target_dir,
         )
         if not check.enabled:
+            output_warning("Check {key} not enabled; skipping.".format(key=key))
             continue
+        start_check_message = (
+            "Running check ({key}) on '{target_dir}' from '{invoke_dir}' "
+            "with effective config: {check_dir_config}"
+        ).format(
+            key=key,
+           target_dir=target_dir,
+           invoke_dir=invoke_dir,
+           check_dir_config=check.dir_config,
+        )
+        output_info(start_check_message)
         result = CheckResult.success if check.run() else CheckResult.failure
         results_by_check[key] = result
         if stop_on_failure and result.is_failure:
@@ -142,38 +153,61 @@ def report_results_and_get_exit_code(results_by_check):
     skipped_checks = [c for c, r in results_by_check.items() if r.is_skipped]
     failed_checks = [c for c, r in results_by_check.items() if r.is_failure]
     if skipped_checks:
-        output(
-            "Checks not run: {}.".format(skipped_checks.join(", ")),
-            status="warning",
-        )
+        output_warning("Checks not run: {}.".format(", ".join(skipped_checks)))
     if successful_checks:
-        output(
-            "Successful checks: {}.".format(successful_checks.join(", ")),
-            status="ok",
-        )
+        output_ok("Successful checks: {}.".format(", ".join(successful_checks)))
     if failed_checks:
-        output(
-            "Failed checks: {}.".format(failed_checks.join(", ")),
-            status="error",
-        )
+        output_error("Failed checks: {}.".format(", ".join(failed_checks)))
     if successful_checks and not failed_checks:
         return 0
     elif failed_checks:
         return 1
     else:
-        output(
-            "Failing because no checks were run.",
-            status="error",
-        )
+        output_error("Failing because no checks were run.")
         return 2
 
 
-def output(message, status='info'):
+def output_info(message):
+    """
+    @@TODO
+    """
+    _output(message, status="info")
+
+
+def output_error(message):
+    """
+    @@TODO
+    """
+    _output(message, status="error")
+
+
+def output_warning(message):
+    """
+    @@TODO
+    """
+    _output(message, status="warning")
+
+
+def output_ok(message):
+    """
+    @@TODO
+    """
+    _output(message, status="ok")
+
+
+def output_normal(message):
+    """
+    @@TODO
+    """
+    _output(message, status="normal")
+
+
+def _output(message, status='info'):
     """
     Write a line of output, followed by a newline.
     """
     color = {
-        'info': INFO, 'error': ERROR, 'warning': WARNING, 'ok': SUCCESS
+        'info': INFO, 'error': ERROR, 'warning': WARNING, 'ok': SUCCESS, 'normal': NORMAL
     }[status]
     to_output = "{color}{message}{NORMAL}".format(
         message=message, color=color, NORMAL=NORMAL
@@ -198,18 +232,25 @@ class Check:
         """
         @TODO
         """
-        self.dir_config = dir_config
+        self.dir_config = self.clean_dir_config(dir_config)
         self.invoke_dir = invoke_dir
         self.target_dir = target_dir
 
-    def run(self):
+    @classmethod
+    def clean_dir_config(cls, dir_config):
+        """
+        @@TODO
+        """
+        return dir_config
+
+    @property
+    def enabled(self):
         """
         @@TODO
         """
         return NotImplementedError
 
-    @property
-    def enabled(self):
+    def run(self):
         """
         @@TODO
         """
@@ -228,17 +269,40 @@ class Check:
         print(to_output, end='')
 
 
+class ConfigException(Exception):
+    """
+    @@TODO
+    """
+
+
 class PylintCheck(Check):
     """
     @@TODO
     """
     check_key = "pylint"
 
-    def run(self):
+    @classmethod
+    def clean_dir_config(cls, dir_config):
         """
-        @@TODO
+        @TODO
         """
-        return CheckResult.failure
+        if dir_config is None:
+            return None
+        if not isinstance(dir_config, dict):
+            raise ConfigException("pylint config must be dictionary")
+        # @@TODO do more validation here?
+        allowances = dir_config.get("allowances", {})
+        return {
+            "allowances": {
+                "I": allowances.get("I"),
+                "C": allowances.get("C"),
+                "R": allowances.get("R"),
+                "W": allowances.get("W"),
+                "E": 0,
+                "F": 0,
+            },
+            "canonical_lms_imports": dir_config.get("canonical_lms_imports", False)
+        }
 
     @property
     def enabled(self):
@@ -247,7 +311,28 @@ class PylintCheck(Check):
         """
         return self.dir_config is not None
 
-    def _run_pylint(self, invoke_dir, target_dir):
+    def run(self):
+        """
+        @@TODO
+        """
+        success = True
+        issues_by_type = self._find_issues_by_type()
+        for issue_type, issues in issues_by_type.items():
+            allowance = self.dir_config["allowances"].get(issue_type, 0)
+            if allowance is None:
+                continue
+            count = len(issues)
+            if count <= allowance:
+                continue
+            success = False
+            message = (
+                "Expected at most {allowance} issues of type {issue_type}, "
+                "but found {count}."
+            ).format(allowance=allowance, issue_type=issue_type, count=count)
+            output_error(message)
+        return success
+
+    def _find_issues_by_type(self):
         """
         Run pylint on `target_dir` from within `invoke_dir`.
 
@@ -263,13 +348,10 @@ class PylintCheck(Check):
                 'I': [...], 'C': [...], 'R': [...], 'W':[...]0, 'E':[...] 'F': [...]
             }
         """
-        output("Running pylint on '{target_dir}' from '{invoke_dir}'".format(
-            target_dir=target_dir, invoke_dir=invoke_dir
-        ))
         original_dir = Path.cwd()
-        os.chdir(str(invoke_dir))
+        os.chdir(str(self.invoke_dir))
         issues_by_type = {'I': [], 'C': [], 'R': [], 'W': [], 'E': [], 'F': []}
-        command = 'pylint {target_dir}'.format(target_dir=target_dir)
+        command = 'pylint {target_dir}'.format(target_dir=self.target_dir)
         with os.popen(command) as pipe:
             for issue_string in pipe:
                 self.subcommand_output(issue_string)
@@ -322,11 +404,10 @@ class PylintCheck(Check):
             return None
         match = self.PYLINT_ISSUE_REGEX.match(stripped)
         if not match:
-            output(
+            output_warning(
                 'Pylint output line not understood: {stripped}'.format(
                     stripped=stripped
                 ),
-                status='warning',
             )
             return None
         issue_dict = match.groupdict().copy()
