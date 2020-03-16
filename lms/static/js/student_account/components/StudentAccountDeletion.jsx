@@ -67,7 +67,7 @@ export class StudentAccountDeletion extends React.Component {
     const changeAcctInfoText = StringUtils.interpolate(
       gettext('{htmlStart}Want to change your email, name, or password instead?{htmlEnd}'),
       {
-        htmlStart: '<a href="https://https://edtech.ucsd.edu/uc-san-diego-online-help/account_basics/manage-your-account-settings/index.html#Manage-Your-Account-Settings" target="_blank">',
+        htmlStart: '<a href="https://edtech.ucsd.edu/uc-san-diego-online-help/account_basics/manage-your-account-settings/index.html#Manage-Your-Account-Settings" target="_blank">',
         htmlEnd: '</a>',
       },
     );
