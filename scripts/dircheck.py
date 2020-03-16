@@ -2,17 +2,13 @@
 """
 @@TODO
 """
-import logging
 import json
 import os
+import pprint
 import re
 import sys
 from collections import namedtuple
-from pathlib import Path, PurePath
-
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-
+from pathlib import Path
 
 CONFIG_FNAME = "dircheck.json"
 
@@ -22,13 +18,15 @@ def run_dircheck(script_name, args):
     @@TODO
     """
     if len(args) > 1:
-        logger.critical("Invalid usage.\n%s", get_usage(script_name))
+        output("Invalid usage.", status='error')
+        output(get_usage(script_name), status='error')
         return 123
     target_dir = Path(args[0] if args else ".")
     repo_root_dir, config = get_repo_root_and_config(target_dir)
     issues_by_type = run_pylint(invoke_dir=repo_root_dir, target_dir=target_dir)
-    print(config, issues_by_type)
-    logger.critical("Warning: not fully implemented")
+    output(config)
+    output(issues_by_type)
+    output("Warning: not fully implemented", status='warning')
     return 0
 
 
@@ -90,12 +88,15 @@ def run_pylint(invoke_dir, target_dir):
             'I': [...], 'C': [...], 'R': [...], 'W':[...]0, 'E':[...] 'F': [...]
         }
     """
-    logger.info("Running pylint on '%s' from '%s'", target_dir, invoke_dir)
+    output("Running pylint on '{target_dir}' from '{invoke_dir}'".format(
+        target_dir=target_dir, invoke_dir=invoke_dir
+    ))
     issues_by_type = {'I': [], 'C': [], 'R': [], 'W': [], 'E': [], 'F': []}
     os.chdir(str(invoke_dir))
     command = 'pylint {target_dir}'.format(target_dir=target_dir)
     with os.popen(command) as pipe:
         for issue_string in pipe:
+            subcommand_output("pylint", issue_string)
             issue = parse_pylint_issue(issue_string)
             if not issue:
                 continue
@@ -124,6 +125,45 @@ PYLINT_ISSUE_REGEX = re.compile(r"""
 """, re.VERBOSE)
 
 
+INFO = "\033[1;34m"  # Bold blue
+ERROR = "\033[1;31m"  # Bold red
+WARNING = "\033[1;33m"  # Bold yellow
+SUCCESS = "\033[1;32m"  # Bold green
+NORMAL = "\033[0m"  # No styling
+
+
+def output(message, status='info'):
+    """
+    Write a line of output, followed by a newline.
+    """
+    color = {
+        'info': INFO, 'error': ERROR, 'warning': WARNING, 'success': SUCCESS
+    }[status]
+    to_output = "{color}{message}{NORMAL}".format(
+        message=message, color=color, NORMAL=NORMAL
+    )
+    print(to_output)
+
+
+def output_object(obj):
+    """
+    Output an object for debugging.
+    """
+    pprint.pprint(obj)
+
+
+def subcommand_output(sub_command, message):
+    """
+    Write a line of output from one of the invoked sub-commands.
+
+    Assumes newline is included in message.
+    """
+    to_output = "{INFO}({sub_command})>{NORMAL} {message}".format(
+        sub_command=sub_command, message=message, INFO=INFO, NORMAL=NORMAL
+    )
+    print(to_output, end='')
+
+
 def parse_pylint_issue(issue_string):
     """
     Parse a PylintIssue from a line of pylint output.
@@ -146,7 +186,13 @@ def parse_pylint_issue(issue_string):
         return None
     match = PYLINT_ISSUE_REGEX.match(stripped)
     if not match:
-        logger.warning('Pylint output line not understood: %s', stripped)
+        output(
+            'Pylint output line not understood: {stripped}'.format(
+                stripped=stripped
+            ),
+            status='warning',
+        )
+        return None
     issue_dict = match.groupdict().copy()
     issue_dict['line_num'] = int(issue_dict['line_num'])
     issue_dict['column_num'] = int(issue_dict['column_num'])
