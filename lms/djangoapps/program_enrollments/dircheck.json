@@ -1,10 +1,12 @@
 {
-    "pylint_allowance": {
-    	"C": 0,
-    	"R": 0,
-    	"W": 0,
-    	"E": 0
+    "pylint": {
+    	"allowances": {
+	    	"C": 0,
+	    	"R": 0,
+	    	"W": 0,
+	    	"E": 0
+    	},
+    	"canonical_lms_imports": true
     },
-    "isort": true,
-    "canonical_lms_imports": true
+    "isort": true
 }
