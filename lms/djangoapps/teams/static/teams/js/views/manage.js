@@ -44,6 +44,9 @@
                 var self = this;
                 var formData = new FormData();
 
+                // clear selected file to allow re-uploading
+                $(event.target).prop('value', '');
+
                 formData.append('csv', file);  // xss-lint: disable=javascript-jquery-append
                 return $.ajax({
                     type: 'POST',
