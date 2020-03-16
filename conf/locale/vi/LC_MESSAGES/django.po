@@ -15175,7 +15175,7 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Enroll Now"
-msgstr ""
+msgstr "Ghi danh"
 
 #: lms/templates/courseware/course_about.html
 msgid "View About Page in studio"
