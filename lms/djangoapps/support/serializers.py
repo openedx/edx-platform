@@ -59,7 +59,7 @@ class ProgramEnrollmentSerializer(serializers.Serializer):
         model = ProgramEnrollment
 
 
-def serialize_user_info(user, user_social_auth=None):
+def serialize_user_info(user, user_social_auths=None):
     """
     Helper method to serialize resulting in user_info_object
     based on passed in django models
@@ -68,11 +68,9 @@ def serialize_user_info(user, user_social_auth=None):
         'username': user.username,
         'email': user.email,
     }
-    if user_social_auth:
-        _, external_key = user_social_auth.uid.split(':', 1)
-        user_info['external_user_key'] = external_key
-        user_info['sso'] = {
-            'uid': user_social_auth.uid,
-            'provider': user_social_auth.provider
-        }
+    if user_social_auths:
+        for user_social_auth in user_social_auths:
+            user_info.setdefault('sso_list', []).append({
+                'uid': user_social_auth.uid,
+            })
     return user_info
