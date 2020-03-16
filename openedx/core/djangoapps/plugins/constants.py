@@ -83,4 +83,4 @@ class PluginContexts(object):
     that can be specified by a Plugin App in order to configure the
     additional views it would like to add context into.
     """
-    CONFIG = u"context_config"
+    CONFIG = u"view_context_config"

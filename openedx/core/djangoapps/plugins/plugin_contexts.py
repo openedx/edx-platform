@@ -2,6 +2,8 @@ from importlib import import_module
 
 from logging import getLogger
 
+from openedx.core.lib.cache_utils import process_cached
+
 from . import constants, registry
 
 
@@ -10,43 +12,27 @@ log = getLogger(__name__)
 def get_plugins_view_context(project_type, view_name, existing_context={}):
     """
     Returns a dict of additonal view context. Will check if any plugin apps
-    have that view in their context_config, and if so will call their
+    have that view in their view_context_config, and if so will call their
     selected function to get their context dicts.
     """
-    aggregate_context = {}
+    aggregate_context = {"plugins": {}}
 
-    for app_config in registry.get_app_configs(project_type):
-        context_function_path = _get_context_function(app_config, project_type, view_name)
-        if context_function_path:
-            module_path, _, name = context_function_path.rpartition('.')
-            try:
-                module = import_module(module_path)
-            except (ImportError, ModuleNotFoundError):
-                log.exception("Failed to import %s plugin when creating %s context", module_path, view_name)
-                continue
-            context_function = getattr(module, name, None)
-            if context_function:
-                plugin_context = context_function(existing_context)
-            else:
-                log.exception(
-                    "Failed to call %s function from %s plugin when creating %s context",
-                    name,
-                    module_path,
-                    view_name
-                )
-                continue
+    # This functionality is cached
+    context_functions = _get_context_functions_for_view(project_type, view_name)
 
-            # NOTE: If two plugins have try to set the same context keys, the last one
-            # called will overwrite the others.
-            for key in plugin_context:
-                if key in aggregate_context:
-                    log.warning(
-                        "Plugin %s is overwriting the value of %s for view %s",
-                        app_config.__module__,
-                        key,
-                        view_name
-                    )
-            aggregate_context.update(plugin_context)
+    for (context_function, plugin_name) in context_functions:
+        plugin_context = context_function(existing_context)
+        try:
+            plugin_context = context_function(existing_context)
+        except Exception as exc:
+            # We're catching this because we don't want the core to blow up when a
+            # plugin is broken. This exception will probably need some sort of
+            # monitoring hooked up to it to make sure that these errors don't go
+            # unseen.
+            log.exception("Failed to call plugin context function. Error: %s", exc)
+            continue
+
+        aggregate_context["plugins"][plugin_name] = plugin_context
 
     return aggregate_context
 
@@ -56,3 +42,40 @@ def _get_context_function(app_config, project_type, view_name):
     context_config = plugin_config.get(constants.PluginContexts.CONFIG, {})
     project_type_settings = context_config.get(project_type, {})
     return project_type_settings.get(view_name)
+
+@process_cached
+def _get_context_functions_for_view(project_type, view_name):
+    """
+    Returns a list of tuples where the first item is the context function
+    and the second item is the name of the plugin it's being called from.
+
+    NOTE: These will be functions will be cached (in RAM not memcache) on this unique
+    combination. If we enable many new views to use this system, we may notice an
+    increase in memory usage as the entirety of these functions will be held in memory.
+    """
+    context_functions = []
+    for app_config in registry.get_app_configs(project_type):
+        context_function_path = _get_context_function(app_config, project_type, view_name)
+        if context_function_path:
+            module_path, _, name = context_function_path.rpartition('.')
+            try:
+                module = import_module(module_path)
+            except (ImportError, ModuleNotFoundError):
+                log.exception(
+                    "Failed to import %s plugin when creating %s context",
+                    module_path,
+                    view_name
+                )
+                continue
+            context_function = getattr(module, name, None)
+            if context_function:
+                plugin_name, _, _ = module_path.partition('.')
+                context_functions.append((context_function, plugin_name))
+            else:
+                log.warning(
+                    "Failed to retrieve %s function from %s plugin when creating %s context",
+                    name,
+                    module_path,
+                    view_name
+                )
+    return context_functions

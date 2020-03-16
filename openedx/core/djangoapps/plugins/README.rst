@@ -231,7 +231,7 @@ OR use string constants when they cannot import from djangoapps.plugins::
                     }],
                 }
             },
-            u'context_config': {
+            u'view_context_config': {
                 u'lms.djangoapp': {
                     'student_dashboard': u'my_app.context_api.get_dashboard_context'
                 }
