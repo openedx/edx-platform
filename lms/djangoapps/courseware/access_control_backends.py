@@ -76,8 +76,9 @@ class AccessControlBackends(object):
         :param action: currently supporting the course access actions in SUPPORTED_ACTIONS.
         :param user: The User model object.
         :param resource: The course/resource ID.
-        :param default_has_access: True/False What's the default Open edX access control.
-        :return: True/False whether the `user` can perform the `action` on the `resource` or not.
+        :param default_has_access: AccessResponse The default access response object by Open edX.
+        :return: AccessResponse: ACCESS_GRANTED or ACCESS_DENIED whether the
+                                 `user` can perform the `action` on the `resource` or not.
         """
         if action not in self.SUPPORTED_ACTIONS:
             raise NotImplementedError(self.UNSUPPORTED_ERROR_FMT(action=action))
