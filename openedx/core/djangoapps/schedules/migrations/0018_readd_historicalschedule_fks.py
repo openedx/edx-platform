@@ -24,9 +24,4 @@ class Migration(migrations.Migration):
             name='start_date',
             field=models.DateTimeField(db_index=True, default=None, help_text='Date this schedule went into effect', null=True),
         ),
-        migrations.AlterField(
-            model_name='schedule',
-            name='start_date',
-            field=models.DateTimeField(db_index=True, default=None, help_text='Date this schedule went into effect', null=True),
-        ),
     ]
