@@ -2618,7 +2618,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=687 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=688 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5191,7 +5191,7 @@ CREATE TABLE `schedules_historicalschedule` (
   `created` datetime(6) NOT NULL,
   `modified` datetime(6) NOT NULL,
   `active` tinyint(1) NOT NULL,
-  `start_date` datetime(6) NOT NULL,
+  `start_date` datetime(6) DEFAULT NULL,
   `upgrade_deadline` datetime(6) DEFAULT NULL,
   `history_id` int(11) NOT NULL AUTO_INCREMENT,
   `history_date` datetime(6) NOT NULL,
@@ -5204,7 +5204,8 @@ CREATE TABLE `schedules_historicalschedule` (
   KEY `schedules_historicalschedule_id_f1648c81` (`id`),
   KEY `schedules_historicalschedule_start_date_8c02ff20` (`start_date`),
   KEY `schedules_historicalschedule_upgrade_deadline_ba67bbd9` (`upgrade_deadline`),
-  KEY `schedules_historicalschedule_enrollment_id_cd620413` (`enrollment_id`)
+  KEY `schedules_historicalschedule_enrollment_id_cd620413` (`enrollment_id`),
+  CONSTRAINT `schedules_historical_history_user_id_6f5d6d7b_fk_auth_user` FOREIGN KEY (`history_user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `schedules_schedule`;
