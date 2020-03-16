@@ -4,7 +4,7 @@ Classes that override default django-oauth-toolkit behavior
 
 
 from oauth2_provider.exceptions import OAuthToolkitError
-from oauth2_provider.http import HttpResponseUriRedirect
+from oauth2_provider.http import OAuth2ResponseRedirect
 from oauth2_provider.models import get_access_token_model, get_application_model
 from oauth2_provider.scopes import get_scopes_backend
 from oauth2_provider.settings import oauth2_settings
@@ -72,7 +72,7 @@ class EdxOAuth2AuthorizationView(AuthorizationView):
                 uri, headers, body, status = self.create_authorization_response(
                     request=self.request, scopes=" ".join(scopes),
                     credentials=credentials, allow=True)
-                return HttpResponseUriRedirect(uri, application.get_allowed_schemes())
+                return OAuth2ResponseRedirect(uri, application.get_allowed_schemes())
 
             # *** Changed the if statement that checked for require_approval to an assert.
             assert require_approval == 'auto_even_if_expired'
@@ -90,7 +90,7 @@ class EdxOAuth2AuthorizationView(AuthorizationView):
                     uri, headers, body, status = self.create_authorization_response(
                         request=self.request, scopes=" ".join(scopes),
                         credentials=credentials, allow=True)
-                    return HttpResponseUriRedirect(uri, application.get_allowed_schemes())
+                    return OAuth2ResponseRedirect(uri, application.get_allowed_schemes())
 
             # render an authorization prompt so the user can approve
             # the application's requested scopes

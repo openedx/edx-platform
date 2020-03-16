@@ -114,6 +114,7 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
         CourseEnrollment,
         null=True,
         blank=True,
+        on_delete=models.CASCADE
     )
     course_key = CourseKeyField(max_length=255)
     status = models.CharField(max_length=9, choices=STATUS_CHOICES)
