@@ -3174,7 +3174,6 @@ class DatesTabTestCase(ModuleStoreTestCase):
 
     def setUp(self):
         super(DatesTabTestCase, self).setUp()
-        self.user = UserFactory.create()
 
         now = datetime.now(utc)
         self.course = CourseFactory.create(start=now + timedelta(days=-1))
@@ -3197,10 +3196,6 @@ class DatesTabTestCase(ModuleStoreTestCase):
 
     @RELATIVE_DATES_FLAG.override(active=True)
     def test_defaults(self):
-        request = RequestFactory().request()
-        request.user = self.user
-        self.addCleanup(crum.set_current_request, None)
-        crum.set_current_request(request)
         enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.VERIFIED)
         now = datetime.now(utc)
         with self.store.bulk_operations(self.course.id):
