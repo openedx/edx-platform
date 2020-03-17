@@ -34,7 +34,7 @@ from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.ucsd_features.ecommerce.utils import is_user_eligible_for_discount
-from openedx.features.ucsd_features.ecommerce.EcommerceClient import EcommerceRestAPIClient
+from openedx.features.ucsd_features.ecommerce.ecommerce_client import EcommerceRestAPIClient
 from openedx.features.ucsd_features.ecommerce.constants import IS_DISCOUNT_AVAILABLE_QUERY_PARAM
 from student.models import CourseEnrollment
 from util.db import outer_atomic
