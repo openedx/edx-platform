@@ -1,15 +1,28 @@
 """
 Test cases for the pluggable access control system.
 """
+import datetime
 import ddt
+from mock import patch, Mock
 import pytest
+import pytz
 
 from django.conf import settings
 from django.test.utils import override_settings
 from django.test import TestCase
-from mock import patch, Mock
+from opaque_keys.edx.locator import CourseLocator
 
-from lms.lib.access_control_backends import AccessControlBackends
+from lms.djangoapps.courseware.access_utils import (
+    ACCESS_DENIED,
+    ACCESS_GRANTED,
+)
+import lms.djangoapps.courseware.access as access
+from lms.djangoapps.courseware.access_control_backends import (
+    access_control_backends,
+    AccessControlBackends,
+)
+from student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 @ddt.ddt
@@ -93,7 +106,7 @@ class AccessControlBackendsTests(TestCase):
             'NAME': 'lms.lib:see_in_catalog_backend',
         }
     })
-    @patch('lms.lib.access_control_backends.log')
+    @patch('lms.djangoapps.courseware.access_control_backends.log')
     def test_settings_with_missing_function(self, mock_log):
         """
         Check that the system fails explicitly on a missing function.
@@ -159,11 +172,14 @@ class AccessControlBackendsTests(TestCase):
 
     @override_settings(ACCESS_CONTROL_BACKENDS={
         'course.load': {
-            'NAME': 'lms.lib:load_backend',
+            'NAME': 'lms.djangoapps.courseware.access_control_backends:load_backend',
         }
     })
-    @patch('lms.lib.load_backend', Mock(side_effect=ArithmeticError('Dividing by zero!')), create=True)
-    @patch('lms.lib.access_control_backends.log')
+    @patch('lms.djangoapps.courseware.access_control_backends.load_backend', Mock(
+        side_effect=ArithmeticError('Dividing by zero!')),
+        create=True,
+    )
+    @patch('lms.djangoapps.courseware.access_control_backends.log')
     def test_query_broken_backend(self, mock_log):
         """
         Ensure a broken backend fails explicitly.
@@ -175,3 +191,38 @@ class AccessControlBackendsTests(TestCase):
         mock_log.exception.assert_called_once_with(
             'Something went wrong in querying the access control backend for `course.load`.'
         )
+
+
+@ddt.ddt
+class AccessWithACLBackendsTestCase(ModuleStoreTestCase):
+    """
+    Integration tests for `access._has_access_course`.
+    """
+
+    def setUp(self):
+        """
+        Set up tests environment.
+        """
+        tomorrow = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
+        self.user = UserFactory.create()
+        self.course = Mock(
+            enrollment_domain='',
+            enrollment_end=tomorrow,
+            enrollment_start=tomorrow,
+            id=CourseLocator('edX', 'test', '2012_Fall'),
+        )
+        CourseEnrollmentAllowedFactory(email=self.user.email, course_id=self.course.id)
+
+    def test_has_access_with_no_acl_backends(self):
+        """
+        Ensure that the `access._has_access_course` queries the Access Control Backends.
+        """
+        assert access._has_access_course(self.user, 'enroll', self.course).has_access
+
+    @ddt.data(ACCESS_GRANTED, ACCESS_DENIED)
+    def test_has_access_with_acl_backends(self, backend_access):
+        """
+        Ensure that the `access._has_access_course` queries the Access Control Backends.
+        """
+        with patch.object(access_control_backends, 'query', Mock(return_value=backend_access)):
+            assert access._has_access_course(self.user, 'enroll', self.course) == backend_access
