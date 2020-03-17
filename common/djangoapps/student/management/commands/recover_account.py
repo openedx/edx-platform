@@ -17,6 +17,7 @@ from django.utils.http import int_to_base36
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 
+from student.models import AccountRecoveryConfiguration
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -49,18 +50,24 @@ class Command(BaseCommand):
         """ Add argument to the command parser. """
         parser.add_argument(
             '--csv_file_path',
-            required=True,
+            required=False,
             help='Csv file path'
         )
 
     def handle(self, *args, **options):
         """ Main handler for the command."""
         file_path = options['csv_file_path']
+        if file_path:
+            if not path.isfile(file_path):
+                raise CommandError('File not found.')
 
-        if not path.isfile(file_path):
-            raise CommandError('File not found.')
-
-        with open(file_path, 'rb') as csv_file:
+            with open(file_path, 'rb') as csv_file:
+                csv_reader = list(unicodecsv.DictReader(csv_file))
+        else:
+            csv_file = AccountRecoveryConfiguration.current().csv_file
+            if not csv_file:
+                logger.error('No csv file found. Please make sure csv file is uploaded')
+                return
             csv_reader = list(unicodecsv.DictReader(csv_file))
 
         successful_updates = []
