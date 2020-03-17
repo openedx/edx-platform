@@ -1,7 +1,7 @@
-import { getAuthenticatedAPIClient } from '@edx/frontend-auth';
+import { getAuthenticatedApiClient } from '@edx/frontend-auth';
 import { NewRelicLoggingService } from '@edx/frontend-logging';
 
-const apiClient = getAuthenticatedAPIClient({
+const apiClient = getAuthenticatedApiClient({
   appBaseUrl: process.env.LMS_ROOT_URL,
   authBaseUrl: process.env.LMS_ROOT_URL,
   loginUrl: `${process.env.LMS_ROOT_URL}/login`,
