@@ -159,11 +159,11 @@ class Command(BaseCommand):
                     "enterprise_customer_uuid": str(enterprise_customer.uuid),
                 }
             except AttributeError as ex:
-                self.stderr.write(u'\t\tskipping enrollment {} due to invalid data. {}'.format(enrollment, ex))
+                self.stderr.write(u'\t\tskipping enrollment {} due to invalid data. {}'.format(enrollment.id, ex))
                 invalid += 1
                 continue
             except CourseEnrollment.DoesNotExist:
-                self.stderr.write(u'\t\tskipping enrollment {} because CourseEnrollment not found'.format(enrollment))
+                self.stderr.write(u'\t\tskipping enrollment {}, as CourseEnrollment not found'.format(enrollment.id))
                 invalid += 1
                 continue
             enrollments_payload.append(enrollment_payload)
@@ -189,7 +189,7 @@ class Command(BaseCommand):
 
         offset = 0
         enrollments_queue = []
-        enrollments_query_batch_size = 5000
+        enrollments_query_batch_size = 1000
         successfully_synced_enrollments = 0
         new_created_orders = 0
         new_created_order_numbers = []
