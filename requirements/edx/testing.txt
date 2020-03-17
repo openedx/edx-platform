@@ -50,7 +50,7 @@ colorama==0.4.1           # via radon
 contextlib2==0.6.0.post1  # via -r requirements/edx/base.txt
 coreapi==2.3.3            # via -r requirements/edx/base.txt, drf-yasg
 coreschema==0.0.4         # via -r requirements/edx/base.txt, coreapi, drf-yasg
-coverage==5.0.3           # via -r requirements/edx/coverage.txt, pytest-cov
+coverage==5.0.4           # via -r requirements/edx/coverage.txt, pytest-cov
 git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0  # via -r requirements/edx/testing.in
 git+https://github.com/edx/crowdsourcehinter.git@a7ffc85b134b7d8909bf1fefd23dbdb8eb28e467#egg=crowdsourcehinter-xblock==0.2  # via -r requirements/edx/base.txt
 cryptography==2.8         # via -r requirements/edx/base.txt, django-fernet-fields, edx-enterprise
@@ -109,8 +109,8 @@ edx-completion==3.1.1     # via -r requirements/edx/base.txt
 edx-django-release-util==0.3.6  # via -r requirements/edx/base.txt
 edx-django-sites-extensions==2.4.3  # via -r requirements/edx/base.txt
 edx-django-utils==3.0     # via -r requirements/edx/base.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client
-edx-drf-extensions==4.0.2  # via -r requirements/edx/base.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==2.5.5     # via -r requirements/edx/base.txt
+edx-drf-extensions==5.0.0  # via -r requirements/edx/base.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
+edx-enterprise==3.0.0     # via -r requirements/edx/base.txt
 edx-i18n-tools==0.5.0     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, ora2
 edx-lint==1.4.1           # via -r requirements/edx/testing.in
 edx-milestones==0.2.6     # via -r requirements/edx/base.txt
@@ -192,7 +192,7 @@ nodeenv==1.3.5            # via -r requirements/edx/base.txt
 numpy==1.18.1             # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, chem, openedx-calc, pandas, scipy
 git+https://github.com/joestump/python-oauth2.git@b94f69b1ad195513547924e380d9265133e995fa#egg=oauth2  # via -r requirements/edx/base.txt
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
-openedx-calc==1.0.5       # via -r requirements/edx/base.txt
+openedx-calc==1.0.6       # via -r requirements/edx/base.txt
 git+https://github.com/edx/edx-ora2.git@2.6.18#egg=ora2==2.6.18  # via -r requirements/edx/base.txt
 packaging==20.3           # via -r requirements/edx/base.txt, drf-yasg, pytest, tox
 pandas==0.22.0            # via -c requirements/edx/../constraints.txt, -r requirements/edx/coverage.txt
