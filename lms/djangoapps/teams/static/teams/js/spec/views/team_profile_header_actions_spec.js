@@ -26,14 +26,27 @@ define([
         };
 
         createHeaderActionsView =
-            function(requests, maxTeamSize, currentUsername, teamModelData, showEditButton, isInstructorManagedTopic) {
+            function(
+                requests,
+                courseMaxTeamSize,
+                currentUsername,
+                teamModelData,
+                showEditButton,
+                isInstructorManagedTopic,
+                topicMaxTeamSize
+            ) {
                 var model = new TeamModel(teamModelData, {parse: true}),
                     context = TeamSpecHelpers.createMockContext({
-                        maxTeamSize: maxTeamSize,
+                        courseMaxTeamSize: courseMaxTeamSize,
                         userInfo: TeamSpecHelpers.createMockUserInfo({
                             username: currentUsername
                         })
-                    });
+                    }),
+                    topicOptions = typeof topicMaxTeamSize !== 'undefined' ?
+                        {max_team_size: topicMaxTeamSize} : {},
+                    topic = isInstructorManagedTopic ?
+                        TeamSpecHelpers.createMockInstructorManagedTopic(topicOptions) :
+                        TeamSpecHelpers.createMockTopic(topicOptions);
 
                 return new TeamProfileHeaderActionsView(
                     {
@@ -41,9 +54,7 @@ define([
                         teamEvents: TeamSpecHelpers.teamEvents,
                         context: context,
                         model: model,
-                        topic: isInstructorManagedTopic ?
-                            TeamSpecHelpers.createMockInstructorManagedTopic() :
-                            TeamSpecHelpers.createMockTopic(),
+                        topic: topic,
                         showEditButton: showEditButton
                     }
                 ).render();
@@ -178,6 +189,68 @@ define([
 
                 // there should be no request made
                 AjaxHelpers.expectNoRequests(requests);
+            });
+
+            it('correctly resolves teamset-level max_size and course-level max_size', function() {
+                var requests = AjaxHelpers.requests(this);
+                var currentUsername = 'ma1';
+                // Teamset maxSize = 2, Course maxSize = 1
+                var view = createHeaderActionsView(
+                    requests,
+                    1,
+                    'ma1',
+                    createTeamModelData('teamA', 'teamAlpha', createMembershipData('ma')),
+                    false,
+                    false,
+                    2
+                );
+
+                // Team should not be considered full with one member
+                AjaxHelpers.expectRequest(
+                    requests,
+                    'GET',
+                    TeamSpecHelpers.testContext.teamMembershipsUrl + '?' + $.param({
+                        username: currentUsername, course_id: TeamSpecHelpers.testCourseID
+                    })
+                );
+
+                // User is not a member of any teams
+                AjaxHelpers.respondWithJson(requests, {count: 0});
+
+                // Course-level size is 1, but Teamset size is 2, so that should take precedence
+                // and we should see the Join Team Button
+                expect(view.$('.action.action-primary').length).toEqual(1);
+            });
+
+            it('behaves correctly if the teamset max size is set to 0', function() {
+                var requests = AjaxHelpers.requests(this);
+                var currentUsername = 'ma1';
+                // Teamset = 0, Course = 2
+                var view = createHeaderActionsView(
+                    requests,
+                    2,
+                    'ma1',
+                    createTeamModelData('teamA', 'teamAlpha', createMembershipData('ma')),
+                    false,
+                    false,
+                    0
+                );
+
+                // Team should not be considered full
+                AjaxHelpers.expectRequest(
+                    requests,
+                    'GET',
+                    TeamSpecHelpers.testContext.teamMembershipsUrl + '?' + $.param({
+                        username: currentUsername, course_id: TeamSpecHelpers.testCourseID
+                    })
+                );
+
+                // User is not a member of any teams
+                AjaxHelpers.respondWithJson(requests, {count: 0});
+
+                // Course-level size is 1 and Teamset size is 0, so course-level value should be used
+                // and we should see the Join Team Button
+                expect(view.$('.action.action-primary').length).toEqual(1);
             });
 
             it('shows not join instructor managed team message', function() {

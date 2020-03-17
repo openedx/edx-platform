@@ -104,9 +104,9 @@
                 });
             },
 
-            getTopicType: function(topicId) { // eslint-disable-line no-unused-vars
+            getTopic: function(topicId) { // eslint-disable-line no-unused-vars
                 var deferred = $.Deferred();
-                deferred.resolve(this.model.get('type'));
+                deferred.resolve(this.model);
                 return deferred.promise();
             }
         });
