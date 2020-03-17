@@ -1,8 +1,11 @@
+"""
+Tasks for the "ecommerce" module of "UCSDFeatures" app
+"""
 from celery.task import task
 from celery.utils.log import get_task_logger
 from django.contrib.auth.models import User
 
-from openedx.features.ucsd_features.ecommerce.EcommerceClient import EcommerceRestAPIClient
+from openedx.features.ucsd_features.ecommerce.ecommerce_client import EcommerceRestAPIClient
 
 
 logger = get_task_logger(__name__)
@@ -10,6 +13,15 @@ logger = get_task_logger(__name__)
 
 @task()
 def assign_course_voucher_to_user(user_email, course_key, course_sku):
+    """
+    This task is responsible for sending the request to Ecommerce to
+    assign a voucher to the user for the course.
+
+    Arguments:
+        user_email (str): email of the user to whom the voucher is to be assigned
+        course_key (str): course_key of the course for which the voucher is to be assigned
+        course_sku (str): SKU of the course for which the voucher is to be assigned
+    """
     try:
         user = User.objects.get(email=user_email)
     except User.DoesNotExist:

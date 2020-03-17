@@ -21,7 +21,9 @@ MESSAGE_TYPES = {
 
 @ddt.ddt
 class UCSDFeaturesUtilsTests(ModuleStoreTestCase):
-    """ Tests for the utils used by ucsd-specific customizations """
+    """
+    Tests for the utils used by ucsd-specific customizations
+    """
 
     def setUp(self):
         super(UCSDFeaturesUtilsTests, self).setUp()

@@ -64,7 +64,7 @@ from openedx.core.djangoapps.user_api.errors import UserNotFound, UserAPIInterna
 from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.features.ucsd_features.ecommerce.utils import is_user_eligible_for_discount
-from openedx.features.ucsd_features.ecommerce.EcommerceClient import EcommerceRestAPIClient
+from openedx.features.ucsd_features.ecommerce.ecommerce_client import EcommerceRestAPIClient
 from openedx.features.ucsd_features.ecommerce.tasks import assign_course_voucher_to_user
 from openedx.features.ucsd_features.ecommerce.constants import IS_DISCOUNT_AVAILABLE_QUERY_PARAM
 from openedx.features.ucsd_features.utils import add_to_ga_events_cookie
