@@ -158,12 +158,12 @@ class Command(BaseCommand):
                     "enterprise_customer_name": enterprise_customer.name,
                     "enterprise_customer_uuid": str(enterprise_customer.uuid),
                 }
-            except AttributeError as ex:
-                self.stderr.write(u'\t\tskipping enrollment {} due to invalid data. {}'.format(enrollment.id, ex))
-                invalid += 1
-                continue
             except CourseEnrollment.DoesNotExist:
                 self.stderr.write(u'\t\tskipping enrollment {}, as CourseEnrollment not found'.format(enrollment.id))
+                invalid += 1
+                continue
+            except Exception as ex:  # pylint: disable=broad-except
+                self.stderr.write(u'\t\tskipping enrollment {} due to invalid data. {}'.format(enrollment.id, ex))
                 invalid += 1
                 continue
             enrollments_payload.append(enrollment_payload)
