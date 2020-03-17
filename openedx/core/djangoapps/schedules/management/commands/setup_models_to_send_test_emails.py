@@ -26,30 +26,21 @@ class ThreeDayNudgeSchedule(ScheduleFactory):
     """
     A ScheduleFactory that creates a Schedule set up for a 3-day nudge email.
     """
-    # TODO: Remove 'start' once data migration is complete, after removing reference to old field step,
-    #  and use new field in column renames.
-    start = factory.Faker('date_time_between', start_date='-3d', end_date='-3d', tzinfo=pytz.UTC)
-    # start_date = factory.Faker('date_time_between', start_date='-3d', end_date='-3d', tzinfo=pytz.UTC)
+    start_date = factory.Faker('date_time_between', start_date='-3d', end_date='-3d', tzinfo=pytz.UTC)
 
 
 class TenDayNudgeSchedule(ScheduleFactory):
     """
     A ScheduleFactory that creates a Schedule set up for a 10-day nudge email.
     """
-    # TODO: Remove 'start' once data migration is complete, after removing reference to old field step,
-    #  and use new field in column renames.
-    start = factory.Faker('date_time_between', start_date='-10d', end_date='-10d', tzinfo=pytz.UTC)
-    # start_date = factory.Faker('date_time_between', start_date='-10d', end_date='-10d', tzinfo=pytz.UTC)
+    start_date = factory.Faker('date_time_between', start_date='-10d', end_date='-10d', tzinfo=pytz.UTC)
 
 
 class UpgradeReminderSchedule(ScheduleFactory):
     """
     A ScheduleFactory that creates a Schedule set up for a 2-days-remaining upgrade reminder.
     """
-    # TODO: Remove 'start' once data migration is complete, after removing reference to old field step,
-    #  and use new field in column renames.
-    start = factory.Faker('past_datetime', tzinfo=pytz.UTC)
-    # start_date = factory.Faker('past_datetime', tzinfo=pytz.UTC)
+    start_date = factory.Faker('past_datetime', tzinfo=pytz.UTC)
     upgrade_deadline = factory.Faker('date_time_between', start_date='+2d', end_date='+2d', tzinfo=pytz.UTC)
 
 
@@ -57,10 +48,7 @@ class ContentHighlightSchedule(ScheduleFactory):
     """
     A ScheduleFactory that creates a Schedule set up for a course highlights email.
     """
-    # TODO: Remove 'start' once data migration is complete, after removing reference to old field step,
-    #  and use new field in column renames.
-    start = factory.Faker('date_time_between', start_date='-7d', end_date='-7d', tzinfo=pytz.UTC)
-    # start_date = factory.Faker('date_time_between', start_date='-7d', end_date='-7d', tzinfo=pytz.UTC)
+    start_date = factory.Faker('date_time_between', start_date='-7d', end_date='-7d', tzinfo=pytz.UTC)
     experience = factory.RelatedFactory(ScheduleExperienceFactory, 'schedule', experience_type=ScheduleExperience.EXPERIENCES.course_updates)
 
 

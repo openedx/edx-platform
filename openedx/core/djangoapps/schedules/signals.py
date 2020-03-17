@@ -1,4 +1,6 @@
-
+"""
+CourseEnrollment related signal handlers.
+"""
 
 import datetime
 import logging
@@ -15,10 +17,13 @@ from lms.djangoapps.courseware.models import (
     DynamicUpgradeDeadlineConfiguration,
     OrgDynamicUpgradeDeadlineConfiguration
 )
+from openedx.core.djangoapps.content.course_overviews.signals import COURSE_START_DATE_CHANGED
 from openedx.core.djangoapps.schedules.content_highlights import course_has_highlights
 from openedx.core.djangoapps.schedules.models import ScheduleExperience
+from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 from openedx.core.djangoapps.theming.helpers import get_current_site
 from student.models import CourseEnrollment
+from student.signals import ENROLLMENT_TRACK_UPDATED
 from track import segment
 
 from .config import CREATE_SCHEDULE_WAFFLE_FLAG
@@ -56,6 +61,7 @@ def create_schedule(sender, **kwargs):  # pylint: disable=unused-argument
         ))
 
 
+@receiver(COURSE_START_DATE_CHANGED)
 def update_schedules_on_course_start_changed(sender, updated_course_overview, previous_start_date, **kwargs):   # pylint: disable=unused-argument
     """
     Updates all course schedules start and upgrade_deadline dates based off of
@@ -72,6 +78,18 @@ def update_schedules_on_course_start_changed(sender, updated_course_overview, pr
             new_upgrade_deadline_str=date.serialize(upgrade_deadline),
         ),
     )
+
+
+@receiver(ENROLLMENT_TRACK_UPDATED)
+def reset_schedule_on_mode_change(sender, user, course_key, mode, **kwargs):  # pylint: disable=unused-argument
+    """
+    When a CourseEnrollment's mode is changed, reset the user's schedule if self-paced.
+    """
+    # If switching to audit, reset to when the user got access to course. This is for the case where a user
+    # upgrades to verified (resetting their date), then later refunds the order and goes back to audit. We want
+    # to make sure that audit users go back to their normal audit schedule access.
+    use_availability_date = mode in CourseMode.AUDIT_MODES
+    reset_self_paced_schedule(user, course_key, use_availability_date=use_availability_date)
 
 
 def _calculate_upgrade_deadline(course_id, content_availability_date):
@@ -175,10 +193,6 @@ def _create_schedule(enrollment, enrollment_created):
         log.debug('Schedules: Creation not enabled for this course or for this site')
         return
 
-    if not enrollment.course_overview.self_paced:
-        log.debug('Schedules: Creation only enabled for self-paced courses')
-        return
-
     # This represents the first date at which the learner can access the content. This will be the latter of
     # either the enrollment date or the course's start date.
     content_availability_date = max(enrollment.created, enrollment.course_overview.start)
@@ -196,8 +210,6 @@ def _create_schedule(enrollment, enrollment_created):
 
     schedule = Schedule.objects.create(
         enrollment=enrollment,
-        # TODO remove 'start' field in removing writes from old field step in column renaming release
-        start=content_availability_date,
         start_date=content_availability_date,
         upgrade_deadline=upgrade_deadline
     )

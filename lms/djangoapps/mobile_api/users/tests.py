@@ -281,9 +281,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
                 course_id=course.id
             )
             ScheduleFactory(
-                # TODO replace 'start' field with 'start_date' after data migration,
-                #  in removing writes from old field step in column renaming release
-                start=self.THREE_YEARS_AGO + datetime.timedelta(days=1),
+                start_date=self.THREE_YEARS_AGO + datetime.timedelta(days=1),
                 enrollment=enrollment
             )
         else:

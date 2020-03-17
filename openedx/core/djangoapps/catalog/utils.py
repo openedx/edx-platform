@@ -18,6 +18,7 @@ from entitlements.utils import is_course_run_entitlement_fulfillable
 from openedx.core.constants import COURSE_PUBLISHED
 from openedx.core.djangoapps.catalog.cache import (
     COURSE_PROGRAMS_CACHE_KEY_TPL,
+    CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL,
     PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL,
     PATHWAY_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
@@ -87,7 +88,7 @@ def check_catalog_integration_and_get_user(error_message_field):
 
 
 # pylint: disable=redefined-outer-name
-def get_programs(site=None, uuid=None, uuids=None, course=None, organization=None):
+def get_programs(site=None, uuid=None, uuids=None, course=None, catalog_course_uuid=None, organization=None):
     """Read programs from the cache.
 
     The cache is populated by a management command, cache_programs.
@@ -96,14 +97,15 @@ def get_programs(site=None, uuid=None, uuids=None, course=None, organization=Non
         site (Site): django.contrib.sites.models object to fetch programs of.
         uuid (string): UUID identifying a specific program to read from the cache.
         uuids (list of string): UUIDs identifying a specific programs to read from the cache.
-        course (string): course id identifying a specific course run to read from the cache.
+        course (string): course run id identifying a specific course run to read from the cache.
+        catalog_course_uuid (string): Catalog Course UUID
         organization (string): short name for specific organization to read from the cache.
 
     Returns:
         list of dict, representing programs.
         dict, if a specific program is requested.
     """
-    if len([arg for arg in (site, uuid, uuids, course, organization) if arg is not None]) != 1:
+    if len([arg for arg in (site, uuid, uuids, course, catalog_course_uuid, organization) if arg is not None]) != 1:
         raise TypeError('get_programs takes exactly one argument')
 
     if uuid:
@@ -114,6 +116,12 @@ def get_programs(site=None, uuid=None, uuids=None, course=None, organization=Non
         return program
     elif course:
         uuids = cache.get(COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_run_id=course))
+        if not uuids:
+            # Currently, the cache does not differentiate between a cache miss and a course
+            # without programs. After this is changed, log any cache misses here.
+            return []
+    elif catalog_course_uuid:
+        uuids = cache.get(CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_uuid=catalog_course_uuid))
         if not uuids:
             # Currently, the cache does not differentiate between a cache miss and a course
             # without programs. After this is changed, log any cache misses here.
@@ -616,6 +624,21 @@ def course_run_keys_for_program(parent_program):
     return keys
 
 
+def course_uuids_for_program(parent_program):
+    """
+    All of the course uuids associated with this ``parent_program``, either
+    via its ``curriculum`` field (looking at both the curriculum's courses
+    and child programs), or through the many-to-many ``courses`` field on the program.
+    """
+    uuids = set()
+    for program in [parent_program] + child_programs(parent_program):
+        curriculum = _primary_active_curriculum(program)
+        if curriculum:
+            uuids.update(_courses_from_container(curriculum))
+        uuids.update(_courses_from_container(program))
+    return uuids
+
+
 def child_programs(program):
     """
     Given a program, recursively find all child programs related
@@ -651,6 +674,18 @@ def _course_runs_from_container(container):
         course_run.get('key')
         for course in container.get('courses', [])
         for course_run in course.get('course_runs', [])
+    ]
+
+
+def _courses_from_container(container):
+    """
+    Pluck nested courses out of a ``container`` dictionary,
+    which is either the ``curriculum`` field of a program, or
+    a program itself (since either may contain a ``courses`` list).
+    """
+    return [
+        course.get('uuid')
+        for course in container.get('courses', [])
     ]
 
 

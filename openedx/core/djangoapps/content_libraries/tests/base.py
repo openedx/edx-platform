@@ -2,12 +2,12 @@
 """
 Tests for Blockstore-based Content Libraries
 """
-
+from contextlib import contextmanager
 import unittest
 
 from django.conf import settings
 from organizations.models import Organization
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APIClient
 import six
 
 from student.tests.factories import UserFactory
@@ -22,6 +22,9 @@ URL_LIB_DETAIL = URL_PREFIX + '{lib_key}/'  # Get data about a library, update o
 URL_LIB_BLOCK_TYPES = URL_LIB_DETAIL + 'block_types/'  # Get the list of XBlock types that can be added to this library
 URL_LIB_COMMIT = URL_LIB_DETAIL + 'commit/'  # Commit (POST) or revert (DELETE) all pending changes to this library
 URL_LIB_BLOCKS = URL_LIB_DETAIL + 'blocks/'  # Get the list of XBlocks in this library, or add a new one
+URL_LIB_TEAM = URL_LIB_DETAIL + 'team/'  # Get the list of users/groups authorized to use this library
+URL_LIB_TEAM_USER = URL_LIB_TEAM + 'user/{user_id}/'  # Add/edit/remove a user's permission to use this library
+URL_LIB_TEAM_GROUP = URL_LIB_TEAM + 'group/{group_name}/'  # Add/edit/remove a group's permission to use this library
 URL_LIB_BLOCK = URL_PREFIX + 'blocks/{block_key}/'  # Get data about a block, or delete it
 URL_LIB_BLOCK_OLX = URL_LIB_BLOCK + 'olx/'  # Get or set the OLX of the specified XBlock
 URL_LIB_BLOCK_ASSETS = URL_LIB_BLOCK + 'assets/'  # List the static asset files of the specified XBlock
@@ -76,7 +79,20 @@ class ContentLibrariesRestApiTest(APITestCase):
 
     def setUp(self):
         super(ContentLibrariesRestApiTest, self).setUp()
+        self.clients_by_user = {}
         self.client.login(username=self.user.username, password="edx")
+
+    # Assertions
+
+    def assertDictContainsEntries(self, big_dict, subset_dict):
+        """
+        Assert that the first dict contains at least all of the same entries as
+        the second dict.
+
+        Like python 2's assertDictContainsSubset, but with the arguments in the
+        correct order.
+        """
+        self.assertGreaterEqual(big_dict.items(), subset_dict.items())
 
     # API helpers
 
@@ -90,6 +106,19 @@ class ContentLibrariesRestApiTest(APITestCase):
             "Unexpected response code {}:\n{}".format(response.status_code, getattr(response, 'data', '(no data)')),
         )
         return response.data
+
+    @contextmanager
+    def as_user(self, user):
+        """
+        Context manager to call the REST API as a user other than self.user
+        """
+        old_client = self.client
+        if user not in self.clients_by_user:
+            client = self.clients_by_user[user] = APIClient()
+            client.force_authenticate(user=user)
+        self.client = self.clients_by_user[user]  # pylint: disable=attribute-defined-outside-init
+        yield
+        self.client = old_client  # pylint: disable=attribute-defined-outside-init
 
     def _create_library(self, slug, title, description="", expect_response=200):
         """ Create a library """
@@ -105,25 +134,45 @@ class ContentLibrariesRestApiTest(APITestCase):
         """ Get a library """
         return self._api('get', URL_LIB_DETAIL.format(lib_key=lib_key), None, expect_response)
 
-    def _update_library(self, lib_key, **data):
+    def _update_library(self, lib_key, expect_response=200, **data):
         """ Update an existing library """
-        return self._api('patch', URL_LIB_DETAIL.format(lib_key=lib_key), data=data, expect_response=200)
+        return self._api('patch', URL_LIB_DETAIL.format(lib_key=lib_key), data, expect_response)
 
     def _delete_library(self, lib_key, expect_response=200):
         """ Delete an existing library """
         return self._api('delete', URL_LIB_DETAIL.format(lib_key=lib_key), None, expect_response)
 
-    def _commit_library_changes(self, lib_key):
+    def _commit_library_changes(self, lib_key, expect_response=200):
         """ Commit changes to an existing library """
-        return self._api('post', URL_LIB_COMMIT.format(lib_key=lib_key), None, expect_response=200)
+        return self._api('post', URL_LIB_COMMIT.format(lib_key=lib_key), None, expect_response)
 
-    def _revert_library_changes(self, lib_key):
+    def _revert_library_changes(self, lib_key, expect_response=200):
         """ Revert pending changes to an existing library """
-        return self._api('delete', URL_LIB_COMMIT.format(lib_key=lib_key), None, expect_response=200)
+        return self._api('delete', URL_LIB_COMMIT.format(lib_key=lib_key), None, expect_response)
 
-    def _get_library_blocks(self, lib_key):
+    def _get_library_team(self, lib_key, expect_response=200):
+        """ Get the list of users/groups authorized to use this library """
+        return self._api('get', URL_LIB_TEAM.format(lib_key=lib_key), None, expect_response)
+
+    def _set_user_access_level(self, lib_key, user_id, access_level, expect_response=200):
+        """ Change the specified user's access level """
+        url = URL_LIB_TEAM_USER.format(lib_key=lib_key, user_id=user_id)
+        if access_level is None:
+            return self._api('delete', url, None, expect_response)
+        else:
+            return self._api('put', url, {"access_level": access_level}, expect_response)
+
+    def _set_group_access_level(self, lib_key, group_name, access_level, expect_response=200):
+        """ Change the specified group's access level """
+        url = URL_LIB_TEAM_GROUP.format(lib_key=lib_key, group_name=group_name)
+        if access_level is None:
+            return self._api('delete', url, None, expect_response)
+        else:
+            return self._api('put', url, {"access_level": access_level}, expect_response)
+
+    def _get_library_blocks(self, lib_key, expect_response=200):
         """ Get the list of XBlocks in the library """
-        return self._api('get', URL_LIB_BLOCKS.format(lib_key=lib_key), None, expect_response=200)
+        return self._api('get', URL_LIB_BLOCKS.format(lib_key=lib_key), None, expect_response)
 
     def _add_block_to_library(self, lib_key, block_type, slug, parent_block=None, expect_response=200):
         """ Add a new XBlock to the library """

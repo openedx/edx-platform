@@ -415,6 +415,13 @@ class VideoBlock(
             'ytTestTimeout': settings.YOUTUBE['TEST_TIMEOUT'],
             'ytApiUrl': settings.YOUTUBE['API'],
             'lmsRootURL': settings.LMS_ROOT_URL,
+            'ytMetadataEndpoint': (
+                # In the new runtime, get YouTube metadata via a handler. The handler supports anonymous users and
+                # can work in sandboxed iframes. In the old runtime, the JS will call the LMS's yt_video_metadata
+                # API endpoint directly (not an XBlock handler).
+                self.runtime.handler_url(self, 'yt_video_metadata')
+                if getattr(self.runtime, 'suppports_state_for_anonymous_users', False) else ''
+            ),
 
             'transcriptTranslationUrl': self.runtime.handler_url(
                 self, 'transcript', 'translation/__lang__'
@@ -617,6 +624,8 @@ class VideoBlock(
         video_block = runtime.construct_xblock_from_class(cls, keys)
         field_data = cls.parse_video_xml(node)
         for key, val in field_data.items():
+            if key not in cls.fields:
+                continue  # parse_video_xml returns some old non-fields like 'source'
             setattr(video_block, key, cls.fields[key].from_json(val))
         # Don't use VAL in the new runtime:
         video_block.edx_video_id = None
@@ -1129,7 +1138,7 @@ class VideoBlock(
 
         available_translations = self.available_translations(self.get_transcripts_info())
         transcripts = {
-            lang: self.runtime.handler_url(self, 'transcript', 'download', query="lang=" + lang, thirdparty=True)
+            lang: self.runtime.handler_url(self, 'transcript', 'download', query="lang=" + lang)
             for lang in available_translations
         }
 

@@ -5,7 +5,6 @@ Specialized models for oauth_dispatch djangoapp
 
 from datetime import datetime
 
-import six
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
@@ -14,7 +13,6 @@ from oauth2_provider.settings import oauth2_settings
 from organizations.models import Organization
 from pytz import utc
 
-from openedx.core.djangoapps.oauth_dispatch.toggles import ENFORCE_JWT_SCOPES
 from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.request_utils import get_request_or_stub
 
@@ -46,10 +44,9 @@ class RestrictedApplication(models.Model):
 
     @classmethod
     def should_expire_access_token(cls, application):
-        set_token_expired = not ENFORCE_JWT_SCOPES.is_enabled()
         jwt_not_requested = get_request_or_stub().POST.get('token_type', '').lower() != 'jwt'
         restricted_application = cls.objects.filter(application=application).exists()
-        return restricted_application and (jwt_not_requested or set_token_expired)
+        return restricted_application and jwt_not_requested
 
     @classmethod
     def verify_access_token_as_expired(cls, access_token):
@@ -65,8 +62,17 @@ class ApplicationAccess(models.Model):
     """
     Specifies access control information for the associated Application.
 
+    For usage details, see:
+    - openedx/core/djangoapps/oauth_dispatch/docs/decisions/0007-include-organizations-in-tokens.rst
+
     .. no_pii:
     """
+
+    # Content org filters are of the form "content_org:<org_name>" eg. "content_org:SchoolX"
+    # and indicate that for anything that cares about the content_org filter, that the response
+    # should be filtered based on the filter value.  ie. We should only get responses pertain
+    # to objects that are relevant to the SchoolX organization.
+    CONTENT_ORG_FILTER_NAME = 'content_org'
 
     application = models.OneToOneField(oauth2_settings.APPLICATION_MODEL, related_name='access',
                                        on_delete=models.CASCADE)
@@ -77,6 +83,15 @@ class ApplicationAccess(models.Model):
         help_text=_('Comma-separated list of scopes that this application will be allowed to request.'),
     )
 
+    filters = ListCharField(
+        base_field=models.CharField(max_length=32),
+        size=25,
+        max_length=(25 * 33),  # 25 * 32 character filters, plus commas
+        help_text=_('Comma-separated list of filters that this application will be allowed to request.'),
+        null=True,
+        blank=True,
+    )
+
     class Meta:
         app_label = 'oauth_dispatch'
 
@@ -84,23 +99,43 @@ class ApplicationAccess(models.Model):
     def get_scopes(cls, application):
         return cls.objects.get(application=application).scopes
 
+    @classmethod
+    def get_filters(cls, application):
+        return cls.objects.get(application=application).filters
+
+    @classmethod
+    def get_filter_values(cls, application, filter_name):
+        filters = cls.get_filters(application=application)
+        if filters:
+            for filter_constraint in filters:
+                name, filter_value = filter_constraint.split(':', 1)
+                if name == filter_name:
+                    yield filter_value
+
     def __str__(self):
         """
         Return a unicode representation of this object.
         """
-        return u"{application_name}:{scopes}".format(
+        return u"{application_name}:{scopes}:{filters}".format(
             application_name=self.application.name,
             scopes=self.scopes,
+            filters=self.filters,
         )
 
 
 @python_2_unicode_compatible
 class ApplicationOrganization(models.Model):
     """
-    Associates a DOT Application to an Organization.
+    DEPRECATED: Associates a DOT Application to an Organization.
 
-    See openedx/core/djangoapps/oauth_dispatch/docs/decisions/0007-include-organizations-in-tokens.rst
-    for the intended use of this model.
+    This model is no longer in use.
+
+    TODO: BOM-1270: This model and table will be removed post-Juniper
+    so Open edX instances can migrate data if necessary.
+
+    To migrate, use ApplicationAccess and add a ``filter`` of the form
+    ``content_org:<ORG NAME>`` (e.g. content_org:edx), for each record
+    in this model's table.
 
     .. no_pii:
     """
@@ -121,31 +156,3 @@ class ApplicationOrganization(models.Model):
     class Meta:
         app_label = 'oauth_dispatch'
         unique_together = ('application', 'relation_type', 'organization')
-
-    @classmethod
-    def get_related_org_names(cls, application, relation_type=None):
-        """
-        Return the names of the Organizations related to the given DOT Application.
-
-        Filter by relation_type if provided.
-        """
-        queryset = application.organizations.all()
-        if relation_type:
-            queryset = queryset.filter(relation_type=relation_type)
-        return [r.organization.name for r in queryset]
-
-    def __str__(self):
-        """
-        Return a unicode representation of this object.
-        """
-        return u"{application_name}:{organization}:{relation_type}".format(
-            application_name=self.application.name,
-            organization=self.organization.short_name,
-            relation_type=self.relation_type,
-        )
-
-    def to_jwt_filter_claim(self):
-        """
-        Serialize for use in JWT filter claim.
-        """
-        return six.text_type(':'.join([self.relation_type, self.organization.short_name]))

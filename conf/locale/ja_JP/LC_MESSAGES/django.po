@@ -113,7 +113,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-01-05 20:42+0000\n"
+"POT-Creation-Date: 2020-03-08 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Japanese (Japan) (https://www.transifex.com/open-edx/teams/6205/ja_JP/)\n"
@@ -136,11 +136,6 @@ msgid "Discussion"
 msgstr "ディスカッション"
 
 #: cms/djangoapps/contentstore/views/component.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "Problem"
-msgstr "問題"
-
-#: cms/djangoapps/contentstore/views/component.py
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Advanced"
 msgstr "詳細"
@@ -149,20 +144,6 @@ msgstr "詳細"
 #: lms/djangoapps/courseware/tabs.py cms/templates/settings.html
 msgid "Entrance Exam"
 msgstr "受講前試験"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: cms/templates/course_outline.html lms/templates/seq_module.html
-#: lms/templates/ccx/schedule.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Section"
-msgstr "セクション"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/templates/ccx/schedule.html
-msgid "Subsection"
-msgstr "サブセクション"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: common/lib/xmodule/xmodule/unit_block.py
@@ -203,10 +184,8 @@ msgid ""
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/videos.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/instructor/views/api.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/shoppingcart/billing_details.html
 #: lms/templates/shoppingcart/receipt.html
 msgid "Name"
@@ -469,7 +448,7 @@ msgstr[0] ""
 #, python-brace-format
 msgid ""
 "Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' in"
-" SiteConfiguration model's values field."
+" SiteConfiguration model's site_values field."
 msgstr ""
 
 #: common/djangoapps/student/admin.py
@@ -904,14 +883,6 @@ msgstr "以前のメールアドレスと新しいメールが重複していま
 #: common/djangoapps/student/views/management.py
 msgid "Cannot be same as your sign in email address."
 msgstr ""
-
-#: common/djangoapps/student/views/management.py
-#: openedx/core/djangoapps/user_authn/views/registration_form.py
-#, python-brace-format
-msgid ""
-"It looks like {email} belongs to an existing account. Try again with a "
-"different email address."
-msgstr "この {email} は既存のアカウントに登録されているようです。他のメールアドレスを使って再操作してください。"
 
 #: common/djangoapps/student/views/management.py
 msgid "Unable to send email activation link. Please try again later."
@@ -3217,11 +3188,10 @@ msgid ""
 "for each topic, and another comma after the closing square brackets. For "
 "example, to specify that teams should have a maximum of 5 participants and "
 "provide a list of 2 topics, enter the configuration in this format: "
-"{example_format}. In \"id\" values, the only supported special characters "
-"are underscore, hyphen, and period."
+"{example_format}. If no max_size is provided, it will default to "
+"{default_max}In \"id\" values, the only supported special characters are "
+"underscore, hyphen, and period."
 msgstr ""
-"波括弧内にチームの最大人数およびトピックを入力してください。波括弧の次にコンマを入力して、角括弧内にトピックをすべて入力した後、もう一つコンマを入力してください。例えば、最大5名の参加者のチームで2つのトピックのリストを入力する場合は、以下の形式で入力してください:"
-" {example_format}。IDの値に入力可能な特別記号は、下線、ハイフンおよびピリオドのみです。"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable Proctored Exams"
@@ -4579,7 +4549,6 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: themes/edx.org/lms/templates/dashboard.html
@@ -5422,53 +5391,6 @@ msgstr "おめでとうございます！このページはあなたが達成し
 msgid "More about {fullname}'s accomplishment"
 msgstr "{fullname} の業績についてもっと見る"
 
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor/views/tools.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/schedules/admin.py
-#: lms/templates/staff_problem_info.html
-#: lms/templates/api_admin/catalogs/search.html
-#: lms/templates/ccx/enrollment.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Username"
-msgstr "ユーザー名"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Grade"
-msgstr "成績"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Percent"
-msgstr "パーセント"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "Opened by this number of students"
-msgstr "これだけの数の受講者によって開かれました"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "subsections"
-msgstr "サブセクション"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "Count of Students"
-msgstr "受講者の数"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "Percent of Students"
-msgstr "受講者の割合"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Score"
-msgstr "得点"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "problems"
-msgstr "問題"
-
 #: lms/djangoapps/commerce/api/v1/serializers.py
 #, python-brace-format
 msgid "{course_id} is not a valid course key."
@@ -5630,6 +5552,10 @@ msgstr "モバイルデバイスではこの講座にアクセスできません
 msgid "Upgrade to Verified"
 msgstr "認証付きにアップグレードする"
 
+#: lms/djangoapps/courseware/courses.py
+msgid "Assignment"
+msgstr ""
+
 #. Translators: 'absolute' is a date such as "Jan 01,
 #. 2020". 'relative' is a fuzzy description of the time until
 #. 'absolute'. For example, 'absolute' might be "Jan 01, 2020",
@@ -5690,6 +5616,14 @@ msgstr ""
 #: lms/djangoapps/courseware/date_summary.py
 #, python-brace-format
 msgid "This course is ending in {time_remaining_string} at {course_end_time}."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "You lose all access to this course, including your progress."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "Audit Access Expires"
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
@@ -5848,6 +5782,10 @@ msgstr "進捗"
 #: cms/templates/widgets/header.html
 msgid "Textbooks"
 msgstr "教科書"
+
+#: lms/djangoapps/courseware/tabs.py
+msgid "Dates"
+msgstr ""
 
 #: lms/djangoapps/courseware/views/index.py
 #, python-brace-format
@@ -6551,6 +6489,16 @@ msgstr "受講登録者プロフィール"
 msgid "User ID"
 msgstr "ユーザーID"
 
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/tools.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: openedx/core/djangoapps/schedules/admin.py
+#: lms/templates/staff_problem_info.html
+#: lms/templates/api_admin/catalogs/search.html
+#: lms/templates/ccx/enrollment.html
+msgid "Username"
+msgstr "ユーザー名"
+
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a field on the login form
 #. meant to hold the user's email address.
@@ -6629,6 +6577,7 @@ msgid "Cohort"
 msgstr "コホート"
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Team"
 msgstr "チーム"
 
@@ -7095,10 +7044,6 @@ msgid "Analytics"
 msgstr "分析"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "Metrics"
-msgstr "メトリック"
-
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Open Responses"
 msgstr "自由記述"
 
@@ -7163,6 +7108,10 @@ msgstr "日付を解析できません: "
 #, python-brace-format
 msgid "Couldn't find module for url: {0}"
 msgstr "URLのモジュールを見つけることができませんでした: {0}"
+
+#: lms/djangoapps/instructor/views/tools.py
+msgid "Could not find student enrollment in the course."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
 #, python-brace-format
@@ -7539,6 +7488,18 @@ msgstr " ({skipped} スキップ)"
 #, python-brace-format
 msgid " (out of {total})"
 msgstr " (合計{total}中)"
+
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/learner_dashboard/programs.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Programs"
+msgstr "プログラム"
+
+#: lms/templates/learner_dashboard/program_details.html
+msgid "Program Details"
+msgstr "問題の詳細"
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
@@ -8699,6 +8660,10 @@ msgid "It is recommended that you change your password."
 msgstr ""
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
+msgid "You may access your course."
+msgstr ""
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
 msgid "Sincerely yours, The %(course_name)s Team"
@@ -8709,6 +8674,11 @@ msgstr ""
 msgid ""
 "To get started, please visit https://%(site_name)s. The login information "
 "for your account follows."
+msgstr ""
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
+#, python-format
+msgid "You may access your course at: %(course_url)s."
 msgstr ""
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/subject.txt
@@ -8996,19 +8966,26 @@ msgid "Signed Out"
 msgstr "サインアウト"
 
 #: lms/templates/logout.html
+msgid "You have signed out."
+msgstr "サインアウトしました。"
+
+#: lms/templates/logout.html
+#, python-brace-format
+msgid ""
+"{start_anchor}Click here{end_anchor} to delete your single signed on (SSO) "
+"session."
+msgstr ""
+
+#: lms/templates/logout.html
 msgid "We are signing you in."
 msgstr ""
 
 #: lms/templates/logout.html
 msgid ""
 "\n"
-"              This may take a minute. If you are not redirected, go to the home page.\n"
-"            "
+"                  This may take a minute. If you are not redirected, go to the home page.\n"
+"                "
 msgstr ""
-
-#: lms/templates/logout.html
-msgid "You have signed out."
-msgstr "サインアウトしました。"
 
 #: lms/templates/logout.html
 #, python-brace-format
@@ -9686,6 +9663,11 @@ msgid ""
 "Service{link_end}."
 msgstr ""
 
+#: openedx/core/djangoapps/auth_exchange/forms.py
+#, python-format
+msgid "'%s' is not a valid scope."
+msgstr ""
+
 #: openedx/core/djangoapps/bookmarks/apps.py
 #: openedx/features/course_bookmarks/plugins.py
 #: openedx/features/course_bookmarks/views/course_bookmarks.py
@@ -9771,6 +9753,26 @@ msgid ""
 "catalog service."
 msgstr "カタログサービスのリクエストのページ数付き回答のレコード最大数。"
 
+#: openedx/core/djangoapps/config_model_utils/admin.py
+#, python-brace-format
+msgid ""
+"These define the context to enable this configuration on. If no values are "
+"set, then the configuration applies globally. If a single value is set, then"
+" the configuration applies to all courses within that context. At most one "
+"value can be set at a time.{br}If multiple contexts apply to a course (for "
+"example, if configuration is specified for the course specifically, and for "
+"the org that the course is in, then the more specific context overrides the "
+"more general context."
+msgstr ""
+
+#: openedx/core/djangoapps/config_model_utils/admin.py
+msgid ""
+"If any of these values are left empty or \"Unknown\", then their value at "
+"runtime will be retrieved from the next most specific context that applies. "
+"For example, if \"Enabled\" is left as \"Unknown\" in the course context, "
+"then that course will be Enabled only if the org that it is in is Enabled."
+msgstr ""
+
 #: openedx/core/djangoapps/config_model_utils/models.py
 #, python-format
 msgid "%(value)s should have the form ORG+COURSE"
@@ -9825,6 +9827,10 @@ msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "Read-only"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "One and only one of 'user' and 'group' must be set."
 msgstr ""
 
 #: openedx/core/djangoapps/cors_csrf/models.py
@@ -10102,6 +10108,12 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
+msgid ""
+"Comma-separated list of filters that this application will be allowed to "
+"request."
+msgstr ""
+
+#: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid "Content Provider"
 msgstr ""
 
@@ -10220,6 +10232,7 @@ msgid " By %(filter_title)s "
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
 #, python-format
 msgid "Welcome to week %(week_num)s of %(course_name)s!"
 msgstr ""
@@ -10240,6 +10253,7 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
 msgid "Resume your course now"
 msgstr ""
 
@@ -10253,6 +10267,32 @@ msgstr ""
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/subject.txt
 #, python-format
 msgid "Welcome to week %(week_num)s"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
+#, python-brace-format
+msgid ""
+"We hope you're enjoying {start_strong}{course_name}{end_strong}! We want to "
+"let you know what you can look forward to in the coming weeks:"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.txt
+msgid ""
+"We encourage you to spend time with the course each week. Your focused "
+"attention will pay off in the end!"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.txt
+#, python-format
+msgid ""
+"We hope you're enjoying %(course_name)s! We want to let you know what you "
+"can look forward to in the coming weeks:"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/subject.txt
+#, python-format
+msgid "%(course_name)s Weekly Update"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
@@ -10797,8 +10837,8 @@ msgstr "何度もログイン試行に失敗しました。しばらく時間を
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
 msgid ""
-"As an {allowed_domain} user, You must login with your {allowed_domain} "
-"{provider} account."
+"As {allowed_domain} user, You must login with your {allowed_domain} "
+"{link_start}{provider} account{link_end}."
 msgstr ""
 
 #. Translators: This example email address is used as a placeholder in
@@ -10946,6 +10986,13 @@ msgstr "必須項目のうち１つ以上入力できていません"
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Unauthorized email address."
 msgstr "許可されていないメールアドレスです。"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid ""
+"It looks like {email} belongs to an existing account. Try again with a "
+"different email address."
+msgstr "この {email} は既存のアカウントに登録されているようです。他のメールアドレスを使って再操作してください。"
 
 #. Translators: These instructions appear on the registration form,
 #. immediately
@@ -11156,27 +11203,6 @@ msgid ""
 "{register_link}, and enroll in this course."
 msgstr ""
 
-#: openedx/features/content_type_gating/admin.py
-#: openedx/features/course_duration_limits/admin.py
-msgid ""
-"These define the context to enable course duration limits on. If no values "
-"are set, then the configuration applies globally. If a single value is set, "
-"then the configuration applies to all courses within that context. At most "
-"one value can be set at a time.<br>If multiple contexts apply to a course "
-"(for example, if configuration is specified for the course specifically, and"
-" for the org that the course is in, then the more specific context overrides"
-" the more general context."
-msgstr ""
-
-#: openedx/features/content_type_gating/admin.py
-#: openedx/features/course_duration_limits/admin.py
-msgid ""
-"If any of these values is left empty or \"Unknown\", then their value at "
-"runtime will be retrieved from the next most specific context that applies. "
-"For example, if \"Enabled\" is left as \"Unknown\" in the course context, "
-"then that course will be Enabled only if the org that it is in is Enabled."
-msgstr ""
-
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
 #: lms/templates/support/feature_based_enrollments.html
@@ -11203,10 +11229,6 @@ msgstr ""
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
 msgid "enabled_as_of must be set when enabled is True"
-msgstr ""
-
-#: openedx/features/content_type_gating/partitions.py
-msgid "Feature-based Enrollments"
 msgstr ""
 
 #: openedx/features/content_type_gating/partitions.py
@@ -11374,8 +11396,8 @@ msgstr ""
 #, no-python-format, python-brace-format
 msgid ""
 "{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% "
-"[{strikeout_price}]{span_close}{br}Discount will be automatically applied at"
-" checkout. {a_open}Upgrade Now{a_close}{div_close}"
+"[{strikeout_price}]{span_close}{br}Use code {b_open}{code}{b_close} at "
+"checkout! {a_open}Upgrade Now{a_close}{div_close}"
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py
@@ -11664,6 +11686,10 @@ msgstr "{platform_name}のサポートレベル: "
 msgid "HTML"
 msgstr "HTML"
 
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Problem"
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/component.py lms/templates/video.html
 msgid "Video"
 msgstr "動画"
@@ -11751,6 +11777,15 @@ msgstr "gitレポジトリへのエクスポートが完了したコース"
 #: cms/djangoapps/contentstore/views/helpers.py
 msgid "Vertical"
 msgstr "縦"
+
+#: cms/templates/course_outline.html lms/templates/seq_module.html
+#: lms/templates/ccx/schedule.html
+msgid "Section"
+msgstr "セクション"
+
+#: lms/templates/ccx/schedule.html
+msgid "Subsection"
+msgstr "サブセクション"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "File upload corrupted. Please try again"
@@ -12168,7 +12203,6 @@ msgstr "設定"
 #: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
 #: lms/templates/edxnotes/edxnotes.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "Loading"
 msgstr "読込中"
@@ -12584,11 +12618,6 @@ msgstr ""
 msgid "Account Status Info"
 msgstr "アカウントステータス情報"
 
-#: lms/templates/dashboard.html lms/templates/header/user_dropdown.html
-#: themes/edx.org/lms/templates/dashboard.html
-msgid "Order History"
-msgstr "注文履歴"
-
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
 msgstr "{course_number}のメール設定"
@@ -12935,6 +12964,10 @@ msgstr "プレビューモードにする"
 msgid "You are now viewing the course as {i_start}{user_name}{i_end}."
 msgstr " {i_start}{user_name}{i_end}としてこの講座を閲覧しています。"
 
+#: lms/templates/preview_menu.html
+msgid "View this unit in the new experience"
+msgstr ""
+
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
 msgid_plural "You have used {num_used} of {num_total} attempts"
@@ -12994,6 +13027,16 @@ msgstr "メール"
 #, python-format
 msgid "Return To %s"
 msgstr "%s に戻る"
+
+#: lms/templates/reset_deadlines_banner.html
+msgid ""
+"It looks like you've missed some important deadlines. Reset your deadlines "
+"and get started today."
+msgstr ""
+
+#: lms/templates/reset_deadlines_banner.html
+msgid "Reset my deadlines"
+msgstr ""
 
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
@@ -14090,32 +14133,34 @@ msgstr "カタログの検索"
 msgid "Enter a username to view catalogs belonging to that user."
 msgstr "ユーザー名を入力して、そのユーザーのカタログを見る。"
 
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe Successful"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe Cancelled"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Confirm Unsubscribe"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "You have been unsubscribed from emails for {course}."
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "You have not been unsubscribed from emails for {course}."
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Do you want to unsubscribe from emails for {course}?"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+#: lms/templates/bulk_email/unsubscribe_success.html
 msgid "Unsubscribe"
+msgstr ""
+
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+msgid "confirm unsubscribe from {org} {course} emails."
+msgstr ""
+
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+msgid "Note:"
+msgstr ""
+
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+msgid ""
+"You will still receive course emails from other courses you are enrolled in."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "You have successfully unsubscribed from {org} {course} emails."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "You have not been unsubscribed from {org} {course} emails."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "{link_start}Return to edX.org{link_end}"
 msgstr ""
 
 #: lms/templates/calculator/toggle_calculator.html
@@ -15006,6 +15051,27 @@ msgstr ""
 msgid "Your score is {current_score}%. You have passed the entrance exam."
 msgstr "あなたの得点は{current_score}%です。受講前試験に合格しました。"
 
+#: lms/templates/courseware/dates.html lms/templates/courseware/syllabus.html
+msgid "{course.display_number_with_default} Course Info"
+msgstr "{course.display_number_with_default}の講座情報"
+
+#: lms/templates/courseware/dates.html
+msgid "Important Dates"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid "Due Today"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid "Verified Only"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid ""
+"{a_start}Upgrade{a_end}{space}to a Verified Certificate for full access."
+msgstr ""
+
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
 msgstr "成績簿"
@@ -15322,10 +15388,6 @@ msgstr "練習問題の点数は非表示です。"
 msgid "No problem scores in this section"
 msgstr "このセクションに問題の点数なし"
 
-#: lms/templates/courseware/syllabus.html
-msgid "{course.display_number_with_default} Course Info"
-msgstr "{course.display_number_with_default}の講座情報"
-
 #: lms/templates/courseware/welcome-back.html
 msgid ""
 "You were most recently in {section_link}.  If you're done with that, choose "
@@ -15406,6 +15468,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
 msgstr "最終成績: "
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Grades will be finalized on {cert_available_date}"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Grade required for a {cert_name_short}:"
@@ -16662,14 +16728,6 @@ msgstr ""
 "{chrome_link}または{ff_link}をお使いいただくことを強くお勧めします。"
 
 #: lms/templates/header/navbar-authenticated.html
-#: lms/templates/learner_dashboard/programs.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Programs"
-msgstr "プログラム"
-
-#: lms/templates/header/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr ""
@@ -16711,6 +16769,10 @@ msgstr ""
 #: lms/templates/header/user_dropdown.html
 msgid "Profile"
 msgstr "プロフィール"
+
+#: lms/templates/header/user_dropdown.html
+msgid "Order History"
+msgstr "注文履歴"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -17876,6 +17938,18 @@ msgid "Add Discussion Admin"
 msgstr "ディスカッション管理者を追加"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Course Data Researcher"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Course Data Researchers can access the data download tab."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Add Course Data Researcher"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Discussion Moderators"
 msgstr "ディスカッションモデレーター"
 
@@ -17939,78 +18013,6 @@ msgstr "CCXコーチは、自分自身の学生のための個別指導をする
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add CCX Coach"
 msgstr "CCXコーチを追加"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "There is no data available to display at this time."
-msgstr "現在表示可能なデータはありません。"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Use Reload Graphs to refresh the graphs."
-msgstr "'グラフの再読込'を使ってグラフを更新します。"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Reload Graphs"
-msgstr "グラフの再読込"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Subsection Data"
-msgstr "サブセクションデータ"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Each bar shows the number of students that opened the subsection."
-msgstr "それぞれの棒グラフはセクションを開いた受講者数を表します。"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid ""
-"You can click on any of the bars to list the students that opened the "
-"subsection."
-msgstr "セクションを開いた受講者の一覧を表示するには、棒グラフのいずれかをクリックしてください。"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "You can also download this data as a CSV file."
-msgstr "このデータはCSVファイルとしてダウンロードすることができます。"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Download Subsection Data for all Subsections as a CSV"
-msgstr "すべてのサブセクションのデータをCSVでダウンロード"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Grade Distribution Data"
-msgstr "成績分布データ"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Each bar shows the grade distribution for that problem."
-msgstr "それぞれの棒グラフはその問題の成績分布を表します。"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid ""
-"You can click on any of the bars to list the students that attempted the "
-"problem, along with the grades they received."
-msgstr "棒グラフのいずれかをクリックすると、問題を解答した受講者の一覧が成績とともに表示されます。"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Download Problem Data for all Problems as a CSV"
-msgstr "すべての問題データをCSVでダウンロード"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Grade Distribution per Problem"
-msgstr "問題ごとの成績分布"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Download Student Opened as a CSV"
-msgstr "開いた受講者をCSVでダウンロード"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Download Student Grades as a CSV"
-msgstr "受講者成績をCSVでダウンロード"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "This is a partial list, to view all students download as a csv."
-msgstr "これはリストの一部です。すべての受講者を見るにはCSVでダウンロードしてください。"
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "There are no problems in this section."
-msgstr "このセクションには問題がありません。"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Send to:"
@@ -18228,6 +18230,10 @@ msgid ""
 msgstr "その問題の合計配点に対する新しい得点"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Score"
+msgstr "得点"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Override Learner's Score"
 msgstr "受講者の点数を無視"
 
@@ -18338,10 +18344,6 @@ msgstr "この問題に関して提出したタスクのステータスを表示
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "My Courses"
 msgstr "受講登録した講座"
-
-#: lms/templates/learner_dashboard/program_details.html
-msgid "Program Details"
-msgstr "問題の詳細"
 
 #: lms/templates/learner_dashboard/text-me-fragment.html
 msgid "Get the {platform_name} Mobile App!"
@@ -18545,41 +18547,6 @@ msgstr "フラグを保持する"
 msgid "Go Back"
 msgstr "戻る"
 
-#: lms/templates/provider/authorize.html
-msgid ""
-"{start_strong}{application_name}{end_strong} would like to access your data "
-"with the following permissions:"
-msgstr ""
-"{start_strong}{application_name}{end_strong} は以下の許可によりあなたのデータへのアクセスを希望します: "
-
-#: lms/templates/provider/authorize.html
-msgid "Read your user ID"
-msgstr "ユーザーIDを読む"
-
-#: lms/templates/provider/authorize.html
-msgid "Read your user profile"
-msgstr "ユーザープロフィールを読む"
-
-#: lms/templates/provider/authorize.html
-msgid "Read your email address"
-msgstr "メールアドレスを読む"
-
-#: lms/templates/provider/authorize.html
-msgid "Read the list of courses in which you are a staff member."
-msgstr "あなたがスタッフメンバーになっている講座リストを読んでください。"
-
-#: lms/templates/provider/authorize.html
-msgid "Read the list of courses in which you are an instructor."
-msgstr "あなたが講師になっている講座リストを読んでください。"
-
-#: lms/templates/provider/authorize.html
-msgid "To see if you are a global staff user"
-msgstr "あなたがグローバルスタッフユーザーであるかどうかを見るには"
-
-#: lms/templates/provider/authorize.html
-msgid "Manage your data: {permission}"
-msgstr "データを管理する：{permission}"
-
 #: lms/templates/registration/account_activation_sidebar_notice.html
 msgid "Account Activation Info"
 msgstr "アカウント有効化情報"
@@ -18604,6 +18571,13 @@ msgstr "{platform_name} のパスワードを変更する"
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Invalid Password Reset Link"
 msgstr "無効なパスワード変更リンク"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid ""
+"This password reset link is invalid. It may have been used already. To reset"
+" your password, go to the {start_link}sign-in{end_link} page and select "
+"{start_strong}Forgot password{end_strong}."
+msgstr ""
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"
@@ -19416,8 +19390,8 @@ msgid "Some Rights Reserved"
 msgstr "部分的に著作権あり"
 
 #: openedx/features/course_experience/templates/course_experience/course-dates-fragment.html
-msgid "Important Course Dates"
-msgstr "講座の重要な予定"
+msgid "Upcoming Dates"
+msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Goal: "
@@ -19526,10 +19500,6 @@ msgstr ""
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "This course does not have any updates."
 msgstr "本講座は更新情報がありません。"
-
-#: openedx/features/course_experience/templates/course_experience/dates-summary.html
-msgid "Today is {date}"
-msgstr "本日は {date} です"
 
 #: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
 msgid "Latest Update"

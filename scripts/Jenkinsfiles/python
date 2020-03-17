@@ -155,12 +155,13 @@ pipeline {
                 }
             }
         }
-        
-        
+
+
         stage('Run coverage') {
             environment {
                 CODE_COV_TOKEN = credentials('CODE_COV_TOKEN')
                 SUBSET_JOB = "null" // Keep this variable until we can remove the $SUBSET_JOB path from .coveragerc
+                COLLECT_WHO_TESTS_WHAT = "${COLLECT_WHO_TESTS_WHAT}"
             }
             steps {
                 script {

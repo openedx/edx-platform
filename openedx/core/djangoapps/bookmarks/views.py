@@ -13,6 +13,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
+import edx_api_doc_tools as apidocs
 from edx_rest_framework_extensions.paginators import DefaultPagination
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -21,18 +22,18 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_oauth.authentication import OAuth2Authentication
 
+from openedx.core.lib.api.authentication import BearerAuthentication
 from openedx.core.djangoapps.bookmarks.api import BookmarksLimitReachedError
 from openedx.core.lib.api.permissions import IsUserInUrl
 from openedx.core.lib.url_utils import unquote_slashes
-from openedx.core import apidocs
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from . import DEFAULT_FIELDS, OPTIONAL_FIELDS, api
 from .serializers import BookmarkSerializer
 
 log = logging.getLogger(__name__)
+
 
 # Default error message for user
 DEFAULT_USER_MESSAGE = ugettext_noop(u'An error has occurred. Please try again.')
@@ -99,7 +100,7 @@ class BookmarksViewMixin(object):
 class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
     """REST endpoints for lists of bookmarks."""
 
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    authentication_classes = (BearerAuthentication, SessionAuthentication,)
     pagination_class = BookmarksPagination
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = BookmarkSerializer
@@ -290,7 +291,8 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
         to a requesting user's bookmark a 404 is returned. 404 will also be returned
         if the bookmark does not exist.
     """
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+
+    authentication_classes = (BearerAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsUserInUrl)
 
     serializer_class = BookmarkSerializer

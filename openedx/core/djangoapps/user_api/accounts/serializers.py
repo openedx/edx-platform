@@ -140,6 +140,7 @@ class UserReadOnlySerializer(serializers.Serializer):
             "account_privacy": self.configuration.get('default_visibility'),
             "social_links": None,
             "extended_profile_fields": None,
+            "phone_number": None,
         }
 
         if user_profile:
@@ -167,6 +168,7 @@ class UserReadOnlySerializer(serializers.Serializer):
                         user_profile.social_links.all().order_by('platform'), many=True
                     ).data,
                     "extended_profile": get_extended_profile(user_profile),
+                    "phone_number": user_profile.phone_number,
                 }
             )
 
@@ -226,7 +228,8 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         model = UserProfile
         fields = (
             "name", "gender", "goals", "year_of_birth", "level_of_education", "country", "social_links",
-            "mailing_address", "bio", "profile_image", "requires_parental_consent", "language_proficiencies"
+            "mailing_address", "bio", "profile_image", "requires_parental_consent", "language_proficiencies",
+            "phone_number"
         )
         # Currently no read-only field, but keep this so view code doesn't need to know.
         read_only_fields = ()
@@ -287,6 +290,12 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         return AccountLegacyProfileSerializer.convert_empty_to_None(value)
 
     def transform_bio(self, user_profile, value):  # pylint: disable=unused-argument
+        """
+        Converts empty string to None, to indicate not set. Replaced by to_representation in version 3.
+        """
+        return AccountLegacyProfileSerializer.convert_empty_to_None(value)
+
+    def transform_phone_number(self, user_profile, value):  # pylint: disable=unused-argument
         """
         Converts empty string to None, to indicate not set. Replaced by to_representation in version 3.
         """

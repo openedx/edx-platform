@@ -17,7 +17,7 @@
             },
 
             events: {
-                'click #download-team-csv-input': ViewUtils.withDisabledElement('downloadCsv'),
+                'click #download-team-csv-input': 'downloadCsv',
                 'change #upload-team-csv-input': ViewUtils.withDisabledElement('uploadCsv')
             },
 
@@ -44,6 +44,9 @@
                 var self = this;
                 var formData = new FormData();
 
+                // clear selected file to allow re-uploading
+                $(event.target).prop('value', '');
+
                 formData.append('csv', file);  // xss-lint: disable=javascript-jquery-append
                 return $.ajax({
                     type: 'POST',
@@ -58,13 +61,15 @@
                 );
             },
 
-            handleCsvUploadSuccess: function() {
+            handleCsvUploadSuccess: function(data) {
+                TeamUtils.showInfoBanner(data.message, false);
+
                 // This handler is currently unimplemented (TODO MST-44)
                 this.teamEvents.trigger('teams:update', {});
             },
 
-            handleCsvUploadFailure: function() {
-                // This handler is currently unimplemented (TODO MST-44)
+            handleCsvUploadFailure: function(jqXHR) {
+                TeamUtils.showInfoBanner(jqXHR.responseJSON.errors, true);
             }
         });
         return ManageView;

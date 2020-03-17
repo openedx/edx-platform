@@ -1156,9 +1156,7 @@ class CCXCoachTabTestCase(CcxTestCase):
 
     def check_ccx_tab(self, course, user):
         """Helper function for verifying the ccx tab."""
-        request = RequestFactory().request()
-        request.user = user
-        all_tabs = get_course_tab_list(request, course)
+        all_tabs = get_course_tab_list(user, course)
         return any(tab.type == 'ccx_coach' for tab in all_tabs)
 
     @ddt.data(

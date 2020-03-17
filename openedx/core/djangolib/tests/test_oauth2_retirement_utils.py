@@ -14,15 +14,8 @@ from oauth2_provider.models import (
     RefreshToken as DOTRefreshToken,
     Grant as DOTGrant,
 )
-from provider.oauth2.models import (
-    AccessToken as DOPAccessToken,
-    RefreshToken as DOPRefreshToken,
-    Grant as DOPGrant,
-    Client as DOPClient,
-)
 
 from ..oauth2_retirement_utils import (
-    retire_dop_oauth2_models,
     retire_dot_oauth2_models,
 )
 
@@ -55,36 +48,6 @@ class RetireDOTModelsTest(TestCase):
         grants = DOTGrant.objects.filter(user=user)
 
         query_sets = [applications, access_tokens, refresh_tokens, grants]
-
-        for query_set in query_sets:
-            self.assertFalse(query_set.exists())
-
-
-class RetireDOPModelsTest(TestCase):
-
-    def test_delete_dop_models(self):
-        user = UserFactory.create()
-        client = DOPClient.objects.create(
-            user=user,
-            client_type=1,
-        )
-        access_token = DOPAccessToken.objects.create(
-            user=user,
-            client=client,
-        )
-        DOPRefreshToken.objects.create(
-            user=user,
-            client=client,
-            access_token=access_token,
-        )
-
-        retire_dop_oauth2_models(user)
-
-        access_tokens = DOPAccessToken.objects.filter(user=user)
-        refresh_tokens = DOPRefreshToken.objects.filter(user=user)
-        grants = DOPGrant.objects.filter(user_id=user.id)
-
-        query_sets = [access_tokens, refresh_tokens, grants]
 
         for query_set in query_sets:
             self.assertFalse(query_set.exists())

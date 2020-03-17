@@ -17,8 +17,6 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from organizations.models import Organization
-from provider.oauth2.models import Client
-from provider.utils import long_token
 from social_core.backends.base import BaseAuth
 from social_core.backends.oauth import OAuthAuth
 from social_core.backends.saml import SAMLAuth
@@ -27,6 +25,7 @@ from social_core.utils import module_member
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_request
+from openedx.core.lib.hash_utils import create_hash256
 
 from .lti import LTI_PARAMS_KEY, LTIAuthBackend
 from .saml import STANDARD_SAML_PROVIDER_KEY, get_saml_idp_choices, get_saml_idp_class
@@ -673,6 +672,13 @@ class SAMLProviderConfig(ProviderConfig):
         """ Get social auth uid from remote id by prepending idp_slug to the remote id """
         return '{}:{}'.format(self.slug, remote_id)
 
+    def get_setting(self, name):
+        """ Get the value of a setting, or raise KeyError """
+        if self.other_settings:
+            other_settings = json.loads(self.other_settings)
+            return other_settings[name]
+        raise KeyError
+
     def get_config(self):
         """
         Return a SAMLIdentityProvider instance for use by SAMLAuthBackend.
@@ -819,7 +825,7 @@ class LTIProviderConfig(ProviderConfig):
     )
 
     lti_consumer_secret = models.CharField(
-        default=long_token,
+        default=create_hash256,
         max_length=255,
         help_text=(
             u'The shared secret that the LTI Tool Consumer will use to '
@@ -871,25 +877,3 @@ class LTIProviderConfig(ProviderConfig):
         app_label = "third_party_auth"
         verbose_name = u"Provider Configuration (LTI)"
         verbose_name_plural = verbose_name
-
-
-class ProviderApiPermissions(models.Model):
-    """
-    This model links OAuth2 client with provider Id.
-
-    It gives permission for a OAuth2 client to access the information under certain IdPs.
-
-    .. no_pii:
-    """
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    provider_id = models.CharField(
-        max_length=255,
-        help_text=(
-            u'Uniquely identify a provider. This is different from backend_name.'
-        )
-    )
-
-    class Meta(object):
-        app_label = "third_party_auth"
-        verbose_name = u"Provider API Permission"
-        verbose_name_plural = verbose_name + 's'

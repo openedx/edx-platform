@@ -8,12 +8,13 @@ Note:
 
 
 from django.conf import settings
+from django.utils.deprecation import MiddlewareMixin
 
 from .models import SiteTheme
 from .views import get_user_preview_site_theme
 
 
-class CurrentSiteThemeMiddleware(object):
+class CurrentSiteThemeMiddleware(MiddlewareMixin):
     """
     Middleware that sets `site_theme` attribute to request object.
     """

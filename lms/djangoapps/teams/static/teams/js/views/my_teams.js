@@ -1,9 +1,15 @@
 (function(define) {
     'use strict';
 
-    define(['backbone', 'gettext', 'teams/js/views/teams', 'edx-ui-toolkit/js/utils/html-utils'],
-        function(Backbone, gettext, TeamsView, HtmlUtils) {
+    define(['underscore', 'backbone', 'gettext', 'teams/js/views/teams', 'edx-ui-toolkit/js/utils/html-utils'],
+        function(_, Backbone, gettext, TeamsView, HtmlUtils) {
             var MyTeamsView = TeamsView.extend({
+
+                initialize: function(options) {
+                    this.getTopic = options.getTopic;
+                    TeamsView.prototype.initialize.call(this, options);
+                },
+
                 render: function() {
                     var view = this;
                     if (this.collection.isStale) {
@@ -19,16 +25,26 @@
                     return this;
                 },
 
+                getTopic: function(topicId) {
+                    return this.getTopic(topicId);
+                },
+
                 createHeaderView: function() {
-                    // Never show a pagination header for the "My Team" tab
-                    // because there is only ever one team.
-                    return null;
+                    // hide pagination when learner isn't a member of any teams
+                    if (!this.collection.length) {
+                        return null;
+                    } else {
+                        return TeamsView.prototype.createHeaderView.call(this);
+                    }
                 },
 
                 createFooterView: function() {
-                    // Never show a pagination footer for the "My Team" tab
-                    // because there is only ever one team.
-                    return null;
+                    // hide pagination when learner isn't a member of any teams
+                    if (!this.collection.length) {
+                        return null;
+                    } else {
+                        return TeamsView.prototype.createFooterView.call(this);
+                    }
                 }
             });
 

@@ -47,6 +47,7 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitFo
       <option value="Errors/Technical Issues">{gettext('Errors/Technical Issues')}</option>
       <option value="Financial Aid">{gettext('Financial Aid')}</option>
       <option value="Masters">{gettext('Masters')}</option>
+      <option value="MicroMasters">{gettext('MicroMasters')}</option>
       <option value="MicroBachelors">{gettext('MicroBachelors')}</option>
       <option value="Photo Verification">{gettext('Photo Verification')}</option>
       <option value="Proctoring">{gettext('Proctoring')}</option>

@@ -72,7 +72,7 @@ CELERY_ALWAYS_EAGER = True
 
 INSTALLED_APPS += ['debug_toolbar']
 
-MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
+MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 INTERNAL_IPS = ('127.0.0.1',)
 
 DEBUG_TOOLBAR_PANELS = (
@@ -136,10 +136,6 @@ FEATURES['FRONTEND_APP_PUBLISHER_URL'] = 'http://localhost:18400'
 REQUIRE_DEBUG = DEBUG
 
 ########################### OAUTH2 #################################
-OAUTH_OIDC_ISSUER = 'http://127.0.0.1:8000/oauth2'
-
-# pylint: disable=unicode-format-string
-
 JWT_AUTH.update({
     'JWT_SECRET_KEY': 'lms-secret',
     'JWT_ISSUER': 'http://127.0.0.1:8000/oauth2',

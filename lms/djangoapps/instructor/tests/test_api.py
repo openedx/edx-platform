@@ -26,7 +26,6 @@ from django.test.utils import override_settings
 from django.urls import reverse as django_reverse
 from django.utils.translation import ugettext as _
 from edx_when.api import get_overrides_for_user
-from edx_when.signals import extract_dates
 from mock import Mock, NonCallableMock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
@@ -62,13 +61,17 @@ from lms.djangoapps.instructor_task.api_helper import (
     QueueConnectionError,
     generate_already_running_error_message
 )
+from openedx.core.djangoapps.course_date_signals.handlers import extract_dates
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
+from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.lib.teams_config import TeamsConfig
 from openedx.core.lib.xblock_utils import grade_histogram
+from openedx.features.course_experience import RELATIVE_DATES_FLAG
 from shoppingcart.models import (
     Coupon,
     CouponRedemption,
@@ -95,7 +98,10 @@ from student.models import (
     get_retired_email_by_email,
     get_retired_username_by_username
 )
-from student.roles import CourseBetaTesterRole, CourseFinanceAdminRole, CourseInstructorRole, CourseSalesAdminRole
+from student.roles import (
+    CourseBetaTesterRole, CourseDataResearcherRole, CourseFinanceAdminRole,
+    CourseInstructorRole, CourseSalesAdminRole
+)
 from student.tests.factories import AdminFactory, UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
@@ -555,6 +561,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
         staff_member = StaffFactory(course_key=self.course.id)
         CourseEnrollment.enroll(staff_member, self.course.id)
         CourseFinanceAdminRole(self.course.id).add_users(staff_member)
+        CourseDataResearcherRole(self.course.id).add_users(staff_member)
         self.client.login(username=staff_member.username, password='test')
         # Try to promote to forums admin - not working
         # update_forum_role(self.course.id, staff_member, FORUM_ROLE_ADMINISTRATOR, 'allow')
@@ -593,6 +600,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
         CourseEnrollment.enroll(inst, self.course.id)
 
         CourseFinanceAdminRole(self.course.id).add_users(inst)
+        CourseDataResearcherRole(self.course.id).add_users(inst)
         self.client.login(username=inst.username, password='test')
 
         for endpoint, args in self.staff_level_endpoints:
@@ -2602,6 +2610,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
                                       min_price=40)
         self.course_mode.save()
         self.instructor = InstructorFactory(course_key=self.course.id)
+        CourseDataResearcherRole(self.course.id).add_users(self.instructor)
         self.client.login(username=self.instructor.username, password='test')
         self.cart = Order.get_cart_for_user(self.instructor)
         self.coupon_code = 'abcde'
@@ -3038,6 +3047,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
                 'max_size': 2, 'topics': [{'id': 'topic', 'name': 'Topic', 'description': 'A Topic'}]
             }))
             course_instructor = InstructorFactory(course_key=self.course.id)
+            CourseDataResearcherRole(self.course.id).add_users(course_instructor)
             self.client.login(username=course_instructor.username, password='test')
 
         url = reverse('get_students_features', kwargs={'course_id': text_type(self.course.id)})
@@ -3990,8 +4000,8 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
         self.assertEqual(response.status_code, 400)
 
     def test_send_email_with_site_template_and_from_addr(self):
-        site_email = self.site_configuration.values.get('course_email_from_addr')
-        site_template = self.site_configuration.values.get('course_email_template_name')
+        site_email = self.site_configuration.site_values.get('course_email_from_addr')
+        site_template = self.site_configuration.site_values.get('course_email_template_name')
         CourseEmailTemplate.objects.create(name=site_template)
         url = reverse('send_email', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, self.full_test_message)
@@ -4009,7 +4019,7 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
         org_email = 'fake_org@example.com'
         org_template = 'fake_org_email_template'
         CourseEmailTemplate.objects.create(name=org_template)
-        self.site_configuration.values.update({
+        self.site_configuration.site_values.update({
             'course_email_from_addr': {self.course.id.org: org_email},
             'course_email_template_name': {self.course.id.org: org_template}
         })
@@ -4471,6 +4481,8 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self.user1 = user1
         self.user2 = user2
+        ScheduleFactory.create(enrollment__user=self.user1, enrollment__course_id=self.course.id)
+        ScheduleFactory.create(enrollment__user=self.user2, enrollment__course_id=self.course.id)
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
         extract_dates(None, self.course.id)
@@ -4512,6 +4524,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             get_extended_due(self.course, self.week3, self.user1)
         )
 
+    @RELATIVE_DATES_FLAG.override(True)
     def test_reset_date(self):
         self.test_change_due_date()
         url = reverse('reset_due_date', kwargs={'course_id': text_type(self.course.id)})
@@ -4630,10 +4643,13 @@ class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestC
 
         self.user1 = user1
         self.user2 = user2
+        ScheduleFactory.create(enrollment__user=self.user1, enrollment__course_id=self.course.id)
+        ScheduleFactory.create(enrollment__user=self.user2, enrollment__course_id=self.course.id)
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
         extract_dates(None, self.course.id)
 
+    @RELATIVE_DATES_FLAG.override(True)
     def test_reset_extension_to_deleted_date(self):
         """
         Test that we can delete a due date extension after deleting the normal

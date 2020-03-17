@@ -1,6 +1,5 @@
 """Views for the branding app. """
 
-
 import logging
 
 import six
@@ -24,6 +23,7 @@ from openedx.core.djangoapps.lang_pref.api import released_languages
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from util.cache import cache_if_anonymous
 from util.json_request import JsonResponse
+from django.urls.exceptions import NoReverseMatch
 
 log = logging.getLogger(__name__)
 
@@ -66,7 +66,18 @@ def index(request):
 
     #  we do not expect this case to be reached in cases where
     #  marketing and edge are enabled
-    return student.views.index(request, user=request.user)
+
+    try:
+        return student.views.index(request, user=request.user)
+    except NoReverseMatch:
+        log.error(
+            'https is not a registered namespace Request from {}'.format(domain),
+            'request_site= {}'.format(request.site.__dict__),
+            'enable_mktg_site= {}'.format(enable_mktg_site),
+            'Auth Status= {}'.format(request.user.is_authenticated),
+            'Request Meta= {}'.format(request.META)
+        )
+        raise
 
 
 @ensure_csrf_cookie

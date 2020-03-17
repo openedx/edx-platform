@@ -23,6 +23,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from six import text_type
 from six.moves import range, zip
+from social_django.models import UserSocialAuth
 
 from bulk_email.models import BulkEmailFlag, Optout
 from course_modes.models import CourseMode
@@ -98,8 +99,8 @@ class EnrollmentsDataMixin(ProgramCacheMixin):
         super(EnrollmentsDataMixin, cls).setUpClass()
         cls.start_cache_isolation()
         cls.organization_key = "testorg"
-        catalog_org = OrganizationFactory(key=cls.organization_key)
-        LMSOrganizationFactory(short_name=cls.organization_key)
+        cls.catalog_org = OrganizationFactory(key=cls.organization_key)
+        cls.lms_org = LMSOrganizationFactory(short_name=cls.organization_key)
         cls.program_uuid = UUID('00000000-1111-2222-3333-444444444444')
         cls.program_uuid_tmpl = '00000000-1111-2222-3333-4444444444{0:02d}'
         cls.curriculum_uuid = UUID('aaaaaaaa-1111-2222-3333-444444444444')
@@ -111,12 +112,12 @@ class EnrollmentsDataMixin(ProgramCacheMixin):
         cls.course_id = CourseKey.from_string(course_run_id_str)
         CourseOverviewFactory(id=cls.course_id)
         course_run = CourseRunFactory(key=course_run_id_str)
-        course = CourseFactory(key=catalog_course_id_str, course_runs=[course_run])
+        cls.course = CourseFactory(key=catalog_course_id_str, course_runs=[course_run])
         inactive_curriculum = CurriculumFactory(uuid=inactive_curriculum_uuid, is_active=False)
-        cls.curriculum = CurriculumFactory(uuid=cls.curriculum_uuid, courses=[course])
+        cls.curriculum = CurriculumFactory(uuid=cls.curriculum_uuid, courses=[cls.course])
         cls.program = ProgramFactory(
             uuid=cls.program_uuid,
-            authoring_organizations=[catalog_org],
+            authoring_organizations=[cls.catalog_org],
             curricula=[inactive_curriculum, cls.curriculum],
         )
 
@@ -1200,6 +1201,172 @@ class ProgramCourseEnrollmentsPatchTests(ProgramCourseEnrollmentsModifyMixin, AP
         self.create_program_and_course_enrollments('learner-2', course_status=initial_statuses[1])
         self.create_program_and_course_enrollments('learner-3', course_status=initial_statuses[2], user=None)
         self.create_program_and_course_enrollments('learner-4', course_status=initial_statuses[3], user=None)
+
+
+@ddt.ddt
+class MultiprogramEnrollmentsTest(EnrollmentsDataMixin, APITestCase):
+    """ Tests for the Multiple Program with same course scenario """
+    @classmethod
+    def setUpClass(cls):
+        super(MultiprogramEnrollmentsTest, cls).setUpClass()
+        cls.another_curriculum_uuid = UUID('bbbbbbbb-8888-9999-7777-666666666666')
+        cls.another_curriculum = CurriculumFactory(
+            uuid=cls.another_curriculum_uuid,
+            courses=[cls.course]
+        )
+        cls.another_program_uuid = UUID(cls.program_uuid_tmpl.format(99))
+        cls.another_program = ProgramFactory(
+            uuid=cls.another_program_uuid,
+            authoring_organizations=[cls.catalog_org],
+            curricula=[cls.another_curriculum]
+        )
+        cls.external_user_key = 'aabbcc'
+        cls.user = UserFactory.create(username='multiprogram_user')
+
+    def setUp(self):
+        super(MultiprogramEnrollmentsTest, self).setUp()
+        self.set_program_in_catalog_cache(self.another_program_uuid, self.another_program)
+        self.client.login(username=self.global_staff.username, password=self.password)
+
+    def get_program_url(self, program_uuid):
+        return reverse('programs_api:v1:program_enrollments', kwargs={
+            'program_uuid': program_uuid
+        })
+
+    def get_program_course_url(self, program_uuid, course_id):
+        return reverse('programs_api:v1:program_course_enrollments', kwargs={
+            'program_uuid': program_uuid,
+            'course_id': course_id
+        })
+
+    def write_program_enrollment(
+        self,
+        method,
+        program_uuid,
+        curriculum_uuid,
+        enrollment_status,
+        existing_user
+    ):
+        """ Create or update the program enrollment through API """
+        write_data = [{
+            'status': enrollment_status,
+            REQUEST_STUDENT_KEY: self.external_user_key,
+            'curriculum_uuid': str(curriculum_uuid)
+        }]
+        url = self.get_program_url(program_uuid=program_uuid)
+        mock_user = defaultdict(lambda: None)
+        if existing_user:
+            mock_user = {self.external_user_key: self.user}
+        with mock.patch(
+            _get_users_patch_path,
+            autospec=True,
+            return_value=mock_user,
+        ):
+            response = getattr(self.client, method)(
+                url,
+                json.dumps(write_data),
+                content_type='application/json'
+            )
+            return response
+
+    def write_program_course_enrollment(
+        self,
+        method,
+        program_uuid,
+        course_id,
+        enrollment_status
+    ):
+        """ Create or update the program course enrollment through API """
+        course_post_data = [{
+            'student_key': self.external_user_key,
+            'status': enrollment_status
+        }]
+        course_url = self.get_program_course_url(program_uuid, course_id)
+        response = getattr(self.client, method)(
+            course_url,
+            json.dumps(course_post_data),
+            content_type='application/json'
+        )
+        return response
+
+    def link_user_social_auth(self):
+        """ Create the UserSocialAuth record to trigger the linkage django signal """
+        SAMLProviderConfigFactory(
+            organization=self.lms_org,
+            slug=self.organization_key
+        )
+        UserSocialAuth.objects.create(
+            user=self.user,
+            uid='{0}:{1}'.format(self.organization_key, self.external_user_key),
+            provider=self.organization_key
+        )
+
+    @ddt.data(True, False)
+    def test_enrollment_in_same_course_multi_program(self, existing_user):
+        response = self.write_program_enrollment(
+            'post', self.program_uuid, self.curriculum_uuid, 'enrolled', existing_user
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.write_program_course_enrollment(
+            'post', self.program_uuid, self.course_id, 'active'
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.write_program_enrollment(
+            'put', self.program_uuid, self.curriculum_uuid, 'canceled', existing_user
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.write_program_course_enrollment(
+            'put', self.program_uuid, self.course_id, 'inactive'
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.write_program_enrollment(
+            'post', self.another_program_uuid, self.another_curriculum_uuid, 'enrolled', existing_user
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.write_program_course_enrollment(
+            'post', self.another_program_uuid, self.course_id, 'active')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        if not existing_user:
+            self.link_user_social_auth()
+            program_course_enrollment = ProgramCourseEnrollment.objects.get(
+                program_enrollment__external_user_key=self.external_user_key,
+                program_enrollment__program_uuid=self.another_program_uuid
+            )
+            self.assertIsNotNone(program_course_enrollment.program_enrollment.user)
+
+    @ddt.data(True, False)
+    @mock.patch('lms.djangoapps.program_enrollments.api.writing.logger')
+    def test_enrollment_in_same_course_both_program_enrollments_active(self, existing_user, mock_log):
+        response = self.write_program_enrollment(
+            'post', self.program_uuid, self.curriculum_uuid, 'enrolled', existing_user
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.write_program_course_enrollment(
+            'post', self.program_uuid, self.course_id, 'active'
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.write_program_enrollment(
+            'post', self.another_program_uuid, self.another_curriculum_uuid, 'enrolled', existing_user
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.write_program_course_enrollment(
+            'post', self.another_program_uuid, self.course_id, 'active'
+        )
+        self.assertEqual(response.status_code, 422)
+        mock_log.error.assert_called_with(
+            u'Detected conflicting active ProgramCourseEnrollment. This is happening on'
+            u' The program_uuid [{}] with course_key [{}] for external_user_key [{}]'.format(
+                self.another_program_uuid,
+                self.course_id,
+                self.external_user_key
+            )
+        )
+        expected_results = {self.external_user_key: CourseStatuses.CONFLICT}
+        self.assertDictEqual(expected_results, response.data)
 
 
 class ProgramCourseEnrollmentsPutTests(ProgramCourseEnrollmentsModifyMixin, APITestCase):

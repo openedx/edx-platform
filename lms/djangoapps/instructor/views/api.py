@@ -94,7 +94,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from shoppingcart.models import (
     Coupon,
@@ -234,7 +234,7 @@ def require_post_params(*args, **kwargs):
     return decorator
 
 
-def require_level(level):
+def require_level(level, perm=None):
     """
     Decorator with argument that requires an access level of the requesting
     user. If the requirement is not satisfied, returns an
@@ -255,7 +255,8 @@ def require_level(level):
             request = args[0]
             course = get_course_by_id(CourseKey.from_string(kwargs['course_id']))
 
-            if has_access(request.user, level, course):
+            if has_access(request.user, level, course) and \
+                    ((perm and request.user.has_perm(perm, course.id)) or not perm):
                 return func(*args, **kwargs)
             else:
                 return HttpResponseForbidden()
@@ -1047,7 +1048,7 @@ def list_course_role_members(request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
+@require_level('staff', perm='student.can_research')
 @common_exceptions_400
 def get_problem_responses(request, course_id):
     """
@@ -1107,7 +1108,7 @@ def get_grading_config(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
+@require_level('staff', perm='student.can_research')
 def get_sale_records(request, course_id, csv=False):  # pylint: disable=unused-argument, redefined-outer-name
     """
     return the summary of all sales records for a particular course
@@ -1138,7 +1139,7 @@ def get_sale_records(request, course_id, csv=False):  # pylint: disable=unused-a
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
+@require_level('staff', perm='student.can_research')
 def get_sale_order_records(request, course_id):  # pylint: disable=unused-argument
     """
     return the summary of all sales records for a particular course
@@ -1286,7 +1287,7 @@ def get_issued_certificates(request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
+@require_level('staff', perm='student.can_research')
 @common_exceptions_400
 def get_students_features(request, course_id, csv=False):  # pylint: disable=redefined-outer-name
     """
@@ -1473,7 +1474,7 @@ class CohortCSV(DeveloperErrorViewMixin, APIView):
     """
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
@@ -1933,7 +1934,7 @@ def spent_registration_codes(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
+@require_level('staff', perm='student.can_research')
 def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
     """
     Respond with 2-column CSV output of user-id, anonymized-user-id
@@ -2564,7 +2565,7 @@ def list_report_downloads(request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
+@require_level('staff', perm='student.can_research')
 @require_finance_admin
 def list_financial_report_downloads(_request, course_id):
     """
@@ -2586,7 +2587,7 @@ def list_financial_report_downloads(_request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
+@require_level('staff', perm='student.can_research')
 @common_exceptions_400
 def export_ora2_data(request, course_id):
     """
@@ -2604,7 +2605,7 @@ def export_ora2_data(request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
+@require_level('staff', perm='student.can_research')
 @common_exceptions_400
 def calculate_grades_csv(request, course_id):
     """
@@ -2622,7 +2623,7 @@ def calculate_grades_csv(request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
+@require_level('staff', perm='student.can_research')
 @common_exceptions_400
 def problem_grade_report(request, course_id):
     """

@@ -7,19 +7,17 @@ Admin site configuration for third party authentication
 from config_models.admin import KeyedConfigurationModelAdmin
 from django import forms
 from django.contrib import admin
-from django.db import DatabaseError, transaction
+from django.db import transaction
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from openedx.core.djangolib.markup import HTML
-from third_party_auth.provider import Registry
 
 from .models import (
     _PSA_OAUTH2_BACKENDS,
     _PSA_SAML_BACKENDS,
     LTIProviderConfig,
     OAuth2ProviderConfig,
-    ProviderApiPermissions,
     SAMLConfiguration,
     SAMLProviderConfig,
     SAMLProviderData
@@ -199,27 +197,3 @@ class LTIProviderConfigAdmin(KeyedConfigurationModelAdmin):
         )
 
 admin.site.register(LTIProviderConfig, LTIProviderConfigAdmin)
-
-
-class ApiPermissionsAdminForm(forms.ModelForm):
-    """ Django admin form for ApiPermissions model """
-    class Meta(object):
-        model = ProviderApiPermissions
-        fields = ['client', 'provider_id']
-
-    provider_id = forms.ChoiceField(choices=[], required=True)
-
-    def __init__(self, *args, **kwargs):
-        super(ApiPermissionsAdminForm, self).__init__(*args, **kwargs)
-        self.fields['provider_id'].choices = (
-            (provider.provider_id, u"{} ({})".format(provider.name, provider.provider_id))
-            for provider in Registry.enabled()
-        )
-
-
-class ApiPermissionsAdmin(admin.ModelAdmin):
-    """ Django Admin class for ApiPermissions """
-    list_display = ('client', 'provider_id')
-    form = ApiPermissionsAdminForm
-
-admin.site.register(ProviderApiPermissions, ApiPermissionsAdmin)

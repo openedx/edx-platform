@@ -103,6 +103,7 @@ from .library import LIBRARIES_ENABLED, get_library_creator_status
 
 log = logging.getLogger(__name__)
 
+
 __all__ = ['course_info_handler', 'course_handler', 'course_listing',
            'course_info_update_handler', 'course_search_index_handler',
            'course_rerun_handler',
@@ -1312,6 +1313,11 @@ def advanced_settings_handler(request, course_key_string):
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)
+
+        advanced_dict = CourseMetadata.fetch(course_module)
+        if settings.FEATURES.get('DISABLE_MOBILE_COURSE_AVAILABLE', False):
+            advanced_dict.get('mobile_available')['deprecated'] = True
+
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
             publisher_enabled = configuration_helpers.get_value_for_org(
                 course_module.location.org,
@@ -1321,7 +1327,7 @@ def advanced_settings_handler(request, course_key_string):
 
             return render_to_response('settings_advanced.html', {
                 'context_course': course_module,
-                'advanced_dict': CourseMetadata.fetch(course_module),
+                'advanced_dict': advanced_dict,
                 'advanced_settings_url': reverse_course_url('advanced_settings_handler', course_key),
                 'publisher_enabled': publisher_enabled,
 

@@ -5,6 +5,7 @@ from functools import wraps
 
 from config_models.admin import ConfigurationModelAdmin
 from django import forms
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.sites import NotRegistered
 from django.contrib.admin.utils import unquote
@@ -39,7 +40,8 @@ from student.models import (
     UserAttribute,
     UserProfile,
     UserTestGroup,
-    BulkUnenrollConfiguration
+    BulkUnenrollConfiguration,
+    AccountRecoveryConfiguration
 )
 from student.roles import REGISTERED_ACCESS_ROLES
 from xmodule.modulestore.django import modulestore
@@ -289,13 +291,17 @@ class UserChangeForm(BaseUserChangeForm):
     Override the default UserChangeForm such that the password field
     does not contain a link to a 'change password' form.
     """
-    password = ReadOnlyPasswordHashField(
-        label=_("Password"),
-        help_text=_(
-            "Raw passwords are not stored, so there is no way to see this "
-            "user's password."
-        ),
-    )
+    def __init__(self, *args, **kwargs):
+        super(UserChangeForm, self).__init__(*args, **kwargs)
+
+        if not settings.FEATURES.get('ENABLE_CHANGE_USER_PASSWORD_ADMIN'):
+            self.fields["password"] = ReadOnlyPasswordHashField(
+                label=_("Password"),
+                help_text=_(
+                    "Raw passwords are not stored, so there is no way to see this "
+                    "user's password."
+                ),
+            )
 
 
 class UserAdmin(BaseUserAdmin):
@@ -460,7 +466,7 @@ class AllowedAuthUserForm(forms.ModelForm):
         if not allowed_site_email_domain:
             raise forms.ValidationError(
                 _("Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' in SiteConfiguration "
-                  "model's values field.")
+                  "model's site_values field.")
             )
         elif email_domain != allowed_site_email_domain:
             raise forms.ValidationError(
@@ -487,6 +493,7 @@ class AllowedAuthUserAdmin(admin.ModelAdmin):
 admin.site.register(UserTestGroup)
 admin.site.register(Registration)
 admin.site.register(PendingNameChange)
+admin.site.register(AccountRecoveryConfiguration, ConfigurationModelAdmin)
 admin.site.register(DashboardConfiguration, ConfigurationModelAdmin)
 admin.site.register(RegistrationCookieConfiguration, ConfigurationModelAdmin)
 admin.site.register(BulkUnenrollConfiguration, ConfigurationModelAdmin)

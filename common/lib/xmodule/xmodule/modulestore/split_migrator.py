@@ -170,7 +170,7 @@ class SplitMigrator(object):
                 draft_location, revision=ModuleStoreEnum.RevisionOption.draft_preferred, **kwargs
             )
             if parent_loc is None:
-                log.warn(u'No parent found in source course for %s', draft_location)
+                log.warning(u'No parent found in source course for %s', draft_location)
                 continue
             old_parent = self.source_modulestore.get_item(parent_loc, **kwargs)
             split_parent_loc = new_draft_course_loc.make_usage_key(

@@ -103,7 +103,7 @@ def prereq_cache(cache_name, paths, install_func):
     cache_file_path = os.path.join(PREREQS_STATE_DIR, "{}.sha1".format(cache_filename))
     old_hash = None
     if os.path.isfile(cache_file_path):
-        with io.open(cache_file_path, "rb") as cache_file:
+        with io.open(cache_file_path, "r") as cache_file:
             old_hash = cache_file.read()
 
     # Compare the old hash to the new hash
@@ -201,9 +201,11 @@ PACKAGES_TO_UNINSTALL = [
     "django-oauth2-provider",       # Because now it's called edx-django-oauth2-provider.
     "edx-oauth2-provider",          # Because it moved from github to pypi
     "i18n-tools",                   # Because now it's called edx-i18n-tools
+    "moto",                         # Because we no longer use it and it conflicts with recent jsondiff versions
     "python-saml",                  # Because python3-saml shares the same directory name
     "pdfminer",                     # Replaced by pdfminer.six, which shares the same directory name
     "pytest-faulthandler",          # Because it was bundled into pytest
+    "djangorestframework-jwt",      # Because now its called drf-jwt.
 ]
 
 

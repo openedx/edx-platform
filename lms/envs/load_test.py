@@ -19,4 +19,4 @@ EXCLUDE_CSRF = lambda elem: elem not in [
 DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] = list(filter(
     EXCLUDE_CSRF, DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors']
 ))
-MIDDLEWARE_CLASSES = list(filter(EXCLUDE_CSRF, MIDDLEWARE_CLASSES))
+MIDDLEWARE = list(filter(EXCLUDE_CSRF, MIDDLEWARE))

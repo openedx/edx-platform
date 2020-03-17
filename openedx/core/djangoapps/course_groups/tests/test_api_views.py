@@ -10,8 +10,8 @@ import ddt
 import six
 from six.moves import range
 from django.urls import reverse
-from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory, AccessTokenFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -54,8 +54,8 @@ class TestCohortOauth(SharedModuleStoreTestCase):
         """ Verify the endpoints supports OAuth, and only allows authorization for staff users. """
         path = reverse(path_name, kwargs={'course_key_string': self.course_str})
         user = UserFactory(is_staff=False)
-        oauth_client = ClientFactory.create()
-        access_token = AccessTokenFactory.create(user=user, client=oauth_client).token
+        oauth_client = ApplicationFactory.create()
+        access_token = AccessTokenFactory.create(user=user, application=oauth_client).token
         headers = {
             'HTTP_AUTHORIZATION': 'Bearer ' + access_token
         }
@@ -75,8 +75,8 @@ class TestCohortOauth(SharedModuleStoreTestCase):
         cohorts.add_cohort(self.course_key, "DEFAULT", "random")
         path = reverse('api_cohorts:cohort_users', kwargs={'course_key_string': self.course_str, 'cohort_id': 1})
         user = UserFactory(is_staff=False)
-        oauth_client = ClientFactory.create()
-        access_token = AccessTokenFactory.create(user=user, client=oauth_client).token
+        oauth_client = ApplicationFactory.create()
+        access_token = AccessTokenFactory.create(user=user, application=oauth_client).token
         headers = {
             'HTTP_AUTHORIZATION': 'Bearer ' + access_token
         }
@@ -99,8 +99,8 @@ class TestCohortOauth(SharedModuleStoreTestCase):
         cohorts.add_cohort(self.course_key, "DEFAULT", "random")
         path = reverse('api_cohorts:cohort_users_csv', kwargs={'course_key_string': self.course_str})
         user = UserFactory(is_staff=False)
-        oauth_client = ClientFactory.create()
-        access_token = AccessTokenFactory.create(user=user, client=oauth_client).token
+        oauth_client = ApplicationFactory.create()
+        access_token = AccessTokenFactory.create(user=user, application=oauth_client).token
         headers = {
             'HTTP_AUTHORIZATION': 'Bearer ' + access_token
         }

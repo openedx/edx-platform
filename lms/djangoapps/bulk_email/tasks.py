@@ -41,6 +41,7 @@ from markupsafe import escape
 from six import text_type
 
 from bulk_email.models import CourseEmail, Optout
+from bulk_email.api import get_unsubscribed_link
 from lms.djangoapps.courseware.courses import get_course
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.subtasks import (
@@ -111,6 +112,7 @@ def _get_course_email_context(course):
         course_root
     )
     image_url = u'{}{}'.format(settings.LMS_ROOT_URL, course_image_url(course))
+    lms_root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
     email_context = {
         'course_title': course_title,
         'course_root': course_root,
@@ -118,8 +120,8 @@ def _get_course_email_context(course):
         'course_url': course_url,
         'course_image_url': image_url,
         'course_end_date': course_end_date,
-        'account_settings_url': '{}{}'.format(settings.LMS_ROOT_URL, reverse('account_settings')),
-        'email_settings_url': '{}{}'.format(settings.LMS_ROOT_URL, reverse('dashboard')),
+        'account_settings_url': '{}{}'.format(lms_root_url, reverse('account_settings')),
+        'email_settings_url': '{}{}'.format(lms_root_url, reverse('dashboard')),
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         'year': timezone.now().year,
     }
@@ -187,7 +189,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     # inefficient OUTER JOIN query that would read the whole user table.
     combined_set = recipient_qsets[0].union(*recipient_qsets[1:]) if len(recipient_qsets) > 1 \
         else recipient_qsets[0]
-    recipient_fields = ['profile__name', 'email']
+    recipient_fields = ['profile__name', 'email', 'username']
 
     log.info(u"Task %s: Preparing to queue subtasks for sending emails for course %s, email %s",
              task_id, course_id, email_id)
@@ -502,6 +504,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
 
     # use the CourseEmailTemplate that was associated with the CourseEmail
     course_email_template = course_email.get_template()
+
     try:
         connection = get_connection()
         connection.open()
@@ -537,6 +540,8 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
             email_context['name'] = current_recipient['profile__name']
             email_context['user_id'] = current_recipient['pk']
             email_context['course_id'] = course_email.course_id
+            email_context['unsubscribe_link'] = get_unsubscribed_link(current_recipient['username'],
+                                                                      text_type(course_email.course_id))
 
             # Construct message content using templates and context:
             plaintext_msg = course_email_template.render_plaintext(course_email.text_message, email_context)

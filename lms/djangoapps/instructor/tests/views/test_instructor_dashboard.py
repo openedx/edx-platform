@@ -107,9 +107,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         def has_instructor_tab(user, course):
             """Returns true if the "Instructor" tab is shown."""
-            request = RequestFactory().request()
-            request.user = user
-            tabs = get_course_tab_list(request, course)
+            tabs = get_course_tab_list(user, course)
             return len([tab for tab in tabs if tab.name == 'Instructor']) == 1
 
         self.assertTrue(has_instructor_tab(self.instructor, self.course))
@@ -168,7 +166,11 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             "ENABLE_MANUAL_ENROLLMENT_REASON_FIELD": enbale_reason_field
         }
         site = Site.objects.first()
-        SiteConfiguration.objects.create(site=site, values=configuration_values, enabled=True)
+        SiteConfiguration.objects.create(
+            site=site,
+            site_values=configuration_values,
+            enabled=True
+        )
 
         url = reverse(
             'instructor_dashboard',
@@ -196,7 +198,11 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             ]
         }
         site = Site.objects.first()
-        SiteConfiguration.objects.create(site=site, values=configuration_values, enabled=True)
+        SiteConfiguration.objects.create(
+            site=site,
+            site_values=configuration_values,
+            enabled=True
+        )
         url = reverse(
             'instructor_dashboard',
             kwargs={

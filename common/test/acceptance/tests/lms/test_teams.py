@@ -591,7 +591,7 @@ class BrowseTopicsTest(TeamsTabBase):
             self.topics_page.visit()
 
 
-@attr(shard=5)
+@attr(shard=4)
 @ddt.ddt
 class BrowseTeamsWithinTopicTest(TeamsTabBase):
     """
@@ -991,7 +991,7 @@ class TeamFormActions(TeamsTabBase):
         )
 
 
-@attr(shard=5)
+@attr(shard=4)
 @ddt.ddt
 class CreateTeamTest(TeamFormActions):
     """

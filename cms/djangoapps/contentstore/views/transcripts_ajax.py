@@ -264,7 +264,7 @@ def download_transcripts(request):
 
     # Construct an HTTP response
     response = HttpResponse(content, content_type=mimetype)
-    response['Content-Disposition'] = u'attachment; filename="{filename}"'.format(filename=filename.encode('utf-8'))
+    response['Content-Disposition'] = u'attachment; filename="{filename}"'.format(filename=filename)
     return response
 
 

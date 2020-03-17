@@ -375,7 +375,7 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
     # assertion metadata. Rather, they will be fetched from the mocked SAPSuccessFactors API.
     USER_EMAIL = "john@smith.com"
     USER_NAME = "John Smith"
-    USER_USERNAME = "jsmith"
+    USER_USERNAME = "John"
 
     def setUp(self):
         """
@@ -426,7 +426,7 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
         # Mock the call to the SAP SuccessFactors OData user endpoint
         ODATA_USER_URL = (
             'http://api.successfactors.com/odata/v2/User(userId=\'myself\')'
-            '?$select=username,firstName,lastName,defaultFullName,email'
+            '?$select=firstName,lastName,defaultFullName,email'
         )
 
         def user_callback(request, _uri, headers):
@@ -525,7 +525,7 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
         # Mock the call to the SAP SuccessFactors OData user endpoint
         ODATA_USER_URL = (
             'http://api.successfactors.com/odata/v2/User(userId=\'myself\')'
-            '?$select=username,firstName,country,lastName,defaultFullName,email'
+            '?$select=firstName,country,lastName,defaultFullName,email'
         )
 
         def user_callback(request, _uri, headers):

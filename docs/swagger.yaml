@@ -1997,7 +1997,7 @@ paths:
   /edx_proctoring/v1/proctored_exam/active_exams_for_user:
     get:
       operationId: edx_proctoring_v1_proctored_exam_active_exams_for_user_list
-      description: returns the get_active_exams_for_user
+      description: Returns the get_active_exams_for_user
       parameters: []
       responses:
         '200':
@@ -4615,73 +4615,6 @@ paths:
         in: path
         required: true
         type: string
-  /xblock/v2/xblocks/{usage_key_str}/handler/{user_id}-{secure_token}/{handler_name}/{suffix}:
-    get:
-      operationId: xblock_v2_xblocks_handler_read
-      description: Run an XBlock's handler and return the result
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-        - xblock
-    post:
-      operationId: xblock_v2_xblocks_handler_create
-      description: Run an XBlock's handler and return the result
-      parameters: []
-      responses:
-        '201':
-          description: ''
-      tags:
-        - xblock
-    put:
-      operationId: xblock_v2_xblocks_handler_update
-      description: Run an XBlock's handler and return the result
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-        - xblock
-    patch:
-      operationId: xblock_v2_xblocks_handler_partial_update
-      description: Run an XBlock's handler and return the result
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-        - xblock
-    delete:
-      operationId: xblock_v2_xblocks_handler_delete
-      description: Run an XBlock's handler and return the result
-      parameters: []
-      responses:
-        '204':
-          description: ''
-      tags:
-        - xblock
-    parameters:
-      - name: handler_name
-        in: path
-        required: true
-        type: string
-      - name: secure_token
-        in: path
-        required: true
-        type: string
-      - name: suffix
-        in: path
-        required: true
-        type: string
-      - name: usage_key_str
-        in: path
-        required: true
-        type: string
-      - name: user_id
-        in: path
-        required: true
-        type: string
   /xblock/v2/xblocks/{usage_key_str}/handler_url/{handler_name}/:
     get:
       operationId: xblock_v2_xblocks_handler_url_read
@@ -5387,7 +5320,6 @@ definitions:
         title: Order number
         type: string
         maxLength: 128
-        minLength: 1
         x-nullable: true
       support_details:
         title: Support details

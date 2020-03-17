@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-import provider.utils
+from openedx.core.lib.hash_utils import short_token
 from django.db import migrations, models
 
 
@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='lticonsumer',
             name='consumer_secret',
-            field=models.CharField(default=provider.utils.short_token, unique=True, max_length=32),
+            field=models.CharField(default=short_token, unique=True, max_length=32),
         ),
     ]

@@ -8,7 +8,6 @@ import ddt
 from django.conf import settings
 from mock import patch
 
-from common.test.utils import MockS3Mixin
 from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 from lms.djangoapps.verify_student.services import IDVerificationService
 from student.tests.factories import UserFactory
@@ -22,7 +21,7 @@ FAKE_SETTINGS = {
 
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @ddt.ddt
-class TestIDVerificationService(ModuleStoreTestCase, MockS3Mixin):
+class TestIDVerificationService(ModuleStoreTestCase):
     """
     Tests for IDVerificationService.
     """

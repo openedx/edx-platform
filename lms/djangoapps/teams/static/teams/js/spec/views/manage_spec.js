@@ -43,5 +43,10 @@ define([
             AjaxHelpers.respondWithError(requests);
             expect(view.handleCsvUploadFailure).toHaveBeenCalled();
         });
+
+        it('should clear input file after upload to allow reuploading', function() {
+            view.uploadCsv(mockUploadClickEvent);
+            expect(view.$('#upload-team-csv-input').prop('value')).toEqual('');
+        });
     });
 });

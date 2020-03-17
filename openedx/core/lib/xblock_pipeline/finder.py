@@ -76,19 +76,19 @@ class XBlockPackageStorage(Storage):
         """
         return os.path.getsize(self.path(name))
 
-    def accessed_time(self, name):
+    def get_accessed_time(self, name):
         """
         Returns a URL to the package resource.
         """
         return datetime.fromtimestamp(os.path.getatime(self.path(name)))
 
-    def created_time(self, name):
+    def get_created_time(self, name):
         """
         Returns the created time of the package resource.
         """
         return datetime.fromtimestamp(os.path.getctime(self.path(name)))
 
-    def modified_time(self, name):
+    def get_modified_time(self, name):
         """
         Returns the modified time of the resource.
         """

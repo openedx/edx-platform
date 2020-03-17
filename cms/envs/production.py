@@ -12,7 +12,7 @@ import os
 import yaml
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from path import Path as path
 
 from .common import *
@@ -96,8 +96,8 @@ CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
 
 # When the broker is behind an ELB, use a heartbeat to refresh the
 # connection and to detect if it has been dropped.
-BROKER_HEARTBEAT = 60.0
-BROKER_HEARTBEAT_CHECKRATE = 2
+BROKER_HEARTBEAT = ENV_TOKENS.get('BROKER_HEARTBEAT', 60.0)
+BROKER_HEARTBEAT_CHECKRATE = ENV_TOKENS.get('BROKER_HEARTBEAT_CHECKRATE', 2)
 
 # Each worker should only fetch one message at a time
 CELERYD_PREFETCH_MULTIPLIER = 1
@@ -258,6 +258,7 @@ ADMINS = ENV_TOKENS.get('ADMINS', ADMINS)
 SERVER_EMAIL = ENV_TOKENS.get('SERVER_EMAIL', SERVER_EMAIL)
 MKTG_URLS = ENV_TOKENS.get('MKTG_URLS', MKTG_URLS)
 MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
+MKTG_URL_OVERRIDES.update(ENV_TOKENS.get('MKTG_URL_OVERRIDES', MKTG_URL_OVERRIDES))
 TECH_SUPPORT_EMAIL = ENV_TOKENS.get('TECH_SUPPORT_EMAIL', TECH_SUPPORT_EMAIL)
 
 for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
@@ -544,9 +545,6 @@ XBLOCK_SETTINGS.setdefault("VideoBlock", {})['YOUTUBE_API_KEY'] = AUTH_TOKENS.ge
 
 ############################ OAUTH2 Provider ###################################
 
-# OpenID Connect issuer ID. Normally the URL of the authentication endpoint.
-OAUTH_OIDC_ISSUER = ENV_TOKENS['OAUTH_OIDC_ISSUER']
-
 #### JWT configuration ####
 JWT_AUTH.update(ENV_TOKENS.get('JWT_AUTH', {}))
 JWT_AUTH.update(AUTH_TOKENS.get('JWT_AUTH', {}))
@@ -574,6 +572,9 @@ VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = ENV_TOKENS.get('VIDEO_TRANSCRIPT_MIGRATI
 ########## Settings youtube thumbnails scraper tasks ############
 SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE = ENV_TOKENS.get('SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE', DEFAULT_PRIORITY_QUEUE)
 
+########## Settings update search index task ############
+UPDATE_SEARCH_INDEX_JOB_QUEUE = ENV_TOKENS.get('UPDATE_SEARCH_INDEX_JOB_QUEUE', DEFAULT_PRIORITY_QUEUE)
+
 ########################## Parental controls config  #######################
 
 # The age at which a learner no longer requires parental consent, or None
@@ -586,7 +587,7 @@ PARENTAL_CONSENT_AGE_LIMIT = ENV_TOKENS.get(
 ########################## Extra middleware classes  #######################
 
 # Allow extra middleware classes to be added to the app through configuration.
-MIDDLEWARE_CLASSES.extend(ENV_TOKENS.get('EXTRA_MIDDLEWARE_CLASSES', []))
+MIDDLEWARE.extend(ENV_TOKENS.get('EXTRA_MIDDLEWARE_CLASSES', []))
 
 ########################## Settings for Completion API #####################
 
@@ -606,6 +607,10 @@ FERNET_KEYS = AUTH_TOKENS.get('FERNET_KEYS', FERNET_KEYS)
 ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = ENV_TOKENS.get(
     'ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER',
     ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER
+)
+ENTERPRISE_CATALOG_INTERNAL_ROOT_URL = ENV_TOKENS.get(
+    'ENTERPRISE_CATALOG_INTERNAL_ROOT_URL',
+    ENTERPRISE_CATALOG_INTERNAL_ROOT_URL
 )
 
 # This limits the type of roles that are submittable via the `student` app's manual enrollment

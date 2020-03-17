@@ -8,7 +8,7 @@ import itertools
 import json
 import re
 from datetime import datetime, timedelta
-from uuid import uuid4, UUID
+from uuid import UUID, uuid4
 
 import ddt
 import six
@@ -17,15 +17,19 @@ from django.db.models import signals
 from django.http import HttpResponse
 from django.urls import reverse
 from mock import patch
+from organizations.tests.factories import OrganizationFactory
 from pytz import UTC
+from social_django.models import UserSocialAuth
 
 from common.test.utils import disable_signal
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAttribute, ManualEnrollmentAudit
 from student.roles import GlobalStaff, SupportStaffRole
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from third_party_auth.tests.factories import SAMLProviderConfigFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -539,3 +543,238 @@ class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
         msg = u"All linking lines must be in the format 'external_user_key,lms_username'"
         render_call_dict = mocked_render.call_args[0][1]
         assert render_call_dict['errors'] == [msg]
+
+
+class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
+    """
+    View tests for Program Enrollments Inspector
+    """
+    patch_render = patch(
+        'support.views.program_enrollments.render_to_response',
+        return_value=HttpResponse(),
+        autospec=True,
+    )
+
+    def setUp(self):
+        super(ProgramEnrollmentsInspectorViewTests, self).setUp()
+        self.url = reverse("support:program_enrollments_inspector")
+        SupportStaffRole().add_users(self.user)
+        self.program_uuid = str(uuid4())
+        self.external_user_key = 'abcaaa'
+        # Setup three orgs and their SAML providers
+        self.org_key_list = ['test_org', 'donut_org', 'tri_org']
+        for org_key in self.org_key_list:
+            lms_org = OrganizationFactory(
+                short_name=org_key
+            )
+            SAMLProviderConfigFactory(
+                organization=lms_org,
+                slug=org_key,
+                enabled=True,
+            )
+        self.no_saml_org_key = 'no_saml_org'
+        self.no_saml_lms_org = OrganizationFactory(
+            short_name=self.no_saml_org_key
+        )
+
+    def _serialize_datetime(self, dt):
+        return dt.strftime('%Y-%m-%dT%H:%M:%S')
+
+    def test_initial_rendering(self):
+        response = self.client.get(self.url)
+        content = six.text_type(response.content, encoding='utf-8')
+        expected_organization_serialized = '"orgKeys": {}'.format(json.dumps(self.org_key_list))
+        assert response.status_code == 200
+        assert expected_organization_serialized in content
+        assert '"learnerInfo": {}' in content
+
+    def _construct_user(self, username, org_key=None, external_user_key=None):
+        """
+        Provided the username, create an edx account user. If the org_key is provided,
+        SSO link the user with the IdP associated with org_key. Return the created user and
+        expected user info object from the view
+        """
+        user = UserFactory(username=username)
+        user_info = {
+            'username': user.username,
+            'email': user.email
+        }
+        if org_key and external_user_key:
+            user_social_auth = UserSocialAuth.objects.create(
+                user=user,
+                uid='{0}:{1}'.format(org_key, external_user_key),
+                provider=org_key
+            )
+            user_info['external_user_key'] = external_user_key
+            user_info['SSO'] = {
+                'uid': user_social_auth.uid,
+                'provider': user_social_auth.provider
+            }
+        return user, user_info
+
+    def _construct_enrollments(self, program_uuids, course_ids, external_user_key, edx_user=None):
+        """
+        A helper function to setup the program enrollments for a given learner.
+        If the edx user is provided, it will try to SSO the user with the enrollments
+        Return the expected info object that should be created based on the model setup
+        """
+        expected_enrollments = []
+        for program_uuid in program_uuids:
+            expected_enrollment = {}
+            expected_course_enrollment = {}
+            course_enrollment = None
+            program_enrollment = ProgramEnrollmentFactory.create(
+                external_user_key=external_user_key,
+                program_uuid=program_uuid,
+                user=edx_user
+            )
+            expected_enrollment['program_enrollment'] = {
+                'created': self._serialize_datetime(
+                    program_enrollment.created
+                ),
+                'modified': self._serialize_datetime(
+                    program_enrollment.modified
+                ),
+                'program_uuid': program_enrollment.program_uuid,
+                'external_user_key': external_user_key,
+                'status': program_enrollment.status
+            }
+
+            for course_id in course_ids:
+                if edx_user:
+                    course_enrollment = CourseEnrollmentFactory.create(
+                        course_id=course_id,
+                        user=edx_user,
+                        mode=CourseMode.MASTERS,
+                        is_active=True
+                    )
+                    expected_course_enrollment = {
+                        'course_id': str(course_enrollment.course_id),
+                        'is_active': course_enrollment.is_active,
+                        'mode': course_enrollment.mode,
+                    }
+
+                program_course_enrollment = ProgramCourseEnrollmentFactory.create(
+                    program_enrollment=program_enrollment,
+                    course_key=course_id,
+                    course_enrollment=course_enrollment,
+                    status='active',
+                )
+                expected_program_course_enrollment = {
+                    'created': self._serialize_datetime(
+                        program_course_enrollment.created
+                    ),
+                    'modified': self._serialize_datetime(
+                        program_course_enrollment.modified
+                    ),
+                    'status': program_course_enrollment.status,
+                    'course_key': str(program_course_enrollment.course_key),
+                }
+                if expected_course_enrollment:
+                    expected_program_course_enrollment['course_enrollment'] = expected_course_enrollment
+
+                expected_enrollment.setdefault('program_course_enrollments', []).append(
+                    expected_program_course_enrollment
+                )
+
+            expected_enrollments.append(expected_enrollment)
+
+        return expected_enrollments
+
+    @patch_render
+    def test_search_username_well_connected_user(self, mocked_render):
+        created_user, expected_user_info = self._construct_user(
+            'test_user_connected',
+            self.org_key_list[0],
+            self.external_user_key
+        )
+        expected_enrollments = self._construct_enrollments(
+            [self.program_uuid],
+            [self.course.id],
+            self.external_user_key,
+            created_user
+        )
+        self.client.get(self.url, data={
+            'edx_user': created_user.username
+        })
+        expected_info = {
+            'user': expected_user_info,
+            'enrollments': expected_enrollments
+        }
+
+        render_call_dict = mocked_render.call_args[0][1]
+        assert expected_info == render_call_dict['learner_program_enrollments']
+
+    @patch_render
+    def test_search_username_user_not_connected(self, mocked_render):
+        created_user, expected_user_info = self._construct_user('user_not_connected')
+        self.client.get(self.url, data={
+            'edx_user': created_user.email
+        })
+        expected_info = {
+            'user': expected_user_info
+        }
+
+        render_call_dict = mocked_render.call_args[0][1]
+        assert expected_info == render_call_dict['learner_program_enrollments']
+
+    @patch_render
+    def test_search_username_user_no_enrollment(self, mocked_render):
+        created_user, expected_user_info = self._construct_user(
+            'user_connected',
+            self.org_key_list[0],
+            self.external_user_key
+        )
+        self.client.get(self.url, data={
+            'edx_user': created_user.email
+        })
+        expected_info = {
+            'user': expected_user_info
+        }
+
+        render_call_dict = mocked_render.call_args[0][1]
+        assert expected_info == render_call_dict['learner_program_enrollments']
+
+    @patch_render
+    def test_search_username_user_no_course_enrollment(self, mocked_render):
+        created_user, expected_user_info = self._construct_user(
+            'user_connected',
+            self.org_key_list[0],
+            self.external_user_key
+        )
+        expected_enrollments = self._construct_enrollments(
+            [self.program_uuid],
+            [],
+            self.external_user_key,
+            created_user,
+        )
+        self.client.get(self.url, data={
+            'edx_user': created_user.email
+        })
+        expected_info = {
+            'user': expected_user_info,
+            'enrollments': expected_enrollments
+        }
+
+        render_call_dict = mocked_render.call_args[0][1]
+        assert expected_info == render_call_dict['learner_program_enrollments']
+
+    @patch_render
+    def test_search_username_user_not_connected_with_enrollments(self, mocked_render):
+        created_user, expected_user_info = self._construct_user(
+            'user_not_connected'
+        )
+        self._construct_enrollments(
+            [self.program_uuid],
+            [],
+            self.external_user_key,
+        )
+        self.client.get(self.url, data={
+            'edx_user': created_user.email
+        })
+        expected_info = {
+            'user': expected_user_info,
+        }
+
+        render_call_dict = mocked_render.call_args[0][1]
+        assert expected_info == render_call_dict['learner_program_enrollments']

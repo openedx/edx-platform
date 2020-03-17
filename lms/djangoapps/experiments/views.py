@@ -27,7 +27,7 @@ class ExperimentCrossDomainSessionAuth(SessionAuthenticationAllowInactiveUser, S
 class ExperimentDataViewSet(viewsets.ModelViewSet):
     authentication_classes = (JwtAuthentication, ExperimentCrossDomainSessionAuth,)
     filter_backends = (DjangoFilterBackend,)
-    filter_class = filters.ExperimentDataFilter
+    filterset_class = filters.ExperimentDataFilter
     permission_classes = (permissions.IsAuthenticated, IsStaffOrOwner,)
     queryset = ExperimentData.objects.all()
     serializer_class = serializers.ExperimentDataSerializer
@@ -80,7 +80,7 @@ class ExperimentDataViewSet(viewsets.ModelViewSet):
 class ExperimentKeyValueViewSet(viewsets.ModelViewSet):
     authentication_classes = (JwtAuthentication, ExperimentCrossDomainSessionAuth,)
     filter_backends = (DjangoFilterBackend,)
-    filter_class = filters.ExperimentKeyValueFilter
+    filterset_class = filters.ExperimentKeyValueFilter
     permission_classes = (IsStaffOrReadOnly,)
     queryset = ExperimentKeyValue.objects.all()
     serializer_class = serializers.ExperimentKeyValueSerializer

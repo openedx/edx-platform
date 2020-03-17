@@ -136,7 +136,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
 
     def _schedule_factory(self, offset=None, **factory_kwargs):
         _, _, target_day, upgrade_deadline = self._get_dates(offset=offset)
-        factory_kwargs.setdefault('start', target_day)
+        factory_kwargs.setdefault('start_date', target_day)
         factory_kwargs.setdefault('upgrade_deadline', upgrade_deadline)
         factory_kwargs.setdefault('enrollment__course__self_paced', True)
         # Make all schedules in the same course
@@ -306,8 +306,12 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
     def test_site_config(self, this_org_list, other_org_list, expected_message_count, mock_ace):
         filtered_org = 'filtered_org'
         unfiltered_org = 'unfiltered_org'
-        this_config = SiteConfigurationFactory.create(values={'course_org_filter': this_org_list})
-        other_config = SiteConfigurationFactory.create(values={'course_org_filter': other_org_list})
+        this_config = SiteConfigurationFactory.create(
+            site_values={'course_org_filter': this_org_list}
+        )
+        other_config = SiteConfigurationFactory.create(
+            site_values={'course_org_filter': other_org_list}
+        )
 
         for config in (this_config, other_config):
             ScheduleConfigFactory.create(site=config.site)

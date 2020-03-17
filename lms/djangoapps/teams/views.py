@@ -4,6 +4,7 @@ HTTP endpoints for the Teams API.
 
 
 import logging
+from collections import Counter
 
 import six
 from django.conf import settings
@@ -11,12 +12,11 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render_to_response
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
-from django.views import View
 from django_countries import countries
 from edx_rest_framework_extensions.paginators import DefaultPagination, paginate_search_results
 from opaque_keys import InvalidKeyError
@@ -27,11 +27,12 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
-from rest_framework_oauth.authentication import OAuth2Authentication
+from openedx.core.lib.api.authentication import BearerAuthentication
 
 from lms.djangoapps.courseware.courses import get_course_with_access, has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
+from openedx.core.lib.teams_config import TeamsetType
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.permissions import IsStaffOrReadOnly
 from openedx.core.lib.api.view_utils import (
@@ -55,7 +56,7 @@ from .api import (
     has_team_api_access,
     user_organization_protection_status
 )
-from .csv import load_team_membership_csv
+from .csv import load_team_membership_csv, TeamMembershipImportManager
 from .errors import AlreadyOnTeamInCourse, ElasticSearchConnectionError, NotEnrolledInCourseForTeam
 from .search_indexes import CourseTeamIndexer
 from .serializers import (
@@ -67,7 +68,7 @@ from .serializers import (
 )
 from .utils import emit_team_event
 
-TEAM_MEMBERSHIPS_PER_PAGE = 2
+TEAM_MEMBERSHIPS_PER_PAGE = 5
 TOPICS_PER_PAGE = 12
 MAXIMUM_SEARCH_SIZE = 100000
 
@@ -86,6 +87,7 @@ def team_post_save_callback(sender, instance, **kwargs):  # pylint: disable=unus
                     six.text_type(changed_fields[field]),
                     six.text_type(getattr(instance, field))
                 )
+                truncated_fields['team_id'] = instance.team_id
                 truncated_fields['team_id'] = instance.team_id
                 truncated_fields['field'] = field
 
@@ -136,6 +138,10 @@ class TeamsDashboardView(GenericAPIView):
         topics = get_alphabetical_topics(course)
         organization_protection_status = user_organization_protection_status(request.user, course_key)
 
+        # We have some frontend logic that needs to know if we have any open, public, or managed teamsets,
+        # and it's easier to just figure that out here when we have them all already
+        teamset_counts_by_type = Counter([topic['type'] for topic in topics])
+
         # Paginate and serialize topic data
         # BulkTeamCountPaginatedTopicSerializer will add team counts to the topics in a single
         # bulk operation per page.
@@ -159,7 +165,7 @@ class TeamsDashboardView(GenericAPIView):
             is_user_org_protected = organization_protection_status == OrganizationProtectionStatus.protected
             filter_query['organization_protected'] = is_user_org_protected
 
-        user_teams = CourseTeam.objects.filter(**filter_query)
+        user_teams = CourseTeam.objects.filter(**filter_query).order_by('-last_activity_at', 'team_size')
         user_teams_data = self._serialize_and_paginate(
             MyTeamsPagination,
             user_teams,
@@ -180,6 +186,12 @@ class TeamsDashboardView(GenericAPIView):
                 "staff": bool(has_access(user, 'staff', course_key)),
                 "teams": user_teams_data
             },
+            "has_open_teamset": bool(teamset_counts_by_type[TeamsetType.open.value]),
+            "has_public_managed_teamset": bool(teamset_counts_by_type[TeamsetType.public_managed.value]),
+            "has_managed_teamset": bool(
+                teamset_counts_by_type[TeamsetType.public_managed.value] +
+                teamset_counts_by_type[TeamsetType.private_managed.value]
+            ),
             "topic_url": reverse(
                 'topics_detail', kwargs={'topic_id': 'topic_id', 'course_id': str(course_id)}, request=request
             ),
@@ -367,8 +379,8 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             If the specified course does not exist, a 404 error is returned.
     """
 
-    # OAuth2Authentication must come first to return a 401 for unauthenticated users
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    # BearerAuthentication must come first to return a 401 for unauthenticated users
+    authentication_classes = (BearerAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = CourseTeamSerializer
 
@@ -419,6 +431,9 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                     topic_id=topic_id
                 )
                 return Response(error, status=status.HTTP_400_BAD_REQUEST)
+
+            if course_module.teamsets_by_id[topic_id].is_private_managed:
+                result_filter.update({'membership__user__username': request.user})
             result_filter.update({'topic_id': topic_id})
 
         organization_protection_status = user_organization_protection_status(
@@ -467,7 +482,19 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             'open_slots': ('team_size', '-last_activity_at'),
             'last_activity_at': ('-last_activity_at', 'team_size'),
         }
-        queryset = CourseTeam.objects.filter(**result_filter)
+
+        if not has_access(request.user, 'staff', course_key):
+            # hide private_managed courses from non-admin users that aren't members of those teams
+            private_topic_ids = [ts.teamset_id for ts in course_module.teamsets if
+                                 ts.is_private_managed]
+            public_teams = CourseTeam.objects.filter(**result_filter).exclude(
+                topic_id__in=private_topic_ids)
+            private_managed_teams_of_user = CourseTeam.objects.filter(topic_id__in=private_topic_ids,
+                                                                      membership__user__username=request.user)
+            queryset = public_teams | private_managed_teams_of_user
+        else:
+            queryset = CourseTeam.objects.filter(**result_filter)
+
         order_by_input = request.query_params.get('order_by', 'name')
         if order_by_input not in ordering_schemes:
             return Response(
@@ -527,7 +554,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         topic_id = request.data.get('topic_id')
-        if not can_user_create_team_in_topic(request.user, course_id, topic_id):
+        if not can_user_create_team_in_topic(request.user, course_key, topic_id):
             return Response(
                 build_api_error(ugettext_noop("You can't create a team in an instructor managed topic.")),
                 status=status.HTTP_403_FORBIDDEN
@@ -696,7 +723,7 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
             If the user is logged in and the team does not exist, a 404 is returned.
 
     """
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    authentication_classes = (BearerAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsStaffOrPrivilegedOrReadOnly, IsEnrolledOrIsStaff,)
     lookup_field = 'team_id'
     serializer_class = CourseTeamSerializer
@@ -791,9 +818,10 @@ class TopicListView(GenericAPIView):
                   those teams whose members are outside of institutions affliation.
     """
 
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    authentication_classes = (BearerAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
     pagination_class = TopicsPagination
+    queryset = []
 
     def get(self, request):
         """GET /api/team/v0/topics/?course_id={course_id}"""
@@ -922,7 +950,7 @@ class TopicDetailView(APIView):
                   those teams whose members are outside of institutions affliation.
     """
 
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    authentication_classes = (BearerAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, topic_id, course_id):
@@ -1082,7 +1110,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
             another user to a team.
     """
 
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    authentication_classes = (BearerAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = MembershipSerializer
 
@@ -1295,7 +1323,7 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
             If the membership does not exist, a 404 error is returned.
     """
 
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    authentication_classes = (BearerAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
     serializer_class = MembershipSerializer
@@ -1360,12 +1388,14 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class MembershipBulkManagementView(View):
+class MembershipBulkManagementView(GenericAPIView):
     """
-    Partially-implemented view for uploading and downloading team membership CSVs.
+    View for uploading and downloading team membership CSVs.
+    """
 
-    TODO MST-31
-    """
+    authentication_classes = (BearerAuthentication, SessionAuthentication)
+    permission_classes = (permissions.IsAuthenticated,)
+
     def get(self, request, **_kwargs):
         """
         Download CSV with team membership data for given course run.
@@ -1384,7 +1414,18 @@ class MembershipBulkManagementView(View):
         Process uploaded CSV to modify team memberships for given course run.
         """
         self.check_access()
-        return HttpResponse(status=status.HTTP_501_NOT_IMPLEMENTED)
+
+        inputfile_handle = request.FILES['csv']
+        team_import_manager = TeamMembershipImportManager(self.course)
+        team_import_manager.set_team_membership_from_csv(inputfile_handle)
+
+        if team_import_manager.import_succeeded:
+            msg = "{} learners were assigned to teams.".format(team_import_manager.number_of_learners_assigned)
+            return JsonResponse({'message': msg}, status=status.HTTP_201_CREATED)
+        else:
+            return JsonResponse({
+                'errors': team_import_manager.validation_errors
+            }, status=status.HTTP_400_BAD_REQUEST)
 
     def check_access(self):
         """

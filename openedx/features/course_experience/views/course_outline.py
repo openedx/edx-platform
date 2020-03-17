@@ -5,19 +5,26 @@ Views to show a course outline.
 
 import datetime
 import re
+import six
 
 from completion import waffle as completion_waffle
 from django.contrib.auth.models import User
+from django.shortcuts import redirect
 from django.template.context_processors import csrf
 from django.template.loader import render_to_string
+from django.urls import reverse
+from django.views.decorators.csrf import ensure_csrf_cookie
+import edx_when.api as edx_when_api
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from waffle.models import Switch
 from web_fragments.fragment import Fragment
 
+from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_overview_with_access
+from lms.djangoapps.courseware.masquerade import setup_masquerade
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
-from student.models import CourseEnrollment
+from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 from util.milestones_helpers import get_course_content_milestones
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 from xmodule.modulestore.django import modulestore
@@ -70,6 +77,10 @@ class CourseOutlineFragmentView(EdxFragmentView):
         page_context = kwargs.get('page_context', None)
         if page_context:
             context['self_paced'] = page_context.get('pacing_type', 'instructor_paced') == 'self_paced'
+
+        # We're using this flag to prevent old self-paced dates from leaking out on courses not
+        # managed by edx-when.
+        context['in_edx_when'] = edx_when_api.is_enabled_for_course(course_key)
 
         html = render_to_string('course_experience/course-outline-fragment.html', context)
         return Fragment(html)
@@ -149,3 +160,24 @@ class CourseOutlineFragmentView(EdxFragmentView):
         if children:
             children[0]['resume_block'] = True
             self.mark_first_unit_to_resume(children[0])
+
+
+@ensure_csrf_cookie
+def reset_course_deadlines(request, course_id):
+    """
+    Set the start_date of a schedule to today, which in turn will adjust due dates for
+    sequentials belonging to a self paced course
+    """
+    course_key = CourseKey.from_string(course_id)
+    masquerade_details, masquerade_user = setup_masquerade(
+        request,
+        course_key,
+        has_access(request.user, 'staff', course_key)
+    )
+    if masquerade_details and masquerade_details.role == 'student' and masquerade_details.user_name:
+        # Masquerading as a specific student, so reset that student's schedule
+        user = masquerade_user
+    else:
+        user = request.user
+    reset_self_paced_schedule(user, course_key)
+    return redirect(reverse('openedx.course_experience.course_home', args=[six.text_type(course_key)]))

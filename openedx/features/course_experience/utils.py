@@ -3,28 +3,14 @@ Common utilities for the course experience, including course outline.
 """
 
 
-import logging
-
 from completion.models import BlockCompletion
-from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import CourseKey
 from six.moves import range
-from web_fragments.fragment import Fragment
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
-from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
-from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.cache_utils import request_cached
-from openedx.features.discounts.applicability import (
-    can_receive_discount,
-    get_discount_expiration_date,
-    discount_percentage
-)
-from openedx.features.discounts.utils import format_strikeout_price
 from xmodule.modulestore.django import modulestore
-
-log = logging.getLogger(__name__)
 
 
 @request_cached()
@@ -48,16 +34,7 @@ def get_course_outline_block_tree(request, course_id, user=None):
 
         for i in range(len(children)):
             child_id = block['children'][i]
-            try:
-                child_detail = populate_children(all_blocks[child_id], all_blocks)
-            except TypeError:
-                if u"MITx+6.002x+MITx_2012_Alumni" in course_outline_root_block['id']:
-                    log.info(u"PopulateChildrenError for Child: {child} in block:{block} at index:{index}".format(
-                        child=child_id,
-                        block=block['id'],
-                        index=i
-                    ))
-                raise
+            child_detail = populate_children(all_blocks[child_id], all_blocks)
             block['children'][i] = child_detail
 
         return block
@@ -159,6 +136,21 @@ def get_course_outline_block_tree(request, course_id, user=None):
             block['scored'] = False
             return False
 
+    def recurse_num_graded_problems(block):
+        """
+        Marks each block with the number of graded and scored leaf blocks below it as 'num_graded_problems'
+
+        Must be run after recurse_mark_scored.
+        """
+        children = block.get('children', [])
+        if children:
+            num_graded_problems = sum(recurse_num_graded_problems(child) for child in children)
+        else:
+            num_graded_problems = 1 if block.get('scored') and block.get('graded') else 0
+
+        block['num_graded_problems'] = num_graded_problems
+        return num_graded_problems
+
     def recurse_mark_auth_denial(block):
         """
         Mark this block as 'scored' if any of its descendents are 'scored' (that is, 'has_score' and 'weight' > 0).
@@ -215,6 +207,7 @@ def get_course_outline_block_tree(request, course_id, user=None):
     if course_outline_root_block:
         populate_children(course_outline_root_block, all_blocks['blocks'])
         recurse_mark_scored(course_outline_root_block)
+        recurse_num_graded_problems(course_outline_root_block)
         recurse_mark_auth_denial(course_outline_root_block)
         if user:
             set_last_accessed_default(course_outline_root_block)

@@ -86,6 +86,8 @@ module.exports = Merge.smart({
             EntitlementSupportPage: './lms/djangoapps/support/static/support/jsx/entitlements/index.jsx',
             LinkProgramEnrollmentsSupportPage: './lms/djangoapps/support/static/support/jsx/' +
                                                'program_enrollments/index.jsx',
+            ProgramEnrollmentsInspectorPage: './lms/djangoapps/support/static/support/jsx/' +
+                                               'program_enrollments/inspector.jsx',
             PasswordResetConfirmation: './lms/static/js/student_account/components/PasswordResetConfirmation.jsx',
             StudentAccountDeletion: './lms/static/js/student_account/components/StudentAccountDeletion.jsx',
             StudentAccountDeletionInitializer: './lms/static/js/student_account/StudentAccountDeletionInitializer.js',

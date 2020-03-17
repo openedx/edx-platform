@@ -11,8 +11,8 @@ mocks in the view tests.
 
 from uuid import UUID
 
-from organizations.tests.factories import OrganizationFactory
 from django.core.cache import cache
+from organizations.tests.factories import OrganizationFactory
 
 from lms.djangoapps.program_enrollments.constants import ProgramEnrollmentStatuses as PEStatuses
 from lms.djangoapps.program_enrollments.models import ProgramEnrollment
@@ -22,9 +22,7 @@ from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from third_party_auth.tests.factories import SAMLProviderConfigFactory
 
-from ..writing import (
-    write_program_enrollments
-)
+from ..writing import write_program_enrollments
 
 
 class WritingProgramEnrollmentTest(CacheIsolationTestCase):
@@ -57,19 +55,23 @@ class WritingProgramEnrollmentTest(CacheIsolationTestCase):
 
     def test_write_program_enrollments_status_ended(self):
         """
-        Successfully updates program enrollment to status ended if requested
+        Successfully updates program enrollment to status ended if requested.
+        This also validates history records are created on both create and update.
         """
         assert ProgramEnrollment.objects.count() == 0
+        assert ProgramEnrollment.historical_records.count() == 0  # pylint: disable=no-member
         write_program_enrollments(self.program_uuid_x, [{
             'external_user_key': self.user_0,
             'status': PEStatuses.PENDING,
             'curriculum_uuid': self.curriculum_uuid_a,
         }], True, False)
         assert ProgramEnrollment.objects.count() == 1
+        assert ProgramEnrollment.historical_records.count() == 1  # pylint: disable=no-member
         write_program_enrollments(self.program_uuid_x, [{
             'external_user_key': self.user_0,
             'status': PEStatuses.ENDED,
             'curriculum_uuid': self.curriculum_uuid_a,
         }], False, True)
         assert ProgramEnrollment.objects.count() == 1
+        assert ProgramEnrollment.historical_records.count() == 2  # pylint: disable=no-member
         assert ProgramEnrollment.objects.filter(status=PEStatuses.ENDED).exists()

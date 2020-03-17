@@ -25,7 +25,7 @@ class RawMixin(object):
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
-        pre_tag_data = [etree.tostring(pre_tag_info) for pre_tag_info in xml_object.findall('pre')]
+        pre_tag_data = [etree.tostring(pre_tag_info) for pre_tag_info in xml_object.findall('.//pre')]
         data = etree.tostring(xml_object, pretty_print=True, encoding='unicode')
         if pre_tag_data:
             for index, pre_tag in enumerate(re.findall(PRE_TAG_REGEX, data)):

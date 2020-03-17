@@ -165,6 +165,24 @@ class TestVideo(BaseTestVideoXBlock):
         status_codes = {response.status_code for response in responses.values()}
         self.assertEqual(status_codes.pop(), 404)
 
+    def test_handle_ajax_for_speed_with_nan(self):
+        self.item_descriptor.handle_ajax('save_user_state', {'speed': json.dumps(1.0)})
+        self.assertEqual(self.item_descriptor.speed, 1.0)
+        self.assertEqual(self.item_descriptor.global_speed, 1.0)
+
+        # try to set NaN value for speed.
+        response = self.item_descriptor.handle_ajax(
+            'save_user_state', {'speed': json.dumps(float('NaN'))}
+        )
+
+        self.assertFalse(json.loads(response)['success'])
+        expected_error = u"Invalid speed value nan, must be a float."
+        self.assertEqual(json.loads(response)['error'], expected_error)
+
+        # verify that the speed and global speed are still 1.0
+        self.assertEqual(self.item_descriptor.speed, 1.0)
+        self.assertEqual(self.item_descriptor.global_speed, 1.0)
+
     def test_handle_ajax(self):
 
         data = [

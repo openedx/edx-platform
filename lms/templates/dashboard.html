@@ -294,15 +294,6 @@ from student.models import CourseEnrollment
             <div class="user-info">
               <ul>
 
-                % if len(order_history_list):
-                <li class="order-history">
-                  <span class="title">${_("Order History")}</span>
-                  % for order_history_item in order_history_list:
-                    <span><a href="${order_history_item['receipt_url']}" rel="noopener" target="_blank" class="edit-name">${order_history_item['order_date']}</a></span>
-                  % endfor
-                </li>
-                % endif
-
                 <%include file="${static.get_template_path('dashboard/_dashboard_status_verification.html')}" />
 
               </ul>

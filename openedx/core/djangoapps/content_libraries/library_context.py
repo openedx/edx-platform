@@ -4,6 +4,9 @@ Definition of "Library" as a learning context.
 
 import logging
 
+from django.core.exceptions import PermissionDenied
+
+from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.djangoapps.content_libraries.library_bundle import (
     LibraryBundle,
     bundle_uuid_for_library_key,
@@ -30,29 +33,45 @@ class LibraryContextImpl(LearningContext):
     def can_edit_block(self, user, usage_key):
         """
         Does the specified usage key exist in its context, and if so, does the
-        specified user (which may be an AnonymousUser) have permission to edit
-        it?
+        specified user have permission to edit it (make changes to the authored
+        data store)?
+
+        user: a Django User object (may be an AnonymousUser)
+
+        usage_key: the UsageKeyV2 subclass used for this learning context
 
         Must return a boolean.
         """
+        try:
+            api.require_permission_for_library_key(usage_key.lib_key, user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
+        except PermissionDenied:
+            return False
         def_key = self.definition_for_usage(usage_key)
         if not def_key:
             return False
-        # TODO: implement permissions
         return True
 
     def can_view_block(self, user, usage_key):
         """
         Does the specified usage key exist in its context, and if so, does the
-        specified user (which may be an AnonymousUser) have permission to view
-        it and interact with it (call handlers, save user state, etc.)?
+        specified user have permission to view it and interact with it (call
+        handlers, save user state, etc.)?
+
+        user: a Django User object (may be an AnonymousUser)
+
+        usage_key: the UsageKeyV2 subclass used for this learning context
 
         Must return a boolean.
         """
+        try:
+            api.require_permission_for_library_key(
+                usage_key.lib_key, user, permissions.CAN_LEARN_FROM_THIS_CONTENT_LIBRARY,
+            )
+        except PermissionDenied:
+            return False
         def_key = self.definition_for_usage(usage_key)
         if not def_key:
             return False
-        # TODO: implement permissions
         return True
 
     def definition_for_usage(self, usage_key, **kwargs):

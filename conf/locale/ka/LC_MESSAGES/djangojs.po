@@ -56,7 +56,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-01-05 20:42+0000\n"
+"POT-Creation-Date: 2020-03-08 20:42+0000\n"
 "PO-Revision-Date: 2019-09-29 20:43+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/)\n"
@@ -2360,11 +2360,23 @@ msgid "Masters"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "MicroMasters"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "MicroBachelors"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Photo Verification"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Proctoring"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Security"
 msgstr ""
 
 #: cms/templates/js/asset-library.underscore
@@ -2645,8 +2657,8 @@ msgid "Cannot join instructor managed team"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
-msgid "{memberCount} / {maxMemberCount} Member"
-msgid_plural "{memberCount} / {maxMemberCount} Members"
+msgid " Member"
+msgid_plural " Members"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -2663,19 +2675,13 @@ msgid "Topics"
 msgstr "თემები"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "My Team"
-msgstr "ჩემი გუნდი"
+msgid "My Teams"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Browse"
 msgstr "დათვალიერება"
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid ""
-"See all teams in your course, organized by topic. Join a team to collaborate"
-" with other learners who are interested in the same topic as you are."
-msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Your request could not be completed. Reload the page and try again."
@@ -2736,6 +2742,23 @@ msgstr ""
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Search teams"
 msgstr "გუნდების ძებნა"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"See all teams you belong to and all public teams in your course, organized "
+"by topic. Join an open public team to collaborate with other learners who "
+"are interested in the same topic as you are."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"See all teams you belong to and all public teams in your course, organized "
+"by topic."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "See all teams you belong to."
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 #: lms/djangoapps/discussion/static/discussion/templates/fake-breadcrumbs.underscore
@@ -5096,28 +5119,6 @@ msgstr ""
 "თქვენ არ შეგიძლიათ კურსისნახვა როგორც სტუდენტს ან ბეტა ტესტერს კურსის "
 "გამოშვების თარიღამდე."
 
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "%(num_students)s student opened Subsection"
-msgid_plural "%(num_students)s students opened Subsection"
-msgstr[0] "ქვეგანყოფილება გახსნა %(num_students)s სტუდენტმა"
-msgstr[1] "ქვეგანყოფილება გახსნა %(num_students)s სტუდენტმა"
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "%(num_students)s student"
-msgid_plural "%(num_students)s students"
-msgstr[0] "%(num_students)s სტუდენტი"
-msgstr[1] "%(num_students)s სტუდენტი"
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "%(num_questions)s question"
-msgid_plural "%(num_questions)s questions"
-msgstr[0] "%(num_questions)s შეკითხვა"
-msgstr[1] "%(num_questions)s შეკითხვა"
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "Number of Students"
-msgstr "სტუდენტების რაოდენობა"
-
 #: lms/templates/courseware/progress_graph.js
 msgid "Overall Score"
 msgstr "საერთო შეფასება"
@@ -7052,6 +7053,10 @@ msgstr ""
 msgid "Upload Memberships"
 msgstr ""
 
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Error assigning team memberships"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
 msgid "Are you having trouble finding a team to join?"
 msgstr ""
@@ -8220,11 +8225,9 @@ msgstr "ვერბკამერა"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"You need a computer that has a webcam. When you receive a browser prompt, "
-"make sure that you allow access to the camera."
+"You need a computer or cell phone that has a webcam. When you receive a "
+"browser prompt, make sure that you allow access to the camera."
 msgstr ""
-"თქვენ გესაჭიროებათ კომპიუტერი, რომელსაც აქვს ვებკამერა. ბრაუზერის მიერ "
-"შეტყობინების ჩვენებისას, დარწმუნდით, რომ ვებ -კამერაზე წვდმას ადასტურებთ."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "Photo Identification"
@@ -8245,11 +8248,9 @@ msgstr "გადაიღეთ ფოტო"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"When your face is in position, use the camera button {icon} below to take "
-"your photo."
+"When your face is in position, use the Take Photo button {icon} below to "
+"take your photo."
 msgstr ""
-"როდესაც თქვენი სახე სრულად გამოჩნდება, ფოტოს გადასაღებად დააჭირეთ ქვემოთ "
-"განთავსებულ კამერის ღილაკს {icon}."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "To take a successful photo, make sure that:"
@@ -8269,11 +8270,9 @@ msgstr "თქვენი ფოტო ემთხვევა პირად
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"To use the current photo, select the camera button {icon}. To take another "
-"photo, select the retake button {icon}."
+"To use the current photo, select the Take Photo button {icon}. To take "
+"another photo, select the Retake Photo button {icon}."
 msgstr ""
-"არსებული ფოტოს გამოყენებისათვის, აირჩიეთ  კამერის ღილაკი {icon}. ახალი ფოტოს"
-" გადასაღებად, აირჩიეთ ფოტოს ხელმეორედ გადაღების ღილაკი {icon}."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8325,6 +8324,50 @@ msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"What if I can't see the camera image, or if I can't see my photo do "
+"determine which side is visible?"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"You may be able to complete the image capture procedure without assistance, "
+"but it may take a couple of submission attempts to get the camera "
+"positioning right.  Optimal camera positioning varies with each computer, "
+"but generally the best position for a headshot is approximately 12-18 inches"
+" (30-45 centimeters) from the camera, with your head centered relative to "
+"the computer screen. "
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"If the photos you submit are rejected, try moving the computer or camera "
+"orientation to change the lighting angle.  The most common reason for "
+"rejection is inability to read the text on the ID card."
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"What if I have difficulty holding my head in position relative to the "
+"camera?"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+#, python-format
+msgid ""
+"If you require assistance with taking either photo for submission, contact "
+"%(platformName)s support for additional suggestions."
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
@@ -8368,15 +8411,28 @@ msgstr ""
 "განათებული"
 
 #: lms/templates/verify_student/id_photo_step.underscore
-msgid "Once in position, use the camera button {icon} to capture your ID"
+msgid "Once in position, use the Take Photo button {icon} to capture your ID"
 msgstr ""
-"როცა მზად იქნებით, გამოიყენეთ კამერის ღილაკი {icon} თქვენი პიდარობის "
-"მოწმობის გადასაღებად"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Use the retake photo button if you are not pleased with your photo"
-msgstr "თუ ფოტო არ მოგეწონებათ, გამოიყენეთ ფოტოს ხელმეორედ გადაღების ღილაკი"
+msgid "Use the Retake Photo button if you are not pleased with your photo"
+msgstr ""
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid ""
+"You may be able to complete the image capture procedure without assistance, "
+"but it may take a couple of submission attempts to get the camera "
+"positioning right.  Optimal camera positioning varies with each computer, "
+"but generally, the best position for a photo of an ID card is 8-12 inches "
+"(20-30 centimeters) from the camera, with the ID card centered relative to "
+"the camera. "
+msgstr ""
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid ""
+"What if I have difficulty holding my ID in position relative to the camera?"
+msgstr ""
 
 #: lms/templates/verify_student/image_input.underscore
 msgid "Preview of uploaded image"
@@ -8403,10 +8459,9 @@ msgid "Be sure your entire face is inside the frame"
 msgstr "დარწმუნდით, რომ სახე მთლიანად არის ჩარჩოში მოქცეული"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Once in position, use the camera button {icon} to capture your photo"
+msgid ""
+"Once in position, use the Take Photo button {icon} to capture your photo"
 msgstr ""
-"როგორც კი საჭირო მდგომარეობას დაიჭერთ, ფოტოს გადასაღებად გამოიყენეთ კამერის "
-"ღილაკი {icon}"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Can we match the photo you took with the one on your ID?"

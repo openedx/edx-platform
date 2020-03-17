@@ -21,6 +21,7 @@ from six import text_type
 from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
+from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Boolean, Integer, List, Scope, String
 
 from .exceptions import NotFoundError
@@ -503,9 +504,9 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         render_items = not context.get('exclude_units', False)
         is_user_authenticated = self.is_user_authenticated(context)
         completion_service = self.runtime.service(self, 'completion')
-        if render_items:
+        try:
             bookmarks_service = self.runtime.service(self, 'bookmarks')
-        else:
+        except NoSuchServiceError:
             bookmarks_service = None
         context['username'] = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(
             'edx-platform.username')
@@ -519,17 +520,10 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             item_type = item.get_icon_class()
             usage_id = item.scope_ids.usage_id
 
-            if item_type == 'problem' and not is_user_authenticated:
-                log.info(
-                    'Problem [%s] was not rendered because anonymous access is not allowed for graded content',
-                    usage_id
-                )
-                continue
-
             show_bookmark_button = False
             is_bookmarked = False
 
-            if is_user_authenticated and render_items:
+            if is_user_authenticated and bookmarks_service:
                 show_bookmark_button = True
                 is_bookmarked = bookmarks_service.is_bookmarked(usage_key=usage_id)
 

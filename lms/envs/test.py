@@ -274,15 +274,8 @@ THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = {
     },
 }
 
-OPENID_CREATE_USERS = False
-OPENID_UPDATE_DETAILS_FROM_SREG = True
-OPENID_USE_AS_ADMIN_LOGIN = False
-OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
-
 ############################## OAUTH2 Provider ################################
 FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
-# don't cache courses for testing
-OIDC_COURSE_HANDLER_CACHE_TIMEOUT = 0
 OAUTH_ENFORCE_SECURE = False
 
 ########################### External REST APIs #################################
@@ -484,7 +477,7 @@ PROFILE_IMAGE_BACKEND = {
 }
 PROFILE_IMAGE_DEFAULT_FILENAME = 'default'
 PROFILE_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
-PROFILE_IMAGE_SECRET_KEY = 'secret'
+PROFILE_IMAGE_HASH_SEED = 'secret'
 PROFILE_IMAGE_MAX_BYTES = 1024 * 1024
 PROFILE_IMAGE_MIN_BYTES = 100
 
@@ -593,9 +586,14 @@ PDF_RECEIPT_TAX_ID_LABEL = 'Tax ID'
 PROFILE_MICROFRONTEND_URL = "http://profile-mfe/abc/"
 ORDER_HISTORY_MICROFRONTEND_URL = "http://order-history-mfe/"
 ACCOUNT_MICROFRONTEND_URL = "http://account-mfe/"
+LEARNING_MICROFRONTEND_URL = "http://learning-mfe"
 
 ########################## limiting dashboard courses ######################
 
 DASHBOARD_COURSE_LIMIT = 250
 
 PROCTORING_SETTINGS = {}
+
+############### Settings for Django Rate limit #####################
+
+RATELIMIT_RATE = '2/m'

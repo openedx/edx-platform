@@ -9,7 +9,7 @@ define([
         describe('MultipleEnterpriseInterface', function() {
             var LEARNER_URL = '/enterprise/api/v1/enterprise-learner/?username=test-learner',
                 NEXT_URL = '/dashboard',
-                REDIRECT_URL = '/enterprise/select/active/?success_url=/dashboard';
+                REDIRECT_URL = '/enterprise/select/active/?success_url=%2Fdashboard';
 
             beforeEach(function() {
                 // Mock the redirect call

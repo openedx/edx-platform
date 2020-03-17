@@ -171,11 +171,14 @@ class CourseEntitlement(TimeStampedModel):
         blank=True,
         on_delete=models.CASCADE,
     )
-    order_number = models.CharField(max_length=128, null=True, blank=True)
+    order_number = models.CharField(max_length=128, default=None, null=True)
     refund_locked = models.BooleanField(default=False)
     _policy = models.ForeignKey(CourseEntitlementPolicy, null=True, blank=True, on_delete=models.CASCADE)
 
     history = HistoricalRecords()
+
+    class Meta:
+        unique_together = ('course_uuid', 'order_number')
 
     @property
     def expired_at_datetime(self):
@@ -441,7 +444,7 @@ class CourseEntitlement(TimeStampedModel):
         refund_successful = refund_entitlement(course_entitlement=self)
         if not refund_successful:
             # This state is achieved in most cases by a failure in the ecommerce service to process the refund.
-            log.warn(
+            log.warning(
                 u'Entitlement Refund failed for Course Entitlement [%s], alert User',
                 self.uuid
             )
@@ -499,7 +502,7 @@ class CourseEntitlementSupportDetail(TimeStampedModel):
         null=True,
         blank=True,
         db_constraint=False,
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
     )
 
     history = HistoricalRecords()

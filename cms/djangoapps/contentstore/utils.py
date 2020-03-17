@@ -4,11 +4,13 @@ Common utility functions useful throughout the contentstore
 
 
 import logging
+from contextlib import contextmanager
 from datetime import datetime
 
 import six
 from django.conf import settings
 from django.urls import reverse
+from django.utils import translation
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocator
@@ -581,3 +583,19 @@ def get_sibling_urls(subsection):
     if next_loc:
         next_url = reverse_usage_url('container_handler', next_loc)
     return prev_url, next_url
+
+
+@contextmanager
+def translation_language(language):
+    """Context manager to override the translation language for the scope
+    of the following block. Has no effect if language is None.
+    """
+    if language:
+        previous = translation.get_language()
+        translation.activate(language)
+        try:
+            yield
+        finally:
+            translation.activate(previous)
+    else:
+        yield

@@ -61,7 +61,7 @@ class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, TestCase):
         'course1'
     )
     def test_get_course_org_filter_equal(self, course_org_filter):
-        self.site_config.values['course_org_filter'] = course_org_filter
+        self.site_config.site_values['course_org_filter'] = course_org_filter
         self.site_config.save()
         mock_query = Mock()
         result = self.resolver.filter_by_org(mock_query)
@@ -73,7 +73,7 @@ class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, TestCase):
         (['course1', 'course2'], ['course1', 'course2'])
     )
     def test_get_course_org_filter_include__in(self, course_org_filter, expected_org_list):
-        self.site_config.values['course_org_filter'] = course_org_filter
+        self.site_config.site_values['course_org_filter'] = course_org_filter
         self.site_config.save()
         mock_query = Mock()
         result = self.resolver.filter_by_org(mock_query)
@@ -88,7 +88,7 @@ class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, TestCase):
     )
     def test_get_course_org_filter_exclude__in(self, course_org_filter, expected_org_list):
         SiteConfigurationFactory.create(
-            values={'course_org_filter': course_org_filter},
+            site_values={'course_org_filter': course_org_filter}
         )
         mock_query = Mock()
         result = self.resolver.filter_by_org(mock_query)
@@ -120,7 +120,7 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
         return CourseUpdateResolver(
             async_send_task=Mock(name='async_send_task'),
             site=self.site_config.site,
-            target_datetime=enrollment.schedule.start,
+            target_datetime=enrollment.schedule.start_date,
             day_offset=-7,
             bin_num=CourseUpdateResolver.bin_num_for_user_id(self.user.id),
         )
@@ -147,7 +147,7 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
             'week_highlights': ['good stuff'],
             'week_num': 1,
         }
-        self.assertEqual(schedules, [(self.user, None, expected_context)])
+        self.assertEqual(schedules, [(self.user, None, expected_context, True)])
 
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     @override_switch('schedules.course_update_show_unsubscribe', True)
@@ -155,3 +155,15 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
         resolver = self.create_resolver()
         schedules = list(resolver.schedules_for_bin())
         self.assertIn('optout', schedules[0][2]['unsubscribe_url'])
+
+    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
+    def test_get_schedules_with_target_date_by_bin_and_orgs_filter_inactive_users(self):
+        """Tests that schedules of inactive users are excluded"""
+        resolver = self.create_resolver()
+        schedules = resolver.get_schedules_with_target_date_by_bin_and_orgs()
+
+        self.assertEqual(schedules.count(), 1)
+        self.user.is_active = False
+        self.user.save()
+        schedules = resolver.get_schedules_with_target_date_by_bin_and_orgs()
+        self.assertEqual(schedules.count(), 0)

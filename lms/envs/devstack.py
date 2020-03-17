@@ -67,7 +67,7 @@ DJFS = {
 ################################ DEBUG TOOLBAR ################################
 
 INSTALLED_APPS += ['debug_toolbar']
-MIDDLEWARE_CLASSES += [
+MIDDLEWARE += [
     'lms.djangoapps.discussion.django_comment_client.utils.QueryCountDebugMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
@@ -140,7 +140,6 @@ CC_PROCESSOR = {
 
 ########################### External REST APIs #################################
 FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
-OAUTH_OIDC_ISSUER = 'http://127.0.0.1:8000/oauth2'
 FEATURES['ENABLE_MOBILE_REST_API'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
 
@@ -220,6 +219,9 @@ FEATURES['ENABLE_COSMETIC_DISPLAY_PRICE'] = True
 ######################### Program Enrollments #####################
 FEATURES['ENABLE_ENROLLMENT_RESET'] = True
 
+######################### New Courseware MFE #####################
+FEATURES['ENABLE_COURSEWARE_MICROFRONTEND'] = True
+
 ########################## Third Party Auth #######################
 
 if FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and 'third_party_auth.dummy.DummyBackend' not in AUTHENTICATION_BACKENDS:
@@ -245,7 +247,7 @@ LOGIN_REDIRECT_WHITELIST = [CMS_BASE]
 ###################### JWTs ######################
 # pylint: disable=unicode-format-string
 JWT_AUTH.update({
-    'JWT_ISSUER': OAUTH_OIDC_ISSUER,
+    'JWT_ISSUER': 'http://127.0.0.1:8000/oauth2',
     'JWT_AUDIENCE': 'lms-key',
     'JWT_SECRET_KEY': 'lms-secret',
     'JWT_SIGNING_ALGORITHM': 'RS512',
@@ -293,3 +295,6 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
 EDXNOTES_INTERNAL_API = 'http://edx.devstack.edxnotesapi:18120/api/v1'
 EDXNOTES_CLIENT_NAME = 'edx_notes_api-backend-service'
+
+############## Settings for Microfrontends  #########################
+LEARNING_MICROFRONTEND_URL = 'http://localhost:2000'

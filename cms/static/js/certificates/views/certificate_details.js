@@ -61,11 +61,13 @@ function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, Vie
                 index: this.model.collection.indexOf(this.model),
                 showDetails: this.showDetails || showDetails || false
             });
+            // xss-lint: disable=javascript-jquery-html
             this.$el.html(_.template(certificateDetailsTemplate)(attrs));
             if (this.showDetails || showDetails) {
                 var self = this;
                 this.model.get('signatories').each(function(modelSignatory) {
                     var signatory_detail_view = new SignatoryDetailsView({model: modelSignatory});
+                    // xss-lint: disable=javascript-jquery-append
                     self.$('div.signatory-details-list').append($(signatory_detail_view.render().$el));
                 });
             }

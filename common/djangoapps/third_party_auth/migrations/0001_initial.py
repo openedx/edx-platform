@@ -2,7 +2,7 @@
 
 
 import django.db.models.deletion
-import provider.utils
+from openedx.core.lib.hash_utils import create_hash256
 from django.conf import settings
 from django.db import migrations, models
 
@@ -11,7 +11,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('oauth2', '0001_initial'),
     ]
 
     operations = [
@@ -28,7 +27,7 @@ class Migration(migrations.Migration):
                 ('skip_email_verification', models.BooleanField(default=False, help_text='If this option is selected, users will not be required to confirm their email, and their account will be activated immediately upon registration.')),
                 ('lti_consumer_key', models.CharField(help_text=u'The name that the LTI Tool Consumer will use to identify itself', max_length=255)),
                 ('lti_hostname', models.CharField(default=u'localhost', help_text=u'The domain that  will be acting as the LTI consumer.', max_length=255, db_index=True)),
-                ('lti_consumer_secret', models.CharField(default=provider.utils.long_token, help_text=u'The shared secret that the LTI Tool Consumer will use to authenticate requests. Only this edX instance and this tool consumer instance should know this value. For increased security, you can avoid storing this in your database by leaving this field blank and setting SOCIAL_AUTH_LTI_CONSUMER_SECRETS = {"consumer key": "secret", ...} in your instance\'s Django setttigs (or lms.auth.json)', max_length=255, blank=True)),
+                ('lti_consumer_secret', models.CharField(default=create_hash256, help_text=u'The shared secret that the LTI Tool Consumer will use to authenticate requests. Only this edX instance and this tool consumer instance should know this value. For increased security, you can avoid storing this in your database by leaving this field blank and setting SOCIAL_AUTH_LTI_CONSUMER_SECRETS = {"consumer key": "secret", ...} in your instance\'s Django setttigs (or lms.auth.json)', max_length=255, blank=True)),
                 ('lti_max_timestamp_age', models.IntegerField(default=10, help_text=u'The maximum age of oauth_timestamp values, in seconds.')),
                 ('changed_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, editable=False, to=settings.AUTH_USER_MODEL, null=True, verbose_name='Changed by')),
             ],
@@ -57,18 +56,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Provider Configuration (OAuth)',
                 'verbose_name_plural': 'Provider Configuration (OAuth)',
-            },
-        ),
-        migrations.CreateModel(
-            name='ProviderApiPermissions',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('provider_id', models.CharField(help_text=u'Uniquely identify a provider. This is different from backend_name.', max_length=255)),
-                ('client', models.ForeignKey(to='oauth2.Client', on_delete=models.CASCADE)),
-            ],
-            options={
-                'verbose_name': 'Provider API Permission',
-                'verbose_name_plural': 'Provider API Permissions',
             },
         ),
         migrations.CreateModel(

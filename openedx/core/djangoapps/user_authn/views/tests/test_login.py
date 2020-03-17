@@ -14,8 +14,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
 from django.core.cache import cache
-from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
-from django.test import TestCase
+from django.http import HttpResponse
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, reverse
@@ -79,6 +78,86 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         )
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success', self.user_email])
+
+    FEATURES_WITH_LOGIN_MFE_ENABLED = settings.FEATURES.copy()
+    FEATURES_WITH_LOGIN_MFE_ENABLED['ENABLE_LOGIN_MICROFRONTEND'] = True
+
+    @ddt.data(
+        # Default redirect is dashboard.
+        {
+            'next_url': None,
+            'course_id': None,
+            'expected_redirect': '/dashboard',
+        },
+        # A relative path is an acceptable redirect.
+        {
+            'next_url': '/harmless-relative-page',
+            'course_id': None,
+            'expected_redirect': '/harmless-relative-page',
+        },
+        # Paths without trailing slashes are also considered relative.
+        {
+            'next_url': 'courses',
+            'course_id': None,
+            'expected_redirect': 'courses',
+        },
+        # An absolute URL to a non-whitelisted domain is not an acceptable redirect.
+        {
+            'next_url': 'https://evil.sketchysite',
+            'course_id': None,
+            'expected_redirect': '/dashboard',
+        },
+        # An absolute URL to a whitelisted domain is acceptable.
+        {
+            'next_url': 'https://openedx.service/coolpage',
+            'course_id': None,
+            'expected_redirect': 'https://openedx.service/coolpage',
+        },
+        # If course_id is provided, redirect to finish_auth with dashboard as next.
+        {
+            'next_url': None,
+            'course_id': 'coursekey',
+            'expected_redirect': (
+                '/account/finish_auth?course_id=coursekey&next=%2Fdashboard'
+            ),
+        },
+        # If valid course_id AND next_url are provided, redirect to finish_auth with
+        # provided next URL.
+        {
+            'next_url': 'freshpage',
+            'course_id': 'coursekey',
+            'expected_redirect': (
+                '/account/finish_auth?course_id=coursekey&next=freshpage'
+            )
+        },
+        # If course_id is provided with invalid next_url, redirect to finish_auth with
+        # course_id and dashboard as next URL.
+        {
+            'next_url': 'http://scam.scam',
+            'course_id': 'coursekey',
+            'expected_redirect': (
+                '/account/finish_auth?course_id=coursekey&next=%2Fdashboard'
+            ),
+        },
+    )
+    @ddt.unpack
+    @override_settings(LOGIN_REDIRECT_WHITELIST=['openedx.service'])
+    @override_settings(FEATURES=FEATURES_WITH_LOGIN_MFE_ENABLED)
+    @skip_unless_lms
+    def test_login_success_with_redirect(self, next_url, course_id, expected_redirect):
+        post_params = {}
+        if next_url:
+            post_params['next'] = next_url
+        if course_id:
+            post_params['course_id'] = course_id
+        response, _ = self._login_response(
+            self.user_email,
+            self.password,
+            extra_post_params=post_params,
+            HTTP_ACCEPT='*/*',
+        )
+        self._assert_response(response, success=True)
+        self._assert_redirect_url(response, expected_redirect)
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_success_no_pii(self):
@@ -484,7 +563,9 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         response, _ = self._login_response(self.user.email, password_entered)
         self._assert_response(response, success=login_success)
 
-    def _login_response(self, email, password, patched_audit_log=None, extra_post_params=None):
+    def _login_response(
+            self, email, password, patched_audit_log=None, extra_post_params=None, **extra
+    ):
         """
         Post the login info
         """
@@ -494,7 +575,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         if extra_post_params is not None:
             post_params.update(extra_post_params)
         with patch(patched_audit_log) as mock_audit_log:
-            result = self.client.post(self.url, post_params)
+            result = self.client.post(self.url, post_params, **extra)
         return result, mock_audit_log
 
     def _assert_response(self, response, success=None, value=None, status_code=None):
@@ -524,6 +605,21 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             msg = (u"'%s' did not contain '%s'" %
                    (six.text_type(response_dict['value']), six.text_type(value)))
             self.assertIn(value, response_dict['value'], msg)
+
+    def _assert_redirect_url(self, response, expected_redirect_url):
+        """
+        Assert that the redirect URL is in the response and has the expected value.
+
+        Assumes that response content is well-formed JSON
+        (you can call `_assert_response` first to assert this).
+        """
+        response_dict = json.loads(response.content.decode('utf-8'))
+        assert 'redirect_url' in response_dict, (
+            "Response JSON unexpectedly does not have redirect_url: {!r}".format(
+                response_dict
+            )
+        )
+        assert response_dict['redirect_url'] == expected_redirect_url
 
     def _assert_audit_log(self, mock_audit_log, level, log_strings):
         """
