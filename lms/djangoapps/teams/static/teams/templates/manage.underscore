@@ -27,7 +27,7 @@
                     "users to teams."
                 ) %>
             </p>
-            <div class="upload-team-csv btn action action-primary">
+            <button class="upload-team-csv btn action action-primary">
                 <input
                     id="upload-team-csv-input"
                     type="file"
@@ -35,7 +35,7 @@
                     class="input-overlay-hack"
                 />
                 <%- gettext("Upload Memberships") %>
-            </div>
+            </button>
             <!-- We need to describe the format of the CSV here (TODO MST-49) -->
             <div class="page-banner" hidden>
                 <div class="alert alert-danger" role="alert">

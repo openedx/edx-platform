@@ -94,6 +94,7 @@ glob2                               # Enhanced glob module, used in openedx.core
 gunicorn
 help-tokens
 html5lib                            # HTML parser, used for capa problems
+icalendar                           # .ics generator, used by calendar_sync
 ipaddress                           # Ip network support for Embargo feature
 jsonfield2                          # Django model field for validated JSON; used in several apps
 laboratory                          # Library for testing that code refactors/infrastructure changes produce identical results
@@ -138,7 +139,6 @@ rules                               # Django extension for rules-based authoriza
 simplejson
 sailthru-client==2.2.3              # For Sailthru integration
 Shapely                             # Geometry library, used for image click regions in capa
-shortuuid			    # used in openedx/core/lib/hash_utils to generate object hashes.
 six                                 # Utilities for supporting Python 2 & 3 in the same codebase
 sortedcontainers                    # Provides SortedKeyList, used for lists of XBlock assets
 sqlparse                            # Required by Django to run migrations.RunSQL

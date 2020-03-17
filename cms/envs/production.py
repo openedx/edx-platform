@@ -12,7 +12,7 @@ import os
 import yaml
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from path import Path as path
 
 from .common import *

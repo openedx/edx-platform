@@ -30,6 +30,7 @@ import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.views.views import CourseTabView
+from lms.djangoapps.discussion.config.waffle import is_forum_daily_digest_enabled, use_bootstrap_flag_enabled
 from lms.djangoapps.discussion.django_comment_client.base.views import track_thread_viewed_event
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY
 from lms.djangoapps.discussion.django_comment_client.permissions import has_permission
@@ -58,8 +59,6 @@ from openedx.features.course_duration_limits.access import generate_course_expir
 from student.models import CourseEnrollment
 from util.json_request import JsonResponse, expect_json
 from xmodule.modulestore.django import modulestore
-
-from .config import USE_BOOTSTRAP_FLAG
 
 log = logging.getLogger("edx.discussions")
 
@@ -424,7 +423,7 @@ def _create_base_discussion_view_context(request, course_key):
     user_info = cc_user.to_dict()
     course = get_course_with_access(user, 'load', course_key, check_if_enrolled=True)
     course_settings = make_course_settings(course, user)
-    uses_bootstrap = USE_BOOTSTRAP_FLAG.is_enabled()
+    uses_bootstrap = use_bootstrap_flag_enabled()
     return {
         'csrf': csrf(request)['csrf_token'],
         'course': course,
@@ -510,6 +509,7 @@ def _create_discussion_board_context(request, base_context, thread=None):
         'is_commentable_divided': is_commentable_divided(course_key, discussion_id, course_discussion_settings),
         # If the default topic id is None the front-end code will look for a topic that contains "General"
         'discussion_default_topic_id': _get_discussion_default_topic_id(course),
+        'enable_daily_digest': is_forum_daily_digest_enabled()
     })
     context.update(
         get_experiment_user_metadata_context(
@@ -809,7 +809,7 @@ class DiscussionBoardFragmentView(EdxFragmentView):
         the files are loaded individually, but in production just the single bundle is loaded.
         """
         is_right_to_left = get_language_bidi()
-        if USE_BOOTSTRAP_FLAG.is_enabled():
+        if use_bootstrap_flag_enabled():
             css_file = BOOTSTRAP_DISCUSSION_CSS_PATH
             if is_right_to_left:
                 css_file = css_file.replace('.css', '-rtl.css')

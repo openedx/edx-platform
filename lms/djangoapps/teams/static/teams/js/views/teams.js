@@ -22,20 +22,19 @@
                 this.context = options.context;
                 this.itemViewClass = TeamCardView.extend({
                     router: options.router,
-                    maxTeamSize: this.context.maxTeamSize,
+                    courseMaxTeamSize: this.context.courseMaxTeamSize,
                     srInfo: this.srInfo,
                     countries: TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.countries),
                     languages: TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.languages),
-                    getTopicType: function(topicId) { return view.getTopicType(topicId); }
+                    getTopic: function(topicId) { return view.getTopic(topicId); }
                 });
                 PaginatedView.prototype.initialize.call(this);
             },
 
             // eslint-disable-next-line no-unused-vars
-            getTopicType: function(topicId) {
-                var deferred = $.Deferred();
-                deferred.resolve('open');
-                return deferred.promise();
+            getTopic: function(topicId) {
+                // This must be overwritten in extending classes.
+                return null;
             }
         });
         return TeamsView;

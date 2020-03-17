@@ -111,7 +111,7 @@ from lms.envs.common import (
     _make_locale_paths,
 )
 from path import Path as path
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy  # pylint: disable=wrong-import-order
 
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.authoring_mixin import AuthoringMixin

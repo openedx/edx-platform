@@ -70,6 +70,10 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         if not request:
             return 0
 
+        if not request.user.id:
+            # We need username for stable bucketing and id for tracking, so just skip anonymous (not-logged-in) users
+            return 0
+
         # Use course key in experiment name to separate caches and segment calls per-course-run
         experiment_name = self.namespaced_flag_name + ('.{}'.format(course_key) if course_key else '')
 
@@ -136,7 +140,8 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
 
     @contextmanager
     def override(self, active=True, bucket=1):  # pylint: disable=arguments-differ
-        from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-        with override_waffle_flag(self, active):
-            with override_waffle_flag(self.bucket_flags[bucket], True):
-                yield
+        from mock import patch
+        if not active:
+            bucket = 0
+        with patch.object(self, 'get_bucket', return_value=bucket):
+            yield
