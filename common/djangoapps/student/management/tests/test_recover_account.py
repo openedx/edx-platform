@@ -6,12 +6,15 @@ from tempfile import NamedTemporaryFile
 import six
 
 from django.core import mail
+from django.contrib.auth import get_user_model
 from django.core.management import call_command, CommandError
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, RequestFactory
 
 from testfixtures import LogCapture
 from student.tests.factories import UserFactory
 
+from student.models import AccountRecoveryConfiguration
 
 LOGGER_NAME = 'student.management.commands.recover_account'
 
@@ -101,4 +104,17 @@ class RecoverAccountTests(TestCase):
 
                 log.check_present(
                     (LOGGER_NAME, 'INFO', expected_message)
+
                 )
+
+    def test_account_recovery_from_config_model(self):
+        """Verify learners account recovery using config model."""
+        lines = 'username,email,new_email\namy,amy@edx.com,amy@newemail.com\n'
+
+        csv_file = SimpleUploadedFile(name='test.csv', content=lines.encode('utf-8'), content_type='text/csv')
+        AccountRecoveryConfiguration.objects.create(enabled=True, csv_file=csv_file)
+
+        call_command("recover_account")
+
+        email = get_user_model().objects.get(pk=self.user.pk).email
+        self.assertEqual(email, 'amy@newemail.com')

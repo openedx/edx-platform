@@ -40,7 +40,8 @@ from student.models import (
     UserAttribute,
     UserProfile,
     UserTestGroup,
-    BulkUnenrollConfiguration
+    BulkUnenrollConfiguration,
+    AccountRecoveryConfiguration
 )
 from student.roles import REGISTERED_ACCESS_ROLES
 from xmodule.modulestore.django import modulestore
@@ -492,6 +493,7 @@ class AllowedAuthUserAdmin(admin.ModelAdmin):
 admin.site.register(UserTestGroup)
 admin.site.register(Registration)
 admin.site.register(PendingNameChange)
+admin.site.register(AccountRecoveryConfiguration, ConfigurationModelAdmin)
 admin.site.register(DashboardConfiguration, ConfigurationModelAdmin)
 admin.site.register(RegistrationCookieConfiguration, ConfigurationModelAdmin)
 admin.site.register(BulkUnenrollConfiguration, ConfigurationModelAdmin)
