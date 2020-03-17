@@ -52,6 +52,10 @@ def get_course_enrollment(user, course_run_key):
 
 
 def get_phone_number(user_id):
+    """ 
+    Get a users phone number from the profile, if
+    one exists. Otherwise, return None.
+    """
     try:
         student = _UserProfile.objects.get(user_id=user_id)
     except _UserProfile.DoesNotExist as exception:
