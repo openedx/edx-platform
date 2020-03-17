@@ -3,14 +3,15 @@ Toggles for courseware in-course experience.
 """
 
 from django.conf import settings
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, ExperimentWaffleFlag, WaffleFlagNamespace
+from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace
 
 # Namespace for courseware waffle flags.
 WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='courseware')
 
 # Waffle flag to redirect to another learner profile experience.
 # .. toggle_name: courseware.redirect_to_microfrontend
-# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_implementation: ExperimentWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Supports staged rollout to students for a new micro-frontend-based implementation of the courseware page.
 # .. toggle_category: micro-frontend
