@@ -158,8 +158,8 @@
             },
             // eslint-disable-next-line no-unused-vars
             getTopic: function(topicId) {
-                // This function will be overrwritten in the extended class in
-                // That will in turn be overwritten by functions in TopicTeamsView and MyTeamsView
+                // This function will be overrwritten in the extended class
+                // that will in turn be overwritten by functions in TopicTeamsView and MyTeamsView
                 return null;
             }
         });

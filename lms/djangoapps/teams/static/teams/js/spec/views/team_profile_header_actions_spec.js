@@ -42,7 +42,8 @@ define([
                             username: currentUsername
                         })
                     }),
-                    topicOptions = topicMaxTeamSize ? {max_team_size: topicMaxTeamSize} : {},
+                    topicOptions = typeof topicMaxTeamSize !== 'undefined' ?
+                        {max_team_size: topicMaxTeamSize} : {},
                     topic = isInstructorManagedTopic ?
                         TeamSpecHelpers.createMockInstructorManagedTopic(topicOptions) :
                         TeamSpecHelpers.createMockTopic(topicOptions);
@@ -213,10 +214,41 @@ define([
                     })
                 );
 
-                // User is not a mamber of any teams
+                // User is not a member of any teams
                 AjaxHelpers.respondWithJson(requests, {count: 0});
 
                 // Course-level size is 1, but Teamset size is 2, so that should take precedence
+                // and we should see the Join Team Button
+                expect(view.$('.action.action-primary').length).toEqual(1);
+            });
+
+            it('behaves correctly if the teamset max size is set to 0', function() {
+                var requests = AjaxHelpers.requests(this);
+                var currentUsername = 'ma1';
+                // Teamset = 0, Course = 2
+                var view = createHeaderActionsView(
+                    requests,
+                    2,
+                    'ma1',
+                    createTeamModelData('teamA', 'teamAlpha', createMembershipData('ma')),
+                    false,
+                    false,
+                    0
+                );
+
+                // Team should not be considered full
+                AjaxHelpers.expectRequest(
+                    requests,
+                    'GET',
+                    TeamSpecHelpers.testContext.teamMembershipsUrl + '?' + $.param({
+                        username: currentUsername, course_id: TeamSpecHelpers.testCourseID
+                    })
+                );
+
+                // User is not a member of any teams
+                AjaxHelpers.respondWithJson(requests, {count: 0});
+
+                // Course-level size is 1 and Teamset size is 0, so course-level value should be used
                 // and we should see the Join Team Button
                 expect(view.$('.action.action-primary').length).toEqual(1);
             });
