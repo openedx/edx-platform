@@ -27,6 +27,7 @@ from third_party_auth import pipeline
 from third_party_auth.api import serializers
 from third_party_auth.api.permissions import TPA_PERMISSIONS
 from third_party_auth.provider import Registry
+from common.djangoapps.third_party_auth.api.utils import filter_user_social_auth_queryset_by_provider
 
 
 class ProviderBaseThrottle(throttling.UserRateThrottle):
@@ -349,16 +350,10 @@ class UserMappingView(ListAPIView):
         if not self.provider:
             raise Http404
 
-        query_set = UserSocialAuth.objects.select_related('user').filter(provider=self.provider.backend_name)
-
-        # build our query filters
-        # When using multi-IdP backend, we only retrieve the ones that are for current IdP.
-        # test if the current provider has a slug
-        uid = self.provider.get_social_auth_uid('uid')
-        if uid != 'uid':
-            # if yes, we add a filter for the slug on uid column
-            query_set = query_set.filter(uid__startswith=uid[:-3])
-
+        query_set = filter_user_social_auth_queryset_by_provider(
+            UserSocialAuth.objects.select_related('user'),
+            self.provider,
+        )
         query = Q()
 
         usernames = self.request.query_params.getlist('username', None)
