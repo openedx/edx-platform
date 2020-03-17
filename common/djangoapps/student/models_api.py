@@ -52,7 +52,7 @@ def get_course_enrollment(user, course_run_key):
 
 
 def get_phone_number(user_id):
-    """ 
+    """
     Get a users phone number from the profile, if
     one exists. Otherwise, return None.
     """
