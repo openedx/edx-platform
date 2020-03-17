@@ -458,17 +458,17 @@ class CoursewareIndex(View):
 
         allow_anonymous = allow_public_access(self.course, [COURSE_VISIBILITY_PUBLIC])
         display_reset_dates_banner = False
-        if not allow_anonymous:  # pylint: disable=too-many-nested-blocks
+        if not allow_anonymous and RELATIVE_DATES_FLAG.is_enabled(self.course.id):  # pylint: disable=too-many-nested-blocks
             course_overview = CourseOverview.objects.get(id=str(self.course_key))
             end_date = getattr(course_overview, 'end_date')
-            if not end_date or timezone.now() < end_date:
+            if course_overview.self_paced and (not end_date or timezone.now() < end_date):
                 if (CourseEnrollment.objects.filter(
                     course=course_overview, user=request.user, mode=CourseMode.VERIFIED
                 ).exists()):
                     course_block_tree = get_course_outline_block_tree(
                         request, str(self.course_key), request.user
                     )
-                    course_sections = course_block_tree.get('children')
+                    course_sections = course_block_tree.get('children', [])
                     for section in course_sections:
                         if display_reset_dates_banner:
                             break
