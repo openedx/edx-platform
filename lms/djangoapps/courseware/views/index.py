@@ -79,7 +79,11 @@ from ..masquerade import check_content_start_date_for_masquerade_user, setup_mas
 from ..model_data import FieldDataCache
 from ..module_render import get_module_for_descriptor, toc_for_course
 from ..permissions import MASQUERADE_AS_STUDENT
-from ..toggles import COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, should_redirect_to_courseware_microfrontend
+from ..toggles import (
+    COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW,
+    REDIRECT_TO_COURSEWARE_MICROFRONTEND,
+    should_redirect_to_courseware_microfrontend
+)
 from ..url_helpers import get_microfrontend_url
 
 from .views import CourseTabView
@@ -715,9 +719,9 @@ def show_courseware_mfe_link(user, staff_access, course_key):
     # course team preview CourseWaffleFlag for this course *or* if we've turned
     # on the redirect for your students.
     mfe_enabled_for_course_team = COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW.is_enabled(course_key)
-    mfe_enabled_for_students = should_redirect_to_courseware_microfrontend(course_key)
+    mfe_experiment_enabled_for_course = REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled_for_course(course_key)
 
-    if staff_access and (mfe_enabled_for_course_team or mfe_enabled_for_students):
+    if staff_access and (mfe_enabled_for_course_team or mfe_experiment_enabled_for_course):
         return True
 
     return False

@@ -10,7 +10,7 @@ from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNam
 WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='courseware')
 
 # Waffle flag to redirect to another learner profile experience.
-# .. toggle_name: courseware.redirect_to_microfrontend
+# .. toggle_name: courseware.courseware_mfe
 # .. toggle_implementation: ExperimentWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Supports staged rollout to students for a new micro-frontend-based implementation of the courseware page.
@@ -19,9 +19,9 @@ WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='courseware')
 # .. toggle_creation_date: 2020-01-29
 # .. toggle_expiration_date: 2020-12-31
 # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and ENABLE_COURSEWARE_MICROFRONTEND.
-# .. toggle_tickets: TNL-6982
+# .. toggle_tickets: TNL-7000
 # .. toggle_status: supported
-REDIRECT_TO_COURSEWARE_MICROFRONTEND = ExperimentWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'courseware-mfe')
+REDIRECT_TO_COURSEWARE_MICROFRONTEND = ExperimentWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'courseware_mfe')
 
 # Waffle flag to display a link for the new learner experience to course teams without redirecting students.
 #

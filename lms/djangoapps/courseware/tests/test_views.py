@@ -3260,7 +3260,7 @@ class TestShowCoursewareMFE(TestCase):
     * user is member of the course team
     * whether the course_key is an old Mongo style of key
     * the COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW CourseWaffleFlag
-    * the REDIRECT_TO_COURSEWARE_MICROFRONTEND CourseWaffleFlag
+    * the REDIRECT_TO_COURSEWARE_MICROFRONTEND ExperimentWaffleFlag
 
     Giving us theoretically 2^6 = 64 states. >_<
     """
