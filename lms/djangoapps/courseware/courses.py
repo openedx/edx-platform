@@ -413,7 +413,7 @@ def get_course_date_blocks(course, user, request=None, include_access=False,
         VerificationDeadlineDate,
         VerifiedUpgradeDeadlineDate,
     ]
-    if certs_api.get_active_web_certificate(course):
+    if not course.self_paced and certs_api.get_active_web_certificate(course):
         block_classes.insert(0, CertificateAvailableDate)
 
     blocks = [cls(course, user) for cls in block_classes]
