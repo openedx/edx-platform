@@ -13,8 +13,12 @@ python scripts/xdist/pytest_worker_manager.py -a up -n ${XDIST_NUM_WORKERS} \
 # Install the correct version of Django depending on which tox environment (if any) is in use
 if [[ -z ${TOX_ENV+x} ]] || [[ ${TOX_ENV} == 'null' ]]; then
     DJANGO_REQUIREMENT="-r requirements/edx/django.txt"
-else
-    DJANGO_REQUIREMENT=$(pip freeze | grep "^[Dd]jango==")
+elif [[ ${TOX_ENV} == *'django20'* ]]; then
+    DJANGO_REQUIREMENT="-r requirements/edx/django20.txt"
+elif [[ ${TOX_ENV} == *'django21'* ]]; then
+    DJANGO_REQUIREMENT="-r requirements/edx/django21.txt"
+elif [[ ${TOX_ENV} == *'django22'* ]]; then
+    DJANGO_REQUIREMENT="-r requirements/edx/django22.txt"
 fi
 
 ip_list=$(<pytest_worker_ips.txt)
