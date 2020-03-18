@@ -195,7 +195,7 @@ class::
                     # Key is the view that the app wishes to add context to and the value
                     # is the function within the app that will return additional context
                     # when called with the original context
-                    PluginContexts.VIEWS.STUDENT_DASHBOARD: u'my_app.context_api.get_dashboard_context'
+                    u'course_dashboard': u'my_app.context_api.get_dashboard_context'
                 }
             }
         }
@@ -233,7 +233,7 @@ OR use string constants when they cannot import from djangoapps.plugins::
             },
             u'view_context_config': {
                 u'lms.djangoapp': {
-                    'student_dashboard': u'my_app.context_api.get_dashboard_context'
+                    'course_dashboard': u'my_app.context_api.get_dashboard_context'
                 }
             }
         }

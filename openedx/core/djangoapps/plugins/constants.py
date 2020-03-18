@@ -77,6 +77,7 @@ class PluginSignals(object):
     RELATIVE_PATH = u'relative_path'
     DEFAULT_RELATIVE_PATH = u'signals'
 
+
 class PluginContexts(object):
     """
     The PluginContexts enum defines dictionary field names (and defaults)

@@ -9,19 +9,30 @@ from . import constants, registry
 
 log = getLogger(__name__)
 
-def get_plugins_view_context(project_type, view_name, existing_context={}):
+
+def get_plugins_view_context(project_type, view_name, existing_context=None):
     """
-    Returns a dict of additonal view context. Will check if any plugin apps
+    Returns a dict of additional view context. Will check if any plugin apps
     have that view in their view_context_config, and if so will call their
     selected function to get their context dicts.
+
+    Params:
+        project_type: a string that determines which project (lms or studio) the view is being called in. See the
+            ProjectType enum in plugins/constants.py for valid options
+        view_name: a string that determines which view needs the additional context. These are globally unique and
+            noted in the api.py in the view's app.
+        existing_context: a dictionary which includes all of the data that the page was going to render with prior
+            to the addition of each plugin's context. This is what will be passed to plugins so they may choose
+            what data to add to the view.
     """
     aggregate_context = {"plugins": {}}
 
-    # This functionality is cached
-    context_functions = _get_context_functions_for_view(project_type, view_name)
+    if existing_context is None:
+        existing_context = {}
+
+    context_functions = _get_cached_context_functions_for_view(project_type, view_name)
 
     for (context_function, plugin_name) in context_functions:
-        plugin_context = context_function(existing_context)
         try:
             plugin_context = context_function(existing_context)
         except Exception as exc:
@@ -37,14 +48,8 @@ def get_plugins_view_context(project_type, view_name, existing_context={}):
     return aggregate_context
 
 
-def _get_context_function(app_config, project_type, view_name):
-    plugin_config = getattr(app_config, constants.PLUGIN_APP_CLASS_ATTRIBUTE_NAME, {})
-    context_config = plugin_config.get(constants.PluginContexts.CONFIG, {})
-    project_type_settings = context_config.get(project_type, {})
-    return project_type_settings.get(view_name)
-
 @process_cached
-def _get_context_functions_for_view(project_type, view_name):
+def _get_cached_context_functions_for_view(project_type, view_name):
     """
     Returns a list of tuples where the first item is the context function
     and the second item is the name of the plugin it's being called from.
@@ -55,7 +60,7 @@ def _get_context_functions_for_view(project_type, view_name):
     """
     context_functions = []
     for app_config in registry.get_app_configs(project_type):
-        context_function_path = _get_context_function(app_config, project_type, view_name)
+        context_function_path = _get_context_function_path(app_config, project_type, view_name)
         if context_function_path:
             module_path, _, name = context_function_path.rpartition('.')
             try:
@@ -79,3 +84,10 @@ def _get_context_functions_for_view(project_type, view_name):
                     view_name
                 )
     return context_functions
+
+
+def _get_context_function_path(app_config, project_type, view_name):
+    plugin_config = getattr(app_config, constants.PLUGIN_APP_CLASS_ATTRIBUTE_NAME, {})
+    context_config = plugin_config.get(constants.PluginContexts.CONFIG, {})
+    project_type_settings = context_config.get(project_type, {})
+    return project_type_settings.get(view_name)

@@ -7,7 +7,7 @@ Draft
 
 Context
 =======
-edx-platform contains a plugin system which allows new Django apps to be installed inside the LMS and Studio without requiring the LMS/Studio to know about them. This is what enables us to move to a small and extensible core. While we had the ability to add settings, URLs, and signal handlers in our plugins, there wasn't any way for a plugin to affect the commonly used pages that the core was delivering. Thus a plugin couldn't change any details on the dashboard, courseware, or any other rendered page that the platform delivered.
+edx-platform contains a plugin system (https://github.com/edx/edx-platform/tree/master/openedx/core/djangoapps/plugins) which allows new Django apps to be installed inside the LMS and Studio without requiring the LMS/Studio to know about them. This is what enables us to move to a small and extensible core. While we had the ability to add settings, URLs, and signal handlers in our plugins, there wasn't any way for a plugin to affect the commonly used pages that the core was delivering. Thus a plugin couldn't change any details on the dashboard, courseware, or any other rendered page that the platform delivered.
 
 Decisions
 =========
@@ -34,7 +34,7 @@ In the plugin app
 ~~~~~~~~~~~~~~~~~
 Config
 ++++++
-Inside of your AppConfig your new plugin app, add a "view_context_config" item like below.
+Inside of the AppConfig of your new plugin app, add a "view_context_config" item like below.
 * The format will be {"globally_unique_view_name": "function_inside_plugin_app"}
 * The function name & path don't need to be named anything specific, so long as they work
 * These functions will be called on **every** render of that view, so keep them efficient or memoize them if they aren't user specific.
@@ -57,7 +57,7 @@ The function that will be called by the plugin system should accept a single par
 
 Example:
 ::
-    def my_context_function(existing_context):
+    def my_context_function(existing_context, *args, **kwargs):
         additional_context = {"some_plugin_value": 10}
         if existing_context.get("some_core_value"):
             additional_context.append({"some_other_plugin_value": True})
