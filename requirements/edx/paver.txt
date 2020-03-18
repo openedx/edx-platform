@@ -6,7 +6,7 @@
 #
 certifi==2019.11.28       # via requests
 chardet==3.0.4            # via requests
-edx-opaque-keys==2.0.1    # via -r requirements/edx/paver.in
+git+https://github.com/edx/opaque-keys.git@889dfe527ab38ecdb5f2302cb569a1b8a716bc00#egg=edx-opaque-keys==3.0  # via -r requirements/edx/paver.in
 idna==2.9                 # via requests
 importlib-metadata==1.5.0  # via path
 lazy==1.4                 # via -r requirements/edx/paver.in
