@@ -288,6 +288,22 @@ from student.models import CourseEnrollment
       </div>
   % endif
 
+  <% account_mfe_url = getattr(settings, 'ACCOUNT_MICROFRONTEND_URL', '') or '' %>
+  % if plugins.get("coaching", {}).get("show_coaching_aside"):
+    <div class="wrapper-coaching">
+        <div class="coaching-signup">
+            <div class="coaching-prompt">
+                ${_("Take advantage of free coaching!")}
+            </div>
+            <div class="coaching-link">
+                <a class="btn-neutral" href="${account_mfe_url}">
+                  ${_("Get Started")}
+                </a>
+            </div>
+        </div>
+    </div>
+  % endif
+
   % if display_sidebar_on_dashboard:
     <section class="profile-sidebar" id="profile-sidebar" role="region" aria-label="Account Status Info">
       <header class="profile">
