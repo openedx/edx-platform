@@ -25,6 +25,7 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
 from six import iteritems, text_type
+from student.api import COURSE_DASHBOARD_PLUGIN_VIEW_NAME
 from student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
 from student.models import (
     AccountRecovery,
@@ -47,6 +48,8 @@ from openedx.core.djangoapps.catalog.utils import (
     get_visible_sessions_for_entitlement
 )
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_attribute_values, make_providers_strings
+from openedx.core.djangoapps.plugins.plugin_contexts import get_plugins_view_context
+from openedx.core.djangoapps.plugins import constants as plugin_constants
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -879,6 +882,13 @@ def student_dashboard(request):
         'course_info': get_dashboard_course_info(user, course_enrollments),
         # TODO START: clean up as part of REVEM-199 (END)
     }
+
+    context_from_plugins = get_plugins_view_context(
+        plugin_constants.ProjectType.LMS,
+        COURSE_DASHBOARD_PLUGIN_VIEW_NAME,
+        context
+    )
+    context.update(context_from_plugins)
 
     if ecommerce_service.is_enabled(request.user):
         context.update({
