@@ -242,29 +242,33 @@ class ResetScheduleTests(SharedModuleStoreTestCase):
         self.enrollment = CourseEnrollmentFactory(
             course_id=self.course.id,
             mode=CourseMode.AUDIT,
+            is_active=False,
         )
         self.schedule = self.enrollment.schedule
+        self.user = self.enrollment.user
 
     def test_schedule_is_reset_after_enrollment_change(self):
         """ Test that an update in enrollment causes a schedule reset. """
         original_start = self.schedule.start_date
 
-        CourseEnrollment.enroll(self.enrollment.user, self.course.id, mode=CourseMode.VERIFIED)
+        CourseEnrollment.enroll(self.user, self.course.id, mode=CourseMode.VERIFIED)
 
         self.schedule.refresh_from_db()
         self.assertGreater(self.schedule.start_date, original_start)  # should have been reset to current time
 
-    def test_schedule_is_reset_to_availabilty_date(self):
-        """ Test that a switch to audit enrollment resets to the availabilty date, not current time. """
+    def test_schedule_is_reset_to_availability_date(self):
+        """ Test that a switch to audit enrollment resets to the availability date, not current time. """
         original_start = self.schedule.start_date
 
         # Switch to verified, confirm we change start date
-        CourseEnrollment.enroll(self.enrollment.user, self.course.id, mode=CourseMode.VERIFIED)
+        CourseEnrollment.enroll(self.user, self.course.id, mode=CourseMode.VERIFIED)
         self.schedule.refresh_from_db()
         self.assertNotEqual(self.schedule.start_date, original_start)
 
+        CourseEnrollment.unenroll(self.user, self.course.id)
+
         # Switch back to audit, confirm we change back to original availability date
-        CourseEnrollment.enroll(self.enrollment.user, self.course.id, mode=CourseMode.AUDIT)
+        CourseEnrollment.enroll(self.user, self.course.id, mode=CourseMode.AUDIT)
         self.schedule.refresh_from_db()
         self.assertEqual(self.schedule.start_date, original_start)
 

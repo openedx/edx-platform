@@ -3,31 +3,20 @@ Tests for the migrate_saml_uids management command.
 """
 
 
+from mock import mock_open, patch
 import six
+
 from django.core.management import call_command
 from django.test import TestCase
 from factory import LazyAttributeSequence, SubFactory
 from factory.django import DjangoModelFactory
-from mock import mock_open, patch
 from social_django.models import UserSocialAuth
 
 from lms.djangoapps.program_enrollments.management.commands import migrate_saml_uids
+from lms.djangoapps.program_enrollments.management.commands.tests.utils import UserSocialAuthFactory
 from student.tests.factories import UserFactory
 
 _COMMAND_PATH = 'lms.djangoapps.program_enrollments.management.commands.migrate_saml_uids'
-
-
-class UserSocialAuthFactory(DjangoModelFactory):
-    """
-    Factory for UserSocialAuth records.
-    """
-    class Meta(object):
-        model = UserSocialAuth
-    user = SubFactory(UserFactory)
-    uid = LazyAttributeSequence(lambda o, n: '%s:%d' % (o.slug, n))
-
-    class Params(object):
-        slug = 'gatech'
 
 
 class TestMigrateSamlUids(TestCase):

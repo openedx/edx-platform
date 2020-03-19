@@ -1025,5 +1025,7 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
 
     @RELATIVE_DATES_FLAG.override(active=True)
     def test_reset_deadline_banner_is_present_on_course_tab(self):
+        CourseEnrollment.enroll(self.user, self.course.id, CourseMode.VERIFIED)  # pylint: disable=no-member
         response = self.client.get(self.url)
+
         self.assertContains(response, '<div class="reset-deadlines-banner">')

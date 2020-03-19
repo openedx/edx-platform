@@ -8,6 +8,6 @@ from django.utils.translation import ugettext as _
     <div class="reset-deadlines-text">${_("It looks like you've missed some important deadlines. Reset your deadlines and get started today.")}</div>
     <form method="post" action="${reset_deadlines_url}">
         <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-        <button class="reset-deadlines-button">${_("Reset my deadlines")}</button>
+        <button class="btn reset-deadlines-button">${_("Reset my deadlines")}</button>
     </form>
 </div>

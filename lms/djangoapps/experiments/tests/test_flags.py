@@ -16,6 +16,7 @@ from experiments.factories import ExperimentKeyValueFactory
 from experiments.flags import ExperimentWaffleFlag
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
@@ -45,8 +46,10 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
         self.addCleanup(RequestCache.clear_all_namespaces)
 
     def get_bucket(self, track=False, active=True):
-        with self.flag.override(active=active):
-            return self.flag.get_bucket(course_key=self.key, track=track)
+        # Does not use ExperimentWaffleFlag.override, since that shortcuts get_bucket and we want to test internals
+        with override_waffle_flag(self.flag, active):
+            with override_waffle_flag(self.flag.bucket_flags[1], True):
+                return self.flag.get_bucket(course_key=self.key, track=track)
 
     def test_basic_happy_path(self):
         self.assertEqual(self.get_bucket(), 1)

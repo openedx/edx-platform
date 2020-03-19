@@ -277,7 +277,7 @@ define([
         hasOpenTopic: true,
         hasPublicManagedTopic: false,
         hasManagedTopic: false,
-        maxTeamSize: 6,
+        courseMaxTeamSize: 6,
         languages: testLanguages,
         countries: testCountries,
         topicUrl: '/api/team/v0/topics/topic_id,' + testCourseID,

@@ -13,8 +13,7 @@ from django.db import connection
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils.deprecation import MiddlewareMixin
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locations import i4xEncoder
+from opaque_keys.edx.keys import CourseKey, i4xEncoder, UsageKey
 from pytz import UTC
 from six import text_type
 from six.moves import map

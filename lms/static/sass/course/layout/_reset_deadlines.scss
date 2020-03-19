@@ -11,12 +11,13 @@ div.reset-deadlines-banner {
 
     &.reset-deadlines-text {
       color: theme-color("inverse");
-      padding-top: 2px;
+      padding-top: 10px;
       margin-right: 10px;
     }
 
     &.reset-deadlines-button {
-      border-radius: 5px;
+      color: #0075b4;
+      background-color: theme-color("inverse");
       cursor: pointer;
     }
   }

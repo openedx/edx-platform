@@ -1,9 +1,10 @@
 define([
+    'jquery',
     'backbone',
     'teams/js/collections/team',
     'teams/js/views/teams',
     'teams/js/spec_helpers/team_spec_helpers'
-], function(Backbone, TeamCollection, TeamsView, TeamSpecHelpers) {
+], function($, Backbone, TeamCollection, TeamsView, TeamSpecHelpers) {
     'use strict';
     var createTeamsView;
     describe('Teams View', function() {
@@ -12,7 +13,13 @@ define([
         });
 
         createTeamsView = function(options) {
-            return new TeamsView({
+            var MockTeamsView = TeamsView.extend({
+                // eslint-disable-next-line no-unused-vars
+                getTopic: function(topicId) {
+                    return $.Deferred().resolve(TeamSpecHelpers.createMockTopic({}));
+                }
+            });
+            return new MockTeamsView({
                 el: '.teams-container',
                 collection: options.teams || TeamSpecHelpers.createMockTeams(),
                 showActions: true,

@@ -135,6 +135,34 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
                         self.assertContains(response, sequential.format)
                     self.assertTrue(sequential.children)
 
+    def test_num_graded_problems(self):
+        course = CourseFactory.create()
+        with self.store.bulk_operations(course.id):
+            chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+            sequential = ItemFactory.create(category='sequential', parent_location=chapter.location)
+            problem = ItemFactory.create(category='problem', parent_location=sequential.location)
+            sequential2 = ItemFactory.create(category='sequential', parent_location=chapter.location)
+            problem2 = ItemFactory.create(category='problem', graded=True, has_score=True,
+                                          parent_location=sequential2.location)
+            sequential3 = ItemFactory.create(category='sequential', parent_location=chapter.location)
+            problem3_1 = ItemFactory.create(category='problem', graded=True, has_score=True,
+                                            parent_location=sequential3.location)
+            problem3_2 = ItemFactory.create(category='problem', graded=True, has_score=True,
+                                            parent_location=sequential3.location)
+        course.children = [chapter]
+        chapter.children = [sequential, sequential2, sequential3]
+        sequential.children = [problem]
+        sequential2.children = [problem2]
+        sequential3.children = [problem3_1, problem3_2]
+        CourseEnrollment.enroll(self.user, course.id)
+
+        url = course_home_url(course)
+        response = self.client.get(url)
+        content = response.content.decode('utf8')
+        self.assertRegex(content, sequential.display_name + r'\s*</h4>')
+        self.assertRegex(content, sequential2.display_name + r'\s*\(1 Question\)\s*</h4>')
+        self.assertRegex(content, sequential3.display_name + r'\s*\(2 Questions\)\s*</h4>')
+
     def test_reset_course_deadlines(self):
         course = self.courses[0]
         enrollment = CourseEnrollment.objects.get(course_id=course.id)

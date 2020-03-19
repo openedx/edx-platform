@@ -186,7 +186,7 @@ from pipeline_mako import render_require_js_path_overrides
     % endif
 
     <% is_course_staff = bool(user and course and has_access(user, 'staff', course, course.id)) %>
-    % if course and course.self_paced and tab and not is_course_staff and relative_dates_is_enabled:
+    % if course and course.self_paced and display_reset_dates_banner and not is_course_staff:
         <%include file="/reset_deadlines_banner.html" />
     % endif
 

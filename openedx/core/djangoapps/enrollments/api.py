@@ -331,7 +331,6 @@ def get_course_enrollment_details(course_id, include_expired=False):
         log.exception(u"Error occurred while retrieving course enrollment details from the cache")
 
     if cached_enrollment_data:
-        log.info(u"Get enrollment data for course %s (cached)", course_id)
         return cached_enrollment_data
 
     course_enrollment_details = _data_api().get_course_enrollment_info(course_id, include_expired)
@@ -344,7 +343,6 @@ def get_course_enrollment_details(course_id, include_expired=False):
         log.exception(u"Error occurred while caching course enrollment details for course %s", course_id)
         raise errors.CourseEnrollmentError(u"An unexpected error occurred while retrieving course enrollment details.")
 
-    log.info(u"Get enrollment data for course %s", course_id)
     return course_enrollment_details
 
 

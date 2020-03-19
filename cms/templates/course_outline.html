@@ -10,7 +10,7 @@ from util.date_utils import get_default_time_display
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_json
 from openedx.core.djangolib.markup import HTML, Text
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 %>
 <%block name="title">${_("Course Outline")}</%block>
 <%block name="bodyclass">is-signedin course view-outline</%block>

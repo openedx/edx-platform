@@ -17,7 +17,7 @@ from student.models import CourseEnrollment
 from .constants import ProgramCourseEnrollmentStatuses, ProgramEnrollmentStatuses
 
 
-class ProgramEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unicode
+class ProgramEnrollment(TimeStampedModel):
     """
     This is a model for Program Enrollments from the registrar service
 
@@ -78,8 +78,20 @@ class ProgramEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unic
     def __str__(self):
         return '[ProgramEnrollment id={}]'.format(self.id)
 
+    def __repr__(self):
+        return (
+            "<ProgramEnrollment"    # pylint: disable=missing-format-attribute
+            " id={self.id}"
+            " user={self.user!r}"
+            " external_user_key={self.external_user_key!r}"
+            " program_uuid={self.program_uuid!r}"
+            " curriculum_uuid={self.curriculum_uuid!r}"
+            " status={self.status!r}"
+            ">"
+        ).format(self=self)
 
-class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unicode
+
+class ProgramCourseEnrollment(TimeStampedModel):
     """
     This is a model to represent a learner's enrollment in a course
     in the context of a program from the registrar service
@@ -114,6 +126,7 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
         CourseEnrollment,
         null=True,
         blank=True,
+        on_delete=models.CASCADE
     )
     course_key = CourseKeyField(max_length=255)
     status = models.CharField(max_length=9, choices=STATUS_CHOICES)
@@ -125,3 +138,14 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
 
     def __str__(self):
         return '[ProgramCourseEnrollment id={}]'.format(self.id)
+
+    def __repr__(self):
+        return (
+            "<ProgramCourseEnrollment"  # pylint: disable=missing-format-attribute
+            " id={self.id}"
+            " program_enrollment={self.program_enrollment!r}"
+            " course_enrollment=<{self.course_enrollment}>"
+            " course_key={self.course_key}"
+            " status={self.status!r}"
+            ">"
+        ).format(self=self)
