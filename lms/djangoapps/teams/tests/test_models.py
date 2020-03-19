@@ -30,14 +30,32 @@ from openedx.core.djangoapps.django_comment_common.signals import (
     thread_edited,
     thread_voted
 )
+from openedx.core.lib.teams_config import TeamsConfig
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import EventTestMixin
+
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 COURSE_KEY1 = CourseKey.from_string('edx/history/1')
-COURSE_KEY2 = CourseKey.from_string('edx/history/2')
+COURSE_KEY2 = CourseKey.from_string('edx/math/1')
 TEAMSET_1_ID = "the-teamset"
 TEAMSET_2_ID = "the-teamset-2"
+TEAMS_CONFIG_1 = TeamsConfig({
+    'team_sets': [{'id': TEAMSET_1_ID, 'name': 'Teamset1Name', 'description': 'Teamset1Desc'}]
+})
+TEAMS_CONFIG_2 = TeamsConfig({
+    'team_sets': [{'id': TEAMSET_2_ID, 'name': 'Teamset2Name', 'description': 'Teamset2Desc'}]
+})
+
+
+def create_course(course_key, teams_config):
+    return CourseFactory.create(
+        teams_configuration=teams_config,
+        org=course_key.org,
+        course=course_key.course,
+        run=course_key.run
+    )
 
 
 class TestModelStrings(SharedModuleStoreTestCase):
@@ -47,10 +65,12 @@ class TestModelStrings(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestModelStrings, cls).setUpClass()
+        cls.course_id = "edx/the-course/1"
+        cls.course1 = create_course(CourseKey.from_string(cls.course_id), TEAMS_CONFIG_1)
         cls.user = UserFactory.create(username="the-user")
-        CourseEnrollmentFactory.create(user=cls.user, course_id="edx/the-course/1")
+        CourseEnrollmentFactory.create(user=cls.user, course_id=cls.course_id)
         cls.team = CourseTeamFactory(
-            course_id="edx/the-course/1",
+            course_id=cls.course_id,
             team_id="the-team",
             topic_id=TEAMSET_1_ID,
             name="The Team"
@@ -90,6 +110,8 @@ class CourseTeamTest(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super(CourseTeamTest, cls).setUpClass()
+        cls.course_id = "edx/the-course/1"
+        cls.course1 = create_course(CourseKey.from_string(cls.course_id), TEAMS_CONFIG_1)
 
         cls.audit_learner = UserFactory.create(username="audit")
         CourseEnrollmentFactory.create(user=cls.audit_learner, course_id="edx/the-course/1", mode=CourseMode.AUDIT)
@@ -128,6 +150,12 @@ class CourseTeamTest(SharedModuleStoreTestCase):
 @ddt.ddt
 class TeamMembershipTest(SharedModuleStoreTestCase):
     """Tests for the TeamMembership model."""
+
+    @classmethod
+    def setUpClass(cls):
+        super(TeamMembershipTest, cls).setUpClass()
+        create_course(COURSE_KEY1, TEAMS_CONFIG_1)
+        create_course(COURSE_KEY2, TEAMS_CONFIG_2)
 
     def setUp(self):
         """
