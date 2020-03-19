@@ -698,7 +698,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         teams = self.get_teams_list(data=data, expected_status=status, **kwargs)
         if names is not None and 200 <= status < 300:
             results = teams['results']
-            self.assertEqual(names, [team['name'] for team in results])
+            self.assertEqual(sorted(names), sorted([team['name'] for team in results]))
 
     def test_filter_invalid_course_id(self):
         self.verify_names({'course_id': 'no_such_course'}, 400)
