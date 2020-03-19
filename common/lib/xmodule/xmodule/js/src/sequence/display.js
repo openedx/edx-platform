@@ -287,7 +287,7 @@
                 // the page on initialization (probably a bug). The call to
                 // focus() below generally brings the main content back onto
                 // screen, however, this behaviour is inconsistent both within
-                // and between different browsers. 
+                // and between different browsers.
                 //
                 // To make this consistent we automatically scroll so the unit
                 // content is at the top of the viewport. Note: we do a hard
