@@ -21,6 +21,8 @@ DEFAULT_BRANDING_DICT = {
     'favicon': "https://edly-edx-theme-files.s3.amazonaws.com/favicon.ico",
 }
 
+DEFAULT_SERVICES_NOTIFICATIONS_URL = 'https://staging.staging.panel.backend.edly.io/api/v1/all_services_notifications/'
+
 
 def dynamic_theming_context(request):  # pylint: disable=unused-argument
     """
@@ -37,6 +39,10 @@ def dynamic_theming_context(request):  # pylint: disable=unused-argument
         )
         theming_context.update(
             {'edly_branding_config': configuration_helpers.get_dict('BRANDING', DEFAULT_BRANDING_DICT)}
+        )
+        theming_context.update(
+            {'services_notifications_url': configuration_helpers.get_value('SERVICES_NOTIFICATIONS_URL',
+                                                                          DEFAULT_SERVICES_NOTIFICATIONS_URL)}
         )
         cache.set(CACHE_NAME, theming_context, CACHE_TIMEOUT)
 
