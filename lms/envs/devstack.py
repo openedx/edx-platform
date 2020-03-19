@@ -71,7 +71,7 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.signals.SignalsPanel',
     'debug_toolbar.panels.logging.LoggingPanel',
 
-    # MongoDebugPanel has been intentionally disabled by maxi@appsembler.com
+    # Appsembler: MongoDebugPanel has been intentionally disabled by maxi@appsembler.com
     # since it was breaking the mongo connections. Probably it's because we
     # upgraded pymongo and DjangoDebugToolbar is some versions behind.
 
