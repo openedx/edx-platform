@@ -139,14 +139,12 @@ def get_course_outline_block_tree(request, course_id, user=None):
     def recurse_num_graded_problems(block):
         """
         Marks each block with the number of graded and scored leaf blocks below it as 'num_graded_problems'
-
-        Must be run after recurse_mark_scored.
         """
-        children = block.get('children', [])
-        if children:
-            num_graded_problems = sum(recurse_num_graded_problems(child) for child in children)
-        else:
-            num_graded_problems = 1 if block.get('scored') and block.get('graded') else 0
+        is_scored = block.get('has_score') and block.get('weight', 1) > 0
+        is_graded = block.get('graded')
+
+        num_graded_problems = 1 if is_scored and is_graded else 0
+        num_graded_problems += sum(recurse_num_graded_problems(child) for child in block.get('children', []))
 
         block['num_graded_problems'] = num_graded_problems
         return num_graded_problems
