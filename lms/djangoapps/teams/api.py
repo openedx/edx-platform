@@ -12,7 +12,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
-from lms.djangoapps.teams.models import CourseTeam
+from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.lib.teams_config import TeamsetType
 from student.models import CourseEnrollment, anonymous_id_for_user
 from student.roles import CourseInstructorRole, CourseStaffRole
@@ -179,8 +179,35 @@ def user_organization_protection_status(user, course_key):
             course_key
         )
 
-
 def has_specific_team_access(user, team):
+    """ 
+    To have access to a team a user must:
+        - Be course staff
+        OR
+        - be in the correct bubble
+        - be in the team if it is private
+    """
+    return valid_organization_bubble_access(user, team) and valid_teamset_type_access(user, team)
+
+
+def valid_teamset_type_access(user, team):
+    """
+    The only users who should be able to see private_managed teams
+    or recieve any information about them at all from the API are:
+    - Course staff
+    - Users who are enrolled in a team in a private_managed teamset
+    * They should only be able to see their own team, no other teams.
+    """
+    if has_course_staff_privileges(user, team.course_id):
+        return True
+    course_module = modulestore().get_course(team.course_id)
+    teamset = course_module.teams_configuration.teamsets_by_id[team.topic_id]
+    if teamset.teamset_type != TeamsetType.private_managed:
+        return True
+    return CourseTeamMembership.is_user_on_team(user, team) 
+
+
+def valid_organization_bubble_access(user, team):
     """
     Check whether the user have access to the specific team.
     The user can be of a different organization protection bubble with the team in question.

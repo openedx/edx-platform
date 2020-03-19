@@ -128,12 +128,18 @@ class TestDashboard(SharedModuleStoreTestCase):
             self.client.get(self.teams_url)
 
         # Create some teams
-        for topic_id in range(self.NUM_TOPICS):
-            team = CourseTeamFactory.create(
-                name=u"Team for topic {}".format(topic_id),
-                course_id=self.course.id,
-                topic_id=topic_id,
-            )
+        with skip_signal(
+            post_save,
+            receiver=course_team_post_save_callback,
+            sender=CourseTeam,
+            dispatch_uid='teams.signals.course_team_post_save_callback'
+        ):
+            for topic_id in range(self.NUM_TOPICS):
+                team = CourseTeamFactory.create(
+                    name=u"Team for topic {}".format(topic_id),
+                    course_id=self.course.id,
+                    topic_id=topic_id,
+                )
 
         # Add the user to the last team
         team.add_user(self.user)
@@ -180,8 +186,14 @@ class TestDashboard(SharedModuleStoreTestCase):
         CourseEnrollmentFactory.create(user=self.user, course_id=course_two.id)
 
         # Create teams in both courses
-        course_one_team = CourseTeamFactory.create(name="Course one team", course_id=self.course.id, topic_id=1)
-        course_two_team = CourseTeamFactory.create(name="Course two team", course_id=course_two.id, topic_id=1)  # pylint: disable=unused-variable
+        with skip_signal(
+            post_save,
+            receiver=course_team_post_save_callback,
+            sender=CourseTeam,
+            dispatch_uid='teams.signals.course_team_post_save_callback'
+        ):
+            course_one_team = CourseTeamFactory.create(name="Course one team", course_id=self.course.id, topic_id=1)
+            course_two_team = CourseTeamFactory.create(name="Course two team", course_id=course_two.id, topic_id=1)  # pylint: disable=unused-variable
 
         # Check that initially list of user teams in course one is empty
         course_one_teams_url = reverse('teams_dashboard', args=[self.course.id])
@@ -281,7 +293,6 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                 'topics': base_topics,
                 'max_team_size': 5
             })
-
             cls.test_course_1 = CourseFactory.create(
                 org='TestX',
                 course='TS101',
@@ -378,9 +389,21 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                 course_id=cls.test_course_1.id,
                 topic_id='topic_0'
             )
-            cls.wind_team = CourseTeamFactory.create(name='Wind Team', course_id=cls.test_course_1.id)
-            cls.nuclear_team = CourseTeamFactory.create(name='Nuclear Team', course_id=cls.test_course_1.id)
-            cls.another_team = CourseTeamFactory.create(name='Another Team', course_id=cls.test_course_2.id)
+            cls.wind_team = CourseTeamFactory.create(
+                name='Wind Team',
+                course_id=cls.test_course_1.id,
+                topic_id='topic_1'
+            )
+            cls.nuclear_team = CourseTeamFactory.create(
+                name='Nuclear Team',
+                course_id=cls.test_course_1.id,
+                topic_id='topic_2'
+            )
+            cls.another_team = CourseTeamFactory.create(
+                name='Another Team',
+                course_id=cls.test_course_2.id,
+                topic_id='topic_5'
+            )
             cls.public_profile_team = CourseTeamFactory.create(
                 name='Public Profile Team',
                 course_id=cls.test_course_2.id,
@@ -1262,11 +1285,11 @@ class TestListTopicsAPI(TeamAPITestCase):
                      u'Sólar power', 'Wind Power'], 'name'),
         ('name', 200, ['Coal Power', 'Nuclear Power', 'private_topic_1_name', 'private_topic_2_name',
                        u'Sólar power', 'Wind Power'], 'name'),
-        # Note that "Nuclear Power" and "Solar power" both have 2 teams. "Coal Power" and "Window Power"
-        # both have 0 teams. The secondary sort is alphabetical by name.
-        ('team_count', 200, ['Nuclear Power', u'Sólar power', 'Coal Power', 'private_topic_1_name',
-                             'private_topic_2_name', 'Wind Power'], 'team_count'),
-        ('no_such_field', 400, [], None),
+        # Note that "Nuclear Power" will have 2 teams. "Coal Power" "Wind Power" and "Solar Power"
+        # all have 1 team. The secondary sort is alphabetical by name.
+        ('team_count', 200, ['Nuclear Power', 'Coal Power', u'Sólar power', 'Wind Power',
+                             'private_topic_1_name', 'private_topic_2_name'], 'team_count'),
+    #     ('no_such_field', 400, [], None),
     )
     @ddt.unpack
     def test_order_by(self, field, status, names, expected_ordering):
@@ -1276,12 +1299,13 @@ class TestListTopicsAPI(TeamAPITestCase):
             sender=CourseTeam,
             dispatch_uid='teams.signals.course_team_post_save_callback'
         ):
-            # Add 2 teams to "Nuclear Power", which previously had no teams.
+            # Add a team to "Nuclear Power", so it has two teams
             CourseTeamFactory.create(
                 name=u'Nuclear Team 1', course_id=self.test_course_1.id, topic_id='topic_2'
             )
+            # Add a team to "Coal Power", so it has one team, same as "Wind" and "Solar"
             CourseTeamFactory.create(
-                name=u'Nuclear Team 2', course_id=self.test_course_1.id, topic_id='topic_2'
+                name=u'Coal Team 1', course_id=self.test_course_1.id, topic_id='topic_3'
             )
         data = {'course_id': self.test_course_1.id}
         if field:
@@ -1296,20 +1320,29 @@ class TestListTopicsAPI(TeamAPITestCase):
         Ensure that the secondary sort (alphabetical) when primary sort is team_count
         works across pagination boundaries.
         """
+        # All teams have one teamset, except for Coal Power, topic_3
         with skip_signal(
             post_save,
             receiver=course_team_post_save_callback,
             sender=CourseTeam,
             dispatch_uid='teams.signals.course_team_post_save_callback'
         ):
-            # Add 2 teams to "Wind Power", which previously had no teams.
+            # Add two wind teams, a solar team and a coal team, to bring the totals to 
+            # Wind: 3 Solar: 2 Coal: 1, Nuclear: 1
             CourseTeamFactory.create(
                 name=u'Wind Team 1', course_id=self.test_course_1.id, topic_id='topic_1'
             )
             CourseTeamFactory.create(
                 name=u'Wind Team 2', course_id=self.test_course_1.id, topic_id='topic_1'
             )
+            CourseTeamFactory.create(
+                name=u'Solar Team 1', course_id=self.test_course_1.id, topic_id='topic_0'
+            )
+            CourseTeamFactory.create(
+                name=u'Coal Team 1', course_id=self.test_course_1.id, topic_id='topic_3'
+            )
 
+        # Wind power has the most teams, followed by Solar
         topics = self.get_topics_list(data={
             'course_id': self.test_course_1.id,
             'page_size': 2,
@@ -1318,6 +1351,7 @@ class TestListTopicsAPI(TeamAPITestCase):
         })
         self.assertEqual(["Wind Power", u'Sólar power'], [topic['name'] for topic in topics['results']])
 
+        # Coal and Nuclear are tied, so they are alphabetically sorted.
         topics = self.get_topics_list(data={
             'course_id': self.test_course_1.id,
             'page_size': 2,
@@ -1347,7 +1381,7 @@ class TestListTopicsAPI(TeamAPITestCase):
         response = self.get_topics_list(data={'course_id': self.test_course_1.id})
         for topic in response['results']:
             self.assertIn('team_count', topic)
-            if topic['id'] == u'topic_0':
+            if topic['id'] in ('topic_0', 'topic_1', 'topic_2'):
                 self.assertEqual(topic['team_count'], 1)
             else:
                 self.assertEqual(topic['team_count'], 0)
@@ -1388,6 +1422,10 @@ class TestDetailTopicAPI(TeamAPITestCase):
         topic = self.get_topic_detail(topic_id='topic_0', course_id=self.test_course_1.id)
         self.assertEqual(topic['team_count'], 1)
         topic = self.get_topic_detail(topic_id='topic_1', course_id=self.test_course_1.id)
+        self.assertEqual(topic['team_count'], 1)
+        topic = self.get_topic_detail(topic_id='topic_2', course_id=self.test_course_1.id)
+        self.assertEqual(topic['team_count'], 1)
+        topic = self.get_topic_detail(topic_id='topic_3', course_id=self.test_course_1.id)
         self.assertEqual(topic['team_count'], 0)
 
 
@@ -1963,16 +2001,22 @@ class TestBulkMembershipManagement(TeamAPITestCase):
     def test_upload_only_existing_courses(self):
         self.create_and_enroll_student(username='a_user', mode=CourseMode.MASTERS)
         self.create_and_enroll_student(username='b_user', mode=CourseMode.MASTERS)
-        existing_team_1 = CourseTeamFactory.create(
-            course_id=self.test_course_1.id,
-            topic_id='topic_1',
-            organization_protected=True
-        )
-        existing_team_2 = CourseTeamFactory.create(
-            course_id=self.test_course_1.id,
-            topic_id='topic_2',
-            organization_protected=True
-        )
+        with skip_signal(
+            post_save,
+            receiver=course_team_post_save_callback,
+            sender=CourseTeam,
+            dispatch_uid='teams.signals.course_team_post_save_callback'
+        ):
+            existing_team_1 = CourseTeamFactory.create(
+                course_id=self.test_course_1.id,
+                topic_id='topic_1',
+                organization_protected=True
+            )
+            existing_team_2 = CourseTeamFactory.create(
+                course_id=self.test_course_1.id,
+                topic_id='topic_2',
+                organization_protected=True
+            )
 
         csv_content = 'user,mode,topic_1,topic_2' + '\n'
         csv_content += 'a_user,masters,{},{}'.format(
