@@ -719,7 +719,7 @@ def show_courseware_mfe_link(user, staff_access, course_key):
     # course team preview CourseWaffleFlag for this course *or* if we've turned
     # on the redirect for your students.
     mfe_enabled_for_course_team = COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW.is_enabled(course_key)
-    mfe_experiment_enabled_for_course = REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled_for_course(course_key)
+    mfe_experiment_enabled_for_course = REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_experiment_on(course_key)
 
     if staff_access and (mfe_enabled_for_course_team or mfe_experiment_enabled_for_course):
         return True

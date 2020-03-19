@@ -138,7 +138,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
     def is_enabled_without_course_context(self):
         return self.is_enabled()
 
-    def is_enabled_for_course(self, course_key=None):
+    def is_experiment_on(self, course_key=None):
         return super().is_enabled(course_key)
 
     @contextmanager
