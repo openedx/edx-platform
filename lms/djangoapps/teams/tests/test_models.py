@@ -191,13 +191,13 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
         (None, None, None, 3),
         ('user1', None, None, 2),
         ('user1', [COURSE_KEY1], None, 1),
-        ('user1', None, 'team1', 1),
+        ('user1', None, ['team1'], 1),
         ('user2', None, None, 1),
     )
     @ddt.unpack
-    def test_get_memberships(self, username, course_ids, team_id, expected_count):
+    def test_get_memberships(self, username, course_ids, team_ids, expected_count):
         self.assertEqual(
-            CourseTeamMembership.get_memberships(username=username, course_ids=course_ids, team_id=team_id).count(),
+            CourseTeamMembership.get_memberships(username=username, course_ids=course_ids, team_ids=team_ids).count(),
             expected_count
         )
 
