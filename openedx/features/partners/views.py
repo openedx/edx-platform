@@ -131,7 +131,7 @@ class PartnerRegistrationView(RegistrationViewCustom):
         except Exception as err:
             error_message = {"Error": {"reason": "User registration failed due to {}".format(repr(err))}}
             log.exception(error_message)
-            return JsonResponse(error_message, status=400)
+            return JsonResponse({"Error": {"reason": err.message}}, status=400)
 
         response = JsonResponse({"success": True})
         set_logged_in_cookies(request, response, user)
@@ -297,10 +297,16 @@ def create_account_with_params_custom(request, params, partner):
     if not registration.user.is_active:
         registration.activate()
 
-    # login user immediately after a user creates an account,
-    new_user = authenticate(username=user.username, password=params['password'])
-    login(request, new_user)
-    request.session.set_expiry(0)
+    count_registered_partner_users = PartnerUser.objects.filter(partner=partner).count()
+    limit_registered_partner_users = partner.configuration.get("USER_LIMIT")
+
+    if limit_registered_partner_users and count_registered_partner_users > int(limit_registered_partner_users):
+        raise Exception("User registration limit for partner {} reached".format(partner.label))
+    else:
+        # login user immediately after a user creates an account,
+        new_user = authenticate(username=user.username, password=params['password'])
+        login(request, new_user)
+        request.session.set_expiry(0)
 
     try:
         record_registration_attributions(request, new_user)
