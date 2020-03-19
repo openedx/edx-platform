@@ -82,7 +82,7 @@ from ..permissions import MASQUERADE_AS_STUDENT
 from ..toggles import (
     COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW,
     REDIRECT_TO_COURSEWARE_MICROFRONTEND,
-    should_redirect_to_courseware_microfrontend
+    should_redirect_to_courseware_microfrontend,
 )
 from ..url_helpers import get_microfrontend_url
 
