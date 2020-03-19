@@ -70,17 +70,6 @@ class SiteConfigurationViewSet(viewsets.ModelViewSet):
         delete_site(instance.site)
 
 
-class OffboardOrganizationAPIView(generics.DestroyAPIView):
-    authentication_classes = (OAuth2AuthenticationAllowInactiveUser,)
-    permission_classes = (IsAuthenticated, AMCAdminPermission)
-    queryset = Site.objects.all()
-    serializer_class = SiteSerializer
-    lookup_field = 'domain'
-
-    def perform_destroy(self, instance):
-        delete_site(instance)
-
-
 class FileUploadView(views.APIView):
     parser_classes = (MultiPartParser,)
     # TODO: oauth token isn't present after step 3 in signup, fix later

@@ -8,7 +8,6 @@ from openedx.core.djangoapps.appsembler.sites.api import (
     DomainSwitchView,
     HostFilesView,
     FileUploadView,
-    OffboardOrganizationAPIView,
     SiteConfigurationViewSet,
     SiteCreateView,
     SiteViewSet,
@@ -29,7 +28,6 @@ urlpatterns = [
     url(r'^custom_domain/', CustomDomainView.as_view()),
     url(r'^domain_switch/', DomainSwitchView.as_view()),
     url(r'^register/', SiteCreateView.as_view()),
-    url(r'^offboard/(?P<domain>\w+(\.\w+)*(:[0-9]+)?\/?)/', OffboardOrganizationAPIView.as_view()),
     url(r'^', include(router.urls)),
 ]
 
