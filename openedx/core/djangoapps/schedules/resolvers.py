@@ -383,7 +383,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
         )
 
         check_completion = (self.check_completion and
-            completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING))
+                            completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING))
         template_context = get_base_template_context(self.site)
         for schedule in schedules:
             enrollment = schedule.enrollment

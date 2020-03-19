@@ -31,7 +31,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 @ddt.ddt
 @skip_unless_lms
 @skipUnless(
-    'openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
+    'openedx.core.djangoapps.schedules' in settings.INSTALLED_APPS,
     "Can't test schedules if the app isn't installed",
 )
 class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, ModuleStoreTestCase):

@@ -176,6 +176,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
                     self.site_config.site,
                     test_day,
                     offset,
+                    None,
                     None
                 )
 
@@ -185,11 +186,11 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
         with patch.object(self.task, 'apply_async') as mock_apply_async:
             self.task.enqueue(self.site_config.site, current_day, offset)
         mock_apply_async.assert_any_call(
-            (self.site_config.site.id, serialize(target_day), offset, 0, None),
+            (self.site_config.site.id, serialize(target_day), offset, 0, None, False),
             retry=False,
         )
         mock_apply_async.assert_any_call(
-            (self.site_config.site.id, serialize(target_day), offset, self.task.num_bins - 1, None),
+            (self.site_config.site.id, serialize(target_day), offset, self.task.num_bins - 1, None, False),
             retry=False,
         )
         self.assertFalse(mock_ace.send.called)

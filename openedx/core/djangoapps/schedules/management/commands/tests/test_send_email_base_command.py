@@ -19,7 +19,7 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_un
 
 @ddt.ddt
 @skip_unless_lms
-@skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
+@skipUnless('openedx.core.djangoapps.schedules' in settings.INSTALLED_APPS,
             "Can't test schedules if the app isn't installed")
 class TestSendEmailBaseCommand(CacheIsolationTestCase, CompletionWaffleTestMixin):
 
@@ -34,6 +34,7 @@ class TestSendEmailBaseCommand(CacheIsolationTestCase, CompletionWaffleTestMixin
             send_emails.assert_called_once_with(
                 self.site,
                 datetime.datetime(2017, 9, 29, tzinfo=pytz.UTC),
+                None,
                 None
             )
 
@@ -47,8 +48,9 @@ class TestSendEmailBaseCommand(CacheIsolationTestCase, CompletionWaffleTestMixin
         with patch.object(self.command, 'send_emails') as send_emails:
             self.command.handle(site_domain_name=self.site.domain, date='2017-09-29', check_completion=True)
             send_emails.assert_called_once_with(
-                self.site.domain,
+                self.site,
                 datetime.datetime(2017, 9, 29, tzinfo=pytz.UTC),
+                None,
                 True
             )
 
