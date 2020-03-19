@@ -1009,6 +1009,13 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
               specified team. The requesting user must be staff or enrolled in
               the course associated with the team.
 
+            * teamset_id: Returns membership records only for the specified teamset.
+              if teamset_id is specified, course_id must also be specified.
+              teamset_id and team_id are mutually exclusive. For open and public_managed
+              teamsets, the user must be staff or enrolled in the course. For
+              private_managed teamsets, the user must be course staff, or a member of the
+              specified teamset.
+
             * course_id: Returns membership records only for the specified
               course. Username must have access to this course, or else team_id
               must be in this course.
@@ -1172,10 +1179,10 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                     status=status.HTTP_404_NOT_FOUND
                 )
             teamset_teams = CourseTeam.objects.filter(course_id=requested_course_key, topic_id=teamset_id)
-            teams_with_access = list(filter(
-                lambda team: has_specific_team_access(request.user, team),
-                teamset_teams
-            ))
+            teams_with_access = [
+                team for team in teamset_teams
+                if has_specific_team_access(request.user, team)
+            ]
             if not teams_with_access:
                 return Response(
                     build_api_error(ugettext_noop("No teamset found in given course with given id")),
