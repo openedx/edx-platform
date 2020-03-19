@@ -310,7 +310,6 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
     reset_url_token = 'set-password'
 
     def __init__(self):
-        self.post_reset_login = False
         self.platform_name = PasswordResetConfirmWrapper._get_platform_name()
         self.validlink = False
         self.user = None
@@ -467,13 +466,8 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
         if response:
             return response
 
-        if 'is_account_recovery' in request.GET:
-            self.post_reset_login = True
-            response = self._process_password_reset_success(request, self.token, self.uidb64,
-                                                            extra_context=self.platform_name)
-        else:
-            response = self._process_password_reset_success(request, self.token, self.uidb64,
-                                                            extra_context=self.platform_name)
+        response = self._process_password_reset_success(request, self.token, self.uidb64,
+                                                        extra_context=self.platform_name)
 
         # If password reset was unsuccessful a template response is returned (status_code 200).
         # Check if form is invalid then show an error to the user.
