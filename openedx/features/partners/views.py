@@ -3,6 +3,7 @@ import json
 from copy import deepcopy
 from datetime import datetime
 from eventtracking import tracker
+from edxmako.shortcuts import render_to_response
 from logging import getLogger
 from notification_prefs.views import enable_notifications
 from pytz import UTC
@@ -26,7 +27,7 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER, record_registration_attributions
-from openedx.features.partners.helpers import auto_join_partner_community
+from openedx.features.partners.helpers import auto_join_partner_community, get_partner_recommended_courses
 from openedx.features.partners.models import PartnerUser
 from philu_overrides.user_api.views import LoginSessionViewCustom
 from student.models import Registration, UserProfile
@@ -35,7 +36,7 @@ from student.views import password_change_request_handler
 from . import constants as partner_constants
 from .forms import PartnerAccountCreationForm
 from .forms import PartnerResetPasswordForm
-from .helpers import import_module_using_slug, user_has_performance_access
+from .helpers import user_has_performance_access
 from .models import Partner
 
 log = getLogger(__name__)
@@ -44,14 +45,16 @@ AUDIT_LOG = getLogger("audit")
 
 def dashboard(request, slug):
     partner = get_object_or_404(Partner, slug=slug)
-    views = import_module_using_slug(partner.slug)
-    return views.dashboard(request, partner.slug)
+    courses = get_partner_recommended_courses(partner.slug, request.user)
+    return render_to_response('features/partners/dashboard.html', {'recommended_courses': courses,
+                                                                       'slug': partner.slug})
 
 
 def performance_dashboard(request, slug):
     partner = get_object_or_404(Partner, slug=slug)
     if user_has_performance_access(request.user, partner):
-        partner_views = import_module_using_slug(partner.slug)
+        return render_to_response('features/partners/performance_dashboard.html',
+                                  {'slug': partner.slug, 'performance_url': partner.performance_url})
         return partner_views.performance_dashboard(request, partner)
     return HttpResponseForbidden()
 
@@ -66,7 +69,6 @@ def register_user(request, slug):
     :return: JsonResponse object with success/error message
     """
     partner = get_object_or_404(Partner, slug=slug)
-    # views = import_module_using_slug(partner.slug)
     return PartnerRegistrationView.as_view()(request, partner=partner)
 
 
@@ -80,7 +82,6 @@ def login_user(request, slug):
     :return: JsonResponse object with success/error message
     """
     partner = get_object_or_404(Partner, slug=slug)
-    # views = import_module_using_slug(partner.slug)
     return PartnerLoginSessionView.as_view()(request, partner=partner)
 
 
