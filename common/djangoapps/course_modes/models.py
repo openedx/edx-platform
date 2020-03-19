@@ -46,9 +46,6 @@ class CourseMode(models.Model):
 
     .. no_pii:
     """
-    class Meta(object):
-        app_label = "course_modes"
-
     course = models.ForeignKey(
         CourseOverview,
         db_constraint=False,
@@ -199,6 +196,7 @@ class CourseMode(models.Model):
     CACHE_NAMESPACE = u"course_modes.CourseMode.cache."
 
     class Meta(object):
+        app_label = "course_modes"
         unique_together = ('course', 'mode_slug', 'currency')
 
     def clean(self):

@@ -25,24 +25,26 @@
                     return this;
                 },
 
-                getTopicType: function(topicId) {
-                    var deferred = $.Deferred();
-                    this.getTopic(topicId).done(function(topic) {
-                        deferred.resolve(topic.get('type'));
-                    });
-                    return deferred.promise();
+                getTopic: function(topicId) {
+                    return this.getTopic(topicId);
                 },
 
                 createHeaderView: function() {
-                    // Never show a pagination header for the "My Team" tab
-                    // because there is only ever one team.
-                    return null;
+                    // hide pagination when learner isn't a member of any teams
+                    if (!this.collection.length) {
+                        return null;
+                    } else {
+                        return TeamsView.prototype.createHeaderView.call(this);
+                    }
                 },
 
                 createFooterView: function() {
-                    // Never show a pagination footer for the "My Team" tab
-                    // because there is only ever one team.
-                    return null;
+                    // hide pagination when learner isn't a member of any teams
+                    if (!this.collection.length) {
+                        return null;
+                    } else {
+                        return TeamsView.prototype.createFooterView.call(this);
+                    }
                 }
             });
 

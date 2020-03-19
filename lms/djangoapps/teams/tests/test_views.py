@@ -258,7 +258,8 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         with super(TeamAPITestCase, cls).setUpClassAndTestData():
             base_topics = [{
                 'id': 'topic_{}'.format(i), 'name': name,
-                'description': u'Description for topic {}.'.format(i)
+                'description': u'Description for topic {}.'.format(i),
+                'max_team_size': 3
             } for i, name in enumerate([u'Sólar power', 'Wind Power', 'Nuclear Power', 'Coal Power'])]
             base_topics.append(
                 {
@@ -277,7 +278,8 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                 }
             )
             teams_configuration_1 = TeamsConfig({
-                'topics': base_topics
+                'topics': base_topics,
+                'max_team_size': 5
             })
 
             cls.test_course_1 = CourseFactory.create(
@@ -1968,3 +1970,23 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             400, method='post',
             data={'csv': csv_file}, user='staff'
         )
+
+    def test_upload_learners_exceed_max_team_size(self):
+        csv_content = 'user,mode,topic_0,topic_1' + '\n'
+        team1 = 'team wind power'
+        team2 = 'team 2'
+        for name_enum in enumerate(['a', 'b', 'c', 'd', 'e', 'f', 'g']):
+            username = 'user_{}'.format(name_enum[1])
+            self.create_and_enroll_student(username=username, mode=CourseMode.MASTERS)
+            csv_content += '{},masters,{},{}'.format(username, team1, team2) + '\n'
+
+        csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
+        self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
+        response = self.make_call(reverse(
+            'team_membership_bulk_management',
+            args=[self.good_course_id]),
+            400, method='post',
+            data={'csv': csv_file}, user='staff'
+        )
+        response_text = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(response_text['errors'][0], 'Team {} is full.'.format(team1))

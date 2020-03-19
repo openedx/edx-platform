@@ -3,6 +3,9 @@
 
 from .models import UserCalendarSyncConfig
 
+SUBSCRIBE = 'subscribe'
+UNSUBSCRIBE = 'unsubscribe'
+
 
 def subscribe_user_to_calendar(user, course_key):
     """

@@ -111,7 +111,7 @@ from lms.envs.common import (
     _make_locale_paths,
 )
 from path import Path as path
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy  # pylint: disable=wrong-import-order
 
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.authoring_mixin import AuthoringMixin
@@ -341,6 +341,50 @@ FEATURES = {
     # .. toggle_status: supported
     # .. toggle_warnings: None
     'ENABLE_CHANGE_USER_PASSWORD_ADMIN': False,
+
+    ### ORA Feature Flags ###
+
+    # .. toggle_name: ENABLE_ORA_TEAM_SUBMISSIONS
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to enable team-based ORA submissions.
+    # .. toggle_category: ora
+    # .. toggle_use_cases: incremental_release
+    # .. toggle_creation_date: 2020-03-03
+    # .. toggle_expiration_date: None
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
+    # .. toggle_status: supported
+    # .. toggle_warnings: None
+    'ENABLE_ORA_TEAM_SUBMISSIONS': False,
+
+    # .. toggle_name: ENABLE_ORA_ALL_FILE_URLS
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: A "work-around" feature toggle meant to help in cases where some file uploads are not
+    #      discoverable.  If enabled, will iterate through all possible file key suffixes up to the max for displaying
+    #      file metadata in staff assessments.
+    # .. toggle_category: ora
+    # .. toggle_use_cases: graceful_degradation
+    # .. toggle_creation_date: 2020-03-03
+    # .. toggle_expiration_date: None
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
+    # .. toggle_status: supported
+    # .. toggle_warnings: None
+    'ENABLE_ORA_ALL_FILE_URLS': False,
+
+    # .. toggle_name: ENABLE_ORA_USER_STATE_UPLOAD_DATA
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: A "work-around" feature toggle meant to help in cases where some file uploads are not
+    #      discoverable.  If enabled, will pull file metadata from StudentModule.state for display in staff assessments.
+    # .. toggle_category: ora
+    # .. toggle_use_cases: graceful_degradation
+    # .. toggle_creation_date: 2020-03-03
+    # .. toggle_expiration_date: None
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
+    # .. toggle_status: supported
+    # .. toggle_warnings: None
+    'ENABLE_ORA_USER_STATE_UPLOAD_DATA': False,
 }
 
 ENABLE_JASMINE = False
@@ -1430,6 +1474,7 @@ INSTALLED_APPS = [
 
     # Management of per-user schedules
     'openedx.core.djangoapps.schedules',
+    'rest_framework_jwt',
 ]
 
 

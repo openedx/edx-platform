@@ -14,19 +14,16 @@ class Schedule(TimeStampedModel):
     .. no_pii:
     """
 
-    enrollment = models.OneToOneField('student.CourseEnrollment', null=False, on_delete=models.CASCADE, db_constraint=False)
+    enrollment = models.OneToOneField('student.CourseEnrollment', null=False, on_delete=models.CASCADE)
     active = models.BooleanField(
         default=True,
         help_text=_('Indicates if this schedule is actively used')
     )
-    # TODO Delete this field during last stage of rolling out field renames
-    start = models.DateTimeField(
-        db_index=True,
-        help_text=_('Date this schedule went into effect')
-    )
     start_date = models.DateTimeField(
         db_index=True,
-        help_text=_('Date this schedule went into effect')
+        help_text=_('Date this schedule went into effect'),
+        null=True,
+        default=None
     )
     upgrade_deadline = models.DateTimeField(
         blank=True,
@@ -73,5 +70,5 @@ class ScheduleExperience(models.Model):
         (1, 'course_updates', u'Course Updates')
     )
 
-    schedule = models.OneToOneField(Schedule, related_name='experience', on_delete=models.CASCADE, db_constraint=False)
+    schedule = models.OneToOneField(Schedule, related_name='experience', on_delete=models.CASCADE)
     experience_type = models.PositiveSmallIntegerField(choices=EXPERIENCES, default=EXPERIENCES.default)

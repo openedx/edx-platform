@@ -136,10 +136,6 @@ def can_receive_discount(user, course, discount_expiration_date=None):
     if is_enterprise_learner(user):
         return False
 
-    # Excute holdback
-    if _is_in_holdback(user):
-        return False
-
     return True
 
 

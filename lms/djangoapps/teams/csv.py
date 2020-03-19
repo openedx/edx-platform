@@ -3,6 +3,7 @@ CSV processing and generation utilities for Teams LMS app.
 """
 
 import csv
+from collections import Counter
 
 from django.contrib.auth.models import User
 
@@ -107,6 +108,7 @@ class TeamMembershipImportManager(object):
         self.max_errors = 0
         self.existing_course_team_memberships = {}
         self.existing_course_teams = {}
+        self.user_count_by_team = Counter()
         self.number_of_learners_assigned = 0
 
     @property
@@ -282,8 +284,15 @@ class TeamMembershipImportManager(object):
                 # checks for a team inside a specific team set. This way team names can be duplicated across
                 # teamsets
                 team = self.existing_course_teams[(team_name, teamset_id)]
+                if (teamset_id, team_name) not in self.user_count_by_team:
+                    self.user_count_by_team[(teamset_id, team_name)] = team.users.count()
+                if (user.id, team.topic_id) in self.existing_course_team_memberships:
+                    error_message = 'User {0} is already on a team in teamset {1}.'.format(
+                        user.username, team.topic_id
+                    )
+                    if self.add_error_and_check_if_max_exceeded(error_message):
+                        return False
             except KeyError:
-                # if a team doesn't exists, the validation doesn't apply to it.
                 all_teamset_user_ids = self.user_ids_by_teamset_id[teamset_id]
                 error_message = 'User {0} is already on a team in teamset {1}.'.format(
                     user.username, teamset_id
@@ -292,18 +301,24 @@ class TeamMembershipImportManager(object):
                     return False
                 else:
                     self.user_ids_by_teamset_id[teamset_id].add(user.id)
-                    continue
-            max_team_size = self.course.teams_configuration.default_max_team_size
-            if max_team_size is not None and team.users.count() >= max_team_size:
-                if self.add_error_and_check_if_max_exceeded('Team ' + team.team_id + ' is full.'):
-                    return False
+            if not self.validate_proposed_team_size_wont_exceed_maximum(team_name, teamset_id):
+                return False
+        return True
 
-            if (user.id, team.topic_id) in self.existing_course_team_memberships:
-                error_message = 'User {0} is already on a team in teamset {1}.'.format(
-                    user.username, team.topic_id
-                )
-                if self.add_error_and_check_if_max_exceeded(error_message):
-                    return False
+    def validate_proposed_team_size_wont_exceed_maximum(self, team_name, teamset_id):
+        """
+        Validates that the number of users we want to add to a team won't exceed maximum team size.
+        """
+        if self.course.teams_configuration.teamsets_by_id[teamset_id].max_team_size is None:
+            max_team_size = self.course.teams_configuration.default_max_team_size
+        else:
+            max_team_size = self.course.teams_configuration.teamsets_by_id[teamset_id].max_team_size
+
+        if max_team_size is not None:
+            if self.user_count_by_team[(teamset_id, team_name)] + 1 > max_team_size:
+                self.add_error_and_check_if_max_exceeded('Team ' + team_name + ' is full.')
+                return False
+        self.user_count_by_team[(teamset_id, team_name)] += 1
         return True
 
     def add_error_and_check_if_max_exceeded(self, error_message):

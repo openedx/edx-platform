@@ -15,6 +15,7 @@ from lms.djangoapps.discussion.django_comment_client.permissions import has_perm
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import Text, HTML
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REVIEWS_TOOL_FLAG
+from openedx.features.course_experience.course_tools import HttpMethod
 %>
 
 <%block name="header_extras">
@@ -62,6 +63,9 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REV
     </header>
     <div class="page-content">
         <div class="page-content-main">
+            % if next_up_banner_fragment:
+                ${HTML(next_up_banner_fragment.body_html())}
+            % endif
             % if offer_banner_fragment:
                 ${HTML(offer_banner_fragment.content)}
             % endif
@@ -114,10 +118,21 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REV
                     <ul class="list-unstyled">
                         % for course_tool in course_tools:
                             <li class="course-tool">
-                                <a class="course-tool-link" data-analytics-id="${course_tool.analytics_id()}" href="${course_tool.url(course_key)}">
-                                    <span class="icon ${course_tool.icon_classes()}" aria-hidden="true"></span>
-                                    ${course_tool.title()}
-                                </a>
+                                % if course_tool.http_method == HttpMethod.GET:
+                                    <a class="course-tool-link" data-analytics-id="${course_tool.analytics_id()}" href="${course_tool.url(course_key)}">
+                                        <span class="icon ${course_tool.icon_classes()}" aria-hidden="true"></span>
+                                        ${course_tool.title()}
+                                    </a>
+                                % elif course_tool.http_method == HttpMethod.POST:
+                                    <form class="course-tool-form" action="${course_tool.url(course_key)}" method="post">
+                                        <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+                                        <input type="hidden" name="tool_data" value="${course_tool.data()}">
+                                        <button class="course-tool-button" data-analytics-id="${course_tool.analytics_id()}" aria-hidden="true">
+                                            <span class="icon ${course_tool.icon_classes()}" aria-hidden="true"></span>
+                                            ${course_tool.title()}
+                                        </button>
+                                    </form>
+                                % endif
                             </li>
                         % endfor
                     </ul>

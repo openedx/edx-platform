@@ -13,6 +13,7 @@ from uuid import uuid4
 import rfc6266_parser
 import six
 from boto import s3
+from boto.sts import STSConnection
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -44,7 +45,11 @@ from contentstore.utils import reverse_course_url
 from contentstore.video_utils import validate_video_image
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
-from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE, waffle_flags
+from openedx.core.djangoapps.video_pipeline.config.waffle import (
+    DEPRECATE_YOUTUBE,
+    ENABLE_DEVSTACK_VIDEO_UPLOADS,
+    waffle_flags
+)
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace, WaffleSwitchNamespace
 from util.json_request import JsonResponse, expect_json
 from xmodule.video_module.transcripts_utils import Transcript
@@ -89,6 +94,38 @@ VIDEO_UPLOAD_MAX_FILE_SIZE_GB = 5
 MAX_UPLOAD_HOURS = 24
 
 VIDEOS_PER_PAGE = 100
+
+
+class AssumeRole(object):
+    """ Singleton class to establish connection to aws using mfa and assume role """
+    __instance = None
+
+    @staticmethod
+    def get_instance():
+        """ Static access method. """
+        if not AssumeRole.__instance:
+            AssumeRole()
+
+        return AssumeRole.__instance
+
+    def __init__(self):
+        """ Virtually private constructor. """
+        if AssumeRole.__instance:
+            raise Exception("This is a singleton class!")
+
+        sts = STSConnection(
+            settings.AWS_ACCESS_KEY_ID,
+            settings.AWS_SECRET_ACCESS_KEY
+        )
+        self.credentials = sts.assume_role(
+            role_arn=settings.ROLE_ARN,
+            role_session_name='vem',
+            duration_seconds=3600,
+            mfa_serial_number=settings.MFA_SERIAL_NUMBER,
+            mfa_token=settings.MFA_TOKEN
+        ).credentials.to_dict()
+
+        AssumeRole.__instance = self
 
 
 class TranscriptProvider(object):
@@ -271,7 +308,7 @@ def validate_transcript_preferences(provider, cielo24_fidelity, cielo24_turnarou
                     return error, preferences
 
                 if not preferred_languages or not set(preferred_languages) <= set(supported_languages.keys()):
-                    error = 'Invalid languages {}.'.format(preferred_languages)  # pylint: disable=unicode-format-string
+                    error = 'Invalid languages {}.'.format(preferred_languages)
                     return error, preferences
 
                 # Validated Cielo24 preferences
@@ -765,10 +802,20 @@ def storage_service_bucket():
     """
     Returns an S3 bucket for video uploads.
     """
-    conn = s3.connection.S3Connection(
-        settings.AWS_ACCESS_KEY_ID,
-        settings.AWS_SECRET_ACCESS_KEY
-    )
+    if waffle_flags()[ENABLE_DEVSTACK_VIDEO_UPLOADS].is_enabled():
+        credentials = AssumeRole.get_instance().credentials
+        params = {
+            'aws_access_key_id': credentials['access_key'],
+            'aws_secret_access_key': credentials['secret_key'],
+            'security_token': credentials['session_token']
+        }
+    else:
+        params = {
+            'aws_access_key_id': settings.AWS_ACCESS_KEY_ID,
+            'aws_secret_access_key': settings.AWS_SECRET_ACCESS_KEY
+        }
+
+    conn = s3.connection.S3Connection(**params)
     # We don't need to validate our bucket, it requires a very permissive IAM permission
     # set since behind the scenes it fires a HEAD request that is equivalent to get_all_keys()
     # meaning it would need ListObjects on the whole bucket, not just the path used in each

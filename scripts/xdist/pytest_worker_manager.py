@@ -59,7 +59,10 @@ class PytestWorkerManager():
                             'ResourceType': 'instance',
                             'Tags': [
                                 {"Key": "master", "Value": "build.testeng.edx.org"},
-                                {"Key": "worker", "Value": "pytest_xdist_worker"}
+                                {"Key": "worker", "Value": "pytest_xdist_worker"},
+                                {"Key": "environment", "Value": "testeng"},
+                                {"Key": "deployment", "Value": "edx"},
+                                {"Key": "cluster", "Value": "xdist-worker"}
                             ]
                         }
                     ]

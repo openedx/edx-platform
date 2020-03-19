@@ -10,7 +10,8 @@ import pytz
 from datetime import date, datetime, timedelta
 
 from django.utils import timezone
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
+from django.utils.translation import ngettext
 
 from openedx.core.djangolib.markup import HTML, Text
 %>
@@ -58,8 +59,11 @@ reset_deadlines_banner_displayed = False
                 needs_prereqs = not gated_content[subsection['id']]['completed_prereqs'] if gated_subsection else False
                 scored = 'scored' if subsection.get('scored', False) else ''
                 graded = 'graded' if subsection.get('graded') else ''
+                num_graded_problems = subsection.get('num_graded_problems', 0)
+                due_date = subsection.get('due')
+                overdue = due_date is not None and due_date < timezone.now() and not subsection.get('complete', True)
                 %>
-                % if not subsection.get('complete', True) and subsection.get('due', timezone.now() + timedelta(1)) < timezone.now() and not reset_deadlines_banner_displayed:
+                % if overdue and not reset_deadlines_banner_displayed:
                     <% reset_deadlines_banner_displayed = True %>
                     <script type="text/javascript">
                         $('.reset-deadlines-banner').css('display', 'flex');
@@ -75,8 +79,16 @@ reset_deadlines_banner_displayed = False
                                 class="subsection-text outline-button"
                                 id="${ subsection['id'] }"
                             >
+                            % if num_graded_problems:
+                                      <span class="icon fa fa-pencil-square-o" aria-hidden="true"></span>
+                            % endif
                                       <h4 class="subsection-title">
                                           ${ subsection['display_name'] }
+                            % if num_graded_problems:
+                                          ${ngettext("({number} Question)",
+                                                     "({number} Questions)",
+                                                     num_graded_problems).format(number=num_graded_problems)}
+                            % endif
                                       </h4>
                             % if subsection.get('complete'):
                                 <span class="complete-checkmark fa fa-check" aria-hidden="true"></span>

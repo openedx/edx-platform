@@ -107,7 +107,7 @@
                             teamEvents: this.teamEvents,
                             course_id: this.context.courseID,
                             username: this.context.userInfo.username,
-                            perPage: 2,
+                            perPage: 5,
                             parse: true,
                             url: this.context.myTeamsUrl
                         }

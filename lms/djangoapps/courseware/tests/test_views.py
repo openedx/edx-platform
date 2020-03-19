@@ -2600,6 +2600,34 @@ class TestIndexView(ModuleStoreTestCase):
                 expected_should_show_enroll_button
             )
 
+    @RELATIVE_DATES_FLAG.override(active=True)
+    def test_reset_deadlines_banner_is_present_when_viewing_courseware(self):
+        user = UserFactory()
+        course = CourseFactory.create(self_paced=True)
+        with self.store.bulk_operations(course.id):
+            chapter = ItemFactory.create(parent=course, category='chapter')
+            section = ItemFactory.create(
+                parent=chapter, category='sequential',
+                display_name="Sequence",
+                due=datetime.today() - timedelta(1),
+            )
+
+        CourseOverview.load_from_module_store(course.id)
+        CourseEnrollmentFactory(user=user, course_id=course.id, mode=CourseMode.VERIFIED)
+        self.client.login(username=user.username, password='test')
+        response = self.client.get(
+            reverse(
+                'courseware_section',
+                kwargs={
+                    'course_id': six.text_type(course.id),
+                    'chapter': chapter.url_name,
+                    'section': section.url_name,
+                }
+            ) + '?activate_block_id=test_block_id'
+        )
+
+        self.assertContains(response, '<div class="reset-deadlines-banner">')
+
 
 @ddt.ddt
 class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin):
@@ -3147,7 +3175,6 @@ class DatesTabTestCase(ModuleStoreTestCase):
 
     def setUp(self):
         super(DatesTabTestCase, self).setUp()
-        self.user = UserFactory.create()
 
         now = datetime.now(utc)
         self.course = CourseFactory.create(start=now + timedelta(days=-1))
@@ -3170,10 +3197,6 @@ class DatesTabTestCase(ModuleStoreTestCase):
 
     @RELATIVE_DATES_FLAG.override(active=True)
     def test_defaults(self):
-        request = RequestFactory().request()
-        request.user = self.user
-        self.addCleanup(crum.set_current_request, None)
-        crum.set_current_request(request)
         enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.VERIFIED)
         now = datetime.now(utc)
         with self.store.bulk_operations(self.course.id):

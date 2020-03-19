@@ -24,6 +24,7 @@ from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpRespo
 from django.shortcuts import redirect
 from django.template.context_processors import csrf
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.http import urlquote_plus
 from django.utils.text import slugify
@@ -131,6 +132,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.tabs import CourseTabList
 from xmodule.x_module import STUDENT_VIEW
 
+from ..context_processor import user_timezone_locale_prefs
 from ..entrance_exams import user_can_skip_entrance_exam
 from ..module_render import get_module, get_module_by_usage_id, get_module_for_descriptor
 
@@ -733,6 +735,15 @@ class CourseTabView(EdxFragmentView):
             'openedx.course_experience.reset_course_deadlines', kwargs={'course_id': text_type(course.id)}
         )
 
+        display_reset_dates_banner = False
+        if RELATIVE_DATES_FLAG.is_enabled(course.id):
+            course_overview = CourseOverview.get_from_id(course.id)
+            end_date = getattr(course_overview, 'end_date', None)
+            if (not end_date or timezone.now() < end_date and CourseEnrollment.objects.filter(
+                course=course_overview, user=request.user, mode=CourseMode.VERIFIED
+            ).exists()):
+                display_reset_dates_banner = True
+
         context = {
             'course': course,
             'tab': tab,
@@ -743,8 +754,8 @@ class CourseTabView(EdxFragmentView):
             'uses_bootstrap': uses_bootstrap,
             'uses_pattern_library': not uses_bootstrap,
             'disable_courseware_js': True,
-            'relative_dates_is_enabled': RELATIVE_DATES_FLAG.is_enabled(course.id),
             'reset_deadlines_url': reset_deadlines_url,
+            'display_reset_dates_banner': display_reset_dates_banner,
         }
         # Avoid Multiple Mathjax loading on the 'user_profile'
         if 'profile_page_context' in kwargs:
@@ -1050,6 +1061,12 @@ def dates(request, course_id):
                                                 include_access=True, include_past_dates=True)
     enrollment = get_enrollment(request.user.username, course_id)
     learner_is_verified = False
+
+    # User locale settings
+    user_timezone_locale = user_timezone_locale_prefs(request)
+    user_timezone = user_timezone_locale['user_timezone']
+    user_language = user_timezone_locale['user_language']
+
     if enrollment:
         learner_is_verified = enrollment.get('mode') == 'verified'
 
@@ -1058,6 +1075,8 @@ def dates(request, course_id):
         'course_date_blocks': [block for block in course_date_blocks if block.title != 'current_datetime'],
         'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
         'learner_is_verified': learner_is_verified,
+        'user_timezone': user_timezone,
+        'user_language': user_language,
     }
 
     return render_to_response('courseware/dates.html', context)
