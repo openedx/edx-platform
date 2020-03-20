@@ -6,7 +6,7 @@ from organizations import api as organizations_api
 from organizations.models import Organization
 
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-from openedx.core.djangoapps.appsembler.sites.tasks import clone_course
+from openedx.core.djangoapps.appsembler.sites.tasks import import_course_on_site_creation
 from openedx.core.djangoapps.appsembler.sites.models import AlternativeDomain
 from openedx.core.djangoapps.appsembler.sites.utils import sass_to_dict, dict_to_sass, bootstrap_site
 
@@ -135,11 +135,9 @@ class RegistrationSerializer(serializers.Serializer):
             site_configuration.save()
 
         # clone course
-        if settings.CLONE_COURSE_FOR_NEW_SIGNUPS:
-            source_course_locator = CourseLocator.from_string(settings.COURSE_TO_CLONE)
-            destination_course_locator = CourseLocator(organization.name, 'My first course', '2017')
-            clone_course.apply_async(
-                (unicode(source_course_locator), unicode(destination_course_locator), user.id),
+        if settings.FEATURES.get("APPSEMBLER_IMPORT_DEFAULT_COURSE_ON_SITE_CREATION", False):
+            import_course_on_site_creation.apply_async(
+                organization,
                 queue="edx.core.cms.high"
             )
         return {
