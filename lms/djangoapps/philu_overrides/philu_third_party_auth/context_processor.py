@@ -17,11 +17,7 @@ def get_third_party_auth_urls(request):
 
     if third_party_auth_context['currentProvider']:
         third_party_form_fields = normalize_pipeline_kwargs(third_party_auth_context['pipeline_user_details'])
-        opt_in = request.session.get('opt_in')
         utm_params = request.session.get('utm_params')
-
-        if opt_in:
-            third_party_form_fields['opt_in'] = opt_in
 
         if utm_params:
             try:
