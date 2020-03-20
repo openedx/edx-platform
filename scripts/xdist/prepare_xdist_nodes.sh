@@ -11,13 +11,13 @@ python scripts/xdist/pytest_worker_manager.py -a up -n ${XDIST_NUM_WORKERS} \
 -iam ${XDIST_WORKER_IAM_PROFILE_ARN}
 
 # Install the correct version of Django depending on which tox environment (if any) is in use
-if [[ -z ${TOX_ENV+x} ]] || [[ ${TOX_ENV} == 'null' ]]; then
+if [[ -z ${TOXENV+x} ]] || [[ ${TOXENV} == 'null' ]]; then
     DJANGO_REQUIREMENT="-r requirements/edx/django.txt"
-elif [[ ${TOX_ENV} == *'django20'* ]]; then
+elif [[ ${TOXENV} == *'django20'* ]]; then
     DJANGO_REQUIREMENT="-r requirements/edx/django20.txt"
-elif [[ ${TOX_ENV} == *'django21'* ]]; then
+elif [[ ${TOXENV} == *'django21'* ]]; then
     DJANGO_REQUIREMENT="-r requirements/edx/django21.txt"
-elif [[ ${TOX_ENV} == *'django22'* ]]; then
+elif [[ ${TOXENV} == *'django22'* ]]; then
     DJANGO_REQUIREMENT="-r requirements/edx/django22.txt"
 fi
 
