@@ -605,8 +605,9 @@ CONTEXT_PROCESSORS = [
     # Mobile App processor (Detects if request is from the mobile app)
     'mobile_api.context_processor.is_from_mobile_app',
 
-    # edly context processor to apply dynamic theming
-    'openedx.features.edly.context_processor.dynamic_theming_context'
+    # edly context processors
+    'openedx.features.edly.context_processor.dynamic_theming_context',
+    'openedx.features.edly.context_processor.edly_app_context'
 ]
 
 # Django templating

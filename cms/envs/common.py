@@ -373,8 +373,9 @@ CONTEXT_PROCESSORS = (
     'help_tokens.context_processor',
     'openedx.core.djangoapps.site_configuration.context_processors.configuration_context',
 
-    # edly context processor to apply dynamic theming
-    'openedx.features.edly.context_processor.dynamic_theming_context'
+    # edly context processors
+    'openedx.features.edly.context_processor.dynamic_theming_context',
+    'openedx.features.edly.context_processor.edly_app_context'
 )
 
 # Django templating

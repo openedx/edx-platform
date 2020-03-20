@@ -4,8 +4,8 @@ from django.core.cache import cache
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
-
 CACHE_NAME = 'context_processor.dynamic_theming'
+EDLY_CACHE_NAME = 'context_processor.edly_app'
 CACHE_TIMEOUT = 60
 DEFAULT_COLOR_DICT = {
     'primary': '#3E99D4',
@@ -40,13 +40,25 @@ def dynamic_theming_context(request):  # pylint: disable=unused-argument
         theming_context.update(
             {'edly_branding_config': configuration_helpers.get_dict('BRANDING', DEFAULT_BRANDING_DICT)}
         )
-        theming_context.update(
-            {'services_notifications_url': configuration_helpers.get_value('SERVICES_NOTIFICATIONS_URL',
-                                                                          DEFAULT_SERVICES_NOTIFICATIONS_URL)}
-        )
         cache.set(CACHE_NAME, theming_context, CACHE_TIMEOUT)
 
     return theming_context
+
+
+def edly_app_context(request):  # pylint: disable=unused-argument
+    """
+    Context processor responsible for edly.
+    """
+    edly_app_context = cache.get(EDLY_CACHE_NAME)
+    if not edly_app_context:
+        edly_app_context = {}
+        edly_app_context.update(
+            {'services_notifications_url': configuration_helpers.get_value('SERVICES_NOTIFICATIONS_URL',
+                                                                           DEFAULT_SERVICES_NOTIFICATIONS_URL)}
+        )
+        cache.set(EDLY_CACHE_NAME, edly_app_context, CACHE_TIMEOUT)
+
+    return edly_app_context
 
 
 def get_theme_colors():
