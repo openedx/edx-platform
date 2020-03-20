@@ -40,8 +40,7 @@ $grid-breakpoints-lg: 992px !default;
 // Wrap grids with grid-container.
 @mixin grid-container() {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-flow: row wrap;
   justify-content: flex-start;
   align-items: flex-start;
   box-sizing: border-box;
@@ -123,11 +122,12 @@ $gray-b: rgba(65, 65, 65, 100) !default;
 $gray-a: rgba(160, 160, 160, 100) !default;
 $gray-l1: rgb(252, 252, 252) !default;
 $gray-l2: mix($white, $gray, 60%) !default;
-$gray-l3: mix($white, $gray, 80%) !default
+$gray-l3: mix($white, $gray, 80%) !default;
 
 // ----------------------------
 // #COLORS- Bootstrap-style
 // ----------------------------
+
 $state-success-text: $black !default;
 $state-success-bg: #dff0d8 !default;
 $state-success-border: darken($state-success-bg, 5%) !default;

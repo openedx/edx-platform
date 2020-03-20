@@ -364,7 +364,8 @@ $btn-color-primary: $blue-d;
         margin-bottom: 0;
       }
 
-      button, .enroll-course-button {
+      button,
+      .enroll-course-button {
         background-color: $btn-color-primary;
         color: $white;
         height: 37px;
@@ -495,7 +496,7 @@ $btn-color-primary: $blue-d;
         margin: 0;
 
         .course-title-link,
-        .course-title-link:visited{
+        .course-title-link:visited {
           color: $blue-b;
           text-decoration: underline;
         }
@@ -597,7 +598,6 @@ $btn-color-primary: $blue-d;
           font-weight: bold;
         }
       }
-
     }
 
     .certificate-status {
@@ -700,8 +700,9 @@ $btn-color-primary: $blue-d;
     border-bottom: 1px solid $gray-l3;
 
     @include media-breakpoint-up(sm) {
-        width: auto;
+      width: auto;
     }
+
     .pathway-info {
       margin: 15px 0;
       font-size: 0.9375em;
