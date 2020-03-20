@@ -201,6 +201,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
       left: 50%;
       font-size: 4em;
       cursor: pointer;
+      opacity: 0.1;
 
       &::after {
         background: $white;
