@@ -2,8 +2,9 @@
 A trivial task for health checks
 """
 from celery.task import task
+from django.conf import settings
 
 
-@task()
+@task(routing_key=settings.CELERY_CHECK_ROUTING_KEY)
 def sample_task():
     return True

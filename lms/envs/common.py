@@ -735,21 +735,6 @@ USERNAME_REGEX_PARTIAL = r'[\w .@_+-]+'
 USERNAME_PATTERN = r'(?P<username>{regex})'.format(regex=USERNAME_REGEX_PARTIAL)
 
 
-############################## HEARTBEAT ######################################
-
-# Checks run in normal mode by the heartbeat djangoapp
-HEARTBEAT_CHECKS = [
-    'openedx.core.djangoapps.heartbeat.default_checks.check_modulestore',
-    'openedx.core.djangoapps.heartbeat.default_checks.check_database',
-]
-
-# Other checks to run by default in "extended"/heavy mode
-HEARTBEAT_EXTENDED_CHECKS = (
-    'openedx.core.djangoapps.heartbeat.default_checks.check_celery',
-)
-
-HEARTBEAT_CELERY_TIMEOUT = 5
-
 ############################## EVENT TRACKING #################################
 LMS_SEGMENT_KEY = None
 
@@ -1913,6 +1898,22 @@ CELERY_QUEUES = {
 
 # let logging work as configured:
 CELERYD_HIJACK_ROOT_LOGGER = False
+
+############################## HEARTBEAT ######################################
+
+# Checks run in normal mode by the heartbeat djangoapp
+HEARTBEAT_CHECKS = [
+    'openedx.core.djangoapps.heartbeat.default_checks.check_modulestore',
+    'openedx.core.djangoapps.heartbeat.default_checks.check_database',
+]
+
+# Other checks to run by default in "extended"/heavy mode
+HEARTBEAT_EXTENDED_CHECKS = (
+    'openedx.core.djangoapps.heartbeat.default_checks.check_celery',
+)
+
+HEARTBEAT_CELERY_TIMEOUT = 5
+CELERY_CHECK_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 
 ################################ Block Structures ###################################
 
