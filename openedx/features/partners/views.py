@@ -36,7 +36,7 @@ from student.views import password_change_request_handler
 from . import constants as partner_constants
 from .forms import PartnerAccountCreationForm
 from .forms import PartnerResetPasswordForm
-from .helpers import user_has_performance_access
+from .helpers import import_form_using_slug, user_has_performance_access
 from .models import Partner
 
 log = getLogger(__name__)
@@ -118,7 +118,11 @@ class PartnerRegistrationView(RegistrationViewCustom):
         registration_data = request.POST.copy()
 
         # validate data provided by end user
-        account_creation_form = PartnerAccountCreationForm(data=registration_data, tos_required=True)
+        # PhilU implementation to import custom form if it exists
+        # Note that the override form must be named `AccountCreationFormCustom`
+        form = import_form_using_slug(partner.slug)
+        account_creation_form = form.AccountCreationFormCustom(data=registration_data, tos_required=True) if form \
+            else PartnerAccountCreationForm(data=registration_data, tos_required=True)
         if not account_creation_form.is_valid():
             return JsonResponse({"Error": dict(account_creation_form.errors.items())}, status=400)
 
@@ -129,9 +133,10 @@ class PartnerRegistrationView(RegistrationViewCustom):
             user = create_account_with_params_custom(request, registration_data, partner)
             self.save_user_utm_info(user)
         except Exception as err:
-            error_message = {"Error": {"reason": "User registration failed due to {}".format(repr(err))}}
+            error_message = {"Error": {"reason": "User registration failed due to {}".format(repr(err))},
+                             "Partner": partner.label}
             log.exception(error_message)
-            return JsonResponse({"Error": {"reason": err.message}}, status=400)
+            return JsonResponse(error_message, status=400)
 
         response = JsonResponse({"success": True})
         set_logged_in_cookies(request, response, user)
@@ -301,7 +306,9 @@ def create_account_with_params_custom(request, params, partner):
     limit_registered_partner_users = partner.configuration.get("USER_LIMIT")
 
     if limit_registered_partner_users and count_registered_partner_users > int(limit_registered_partner_users):
-        raise Exception("User registration limit for partner {} reached".format(partner.label))
+        partner_user.status = partner_constants.PARTNER_USER_STATUS_WAITING
+        partner_user.save()
+        raise Exception("User registration limit for partner {} exceeded".format(partner.label))
     else:
         # login user immediately after a user creates an account,
         new_user = authenticate(username=user.username, password=params['password'])
