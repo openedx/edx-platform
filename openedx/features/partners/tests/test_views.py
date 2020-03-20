@@ -51,7 +51,7 @@ class PartnerRegistrationViewTest(ApiTestCase):
 
     def test_create_new_partner_user_with_orphan_organization(self):
         """
-        Test user is not first learner if organization already exists
+        Test user is first learner for already existing orphan organization
         Create an organization and then try to register.
         :return : None
         """
@@ -88,7 +88,7 @@ class PartnerRegistrationViewTest(ApiTestCase):
     @mock.patch('openedx.features.partners.views.Organization.users_count')
     def test_create_new_partner_user_with_non_orphan_organization(self, mock_org_user_count):
         """
-        Test user is not first learner if organization already exists
+        Test user is not first learner if organization already exists with some members
         Create an organization and then try to register.
         :return : None
         """
