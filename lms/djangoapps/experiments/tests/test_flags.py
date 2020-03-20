@@ -62,9 +62,10 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
         self.assertEqual(self.get_bucket(active=False), 0)
 
     @ddt.data(
-        ('2012-01-06', None, 1),  # no enrollment (we allow normal bucketing in this case)
-        ('2012-01-06', '2012-01-05', 0),  # enrolled before experiment
-        ('2012-01-06', '2012-01-07', 1),  # enrolled after experiment
+        ('2012-01-06', None, 1),  # no enrollment, but start is in past (we allow normal bucketing in this case)
+        ('9999-01-06', None, 0),  # no enrollment, but start is in future (we give bucket 0 in that case)
+        ('2012-01-06', '2012-01-05', 0),  # enrolled before experiment start
+        ('2012-01-06', '2012-01-07', 1),  # enrolled after experiment start
         (None, '2012-01-07', 1),  # no experiment date
         ('not-a-date', '2012-01-07', 0),  # bad experiment date
     )
@@ -76,6 +77,24 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
             enrollment.save()
         if experiment_start:
             ExperimentKeyValueFactory(experiment_id=0, key='enrollment_start', value=experiment_start)
+        self.assertEqual(self.get_bucket(), expected_bucket)
+
+    @ddt.data(
+        ('2012-01-06', None, 0),  # no enrollment, but end is in past (we give bucket 0 in that case)
+        ('9999-01-06', None, 1),  # no enrollment, but end is in future (we allow normal bucketing in this case)
+        ('2012-01-06', '2012-01-05', 1),  # enrolled before experiment end
+        ('2012-01-06', '2012-01-07', 0),  # enrolled after experiment end
+        (None, '2012-01-07', 1),  # no experiment date
+        ('not-a-date', '2012-01-07', 0),  # bad experiment date
+    )
+    @ddt.unpack
+    def test_enrollment_end(self, experiment_end, enrollment_created, expected_bucket):
+        if enrollment_created:
+            enrollment = CourseEnrollmentFactory(user=self.user, course_id='a/b/c')
+            enrollment.created = parser.parse(enrollment_created).replace(tzinfo=pytz.UTC)
+            enrollment.save()
+        if experiment_end:
+            ExperimentKeyValueFactory(experiment_id=0, key='enrollment_end', value=experiment_end)
         self.assertEqual(self.get_bucket(), expected_bucket)
 
     @ddt.data(
