@@ -2,6 +2,31 @@
 Database Routers for use with the coursewarehistoryextended django app.
 """
 
+from django.conf import settings
+
+
+class ReadReplicaRouter:
+    """
+    A Database Router that sends read operations to a read replica, if defined.
+    """
+
+    DATABASE_NAME = 'read_replica'
+
+    def db_for_read(self, *_args, **_kwargs):
+        if self.DATABASE_NAME in settings.DATABASES:
+            return self.DATABASE_NAME
+        else:
+            return None
+
+    def db_for_write(self, *_args, **_kwargs):
+        return None
+
+    def allow_relation(self, *_args, **_kwargs):
+        return None
+
+    def allow_migrate(self, *_args, **_kwargs):
+        return None
+
 
 class StudentModuleHistoryExtendedRouter(object):
     """

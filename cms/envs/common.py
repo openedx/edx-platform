@@ -1810,6 +1810,7 @@ ENABLE_COMPREHENSIVE_THEMING = False
 
 DATABASE_ROUTERS = [
     'openedx.core.lib.django_courseware_routers.StudentModuleHistoryExtendedRouter',
+    'openedx.core.lib.django_courseware_routers.ReadReplicaRouter',
 ]
 
 ############################ Cache Configuration ###############################
