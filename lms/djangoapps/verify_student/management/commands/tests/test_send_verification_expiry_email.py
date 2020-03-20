@@ -101,6 +101,8 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
         outdated_verification.status = 'approved'
         outdated_verification.save()
 
+        call_command('send_verification_expiry_email')
+
         # Check that the expiry_email_date is not set for the outdated verification
         expiry_email_date = SoftwareSecurePhotoVerification.objects.get(pk=outdated_verification.pk).expiry_email_date
         self.assertIsNone(expiry_email_date)
@@ -236,3 +238,32 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
                      u"emails use --dry-run flag instead."
         with self.assertRaisesRegex(CommandError, err_string):
             call_command('send_verification_expiry_email')
+
+    def test_one_failed_but_others_succeeded(self):
+        """
+        Test that if the first verification fails to send, the rest still do.
+        """
+        verifications = []
+        for _i in range(2):
+            user = UserFactory.create()
+            verification = self.create_and_submit(user)
+            verification.status = 'approved'
+            verification.expiry_date = now() - timedelta(days=self.days)
+            verification.save()
+            verifications.append(verification)
+
+        with patch('lms.djangoapps.verify_student.management.commands.send_verification_expiry_email.ace') as mock_ace:
+            mock_ace.send.side_effect = (Exception('Aw shucks'), None)
+            with self.assertRaisesRegex(CommandError, 'One or more email attempts failed.*'):
+                with LogCapture(LOGGER_NAME) as logger:
+                    call_command('send_verification_expiry_email')
+
+        logger.check_present(
+            (LOGGER_NAME, 'ERROR', 'Could not send email for verification id {}'.format(verifications[0].id)),
+        )
+
+        for verification in verifications:
+            verification.refresh_from_db()
+        self.assertIsNone(verifications[0].expiry_email_date)
+        self.assertIsNotNone(verifications[1].expiry_email_date)
+        self.assertEqual(mock_ace.send.call_count, 2)
