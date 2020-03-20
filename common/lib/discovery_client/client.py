@@ -19,8 +19,17 @@ class DiscoveryClient(OAuthAPIClient):
         super(DiscoveryClient, self).__init__(settings.LMS_ROOT_URL, client.client_id, client.client_secret)
         self._api_url = '{discovery_url}/api/{version}'.format(discovery_url=client.url, version=VERSION)
 
-    def active_programs(self):
-        response = self.request('GET', '{api_url}/programs/?status=active'.format(api_url=self._api_url))
-        if response.status_code == status.HTTP_200_OK:
-            return json.loads(response.text)
+    def _get(self, path):
+        self.response = self.request('GET', '{api_url}{path}'.format(api_url=self._api_url, path=path))
+        return self._handle_response()
+
+    def _handle_response(self):
+        if self.response.status_code == status.HTTP_200_OK:
+            return json.loads(self.response.text)
         raise PermissionDenied
+
+    def active_programs(self):
+        return self._get('/programs/?status=active')
+
+    def get_program(self, uuid):
+        return self._get('/programs/{uuid}'.format(uuid=uuid))
