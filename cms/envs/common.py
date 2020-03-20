@@ -75,6 +75,7 @@ from lms.envs.common import (
     HEARTBEAT_CHECKS,
     HEARTBEAT_EXTENDED_CHECKS,
     HEARTBEAT_CELERY_TIMEOUT,
+    HEARTBEAT_CELERY_ROUTING_KEY,
 
     # Default site to use if no site exists matching request headers
     SITE_ID,
