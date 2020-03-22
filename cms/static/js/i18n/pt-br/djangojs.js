@@ -967,7 +967,6 @@
     "Yes, allow edits to the active Certificate": "Sim, permita a edi\u00e7\u00e3o para este certificado",
     "Yes, replace the edX transcript with the YouTube transcript": "Sim, substitua a transcri\u00e7\u00e3o do edX pela transcri\u00e7\u00e3o do Youtube",
     "Yesterday": "Ontem",
-    "You already belong to another team.": "Voc\u00ea j\u00e1 faz parte de outra equipe.",
     "You are a member of this team.": "Voc\u00ea \u00e9 membro desta equipe",
     "You are currently sharing a limited profile.": "Voc\u00ea est\u00e1 compartilhando um perfil limitado no momento.",
     "You are not currently a member of any team.": "No momento, voc\u00ea n\u00e3o \u00e9 membro de nenhuma equipe. ",

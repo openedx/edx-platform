@@ -395,7 +395,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-03-08 20:42+0000\n"
+"POT-Creation-Date: 2020-03-22 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/open-edx/teams/6205/zh_CN/)\n"
@@ -998,6 +998,13 @@ msgid ""
 "exists in this model, can be able to login from login screen through email "
 "and password. And if any employee's email doesn't exist in this model then "
 "that employee can login via third party authentication backend only."
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid ""
+"It expect that the data will be provided in a csv file format with"
+"                     first row being the header and columns will be as "
+"follows:                     username, email, new_email"
 msgstr ""
 
 #: common/djangoapps/student/views/dashboard.py
@@ -1858,9 +1865,8 @@ msgid "Cannot rescore problems with possible file submissions"
 msgstr "无法对可能的文件提交重新评分"
 
 #: common/lib/capa/capa/capa_problem.py
-#, python-brace-format
-msgid "Question {0}"
-msgstr "问题{0}"
+msgid "Question {}"
+msgstr ""
 
 #: common/lib/capa/capa/capa_problem.py
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -8746,8 +8752,20 @@ msgid "You can't create a team in an instructor managed topic."
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
-msgid "username or team_id must be specified."
-msgstr "必须制定用户名和team_id。"
+msgid "teamset_id and team_id are mutually exclusive options."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "teamset_id requires course_id to also be provided."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "No teamset found in given course with given id"
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "username or (team_id or teamset_id) must be specified."
+msgstr ""
 
 #: lms/djangoapps/teams/views.py
 msgid "Username is required."
@@ -11530,6 +11548,23 @@ msgid ""
 "You are not signed in. To view the discussion content, {sign_in_link} or "
 "{register_link}, and enroll in this course."
 msgstr "您尚未登录，如需查看此讨论内容，请{sign_in_link}或{register_link}，并加入此门课程。"
+
+#: openedx/features/calendar_sync/ics.py
+#, python-brace-format
+msgid "{assignment} is due for {course}."
+msgstr ""
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Calendar Sync"
+msgstr ""
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Unsubscribe from calendar updates"
+msgstr ""
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Subscribe to calendar updates"
+msgstr ""
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
@@ -19471,6 +19506,10 @@ msgstr "未找到结果"
 msgid "Student Support: Manage User"
 msgstr "学员帮助：管理用户"
 
+#: lms/templates/support/program_enrollments_inspector.html
+msgid "Program Enrollments Inspector"
+msgstr ""
+
 #: lms/templates/support/refund.html
 msgid "About to refund this order:"
 msgstr "准备就该订单退费"
@@ -19763,6 +19802,11 @@ msgid "Expand All"
 msgstr "展开全部"
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "({number} Question)"
+msgid_plural "({number} Questions)"
+msgstr[0] ""
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Prerequisite: "
 msgstr "先修条件："
 
@@ -19854,6 +19898,10 @@ msgstr "此门课程没有任何更新。"
 msgid "Latest Update"
 msgstr "最近更新"
 
+#: openedx/features/course_experience/templates/course_experience/next-up-banner-fragment.html
+msgid "Get started on what's next: "
+msgstr ""
+
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
 msgid "Search Results"
 msgstr "搜索结果"
@@ -19937,6 +19985,14 @@ msgid ""
 "Browse recently launched courses and see what's new in your favorite "
 "subjects."
 msgstr "浏览最新开办的课程，看看您最喜欢的科目中有了什么新内容"
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Take advantage of free coaching!"
+msgstr ""
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Get Started"
+msgstr ""
 
 #: themes/edx.org/lms/templates/footer.html
 msgid "Page Footer"

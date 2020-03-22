@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-03-09 06:51+0000\n"
-"PO-Revision-Date: 2020-03-09 06:51:43.954316\n"
+"POT-Creation-Date: 2020-03-22 20:52+0000\n"
+"PO-Revision-Date: 2020-03-22 20:52:41.579423\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -779,6 +779,21 @@ msgstr ""
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
 "ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
 "ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ #"
+
+#: common/djangoapps/student/models.py
+msgid ""
+"It expect that the data will be provided in a csv file format with"
+"                     first row being the header and columns will be as "
+"follows:                     username, email, new_email"
+msgstr ""
+"Ìt éxpéçt thät thé dätä wïll ßé prövïdéd ïn ä çsv fïlé förmät wïth"
+"                     fïrst röw ßéïng thé héädér änd çölümns wïll ßé äs "
+"föllöws:                     üsérnämé, émäïl, néw_émäïl Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
+"łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
+"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
+"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
+"ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ησ#"
 
 #: common/djangoapps/student/views/dashboard.py
 msgid " and "
@@ -1862,9 +1877,8 @@ msgstr ""
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/lib/capa/capa/capa_problem.py
-#, python-brace-format
-msgid "Question {0}"
-msgstr "Qüéstïön {0} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+msgid "Question {}"
+msgstr "Qüéstïön {} Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: common/lib/capa/capa/capa_problem.py
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -10607,10 +10621,28 @@ msgstr ""
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/djangoapps/teams/views.py
-msgid "username or team_id must be specified."
+msgid "teamset_id and team_id are mutually exclusive options."
 msgstr ""
-"üsérnämé ör téäm_ïd müst ßé spéçïfïéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
+"téämsét_ïd änd téäm_ïd äré mütüällý éxçlüsïvé öptïöns. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/teams/views.py
+msgid "teamset_id requires course_id to also be provided."
+msgstr ""
+"téämsét_ïd réqüïrés çöürsé_ïd tö älsö ßé prövïdéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/teams/views.py
+msgid "No teamset found in given course with given id"
+msgstr ""
+"Nö téämsét föünd ïn gïvén çöürsé wïth gïvén ïd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/teams/views.py
+msgid "username or (team_id or teamset_id) must be specified."
+msgstr ""
+"üsérnämé ör (téäm_ïd ör téämsét_ïd) müst ßé spéçïfïéd. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/djangoapps/teams/views.py
 msgid "Username is required."
@@ -14134,6 +14166,24 @@ msgid ""
 msgstr ""
 "Ýöü äré nöt sïgnéd ïn. Tö vïéw thé dïsçüssïön çöntént, {sign_in_link} ör "
 "{register_link}, änd énröll ïn thïs çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: openedx/features/calendar_sync/ics.py
+#, python-brace-format
+msgid "{assignment} is due for {course}."
+msgstr "{assignment} ïs düé för {course}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Calendar Sync"
+msgstr "Çäléndär Sýnç Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Unsubscribe from calendar updates"
+msgstr ""
+"Ûnsüßsçrïßé fröm çäléndär üpdätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Subscribe to calendar updates"
+msgstr "Süßsçrïßé tö çäléndär üpdätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
@@ -24074,6 +24124,10 @@ msgstr "Nö résülts föünd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 msgid "Student Support: Manage User"
 msgstr "Stüdént Süppört: Mänägé Ûsér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
+#: lms/templates/support/program_enrollments_inspector.html
+msgid "Program Enrollments Inspector"
+msgstr "Prögräm Énröllménts Ìnspéçtör Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
 #: lms/templates/support/refund.html
 msgid "About to refund this order:"
 msgstr "Àßöüt tö réfünd thïs ördér: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
@@ -24425,6 +24479,12 @@ msgid "Expand All"
 msgstr "Éxpänd Àll Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "({number} Question)"
+msgid_plural "({number} Questions)"
+msgstr[0] "({number} Qüéstïön) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+msgstr[1] "({number} Qüéstïöns) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Prerequisite: "
 msgstr "Préréqüïsïté:  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
@@ -24547,6 +24607,10 @@ msgstr ""
 msgid "Latest Update"
 msgstr "Lätést Ûpdäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
+#: openedx/features/course_experience/templates/course_experience/next-up-banner-fragment.html
+msgid "Get started on what's next: "
+msgstr "Gét stärtéd ön whät's néxt:  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
 msgid "Search Results"
 msgstr "Séärçh Résülts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
@@ -24640,6 +24704,15 @@ msgid ""
 msgstr ""
 "Bröwsé réçéntlý läünçhéd çöürsés änd séé whät's néw ïn ýöür fävörïté "
 "süßjéçts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Take advantage of free coaching!"
+msgstr ""
+"Täké ädväntägé öf fréé çöäçhïng! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Get Started"
+msgstr "Gét Stärtéd Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: themes/edx.org/lms/templates/footer.html
 msgid "Page Footer"

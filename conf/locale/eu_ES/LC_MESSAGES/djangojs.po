@@ -50,7 +50,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-03-08 20:42+0000\n"
+"POT-Creation-Date: 2020-03-15 20:42+0000\n"
 "PO-Revision-Date: 2020-03-05 10:11+0000\n"
 "Last-Translator: Abel Camacho <abelcama@gmail.com>\n"
 "Language-Team: Basque (Spain) (http://www.transifex.com/open-edx/edx-platform/language/eu_ES/)\n"
@@ -6014,7 +6014,7 @@ msgstr "Oraindik ez"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "All Learners and Staff"
-msgstr ""
+msgstr "Ikasle eta arduradun guztiak"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Basic"
@@ -6279,7 +6279,7 @@ msgstr "Kargatu ikastaroaren irudia"
 
 #: cms/static/js/views/settings/main.js
 msgid "Upload your banner image."
-msgstr ""
+msgstr "Kargatu bannerraren irudia."
 
 #: cms/static/js/views/settings/main.js
 msgid "Upload your video thumbnail image."
@@ -6287,7 +6287,7 @@ msgstr ""
 
 #: cms/static/js/views/show_textbook.js
 msgid "Delete “<%- name %>”?"
-msgstr ""
+msgstr "“<%- name %>” ezabatu nahi al duzu?"
 
 #: cms/static/js/views/show_textbook.js
 msgid ""
@@ -6329,7 +6329,7 @@ msgstr ""
 
 #: cms/static/js/views/utils/move_xblock_utils.js
 msgid "Success! \"{displayName}\" has been moved."
-msgstr ""
+msgstr "Ondo! \"{displayName}\" mugitu da."
 
 #: cms/static/js/views/utils/move_xblock_utils.js
 msgid ""
@@ -6343,7 +6343,7 @@ msgstr ""
 
 #: cms/static/js/views/utils/move_xblock_utils.js
 msgid "Take me to the new location"
-msgstr ""
+msgstr "Eraman nazazu kokapen berrira"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Duplicating"
@@ -6351,11 +6351,11 @@ msgstr "Bikoizten"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Undo moving"
-msgstr ""
+msgstr "Desegin mugitutakoa"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Moving"
-msgstr ""
+msgstr "Mugitzen"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Deleting this {xblock_type} is permanent and cannot be undone."
@@ -8680,7 +8680,7 @@ msgstr "Une honetan profil mugatua partekatzen ari zara."
 
 #: openedx/features/learner_profile/static/learner_profile/templates/section_two.underscore
 msgid "This learner is currently sharing a limited profile."
-msgstr ""
+msgstr "Ikasle hau une honetan profil mugatua partekatzen ari da."
 
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Share on Mozilla Backpack"
