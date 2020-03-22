@@ -1614,7 +1614,6 @@
     "Yes, delete this {xblock_type}": "\u0110\u1ed3ng \u00fd, xo\u00e1 {xblock_type}",
     "Yes, replace the edX transcript with the YouTube transcript": "C\u00f3, thay th\u1ebf b\u1ea3n d\u1ecbch edX b\u1eb1ng b\u1ea3n d\u1ecbch c\u1ee7a YouTube",
     "Yesterday": "H\u00f4m qua",
-    "You already belong to another team.": "B\u1ea1n \u0111\u00e3 n\u1eb1m trong m\u1ed9t nh\u00f3m kh\u00e1c.",
     "You are a member of this team.": "B\u1ea1n l\u00e0 m\u1ed9t th\u00e0nh vi\u00ean c\u1ee7a nh\u00f3m n\u00e0y.",
     "You are not currently a member of any team.": "B\u1ea1n hi\u1ec7n kh\u00f4ng ph\u1ea3i th\u00e0nh vi\u00ean c\u1ee7a b\u1ea5t k\u1ef3 nh\u00f3m n\u00e0o.",
     "You are sending an email message with the subject {subject} to the following recipients.": "B\u1ea1n \u0111ang g\u1eedi m\u1ed9t email v\u1edbi ch\u1ee7 \u0111\u1ec1 {subject} t\u1edbi nh\u1eefng ng\u01b0\u1eddi nh\u1eadn sau \u0111\u00e2y.",

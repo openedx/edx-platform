@@ -1526,7 +1526,6 @@
     "Yes, allow edits to the active Certificate": "Tak, pozw\u00f3l na edycj\u0119 aktywnego certyfikatu.",
     "Yes, replace the edX transcript with the YouTube transcript": "Tak, zamie\u0144 transkrypcj\u0119 na transkrypcj\u0119 z YouTube",
     "Yesterday": "Wczoraj",
-    "You already belong to another team.": "Ju\u017c nale\u017cysz do innego zespo\u0142u.",
     "You already have an edX account with your {enterprise_name} email address.": "Istnieje ju\u017c konto przypisane do adresu e-mail z serwisu {enterprise_name}.",
     "You are a member of this team.": "Jeste\u015b cz\u0142onkiem tego zespo\u0142u.",
     "You are currently sharing a limited profile.": "Obecnie dzielisz si\u0119 ograniczonym profilem.",

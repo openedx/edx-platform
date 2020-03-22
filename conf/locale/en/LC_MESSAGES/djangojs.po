@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-03-09 06:51+0000\n"
-"PO-Revision-Date: 2020-03-09 06:51:43.969408\n"
+"POT-Creation-Date: 2020-03-22 20:52+0000\n"
+"PO-Revision-Date: 2020-03-22 20:52:41.635754\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -2679,7 +2679,7 @@ msgid "Confirm"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
-msgid "You already belong to another team."
+msgid "You already belong to another team in this team set."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js

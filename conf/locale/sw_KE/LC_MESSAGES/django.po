@@ -85,7 +85,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-03-08 20:42+0000\n"
+"POT-Creation-Date: 2020-03-22 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Swahili (Kenya) (https://www.transifex.com/open-edx/teams/6205/sw_KE/)\n"
@@ -717,6 +717,13 @@ msgid ""
 "exists in this model, can be able to login from login screen through email "
 "and password. And if any employee's email doesn't exist in this model then "
 "that employee can login via third party authentication backend only."
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid ""
+"It expect that the data will be provided in a csv file format with"
+"                     first row being the header and columns will be as "
+"follows:                     username, email, new_email"
 msgstr ""
 
 #: common/djangoapps/student/views/dashboard.py
@@ -1611,8 +1618,7 @@ msgstr ""
 "Haiwezi kuweka alama upya kwa matatizo yaliyo na uwezekano wa uwasilishaji"
 
 #: common/lib/capa/capa/capa_problem.py
-#, python-brace-format
-msgid "Question {0}"
+msgid "Question {}"
 msgstr ""
 
 #: common/lib/capa/capa/capa_problem.py
@@ -8487,8 +8493,20 @@ msgid "You can't create a team in an instructor managed topic."
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
-msgid "username or team_id must be specified."
-msgstr "jina la mtumiaji au timu_lazima lidhihirishwe."
+msgid "teamset_id and team_id are mutually exclusive options."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "teamset_id requires course_id to also be provided."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "No teamset found in given course with given id"
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "username or (team_id or teamset_id) must be specified."
+msgstr ""
 
 #: lms/djangoapps/teams/views.py
 msgid "Username is required."
@@ -11263,6 +11281,23 @@ msgstr ""
 msgid ""
 "You are not signed in. To view the discussion content, {sign_in_link} or "
 "{register_link}, and enroll in this course."
+msgstr ""
+
+#: openedx/features/calendar_sync/ics.py
+#, python-brace-format
+msgid "{assignment} is due for {course}."
+msgstr ""
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Calendar Sync"
+msgstr ""
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Unsubscribe from calendar updates"
+msgstr ""
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Subscribe to calendar updates"
 msgstr ""
 
 #: openedx/features/content_type_gating/models.py
@@ -19647,6 +19682,10 @@ msgstr ""
 msgid "Student Support: Manage User"
 msgstr ""
 
+#: lms/templates/support/program_enrollments_inspector.html
+msgid "Program Enrollments Inspector"
+msgstr ""
+
 #: lms/templates/support/refund.html
 msgid "About to refund this order:"
 msgstr "Kuhusu kurejesha malipo ya hili agizo:"
@@ -19957,6 +19996,12 @@ msgid "Expand All"
 msgstr "Refusha Zote"
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "({number} Question)"
+msgid_plural "({number} Questions)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Prerequisite: "
 msgstr ""
 
@@ -20048,6 +20093,10 @@ msgstr ""
 msgid "Latest Update"
 msgstr ""
 
+#: openedx/features/course_experience/templates/course_experience/next-up-banner-fragment.html
+msgid "Get started on what's next: "
+msgstr ""
+
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
 msgid "Search Results"
 msgstr "Tafuta Matokeo"
@@ -20135,6 +20184,14 @@ msgid ""
 msgstr ""
 "Kivinjari kimezindua kozi hivi karibuni na kuona nini jipya katika maudhui "
 "uyapendayo."
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Take advantage of free coaching!"
+msgstr ""
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Get Started"
+msgstr ""
 
 #: themes/edx.org/lms/templates/footer.html
 msgid "Page Footer"

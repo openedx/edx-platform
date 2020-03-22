@@ -2025,7 +2025,6 @@
     "Yes, allow edits to the active Certificate": "\u662f\u7684\uff0c\u5141\u8bb8\u7f16\u8f91\u6fc0\u6d3b\u7684\u8bc1\u4e66",
     "Yes, delete this {xblock_type}": "\u662f\u7684\uff0c\u5220\u9664\u8be5 {xblock_type}",
     "Yes, replace the edX transcript with the YouTube transcript": "\u662f\u7684\uff0c\u7528 YouTube \u5b57\u5e55\u66ff\u6362 edX \u5b57\u5e55\u3002",
-    "You already belong to another team.": "\u60a8\u5df2\u7ecf\u5c5e\u4e8e\u53e6\u4e00\u4e2a\u56e2\u961f\u3002",
     "You already have an edX account with your {enterprise_name} email address.": "\u60a8\u5df2\u4f7f\u7528\u90ae\u7bb1{enterprise_name}\u6ce8\u518cedX\u8d26\u53f7\u3002",
     "You are a member of this team.": "\u60a8\u662f\u8fd9\u4e2a\u56e2\u961f\u7684\u6210\u5458\u3002",
     "You are currently sharing a limited profile.": "\u60a8\u5f53\u524d\u516c\u5f00\u90e8\u5206\u4e2a\u4eba\u4fe1\u606f\u3002",
