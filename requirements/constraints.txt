@@ -22,9 +22,6 @@ django-cors-headers<3.0.0
 # It seems like django-countries > 5.5 may cause performance issues for us.
 django-countries==5.5
 
-# django-storages version 1.9 drops support for boto storage backend.
-django-storages<1.9
-
 # Support was dropped for Python 3.5, Django 2.0, Django 2.1, DRF 3.7
 drf-yasg<1.17.1
 
