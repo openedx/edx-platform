@@ -22,7 +22,7 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_un
 @ddt.ddt
 @skip_unless_lms
 @skipUnless(
-    'openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
+    'openedx.core.djangoapps.schedules' in settings.INSTALLED_APPS,
     "Can't test schedules if the app isn't installed",
 )
 class TestSendRecurringNudge(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, CacheIsolationTestCase):

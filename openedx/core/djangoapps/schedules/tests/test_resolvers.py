@@ -7,6 +7,7 @@ import datetime
 from unittest import skipUnless
 
 import ddt
+from completion.test_utils import submit_completions_for_testing
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -40,7 +41,7 @@ class SchedulesResolverTestMixin(CacheIsolationMixin):
 
 @ddt.ddt
 @skip_unless_lms
-@skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
+@skipUnless('openedx.core.djangoapps.schedules' in settings.INSTALLED_APPS,
             "Can't test schedules if the app isn't installed")
 class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, TestCase):
     """
@@ -97,7 +98,7 @@ class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, TestCase):
 
 
 @skip_unless_lms
-@skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
+@skipUnless('openedx.core.djangoapps.schedules' in settings.INSTALLED_APPS,
             "Can't test schedules if the app isn't installed")
 class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
     """
@@ -107,7 +108,13 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
         super(TestCourseUpdateResolver, self).setUp()
         self.course = CourseFactory(highlights_enabled_for_messaging=True, self_paced=True)
         with self.store.bulk_operations(self.course.id):
-            ItemFactory.create(parent=self.course, category='chapter', highlights=[u'good stuff'])
+            self.block_key = [
+                ItemFactory.create(
+                    parent=self.course,
+                    category='chapter',
+                    highlights=[u'good stuff']
+                ).location
+            ]
 
     def create_resolver(self):
         """
@@ -123,6 +130,7 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
             target_datetime=enrollment.schedule.start_date,
             day_offset=-7,
             bin_num=CourseUpdateResolver.bin_num_for_user_id(self.user.id),
+            check_completion=True,
         )
 
     @override_settings(CONTACT_MAILING_ADDRESS='123 Sesame Street')
@@ -167,3 +175,18 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
         self.user.save()
         schedules = resolver.get_schedules_with_target_date_by_bin_and_orgs()
         self.assertEqual(schedules.count(), 0)
+
+    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
+    @override_switch('completion.enable_completion_tracking', True)
+    def test_schedules_with_check_completion_no_block_completed(self):
+        resolver = self.create_resolver()
+        schedules = list(resolver.schedules_for_bin())
+        self.assertEqual(len(schedules), 0)
+
+    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
+    @override_switch('completion.enable_completion_tracking', True)
+    def test_schedule_with_check_completion_and_block_completed(self):
+        resolver = self.create_resolver()
+        submit_completions_for_testing(self.user, self.block_key)
+        schedules = list(resolver.schedules_for_bin())
+        self.assertEqual(len(schedules), 1)

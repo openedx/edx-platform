@@ -40,7 +40,7 @@ class SendEmailBaseCommand(PrefixedDebugLoggerMixin, BaseCommand):
             '--check-completion',
             default=False,
             action='store_true',
-            help='Check if the student has completed atleast one block'
+            help='Check if the student has completed at least one block'
         )
 
     def handle(self, *args, **options):

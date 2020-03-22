@@ -31,7 +31,7 @@ LOG = logging.getLogger(__name__)
 
 @ddt.ddt
 @skip_unless_lms
-@skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
+@skipUnless('openedx.core.djangoapps.schedules' in settings.INSTALLED_APPS,
             "Can't test schedules if the app isn't installed")
 class TestUpgradeReminder(ScheduleSendEmailTestMixin, CacheIsolationTestCase):
     __test__ = True
