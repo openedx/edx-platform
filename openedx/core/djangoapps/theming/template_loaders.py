@@ -41,7 +41,7 @@ class ThemeFilesystemLoader(FilesystemLoader):
         if isinstance(theme_dirs, list):
             template_dirs = theme_dirs + template_dirs
 
-        return list(super(ThemeFilesystemLoader, self).get_template_sources(template_name, template_dirs))
+        return list(super(ThemeFilesystemLoader, self).get_template_sources(template_name))
 
     @staticmethod
     def get_theme_template_sources():
