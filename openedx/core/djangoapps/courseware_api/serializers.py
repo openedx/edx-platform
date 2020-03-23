@@ -87,6 +87,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     user_has_staff_access = serializers.BooleanField()
     tabs = serializers.SerializerMethodField()
     verified_mode = serializers.SerializerMethodField()
+    show_calculator = serializers.BooleanField()
 
     def __init__(self, *args, **kwargs):
         """

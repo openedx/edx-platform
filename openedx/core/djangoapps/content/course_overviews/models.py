@@ -828,6 +828,13 @@ class CourseOverview(TimeStampedModel):
         """
         return self._original_course.teams_enabled
 
+    @property
+    def show_calculator(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.show_calculator
+
     def __str__(self):
         """Represent ourselves with the course key."""
         return six.text_type(self.id)
