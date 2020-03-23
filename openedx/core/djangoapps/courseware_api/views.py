@@ -16,6 +16,7 @@ from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from student.models import CourseEnrollment
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import generate_course_expired_message
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 
@@ -116,6 +117,12 @@ class CoursewareInformation(RetrieveAPIView):
 
         # TODO: TNL-7185 Legacy: Refactor to return the expiration date and format the message in the MFE
         overview.course_expired_message = generate_course_expired_message(self.request.user, overview)
+
+        course_key = CourseKey.from_string(self.kwargs['course_key_string'])
+        overview.content_type_gating_enabled = ContentTypeGatingConfig.enabled_for_enrollment(
+            user=self.request.user,
+            course_key=course_key,
+        )
         return overview
 
     def get_serializer_context(self):
