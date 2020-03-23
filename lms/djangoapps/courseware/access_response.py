@@ -192,6 +192,7 @@ class IncorrectPartitionGroupError(AccessError):
     Access denied because the user is not in the correct user subset.
     """
     def __init__(self, partition, user_group, allowed_groups, user_message=None, user_fragment=None):
+        print('FUNK', 'wtf', partition, user_group, allowed_groups, user_message)
         error_code = "incorrect_user_group"
         developer_message = u"In partition {}, user was in group {}, but only {} are allowed access".format(
             partition.name,

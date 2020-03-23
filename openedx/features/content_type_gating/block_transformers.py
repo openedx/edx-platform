@@ -40,7 +40,9 @@ class ContentTypeGateTransformer(BlockStructureTransformer):
             user=usage_info.user,
             course_key=usage_info.course_key,
         ):
+            print('FUNK', 'not enabled')
             return
+        print('FUNK', 'is enabled')
 
         for block_key in block_structure.topological_traversal():
             graded = block_structure.get_xblock_field(block_key, 'graded')
@@ -55,4 +57,6 @@ class ContentTypeGateTransformer(BlockStructureTransformer):
                     CONTENT_GATING_PARTITION_ID,
                     [settings.CONTENT_TYPE_GATE_GROUP_IDS['full_access']]
                 )
+                print('FUNK', 'transform', current_access, block_structure)
+                return
                 block_structure.override_xblock_field(block_key, 'group_access', current_access)

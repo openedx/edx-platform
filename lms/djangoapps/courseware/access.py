@@ -514,13 +514,15 @@ def _has_group_access(descriptor, user, course_key):
     if missing_groups:
         partition, user_group, allowed_groups = missing_groups[0]
         block_key = descriptor.scope_ids.usage_id
-        return IncorrectPartitionGroupError(
+        error = IncorrectPartitionGroupError(
             partition=partition,
             user_group=user_group,
             allowed_groups=allowed_groups,
             user_message=partition.access_denied_message(block_key, user, user_group, allowed_groups),
             user_fragment=partition.access_denied_fragment(descriptor, user, user_group, allowed_groups),
         )
+        print('FUNK', 'error', error)
+        return error
 
     # all checks passed.
     return ACCESS_GRANTED
@@ -550,13 +552,10 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         # before this method is that _has_staff_access_to_descriptor short-circuits and returns True
         # for staff users in preview mode.
         group_access_response = _has_group_access(descriptor, user, course_key)
-        if not group_access_response:
+        if isinstance(group_access_response, IncorrectPartitionGroupError):
+            print('FUNK', 'isinstance', group_access_response)
+        elif not group_access_response:
             return group_access_response
-
-        # If the user has staff access, they can load the module and checks below are not needed.
-        staff_access_response = _has_staff_access_to_descriptor(user, descriptor, course_key)
-        if staff_access_response:
-            return staff_access_response
 
         return (
             _visible_to_nonstaff_users(descriptor, display_error_to_user=False) and

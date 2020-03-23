@@ -129,6 +129,11 @@ class CoursewareInformation(RetrieveAPIView):
         overview.user_has_access = overview.can_load_courseware
         overview.user_has_staff_access = overview.is_staff
 
+        course_key = CourseKey.from_string(self.kwargs['course_key_string'])
+        overview.content_type_gating_enabled = ContentTypeGatingConfig.enabled_for_enrollment(
+            user=self.request.user,
+            course_key=course_key,
+        )
         return overview
 
     def get_serializer_context(self):

@@ -69,6 +69,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     Compare this with CourseDetailSerializer.
     """
 
+    content_type_gating_enabled = serializers.BooleanField()
     effort = serializers.CharField()
     end = serializers.DateTimeField()
     enrollment_start = serializers.DateTimeField()
