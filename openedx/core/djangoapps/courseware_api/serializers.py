@@ -69,6 +69,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     Compare this with CourseDetailSerializer.
     """
 
+    course_expired_message = serializers.CharField()
     effort = serializers.CharField()
     end = serializers.DateTimeField()
     enrollment_start = serializers.DateTimeField()
