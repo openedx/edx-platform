@@ -1,14 +1,9 @@
-import analytics
 import json
 from copy import deepcopy
 from datetime import datetime
-from eventtracking import tracker
-from edxmako.shortcuts import render_to_response
 from logging import getLogger
-from notification_prefs.views import enable_notifications
-from pytz import UTC
-from rest_framework import status
 
+import analytics
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
@@ -19,6 +14,11 @@ from django.shortcuts import get_object_or_404
 from django.utils.translation import get_language
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
+from edxmako.shortcuts import render_to_response
+from eventtracking import tracker
+from notification_prefs.views import enable_notifications
+from pytz import UTC
+from rest_framework import status
 
 from lms.djangoapps.philu_overrides.user_api.views import RegistrationViewCustom
 from lms.djangoapps.onboarding.models import EmailPreference, Organization, PartnerNetwork, UserExtendedProfile
@@ -40,14 +40,14 @@ from .helpers import import_form_using_slug, user_has_performance_access
 from .models import Partner
 
 log = getLogger(__name__)
-AUDIT_LOG = getLogger("audit")
+AUDIT_LOG = getLogger('audit')
 
 
 def dashboard(request, slug):
     partner = get_object_or_404(Partner, slug=slug)
     courses = get_partner_recommended_courses(partner.slug, request.user)
     return render_to_response('features/partners/dashboard.html', {'recommended_courses': courses,
-                                                                       'slug': partner.slug})
+                                                                   'slug': partner.slug})
 
 
 def performance_dashboard(request, slug):
@@ -55,11 +55,14 @@ def performance_dashboard(request, slug):
     if user_has_performance_access(request.user, partner):
         return render_to_response('features/partners/performance_dashboard.html',
                                   {'slug': partner.slug, 'performance_url': partner.performance_url})
-        return partner_views.performance_dashboard(request, partner)
     return HttpResponseForbidden()
 
 
-@require_http_methods(["POST"])
+class PartnerLimitReachedError(Exception):
+    pass
+
+
+@require_http_methods(['POST'])
 @sensitive_post_parameters('password')
 def register_user(request, slug):
     """
@@ -72,7 +75,7 @@ def register_user(request, slug):
     return PartnerRegistrationView.as_view()(request, partner=partner)
 
 
-@require_http_methods(["POST"])
+@require_http_methods(['POST'])
 @sensitive_post_parameters('password')
 def login_user(request, slug):
     """
@@ -99,14 +102,14 @@ def reset_password_view(request):
     if reset_password_form.is_valid():
         response = password_change_request_handler(request)
         if response.status_code == status.HTTP_403_FORBIDDEN:
-            return JsonResponse({"Error": {"email": [response.content]}}, status=status.HTTP_403_FORBIDDEN)
+            return JsonResponse({'Error': {'email': [response.content]}}, status=status.HTTP_403_FORBIDDEN)
         return response
-    return JsonResponse({"Error": dict(reset_password_form.errors.items())}, status=status.HTTP_404_NOT_FOUND)
+    return JsonResponse({'Error': dict(reset_password_form.errors.items())}, status=status.HTTP_404_NOT_FOUND)
 
 
 class PartnerRegistrationView(RegistrationViewCustom):
     """
-    This class handles registration flow for give2asia users. It inherit some basic functionality from original (normal)
+    This class handles registration flow for partner users. It inherit some basic functionality from original (normal)
     registration flow
     """
 
@@ -124,7 +127,7 @@ class PartnerRegistrationView(RegistrationViewCustom):
         account_creation_form = form.AccountCreationFormCustom(data=registration_data, tos_required=True) if form \
             else PartnerAccountCreationForm(data=registration_data, tos_required=True)
         if not account_creation_form.is_valid():
-            return JsonResponse({"Error": dict(account_creation_form.errors.items())}, status=400)
+            return JsonResponse({'Error': dict(account_creation_form.errors.items())}, status=400)
 
         account_creation_form.clean_registration_data(registration_data)
         try:
@@ -132,13 +135,17 @@ class PartnerRegistrationView(RegistrationViewCustom):
             # UserExtendedProfile, Organization, PartnerUser and EmailPreference
             user = create_account_with_params_custom(request, registration_data, partner)
             self.save_user_utm_info(user)
+        except PartnerLimitReachedError as er:
+            error_message = {'Error': er.message,
+                             'Partner': partner.label}
+            log.exception(error_message)
+            return JsonResponse(error_message, status=400)
         except Exception as err:
-            error_message = {"Error": {"reason": "User registration failed due to {}".format(repr(err))},
-                             "Partner": partner.label}
+            error_message = {'Error': {'reason': 'User registration failed due to {}'.format(repr(err))}}
             log.exception(error_message)
             return JsonResponse(error_message, status=400)
 
-        response = JsonResponse({"success": True})
+        response = JsonResponse({'success': True})
         set_logged_in_cookies(request, response, user)
         return response
 
@@ -155,18 +162,18 @@ def create_account_with_params_custom(request, params, partner):
             # Create user and activate it
             user = User(
                 username=params['username'],
-                email=params["email"],
+                email=params['email'],
                 first_name=first_name,
                 last_name=last_name,
                 is_active=True,
             )
-            user.set_password(params["password"])
+            user.set_password(params['password'])
             registration = Registration()
 
             user.save()
             registration.register(user)
         except Exception as err:  # pylint: disable=broad-except
-            log.exception("User creation failed for user {username}".format(username=params['username']), repr(err))
+            log.exception('User creation failed for user {username}'.format(username=params['username']), repr(err))
             raise
 
         extended_profile_data = deepcopy(partner_constants.PARTNER_EXTENDED_PROFILE_DEFAULT_DATA)
@@ -186,7 +193,7 @@ def create_account_with_params_custom(request, params, partner):
             post_save.send(UserProfile, instance=profile, created=False)
 
         except Exception as err:  # pylint: disable=broad-except
-            log.exception("UserProfile creation failed for user {id}.".format(id=user.id), repr(err))
+            log.exception('UserProfile creation failed for user {id}.'.format(id=user.id), repr(err))
             raise
 
         try:
@@ -215,7 +222,7 @@ def create_account_with_params_custom(request, params, partner):
 
             extended_profile.save()
         except Exception as err:  # pylint: disable=broad-except
-            log.exception("User extended profile creation failed for user {id}.".format(id=user.id), repr(err))
+            log.exception('User extended profile creation failed for user {id}.'.format(id=user.id), repr(err))
             raise
 
         try:
@@ -223,7 +230,7 @@ def create_account_with_params_custom(request, params, partner):
             partner_user = PartnerUser.objects.create(user=user, partner=partner)
             partner_user.save()
         except Exception as err:  # pylint: disable=broad-except
-            log.exception("partner_user creation failed for user {id}, partner {slug}"
+            log.exception('partner_user creation failed for user {id}, partner {slug}'
                           .format(id=user.id, slug=partner.slug), repr(err))
             raise
 
@@ -232,7 +239,7 @@ def create_account_with_params_custom(request, params, partner):
             user_email_preferences.opt_in = partner_constants.OPT_IN_DATA
             user_email_preferences.save()
         except Exception as err:  # pylint: disable=broad-except
-            log.exception("User email preferences creation failed for user {id}.".format(id=user.id), repr(err))
+            log.exception('User email preferences creation failed for user {id}.'.format(id=user.id), repr(err))
             raise
 
     # Perform operations that are non-critical parts of account creation
@@ -244,7 +251,7 @@ def create_account_with_params_custom(request, params, partner):
         try:
             enable_notifications(user)
         except Exception:  # pylint: disable=broad-except
-            log.exception("Enable discussion notifications failed for user {id}.".format(id=user.id))
+            log.exception('Enable discussion notifications failed for user {id}.'.format(id=user.id))
 
     # Track the user's registration
     if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
@@ -267,8 +274,8 @@ def create_account_with_params_custom(request, params, partner):
 
         if hasattr(settings, 'MAILCHIMP_NEW_USER_LIST_ID'):
             identity_args.append({
-                "MailChimp": {
-                    "listId": settings.MAILCHIMP_NEW_USER_LIST_ID
+                'MailChimp': {
+                    'listId': settings.MAILCHIMP_NEW_USER_LIST_ID
                 }
             })
 
@@ -276,7 +283,7 @@ def create_account_with_params_custom(request, params, partner):
 
         analytics.track(
             user.id,
-            "edx.bi.user.account.registered",
+            'edx.bi.user.account.registered',
             {
                 'category': 'conversion',
                 'label': params.get('course_id'),
@@ -303,12 +310,12 @@ def create_account_with_params_custom(request, params, partner):
         registration.activate()
 
     count_registered_partner_users = PartnerUser.objects.filter(partner=partner).count()
-    limit_registered_partner_users = partner.configuration.get("USER_LIMIT")
+    limit_registered_partner_users = partner.configuration.get('USER_LIMIT')
 
     if limit_registered_partner_users and count_registered_partner_users > int(limit_registered_partner_users):
         partner_user.status = partner_constants.PARTNER_USER_STATUS_WAITING
         partner_user.save()
-        raise Exception("User registration limit for partner {} exceeded".format(partner.label))
+        raise PartnerLimitReachedError('Partner registration limit reached for partner {}'.format(partner.label))
     else:
         # login user immediately after a user creates an account,
         new_user = authenticate(username=user.username, password=params['password'])
@@ -324,7 +331,7 @@ def create_account_with_params_custom(request, params, partner):
     # TODO: there is no error checking here to see that the user actually logged in successfully,
     # and is not yet an active user.
     if new_user is not None:
-        AUDIT_LOG.info(u"Login success on new account creation - {0}".format(new_user.username))
+        AUDIT_LOG.info(u'Login success on new account creation - {0}'.format(new_user.username))
 
     return new_user
 
@@ -332,7 +339,7 @@ def create_account_with_params_custom(request, params, partner):
 class PartnerLoginSessionView(LoginSessionViewCustom):
     """
     Inherited from LoginSessionViewCustom to keep the existing flow for login
-    and extend the functionality to affiliate the user with Give2Asia if not already done
+    and extend the functionality to affiliate the user with Partner if not already done
     """
 
     def post(self, request, partner):
@@ -344,8 +351,8 @@ class PartnerLoginSessionView(LoginSessionViewCustom):
             try:
                 PartnerUser.objects.get_or_create(partner=partner, user=user)
             except Exception as ex:
-                log.error("Failed to affiliate {user} with {partner} due to exception {exp}".format(
-                    user=user.username, partner=partner.slug, exp=ex.message)
+                log.error('Failed to affiliate {user} with {partner} due to exception {exp}'.format(
+                    user=user.username, partner=partner.slug, exp=str(ex))
                 )
         return response
 

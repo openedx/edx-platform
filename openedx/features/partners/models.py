@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import models
 from jsonfield.fields import JSONField
 from model_utils import Choices
@@ -24,6 +25,16 @@ class Partner(TimeStampedModel):
     class Meta:
         verbose_name = "Partner"
         verbose_name_plural = "Partners"
+
+    def clean(self, *args, **kwargs):
+        user_limit = self.configuration.get("USER_LIMIT")
+        try:
+            int(user_limit)
+        except ValueError:
+            raise ValidationError({
+                'configuration': ValidationError('USER_LIMIT can only be an integer string or blank string'),
+            })
+        super(Partner, self).clean(*args, **kwargs)
 
 
 class PartnerUser(TimeStampedModel):

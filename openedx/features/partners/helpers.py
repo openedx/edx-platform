@@ -74,6 +74,11 @@ def get_course_description(course):
 
 
 def import_form_using_slug(partner_slug):
+    """
+    :param partner_slug: String object, slug of a registered partner
+    :return: partner custom form, if an overridden form for partner exists
+             None, if an overridden form does not exist
+    """
     try:
         return import_module(PARTNERS_FORM_FRMT.format(slug=partner_slug))
     except ImportError:

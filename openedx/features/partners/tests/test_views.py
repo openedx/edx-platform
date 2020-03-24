@@ -14,7 +14,7 @@ from openedx.features.partners.tests.factories import FocusAreaFactory, Organiza
 @ddt
 class PartnerRegistrationViewTest(ApiTestCase):
     """
-    Includes test cases for g2a registration
+    Includes test cases for partner registration
     """
 
     NAME = 'bob james'
@@ -29,8 +29,7 @@ class PartnerRegistrationViewTest(ApiTestCase):
 
     def setUp(self):
         self.partner = PartnerFactory.create(slug=self.PARTNER,
-                                             label=self.ORGANIZATION,
-                                             configuration={"USER_LIMIT": None})
+                                             label=self.ORGANIZATION)
         self.registration_url = reverse('partner_register', args=[self.PARTNER])
 
     def test_put_not_allowed(self):
@@ -224,7 +223,7 @@ class PartnerRegistrationViewTest(ApiTestCase):
         :return : None
         """
 
-        self.partner.configuration = {"USER_LIMIT": "0"}
+        self.partner.configuration = {'USER_LIMIT': '0'}
         self.partner.save()
         # create focus area with default values
         FocusAreaFactory()
