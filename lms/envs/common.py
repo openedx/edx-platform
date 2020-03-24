@@ -3384,23 +3384,33 @@ SEARCH_FILTER_GENERATOR = "lms.lib.courseware_search.lms_filter_generator.LmsSea
 #: Override to skip enrollment start date filtering in course search
 SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = False
 
-# DOCUMENTME
-#: The configuration visibility of account fields.
+#: Configure the visibility of user account fields for other users. This is a
+#: :py:class:`dict` with the following string items:
+#:
+#: * "default_visibility": Default visibility level for accounts without a specified
+#:   value. The value is one of: "all_users", "private" or "custom".
+#: * "public_fields": The list of account fields that are always public.
+#: * "bulk_shareable_fields": The list of all fields that are shared with other users
+#:   using the default "all_users" privacy setting. By default, this includes the values
+#:   from "public_fields" plus: "bio", "course_certificates", "country",
+#:   "date_joined", "language_proficiencies", "level_of_education", "social_links",
+#:   "time_zone".
+#: * "custom_shareable_fields": The list of all fields that can be shared selectively
+#:   with other users using the "custom" default privacy setting. By default, this
+#:   includes the values from "bulk_shareable_fields" plus: "name".
+#: * "admin_fields": The list of account fields that are visible only to staff and
+#:   users viewing their own profiles. By default, this includes the values from
+#: * "custom_shareable_fields" plus "email", "extended_profile", "gender", "goals",
+#:   "is_active", "mailing_address", "requires_parental_consent", "secondary_email",
+#:   "year_of_birth", "phone_number".
 ACCOUNT_VISIBILITY_CONFIGURATION = {
-    # Default visibility level for accounts without a specified value
-    # The value is one of: 'all_users', 'private'
     "default_visibility": "all_users",
-
-    # The list of account fields that are always public
     "public_fields": [
         'account_privacy',
         'profile_image',
         'username',
     ],
 }
-
-# DOCUMENTME
-#: The list of all fields that are shared with other users using the bulk 'all_users' privacy setting
 ACCOUNT_VISIBILITY_CONFIGURATION["bulk_shareable_fields"] = (
     ACCOUNT_VISIBILITY_CONFIGURATION["public_fields"] + [
         'bio',
@@ -3416,17 +3426,11 @@ ACCOUNT_VISIBILITY_CONFIGURATION["bulk_shareable_fields"] = (
         'accomplishments_shared',
     ]
 )
-
-# DOCUMENTME
-#: The list of all fields that can be shared selectively with other users using the 'custom' privacy setting
 ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] = (
     ACCOUNT_VISIBILITY_CONFIGURATION["bulk_shareable_fields"] + [
         "name",
     ]
 )
-
-# DOCUMENTME
-#: The list of account fields that are visible only to staff and users viewing their own profiles
 ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
     ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] + [
         "email",
