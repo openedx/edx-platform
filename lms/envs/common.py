@@ -54,6 +54,7 @@ from xmodule.modulestore.edit_info import EditInfoMixin
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
+# DOCUMENTME
 #: The display name of the platform to be used in templates/emails/etc.
 PLATFORM_NAME = _('Your Platform Name Here')
 PLATFORM_DESCRIPTION = _('Your Platform Description Here')
@@ -69,11 +70,13 @@ LMS_ROOT_URL = 'https://localhost:18000'
 LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
 LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
 
+# DOCUMENTME
 #: Default choices for role dropdown in the membership tab of the instructor dashboard.
 #: This setting is used when a site does not define its own choices via site
 #: configurations.
 MANUAL_ENROLLMENT_ROLE_CHOICES = ['Learner', 'Support', 'Partner']
 
+# DOCUMENTME
 #: List of logout URIs for each IDA that the learner should be logged out of when they
 #: logout of the LMS. Only applies to IDA for which the social auth flow uses DOT
 #: (Django OAuth Toolkit).
@@ -487,15 +490,19 @@ COURSE_REVIEWS_TOOL_PROVIDER_PLATFORM_KEY = 'edx'
 COURSE_TALK_READ_ONLY_SOURCE = '//d3q6qq2zt8nhwv.cloudfront.net/s/js/widgets/coursetalk-read-reviews.js'
 COURSE_TALK_WRITE_ONLY_SOURCE = '//d3q6qq2zt8nhwv.cloudfront.net/s/js/widgets/coursetalk-write-reviews.js'
 
+# DOCUMENTME
 #: Ignore static asset files on import which match this pattern
 ASSET_IGNORE_REGEX = r"(^\._.*$)|(^\.DS_Store$)|(^.*~$)"
 
+# DOCUMENTME
 #: Used for A/B testing
 DEFAULT_GROUPS = []
 
+# DOCUMENTME
 #: If this is true, random scores will be generated for the purpose of debugging the profile graphs
 GENERATE_PROFILE_SCORES = False
 
+# DOCUMENTME
 #: Used with XQueue
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 XQUEUE_INTERFACE = {
@@ -507,6 +514,7 @@ XQUEUE_INTERFACE = {
     }
 }
 
+# DOCUMENTME
 #: Used with Email sending
 RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS = 5
 RETRY_ACTIVATION_EMAIL_TIMEOUT = 0.5
@@ -522,6 +530,7 @@ PASSWORD_RESET_EMAIL_RATE_LIMIT = {
     'per_seconds': 60
 }
 RETRY_CALENDAR_SYNC_EMAIL_MAX_ATTEMPTS = 5
+# DOCUMENTME
 #: Deadline message configurations
 COURSE_MESSAGE_ALERT_DURATION_IN_DAYS = 14
 
@@ -536,11 +545,13 @@ NODE_MODULES_ROOT = REPO_ROOT / "node_modules"
 
 DATA_DIR = COURSES_ROOT
 
+# DOCUMENTME
 #: TODO: Remove the rest of the sys.path modification here and in cms/envs/common.py
 sys.path.append(REPO_ROOT)
 sys.path.append(PROJECT_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 
+# DOCUMENTME
 #: For Node.js
 
 system_node_path = os.environ.get("NODE_PATH", NODE_MODULES_ROOT)
@@ -551,8 +562,10 @@ node_paths = [
 ]
 NODE_PATH = ':'.join(node_paths)
 
+# DOCUMENTME
 #: For geolocation ip database
 GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoLite2-Country.mmdb"
+# DOCUMENTME
 #: Where to look for a status message
 STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"
 
@@ -627,6 +640,7 @@ OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 
 ################################## DJANGO OAUTH TOOLKIT #######################################
 
+# DOCUMENTME
 #: Scope description strings are presented to the user on the application authorization
 #: page. See: lms/templates/oauth2_provider/authorize.html for details. Non-default
 #: scopes should be added directly to OAUTH2_PROVIDER['SCOPES'] below.
@@ -652,10 +666,12 @@ OAUTH2_PROVIDER = {
     'REQUEST_APPROVAL_PROMPT': 'auto_even_if_expired',
     'ERROR_RESPONSE_WITH_SCOPES': True,
 }
+# DOCUMENTME
 #: This is required for the migrations in oauth_dispatch.models
 #: otherwise it fails saying this attribute is not present in Settings
 OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
 
+# DOCUMENTME
 #: Automatically clean up edx-django-oauth2-provider tokens on use
 OAUTH_DELETE_EXPIRED = True
 OAUTH_ID_TOKEN_EXPIRATION = 60 * 60
@@ -784,15 +800,18 @@ AUTHENTICATION_BACKENDS = [
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
 
+# DOCUMENTME
 #: Set request limits for maximum size of a request body and maximum number of GET/POST parameters. (>=Django 1.10)
 #: Limits are currently disabled - but can be used for finer-grained denial-of-service protection.
 DATA_UPLOAD_MAX_MEMORY_SIZE = None
 DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 
+# DOCUMENTME
 #: Configuration option for when we want to grab server error pages
 STATIC_GRAB = False
 DEV_CONTENT = True
 
+# DOCUMENTME
 #: License for serving content in China
 ICP_LICENSE = None
 ICP_LICENSE_INFO = {}
@@ -861,6 +880,7 @@ COURSE_MODE_DEFAULTS = {
     'suggested_prices': '',
 }
 
+# DOCUMENTME
 #: IP addresses that are allowed to reload the course, etc.
 #: TODO (vshnayder): Will probably need to change as we get real access control in.
 LMS_MIGRATION_ALLOWED_IPS = []
@@ -870,6 +890,7 @@ ASSET_KEY_PATTERN = r'(?P<asset_key_string>(?:/?c4x(:/)?/[^/]+/[^/]+/[^/]+/[^@]+
 USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 
 
+# DOCUMENTME
 #: The space is required for space-dependent languages like Arabic and Farsi.
 #: However, backward compatibility with Ficus older releases is still maintained (space is still not valid)
 #: in the AccountCreationForm and the user_api through the ENABLE_UNICODE_USERNAME feature flag.
@@ -879,12 +900,14 @@ USERNAME_PATTERN = r'(?P<username>{regex})'.format(regex=USERNAME_REGEX_PARTIAL)
 
 ############################## HEARTBEAT ######################################
 
+# DOCUMENTME
 #: Checks run in normal mode by the heartbeat djangoapp
 HEARTBEAT_CHECKS = [
     'openedx.core.djangoapps.heartbeat.default_checks.check_modulestore',
     'openedx.core.djangoapps.heartbeat.default_checks.check_database',
 ]
 
+# DOCUMENTME
 #: Other checks to run by default in "extended"/heavy mode
 HEARTBEAT_EXTENDED_CHECKS = (
     'openedx.core.djangoapps.heartbeat.default_checks.check_celery',
@@ -895,6 +918,7 @@ HEARTBEAT_CELERY_TIMEOUT = 5
 ############################## EVENT TRACKING #################################
 LMS_SEGMENT_KEY = None
 
+# DOCUMENTME
 #: FIXME: Should we be doing this truncation?
 TRACK_MAX_EVENT = 50000
 
@@ -909,6 +933,7 @@ TRACKING_BACKENDS = {
     }
 }
 
+# DOCUMENTME
 #: We're already logging events, and we don't want to capture user
 #: names/passwords.  Heartbeat events are likely not interesting.
 TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat', r'^/segmentio/event', r'^/performance']
@@ -986,14 +1011,17 @@ from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore import prefer_xmodules
 from xmodule.x_module import XModuleMixin
 
+# DOCUMENTME
 #: These are the Mixins that should be added to every XBlock.
 #: This should be moved into an XBlock Runtime/Application object
 #: once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin, EditInfoMixin)
 
+# DOCUMENTME
 #: Allow any XBlock in the LMS
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
+# DOCUMENTME
 #: Paths to wrapper methods which should be applied to every XBlock's FieldData.
 XBLOCK_FIELD_DATA_WRAPPERS = ()
 
@@ -1130,6 +1158,7 @@ CODE_JAIL = {
     },
 }
 
+# DOCUMENTME
 #: Some courses are allowed to run unsafe code. This is a list of regexes, one
 #: of them must match the course id for that course to run unsafe code.
 #:
@@ -1142,6 +1171,7 @@ CODE_JAIL = {
 COURSES_WITH_UNSAFE_CODE = []
 
 ############################### DJANGO BUILT-INS ###############################
+# DOCUMENTME
 #: Change DEBUG in your environment settings files, not here
 DEBUG = False
 USE_TZ = True
@@ -1151,22 +1181,27 @@ SESSION_SERIALIZER = 'openedx.core.lib.session_serializers.PickleSerializer'
 SESSION_COOKIE_DOMAIN = ""
 SESSION_COOKIE_NAME = 'sessionid'
 
+# DOCUMENTME
 #: CMS base
 CMS_BASE = 'localhost:18010'
 
+# DOCUMENTME
 #: LMS base
 LMS_BASE = 'localhost:18000'
 
+# DOCUMENTME
 #: Studio name
 STUDIO_NAME = 'Studio'
 STUDIO_SHORT_NAME = 'Studio'
 
+# DOCUMENTME
 #: Site info
 SITE_NAME = "localhost"
 HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 # NOTE: Please set ALLOWED_HOSTS to some sane value, as we do not allow the default '*'
 
+# DOCUMENTME
 #: Platform Email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'localhost'
@@ -1184,15 +1219,18 @@ UNIVERSITY_EMAIL = 'university@example.com'
 PRESS_EMAIL = 'press@example.com'
 FINANCE_EMAIL = ''
 
+# DOCUMENTME
 #: Platform mailing address
 CONTACT_MAILING_ADDRESS = 'SET-ME-PLEASE'
 
+# DOCUMENTME
 #: Account activation email sender address
 ACTIVATION_EMAIL_FROM_ADDRESS = ''
 
 ADMINS = ()
 MANAGERS = ADMINS
 
+# DOCUMENTME
 #: Static content
 STATIC_URL = '/static/'
 STATIC_ROOT = ENV_ROOT / "staticfiles"
@@ -1211,19 +1249,23 @@ CAS_SERVER_URL = ""
 CAS_EXTRA_LOGIN_PARAMS = ""
 CAS_ATTRIBUTE_CALLBACK = ""
 
+# DOCUMENTME
 #: User-uploaded content
 MEDIA_ROOT = '/edx/var/edxapp/media/'
 MEDIA_URL = '/media/'
 
+# DOCUMENTME
 #: Locale/Internationalization
 CELERY_TIMEZONE = 'UTC'
 TIME_ZONE = 'UTC'
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
+# DOCUMENTME
 #: these languages display right to left
 LANGUAGES_BIDI = ("he", "ar", "fa", "ur", "fa-ir", "rtl")
 
 LANGUAGE_COOKIE = "openedx-language-preference"
 
+# DOCUMENTME
 #: Sourced from http://www.localeplanet.com/icu/ and wikipedia
 LANGUAGES = [
     ('en', u'English'),
@@ -1311,6 +1353,7 @@ LANGUAGES = [
 
 LANGUAGE_DICT = dict(LANGUAGES)
 
+# DOCUMENTME
 #: Languages supported for custom course certificate templates
 CERTIFICATE_TEMPLATE_LANGUAGES = {
     'en': 'English',
@@ -1325,6 +1368,7 @@ STATICI18N_ROOT = PROJECT_ROOT / "static"
 STATICI18N_OUTPUT_DIR = "js/i18n"
 
 
+# DOCUMENTME
 #: Localization strings (e.g. django.po) are under these directories
 def _make_locale_paths(settings):  # pylint: disable=missing-docstring
     locale_paths = [settings.REPO_ROOT + '/conf/locale']  # edx-platform/conf/locale/
@@ -1336,13 +1380,16 @@ def _make_locale_paths(settings):  # pylint: disable=missing-docstring
 LOCALE_PATHS = _make_locale_paths
 derived('LOCALE_PATHS')
 
+# DOCUMENTME
 #: Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
+# DOCUMENTME
 #: Guidelines for translators
 TRANSLATORS_GUIDE = 'https://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/internationalization/i18n_translators_guide.html'  # pylint: disable=line-too-long
 
 #################################### AWS #######################################
+# DOCUMENTME
 #: S3BotoStorage insists on a timeout for uploaded assets. We should make it
 #: permanent instead, but rather than trying to figure out exactly where that
 #: setting is, I'm just bumping the expiration time to something absurd (100
@@ -1384,6 +1431,7 @@ ZENDESK_USER = ''
 ZENDESK_API_KEY = ''
 ZENDESK_CUSTOM_FIELDS = {}
 ZENDESK_OAUTH_ACCESS_TOKEN = ''
+# DOCUMENTME
 #: A mapping of string names to Zendesk Group IDs
 #: To get the IDs of your groups you can go to
 #: {zendesk_url}/api/v2/groups.json
@@ -1407,14 +1455,17 @@ CC_PROCESSOR = {
     }
 }
 
+# DOCUMENTME
 #: Setting for PAID_COURSE_REGISTRATION, DOES NOT AFFECT VERIFIED STUDENTS
 PAID_COURSE_REGISTRATION_CURRENCY = ['usd', '$']
 
+# DOCUMENTME
 #: Members of this group are allowed to generate payment reports
 PAYMENT_REPORT_GENERATOR_GROUP = 'shoppingcart_report_access'
 
 ################################# EdxNotes config  #########################
 
+# DOCUMENTME
 #: Configure the LMS to use our stub EdxNotes implementation
 EDXNOTES_PUBLIC_API = 'http://localhost:18120/api/v1'
 EDXNOTES_INTERNAL_API = 'http://localhost:18120/api/v1'
@@ -1425,6 +1476,7 @@ EDXNOTES_READ_TIMEOUT = 1.5  # time in seconds
 
 ########################## Parental controls config  #######################
 
+# DOCUMENTME
 #: The age at which a learner no longer requires parental consent, or None
 #: if parental consent is never required.
 PARENTAL_CONSENT_AGE_LIMIT = 13
@@ -1433,9 +1485,11 @@ PARENTAL_CONSENT_AGE_LIMIT = 13
 # Constants for the footer used on the site and shared with other sites
 # (such as marketing and the blog) via the branding API.
 
+# DOCUMENTME
 #: URL for OpenEdX displayed in the footer
 FOOTER_OPENEDX_URL = "http://open.edx.org"
 
+# DOCUMENTME
 #: URL for the OpenEdX logo image
 #: We use logo images served from files.edx.org so we can (roughly) track
 #: how many OpenEdX installations are running.
@@ -1445,10 +1499,12 @@ FOOTER_OPENEDX_URL = "http://open.edx.org"
 #: * https://files.edx.org/openedx-logos/edx-openedx-logo-tag-dark.png
 FOOTER_OPENEDX_LOGO_IMAGE = "https://files.edx.org/openedx-logos/edx-openedx-logo-tag.png"
 
+# DOCUMENTME
 #: This is just a placeholder image.
 #: Site operators can customize this with their organization's image.
 FOOTER_ORGANIZATION_IMAGE = "images/logo.png"
 
+# DOCUMENTME
 #: These are referred to both by the Django asset pipeline
 #: AND by the branding footer API, which needs to decide which
 #: version of the CSS to serve.
@@ -1463,13 +1519,16 @@ FOOTER_CSS = {
     },
 }
 
+# DOCUMENTME
 #: Cache expiration for the version of the footer served
 #: by the branding API.
 FOOTER_CACHE_TIMEOUT = 30 * 60
 
+# DOCUMENTME
 #: Max age cache control header for the footer (controls browser caching).
 FOOTER_BROWSER_CACHE_MAX_AGE = 5 * 60
 
+# DOCUMENTME
 #: Credit api notification cache timeout
 CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 
@@ -1576,9 +1635,11 @@ MIDDLEWARE = [
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 ]
 
+# DOCUMENTME
 #: Clickjacking protection can be disbaled by setting this to 'ALLOW'
 X_FRAME_OPTIONS = 'DENY'
 
+# DOCUMENTME
 #: Platform for Privacy Preferences header
 P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
 
@@ -1597,6 +1658,7 @@ PIPELINE = {
 STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 STATICFILES_STORAGE_KWARGS = {}
 
+# DOCUMENTME
 #: List of finder classes that know how to find static files in various locations.
 #: Note: the pipeline finder is included to be able to discover optimized files
 STATICFILES_FINDERS = [
@@ -1618,6 +1680,7 @@ courseware_js = [
 ]
 
 
+# DOCUMENTME
 #: Before a student accesses courseware, we do not
 #: need many of the JS dependencies.  This includes
 #: only the dependencies used everywhere in the LMS
@@ -1655,6 +1718,7 @@ main_vendor_js = base_vendor_js + [
     'js/vendor/jquery.ba-bbq.min.js',
 ]
 
+# DOCUMENTME
 #: Common files used by both RequireJS code and non-RequireJS code
 base_application_js = [
     'js/src/utility.js',
@@ -2033,21 +2097,26 @@ STATICFILES_IGNORE_PATTERNS = (
 
 ################################# DJANGO-REQUIRE ###############################
 
+# DOCUMENTME
 #: The baseUrl to pass to the r.js optimizer, relative to STATIC_ROOT.
 REQUIRE_BASE_URL = "./"
 
+# DOCUMENTME
 #: The name of a build profile to use for your project, relative to REQUIRE_BASE_URL.
 #: A sensible value would be 'app.build.js'. Leave blank to use the built-in default build profile.
 #: Set to False to disable running the default profile (e.g. if only using it to build Standalone
 #: Modules)
 REQUIRE_BUILD_PROFILE = "lms/js/build.js"
 
+# DOCUMENTME
 #: The name of the require.js script used by your project, relative to REQUIRE_BASE_URL.
 REQUIRE_JS = "common/js/vendor/require.js"
 
+# DOCUMENTME
 #: Whether to run django-require in debug mode.
 REQUIRE_DEBUG = False
 
+# DOCUMENTME
 #: In production, the Django pipeline appends a file hash to JavaScript file names.
 #: This makes it difficult for RequireJS to load its requirements, since module names
 #: specified in JavaScript code do not include the hash.
@@ -2092,6 +2161,7 @@ WEBPACK_CONFIG_PATH = 'webpack.prod.config.js'
 
 ########################## DJANGO DEBUG TOOLBAR ###############################
 
+# DOCUMENTME
 #: We don't enable Django Debug Toolbar universally, but whenever we do, we want
 #: to avoid patching settings.  Patched settings can cause circular import
 #: problems: https://django-debug-toolbar.readthedocs.org/en/1.0/installation.html#explicit-setup
@@ -2100,6 +2170,7 @@ DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
 ################################# CELERY ######################################
 
+# DOCUMENTME
 #: Celery's task autodiscovery won't find tasks nested in a tasks package.
 #: Tasks are only registered when the module they are defined in is imported.
 CELERY_IMPORTS = (
@@ -2149,6 +2220,7 @@ CELERY_QUEUES = [
     'edx.lms.core.high_mem'
 ]
 
+# DOCUMENTME
 #: let logging work as configured:
 CELERYD_HIJACK_ROOT_LOGGER = False
 
@@ -2183,42 +2255,52 @@ BLOCK_STRUCTURES_SETTINGS = dict(
 
 ################################ Bulk Email ###################################
 
+# DOCUMENTME
 #: Suffix used to construct 'from' email address for bulk emails.
 #: A course-specific identifier is prepended.
 BULK_EMAIL_DEFAULT_FROM_EMAIL = 'no-reply@example.com'
 
+# DOCUMENTME
 #: Parameters for breaking down course enrollment into subtasks.
 BULK_EMAIL_EMAILS_PER_TASK = 500
 
+# DOCUMENTME
 #: Initial delay used for retrying tasks.  Additional retries use
 #: longer delays.  Value is in seconds.
 BULK_EMAIL_DEFAULT_RETRY_DELAY = 30
 
+# DOCUMENTME
 #: Maximum number of retries per task for errors that are not related
 #: to throttling.
 BULK_EMAIL_MAX_RETRIES = 5
 
+# DOCUMENTME
 #: Maximum number of retries per task for errors that are related to
 #: throttling.  If this is not set, then there is no cap on such retries.
 BULK_EMAIL_INFINITE_RETRY_CAP = 1000
 
+# DOCUMENTME
 #: We want Bulk Email running on the high-priority queue, so we define the
 #: routing key that points to it.  At the moment, the name is the same.
 BULK_EMAIL_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 
+# DOCUMENTME
 #: We also define a queue for smaller jobs so that large courses don't block
 #: smaller emails (see BULK_EMAIL_JOB_SIZE_THRESHOLD setting)
 BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = 'edx.lms.core.default'
 
+# DOCUMENTME
 #: For emails with fewer than these number of recipients, send them through
 #: a different queue to avoid large courses blocking emails that are meant to be
 #: sent to self and staff
 BULK_EMAIL_JOB_SIZE_THRESHOLD = 100
 
+# DOCUMENTME
 #: Flag to indicate if individual email addresses should be logged as they are sent
 #: a bulk email message.
 BULK_EMAIL_LOG_SENT_EMAILS = False
 
+# DOCUMENTME
 #: Delay in seconds to sleep between individual mail messages being sent,
 #: when a bulk email task is retried for rate-related reasons.  Choose this
 #: value depending on the number of workers that might be sending email in
@@ -2227,6 +2309,7 @@ BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS = 0.02
 
 ############################# Email Opt In ####################################
 
+# DOCUMENTME
 #: Minimum age for organization-wide email opt in
 EMAIL_OPTIN_MINIMUM_AGE = PARENTAL_CONSENT_AGE_LIMIT
 
@@ -2257,6 +2340,7 @@ YOUTUBE_API_KEY = 'PUT_YOUR_API_KEY_HERE'
 
 ################################### APPS ######################################
 
+# DOCUMENTME
 #: The order of INSTALLED_APPS is important, when adding new apps here
 #: remember to check that you are not creating new
 #: RemovedInDjango19Warnings in the test logs.
@@ -2554,6 +2638,7 @@ INSTALLED_APPS = [
 
 ######################### CSRF #########################################
 
+# DOCUMENTME
 #: Forwards-compatibility with Django 1.7
 CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
 #: It is highly recommended that you override this in any environment accessed by
@@ -2583,6 +2668,7 @@ SWAGGER_SETTINGS = {
     'DEFAULT_INFO': 'openedx.core.apidocs.api_info',
 }
 
+# DOCUMENTME
 #: How long to cache OpenAPI schemas and UI, in seconds.
 OPENAPI_CACHE_TIMEOUT = 0
 
@@ -2618,10 +2704,12 @@ ID_VERIFICATION_SUPPORT_LINK = ''
 PASSWORD_RESET_SUPPORT_LINK = ''
 ACTIVATION_EMAIL_SUPPORT_LINK = ''
 
+# DOCUMENTME
 #: Days before the expired date that we warn the user
 ENTITLEMENT_EXPIRED_ALERT_PERIOD = 90
 
 ############################# SOCIAL MEDIA SHARING #############################
+# DOCUMENTME
 #: Social Media Sharing on Student Dashboard
 SOCIAL_SHARING_SETTINGS = {
     # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in cms/envs/common.py
@@ -2638,6 +2726,7 @@ SOCIAL_SHARING_SETTINGS = {
 }
 
 ################# Social Media Footer Links #######################
+# DOCUMENTME
 #: The names list controls the order of social media
 #: links in the footer.
 SOCIAL_MEDIA_FOOTER_NAMES = [
@@ -2649,10 +2738,12 @@ SOCIAL_MEDIA_FOOTER_NAMES = [
     "reddit",
 ]
 
+# DOCUMENTME
 #: The footer URLs dictionary maps social footer names
 #: to URLs defined in configuration.
 SOCIAL_MEDIA_FOOTER_URLS = {}
 
+# DOCUMENTME
 #: The display dictionary defines the title
 #: and icon class for each social media link.
 SOCIAL_MEDIA_FOOTER_DISPLAY = {
@@ -2729,6 +2820,7 @@ SOCIAL_AUTH_OAUTH_SECRETS = {}
 
 ################# Mobile URLS ##########################
 
+# DOCUMENTME
 #: These are URLs to the app store for mobile.
 MOBILE_STORE_URLS = {}
 
@@ -2764,6 +2856,7 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
 
 CORS_ORIGIN_WHITELIST = []
 CORS_ORIGIN_ALLOW_ALL = False
+# DOCUMENTME
 #: Default cache expiration for the cross-domain proxy HTML page.
 #: This is a static page that can be iframed into an external page
 #: to simulate cross-domain requests.
@@ -2813,6 +2906,7 @@ REGISTRATION_FIELD_ORDER = [
     "terms_of_service",
 ]
 
+# DOCUMENTME
 #: Optional setting to restrict registration / account creation to only emails
 #: that match a regex in this list. Set to None to allow any email (default).
 REGISTRATION_EMAIL_PATTERNS_ALLOWED = None
@@ -2825,15 +2919,19 @@ CERT_NAME_LONG = "Certificate of Achievement"
 
 BADGING_BACKEND = 'badges.backends.badgr.BadgrBackend'
 
+# DOCUMENTME
 #: Be sure to set up images for course modes using the BadgeImageConfiguration model in the certificates app.
 BADGR_API_TOKEN = None
+# DOCUMENTME
 #: Do not add the trailing slash here.
 BADGR_BASE_URL = "http://localhost:8005"
 BADGR_ISSUER_SLUG = "example-issuer"
+# DOCUMENTME
 #: Number of seconds to wait on the badging server when contacting it before giving up.
 BADGR_TIMEOUT = 10
 
 ###################### Grade Downloads ######################
+# DOCUMENTME
 #: These keys are used for all of our asynchronous downloadable files, including
 #: the ones that contain information other than grades.
 GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
@@ -2861,6 +2959,7 @@ FINANCIAL_REPORTS = {
 }
 
 #### Grading policy change-related settings #####
+# DOCUMENTME
 #: Rate limit for regrading tasks that a grading policy change can kick off
 POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
 
@@ -2889,9 +2988,11 @@ PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG = {
 
 ############################ ORA 2 ############################################
 
+# DOCUMENTME
 #: By default, don't use a file prefix
 ORA2_FILE_PREFIX = None
 
+# DOCUMENTME
 #: Default File Upload Storage bucket and prefix. Used by the FileUpload Service.
 FILE_UPLOAD_STORAGE_BUCKET_NAME = 'SET-ME-PLEASE (ex. bucket-name)'
 FILE_UPLOAD_STORAGE_PREFIX = 'submissions_attachments'
@@ -2938,6 +3039,7 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
 
 VIDEO_TRANSCRIPTS_MAX_AGE = 31536000
 
+# DOCUMENTME
 #: Source:
 #: http://loc.gov/standards/iso639-2/ISO-639-2_utf-8.txt according to http://en.wikipedia.org/wiki/ISO_639-1
 #: Note that this is used as the set of choices to the `code` field of the
@@ -3133,6 +3235,7 @@ ALL_LANGUAGES = [
 
 
 ### Apps only installed in some instances
+# DOCUMENTME
 #: The order of INSTALLED_APPS matters, so this tuple is the app name and the item in INSTALLED_APPS
 #: that this app should be inserted *before*. A None here means it should be appended to the list.
 OPTIONAL_APPS = [
@@ -3196,6 +3299,7 @@ ANALYTICS_DASHBOARD_NAME = 'Your Platform Name Here Insights'
 INVOICE_CORP_ADDRESS = "Please place your corporate address\nin this configuration"
 INVOICE_PAYMENT_INSTRUCTIONS = "This is where you can\nput directions on how people\nbuying registration codes"
 
+# DOCUMENTME
 #: Country code overrides
 #: Used by django-countries
 COUNTRIES_OVERRIDE = {
@@ -3204,10 +3308,12 @@ COUNTRIES_OVERRIDE = {
     'XK': _('Kosovo'),
 }
 
+# DOCUMENTME
 #: which access.py permission name to check in order to determine if a course is visible in
 #: the course catalog. We default this to the legacy permission 'see_exists'.
 COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_exists'
 
+# DOCUMENTME
 #: which access.py permission name to check in order to determine if a course about page is
 #: visible. We default this to the legacy permission 'see_exists'.
 COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
@@ -3215,12 +3321,15 @@ COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
 DEFAULT_COURSE_VISIBILITY_IN_CATALOG = "both"
 DEFAULT_MOBILE_AVAILABLE = False
 
+# DOCUMENTME
 #: Enrollment API Cache Timeout
 ENROLLMENT_COURSE_DETAILS_CACHE_TIMEOUT = 60
 
+# DOCUMENTME
 #: These tabs are currently disabled
 NOTES_DISABLED_TABS = ['course_structure', 'tags']
 
+# DOCUMENTME
 #: Configuration used for generating PDF Receipts/Invoices
 PDF_RECEIPT_TAX_ID = '00-0000000'
 PDF_RECEIPT_FOOTER_TEXT = 'Enter your receipt footer text here.'
@@ -3229,23 +3338,31 @@ PDF_RECEIPT_BILLING_ADDRESS = 'Enter your receipt billing address here.'
 PDF_RECEIPT_TERMS_AND_CONDITIONS = 'Enter your receipt terms and conditions here.'
 PDF_RECEIPT_TAX_ID_LABEL = 'fake Tax ID'
 PDF_RECEIPT_LOGO_PATH = PROJECT_ROOT + '/static/images/openedx-logo-tag.png'
+# DOCUMENTME
 #: Height of the Logo in mm
 PDF_RECEIPT_LOGO_HEIGHT_MM = 12
 PDF_RECEIPT_COBRAND_LOGO_PATH = PROJECT_ROOT + '/static/images/logo.png'
+# DOCUMENTME
 #: Height of the Co-brand Logo in mm
 PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM = 12
 
+# DOCUMENTME
 #: Use None for the default search engine
 SEARCH_ENGINE = None
+# DOCUMENTME
 #: Use LMS specific search initializer
 SEARCH_INITIALIZER = "lms.lib.courseware_search.lms_search_initializer.LmsSearchInitializer"
+# DOCUMENTME
 #: Use the LMS specific result processor
 SEARCH_RESULT_PROCESSOR = "lms.lib.courseware_search.lms_result_processor.LmsSearchResultProcessor"
+# DOCUMENTME
 #: Use the LMS specific filter generator
 SEARCH_FILTER_GENERATOR = "lms.lib.courseware_search.lms_filter_generator.LmsSearchFilterGenerator"
+# DOCUMENTME
 #: Override to skip enrollment start date filtering in course search
 SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = False
 
+# DOCUMENTME
 #: The configuration visibility of account fields.
 ACCOUNT_VISIBILITY_CONFIGURATION = {
     # Default visibility level for accounts without a specified value
@@ -3260,6 +3377,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
     ],
 }
 
+# DOCUMENTME
 #: The list of all fields that are shared with other users using the bulk 'all_users' privacy setting
 ACCOUNT_VISIBILITY_CONFIGURATION["bulk_shareable_fields"] = (
     ACCOUNT_VISIBILITY_CONFIGURATION["public_fields"] + [
@@ -3277,6 +3395,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION["bulk_shareable_fields"] = (
     ]
 )
 
+# DOCUMENTME
 #: The list of all fields that can be shared selectively with other users using the 'custom' privacy setting
 ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] = (
     ACCOUNT_VISIBILITY_CONFIGURATION["bulk_shareable_fields"] + [
@@ -3284,6 +3403,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] = (
     ]
 )
 
+# DOCUMENTME
 #: The list of account fields that are visible only to staff and users viewing their own profiles
 ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
     ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] + [
@@ -3301,6 +3421,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
     ]
 )
 
+# DOCUMENTME
 #: The current list of social platforms to be shown to the user.
 #
 #: url_stub represents the host URL, it must end with a forward
@@ -3327,6 +3448,7 @@ SOCIAL_PLATFORMS = {
     }
 }
 
+# DOCUMENTME
 #: E-Commerce API Configuration
 ECOMMERCE_PUBLIC_URL_ROOT = 'http://localhost:8002'
 ECOMMERCE_API_URL = 'http://localhost:8002/api/v2'
@@ -3342,19 +3464,23 @@ CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:8005'
 COMMENTS_SERVICE_URL = 'http://localhost:18080'
 COMMENTS_SERVICE_KEY = 'password'
 
+# DOCUMENTME
 #: Reverification checkpoint name pattern
 CHECKPOINT_PATTERN = r'(?P<checkpoint_name>[^/]+)'
 
+# DOCUMENTME
 #: For the fields override feature
 #: If using FEATURES['INDIVIDUAL_DUE_DATES'], you should add
 #: 'lms.djangoapps.courseware.student_field_overrides.IndividualStudentOverrideProvider' to
 #: this setting.
 FIELD_OVERRIDE_PROVIDERS = ()
 
+# DOCUMENTME
 #: Modulestore-level field override providers. These field override providers don't
 #: require student context.
 MODULESTORE_FIELD_OVERRIDE_PROVIDERS = ('openedx.features.content_type_gating.field_override.ContentTypeGatingFieldOverride',)  # pylint: disable=line-too-long
 
+# DOCUMENTME
 #: PROFILE IMAGE CONFIG
 #: WARNING: Certain django storage backends do not support atomic
 #: file overwrites (including the default, OverwriteStorage) - instead
@@ -3371,6 +3497,7 @@ PROFILE_IMAGE_BACKEND = {
 }
 PROFILE_IMAGE_DEFAULT_FILENAME = 'images/profiles/default'
 PROFILE_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
+# DOCUMENTME
 #: This key is used in generating unguessable URLs to users'
 #: profile images. Once it has been set, changing it will make the
 #: platform unaware of current image URLs.
@@ -3384,23 +3511,28 @@ PROFILE_IMAGE_SIZES_MAP = {
     'small': 30
 }
 
+# DOCUMENTME
 #: Sets the maximum number of courses listed on the homepage
 #: If set to None, all courses will be listed on the homepage
 HOMEPAGE_COURSE_MAX = None
 
 ################################ Settings for Credit Courses ################################
+# DOCUMENTME
 #: Initial delay used for retrying tasks.
 #: Additional retries use longer delays.
 #: Value is in seconds.
 CREDIT_TASK_DEFAULT_RETRY_DELAY = 30
 
+# DOCUMENTME
 #: Maximum number of retries per task for errors that are not related
 #: to throttling.
 CREDIT_TASK_MAX_RETRIES = 5
 
+# DOCUMENTME
 #: Dummy secret key for dev/test
 SECRET_KEY = 'dev key'
 
+# DOCUMENTME
 #: Secret keys shared with credit providers.
 #: Used to digitally sign credit requests (us --> provider)
 #: and validate responses (provider --> us).
@@ -3408,20 +3540,24 @@ SECRET_KEY = 'dev key'
 #: the value is the 32-character key.
 CREDIT_PROVIDER_SECRET_KEYS = {}
 
+# DOCUMENTME
 #: Maximum age in seconds of timestamps we will accept
 #: when a credit provider notifies us that a student has been approved
 #: or denied for credit.
 CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
 
+# DOCUMENTME
 #: The Help link to the FAQ page about the credit
 CREDIT_HELP_LINK_URL = ""
 
+# DOCUMENTME
 #: Default domain for the e-mail address associated with users who are created
 #: via the LTI Provider feature. Note that the generated e-mail addresses are
 #: not expected to be active; this setting simply allows administrators to
 #: route any messages intended for LTI users to a common domain.
 LTI_USER_EMAIL_DOMAIN = 'lti.example.com'
 
+# DOCUMENTME
 #: An aggregate score is one derived from multiple problems (such as the
 #: cumulative score for a vertical element containing many problems). Sending
 #: aggregate scores immediately introduces two issues: one is a race condition
@@ -3434,6 +3570,7 @@ LTI_USER_EMAIL_DOMAIN = 'lti.example.com'
 #: The time value is in seconds.
 LTI_AGGREGATE_SCORE_PASSBACK_DELAY = 15 * 60
 
+# DOCUMENTME
 #: Credit notifications settings
 NOTIFICATION_EMAIL_CSS = "templates/credit_notifications/credit_notification.css"
 NOTIFICATION_EMAIL_EDX_LOGO = "templates/credit_notifications/edx-logo-header.png"
@@ -3501,6 +3638,7 @@ RSS_PROXY_CACHE_TIMEOUT = 3600  # The length of time we cache RSS retrieved from
 
 #### Custom Courses for EDX (CCX) configuration
 
+# DOCUMENTME
 #: This is an arbitrary hard limit.
 #: The reason we introcuced this number is because we do not want the CCX
 #: to compete with the MOOC.
@@ -3508,12 +3646,14 @@ CCX_MAX_STUDENTS_ALLOWED = 200
 
 # Financial assistance settings
 
+# DOCUMENTME
 #: Maximum and minimum length of answers, in characters, for the
 #: financial assistance form
 FINANCIAL_ASSISTANCE_MIN_LENGTH = 1250
 FINANCIAL_ASSISTANCE_MAX_LENGTH = 2500
 
 #### Registration form extension. ####
+# DOCUMENTME
 #: Only used if combined login/registration is enabled.
 #: This can be used to add fields to the registration page.
 #: It must be a path to a valid form, in dot-separated syntax.
@@ -3524,14 +3664,17 @@ FINANCIAL_ASSISTANCE_MAX_LENGTH = 2500
 
 REGISTRATION_EXTENSION_FORM = None
 
+# DOCUMENTME
 #: Identifier included in the User Agent from open edX mobile apps.
 MOBILE_APP_USER_AGENT_REGEXES = [
     r'edX/org.edx.mobile',
 ]
 
+# DOCUMENTME
 #: cache timeout in seconds for Mobile App Version Upgrade
 APP_UPGRADE_CACHE_TIMEOUT = 3600
 
+# DOCUMENTME
 #: Offset for courseware.StudentModuleHistoryExtended which is used to
 #: calculate the starting primary key for the underlying table.  This gap
 #: should be large enough that you do not generate more than N courseware.StudentModuleHistory
@@ -3539,6 +3682,7 @@ APP_UPGRADE_CACHE_TIMEOUT = 3600
 #: if you want to avoid an overlap in ids while searching for history across the two tables.
 STUDENTMODULEHISTORYEXTENDED_OFFSET = 10000
 
+# DOCUMENTME
 #: Cutoff date for granting audit certificates
 
 AUDIT_CERT_CUTOFF_DATE = None
@@ -3548,38 +3692,46 @@ AUDIT_CERT_CUTOFF_DATE = None
 CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'
 CREDENTIALS_GENERATION_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
+# DOCUMENTME
 #: Queue to use for award program certificates
 PROGRAM_CERTIFICATES_ROUTING_KEY = 'edx.lms.core.default'
 
 # Settings for Comprehensive Theming app
 
+# DOCUMENTME
 #: See https://github.com/edx/edx-django-sites-extensions for more info
 #: Default site to use if site matching request headers does not exist
 SITE_ID = 1
 
+# DOCUMENTME
 #: dir containing all themes
 COMPREHENSIVE_THEME_DIRS = []
 
+# DOCUMENTME
 #: Theme directory locale paths
 COMPREHENSIVE_THEME_LOCALE_PATHS = []
 
+# DOCUMENTME
 #: Theme to use when no site or site theme is defined,
 #: set to None if you want to use openedx theme
 DEFAULT_SITE_THEME = None
 
 ENABLE_COMPREHENSIVE_THEMING = False
 
+# DOCUMENTME
 #: API access management
 API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
 API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
 API_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/'
 AUTH_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/authentication/index.html'
 
+# DOCUMENTME
 #: Affiliate cookie tracking
 AFFILIATE_COOKIE_NAME = 'dev_affiliate_id'
 
 ############## Settings for RedirectMiddleware ###############
 
+# DOCUMENTME
 #: Setting this to None causes Redirect data to never expire
 #: The cache is cleared when Redirect models are saved/deleted
 REDIRECT_CACHE_TIMEOUT = None  # The length of time we cache Redirect model data
@@ -3670,6 +3822,7 @@ ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
 ENTERPRISE_TAGLINE = ''
 
 ############## Settings for Course Enrollment Modes ######################
+# DOCUMENTME
 #: The min_price key refers to the minimum price allowed for an instance
 #: of a particular type of course enrollment mode. This is not to be confused
 #: with the min_price field of the CourseMode model, which refers to the actual
@@ -3732,11 +3885,13 @@ COURSES_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 COURSEGRAPH_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
 
 
+# DOCUMENTME
 #: Initialize to 'unknown', but read from JSON in production.py
 EDX_PLATFORM_REVISION = 'release'
 
 ############## Settings for Completion API #########################
 
+# DOCUMENTME
 #: Once a user has watched this percentage of a video, mark it as complete:
 #: (0.0 = 0%, 1.0 = 100%)
 COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
@@ -3758,6 +3913,7 @@ RETIREMENT_SERVICE_WORKER_USERNAME = 'RETIREMENT_SERVICE_USER'
 RETIREMENT_SERVICE_USER_EMAIL = "retirement_worker@example.com"
 RETIREMENT_SERVICE_USER_NAME = "retirement_worker"
 
+# DOCUMENTME
 #: These states are the default, but are designed to be overridden in configuration.
 RETIREMENT_STATES = [
     'PENDING',
@@ -3791,6 +3947,7 @@ RETIREMENT_STATES = [
 USERNAME_REPLACEMENT_WORKER = "REPLACE WITH VALID USERNAME"
 
 ############## Settings for Microfrontends  #########################
+# DOCUMENTME
 #: If running a Gradebook container locally,
 #: modify lms/envs/private.py to give it a non-null value
 WRITABLE_GRADEBOOK_URL = None
@@ -3835,6 +3992,7 @@ FERNET_KEYS = [
 ]
 
 ############### Settings for user-state-client ##################
+# DOCUMENTME
 #: Maximum number of rows to fetch in XBlockUserStateClient calls. Adjust for performance
 USER_STATE_BATCH_SIZE = 5000
 
@@ -3882,6 +4040,7 @@ MAILCHIMP_NEW_USER_LIST_ID = ""
 ########################## BLOCKSTORE #####################################
 BLOCKSTORE_PUBLIC_URL_ROOT = 'http://localhost:18250'
 BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
+# DOCUMENTME
 #: Which of django's caches to use for storing anonymous user state for XBlocks
 #: in the blockstore-based XBlock runtime
 XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
