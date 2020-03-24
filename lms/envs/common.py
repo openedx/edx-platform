@@ -54,8 +54,9 @@ from xmodule.modulestore.edit_info import EditInfoMixin
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
-# DOCUMENTME
-#: The display name of the platform to be used in templates/emails/etc.
+#: The display name of the LMS platform to be used in templates/emails/etc. Note that
+#: this is only valid for the LMS. For the Studio, see 
+#: :py:data:`cms.envs.common.STUDIO_NAME`.
 PLATFORM_NAME = _('Your Platform Name Here')
 PLATFORM_DESCRIPTION = _('Your Platform Description Here')
 CC_MERCHANT_NAME = PLATFORM_NAME
@@ -1189,9 +1190,9 @@ CMS_BASE = 'localhost:18010'
 #: LMS base
 LMS_BASE = 'localhost:18000'
 
-# DOCUMENTME
-#: Studio name
+#: See :py:data:`cms.envs.common.STUDIO_NAME`.
 STUDIO_NAME = 'Studio'
+#: See :py:data:`cms.envs.common.STUDIO_SHORT_NAME`.
 STUDIO_SHORT_NAME = 'Studio'
 
 # DOCUMENTME

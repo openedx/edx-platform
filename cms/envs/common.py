@@ -156,7 +156,11 @@ PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
 #: Dummy secret key for dev/test
 SECRET_KEY = 'dev key'
 FAVICON_PATH = 'images/favicon.ico'
+#: Studio name used on the studio landing page, emails, etc. Similar to
+#: :py:data:`lms.envs.common.STUDIO_NAME`.
 STUDIO_NAME = _("Your Platform Studio")
+#: Shorter name for the studio, used in some emails and pages. See
+#: :py:data:`cms.envs.common.STUDIO_NAME`.
 STUDIO_SHORT_NAME = _("Studio")
 FEATURES = {
     'GITHUB_PUSH': False,
