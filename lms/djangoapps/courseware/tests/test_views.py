@@ -3378,7 +3378,7 @@ class TestShowCoursewareMFE(TestCase):
         )
 
 # TODO: TNL-7157 Re-enable these tests before Courseware MFE Canary
-@skip
+@unittest.skip
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSEWARE_MICROFRONTEND': True})
 @ddt.ddt
 class MFERedirectTests(BaseViewsTestCase):
