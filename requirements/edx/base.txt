@@ -100,7 +100,7 @@ edx-celeryutils==0.4.0    # via -r requirements/edx/base.in, super-csv
 edx-completion==3.1.1     # via -r requirements/edx/base.in
 edx-django-release-util==0.4.1  # via -r requirements/edx/base.in
 edx-django-sites-extensions==2.4.3  # via -r requirements/edx/base.in
-edx-django-utils==3.1     # via -r requirements/edx/base.in, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client
+edx-django-utils==3.1     # via -r requirements/edx/base.in, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==5.0.2  # via -r requirements/edx/base.in, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
 edx-enterprise==3.0.1     # via -r requirements/edx/base.in
 edx-i18n-tools==0.5.0     # via ora2
@@ -116,7 +116,7 @@ edx-sga==0.10.0           # via -r requirements/edx/base.in
 edx-submissions==3.0.4    # via -r requirements/edx/base.in, ora2
 edx-tincan-py35==0.0.5    # via edx-enterprise
 edx-user-state-client==1.1.2  # via -r requirements/edx/base.in
-edx-when==1.0.7           # via -r requirements/edx/base.in, edx-proctoring
+edx-when==1.1.1           # via -r requirements/edx/base.in, edx-proctoring
 edxval==1.2.5             # via -r requirements/edx/base.in
 elasticsearch==1.9.0      # via edx-search
 enum34==1.1.10            # via edxval
