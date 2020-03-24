@@ -106,9 +106,9 @@ edx-bulk-grades==0.6.8    # via -r requirements/edx/base.txt, staff-graded-xbloc
 edx-ccx-keys==1.0.1       # via -r requirements/edx/base.txt
 edx-celeryutils==0.4.0    # via -r requirements/edx/base.txt, super-csv
 edx-completion==3.1.1     # via -r requirements/edx/base.txt
-edx-django-release-util==0.4.0  # via -r requirements/edx/base.txt
+edx-django-release-util==0.4.1  # via -r requirements/edx/base.txt
 edx-django-sites-extensions==2.4.3  # via -r requirements/edx/base.txt
-edx-django-utils==3.0     # via -r requirements/edx/base.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client
+edx-django-utils==3.1     # via -r requirements/edx/base.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client
 edx-drf-extensions==5.0.2  # via -r requirements/edx/base.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
 edx-enterprise==3.0.1     # via -r requirements/edx/base.txt
 edx-i18n-tools==0.5.0     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, ora2
@@ -125,7 +125,7 @@ edx-sga==0.10.0           # via -r requirements/edx/base.txt
 edx-submissions==3.0.4    # via -r requirements/edx/base.txt, ora2
 edx-tincan-py35==0.0.5    # via -r requirements/edx/base.txt, edx-enterprise
 edx-user-state-client==1.1.2  # via -r requirements/edx/base.txt
-edx-when==1.0.6           # via -r requirements/edx/base.txt, edx-proctoring
+edx-when==1.0.7           # via -r requirements/edx/base.txt, edx-proctoring
 edxval==1.2.5             # via -r requirements/edx/base.txt
 elasticsearch==1.9.0      # via -r requirements/edx/base.txt, edx-search
 entrypoints==0.3          # via flake8
