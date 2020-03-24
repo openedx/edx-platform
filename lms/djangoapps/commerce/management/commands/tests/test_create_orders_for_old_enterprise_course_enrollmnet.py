@@ -89,6 +89,7 @@ class TestEnterpriseCourseEnrollmentCreateOldOrder(TestCase):
             '--start-index=5',
             '--end-index=20',
             '--batch-size=10',
+            '--sleep-time=0.5',
             stdout=out
         )
         output = out.getvalue()
