@@ -8,6 +8,8 @@ Static assets
 
 .. DOCUMENTME
 
+.. autofunction:: pavelib.assets.webpack
+
 Database management
 -------------------
 
