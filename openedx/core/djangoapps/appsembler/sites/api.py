@@ -67,7 +67,7 @@ class SiteConfigurationViewSet(viewsets.ModelViewSet):
         return super(SiteConfigurationViewSet, self).get_serializer_class()
 
     def perform_destroy(self, instance):
-        delete_site(instance)
+        delete_site(instance.site)
 
 
 class FileUploadView(views.APIView):
