@@ -295,7 +295,7 @@ user-util==0.1.5          # via -r requirements/edx/base.txt
 virtualenv==20.0.13       # via tox
 voluptuous==0.11.7        # via -r requirements/edx/base.txt, ora2
 watchdog==0.10.2          # via -r requirements/edx/base.txt
-wcwidth==0.1.8            # via pytest
+wcwidth==0.1.9            # via pytest
 web-fragments==0.3.1      # via -r requirements/edx/base.txt, staff-graded-xblock, xblock, xblock-utils
 webencodings==0.5.1       # via -r requirements/edx/base.txt, bleach, html5lib
 webob==1.8.6              # via -r requirements/edx/base.txt, xblock, xmodule
