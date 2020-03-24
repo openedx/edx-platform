@@ -1165,6 +1165,7 @@ REQUIRE_DEBUG = False
 
 ########################## DJANGO WEBPACK LOADER ##############################
 
+#: See :py:data:`lms.envs.common.WEBPACK_LOADER`.
 WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'bundles/',
@@ -1175,6 +1176,7 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-worker-stats.json')
     }
 }
+#: See :py:data:`lms.envs.common.WEBPACK_CONFIG_PATH`.
 WEBPACK_CONFIG_PATH = 'webpack.prod.config.js'
 
 ################################# CELERY ######################################

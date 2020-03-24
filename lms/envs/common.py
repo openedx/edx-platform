@@ -2147,6 +2147,12 @@ REQUIRE_JS_PATH_OVERRIDES = {
 
 ########################## DJANGO WEBPACK LOADER ##############################
 
+#: Configuration for the `django-webpack-loader
+#: <https://github.com/owais/django-webpack-loader>`__ package. If the ``STATS_FILE``
+#: value is modified, then it will be incompatible with the value used by the
+#: webpack config files bundled in this repo. (See
+#: :py:const:`lms.envs.common.WEBPACK_CONFIG_PATH`).
+#: For reference, see: https://github.com/owais/django-webpack-loader#configuration
 WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'bundles/',
@@ -2157,6 +2163,11 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-worker-stats.json')
     }
 }
+#: Path to the webpack configuration file that will be used to run a Webpack build. See
+#: :py:func:`pavelib.assets.webpack`.
+#: By default here we point to the production settings, which will probably not work in
+#: a development environment where the pipeline is deactivated. In development, this
+#: should probably be set to "webpack.dev.config.js".
 WEBPACK_CONFIG_PATH = 'webpack.prod.config.js'
 
 ########################## DJANGO DEBUG TOOLBAR ###############################
