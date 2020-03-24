@@ -88,7 +88,7 @@ for app in os.listdir(six.text_type(root / 'common' / 'djangoapps')):
 # Others don't import correctly without it...INSTALLED_APPS entries are inconsistent
 lms_djangoapps = ['badges', 'branding', 'bulk_email', 'courseware',
                   'coursewarehistoryextended', 'email_marketing', 'experiments', 'lti_provider',
-                  'mobile_api', 'notes', 'rss_proxy', 'shoppingcart', 'survey']
+                  'mobile_api', 'rss_proxy', 'shoppingcart', 'survey']
 for app in lms_djangoapps:
     path = os.path.join('lms', 'djangoapps', app)
     modules[path] = path
