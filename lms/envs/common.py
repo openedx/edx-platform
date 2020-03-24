@@ -553,7 +553,6 @@ STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"
 
 DATABASE_ROUTERS = [
     'openedx.core.lib.django_courseware_routers.StudentModuleHistoryExtendedRouter',
-    'edx_django_utils.db.read_replica.ReadReplicaRouter',
 ]
 
 ############################ Cache Configuration ###############################
