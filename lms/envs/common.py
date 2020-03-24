@@ -3308,14 +3308,24 @@ COUNTRIES_OVERRIDE = {
     'XK': _('Kosovo'),
 }
 
-# DOCUMENTME
-#: which access.py permission name to check in order to determine if a course is visible in
-#: the course catalog. We default this to the legacy permission 'see_exists'.
+#: Name of the access permission to check in order to determine if a course is visible
+#: in the course catalog. The accepted values for access permission names are the same
+#: as listed in the :py:func:`courseware.access._has_access_course` function, namely:
+#: 
+#: * "load": load the courseware, see inside the course
+#: * "load_forum": can load and contribute to the forums (one access level for now)
+#: * "load_mobile": can load from a mobile context
+#: * "enroll": enroll.  Checks for enrollment window.
+#: * "see_exists": can see that the course exists.
+#: * "staff": staff access to course.
+#: * "see_in_catalog": user is able to see the course listed in the course catalog.
+#: * "see_about_page": user is able to see the course about page.
+#:
+#: We default this to the legacy permission 'see_exists'.
 COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_exists'
 
-# DOCUMENTME
-#: which access.py permission name to check in order to determine if a course about page is
-#: visible. We default this to the legacy permission 'see_exists'.
+#: Name of the access permission to check in order to determine if a course about page
+#: is visible. See :py:const:`lms.envs.common.COURSE_CATALOG_VISIBILITY_PERMISSION`.
 COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
 
 DEFAULT_COURSE_VISIBILITY_IN_CATALOG = "both"

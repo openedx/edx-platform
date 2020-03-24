@@ -1925,12 +1925,10 @@ MANUAL_ENROLLMENT_ROLE_CHOICES = ['Learner', 'Support', 'Partner']
 
 COURSE_CATALOG_API_URL = 'http://localhost:8008/api/v1'
 
-#: which access.py permission name to check in order to determine if a course is visible in
-#: the course catalog. We default this to the legacy permission 'see_exists'.
+#: See :py:const:`lms.envs.common.COURSE_CATALOG_VISIBILITY_PERMISSION`.
 COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_exists'
 
-#: which access.py permission name to check in order to determine if a course about page is
-#: visible. We default this to the legacy permission 'see_exists'.
+#: See :py:const:`lms.envs.common.COURSE_ABOUT_VISIBILITY_PERMISSION`.
 COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
 
 DEFAULT_COURSE_VISIBILITY_IN_CATALOG = "both"
