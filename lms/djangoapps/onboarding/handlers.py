@@ -152,6 +152,7 @@ def propagate_email_change(sender, user=None, table=None, setting=None, old_valu
     if new_value and new_value != old_value:
         update_user_email(user, old_value, new_value)
 
+
 @receiver(pre_save, sender=UserExtendedProfile)
 def extended_profile_pre_save_callback(sender, **kwargs):
     """
