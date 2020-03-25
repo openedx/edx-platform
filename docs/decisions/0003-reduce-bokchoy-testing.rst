@@ -28,7 +28,7 @@ Of the real failures found, there was one PR which had a failure that was only f
 Recommendation
 ==============
 
-Based on the info we have so far, we should only run a suite of smoke tests in bokchoy that ensure the frontend is not entirely broken.
+Based on the info we have so far, we will only run a suite of smoke tests in bokchoy that ensure the frontend is not entirely broken.
 
 For the experiment, we will use the a11y bokchoy tests as a simple stand-in for a suite of smoke tests, because it is already a much smaller suite of happy path tests.
 
@@ -60,6 +60,11 @@ Experiment Results
 ==================
 
 TBD
+
+Decision
+========
+
+TBD - Based on experiment outcome.
 
 Consequences
 ============
