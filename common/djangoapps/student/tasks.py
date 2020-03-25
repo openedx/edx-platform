@@ -43,10 +43,6 @@ def send_activation_email(self, msg_string, from_address=None):
     try:
         with emulate_http_request(site=site, user=user):
             ace.send(msg)
-        # Log that the Activation Email has been sent to user without an exception
-        log.info("Activation Email has been sent to User {user_email}".format(
-            user_email=dest_addr
-        ))
     except RecoverableChannelDeliveryError:
         log.info('Retrying sending email to user {dest_addr}, attempt # {attempt} of {max_attempts}'.format(
             dest_addr=dest_addr,
@@ -67,6 +63,5 @@ def send_activation_email(self, msg_string, from_address=None):
             'Unable to send activation email to user from "%s" to "%s"',
             from_address,
             dest_addr,
-            exc_info=True
         )
         raise Exception

@@ -85,7 +85,6 @@ class SendActivationEmailTestCase(TestCase):
             'Unable to send activation email to user from "%s" to "%s"',
             from_address,
             self.student.email,
-            exc_info=True
         )
 
         # Assert that nothing else was logged
