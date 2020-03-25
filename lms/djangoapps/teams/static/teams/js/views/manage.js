@@ -17,7 +17,8 @@
             },
 
             events: {
-                'click #download-team-csv-input': 'downloadCsv',
+                'click #download-team-csv': 'downloadCsv',
+                'change #upload-team-csv-input': 'setTeamMembershipCsv',
                 'click #upload-team-csv': ViewUtils.withDisabledElement('uploadCsv')
             },
 
@@ -39,12 +40,14 @@
                 window.location.href = this.csvDownloadUrl;
             },
 
+            setTeamMembershipCsv: function(event) {
+                this.membershipFile = event.target.files[0];
+            },
+
             uploadCsv: function() {
-                var file = $('#upload-team-csv-input')[0].files[0];
                 var self = this;
                 var formData = new FormData();
-
-                formData.append('csv', file);  // xss-lint: disable=javascript-jquery-append
+                formData.append('csv', this.membershipFile);
 
                 return $.ajax({
                     type: 'POST',
