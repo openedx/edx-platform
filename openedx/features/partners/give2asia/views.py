@@ -40,12 +40,12 @@ AUDIT_LOG = getLogger("audit")
 
 def dashboard(request, partner_slug):
     courses = get_partner_recommended_courses(partner_slug, request.user)
-    return render_to_response('features/partners/g2a/dashboard.html', {'recommended_courses': courses,
+    return render_to_response('features/partners/dashboard.html', {'recommended_courses': courses,
                                                                        'slug': partner_slug})
 
 
 def performance_dashboard(request, partner):
-    return render_to_response('features/partners/g2a/performance_dashboard.html',
+    return render_to_response('features/partners/performance_dashboard.html',
                               {'slug': partner.slug, 'performance_url': partner.performance_url})
 
 

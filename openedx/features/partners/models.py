@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import models
+
 from model_utils.models import TimeStampedModel
 
 
@@ -8,10 +10,10 @@ class Partner(TimeStampedModel):
     This model represents white-labelled partners.
     """
     performance_url = models.URLField(blank=True, default=None)
-    label = models.CharField(max_length=100)
-    main_logo = models.CharField(max_length=255)
-    small_logo = models.CharField(max_length=255)
-    slug = models.CharField(max_length=100, unique=True)
+    label = models.CharField(max_length=100, help_text="Display as a Title in Landing page.")
+    logo = models.ImageField(upload_to="partners/logo", help_text="Main Logo in Landing page.")
+    slug = models.CharField(max_length=100, unique=True, help_text="A Unique Identifier for an Organization")
+    email = models.EmailField(help_text="Contact Email of an Organization")
 
     def __unicode__(self):
         return '{}'.format(self.label)

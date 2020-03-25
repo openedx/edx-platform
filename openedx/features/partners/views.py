@@ -3,8 +3,9 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
 
+from edxmako.shortcuts import render_to_response
 from rest_framework import status
-
+from openedx.features.partners.helpers import auto_join_partner_community, get_partner_recommended_courses
 from student.views import password_change_request_handler
 
 from .forms import PartnerResetPasswordForm
@@ -14,15 +15,16 @@ from .models import Partner
 
 def dashboard(request, slug):
     partner = get_object_or_404(Partner, slug=slug)
-    views = import_module_using_slug(partner.slug)
-    return views.dashboard(request, partner.slug)
+    courses = get_partner_recommended_courses(partner.slug, request.user)
+    return render_to_response('features/partners/dashboard.html', {'partner': partner, 'recommended_courses': courses,
+                                                                   'slug': partner.slug})
 
 
 def performance_dashboard(request, slug):
     partner = get_object_or_404(Partner, slug=slug)
     if user_has_performance_access(request.user, partner):
-        partner_views = import_module_using_slug(partner.slug)
-        return partner_views.performance_dashboard(request, partner)
+        return render_to_response('features/partners/performance_dashboard.html',
+                                  {'partner': partner, 'slug': partner.slug})
     return HttpResponseForbidden()
 
 
