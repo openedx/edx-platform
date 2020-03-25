@@ -2,29 +2,35 @@ from logging import getLogger
 
 from crum import get_current_request
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save, pre_save, post_delete, pre_delete
+from django.db.models.signals import post_delete, post_save, pre_delete, pre_save
 from django.dispatch import receiver
 
-from nodebb.tasks import (task_create_user_on_nodebb, task_update_user_profile_on_nodebb,
-                          task_delete_user_on_nodebb, task_activate_user_on_nodebb,
-                          task_join_group_on_nodebb, task_un_join_group_on_nodebb)
 from common.lib.nodebb_client.client import NodeBBClient
-from lms.djangoapps.onboarding.helpers import COUNTRIES
 from lms.djangoapps.certificates.models import GeneratedCertificate
-from lms.djangoapps.onboarding.models import (
-    UserExtendedProfile, Organization, FocusArea, EmailPreference, )
+from lms.djangoapps.onboarding.helpers import COUNTRIES
+from lms.djangoapps.onboarding.models import EmailPreference, FocusArea, Organization, UserExtendedProfile
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
-from mailchimp_pipeline.signals.handlers import send_user_info_to_mailchimp, \
-    send_user_course_completions_to_mailchimp, send_user_enrollments_to_mailchimp
-from nodebb.models import DiscussionCommunity, TeamGroupChat
+from mailchimp_pipeline.signals.handlers import (
+    send_user_course_completions_to_mailchimp,
+    send_user_enrollments_to_mailchimp,
+    send_user_info_to_mailchimp
+)
 from nodebb.helpers import get_community_id
+from nodebb.models import DiscussionCommunity, TeamGroupChat
+from nodebb.tasks import (
+    task_activate_user_on_nodebb,
+    task_create_user_on_nodebb,
+    task_delete_user_on_nodebb,
+    task_join_group_on_nodebb,
+    task_un_join_group_on_nodebb,
+    task_update_user_profile_on_nodebb
+)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
 from openedx.features.badging.models import UserBadge
-
-from student.models import ENROLL_STATUS_CHANGE, EnrollStatusChange, UserProfile, CourseEnrollment
-from xmodule.modulestore.django import modulestore
+from student.models import ENROLL_STATUS_CHANGE, CourseEnrollment, EnrollStatusChange, UserProfile
 from util.model_utils import get_changed_fields_dict
+from xmodule.modulestore.django import modulestore
 
 log = getLogger(__name__)
 
@@ -110,8 +116,7 @@ def sync_extended_profile_info_with_nodebb(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=Organization)
-def sync_organization_info_with_nodebb(sender, instance, created,
-                                       **kwargs):  # pylint: disable=unused-argument, invalid-name
+def sync_organization_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: disable=unused-argument, invalid-name
     """
     Sync information b/w NodeBB User Profile and Edx User Profile
     """
@@ -373,8 +378,7 @@ def _get_team_subcategory_data(instance):
     return subcategory_info
 
 
-@receiver(post_save, sender=CourseTeamMembership,
-          dispatch_uid="nodebb.signals.handlers.join_team_subcategory_on_nodebb")
+@receiver(post_save, sender=CourseTeamMembership, dispatch_uid="nodebb.signals.handlers.join_team_subcategory_on_nodebb")
 def join_team_subcategory_on_nodebb(sender, instance, created, **kwargs):
     """
     Join team subcategory on NodeBB whenever a new member joins a team
@@ -399,8 +403,7 @@ def join_team_subcategory_on_nodebb(sender, instance, created, **kwargs):
                      instance.team.name)
 
 
-@receiver(post_delete, sender=CourseTeamMembership,
-          dispatch_uid="nodebb.signals.handlers.leave_team_subcategory_on_nodebb")
+@receiver(post_delete, sender=CourseTeamMembership, dispatch_uid="nodebb.signals.handlers.leave_team_subcategory_on_nodebb")
 def leave_team_subcategory_on_nodebb(sender, instance, **kwargs):
     """
     Leave team subcategory on NodeBB whenever a member leaves a shootingteam
