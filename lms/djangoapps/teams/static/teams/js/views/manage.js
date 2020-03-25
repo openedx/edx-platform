@@ -45,20 +45,19 @@
             },
 
             uploadCsv: function() {
-                var self = this;
                 var formData = new FormData();
                 formData.append('csv', this.membershipFile);
 
                 return $.ajax({
                     type: 'POST',
-                    url: self.csvUploadUrl,
+                    url: this.csvUploadUrl,
                     data: formData,
                     processData: false,  // tell jQuery not to process the data
                     contentType: false   // tell jQuery not to set contentType
                 }).done(
-                    self.handleCsvUploadSuccess
+                    this.handleCsvUploadSuccess
                 ).fail(
-                    self.handleCsvUploadFailure
+                    this.handleCsvUploadFailure
                 );
             },
 
