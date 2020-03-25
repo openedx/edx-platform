@@ -28,11 +28,11 @@ class Partner(TimeStampedModel):
 
     def clean(self, *args, **kwargs):
         user_limit = self.configuration.get("USER_LIMIT")
-        try:
-            int(user_limit)
-        except ValueError:
+        if user_limit is None or user_limit == "":
+            pass
+        elif not isinstance(user_limit, basestring) or not user_limit.isdigit():
             raise ValidationError({
-                'configuration': ValidationError('USER_LIMIT can only be an integer string or blank string'),
+                "configuration": ValidationError("USER_LIMIT can only be an integer string or blank string"),
             })
         super(Partner, self).clean(*args, **kwargs)
 
