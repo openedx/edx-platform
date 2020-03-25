@@ -228,6 +228,17 @@ class Organization(TimeStampedModel):
         """
         return UserExtendedProfile.objects.filter(organization=self).count()
 
+    def can_join_as_first_learner(self, exclude_user):
+        """
+        Identify, if next user, who will join this organization will become first learner not not.
+
+        :param exclude_user: Currently logged-in user
+        :return: True if this organization is not associated with any
+         user, except currently logged-in user; False otherwise
+        """
+        org_association_count = UserExtendedProfile.objects.filter(organization=self).exclude(user=exclude_user).count()
+        return org_association_count == 0
+
     @staticmethod
     def is_non_profit(user_extended_profile):
         """

@@ -106,14 +106,12 @@ def set_opt_in_and_affiliate_user_organization(user, form):
     if org_name:
         user_organization, org_created = Organization.objects.get_or_create(label=org_name)
         org_size = form.cleaned_data.get('organization_size')
+
         if org_created:
             user_organization.total_employees = org_size
             user_organization.org_type = org_type
             user_organization.save()
-            user_extended_profile_data = {
-                'is_first_learner': True,
-                "organization_id": user_organization.id
-            }
+            is_first_learner = True
         else:
             if org_size:
                 user_organization.total_employees = org_size
@@ -122,10 +120,12 @@ def set_opt_in_and_affiliate_user_organization(user, form):
                 user_organization.org_type = org_type
 
             user_organization.save()
+            is_first_learner = user_organization.can_join_as_first_learner(exclude_user=user)
 
-            user_extended_profile_data = {
-                "organization_id": user_organization.id
-            }
+        user_extended_profile_data = {
+            'is_first_learner': is_first_learner,
+            'organization_id': user_organization.id
+        }
 
     # create User Extended Profile
     user_extended_profile = UserExtendedProfile.objects.create(user=user, **user_extended_profile_data)
