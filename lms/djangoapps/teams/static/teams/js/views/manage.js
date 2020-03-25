@@ -18,7 +18,7 @@
 
             events: {
                 'click #download-team-csv-input': 'downloadCsv',
-                'change #upload-team-csv-input': ViewUtils.withDisabledElement('uploadCsv')
+                'click #upload-team-csv': ViewUtils.withDisabledElement('uploadCsv')
             },
 
             initialize: function(options) {
@@ -39,15 +39,13 @@
                 window.location.href = this.csvDownloadUrl;
             },
 
-            uploadCsv: function(event) {
-                var file = event.target.files[0];
+            uploadCsv: function() {
+                var file = $('#upload-team-csv-input')[0].files[0];
                 var self = this;
                 var formData = new FormData();
 
-                // clear selected file to allow re-uploading
-                $(event.target).prop('value', '');
-
                 formData.append('csv', file);  // xss-lint: disable=javascript-jquery-append
+
                 return $.ajax({
                     type: 'POST',
                     url: self.csvUploadUrl,
@@ -65,7 +63,7 @@
                 TeamUtils.showInfoBanner(data.message, false);
 
                 // This handler is currently unimplemented (TODO MST-44)
-                this.teamEvents.trigger('teams:update', {});
+                // this.teamEvents.trigger('teams:update', {});
             },
 
             handleCsvUploadFailure: function(jqXHR) {
