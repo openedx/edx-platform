@@ -22,6 +22,7 @@ from functools import total_ordering
 from importlib import import_module
 from urllib import urlencode
 
+from crum import get_current_request
 from config_models.models import ConfigurationModel
 from django.apps import apps
 from django.conf import settings
@@ -654,6 +655,11 @@ def user_post_save_callback(sender, **kwargs):
 
     Additionally, emit analytics events after saving the User.
     """
+
+    request = get_current_request()
+    if not request or 'login' in request.path or '/myaccount/settings/' in request.path:
+        return
+
     from lms.djangoapps.philu_overrides.tasks import task_enroll_user_in_pending_courses
 
     user = kwargs['instance']

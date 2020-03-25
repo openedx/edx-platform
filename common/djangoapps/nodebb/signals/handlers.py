@@ -6,8 +6,8 @@ from django.db.models.signals import post_save, pre_save, post_delete, pre_delet
 from django.dispatch import receiver
 
 from nodebb.tasks import (task_create_user_on_nodebb, task_update_user_profile_on_nodebb,
-                                            task_delete_user_on_nodebb, task_activate_user_on_nodebb,
-                                            task_join_group_on_nodebb, task_un_join_group_on_nodebb)
+                          task_delete_user_on_nodebb, task_activate_user_on_nodebb,
+                          task_join_group_on_nodebb, task_un_join_group_on_nodebb)
 from common.lib.nodebb_client.client import NodeBBClient
 from lms.djangoapps.onboarding.helpers import COUNTRIES
 from lms.djangoapps.certificates.models import GeneratedCertificate
@@ -15,7 +15,7 @@ from lms.djangoapps.onboarding.models import (
     UserExtendedProfile, Organization, FocusArea, EmailPreference, )
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from mailchimp_pipeline.signals.handlers import send_user_info_to_mailchimp, \
-     send_user_course_completions_to_mailchimp, send_user_enrollments_to_mailchimp
+    send_user_course_completions_to_mailchimp, send_user_enrollments_to_mailchimp
 from nodebb.models import DiscussionCommunity, TeamGroupChat
 from nodebb.helpers import get_community_id
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -24,7 +24,7 @@ from openedx.features.badging.models import UserBadge
 
 from student.models import ENROLL_STATUS_CHANGE, EnrollStatusChange, UserProfile, CourseEnrollment
 from xmodule.modulestore.django import modulestore
-
+from util.model_utils import get_changed_fields_dict
 
 log = getLogger(__name__)
 
@@ -44,33 +44,55 @@ def handle_course_cert_awarded(sender, user, course_key, **kwargs):  # pylint: d
     send_user_course_completions_to_mailchimp.delay(data)
 
 
-@receiver(post_save, sender=UserProfile)
-def sync_user_profile_info_with_nodebb(sender, instance, created, **kwargs):
-    city_of_residence = instance.city
-    country_of_residence = COUNTRIES.get(instance.country.code, '')
-    birth_year = instance.year_of_birth
-    language = instance.language
+@receiver(pre_save, sender=UserProfile)
+def user_profile_pre_save_callback(sender, **kwargs):
+    """
+    Capture old fields on the user_profile instance before save and cache them as a
+    private field on the current model for use in the post_save callback.
+    """
+    user_profile = kwargs['instance']
+    user_profile._updated_fields = get_changed_fields_dict(user_profile, sender)
 
-    if not created and (country_of_residence or birth_year or language):
-        user = instance.user
-        data_to_sync = {
-            "city_of_residence": city_of_residence,
-            "country_of_residence": country_of_residence,
-            "birthday": "01/01/%s" % birth_year,
-            "language": language,
-        }
-        task_update_user_profile_on_nodebb.delay(
-            username=user.username, profile_data=data_to_sync)
+
+@receiver(post_save, sender=UserProfile)
+def sync_user_profile_info_with_nodebb(sender, instance, **kwargs):
+    updated_fields = getattr(instance, '_updated_fields', {})
+
+    if not ('city' in updated_fields or
+            'country' in updated_fields or
+            'year_of_birth' in updated_fields or
+            'language' in updated_fields):
+        return
+
+    user = instance.user
+    data_to_sync = {
+        "city_of_residence": instance.city,
+        "country_of_residence": COUNTRIES.get(instance.country.code, ''),
+        "birthday": "01/01/%s" % instance.year_of_birth,
+        "language": instance.language,
+    }
+    task_update_user_profile_on_nodebb.delay(
+        username=user.username, profile_data=data_to_sync)
 
 
 @receiver(post_save, sender=UserExtendedProfile)
 def sync_extended_profile_info_with_nodebb(sender, instance, **kwargs):
     request = get_current_request()
 
-    if not request:
+    user = instance.user
+
+    changed_fields = getattr(instance, '_changed_fields', {})
+
+    # return if fields to be updated on nodebb are not changed
+    if not request or not ('country_of_employment' in changed_fields or
+                            'city_of_employment' in changed_fields or
+                            [interest for interest in instance.get_user_selected_interests(_type='field_name')
+                             if interest in changed_fields] or
+                            [prioritize_areas for prioritize_areas in
+                             instance.get_user_selected_functions(_type='field_name')
+                             if prioritize_areas in changed_fields]):
         return
 
-    user = instance.user
     data_to_sync = {
         "country_of_employment": COUNTRIES.get(instance.country_of_employment, ''),
         "city_of_employment": instance.city_of_employment,
@@ -88,7 +110,8 @@ def sync_extended_profile_info_with_nodebb(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=Organization)
-def sync_organization_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: disable=unused-argument, invalid-name
+def sync_organization_info_with_nodebb(sender, instance, created,
+                                       **kwargs):  # pylint: disable=unused-argument, invalid-name
     """
     Sync information b/w NodeBB User Profile and Edx User Profile
     """
@@ -110,7 +133,6 @@ def sync_organization_info_with_nodebb(sender, instance, created, **kwargs):  # 
 
     task_update_user_profile_on_nodebb.delay(
         username=user.username, profile_data=data_to_sync)
-
 
 
 @receiver(post_save, sender=User, dispatch_uid='update_user_profile_on_nodebb')
@@ -137,18 +159,21 @@ def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
         task_create_user_on_nodebb.delay(
             username=instance.username, user_data=data_to_sync)
     else:
-        # This sanity blocks two extra syncs because during 'registration'
-        # we sync first_name and last_name under above 'created' sanity block
-        # so no need to sync first_name and last_name again.
-        if 'registration' not in request.path:
-            data_to_sync = {
-                'first_name': instance.first_name,
-                'last_name': instance.last_name
-            }
+        # sync only if fields are updated
+        changed_fields = getattr(instance, '_changed_fields', {})
+        if not (
+            'first_name' in changed_fields or
+            'last_name' in changed_fields
+        ):
+            return
 
-            task_update_user_profile_on_nodebb.delay(
-                username=instance.username, profile_data=data_to_sync)
+        data_to_sync = {
+            'first_name': instance.first_name,
+            'last_name': instance.last_name
+        }
 
+        task_update_user_profile_on_nodebb.delay(
+            username=instance.username, profile_data=data_to_sync)
 
 
 @receiver(post_delete, sender=User)
@@ -348,7 +373,8 @@ def _get_team_subcategory_data(instance):
     return subcategory_info
 
 
-@receiver(post_save, sender=CourseTeamMembership, dispatch_uid="nodebb.signals.handlers.join_team_subcategory_on_nodebb")
+@receiver(post_save, sender=CourseTeamMembership,
+          dispatch_uid="nodebb.signals.handlers.join_team_subcategory_on_nodebb")
 def join_team_subcategory_on_nodebb(sender, instance, created, **kwargs):
     """
     Join team subcategory on NodeBB whenever a new member joins a team
@@ -373,7 +399,8 @@ def join_team_subcategory_on_nodebb(sender, instance, created, **kwargs):
                      instance.team.name)
 
 
-@receiver(post_delete, sender=CourseTeamMembership, dispatch_uid="nodebb.signals.handlers.leave_team_subcategory_on_nodebb")
+@receiver(post_delete, sender=CourseTeamMembership,
+          dispatch_uid="nodebb.signals.handlers.leave_team_subcategory_on_nodebb")
 def leave_team_subcategory_on_nodebb(sender, instance, **kwargs):
     """
     Leave team subcategory on NodeBB whenever a member leaves a shootingteam
