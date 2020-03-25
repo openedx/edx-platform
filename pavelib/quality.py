@@ -880,15 +880,19 @@ def check_keywords(options):
             )
         )
 
-    
-    with open(run_output_file) as fi:
-        for line in fi.readlines():
+    with open(run_output_file) as output:
+        for line in output.readlines():
             if re.search(r"CommandError: Found \d+ reserved keyword conflicts", line):
                 overall_status = False
                 break
 
     if not overall_status:
-        fail_quality('keywords', 'FAILURE!!!')
+        fail_quality(
+            'keywords',
+            'Failure: reserved keyword checker failed. Logs can be found here: {}'.format(
+                run_output_file
+            )
+        )
 
 
 @task
