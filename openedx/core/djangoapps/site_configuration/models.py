@@ -6,6 +6,7 @@ from logging import getLogger
 import os
 
 from django.conf import settings
+from django.core.files.storage import get_storage_class
 from django.contrib.sites.models import Site
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.files.storage import get_storage_class
@@ -15,7 +16,6 @@ from django.dispatch import receiver
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
 
-from storages.backends.s3boto import S3BotoStorage
 
 logger = getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -171,7 +171,8 @@ class SiteConfiguration(models.Model):
         css_output = compile_sass('main.scss', custom_branding=self._sass_var_override)
         file_name = self.get_value('css_overrides_file')
         if settings.USE_S3_FOR_CUSTOMER_THEMES:
-            storage = S3BotoStorage(
+            storage_class = get_storage_class(settings.DEFAULT_FILE_STORAGE)
+            storage = storage_class(
                 location="customer_themes",
             )
             with storage.open(file_name, 'w') as f:
