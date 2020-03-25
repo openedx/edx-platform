@@ -1,3 +1,5 @@
+from json import dumps
+
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -17,7 +19,7 @@ class Partner(TimeStampedModel):
     main_logo = models.CharField(max_length=255)
     small_logo = models.CharField(max_length=255)
     slug = models.CharField(max_length=100, unique=True)
-    configuration = JSONField(null=False, blank=True, default={"USER_LIMIT": ""})
+    configuration = JSONField(null=False, blank=True, default=dumps({"USER_LIMIT": ""}))
 
     def __unicode__(self):
         return '{}'.format(self.label)
