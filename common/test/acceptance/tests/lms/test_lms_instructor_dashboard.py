@@ -493,16 +493,6 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         self.data_download_section.wait_for_available_report()
         self.verify_report_download(report_name)
 
-    @attr('a11y')
-    def test_data_download_a11y(self):
-        """
-        Data download page accessibility tests
-        """
-        self.data_download_section.a11y_audit.config.set_scope([
-            '.data-download-container'
-        ])
-        self.data_download_section.a11y_audit.check_for_accessibility_errors()
-
 
 @ddt.ddt
 class DataDownloadsWithMultipleRoleTests(BaseInstructorDashboardTest):
