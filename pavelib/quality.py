@@ -865,23 +865,28 @@ def check_keywords(options):
     """
     Check Django model fields for names that conflict with a list of reserved keywords
     """
-    report_path = Env.REPORT_DIR
+    report_path = os.path.join(Env.REPORT_DIR, 'reserved_keywords')
     run_output_file = os.path.join(report_path, 'reserved_keyword.log')
 
     overall_status = True
-    for env in ['lms', 'cms']:
+    for env, env_settings_file in [('lms', 'lms.envs.test'), ('cms', 'cms.envs.test')]:
         sh(
+            "mkdir -p {} && "
+            "export DJANGO_SETTINGS_MODULE={}; "
             "python manage.py {} check_reserved_keywords "
             "--override_file {}/db_keyword_overrides.yml "
             "--report_path {} "
             "--report_file {}_reserved_keyword_report.csv "
             "2>&1  | tee -a {}".format(
-                env, Env.REPO_ROOT, report_path, env, run_output_file
+                report_path, env_settings_file, env, Env.REPO_ROOT, report_path, env, run_output_file
             )
         )
 
     with open(run_output_file) as output:
         for line in output.readlines():
+            if re.search(r"Traceback \(most recent call last\):", line):
+                overall_status = False
+                break
             if re.search(r"CommandError: Found \d+ reserved keyword conflicts", line):
                 overall_status = False
                 break
