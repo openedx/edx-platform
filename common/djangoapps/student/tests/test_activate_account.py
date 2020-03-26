@@ -147,3 +147,21 @@ class TestActivateAccount(TestCase):
             self.assertRedirects(response, login_page_url)
             self.assertContains(response, SYSTEM_MAINTENANCE_MSG)
             self._assert_user_active_state(expected_active_state=False)
+
+    @override_settings(MKTG_URLS={"ROOT": "https://www.test.com/", "ACTIVATION": "activate"})
+    @patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": True})
+    def test_account_activation_redirect_to_mktg_site(self):
+        redirect_url= "{mktg_root}{activate}".format(
+            mktg_root="https://www.test.com/",
+            activate="activate",
+        )
+        self._assert_user_active_state(expected_active_state=False)
+        self.login()
+        response = self.client.get(reverse('activate', args=[self.registration.activation_key]))
+        self._assert_user_active_state(expected_active_state=True)
+        self.assertRedirects(
+            response,
+            redirect_url,
+            fetch_redirect_response=False
+        )
+

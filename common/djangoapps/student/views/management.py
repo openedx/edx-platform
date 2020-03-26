@@ -36,6 +36,7 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import text_type
 
+from edxmako.shortcuts import marketing_link
 import track.views
 from bulk_email.models import Optout
 from course_modes.models import CourseMode
@@ -552,6 +553,13 @@ def activate_account(request, key):
                 ),
                 extra_tags='account-activation aa-icon',
             )
+    if settings.FEATURES.get('ENABLE_MKTG_SITE'):
+        post_activation = marketing_link('ACTIVATION')
+
+        # marketing_link returns '#' if it is not found a match for the name
+        # passed as argument.
+        if post_activation != '#':
+            return redirect(post_activation)
 
     return redirect('dashboard')
 
