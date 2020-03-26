@@ -5,7 +5,7 @@ from django.views.decorators.http import require_http_methods
 
 from edxmako.shortcuts import render_to_response
 from rest_framework import status
-from openedx.features.partners.helpers import auto_join_partner_community, get_partner_recommended_courses
+from openedx.features.partners.helpers import get_partner_recommended_courses
 from student.views import password_change_request_handler
 
 from .forms import PartnerResetPasswordForm
