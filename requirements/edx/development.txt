@@ -110,7 +110,7 @@ edx-bulk-grades==0.6.8    # via -r requirements/edx/testing.txt, staff-graded-xb
 edx-ccx-keys==1.0.1       # via -r requirements/edx/testing.txt
 edx-celeryutils==0.4.0    # via -r requirements/edx/testing.txt, super-csv
 edx-completion==3.1.1     # via -r requirements/edx/testing.txt
-edx-django-release-util==0.4.1  # via -r requirements/edx/testing.txt
+edx-django-release-util==0.4.2  # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==2.4.3  # via -r requirements/edx/testing.txt
 edx-django-utils==3.1     # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==5.0.2  # via -r requirements/edx/testing.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
@@ -244,7 +244,7 @@ pyrsistent==0.16.0        # via jsonschema
 pysrt==1.1.2              # via -r requirements/edx/testing.txt, edxval
 pytest-attrib==0.1.3      # via -r requirements/edx/testing.txt
 pytest-cov==2.8.1         # via -r requirements/edx/testing.txt
-pytest-django==3.8.0      # via -r requirements/edx/testing.txt
+pytest-django==3.9.0      # via -r requirements/edx/testing.txt
 pytest-forked==1.1.3      # via -r requirements/edx/testing.txt, pytest-xdist
 pytest-json-report==1.2.1  # via -r requirements/edx/testing.txt
 pytest-metadata==1.8.0    # via -r requirements/edx/testing.txt, pytest-json-report
