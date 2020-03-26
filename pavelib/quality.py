@@ -869,7 +869,7 @@ def check_keywords():
     run_output_file = os.path.join(report_path, 'reserved_keyword.log')
 
     overall_status = True
-    for env, env_settings_file in [('lms', 'lms.envs.devstack_docker'), ('cms', 'cms.envs.devstack_docker')]:
+    for env, env_settings_file in [('lms', 'lms.envs.test'), ('cms', 'cms.envs.test')]:
         report_file = "{}_reserved_keyword_report.csv".format(env)
         sh("mkdir -p {}".format(report_path))
         sh(

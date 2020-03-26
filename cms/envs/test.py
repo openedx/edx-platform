@@ -42,6 +42,12 @@ from lms.envs.test import (
     WIKI_ENABLED
 )
 
+# Log to console, as some testing requires logging that can be read by other tools
+LOGGING['handlers']['local'] = LOGGING['handlers']['tracking'] = {
+    'class': 'logging.NullHandler',
+}
+LOGGING['loggers']['tracking']['handlers'] = ['console']
+
 
 # Include a non-ascii character in STUDIO_NAME and STUDIO_SHORT_NAME to uncover possible
 # UnicodeEncodeErrors in tests. Also use lazy text to reveal possible json dumps errors
