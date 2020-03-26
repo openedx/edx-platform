@@ -8136,3 +8136,16 @@ def update_user_email(user, old_email, new_email):
     }
     MandrillClient().send_mail(MandrillClient.CHANGE_USER_EMAIL_ALERT, old_email, context)
     MandrillClient().send_mail(MandrillClient.CHANGE_USER_EMAIL_ALERT, new_email, context)
+
+
+def affiliated_unattended_surveys(user_extended_profile):
+    """
+    Check if all required forms are submitted or not and explicitly
+    check if two org forms submitted or not. Return both flags as tuple
+    """
+
+    unattended_surveys = user_extended_profile.unattended_surveys(_type='list')
+    unattended_org_surveys = any(survey in ['organization', 'org_detail_survey'] for survey in unattended_surveys)
+    are_forms_complete = not (bool(unattended_surveys))
+
+    return are_forms_complete, unattended_org_surveys

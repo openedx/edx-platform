@@ -29,7 +29,8 @@ from lms.djangoapps.onboarding.decorators import can_save_org_data, can_save_org
 from lms.djangoapps.onboarding.email_utils import send_admin_activation_email, send_admin_update_confirmation_email, \
     send_admin_update_email
 from lms.djangoapps.onboarding.helpers import calculate_age_years, COUNTRIES, LANGUAGES, oef_eligible_first_learner, \
-    get_close_matching_orgs_with_suggestions, get_alquity_community_url, serialize_partner_networks
+    get_close_matching_orgs_with_suggestions, get_alquity_community_url, serialize_partner_networks, \
+    affiliated_unattended_surveys
 from lms.djangoapps.onboarding.models import (
     Organization,
     Currency, OrganizationMetric, OrganizationAdminHashKeys, PartnerNetwork)
@@ -40,19 +41,6 @@ from lms.djangoapps.philu_overrides.helpers import save_user_partner_network_con
 from lms.djangoapps.student_dashboard.views import get_recommended_xmodule_courses, get_joined_communities
 
 log = logging.getLogger("edx.onboarding")
-
-
-def check_unattended_surveys(user_extended_profile):
-    """
-    Check if all required forms are submitted or not and explicitly
-    check if two org forms submitted or not. Return both flags as tuple
-    """
-
-    unattended_surveys = user_extended_profile.unattended_surveys(_type='list')
-    unattended_org_surveys = any(survey in ['organization', 'org_detail_survey'] for survey in unattended_surveys)
-    are_forms_complete = not (bool(unattended_surveys))
-
-    return are_forms_complete, unattended_org_surveys
 
 
 @login_required
@@ -68,7 +56,7 @@ def user_info(request):
     """
 
     user_extended_profile = request.user.extended_profile
-    are_forms_complete, unattended_org_surveys = check_unattended_surveys(user_extended_profile)
+    are_forms_complete, unattended_org_surveys = affiliated_unattended_surveys(user_extended_profile)
     userprofile = request.user.profile
     is_under_age = False
     reset_org = False
@@ -164,7 +152,7 @@ def interests(request):
     namely, organization survey.
     """
     user_extended_profile = request.user.extended_profile
-    are_forms_complete, unattended_org_surveys = check_unattended_surveys(user_extended_profile)
+    are_forms_complete, unattended_org_surveys = affiliated_unattended_surveys(user_extended_profile)
     is_first_signup_in_org = user_extended_profile.is_first_signup_in_org \
         if user_extended_profile.organization else False
 
@@ -226,7 +214,7 @@ def organization(request):
 
     user_extended_profile = request.user.extended_profile
     _organization = user_extended_profile.organization
-    are_forms_complete, unattended_org_surveys = check_unattended_surveys(user_extended_profile)
+    are_forms_complete, unattended_org_surveys = affiliated_unattended_surveys(user_extended_profile)
 
     template = 'onboarding/organization_survey.html'
     redirect_to_next = True
@@ -256,7 +244,7 @@ def organization(request):
         if form.is_valid():
             form.save(request)
             old_url = _organization.url.replace('https://', '', 1) if _organization.url else _organization.url
-            are_forms_complete, unattended_org_surveys = check_unattended_surveys(user_extended_profile)
+            are_forms_complete, unattended_org_surveys = affiliated_unattended_surveys(user_extended_profile)
 
             if unattended_org_surveys:
                 # redirect to organization detail page
@@ -340,7 +328,7 @@ def get_country_names(request):
 @transaction.atomic
 def org_detail_survey(request):
     user_extended_profile = request.user.extended_profile
-    are_forms_complete, unattended_org_surveys = check_unattended_surveys(user_extended_profile)
+    are_forms_complete, unattended_org_surveys = affiliated_unattended_surveys(user_extended_profile)
     latest_survey = OrganizationMetric.objects.filter(org=user_extended_profile.organization).last()
 
     initial = {
@@ -379,7 +367,7 @@ def org_detail_survey(request):
         if form.is_valid():
             form.save(request)
 
-            are_forms_complete, unattended_org_surveys = check_unattended_surveys(user_extended_profile)
+            are_forms_complete, unattended_org_surveys = affiliated_unattended_surveys(user_extended_profile)
 
             if is_my_account_page and not unattended_org_surveys:
                 update_nodebb_for_user_status(request.user.username)
@@ -477,7 +465,7 @@ def update_account_settings(request):
             }
         )
 
-    _, unattended_org_surveys = check_unattended_surveys(user_extended_profile)
+    _, unattended_org_surveys = affiliated_unattended_surveys(user_extended_profile)
 
     ctx = {
         'form': form,

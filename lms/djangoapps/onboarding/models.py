@@ -236,8 +236,8 @@ class Organization(TimeStampedModel):
         :return: True if this organization is not associated with any
          user, except currently logged-in user; False otherwise
         """
-        org_association_count = UserExtendedProfile.objects.filter(organization=self).exclude(user=exclude_user).count()
-        return org_association_count == 0
+        users_in_org = UserExtendedProfile.objects.filter(organization=self).exclude(user=exclude_user)
+        return not users_in_org.exists()
 
     @staticmethod
     def is_non_profit(user_extended_profile):
