@@ -1,13 +1,18 @@
 """Client to communicate with discovery service from lms"""
 
 import json
+import logging
 
 from django.conf import settings
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from edx_rest_api_client.client import OAuthAPIClient
 from provider.oauth2.models import Client
+from requests import RequestException
 from rest_framework import status
+
+logger = logging.getLogger(__name__)
 
 VERSION = 'v1'
 
@@ -20,13 +25,23 @@ class DiscoveryClient(OAuthAPIClient):
         self._api_url = '{discovery_url}/api/{version}'.format(discovery_url=client.url, version=VERSION)
 
     def _get(self, path):
-        self.response = self.request('GET', '{api_url}{path}'.format(api_url=self._api_url, path=path))
+        try:
+            self.response = self.request('GET', '{api_url}{path}'.format(api_url=self._api_url, path=path))
+        except RequestException as exc:
+            logger.error(exc.response.text)
+            raise ValidationError(json.loads(exc.response.text).get('error'))
         return self._handle_response()
 
     def _handle_response(self):
-        if self.response.status_code == status.HTTP_200_OK:
-            return json.loads(self.response.text)
-        raise PermissionDenied
+        status_code = self.response.status_code
+        response_body = json.loads(self.response.text)
+        if status_code == status.HTTP_200_OK:
+            return response_body
+
+        logger.error(self.response.text)
+        if status_code == status.HTTP_403_FORBIDDEN:
+            raise PermissionDenied
+        raise Http404 if status_code == status.HTTP_404_NOT_FOUND else ValidationError(response_body.get('detail'))
 
     def active_programs(self):
         return self._get('/programs/?status=active')

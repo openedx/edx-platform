@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from django.core.exceptions import ValidationError
+from django.http import HttpResponseBadRequest
 from opaque_keys.edx.keys import CourseKey
 
 from common.lib.discovery_client.client import DiscoveryClient
@@ -10,26 +12,33 @@ from .helpers import date_from_str
 
 
 def list_specializations(request):
-    context = DiscoveryClient().active_programs()
+    try:
+        context = DiscoveryClient().active_programs()
+    except ValidationError as exc:
+        return HttpResponseBadRequest(exc.message)
     return render_to_response('features/specializations/list.html', context)
 
 
 def specialization_about(request, specialization_uuid):
-    context = DiscoveryClient().get_program(specialization_uuid)
+    try:
+        context = DiscoveryClient().get_program(specialization_uuid)
+    except ValidationError as exc:
+        return HttpResponseBadRequest(exc.message)
 
     courses = []
-
-    for course in [c for c in context.get('courses') if c['course_runs']]:
+    for course in [course for course in context['courses'] if course['course_runs']]:
         course_open_rerun_list = [
             rerun for rerun in course['course_runs']
             if date_from_str(rerun['enrollment_start']) <= datetime.now() <= date_from_str(rerun['enrollment_end'])
         ]
 
         opened = bool(course_open_rerun_list)
-        course_rerun = (sorted(course_open_rerun_list, key=lambda i: date_from_str(i['enrollment_start']))[0]
+        course_rerun = (sorted(course_open_rerun_list,
+                        key=lambda open_rerun: date_from_str(open_rerun['enrollment_start']))[0]
                         if opened else course['course_runs'][0])
         course_rerun['opened'] = opened
-        course_rerun['enrolled'] = CourseEnrollment.is_enrolled(request.user, CourseKey.from_string(course_rerun['key']))
+        course_rerun['enrolled'] = CourseEnrollment.is_enrolled(request.user,
+                                                                CourseKey.from_string(course_rerun['key']))
 
         courses.append(course_rerun)
 
