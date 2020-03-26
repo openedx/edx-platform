@@ -80,7 +80,7 @@ def get_amc_tokens(user):
     return tokens
 
 
-def reset_amc_tokens(user):
+def reset_amc_tokens(user, access_token=None, refresh_token=None):
     """
     Create and return new tokens, or extend existing ones to one year in the future.
     """
@@ -94,6 +94,8 @@ def reset_amc_tokens(user):
         )
 
     access.expires = access.client.get_default_token_expiry()
+    if access_token:
+        access.token = access_token
     access.save()
 
     try:
@@ -105,7 +107,9 @@ def reset_amc_tokens(user):
             access_token=access,
         )
 
-    refresh.expired = True
+    if refresh_token:
+        refresh.token = refresh_token
+    refresh.expired = False
     refresh.save()
 
     return get_amc_tokens(user)
@@ -302,10 +306,10 @@ def bootstrap_site(site, org_data=None, user_email=None):
     return organization, site, user
 
 
-def delete_site(site_id):
-    site = Site.objects.get(id=site_id)
+def delete_site(site):
     site.configuration.delete()
-    site.themes.delete()
+    site.themes.all().delete()
+
     site.delete()
 
 
