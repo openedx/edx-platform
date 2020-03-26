@@ -64,10 +64,9 @@ def user_profile_pre_save_callback(sender, **kwargs):
 def sync_user_profile_info_with_nodebb(sender, instance, **kwargs):
     updated_fields = getattr(instance, '_updated_fields', {})
 
-    if not ('city' in updated_fields or
-            'country' in updated_fields or
-            'year_of_birth' in updated_fields or
-            'language' in updated_fields):
+    relevant_signal_fields = ['city', 'country', 'year_of_birth', 'language']
+
+    if not any([field in updated_fields for field in relevant_signal_fields]):
         return
 
     user = instance.user
@@ -89,14 +88,12 @@ def sync_extended_profile_info_with_nodebb(sender, instance, **kwargs):
 
     changed_fields = getattr(instance, '_changed_fields', {})
 
-    # return if fields to be updated on nodebb are not changed
-    if not request or not ('country_of_employment' in changed_fields or
-                            'city_of_employment' in changed_fields or
-                            [interest for interest in instance.get_user_selected_interests(_type='field_name')
-                             if interest in changed_fields] or
-                            [prioritize_areas for prioritize_areas in
-                             instance.get_user_selected_functions(_type='field_name')
-                             if prioritize_areas in changed_fields]):
+    relevant_signal_fields = ['country_of_employment', 'city_of_employment']
+    relevant_signal_fields += instance.get_user_selected_functions(_type='field_name')
+    relevant_signal_fields += instance.get_user_selected_interests(_type='field_name')
+
+    # return if fields to be updated on nodebb haven't changed
+    if not request or not any([field in changed_fields for field in relevant_signal_fields]):
         return
 
     data_to_sync = {
@@ -166,10 +163,9 @@ def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
     else:
         # sync only if fields are updated
         changed_fields = getattr(instance, '_changed_fields', {})
-        if not (
-            'first_name' in changed_fields or
-            'last_name' in changed_fields
-        ):
+        relevant_signal_fields = ['first_name', 'last_name']
+
+        if not any([field in changed_fields for field in relevant_signal_fields]):
             return
 
         data_to_sync = {
