@@ -488,6 +488,9 @@ class UserExtendedProfile(TimeStampedModel):
         if _type == "labels":
             return [label for field_name, label in self.FUNCTIONS_LABELS.items() if
                     getattr(self, field_name.split("=")[1]) == 1]
+        elif _type == "field_name":
+            return [field_name.split('=')[1] for field_name, label in self.FUNCTIONS_LABELS.items() if
+                    getattr(self, field_name.split("=")[1]) == 1]
         else:
             return [field_name for field_name, label in self.FUNCTIONS_LABELS.items() if
                     getattr(self, field_name.split("=")[1]) == 1]
@@ -500,6 +503,9 @@ class UserExtendedProfile(TimeStampedModel):
         """
         if _type == "labels":
             return [label for field_name, label in self.INTERESTS_LABELS.items() if
+                    getattr(self, field_name.split("=")[1]) == 1]
+        elif _type == "field_name":
+            return [field_name.split('=')[1] for field_name, label in self.INTERESTS_LABELS.items() if
                     getattr(self, field_name.split("=")[1]) == 1]
         else:
             return [field_name for field_name, label in self.INTERESTS_LABELS.items() if

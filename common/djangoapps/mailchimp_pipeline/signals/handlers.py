@@ -53,6 +53,13 @@ def sync_email_preference_with_mailchimp(sender, instance, **kwargs):
 
 @receiver(post_save, sender=UserProfile)
 def sync_user_profile_with_mailchimp(sender, instance, **kwargs):
+    updated_fields = getattr(instance, '_updated_fields', {})
+
+    relevant_signal_fields = ['city', 'country', 'language']
+
+    if not any([field in updated_fields for field in relevant_signal_fields]):
+        return
+
     if instance.language or instance.country or instance.city:
         user_json = {
             "merge_fields": {

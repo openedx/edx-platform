@@ -11,10 +11,10 @@ file and check it in at the same time as your model changes. To do that,
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
 from __future__ import print_function
+
 import hashlib
 import json
 import logging
-import six
 import uuid
 from collections import OrderedDict, defaultdict, namedtuple
 from datetime import datetime, timedelta
@@ -22,7 +22,9 @@ from functools import total_ordering
 from importlib import import_module
 from urllib import urlencode
 
+import six
 from config_models.models import ConfigurationModel
+from crum import get_current_request
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
@@ -40,6 +42,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django_countries.fields import CountryField
+from edx_django_utils.cache import RequestCache
 from edx_rest_api_client.exceptions import SlumberBaseException
 from eventtracking import tracker
 from model_utils.models import TimeStampedModel
@@ -50,10 +53,7 @@ from six import text_type
 from slumber.exceptions import HttpClientError, HttpServerError
 from user_util import user_util
 
-from edx_django_utils.cache import RequestCache
 import lms.lib.comment_client as cc
-from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED
-from lms.djangoapps.certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 from courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
@@ -61,11 +61,12 @@ from courseware.models import (
     OrgDynamicUpgradeDeadlineConfiguration
 )
 from enrollment.api import _default_course_mode
-
+from lms.djangoapps.certificates.models import GeneratedCertificate
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
+from student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
 from track import contexts, segment
 from util.milestones_helpers import is_entrance_exams_enabled
 from util.model_utils import emit_field_changed_events, get_changed_fields_dict
@@ -654,6 +655,11 @@ def user_post_save_callback(sender, **kwargs):
 
     Additionally, emit analytics events after saving the User.
     """
+
+    request = get_current_request()
+    if not request or 'login' in request.path or '/myaccount/settings/' in request.path:
+        return
+
     from lms.djangoapps.philu_overrides.tasks import task_enroll_user_in_pending_courses
 
     user = kwargs['instance']
