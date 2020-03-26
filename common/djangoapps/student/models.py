@@ -2893,21 +2893,6 @@ class UserAttribute(TimeStampedModel):
             return None
 
 
-@python_2_unicode_compatible
-class LogoutViewConfiguration(ConfigurationModel):
-    """
-    DEPRECATED: Configuration for the logout view.
-
-    .. no_pii:
-    """
-
-    def __str__(self):
-        """
-        Unicode representation of the instance.
-        """
-        return u'Logout view configuration: {enabled}'.format(enabled=self.enabled)
-
-
 class AccountRecoveryManager(models.Manager):
     """
     Custom Manager for AccountRecovery model
