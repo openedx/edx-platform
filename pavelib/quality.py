@@ -877,6 +877,7 @@ def check_keywords(options):
             "--override_file {}/db_keyword_overrides.yml "
             "--report_path {} "
             "--report_file {}_reserved_keyword_report.csv "
+            "--verbosity 2"
             "2>&1  | tee -a {}".format(
                 report_path, env_settings_file, env, Env.REPO_ROOT, report_path, env, run_output_file
             )
