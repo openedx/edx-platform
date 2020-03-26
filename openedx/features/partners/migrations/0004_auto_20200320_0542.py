@@ -23,23 +23,23 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='partner',
             name='email',
-            field=models.EmailField(default='', help_text=b'Contact Email of an Organization', max_length=254),
+            field=models.EmailField(default='', help_text=b'Contact email of an organization', max_length=254),
             preserve_default=False,
         ),
         migrations.AddField(
             model_name='partner',
             name='logo',
-            field=models.ImageField(default='', help_text=b'Main Logo in Landing page.', upload_to=b'partners/logo'),
+            field=models.ImageField(default='', help_text=b'Main logo in landing page.', upload_to=b'partners/logo'),
             preserve_default=False,
         ),
         migrations.AlterField(
             model_name='partner',
             name='label',
-            field=models.CharField(help_text=b'Display as a Title in Landing page.', max_length=100),
+            field=models.CharField(help_text=b'Display as a title in landing page.', max_length=100),
         ),
         migrations.AlterField(
             model_name='partner',
             name='slug',
-            field=models.CharField(help_text=b'A Unique Identifier for an Organization', max_length=100, unique=True),
+            field=models.CharField(help_text=b'A unique identifier for an organization', max_length=100, unique=True),
         ),
     ]
