@@ -356,8 +356,12 @@
   .team-management {
     padding: 1%;
 
-    h3, p, .action, .team-management-section, input {
-        margin-bottom: 2%;
+    h3,
+    p,
+    .action,
+    .team-management-section,
+    input {
+      margin-bottom: 2%;
     }
 
     #upload-team-csv {
@@ -365,7 +369,8 @@
     }
   }
 
-  .team-profile, .team-management {
+  .team-profile,
+  .team-management {
     .page-content-main {
       display: inline-block;
       width: flex-grid(8, 12);
@@ -544,6 +549,7 @@
       border: inherit;
       box-shadow: none;
     }
+
     display: inline-block;
     text-shadow: none;
   }
