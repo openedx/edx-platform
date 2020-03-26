@@ -1067,7 +1067,10 @@ class SubsectionGradeView(GradeViewMixin, APIView):
                 'possible_graded': original_grade.possible_graded,
             }
         except PersistentSubsectionGrade.DoesNotExist:
-            grade_data = self._get_grade_data_for_not_attempted_assignment(user_id, usage_key)
+            try:
+                grade_data = self._get_grade_data_for_not_attempted_assignment(user_id, usage_key)
+            except ValueError:
+                grade_data = None
 
         results = SubsectionGradeResponseSerializer({
             'original_grade': grade_data,
