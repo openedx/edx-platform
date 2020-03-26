@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('partners', '0003_auto_20200120_0715'),
+        ('partners', '0004_partner_config_partneruser_status'),
     ]
 
     operations = [
@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='partner',
             name='logo',
-            field=models.ImageField(default='', help_text=b'Main Logo in Landing page.', upload_to=b'partner_logos'),
+            field=models.ImageField(default='', help_text=b'Main Logo in Landing page.', upload_to=b'partners/logo'),
             preserve_default=False,
         ),
         migrations.AlterField(
