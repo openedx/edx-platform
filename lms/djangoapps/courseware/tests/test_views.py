@@ -1521,8 +1521,8 @@ class ProgressPageTests(ProgressPageBaseTests):
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 62, 41),
-        (True, 53, 36)
+        (False, 62, 40),
+        (True, 53, 35)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
