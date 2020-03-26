@@ -46,7 +46,7 @@
 
             uploadCsv: function() {
                 var formData = new FormData();
-                formData.append('csv', this.membershipFile);
+                formData.append('csv', this.membershipFile);  // xss-lint: disable=javascript-jquery-append
 
                 return $.ajax({
                     type: 'POST',
