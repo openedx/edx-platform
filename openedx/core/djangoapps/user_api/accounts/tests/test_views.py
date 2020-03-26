@@ -328,6 +328,22 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         response = client.get(reverse("accounts_api", kwargs={'username': "does_not_exist"}))
         self.assertEqual(404, response.status_code)
 
+    @ddt.data(
+        ("client", "user"),
+        ("staff_client", "staff_user"),
+    )
+    @ddt.unpack
+    def test_get_account_by_email(self, api_client, user):
+        """
+        Test that requesting a user email search works.
+        """
+        client = self.login_client(api_client, user)
+        self.create_mock_profile(self.user)
+        set_user_preference(self.user, ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY)
+
+        response = self.send_get(client, query_parameters='email={}'.format(self.user.email))
+        self._verify_full_account_response(response)
+
     # Note: using getattr so that the patching works even if there is no configuration.
     # This is needed when testing CMS as the patching is still executed even though the
     # suite is skipped.
@@ -395,6 +411,9 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
 
         # Verify how the view parameter changes the fields that are returned.
         response = self.send_get(client, query_parameters='view=shared')
+        verify_fields_visible_to_all_users(response)
+
+        response = self.send_get(client, query_parameters='view=shared&email={}'.format(self.user.email))
         verify_fields_visible_to_all_users(response)
 
     @ddt.data(

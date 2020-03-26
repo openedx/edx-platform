@@ -125,6 +125,7 @@ class AccountViewSet(ViewSet):
 
             GET /api/user/v1/me[?view=shared]
             GET /api/user/v1/accounts?usernames={username1,username2}[?view=shared]
+            GET /api/user/v1/accounts?email={user_email}
             GET /api/user/v1/accounts/{username}/[?view=shared]
 
             PATCH /api/user/v1/accounts/{username}/{"key":"value"} "application/merge-patch+json"
@@ -148,7 +149,7 @@ class AccountViewSet(ViewSet):
 
         **Response Values for GET requests to /accounts endpoints**
 
-            If no user exists with the specified username, an HTTP 404 "Not
+            If no user exists with the specified username, or email, an HTTP 404 "Not
             Found" response is returned.
 
             If the user makes the request for her own account, or makes a
@@ -284,13 +285,24 @@ class AccountViewSet(ViewSet):
     def list(self, request):
         """
         GET /api/user/v1/accounts?username={username1,username2}
+        GET /api/user/v1/accounts?email={user_email}
         """
         usernames = request.GET.get('username')
+        user_email = request.GET.get('email')
+        search_usernames = []
+
+        if usernames:
+            search_usernames = usernames.strip(',').split(',')
+        elif user_email:
+            user_email = user_email.strip('')
+            try:
+                user = User.objects.get(email=user_email)
+            except (UserNotFound, User.DoesNotExist):
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            search_usernames = [user.username]
         try:
-            if usernames:
-                usernames = usernames.strip(',').split(',')
             account_settings = get_account_settings(
-                request, usernames, view=request.query_params.get('view'))
+                request, search_usernames, view=request.query_params.get('view'))
         except UserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
