@@ -14,7 +14,7 @@ from simple_history.models import HistoricalRecords
 
 from student.models import CourseEnrollment
 
-from .constants import ProgramCourseEnrollmentStatuses, ProgramEnrollmentStatuses
+from .constants import AllowedProgramCourseEnrollmentRoles, ProgramCourseEnrollmentStatuses, ProgramEnrollmentStatuses
 
 
 class ProgramEnrollment(TimeStampedModel):
@@ -147,5 +147,30 @@ class ProgramCourseEnrollment(TimeStampedModel):
             " course_enrollment=<{self.course_enrollment}>"
             " course_key={self.course_key}"
             " status={self.status!r}"
+            ">"
+        ).format(self=self)
+
+
+class PendingCourseAccessRoleAssignment(TimeStampedModel):
+    """
+    This model represents a role that should be assigned to the eventual user of a pending enrollment.
+
+    .. no_pii:
+    """
+    class Meta(object):
+        unique_together = ('role', 'enrollment')
+
+    role = models.CharField(max_length=64, choices=AllowedProgramCourseEnrollmentRoles.__MODEL_CHOICES__)
+    enrollment = models.ForeignKey(ProgramCourseEnrollment, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '[PendingCourseAccessRoleAssignment id={}]'.format(self.id)
+
+    def __repr__(self):
+        return (
+            "<PendingCourseAccessRoleAssignment"  # pylint: disable=missing-format-attribute
+            " id={self.id}"
+            " role={self.role!r}"
+            " enrollment={self.enrollment!r}"
             ">"
         ).format(self=self)

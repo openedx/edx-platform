@@ -15,8 +15,13 @@ from course_modes.models import CourseMode
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
+from ..constants import AllowedProgramCourseEnrollmentRoles
 from ..models import ProgramEnrollment
-from .factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
+from .factories import (
+    PendingCourseAccessRoleAssignmentFactory,
+    ProgramCourseEnrollmentFactory,
+    ProgramEnrollmentFactory
+)
 
 
 class ProgramEnrollmentModelTests(TestCase):
@@ -200,3 +205,41 @@ class ProgramCourseEnrollmentModelTests(TestCase):
             course_enrollment=None,
             status="active"
         )
+
+
+class PendingCourseAccessRoleAssignmentTests(TestCase):
+    """
+    Tests for the PendingCourseAccessRoleAssignment model.
+    """
+    def setUp(self):
+        super(PendingCourseAccessRoleAssignmentTests, self).setUp()
+        self.program_course_enrollment = ProgramCourseEnrollmentFactory()
+        self.pending_role_assignment = PendingCourseAccessRoleAssignmentFactory(
+            enrollment=self.program_course_enrollment,
+            role=AllowedProgramCourseEnrollmentRoles.COURSE_STAFF,
+        )
+
+    def test_str_and_repr(self):
+        """
+        Make sure str() and repr() work correctly on instances of this model.
+        """
+        assert str(self.pending_role_assignment) == "[PendingCourseAccessRoleAssignment id=1]"
+
+        # The record contains timestamp information, and a repeat of the ProgramCourseEnrollment repr()
+        # already tested above, let's just test the parts of the repr()
+        # that come before that.
+        assert (
+            "<PendingCourseAccessRoleAssignment id=1"
+            " role='staff'"
+            " enrollment=<ProgramCourseEnrollment id=1"
+        ) in repr(self.pending_role_assignment)
+
+    def test_unique(self):
+        """
+        Multiple records with the same enrollment and role cannot be created
+        """
+        with self.assertRaises(IntegrityError):
+            PendingCourseAccessRoleAssignmentFactory(
+                enrollment=self.program_course_enrollment,
+                role=AllowedProgramCourseEnrollmentRoles.COURSE_STAFF,
+            )
