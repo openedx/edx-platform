@@ -1,7 +1,10 @@
+from ddt import ddt, data
 from django.test import RequestFactory, TestCase
 from mock import patch
 
 from lms.djangoapps.onboarding.models import Organization, OrgSector, TotalEmployee
+from lms.djangoapps.onboarding.tests.factories import UserFactory
+from openedx.features.partners.tests.factories import OrganizationFactory
 from openedx.features.student_account.forms import AccountCreationFormCustom
 from openedx.features.student_account.helpers import (
     compose_and_send_activation_email_custom,
@@ -9,7 +12,7 @@ from openedx.features.student_account.helpers import (
     set_opt_in_and_affiliate_user_organization
 )
 from openedx.features.user_leads.models import UserLeads
-from student.tests.factories import RegistrationFactory, UserFactory
+from student.tests.factories import RegistrationFactory
 
 
 class TestComposeAndSendActivationEmail(TestCase):
@@ -106,7 +109,7 @@ class TestSaveUserUTMInfo(TestCase):
         save_user_utm_info(request, self.user)
         self.assertRaises(Exception, save_user_utm_info)
 
-
+@ddt
 class TestSetOptInAndAffiliateOrganization(TestCase):
     """
     The purpose of this test suite is to check if the set_opt_in_and_affiliate_user_organization
@@ -204,9 +207,10 @@ class TestSetOptInAndAffiliateOrganization(TestCase):
         mock_email_preferences_create_method.assert_called_once_with(user=self.user,
                                                                      opt_in=form.cleaned_data.get('opt_in'))
 
+    @data(True, False)
     @patch('openedx.features.student_account.helpers.EmailPreference.objects.create')
     @patch('openedx.features.student_account.helpers.UserExtendedProfile.objects.create')
-    def test_user_with_existing_organization(self, mock_user_extended_profile_create_method,
+    def test_user_with_existing_organization(self, is_org_orphan, mock_user_extended_profile_create_method,
                                              mock_email_preferences_create_method):
         """
         Test that when a user gives the name of an already existing organization,
@@ -219,26 +223,36 @@ class TestSetOptInAndAffiliateOrganization(TestCase):
             'org_type': 'IWRNS'
         }
 
-        existing_organization = Organization.objects.create(**organization_data)
-        self.request_data['organization_name'] = existing_organization.label
-
-        request = RequestFactory().post('/user_api/v1/account/registration/', self.request_data)
-        params = dict(request.POST.copy().items())
-        params['name'] = '{f_name} {l_name}'.format(f_name=params.get('first_name'), l_name=params.get('last_name'))
-
-        form = AccountCreationFormCustom(data=params,
-                                         extended_profile_fields=None,
-                                         do_third_party_auth=False)
-        form.is_valid()
-        set_opt_in_and_affiliate_user_organization(self.user, form)
-
+        existing_organization = OrganizationFactory(**organization_data)
         user_extended_profile_data = {
-            'organization_id': existing_organization.id
+            'is_first_learner': is_org_orphan,
+            'organization_id': existing_organization.id,
         }
+
+        if not is_org_orphan:
+            # Add one user to organization, so that it does not remain orphan
+            UserFactory(extended_profile__organization=existing_organization)
+
+        form = AccountCreationFormCustom(
+            data={
+                'organization_name': existing_organization.label,
+                'organization_type': existing_organization.org_type,
+                'organization_size': existing_organization.total_employees,
+                'is_org_selected': True
+            },
+            extended_profile_fields=None,
+            do_third_party_auth=False
+        )
+
+        form.is_valid()
+
+        set_opt_in_and_affiliate_user_organization(self.user, form)
 
         self.assertEqual(existing_organization.label, organization_data['label'])
         self.assertEqual(existing_organization.total_employees, organization_data['total_employees'])
         self.assertEqual(existing_organization.org_type, organization_data['org_type'])
         mock_user_extended_profile_create_method.assert_called_once_with(user=self.user, **user_extended_profile_data)
-        mock_email_preferences_create_method.assert_called_once_with(user=self.user,
-                                                                     opt_in=form.cleaned_data.get('opt_in'))
+        mock_email_preferences_create_method.assert_called_once_with(
+            user=self.user,
+            opt_in=form.cleaned_data.get('opt_in')
+        )
