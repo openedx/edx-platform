@@ -3278,7 +3278,7 @@ msgid ""
 msgstr ""
 "يُرجى إدخال الصيغة الخاصّة بتواريخ الاستحقاق. والصيغة الافتراضية هي الشهر "
 "ثمّ اليوم ثمّ السنة Mon DD, YYYY. ويُرجى إدخال \"%m-%d-%Y\" لصيغة MM-DD-"
-"YYYY، و\"%d-%m-%Y\" لصيغة DD-MM-YYYY، و\"%Y-%m-%d\" لصيغة YYYY-MM-DD، "
+"‏YYYY، و\"%d-%m-%Y\" لصيغة DD-MM-YYYY، و\"%Y-%m-%d\" لصيغة YYYY-MM-DD، "
 "و\"%Y-%d-%m\" لصيغة YYYY-DD-MM."
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3722,8 +3722,8 @@ msgid ""
 "course. Regardless of this setting, timed exams are enabled if Enable "
 "Proctored Exams is set to true."
 msgstr ""
-"أدخل صحيح أو خاطئ. إذا كان الخيار صحيح، سيتم تفعيل الامتحانات الموقته في "
-"دورتك. بغض النظر عن هذا الإعداد، يتم تفعيل الامتحانات الموقتة إذا تم تحديد "
+"أدخل   {em_start}True{em_end} أو   {em_start}False{em_end}. إذا كان الخيار صحيح  {em_start}True{em_end}، سيتم تفعيل الامتحانات الموقتة في "
+"دورتك. بغض النظر هذا عن الإعداد، يتم تفعيل الامتحانات الموقتة إذا تم تحديد "
 "خيار تفعيل الامتحانات الموقتة."
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -21494,10 +21494,9 @@ msgid ""
 "Staff or Admin role selects {em_start}Activate{em_end}. Only course team "
 "members with these roles can edit or delete an activated certificate."
 msgstr ""
-"للبدء في إصدار شهادات لهذه الدورة التعليمية يقوم أحد أعضاء الفريق الذي يقوم "
-"بدور عضو طاقم أو مشرف  {em_start}Activate{em_end}. يمكن فقط لأعضاء فريق "
+"للبدء في إصدار شهادات لهذه الدورة التعليمية يقوم أحد أعضاء الفريق "
+"بدور عضو طاقم أو مشرف بإختيار  {em_start}Activate{em_end}. يمكن فقط لأعضاء فريق "
 "الدورة التعليمية الذي يشغلون هذه الأدوار تحرير أو حذف شهادة التي تم تفعيلها."
-
 #: cms/templates/certificates.html
 msgid ""
 "{em_start}Do not{em_end} delete certificates after a course has started; "
@@ -24331,9 +24330,8 @@ msgid ""
 " you use double quotation marks (\") around the string. Do not use single "
 "quotation marks (')."
 msgstr ""
-"{em_start}Note:{em_end} عند إدخال سلاسل كقيم سياسة، تأكد من أنك تستخدم "
-"علامات اقتباس مزدوجة (\") حول السلسلة. لا تستخدم علامات الاقتباس المفردة ( "
-"')."
+"ملاحظة: عند إدخال مجموعة التعليمات المشفرة، تأكد من أنك تستخدم علامات اقتباس مزدوجة (\") حول "
+"السلسلة. لا تستخدم علامات الاقتباس المفردة ( ')."
 
 #: cms/templates/settings_graders.html
 msgid "Grading Settings"
@@ -25946,3 +25944,13 @@ msgid ""
 "A new revision was created: Merge between Revision #%(r1)d and Revision "
 "#%(r2)d"
 msgstr "أُنشأت مراجعة جديدة: الدمج بين المراجعة #%(r1)d والمراجعة #%(r2)d "
+
+# cms/djangoapps/maintenance/views.py
+#, python-format
+msgid "Edit Announcements"
+msgstr "تعديل الإعلانات"
+
+# cms/djangoapps/maintenance/views.py
+#, python-format
+msgid "This view shows the announcement editor to create or alter announcements that are shown on the rightside of the dashboard."
+msgstr "تعرف طريقة العرض هذه محرر الإعلانات أن يقوم بكتابة أو تغيير الإعلانات التي تظهر على الجانب الأيمن من لوحة القيادة."
