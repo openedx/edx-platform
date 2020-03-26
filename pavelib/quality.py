@@ -861,7 +861,7 @@ def run_pii_check(options):
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
 @timed
-def check_keywords(options):
+def check_keywords():
     """
     Check Django model fields for names that conflict with a list of reserved keywords
     """
@@ -869,17 +869,18 @@ def check_keywords(options):
     run_output_file = os.path.join(report_path, 'reserved_keyword.log')
 
     overall_status = True
-    for env, env_settings_file in [('lms', 'lms.envs.test'), ('cms', 'cms.envs.test')]:
+    for env, env_settings_file in [('lms', 'lms.envs.devstack_docker'), ('cms', 'cms.envs.devstack_docker')]:
+        report_file = "{}_reserved_keyword_report.csv".format(env)
+        sh("mkdir -p {}".format(report_path))
         sh(
-            "mkdir -p {} && "
             "export DJANGO_SETTINGS_MODULE={}; "
             "python manage.py {} check_reserved_keywords "
             "--override_file {}/db_keyword_overrides.yml "
             "--report_path {} "
-            "--report_file {}_reserved_keyword_report.csv "
+            "--report_file {} "
             "--verbosity 2 "
-            "2>&1  | tee -a {}".format(
-                report_path, env_settings_file, env, Env.REPO_ROOT, report_path, env, run_output_file
+            "2>&1 | tee -a {}".format(
+                env_settings_file, env, Env.REPO_ROOT, report_path, report_file, run_output_file
             )
         )
 
