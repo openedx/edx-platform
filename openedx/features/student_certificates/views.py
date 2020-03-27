@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from constants import COURSE_URL_FMT, PDF_RESPONSE_HEADER, PDFKIT_IMAGE_PATH, TWITTER_META_TITLE_FMT
+from openedx.core.djangoapps.credentials.utils import get_credentials
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.philu_api.helpers import get_course_custom_settings
@@ -20,6 +21,7 @@ from lms.djangoapps.certificates.models import (
     CertificateStatuses)
 
 from helpers import (
+    date_from_str,
     get_certificate_image_url,
     get_certificate_image_url_by_uuid,
     get_image_and_size_from_url,
@@ -117,7 +119,29 @@ def student_certificates(request):
             'certificate_url': "%s%s" % (settings.LMS_ROOT_URL, certificate_url),
             'course_start': start_date.strftime('%b %d, %Y') if start_date else None,
             'completion_date': completion_date.strftime('%b %d, %Y') if completion_date else None,
+            'is_program_cert': False,
         })
+
+    program_credentials = get_credentials(request.user, credential_type='program')
+    for credential in program_credentials:
+        program_name = [attribute['value'] for attribute in credential.get('attributes')
+                        if attribute['name'] == 'program_name']
+        if program_name:
+            user_certificates.append({
+                'course_name': program_name[0],
+                'course_title': program_name[0],
+                'social_sharing_urls': {
+                    'twitter': '',
+                    'facebook': '',
+                    'email': '',
+                    'linkedin': '',
+                    'facebook_after_enroll': ''
+                },
+                'certificate_url': credential.get('certificate_url'),
+                'course_start': '',
+                'completion_date': date_from_str(credential.get('created')).strftime('%b %d, %Y'),
+                'is_program_cert': True,
+            })
 
     context = {
         'user_certificates': user_certificates,
@@ -210,7 +234,7 @@ def verify_certificate(request, key):
     context = {
         'achieved_by': certificate.user.get_full_name(),
         'achieved_at': certificate.created_date.strftime('%B %d, %Y'),
-        'course_name': get_course(certificate.course_id).display_name, 
+        'course_name': get_course(certificate.course_id).display_name,
         'certificate_image': get_certificate_image_url(certificate)
     }
 
