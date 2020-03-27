@@ -116,7 +116,7 @@ class ProgramCourseOperationStatuses(
     __ALL__ = __OK__ + __ERRORS__
 
 
-class AllowedProgramCourseEnrollmentRoles(object):
+class ProgramCourseEnrollmentRoles(object):
     """
     Valid roles that can be assigned as part of a ProgramCourseEnrollment
     """
@@ -124,7 +124,7 @@ class AllowedProgramCourseEnrollmentRoles(object):
     __ALL__ = (COURSE_STAFF,)
 
     # Note: Any changes to this value will trigger a migration on
-    # PendingCourseAccessRoleAssignment!
+    # CourseAccessRoleAssignment!
     __MODEL_CHOICES__ = (
         (role, role) for role in __ALL__
     )

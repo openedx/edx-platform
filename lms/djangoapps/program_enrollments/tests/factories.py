@@ -47,10 +47,10 @@ class ProgramCourseEnrollmentFactory(DjangoModelFactory):
     status = 'active'
 
 
-class PendingCourseAccessRoleAssignmentFactory(DjangoModelFactory):
-    """ A factory for the PendingCourseAccessRoleAssignment model. """
+class CourseAccessRoleAssignmentFactory(DjangoModelFactory):
+    """ A factory for the CourseAccessRoleAssignment model. """
     class Meta(object):
-        model = models.PendingCourseAccessRoleAssignment
+        model = models.CourseAccessRoleAssignment
 
     enrollment = factory.SubFactory(ProgramCourseEnrollmentFactory)
     role = 'staff'

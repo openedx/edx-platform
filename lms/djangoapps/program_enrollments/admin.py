@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 
 from lms.djangoapps.program_enrollments.models import (
-    PendingCourseAccessRoleAssignment,
+    CourseAccessRoleAssignment,
     ProgramCourseEnrollment,
     ProgramEnrollment
 )
@@ -131,9 +131,9 @@ _pending_role_assignment_enrollment_id.short_description = "Program Course Enrol
 _pending_role_assignment_external_user_key.short_description = "Pgm Enrollment: Ext User Key"
 
 
-class PendingCourseAccessRoleAssignmentAdmin(admin.ModelAdmin):
+class CourseAccessRoleAssignmentAdmin(admin.ModelAdmin):
     """
-    Admin tool for the PendingCourseAccessRoleAssignment model
+    Admin tool for the CourseAccessRoleAssignment model
     """
     list_display = (
         'id',
@@ -146,4 +146,4 @@ class PendingCourseAccessRoleAssignmentAdmin(admin.ModelAdmin):
 
 admin.site.register(ProgramEnrollment, ProgramEnrollmentAdmin)
 admin.site.register(ProgramCourseEnrollment, ProgramCourseEnrollmentAdmin)
-admin.site.register(PendingCourseAccessRoleAssignment, PendingCourseAccessRoleAssignmentAdmin)
+admin.site.register(CourseAccessRoleAssignment, CourseAccessRoleAssignmentAdmin)

@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='PendingCourseAccessRoleAssignment',
+            name='CourseAccessRoleAssignment',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created')),
@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.AlterUniqueTogether(
-            name='pendingcourseaccessroleassignment',
+            name='CourseAccessRoleAssignment',
             unique_together=set([('role', 'enrollment')]),
         ),
     ]
