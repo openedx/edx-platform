@@ -252,6 +252,40 @@ class GraderTest(unittest.TestCase):
         self.assertEqual(len(graded['section_breakdown']), 0)
         self.assertEqual(len(graded['grade_breakdown']), 0)
 
+    def test_grade_with_string_min_count(self):
+        """
+        Test that the grading succeeds in case the min_count is set to a string
+        """
+        weighted_grader = graders.grader_from_conf([
+            {
+                'type': "Homework",
+                'min_count': '12',
+                'drop_count': 2,
+                'short_label': "HW",
+                'weight': 0.25,
+            },
+            {
+                'type': "Lab",
+                'min_count': '7',
+                'drop_count': 3,
+                'category': "Labs",
+                'weight': 0.25
+            },
+            {
+                'type': "Midterm",
+                'min_count': '0',
+                'drop_count': 0,
+                'name': "Midterm Exam",
+                'short_label': "Midterm",
+                'weight': 0.5,
+            },
+        ])
+
+        graded = weighted_grader.grade(self.test_gradesheet)
+        self.assertAlmostEqual(graded['percent'], 0.50812499999999994)
+        self.assertEqual(len(graded['section_breakdown']), (12 + 1) + (7 + 1) + 1)
+        self.assertEqual(len(graded['grade_breakdown']), 3)
+
     def test_grader_from_conf(self):
 
         # Confs always produce a graders.WeightedSubsectionsGrader, so we test this by repeating the test
