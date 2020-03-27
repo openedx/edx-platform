@@ -7,6 +7,7 @@ from django.conf import settings
 from django.conf.urls import url
 
 from lms.djangoapps.verify_student import views
+from lms.djangoapps.verify_student.api import PhotoVerificationStatusDetail
 
 urlpatterns = [
     # The user is starting the verification / payment process,
@@ -104,6 +105,13 @@ urlpatterns = [
         r'^reverify$',
         views.ReverifyView.as_view(),
         name="verify_student_reverify"
+    ),
+
+    # End point for verification status
+    url(
+        r'^{username}/status$'.format(username=settings.USERNAME_PATTERN),
+        PhotoVerificationStatusDetail.as_view(),
+        name="verification_status"
     ),
 ]
 
