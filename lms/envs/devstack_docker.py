@@ -85,6 +85,11 @@ SYSTEM_WIDE_ROLE_CLASSES.extend(['system_wide_roles.SystemWideRoleAssignment'])
 if FEATURES['ENABLE_ENTERPRISE_INTEGRATION']:
     SYSTEM_WIDE_ROLE_CLASSES.extend(['enterprise.SystemWideEnterpriseUserRoleAssignment'])
 
+#####################################################################
+# See if the developer has any local overrides.
+if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):
+    from .private import *  # pylint: disable=import-error,wildcard-import
+
 ########################## THEMING  #######################
 # If you want to enable theming in devstack, uncomment this section and add any relevant
 # theme directories to COMPREHENSIVE_THEME_DIRS
