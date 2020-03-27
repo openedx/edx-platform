@@ -4,13 +4,13 @@ JOB_TYPE_CHOICES = (
 )
 
 JOB_COMPENSATION_CHOICES = (
-    ('volunteer', 'Freelance'),
+    ('volunteer', 'Volunteer'),
     ('hourly', 'Hourly'),
     ('salaried', 'Salaried'),
 )
 
 JOB_HOURS_CHOICES = (
-    ('freelance', 'Freelance'),
     ('fulltime', 'Full Time'),
-    ('halftime', 'Part Time'),
+    ('parttime', 'Part Time'),
+    ('freelance', 'Freelance'),
 )

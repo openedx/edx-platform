@@ -1,4 +1,5 @@
 from django.db import models
+
 from django_countries.fields import CountryField
 from model_utils.models import TimeStampedModel
 
@@ -10,13 +11,13 @@ class Job(TimeStampedModel):
     This model contains all the fields related to a job being
     posted on the job board.
     """
-    title = models.CharField(max_length=255, null=False, blank=False)
-    company = models.CharField(max_length=255, null=False, blank=False)
-    type = models.CharField(max_length=32, choices=JOB_TYPE_CHOICES, blank=False)
-    compensation = models.CharField(max_length=32, choices=JOB_COMPENSATION_CHOICES, blank=False)
-    hours = models.CharField(max_length=32, choices=JOB_HOURS_CHOICES, blank=False)
+    title = models.CharField(max_length=255)
+    company = models.CharField(max_length=255)
+    type = models.CharField(max_length=255, choices=JOB_TYPE_CHOICES)
+    compensation = models.CharField(max_length=255, choices=JOB_COMPENSATION_CHOICES)
+    hours = models.CharField(max_length=255, choices=JOB_HOURS_CHOICES)
     city = models.CharField(max_length=255, blank=True, null=True)
     country = CountryField(null=True, blank=True)
-    description = models.TextField(null=False, blank=False)
-    function = models.TextField(null=False, blank=False)
-    responsibilities = models.TextField(null=False, blank=False)
+    description = models.TextField()
+    function = models.TextField()
+    responsibilities = models.TextField()
