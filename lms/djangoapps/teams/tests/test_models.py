@@ -65,7 +65,7 @@ class TestModelStrings(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestModelStrings, cls).setUpClass()
-        cls.course_id = "edx/the-course/1" 
+        cls.course_id = "edx/the-course/1"
         cls.course1 = create_course(CourseKey.from_string(cls.course_id), TEAMS_CONFIG_1)
         cls.user = UserFactory.create(username="the-user")
         CourseEnrollmentFactory.create(user=cls.user, course_id=cls.course_id)
@@ -110,7 +110,7 @@ class CourseTeamTest(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super(CourseTeamTest, cls).setUpClass()
-        cls.course_id = "edx/the-course/1" 
+        cls.course_id = "edx/the-course/1"
         cls.course1 = create_course(CourseKey.from_string(cls.course_id), TEAMS_CONFIG_1)
 
         cls.audit_learner = UserFactory.create(username="audit")

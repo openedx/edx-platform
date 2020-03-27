@@ -826,6 +826,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         ('staff', True),
     )
     def test_text_search_organization_protected(self, user, can_see_masters_team):
+        """ When doing a text search as different users, will the masters_only team show up? """
         self.reset_search_index()
         result = self.get_teams_list(
             data={'text_search': 'master'},
@@ -842,6 +843,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         ('staff', True, True, True),
     )
     def test_text_search_private_teamset(self, user, can_see_private_1_1, can_see_private_1_2, can_see_private_2_1):
+        """ When doing a text search as different users, will private_managed teams show up? """
         self.reset_search_index()
         result = self.get_teams_list(
             data={'text_search': 'private'},
@@ -1190,6 +1192,7 @@ class TestDetailTeamAPI(TeamAPITestCase):
         ('staff', 200)
     )
     def test_bubble_protection(self, requesting_user, expected_response):
+        """ As different users, check if we can request the masters_only team detail """
         team = self.get_team_detail(
             self.masters_only_team.team_id,
             expected_response,
@@ -1207,6 +1210,7 @@ class TestDetailTeamAPI(TeamAPITestCase):
         ('staff', 200)
     )
     def test_teamset_types(self, requesting_user, expected_response):
+        """ As different users, check if we can request a private_managed team detail """
         team = self.get_team_detail(
             self.team_1_in_private_teamset_1.team_id,
             expected_response,
@@ -1273,6 +1277,7 @@ class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
         ('staff', 204)
     )
     def test_organization_protection_status(self, requesting_user, expected_status):
+        """ As different users, try to delete the masters-only team """
         self.delete_team(
             self.masters_only_team.team_id,
             expected_status,
@@ -1287,6 +1292,7 @@ class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
         ('staff', 204)
     )
     def test_teamset_type(self, requesting_user, expected_status):
+        """ As different users, try to delete a private_managed team """
         self.delete_team(
             self.team_1_in_private_teamset_1.team_id,
             expected_status,
@@ -1366,8 +1372,9 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
                 new=value
             )
 
-    def test_does_not_exist(self):
-        self.patch_team_detail('no_such_team', 404, user='staff')
+    @ddt.data('staff', 'student_enrolled')
+    def test_does_not_exist(self, user):
+        self.patch_team_detail('no_such_team', 404, user=user)
 
     @ddt.unpack
     @ddt.data(
@@ -1377,6 +1384,7 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
         ('staff', 200)
     )
     def test_organization_protection_status(self, requesting_user, expected_status):
+        """ As different users, try to modify the masters_only team """
         team = self.patch_team_detail(
             self.masters_only_team.team_id,
             expected_status,
@@ -1394,6 +1402,7 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
         ('staff', 200)
     )
     def test_teamset_type(self, requesting_user, expected_status):
+        """ As different users, try to modify a private_managed team """
         team = self.patch_team_detail(
             self.team_1_in_private_teamset_1.team_id,
             expected_status,
@@ -1544,6 +1553,7 @@ class TestListTopicsAPI(TeamAPITestCase):
         ('staff', True)
     )
     def test_teamset_type(self, requesting_user, expect_see_private_teamsets):
+        """ As different users, request course's list of topics, and see what private_managed teamsets are returned """
         topics = self.get_topics_list(
             data={'course_id': self.test_course_1.id},
             user=requesting_user
@@ -1603,6 +1613,7 @@ class TestDetailTopicAPI(TeamAPITestCase):
         ('student_on_team_2_private_set_1', 200, 2),
         ('staff', 200, 2)
     )
+    """ As different users, request info about a private_managed team """
     def test_teamset_type(self, requesting_user, expected_status, expected_team_count):
         topic = self.get_topic_detail(
             topic_id='private_topic_1_id',
@@ -1664,6 +1675,7 @@ class TestListMembershipAPI(TeamAPITestCase):
     )
     @ddt.unpack
     def test_access_by_username_organization_protected(self, user, can_see_bubble_team):
+        """ As different users, request team membership info for student_masters """
         membership = self.get_membership_list(200, {'username': 'student_masters'}, user=user)
         if can_see_bubble_team:
             self.assertEqual(membership['count'], 1)
@@ -1681,6 +1693,7 @@ class TestListMembershipAPI(TeamAPITestCase):
         ('staff', True, True)
     )
     def test_access_by_username_private_teamset(self, user, can_see_any_teams, can_see_private_team):
+        """ As different users, request team membership info for student_on_team_1_private_set_1 """
         self.masters_only_team.add_user(self.users['student_on_team_1_private_set_1'])
         memberships = self.get_membership_list(200, {'username': 'student_on_team_1_private_set_1'}, user=user)
         team_ids = [membership['team']['team_id'] for membership in memberships['results']]
@@ -1704,6 +1717,7 @@ class TestListMembershipAPI(TeamAPITestCase):
         ('staff', 200)
     )
     def test_access_by_team_private_teamset(self, user, expected_response):
+        """ As different users, request team membership info for a private_managed team """
         memberships = self.get_membership_list(
             expected_response,
             {'team_id': self.team_1_in_private_teamset_1.team_id},
@@ -1923,6 +1937,7 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
     )
     @ddt.unpack
     def test_join_organization_protected_team(self, user, expected_status, expected_message):
+        """ As different users, attempt to join masters_only team """
         response = self.post_create_membership(
             expected_status,
             self.build_membership_data_raw(self.users[user].username, self.masters_only_team.team_id),
@@ -1941,6 +1956,7 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
         ('staff', 200)
     )
     def test_student_join_private_managed_team(self, user, expected_status):
+        """ As different users, attempt to join private_managed team """
         self.post_create_membership(
             expected_status,
             self.build_membership_data_raw(self.users[user].username, self.team_1_in_private_teamset_1.team_id),
@@ -2078,8 +2094,8 @@ class TestDetailMembershipAPI(TeamAPITestCase):
     )
     def test_private_managed_team(self, user, expected_status):
         """
-        Users should not be able to see memberships for users in private_managed
-        teams that they are not a member of
+        As different users, request info about student_on_team_1_private_set_1's
+        membership in team_1_in_private_teamset_1
         """
         self.get_membership_detail(
             self.team_1_in_private_teamset_1.team_id,
@@ -2089,6 +2105,7 @@ class TestDetailMembershipAPI(TeamAPITestCase):
         )
 
     def test_join_private_managed_teamset(self):
+        """ After joining a private_managed team, a user can see memberships"""
         self.get_membership_detail(
             self.team_1_in_private_teamset_1.team_id,
             self.users['student_on_team_1_private_set_1'].username,
@@ -2177,6 +2194,7 @@ class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
         ('staff', 204)
     )
     def test_organization_protection_status(self, user, expected_status):
+        """ As different users, attempt to remove student_masters from masters_only_team """
         self.delete_membership(
             self.masters_only_team.team_id,
             self.users['student_masters'].username,
@@ -2192,6 +2210,10 @@ class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
         ('staff', 204)
     )
     def test_teamset_type(self, requesting_user, expected_status):
+        """
+        As different users, attempt to remove student_on_team_1_private_set_1
+        from team_1_in_private_teamset_1
+        """
         self.delete_membership(
             self.team_1_in_private_teamset_1.team_id,
             self.users['student_on_team_1_private_set_1'].username,

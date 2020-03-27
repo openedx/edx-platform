@@ -179,8 +179,9 @@ def user_organization_protection_status(user, course_key):
             course_key
         )
 
+
 def has_specific_team_access(user, team):
-    """ 
+    """
     To have access to a team a user must:
         - Be course staff
         OR
@@ -204,7 +205,7 @@ def valid_teamset_type_access(user, team):
     teamset = course_module.teams_configuration.teamsets_by_id[team.topic_id]
     if teamset.teamset_type != TeamsetType.private_managed:
         return True
-    return CourseTeamMembership.is_user_on_team(user, team) 
+    return CourseTeamMembership.is_user_on_team(user, team)
 
 
 def valid_organization_bubble_access(user, team):
