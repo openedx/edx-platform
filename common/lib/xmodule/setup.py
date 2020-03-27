@@ -12,6 +12,7 @@ XMODULES = [
     "image = xmodule.backcompat_module:TranslateCustomTagDescriptor",
     "library_content = xmodule.library_content_module:LibraryContentDescriptor",
     "error = xmodule.error_module:ErrorDescriptor",
+    "nonstaff_error = xmodule.error_module:NonStaffErrorDescriptor",
     "poll_question = xmodule.poll_module:PollDescriptor",
     "problemset = xmodule.seq_module:SequenceDescriptor",
     "randomize = xmodule.randomize_module:RandomizeDescriptor",
