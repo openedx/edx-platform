@@ -64,8 +64,7 @@
             handleCsvUploadSuccess: function(data) {
                 TeamUtils.showInfoBanner(data.message, false);
 
-                // This handler is currently unimplemented (TODO MST-44)
-                // this.teamEvents.trigger('teams:update', {});
+                // Implement a teams:update event (TODO MST-44)
             },
 
             handleCsvUploadFailure: function(jqXHR) {
