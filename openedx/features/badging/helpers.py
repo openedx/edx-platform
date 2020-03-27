@@ -31,6 +31,9 @@ from .constants import (
 )
 from .models import Badge
 
+BADGE_TYPE_TEAM = TEAM_PLAYER[TEAM_PLAYER_ENTRY_INDEX]
+BADGE_TYPE_CONVERSATIONALIST = CONVERSATIONALIST[CONVERSATIONALIST_ENTRY_INDEX]
+
 
 def populate_trophycase(user, courses, earned_badges):
     """
@@ -74,7 +77,7 @@ def get_course_badges(user, course_id, earned_badges, badge_queryset=None):
 
     for badge_type, _ in Badge.BADGE_TYPES:
 
-        if badge_type == TEAM_PLAYER[TEAM_PLAYER_ENTRY_INDEX]:
+        if badge_type == BADGE_TYPE_TEAM:
             course = get_course_by_id(course_id)
 
             if not is_teams_feature_enabled(course):
@@ -152,9 +155,9 @@ def get_badge_url(course_id, badge_type, team_id):
     :return: URL of badge in String format. Return "browse team" if user hasn't join any team.
     """
     badge_url = reverse('teams_dashboard', kwargs={'course_id': course_id})
-    if badge_type == CONVERSATIONALIST[CONVERSATIONALIST_ENTRY_INDEX]:
+    if badge_type == BADGE_TYPE_CONVERSATIONALIST:
         badge_url = reverse('nodebb_forum_discussion', kwargs={'course_id': course_id})
-    elif badge_type == TEAM_PLAYER[TEAM_PLAYER_ENTRY_INDEX] and team_id:
+    elif badge_type == BADGE_TYPE_TEAM and team_id:
         badge_url = reverse('view_team', kwargs={'course_id': course_id, 'team_id': team_id})
     return badge_url
 
@@ -215,14 +218,14 @@ def get_discussion_team_ids(course_id, discussion_room_id, badges):
     :param discussion_room_id: Discussion room Id in Int format
     :param badges: Dictionary contain badges
     """
-    obj = {
+    course_discussion_team = {
         course_id: {
             DISCUSSION_ID_KEY: discussion_room_id
         }
     }
     if TEAM_ROOM_ID_KEY in badges:
-        obj[course_id][TEAM_ID_KEY] = badges[TEAM_ROOM_ID_KEY]
-    return obj
+        course_discussion_team[course_id][TEAM_ID_KEY] = badges[TEAM_ROOM_ID_KEY]
+    return course_discussion_team
 
 
 def get_badge_progress_request_data(username, courses):
@@ -237,21 +240,21 @@ def get_badge_progress_request_data(username, courses):
     }
 
 
-def add_posts_data_in_badges_list(course, course_key, badges_list):
+def add_posts_count_in_badges_list(course, badges_list):
     """
     Add post count data in conversationalist badges and team badges
     :param course: Dictionary that contain information related to posts count in Discussion room and Team room.
-    :param course_key: Course Id in String format
     :param badges_list: Dictionary contain badges both conversationalist badges and team badges
     """
+    course_key = course.keys()[0]
     discussion_posts_count = course[course_key][DISCUSSION_COUNT_KEY]
     conversationalist_badges = add_badge_progress(
-        badges_list[CONVERSATIONALIST[CONVERSATIONALIST_ENTRY_INDEX]], discussion_posts_count)
-    badges_list[CONVERSATIONALIST[CONVERSATIONALIST_ENTRY_INDEX]] = conversationalist_badges
+        badges_list[BADGE_TYPE_CONVERSATIONALIST], discussion_posts_count)
+    badges_list[BADGE_TYPE_CONVERSATIONALIST] = conversationalist_badges
 
-    team_posts_count = course[course_key][TEAM_COUNT_KEY] if TEAM_COUNT_KEY in course[course.keys()[0]] else 0
-    team_badges = add_badge_progress(badges_list[TEAM_PLAYER[TEAM_PLAYER_ENTRY_INDEX]], team_posts_count)
-    badges_list[TEAM_PLAYER[TEAM_PLAYER_ENTRY_INDEX]] = team_badges
+    team_posts_count = course[course_key].get(TEAM_COUNT_KEY, 0)
+    team_badges = add_badge_progress(badges_list[BADGE_TYPE_TEAM], team_posts_count)
+    badges_list[BADGE_TYPE_TEAM] = team_badges
 
 
 def add_badge_progress(course_badges, posts_count):
