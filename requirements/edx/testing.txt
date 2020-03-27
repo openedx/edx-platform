@@ -70,7 +70,7 @@ django-config-models==2.0.0  # via -r requirements/edx/base.txt, edx-enterprise
 django-cors-headers==2.5.3  # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
 django-countries==5.5     # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edx-enterprise
 django-crum==0.7.5        # via -r requirements/edx/base.txt, edx-enterprise, edx-proctoring, edx-rbac, super-csv
-django-fernet-fields==0.6  # via -r requirements/edx/base.txt, edx-enterprise
+django-fernet-fields==0.6  # via -r requirements/edx/base.txt, edx-enterprise, edxval
 django-filter==2.2.0      # via -r requirements/edx/base.txt, edx-enterprise
 django-ipware==2.1.0      # via -r requirements/edx/base.txt, edx-enterprise, edx-proctoring
 django-js-asset==1.2.2    # via -r requirements/edx/base.txt, django-mptt
@@ -126,7 +126,7 @@ edx-submissions==3.0.4    # via -r requirements/edx/base.txt, ora2
 edx-tincan-py35==0.0.5    # via -r requirements/edx/base.txt, edx-enterprise
 edx-user-state-client==1.1.2  # via -r requirements/edx/base.txt
 edx-when==1.1.3           # via -r requirements/edx/base.txt, edx-proctoring
-edxval==1.2.5             # via -r requirements/edx/base.txt
+edxval==1.2.6             # via -r requirements/edx/base.txt
 elasticsearch==1.9.0      # via -r requirements/edx/base.txt, edx-search
 entrypoints==0.3          # via flake8
 enum34==1.1.10            # via -r requirements/edx/base.txt, edxval
