@@ -114,7 +114,7 @@ edx-django-release-util==0.4.1  # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==2.4.3  # via -r requirements/edx/testing.txt
 edx-django-utils==3.1     # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==5.0.2  # via -r requirements/edx/testing.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.0.1     # via -r requirements/edx/testing.txt
+edx-enterprise==3.0.3     # via -r requirements/edx/testing.txt
 edx-i18n-tools==0.5.0     # via -r requirements/edx/testing.txt, ora2
 edx-lint==1.4.1           # via -r requirements/edx/testing.txt
 edx-milestones==0.2.6     # via -r requirements/edx/testing.txt
@@ -156,7 +156,7 @@ httpretty==0.9.7          # via -c requirements/edx/../constraints.txt, -r requi
 icalendar==4.0.5          # via -r requirements/edx/testing.txt
 idna==2.9                 # via -r requirements/edx/testing.txt, requests
 imagesize==1.2.0          # via sphinx
-importlib-metadata==1.5.2  # via -r requirements/edx/testing.txt, importlib-resources, inflect, jsonschema, path, pluggy, pytest, pytest-randomly, tox, virtualenv
+importlib-metadata==1.6.0  # via -r requirements/edx/testing.txt, importlib-resources, inflect, jsonschema, path, pluggy, pytest, pytest-randomly, tox, virtualenv
 importlib-resources==1.4.0  # via -r requirements/edx/testing.txt, virtualenv
 inflect==3.0.2            # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, jinja2-pluralize
 inflection==0.3.1         # via -r requirements/edx/testing.txt, drf-yasg
@@ -313,7 +313,7 @@ unidiff==0.5.5            # via -r requirements/edx/testing.txt, coverage-pytest
 uritemplate==3.0.1        # via -r requirements/edx/testing.txt, coreapi, drf-yasg
 urllib3==1.25.8           # via -r requirements/edx/testing.txt, elasticsearch, geoip2, requests, selenium, transifex-client
 user-util==0.1.5          # via -r requirements/edx/testing.txt
-virtualenv==20.0.14       # via -r requirements/edx/testing.txt, tox
+virtualenv==20.0.15       # via -r requirements/edx/testing.txt, tox
 voluptuous==0.11.7        # via -r requirements/edx/testing.txt, ora2
 vulture==1.3              # via -r requirements/edx/development.in
 watchdog==0.10.2          # via -r requirements/edx/testing.txt
