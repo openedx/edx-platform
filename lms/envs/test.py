@@ -28,7 +28,6 @@ from six.moves import range
 
 from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
 from openedx.core.lib.derived import derive_settings
-from openedx.core.lib.logsettings import get_logger_config
 from openedx.core.lib.tempdir import mkdtemp_clean
 
 from .common import *
@@ -54,12 +53,6 @@ LOG_OVERRIDES = [
 for log_name, log_level in LOG_OVERRIDES:
     logging.getLogger(log_name).setLevel(log_level)
 
-# Log to console, as some testing requires logging that can be read by other tools
-LOGGING = get_logger_config(None)
-LOGGING['handlers']['local'] = LOGGING['handlers']['tracking'] = {
-    'class': 'logging.NullHandler',
-}
-LOGGING['loggers']['tracking']['handlers'] = ['console']
 
 # mongo connection settings
 MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
