@@ -1059,7 +1059,8 @@ class TestCourseExportImportProblem(CourseTestCase):
             category='problem',
             display_name='Test Problem',
             publish_item=publish_item,
-            data='<problem><pre><code>x=10</code></pre><multiplechoiceresponse></multiplechoiceresponse></problem>',
+            data='<problem><pre><code>x=10 print("hello \n")</code></pre>'
+                 '<multiplechoiceresponse></multiplechoiceresponse></problem>',
         )
 
     def get_problem_content(self, block_location):
@@ -1075,10 +1076,9 @@ class TestCourseExportImportProblem(CourseTestCase):
         """
         Asserts that problems' data is as expected with pre-tag content maintained.
         """
-        expected_problem_content = '<problem>\n  <pre><code>x=10</code></pre>\n' \
-                                   '  <multiplechoiceresponse/>\n</problem>\n'
+        expected_problem_content = '<problem>\n  <pre>\n    <code>x=10 print("hello \n")</code>\n  </pre>\n  ' \
+                                   '<multiplechoiceresponse/>\n</problem>\n'
         problem_content = self.get_problem_content(course_location)
-
         self.assertEqual(expected_problem_content, problem_content)
 
     def test_problem_content_on_course_export_import(self):
