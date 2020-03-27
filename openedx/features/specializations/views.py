@@ -29,7 +29,8 @@ def specialization_about(request, specialization_uuid):
     for course in [course for course in context['courses'] if course['course_runs']]:
         course_open_rerun_list = [
             rerun for rerun in course['course_runs']
-            if date_from_str(rerun['enrollment_start']) <= datetime.now() <= date_from_str(rerun['enrollment_end'])
+            if rerun['enrollment_start'] and rerun['enrollment_end'] and
+            date_from_str(rerun['enrollment_start']) <= datetime.now() <= date_from_str(rerun['enrollment_end'])
         ]
 
         opened = bool(course_open_rerun_list)
