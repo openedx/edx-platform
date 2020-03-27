@@ -327,6 +327,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         }
         cls.create_and_enroll_student(username='student_enrolled')
         cls.create_and_enroll_student(username='student_on_team_1_private_set_1', mode=CourseMode.MASTERS)
+        cls.create_and_enroll_student(username='student_on_team_2_private_set_1', mode=CourseMode.MASTERS)
         cls.create_and_enroll_student(username='student_not_member_of_private_teams', mode=CourseMode.MASTERS)
         cls.create_and_enroll_student(username='student_enrolled_not_on_team')
         cls.create_and_enroll_student(username='student_unenrolled', courses=[])
@@ -364,6 +365,11 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         cls.create_and_enroll_student(
             courses=[cls.test_course_1, cls.test_course_2],
             username='student_masters',
+            mode=CourseMode.MASTERS
+        )
+        cls.create_and_enroll_student(
+            courses=[cls.test_course_1, cls.test_course_2],
+            username='student_masters_not_on_team',
             mode=CourseMode.MASTERS
         )
 
@@ -464,6 +470,9 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             cls.search_team,
             cls.chinese_team,
             cls.masters_only_team,
+            cls.team_1_in_private_teamset_1,
+            cls.team_2_in_private_teamset_1,
+            cls.team_1_in_private_teamset_2,
         )}
 
         for user, course in [('staff', cls.test_course_1), ('course_staff', cls.test_course_1)]:
@@ -480,6 +489,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         cls.public_profile_team.add_user(cls.users['student_enrolled_public_profile'])
         cls.masters_only_team.add_user(cls.users['student_masters'])
         cls.team_1_in_private_teamset_1.add_user(cls.users['student_on_team_1_private_set_1'])
+        cls.team_2_in_private_teamset_1.add_user(cls.users['student_on_team_2_private_set_1'])
 
     def build_membership_data_raw(self, username, team):
         """Assembles a membership creation payload based on the raw values provided."""
@@ -792,6 +802,59 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         self.assertEqual('private_topic_1_id', result['results'][0]['topic_id'])
         self.assertNotEqual([], result['results'])
 
+    @ddt.unpack
+    @ddt.data(
+        ('student_masters_not_on_team', 1),
+        ('student_masters', 1),
+        ('student_enrolled', 0),
+        ('staff', 1),
+    )
+    def test_text_search_organization_protected(self, user, expected_results):
+        """
+        When doing a text search as different users, will the masters_only team show up?
+        Only staff, or people who are within the organization_protected bubble should be
+        able to see the masters team
+        """
+        self.reset_search_index()
+        result = self.get_teams_list(
+            data={'text_search': 'master'},
+            user=user,
+        )
+        self.assertEqual(result['count'], expected_results)
+
+    @ddt.unpack
+    @ddt.data(
+        ('student_on_team_1_private_set_1', True, True, True),
+        ('student_on_team_2_private_set_1', True, True, True),
+        ('student_enrolled', False, False, False),
+        ('student_masters', True, True, True),
+        ('staff', True, True, True),
+    )
+    def test_text_search_private_teamset(self, user, can_see_private_1_1, can_see_private_1_2, can_see_private_2_1):
+        """
+        When doing a text search as different users, will private_managed teams show up?
+        Only staff should be able to see all private_managed teams.
+        Students enrolled in a private_managed teams should be able to see their team, and no others.
+
+        TODO: Currently, anyone within the organization_protected bubble can see all private teams regardless of
+        team membership. If our test data contained a non-protected private_managed topic, everyone would see that
+        as well.
+        """
+        self.reset_search_index()
+        result = self.get_teams_list(
+            data={'text_search': 'private'},
+            user=user,
+        )
+        teams = {team['name'] for team in result['results']}
+        expected_teams = set()
+        if can_see_private_1_1:
+            expected_teams.add(self.team_1_in_private_teamset_1.name)
+        if can_see_private_1_2:
+            expected_teams.add(self.team_2_in_private_teamset_1.name)
+        if can_see_private_2_1:
+            expected_teams.add(self.team_1_in_private_teamset_2.name)
+        self.assertEqual(expected_teams, teams)
+
     def test_page(self):
         result = self.get_teams_list(200, {'page_size': 1, 'page': 3})
         self.assertEqual(3, result['num_pages'])
@@ -1078,6 +1141,40 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
 
         self.assertEqual(team['membership'], [])
 
+    @ddt.unpack
+    @ddt.data(
+        ('student_enrolled', 400, 'You are already in a team in this course.'),
+        ('student_unenrolled', 403, None),
+        ('student_enrolled_not_on_team', 403, "You can't create a team in an instructor managed topic."),
+        ('student_masters', 400, 'You are already in a team in this course.'),
+        ('student_on_team_1_private_set_1', 400, 'You are already in a team in this course.'),
+        ('student_on_team_2_private_set_1', 400, 'You are already in a team in this course.'),
+        ('staff', 200, None)
+    )
+    def test_private_managed_access(self, user, expected_response, msg):
+        """
+        As different users, check if we can create a team in a private teamset.
+        Only staff should be able to create teams in managed teamsets, but they're also
+        the only ones who should know that private_managed teamsets exist. If the team hasn't been created yet,
+        no one can be in it, so no non-staff should get any info at all from this endpoint.
+
+        TODO: This endpoint should check for teamset enrollment rather than course enrollment.
+        I'm not sure of the severity of the 'user_message' info, but it seems like we might not want to
+        return that for student_enrolled_not_on_team (they should just get 403, like student_unenrolled)
+        """
+        response = self.post_create_team(
+            expected_response,
+            data=self.build_team_data(
+                name="test_private_managed_access",
+                course=self.test_course_1,
+                description="test_private_managed_access",
+                topic_id="private_topic_1_id"
+            ),
+            user=user
+        )
+        if msg:
+            self.assertEqual(msg, response.json()['user_message'])
+
 
 @ddt.ddt
 class TestDetailTeamAPI(TeamAPITestCase):
@@ -1116,6 +1213,53 @@ class TestDetailTeamAPI(TeamAPITestCase):
             user='student_enrolled_public_profile'
         )
         self.verify_expanded_public_user(result['membership'][0]['user'])
+
+    @ddt.unpack
+    @ddt.data(
+        ('student_enrolled', 200),
+        ('student_masters_not_on_team', 200),
+        ('student_masters', 200),
+        ('staff', 200)
+    )
+    def test_organization_protected(self, requesting_user, expected_response):
+        """
+        As different users, check if we can request the masters_only team detail.
+        Only staff and users within the organization_protection bubble should be able to get info about
+        an organization_protected team, or be able to tell that it exists.
+
+        TODO: student_enrolled should not be able to see this data
+        """
+        team = self.get_team_detail(
+            self.masters_only_team.team_id,
+            expected_response,
+            user=requesting_user
+        )
+        if expected_response == 200:
+            self.assertEqual(team['name'], self.masters_only_team.name)
+
+    @ddt.unpack
+    @ddt.data(
+        ('student_enrolled', 200),
+        ('student_masters', 200),
+        ('student_on_team_1_private_set_1', 200),
+        ('student_on_team_2_private_set_1', 200),
+        ('staff', 200)
+    )
+    def test_teamset_types(self, requesting_user, expected_response):
+        """
+        As different users, check if we can request the masters_only team detail.
+        Only staff or users enrolled in the team should be able to get info about a private_managed team,
+        or even be able to tell that it exists.
+
+        TODO: Only staff and sot1ps1 should be able to get any information about team_1_in_private_teamset_1
+        """
+        team = self.get_team_detail(
+            self.team_1_in_private_teamset_1.team_id,
+            expected_response,
+            user=requesting_user
+        )
+        if expected_response == 200:
+            self.assertEqual(team['name'], self.team_1_in_private_teamset_1.name)
 
 
 @ddt.ddt
@@ -1166,6 +1310,52 @@ class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
             user_id=self.users['student_enrolled'].id
         )
         self.assertEqual(CourseTeamMembership.objects.filter(team=self.solar_team).count(), 0)
+
+    @ddt.unpack
+    @ddt.data(
+        ('student_enrolled', 403),
+        ('student_masters_not_on_team', 403),
+        ('student_masters', 403),
+        ('staff', 204)
+    )
+    def test_organization_protection_status(self, requesting_user, expected_status):
+        """
+        As different users, try to delete the masters-only team.
+        Only staff should be able to delete this team, and people outside the bubble shouldn't be able to
+        tell that it even exists.
+
+        TODO: This leaks info - if you try to request a team that doesn't exist you get a 404,
+        but you get a 403 if it exists and you can't delete it.
+        Change the behavior so that either the 403 takes precedence
+        ("You can't do any deletes, we didn't even check if it exists"), or only show the 403
+        if the user has_specific_access to the team
+        """
+        self.delete_team(
+            self.masters_only_team.team_id,
+            expected_status,
+            user=requesting_user
+        )
+
+    @ddt.unpack
+    @ddt.data(
+        ('student_enrolled', 403),
+        ('student_on_team_1_private_set_1', 403),
+        ('student_on_team_2_private_set_1', 403),
+        ('staff', 204)
+    )
+    def test_teamset_type(self, requesting_user, expected_status):
+        """
+        As different users, try to delete a private_managed team
+        Only staff should be able to delete a private_managed team, and only they and users enrolled in that
+        team should even be able to tell that it exists.
+
+        TODO: Same as `test_organization_protection_status`
+        """
+        self.delete_team(
+            self.team_1_in_private_teamset_1.team_id,
+            expected_status,
+            user=requesting_user
+        )
 
 
 @ddt.ddt
@@ -1242,6 +1432,58 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
 
     def test_does_not_exist(self):
         self.patch_team_detail('no_such_team', 404, user='staff')
+
+    @ddt.unpack
+    @ddt.data(
+        ('student_enrolled', 403),
+        ('student_masters_not_on_team', 403),
+        ('student_masters', 403),
+        ('staff', 200)
+    )
+    def test_organization_protection_status(self, requesting_user, expected_status):
+        """
+        As different users, try to modify the masters-only team.
+        Only staff should be able to modify this team, and people outside the bubble shouldn't be able to
+        tell that it even exists.
+
+        TODO: This leaks info - if you try to request a team that doesn't exist you get a 404,
+        but you get a 403 if it exists and you can't modify it.
+        Change the behavior so that either the 403 takes precedence
+        ("You can't do any modifications, we didn't even check if it exists"), or only show the 403
+        if the user has_specific_access to the team
+        """
+        team = self.patch_team_detail(
+            self.masters_only_team.team_id,
+            expected_status,
+            {'name': 'foo'},
+            user=requesting_user
+        )
+        if expected_status == 200:
+            self.assertEqual(team['name'], 'foo')
+
+    @ddt.unpack
+    @ddt.data(
+        ('student_enrolled', 403),
+        ('student_on_team_1_private_set_1', 403),
+        ('student_on_team_2_private_set_1', 403),
+        ('staff', 200)
+    )
+    def test_teamset_type(self, requesting_user, expected_status):
+        """
+        As different users, try to modify a private_managed team
+        Only staff should be able to modify a private_managed team, and only they and users enrolled in that
+        team should even be able to tell that it exists.
+
+        TODO: Same as `test_organization_protection_status`
+        """
+        team = self.patch_team_detail(
+            self.team_1_in_private_teamset_1.team_id,
+            expected_status,
+            {'name': 'foo'},
+            user=requesting_user
+        )
+        if expected_status == 200:
+            self.assertEqual(team['name'], 'foo')
 
 
 @ddt.ddt
@@ -1376,6 +1618,33 @@ class TestListTopicsAPI(TeamAPITestCase):
             else:
                 self.assertEqual(topic['team_count'], 0)
 
+    @ddt.unpack
+    @ddt.data(
+        ('student_enrolled', 2),
+        ('student_on_team_1_private_set_1', 2),
+        ('student_on_team_2_private_set_1', 2),
+        ('student_masters', 2),
+        ('staff', 2)
+    )
+    def test_teamset_type(self, requesting_user, expected_private_teamsets):
+        """
+        As different users, request course_1's list of topics, and see what private_managed teamsets are returned
+
+        Staff should be able to see both teamsets, and anyone enrolled in a private teamset should see that and
+        only that teamset
+
+        TODO: student_enrolled and student_masters should see no private teamsets.
+        sot1ps1 and sot2ps3 should only see their teamset
+        """
+        topics = self.get_topics_list(
+            data={'course_id': self.test_course_1.id},
+            user=requesting_user
+        )
+        private_teamsets_returned = [
+            topic['name'] for topic in topics['results'] if topic['type'] == 'private_managed'
+        ]
+        self.assertEqual(len(private_teamsets_returned), expected_private_teamsets)
+
 
 @ddt.ddt
 class TestDetailTopicAPI(TeamAPITestCase):
@@ -1417,6 +1686,34 @@ class TestDetailTopicAPI(TeamAPITestCase):
         self.assertEqual(topic['team_count'], 1)
         topic = self.get_topic_detail(topic_id='topic_3', course_id=self.test_course_1.id)
         self.assertEqual(topic['team_count'], 0)
+
+    @ddt.unpack
+    @ddt.data(
+        ('student_enrolled', 200, 0),
+        ('student_on_team_1_private_set_1', 200, 2),
+        ('student_on_team_2_private_set_1', 200, 2),
+        ('student_masters', 200, 2),
+        ('staff', 200, 2)
+    )
+    def test_teamset_type(self, requesting_user, expected_status, expected_team_count):
+        """
+        As different users, request info about a private_managed team.
+        Staff should be able to see all teamsets, and someone enrolled in a private_managed teamset
+        should be able to see that and only that teamset. As shown in `test_invalid_topic_id`,
+        nonexistant topics 404, and if someone doesn't have access to a private_managed teamset, as far as they know
+        the teamset does not exist.
+
+        TODO: only staff, sot1ps1, and sot2ps1 should get the topic. everyone else should 404.
+        """
+        topic = self.get_topic_detail(
+            topic_id='private_topic_1_id',
+            course_id=self.test_course_1.id,
+            expected_status=expected_status,
+            user=requesting_user
+        )
+        if expected_status == 200:
+            self.assertEqual(topic['name'], 'private_topic_1_name')
+            self.assertEqual(topic['team_count'], expected_team_count)
 
 
 @ddt.ddt
@@ -1461,6 +1758,91 @@ class TestListMembershipAPI(TeamAPITestCase):
                 self.assertEqual(membership['count'], 0)
 
     @ddt.data(
+        ('student_masters', True),
+        ('student_masters_not_on_team', True),
+        ('student_unenrolled', False),
+        ('student_enrolled', True),
+        ('student_enrolled_both_courses_other_team', True),
+        ('staff', True),
+    )
+    @ddt.unpack
+    def test_access_by_username_organization_protected(self, user, can_see_bubble_team):
+        """
+        As different users, request team membership info for student_masters
+        Only staff, and users who are within the bubble should be able to see a bubble user's team
+        memberships. Non-bubble users shouldn't be able to tell that student_masters exists.
+        (Nonexistant users still return 200, just with no data.)
+
+        TODO: Only the oragnization_protected users (student_masters, student_masters_not_on_team)
+        and staff should be able to see student_masters
+        """
+        membership = self.get_membership_list(200, {'username': 'student_masters'}, user=user)
+        if can_see_bubble_team:
+            self.assertEqual(membership['count'], 1)
+            self.assertEqual(membership['results'][0]['team']['team_id'], self.masters_only_team.team_id)
+        else:
+            self.assertEqual(membership['count'], 0)
+
+    @ddt.unpack
+    @ddt.data(
+        ('student_on_team_1_private_set_1', True, True),
+        ('student_unenrolled', False, False),
+        ('student_enrolled', True, True),
+        ('student_on_team_2_private_set_1', True, True),
+        ('student_masters', True, True),
+        ('staff', True, True)
+    )
+    def test_access_by_username_private_teamset(self, user, can_see_any_teams, can_see_private_team):
+        """
+        Add student_on_team_1_private_set_1 to masters_only_team.
+        Then, as different users, request team membership info for student_on_team_1_private_set_1.
+        Anyone in the organization_protected bubble should be able to see the masters_only membership,
+        but only staff and users in team_1_private_set_1 ahould be able to see that membership.
+
+        TODO: student_enrolled shouldn't see any teams as he is outside the bubble.
+        student_masters and sot2ps1 should only see masters_only team.
+        """
+        self.masters_only_team.add_user(self.users['student_on_team_1_private_set_1'])
+        memberships = self.get_membership_list(200, {'username': 'student_on_team_1_private_set_1'}, user=user)
+        team_ids = [membership['team']['team_id'] for membership in memberships['results']]
+        if can_see_private_team:
+            self.assertEqual(len(team_ids), 2)
+            self.assertIn(self.team_1_in_private_teamset_1.team_id, team_ids)
+            self.assertIn(self.masters_only_team.team_id, team_ids)
+        elif can_see_any_teams:
+            self.assertEqual(len(team_ids), 1)
+            self.assertIn(self.masters_only_team.team_id, team_ids)
+        else:
+            self.assertEqual(len(team_ids), 0)
+
+    @ddt.unpack
+    @ddt.data(
+        ('student_on_team_1_private_set_1', 200),
+        ('student_unenrolled', 404),
+        ('student_enrolled', 403),
+        ('student_on_team_2_private_set_1', 403),
+        ('student_masters', 403),
+        ('staff', 200)
+    )
+    def test_access_by_team_private_teamset(self, user, expected_response):
+        """
+        As different users, request membership info for team_1_in_private_teamset_1.
+        Only staff or users enrolled in a private_managed team should be able to tell that the team exists.
+        (a bad team_id returns a 404 currently)
+
+        TODO: No data is returned that shouldn't be, but the 403 that the users get tells them that a team
+        with the given id does in fact exist. This should be changed to be a 404.
+        """
+        memberships = self.get_membership_list(
+            expected_response,
+            {'team_id': self.team_1_in_private_teamset_1.team_id},
+            user=user
+        )
+        if expected_response == 200:
+            users = [membership['user']['username'] for membership in memberships['results']]
+            self.assertEqual(users, ['student_on_team_1_private_set_1'])
+
+    @ddt.data(
         ('student_enrolled_both_courses_other_team', 'TestX/TS101/Test_Course', 200, 'Nuclear Team'),
         ('student_enrolled_both_courses_other_team', 'MIT/6.002x/Circuits', 200, 'Another Team'),
         ('student_enrolled', 'TestX/TS101/Test_Course', 200, u'Sólar team'),
@@ -1490,6 +1872,10 @@ class TestListMembershipAPI(TeamAPITestCase):
         if status == 200:
             self.assertEqual(membership['count'], 1)
             self.assertEqual(membership['results'][0]['team']['team_id'], self.solar_team.team_id)
+
+    def test_nonexistent_user(self):
+        response = self.get_membership_list(200, {'username': 'this-user-will-not-exist-&&&&#!^'})
+        self.assertEqual(response['count'], 0)
 
     def test_bad_course_id(self):
         self.get_membership_list(404, {'course_id': 'no_such_course'})
@@ -1571,11 +1957,32 @@ class TestListMembershipAPI(TeamAPITestCase):
         self.get_membership_list(
             404,
             {
-                'teamset_id': 'private-topic-1-id',
+                'teamset_id': 'private_topic_1_id',
                 'course_id': str(self.test_course_1.id),
                 'username': 'student_on_team_1_private_set_1'
             }
         )
+
+    @ddt.unpack
+    @ddt.data(
+        ('student_enrolled', 404, None),
+        ('student_on_team_1_private_set_1', 200, {'student_on_team_1_private_set_1'}),
+        ('student_on_team_2_private_set_1', 200, {'student_on_team_2_private_set_1'}),
+        ('student_masters', 404, None),
+        ('staff', 200, {'student_on_team_1_private_set_1', 'student_on_team_2_private_set_1'})
+    )
+    def test_access_filter_teamset(self, user, expected_response, expected_users):
+        memberships = self.get_membership_list(
+            expected_response,
+            {
+                'teamset_id': 'private_topic_1_id',
+                'course_id': str(self.test_course_1.id),
+            },
+            user=user
+        )
+        if expected_response == 200:
+            returned_users = {membership['user']['username'] for membership in memberships['results']}
+            self.assertEqual(returned_users, expected_users)
 
 
 @ddt.ddt
@@ -1628,10 +2035,12 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
         response = self.post_create_membership(400, {'username': self.users['student_enrolled_not_on_team'].username})
         self.assertIn('team_id', json.loads(response.content.decode('utf-8'))['field_errors'])
 
-    def test_bad_team(self):
+    @ddt.data('staff', 'student_enrolled')
+    def test_bad_team(self, user):
         self.post_create_membership(
             404,
-            self.build_membership_data_raw(self.users['student_enrolled'].username, 'no_such_team')
+            self.build_membership_data_raw(self.users['student_enrolled'].username, 'no_such_team'),
+            user=user
         )
 
     def test_bad_username(self):
@@ -1654,6 +2063,60 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
         self.post_create_membership(
             403,
             self.build_membership_data_raw(self.users['student_enrolled_not_on_team'].username, self.solar_team.team_id)
+        )
+
+    @ddt.data(
+        ('student_masters', 400, 'is already a member'),
+        ('student_masters_not_on_team', 200, None),
+        ('student_unenrolled', 404, None),
+        ('student_enrolled', 403, None),
+        ('student_enrolled_both_courses_other_team', 403, None),
+        ('staff', 200, None),
+    )
+    @ddt.unpack
+    def test_join_organization_protected_team(self, user, expected_status, expected_message):
+        """
+        As different users, attempt to join masters_only team.
+        Only staff or users within the organization_protected bubble should be able to join the team.
+        Anyone else should not be able to join or even tell that the team exists.
+
+        TODO: student_enrolled and student_enrolled_both_courses_other_team are correctly not being allowed
+        to join the team, but they are getting a 403 rather than a 404, telling them that a team with the
+        given name does exist. They should recieve 404s.
+        """
+        response = self.post_create_membership(
+            expected_status,
+            self.build_membership_data_raw(self.users[user].username, self.masters_only_team.team_id),
+            user=user
+        )
+        if expected_message:
+            self.assertIn(expected_message, json.loads(response.content.decode('utf-8'))['developer_message'])
+
+    @ddt.unpack
+    @ddt.data(
+        ('student_on_team_1_private_set_1', 403),
+        ('student_unenrolled', 404),
+        ('student_enrolled', 403),
+        ('student_on_team_2_private_set_1', 403),
+        ('student_masters', 403),
+        ('staff', 200)
+    )
+    def test_student_join_private_managed_team(self, user, expected_status):
+        """
+        As different users, attempt to join private_managed team.
+        Only staff should be able to add users to any managed teams.
+        Anyone else should not be able to join, and only student_on_team_1_private_set_1 should
+        be able to tell that the team exists at all.
+        (A nonexistant team results in a 404)
+
+        TODO: student_on_team_1_private_set_1 is okay to get a 403,
+        but everyone else getting a 403 should instead be getting a 404. They should not be able
+        to tell that the team exists at all.
+        """
+        self.post_create_membership(
+            expected_status,
+            self.build_membership_data_raw(self.users[user].username, self.team_1_in_private_teamset_1.team_id),
+            user=user
         )
 
     @ddt.data('student_enrolled', 'staff', 'course_staff')
@@ -1759,6 +2222,72 @@ class TestDetailMembershipAPI(TeamAPITestCase):
         )
         self.verify_expanded_team(result['team'])
 
+    @ddt.data(
+        ('student_masters', 200),
+        ('student_masters_not_on_team', 200),
+        ('student_unenrolled', 404),
+        ('student_enrolled', 403),
+        ('student_enrolled_both_courses_other_team', 403),
+        ('staff', 200),
+    )
+    @ddt.unpack
+    def test_organization_protected(self, user, expected_status):
+        """
+        Users should not be able to see memberships for users in a different bubble than them
+
+        TODO: No information is leaked, but the 403 gives away that the membership does exist.
+        All 403s should be 404s.
+        """
+        self.get_membership_detail(
+            self.masters_only_team.team_id,
+            self.users['student_masters'].username,
+            expected_status,
+            user=user
+        )
+
+    @ddt.unpack
+    @ddt.data(
+        ('student_on_team_1_private_set_1', 200),
+        ('student_unenrolled', 404),
+        ('student_enrolled', 403),
+        ('student_on_team_2_private_set_1', 403),
+        ('staff', 200)
+    )
+    def test_private_managed_team(self, user, expected_status):
+        """
+        Users should not be able to see memberships for users in private_managed
+        teams that they are not a member of
+
+        TODO: same as `test_organization_protected`
+        """
+        self.get_membership_detail(
+            self.team_1_in_private_teamset_1.team_id,
+            self.users['student_on_team_1_private_set_1'].username,
+            expected_status,
+            user=user
+        )
+
+    def test_join_private_managed_teamset(self):
+        """
+        A user who is not on a private team requests membership info about that team.
+        They are added to the team and then try again.
+
+        TODO: The first call should be a 404, the user should not be able to tell that the membership exists.
+        """
+        self.get_membership_detail(
+            self.team_1_in_private_teamset_1.team_id,
+            self.users['student_on_team_1_private_set_1'].username,
+            403,
+            user='student_masters'
+        )
+        self.team_1_in_private_teamset_1.add_user(self.users['student_masters'])
+        self.get_membership_detail(
+            self.team_1_in_private_teamset_1.team_id,
+            self.users['student_on_team_1_private_set_1'].username,
+            200,
+            user='student_masters'
+        )
+
 
 @ddt.ddt
 class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
@@ -1824,6 +2353,62 @@ class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
     def test_student_leave_instructor_managed_team(self, *args):  # pylint: disable=unused-argument
         self.delete_membership(
             self.solar_team.team_id, self.users['student_enrolled'].username, 403, user='student_enrolled')
+
+    @ddt.unpack
+    @ddt.data(
+        ('student_enrolled', 'student_masters', 404),
+        ('student_enrolled', 'student_enrolled', 403),
+        ('student_masters_not_on_team', 'student_masters', 404),
+        ('student_masters_not_on_team', 'student_masters_not_on_team', 404),
+        ('student_masters', 'student_masters', 204),
+        ('staff', 'student_masters', 204),
+        ('staff', 'staff', 404),
+    )
+    def test_organization_protection_status(self, user, user_to_remove, expected_status):
+        """
+        As different users, attempt to remove themselves or studet_masters from masters_only team.
+        (only student_masters is actually on this team)
+        Only staff and the student_masters should be able to remove, and users outside of the
+        organization_protected bubble should not be able to tell that the team exists in
+        any way.
+
+        TODO: student_enrolled should not be able to tell that masters_only team exists, he should
+        get a 404 on both calls
+        """
+        self.delete_membership(
+            self.masters_only_team.team_id,
+            self.users[user_to_remove].username,
+            expected_status,
+            user=user
+        )
+
+    @ddt.unpack
+    @ddt.data(
+        ('student_enrolled', 'student_on_team_1_private_set_1', 404),
+        ('student_enrolled', 'student_enrolled', 403),
+        ('student_on_team_1_private_set_1', 'student_on_team_1_private_set_1', 403),
+        ('student_on_team_2_private_set_1', 'student_on_team_1_private_set_1', 404),
+        ('student_on_team_2_private_set_1', 'student_on_team_2_private_set_1', 403),
+        ('staff', 'student_on_team_1_private_set_1', 204),
+        ('staff', 'staff', 404),
+    )
+    def test_remove_user_from_private_teamset(self, user, user_to_remove, expected_status):
+        """
+        As different users, attempt to remove themselves or student_on_team_1_private_set_1 from a
+        private_managed team.
+        (only student_on_team_1_private_set_1 is actually on this team)
+        Only staff should be able to remove, and all users other than student_on_team_1_private_set_1
+        should not be able to tell that the team exists in any way.
+
+        TODO: The only 403 that should remain is student_on_team_1_private_set_1. The other users should not be
+        able to tell that the team exists.
+        """
+        self.delete_membership(
+            self.team_1_in_private_teamset_1.team_id,
+            self.users[user_to_remove].username,
+            expected_status,
+            user=user
+        )
 
 
 class TestElasticSearchErrors(TeamAPITestCase):
