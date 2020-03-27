@@ -28,7 +28,7 @@ class ThemeFilesystemLoader(FilesystemLoader):
     _accepts_engine_in_init = True
 
     def __init__(self, engine, dirs=None):
-        self.super().__init__(engine, dirs)
+        super().__init__(engine, dirs)
         theme_dirs = self.get_theme_template_sources()
         engine_dirs = self.engine.dirs
         if isinstance(theme_dirs, list):
