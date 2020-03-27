@@ -260,7 +260,11 @@ class VideoBlock(
         if getattr(self.runtime, 'suppports_state_for_anonymous_users', False):
             # The new runtime can support anonymous users as fully as regular users:
             return self.student_view(context)
-        return Fragment(self.get_html(view=PUBLIC_VIEW))
+
+        fragment = Fragment(self.get_html(view=PUBLIC_VIEW))
+        add_webpack_to_fragment(fragment, 'VideoBlockPreview')
+        shim_xmodule_js(fragment, 'Video')
+        return fragment
 
     def get_html(self, view=STUDENT_VIEW):
 
