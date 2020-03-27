@@ -5,7 +5,6 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
 
-from lms.djangoapps.program_enrollments.constants import AllowedProgramCourseEnrollmentRoles
 from lms.djangoapps.program_enrollments.models import (
     PendingCourseAccessRoleAssignment,
     ProgramCourseEnrollment,

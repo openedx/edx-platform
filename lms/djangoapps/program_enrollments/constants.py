@@ -117,6 +117,9 @@ class ProgramCourseOperationStatuses(
 
 
 class AllowedProgramCourseEnrollmentRoles(object):
+    """
+    Valid roles that can be assigned as part of a ProgramCourseEnrollment
+    """
     COURSE_STAFF = CourseStaffRole.ROLE
     __ALL__ = (COURSE_STAFF,)
 
