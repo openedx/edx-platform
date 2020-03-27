@@ -101,7 +101,8 @@ class XBlockRuntime(RuntimeShim, Runtime):
         Get the URL to a specific handler.
         """
         if thirdparty:
-            raise NotImplementedError("thirdparty handlers are not supported by this runtime.")
+            log.warning("thirdparty handlers are not supported by this runtime for XBlock %s.", type(block))
+
         url = self.system.handler_url(usage_key=block.scope_ids.usage_id, handler_name=handler_name, user=self.user)
         if suffix:
             if not url.endswith('/'):
