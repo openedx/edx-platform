@@ -34,7 +34,8 @@
             />
             <button
                 id="upload-team-csv"
-                class="btn action action-primary"
+                class="btn action action-primary is-disabled"
+                aria-disabled="true"
             >
                 <%- gettext("Upload Memberships") %>
             </button>

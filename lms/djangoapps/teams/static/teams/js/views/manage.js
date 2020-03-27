@@ -42,6 +42,13 @@
 
             setTeamMembershipCsv: function(event) {
                 this.membershipFile = event.target.files[0];
+
+                // enable the upload button when a file is selected
+                if (this.membershipFile) {
+                    $('#upload-team-csv').removeClass('is-disabled').attr('aria-disabled', false);
+                } else {
+                    $('#upload-team-csv').addClass('is-disabled').attr('aria-disabled', true);
+                }
             },
 
             uploadCsv: function() {
