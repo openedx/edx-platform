@@ -346,16 +346,24 @@ class CourseOverview(TimeStampedModel):
         """
         try:
             course_overview = cls.objects.select_related('image_set').get(id=course_id)
+            string_course_id = six.text_type(course_id)
+            if course_overview and 'BerkeleyX/LUCS' in string_course_id:
+                log.info("course overview object received for course id: {id}".format(id=course_id))
             if course_overview.version < cls.VERSION:
                 # Reload the overview from the modulestore to update the version
+                if 'BerkeleyX/LUCS' in string_course_id:
+                    log.info("Getting latest version for the course id: {id}".format(id=course_id))
                 course_overview = cls.load_from_module_store(course_id)
         except cls.DoesNotExist:
+            log.info("Unable to find the course overview object course id: {id}".format(id=course_id))
             course_overview = None
 
         # Regenerate the thumbnail images if they're missing (either because
         # they were never generated, or because they were flushed out after
         # a change to CourseOverviewImageConfig.
         if course_overview and not hasattr(course_overview, 'image_set'):
+            if 'BerkeleyX/LUCS' in string_course_id:
+                log.info("Creating course overview image course id: {id}".format(id=course_id))
             CourseOverviewImageSet.create(course_overview)
 
         return course_overview or cls.load_from_module_store(course_id)
