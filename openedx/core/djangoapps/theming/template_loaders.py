@@ -32,7 +32,7 @@ class ThemeFilesystemLoader(FilesystemLoader):
         theme_dirs = self.get_theme_template_sources()
         engine_dirs = self.engine.dirs
         if isinstance(theme_dirs, list):
-            self.dirs = theme_dirs + template_dirs + engine_dirs
+            self.dirs += theme_dirs + engine_dirs
 
     @staticmethod
     def get_theme_template_sources():
