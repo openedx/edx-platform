@@ -48,6 +48,8 @@ from student.models import (
 )
 from util.password_policy_validators import normalize_password
 
+# PhilU imports
+from openedx.features.student_account.helpers import set_opt_in_and_affiliate_user_organization
 
 # Enumeration of per-course verification statuses
 # we display on the student dashboard.
@@ -615,7 +617,9 @@ def do_create_account(form, custom_form=None):
     user = User(
         username=proposed_username,
         email=form.cleaned_data["email"],
-        is_active=False
+        is_active=False,
+        first_name=form.cleaned_data.get("first_name"),
+        last_name=form.cleaned_data.get("last_name")
     )
     password = normalize_password(form.cleaned_data["password"])
     user.set_password(password)
@@ -667,5 +671,7 @@ def do_create_account(form, custom_form=None):
     except Exception:
         log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
         raise
+
+    set_opt_in_and_affiliate_user_organization(user, form)
 
     return user, profile, registration

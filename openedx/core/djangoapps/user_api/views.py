@@ -37,6 +37,9 @@ from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from student.helpers import AccountValidationError
 from util.json_request import JsonResponse
 
+# PhilU imports
+from openedx.features.student_account.helpers import check_and_add_third_party_params, save_user_utm_info
+
 
 class LoginSessionView(APIView):
     """HTTP end-points for logging in users. """
@@ -151,6 +154,9 @@ class RegistrationView(APIView):
             data["terms_of_service"] = data["honor_code"]
 
         try:
+            # PhilU hook for adding third party params
+            check_and_add_third_party_params(request, data)
+
             user = create_account_with_params(request, data)
         except AccountValidationError as err:
             errors = {
@@ -171,6 +177,7 @@ class RegistrationView(APIView):
 
         response = JsonResponse({"success": True})
         set_logged_in_cookies(request, response, user)
+        save_user_utm_info(request, user)
         return response
 
     @method_decorator(transaction.non_atomic_requests)

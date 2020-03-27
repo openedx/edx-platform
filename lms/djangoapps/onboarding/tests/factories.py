@@ -1,6 +1,6 @@
 import factory
 
-from common.djangoapps.student.tests.factories import UserFactory as ParentUserFactory
+from student.tests.factories import UserFactory as ParentUserFactory
 from factory.django import DjangoModelFactory
 
 from ..models import UserExtendedProfile, Organization, EmailPreference

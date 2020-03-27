@@ -640,7 +640,11 @@ CONTEXT_PROCESSORS = [
     'lms.djangoapps.philu_overrides.context_processor.get_cdn_link',
 
     # Mobile App processor (Detects if request is from the mobile app)
-    'mobile_api.context_processor.is_from_mobile_app'
+    'mobile_api.context_processor.is_from_mobile_app',
+
+    # Generic third party auth urls on all public pages
+    'lms.djangoapps.philu_overrides.philu_third_party_auth.context_processor.get_third_party_auth_urls'
+
 ]
 
 # Django templating
@@ -1343,7 +1347,6 @@ MIDDLEWARE_CLASSES = [
     'course_wiki.middleware.WikiAccessMiddleware',
 
     'openedx.core.djangoapps.theming.middleware.CurrentSiteThemeMiddleware',
-    'lms.djangoapps.onboarding.middleware.RedirectMiddleware',
 
     'waffle.middleware.WaffleMiddleware',
 
@@ -2340,9 +2343,6 @@ INSTALLED_APPS = [
     # edx-drf-extensions
     'csrf.apps.CsrfAppConfig',  # Enables frontend apps to retrieve CSRF tokens.
 
-    # Split Registration
-    'openedx.features.split_registration',
-
     'lms.djangoapps.onboarding',
 
     # OEF survey
@@ -3292,8 +3292,7 @@ FINANCIAL_ASSISTANCE_MAX_LENGTH = 2500
 # need to add the model's app to the ADDL_INSTALLED_APPS array in your
 # lms.env.json file.
 
-REGISTRATION_EXTENSION_FORM = 'onboarding.forms.RegModelForm'
-REGISTRATION_EXTENSION_FORM_V2 = 'openedx.features.split_registration.forms.RegModelForm'
+REGISTRATION_EXTENSION_FORM = None
 
 # Identifier included in the User Agent from open edX mobile apps.
 MOBILE_APP_USER_AGENT_REGEXES = [
