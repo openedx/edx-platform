@@ -53,7 +53,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):
     def create_prefs(self):
         """Create all test preferences in the database"""
         for (user, token) in self.tokens.items():
-            UserPreference.objects.create(user=user, key=NOTIFICATION_PREF_KEY, value=token)
+            UserPreference.objects.get_or_create(user=user, key=NOTIFICATION_PREF_KEY, value=token)
 
     def assertPrefValid(self, user):
         """Ensure that the correct preference for the user is persisted"""
