@@ -89,7 +89,7 @@ def my_badges(request, course_id):
         discussion_id = 0
 
     # Here we are dealing with just one course so we can wrap this course details in '[]'
-    # because our API on NOdeBB side only accepts params in this format.
+    # because our API on NodeBB side only accepts params in this format.
     courses = [get_discussion_team_ids(course_id, int(discussion_id), badges)]
 
     status_code, response = NodeBBClient().badges.get_progress(
