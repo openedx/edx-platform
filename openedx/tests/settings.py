@@ -122,3 +122,9 @@ RETIREMENT_SERVICE_WORKER_USERNAME = 'RETIREMENT_SERVICE_USER'
 RETIRED_USERNAME_PREFIX = 'retired__user_'
 
 PROCTORING_SETTINGS = {}
+
+# Software Secure request retry settings
+# Time in seconds before a retry of the task should be 60 mints.
+SOFTWARE_SECURE_REQUEST_RETRY_DELAY = 60 * 60
+# Maximum of 6 retries before giving up.
+SOFTWARE_SECURE_RETRY_MAX_ATTEMPTS = 6
