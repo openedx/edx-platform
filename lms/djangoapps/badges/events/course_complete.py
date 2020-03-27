@@ -7,6 +7,7 @@ import hashlib
 import logging
 
 import six
+
 from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
@@ -63,6 +64,7 @@ def evidence_url(user_id, course_key):
     event.
     """
     course_id = six.text_type(course_key)
+
     return site_prefix() + reverse(
         'certificates:html_view', kwargs={'user_id': user_id, 'course_id': course_id}) + '?evidence_visit=1'
 
