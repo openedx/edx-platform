@@ -263,13 +263,10 @@ def add_badge_progress(course_badges, posts_count):
     :param course_badges: Badges data either conversationalist badges or team badges
     :param posts_count: Count of post in Int format
     """
-    previous_threshold = None
+    previous_threshold = 0
     for index, badge in enumerate(course_badges):
-        if not previous_threshold:
-            previous_threshold = badge[THRESHOLD_LABEL_KEY]
-        if index > 0:
-            badge[THRESHOLD_LABEL_KEY] = badge[THRESHOLD_LABEL_KEY] - previous_threshold
-            previous_threshold = badge[THRESHOLD_LABEL_KEY] + previous_threshold
+        badge[THRESHOLD_LABEL_KEY] = badge[THRESHOLD_LABEL_KEY] - previous_threshold
+        previous_threshold = badge[THRESHOLD_LABEL_KEY] + previous_threshold
         if BADGES_DATE_EARNED_KEY in badge:
             badge[BADGES_PROGRESS_KEY] = 100
             posts_count = posts_count - badge[THRESHOLD_LABEL_KEY]
