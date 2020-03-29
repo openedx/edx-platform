@@ -2097,7 +2097,6 @@
     "Yes, delete this {xblock_type}": "Si, eliminar este {xblock_type}",
     "Yes, replace the edX transcript with the YouTube transcript": "Si, reemplazar la transcripci\u00f3n de edX con la de YouTube",
     "Yesterday": "Ayer",
-    "You already belong to another team.": "Tu ya perteneces a otro equipo.",
     "You already have an edX account with your {enterprise_name} email address.": "Ya tiene una cuenta edX con su direcci\u00f3n de correo electr\u00f3nico de {enterprise_name}",
     "You are a member of this team.": "Usted ya es miembro de este equipo.",
     "You are currently sharing a limited profile.": "Actualmente est\u00e1 compartiendo un perfil limitado.",

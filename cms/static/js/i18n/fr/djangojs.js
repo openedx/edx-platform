@@ -1788,7 +1788,6 @@
     "Yes, allow edits to the active Certificate": "Oui, permettre les modifications du certificat actif",
     "Yes, replace the edX transcript with the YouTube transcript": "Oui, remplacer la transcription EdX par celle de YouTube",
     "Yesterday": "Hier",
-    "You already belong to another team.": "Vous appartenez d\u00e9j\u00e0 \u00e0 une autre \u00e9quipe.",
     "You are a member of this team.": "Vous \u00eatre membre de cette \u00e9quipe.",
     "You are currently sharing a limited profile.": "Vous partagez actuellement votre profil restreint.",
     "You are enrolling in: {courseName}": "Vous vous inscrivez \u00e0 : {courseName}",
