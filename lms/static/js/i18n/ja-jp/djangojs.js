@@ -1400,7 +1400,6 @@
     "Yes, allow edits to the active Certificate": "\u306f\u3044\u3001\u30a2\u30af\u30c6\u30a3\u30d6\u306a\u4fee\u4e86\u8a3c\u3092\u7de8\u96c6\u3057\u307e\u3059",
     "Yes, replace the edX transcript with the YouTube transcript": "\u306f\u3044\u3001edX\u5b57\u5e55\u3092YouTube\u5b57\u5e55\u3067\u7f6e\u304d\u63db\u3048\u3066\u304f\u3060\u3055\u3044",
     "Yesterday": "\u6628\u65e5",
-    "You already belong to another team.": "\u3059\u3067\u306b\u4ed6\u306e\u30c1\u30fc\u30e0\u306b\u53c2\u52a0\u3057\u3066\u3044\u307e\u3059\u3002",
     "You are a member of this team.": "\u3042\u306a\u305f\u306f\u3053\u306e\u30c1\u30fc\u30e0\u306e\u30e1\u30f3\u30d0\u30fc\u3067\u3059\u3002",
     "You are currently sharing a limited profile.": "\u73fe\u5728\u306f\u9650\u5b9a\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb\u3092\u516c\u958b\u3057\u3066\u3044\u307e\u3059\u3002",
     "You are enrolling in: {courseName}": "\u53d7\u8b1b\u767b\u9332\u4e2d: {courseName}",

@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-03-22 20:52+0000\n"
-"PO-Revision-Date: 2020-03-22 20:52:41.579423\n"
+"POT-Creation-Date: 2020-03-29 20:52+0000\n"
+"PO-Revision-Date: 2020-03-29 20:52:59.889386\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -9046,6 +9046,14 @@ msgstr "مهرن حقخلقشو ثرقخمموثرفس"
 msgid "Link LMS users to program enrollments"
 msgstr "مهرن موس عسثقس فخ حقخلقشو ثرقخمموثرفس"
 
+#: lms/djangoapps/support/views/index.py
+msgid "Program Enrollments Inspector Tool"
+msgstr "حقخلقشو ثرقخمموثرفس هرسحثذفخق فخخم"
+
+#: lms/djangoapps/support/views/index.py
+msgid "Find information related to a learner's program enrollments"
+msgstr "بهري هربخقوشفهخر قثمشفثي فخ ش مثشقرثق'س حقخلقشو ثرقخمموثرفس"
+
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
 msgstr "عسثق_سعححخقف_عقم"
@@ -12247,6 +12255,43 @@ msgstr "عرسعزسذقهزث بقخو ذشمثريشق عحيشفثس"
 #: openedx/features/calendar_sync/plugins.py
 msgid "Subscribe to calendar updates"
 msgstr "سعزسذقهزث فخ ذشمثريشق عحيشفثس"
+
+#: openedx/features/calendar_sync/views/management.py
+#, python-brace-format
+msgid "Updates for Your {course} Schedule"
+msgstr "عحيشفثس بخق غخعق {course} سذاثيعمث"
+
+#: openedx/features/calendar_sync/views/management.py
+msgid "Update Your Calendar"
+msgstr "عحيشفث غخعق ذشمثريشق"
+
+#: openedx/features/calendar_sync/views/management.py
+#, python-brace-format
+msgid ""
+"Your assignment due dates for {course} were recently adjusted. Update your "
+"calendarwith your new schedule to ensure that you stay on track!"
+msgstr ""
+"غخعق شسسهلروثرف يعث يشفثس بخق {course} صثقث قثذثرفمغ شيتعسفثي. عحيشفث غخعق "
+"ذشمثريشقصهفا غخعق رثص سذاثيعمث فخ ثرسعقث فاشف غخع سفشغ خر فقشذن!"
+
+#: openedx/features/calendar_sync/views/management.py
+msgid "Stay on Track"
+msgstr "سفشغ خر فقشذن"
+
+#: openedx/features/calendar_sync/views/management.py
+msgid "Mark Your Calendar"
+msgstr "وشقن غخعق ذشمثريشق"
+
+#: openedx/features/calendar_sync/views/management.py
+#, python-brace-format
+msgid ""
+"Sticking to a schedule is the best way to ensure that you successfully "
+"complete your self-paced course. This schedule of assignment due dates for "
+"{course} will help you stay on track!"
+msgstr ""
+"سفهذنهرل فخ ش سذاثيعمث هس فاث زثسف صشغ فخ ثرسعقث فاشف غخع سعذذثسسبعممغ "
+"ذخوحمثفث غخعق سثمب-حشذثي ذخعقسث. فاهس سذاثيعمث خب شسسهلروثرف يعث يشفثس بخق "
+"{course} صهمم اثمح غخع سفشغ خر فقشذن!"
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
