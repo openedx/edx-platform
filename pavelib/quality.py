@@ -877,13 +877,14 @@ def check_keywords():
                 "python manage.py {} check_reserved_keywords "
                 "--override_file {}/db_keyword_overrides.yml "
                 "--report_path {} "
-                "--report_file {} "
-                "--verbosity 2 ".format(
+                "--report_file {}".format(
                     env_settings_file, env, Env.REPO_ROOT, report_path, report_file
                 )
             )
         except BuildFailure:
             overall_status = False
+
+
 
     if not overall_status:
         fail_quality(

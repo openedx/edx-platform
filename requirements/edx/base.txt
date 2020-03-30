@@ -98,7 +98,7 @@ edx-bulk-grades==0.6.8    # via -r requirements/edx/base.in, staff-graded-xblock
 edx-ccx-keys==1.0.1       # via -r requirements/edx/base.in
 edx-celeryutils==0.4.0    # via -r requirements/edx/base.in, super-csv
 edx-completion==3.1.1     # via -r requirements/edx/base.in
-git+https://github.com/edx/edx-django-release-util.git@a5094565aed35ffc0a9418a9ec92f52c78e92c7e#egg=edx-django-release-util
+git+https://github.com/edx/edx-django-release-util.git@a5094565aed35ffc0a9418a9ec92f52c78e92c7e#egg=edx-django-release-util==0.4.2
 
 
 edx-django-sites-extensions==2.4.3  # via -r requirements/edx/base.in
