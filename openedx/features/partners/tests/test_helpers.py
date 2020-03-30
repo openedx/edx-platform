@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 
 from django.contrib.auth.models import Permission
-from django.http import Http404
 from mock import patch
 from organizations.tests.factories import UserFactory
 
@@ -21,7 +20,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 class PartnerHelpersTest(ModuleStoreTestCase):
     """ Test cases for openedx partner feature helpers """
 
-    PARTNER_SLUG = 'give2asia'
+    PARTNER_SLUG = 'ignite'
     PARTNER_PERMISSION = 'can_access_{slug}_performance'.format(slug=PARTNER_SLUG)
     ORGANIZATION = 'arbisoft'
     ATTRIBUTE_NAME = 'description'
@@ -33,22 +32,21 @@ class PartnerHelpersTest(ModuleStoreTestCase):
         self.partner_user = PartnerUserFactory(user=self.user, partner=self.partner)
         self.course = CourseFactory.create()
 
-    def test_import_module_using_slug_with_valid_slug(self):
+    def test_import_form_using_slug_with_valid_slug(self):
         """
-        Test if view is available for a valid slug
+        Test if form is available for a valid slug
         :return : partner view
         """
-        views = helpers.import_module_using_slug(self.PARTNER_SLUG)
-        self.assertIsNotNone(views)
+        form = helpers.import_form_using_slug(self.PARTNER_SLUG)
+        self.assertIsNotNone(form)
 
-    def test_import_module_using_slug_with_invalid_slug(self):
+    def test_import_form_using_slug_with_invalid_slug(self):
         """
-        Test 404 is returned for an invalid partner slug
+        Test None is returned for an invalid partner slug
         :return : None
         """
-        with self.assertRaises(Http404) as error:
-            helpers.import_module_using_slug('invalid')
-        self.assertEqual(error.exception.message, 'Your partner is not properly registered')
+        form = helpers.import_form_using_slug('invalid')
+        self.assertIsNone(form)
 
     def test_get_course_description_with_invalid_course(self):
         """
