@@ -55,6 +55,9 @@ from staticbook import views as staticbook_views
 from student import views as student_views
 from util import views as util_views
 
+RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
+RENDER_XBLOCK_NAME = 'render_xblock'
+
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     django_autodiscover()
     admin.site.site_header = _('LMS Administration')
@@ -237,6 +240,7 @@ COURSE_URLS = [
         name='registration_code_details',
     ),
 ]
+
 urlpatterns += [
     # jump_to URLs for direct access to a location in the course
     url(
@@ -291,7 +295,7 @@ urlpatterns += [
     url(
         r'^xblock/{usage_key_string}$'.format(usage_key_string=settings.USAGE_KEY_PATTERN),
         courseware_views.render_xblock,
-        name='render_xblock',
+        name=RENDER_XBLOCK_NAME,
     ),
 
     # xblock Resource URL
@@ -315,6 +319,12 @@ urlpatterns += [
 
     # TODO: These views need to be updated before they work
     url(r'^calculate$', util_views.calculate),
+
+    url(
+        r'^reset_deadlines$',
+        util_views.reset_course_deadlines,
+        name=RESET_COURSE_DEADLINES_NAME,
+    ),
 
     url(r'^courses/?$', branding_views.courses, name='courses'),
 

@@ -51,7 +51,9 @@ from openedx.features.course_experience import (
     default_course_url_name,
     RELATIVE_DATES_FLAG,
 )
+from openedx.features.course_experience.urls import COURSE_HOME_VIEW_NAME
 from openedx.features.course_experience.utils import get_course_outline_block_tree
+from openedx.features.course_experience.utils import reset_deadlines_banner_should_display
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from shoppingcart.models import CourseRegistrationCode
@@ -450,6 +452,8 @@ class CoursewareIndex(View):
         Returns and creates the rendering context for the courseware.
         Also returns the table of contents for the courseware.
         """
+        from lms.urls import RESET_COURSE_DEADLINES_NAME
+
         course_url_name = default_course_url_name(self.course.id)
         course_url = reverse(course_url_name, kwargs={'course_id': six.text_type(self.course.id)})
         show_search = (
@@ -458,31 +462,14 @@ class CoursewareIndex(View):
         )
         staff_access = self.is_staff
 
-        reset_deadlines_url = reverse(
-            'openedx.course_experience.reset_course_deadlines', kwargs={'course_id': six.text_type(self.course.id)}
-        )
-
         allow_anonymous = allow_public_access(self.course, [COURSE_VISIBILITY_PUBLIC])
         display_reset_dates_banner = False
-        if not allow_anonymous and RELATIVE_DATES_FLAG.is_enabled(self.course.id):  # pylint: disable=too-many-nested-blocks
-            course_overview = CourseOverview.objects.get(id=str(self.course_key))
-            end_date = getattr(course_overview, 'end_date')
-            if course_overview.self_paced and (not end_date or timezone.now() < end_date):
-                if (CourseEnrollment.objects.filter(
-                    course=course_overview, user=request.user, mode=CourseMode.VERIFIED
-                ).exists()):
-                    course_block_tree = get_course_outline_block_tree(
-                        request, str(self.course_key), request.user
-                    )
-                    course_sections = course_block_tree.get('children', [])
-                    for section in course_sections:
-                        if display_reset_dates_banner:
-                            break
-                        for subsection in section.get('children', []):
-                            if (not subsection.get('complete', True)
-                                    and subsection.get('due', timezone.now() + timedelta(1)) < timezone.now()):
-                                display_reset_dates_banner = True
-                                break
+        if not allow_anonymous and RELATIVE_DATES_FLAG.is_enabled(self.course.id):
+            display_reset_dates_banner = reset_deadlines_banner_should_display(self.course_key, request)
+
+        reset_deadlines_url = reverse(RESET_COURSE_DEADLINES_NAME) if display_reset_dates_banner else None
+
+        reset_deadlines_redirect_url_base = COURSE_HOME_VIEW_NAME if reset_deadlines_url else None
 
         courseware_context = {
             'csrf': csrf(self.request)['csrf_token'],
@@ -506,8 +493,10 @@ class CoursewareIndex(View):
             'disable_accordion': COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id),
             'show_search': show_search,
             'relative_dates_is_enabled': RELATIVE_DATES_FLAG.is_enabled(self.course.id),
-            'reset_deadlines_url': reset_deadlines_url,
             'display_reset_dates_banner': display_reset_dates_banner,
+            'reset_deadlines_url': reset_deadlines_url,
+            'reset_deadlines_redirect_url_base': reset_deadlines_redirect_url_base,
+            'reset_deadlines_redirect_url_id_dict': {'course_id': str(self.course.id)},
         }
         courseware_context.update(
             get_experiment_user_metadata_context(
