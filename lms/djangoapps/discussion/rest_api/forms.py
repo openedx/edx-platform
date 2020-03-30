@@ -167,7 +167,7 @@ class CourseDiscussionRolesForm(CourseDiscussionSettingsForm):
         (FORUM_ROLE_GROUP_MODERATOR, FORUM_ROLE_GROUP_MODERATOR),
     )
     rolename = ChoiceField(
-        ROLE_CHOICES,
+        choices=ROLE_CHOICES,
         error_messages={u"invalid_choice": u"Role '%(value)s' does not exist"}
     )
 

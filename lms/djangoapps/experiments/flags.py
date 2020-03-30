@@ -2,6 +2,7 @@
 Feature flag support for experiments
 """
 
+import datetime
 import logging
 from contextlib import contextmanager
 
@@ -54,6 +55,45 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         request_cache.set(key, value)
         return value
 
+    def _is_enrollment_inside_date_bounds(self, experiment_values, user, course_key):
+        """ Returns True if the user's enrollment (if any) is valid for the configured experiment date range """
+        from student.models import CourseEnrollment
+
+        enrollment_start = experiment_values.get('enrollment_start')
+        enrollment_end = experiment_values.get('enrollment_end')
+        if not enrollment_start and not enrollment_end:
+            return True  # early exit just to avoid any further lookups
+
+        now = datetime.datetime.now(pytz.utc)
+        enrollment = CourseEnrollment.get_enrollment(user, course_key)
+
+        # If the user isn't enrolled, act like they would enroll right now (this keeps the pre-enroll and post-enroll
+        # experiences the same, if they decide to enroll right now)
+        enrollment_creation_date = enrollment.created if enrollment else now
+
+        # Enrollment must be after any enrollment_start date, if specified
+        if enrollment_start:
+            try:
+                start_date = dateutil.parser.parse(enrollment_start).replace(tzinfo=pytz.UTC)
+            except ValueError:
+                log.exception('Could not parse enrollment start date for experiment %d', self.experiment_id)
+                return False
+            if enrollment_creation_date < start_date:
+                return False
+
+        # Enrollment must be before any enrollment_end date, if specified
+        if enrollment_end:
+            try:
+                end_date = dateutil.parser.parse(enrollment_end).replace(tzinfo=pytz.UTC)
+            except ValueError:
+                log.exception('Could not parse enrollment end date for experiment %d', self.experiment_id)
+                return False
+            if enrollment_creation_date >= end_date:
+                return False
+
+        # All good! Either because the key was not set or because the enrollment was valid
+        return True
+
     def get_bucket(self, course_key=None, track=True):
         """
         Return which bucket number the specified user is in.
@@ -64,7 +104,6 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         # Keep some imports in here, because this class is commonly used at a module level, and we want to avoid
         # circular imports for any models.
         from experiments.models import ExperimentKeyValue
-        from student.models import CourseEnrollment
 
         request = get_current_request()
         if not request:
@@ -89,19 +128,11 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
 
         # Check if the enrollment should even be considered (if it started before the experiment wants, we ignore)
         if course_key and self.experiment_id is not None:
-            start_val = ExperimentKeyValue.objects.filter(experiment_id=self.experiment_id, key='enrollment_start')
-            if start_val:
-                try:
-                    start_date = dateutil.parser.parse(start_val.first().value).replace(tzinfo=pytz.UTC)
-                except ValueError:
-                    log.exception('Could not parse enrollment start date for experiment %d', self.experiment_id)
-                    return self._cache_bucket(experiment_name, 0)
-                enrollment = CourseEnrollment.get_enrollment(request.user, course_key)
-                # Only bail if they have an enrollment and it's old -- if they don't have an enrollment, we want to do
-                # normal bucketing -- consider the case where the experiment has bits that show before you enroll. We
-                # want to keep your bucketing stable before and after you do enroll.
-                if enrollment and enrollment.created < start_date:
-                    return self._cache_bucket(experiment_name, 0)
+            values = ExperimentKeyValue.objects.filter(experiment_id=self.experiment_id).values('key', 'value')
+            values = {pair['key']: pair['value'] for pair in values}
+
+            if not self._is_enrollment_inside_date_bounds(values, request.user, course_key):
+                return self._cache_bucket(experiment_name, 0)
 
         bucket = stable_bucketing_hash_group(experiment_name, self.num_buckets, request.user.username)
 
@@ -137,6 +168,9 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
 
     def is_enabled_without_course_context(self):
         return self.is_enabled()
+
+    def is_experiment_on(self, course_key=None):
+        return super().is_enabled(course_key)
 
     @contextmanager
     def override(self, active=True, bucket=1):  # pylint: disable=arguments-differ

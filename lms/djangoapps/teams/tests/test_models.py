@@ -124,39 +124,6 @@ class CourseTeamTest(SharedModuleStoreTestCase):
         with self.assertRaises(AddToIncompatibleTeamError):
             self.masters_team.add_user(self.audit_learner)
 
-    def test_defaults_with_create(self):
-        field = CourseTeam._meta.get_field('last_activity_at')
-        default_date = datetime(1978, 1, 1)
-        mock_now = lambda: default_date
-        with patch.object(field, 'default', new=mock_now):
-            team = CourseTeam.create(
-                name='foo',
-                course_id='sedx/the-course/1',
-                description='Import from csv',
-                topic_id=TEAMSET_1_ID,
-                organization_protected=True
-            )
-        self.assert_team_default_values(default_date, team)
-
-    def test_defaults_with_constructor(self):
-        field = CourseTeam._meta.get_field('last_activity_at')
-        default_date = datetime(1978, 1, 1)
-        mock_now = lambda: default_date
-        with patch.object(field, 'default', new=mock_now):
-            team = CourseTeam(
-                name='foo',
-                course_id='sedx/the-course/1',
-                description='Import from csv',
-                topic_id=TEAMSET_1_ID,
-                organization_protected=True
-            )
-        self.assert_team_default_values(default_date, team)
-
-    def assert_team_default_values(self, default_date, team):
-        self.assertEqual(default_date, team.last_activity_at)
-        self.assertEqual('', team.language)
-        self.assertEqual('', team.country)
-
 
 @ddt.ddt
 class TeamMembershipTest(SharedModuleStoreTestCase):
@@ -224,13 +191,13 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
         (None, None, None, 3),
         ('user1', None, None, 2),
         ('user1', [COURSE_KEY1], None, 1),
-        ('user1', None, 'team1', 1),
+        ('user1', None, ['team1'], 1),
         ('user2', None, None, 1),
     )
     @ddt.unpack
-    def test_get_memberships(self, username, course_ids, team_id, expected_count):
+    def test_get_memberships(self, username, course_ids, team_ids, expected_count):
         self.assertEqual(
-            CourseTeamMembership.get_memberships(username=username, course_ids=course_ids, team_id=team_id).count(),
+            CourseTeamMembership.get_memberships(username=username, course_ids=course_ids, team_ids=team_ids).count(),
             expected_count
         )
 

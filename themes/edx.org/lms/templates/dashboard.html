@@ -278,7 +278,7 @@ from student.models import CourseEnrollment
               <div class="advertise-message">
                   ${_("Browse recently launched courses and see what's new in your favorite subjects.")}
               </div>
-              <div class="ad-link">
+              <div class="marketing-link">
                   <a class="btn-neutral" href="${marketing_link('COURSES')}">
                       <span class="icon fa fa-search" aria-hidden="true"></span>
                       ${_("Explore New Courses")}
@@ -286,6 +286,22 @@ from student.models import CourseEnrollment
               </div>
           </div>
       </div>
+  % endif
+
+  <% account_mfe_url = getattr(settings, 'ACCOUNT_MICROFRONTEND_URL', '') or '' %>
+  % if plugins.get("coaching", {}).get("show_coaching_aside"):
+    <div class="wrapper-coaching">
+        <div class="coaching-signup">
+            <div class="coaching-prompt">
+                ${_("Take advantage of free coaching!")}
+            </div>
+            <div class="coaching-link">
+                <a class="btn-neutral" href="${account_mfe_url}">
+                  ${_("Get Started")}
+                </a>
+            </div>
+        </div>
+    </div>
   % endif
 
   % if display_sidebar_on_dashboard:

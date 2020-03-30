@@ -1896,7 +1896,7 @@ class TeamPageTest(TeamsTabBase):
         """
         self._set_team_configuration_and_membership(membership_team_index=0, visit_team_index=1)
         self.team_page.visit()
-        self.assertEqual(self.team_page.join_team_message, 'You already belong to another team.')
+        self.assertEqual(self.team_page.join_team_message, 'You already belong to another team in this team set.')
         self.assert_team_details(num_members=0, is_member=False)
 
     def test_team_full_message(self):

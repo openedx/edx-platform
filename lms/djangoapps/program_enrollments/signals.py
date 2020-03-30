@@ -59,7 +59,7 @@ def matriculate_learner(user, uid):
         if not authorizing_org:
             return
     except (AttributeError, ValueError):
-        logger.info('Ignoring non-saml social auth entry for user=%s', user.id)
+        logger.debug('Ignoring non-saml social auth entry for user=%s', user.id)
         return
     except SAMLProviderConfig.DoesNotExist:
         logger.warning(

@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-03-09 06:51+0000\n"
-"PO-Revision-Date: 2020-03-09 06:51:43.954316\n"
+"POT-Creation-Date: 2020-03-29 20:52+0000\n"
+"PO-Revision-Date: 2020-03-29 20:52:59.889386\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -686,6 +686,16 @@ msgstr ""
 "ثطهسفس هر فاهس وخيثم, ذشر زث شزمث فخ مخلهر بقخو مخلهر سذقثثر فاقخعلا ثوشهم "
 "شري حشسسصخقي. شري هب شرغ ثوحمخغثث'س ثوشهم يخثسر'ف ثطهسف هر فاهس وخيثم فاثر "
 "فاشف ثوحمخغثث ذشر مخلهر دهش فاهقي حشقفغ شعفاثرفهذشفهخر زشذنثري خرمغ."
+
+#: common/djangoapps/student/models.py
+msgid ""
+"It expect that the data will be provided in a csv file format with"
+"                     first row being the header and columns will be as "
+"follows:                     username, email, new_email"
+msgstr ""
+"هف ثطحثذف فاشف فاث يشفش صهمم زث حقخدهيثي هر ش ذسد بهمث بخقوشف صهفا"
+"                     بهقسف قخص زثهرل فاث اثشيثق شري ذخمعورس صهمم زث شس "
+"بخممخصس:                     عسثقرشوث, ثوشهم, رثص_ثوشهم"
 
 #: common/djangoapps/student/views/dashboard.py
 msgid " and "
@@ -1624,9 +1634,8 @@ msgid "Cannot rescore problems with possible file submissions"
 msgstr "ذشررخف قثسذخقث حقخزمثوس صهفا حخسسهزمث بهمث سعزوهسسهخرس"
 
 #: common/lib/capa/capa/capa_problem.py
-#, python-brace-format
-msgid "Question {0}"
-msgstr "ضعثسفهخر {0}"
+msgid "Question {}"
+msgstr "ضعثسفهخر {}"
 
 #: common/lib/capa/capa/capa_problem.py
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -9037,6 +9046,14 @@ msgstr "مهرن حقخلقشو ثرقخمموثرفس"
 msgid "Link LMS users to program enrollments"
 msgstr "مهرن موس عسثقس فخ حقخلقشو ثرقخمموثرفس"
 
+#: lms/djangoapps/support/views/index.py
+msgid "Program Enrollments Inspector Tool"
+msgstr "حقخلقشو ثرقخمموثرفس هرسحثذفخق فخخم"
+
+#: lms/djangoapps/support/views/index.py
+msgid "Find information related to a learner's program enrollments"
+msgstr "بهري هربخقوشفهخر قثمشفثي فخ ش مثشقرثق'س حقخلقشو ثرقخمموثرفس"
+
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
 msgstr "عسثق_سعححخقف_عقم"
@@ -9154,8 +9171,20 @@ msgid "You can't create a team in an instructor managed topic."
 msgstr "غخع ذشر'ف ذقثشفث ش فثشو هر شر هرسفقعذفخق وشرشلثي فخحهذ."
 
 #: lms/djangoapps/teams/views.py
-msgid "username or team_id must be specified."
-msgstr "عسثقرشوث خق فثشو_هي وعسف زث سحثذهبهثي."
+msgid "teamset_id and team_id are mutually exclusive options."
+msgstr "فثشوسثف_هي شري فثشو_هي شقث وعفعشممغ ثطذمعسهدث خحفهخرس."
+
+#: lms/djangoapps/teams/views.py
+msgid "teamset_id requires course_id to also be provided."
+msgstr "فثشوسثف_هي قثضعهقثس ذخعقسث_هي فخ شمسخ زث حقخدهيثي."
+
+#: lms/djangoapps/teams/views.py
+msgid "No teamset found in given course with given id"
+msgstr "رخ فثشوسثف بخعري هر لهدثر ذخعقسث صهفا لهدثر هي"
+
+#: lms/djangoapps/teams/views.py
+msgid "username or (team_id or teamset_id) must be specified."
+msgstr "عسثقرشوث خق (فثشو_هي خق فثشوسثف_هي) وعسف زث سحثذهبهثي."
 
 #: lms/djangoapps/teams/views.py
 msgid "Username is required."
@@ -12209,6 +12238,60 @@ msgid ""
 msgstr ""
 "غخع شقث رخف سهلرثي هر. فخ دهثص فاث يهسذعسسهخر ذخرفثرف, {sign_in_link} خق "
 "{register_link}, شري ثرقخمم هر فاهس ذخعقسث."
+
+#: openedx/features/calendar_sync/ics.py
+#, python-brace-format
+msgid "{assignment} is due for {course}."
+msgstr "{assignment} هس يعث بخق {course}."
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Calendar Sync"
+msgstr "ذشمثريشق سغرذ"
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Unsubscribe from calendar updates"
+msgstr "عرسعزسذقهزث بقخو ذشمثريشق عحيشفثس"
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Subscribe to calendar updates"
+msgstr "سعزسذقهزث فخ ذشمثريشق عحيشفثس"
+
+#: openedx/features/calendar_sync/views/management.py
+#, python-brace-format
+msgid "Updates for Your {course} Schedule"
+msgstr "عحيشفثس بخق غخعق {course} سذاثيعمث"
+
+#: openedx/features/calendar_sync/views/management.py
+msgid "Update Your Calendar"
+msgstr "عحيشفث غخعق ذشمثريشق"
+
+#: openedx/features/calendar_sync/views/management.py
+#, python-brace-format
+msgid ""
+"Your assignment due dates for {course} were recently adjusted. Update your "
+"calendarwith your new schedule to ensure that you stay on track!"
+msgstr ""
+"غخعق شسسهلروثرف يعث يشفثس بخق {course} صثقث قثذثرفمغ شيتعسفثي. عحيشفث غخعق "
+"ذشمثريشقصهفا غخعق رثص سذاثيعمث فخ ثرسعقث فاشف غخع سفشغ خر فقشذن!"
+
+#: openedx/features/calendar_sync/views/management.py
+msgid "Stay on Track"
+msgstr "سفشغ خر فقشذن"
+
+#: openedx/features/calendar_sync/views/management.py
+msgid "Mark Your Calendar"
+msgstr "وشقن غخعق ذشمثريشق"
+
+#: openedx/features/calendar_sync/views/management.py
+#, python-brace-format
+msgid ""
+"Sticking to a schedule is the best way to ensure that you successfully "
+"complete your self-paced course. This schedule of assignment due dates for "
+"{course} will help you stay on track!"
+msgstr ""
+"سفهذنهرل فخ ش سذاثيعمث هس فاث زثسف صشغ فخ ثرسعقث فاشف غخع سعذذثسسبعممغ "
+"ذخوحمثفث غخعق سثمب-حشذثي ذخعقسث. فاهس سذاثيعمث خب شسسهلروثرف يعث يشفثس بخق "
+"{course} صهمم اثمح غخع سفشغ خر فقشذن!"
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
@@ -20987,6 +21070,10 @@ msgstr "رخ قثسعمفس بخعري"
 msgid "Student Support: Manage User"
 msgstr "سفعيثرف سعححخقف: وشرشلث عسثق"
 
+#: lms/templates/support/program_enrollments_inspector.html
+msgid "Program Enrollments Inspector"
+msgstr "حقخلقشو ثرقخمموثرفس هرسحثذفخق"
+
 #: lms/templates/support/refund.html
 msgid "About to refund this order:"
 msgstr "شزخعف فخ قثبعري فاهس خقيثق:"
@@ -21302,6 +21389,12 @@ msgid "Expand All"
 msgstr "ثطحشري شمم"
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "({number} Question)"
+msgid_plural "({number} Questions)"
+msgstr[0] "({number} ضعثسفهخر)"
+msgstr[1] "({number} ضعثسفهخرس)"
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Prerequisite: "
 msgstr "حقثقثضعهسهفث: "
 
@@ -21401,6 +21494,10 @@ msgstr "فاهس ذخعقسث يخثس رخف اشدث شرغ عحيشفثس."
 msgid "Latest Update"
 msgstr "مشفثسف عحيشفث"
 
+#: openedx/features/course_experience/templates/course_experience/next-up-banner-fragment.html
+msgid "Get started on what's next: "
+msgstr "لثف سفشقفثي خر صاشف'س رثطف: "
+
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
 msgid "Search Results"
 msgstr "سثشقذا قثسعمفس"
@@ -21489,6 +21586,14 @@ msgid ""
 msgstr ""
 "زقخصسث قثذثرفمغ مشعرذاثي ذخعقسثس شري سثث صاشف'س رثص هر غخعق بشدخقهفث "
 "سعزتثذفس."
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Take advantage of free coaching!"
+msgstr "فشنث شيدشرفشلث خب بقثث ذخشذاهرل!"
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Get Started"
+msgstr "لثف سفشقفثي"
 
 #: themes/edx.org/lms/templates/footer.html
 msgid "Page Footer"

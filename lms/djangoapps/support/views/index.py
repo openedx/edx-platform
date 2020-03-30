@@ -48,6 +48,11 @@ SUPPORT_INDEX_URLS = [
         "name": _("Link Program Enrollments"),
         "description": _("Link LMS users to program enrollments"),
     },
+    {
+        "url": reverse_lazy("support:program_enrollments_inspector"),
+        "name": _("Program Enrollments Inspector Tool"),
+        "description": _("Find information related to a learner's program enrollments"),
+    },
 ]
 
 

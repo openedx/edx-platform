@@ -67,8 +67,12 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
                 u'<a href="/course/{course}{subsection_parameters}">Lesson 1</a>'
             ).format(
                 course=re.escape(six.text_type(self.course.id)),
-                section_parameters=re.escape(u'?show={}'.format(http.urlquote(self.chapter.location))),
-                subsection_parameters=re.escape(u'?show={}'.format(http.urlquote(self.sequential.location))),
+                section_parameters=re.escape(u'?show={}'.format(http.urlquote(
+                    str(self.chapter.location).encode()
+                ))),
+                subsection_parameters=re.escape(u'?show={}'.format(http.urlquote(
+                    str(self.sequential.location).encode()
+                ))),
             ),
         )
 
@@ -93,7 +97,9 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
                 ).format(
                     course=re.escape(six.text_type(self.course.id)),
                     unit_parameters=re.escape(str(self.vertical.location)),
-                    subsection_parameters=re.escape(u'?show={}'.format(http.urlquote(self.sequential.location))),
+                    subsection_parameters=re.escape(u'?show={}'.format(http.urlquote(
+                        str(self.sequential.location).encode()
+                    ))),
                 ),
             )
 

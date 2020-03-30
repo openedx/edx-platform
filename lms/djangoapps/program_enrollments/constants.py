@@ -2,6 +2,7 @@
 Constants used throughout the program_enrollments app and exposed to other
 in-process apps through api.py.
 """
+from student.roles import CourseStaffRole
 
 
 class ProgramEnrollmentStatuses(object):
@@ -113,3 +114,17 @@ class ProgramCourseOperationStatuses(
     __OK__ = ProgramCourseEnrollmentStatuses.__ALL__
     __ERRORS__ = (NOT_FOUND,) + _EnrollmentErrorStatuses.__ALL__
     __ALL__ = __OK__ + __ERRORS__
+
+
+class ProgramCourseEnrollmentRoles(object):
+    """
+    Valid roles that can be assigned as part of a ProgramCourseEnrollment
+    """
+    COURSE_STAFF = CourseStaffRole.ROLE
+    __ALL__ = (COURSE_STAFF,)
+
+    # Note: Any changes to this value will trigger a migration on
+    # CourseAccessRoleAssignment!
+    __MODEL_CHOICES__ = (
+        (role, role) for role in __ALL__
+    )

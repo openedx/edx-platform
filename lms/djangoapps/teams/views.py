@@ -738,7 +738,7 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
         team = get_object_or_404(CourseTeam, team_id=team_id)
         self.check_object_permissions(request, team)
         # Note: list() forces the queryset to be evualuated before delete()
-        memberships = list(CourseTeamMembership.get_memberships(team_id=team_id))
+        memberships = list(CourseTeamMembership.get_memberships(team_ids=[team_id]))
 
         # Note: also deletes all team memberships associated with this team
         team.delete()
@@ -1009,6 +1009,13 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
               specified team. The requesting user must be staff or enrolled in
               the course associated with the team.
 
+            * teamset_id: Returns membership records only for the specified teamset.
+              if teamset_id is specified, course_id must also be specified.
+              teamset_id and team_id are mutually exclusive. For open and public_managed
+              teamsets, the user must be staff or enrolled in the course. For
+              private_managed teamsets, the user must be course staff, or a member of the
+              specified teamset.
+
             * course_id: Returns membership records only for the specified
               course. Username must have access to this course, or else team_id
               must be in this course.
@@ -1118,7 +1125,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         """GET /api/team/v0/team_membership"""
         specified_username_or_team = False
         username = None
-        team_id = None
+        team_ids = None
         requested_course_id = None
         requested_course_key = None
         accessible_course_ids = None
@@ -1130,11 +1137,17 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
             except InvalidKeyError:
                 return Response(status=status.HTTP_404_NOT_FOUND)
 
-        if 'team_id' in request.query_params:
+        if 'team_id' in request.query_params and 'teamset_id' in request.query_params:
+            return Response(
+                build_api_error(ugettext_noop("teamset_id and team_id are mutually exclusive options.")),
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        elif 'team_id' in request.query_params:
             specified_username_or_team = True
             team_id = request.query_params['team_id']
             try:
                 team = CourseTeam.objects.get(team_id=team_id)
+                team_ids = [team.team_id]
             except CourseTeam.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
             if requested_course_key is not None and requested_course_key != team.course_id:
@@ -1143,6 +1156,39 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                 return Response(status=status.HTTP_404_NOT_FOUND)
             if not has_specific_team_access(request.user, team):
                 return Response(status=status.HTTP_403_FORBIDDEN)
+        elif 'teamset_id' in request.query_params:
+            if 'course_id' not in request.query_params:
+                return Response(
+                    build_api_error(ugettext_noop("teamset_id requires course_id to also be provided.")),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            if not has_team_api_access(request.user, requested_course_key):
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+            course_module = modulestore().get_course(requested_course_key)
+            if not course_module:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            specified_username_or_team = True
+            teamsets = course_module.teams_configuration.teamsets_by_id
+            teamset_id = request.query_params['teamset_id']
+            teamset = teamsets.get(teamset_id, None)
+            if not teamset:
+                return Response(
+                    build_api_error(ugettext_noop("No teamset found in given course with given id")),
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            teamset_teams = CourseTeam.objects.filter(course_id=requested_course_key, topic_id=teamset_id)
+            teams_with_access = [
+                team for team in teamset_teams
+                if has_specific_team_access(request.user, team)
+            ]
+            if not teams_with_access:
+                return Response(
+                    build_api_error(ugettext_noop("No teamset found in given course with given id")),
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            team_ids = [team.team_id for team in teams_with_access]
 
         if 'username' in request.query_params:
             specified_username_or_team = True
@@ -1160,7 +1206,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
 
         if not specified_username_or_team:
             return Response(
-                build_api_error(ugettext_noop("username or team_id must be specified.")),
+                build_api_error(ugettext_noop("username or (team_id or teamset_id) must be specified.")),
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -1170,7 +1216,8 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         elif accessible_course_ids is not None:
             course_keys = accessible_course_ids
 
-        queryset = CourseTeamMembership.get_memberships(username, course_keys, team_id)
+        queryset = CourseTeamMembership.get_memberships(username, course_keys, team_ids)
+
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)

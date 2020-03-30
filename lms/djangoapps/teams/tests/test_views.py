@@ -698,7 +698,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         teams = self.get_teams_list(data=data, expected_status=status, **kwargs)
         if names is not None and 200 <= status < 300:
             results = teams['results']
-            self.assertEqual(names, [team['name'] for team in results])
+            self.assertEqual(sorted(names), sorted([team['name'] for team in results]))
 
     def test_filter_invalid_course_id(self):
         self.verify_names({'course_id': 'no_such_course'}, 400)
@@ -1488,6 +1488,66 @@ class TestListMembershipAPI(TeamAPITestCase):
     def test_expand_team(self):
         result = self.get_membership_list(200, {'team_id': self.solar_team.team_id, 'expand': 'team'})
         self.verify_expanded_team(result['results'][0]['team'])
+
+    @ddt.data(False, True)
+    def test_filter_teamset(self, filter_username):
+        other_username = self.create_and_enroll_student()
+        self.solar_team.add_user(self.users[other_username])
+        filters = {
+            'teamset_id': self.solar_team.topic_id,
+            'course_id': self.test_course_1.id
+        }
+        if filter_username:
+            filters['username'] = other_username
+
+        result = self.get_membership_list(200, filters)
+        self.assertEqual(result['count'], 1 if filter_username else 2)
+        usernames = {enrollment['user']['username'] for enrollment in result['results']}
+        self.assertIn(other_username, usernames)
+        if not filter_username:
+            self.assertIn('student_enrolled', usernames)
+
+    def test_filter_teamset_team_id(self):
+        # team_id and teamset_id are mutually exclusive
+        self.get_membership_list(
+            400,
+            {
+                'team_id': self.solar_team.team_id,
+                'teamset_id': 'topic_0',
+                'course_id': 'TestX/TS101/Non_Existent_Course'
+            }
+        )
+
+    def test_filter_teamset_no_course(self):
+        self.get_membership_list(400, {'teamset_id': 'topic_0'})
+
+    def test_filter_teamset_not_enrolled_in_course(self):
+        self.get_membership_list(
+            404,
+            {
+                'teamset_id': 'topic_0',
+                'course_id': self.test_course_1.id
+            },
+            user='student_unenrolled'
+        )
+
+    def test_filter_teamset_course_nonexistant(self):
+        self.get_membership_list(404, {'teamset_id': 'topic_0', 'course_id': 'TestX/TS101/Non_Existent_Course'})
+
+    def test_filter_teamset_teamset_nonexistant(self):
+        self.get_membership_list(404, {'teamset_id': 'nonexistant', 'course_id': self.test_course_1.id})
+
+    def test_filter_teamset_enrolled_in_course_but_no_team_access(self):
+        # The requesting user is enrolled in the course, but the requested team is oraganization_protected and
+        # the requesting user is outside of the bubble
+        self.get_membership_list(
+            404,
+            {
+                'teamset_id': 'private-topic-1-id',
+                'course_id': self.test_course_1.id,
+                'username': 'student_on_team_1_private_set_1'
+            }
+        )
 
 
 @ddt.ddt

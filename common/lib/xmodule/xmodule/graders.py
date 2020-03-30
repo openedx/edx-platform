@@ -380,7 +380,7 @@ class AssignmentFormatGrader(CourseGrader):
         scores = list(grade_sheet.get(self.type, {}).values())
         breakdown = []
         labeler = get_short_labeler(self.short_label)
-        for i in range(max(self.min_count, len(scores))):
+        for i in range(max(int(float(self.min_count)), len(scores))):
             if i < len(scores) or generate_random_scores:
                 if generate_random_scores:  	# for debugging!
                     earned = random.randint(2, 15)

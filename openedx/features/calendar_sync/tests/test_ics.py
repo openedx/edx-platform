@@ -8,6 +8,7 @@ from freezegun import freeze_time
 from mock import patch
 
 from lms.djangoapps.courseware.courses import _Assignment
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.features.calendar_sync import get_calendar_event_id
 from openedx.features.calendar_sync.ics import generate_ics_for_user_course
@@ -22,6 +23,8 @@ class TestIcsGeneration(TestCase):
         freezer = freeze_time(datetime(2013, 10, 3, 8, 24, 55, tzinfo=pytz.utc))
         self.addCleanup(freezer.stop)
         freezer.start()
+
+        self.course = CourseOverviewFactory()
 
         self.user = UserFactory()
         self.request = RequestFactory().request()
@@ -44,7 +47,7 @@ DTSTART;VALUE=DATE-TIME:{timedue}
 DURATION:P0D
 DTSTAMP;VALUE=DATE-TIME:20131003T082455Z
 UID:{uid}
-DESCRIPTION:<a href="{url}">Link</a>
+DESCRIPTION:{summary} is due for {course}.
 ORGANIZER;CN=édX:mailto:registration@example.com
 TRANSP:TRANSPARENT
 END:VEVENT
@@ -53,8 +56,8 @@ END:VCALENDAR
         return (
             template.format(
                 summary=assignment.title,
+                course=self.course.display_name_with_default,
                 timedue=assignment.date.strftime('%Y%m%dT%H%M%SZ'),
-                url=assignment.url,
                 uid=get_calendar_event_id(self.user, str(assignment.block_key), 'due', self.request.site.domain),
             )
             for assignment in assignments
@@ -64,7 +67,7 @@ END:VCALENDAR
         """ Uses generate_ics_for_user_course to create ics files for the given assignments """
         with patch('openedx.features.calendar_sync.ics.get_course_assignments') as mock_get_assignments:
             mock_get_assignments.return_value = assignments
-            return generate_ics_for_user_course('a/b/c', self.user, self.request)
+            return generate_ics_for_user_course(self.course, self.user, self.request)
 
     def assert_ics(self, *assignments):
         """ Asserts that the generated and expected ics for the given assignments are equal """

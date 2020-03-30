@@ -1641,7 +1641,6 @@
     "Yes, Delete": "Ya, hapus",
     "Yes, replace the edX transcript with the YouTube transcript": "Ya, mengganti Transkrip edX dengan transkrip You Tube",
     "Yesterday": "Kemarin",
-    "You already belong to another team.": "Anda telah menjadi anggota tim lain.",
     "You already have an edX account with your {enterprise_name} email address.": "Anda sudah memiliki akun edX dengan alamat email {enterprise_name} Anda.",
     "You are currently sharing a limited profile.": "Anda sekarang sedang membagi profil yang terbatas",
     "You are enrolling in: {courseName}": "Anda mendaftar di: {courseName}",

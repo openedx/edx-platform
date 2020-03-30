@@ -14,10 +14,10 @@ from simple_history.models import HistoricalRecords
 
 from student.models import CourseEnrollment
 
-from .constants import ProgramCourseEnrollmentStatuses, ProgramEnrollmentStatuses
+from .constants import ProgramCourseEnrollmentRoles, ProgramCourseEnrollmentStatuses, ProgramEnrollmentStatuses
 
 
-class ProgramEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unicode
+class ProgramEnrollment(TimeStampedModel):
     """
     This is a model for Program Enrollments from the registrar service
 
@@ -78,8 +78,20 @@ class ProgramEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unic
     def __str__(self):
         return '[ProgramEnrollment id={}]'.format(self.id)
 
+    def __repr__(self):
+        return (
+            "<ProgramEnrollment"    # pylint: disable=missing-format-attribute
+            " id={self.id}"
+            " user={self.user!r}"
+            " external_user_key={self.external_user_key!r}"
+            " program_uuid={self.program_uuid!r}"
+            " curriculum_uuid={self.curriculum_uuid!r}"
+            " status={self.status!r}"
+            ">"
+        ).format(self=self)
 
-class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unicode
+
+class ProgramCourseEnrollment(TimeStampedModel):
     """
     This is a model to represent a learner's enrollment in a course
     in the context of a program from the registrar service
@@ -126,3 +138,39 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
 
     def __str__(self):
         return '[ProgramCourseEnrollment id={}]'.format(self.id)
+
+    def __repr__(self):
+        return (
+            "<ProgramCourseEnrollment"  # pylint: disable=missing-format-attribute
+            " id={self.id}"
+            " program_enrollment={self.program_enrollment!r}"
+            " course_enrollment=<{self.course_enrollment}>"
+            " course_key={self.course_key}"
+            " status={self.status!r}"
+            ">"
+        ).format(self=self)
+
+
+class CourseAccessRoleAssignment(TimeStampedModel):
+    """
+    This model represents a role that should be assigned to the eventual user of a pending enrollment.
+
+    .. no_pii:
+    """
+    class Meta(object):
+        unique_together = ('role', 'enrollment')
+
+    role = models.CharField(max_length=64, choices=ProgramCourseEnrollmentRoles.__MODEL_CHOICES__)
+    enrollment = models.ForeignKey(ProgramCourseEnrollment, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '[CourseAccessRoleAssignment id={}]'.format(self.id)
+
+    def __repr__(self):
+        return (
+            "<CourseAccessRoleAssignment"  # pylint: disable=missing-format-attribute
+            " id={self.id}"
+            " role={self.role!r}"
+            " enrollment={self.enrollment!r}"
+            ">"
+        ).format(self=self)

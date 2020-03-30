@@ -136,6 +136,7 @@ def get_course_overview_with_access(user, action, course_key, check_if_enrolled=
     try:
         course_overview = CourseOverview.get_from_id(course_key)
     except CourseOverview.DoesNotExist:
+        log.info("Could't find the course overview for course id: {id}".format(id=course_key))
         raise Http404("Course not found.")
     check_course_access(course_overview, user, action, check_if_enrolled)
     return course_overview
@@ -413,7 +414,7 @@ def get_course_date_blocks(course, user, request=None, include_access=False,
         VerificationDeadlineDate,
         VerifiedUpgradeDeadlineDate,
     ]
-    if certs_api.get_active_web_certificate(course):
+    if not course.self_paced and certs_api.get_active_web_certificate(course):
         block_classes.insert(0, CertificateAvailableDate)
 
     blocks = [cls(course, user) for cls in block_classes]

@@ -25,7 +25,10 @@ from common.test.utils import disable_signal
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
+from lms.djangoapps.support.serializers import ProgramEnrollmentSerializer
 from lms.djangoapps.verify_student.models import VerificationDeadline
+from lms.djangoapps.verify_student.services import IDVerificationService
+from lms.djangoapps.verify_student.tests.factories import SSOVerificationFactory
 from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAttribute, ManualEnrollmentAudit
 from student.roles import GlobalStaff, SupportStaffRole
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -545,6 +548,7 @@ class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
         assert render_call_dict['errors'] == [msg]
 
 
+@ddt.ddt
 class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
     """
     View tests for Program Enrollments Inspector
@@ -583,7 +587,9 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
     def test_initial_rendering(self):
         response = self.client.get(self.url)
         content = six.text_type(response.content, encoding='utf-8')
-        expected_organization_serialized = '"orgKeys": {}'.format(json.dumps(self.org_key_list))
+        expected_organization_serialized = '"orgKeys": {}'.format(
+            json.dumps(sorted(self.org_key_list))
+        )
         assert response.status_code == 200
         assert expected_organization_serialized in content
         assert '"learnerInfo": {}' in content
@@ -603,13 +609,11 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
             user_social_auth = UserSocialAuth.objects.create(
                 user=user,
                 uid='{0}:{1}'.format(org_key, external_user_key),
-                provider=org_key
+                provider='tpa-saml'
             )
-            user_info['external_user_key'] = external_user_key
-            user_info['SSO'] = {
-                'uid': user_social_auth.uid,
-                'provider': user_social_auth.provider
-            }
+            user_info['sso_list'] = [{
+                'uid': user_social_auth.uid
+            }]
         return user, user_info
 
     def _construct_enrollments(self, program_uuids, course_ids, external_user_key, edx_user=None):
@@ -618,27 +622,14 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
         If the edx user is provided, it will try to SSO the user with the enrollments
         Return the expected info object that should be created based on the model setup
         """
-        expected_enrollments = []
+        program_enrollments = []
         for program_uuid in program_uuids:
-            expected_enrollment = {}
-            expected_course_enrollment = {}
             course_enrollment = None
             program_enrollment = ProgramEnrollmentFactory.create(
                 external_user_key=external_user_key,
                 program_uuid=program_uuid,
                 user=edx_user
             )
-            expected_enrollment['program_enrollment'] = {
-                'created': self._serialize_datetime(
-                    program_enrollment.created
-                ),
-                'modified': self._serialize_datetime(
-                    program_enrollment.modified
-                ),
-                'program_uuid': program_enrollment.program_uuid,
-                'external_user_key': external_user_key,
-                'status': program_enrollment.status
-            }
 
             for course_id in course_ids:
                 if edx_user:
@@ -648,11 +639,6 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
                         mode=CourseMode.MASTERS,
                         is_active=True
                     )
-                    expected_course_enrollment = {
-                        'course_id': str(course_enrollment.course_id),
-                        'is_active': course_enrollment.is_active,
-                        'mode': course_enrollment.mode,
-                    }
 
                 program_course_enrollment = ProgramCourseEnrollmentFactory.create(
                     program_enrollment=program_enrollment,
@@ -660,26 +646,22 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
                     course_enrollment=course_enrollment,
                     status='active',
                 )
-                expected_program_course_enrollment = {
-                    'created': self._serialize_datetime(
-                        program_course_enrollment.created
-                    ),
-                    'modified': self._serialize_datetime(
-                        program_course_enrollment.modified
-                    ),
-                    'status': program_course_enrollment.status,
-                    'course_key': str(program_course_enrollment.course_key),
-                }
-                if expected_course_enrollment:
-                    expected_program_course_enrollment['course_enrollment'] = expected_course_enrollment
 
-                expected_enrollment.setdefault('program_course_enrollments', []).append(
-                    expected_program_course_enrollment
-                )
+            program_enrollments.append(program_enrollment)
 
-            expected_enrollments.append(expected_enrollment)
+        serialized = ProgramEnrollmentSerializer(program_enrollments, many=True)
+        return serialized.data
 
-        return expected_enrollments
+    def _construct_id_verification(self, user):
+        """
+        Helper function to create the SSO verified record for the user
+        so that the user is ID Verified
+        """
+        SSOVerificationFactory(
+            identity_provider_slug=self.org_key_list[0],
+            user=user,
+        )
+        return IDVerificationService.user_status(user)
 
     @patch_render
     def test_search_username_well_connected_user(self, mocked_render):
@@ -688,6 +670,7 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
             self.org_key_list[0],
             self.external_user_key
         )
+        id_verified = self._construct_id_verification(created_user)
         expected_enrollments = self._construct_enrollments(
             [self.program_uuid],
             [self.course.id],
@@ -695,11 +678,13 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
             created_user
         )
         self.client.get(self.url, data={
-            'edx_user': created_user.username
+            'edx_user': created_user.username,
+            'org_key': self.org_key_list[0]
         })
         expected_info = {
             'user': expected_user_info,
-            'enrollments': expected_enrollments
+            'enrollments': expected_enrollments,
+            'id_verification': id_verified
         }
 
         render_call_dict = mocked_render.call_args[0][1]
@@ -709,10 +694,12 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
     def test_search_username_user_not_connected(self, mocked_render):
         created_user, expected_user_info = self._construct_user('user_not_connected')
         self.client.get(self.url, data={
-            'edx_user': created_user.email
+            'edx_user': created_user.email,
+            'org_key': self.org_key_list[0]
         })
         expected_info = {
-            'user': expected_user_info
+            'user': expected_user_info,
+            'id_verification': IDVerificationService.user_status(created_user)
         }
 
         render_call_dict = mocked_render.call_args[0][1]
@@ -726,10 +713,12 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
             self.external_user_key
         )
         self.client.get(self.url, data={
-            'edx_user': created_user.email
+            'edx_user': created_user.email,
+            'org_key': self.org_key_list[0]
         })
         expected_info = {
-            'user': expected_user_info
+            'user': expected_user_info,
+            'id_verification': IDVerificationService.user_status(created_user),
         }
 
         render_call_dict = mocked_render.call_args[0][1]
@@ -749,11 +738,13 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
             created_user,
         )
         self.client.get(self.url, data={
-            'edx_user': created_user.email
+            'edx_user': created_user.email,
+            'org_key': self.org_key_list[0]
         })
         expected_info = {
             'user': expected_user_info,
-            'enrollments': expected_enrollments
+            'enrollments': expected_enrollments,
+            'id_verification': IDVerificationService.user_status(created_user),
         }
 
         render_call_dict = mocked_render.call_args[0][1]
@@ -770,11 +761,117 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
             self.external_user_key,
         )
         self.client.get(self.url, data={
-            'edx_user': created_user.email
+            'edx_user': created_user.email,
+            'org_key': self.org_key_list[0]
         })
         expected_info = {
             'user': expected_user_info,
+            'id_verification': IDVerificationService.user_status(created_user),
         }
 
         render_call_dict = mocked_render.call_args[0][1]
         assert expected_info == render_call_dict['learner_program_enrollments']
+
+    @patch_render
+    def test_search_username_user_id_verified(self, mocked_render):
+        created_user, expected_user_info = self._construct_user(
+            'user_not_connected'
+        )
+        id_verified = self._construct_id_verification(created_user)
+        expected_info = {
+            'user': expected_user_info,
+            'id_verification': id_verified
+        }
+
+        self.client.get(self.url, data={
+            'edx_user': created_user.email,
+            'org_key': self.org_key_list[0]
+        })
+
+        render_call_dict = mocked_render.call_args[0][1]
+        assert expected_info == render_call_dict['learner_program_enrollments']
+
+    @patch_render
+    def test_search_external_key_well_connected(self, mocked_render):
+        created_user, expected_user_info = self._construct_user(
+            'test_user_connected',
+            self.org_key_list[0],
+            self.external_user_key
+        )
+        expected_enrollments = self._construct_enrollments(
+            [self.program_uuid],
+            [self.course.id],
+            self.external_user_key,
+            created_user
+        )
+        id_verified = self._construct_id_verification(created_user)
+        self.client.get(self.url, data={
+            'external_user_key': self.external_user_key,
+            'org_key': self.org_key_list[0]
+        })
+        expected_info = {
+            'user': expected_user_info,
+            'enrollments': expected_enrollments,
+            'id_verification': id_verified,
+        }
+
+        render_call_dict = mocked_render.call_args[0][1]
+        assert expected_info == render_call_dict['learner_program_enrollments']
+
+    @ddt.data(
+        ('', 'test_org'),
+        ('bad_key', '')
+    )
+    @ddt.unpack
+    @patch_render
+    def test_search_no_external_user_key(self, user_key, org_key, mocked_render):
+        self.client.get(self.url, data={
+            'external_user_key': user_key,
+            'org_key': org_key,
+        })
+
+        expected_error = (
+            "To perform a search, you must provide either the student's "
+            "(a) edX username, "
+            "(b) email address associated with their edX account, or "
+            "(c) Identity-providing institution and external key!"
+        )
+
+        render_call_dict = mocked_render.call_args[0][1]
+        assert {} == render_call_dict['learner_program_enrollments']
+        assert expected_error == render_call_dict['error']
+
+    @patch_render
+    def test_search_external_user_not_connected(self, mocked_render):
+        expected_enrollments = self._construct_enrollments(
+            [self.program_uuid],
+            [self.course.id],
+            self.external_user_key,
+        )
+        self.client.get(self.url, data={
+            'external_user_key': self.external_user_key,
+            'org_key': self.org_key_list[0]
+        })
+        expected_info = {
+            'user': {
+                'external_user_key': self.external_user_key,
+            },
+            'enrollments': expected_enrollments
+        }
+
+        render_call_dict = mocked_render.call_args[0][1]
+        assert expected_info == render_call_dict['learner_program_enrollments']
+
+    @patch_render
+    def test_search_external_user_not_in_system(self, mocked_render):
+        external_user_key = 'not_in_system'
+        self.client.get(self.url, data={
+            'external_user_key': external_user_key,
+            'org_key': self.org_key_list[0],
+        })
+
+        expected_error = 'No user found for external key {} for institution {}'.format(
+            external_user_key, self.org_key_list[0]
+        )
+        render_call_dict = mocked_render.call_args[0][1]
+        assert expected_error == render_call_dict['error']

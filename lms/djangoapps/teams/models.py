@@ -299,7 +299,7 @@ class CourseTeamMembership(models.Model):
         self.team.reset_team_size()
 
     @classmethod
-    def get_memberships(cls, username=None, course_ids=None, team_id=None):
+    def get_memberships(cls, username=None, course_ids=None, team_ids=None):
         """
         Get a queryset of memberships.
 
@@ -313,8 +313,8 @@ class CourseTeamMembership(models.Model):
             queryset = queryset.filter(user__username=username)
         if course_ids is not None:
             queryset = queryset.filter(team__course_id__in=course_ids)
-        if team_id is not None:
-            queryset = queryset.filter(team__team_id=team_id)
+        if team_ids is not None:
+            queryset = queryset.filter(team__team_id__in=team_ids)
 
         return queryset
 
@@ -360,3 +360,12 @@ class CourseTeamMembership(models.Model):
         emit_team_event('edx.team.activity_updated', membership.team.course_id, {
             'team_id': membership.team.team_id,
         })
+
+    @classmethod
+    def is_user_on_team(cls, user, team):
+        """ Is `user` on `team`?"""
+        try:
+            cls.objects.get(user=user, team=team)
+        except ObjectDoesNotExist:
+            return False
+        return True

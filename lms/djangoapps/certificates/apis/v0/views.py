@@ -280,10 +280,7 @@ class CertificatesListView(APIView):
                 # add certificate into viewable certificate list only if it's a PDF certificate
                 # or there is an active certificate configuration.
                 if course_certificate['is_pdf_certificate'] or course_overview.has_any_active_web_certificate:
-                    course_display_name = course_overview.display_name
-                    if not course_overview.pk:
-                        course_display_name = course_overview.display_name_with_default
-                    course_certificate['course_display_name'] = course_display_name
+                    course_certificate['course_display_name'] = course_overview.display_name_with_default
                     course_certificate['course_organization'] = course_overview.display_org_with_default
                     viewable_certificates.append(course_certificate)
 

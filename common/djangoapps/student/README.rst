@@ -14,3 +14,8 @@ Glossary
 
 More Documentation
 ==================
+
+Plugins
+-------
+Plugin Context view names (see ADR 0003-plugin-contexts.rst):
+* "course_dashboard" -> student.views.dashboard.student_dashboard

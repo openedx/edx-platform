@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 import pytz
 from django.conf import settings
+from django.utils.translation import gettext as _
 from icalendar import Calendar, Event, vCalAddress, vText
 
 from lms.djangoapps.courseware.courses import get_course_assignments
@@ -13,7 +14,7 @@ from openedx.core.djangolib.markup import HTML
 from . import get_calendar_event_id
 
 
-def generate_ics_for_event(uid, summary, url, now, start, organizer_name, organizer_email):
+def generate_ics_for_event(uid, title, course_name, now, start, organizer_name, organizer_email):
     """
     Generates an ics-formatted bytestring for the given assignment information.
 
@@ -30,9 +31,8 @@ def generate_ics_for_event(uid, summary, url, now, start, organizer_name, organi
     event.add('uid', uid)
     event.add('dtstamp', now)
     event.add('organizer', organizer, encode=0)
-    event.add('summary', summary)
-    # FIXME description should be translated if we use hardcoded text, once we finalize that text
-    event.add('description', HTML('<a href="{url}">Link</a>').format(url=url))
+    event.add('summary', title)
+    event.add('description', HTML(_('{assignment} is due for {course}.')).format(assignment=title, course=course_name))
     event.add('dtstart', start)
     event.add('duration', timedelta(0))
     event.add('transp', 'TRANSPARENT')  # available, rather than busy
@@ -46,7 +46,7 @@ def generate_ics_for_event(uid, summary, url, now, start, organizer_name, organi
     return cal.to_ical()
 
 
-def generate_ics_for_user_course(course_key, user, request):
+def generate_ics_for_user_course(course, user, request):
     """
     Generates ics-formatted bytestrings of all assignments for a given course and user.
 
@@ -54,7 +54,7 @@ def generate_ics_for_user_course(course_key, user, request):
 
     Returns an iterable of ics files, each one representing an assignment.
     """
-    assignments = get_course_assignments(course_key, user, request)
+    assignments = get_course_assignments(course.id, user, request)
     platform_name = get_value('platform_name', settings.PLATFORM_NAME)
     platform_email = get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
     now = datetime.now(pytz.utc)
@@ -65,9 +65,9 @@ def generate_ics_for_user_course(course_key, user, request):
             organizer_name=platform_name,
             organizer_email=platform_email,
             start=assignment.date,
-            summary=assignment.title,
+            title=assignment.title,
+            course_name=course.display_name_with_default,
             uid=get_calendar_event_id(user, str(assignment.block_key), 'due', request.site.domain),
-            url=assignment.url,
         )
         for assignment in assignments
     )

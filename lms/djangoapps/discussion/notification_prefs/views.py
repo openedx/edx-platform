@@ -71,7 +71,7 @@ class UsernameCipher(object):
         encryptor = aes_cipher.encryptor()
         padder = PKCS7(AES.block_size).padder()
         padded = padder.update(username.encode("utf-8")) + padder.finalize()
-        return urlsafe_b64encode(initialization_vector + encryptor.update(padded) + encryptor.finalize())
+        return urlsafe_b64encode(initialization_vector + encryptor.update(padded) + encryptor.finalize()).decode()
 
     @staticmethod
     def decrypt(token):
@@ -187,7 +187,7 @@ def set_subscription(request, token, subscribe):  # pylint: disable=unused-argum
     success, the response will contain a page indicating success.
     """
     try:
-        username = UsernameCipher().decrypt(token.encode())
+        username = UsernameCipher().decrypt(token.encode()).decode()
         user = User.objects.get(username=username)
     except UnicodeDecodeError:
         raise Http404("base64url")

@@ -35,7 +35,7 @@
 #
 # Translators:
 # adem ÖZGÜR <admozgur@gmail.com>, 2015
-# Ali Işıngör <ali@artistanbul.io>, 2017-2019
+# Ali Işıngör <ali@artistanbul.io>, 2017-2020
 # ali selek <aliselek01@gmail.com>, 2015
 # baris <brscvs@gmail.com>, 2013
 # Burak Özalp <realburq@gmail.com>, 2013
@@ -107,7 +107,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-03-08 20:42+0000\n"
+"POT-Creation-Date: 2020-03-29 20:42+0000\n"
 "PO-Revision-Date: 2020-02-20 16:22+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
@@ -2841,8 +2841,8 @@ msgid "Confirm"
 msgstr "Onayla"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
-msgid "You already belong to another team."
-msgstr "Şu anda başka bir takıma ait görünüyorsunuz."
+msgid "You already belong to another team in this team set."
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "This team is full."
@@ -6430,7 +6430,7 @@ msgstr "Tarih eklendi"
 #. edited.
 #: cms/static/js/views/pages/container.js
 msgid "Editing access for: {title}"
-msgstr ""
+msgstr "{title} için erişim düzenleniyor"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
@@ -6606,7 +6606,7 @@ msgstr "Ders kredisi için minimum not ayarlanmadı."
 
 #: cms/static/js/views/settings/main.js
 msgid "Course pacing cannot be changed once a course has started."
-msgstr "Ders denetimi bir ders denetimi başladıktan sonra değiştirilemez."
+msgstr "Ders eğitim türü ders bir kere başladıktan sonra değiştirilemez."
 
 #: cms/static/js/views/settings/main.js
 msgid "{hours}:{minutes} (current UTC time)"
@@ -6626,7 +6626,7 @@ msgstr "Videonuzun küçük resmini yükleyin."
 
 #: cms/static/js/views/show_textbook.js
 msgid "Delete “<%- name %>”?"
-msgstr ""
+msgstr "Sil “<%- name %>”?"
 
 #: cms/static/js/views/show_textbook.js
 msgid ""
