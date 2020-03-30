@@ -185,13 +185,6 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         self.user.refresh_from_db()
         assert self.user.last_login > old_last_login
 
-    def test_login_success_prevent_auth_user_writes(self):
-        with waffle().override(PREVENT_AUTH_USER_WRITES, True):
-            old_last_login = self.user.last_login
-            self.test_login_success()
-            self.user.refresh_from_db()
-            assert old_last_login == self.user.last_login
-
     def test_login_fail_no_user_exists(self):
         nonexistent_email = u'not_a_user@edx.org'
         response, mock_audit_log = self._login_response(
