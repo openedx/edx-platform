@@ -124,7 +124,7 @@ def student_certificates(request):
 
     program_credentials = get_credentials(request.user, credential_type='program')
     for credential in program_credentials:
-        program_name = [attribute['value'] for attribute in credential.get('attributes')
+        program_name = [attribute['value'] for attribute in credential.get('attributes',{})
                         if 'name' in attribute and attribute['name'] == 'program_name']
         if program_name:
             user_certificates.append({
