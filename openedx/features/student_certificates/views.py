@@ -79,10 +79,7 @@ def student_certificates(request):
 
     user_certificates = []
 
-    import json
-    x = '{ "count": 1,"next": "","previous": "","results": [{"username": "edx","credential": {"type": "program","credential_id": 3,"program_uuid": "eb228773-a9a5-48cf-bb0e-94725d5aa4f1"},"status": "awarded","download_url": "","uuid": "5a1620c5-cb31-421e-b720-5704229d8c9a","attributes": [{"name": "program_name","value": "Test Discovery Program"}],"created": "2020-02-11T12:45:54Z","modified": "2020-03-27T16:43:59Z","certificate_url": "http://local.philanthropyu.org:18150/credentials/5a1620c5cb31421eb7205704229d8c9a/"}  ]}'
-    context = json.loads(x)
-    program_credentials = context['results']
+    program_credentials = get_credentials(request.user, credential_type='program')
     for credential in program_credentials:
         if 'certificate_url' in credential:
             program_name = [attribute['value'] for attribute in credential.get('attributes', {})
