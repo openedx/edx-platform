@@ -8,7 +8,7 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views.decorators.csrf import ensure_csrf_cookie
-from constants import COURSE_URL_FMT, PDF_RESPONSE_HEADER, PDFKIT_IMAGE_PATH, TWITTER_META_TITLE_FMT
+from constants import COMPLETION_DATE_FORMAT, COURSE_URL_FMT, PDF_RESPONSE_HEADER, PDFKIT_IMAGE_PATH, TWITTER_META_TITLE_FMT
 from openedx.core.djangoapps.credentials.utils import get_credentials
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from edxmako.shortcuts import render_to_response
@@ -113,8 +113,8 @@ def student_certificates(request):
             course_title = course.display_name
 
         user_certificates.append({
-            'course_name': course_name,
-            'course_title': course_title,
+            'certificate_name': course_name,
+            'certificate_title': course_title,
             'social_sharing_urls': get_philu_certificate_social_context(course, certificate),
             'certificate_url': "%s%s" % (settings.LMS_ROOT_URL, certificate_url),
             'course_start': start_date.strftime('%b %d, %Y') if start_date else None,
@@ -128,12 +128,10 @@ def student_certificates(request):
                         if 'name' in attribute and attribute['name'] == 'program_name']
         if program_name:
             user_certificates.append({
-                'course_name': program_name[0],
-                'course_title': program_name[0],
-                'social_sharing_urls': {},
-                'certificate_url': '',
-                'course_start': '',
-                'completion_date': date_from_str(credential.get('created')).strftime('%b %d, %Y'),
+                'certificate_name': program_name[0],
+                'certificate_title': program_name[0],
+                'certificate_url': credential.get('certificate_url'),
+                'completion_date': date_from_str(credential.get('created')).strftime(COMPLETION_DATE_FORMAT),
                 'is_program_cert': True,
             })
 
