@@ -15,11 +15,12 @@ class Partner(TimeStampedModel):
     This model represents white-labelled partners.
     """
     performance_url = models.URLField(blank=True, default=None)
-    label = models.CharField(max_length=100)
-    main_logo = models.CharField(max_length=255)
-    small_logo = models.CharField(max_length=255)
-    slug = models.CharField(max_length=100, unique=True)
+    label = models.CharField(max_length=100, help_text="Display as a title in landing page.")
+    logo = models.ImageField(upload_to="partners/logo", help_text="Main logo in landing page.")
+    slug = models.CharField(max_length=100, unique=True, help_text="A unique identifier for an organization")
+    email = models.EmailField(help_text="Contact email of an organization")
     configuration = JSONField(null=False, blank=True, default=dumps({"USER_LIMIT": ""}))
+
 
     def __unicode__(self):
         return '{}'.format(self.label)

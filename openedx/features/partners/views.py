@@ -48,14 +48,15 @@ def dashboard(request, slug):
     partner = get_object_or_404(Partner, slug=slug)
     courses = get_partner_recommended_courses(partner.slug, request.user)
     return render_to_response('features/partners/dashboard.html', {'recommended_courses': courses,
-                                                                   'slug': partner.slug})
+                                                                   'slug': partner.slug, 'partner': partner})
 
 
 def performance_dashboard(request, slug):
     partner = get_object_or_404(Partner, slug=slug)
     if user_has_performance_access(request.user, partner):
         return render_to_response('features/partners/performance_dashboard.html',
-                                  {'slug': partner.slug, 'performance_url': partner.performance_url})
+                                  {'slug': partner.slug, 'partner': partner,
+                                   'performance_url': partner.performance_url})
     return HttpResponseForbidden()
 
 
