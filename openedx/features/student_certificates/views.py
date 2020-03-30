@@ -131,7 +131,7 @@ def student_certificates(request):
                 'course_name': program_name[0],
                 'course_title': program_name[0],
                 'social_sharing_urls': {},
-                'certificate_url': credential.get('certificate_url'),
+                'certificate_url': '',
                 'course_start': '',
                 'completion_date': date_from_str(credential.get('created')).strftime('%b %d, %Y'),
                 'is_program_cert': True,
