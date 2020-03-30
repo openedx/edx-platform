@@ -12,6 +12,7 @@ from itertools import chain, cycle, repeat
 from smtplib import SMTPAuthenticationError, SMTPConnectError, SMTPDataError, SMTPServerDisconnected
 from uuid import uuid4
 
+# TODO: replace boto with boto3
 from boto.exception import AWSConnectionError
 from boto.ses.exceptions import (
     SESAddressBlacklistedError,

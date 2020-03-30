@@ -11,6 +11,7 @@ from collections import Counter
 from smtplib import SMTPConnectError, SMTPDataError, SMTPException, SMTPServerDisconnected
 from time import sleep
 
+# TODO: replace boto with boto3
 from boto.exception import AWSConnectionError
 from boto.ses.exceptions import (
     SESAddressBlacklistedError,
