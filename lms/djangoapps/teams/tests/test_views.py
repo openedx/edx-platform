@@ -840,6 +840,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         ('student_on_team_1_private_set_1', True, True, True),
         ('student_on_team_2_private_set_1', True, True, True),
         ('student_enrolled', False, False, False),
+        ('student_masters', True, True, True),
         ('staff', True, True, True),
     )
     def test_text_search_private_teamset(self, user, can_see_private_1_1, can_see_private_1_2, can_see_private_2_1):
@@ -1613,8 +1614,8 @@ class TestDetailTopicAPI(TeamAPITestCase):
         ('student_on_team_2_private_set_1', 200, 2),
         ('staff', 200, 2)
     )
-    """ As different users, request info about a private_managed team """
     def test_teamset_type(self, requesting_user, expected_status, expected_team_count):
+        """ As different users, request info about a private_managed team """
         topic = self.get_topic_detail(
             topic_id='private_topic_1_id',
             course_id=self.test_course_1.id,
