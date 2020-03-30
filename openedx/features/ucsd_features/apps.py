@@ -6,5 +6,5 @@ class UcsdFeatures(AppConfig):
 
     def ready(self):
         super(UcsdFeatures, self).ready()
-        from .signals import *
-        from .additional_registration_fields import *
+        from openedx.features.ucsd_features.signals import *
+        from openedx.features.ucsd_features.additional_registration_fields import *
