@@ -106,7 +106,7 @@ edx-bulk-grades==0.6.8    # via -r requirements/edx/base.txt, staff-graded-xbloc
 edx-ccx-keys==1.0.1       # via -r requirements/edx/base.txt
 edx-celeryutils==0.4.0    # via -r requirements/edx/base.txt, super-csv
 edx-completion==3.1.1     # via -r requirements/edx/base.txt
-edx-django-release-util==0.4.1  # via -r requirements/edx/base.txt
+git+https://github.com/edx/edx-django-release-util.git@a5094565aed35ffc0a9418a9ec92f52c78e92c7e#egg=edx-django-release-util
 edx-django-sites-extensions==2.4.3  # via -r requirements/edx/base.txt
 edx-django-utils==3.1     # via -r requirements/edx/base.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==5.0.2  # via -r requirements/edx/base.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
