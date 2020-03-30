@@ -64,6 +64,9 @@ pandas==0.22.0
 # path 13.2.0 drops support for Python 3.5
 path<13.2.0
 
+# BOM-1430: pytest 5.4.0 breaks reporting sometimes: https://github.com/pytest-dev/pytest/issues/6925
+pytest<5.4.0
+
 # Upgrading to 2.5.3 on 2020-01-03 triggered "'tzlocal' object has no attribute '_std_offset'" errors in production
 python-dateutil==2.4.0
 
