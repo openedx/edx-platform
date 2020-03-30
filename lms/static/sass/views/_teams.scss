@@ -356,26 +356,21 @@
   .team-management {
     padding: 1%;
 
-    h3, p, .action, .team-management-section {
-        margin-bottom: 2%;
+    h3,
+    p,
+    .action,
+    .team-management-section,
+    input {
+      margin-bottom: 2%;
     }
 
-    .input-overlay-hack {
-      position: absolute;
-      height: 100%;
-      width: 100%;
-      opacity: 0;
-      top: 0;
-      left: 0;
-      cursor: pointer;
-    }
-
-    .upload-team-csv {
-      position: relative;
+    #upload-team-csv {
+      display: block;
     }
   }
 
-  .team-profile, .team-management {
+  .team-profile,
+  .team-management {
     .page-content-main {
       display: inline-block;
       width: flex-grid(8, 12);
@@ -554,6 +549,7 @@
       border: inherit;
       box-shadow: none;
     }
+
     display: inline-block;
     text-shadow: none;
   }
