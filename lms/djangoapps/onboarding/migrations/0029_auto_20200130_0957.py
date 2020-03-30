@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('onboarding', '0027_auto_20191111_0550'),
+        ('onboarding', '0028_education_experience_skill'),
     ]
 
     operations = [
