@@ -85,7 +85,7 @@ edx-sga
 edx-submissions
 edx-user-state-client
 edx-when
-git+https://github.com/open-craft/edx-val.git@paulo/always-import-transcripts#egg=edxval
+-e git+https://github.com/open-craft/edx-val.git@paulo/always-import-transcripts#egg=edxval
 event-tracking
 fs==2.0.18
 fs-s3fs==0.1.8
