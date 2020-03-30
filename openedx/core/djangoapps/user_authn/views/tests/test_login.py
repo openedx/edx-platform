@@ -179,7 +179,6 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success', unicode_email])
 
-
     def test_login_fail_no_user_exists(self):
         nonexistent_email = u'not_a_user@edx.org'
         response, mock_audit_log = self._login_response(
