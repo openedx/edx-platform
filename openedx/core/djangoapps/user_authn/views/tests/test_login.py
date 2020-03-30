@@ -179,11 +179,6 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success', unicode_email])
 
-    def test_last_login_updated(self):
-        old_last_login = self.user.last_login
-        self.test_login_success()
-        self.user.refresh_from_db()
-        assert self.user.last_login > old_last_login
 
     def test_login_fail_no_user_exists(self):
         nonexistent_email = u'not_a_user@edx.org'
