@@ -30,10 +30,10 @@ from openedx.features.student_certificates.signals import USER_CERTIFICATE_DOWNL
 certs_api = import_module('lms.djangoapps.certificates.api')
 CERTIFICATE_IMG_PREFIX = 'certificates_images'
 
-DISCOVERY_DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
+CREDENTIALS_DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 
 
-def date_from_str(date_str, date_format=DISCOVERY_DATE_FORMAT):
+def date_from_str(date_str, date_format=CREDENTIALS_DATE_FORMAT):
     return datetime.strptime(date_str, date_format)
 
 
