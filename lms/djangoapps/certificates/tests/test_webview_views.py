@@ -418,7 +418,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             response.content
         )
         self.assertIn(
-            '<title>test_organization {} Certificate |'.format(self.course.number, ),
+            '<title>test_organization {} Statement of Accomplishment |'.format(self.course.number, ),
             response.content
         )
         self.assertIn('logo_test1.png', response.content)
@@ -503,7 +503,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             response.content
         )
         self.assertIn(
-            'Certificate ID Number',
+            'Statement of Accomplishment ID Number',
             response.content
         )
         # Test an item from html cert configuration
@@ -518,7 +518,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         )
         # Test an item from user info
         self.assertIn(
-            "{fullname}, you earned a certificate!".format(fullname=self.user.profile.name),
+            "{fullname}, you earned a statement of accomplishment!".format(fullname=self.user.profile.name),
             response.content
         )
         # Test an item from social info
@@ -598,7 +598,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self.cert.status = CertificateStatuses.generating
         self.cert.save()
         response = self.client.get(test_url)
-        self.assertIn("Invalid Certificate", response.content)
+        self.assertIn("Invalid Statement of Accomplishment", response.content)
         self.assertIn("Cannot Find Certificate", response.content)
         self.assertIn("We cannot find a certificate with this URL or ID number.", response.content)
 
@@ -625,11 +625,10 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             course_id=unicode(self.course.id)
         )
         response = self.client.get(test_url)
-
         if eligible_for_certificate:
             self.assertIn(str(self.cert.verify_uuid), response.content)
         else:
-            self.assertIn("Invalid Certificate", response.content)
+            self.assertIn("Invalid Statement of Accomplishment", response.content)
             self.assertIn("Cannot Find Certificate", response.content)
             self.assertIn("We cannot find a certificate with this URL or ID number.", response.content)
             self.assertNotIn(str(self.cert.verify_uuid), response.content)
@@ -652,7 +651,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         # invalidate certificate and verify that "Cannot Find Certificate" is returned
         self.cert.invalidate()
         response = self.client.get(test_url)
-        self.assertIn("Invalid Certificate", response.content)
+        self.assertIn("Invalid Statement of Accomplishment", response.content)
         self.assertIn("Cannot Find Certificate", response.content)
         self.assertIn("We cannot find a certificate with this URL or ID number.", response.content)
 
@@ -704,7 +703,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             course_id=unicode(self.course.id)
         )
         response = self.client.get(test_url)
-        self.assertIn("Invalid Certificate", response.content)
+        self.assertIn("Invalid Statement of Accomplishment", response.content)
         self.assertIn("Cannot Find Certificate", response.content)
         self.assertIn("We cannot find a certificate with this URL or ID number.", response.content)
 
@@ -993,7 +992,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             course_id=unicode(self.course.id)
         )
         response = self.client.get(test_url)
-        self.assertIn("Invalid Certificate", response.content)
+        self.assertIn("Invalid Statement of Accomplishment", response.content)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_500_view_invalid_certificate_configuration(self):

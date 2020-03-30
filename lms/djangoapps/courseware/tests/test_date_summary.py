@@ -270,7 +270,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         block = CourseEndDate(course, user)
         self.assertEqual(
             block.description,
-            'To earn a certificate, you must complete all requirements before this date.'
+            'To earn a statement of accomplishment, you must complete all requirements before this date.'
         )
 
     def test_course_end_date_for_non_certificate_eligible_mode(self):
@@ -396,7 +396,8 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             self.assertEqual(block.date, datetime.now(utc) + timedelta(days=14))
             self.assertEqual(
                 block.description,
-                'You must successfully complete verification before this date to qualify for a Verified Certificate.'
+                ('You must successfully complete verification before this date to qualify for a '
+                 'Statement of Accomplishment.')
             )
             self.assertEqual(block.link_text, 'Verify My Identity')
             self.assertEqual(block.link, reverse('verify_student_verify_now', args=(course.id,)))
@@ -413,7 +414,8 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             self.assertEqual(block.date, datetime.now(utc) + timedelta(days=14))
             self.assertEqual(
                 block.description,
-                'You must successfully complete verification before this date to qualify for a Verified Certificate.'
+                ('You must successfully complete verification before this date to qualify for a '
+                 'Statement of Accomplishment.')
             )
             self.assertEqual(block.link_text, 'Retry Verification')
             self.assertEqual(block.link, reverse('verify_student_reverify'))
@@ -456,6 +458,7 @@ class TestDateAlerts(SharedModuleStoreTestCase):
     """
     Unit tests for date alerts.
     """
+
     def setUp(self):
         super(TestDateAlerts, self).setUp()
         with freeze_time('2017-07-01 09:00:00'):
@@ -518,10 +521,14 @@ class TestDateAlerts(SharedModuleStoreTestCase):
 
     @ddt.data(
         ['2017-06-20 09:00:00', None],
-        ['2017-06-21 09:00:00', u'Don&#39;t forget, you have 2 weeks left to upgrade to a Verified Certificate.'],
-        ['2017-07-04 10:00:00', u'Don&#39;t forget, you have 1 day left to upgrade to a Verified Certificate.'],
-        ['2017-07-05 08:00:00', u'Don&#39;t forget, you have 1 hour left to upgrade to a Verified Certificate.'],
-        ['2017-07-05 08:55:00', u'Don&#39;t forget, you have 5 minutes left to upgrade to a Verified Certificate.'],
+        ['2017-06-21 09:00:00', (u'Don&#39;t forget, you have 2 weeks left to upgrade to a '
+                                 'Statement of Accomplishment.')],
+        ['2017-07-04 10:00:00', (u'Don&#39;t forget, you have 1 day left to upgrade to a '
+                                 'Statement of Accomplishment.')],
+        ['2017-07-05 08:00:00', (u'Don&#39;t forget, you have 1 hour left to upgrade to a '
+                                 'Statement of Accomplishment.')],
+        ['2017-07-05 08:55:00', (u'Don&#39;t forget, you have 5 minutes left to upgrade to a '
+                                 'Statement of Accomplishment.')],
         ['2017-07-05 09:00:00', None],
         ['2017-08-05 09:00:00', None],
     )
@@ -543,9 +550,12 @@ class TestDateAlerts(SharedModuleStoreTestCase):
 
     @ddt.data(
         ['2017-07-15 08:00:00', None],
-        ['2017-07-15 09:00:00', u'If you have earned a certificate, you will be able to access it 1 week from now.'],
-        ['2017-07-21 09:00:00', u'If you have earned a certificate, you will be able to access it 1 day from now.'],
-        ['2017-07-22 08:00:00', u'If you have earned a certificate, you will be able to access it 1 hour from now.'],
+        ['2017-07-15 09:00:00', (u'If you have earned a statement of accomplishment, you will be able to access it 1 '
+                                 'week from now.')],
+        ['2017-07-21 09:00:00', (u'If you have earned a statement of accomplishment, you will be able to access it 1 '
+                                 'day from now.')],
+        ['2017-07-22 08:00:00', (u'If you have earned a statement of accomplishment, you will be able to access it 1 '
+                                 'hour from now.')],
         ['2017-07-22 09:00:00', None],
         ['2017-07-23 09:00:00', None],
     )

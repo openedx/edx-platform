@@ -356,8 +356,8 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         # Assert success message
         self.assertEqual(
             res_json['message'],
-            u'Certificate regeneration task has been started. You can view the status of the generation task in '
-            u'the "Pending Tasks" section.'
+            u'Statement of accomplishment regeneration task has been started. You can view the status of '
+            u'the generation task in the "Pending Tasks" section.'
         )
 
     @override_settings(AUDIT_CERT_CUTOFF_DATE=datetime.now(pytz.UTC) - timedelta(days=1))
@@ -428,7 +428,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
                 # Assert success message
                 self.assertEquals(
                     res_json['message'],
-                    u'Certificate regeneration task has been started. '
+                    u'Statement of accomplishment regeneration task has been started. '
                     u'You can view the status of the generation task in '
                     u'the "Pending Tasks" section.'
                 )
@@ -466,7 +466,8 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         # Assert Error Message
         self.assertEqual(
             res_json['message'],
-            u'Please select one or more certificate statuses that require certificate regeneration.'
+            (u'Please select one or more statement of accomplishment statuses that require statement of '
+             'accomplishment regeneration.')
         )
 
         # Access the url passing 'certificate_statuses' that are not present in db

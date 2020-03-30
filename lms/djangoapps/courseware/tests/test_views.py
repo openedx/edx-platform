@@ -1390,7 +1390,7 @@ class ProgressPageTests(ProgressPageBaseTests):
 
             self.assertContains(resp, u"View Certificate")
 
-            self.assertContains(resp, u"earned a certificate for this course")
+            self.assertContains(resp, u"earned a statement of accomplishment for this course")
             cert_url = certs_api.get_certificate_url(course_id=self.course.id, uuid=certificate.verify_uuid)
             self.assertContains(resp, cert_url)
 
@@ -1399,10 +1399,10 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.store.update_item(self.course, self.user.id)
 
             resp = self._get_progress_page()
-            self.assertNotContains(resp, u"View Your Certificate")
-            self.assertNotContains(resp, u"You can now view your certificate")
-            self.assertContains(resp, "Your certificate is available")
-            self.assertContains(resp, "earned a certificate for this course.")
+            self.assertNotContains(resp, u"View Your Statement of Accomplishment")
+            self.assertNotContains(resp, u"You can now view your statement of accomplishment")
+            self.assertContains(resp, "Your statement of accomplishment is available")
+            self.assertContains(resp, "earned a statement of accomplishment for this course.")
 
     @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
@@ -1711,7 +1711,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         generated_certificate.invalidate()
         response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
         self.assertEqual(response.cert_status, 'invalidated')
-        self.assertEqual(response.title, 'Your certificate has been invalidated')
+        self.assertEqual(response.title, 'Your statement of accomplishment has been invalidated')
 
     def test_downloadable_get_cert_data(self):
         """
@@ -1725,7 +1725,7 @@ class ProgressPageTests(ProgressPageBaseTests):
             response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 
         self.assertEqual(response.cert_status, 'downloadable')
-        self.assertEqual(response.title, 'Your certificate is available')
+        self.assertEqual(response.title, 'Your statement of accomplishment is available')
 
     def test_generating_get_cert_data(self):
         """
@@ -1753,7 +1753,7 @@ class ProgressPageTests(ProgressPageBaseTests):
             response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 
         self.assertEqual(response.cert_status, 'unverified')
-        self.assertEqual(response.title, "Certificate unavailable")
+        self.assertEqual(response.title, "Statement of accomplishment unavailable")
 
     def test_request_get_cert_data(self):
         """
@@ -1767,7 +1767,7 @@ class ProgressPageTests(ProgressPageBaseTests):
             response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 
         self.assertEqual(response.cert_status, 'requesting')
-        self.assertEqual(response.title, "Congratulations, you qualified for a certificate!")
+        self.assertEqual(response.title, "Congratulations, you qualified for a statement of accomplishment!")
 
     def assert_invalidate_certificate(self, certificate):
         """ Dry method to mark certificate as invalid. And assert the response. """
@@ -1778,12 +1778,11 @@ class ProgressPageTests(ProgressPageBaseTests):
         # Invalidate user certificate
         certificate.invalidate()
         resp = self._get_progress_page()
-
-        self.assertNotContains(resp, u'Request Certificate')
-        self.assertContains(resp, u'Your certificate has been invalidated')
+        self.assertNotContains(resp, u'Request Statement of Accomplishment')
+        self.assertContains(resp, u'Your statement of accomplishment has been invalidated')
         self.assertContains(resp, u'Please contact your course team if you have any questions.')
-        self.assertNotContains(resp, u'View Your Certificate')
-        self.assertNotContains(resp, u'Download Your Certificate')
+        self.assertNotContains(resp, u'View Your Statement of Accomplishment')
+        self.assertNotContains(resp, u'Download Your Statement of Accomplishment')
 
     def generate_certificate(self, url, mode):
         """ Dry method to generate certificate. """
@@ -2144,7 +2143,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         # If user has no grading then json will return failed message and badrequest code
         resp = self.client.post(self.url)
         self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-        self.assertIn("Your certificate will be available when you pass the course.", resp.content)
+        self.assertIn("Your statement of accomplishment will be available when you pass the course.", resp.content)
 
     @patch('courseware.views.views.is_course_passed', return_value=True)
     @override_settings(CERT_QUEUE='certificates', LMS_SEGMENT_KEY="foobar")
@@ -2190,7 +2189,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
 
             resp = self.client.post(self.url)
             self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-            self.assertIn("Certificate is being created.", resp.content)
+            self.assertIn("Statement of accomplishment is being created.", resp.content)
 
     @override_settings(CERT_QUEUE='certificates', LMS_SEGMENT_KEY="foobar")
     def test_user_with_passing_existing_downloadable_cert(self):
@@ -2211,7 +2210,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
 
             resp = self.client.post(self.url)
             self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-            self.assertIn("Certificate has already been created.", resp.content)
+            self.assertIn("Statement of accomplishment has already been created.", resp.content)
 
     def test_user_with_non_existing_course(self):
         # If try to access a course with valid key pattern then it will return
@@ -2762,6 +2761,7 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
     This class overrides the get_response method, which is used by
     the tests defined in RenderXBlockTestMixin.
     """
+
     def setUp(self):
         reload_django_url_config()
         super(TestRenderXBlock, self).setUp()
@@ -2840,6 +2840,7 @@ class TestRenderXBlockSelfPaced(TestRenderXBlock):
     Test rendering XBlocks for a self-paced course. Relies on the query
     count assertions in the tests defined by RenderXBlockMixin.
     """
+
     def setUp(self):
         super(TestRenderXBlockSelfPaced, self).setUp()
 
@@ -2934,6 +2935,7 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ModuleStoreTestCa
     """
     Ensure that the Enterprise Data Consent redirects are in place only when consent is required.
     """
+
     def setUp(self):
         super(EnterpriseConsentTestCase, self).setUp()
         self.user = UserFactory.create()
