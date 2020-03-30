@@ -9,7 +9,8 @@ define([
         describe('MultipleEnterpriseInterface', function() {
             var LEARNER_URL = '/enterprise/api/v1/enterprise-learner/?username=test-learner',
                 NEXT_URL = '/dashboard',
-                REDIRECT_URL = '/enterprise/select/active/?success_url=%2Fdashboard';
+                REDIRECT_URL = '/enterprise/select/active/?success_url=%2Fdashboard',
+                ENTERPRISE_ACTIVATION_URL = '/enterprise/select/active';
 
             beforeEach(function() {
                 // Mock the redirect call
@@ -34,6 +35,75 @@ define([
 
                 // Simulate a successful response from the server
                 AjaxHelpers.respondWithJson(requests, {count: 2});
+
+                // Verify that the user was redirected correctly
+                expect(MultipleEnterpriseInterface.redirect).toHaveBeenCalledWith(REDIRECT_URL);
+            });
+
+            it('checks bypass of enterprise selection page in case of enterprise in URL', function() {
+                // Spy on Ajax requests
+                var requests = AjaxHelpers.requests(this);
+                spyOn(MultipleEnterpriseInterface, 'getEnterpriseFromUrl').and.returnValue('SomeEnterprise');
+                spyOn(MultipleEnterpriseInterface, 'checkEnterpriseExists').and.returnValue(true);
+
+                // Attempt to fetch a learner
+                MultipleEnterpriseInterface.check(NEXT_URL);
+
+                // Expect that the correct request was made to the server
+                AjaxHelpers.expectRequest(
+                    requests,
+                    'GET',
+                    LEARNER_URL,
+                    null
+                );
+
+                // Simulate a successful response from the server
+                AjaxHelpers.respondWithJson(requests, {count: 2});
+
+                AjaxHelpers.expectRequest(
+                    requests,
+                    'POST',
+                    ENTERPRISE_ACTIVATION_URL,
+                    $.param({
+                        enterprise: 'SomeEnterprise'
+                    })
+                );
+                AjaxHelpers.respondWithNoContent(requests);
+
+                // Verify that the user was redirected correctly
+                expect(MultipleEnterpriseInterface.redirect).toHaveBeenCalledWith(NEXT_URL);
+            });
+
+            it('checks enterprise selection page redirect in case of enterprise activation failure', function() {
+                // Spy on Ajax requests
+                var requests = AjaxHelpers.requests(this);
+                spyOn(MultipleEnterpriseInterface, 'getEnterpriseFromUrl').and.returnValue('SomeEnterprise');
+                spyOn(MultipleEnterpriseInterface, 'checkEnterpriseExists').and.returnValue(true);
+
+                // Attempt to fetch a learner
+                MultipleEnterpriseInterface.check(NEXT_URL);
+
+                // Expect that the correct request was made to the server
+                AjaxHelpers.expectRequest(
+                    requests,
+                    'GET',
+                    LEARNER_URL,
+                    null
+                );
+
+                // Simulate a successful response from the server
+                AjaxHelpers.respondWithJson(requests, {count: 2});
+
+                AjaxHelpers.expectRequest(
+                    requests,
+                    'POST',
+                    ENTERPRISE_ACTIVATION_URL,
+                    $.param({
+                        enterprise: 'SomeEnterprise'
+                    })
+                );
+                // Simulate an error response from the server
+                AjaxHelpers.respondWithError(requests);
 
                 // Verify that the user was redirected correctly
                 expect(MultipleEnterpriseInterface.redirect).toHaveBeenCalledWith(REDIRECT_URL);
