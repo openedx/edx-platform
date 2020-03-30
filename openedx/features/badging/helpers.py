@@ -1,3 +1,4 @@
+import json
 from collections import OrderedDict
 
 from django.template.loader import render_to_string
@@ -12,14 +13,26 @@ from nodebb.constants import CONVERSATIONALIST_ENTRY_INDEX, TEAM_PLAYER_ENTRY_IN
 
 from .constants import (
     BADGES_KEY,
+    BADGES_DATE_EARNED_KEY,
+    BADGES_PROGRESS_KEY,
+    COURSES_KEY,
     CONVERSATIONALIST,
+    DISCUSSION_ID_KEY,
+    DISCUSSION_COUNT_KEY,
     EARNED_BADGE_NOTIFICATION_TYPE,
     FILTER_BADGES_ERROR,
+    POST_COUNT_KEY,
+    TEAM_COUNT_KEY,
     TEAM_ID_KEY,
     TEAM_PLAYER,
-    TEAM_ROOM_ID_KEY
+    TEAM_ROOM_ID_KEY,
+    THRESHOLD_LABEL_KEY,
+    USERNAME_KEY
 )
 from .models import Badge
+
+BADGE_TYPE_TEAM = TEAM_PLAYER[TEAM_PLAYER_ENTRY_INDEX]
+BADGE_TYPE_CONVERSATIONALIST = CONVERSATIONALIST[CONVERSATIONALIST_ENTRY_INDEX]
 
 
 def populate_trophycase(user, courses, earned_badges):
@@ -32,7 +45,7 @@ def populate_trophycase(user, courses, earned_badges):
     :return: dictionary containing trophycase json
     """
     trophycase_dict = OrderedDict()
-    badge_queryset = Badge.objects.all().order_by('threshold')
+    badge_queryset = Badge.objects.all().order_by(THRESHOLD_LABEL_KEY)
 
     for course_key, display_name in courses:
         course_badges = get_course_badges(user, course_key, earned_badges, badge_queryset)
@@ -60,11 +73,11 @@ def get_course_badges(user, course_id, earned_badges, badge_queryset=None):
     }
 
     if not badge_queryset:
-        badge_queryset = Badge.objects.all().order_by('threshold')
+        badge_queryset = Badge.objects.all().order_by(THRESHOLD_LABEL_KEY)
 
     for badge_type, _ in Badge.BADGE_TYPES:
 
-        if badge_type == TEAM_PLAYER[TEAM_PLAYER_ENTRY_INDEX]:
+        if badge_type == BADGE_TYPE_TEAM:
             course = get_course_by_id(course_id)
 
             if not is_teams_feature_enabled(course):
@@ -76,6 +89,7 @@ def get_course_badges(user, course_id, earned_badges, badge_queryset=None):
             if course_team:
                 # only if user has joined any team
                 badges[TEAM_ID_KEY] = course_team[TEAM_ID_KEY]
+                badges[TEAM_ROOM_ID_KEY] = course_team[TEAM_ROOM_ID_KEY]
 
         badge_list = list(
             badge_queryset.filter(type=badge_type).values()
@@ -101,7 +115,7 @@ def add_badge_earned_date(course_id, course_badges, earned_badges):
         for earned_badge in earned_badges:
             if badge['id'] == earned_badge.badge_id and course_id == earned_badge.course_id:
                 # earned date indicate badge is earned
-                badge['date_earned'] = earned_badge.date_earned
+                badge[BADGES_DATE_EARNED_KEY] = earned_badge.date_earned
 
 
 def filter_earned_badge_by_joined_team(user, course, earned_badges):
@@ -141,9 +155,9 @@ def get_badge_url(course_id, badge_type, team_id):
     :return: URL of badge in String format. Return "browse team" if user hasn't join any team.
     """
     badge_url = reverse('teams_dashboard', kwargs={'course_id': course_id})
-    if badge_type == CONVERSATIONALIST[CONVERSATIONALIST_ENTRY_INDEX]:
+    if badge_type == BADGE_TYPE_CONVERSATIONALIST:
         badge_url = reverse('nodebb_forum_discussion', kwargs={'course_id': course_id})
-    elif badge_type == TEAM_PLAYER[TEAM_PLAYER_ENTRY_INDEX] and team_id:
+    elif badge_type == BADGE_TYPE_TEAM and team_id:
         badge_url = reverse('view_team', kwargs={'course_id': course_id, 'team_id': team_id})
     return badge_url
 
@@ -164,9 +178,9 @@ def get_badge_progress(index, badges, team_joined=True):
     badge_progress = ('', 'Not Started')
     if not team_joined:
         return badge_progress
-    elif 'date_earned' in current_badge:
+    elif BADGES_DATE_EARNED_KEY in current_badge:
         badge_progress = ('completed', 'Completed!')
-    elif not previous_badge or 'date_earned' in previous_badge:
+    elif not previous_badge or BADGES_DATE_EARNED_KEY in previous_badge:
         badge_progress = ('in-progress', 'In Progress')
     return badge_progress
 
@@ -194,3 +208,70 @@ def send_user_badge_notification(user, my_badge_url, badge_name):
     )
 
     publish_notification_to_user(user.id, message)
+
+
+def get_discussion_team_ids(course_id, discussion_room_id, badges):
+    """
+    Return generic dictionary that contain another dictionary with course_id as key and contain
+    discussion_room_id and team_room_id.
+    :param course_id: Course Id in String format
+    :param discussion_room_id: Discussion room Id in Int format
+    :param badges: Dictionary contain badges
+    """
+    course_discussion_team = {
+        course_id: {
+            DISCUSSION_ID_KEY: discussion_room_id
+        }
+    }
+    if TEAM_ROOM_ID_KEY in badges:
+        course_discussion_team[course_id][TEAM_ID_KEY] = badges[TEAM_ROOM_ID_KEY]
+    return course_discussion_team
+
+
+def get_badge_progress_request_data(username, courses):
+    """
+    Return dictionary that contain username and course data regarding discussion room Id and team room Id.
+    :param username: Username in String format
+    :param courses: course data regarding discussion room Id and team room Id
+    """
+    return {
+        USERNAME_KEY: username,
+        COURSES_KEY: json.dumps(courses)
+    }
+
+
+def add_posts_count_in_badges_list(course, badges_list):
+    """
+    Add post count data in conversationalist badges and team badges
+    :param course: Dictionary that contain information related to posts count in Discussion room and Team room.
+    :param badges_list: Dictionary contain badges both conversationalist badges and team badges
+    """
+    course_key = course.keys()[0]
+    discussion_posts_count = course[course_key][DISCUSSION_COUNT_KEY]
+    conversationalist_badges = add_badge_progress(
+        badges_list[BADGE_TYPE_CONVERSATIONALIST], discussion_posts_count)
+    badges_list[BADGE_TYPE_CONVERSATIONALIST] = conversationalist_badges
+
+    team_posts_count = course[course_key].get(TEAM_COUNT_KEY, 0)
+    team_badges = add_badge_progress(badges_list[BADGE_TYPE_TEAM], team_posts_count)
+    badges_list[BADGE_TYPE_TEAM] = team_badges
+
+
+def add_badge_progress(course_badges, posts_count):
+    """
+    Add post count and badge progress in badges that will than rendered in 'my badges' or 'my trophy case'
+    :param course_badges: Badges data either conversationalist badges or team badges
+    :param posts_count: Count of post in Int format
+    """
+    previous_threshold = 0
+    for index, badge in enumerate(course_badges):
+        badge[THRESHOLD_LABEL_KEY] = badge[THRESHOLD_LABEL_KEY] - previous_threshold
+        previous_threshold = badge[THRESHOLD_LABEL_KEY] + previous_threshold
+        if BADGES_DATE_EARNED_KEY in badge:
+            badge[BADGES_PROGRESS_KEY] = 100
+            posts_count = posts_count - badge[THRESHOLD_LABEL_KEY]
+        else:
+            badge[POST_COUNT_KEY] = posts_count if posts_count > 0 else 0
+            badge[BADGES_PROGRESS_KEY] = ((posts_count * 100) / badge[THRESHOLD_LABEL_KEY]) if posts_count > 0 else 0
+            posts_count = posts_count - badge[THRESHOLD_LABEL_KEY]
+    return course_badges

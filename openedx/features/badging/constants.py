@@ -3,11 +3,22 @@ TEAM_PLAYER = ('team', 'Team player')
 
 BADGE_ID_KEY = 'badge_id'
 BADGES_KEY = 'badges'
+BADGES_DATE_EARNED_KEY = 'date_earned'
+BADGES_PROGRESS_KEY = 'badge_progress'
+COURSES_KEY = 'courses'
 COURSE_ID_KEY = 'course_id'
+COURSE_NAME_KEY = 'course__display_name'
+COMMUNITY_URL_KEY = 'community_url'
+DISCUSSION_ID_KEY = 'discussion_id'
+DISCUSSION_COUNT_KEY = 'discussion_count'
+POST_COUNT_KEY = 'post_count'
 ROOM_ID_KEY = 'room_id'
 TEAM_ID_KEY = 'team_id'
+TEAM_COUNT_KEY = 'team_count'
 TEAM_ROOM_ID_KEY = 'team__room_id'
 THRESHOLD_KEY = 'badge__threshold'
+THRESHOLD_LABEL_KEY = 'threshold'
+USERNAME_KEY = 'username'
 
 MY_BADGES_URL_NAME = 'my_badges'
 
