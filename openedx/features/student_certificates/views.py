@@ -8,9 +8,15 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views.decorators.csrf import ensure_csrf_cookie
-from constants import COMPLETION_DATE_FORMAT, COURSE_URL_FMT, PDF_RESPONSE_HEADER, PDFKIT_IMAGE_PATH, TWITTER_META_TITLE_FMT
+from constants import (
+    COMPLETION_DATE_FORMAT,
+    COURSE_URL_FMT,
+    PDF_RESPONSE_HEADER,
+    PDFKIT_IMAGE_PATH,
+    TWITTER_META_TITLE_FMT)
 from openedx.core.djangoapps.credentials.utils import get_credentials
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from util.philu_utils import date_from_str
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.philu_api.helpers import get_course_custom_settings
 
@@ -21,7 +27,6 @@ from lms.djangoapps.certificates.models import (
     CertificateStatuses)
 
 from helpers import (
-    date_from_str,
     get_certificate_image_url,
     get_certificate_image_url_by_uuid,
     get_image_and_size_from_url,
@@ -74,6 +79,23 @@ def student_certificates(request):
 
     user_certificates = []
 
+    import json
+    x = '{ "count": 1,"next": "","previous": "","results": [{"username": "edx","credential": {"type": "program","credential_id": 3,"program_uuid": "eb228773-a9a5-48cf-bb0e-94725d5aa4f1"},"status": "awarded","download_url": "","uuid": "5a1620c5-cb31-421e-b720-5704229d8c9a","attributes": [{"name": "program_name","value": "Test Discovery Program"}],"created": "2020-02-11T12:45:54Z","modified": "2020-03-27T16:43:59Z","certificate_url": "http://local.philanthropyu.org:18150/credentials/5a1620c5cb31421eb7205704229d8c9a/"}  ]}'
+    context = json.loads(x)
+    program_credentials = context['results']
+    for credential in program_credentials:
+        if 'certificate_url' in credential:
+            program_name = [attribute['value'] for attribute in credential.get('attributes', {})
+                            if 'name' in attribute and attribute['name'] == 'program_name']
+            if program_name:
+                user_certificates.append({
+                    'certificate_name': program_name[0],
+                    'certificate_title': program_name[0],
+                    'certificate_url': credential.get('certificate_url'),
+                    'completion_date': date_from_str(credential.get('created')).strftime(COMPLETION_DATE_FORMAT),
+                    'is_program_cert': True,
+                })
+
     available_certificates = GeneratedCertificate.objects.filter(user=user, course_id__in=enrolled_course_ids).all()
 
     for certificate in available_certificates:
@@ -122,18 +144,7 @@ def student_certificates(request):
             'is_program_cert': False,
         })
 
-    program_credentials = get_credentials(request.user, credential_type='program')
-    for credential in program_credentials:
-        program_name = [attribute['value'] for attribute in credential.get('attributes',{})
-                        if 'name' in attribute and attribute['name'] == 'program_name']
-        if program_name:
-            user_certificates.append({
-                'certificate_name': program_name[0],
-                'certificate_title': program_name[0],
-                'certificate_url': credential.get('certificate_url'),
-                'completion_date': date_from_str(credential.get('created')).strftime(COMPLETION_DATE_FORMAT),
-                'is_program_cert': True,
-            })
+
 
     context = {
         'user_certificates': user_certificates,

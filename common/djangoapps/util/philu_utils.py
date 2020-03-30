@@ -1,3 +1,11 @@
+from constants import CREDENTIALS_DATE_FORMAT
+from datetime import datetime
+
+
+def date_from_str(date_str, date_format=CREDENTIALS_DATE_FORMAT):
+    return datetime.strptime(date_str, date_format)
+
+
 def extract_utm_params(input_dict):
     """
     This method returns a subset of the input dictionary that only contains the utm params found
