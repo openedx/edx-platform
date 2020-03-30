@@ -47,6 +47,9 @@ from third_party_auth import pipeline, provider
 from third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
 from util.db import outer_atomic
 
+# PhilU imports
+from openedx.features.student_account.forms import AccountCreationFormCustom
+from openedx.features.student_account.helpers import compose_and_send_activation_email_custom
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -148,13 +151,10 @@ def create_account_with_params(request, params):
     )
 
     params['name'] = "{} {}".format(params.get('first_name'), params.get('last_name'))
-    form = AccountCreationForm(
+    form = AccountCreationFormCustom(
         data=params,
-        extra_fields=extra_fields,
-        extended_profile_fields=extended_profile_fields,
-        do_third_party_auth=do_external_auth,
-        tos_required=tos_required,
-    )
+        extended_profile_fields=None,
+        do_third_party_auth=do_external_auth)
     custom_form = get_registration_extension_form(data=params)
 
     # Perform operations within a transaction that are critical to account creation
@@ -180,7 +180,7 @@ def create_account_with_params(request, params):
     if skip_email:
         registration.activate()
     else:
-        compose_and_send_activation_email(user, profile, registration)
+        compose_and_send_activation_email_custom(request, registration, user)
 
     # Perform operations that are non-critical parts of account creation
     create_or_set_user_attribute_created_on_site(user, request.site)
@@ -198,7 +198,9 @@ def create_account_with_params(request, params):
     # Announce registration
     REGISTER_USER.send(sender=None, user=user, registration=registration)
 
-    create_comments_service_user(user)
+    # PhilU is not using this feature, so this has been commented
+    # out to avoid useless a call, that results in an error.
+    # create_comments_service_user(user)
 
     try:
         record_registration_attributions(request, new_user)

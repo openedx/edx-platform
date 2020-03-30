@@ -20,12 +20,13 @@ from util.json_request import JsonResponse
 
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
+from openedx.core.djangoapps.user_api.views import RegistrationView
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER, record_registration_attributions
 from openedx.features.partners.helpers import auto_join_partner_community, get_partner_recommended_courses
 from openedx.features.partners.models import PartnerUser
+from openedx.features.student_account.helpers import save_user_utm_info
 
-from lms.djangoapps.philu_overrides.user_api.views import RegistrationViewCustom
 from lms.djangoapps.onboarding.models import EmailPreference, Organization, PartnerNetwork, UserExtendedProfile
 from philu_overrides.user_api.views import LoginSessionViewCustom
 from nodebb.helpers import update_nodebb_for_user_status, set_user_activation_status_on_nodebb
@@ -49,7 +50,7 @@ def performance_dashboard(request, partner):
                               {'slug': partner.slug, 'performance_url': partner.performance_url})
 
 
-class Give2AsiaRegistrationView(RegistrationViewCustom):
+class Give2AsiaRegistrationView(RegistrationView):
     """
     This class handles registration flow for give2asia users. It inherit some basic functionality from original (normal)
     registration flow
@@ -72,7 +73,7 @@ class Give2AsiaRegistrationView(RegistrationViewCustom):
             # Create or update models for User, UserProfile,
             # UserExtendedProfile, Organization, PartnerUser and EmailPreference
             user = create_account_with_params_custom(request, registration_data, partner)
-            self.save_user_utm_info(user)
+            save_user_utm_info(request, user)
         except Exception as err:
             error_message = {"Error": {"reason": "User registration failed due to {}".format(repr(err))}}
             log.exception(error_message)

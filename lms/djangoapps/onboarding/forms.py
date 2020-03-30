@@ -375,7 +375,7 @@ class UserInfoModelForm(BaseOnboardingModelForm):
 
             prev_org = user_info_survey.organization
             user_info_survey.organization = organization_to_assign
-            user_info_survey.is_first_learner = organization_to_assign.users_count() == 0
+            user_info_survey.is_first_learner = organization_to_assign.can_join_as_first_learner(exclude_user=user)
 
             # Reset organizations under my administrations if i updated my organization & ask for org details
             if not prev_org == organization_to_assign:

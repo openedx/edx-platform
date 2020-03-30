@@ -105,9 +105,9 @@ class IsStaffOrReadOnly(permissions.BasePermission):
     staff, permitting only read-only access if they are not.
     """
 
-    def has_object_permission(self, request, view, obj):
+    def has_object_permission(self, request, view, obj, check_user_activation=True):
         return (request.user.is_staff or
-                CourseStaffRole(obj.course_id).has_user(request.user) or
+                CourseStaffRole(obj.course_id).has_user(request.user, check_user_activation) or
                 request.method in permissions.SAFE_METHODS)
 
 

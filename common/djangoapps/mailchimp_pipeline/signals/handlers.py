@@ -35,14 +35,13 @@ def update_mailchimp(email, data):
 
 @receiver(post_save, sender=EmailPreference)
 def sync_email_preference_with_mailchimp(sender, instance, **kwargs):
-    email_preferences = instance
+    opt_in = ''
 
-    if email_preferences.opt_in == 'yes':
+    if instance.opt_in == 'yes':
         opt_in = 'TRUE'
-    elif email_preferences.opt_in == 'no':
+    elif instance.opt_in == 'no':
         opt_in = 'FALSE'
-    else:
-        opt_in = ''
+
     user_json = {
         "merge_fields": {
             "OPTIN": opt_in
@@ -54,23 +53,30 @@ def sync_email_preference_with_mailchimp(sender, instance, **kwargs):
 
 @receiver(post_save, sender=UserProfile)
 def sync_user_profile_with_mailchimp(sender, instance, **kwargs):
-    profile = instance
-    user_json = {
-        "merge_fields": {
-            "LANG": profile.language if profile.language else "",
-            "COUNTRY": profile.country.name.format() if profile.country else "",
-            "CITY": profile.city if profile.city else "",
-        }
-    }
+    updated_fields = getattr(instance, '_updated_fields', {})
 
-    update_mailchimp(instance.user.email, user_json)
+    relevant_signal_fields = ['city', 'country', 'language']
+
+    if not any([field in updated_fields for field in relevant_signal_fields]):
+        return
+
+    if instance.language or instance.country or instance.city:
+        user_json = {
+            "merge_fields": {
+                "LANG": instance.language or "",
+                "COUNTRY": instance.country.name.format() if instance.country else "",
+                "CITY": instance.city or "",
+            }
+        }
+
+        update_mailchimp(instance.user.email, user_json)
 
 
 @receiver(post_save, sender=UserExtendedProfile)
 def sync_extended_profile_with_mailchimp(sender, instance, **kwargs):
-    extended_profile = instance
     org_label, org_type, work_area = get_org_data_for_mandrill(
-        extended_profile.organization)
+        instance.organization)
+
     user_json = {
         "merge_fields": {
             "ORG": org_label,
@@ -84,22 +90,21 @@ def sync_extended_profile_with_mailchimp(sender, instance, **kwargs):
 
 @receiver(post_save, sender=GranteeOptIn)
 def sync_grantee_optin_with_mailchimp(sender, instance, **kwargs):
-    grantee_opt_in = instance
-
-    if grantee_opt_in.organization_partner.partner == 'ECHIDNA':
+    if instance.organization_partner.partner == 'ECHIDNA':
         user_json = {
             "merge_fields": {
-                "ECHIDNA": 'TRUE' if grantee_opt_in.agreed else 'FALSE',
+                "ECHIDNA": 'TRUE' if instance.agreed else 'FALSE',
             }
         }
         update_mailchimp(instance.user.email, user_json)
 
 
 @receiver(post_save, sender=Organization)
-def sync_organization_with_mailchimp(sender, instance, **kwargs):
-    org_label, org_type, work_area = get_org_data_for_mandrill(instance)
-    update_org_details_at_mailchimp.delay(
-        org_label, org_type, work_area, settings.MAILCHIMP_LEARNERS_LIST_ID)
+def sync_organization_with_mailchimp(sender, instance, created, **kwargs):
+    if not created:
+        org_label, org_type, work_area = get_org_data_for_mandrill(instance)
+        update_org_details_at_mailchimp.delay(
+            org_label, org_type, work_area, instance.id, settings.MAILCHIMP_LEARNERS_LIST_ID)
 
 
 def sync_metric_update_prompt_with_mail_chimp(update_prompt):

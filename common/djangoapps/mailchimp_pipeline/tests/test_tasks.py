@@ -274,7 +274,7 @@ class MailchimpPipelineTaskTestClass(ModuleStoreTestCase):
         completed_course_keys = [
             cert.get('course_key', '') for cert in all_certs if certificate_api.is_passing_status(cert['status'])]
         completed_courses = CourseOverview.objects.filter(id__in=completed_course_keys)
-        org_type = OrgSector.get_map().get(extended_profile.organization.org_type, '')
+        org_type = OrgSector.objects.get_map().get(extended_profile.organization.org_type, '')
         all_certs = certificate_api.get_certificates_for_user(self.user.username)
 
         result = update_enrollments_completions_at_mailchimp.delay(self.mailchimp_list_id)

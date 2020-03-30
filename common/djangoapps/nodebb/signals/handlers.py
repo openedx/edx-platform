@@ -2,29 +2,35 @@ from logging import getLogger
 
 from crum import get_current_request
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save, pre_save, post_delete, pre_delete
+from django.db.models.signals import post_delete, post_save, pre_delete, pre_save
 from django.dispatch import receiver
 
-from nodebb.tasks import (task_create_user_on_nodebb, task_update_user_profile_on_nodebb,
-                                            task_delete_user_on_nodebb, task_activate_user_on_nodebb,
-                                            task_join_group_on_nodebb, task_un_join_group_on_nodebb)
 from common.lib.nodebb_client.client import NodeBBClient
-from lms.djangoapps.onboarding.helpers import COUNTRIES
 from lms.djangoapps.certificates.models import GeneratedCertificate
-from lms.djangoapps.onboarding.models import (
-    UserExtendedProfile, Organization, FocusArea, EmailPreference, )
+from lms.djangoapps.onboarding.helpers import COUNTRIES
+from lms.djangoapps.onboarding.models import EmailPreference, FocusArea, Organization, UserExtendedProfile
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
-from mailchimp_pipeline.signals.handlers import send_user_info_to_mailchimp, \
-     send_user_course_completions_to_mailchimp, send_user_enrollments_to_mailchimp
-from nodebb.models import DiscussionCommunity, TeamGroupChat
+from mailchimp_pipeline.signals.handlers import (
+    send_user_course_completions_to_mailchimp,
+    send_user_enrollments_to_mailchimp,
+    send_user_info_to_mailchimp
+)
 from nodebb.helpers import get_community_id
+from nodebb.models import DiscussionCommunity, TeamGroupChat
+from nodebb.tasks import (
+    task_activate_user_on_nodebb,
+    task_create_user_on_nodebb,
+    task_delete_user_on_nodebb,
+    task_join_group_on_nodebb,
+    task_un_join_group_on_nodebb,
+    task_update_user_profile_on_nodebb
+)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
 from openedx.features.badging.models import UserBadge
-
-from student.models import ENROLL_STATUS_CHANGE, EnrollStatusChange, UserProfile, CourseEnrollment
+from student.models import ENROLL_STATUS_CHANGE, CourseEnrollment, EnrollStatusChange, UserProfile
+from util.model_utils import get_changed_fields_dict
 from xmodule.modulestore.django import modulestore
-
 
 log = getLogger(__name__)
 
@@ -44,33 +50,52 @@ def handle_course_cert_awarded(sender, user, course_key, **kwargs):  # pylint: d
     send_user_course_completions_to_mailchimp.delay(data)
 
 
-@receiver(post_save, sender=UserProfile)
-def sync_user_profile_info_with_nodebb(sender, instance, created, **kwargs):
-    city_of_residence = instance.city
-    country_of_residence = COUNTRIES.get(instance.country.code, '')
-    birth_year = instance.year_of_birth
-    language = instance.language
+@receiver(pre_save, sender=UserProfile)
+def user_profile_pre_save_callback(sender, **kwargs):
+    """
+    Capture old fields on the user_profile instance before save and cache them as a
+    private field on the current model for use in the post_save callback.
+    """
+    user_profile = kwargs['instance']
+    user_profile._updated_fields = get_changed_fields_dict(user_profile, sender)
 
-    if not created and (country_of_residence or birth_year or language):
-        user = instance.user
-        data_to_sync = {
-            "city_of_residence": city_of_residence,
-            "country_of_residence": country_of_residence,
-            "birthday": "01/01/%s" % birth_year,
-            "language": language,
-        }
-        task_update_user_profile_on_nodebb.delay(
-            username=user.username, profile_data=data_to_sync)
+
+@receiver(post_save, sender=UserProfile)
+def sync_user_profile_info_with_nodebb(sender, instance, **kwargs):
+    updated_fields = getattr(instance, '_updated_fields', {})
+
+    relevant_signal_fields = ['city', 'country', 'year_of_birth', 'language']
+
+    if not any([field in updated_fields for field in relevant_signal_fields]):
+        return
+
+    user = instance.user
+    data_to_sync = {
+        "city_of_residence": instance.city,
+        "country_of_residence": COUNTRIES.get(instance.country.code, ''),
+        "birthday": "01/01/%s" % instance.year_of_birth,
+        "language": instance.language,
+    }
+    task_update_user_profile_on_nodebb.delay(
+        username=user.username, profile_data=data_to_sync)
 
 
 @receiver(post_save, sender=UserExtendedProfile)
 def sync_extended_profile_info_with_nodebb(sender, instance, **kwargs):
     request = get_current_request()
 
-    if not request:
+    user = instance.user
+
+    changed_fields = getattr(instance, '_changed_fields', {})
+
+    relevant_signal_fields = ['country_of_employment', 'city_of_employment']
+    relevant_signal_fields += instance.get_user_selected_functions(_type='field_name')
+    relevant_signal_fields += instance.get_user_selected_interests(_type='field_name')
+
+    # return if fields to be updated on nodebb haven't changed
+    if not request or not any([field in changed_fields for field in relevant_signal_fields]):
         return
 
-    user = instance.user
     data_to_sync = {
         "country_of_employment": COUNTRIES.get(instance.country_of_employment, ''),
         "city_of_employment": instance.city_of_employment,
@@ -98,8 +123,8 @@ def sync_organization_info_with_nodebb(sender, instance, created, **kwargs):  # 
     request = get_current_request()
     focus_area = FocusArea.objects.get(code=instance.focus_area).label if instance.focus_area else ''
 
-    # For anonymous user username is empty('') so we can't sync with mailchimp
-    if request is None or not focus_area or not request.user.is_anonymous():
+    # For anonymous user username is empty('') so we can't sync with nodebb
+    if request is None or not focus_area or request.user.is_anonymous():
         return
 
     data_to_sync = {
@@ -110,7 +135,6 @@ def sync_organization_info_with_nodebb(sender, instance, created, **kwargs):  # 
 
     task_update_user_profile_on_nodebb.delay(
         username=user.username, profile_data=data_to_sync)
-
 
 
 @receiver(post_save, sender=User, dispatch_uid='update_user_profile_on_nodebb')
@@ -137,18 +161,20 @@ def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
         task_create_user_on_nodebb.delay(
             username=instance.username, user_data=data_to_sync)
     else:
-        # This sanity blocks two extra syncs because during 'registration'
-        # we sync first_name and last_name under above 'created' sanity block
-        # so no need to sync first_name and last_name again.
-        if 'registration' not in request.path:
-            data_to_sync = {
-                'first_name': instance.first_name,
-                'last_name': instance.last_name
-            }
+        # sync only if fields are updated
+        changed_fields = getattr(instance, '_changed_fields', {})
+        relevant_signal_fields = ['first_name', 'last_name']
 
-            task_update_user_profile_on_nodebb.delay(
-                username=instance.username, profile_data=data_to_sync)
+        if not any([field in changed_fields for field in relevant_signal_fields]):
+            return
 
+        data_to_sync = {
+            'first_name': instance.first_name,
+            'last_name': instance.last_name
+        }
+
+        task_update_user_profile_on_nodebb.delay(
+            username=instance.username, profile_data=data_to_sync)
 
 
 @receiver(post_delete, sender=User)
