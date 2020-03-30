@@ -6,7 +6,6 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
-from django.urls import reverse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from constants import (
     COMPLETION_DATE_FORMAT,
@@ -14,9 +13,7 @@ from constants import (
     PDF_RESPONSE_HEADER,
     PDFKIT_IMAGE_PATH,
     TWITTER_META_TITLE_FMT)
-from openedx.core.djangoapps.credentials.utils import get_credentials
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from util.philu_utils import date_from_str
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.philu_api.helpers import get_course_custom_settings
 
@@ -24,11 +21,13 @@ from certificates import api as certs_api
 from courseware.courses import get_course
 from lms.djangoapps.certificates.models import (
     GeneratedCertificate,
-    CertificateStatuses)
+    CertificateStatuses,
+)
 
 from helpers import (
     get_certificate_image_url,
     get_certificate_image_url_by_uuid,
+    get_credential_certificates,
     get_image_and_size_from_url,
     get_pdfkit_html,
     get_pdfkit_options,
@@ -77,21 +76,7 @@ def student_certificates(request):
     # Retrieve the course modes for each course
     enrolled_course_ids = [enrollment.course_id for enrollment in course_enrollments]
 
-    user_certificates = []
-
-    program_credentials = get_credentials(request.user, credential_type='program')
-    for credential in program_credentials:
-        if 'certificate_url' in credential:
-            program_name = [attribute['value'] for attribute in credential.get('attributes', {})
-                            if 'name' in attribute and attribute['name'] == 'program_name']
-            if program_name:
-                user_certificates.append({
-                    'certificate_name': program_name[0],
-                    'certificate_title': program_name[0],
-                    'certificate_url': credential.get('certificate_url'),
-                    'completion_date': date_from_str(credential.get('created')).strftime(COMPLETION_DATE_FORMAT),
-                    'is_program_cert': True,
-                })
+    user_certificates = get_credential_certificates(user)
 
     available_certificates = GeneratedCertificate.objects.filter(user=user, course_id__in=enrolled_course_ids).all()
 
@@ -132,23 +117,20 @@ def student_certificates(request):
             course_title = course.display_name
 
         user_certificates.append({
-            'certificate_name': course_name,
+            'display_name': course_name,
             'certificate_title': course_title,
             'social_sharing_urls': get_philu_certificate_social_context(course, certificate),
             'certificate_url': "%s%s" % (settings.LMS_ROOT_URL, certificate_url),
-            'course_start': start_date.strftime('%b %d, %Y') if start_date else None,
-            'completion_date': completion_date.strftime('%b %d, %Y') if completion_date else None,
+            'course_start': start_date.strftime(COMPLETION_DATE_FORMAT) if start_date else None,
+            'completion_date': completion_date.strftime(COMPLETION_DATE_FORMAT) if completion_date else None,
             'is_program_cert': False,
         })
-
-
 
     context = {
         'user_certificates': user_certificates,
     }
 
-    response = render_to_response('certificates.html', context)
-    return response
+    return render_to_response('certificates.html', context)
 
 
 def shared_student_achievements(request, certificate_uuid):
