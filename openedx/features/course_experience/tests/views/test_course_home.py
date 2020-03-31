@@ -300,8 +300,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         is_enrolled_or_staff = is_enrolled or user_type in (
             CourseUserType.UNENROLLED_STAFF, CourseUserType.GLOBAL_STAFF
         )
-
-        self.assertContains(response, 'Learn About Verified Certificate', count=(1 if is_enrolled else 0))
+        self.assertContains(response, 'Learn About Statements of Accomplishment', count=(1 if is_enrolled else 0))
 
         # Verify that start button, course sock, and welcome message
         # are only shown to enrolled users or staff.
@@ -353,7 +352,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         expected_count = 1 if (is_enrolled or is_unenrolled_staff) else 0
         self.assertContains(response, TEST_CHAPTER_NAME, count=expected_count)
         self.assertContains(response, 'Start Course', count=expected_count)
-        self.assertContains(response, 'Learn About Verified Certificate', count=(1 if is_enrolled else 0))
+        self.assertContains(response, 'Learn About Statements of Accomplishment', count=(1 if is_enrolled else 0))
 
         # Verify that the expected message is shown to the user
         self.assertContains(response, '<div class="user-messages"', count=1 if expected_message else 0)

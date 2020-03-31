@@ -122,7 +122,7 @@ class TestActivateAccount(TestCase):
         self.login()
         expected_message = (
             u"Check your {email_start}{email}{email_end} inbox for an account activation link from "
-            u"{platform_name}. If you need help, contact <a href='https://edtech.ucsd.edu/uc-san-diego-online-help'> {platform_name} Support</a>."
+            u"{platform_name}. If you need help, visit the {link_start}{platform_name} Help Center{link_end}."
         ).format(
             platform_name=self.platform_name,
             email_start="<strong>",
