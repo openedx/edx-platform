@@ -72,7 +72,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
     @override_waffle_flag(MOBILE_UPSELL_FLAG, active=True)
     def test_simple_course(self):
         course = CourseFactory.create(start=now() - timedelta(days=30))
-        response = self.client.get(self.url, {'course_id': course.id})
+        response = self.client.get(self.url, {'course_id': str(course.id)})
         self.assertEqual(response.status_code, 200)
         expected = {
             'show_upsell': False,
@@ -97,7 +97,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
             sku=six.text_type(uuid4().hex)
         )
 
-        response = self.client.get(self.url, {'course_id': course.id})
+        response = self.client.get(self.url, {'course_id': str(course.id)})
         self.assertEqual(response.status_code, 200)
         result = response.data
         self.assertIn('basket_url', result)
@@ -125,7 +125,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
             expiration_datetime=now() - timedelta(days=30),
         )
 
-        response = self.client.get(self.url, {'course_id': course.id})
+        response = self.client.get(self.url, {'course_id': str(course.id)})
         self.assertEqual(response.status_code, 200)
         expected = {
             'show_upsell': False,
@@ -151,7 +151,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
             sku=six.text_type(uuid4().hex)
         )
 
-        response = self.client.get(self.url, {'course_id': course.id})
+        response = self.client.get(self.url, {'course_id': str(course.id)})
         self.assertEqual(response.status_code, 200)
         expected = {
             'show_upsell': False,
@@ -175,7 +175,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
             sku=six.text_type(uuid4().hex)
         )
 
-        response = self.client.get(self.url, {'course_id': course.id})
+        response = self.client.get(self.url, {'course_id': str(course.id)})
         self.assertEqual(response.status_code, 200)
         expected = {
             'show_upsell': False,
@@ -204,7 +204,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
             user=self.user
         )
 
-        response = self.client.get(self.url, {'course_id': course.id})
+        response = self.client.get(self.url, {'course_id': str(course.id)})
         self.assertEqual(response.status_code, 200)
         result = response.data
         self.assertIn('basket_url', result)
