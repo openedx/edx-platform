@@ -21,3 +21,6 @@ class Job(TimeStampedModel):
     description = models.TextField()
     function = models.TextField()
     responsibilities = models.TextField()
+    website_link = models.URLField(max_length=255, blank=True, null=True)
+    contact_email = models.EmailField(max_length=255, blank=True, null=True)
+    logo = models.ImageField(upload_to="job_board/uploaded_logos/", blank=True, null=True)
