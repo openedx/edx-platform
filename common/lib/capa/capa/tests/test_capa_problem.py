@@ -185,6 +185,23 @@ class CAPAProblemTest(unittest.TestCase):
             }
         )
 
+    def test_additional_answer_is_skipped_from_resulting_html(self):
+        """Tests that additional_answer element is not present in transformed HTML"""
+        xml = """
+        <problem>
+            <p>Be sure to check your spelling.</p>
+            <stringresponse answer="War" type="ci">
+                <label>___ requires sacrifices.</label>
+                <description>Anyone who looks the world as if it was a game of chess deserves to lose.</description>
+                <additional_answer answer="optional acceptable variant of the correct answer"/>
+                <textline size="40"/>
+            </stringresponse>
+        </problem>
+        """
+        problem = new_loncapa_problem(xml)
+        self.assertEqual(len(problem.extracted_tree.xpath('//additional_answer')), 0)
+        self.assertNotIn('additional_answer', problem.get_html())
+
     def test_non_accessible_inputtype(self):
         """
         Verify that tag with question text is not removed when inputtype is not fully accessible.

@@ -4,7 +4,7 @@
     <span class="u-field-order-price"><span class="sr"><%- gettext('Cost') %>: </span><% if (!isNaN(parseFloat(totalPrice))) { %>$<% } %><%- totalPrice %></span>
     <span class="u-field-order-link">
         <% if (receiptUrl) { %>
-            <a class="u-field-link" target="_blank" href="<%- receiptUrl %>"><%- gettext('Order Details') %><span class="sr"> <%- gettext('for') %> <%- orderId %></span></a>
+            <a class="u-field-link" rel="noopener" target="_blank" href="<%- receiptUrl %>"><%- gettext('Order Details') %><span class="sr"> <%- gettext('for') %> <%- orderId %></span></a>
         <% } %>
     </span>
     <% _.each(lines, function(item){ %>

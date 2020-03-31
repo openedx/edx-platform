@@ -235,10 +235,11 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                           data-trigger="focus hover"
                           class="action action-facebook"
                           href="${facebook_url}"
+                          rel="noopener"
                           target="_blank"
                           title="${_('Share on Facebook')}"
                           data-course-id="${course_overview.id}"
-                          onclick="window.open('${facebook_url}', '${share_window_name}', '${share_window_config}'); return false;">
+                          onclick="var popupWindow = window.open('${facebook_url}', '${share_window_name}', '${share_window_config}'); popupWindow.opener = null; return false;">
                           <span class="sr">${share_msg}</span>
                           <span class="fa fa-facebook" aria-hidden="true"></span>
                         </a>
@@ -256,10 +257,11 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                           data-trigger="focus hover"
                           class="action action-twitter"
                           href="${twitter_url}"
+                          rel="noopener"
                           target="_blank"
                           title="${_('Share on Twitter')}"
                           data-course-id="${course_overview.id}"
-                          onclick="window.open('${twitter_url}', '${share_window_name}', '${share_window_config}'); return false;">
+                          onclick="var popupWindow = window.open('${twitter_url}', '${share_window_name}', '${share_window_config}'); popupWindow.opener = null; return false;">
                           <span class="sr">${share_msg}</span>
                           <span class="fa fa-twitter" aria-hidden="true"></span>
                         </a>

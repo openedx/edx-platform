@@ -35,7 +35,7 @@ boto3==1.4.8                        # Amazon Web Services SDK for Python
 botocore==1.8.17                    # via boto3, s3transfer
 celery==3.1.25                      # Asynchronous task execution library
 defusedxml==0.4.1                   # XML bomb protection for common XML parsers
-Django==1.11.23                     # Web application framework
+Django==1.11.29                    # Web application framework
 django-babel-underscore             # underscore template extractor for django-babel (internationalization utilities)
 django-config-models>=0.2.2         # Configuration models for Django allowing config management with auditing
 django-cors-headers==2.1.0          # Used to allow to configure CORS headers for cross-domain requests

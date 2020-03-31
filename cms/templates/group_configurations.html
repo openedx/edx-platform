@@ -86,7 +86,7 @@ from openedx.core.djangolib.markup import HTML, Text
             <p>${_("Enrollment track groups allow you to offer different course content to learners in each enrollment track. Learners enrolled in each enrollment track in your course are automatically included in the corresponding enrollment track group.")}</p>
             <p>${_("On unit pages in the course outline, you can restrict access to components to learners based on their enrollment track.")}</p>
             <p>${_("You cannot edit enrollment track groups, but you can expand each group to view details of the course content that is designated for learners in the group.")}</p>
-            <p><a href="${get_online_help_info(enrollment_track_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn More")}</a></p>
+            <p><a href="${get_online_help_info(enrollment_track_help_token())['doc_url']}" rel="noopener" target="_blank" class="button external-help-button">${_("Learn More")}</a></p>
           </div>
         </div>
       % endif
@@ -96,7 +96,7 @@ from openedx.core.djangolib.markup import HTML, Text
               <p>${_("If you have cohorts enabled in your course, you can use content groups to create cohort-specific courseware. In other words, you can customize the content that particular cohorts see in your course.")}</p>
               <p>${_("Each content group that you create can be associated with one or more cohorts. In addition to making course content available to all learners, you can restrict access to some content to learners in specific content groups. Only learners in the cohorts that are associated with the specified content groups see the additional content.")}</p>
               <p>${Text(_("Click {em_start}New content group{em_end} to add a new content group. To edit the name of a content group, hover over its box and click {em_start}Edit{em_end}. You can delete a content group only if it is not in use by a unit. To delete a content group, hover over its box and click the delete icon.")).format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
-              <p><a href="${get_online_help_info(content_groups_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn More")}</a></p>
+              <p><a href="${get_online_help_info(content_groups_help_token())['doc_url']}" rel="noopener" target="_blank" class="button external-help-button">${_("Learn More")}</a></p>
           </div>
         </div>
       % if should_show_experiment_groups:
@@ -105,7 +105,7 @@ from openedx.core.djangolib.markup import HTML, Text
             <h3 class="title-3">${_("Experiment Group Configurations")}</h3>
             <p>${_("Use experiment group configurations if you are conducting content experiments, also known as A/B testing, in your course. Experiment group configurations define how many groups of learners are in a content experiment. When you create a content experiment for a course, you select the group configuration to use.")}</p>
             <p>${Text(_("Click {em_start}New Group Configuration{em_end} to add a new configuration. To edit a configuration, hover over its box and click {em_start}Edit{em_end}. You can delete a group configuration only if it is not in use in an experiment. To delete a configuration, hover over its box and click the delete icon.")).format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
-            <p><a href="${get_online_help_info(experiment_group_configurations_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn More")}</a></p>
+            <p><a href="${get_online_help_info(experiment_group_configurations_help_token())['doc_url']}" rel="noopener" target="_blank" class="button external-help-button">${_("Learn More")}</a></p>
           </div>
         </div>
       % endif
