@@ -78,6 +78,7 @@ from lms.envs.common import (
     HEARTBEAT_CHECKS,
     HEARTBEAT_EXTENDED_CHECKS,
     HEARTBEAT_CELERY_TIMEOUT,
+    CELERY_CHECK_ROUTING_KEY,
 
     # Theme to use when no site or site theme is defined,
     DEFAULT_SITE_THEME,
