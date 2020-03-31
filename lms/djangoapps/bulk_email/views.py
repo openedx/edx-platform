@@ -22,6 +22,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 
+
 log = logging.getLogger(__name__)
 
 
@@ -35,6 +36,7 @@ def opt_out_email_updates(request, token, course_id):
 
     Raises a 404 if there are any errors parsing the input.
     """
+
     try:
         username = UsernameCipher().decrypt(token).decode("utf-8")
         user = User.objects.get(username=username)
