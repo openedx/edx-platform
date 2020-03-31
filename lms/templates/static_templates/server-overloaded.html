@@ -20,14 +20,11 @@ from openedx.core.djangolib.markup import HTML, Text
             </%block>
         </h1>
         <p>
-            <%block name="pagecontent">
+        <%block name="pagecontent">
                 % if page_content:
                     ${page_content}
                 % else:
-                    ${Text(_("Our staff is currently working to get the site back up as soon as possible. "
-                    "Please email us at {tech_support_email} to report any problems or downtime.")).format(
-                    tech_support_email=HTML('<a href="mailto:{0}">{0}</a>').format(tech_support_email=Text(static.get_tech_support_email_address()))
-                    )}
+                    ${Text(_("Our staff is currently working to get the site back up as soon as possible. "))}
                 % endif
             </%block>
         </p>
