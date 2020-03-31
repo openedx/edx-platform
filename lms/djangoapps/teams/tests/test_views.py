@@ -10,7 +10,6 @@ from datetime import datetime
 
 import ddt
 import pytz
-import pdb
 from dateutil import parser
 from django.conf import settings
 from django.db.models.signals import post_save
@@ -545,7 +544,6 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         data = data if data else {}
         if 'course_id' not in data and not no_course_id:
             data.update({'course_id': str(self.test_course_1.id)})
-        # pdb.set_trace()
         return self.make_call(reverse('teams_list'), expected_status, 'get', data, **kwargs)
 
     def get_user_course_specific_teams_list(self):
@@ -994,7 +992,6 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
         self.post_create_team(400, self.build_team_data(**kwargs))
 
     def test_missing_name(self):
-        # pdb.set_trace()
         self.post_create_team(400, {
             'course_id': str(self.test_course_1.id),
             'description': "foobar"
