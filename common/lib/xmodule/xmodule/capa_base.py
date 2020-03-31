@@ -681,7 +681,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
                     )
                 ),
                 # Course-authored HTML demand hints are supported.
-                hint_text=HTML(get_inner_html_from_xpath(demand_hints[counter]))
+                hint_text=HTML(self.runtime.replace_urls(get_inner_html_from_xpath(demand_hints[counter])))
             )
             counter += 1
 

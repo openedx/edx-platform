@@ -1611,6 +1611,37 @@ class ProblemBlockTest(unittest.TestCase):
         self.assertEqual(result['hint_index'], 0)
         self.assertFalse(result['should_enable_next_hint'])
 
+    def test_image_hint(self):
+        """
+        Test the hint button shows an image without the static url.
+        """
+        test_xml = """
+            <problem>
+            <p>That is the question</p>
+            <multiplechoiceresponse>
+              <choicegroup type="MultipleChoice">
+                <choice correct="false">Alpha <choicehint>A hint</choicehint>
+                </choice>
+                <choice correct="true">Beta</choice>
+              </choicegroup>
+            </multiplechoiceresponse>
+            <demandhint>
+              <hint>
+                <img src="/static/7b1d74b2383b7d25a70ae4991190c222_28-collection-of-dark-souls-bonfire-clipart-high-quality-free-_1200-1386.jpeg"> </img>
+                You can add an optional hint like this. Problems that have a hint include a hint button, and this text appears the first time learners select the button.</hint>
+            </demandhint>
+            </problem>"""
+        module = CapaFactory.create(xml=test_xml)
+        module.get_problem_html()  # ignoring html result
+        context = module.system.render_template.call_args[0][1]
+        self.assertTrue(context['demand_hint_possible'])
+        self.assertTrue(context['should_enable_next_hint'])
+
+        # Check the AJAX call that gets the hint by index
+        result = module.get_demand_hint(0)
+        self.assertEqual(result['hint_index'], 0)
+        self.assertFalse(result['should_enable_next_hint'])
+
     def test_demand_hint_logging(self):
         def mock_location_text(self):
             """
