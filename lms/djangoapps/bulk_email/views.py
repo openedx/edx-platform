@@ -35,9 +35,8 @@ def opt_out_email_updates(request, token, course_id):
 
     Raises a 404 if there are any errors parsing the input.
     """
-
     try:
-        username = UsernameCipher().decrypt(token)
+        username = UsernameCipher().decrypt(token).decode("utf-8")
         user = User.objects.get(username=username)
         course_key = CourseKey.from_string(course_id)
         course = get_course_by_id(course_key, depth=0)
