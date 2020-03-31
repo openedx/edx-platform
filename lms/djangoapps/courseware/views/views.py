@@ -1613,6 +1613,7 @@ def _track_successful_certificate_generation(user_id, course_id):
 @require_http_methods(["GET", "POST"])
 @ensure_valid_usage_key
 @xframe_options_exempt
+@transaction.non_atomic_requests
 def render_xblock(request, usage_key_string, check_if_enrolled=True):
     """
     Returns an HttpResponse with HTML content for the xBlock with the given usage_key.
