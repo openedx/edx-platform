@@ -308,7 +308,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         self.assert_enrollment(CourseMode.VERIFIED)
 
     @ddt.data(
-        ({}, r"The field \"'\w+'\" is required."),  # The double quoting goes away in Django 2.0.1
+        ({}, r"The field \w+ is required."),
         ({'course_id': 'bad course key'}, 'Could not parse course key.'),
         ({
             'course_id': 'course-v1:TestX+T101+2015',
@@ -334,10 +334,13 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         # `self` isn't available from within the DDT declaration, so
         # assign the course ID here
         if 'course_id' in data and data['course_id'] is None:
-            data['course_id'] = six.text_type(self.course.id)
+            data['course_id'] = str(self.course.id)
         response = self.client.post(self.url, data)
+
         self.assertEqual(response.status_code, 400)
-        self.assertIsNotNone(re.match(error_message, response.content.decode('utf-8')))
+        self.assertIsNotNone(
+            re.match(error_message, response.content.decode('utf-8').replace("'", '').replace('"', ''))
+        )
         self.assert_enrollment(CourseMode.AUDIT)
         self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
 
