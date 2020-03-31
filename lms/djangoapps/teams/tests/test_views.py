@@ -10,6 +10,7 @@ from datetime import datetime
 
 import ddt
 import pytz
+import pdb
 from dateutil import parser
 from django.conf import settings
 from django.db.models.signals import post_save
@@ -543,7 +544,8 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         """Gets the list of teams as the given user with data as query params. Verifies expected_status."""
         data = data if data else {}
         if 'course_id' not in data and not no_course_id:
-            data.update({'course_id': self.test_course_1.id})
+            data.update({'course_id': str(self.test_course_1.id)})
+        # pdb.set_trace()
         return self.make_call(reverse('teams_list'), expected_status, 'get', data, **kwargs)
 
     def get_user_course_specific_teams_list(self):
@@ -554,8 +556,8 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             courses=[self.test_course_1, self.test_course_2],
             username='test_user_enrolled_both_courses'
         )
-        course_one_data = {'course_id': self.test_course_1.id, 'username': user}
-        course_two_data = {'course_id': self.test_course_2.id, 'username': user}
+        course_one_data = {'course_id': str(self.test_course_1.id), 'username': user}
+        course_two_data = {'course_id': str(self.test_course_2.id), 'username': user}
 
         # Check that initially list of user teams in course one is empty
         team_list = self.get_teams_list(user=user, expected_status=200, data=course_one_data)
@@ -705,18 +707,18 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
 
     def test_filter_course_id(self):
         self.verify_names(
-            {'course_id': self.test_course_2.id},
+            {'course_id': str(self.test_course_2.id)},
             200,
             ['Another Team', 'Public Profile Team', 'Search', u'著文企臺個'],
             user='staff'
         )
 
     def test_filter_topic_id(self):
-        self.verify_names({'course_id': self.test_course_1.id, 'topic_id': 'topic_0'}, 200, [u'Sólar team'])
+        self.verify_names({'course_id': str(self.test_course_1.id), 'topic_id': 'topic_0'}, 200, [u'Sólar team'])
 
     def test_filter_username(self):
-        self.verify_names({'course_id': self.test_course_1.id, 'username': 'student_enrolled'}, 200, [u'Sólar team'])
-        self.verify_names({'course_id': self.test_course_1.id, 'username': 'staff'}, 200, [])
+        self.verify_names({'course_id': str(self.test_course_1.id), 'username': 'student_enrolled'}, 200, [u'Sólar team'])
+        self.verify_names({'course_id': str(self.test_course_1.id), 'username': 'staff'}, 200, [])
 
     @ddt.data(
         (None, 200, ['Nuclear Team', u'Sólar team', 'Wind Team']),
@@ -796,7 +798,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
             {
                 'expand': 'user',
                 'topic_id': 'topic_6',
-                'course_id': self.test_course_2.id
+                'course_id': str(self.test_course_2.id)
             },
             user='student_enrolled_public_profile'
         )
@@ -815,7 +817,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
     def test_text_search(self, text_search, expected_team_names):
         self.reset_search_index()
         self.verify_names(
-            {'course_id': self.test_course_2.id, 'text_search': text_search},
+            {'course_id': str(self.test_course_2.id), 'text_search': text_search},
             200,
             expected_team_names,
             user='student_enrolled_public_profile'
@@ -832,7 +834,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         with translation.override('ar'):
             self.reset_search_index()
             self.verify_names(
-                {'course_id': self.test_course_2.id, 'text_search': text_search},
+                {'course_id': str(self.test_course_2.id), 'text_search': text_search},
                 200,
                 expected_team_names,
                 user='student_enrolled_public_profile'
@@ -849,7 +851,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         # Verify that the search is working with Masters learner
         self.reset_search_index()
         self.verify_names(
-            {'course_id': self.test_course_1.id, 'text_search': text_search},
+            {'course_id': str(self.test_course_1.id), 'text_search': text_search},
             200,
             expected_team_names,
             user='student_masters'
@@ -862,14 +864,14 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
             topic_id='topic_0'
         )
         self.verify_names(
-            {'course_id': self.test_course_1.id, 'text_search': 'zoinks'},
+            {'course_id': str(self.test_course_1.id), 'text_search': 'zoinks'},
             200,
             [team.name],
             user='staff'
         )
         team.delete()
         self.verify_names(
-            {'course_id': self.test_course_1.id, 'text_search': 'zoinks'},
+            {'course_id': str(self.test_course_1.id), 'text_search': 'zoinks'},
             200,
             [],
             user='staff'
@@ -992,6 +994,7 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
         self.post_create_team(400, self.build_team_data(**kwargs))
 
     def test_missing_name(self):
+        # pdb.set_trace()
         self.post_create_team(400, {
             'course_id': str(self.test_course_1.id),
             'description': "foobar"
@@ -1246,7 +1249,7 @@ class TestListTopicsAPI(TeamAPITestCase):
     )
     @ddt.unpack
     def test_access(self, user, status):
-        topics = self.get_topics_list(status, {'course_id': self.test_course_1.id}, user=user)
+        topics = self.get_topics_list(status, {'course_id': str(self.test_course_1.id)}, user=user)
         if status == 200:
             self.assertEqual(topics['count'], self.topics_count)
 
@@ -1283,7 +1286,7 @@ class TestListTopicsAPI(TeamAPITestCase):
             CourseTeamFactory.create(
                 name=u'Nuclear Team 2', course_id=self.test_course_1.id, topic_id='topic_2'
             )
-        data = {'course_id': self.test_course_1.id}
+        data = {'course_id': str(self.test_course_1.id)}
         if field:
             data['order_by'] = field
         topics = self.get_topics_list(status, data)
@@ -1311,7 +1314,7 @@ class TestListTopicsAPI(TeamAPITestCase):
             )
 
         topics = self.get_topics_list(data={
-            'course_id': self.test_course_1.id,
+            'course_id': str(self.test_course_1.id),
             'page_size': 2,
             'page': 1,
             'order_by': 'team_count'
@@ -1319,7 +1322,7 @@ class TestListTopicsAPI(TeamAPITestCase):
         self.assertEqual(["Wind Power", u'Sólar power'], [topic['name'] for topic in topics['results']])
 
         topics = self.get_topics_list(data={
-            'course_id': self.test_course_1.id,
+            'course_id': str(self.test_course_1.id),
             'page_size': 2,
             'page': 2,
             'order_by': 'team_count'
@@ -1328,7 +1331,7 @@ class TestListTopicsAPI(TeamAPITestCase):
 
     def test_pagination(self):
         response = self.get_topics_list(data={
-            'course_id': self.test_course_1.id,
+            'course_id': str(self.test_course_1.id),
             'page_size': 2,
         })
 
@@ -1339,12 +1342,12 @@ class TestListTopicsAPI(TeamAPITestCase):
         self.assertIsNotNone(response['next'])
 
     def test_default_ordering(self):
-        response = self.get_topics_list(data={'course_id': self.test_course_1.id})
+        response = self.get_topics_list(data={'course_id': str(self.test_course_1.id)})
         self.assertEqual(response['sort_order'], 'name')
 
     def test_team_count(self):
         """Test that team_count is included for each topic"""
-        response = self.get_topics_list(data={'course_id': self.test_course_1.id})
+        response = self.get_topics_list(data={'course_id': str(self.test_course_1.id)})
         for topic in response['results']:
             self.assertIn('team_count', topic)
             if topic['id'] == u'topic_0':
@@ -1495,7 +1498,7 @@ class TestListMembershipAPI(TeamAPITestCase):
         self.solar_team.add_user(self.users[other_username])
         filters = {
             'teamset_id': self.solar_team.topic_id,
-            'course_id': self.test_course_1.id
+            'course_id': str(self.test_course_1.id)
         }
         if filter_username:
             filters['username'] = other_username
@@ -1526,7 +1529,7 @@ class TestListMembershipAPI(TeamAPITestCase):
             404,
             {
                 'teamset_id': 'topic_0',
-                'course_id': self.test_course_1.id
+                'course_id': str(self.test_course_1.id)
             },
             user='student_unenrolled'
         )
@@ -1535,7 +1538,7 @@ class TestListMembershipAPI(TeamAPITestCase):
         self.get_membership_list(404, {'teamset_id': 'topic_0', 'course_id': 'TestX/TS101/Non_Existent_Course'})
 
     def test_filter_teamset_teamset_nonexistant(self):
-        self.get_membership_list(404, {'teamset_id': 'nonexistant', 'course_id': self.test_course_1.id})
+        self.get_membership_list(404, {'teamset_id': 'nonexistant', 'course_id': str(self.test_course_1.id)})
 
     def test_filter_teamset_enrolled_in_course_but_no_team_access(self):
         # The requesting user is enrolled in the course, but the requested team is oraganization_protected and
@@ -1544,7 +1547,7 @@ class TestListMembershipAPI(TeamAPITestCase):
             404,
             {
                 'teamset_id': 'private-topic-1-id',
-                'course_id': self.test_course_1.id,
+                'course_id': str(self.test_course_1.id),
                 'username': 'student_on_team_1_private_set_1'
             }
         )
@@ -1810,12 +1813,12 @@ class TestElasticSearchErrors(TeamAPITestCase):
         The endpoint should still return 200 when a search is not supplied."""
         self.get_teams_list(
             expected_status=503,
-            data={'course_id': self.test_course_1.id, 'text_search': 'zoinks'},
+            data={'course_id': str(self.test_course_1.id), 'text_search': 'zoinks'},
             user='staff'
         )
         self.get_teams_list(
             expected_status=200,
-            data={'course_id': self.test_course_1.id},
+            data={'course_id': str(self.test_course_1.id)},
             user='staff'
         )
 
