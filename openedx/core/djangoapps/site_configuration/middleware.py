@@ -37,7 +37,7 @@ class SessionCookieDomainOverrideMiddleware(MiddlewareMixin):
                 # as defined in settings.SESSION_COOKIE_NAME
                 if key == configuration_helpers.get_value('SESSION_COOKIE_NAME', settings.SESSION_COOKIE_NAME):
                     domain = session_cookie_domain
-                
+
                 # samesite flag was added in django 2.1, so only pass it in for django 2.1 or higher
                 if django.VERSION >= (2, 1):
                     # then call down into the normal Django set_cookie method
