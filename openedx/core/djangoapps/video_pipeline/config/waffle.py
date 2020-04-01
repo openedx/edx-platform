@@ -11,6 +11,7 @@ WAFFLE_NAMESPACE = 'videos'
 # Waffle flag telling whether youtube is deprecated.
 DEPRECATE_YOUTUBE = 'deprecate_youtube'
 ENABLE_DEVSTACK_VIDEO_UPLOADS = 'enable_devstack_video_uploads'
+SAVE_CREDENTIALS_IN_VAL = 'save_credentials_in_val'
 
 
 def waffle_flags():
@@ -26,6 +27,11 @@ def waffle_flags():
         ENABLE_DEVSTACK_VIDEO_UPLOADS: WaffleFlag(
             waffle_namespace=namespace,
             flag_name=ENABLE_DEVSTACK_VIDEO_UPLOADS,
+            flag_undefined_default=False
+        ),
+        SAVE_CREDENTIALS_IN_VAL: CourseWaffleFlag(
+            waffle_namespace=namespace,
+            flag_name=SAVE_CREDENTIALS_IN_VAL,
             flag_undefined_default=False
         )
     }
