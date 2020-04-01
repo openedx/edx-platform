@@ -188,10 +188,11 @@ def has_specific_team_access(user, team):
         - be in the correct bubble
         - be in the team if it is private
     """
-    return valid_organization_bubble_access(user, team) and valid_teamset_type_access(user, team)
+    return has_course_staff_privileges(user, team.course_id) or (
+        user_protection_status_matches_team(user, team) and team_is_public_or_user_on_team(user, team)
+    )
 
-
-def valid_teamset_type_access(user, team):
+def team_is_public_or_user_on_team(user, team):
     """
     The only users who should be able to see private_managed teams
     or recieve any information about them at all from the API are:
@@ -199,8 +200,6 @@ def valid_teamset_type_access(user, team):
     - Users who are enrolled in a team in a private_managed teamset
     * They should only be able to see their own team, no other teams.
     """
-    if has_course_staff_privileges(user, team.course_id):
-        return True
     course_module = modulestore().get_course(team.course_id)
     teamset = course_module.teams_configuration.teamsets_by_id[team.topic_id]
     if teamset.teamset_type != TeamsetType.private_managed:
@@ -208,7 +207,7 @@ def valid_teamset_type_access(user, team):
     return CourseTeamMembership.is_user_on_team(user, team)
 
 
-def valid_organization_bubble_access(user, team):
+def user_protection_status_matches_team(user, team):
     """
     Check whether the user have access to the specific team.
     The user can be of a different organization protection bubble with the team in question.
