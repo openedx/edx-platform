@@ -53,7 +53,10 @@ class StudentModuleHistoryExtendedRouter(object):
         """
         Manage relations if the model is StudentModuleHistoryExtended.
         """
-        # Allow relation between CSM and CSMH (this cross-database relationship is declared with db_constraint=False).
+        # Allow relation between CSM and CSMH (this cross-database relationship is declared with db_constraint=False
+        # so while cross-model relationship is allowed via Django it is not stored as such within the database).
+        # Note: The order of obj1 and obj2 are based on the parent-child relationship as explained in
+        #   https://github.com/django/django/blob/stable/2.2.x/django/db/models/fields/related_descriptors.py
         if self._is_csm(obj1) and self._is_csm_h(obj2):
             return True
 
