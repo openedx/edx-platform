@@ -192,6 +192,7 @@ def has_specific_team_access(user, team):
         user_protection_status_matches_team(user, team) and team_is_public_or_user_on_team(user, team)
     )
 
+
 def team_is_public_or_user_on_team(user, team):
     """
     The only users who should be able to see private_managed teams
