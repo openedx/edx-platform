@@ -65,7 +65,7 @@ django-filter==2.2.0      # via -r requirements/edx/base.in, edx-enterprise
 django-ipware==2.1.0      # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring
 django-js-asset==1.2.2    # via django-mptt
 git+https://gitlab.com/Ayub-khan/django-method-override.git@5270af321be2e576d8e8b3c4191711a19975c356#egg=django-method-override==1.0.4  # via -r requirements/edx/github.in
-django-model-utils==3.0.0  # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, django-user-tasks, edx-bulk-grades, edx-celeryutils, edx-completion, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-rbac, edx-submissions, edx-when, edxval, ora2, super-csv
+django-model-utils==3.2.0  # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, django-user-tasks, edx-bulk-grades, edx-celeryutils, edx-completion, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-rbac, edx-submissions, edx-when, edxval, ora2, super-csv
 django-mptt==0.11.0       # via -r requirements/edx/base.in, django-wiki
 django-multi-email-field==0.6.1  # via edx-enterprise
 django-mysql==3.3.0       # via -r requirements/edx/base.in
