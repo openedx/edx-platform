@@ -205,7 +205,7 @@ def user_on_team_or_team_is_public(user, team):
         return True
     course_module = modulestore().get_course(team.course_id)
     teamset = course_module.teams_configuration.teamsets_by_id[team.topic_id]
-    return teamset.teamset_type != TeamsetType.private_managed:
+    return teamset.teamset_type != TeamsetType.private_managed
 
 
 def user_protection_status_matches_team(user, team):
