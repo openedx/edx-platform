@@ -322,7 +322,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         # (cookies are deleted by setting an expiration date in 1970)
         for cookie_name in [settings.EDXMKTG_LOGGED_IN_COOKIE_NAME, settings.EDXMKTG_USER_INFO_COOKIE_NAME]:
             cookie = self.client.cookies[cookie_name]
-            self.assertIn("01-Jan-1970", cookie.get('expires'))
+            self.assertIn("01 Jan 1970", cookie.get('expires').replace('-', ' '))
 
     @override_settings(
         EDXMKTG_LOGGED_IN_COOKIE_NAME=u"unicode-logged-in",
@@ -897,7 +897,7 @@ class LoginSessionViewTest(ApiTestCase):
         # Verify that the session expiration was set correctly
         cookie = self.client.cookies[settings.SESSION_COOKIE_NAME]
         expected_expiry = datetime.datetime.utcnow() + datetime.timedelta(weeks=4)
-        self.assertIn(expected_expiry.strftime('%d-%b-%Y'), cookie.get('expires'))
+        self.assertIn(expected_expiry.strftime('%d %b %Y'), cookie.get('expires').replace('-', ' '))
 
     def test_invalid_credentials(self):
         # Create a test user
