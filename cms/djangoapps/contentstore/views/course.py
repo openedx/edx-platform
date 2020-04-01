@@ -8,6 +8,10 @@ import logging
 import random
 import re
 import string
+from datetime import datetime, timedelta
+import pytz
+
+utc=pytz.UTC
 
 import django.utils
 import six
@@ -100,7 +104,7 @@ from .library import LIBRARIES_ENABLED, get_library_creator_status
 
 log = logging.getLogger(__name__)
 
-__all__ = ['course_info_handler', 'course_handler', 'course_listing',
+__all__ = ['course_info_handler', 'course_archive_handler', 'course_handler', 'course_listing',
            'course_info_update_handler', 'course_search_index_handler',
            'course_rerun_handler',
            'settings_handler',
@@ -275,6 +279,22 @@ def course_handler(request, course_key_string=None):
             return HttpResponseNotFound()
     except InvalidKeyError:
         raise Http404
+
+
+@login_required
+def course_archive_handler(request, course_key_string=None):
+    if request.method == 'GET':
+        if course_key_string:
+            course_key = CourseKey.from_string(course_key_string)
+            course_details = CourseDetails.fetch(course_key)
+            end_date_setting = {
+                'start_date': (datetime.today() - timedelta(days=2)).replace(tzinfo=utc),
+                'end_date': (datetime.today() - timedelta(days=1)).replace(tzinfo=utc),
+                'intro_video': course_details.intro_video
+            }
+            CourseDetails.update_from_json(course_key, end_date_setting, request.user)
+
+    return redirect(request.META.get('HTTP_REFERER'), permanent=True)
 
 
 @login_required
@@ -729,6 +749,9 @@ def _process_courses_list(courses_iter, in_process_course_actions, split_archive
         if split_archived and course.has_ended():
             archived_courses.append(formatted_course)
         else:
+            formatted_course.update({
+                'archive_link': reverse_course_url('course_archive_handler', course.id),
+            })
             active_courses.append(formatted_course)
 
     return active_courses, archived_courses
