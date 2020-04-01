@@ -860,6 +860,43 @@ def run_pii_check(options):
 
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
+@timed
+def check_keywords():
+    """
+    Check Django model fields for names that conflict with a list of reserved keywords
+    """
+    report_path = os.path.join(Env.REPORT_DIR, 'reserved_keywords')
+    sh("mkdir -p {}".format(report_path))
+
+    overall_status = True
+    for env, env_settings_file in [('lms', 'lms.envs.test'), ('cms', 'cms.envs.test')]:
+        report_file = "{}_reserved_keyword_report.csv".format(env)
+        override_file = os.path.join(Env.REPO_ROOT, "db_keyword_overrides.yml")
+        try:
+            sh(
+                "export DJANGO_SETTINGS_MODULE={settings_file}; "
+                "python manage.py {app} check_reserved_keywords "
+                "--override_file {override_file} "
+                "--report_path {report_path} "
+                "--report_file {report_file}".format(
+                    settings_file=env_settings_file, app=env, override_file=override_file,
+                    report_path=report_path, report_file=report_file
+                )
+            )
+        except BuildFailure:
+            overall_status = False
+
+    if not overall_status:
+        fail_quality(
+            'keywords',
+            'Failure: reserved keyword checker failed. Reports can be found here: {}'.format(
+                report_path
+            )
+        )
+
+
+@task
+@needs('pavelib.prereqs.install_python_prereqs')
 @cmdopts([
     ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
     ("percentage=", "p", "fail if diff-quality is below this percentage"),
