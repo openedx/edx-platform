@@ -27,8 +27,8 @@ class TestEnterpriseCourseEnrollmentCreateOldOrder(TestCase):
     """
 
     @classmethod
-    def setUpClass(cls):
-        super(TestEnterpriseCourseEnrollmentCreateOldOrder, cls).setUpClass()
+    def setUpTestData(cls):
+        super(TestEnterpriseCourseEnrollmentCreateOldOrder, cls).setUpTestData()
         UserFactory(username=TEST_ECOMMERCE_WORKER)
         cls.enrollment_count = 30
         cls._create_enterprise_course_enrollments(30)
