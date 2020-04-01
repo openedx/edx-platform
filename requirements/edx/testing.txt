@@ -75,7 +75,7 @@ django-filter==2.2.0      # via -r requirements/edx/base.txt, edx-enterprise
 django-ipware==2.1.0      # via -r requirements/edx/base.txt, edx-enterprise, edx-proctoring
 django-js-asset==1.2.2    # via -r requirements/edx/base.txt, django-mptt
 git+https://gitlab.com/Ayub-khan/django-method-override.git@5270af321be2e576d8e8b3c4191711a19975c356#egg=django-method-override==1.0.4  # via -r requirements/edx/base.txt
-django-model-utils==3.0.0  # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, django-user-tasks, edx-bulk-grades, edx-celeryutils, edx-completion, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-rbac, edx-submissions, edx-when, edxval, ora2, super-csv
+django-model-utils==3.2.0  # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, django-user-tasks, edx-bulk-grades, edx-celeryutils, edx-completion, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-rbac, edx-submissions, edx-when, edxval, ora2, super-csv
 django-mptt==0.11.0       # via -r requirements/edx/base.txt, django-wiki
 django-multi-email-field==0.6.1  # via -r requirements/edx/base.txt, edx-enterprise
 django-mysql==3.3.0       # via -r requirements/edx/base.txt
@@ -104,7 +104,7 @@ edx-analytics-data-api-client==0.15.5  # via -r requirements/edx/base.txt
 edx-api-doc-tools==1.1.0  # via -r requirements/edx/base.txt
 edx-bulk-grades==0.6.8    # via -r requirements/edx/base.txt, staff-graded-xblock
 edx-ccx-keys==1.0.1       # via -r requirements/edx/base.txt
-edx-celeryutils==0.4.0    # via -r requirements/edx/base.txt, super-csv
+edx-celeryutils==0.5.0    # via -r requirements/edx/base.txt, super-csv
 edx-completion==3.1.1     # via -r requirements/edx/base.txt
 edx-django-release-util==0.4.2  # via -r requirements/edx/base.txt
 edx-django-sites-extensions==2.4.3  # via -r requirements/edx/base.txt
@@ -193,7 +193,7 @@ numpy==1.18.2             # via -r requirements/edx/base.txt, -r requirements/ed
 git+https://github.com/joestump/python-oauth2.git@b94f69b1ad195513547924e380d9265133e995fa#egg=oauth2  # via -r requirements/edx/base.txt
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
 openedx-calc==1.0.7       # via -r requirements/edx/base.txt
-git+https://github.com/edx/edx-ora2.git@2.6.23#egg=ora2==2.6.23  # via -r requirements/edx/base.txt
+git+https://github.com/edx/edx-ora2.git@2.6.25#egg=ora2==2.6.25  # via -r requirements/edx/base.txt
 packaging==20.3           # via -r requirements/edx/base.txt, drf-yasg, pytest, tox
 pandas==0.22.0            # via -c requirements/edx/../constraints.txt, -r requirements/edx/coverage.txt
 path.py==12.4.0           # via -r requirements/edx/base.txt, edx-enterprise, edx-i18n-tools, ora2, xmodule
