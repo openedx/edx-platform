@@ -106,7 +106,7 @@ edx-enterprise==3.0.3     # via -r requirements/edx/base.in
 edx-i18n-tools==0.5.0     # via ora2
 edx-milestones==0.2.6     # via -r requirements/edx/base.in
 edx-opaque-keys[django]==2.0.2  # via -r requirements/edx/paver.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, xmodule
-edx-organizations==4.0.0  # via -r requirements/edx/base.in
+edx-organizations==5.0.0  # via -r requirements/edx/base.in
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/base.in
 edx-proctoring==2.3.3     # via -r requirements/edx/base.in, edx-proctoring-proctortrack
 edx-rbac==1.1.2           # via edx-enterprise
@@ -117,7 +117,7 @@ edx-submissions==3.0.4    # via -r requirements/edx/base.in, ora2
 edx-tincan-py35==0.0.5    # via edx-enterprise
 edx-user-state-client==1.1.2  # via -r requirements/edx/base.in
 edx-when==1.1.5           # via -r requirements/edx/base.in, edx-proctoring
-edxval==1.2.6             # via -r requirements/edx/base.in
+edxval==1.2.7             # via -r requirements/edx/base.in
 elasticsearch==1.9.0      # via edx-search
 enum34==1.1.10            # via edxval
 event-tracking==0.3.0     # via -r requirements/edx/base.in, edx-proctoring, edx-search

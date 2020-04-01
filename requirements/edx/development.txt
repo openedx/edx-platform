@@ -119,7 +119,7 @@ edx-i18n-tools==0.5.0     # via -r requirements/edx/testing.txt, ora2
 edx-lint==1.4.1           # via -r requirements/edx/testing.txt
 edx-milestones==0.2.6     # via -r requirements/edx/testing.txt
 edx-opaque-keys[django]==2.0.2  # via -r requirements/edx/testing.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, xmodule
-edx-organizations==4.0.0  # via -r requirements/edx/testing.txt
+edx-organizations==5.0.0  # via -r requirements/edx/testing.txt
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/testing.txt
 edx-proctoring==2.3.3     # via -r requirements/edx/testing.txt, edx-proctoring-proctortrack
 edx-rbac==1.1.2           # via -r requirements/edx/testing.txt, edx-enterprise
@@ -131,7 +131,7 @@ edx-submissions==3.0.4    # via -r requirements/edx/testing.txt, ora2
 edx-tincan-py35==0.0.5    # via -r requirements/edx/testing.txt, edx-enterprise
 edx-user-state-client==1.1.2  # via -r requirements/edx/testing.txt
 edx-when==1.1.5           # via -r requirements/edx/testing.txt, edx-proctoring
-edxval==1.2.6             # via -r requirements/edx/testing.txt
+edxval==1.2.7             # via -r requirements/edx/testing.txt
 elasticsearch==1.9.0      # via -r requirements/edx/testing.txt, edx-search
 entrypoints==0.3          # via -r requirements/edx/testing.txt, flake8
 enum34==1.1.10            # via -r requirements/edx/testing.txt, edxval
