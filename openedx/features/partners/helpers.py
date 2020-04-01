@@ -4,8 +4,6 @@ from datetime import datetime
 from importlib import import_module
 from logging import getLogger
 
-from django.http import Http404
-
 from course_action_state.models import CourseRerunState
 from custom_settings.models import CustomSettings
 from nodebb.tasks import task_join_group_on_nodebb
@@ -19,7 +17,7 @@ from .constants import PERFORMANCE_PERM_FRMT
 
 log = getLogger(__name__)
 
-PARTNERS_VIEW_FRMT = 'openedx.features.partners.{slug}.views'
+PARTNERS_FORM_FRMT = 'openedx.features.partners.{slug}.forms'
 
 
 def get_partner_recommended_courses(partner_slug, user):
@@ -75,11 +73,16 @@ def get_course_description(course):
     return description
 
 
-def import_module_using_slug(partner_slug):
+def import_form_using_slug(partner_slug):
+    """
+    :param partner_slug: String object, slug of a registered partner
+    :return: partner custom form, if an overridden form for partner exists
+             None, if an overridden form does not exist
+    """
     try:
-        return import_module(PARTNERS_VIEW_FRMT.format(slug=partner_slug))
+        return import_module(PARTNERS_FORM_FRMT.format(slug=partner_slug))
     except ImportError:
-        raise Http404('Your partner is not properly registered')
+        return None
 
 
 def auto_join_partner_community(partner, user):

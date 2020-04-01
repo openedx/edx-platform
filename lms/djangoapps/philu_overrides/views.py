@@ -498,17 +498,7 @@ def course_about(request, course_id):
     from commerce.utils import EcommerceService
     from course_modes.models import CourseMode, get_cosmetic_display_price
     from lms.djangoapps.courseware.access_utils import ACCESS_DENIED
-    from lms.djangoapps.courseware.views.views import registered_for_course
-    from lms.djangoapps.courseware.courses import (
-        get_courses,
-        get_permission_for_course_about,
-        get_course_overview_with_access,
-        get_course_with_access,
-        get_studio_url,
-        sort_by_start_date,
-        get_course_by_id,
-        sort_by_announcement
-    )
+    from lms.djangoapps.courseware.courses import get_studio_url
     from lms.envs.common import DEFAULT_IMAGE_NAME
     import shoppingcart
     from shoppingcart.utils import is_shopping_cart_enabled
