@@ -172,13 +172,13 @@ class UserReadOnlySerializer(serializers.Serializer):
                 }
             )
 
-        if account_recovery:
-            if is_secondary_email_feature_enabled_for_user(user):
-                data.update(
-                    {
-                        "secondary_email": account_recovery.secondary_email,
-                    }
-                )
+        if is_secondary_email_feature_enabled_for_user(user):
+            data.update(
+                {
+                    "secondary_email": account_recovery.secondary_email if account_recovery else None,
+                    "secondary_email_enabled": True,
+                }
+            )
 
         if self.custom_fields:
             fields = self.custom_fields

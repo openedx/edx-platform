@@ -3288,6 +3288,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
         "mailing_address",
         "requires_parental_consent",
         "secondary_email",
+        "secondary_email_enabled",
         "year_of_birth",
         "phone_number",
     ]

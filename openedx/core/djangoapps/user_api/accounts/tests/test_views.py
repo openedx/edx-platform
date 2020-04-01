@@ -266,7 +266,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         Verify that all account fields are returned (even those that are not shareable).
         """
         data = response.data
-        self.assertEqual(23, len(data))
+        self.assertEqual(24, len(data))
 
         # public fields (3)
         expected_account_privacy = (
@@ -297,6 +297,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         self.assertEqual("Park Ave", data['mailing_address'])
         self.assertEqual(requires_parental_consent, data["requires_parental_consent"])
         self.assertIsNone(data["secondary_email"])
+        self.assertIsNone(data["secondary_email_enabled"])
         self.assertEqual(year_of_birth, data["year_of_birth"])
 
     def test_anonymous_access(self):
@@ -355,7 +356,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
         self.create_mock_profile(self.user)
-        with self.assertNumQueries(22):
+        with self.assertNumQueries(23):
             response = self.send_get(self.different_client)
         self._verify_full_shareable_account_response(response, account_privacy=ALL_USERS_VISIBILITY)
 
@@ -370,7 +371,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
         self.create_mock_profile(self.user)
-        with self.assertNumQueries(22):
+        with self.assertNumQueries(23):
             response = self.send_get(self.different_client)
         self._verify_private_account_response(response)
 
@@ -494,7 +495,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             with self.assertNumQueries(queries):
                 response = self.send_get(self.client)
             data = response.data
-            self.assertEqual(23, len(data))
+            self.assertEqual(24, len(data))
             self.assertEqual(self.user.username, data["username"])
             self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
             for empty_field in ("year_of_birth", "level_of_education", "mailing_address", "bio"):
@@ -514,7 +515,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             self.assertEqual(False, data["accomplishments_shared"])
 
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        verify_get_own_information(20)
+        verify_get_own_information(21)
 
         # Now make sure that the user can get the same information, even if not active
         self.user.is_active = False
@@ -533,7 +534,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         legacy_profile.save()
 
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        with self.assertNumQueries(20):
+        with self.assertNumQueries(21):
             response = self.send_get(self.client)
         for empty_field in ("level_of_education", "gender", "country", "bio"):
             self.assertIsNone(response.data[empty_field])
@@ -905,7 +906,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         response = self.send_get(client)
         if has_full_access:
             data = response.data
-            self.assertEqual(23, len(data))
+            self.assertEqual(24, len(data))
             self.assertEqual(self.user.username, data["username"])
             self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
             self.assertEqual(self.user.email, data["email"])
