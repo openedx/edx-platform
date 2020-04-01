@@ -72,6 +72,32 @@ class GradeReportBase(object):
     """
     Base class for grade reports (ProblemGradeReport and CourseGradeReport).
     """
+
+    def _get_enrolled_learner_count(self, context):
+        """
+        Returns count of number of learner enrolled in course.
+        """
+        return CourseEnrollment.objects.users_enrolled_in(
+            course_id=context.course_id,
+            include_inactive=True,
+            verified_only=context.report_for_verified_only,
+        ).count()
+
+    def log_task_info(self, context, message):
+        """
+        Updates the status on the celery task to the given message.
+        Also logs the update.
+        """
+        fmt = u'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
+        task_info_string = fmt.format(
+            task_id=context.task_id,
+            entry_id=context.entry_id,
+            course_id=context.course_id,
+            task_input=context.task_input
+        )
+        TASK_LOG.info(u'%s, Task type: %s, %s, %s', task_info_string, context.action_name,
+                      message, context.task_progress.state)
+
     def _handle_empty_generator(self, generator, default):
         """
         Handle empty generator.
@@ -126,8 +152,7 @@ class GradeReportBase(object):
 
         course_id = context.course_id
 
-        report_for_verified_only = generate_grade_report_for_verified_only()
-        return get_enrolled_learners_for_course(course_id=course_id, verified_only=report_for_verified_only)
+        return get_enrolled_learners_for_course(course_id=course_id, verified_only=context.report_for_verified_only)
 
     def _compile(self, context, batched_rows):
         """
@@ -253,19 +278,24 @@ class _ProblemGradeReportContext(object):
     """
 
     def __init__(self, _xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+        task_id = _xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None
         self.task_info_string = (
             'Task: {task_id}, '
             'InstructorTask ID: {entry_id}, '
             'Course: {course_id}, '
             'Input: {task_input}'
         ).format(
-            task_id=_xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None,
+            task_id=task_id,
             entry_id=_entry_id,
             course_id=course_id,
             task_input=_task_input,
         )
+        self.task_id = task_id
+        self.entry_id = _entry_id
+        self.task_input = _task_input
         self.action_name = action_name
         self.course_id = course_id
+        self.report_for_verified_only = generate_grade_report_for_verified_only()
         self.task_progress = TaskProgress(self.action_name, total=None, start_time=time())
         self.course = get_course_by_id(self.course_id)
         self.file_name = 'problem_grade_report'
@@ -659,6 +689,7 @@ class ProblemGradeReport(GradeReportBase):
         Generate a CSV containing all students' problem grades within a given
         `course_id`.
         """
+        context.task_progress.total = self._get_enrolled_learner_count(context)
         context.update_status('ProblemGradeReport Step 1: Starting problem grades')
         course = get_course_by_id(context.course_id)
         header_row = OrderedDict([('id', 'Student ID'), ('email', 'Email'), ('username', 'Username')])
@@ -671,10 +702,10 @@ class ProblemGradeReport(GradeReportBase):
         context.update_status('ProblemGradeReport Step 4: Retrieving problem scores for course for enrolled users')
         generated_rows = self._batched_rows(context, header_row, graded_scorable_blocks)
         success_rows, error_rows = self._compile(context, generated_rows)
-        context.update_status('ProblemGradeReport Step 5: Uploading data to CSV report file')
+        context.update_status('ProblemGradeReport Step 6: Uploading data to CSV report file')
         self._upload(context, [success_headers] + success_rows, [error_headers] + error_rows)
 
-        return context.update_status('ProblemGradeReport Step 6: Completed problem grades report')
+        return context.update_status('ProblemGradeReport Step 7: Completed problem grades report')
 
     def _success_headers(self, header_row, graded_scorable_blocks):
         """
@@ -729,13 +760,14 @@ class ProblemGradeReport(GradeReportBase):
         success_rows, error_rows = [], []
         for student, course_grade, error in CourseGradeFactory().iter(users, context.course):
             student_fields = [getattr(student, field_name) for field_name in header_row]
-
+            context.task_progress.attempted += 1
             if not course_grade:
                 err_msg = text_type(error)
                 # There was an error grading this student.
                 if not err_msg:
                     err_msg = 'Unknown error'
                 error_rows.append(student_fields + [err_msg])
+                context.task_progress.failed += 1
                 continue
 
             enrollment_status = _user_enrollment_status(student, context.course_id)
@@ -752,9 +784,14 @@ class ProblemGradeReport(GradeReportBase):
                     else:
                         earned_possible_values.append(['Not Attempted', problem_score.possible])
 
+            context.task_progress.succeeded += 1
             success_rows.append(
                 student_fields + [enrollment_status, course_grade.percent] + _flatten(earned_possible_values))
 
+        context.task_progress.update_task_state(extra_meta={'step': 'ProblemGradeReport Step 5: Calculating Grades'})
+        log_message = u'{0} {1}/{2}'.format('ProblemGradeReport Step 5: Calculating Grades',
+                                            context.task_progress.attempted, context.task_progress.total)
+        self.log_task_info(context, log_message)
         return success_rows, error_rows
 
     def _batched_rows(self, context, header_row, graded_scorable_blocks):
