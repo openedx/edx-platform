@@ -241,7 +241,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         billing_url = reverse('billing_details')
         self.login_user()
 
-        #chagne the order_type to business
+        #change the order_type to business
         self.cart.order_type = 'business'
         self.cart.save()
         resp = self.client.get(billing_url)
