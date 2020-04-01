@@ -14,7 +14,7 @@ class JobsListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(JobsListView, self).get_context_data(**kwargs)
-        context['job_count'] = Job.objects.all().count()
+        context['total_job_count'] = Job.objects.all().count()
         return context
 
 
