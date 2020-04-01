@@ -252,9 +252,10 @@ def add_posts_count_in_badges_list(course, badges_list):
         badges_list[BADGE_TYPE_CONVERSATIONALIST], discussion_posts_count)
     badges_list[BADGE_TYPE_CONVERSATIONALIST] = conversationalist_badges
 
-    team_posts_count = course[course_key].get(TEAM_COUNT_KEY, 0)
-    team_badges = add_badge_progress(badges_list[BADGE_TYPE_TEAM], team_posts_count)
-    badges_list[BADGE_TYPE_TEAM] = team_badges
+    if BADGE_TYPE_TEAM in badges_list:
+        team_posts_count = course[course_key].get(TEAM_COUNT_KEY, 0)
+        team_badges = add_badge_progress(badges_list[BADGE_TYPE_TEAM], team_posts_count)
+        badges_list[BADGE_TYPE_TEAM] = team_badges
 
 
 def add_badge_progress(course_badges, posts_count):
