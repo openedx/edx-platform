@@ -16,6 +16,7 @@ from completion.models import BlockCompletion
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
+from django.db import transaction
 from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.middleware.csrf import CsrfViewMiddleware
 from django.template.context_processors import csrf
@@ -994,6 +995,7 @@ def xqueue_callback(request, course_id, userid, mod_id, dispatch):
 
 @csrf_exempt
 @xframe_options_exempt
+@transaction.non_atomic_requests
 def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=None):
     """
     Entry point for unauthenticated XBlock handlers.
@@ -1008,6 +1010,7 @@ def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=
 
 @csrf_exempt
 @xframe_options_exempt
+@transaction.non_atomic_requests
 def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     """
     Generic view for extensions. This is where AJAX calls go.

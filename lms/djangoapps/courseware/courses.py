@@ -136,7 +136,6 @@ def get_course_overview_with_access(user, action, course_key, check_if_enrolled=
     try:
         course_overview = CourseOverview.get_from_id(course_key)
     except CourseOverview.DoesNotExist:
-        log.info("Could't find the course overview for course id: {id}".format(id=course_key))
         raise Http404("Course not found.")
     check_course_access(course_overview, user, action, check_if_enrolled)
     return course_overview

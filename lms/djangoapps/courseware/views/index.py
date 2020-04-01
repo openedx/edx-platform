@@ -16,6 +16,7 @@ import six.moves.urllib.request  # pylint: disable=import-error
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.views import redirect_to_login
+from django.db import transaction
 from django.http import Http404
 from django.template.context_processors import csrf
 from django.urls import reverse
@@ -95,6 +96,7 @@ TEMPLATE_IMPORTS = {'urllib': urllib}
 CONTENT_DEPTH = 2
 
 
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class CoursewareIndex(View):
     """
     View class for the Courseware page.

@@ -962,32 +962,6 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         )
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
-    @patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.iter')
-    @ddt.data(u'Cannot grade student', '')
-    def test_grading_failure(self, error_message, mock_grades_iter, _mock_current_task):
-        """
-        Test that any grading errors are properly reported in the progress
-        dict and uploaded to the report store.
-        """
-        student = self.create_student(u'username', u'student@example.com')
-        mock_grades_iter.return_value = [
-            (student, None, Exception(error_message))
-        ]
-        result = ProblemGradeReport.generate(None, None, self.course.id, None, 'graded')
-        self.assertDictContainsSubset({'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
-
-        report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
-        self.assertTrue(any('grade_report_err' in item[0] for item in report_store.links_for(self.course.id)))
-        self.verify_rows_in_csv([
-            {
-                u'Student ID': text_type(student.id),
-                u'Email': student.email,
-                u'Username': student.username,
-                u'error_msg': error_message if error_message else "Unknown error"
-            }
-        ])
-
-    @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
     def test_inactive_enrollment_included(self, _get_current_task):
         """
         Students with inactive enrollments in a course should be included in Problem Grade Report.

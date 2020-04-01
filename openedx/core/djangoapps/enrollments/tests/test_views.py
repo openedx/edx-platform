@@ -1672,12 +1672,12 @@ class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
 
     def test_user_not_authenticated(self):
         self.client.logout()
-        response = self.client.get(self.url, {'course_id': self.course.id})
+        response = self.client.get(self.url, {'course_id': str(self.course.id)})
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_user_not_authorized(self):
         self.client.login(username=self.student1.username, password='edx')
-        response = self.client.get(self.url, {'course_id': self.course.id})
+        response = self.client.get(self.url, {'course_id': str(self.course.id)})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     @ddt.data(
