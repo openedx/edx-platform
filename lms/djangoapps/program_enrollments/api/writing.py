@@ -11,6 +11,7 @@ import logging
 from simple_history.utils import bulk_create_with_history
 
 from course_modes.models import CourseMode
+from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment, NonExistentCourseError
 from student.roles import CourseStaffRole
@@ -268,7 +269,7 @@ def write_program_course_enrollments(
             if not update:
                 results[external_key] = ProgramCourseOpStatuses.CONFLICT
                 continue
-            results[external_key] = change_program_course_enrollment_status(
+            updated_course_enrollment = change_program_course_enrollment_status(
                 existing_course_enrollment, status
             )
             updated_enrollments.append(existing_course_enrollment)
@@ -340,6 +341,22 @@ def create_program_course_enrollment(program_enrollment, course_key, status, sav
     if save:
         program_course_enrollment.save()
     return program_course_enrollment
+
+
+def create_program_course_enrollment_role(program_course_enrollment, role, save=True):
+    """
+    TODO
+    """
+    if user:
+        # create real role
+        CourseStaffRole(course_key)
+
+    else:
+        role_assignment = CourseAccessRoleAssignment(
+            enrollment=program_course_enrollment,
+            role=role,
+        )
+
 
 
 def change_program_course_enrollment_status(program_course_enrollment, new_status):

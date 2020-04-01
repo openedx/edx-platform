@@ -120,11 +120,12 @@ class ProgramCourseEnrollmentRoles(object):
     """
     Valid roles that can be assigned as part of a ProgramCourseEnrollment
     """
+    STUDENT = 'student'  # implys no CourseAccessRole
     COURSE_STAFF = CourseStaffRole.ROLE
     __ALL__ = (COURSE_STAFF,)
 
     # Note: Any changes to this value will trigger a migration on
     # CourseAccessRoleAssignment!
     __MODEL_CHOICES__ = (
-        (role, role) for role in __ALL__
+        (role, role) for role in (COURSE_STAFF,)
     )
