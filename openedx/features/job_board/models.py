@@ -25,3 +25,6 @@ class Job(TimeStampedModel):
     contact_email = models.EmailField(max_length=255)
     logo = models.ImageField(upload_to='job-board/uploaded-logos/', blank=True, null=True)
 
+    def get_job_location(self):
+        return '{city}, {country}'.format(city=self.city, country=self.country.name)
+
