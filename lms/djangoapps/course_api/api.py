@@ -38,9 +38,13 @@ def get_effective_user(requesting_user, target_username):
     """
     if target_username == requesting_user.username:
         return requesting_user
+    # This is the default behavior if username is not specified as a query parameter
+    # which is why the is_staff check is happening inside of here.
     elif target_username == '':
+        if requesting_user.is_staff:
+            return requesting_user
         return AnonymousUser()
-    elif can_view_courses_for_username(requesting_user, target_username):
+    elif target_username and can_view_courses_for_username(requesting_user, target_username):
         return User.objects.get(username=target_username)
     else:
         raise PermissionDenied()
