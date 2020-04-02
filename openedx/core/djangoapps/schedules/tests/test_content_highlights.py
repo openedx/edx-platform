@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import datetime
 
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
-from openedx.core.djangoapps.schedules.content_highlights import course_has_highlights, get_week_highlights
+from openedx.core.djangoapps.schedules.content_highlights import (
+    course_has_highlights, get_week_highlights, get_next_section_highlights,
+)
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import skip_unless_lms
@@ -130,3 +133,25 @@ class TestContentHighlights(ModuleStoreTestCase):
         self.assertTrue(course_has_highlights(self.course_key))
         with self.assertRaises(CourseUpdateDoesNotExist):
             get_week_highlights(self.user, self.course_key, week_num=1)
+
+    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
+    def test_get_next_section_highlights(self):
+        yesterday = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+        today = datetime.datetime.utcnow()
+        tomorrow = datetime.datetime.utcnow() + datetime.timedelta(days=1)
+        with self.store.bulk_operations(self.course_key):
+            self._create_chapter(  # Week 1
+                highlights=[u'a', u'b', u'á'],
+                due=yesterday,
+            )
+            self._create_chapter(  # Week 2
+                highlights=[u'skipped a week'],
+                due=today,
+            )
+
+        self.assertEqual(
+            get_next_section_highlights(self.user, self.course_key, yesterday.date()),
+            ([u'skipped a week'], 2),
+        )
+        with self.assertRaises(CourseUpdateDoesNotExist):
+            get_next_section_highlights(self.user, self.course_key, tomorrow.date())
