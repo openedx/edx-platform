@@ -14,11 +14,6 @@ class JobListView(ListView):
     ordering = ['-created']
     template_engine = 'mako'
 
-    def get_context_data(self, **kwargs):
-        context = super(JobListView, self).get_context_data(**kwargs)
-        context['total_job_count'] = Job.objects.all().count()
-        return context
-
 
 def show_job_detail(request):
 
