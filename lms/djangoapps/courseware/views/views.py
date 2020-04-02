@@ -115,6 +115,7 @@ from openedx.features.course_experience import (
     RELATIVE_DATES_FLAG,
 )
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
+from openedx.features.course_experience.utils import reset_deadlines_banner_should_display
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
@@ -717,6 +718,9 @@ class CourseTabView(EdxFragmentView):
         """
         Creates the context for the fragment's template.
         """
+        from lms.urls import RESET_COURSE_DEADLINES_NAME
+        from openedx.features.course_experience.urls import COURSE_HOME_VIEW_NAME
+
         can_masquerade = request.user.has_perm(MASQUERADE_AS_STUDENT, course)
         supports_preview_menu = tab.get('supports_preview_menu', False)
         uses_bootstrap = self.uses_bootstrap(request, course, tab=tab)
@@ -731,10 +735,6 @@ class CourseTabView(EdxFragmentView):
         else:
             masquerade = None
 
-        reset_deadlines_url = reverse(
-            'openedx.course_experience.reset_course_deadlines', kwargs={'course_id': text_type(course.id)}
-        )
-
         display_reset_dates_banner = False
         if RELATIVE_DATES_FLAG.is_enabled(course.id):
             course_overview = CourseOverview.get_from_id(course.id)
@@ -743,6 +743,10 @@ class CourseTabView(EdxFragmentView):
                 course=course_overview, user=request.user, mode=CourseMode.VERIFIED
             ).exists()):
                 display_reset_dates_banner = True
+
+        reset_deadlines_url = reverse(RESET_COURSE_DEADLINES_NAME) if display_reset_dates_banner else None
+
+        reset_deadlines_redirect_url_base = COURSE_HOME_VIEW_NAME if reset_deadlines_url else None
 
         context = {
             'course': course,
@@ -754,8 +758,10 @@ class CourseTabView(EdxFragmentView):
             'uses_bootstrap': uses_bootstrap,
             'uses_pattern_library': not uses_bootstrap,
             'disable_courseware_js': True,
-            'reset_deadlines_url': reset_deadlines_url,
             'display_reset_dates_banner': display_reset_dates_banner,
+            'reset_deadlines_url': reset_deadlines_url,
+            'reset_deadlines_redirect_url_base': reset_deadlines_redirect_url_base,
+            'reset_deadlines_redirect_url_id_dict': {'course_id': str(course.id)}
         }
         # Avoid Multiple Mathjax loading on the 'user_profile'
         if 'profile_page_context' in kwargs:
@@ -1614,11 +1620,14 @@ def _track_successful_certificate_generation(user_id, course_id):
 @ensure_valid_usage_key
 @xframe_options_exempt
 @transaction.non_atomic_requests
+@ensure_csrf_cookie
 def render_xblock(request, usage_key_string, check_if_enrolled=True):
     """
     Returns an HttpResponse with HTML content for the xBlock with the given usage_key.
     The returned HTML is a chromeless rendering of the xBlock (excluding content of the containing courseware).
     """
+    from lms.urls import RENDER_XBLOCK_NAME, RESET_COURSE_DEADLINES_NAME
+
     usage_key = UsageKey.from_string(usage_key_string)
 
     usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
@@ -1655,6 +1664,14 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
                     'mark-completed-on-view-after-delay': completion_service.get_complete_on_view_delay_ms()
                 }
 
+        display_reset_dates_banner = False
+        if RELATIVE_DATES_FLAG.is_enabled(course.id):
+            display_reset_dates_banner = reset_deadlines_banner_should_display(course_key, request)
+
+        reset_deadlines_url = reverse(RESET_COURSE_DEADLINES_NAME) if display_reset_dates_banner else None
+
+        reset_deadlines_redirect_url_base = RENDER_XBLOCK_NAME if reset_deadlines_url else None
+
         context = {
             'fragment': block.render('student_view', context=student_view_context),
             'course': course,
@@ -1667,6 +1684,10 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'edx_notes_enabled': is_feature_enabled(course, request.user),
             'staff_access': bool(request.user.has_perm(VIEW_XQA_INTERFACE, course)),
             'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
+            'display_reset_dates_banner': display_reset_dates_banner,
+            'reset_deadlines_url': reset_deadlines_url,
+            'reset_deadlines_redirect_url_base': reset_deadlines_redirect_url_base,
+            'reset_deadlines_redirect_url_id_dict': {'course_id': str(course.id), 'usage_key_string': usage_key_string}
         }
         return render_to_response('courseware/courseware-chromeless.html', context)
 

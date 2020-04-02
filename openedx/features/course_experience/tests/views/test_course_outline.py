@@ -24,6 +24,7 @@ from waffle.models import Switch
 from waffle.testutils import override_switch
 
 from lms.djangoapps.courseware.tests.factories import StaffFactory
+from lms.urls import RESET_COURSE_DEADLINES_NAME
 from gating import api as lms_gating_api
 from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesAndSpecialExamsTransformer
 from openedx.core.djangoapps.schedules.models import Schedule
@@ -170,8 +171,8 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
             start_date=timezone.now() - datetime.timedelta(1),
             enrollment=enrollment
         )
-        url = '{}{}'.format(course_home_url(course), 'reset_deadlines')
-        self.client.post(url)
+        post_dict = {'reset_deadlines_redirect_url_id_dict': json.dumps({'course_id': str(course.id)})}
+        self.client.post(reverse(RESET_COURSE_DEADLINES_NAME), post_dict)
         updated_schedule = Schedule.objects.get(enrollment=enrollment)
         self.assertEqual(updated_schedule.start_date.date(), datetime.datetime.today().date())
 
@@ -204,8 +205,8 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
 
         assert response.status_code == 200
 
-        url = '{}{}'.format(course_home_url(course), 'reset_deadlines')
-        self.client.post(url)
+        post_dict = {'reset_deadlines_redirect_url_id_dict': json.dumps({'course_id': str(course.id)})}
+        self.client.post(reverse(RESET_COURSE_DEADLINES_NAME), post_dict)
         updated_schedule = Schedule.objects.get(id=student_schedule.id)
         self.assertEqual(updated_schedule.start_date.date(), datetime.datetime.today().date())
         updated_staff_schedule = Schedule.objects.get(id=staff_schedule.id)
@@ -240,8 +241,8 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
 
         assert response.status_code == 200
 
-        url = '{}{}'.format(course_home_url(course), 'reset_deadlines')
-        self.client.post(url)
+        post_dict = {'reset_deadlines_redirect_url_id_dict': json.dumps({'course_id': str(course.id)})}
+        self.client.post(reverse(RESET_COURSE_DEADLINES_NAME), post_dict)
         updated_student_schedule = Schedule.objects.get(id=student_schedule.id)
         self.assertEqual(updated_student_schedule.start_date, student_schedule.start_date)
         updated_staff_schedule = Schedule.objects.get(id=staff_schedule.id)
