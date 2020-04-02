@@ -3,15 +3,13 @@ Views related to operations on course objects
 """
 from collections import defaultdict
 import copy
+from datetime import datetime, timedelta
 import json
 import logging
+import pytz
 import random
 import re
 import string
-from datetime import datetime, timedelta
-import pytz
-
-utc=pytz.UTC
 
 import django.utils
 import six
@@ -283,18 +281,23 @@ def course_handler(request, course_key_string=None):
 
 @login_required
 def course_archive_handler(request, course_key_string=None):
+    """
+    The restful handler to archive a course.
+    GET
+        html: return home page after archiving the given course
+    """
     if request.method == 'GET':
         if course_key_string:
             course_key = CourseKey.from_string(course_key_string)
             course_details = CourseDetails.fetch(course_key)
-            end_date_setting = {
-                'start_date': (datetime.today() - timedelta(days=2)).replace(tzinfo=utc),
-                'end_date': (datetime.today() - timedelta(days=1)).replace(tzinfo=utc),
+            archive_settings = {
+                'start_date': (datetime.today() - timedelta(days=2)).replace(tzinfo=pytz.UTC),
+                'end_date': (datetime.today() - timedelta(days=1)).replace(tzinfo=pytz.UTC),
                 'intro_video': course_details.intro_video
             }
-            CourseDetails.update_from_json(course_key, end_date_setting, request.user)
+            CourseDetails.update_from_json(course_key, archive_settings, request.user)
 
-    return redirect(request.META.get('HTTP_REFERER'), permanent=True)
+    return redirect(reverse('home'))
 
 
 @login_required
