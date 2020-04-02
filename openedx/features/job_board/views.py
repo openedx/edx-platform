@@ -8,7 +8,7 @@ from .models import Job
 class JobListView(ListView):
 
     model = Job
-    context_object_name = 'jobs_list'
+    context_object_name = 'job_list'
     paginate_by = 10
     template_name = 'features/job_board/job_list.html'
     ordering = ['-created']
