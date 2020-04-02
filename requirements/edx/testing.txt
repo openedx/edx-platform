@@ -110,7 +110,7 @@ edx-django-release-util==0.4.2  # via -r requirements/edx/base.txt
 edx-django-sites-extensions==2.4.3  # via -r requirements/edx/base.txt
 edx-django-utils==3.1     # via -r requirements/edx/base.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==5.0.2  # via -r requirements/edx/base.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.0.3     # via -r requirements/edx/base.txt
+edx-enterprise==3.0.5     # via -r requirements/edx/base.txt
 edx-i18n-tools==0.5.0     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, ora2
 edx-lint==1.4.1           # via -r requirements/edx/testing.in
 edx-milestones==0.2.6     # via -r requirements/edx/base.txt
@@ -202,9 +202,9 @@ pathlib2==2.3.5           # via pytest
 pathtools==0.1.2          # via -r requirements/edx/base.txt, watchdog
 paver==1.3.4              # via -r requirements/edx/base.txt
 pbr==5.4.4                # via -r requirements/edx/base.txt, stevedore
-pdfminer.six==20200124    # via -r requirements/edx/base.txt
+pdfminer.six==20200402    # via -r requirements/edx/base.txt
 piexif==1.1.3             # via -r requirements/edx/base.txt
-pillow==7.0.0             # via -r requirements/edx/base.txt, edx-enterprise, edx-organizations
+pillow==7.1.0             # via -r requirements/edx/base.txt, edx-enterprise, edx-organizations
 pkgconfig==1.5.1          # via -r requirements/edx/base.txt, xmlsec
 pluggy==0.13.1            # via -r requirements/edx/coverage.txt, diff-cover, pytest, tox
 polib==1.1.0              # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, edx-i18n-tools
@@ -232,7 +232,7 @@ pyquery==1.4.1            # via -r requirements/edx/testing.in
 pysrt==1.1.2              # via -r requirements/edx/base.txt, edxval
 pytest-attrib==0.1.3      # via -r requirements/edx/testing.in
 pytest-cov==2.8.1         # via -r requirements/edx/testing.in
-pytest-django==3.8.0      # via -r requirements/edx/testing.in
+pytest-django==3.8.0      # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
 pytest-forked==1.1.3      # via pytest-xdist
 pytest-json-report==1.2.1  # via -r requirements/edx/testing.in
 pytest-metadata==1.8.0    # via pytest-json-report
