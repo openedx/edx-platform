@@ -38,17 +38,18 @@ class SessionCookieDomainOverrideMiddleware(MiddlewareMixin):
                 if key == configuration_helpers.get_value('SESSION_COOKIE_NAME', settings.SESSION_COOKIE_NAME):
                     domain = session_cookie_domain
 
-                kwargs = {'max_age': max_age,
-                          'expires': expires,
-                          'path': path,
-                          'domain': domain,
-                          'secure': secure,
-                          'httponly': httponly,
-                          }
+                kwargs = {
+                    'max_age': max_age,
+                    'expires': expires,
+                    'path': path,
+                    'domain': domain,
+                    'secure': secure,
+                    'httponly': httponly,
+                }
                 # samesite flag was added in django 2.1, so only pass it in for django 2.1 or higher
                 if django.VERSION >= (2, 1):
                     kwargs['samesite'] = samesite
-                    
+
                 # then call down into the normal Django set_cookie method
                 return response.set_cookie_wrapped_func(key, value, **kwargs)
 
