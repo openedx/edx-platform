@@ -1,4 +1,5 @@
 from django.views.generic.list import ListView
+
 from edxmako.shortcuts import render_to_response
 
 from .models import Job
