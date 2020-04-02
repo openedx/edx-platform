@@ -1,9 +1,10 @@
 from django.conf.urls import url
 
-from .views import list_jobs, show_job_detail
+from .views import add_job, list_jobs, show_job_detail
 
 
 urlpatterns = [
-    url(r'^jobs/list/$', list_jobs, name='job_list'),
-    url(r'^jobs/list/[0-9]$', list_jobs, name='job_detail'),
+    url(r'list/$', list_jobs, name='job_list'),
+    url(r'add/$', add_job, name='add_job'),
+    url(r'[0-9]+/$', show_job_detail, name='job_detail'),
 ]
