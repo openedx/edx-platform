@@ -431,7 +431,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `auth_permission_content_type_id_codename_01ab375a_uniq` (`content_type_id`,`codename`),
   CONSTRAINT `auth_permission_content_type_id_2f476e4b_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2441 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2444 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2618,7 +2618,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_model_76bd3d3b_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=811 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=812 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2629,7 +2629,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=696 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=697 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6350,12 +6350,40 @@ CREATE TABLE `submissions_submission` (
   `raw_answer` longtext NOT NULL,
   `student_item_id` int(11) NOT NULL,
   `status` varchar(1) NOT NULL,
+  `team_submission_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `submissions_submissi_student_item_id_9d087470_fk_submissio` (`student_item_id`),
   KEY `submissions_submission_uuid_210428ab` (`uuid`),
   KEY `submissions_submission_submitted_at_9653124d` (`submitted_at`),
   KEY `submissions_submission_created_at_01c4bf22` (`created_at`),
-  CONSTRAINT `submissions_submissi_student_item_id_9d087470_fk_submissio` FOREIGN KEY (`student_item_id`) REFERENCES `submissions_studentitem` (`id`)
+  KEY `submissions_submissi_team_submission_id_40e6bc97_fk_submissio` (`team_submission_id`),
+  CONSTRAINT `submissions_submissi_student_item_id_9d087470_fk_submissio` FOREIGN KEY (`student_item_id`) REFERENCES `submissions_studentitem` (`id`),
+  CONSTRAINT `submissions_submissi_team_submission_id_40e6bc97_fk_submissio` FOREIGN KEY (`team_submission_id`) REFERENCES `submissions_teamsubmission` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `submissions_teamsubmission`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `submissions_teamsubmission` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `uuid` char(32) NOT NULL,
+  `attempt_number` int(10) unsigned NOT NULL,
+  `submitted_at` datetime(6) NOT NULL,
+  `course_id` varchar(255) NOT NULL,
+  `item_id` varchar(255) NOT NULL,
+  `team_id` varchar(255) NOT NULL,
+  `status` varchar(1) NOT NULL,
+  `submitted_by_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `submissions_teamsubm_submitted_by_id_5a27162a_fk_auth_user` (`submitted_by_id`),
+  KEY `submissions_teamsubmission_uuid_4d1aef87` (`uuid`),
+  KEY `submissions_teamsubmission_submitted_at_74e28ed6` (`submitted_at`),
+  KEY `submissions_teamsubmission_course_id_68c6908d` (`course_id`),
+  KEY `submissions_teamsubmission_item_id_2bdcb26c` (`item_id`),
+  KEY `submissions_teamsubmission_team_id_5fda0e54` (`team_id`),
+  CONSTRAINT `submissions_teamsubm_submitted_by_id_5a27162a_fk_auth_user` FOREIGN KEY (`submitted_by_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `super_csv_csvoperation`;
