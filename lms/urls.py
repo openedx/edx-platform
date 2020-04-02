@@ -1092,6 +1092,7 @@ if settings.FEATURES.get('ENABLE_API_DOCS'):
 # edx-drf-extensions csrf app
 urlpatterns += [
     url(r'', include('csrf.urls')),
+    url(r'', include('philu.urls')),
 ]
 
 urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.LMS))
