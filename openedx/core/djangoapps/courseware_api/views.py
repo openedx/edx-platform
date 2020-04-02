@@ -16,6 +16,7 @@ from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from student.models import CourseEnrollment
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
+from openedx.features.course_duration_limits.access import generate_course_expired_message
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 
 from .serializers import CourseInfoSerializer
