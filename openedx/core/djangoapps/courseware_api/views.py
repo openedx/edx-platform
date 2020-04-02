@@ -101,11 +101,7 @@ class CoursewareInformation(RetrieveAPIView):
             )
 
         overview.enrollment = {'mode': mode, 'is_active': is_active}
-        if not is_active:
-            user_has_access = allow_public_access(overview, [COURSE_VISIBILITY_PUBLIC])
-        else:
-            user_has_access = True
-        overview.user_has_access = user_has_access
+        overview.user_has_access = has_access(self.request.user, 'load', overview).has_access
         overview.user_has_staff_access = has_access(self.request.user, 'staff', overview).has_access
         return overview
 
