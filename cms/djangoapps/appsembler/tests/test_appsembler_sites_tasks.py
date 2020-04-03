@@ -8,7 +8,7 @@ from organizations.models import UserOrganizationMapping
 from organizations.tests.factories import OrganizationFactory
 
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.appsembler.sites.tasks import import_course_on_site_creation
+from openedx.core.djangoapps.appsembler.sites.tasks import import_course_on_site_creation_apply_async
 from student.roles import CourseAccessRole
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
@@ -86,8 +86,8 @@ class ImportCourseOnSiteCreationTestCase(ModuleStoreTestCase):
         """
         Ensure the task run properly.
         """
-        result = import_course_on_site_creation(self.organization)
-        assert not result, 'Task should succeed instead of returning an exception'
+        result = import_course_on_site_creation_apply_async(self.organization)
+        assert not result.failed(), 'Task should succeed instead of returning: "{}"'.format(result.result)
 
         courses = self.m_store.get_courses()
         assert len(courses) == 1, 'Should import just one course'

@@ -19,6 +19,7 @@ from student.roles import CourseAccessRole
 
 from opaque_keys.edx.keys import CourseKey
 
+from organizations.models import Organization
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -27,12 +28,33 @@ from xmodule.modulestore.xml_importer import import_course_from_xml
 LOGGER = get_task_logger(__name__)
 
 
+def import_course_on_site_creation_apply_async(organization):
+    """
+    Apply the `import_course_on_site_creation` task async. with proper call and configurations.
+
+    This helper ensures that the configuration is tested properly even if
+    the `RegistrationSerializer` has no tests.
+
+    :param organization:
+    :return: ResultBase.
+    """
+    return import_course_on_site_creation.apply_async(
+        kwargs={'organization_id': organization.id},
+        retry=False,  # The task is not expected to be able to recover after a failure.
+        queue="edx.core.cms.high"
+    )
+
+
 @task()
-def import_course_on_site_creation(organization):
+def import_course_on_site_creation(organization_id):
     """
     Celery task to copy the template course for new sites.
+
+    :param organization_id: The integer ID for the organization object in database.
     """
     try:
+        organization = Organization.objects.get(pk=organization_id)
+
         course_name = settings.TAHOE_DEFAULT_COURSE_NAME
         course_github_org = settings.TAHOE_DEFAULT_COURSE_GITHUB_ORG
         course_github_name = settings.TAHOE_DEFAULT_COURSE_GITHUB_NAME
