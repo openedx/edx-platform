@@ -93,6 +93,8 @@ urlpatterns = [
     url(r'', include('openedx.features.philu_courseware.urls')),
     url(r'', include('openedx.features.badging.urls')),
     url(r'', include('openedx.features.specializations.urls')),
+    url(r'^marketplace/', include('openedx.features.marketplace.urls')),
+    url(r'^idea/', include('openedx.features.idea.urls')),
 
     # Event tracking endpoints
     url(r'', include('track.urls')),
@@ -1092,8 +1094,6 @@ if settings.FEATURES.get('ENABLE_API_DOCS'):
 # edx-drf-extensions csrf app
 urlpatterns += [
     url(r'', include('csrf.urls')),
-    url(r'', include('openedx.features.marketplace.urls')),
-    url(r'', include('openedx.features.idea.urls')),
 ]
 
 urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.LMS))

@@ -2369,6 +2369,8 @@ INSTALLED_APPS = [
     'openedx.features.partners',
     'openedx.features.philu_courseware',
     'openedx.features.student_certificates',
+    'openedx.features.marketplace',
+    'openedx.features.idea',
 
     #third party surveys
     'lms.djangoapps.third_party_surveys',
@@ -2398,9 +2400,6 @@ INSTALLED_APPS = [
     'openedx.features.user_leads',
 
     'channels',
-
-    'openedx.features.marketplace',
-    'openedx.features.idea',
 ]
 
 ######################### CSRF #########################################

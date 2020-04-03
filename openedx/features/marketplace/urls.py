@@ -5,18 +5,18 @@ from openedx.features.marketplace.views import (MarketplaceListingView, Marketpl
 
 urlpatterns = [
     url(
-        r'^marketplaces/$',
+        r'',
         MarketplaceListingView.as_view(),
         name='marketplace-listing'
     ),
     url(
-        r'^marketplace/request/$',
+        r'^request/$',
         MarketplaceCreateRequestView.as_view(),
         name='marketplace-make-request'
     ),
     url(
-        r'^marketplace/(?P<pk>[0-9]+)/$',
+        r'^(?P<pk>[0-9]+)/$',
         MarketplaceRequestDetailView.as_view(),
-        name='idea-details'
+        name='marketplace-details'
     ),
 ]

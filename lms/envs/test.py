@@ -647,7 +647,7 @@ JWT_AUTH.update({
         ': "RSA"}'
     ),
 })
-
+CAPTCHA_SITE_KEY = os.getenv('CAPTCHA_SITE_KEY', 'test-key')
 ####################### Plugin Settings ##########################
 
 from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants

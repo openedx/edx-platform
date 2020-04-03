@@ -4,22 +4,22 @@ from openedx.features.idea.views import (ChallengeLandingView, IdeaListingView, 
 
 urlpatterns = [
     url(
-        r'^ideas/overview$',
+        r'^overview/$',
         ChallengeLandingView.as_view(),
         name='challenge-landing'
     ),
     url(
-        r'^ideas/$',
+        r'',
         IdeaListingView.as_view(),
         name='idea-listing'
     ),
     url(
-        r'^ideas/create/$',
+        r'^create/$',
         IdeaCreateView.as_view(),
         name='idea-create'
     ),
     url(
-        r'^ideas/(?P<pk>[0-9]+)/$',
+        r'^(?P<pk>[0-9]+)/$',
         IdeaDetailView.as_view(),
         name='idea-details'
     ),
