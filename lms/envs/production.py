@@ -1158,3 +1158,6 @@ MANUAL_ENROLLMENT_ROLE_CHOICES = ENV_TOKENS.get('MANUAL_ENROLLMENT_ROLE_CHOICES'
 ########################## limiting dashboard courses ######################
 
 DASHBOARD_COURSE_LIMIT = ENV_TOKENS.get('DASHBOARD_COURSE_LIMIT', None)
+
+##################### SUPPORT URL ############################
+SUPPORT_HOW_TO_UNENROLL_LINK = ENV_TOKENS.get('SUPPORT_HOW_TO_UNENROLL_LINK', SUPPORT_HOW_TO_UNENROLL_LINK)
