@@ -101,8 +101,3 @@ def plugin_settings(settings):
     settings.USE_S3_FOR_CUSTOMER_THEMES = True
 
     _add_theme_static_dirs(settings)
-
-    settings.TAHOE_DEFAULT_COURSE_NAME = settings.ENV_TOKENS.get('TAHOE_DEFAULT_COURSE_NAME', '')
-    settings.TAHOE_DEFAULT_COURSE_GITHUB_ORG = settings.ENV_TOKENS.get('TAHOE_DEFAULT_COURSE_GITHUB_ORG', '')
-    settings.TAHOE_DEFAULT_COURSE_GITHUB_NAME = settings.ENV_TOKENS.get('TAHOE_DEFAULT_COURSE_GITHUB_NAME', '')
-    settings.TAHOE_DEFAULT_COURSE_VERSION = settings.ENV_TOKENS.get('TAHOE_DEFAULT_COURSE_VERSION', '')
