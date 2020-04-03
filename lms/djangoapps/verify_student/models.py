@@ -940,7 +940,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
             settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["API_URL"],
             headers=headers,
             data=simplejson.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8'),
-            verify=False
+            verify=True
         )
 
         log.info(u"Sent request to Software Secure for receipt ID %s.", self.receipt_id)
