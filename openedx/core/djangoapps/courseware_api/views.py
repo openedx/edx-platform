@@ -80,8 +80,11 @@ class CoursewareInformation(RetrieveAPIView):
 
     serializer_class = CourseInfoSerializer
 
-    def _check_access(self, user, overview):
-        if has_access(user, 'staff', overview):
+    def _check_access(self, user, overview, is_staff=None):
+        if is_staff is None:
+            is_staff = has_access(user, 'staff', overview)
+
+        if is_staff:
             return True
 
         # We can only trust has_access in its false case because it doesn't check everything we
@@ -122,8 +125,8 @@ class CoursewareInformation(RetrieveAPIView):
             )
         overview.enrollment = {'mode': mode, 'is_active': is_active}
 
-        overview.can_load_course = self._check_access(self.request.user, overview)
         overview.is_staff = has_access(self.request.user, 'staff', overview).has_access
+        overview.can_load_course = self._check_access(self.request.user, overview, overview.is_staff)
 
         overview.user_has_access = overview.can_load_course  # TODO: TNL-7053 Legacy: Delete once ready to contract
         overview.user_has_staff_access = overview.is_staff  # TODO: TNL-7053 Legacy: Delete once ready to contract
