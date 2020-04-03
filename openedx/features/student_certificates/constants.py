@@ -33,3 +33,6 @@ CERTIFICATE_VERIFICATION_SALT_CHARACTERS = [c for c in ascii_uppercase[16:]]
 HEX_ROT_10_MAP = {format(i, 'x').upper(): c for i, c in enumerate(ascii_uppercase[:16])}
 
 PREVIEW_CERTIFICATE_VERIFICATION_URL = '{}verify/PREVIEW_CERTIFICATE'.format(settings.LMS_ROOT_URL)
+
+COMPLETION_DATE_FORMAT = '%b %d, %Y'
+CREDENTIALS_DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'

@@ -16,3 +16,10 @@ class ForumBadge(Resource):
         delete badge configuration
         """
         return self.client.delete('/api/v2/badge-config/{}'.format(badge_id))
+
+    def get_progress(self, request_data):
+        """
+        Get badges progress
+        """
+        payload = request_data
+        return self.client.post('/api/v2/badges/badge-progress', **payload)

@@ -3,7 +3,6 @@ from custom_settings.models import CustomSettings
 from opaque_keys.edx.keys import CourseKey
 from urllib import urlencode
 from w3lib.url import add_or_replace_parameter
-from django.core.urlresolvers import reverse
 
 from lms.envs.common import (SOCIAL_SHARING_URLS, TWITTER_MESSAGE_FORMAT)
 
@@ -72,19 +71,3 @@ def _compile_social_sharing_url(share_url, course_url, url_param, utm_source, te
         url = add_or_replace_parameter(url, 'text', text)
 
     return url
-
-
-def user_org_survey_completion_status(user):
-    """
-    :param user: user for which we want to check org survey completion
-    :return: returns either "complete" or the org survey to which we have to
-             redirect to
-    """
-    user_org_details_complete = 'complete'
-
-    if user.is_authenticated():
-        org_unattended_surveys = user.extended_profile.org_unattended_surveys_v2(_type='list')
-        if org_unattended_surveys:
-            user_org_details_complete = reverse(org_unattended_surveys[0])
-
-    return user_org_details_complete

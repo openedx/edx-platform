@@ -31,6 +31,12 @@ class ExceptionMiddleware(SocialAuthExceptionMiddleware):
         if auth_entry and auth_entry in pipeline.AUTH_DISPATCH_URLS:
             redirect_uri = pipeline.AUTH_DISPATCH_URLS[auth_entry]
 
+            # PhilU check for redirection in popup based registration
+            register_origin_url = request.session.get('next')
+
+            if auth_entry == pipeline.AUTH_ENTRY_REGISTER and register_origin_url:
+                redirect_uri = register_origin_url
+
         return redirect_uri
 
     def process_exception(self, request, exception):

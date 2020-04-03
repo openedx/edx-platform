@@ -11,6 +11,7 @@ from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.db.models import Q
@@ -24,12 +25,12 @@ from edxmako.shortcuts import render_to_response
 from nodebb.helpers import update_nodebb_for_user_status
 
 from lms.djangoapps.onboarding import forms
-from lms.djangoapps.onboarding.decorators import can_save_org_data, can_not_update_onboarding_steps, \
-    can_save_org_details
+from lms.djangoapps.onboarding.decorators import can_save_org_data, can_save_org_details
 from lms.djangoapps.onboarding.email_utils import send_admin_activation_email, send_admin_update_confirmation_email, \
     send_admin_update_email
 from lms.djangoapps.onboarding.helpers import calculate_age_years, COUNTRIES, LANGUAGES, oef_eligible_first_learner, \
-    get_close_matching_orgs_with_suggestions, get_alquity_community_url, serialize_partner_networks
+    get_close_matching_orgs_with_suggestions, get_alquity_community_url, serialize_partner_networks, \
+    affiliated_unattended_surveys
 from lms.djangoapps.onboarding.models import (
     Organization,
     Currency, OrganizationMetric, OrganizationAdminHashKeys, PartnerNetwork)
@@ -43,7 +44,6 @@ log = logging.getLogger("edx.onboarding")
 
 
 @login_required
-@can_not_update_onboarding_steps
 @transaction.atomic
 def user_info(request):
     """
@@ -56,17 +56,15 @@ def user_info(request):
     """
 
     user_extended_profile = request.user.extended_profile
-    are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
+    are_forms_complete, unattended_org_surveys = affiliated_unattended_surveys(user_extended_profile)
     userprofile = request.user.profile
     is_under_age = False
     reset_org = False
     is_poc = user_extended_profile.is_organization_admin
 
     template = 'onboarding/tell_us_more_survey.html'
-    redirect_to_next = True
 
     if request.path == reverse('additional_information'):
-        redirect_to_next = False
         template = 'myaccount/additional_information.html'
 
     initial = {
@@ -114,19 +112,7 @@ def user_info(request):
             if custom_model.organization:
                 custom_model.organization.save()
 
-            unattended_surveys = user_extended_profile.unattended_surveys(_type='list')
-            are_forms_complete = not (bool(unattended_surveys))
-
-            if len(unattended_surveys) > 0:
-                redirect_to_next = True
-
-            if not are_forms_complete and redirect_to_next:
-                return redirect(unattended_surveys[0])
-
-            # this will only executed if user updated his/her employed status from account settings page
-            # redirect user to account settings page where he come from
-            if not request.path == "/myaccount/additional_information/":
-                return redirect(reverse("update_account_settings"))
+            return redirect(reverse("additional_information"))
         else:
             reset_org = True
             is_poc = True if request.POST.get('is_poc') == '1' else False
@@ -146,8 +132,8 @@ def user_info(request):
         'org_url': reverse('get_organizations'),
         'reset_org': reset_org,
         'is_employed': bool(user_extended_profile.organization),
-        'partners_opt_in': request.POST.get('partners_opt_in', '')
-
+        'partners_opt_in': request.POST.get('partners_opt_in', ''),
+        'unattended_org_surveys': unattended_org_surveys,
     })
 
     context.update(user_extended_profile.unattended_surveys())
@@ -155,7 +141,6 @@ def user_info(request):
 
 
 @login_required
-@can_not_update_onboarding_steps
 @transaction.atomic
 def interests(request):
     """
@@ -167,16 +152,13 @@ def interests(request):
     namely, organization survey.
     """
     user_extended_profile = request.user.extended_profile
-    are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
+    are_forms_complete, unattended_org_surveys = affiliated_unattended_surveys(user_extended_profile)
     is_first_signup_in_org = user_extended_profile.is_first_signup_in_org \
         if user_extended_profile.organization else False
 
     template = 'onboarding/interests_survey.html'
-    next_page_url = reverse('organization')
-    redirect_to_next = True
 
     if request.path == reverse('update_interests'):
-        redirect_to_next = False
         template = 'myaccount/interests.html'
 
     initial = {
@@ -192,22 +174,13 @@ def interests(request):
         form = forms.InterestsForm(request.POST, initial=initial)
 
         is_action_update = user_extended_profile.is_interests_data_submitted
-
         form.save(request, user_extended_profile)
-
         save_interests.send(sender=UserExtendedProfile, instance=user_extended_profile)
 
         are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
 
-        if (user_extended_profile.is_organization_admin or is_first_signup_in_org) and not are_forms_complete \
-                and redirect_to_next:
-            return redirect(next_page_url)
-
         if are_forms_complete and not is_action_update:
             update_nodebb_for_user_status(request.user.username)
-            if user_extended_profile.is_alquity_user:
-                return redirect(get_alquity_community_url())
-            return redirect(reverse('recommendations'))
 
     else:
         form = forms.InterestsForm(initial=initial)
@@ -221,6 +194,7 @@ def interests(request):
         'non_profile_organization': Organization.is_non_profit(user_extended_profile),
         'is_poc': extended_profile.is_organization_admin,
         'is_first_user': is_first_signup_in_org,
+        'unattended_org_surveys': unattended_org_surveys,
     })
 
     return render(request, template, context)
@@ -228,7 +202,6 @@ def interests(request):
 
 @login_required
 @can_save_org_data
-@can_not_update_onboarding_steps
 @transaction.atomic
 def organization(request):
     """
@@ -241,11 +214,18 @@ def organization(request):
 
     user_extended_profile = request.user.extended_profile
     _organization = user_extended_profile.organization
-    are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
+    are_forms_complete, unattended_org_surveys = affiliated_unattended_surveys(user_extended_profile)
 
     template = 'onboarding/organization_survey.html'
-    next_page_url = reverse('recommendations')
     redirect_to_next = True
+    is_my_account_page = False
+
+    if request.path == reverse('myaccount_organization'):
+        if not unattended_org_surveys:
+            raise PermissionDenied
+
+        is_my_account_page = True
+        template = 'organization/update_organization.html'
 
     if request.path == reverse('update_organization'):
         redirect_to_next = False
@@ -264,19 +244,21 @@ def organization(request):
         if form.is_valid():
             form.save(request)
             old_url = _organization.url.replace('https://', '', 1) if _organization.url else _organization.url
-            are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
+            are_forms_complete, unattended_org_surveys = affiliated_unattended_surveys(user_extended_profile)
 
-            if user_extended_profile.organization.org_type == PartnerNetwork.NON_PROFIT_ORG_TYPE_CODE:
+            if unattended_org_surveys:
                 # redirect to organization detail page
-                next_page_url = reverse('org_detail_survey')
+                if redirect_to_next and not is_my_account_page:
+                    return redirect(reverse('org_detail_survey'))
             else:
                 # update nodebb for user profile completion
                 update_nodebb_for_user_status(request.user.username)
-                if user_extended_profile.is_alquity_user:
-                    next_page_url = get_alquity_community_url()
 
-            if redirect_to_next:
-                return redirect(next_page_url)
+                if is_my_account_page:
+                    return redirect(reverse('recommendations'))
+
+                if redirect_to_next and user_extended_profile.is_alquity_user:
+                    return redirect(get_alquity_community_url())
 
     else:
         old_url = _organization.url.replace('https://', '', 1) if _organization.url else _organization.url
@@ -295,7 +277,9 @@ def organization(request):
         'organization_name': _organization.label,
         'google_place_api_key': settings.GOOGLE_PLACE_API_KEY,
         'partner_networks': serialize_partner_networks(),
-        'partners_opt_in': request.POST.get('partners_opt_in', '')
+        'partners_opt_in': request.POST.get('partners_opt_in', ''),
+        'is_my_account_page': is_my_account_page,
+        'unattended_org_surveys': unattended_org_surveys,
     })
 
     return render(request, template, context)
@@ -341,11 +325,10 @@ def get_country_names(request):
 
 @login_required
 @can_save_org_details
-@can_not_update_onboarding_steps
 @transaction.atomic
 def org_detail_survey(request):
     user_extended_profile = request.user.extended_profile
-    are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
+    are_forms_complete, unattended_org_surveys = affiliated_unattended_surveys(user_extended_profile)
     latest_survey = OrganizationMetric.objects.filter(org=user_extended_profile.organization).last()
 
     initial = {
@@ -358,7 +341,12 @@ def org_detail_survey(request):
     next_page_url = reverse('recommendations')
     org_metric_form = forms.OrganizationMetricModelForm
     redirect_to_next = True
-    update_org_url = reverse('update_organization_details')
+    is_my_account_page = False
+
+    if request.path == reverse('myaccount_organization_detail'):
+        is_my_account_page = True
+        if not unattended_org_surveys:
+            raise PermissionDenied
 
     if request.path == reverse('update_organization_details'):
         redirect_to_next = False
@@ -379,9 +367,12 @@ def org_detail_survey(request):
         if form.is_valid():
             form.save(request)
 
-            are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
+            are_forms_complete, unattended_org_surveys = affiliated_unattended_surveys(user_extended_profile)
 
-            if are_forms_complete and redirect_to_next:
+            if is_my_account_page and not unattended_org_surveys:
+                update_nodebb_for_user_status(request.user.username)
+                return redirect(next_page_url)
+            elif are_forms_complete and redirect_to_next:
                 update_nodebb_for_user_status(request.user.username)
                 if user_extended_profile.is_alquity_user:
                     next_page_url = get_alquity_community_url()
@@ -405,6 +396,8 @@ def org_detail_survey(request):
         'is_poc': user_extended_profile.is_organization_admin,
         'is_first_user': user_extended_profile.is_first_signup_in_org if user_extended_profile.organization else False,
         'organization_name': user_extended_profile.organization.label,
+        'is_my_account_page': is_my_account_page,
+        'unattended_org_surveys': unattended_org_surveys,
     })
 
     return render(request, template, context)
@@ -453,11 +446,6 @@ def update_account_settings(request):
         if form.is_valid():
             user_extended_profile = form.save(user=user_extended_profile.user, commit=True)
             save_user_partner_network_consent(user_extended_profile.user, partners_opt_in)
-            unattended_surveys = user_extended_profile.unattended_surveys(_type='list')
-            are_forms_complete = not (bool(unattended_surveys))
-
-            if not are_forms_complete:
-                return redirect(reverse(unattended_surveys[0]))
 
             return redirect(reverse('update_account_settings'))
 
@@ -477,11 +465,17 @@ def update_account_settings(request):
             }
         )
 
+    _, unattended_org_surveys = affiliated_unattended_surveys(user_extended_profile)
+
     ctx = {
         'form': form,
         'admin_has_pending_admin_suggestion_request': user_extended_profile.admin_has_pending_admin_suggestion_request(),
         'org_url': reverse('get_organizations'),
-        'partners_opt_in': partners_opt_in
+        'partners_opt_in': partners_opt_in,
+        'is_poc': user_extended_profile.is_organization_admin,
+        'is_first_user': user_extended_profile.is_first_signup_in_org if user_extended_profile.organization else False,
+        'non_profile_organization': Organization.is_non_profit(user_extended_profile),
+        'unattended_org_surveys': unattended_org_surveys,
     }
 
     return render(request, 'myaccount/registration_update.html', ctx)

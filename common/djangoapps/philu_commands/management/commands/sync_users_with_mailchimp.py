@@ -29,7 +29,7 @@ class Command(BaseCommand):
         users_set = []
 
         focus_areas = FocusArea.get_map()
-        org_sectors = OrgSector.get_map()
+        org_sectors = OrgSector.objects.get_map()
 
         for user in users:
             language = country = city = organization = org_type = work_area = ""

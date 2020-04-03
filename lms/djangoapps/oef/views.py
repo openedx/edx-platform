@@ -8,7 +8,7 @@ from rest_framework import status
 
 from lms.djangoapps.oef.decorators import can_take_oef
 from lms.djangoapps.oef.helpers import *
-from lms.djangoapps.onboarding.models import Organization, RegistrationType
+from lms.djangoapps.onboarding.models import Organization
 
 
 @login_required
@@ -33,8 +33,7 @@ def oef_dashboard(request):
         'non_profile_organization': Organization.is_non_profit(user_extended_profile),
         'is_poc': user_extended_profile.is_organization_admin,
         'is_first_user': is_first_user,
-        'first_learner_submitted_oef': is_first_user and user_extended_profile.has_submitted_oef(),
-        'user_reg_type': 1
+        'first_learner_submitted_oef': is_first_user and user_extended_profile.has_submitted_oef()
     }
 
     for survey in user_surveys:
@@ -47,10 +46,6 @@ def oef_dashboard(request):
         })
 
     context.update({'surveys': surveys, 'error': user_survey_status['error']})
-
-    user_reg_type = RegistrationType.objects.filter(user=request.user).first()
-    if user_reg_type and user_reg_type.choice == 2:
-        context['user_reg_type'] = 2
 
     return render(request, 'oef/oef-org.html', context)
 
