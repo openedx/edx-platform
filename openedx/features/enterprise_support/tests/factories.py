@@ -71,6 +71,5 @@ class EnterpriseCourseEnrollmentFactory(factory.django.DjangoModelFactory):
 
         model = EnterpriseCourseEnrollment
 
-    id = factory.LazyAttribute(lambda x: FAKER.random_int(min=1))  # pylint: disable=no-member
     course_id = factory.LazyAttribute(lambda x: FAKER.slug())  # pylint: disable=no-member
     enterprise_customer_user = factory.SubFactory(EnterpriseCustomerUserFactory)
