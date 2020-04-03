@@ -126,8 +126,8 @@ class CoursewareInformation(RetrieveAPIView):
         overview.can_load_course = self._check_access(self.request.user, overview)
         overview.is_staff = has_access(self.request.user, 'staff', overview).has_access
 
-        overview.user_has_access = overview.can_load_course # TODO: TNL-7053 Legacy: Delete once ready to contract
-        overview.user_has_staff_access = overview.is_staff # TODO: TNL-7053 Legacy: Delete once ready to contract
+        overview.user_has_access = overview.can_load_course  # TODO: TNL-7053 Legacy: Delete once ready to contract
+        overview.user_has_staff_access = overview.is_staff  # TODO: TNL-7053 Legacy: Delete once ready to contract
 
         return overview
 
