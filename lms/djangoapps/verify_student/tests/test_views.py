@@ -1271,7 +1271,8 @@ class TestCheckoutWithEcommerceService(ModuleStoreTestCase):
         ecommerce api, we correctly call to that api to create a basket.
         """
         user = UserFactory.create(username="test-username")
-        course_mode = CourseModeFactory.create(sku="test-sku").to_tuple()
+        course_id = 'edX/test/test_run'
+        course_mode = CourseModeFactory.create(course_id=course_id, sku="test-sku").to_tuple()
         expected_payment_data = {'foo': 'bar'}
         # mock out the payment processors endpoint
         httpretty.register_uri(

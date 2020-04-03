@@ -675,7 +675,7 @@ class CertificateGenerationEnabledTest(EventTestMixin, TestCase):
         self.assertEqual(expect_enabled, actual_enabled)
 
 
-class GenerateExampleCertificatesTest(TestCase):
+class GenerateExampleCertificatesTest(ModuleStoreTestCase):
     """Test generation of example certificates. """
 
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')
@@ -739,7 +739,7 @@ class GenerateExampleCertificatesTest(TestCase):
 
 
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-class CertificatesBrandingTest(TestCase):
+class CertificatesBrandingTest(ModuleStoreTestCase):
     """Test certificates branding. """
 
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')

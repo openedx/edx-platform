@@ -836,35 +836,6 @@ class ViewsTestCase(BaseViewsTestCase):
 
         self.assertNotContains(response, str(course.id))
 
-    @patch.object(CourseOverview, 'load_from_module_store', return_value=None)
-    def test_financial_assistance_form_missing_course_overview(self, _mock_course_overview):
-        """
-        Verify that learners can not get financial aid for the courses with no
-        course overview.
-        """
-        # Create course
-        course = CourseFactory.create().id
-
-        # Create Course Modes
-        CourseModeFactory.create(mode_slug=CourseMode.AUDIT, course_id=course)
-        CourseModeFactory.create(mode_slug=CourseMode.VERIFIED, course_id=course)
-
-        # Enroll user in the course
-        # Don't use the CourseEnrollmentFactory since it ensures a CourseOverview is available
-        enrollment = CourseEnrollment.objects.create(
-            course_id=course,
-            user=self.user,
-            mode=CourseMode.AUDIT,
-        )
-
-        self.assertEqual(enrollment.course_overview, None)
-
-        url = reverse('financial_assistance_form')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-        self.assertNotContains(response, str(course))
-
     def test_financial_assistance_form(self):
         """Verify that learner can get the financial aid for the course in which
         he/she is enrolled in audit mode whereas the course provide verified mode.
