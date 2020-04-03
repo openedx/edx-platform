@@ -89,12 +89,11 @@ class CoursewareInformation(RetrieveAPIView):
         if not has_access(user, 'load', overview):
             return False
 
-        has_public_access = allow_public_access(overview, [COURSE_VISIBILITY_PUBLIC])
-        if user.is_anonymous and not has_public_access:
-            return False
-
-        if not CourseEnrollment.is_enrolled(user, overview.id) and not has_public_access:
-            return False
+        # Anonymous or unenrolled users
+        if user.is_anonymous or not CourseEnrollment.is_enrolled(user, overview.id):
+            # do not have access if the course is not public
+            if not allow_public_access(overview, [COURSE_VISIBILITY_PUBLIC]):
+                return False
 
         # if is_survey_required_and_unanswered(user, course):
             # TODO: This.
