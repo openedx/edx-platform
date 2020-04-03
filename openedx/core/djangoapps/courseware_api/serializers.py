@@ -8,6 +8,7 @@ from django.urls import reverse
 from rest_framework import serializers
 
 from course_modes.models import CourseMode
+from edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 
@@ -88,6 +89,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     show_calculator = serializers.BooleanField()
     is_staff = serializers.BooleanField()
     can_load_courseware = serializers.BooleanField()
+    notes = serializers.SerializerMethodField()
 
     # TODO: TNL-7053 Legacy: Delete these two once ready to contract
     user_has_access = serializers.BooleanField()
@@ -134,3 +136,12 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
                 'sku': mode.sku,
                 'upgrade_url': verified_upgrade_deadline_link(course_overview.effective_user, course_overview),
             }
+
+    def get_notes(self, course_overview):
+        """
+        Return whether edxnotes is enabled and visible.
+        """
+        return {
+            'enabled': is_feature_enabled(course_overview, course_overview.effective_user),
+            'visible': course_overview.edxnotes_visibility,
+        }
