@@ -13,6 +13,10 @@
 # (although it is advertised in the changelog as 3.1.26.)
 celery>=3.1.25,<4.0.0
 
+# Need to review backward incompatible changes before upgrading.
+# See https://github.com/pyca/cryptography/blob/master/CHANGELOG.rst#29---2020-04-02
+cryptography<2.9
+
 # The CORS_ORIGIN_WHITELIST changes in a backwards incompatible way in 3.0.0, needs matching configuration repo changes
 django-cors-headers<3.0.0
 
