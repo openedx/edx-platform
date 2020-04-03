@@ -291,7 +291,7 @@ def course_archive_handler(request, course_key_string=None):
             course_key = CourseKey.from_string(course_key_string)
             course_details = CourseDetails.fetch(course_key)
             archive_settings = {
-                'start_date': (datetime.today() - timedelta(days=2)).replace(tzinfo=pytz.UTC),
+                'start_date': course_details.start_date,
                 'end_date': (datetime.today() - timedelta(days=1)).replace(tzinfo=pytz.UTC),
                 'intro_video': course_details.intro_video
             }
