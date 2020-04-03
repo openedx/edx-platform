@@ -53,6 +53,9 @@ inflect<4.0.0
 # jsonfield2 3.1.0 drops support for python 3.5
 jsonfield2<3.1.0
 
+# kiwisolver 1.2.0 requires Python 3.6+
+kiwisolver<1.2.0
+
 # Convert text markup to HTML; used in capa problems, forums, and course wikis; pin Markdown version as tests failed for its upgrade to the latest release
 Markdown==2.6.11
 
