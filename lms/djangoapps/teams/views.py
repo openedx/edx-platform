@@ -930,6 +930,8 @@ class TopicListView(GenericAPIView):
         # in the case of "team_count".
         organization_protection_status = user_organization_protection_status(request.user, course_id)
         topics = get_alphabetical_topics(course_module)
+        topics = self._filter_hidden_private_teamsets(topics, course_module)
+
         if ordering == 'team_count':
             add_team_count(topics, course_id, organization_protection_status)
             topics.sort(key=lambda t: t['team_count'], reverse=True)
@@ -955,6 +957,27 @@ class TopicListView(GenericAPIView):
         response.data['sort_order'] = ordering
 
         return response
+
+    def _filter_hidden_private_teamsets(self, teamsets, course_module):
+        """
+        Return a filtered list of teamsets, removing any private teamsets that a user doesn't have access to.
+        Follows the same logic as `has_specific_teamset_access` but in bulk rather than for one teamset at a time
+        """
+        # import pdb; pdb.set_trace()
+        if has_course_staff_privileges(self.request.user, course_module.id):
+            return teamsets
+        private_teamset_ids = [teamset.teamset_id for teamset in course_module.teamsets if teamset.is_private_managed]
+        teamset_ids_user_has_access_to = set(
+            CourseTeam.objects.filter(
+                course_id=course_module.id,
+                topic_id__in=private_teamset_ids,
+                membership__user=self.request.user
+            ).values_list('topic_id', flat=True)
+        )
+        return [
+            teamset for teamset in teamsets
+            if teamset['type'] != TeamsetType.private_managed.value or teamset['id'] in teamset_ids_user_has_access_to
+        ]
 
 
 def get_alphabetical_topics(course_module):
