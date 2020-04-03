@@ -20,6 +20,9 @@ cryptography<2.9
 # The CORS_ORIGIN_WHITELIST changes in a backwards incompatible way in 3.0.0, needs matching configuration repo changes
 django-cors-headers<3.0.0
 
+# It seems like django-countries > 5.5 may cause performance issues for us.
+django-countries==5.5
+
 # Version 4.0.0 dropped support for Django < 2.0.1
 django-model-utils<4.0.0
 
@@ -50,6 +53,9 @@ inflect<4.0.0
 # jsonfield2 3.1.0 drops support for python 3.5
 jsonfield2<3.1.0
 
+# kiwisolver 1.2.0 requires Python 3.6+
+kiwisolver<1.2.0
+
 # Convert text markup to HTML; used in capa problems, forums, and course wikis; pin Markdown version as tests failed for its upgrade to the latest release
 Markdown==2.6.11
 
@@ -61,6 +67,9 @@ mock<4.0.0
 
 # mysqlclient 1.5 is scheduled to change internal APIs used by Django 1.11
 mysqlclient<1.5
+
+# oauthlib>3.0.1 causes test failures
+oauthlib==3.0.1
 
 # Version 0.23.0 requires python-dateutil>=2.5.0
 pandas==0.22.0
@@ -81,9 +90,6 @@ python-dateutil==2.4.0
 # python3-saml 1.6.0 breaks unittests in common/djangoapps/third_party_auth/tests/test_views.py::SAMLMetadataTest
 python3-saml==1.5.0
 
-# oauthlib>3.0.1 causes test failures
-oauthlib==3.0.1
-
 # transifex-client 0.13.5 and 0.13.6 needlessly pin six and urllib3, 0.13.7 does so for python-slugify
 #   https://github.com/transifex/transifex-client/issues/252
 transifex-client==0.13.4
@@ -93,6 +99,3 @@ wrapt==1.11.*
 
 # zipp 2.0.0 requires Python >= 3.6
 zipp==1.0.0
-
-# It seems like django-countries > 5.5 may cause performance issues for us.
-django-countries==5.5
