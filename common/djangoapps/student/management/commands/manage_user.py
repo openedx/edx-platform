@@ -18,13 +18,10 @@ from student.models import UserProfile
 def is_valid_django_hash(encoded):
     """
     Starting with django 2.1, the function is_password_usable no longer checks whether encode
-    is a valid password created by a django hasher(hasher in  PASSWORD_HASHERS setting)
+    is a valid password created by a django hasher (hasher in  PASSWORD_HASHERS setting)
 
     Adding this function to create constant behavior as we upgrade django versions
     """
-    if encoded is None:
-        return False
-
     try:
         identify_hasher(encoded)
     except ValueError:
