@@ -53,6 +53,7 @@ from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
 from openedx.core.djangoapps.user_authn.views.register import RegistrationValidationThrottle
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.api import test_utils
+from student.helpers import authenticate_new_user
 from student.tests.factories import UserFactory
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
 from third_party_auth.tests.utils import (
@@ -1572,6 +1573,27 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             self.assertHttpOK(response)
 
         self.assertContains(response, 'Kosovo')
+
+    def test_password_with_spaces(self):
+        """Test that spaces are stripped correctly from password while creating an account."""
+        unstripped_password = self.PASSWORD + '  '
+        with mock.patch(
+            'openedx.core.djangoapps.user_authn.views.register.authenticate_new_user',
+            wraps=authenticate_new_user
+        ) as mock_authenticate_new_user:
+            self.client.post(self.url, {
+                "email": self.EMAIL,
+                "name": self.NAME,
+                "username": self.USERNAME,
+                "password": unstripped_password,
+                "honor_code": "true",
+            })
+
+            mock_authenticate_new_user.assert_called_with(
+                mock_authenticate_new_user.call_args[0][0],  # get request object from mock
+                self.USERNAME,
+                unstripped_password.strip()
+            )
 
     def test_create_account_not_allowed(self):
         """
