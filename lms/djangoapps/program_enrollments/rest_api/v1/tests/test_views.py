@@ -1728,18 +1728,18 @@ class ProgramCourseEnrollmentOverviewGetTests(
             user=self.student,
         )
 
-        # create course enrollment
-        self.course_enrollment = CourseEnrollmentFactory.create(
-            course_id=self.course_id,
-            user=self.student,
-            mode=CourseMode.MASTERS,
-        )
-
         # create course overview
         self.course_overview = CourseOverviewFactory.create(
             id=self.course_id,
             start=self.yesterday,
             end=self.tomorrow,
+        )
+
+        # create course enrollment
+        self.course_enrollment = CourseEnrollmentFactory.create(
+            course=self.course_overview,
+            user=self.student,
+            mode=CourseMode.MASTERS,
         )
 
         # create program course enrollment

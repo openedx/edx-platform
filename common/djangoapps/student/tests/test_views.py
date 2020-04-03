@@ -341,7 +341,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         # If an entitlement has already been redeemed by the user for a course run, do not let the run be selectable
         enrollment = CourseEnrollmentFactory(
-            user=self.user, course_id=six.text_type(mock_course_overview.return_value.id), mode=CourseMode.VERIFIED
+            user=self.user, course=mock_course_overview.return_value, mode=CourseMode.VERIFIED
         )
         CourseEntitlementFactory.create(
             user=self.user, course_uuid=program['courses'][0]['uuid'], enrollment_course_run=enrollment
