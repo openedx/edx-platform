@@ -1,12 +1,14 @@
 from django.conf import settings
 from django.contrib.sites.models import Site
-from opaque_keys.edx.locator import CourseLocator
 from rest_framework import serializers
 from organizations import api as organizations_api
 from organizations.models import Organization
 
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-from openedx.core.djangoapps.appsembler.sites.tasks import import_course_on_site_creation
+from openedx.core.djangoapps.appsembler.sites.tasks import (
+    import_course_on_site_creation,
+    import_course_on_site_creation_apply_async,
+)
 from openedx.core.djangoapps.appsembler.sites.models import AlternativeDomain
 from openedx.core.djangoapps.appsembler.sites.utils import sass_to_dict, dict_to_sass, bootstrap_site
 
@@ -136,10 +138,7 @@ class RegistrationSerializer(serializers.Serializer):
 
         # clone course
         if settings.FEATURES.get("APPSEMBLER_IMPORT_DEFAULT_COURSE_ON_SITE_CREATION", False):
-            import_course_on_site_creation.apply_async(
-                organization,
-                queue="edx.core.cms.high"
-            )
+            import_course_on_site_creation_apply_async(organization)
         return {
             'site': site,
             'organization': organization,
