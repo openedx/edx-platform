@@ -626,6 +626,19 @@ class IsStaffOrPrivilegedOrReadOnly(IsStaffOrReadOnly):
         )
 
 
+class HasSpecificTeamAccess(permissions.BasePermission):
+    """
+    Permission that checks if the user has access to a specific team.
+    If the user doesn't have access to the team, the endpoint should behave as if
+    the team does not exist,
+    """
+
+    def has_object_permission(self, request, view, obj):
+        if not has_specific_team_access(request.user, obj):
+            raise Http404
+        return True
+
+
 class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
     """
         **Use Cases**
@@ -724,7 +737,12 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
 
     """
     authentication_classes = (BearerAuthentication, SessionAuthentication)
-    permission_classes = (permissions.IsAuthenticated, IsStaffOrPrivilegedOrReadOnly, IsEnrolledOrIsStaff,)
+    permission_classes = (
+        permissions.IsAuthenticated,
+        IsEnrolledOrIsStaff,
+        HasSpecificTeamAccess,
+        IsStaffOrPrivilegedOrReadOnly,
+    )
     lookup_field = 'team_id'
     serializer_class = CourseTeamSerializer
     parser_classes = (MergePatchParser,)
