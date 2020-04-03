@@ -1,10 +1,10 @@
 from django.conf.urls import url
 
-from philu.djangoapps.idea.views import (ChallengeLandingView, IdeaListingView, IdeaCreateView, IdeaDetailView)
+from openedx.features.idea.views import (ChallengeLandingView, IdeaListingView, IdeaCreateView, IdeaDetailView)
 
 urlpatterns = [
     url(
-        r'^challenges/$',
+        r'^ideas/overview$',
         ChallengeLandingView.as_view(),
         name='challenge-landing'
     ),

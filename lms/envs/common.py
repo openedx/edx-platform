@@ -2399,8 +2399,8 @@ INSTALLED_APPS = [
 
     'channels',
 
-    'philu.djangoapps.marketplace',
-    'philu.djangoapps.idea',
+    'openedx.features.marketplace',
+    'openedx.features.idea',
 ]
 
 ######################### CSRF #########################################

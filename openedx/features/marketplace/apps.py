@@ -5,4 +5,4 @@ from django.apps import AppConfig
 
 
 class MarketplaceConfig(AppConfig):
-    name = 'philu.djangoapps.marketplace'
+    name = 'openedx.features.marketplace'

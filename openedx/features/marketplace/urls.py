@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from philu.djangoapps.marketplace.views import (MarketplaceListingView, MarketplaceCreateRequestView,
+from openedx.features.marketplace.views import (MarketplaceListingView, MarketplaceCreateRequestView,
                                                 MarketplaceRequestDetailView)
 
 urlpatterns = [
