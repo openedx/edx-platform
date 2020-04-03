@@ -80,10 +80,7 @@ class CoursewareInformation(RetrieveAPIView):
 
     serializer_class = CourseInfoSerializer
 
-    def _check_access(self, user, overview, is_staff=None):
-        if is_staff is None:
-            is_staff = has_access(user, 'staff', overview)
-
+    def _check_access(self, user, overview, is_staff):
         if is_staff:
             return True
 
@@ -126,10 +123,11 @@ class CoursewareInformation(RetrieveAPIView):
         overview.enrollment = {'mode': mode, 'is_active': is_active}
 
         overview.is_staff = has_access(self.request.user, 'staff', overview).has_access
-        overview.can_load_course = self._check_access(self.request.user, overview, overview.is_staff)
+        overview.can_load_courseware = self._check_access(self.request.user, overview, overview.is_staff)
 
-        overview.user_has_access = overview.can_load_course  # TODO: TNL-7053 Legacy: Delete once ready to contract
-        overview.user_has_staff_access = overview.is_staff  # TODO: TNL-7053 Legacy: Delete once ready to contract
+        # TODO: TNL-7053 Legacy: Delete these two once ready to contract
+        overview.user_has_access = overview.can_load_courseware
+        overview.user_has_staff_access = overview.is_staff
 
         return overview
 
