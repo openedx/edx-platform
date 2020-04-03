@@ -5,12 +5,12 @@ from django.views.generic import TemplateView
 
 
 class MarketplaceListingView(TemplateView):
-    template_name = 'features/marketplace/marketplace-listing-template.html'
+    template_name = 'features/marketplace/marketplace_listing.html'
 
 
 class MarketplaceCreateRequestView(TemplateView):
-    template_name = 'features/marketplace/markertplace-request-form-template.html'
+    template_name = 'features/marketplace/markertplace_request_form.html'
 
 
 class MarketplaceRequestDetailView(TemplateView):
-    template_name = 'features/marketplace/marketplace-details-template.html'
+    template_name = 'features/marketplace/marketplace_details.html'

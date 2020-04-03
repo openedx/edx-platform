@@ -5,16 +5,16 @@ from django.views.generic import TemplateView
 
 
 class ChallengeLandingView(TemplateView):
-    template_name = 'features/idea/challenges-landing-template.html'
+    template_name = 'features/idea/challenges_landing.html'
 
 
 class IdeaListingView(TemplateView):
-    template_name = 'features/idea/idea-listing-template.html'
+    template_name = 'features/idea/idea_listing.html'
 
 
 class IdeaCreateView(TemplateView):
-    template_name = 'features/idea/idea-form-template.html'
+    template_name = 'features/idea/idea_form.html'
 
 
 class IdeaDetailView(TemplateView):
-    template_name = 'features/idea/idea-details-template.html'
+    template_name = 'features/idea/idea_details.html'
