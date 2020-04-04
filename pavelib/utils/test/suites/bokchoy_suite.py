@@ -9,7 +9,7 @@ from time import sleep
 from paver.easy import call_task, cmdopts, dry, might_call, needs, sh, task
 
 from common.test.acceptance.fixtures.course import CourseFixture, FixtureError
-from pavelib.database import update_local_bokchoy_db_from_s3
+from pavelib.database import update_bokchoy_db_from_local_or_s3
 from pavelib.utils.envs import Env
 from pavelib.utils.test import utils as test_utils
 from pavelib.utils.test.bokchoy_options import (
@@ -109,7 +109,7 @@ def reset_test_database():
 
     Use the database cache automation defined in pavelib/database.py
     """
-    update_local_bokchoy_db_from_s3()  # pylint: disable=no-value-for-parameter
+    update_bokchoy_db_from_local_or_s3()  # pylint: disable=no-value-for-parameter
 
 
 @task
