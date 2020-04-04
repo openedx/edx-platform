@@ -241,7 +241,7 @@ def upload_to_s3(file_name, file_path, s3_bucket_name, replace=False):
 
     try:
         client.head_object(Bucket=s3_bucket_name, Key=s3_key, ACL='public-read', Body=file_content)
-    except botocore.exceptions.ClientError:
+    except botocore.exceptions.ClientError as e:
         if e.response["Error"]["Code"] == "NoCredentials":
             print("No AWS credentials found. {}".format(continue_without_upload_msg))
             return
@@ -264,9 +264,9 @@ def upload_to_s3(file_name, file_path, s3_bucket_name, replace=False):
         client.put_object(Bucket=s3_bucket_name, Key=s3_key, ACL='public-read', Body=file_content)
     except botocore.exceptions.ClientError as e:
         print("Unable to upload cache file to S3. Code: {}, Message: {}. {}".format(
-                 e.response["Error"]["Code"], e.response["Error"]["Message"],
-                 continue_without_upload_msg
-              ))
+            e.response["Error"]["Code"], e.response["Error"]["Message"],
+            continue_without_upload_msg
+        ))
         return
 
     print("Cache file {} saved to S3 at bucket {}, key {}.".format(file_name, s3_bucket_name, s3_key))
