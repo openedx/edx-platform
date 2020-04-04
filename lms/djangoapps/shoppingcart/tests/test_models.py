@@ -14,7 +14,7 @@ import ddt
 import pytz
 import six
 from six.moves import range
-from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
+from botocore.exceptions import ClientError
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core import mail
@@ -328,7 +328,9 @@ class OrderTest(ModuleStoreTestCase):
         cart = Order.get_cart_for_user(user=self.user)
         CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
         with patch.object(EmailMessage, 'send') as mock_send:
-            mock_send.side_effect = BotoServerError("status", "reason")
+            ex_code = "ConnectionClosed"
+            ex_msg = "connection closed"
+            mock_send.side_effect = ClientError({"Error": {"Code": ex_code, "Message": ex_msg}}, "SendEmail")
             cart.purchase()
             self.assertTrue(error_logger.called)
 

@@ -7,7 +7,7 @@ import logging
 from uuid import uuid4
 
 import mock
-from boto.exception import NoAuthHandlerFound
+from botocore.exceptions import ClientError
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
@@ -219,7 +219,7 @@ class TestUserTaskStopped(APITestCase):
         Make sure we can succeed on retries
         """
         with mock.patch('django.core.mail.send_mail') as mock_exception:
-            mock_exception.side_effect = NoAuthHandlerFound()
+            mock_exception.side_effect = ClientError({"Error": {"Code": "code", "Message": "msg"}}, "operation")
 
             with mock.patch('cms_user_tasks.tasks.send_task_complete_email.retry') as mock_retry:
                 user_task_stopped.send(sender=UserTaskStatus, status=self.status)
@@ -231,7 +231,7 @@ class TestUserTaskStopped(APITestCase):
         logger.addHandler(hdlr)
 
         with mock.patch('cms_user_tasks.tasks.send_task_complete_email.delay') as mock_delay:
-            mock_delay.side_effect = NoAuthHandlerFound()
+            mock_delay.side_effect = ClientError({"Error": {"Code": "code", "Message": "msg"}}, "operation")
             user_task_stopped.send(sender=UserTaskStatus, status=self.status)
             self.assertTrue(mock_delay.called)
             self.assertEqual(hdlr.messages['error'][0], u'Unable to queue send_task_complete_email')

@@ -24,7 +24,7 @@ from mock import Mock, patch
 from opaque_keys.edx.locator import LibraryLocator
 from path import Path as path
 from six.moves import zip
-from storages.backends.s3boto import S3BotoStorage
+from storages.backends.s3boto3 import S3Boto3Storage
 from user_tasks.models import UserTaskStatus
 
 from contentstore.tests.test_libraries import LibraryTestCase
@@ -795,7 +795,7 @@ class ExportTestCase(CourseTestCase):
         """
         Verify that the export status handler generates the correct export path
         for storage providers other than ``FileSystemStorage`` and
-        ``S3BotoStorage``
+        ``S3Boto3Storage``
         """
         mock_latest_task_status.return_value = Mock(state=UserTaskStatus.SUCCEEDED)
         mock_get_user_task_artifact.return_value = self._mock_artifact(
@@ -814,11 +814,11 @@ class ExportTestCase(CourseTestCase):
     ):
         """
         Verify that the export status handler generates the correct export path
-        for the ``S3BotoStorage`` storage provider
+        for the ``S3Boto3Storage`` storage provider
         """
         mock_latest_task_status.return_value = Mock(state=UserTaskStatus.SUCCEEDED)
         mock_get_user_task_artifact.return_value = self._mock_artifact(
-            spec=S3BotoStorage,
+            spec=S3Boto3Storage,
             file_url='/s3/file/path/testfile.tar.gz',
         )
         resp = self.client.get(self.status_url)

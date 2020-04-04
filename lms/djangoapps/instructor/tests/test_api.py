@@ -15,7 +15,7 @@ import tempfile
 import ddt
 import pytest
 import six
-from boto.exception import BotoServerError
+from botocore.exceptions import ClientError
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
@@ -3312,16 +3312,18 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         """
         Tests the Rate-Limit exceeded is handled and does not raise 500 error.
         """
-        ex_status = 503
-        ex_reason = 'Slow Down'
+        # fake error code and message
+        ex_code = 'RateLimitExceeded'
+        ex_msg = 'Slow Down'
         url = reverse('list_report_downloads', kwargs={'course_id': text_type(self.course.id)})
-        with patch('storages.backends.s3boto.S3BotoStorage.listdir', side_effect=BotoServerError(ex_status, ex_reason)):
+        boto_client_error = ClientError({"Error": {"Code": ex_code, "Message": ex_msg}}, "ListObjects")
+        with patch('storages.backends.s3boto3.S3Boto3Storage.listdir', side_effect=boto_client_error):
             response = self.client.post(url, {})
         mock_error.assert_called_with(
-            u'Fetching files failed for course: %s, status: %s, reason: %s',
+            u'Fetching files failed for course: %s, code: %s, message: %s',
             self.course.id,
-            ex_status,
-            ex_reason,
+            ex_code,
+            ex_msg,
         )
 
         res_json = json.loads(response.content.decode('utf-8'))

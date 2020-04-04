@@ -12,7 +12,7 @@ from decimal import Decimal
 
 import pytz
 import six
-from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
+from botocore.exceptions import ClientError
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -391,7 +391,7 @@ class Order(models.Model):
                 if csv_file:
                     email.attach(u'RegistrationCodesRedemptionUrls.csv', csv_file.getvalue(), 'text/csv')
                 email.send()
-        except (smtplib.SMTPException, BotoServerError):  # sadly need to handle diff. mail backends individually
+        except (smtplib.SMTPException, ClientError):  # sadly need to handle diff. mail backends individually
             log.error(u'Failed sending confirmation e-mail for order %d', self.id)
 
     def purchase(self, first='', last='', street1='', street2='', city='', state='', postalcode='',
