@@ -9,7 +9,6 @@ import tarfile
 from tempfile import mkdtemp
 from unittest import TestCase
 
-import boto3
 from mock import call, patch, Mock
 
 from pavelib import database
