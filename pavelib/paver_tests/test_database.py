@@ -78,8 +78,8 @@ class TestPaverDatabaseTasks(PaverTestCase):
     def test_load_data_from_local_cache(self, _mock_sh):
         """
         Assuming that the computed db cache file fingerprint is the same as
-        the stored fingerprint, verify that we make a call to load data into
-        the database without running migrations
+        the stored fingerprint, verify that unapplied db migrations files were created,
+        that dbs schema/data was not loaded from S3 and that dbs were not destroyed
         """
         self.addCleanup(shutil.rmtree, db_utils.CACHE_FOLDER)
         self.addCleanup(os.remove, db_utils.FINGERPRINT_FILEPATH)
@@ -90,7 +90,7 @@ class TestPaverDatabaseTasks(PaverTestCase):
             fingerprint_file.write(self.expected_fingerprint)
 
         with patch.object(db_utils, 'get_file_from_s3', wraps=db_utils.get_file_from_s3) as _mock_get_file:
-            database.update_local_bokchoy_db_from_s3()  # pylint: disable=no-value-for-parameter
+            database.update_bokchoy_db_from_local_or_s3()  # pylint: disable=no-value-for-parameter
             # Make sure that the local cache files are used - NOT downloaded from s3
             self.assertFalse(_mock_get_file.called)
         calls = [
@@ -103,24 +103,23 @@ class TestPaverDatabaseTasks(PaverTestCase):
     @patch.object(db_utils, 'CACHE_FOLDER', mkdtemp())
     @patch.object(db_utils, 'FINGERPRINT_FILEPATH', os.path.join(mkdtemp(), 'fingerprint'))
     @patch.object(db_utils, 'sh')
-    def test_load_data_from_s3_fingerprint(self, _mock_sh):
+    def test_load_data_from_s3(self, _mock_sh):
         """
         Assuming that the computed db cache file fingerprint is different
         than the stored fingerprint AND there is a matching fingerprint file
-        in s3, verify that we make a call to load data into the database
-        without running migrations
+        in s3, verify that we load data into the database without running migrations
         """
         self.addCleanup(shutil.rmtree, db_utils.CACHE_FOLDER)
         self.addCleanup(os.remove, db_utils.FINGERPRINT_FILEPATH)
         _write_temporary_db_cache_files(db_utils.CACHE_FOLDER, database.ALL_DB_FILES)
 
         # zip the temporary files and push them to s3 bucket
-        zipfile_path = os.path.join(db_utils.CACHE_FOLDER, self.fingerprint_filename)
-        with tarfile.open(name=zipfile_path, mode='w:gz') as tar_file:
+        targz_file_path = os.path.join(db_utils.CACHE_FOLDER, self.fingerprint_filename)
+        with tarfile.open(name=targz_file_path, mode='w:gz') as tar_file:
             for name in database.ALL_DB_FILES:
                 tar_file.add(os.path.join(db_utils.CACHE_FOLDER, name), arcname=name)
         key = boto.s3.key.Key(bucket=self.bucket, name=self.fingerprint_filename)
-        key.set_contents_from_filename(zipfile_path, replace=False)
+        key.set_contents_from_filename(targz_file_path, replace=False)
 
         # write the local fingerprint file with a different value than
         # the computed fingerprint
@@ -130,7 +129,7 @@ class TestPaverDatabaseTasks(PaverTestCase):
 
         with patch('boto.connect_s3', Mock(return_value=Mock())):
             with patch.object(db_utils, 'get_file_from_s3') as _mock_get_file:
-                database.update_local_bokchoy_db_from_s3()  # pylint: disable=no-value-for-parameter
+                database.update_bokchoy_db_from_local_or_s3()  # pylint: disable=no-value-for-parameter
                 # Make sure that the fingerprint file is downloaded from s3
                 _mock_get_file.assert_called_once_with(
                     'test_bucket', self.fingerprint_filename, db_utils.CACHE_FOLDER
@@ -163,7 +162,7 @@ class TestPaverDatabaseTasks(PaverTestCase):
         with open(db_utils.FINGERPRINT_FILEPATH, 'w') as fingerprint_file:
             fingerprint_file.write(local_fingerprint)
 
-        database.update_local_bokchoy_db_from_s3()  # pylint: disable=no-value-for-parameter
+        database.update_bokchoy_db_from_local_or_s3()  # pylint: disable=no-value-for-parameter
         calls = [
             call(u'{}/scripts/reset-test-db.sh --calculate_migrations'.format(Env.REPO_ROOT)),
             call(u'{}/scripts/reset-test-db.sh --rebuild_cache --use-existing-db'.format(Env.REPO_ROOT))
@@ -190,5 +189,5 @@ class TestPaverDatabaseTasks(PaverTestCase):
         with open(db_utils.FINGERPRINT_FILEPATH, 'w') as fingerprint_file:
             fingerprint_file.write(local_fingerprint)
 
-        database.update_local_bokchoy_db_from_s3()  # pylint: disable=no-value-for-parameter
+        database.update_bokchoy_db_from_local_or_s3()  # pylint: disable=no-value-for-parameter
         self.assertTrue(self.bucket.get_key(self.fingerprint_filename))

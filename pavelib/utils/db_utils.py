@@ -126,20 +126,20 @@ def does_fingerprint_on_disk_match(fingerprint):
     return fingerprint == cache_fingerprint
 
 
-def is_fingerprint_in_bucket(fingerprint, bucket_name):
+def is_fingerprint_in_s3(fingerprint, s3_bucket_name):
     """
-    Test if a zip file matching the given fingerprint is present within an s3 bucket.
-    If there is any issue reaching the bucket, show the exception but continue by
+    Test if the fingerprint is stored as an S3 object in an S3 bucket.
+    If there is any issue reaching the S3 object, show the exception but continue by
     returning False
     """
-    zipfile_name = '{}.tar.gz'.format(fingerprint)
+    targz_file_name = '{}.tar.gz'.format(fingerprint)
     try:
         conn = boto.connect_s3(anon=True)
-        bucket = conn.get_bucket(bucket_name)
+        bucket = conn.get_bucket(s3_bucket_name)
     except Exception as e:  # pylint: disable=broad-except
-        print(u"Exception caught trying to reach S3 bucket {}: {}".format(bucket_name, e))
+        print(u"Exception caught trying to reach S3 bucket {}: {}".format(s3_bucket_name, e))
         return False
-    key = boto.s3.key.Key(bucket=bucket, name=zipfile_name)
+    key = boto.s3.key.Key(bucket=bucket, name=targz_file_name)
     return key.exists()
 
 
@@ -155,67 +155,67 @@ def get_bokchoy_db_fingerprint_from_file():
     return cached_fingerprint
 
 
-def get_file_from_s3(bucket_name, zipfile_name, path):
+def get_file_from_s3(s3_bucket_name, targz_file_name, path):
     """
     Get the file from s3 and save it to disk.
     """
-    print(u"Retrieving {} from bucket {}.".format(zipfile_name, bucket_name))
+    print(u"Retrieving {} from bucket {}.".format(targz_file_name, s3_bucket_name))
     conn = boto.connect_s3(anon=True)
-    bucket = conn.get_bucket(bucket_name)
-    key = boto.s3.key.Key(bucket=bucket, name=zipfile_name)
+    bucket = conn.get_bucket(s3_bucket_name)
+    key = boto.s3.key.Key(bucket=bucket, name=targz_file_name)
     if not key.exists():
         msg = u"Did not find expected file {} in the S3 bucket {}".format(
-            zipfile_name, bucket_name
+            targz_file_name, s3_bucket_name
         )
         raise BuildFailure(msg)
 
-    zipfile_path = os.path.join(path, zipfile_name)
-    key.get_contents_to_filename(zipfile_path)
+    targz_file_path = os.path.join(path, targz_file_name)
+    key.get_contents_to_filename(targz_file_path)
 
 
-def extract_files_from_zip(files, zipfile_path, to_path):
+def extract_files_from_zip(files, targz_file_path, to_path):
     """
     Extract files from a zip.
     """
-    with tarfile.open(name=zipfile_path, mode='r') as tar_file:
+    with tarfile.open(name=targz_file_path, mode='r') as tar_file:
         for file_name in files:
             tar_file.extract(file_name, path=to_path)
     verify_files_exist(files)
 
 
-def refresh_bokchoy_db_cache_from_s3(fingerprint, bucket_name, bokchoy_db_files):
+def refresh_bokchoy_db_cache_from_s3(fingerprint, s3_bucket_name, bokchoy_db_files):
     """
     If the cache files for the current fingerprint exist
     in s3 then replace what you have on disk with those.
     If no copy exists on s3 then continue without error.
     """
     path = CACHE_FOLDER
-    if is_fingerprint_in_bucket(fingerprint, bucket_name):
-        zipfile_name = '{}.tar.gz'.format(fingerprint)
-        get_file_from_s3(bucket_name, zipfile_name, path)
-        zipfile_path = os.path.join(path, zipfile_name)
+    if is_fingerprint_in_s3(fingerprint, s3_bucket_name):
+        targz_file_name = '{}.tar.gz'.format(fingerprint)
+        get_file_from_s3(s3_bucket_name, targz_file_name, path)
+        targz_file_path = os.path.join(path, targz_file_name)
         print("Extracting db cache files.")
-        extract_files_from_zip(bokchoy_db_files, zipfile_path, path)
-        os.remove(zipfile_path)
+        extract_files_from_zip(bokchoy_db_files, targz_file_path, path)
+        os.remove(targz_file_path)
 
 
 def create_tarfile_from_db_cache(fingerprint, files, path):
     """
     Create a tar.gz file with the current bokchoy DB cache files.
     """
-    zipfile_name = '{}.tar.gz'.format(fingerprint)
-    zipfile_path = os.path.join(path, zipfile_name)
-    with tarfile.open(name=zipfile_path, mode='w:gz') as tar_file:
+    targz_file_name = '{}.tar.gz'.format(fingerprint)
+    targz_file_path = os.path.join(path, targz_file_name)
+    with tarfile.open(name=targz_file_path, mode='w:gz') as tar_file:
         for name in files:
             tar_file.add(os.path.join(path, name), arcname=name)
-    return zipfile_name, zipfile_path
+    return targz_file_name, targz_file_path
 
 
-def upload_to_s3(file_name, file_path, bucket_name, replace=False):
+def upload_to_s3(file_name, file_path, s3_bucket_name, replace=False):
     """
-    Upload the specified files to an s3 bucket.
+    Upload the specified file to an s3 bucket.
     """
-    print(u"Uploading {} to s3 bucket {}".format(file_name, bucket_name))
+    print(u"Uploading {} to s3 bucket {}".format(file_name, s3_bucket_name))
     try:
         conn = boto.connect_s3()
     except boto.exception.NoAuthHandlerFound:
@@ -223,7 +223,7 @@ def upload_to_s3(file_name, file_path, bucket_name, replace=False):
               "Continuing without uploading the new cache to S3.")
         return
     try:
-        bucket = conn.get_bucket(bucket_name)
+        bucket = conn.get_bucket(s3_bucket_name)
     except boto.exception.S3ResponseError:
         print("Unable to connect to cache bucket with these credentials. "
               "Continuing without uploading the new cache to S3.")
@@ -233,15 +233,15 @@ def upload_to_s3(file_name, file_path, bucket_name, replace=False):
     if bytes_written:
         msg = u"Wrote {} bytes to {}.".format(bytes_written, key.name)
     else:
-        msg = u"File {} already existed in bucket {}.".format(key.name, bucket_name)
+        msg = u"File {} already existed in bucket {}.".format(key.name, s3_bucket_name)
     print(msg)
 
 
-def upload_db_cache_to_s3(fingerprint, bokchoy_db_files, bucket_name):
+def upload_db_cache_to_s3(fingerprint, bokchoy_db_files, s3_bucket_name):
     """
     Update the S3 bucket with the bokchoy DB cache files.
     """
-    zipfile_name, zipfile_path = create_tarfile_from_db_cache(
+    targz_file_name, targz_file_path = create_tarfile_from_db_cache(
         fingerprint, bokchoy_db_files, CACHE_FOLDER
     )
-    upload_to_s3(zipfile_name, zipfile_path, bucket_name)
+    upload_to_s3(targz_file_name, targz_file_path, s3_bucket_name)

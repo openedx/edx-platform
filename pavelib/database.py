@@ -9,7 +9,7 @@ from pavelib.utils.db_utils import (
     compute_fingerprint_and_write_to_disk,
     does_fingerprint_on_disk_match,
     fingerprint_bokchoy_db_files,
-    is_fingerprint_in_bucket,
+    is_fingerprint_in_s3,
     refresh_bokchoy_db_cache_from_s3,
     remove_files_from_folder,
     reset_test_db,
@@ -62,31 +62,31 @@ def update_bokchoy_db_cache():
 @cmdopts([
     ("rewrite_fingerprint", None, "Optional flag that will write the new sha1 fingerprint to disk")
 ])
-def update_local_bokchoy_db_from_s3(options):
+def update_bokchoy_db_from_local_or_s3(options):
     """
-    Prepare the local MYSQL test database for running bokchoy tests. Since
-    most pull requests do not introduce migrations, this task provides
-    an optimization for caching the state of the db when migrations are
-    added into a bucket in s3. Subsequent commits can avoid rerunning
-    migrations by using the cache files from s3, until the local cache files
-    are updated by running the `update_bokchoy_db_cache` Paver task, and
-    committing the updated cache files to github.
+    Prepare the local MySQL test databases for running bokchoy tests. Since
+    most GitHub pull requests do not introduce migrations, this task caches the state
+    of the dbs and uploads it to s3 when it detects new migrations. Subsequent commits
+    can avoid rerunning migrations by using the cache files from s3. At some point, the
+    local cache files must be manually updated by running the `update_bokchoy_db_cache`
+    Paver task and committing the updated cache files to GitHub.
 
     Steps:
-    1. Determine which migrations, if any, need to be applied to your current
-       db cache files to make them up to date
-    2. Compute the sha1 fingerprint of the local db cache files and the output
-       of the migration
-    3a. If the fingerprint computed in step 2 is equal to the local
-        fingerprint file, load the cache files into the MYSQL test database
-    3b. If the fingerprints are not equal, but there is bucket matching the
-        fingerprint computed in step 2, download and extract the contents of
-        bucket (db cache files) and load them into the MYSQL test database
-    3c. If the fingerprints are not equal AND there is no bucket matching the
-        fingerprint computed in step 2, load the local db cache files into
-        the MYSQL test database and apply any needed migrations. Create a
-        bucket in s3 named the fingerprint computed in step 2 and push the
-        newly updated db cache files to the bucket.
+    1. For each MySQL database, create a file with the list of migrations which were not
+       applied yet
+    2. Compute a sha1 fingerprint from the local MySQL dbs cache files and the unapplied
+       migrations files created on step 1
+    3a. If the sha1 fingerprint computed in step 2 is equal to the cached sha1 fingerprint
+        in the local fingerprint file, load the dbs cache files into the MySQL databases
+    3b. If the sha1 fingerprints are not equal AND there is an object in S3 whose name
+        matches the sha1 fingerprint computed in step 2, download this S3 object ( == file),
+        which is a tar.gz file with the compressed db cache files. Extract those db cache
+        files and load them into the MySQL databases
+    3c. If the sha1 fingerprints are not equal AND there is no object in S3 whose name
+        matches the sha fingerprint computed in step 2, load the local db cache files
+        into the MySQL databases and apply any needed migrations. When Compress the
+        updated db cache files to a tar.gz file named with the fingerprint and
+        upload this file to S3.
 
     NOTE: the computed fingerprints referenced in this and related functions
     represent the state of the db cache files and migration output PRIOR
@@ -102,7 +102,7 @@ def update_local_bokchoy_db_from_s3(options):
         print("DB cache files match the current migrations.")
         reset_test_db(BOKCHOY_DB_FILES, update_cache_files=False, use_existing_db=True)
 
-    elif is_fingerprint_in_bucket(fingerprint, CACHE_BUCKET_NAME):
+    elif is_fingerprint_in_s3(fingerprint, CACHE_BUCKET_NAME):
         print("Found updated bokchoy db files at S3.")
         refresh_bokchoy_db_cache_from_s3(fingerprint, CACHE_BUCKET_NAME, BOKCHOY_DB_FILES)
         reset_test_db(BOKCHOY_DB_FILES, update_cache_files=False, use_existing_db=True)
@@ -118,7 +118,7 @@ def update_local_bokchoy_db_from_s3(options):
         # Check one last time to see if the fingerprint is present in
         # the s3 bucket. This could occur because the bokchoy job is
         # sharded and running the same task in parallel
-        if not is_fingerprint_in_bucket(fingerprint, CACHE_BUCKET_NAME):
+        if not is_fingerprint_in_s3(fingerprint, CACHE_BUCKET_NAME):
             upload_db_cache_to_s3(fingerprint, BOKCHOY_DB_FILES, CACHE_BUCKET_NAME)
         else:
             msg = u"{} {}. {}".format(
