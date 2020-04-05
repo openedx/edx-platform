@@ -24,6 +24,7 @@
 # 39e62ebcacb2326f6384f8b81e0898eb, 2014
 # Litera TUGO <literatugo@ibr.cs.tu-bs.de>, 2016
 # loomis red <markus@qreini.de>, 2017
+# Markus Maurer <admin@ryuum3gum1n.de>, 2020
 # Maximilian Kindshofer <maximilian@kindshofer.net>, 2014
 # Maximilian Kindshofer <maximilian@kindshofer.net>, 2014
 # mc <marc.mannsfeld@phil.hhu.de>, 2015-2016
@@ -96,6 +97,7 @@
 # trajan, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2017
 # mc <marc.mannsfeld@phil.hhu.de>, 2015
+# Markus Maurer <admin@ryuum3gum1n.de>, 2020
 # mc <marc.mannsfeld@phil.hhu.de>, 2015-2016
 # Ron Lucke <ronlucke@googlemail.com>, 2014
 # Sofia Gruber <sofia.karoline@me.com>, 2015
@@ -127,7 +129,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-03-22 20:42+0000\n"
+"POT-Creation-Date: 2020-03-29 20:42+0000\n"
 "PO-Revision-Date: 2020-01-06 08:48+0000\n"
 "Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>\n"
 "Language-Team: German (Germany) (http://www.transifex.com/open-edx/edx-platform/language/de_DE/)\n"
