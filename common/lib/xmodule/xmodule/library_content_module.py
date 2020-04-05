@@ -10,19 +10,19 @@ import random
 from copy import copy
 from gettext import ngettext
 
-from pkg_resources import resource_string
-
 import six
-from capa.responsetypes import registry
 from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.locator import LibraryLocator
+from pkg_resources import resource_string
 from six import text_type
 from six.moves import zip
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock
 from xblock.fields import Integer, List, Scope, String
+
+from capa.responsetypes import registry
 from xmodule.studio_editable import StudioEditableDescriptor, StudioEditableModule
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.x_module import STUDENT_VIEW, XModule

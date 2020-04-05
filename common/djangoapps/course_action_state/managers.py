@@ -2,8 +2,9 @@
 Model Managers for Course Actions
 """
 
-import six
 import traceback
+
+import six
 from django.db import models, transaction
 
 

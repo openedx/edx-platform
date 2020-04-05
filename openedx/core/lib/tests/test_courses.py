@@ -4,13 +4,13 @@ Tests for functionality in openedx/core/lib/courses.py.
 
 
 import ddt
+import six
 from django.test.utils import override_settings
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-import six
 from ..courses import course_image_url
 
 

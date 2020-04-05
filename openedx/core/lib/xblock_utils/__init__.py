@@ -9,32 +9,31 @@ import json
 import logging
 import re
 import uuid
-import static_replace
-import markupsafe
-from lxml import html, etree
-from contracts import contract
 
+import markupsafe
+import six
+import webpack_loader.utils
+from contracts import contract
 from django.conf import settings
-from django.urls import reverse
-from django.utils.html import escape
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.urls import reverse
+from django.utils.html import escape
+from lxml import etree, html
+from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 from pytz import UTC
-from edxmako.shortcuts import render_to_string
+from six import text_type
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
 from xblock.scorable import ScorableXBlockMixin
-from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 
+import static_replace
+from edxmako.shortcuts import render_to_string
 from xmodule.seq_module import SequenceModule
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.vertical_block import VerticalBlock
-from xmodule.x_module import shim_xmodule_js, XModuleDescriptor, XModule, PREVIEW_VIEWS, STUDIO_VIEW
-
-import webpack_loader.utils
-import six
-from six import text_type
+from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW, XModule, XModuleDescriptor, shim_xmodule_js
 
 log = logging.getLogger(__name__)
 

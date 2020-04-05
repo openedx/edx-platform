@@ -20,8 +20,10 @@ import string
 import unicodedata
 #import subprocess
 from copy import deepcopy
+from functools import reduce
 from xml.sax.saxutils import unescape
 
+import six
 import sympy
 from lxml import etree
 from sympy import latex, sympify
@@ -29,8 +31,6 @@ from sympy.physics.quantum.qubit import Qubit
 from sympy.physics.quantum.state import Ket
 from sympy.printing.latex import LatexPrinter
 from sympy.printing.str import StrPrinter
-import six
-from functools import reduce
 
 log = logging.getLogger(__name__)
 

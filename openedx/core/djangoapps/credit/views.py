@@ -18,7 +18,6 @@ from rest_framework import generics, mixins, permissions, views, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from openedx.core.lib.api.authentication import BearerAuthentication
 from six import text_type
 
 from openedx.core.djangoapps.credit.api import create_credit_request
@@ -41,6 +40,7 @@ from openedx.core.djangoapps.credit.serializers import (
     CreditProviderCallbackSerializer,
     CreditProviderSerializer
 )
+from openedx.core.lib.api.authentication import BearerAuthentication
 from openedx.core.lib.api.mixins import PutAsCreateMixin
 from openedx.core.lib.api.permissions import IsStaffOrOwner
 

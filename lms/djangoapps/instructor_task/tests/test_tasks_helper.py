@@ -15,21 +15,24 @@ import tempfile
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 
-from six import text_type
-from six.moves import range, zip
-from six.moves.urllib.parse import quote  # pylint: disable=import-error
-
 import ddt
-import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 import unicodecsv
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_django_utils.cache import RequestCache
 from freezegun import freeze_time
+from mock import ANY, MagicMock, Mock, patch
+from pytz import UTC
+from six import text_type
+from six.moves import range, zip
+from six.moves.urllib.parse import quote  # pylint: disable=import-error
+from waffle.testutils import override_switch
+
+import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
+from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
 from lms.djangoapps.courseware.tests.factories import InstructorFactory
@@ -64,14 +67,12 @@ from lms.djangoapps.instructor_task.tests.test_base import (
 )
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
-from mock import ANY, MagicMock, Mock, patch
 from openedx.core.djangoapps.course_groups.models import CohortMembership, CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.credit.tests.factories import CreditCourseFactory
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
 from openedx.core.lib.teams_config import TeamsConfig
-from pytz import UTC
 from shoppingcart.models import (
     Coupon,
     CourseRegistrationCode,
@@ -84,7 +85,6 @@ from shoppingcart.models import (
 from student.models import ALLOWEDTOENROLL_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from survey.models import SurveyAnswer, SurveyForm
-from waffle.testutils import override_switch
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls

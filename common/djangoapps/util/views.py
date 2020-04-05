@@ -15,12 +15,12 @@ from django.views.decorators.csrf import ensure_csrf_cookie, requires_csrf_token
 from django.views.defaults import server_error
 from django.shortcuts import redirect
 from django.urls import reverse
-from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.courseware.masquerade import setup_masquerade
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 from six.moves import map
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.masquerade import setup_masquerade
+from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 
 import track.views
 from edxmako.shortcuts import render_to_response

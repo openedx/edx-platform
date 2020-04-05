@@ -6,11 +6,11 @@ Tests for cache_utils.py
 from unittest import TestCase
 
 import ddt
+import six
+from edx_django_utils.cache import RequestCache
 from mock import Mock
 
-from edx_django_utils.cache import RequestCache
 from openedx.core.lib.cache_utils import request_cached
-import six
 
 
 @ddt.ddt

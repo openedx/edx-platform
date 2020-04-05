@@ -26,11 +26,11 @@ from django.test import RequestFactory
 from django.utils.text import get_valid_filename
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locator import LibraryLocator, BlockUsageLocator
+from opaque_keys.edx.locator import LibraryLocator
 from organizations.models import OrganizationCourse
 from path import Path as path
 from pytz import UTC
-from six import iteritems, text_type, binary_type
+from six import iteritems, text_type
 from six.moves import range
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.tasks import UserTask
@@ -55,19 +55,9 @@ from xmodule.modulestore.xml_exporter import export_course_to_xml, export_librar
 from xmodule.modulestore.xml_importer import import_course_from_xml, import_library_from_xml
 from xmodule.video_module.transcripts_utils import (
     Transcript,
+    TranscriptsGenerationException,
     clean_video_id,
-    get_transcript_from_contentstore,
-    TranscriptsGenerationException
-)
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.exceptions import NotFoundError
-from edxval.api import (
-    ValCannotCreateError,
-    create_video_transcript,
-    is_video_available,
-    is_transcript_available,
-    create_or_update_video_transcript,
-    create_external_video,
+    get_transcript_from_contentstore
 )
 
 User = get_user_model()

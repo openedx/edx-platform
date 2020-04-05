@@ -9,7 +9,6 @@ import sys
 import time
 
 import six
-import six.moves.http_client  # pylint: disable=import-error
 from paver import tasks
 from paver.easy import cmdopts, needs, sh, task
 

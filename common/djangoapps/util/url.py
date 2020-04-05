@@ -4,9 +4,9 @@ Utility functions related to urls.
 
 
 import sys
-import six
 from importlib import import_module
 
+import six
 from django.conf import settings
 from django.urls import set_urlconf
 

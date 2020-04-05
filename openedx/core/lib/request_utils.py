@@ -2,17 +2,17 @@
 
 import logging
 import re
-from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
 import crum
 from django.conf import settings
-from django.utils.deprecation import MiddlewareMixin
 from django.test.client import RequestFactory
-
-from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from django.utils.deprecation import MiddlewareMixin
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from six.moves.urllib.parse import urlparse
+
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 
 try:
     import newrelic.agent

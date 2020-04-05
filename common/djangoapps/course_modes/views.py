@@ -8,9 +8,6 @@ import json
 import logging
 
 import six
-import six.moves.urllib.error
-import six.moves.urllib.parse
-import six.moves.urllib.request
 import waffle
 from babel.dates import format_datetime
 from babel.numbers import get_currency_symbol
@@ -41,7 +38,6 @@ from openedx.features.discounts.applicability import discount_percentage
 from student.models import CourseEnrollment
 from util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
-
 
 LOG = logging.getLogger(__name__)
 

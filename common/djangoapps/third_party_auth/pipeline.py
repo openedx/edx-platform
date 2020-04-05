@@ -68,9 +68,6 @@ from smtplib import SMTPException
 from uuid import uuid4
 
 import six
-import six.moves.urllib.error  # pylint: disable=import-error
-import six.moves.urllib.parse  # pylint: disable=import-error
-import six.moves.urllib.request  # pylint: disable=import-error
 import social_django
 from django.conf import settings
 from django.contrib.auth.models import User

@@ -5,9 +5,6 @@ import json
 import logging
 
 import six
-import six.moves.urllib.parse  # pylint: disable=import-error
-import third_party_auth
-
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import redirect
@@ -21,13 +18,13 @@ from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.accounts.utils import (
-    is_secondary_email_feature_enabled,
-    is_multiple_user_enterprises_feature_enabled
+    is_multiple_user_enterprises_feature_enabled,
+    is_secondary_email_feature_enabled
 )
 from openedx.core.djangoapps.user_api.helpers import FormDescription
 from openedx.core.djangoapps.user_authn.cookies import are_logged_in_cookies_set
-from openedx.core.djangoapps.user_authn.views.registration_form import RegistrationFormFactory
 from openedx.core.djangoapps.user_authn.views.password_reset import get_password_reset_form
+from openedx.core.djangoapps.user_authn.views.registration_form import RegistrationFormFactory
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from openedx.features.enterprise_support.utils import (
     handle_enterprise_cookies_for_logistration,
@@ -36,10 +33,7 @@ from openedx.features.enterprise_support.utils import (
 from student.helpers import get_next_url_for_login_page
 from third_party_auth import pipeline
 from third_party_auth.decorators import xframe_allow_whitelisted
-
-from util.password_policy_validators import (
-    DEFAULT_MAX_PASSWORD_LENGTH,
-)
+from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 
 log = logging.getLogger(__name__)
 

@@ -1,13 +1,13 @@
 """ Tests for rendering functions in the mako pipeline. """
 
 
-import ddt
-from mock import patch
-from six.moves import map
 from unittest import skipUnless
 
+import ddt
 from django.conf import settings
 from django.test import TestCase
+from mock import patch
+from six.moves import map
 
 from pipeline_mako import compressed_css, compressed_js, render_require_js_path_overrides
 

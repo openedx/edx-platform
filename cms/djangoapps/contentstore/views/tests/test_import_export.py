@@ -9,7 +9,6 @@ import logging
 import os
 import re
 import shutil
-from six import StringIO
 import tarfile
 import tempfile
 from uuid import uuid4

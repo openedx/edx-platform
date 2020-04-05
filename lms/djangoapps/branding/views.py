@@ -10,6 +10,7 @@ from django.db import transaction
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.urls.exceptions import NoReverseMatch
 from django.utils import translation
 from django.utils.translation.trans_real import get_supported_language_variant
 from django.views.decorators.cache import cache_control
@@ -23,7 +24,6 @@ from openedx.core.djangoapps.lang_pref.api import released_languages
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from util.cache import cache_if_anonymous
 from util.json_request import JsonResponse
-from django.urls.exceptions import NoReverseMatch
 
 log = logging.getLogger(__name__)
 
