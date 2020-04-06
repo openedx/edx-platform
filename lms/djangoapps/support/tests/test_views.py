@@ -286,7 +286,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             'course_id': unicode(self.course.id),
             'old_mode': CourseMode.AUDIT,
             'new_mode': CourseMode.VERIFIED,
-            'reason': 'Financial Assistance'
+            'reason': u'Financial Assistance'
         })
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))

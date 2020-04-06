@@ -64,7 +64,7 @@ class EnrollmentTestMixin(object):
             is_active=None,
             enrollment_attributes=None,
             min_mongo_calls=0,
-            max_mongo_calls=0,
+            max_mongo_calls=8,
             linked_enterprise_customer=None,
             cohort=None,
     ):
@@ -378,10 +378,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
                 mode_slug=CourseMode.DEFAULT_MODE_SLUG,
                 mode_display_name=CourseMode.DEFAULT_MODE_SLUG,
             )
-            self.assert_enrollment_status(
-                course_id=unicode(course.id),
-                max_mongo_calls=0,
-            )
+            self.assert_enrollment_status(course_id=six.text_type(course.id))
         # Verify the user himself can see both of his enrollments.
         self._assert_enrollments_visible_in_list([self.course, other_course])
         # Verify that self.other_user can't see any of the enrollments.
