@@ -13,6 +13,7 @@ file and check it in at the same time as your model changes. To do that,
 
 
 import hashlib
+import inspect
 import json
 import logging
 import uuid
@@ -1094,17 +1095,6 @@ class CourseEnrollment(models.Model):
     def course_price(self):
         return get_cosmetic_verified_display_price(self.course)
 
-    @property
-    def course_id(self):
-        return self._course_id
-
-    @course_id.setter
-    def course_id(self, value):
-        if isinstance(value, six.string_types):
-            self._course_id = CourseKey.from_string(value)
-        else:
-            self._course_id = value
-
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 
     # If is_active is False, then the student is not considered to be enrolled
@@ -1136,6 +1126,13 @@ class CourseEnrollment(models.Model):
         ordering = ('user', 'course')
 
     def __init__(self, *args, **kwargs):
+        if 'course_id' in kwargs:
+            course_id = kwargs['course_id']
+            if isinstance(course_id, str):
+                kwargs['course_id'] = CourseKey.from_string(course_id)
+                call_location = "\n".join("%30s : %s:%d" % (t[3], t[1], t[2]) for t in inspect.stack()[::-1])
+                log.warning("Forced to coerce course_id in CourseEnrollment instantiation: %s", call_location)
+
         super(CourseEnrollment, self).__init__(*args, **kwargs)
 
         # Private variable for storing course_overview to minimize calls to the database.

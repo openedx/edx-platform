@@ -12,7 +12,7 @@ from openedx.core.djangoapps.catalog.tests.factories import (
     CourseFactory,
     ProgramFactory,
 )
-from student.tests.factories import TEST_PASSWORD, UserFactory
+from student.tests.factories import TEST_PASSWORD, UserFactory, CourseEnrollmentFactory
 from openedx.core.djangoapps.catalog.cache import (
     CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL,
     COURSE_PROGRAMS_CACHE_KEY_TPL,
@@ -93,7 +93,7 @@ class MicrobachelorsExternalIDTest(ModuleStoreTestCase, CacheIsolationTestCase):
         course_run_key = self.program['courses'][0]['course_runs'][0]['key']
 
         # Enroll user
-        enrollment = CourseEnrollment.objects.create(
+        enrollment = CourseEnrollmentFactory.create(
             course_id=course_run_key,
             user=self.user,
             mode=CourseMode.VERIFIED,
@@ -110,7 +110,7 @@ class MicrobachelorsExternalIDTest(ModuleStoreTestCase, CacheIsolationTestCase):
         course_run_key2 = self.program['courses'][1]['course_runs'][0]['key']
 
         # Enroll user
-        CourseEnrollment.objects.create(
+        CourseEnrollmentFactory.create(
             course_id=course_run_key1,
             user=self.user,
             mode=CourseMode.VERIFIED,
@@ -122,7 +122,7 @@ class MicrobachelorsExternalIDTest(ModuleStoreTestCase, CacheIsolationTestCase):
         assert external_id.external_id_type.name == ExternalIdType.MICROBACHELORS_COACHING
         original_external_user_uuid = external_id.external_user_id
 
-        CourseEnrollment.objects.create(
+        CourseEnrollmentFactory.create(
             course_id=course_run_key2,
             user=self.user,
             mode=CourseMode.VERIFIED,
