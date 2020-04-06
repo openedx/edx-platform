@@ -9,7 +9,7 @@ urlpatterns = [
         name='challenge-landing'
     ),
     url(
-        r'',
+        r'^$',
         IdeaListingView.as_view(),
         name='idea-listing'
     ),

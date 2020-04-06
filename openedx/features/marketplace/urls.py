@@ -5,7 +5,7 @@ from openedx.features.marketplace.views import (MarketplaceListingView, Marketpl
 
 urlpatterns = [
     url(
-        r'',
+        r'^$',
         MarketplaceListingView.as_view(),
         name='marketplace-listing'
     ),
