@@ -5,12 +5,16 @@ from tempfile import TemporaryFile
 
 import boto
 import requests
+
+from datetime import datetime
 from PIL import Image
 from boto.s3.key import Key
 from django.conf import settings
 from django.urls import reverse
 
 from constants import (
+    COMPLETION_DATE_FORMAT,
+    CREDENTIALS_DATE_FORMAT,
     PAGE_HEIGHT,
     PAGE_WIDTH,
     PDFKIT_HTML_STRING,
@@ -24,6 +28,7 @@ from constants import (
 )
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.philu_api.helpers import get_course_custom_settings, get_social_sharing_urls
+from openedx.core.djangoapps.credentials.utils import get_credentials
 from openedx.features.student_certificates.signals import USER_CERTIFICATE_DOWNLOADABLE
 
 certs_api = import_module('lms.djangoapps.certificates.api')
@@ -99,6 +104,27 @@ def get_certificate_img_key(img_name):
     :return: return S3 key name for the image name
     """
     return '{prefix}/{img_name}'.format(prefix=CERTIFICATE_IMG_PREFIX, img_name=img_name)
+
+
+def get_credential_certificates(user):
+    certificates = []
+    program_credentials = get_credentials(user, credential_type='program')
+    for credential in program_credentials:
+        certificate_url = credential.get('certificate_url')
+        if not certificate_url:
+            continue
+        program_name = [attribute.get('value') for attribute in credential.get('attributes', [])
+                        if attribute.get('name') == 'program_name']
+        if program_name:
+            completion_date = datetime.strptime(credential.get('created'), CREDENTIALS_DATE_FORMAT)
+            certificates.append({
+                'display_name': program_name[0],
+                'certificate_title': program_name[0],
+                'certificate_url': certificate_url,
+                'completion_date': completion_date.strftime(COMPLETION_DATE_FORMAT),
+                'is_program_cert': True,
+            })
+    return certificates
 
 
 def get_philu_certificate_social_context(course, certificate):

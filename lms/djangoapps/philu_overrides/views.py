@@ -1,5 +1,4 @@
 """ Views for a student's account information. """
-import base64
 from datetime import datetime
 import json
 import third_party_auth
@@ -33,9 +32,8 @@ from xmodule.modulestore.django import modulestore
 from lms.djangoapps.philu_overrides.courseware.views.views import get_course_related_keys
 from lms.djangoapps.courseware.access import has_access, _can_enroll_courselike
 from lms.djangoapps.courseware.courses import get_courses, sort_by_start_date, get_course_by_id, sort_by_announcement
-from lms.djangoapps.onboarding.helpers import reorder_registration_form_fields, get_alquity_community_url
-from lms.djangoapps.philu_api.helpers import get_course_custom_settings, get_social_sharing_urls, \
-    user_org_survey_completion_status
+from lms.djangoapps.onboarding.helpers import get_alquity_community_url
+from lms.djangoapps.philu_api.helpers import get_course_custom_settings, get_social_sharing_urls
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from third_party_auth import pipeline, provider
@@ -68,7 +66,7 @@ def get_form_field_by_name(fields, name):
 @require_http_methods(['GET'])
 @ensure_csrf_cookie
 @xframe_allow_whitelisted
-def login_and_registration_form(request, initial_mode="login", org_name=None, admin_email=None):
+def login_and_registration_form(request, initial_mode="login"):
     """Render the combined login/registration form, defaulting to login
 
     This relies on the JS to asynchronously load the actual form from
@@ -79,12 +77,9 @@ def login_and_registration_form(request, initial_mode="login", org_name=None, ad
 
     """
     # Determine the URL to redirect to following login/registration/third_party_auth
-    from openedx.features.student_account.views import local_server_get
     from openedx.core.djangoapps.user_authn.views.login_form import _external_auth_intercept, _get_form_descriptions,\
         _third_party_auth_context
 
-
-    local_server_get('/user_api/v1/account/registration/', request.session)
     redirect_to = get_next_url_for_login_page_override(request)
     # If we're already logged in, redirect to the dashboard
     if request.user.is_authenticated():
@@ -145,7 +140,6 @@ def login_and_registration_form(request, initial_mode="login", org_name=None, ad
             # but we include them in the initial page load to avoid
             # the additional round-trip to the server.
             'login_form_desc': json.loads(form_descriptions['login']),
-            'registration_form_desc': json.loads(form_descriptions['registration']),
             'password_reset_form_desc': json.loads(form_descriptions['password_reset']),
         },
         'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in header
@@ -159,23 +153,8 @@ def login_and_registration_form(request, initial_mode="login", org_name=None, ad
         'fields_to_disable': []
     }
 
-    registration_fields = context['data']['registration_form_desc']['fields']
-    registration_fields = context['data']['registration_form_desc']['fields'] = reorder_registration_form_fields(registration_fields)
-
-    if org_name and admin_email:
-        org_name = base64.b64decode(org_name)
-        admin_email = base64.b64decode(admin_email)
-
-        email_field = get_form_field_by_name(registration_fields, 'email')
-        org_field = get_form_field_by_name(registration_fields, 'organization_name')
-        is_poc_field = get_form_field_by_name(registration_fields, 'is_poc')
-        email_field['defaultValue'] = admin_email
-        org_field['defaultValue'] = org_name
-        is_poc_field['defaultValue'] = "1"
-
-        context['fields_to_disable'] = json.dumps([email_field['name'], org_field['name'], is_poc_field['name']])
-
-    return render_to_response('student_account/login_and_register.html', context)
+    template = 'student_account/{}.html'.format(initial_mode)
+    return render_to_response(template, context)
 
 
 @ensure_csrf_cookie
@@ -519,17 +498,7 @@ def course_about(request, course_id):
     from commerce.utils import EcommerceService
     from course_modes.models import CourseMode, get_cosmetic_display_price
     from lms.djangoapps.courseware.access_utils import ACCESS_DENIED
-    from lms.djangoapps.courseware.views.views import registered_for_course
-    from lms.djangoapps.courseware.courses import (
-        get_courses,
-        get_permission_for_course_about,
-        get_course_overview_with_access,
-        get_course_with_access,
-        get_studio_url,
-        sort_by_start_date,
-        get_course_by_id,
-        sort_by_announcement
-    )
+    from lms.djangoapps.courseware.courses import get_studio_url
     from lms.envs.common import DEFAULT_IMAGE_NAME
     import shoppingcart
     from shoppingcart.utils import is_shopping_cart_enabled
@@ -668,8 +637,7 @@ def course_about(request, course_id):
             'course_image_urls': overview.image_urls,
             'meta_tags': meta_tags,
             'is_alquity': is_alquity,
-            'social_sharing_urls': social_sharing_urls,
-            'org_survey_status': user_org_survey_completion_status(request.user)
+            'social_sharing_urls': social_sharing_urls
         }
 
         return render_to_response('courseware/course_about.html', context)

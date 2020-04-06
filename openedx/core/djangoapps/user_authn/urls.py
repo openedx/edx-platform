@@ -3,9 +3,6 @@ from django.conf import settings
 from django.conf.urls import include, url
 
 from openedx.core.djangoapps.user_api.accounts import settings_views
-from openedx.features.student_account.views import login_and_registration_form as\
-    login_and_registration_form_v2
-
 from lms.djangoapps.philu_overrides.views import login_and_registration_form
 
 from .views import login, deprecated
@@ -27,8 +24,6 @@ if settings.FEATURES.get('ENABLE_COMBINED_LOGIN_REGISTRATION'):
         url(r'^login$', login_and_registration_form,
             {'initial_mode': 'login'}, name="signin_user"),
         url(r'^register$', login_and_registration_form,
-            {'initial_mode': 'register'}, name="register_user"),
-        url(r'^signup', login_and_registration_form_v2,
             {'initial_mode': 'register'}, name="register_user"),
         url(r'^register/(?P<org_name>[^/]*)/(?P<admin_email>[^/]*)/$',
             login_and_registration_form,

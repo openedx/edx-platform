@@ -1,25 +1,30 @@
 """
 Handlers for onboarding app
 """
-from django.db import connection
-
 from django.contrib.auth.models import User
-from django.db.models.signals import post_delete, post_save
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import connection
+from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
-from mailchimp_pipeline.signals.handlers import sync_metric_update_prompt_with_mail_chimp
-from lms.djangoapps.onboarding.models import Organization, OrganizationMetric,\
-        OrganizationMetricUpdatePrompt, MetricUpdatePromptRecord
-from oef.models import OrganizationOefUpdatePrompt
-from lms.djangoapps.onboarding.constants import  REMIND_ME_LATER_KEY, TAKE_ME_THERE_KEY, NOT_INTERESTED_KEY
-from util.model_utils import USER_FIELD_CHANGED
+
+from lms.djangoapps.onboarding.constants import NOT_INTERESTED_KEY, REMIND_ME_LATER_KEY, TAKE_ME_THERE_KEY
 from lms.djangoapps.onboarding.helpers import (
     its_been_year,
     its_been_year_month,
-    its_been_year_three_month,
     its_been_year_six_month,
+    its_been_year_three_month,
     update_user_email
 )
+from lms.djangoapps.onboarding.models import (
+    MetricUpdatePromptRecord,
+    Organization,
+    OrganizationMetric,
+    OrganizationMetricUpdatePrompt,
+    UserExtendedProfile
+)
+from mailchimp_pipeline.signals.handlers import sync_metric_update_prompt_with_mail_chimp
+from oef.models import OrganizationOefUpdatePrompt
+from util.model_utils import USER_FIELD_CHANGED, get_changed_fields_dict
 
 
 @receiver(post_save, sender=User)
@@ -146,3 +151,13 @@ def propagate_email_change(sender, user=None, table=None, setting=None, old_valu
 
     if new_value and new_value != old_value:
         update_user_email(user, old_value, new_value)
+
+
+@receiver(pre_save, sender=UserExtendedProfile)
+def extended_profile_pre_save_callback(sender, **kwargs):
+    """
+    Capture old fields on the UserExtendedProfile instance before save and cache them as a
+    private field on the current model for use in the post_save callback.
+    """
+    user_extended_profile = kwargs['instance']
+    user_extended_profile._changed_fields = get_changed_fields_dict(user_extended_profile, sender)

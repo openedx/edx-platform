@@ -1,16 +1,20 @@
+import mock
+
 from ddt import data, ddt
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from lms.djangoapps.onboarding.models import Organization, UserExtendedProfile
 from openedx.core.lib.api.test_utils import ApiTestCase
+from openedx.features.partners.constants import PARTNER_USER_STATUS_WAITING
+from openedx.features.partners.models import PartnerUser
 from openedx.features.partners.tests.factories import FocusAreaFactory, OrganizationFactory, PartnerFactory
 
 
 @ddt
-class G2ARegistrationViewTest(ApiTestCase):
+class PartnerRegistrationViewTest(ApiTestCase):
     """
-    Includes test cases for g2a registration
+    Includes test cases for partner registration
     """
 
     NAME = 'bob james'
@@ -24,7 +28,8 @@ class G2ARegistrationViewTest(ApiTestCase):
     PARTNER = 'give2asia'
 
     def setUp(self):
-        self.partner = PartnerFactory.create(slug=self.PARTNER, label=self.ORGANIZATION)
+        self.partner = PartnerFactory.create(slug=self.PARTNER,
+                                             label=self.ORGANIZATION)
         self.registration_url = reverse('partner_register', args=[self.PARTNER])
 
     def test_put_not_allowed(self):
@@ -43,9 +48,9 @@ class G2ARegistrationViewTest(ApiTestCase):
         response = self.client.delete(self.registration_url)
         self.assertHttpMethodNotAllowed(response)
 
-    def test_create_new_partner_user_with_organization(self):
+    def test_create_new_partner_user_with_orphan_organization(self):
         """
-        Test user is not first learner if organization already exists
+        Test user is first learner for already existing orphan organization
         Create an organization and then try to register.
         :return : None
         """
@@ -74,7 +79,45 @@ class G2ARegistrationViewTest(ApiTestCase):
         self.assertEqual(self.NAME.split(' ', 1)[0], user.first_name)
         self.assertEqual(self.NAME.split(' ', 1)[1], user.last_name)
         self.assertTrue(user.is_active)
-        self.assertEqual(organization.label, organization.label)
+        self.assertEqual(self.ORGANIZATION, organization.label)
+        # in case organization already exists make sure that user is not first learner
+        self.assertTrue(extended_profile.is_first_learner)
+        self.assertHttpOK(response)
+
+    @mock.patch('openedx.features.partners.views.Organization.users_count')
+    def test_create_new_partner_user_with_non_orphan_organization(self, mock_org_user_count):
+        """
+        Test user is not first learner if organization already exists with some members
+        Create an organization and then try to register.
+        :return : None
+        """
+        OrganizationFactory(label=self.ORGANIZATION)
+        mock_org_user_count.return_value = 5
+
+        response = self.client.post(self.registration_url, {
+            'name': self.NAME,
+            'organization_name': self.ORGANIZATION,
+            'country': self.COUNTRY,
+            'email': self.EMAIL,
+            'username': self.USERNAME,
+            'password': self.PASSWORD,
+            'terms_of_service': self.TERMS_OF_SERVICE
+        })
+        self.assertHttpOK(response)
+
+        # get inserted data from the database
+        user = User.objects.filter(username=self.USERNAME).first()
+        organization = Organization.objects.filter(label__iexact=self.ORGANIZATION).first()
+        extended_profile = UserExtendedProfile.objects.filter(user=user).first()
+
+        # verify if user is registered and data is stored in the database
+        self.assertIsNotNone(user)
+        self.assertEqual(self.USERNAME, user.username)
+        self.assertEqual(self.EMAIL, user.email)
+        self.assertEqual(self.NAME.split(' ', 1)[0], user.first_name)
+        self.assertEqual(self.NAME.split(' ', 1)[1], user.last_name)
+        self.assertTrue(user.is_active)
+        self.assertEqual(self.ORGANIZATION, organization.label)
         # in case organization already exists make sure that user is not first learner
         self.assertFalse(extended_profile.is_first_learner)
         self.assertHttpOK(response)
@@ -172,3 +215,30 @@ class G2ARegistrationViewTest(ApiTestCase):
         # Send a request with missing field
         response = self.client.post(self.registration_url, form_data)
         self.assertHttpBadRequest(response)
+
+    def test_register_partner_limit_reached(self):
+        """
+        Test that on limit exceeding, the user is created with status
+        'waiting' in the PartnerUser table, and a 400 error is thrown
+        :return : None
+        """
+
+        self.partner.configuration = {'USER_LIMIT': '0'}
+        self.partner.save()
+        # create focus area with default values
+        FocusAreaFactory()
+
+        response = self.client.post(self.registration_url, {
+            'name': self.NAME,
+            'organization_name': self.ORGANIZATION,
+            'country': self.COUNTRY,
+            'email': self.EMAIL,
+            'username': self.USERNAME,
+            'password': self.PASSWORD,
+            'terms_of_service': self.TERMS_OF_SERVICE
+        })
+
+        self.assertHttpBadRequest(response)
+        user = User.objects.filter(username=self.USERNAME).first()
+        self.assertIsNotNone(user)
+        self.assertEqual(PartnerUser.objects.filter(user=user).first().status, PARTNER_USER_STATUS_WAITING)

@@ -21,6 +21,7 @@ class PartnerFactory(DjangoModelFactory):
     slug = factory.Faker('slug')
     main_logo = 'dummy'
     small_logo = 'dummy'
+    configuration = {'USER_LIMIT': None}
 
 
 class PartnerUserFactory(DjangoModelFactory):
