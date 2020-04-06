@@ -83,11 +83,15 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     start_type = serializers.CharField()
     pacing = serializers.CharField()
     enrollment = serializers.DictField()
-    user_has_access = serializers.BooleanField()
-    user_has_staff_access = serializers.BooleanField()
     tabs = serializers.SerializerMethodField()
     verified_mode = serializers.SerializerMethodField()
     show_calculator = serializers.BooleanField()
+    is_staff = serializers.BooleanField()
+    can_load_courseware = serializers.BooleanField()
+
+    # TODO: TNL-7053 Legacy: Delete these two once ready to contract
+    user_has_access = serializers.BooleanField()
+    user_has_staff_access = serializers.BooleanField()
 
     def __init__(self, *args, **kwargs):
         """
