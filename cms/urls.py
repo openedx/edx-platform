@@ -97,6 +97,8 @@ urlpatterns = [
         contentstore.views.course_search_index_handler,
         name='course_search_index_handler'
         ),
+    url(r'^course/archive/{}?$'.format(settings.COURSE_KEY_PATTERN), contentstore.views.course_archive_handler, name='course_archive_handler'),
+
     url(r'^course/{}?$'.format(settings.COURSE_KEY_PATTERN), contentstore.views.course_handler, name='course_handler'),
 
     url(r'^checklists/{}?$'.format(settings.COURSE_KEY_PATTERN),

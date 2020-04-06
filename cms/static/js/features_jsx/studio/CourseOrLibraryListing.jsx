@@ -9,6 +9,7 @@ export function CourseOrLibraryListing(props) {
   const allowReruns = props.allowReruns;
   const linkClass = props.linkClass;
   const idBase = props.idBase;
+  const can_archive = props.can_archive;
 
   return (
     <ul className="list-courses">
@@ -59,6 +60,16 @@ export function CourseOrLibraryListing(props) {
                     id={`view-live-${idBase}-${i}`}
                   >{gettext('View Live')}</a>
                 </li>
+                { can_archive &&
+                <li className="action action-view">
+                  <a
+                    href={item.archive_link}
+                    className="button view-button"
+                    aria-labelledby={`view-archive-${idBase}-${i} title-${idBase}-${i}`}
+                    id={`view-archive-${idBase}-${i}`}
+                  >{gettext('Archive')}</a>
+                </li>
+                }
               </ul>
               }
             </li>

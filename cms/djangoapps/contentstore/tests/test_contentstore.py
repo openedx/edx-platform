@@ -4,7 +4,8 @@ from __future__ import print_function
 
 import copy
 import shutil
-from datetime import timedelta
+from datetime import datetime, timedelta
+import pytz
 from functools import wraps
 from json import loads
 from textwrap import dedent
@@ -36,6 +37,7 @@ from contentstore.config import waffle
 from course_action_state.managers import CourseActionStateItemNotFoundError
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from django_comment_common.utils import are_permissions_roles_seeded
+from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.tempdir import mkdtemp_clean
 from student import auth
 from student.models import CourseEnrollment
@@ -1805,6 +1807,14 @@ class ContentStoreTest(ContentStoreTestCase):
 
         response = self.client.get_html('/course/edX/test')
         self.assertEquals(response.status_code, 404)
+
+    def test_course_archive_handler(self):
+        """Test course_archive_handler view archives the course"""
+
+        course = CourseFactory.create()
+        self.client.get(get_url('course_archive_handler', course.id, 'course_key_string'))
+        course_module = self.store.get_course(course.id)
+        self.assertEqual(course_module.has_ended(), True)
 
 
 class MetadataSaveTestCase(ContentStoreTestCase):
