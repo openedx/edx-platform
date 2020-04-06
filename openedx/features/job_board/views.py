@@ -1,6 +1,5 @@
+from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
-
-from edxmako.shortcuts import render_to_response
 
 from .models import Job
 
@@ -15,6 +14,7 @@ class JobListView(ListView):
     template_engine = 'mako'
 
 
-def show_job_detail(request):
-
-    return render_to_response('features/job_board/job_detail.html', {})
+class JobDetailView(DetailView):
+    model = Job
+    template_engine = 'mako'
+    template_name = 'features/job_board/job_detail.html'
