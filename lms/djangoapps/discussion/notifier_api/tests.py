@@ -159,7 +159,7 @@ class NotifierUsersViewSetTest(UrlResetMixin, ModuleStoreTestCase):
         )
         return self.list_view(request)
 
-    def _get_list(self, page=1, page_size=None):
+    def _get_list(self, page=1, page_size=''):
         response = self._make_list_request(page, page_size)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
