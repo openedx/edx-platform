@@ -29,6 +29,7 @@ from contentstore.signals.handlers import listen_for_course_publish, listen_for_
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url, reverse_usage_url
 from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from xmodule.library_tools import normalize_key_for_search
 from xmodule.modulestore import ModuleStoreEnum
@@ -473,14 +474,14 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
 
     def _test_course_about_mode_index(self, store):
         """ Test that informational properties in the course modes store end up in the course_info index """
-        honour_mode = CourseMode(
-            course_id=six.text_type(self.course.id),
+        honour_mode = CourseModeFactory(
+            course_id=self.course.id,
             mode_slug=CourseMode.HONOR,
             mode_display_name=CourseMode.HONOR
         )
         honour_mode.save()
-        verified_mode = CourseMode(
-            course_id=six.text_type(self.course.id),
+        verified_mode = CourseModeFactory(
+            course_id=self.course.id,
             mode_slug=CourseMode.VERIFIED,
             mode_display_name=CourseMode.VERIFIED,
             min_price=1

@@ -6,6 +6,8 @@ Add and create new modes for running courses on this particular LMS
 from collections import defaultdict, namedtuple
 from datetime import timedelta
 
+import inspect
+import logging
 import six
 from config_models.models import ConfigurationModel
 from django.conf import settings
@@ -24,6 +26,8 @@ from simple_history.models import HistoricalRecords
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.cache_utils import request_cached
+
+log = logging.getLogger(__name__)
 
 Mode = namedtuple('Mode',
                   [
@@ -53,19 +57,6 @@ class CourseMode(models.Model):
         related_name='modes',
         on_delete=models.DO_NOTHING,
     )
-
-    # Django sets the `course_id` property in __init__ with the value from the database
-    # This pair of properties converts that into a proper CourseKey
-    @property
-    def course_id(self):
-        return self._course_id
-
-    @course_id.setter
-    def course_id(self, value):
-        if isinstance(value, six.string_types):
-            self._course_id = CourseKey.from_string(value)
-        else:
-            self._course_id = value
 
     # the reference to this mode that can be used by Enrollments to generate
     # similar behavior for the same slug across courses
@@ -198,6 +189,16 @@ class CourseMode(models.Model):
     class Meta(object):
         app_label = "course_modes"
         unique_together = ('course', 'mode_slug', 'currency')
+
+    def __init__(self, *args, **kwargs):
+        if 'course_id' in kwargs:
+            course_id = kwargs['course_id']
+            if isinstance(course_id, str):
+                kwargs['course_id'] = CourseKey.from_string(course_id)
+                call_location = "\n".join("%30s : %s:%d" % (t[3], t[1], t[2]) for t in inspect.stack()[::-1])
+                log.warning("Forced to coerce course_id in CourseMode instantiation: %s", call_location)
+
+        super(CourseMode, self).__init__(*args, **kwargs)
 
     def clean(self):
         """
