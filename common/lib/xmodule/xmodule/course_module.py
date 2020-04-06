@@ -232,7 +232,7 @@ class ProctoringProvider(String):
 
         available_providers = get_available_providers()
 
-        if value and value not in available_providers:
+        if value is not None and value not in available_providers:
             errors.append(
                 _('The selected proctoring provider, {proctoring_provider}, is not a valid provider. '
                     'Please select from one of {available_providers}.')
