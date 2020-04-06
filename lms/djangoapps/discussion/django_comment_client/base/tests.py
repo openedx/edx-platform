@@ -111,7 +111,7 @@ class CreateThreadGroupIdTestCase(
             mock_request,
             "cohorted_topic",
             self.student,
-            None
+            ''
         )
         self._assert_json_response_contains_group_info(response)
 
