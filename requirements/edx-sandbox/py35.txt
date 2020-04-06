@@ -9,7 +9,7 @@ common/lib/symmath  # via -r requirements/edx-sandbox/py35.in
 git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4  # via -r requirements/edx-sandbox/py35.in
 cffi==1.14.0              # via -r requirements/edx-sandbox/shared.txt, cryptography
 git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0  # via -r requirements/edx-sandbox/py35.in
-cryptography==2.8         # via -r requirements/edx-sandbox/shared.txt
+cryptography==2.9         # via -r requirements/edx-sandbox/shared.txt
 cycler==0.10.0            # via matplotlib
 decorator==4.4.2          # via networkx
 kiwisolver==1.1.0         # via matplotlib
