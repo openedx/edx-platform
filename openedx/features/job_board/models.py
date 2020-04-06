@@ -28,4 +28,4 @@ class Job(TimeStampedModel):
     @property
     def location(self):
         """Get the full location (city, country) of job."""
-        return '{city}, {country}'.format(city=self.city, country=self.country.name)
+        return '{city}, {country}'.format(city=self.city, country=self.country.name.encode('utf-8'))
