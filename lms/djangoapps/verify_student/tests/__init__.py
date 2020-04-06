@@ -62,6 +62,7 @@ class TestVerificationBase(TestCase):
     def submit_attempt(self, attempt):
         with self.immediate_on_commit():
             attempt.submit()
+            attempt.refresh_from_db()
         return attempt
 
     def create_and_submit_attempt_for_user(self, user=None):

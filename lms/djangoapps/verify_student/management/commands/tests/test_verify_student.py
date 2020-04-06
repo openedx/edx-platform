@@ -39,7 +39,6 @@ class TestVerifyStudentCommand(MockS3BotoMixin, TestVerificationBase):
         self.create_upload_and_submit_attempt_for_user()
         with patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post_error):
             self.create_upload_and_submit_attempt_for_user()
-        with patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post_error):
             self.create_upload_and_submit_attempt_for_user()
 
         # check to make sure we had two successes and two failures; otherwise we've got problems elsewhere
