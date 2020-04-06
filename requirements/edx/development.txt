@@ -31,7 +31,7 @@ appdirs==1.4.3            # via -r requirements/edx/testing.txt, fs, virtualenv
 astroid==2.3.3            # via -r requirements/edx/testing.txt, pylint, pylint-celery
 attrs==19.3.0             # via -r requirements/edx/testing.txt, edx-ace, jsonschema, pytest
 babel==2.8.0              # via -r requirements/edx/testing.txt, django-babel, django-babel-underscore, sphinx
-beautifulsoup4==4.8.2     # via -r requirements/edx/testing.txt, pynliner
+beautifulsoup4==4.9.0     # via -r requirements/edx/testing.txt, pynliner
 billiard==3.3.0.23        # via -r requirements/edx/testing.txt, celery
 bleach==3.1.4             # via -r requirements/edx/testing.txt, edx-enterprise, lti-consumer-xblock, ora2
 bok-choy==1.0.1           # via -r requirements/edx/testing.txt
@@ -40,7 +40,7 @@ boto==2.39.0              # via -r requirements/edx/testing.txt, django-ses, edx
 botocore==1.8.17          # via -r requirements/edx/testing.txt, boto3, s3transfer
 git+https://github.com/edx/bridgekeeper.git@2423e8d8788c2132ebeec509e1a7b17e1f5b9364#egg=bridgekeeper==0.0  # via -r requirements/edx/testing.txt
 celery==3.1.26.post2      # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, django-celery, django-user-tasks, edx-celeryutils, edx-enterprise
-certifi==2019.11.28       # via -r requirements/edx/testing.txt, requests
+certifi==2020.4.5.1       # via -r requirements/edx/testing.txt, requests
 cffi==1.14.0              # via -r requirements/edx/testing.txt, cryptography
 chardet==3.0.4            # via -r requirements/edx/testing.txt, pdfminer.six, pysrt, requests
 git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0  # via -r requirements/edx/testing.txt
@@ -114,7 +114,7 @@ edx-django-release-util==0.4.2  # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==2.4.3  # via -r requirements/edx/testing.txt
 edx-django-utils==3.1     # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==5.0.2  # via -r requirements/edx/testing.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.0.5     # via -r requirements/edx/testing.txt
+edx-enterprise==3.0.6     # via -r requirements/edx/testing.txt
 edx-i18n-tools==0.5.0     # via -r requirements/edx/testing.txt, ora2
 edx-lint==1.4.1           # via -r requirements/edx/testing.txt
 edx-milestones==0.2.6     # via -r requirements/edx/testing.txt
@@ -123,7 +123,7 @@ edx-organizations==5.0.0  # via -r requirements/edx/testing.txt
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/testing.txt
 edx-proctoring==2.3.3     # via -r requirements/edx/testing.txt, edx-proctoring-proctortrack
 edx-rbac==1.1.2           # via -r requirements/edx/testing.txt, edx-enterprise
-edx-rest-api-client==5.0.2  # via -r requirements/edx/testing.txt, edx-enterprise, edx-proctoring
+edx-rest-api-client==5.1.0  # via -r requirements/edx/testing.txt, edx-enterprise, edx-proctoring
 edx-search==1.3.4         # via -r requirements/edx/testing.txt
 edx-sga==0.10.0           # via -r requirements/edx/testing.txt
 edx-sphinx-theme==1.5.0   # via -r requirements/edx/development.in
@@ -287,7 +287,7 @@ social-auth-core==3.3.3   # via -r requirements/edx/testing.txt, social-auth-app
 git+https://github.com/jazzband/sorl-thumbnail.git@13bedfb7d2970809eda597e3ef79318a6fa80ac2#egg=sorl-thumbnail  # via -r requirements/edx/testing.txt
 sortedcontainers==2.1.0   # via -r requirements/edx/testing.txt, pdfminer.six
 soupsieve==2.0            # via -r requirements/edx/testing.txt, beautifulsoup4
-sphinx==2.4.4             # via edx-sphinx-theme, sphinxcontrib-httpdomain
+sphinx==3.0.0             # via edx-sphinx-theme, sphinxcontrib-httpdomain
 sphinxcontrib-applehelp==1.0.2  # via sphinx
 sphinxcontrib-devhelp==1.0.2  # via sphinx
 sphinxcontrib-htmlhelp==1.0.3  # via sphinx
@@ -313,7 +313,7 @@ unidiff==0.5.5            # via -r requirements/edx/testing.txt, coverage-pytest
 uritemplate==3.0.1        # via -r requirements/edx/testing.txt, coreapi, drf-yasg
 urllib3==1.25.8           # via -r requirements/edx/testing.txt, elasticsearch, geoip2, requests, selenium, transifex-client
 user-util==0.1.5          # via -r requirements/edx/testing.txt
-virtualenv==20.0.15       # via -r requirements/edx/testing.txt, tox
+virtualenv==20.0.16       # via -r requirements/edx/testing.txt, tox
 voluptuous==0.11.7        # via -r requirements/edx/testing.txt, ora2
 vulture==1.4              # via -r requirements/edx/development.in
 watchdog==0.10.2          # via -r requirements/edx/testing.txt
