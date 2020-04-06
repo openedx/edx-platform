@@ -768,7 +768,6 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
             lambda:
             send_request_to_ss_for_user.delay(user_verification_id=self.id, copy_id_photo_from=copy_id_photo_from)
         )
-        self.refresh_from_db()
 
     def parsed_error_msg(self):
         """
