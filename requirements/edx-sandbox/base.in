@@ -7,6 +7,12 @@
 #   * confirm that it has no system requirements beyond what we already install
 #   * run "make upgrade" to update the detailed requirements files
 
+
+# We pin things specifically in this file beacuse we want to be very explicit about
+# updating dependencies to the sandbox since they can impact how custom response code is run.
+# We can then use constraints.txt to constrain any sub-dependencies that may need to be held back.
+
+
 -c ../constraints.txt
 
 -r shared.txt                       # Dependencies in common with LMS and Studio
