@@ -320,6 +320,8 @@ class UserChangeForm(BaseUserChangeForm):
     Override the default UserChangeForm such that the password field
     does not contain a link to a 'change password' form.
     """
+    last_name = forms.CharField(max_length=30, required=False)
+
     def __init__(self, *args, **kwargs):
         super(UserChangeForm, self).__init__(*args, **kwargs)
 
