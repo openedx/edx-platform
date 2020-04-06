@@ -388,7 +388,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {'success': True})
 
-        response = self.client.post(dispatch_url, {'position': None})
+        response = self.client.post(dispatch_url, {'position': ''})
         self.assertEqual(200, response.status_code)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {'success': True})
 
