@@ -1061,6 +1061,9 @@ class TopicDetailView(APIView):
         except KeyError:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+        if not has_specific_teamset_access(request.user, course_module, topic_id):
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
         organization_protection_status = user_organization_protection_status(request.user, course_id)
         serializer = TopicSerializer(
             topic.cleaned_data,

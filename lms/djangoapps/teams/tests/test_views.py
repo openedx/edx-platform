@@ -1700,10 +1700,10 @@ class TestDetailTopicAPI(TeamAPITestCase):
 
     @ddt.unpack
     @ddt.data(
-        ('student_enrolled', 200, 0),
+        ('student_enrolled', 404, None),
         ('student_on_team_1_private_set_1', 200, 2),
         ('student_on_team_2_private_set_1', 200, 2),
-        ('student_masters', 200, 2),
+        ('student_masters', 404, None),
         ('staff', 200, 2)
     )
     def test_teamset_type(self, requesting_user, expected_status, expected_team_count):
@@ -1713,8 +1713,6 @@ class TestDetailTopicAPI(TeamAPITestCase):
         should be able to see that and only that teamset. As shown in `test_invalid_topic_id`,
         nonexistant topics 404, and if someone doesn't have access to a private_managed teamset, as far as they know
         the teamset does not exist.
-
-        TODO: only staff, sot1ps1, and sot2ps1 should get the topic. everyone else should 404.
         """
         topic = self.get_topic_detail(
             topic_id='private_topic_1_id',
