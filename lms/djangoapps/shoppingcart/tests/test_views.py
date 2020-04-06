@@ -551,7 +551,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
 
-        # unit price should be updated for that course
+        # unit price should be updated for that course.
         item = self.cart.orderitem_set.all().select_subclasses()[0]
         self.assertEqual(item.unit_cost, self.get_discount(self.cost))
 
