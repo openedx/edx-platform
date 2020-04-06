@@ -542,7 +542,7 @@ class TestViewDispatch(TestCase):
         self.assertEqual(self.view.select_backend(request), self.dot_adapter.backend)
 
     def test_dispatching_with_no_client(self):
-        request = self._post_request(None)
+        request = self._post_request('')
         self.assertEqual(self.view.select_backend(request), self.dot_adapter.backend)
 
     def test_dispatching_with_invalid_client(self):

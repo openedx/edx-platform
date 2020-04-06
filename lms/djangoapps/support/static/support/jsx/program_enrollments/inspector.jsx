@@ -62,7 +62,13 @@ const renderEnrollmentsSection = enrollments => (
     <h3>Program Enrollments</h3>
     {enrollments.map(enrollment => (
       <div key={enrollment.program_uuid} className="ml-5">
-        <h4>Program {enrollment.program_uuid} Enrollment</h4>
+        <h4>
+          <span className="font-weight-bold">
+            {enrollment.program_name}
+          </span> Program ( <span className="font-weight-bold">
+            {enrollment.program_uuid}
+          </span>)
+        </h4>
         <div> <span className="font-weight-bold">Status</span>: {enrollment.status} </div>
         <div> <span className="font-weight-bold">Created</span>: {enrollment.created} </div>
         <div> <span className="font-weight-bold">Last updated</span>: {enrollment.modified} </div>
@@ -73,7 +79,11 @@ const renderEnrollmentsSection = enrollments => (
         {enrollment.program_course_enrollments && enrollment.program_course_enrollments.map(
           programCourseEnrollment => (
             <div key={programCourseEnrollment.course_key} className="ml-5">
-              <h4>Course {programCourseEnrollment.course_key}</h4>
+              <h4>
+                <a href={programCourseEnrollment.course_url}>
+                  {programCourseEnrollment.course_key}
+                </a>
+              </h4>
               <div>
                 <span className="font-weight-bold">Status</span>
                 : {programCourseEnrollment.status}
@@ -201,11 +211,13 @@ ProgramEnrollmentsInspectorPage.propTypes = {
         created: PropTypes.string,
         modified: PropTypes.string,
         program_uuid: PropTypes.string,
+        program_name: PropTypes.string,
         status: PropTypes.string,
         external_user_key: PropTypes.string,
         program_course_enrollments: PropTypes.arrayOf(
           PropTypes.shape({
             course_key: PropTypes.string,
+            course_url: PropTypes.string,
             created: PropTypes.string,
             modified: PropTypes.string,
             status: PropTypes.string,

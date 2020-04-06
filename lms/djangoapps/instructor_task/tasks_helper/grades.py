@@ -104,14 +104,17 @@ class GradeReportBase(object):
         Return default if the generator is emtpy, otherwise return all
         its iterations (including the first which was used for validation).
         """
+        TASK_LOG.info('GradeReport: Checking generator')
         empty_generator_sentinel = object()
         first_iteration_output = next(generator, empty_generator_sentinel)
         generator_is_empty = first_iteration_output == empty_generator_sentinel
 
         if generator_is_empty:
+            TASK_LOG.info('GradeReport: Generator is empty')
             yield default
 
         else:
+            TASK_LOG.info('GradeReport: Generator is not empty')
             yield first_iteration_output
             for element in generator:
                 yield element
@@ -131,6 +134,8 @@ class GradeReportBase(object):
             This generator method fetches & loads the enrolled user objects on demand which in chunk
             size defined. This method is a workaround to avoid out-of-memory errors.
             """
+            if six.text_type(course_id) == 'course-v1:MITx+CTL.SC0x+1T2019':
+                context.update_status('ProblemGradeReport Investigation log: Starting batching of enrolled students')
             filter_kwargs = {
                 'courseenrollment__course_id': course_id,
             }
@@ -139,6 +144,8 @@ class GradeReportBase(object):
 
             user_ids_list = get_user_model().objects.filter(**filter_kwargs).values_list('id', flat=True).order_by('id')
             user_chunks = grouper(user_ids_list)
+            if six.text_type(course_id) == 'course-v1:MITx+CTL.SC0x+1T2019':
+                context.update_status('ProblemGradeReport Investigation log: user chunks created successfully')
             for user_ids in user_chunks:
                 user_ids = [user_id for user_id in user_ids if user_id is not None]
                 min_id = min(user_ids)
@@ -148,10 +155,13 @@ class GradeReportBase(object):
                     id__lte=max_id,
                     **filter_kwargs
                 ).select_related('profile')
+                if six.text_type(course_id) == 'course-v1:MITx+CTL.SC0x+1T2019':
+                    context.update_status('ProblemGradeReport Investigation log: user chunk yielded successfully')
                 yield users
 
         course_id = context.course_id
-
+        if six.text_type(course_id) == 'course-v1:MITx+CTL.SC0x+1T2019':
+            context.update_status('ProblemGradeReport Investigation log: Start of getting enrolled users')
         return get_enrolled_learners_for_course(course_id=course_id, verified_only=context.report_for_verified_only)
 
     def _compile(self, context, batched_rows):
@@ -674,6 +684,7 @@ class ProblemGradeReport(GradeReportBase):
     """
     Class to encapsulate functionality related to generating Problem Grade Reports.
     """
+
     @classmethod
     def generate(cls, _xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
         """
@@ -701,6 +712,7 @@ class ProblemGradeReport(GradeReportBase):
 
         context.update_status('ProblemGradeReport Step 4: Retrieving problem scores for course for enrolled users')
         generated_rows = self._batched_rows(context, header_row, graded_scorable_blocks)
+        context.update_status('ProblemGradeReport Step 4: Successfully retrieved problem scores')
         success_rows, error_rows = self._compile(context, generated_rows)
         context.update_status('ProblemGradeReport Step 6: Uploading data to CSV report file')
         self._upload(context, [success_headers] + success_rows, [error_headers] + error_rows)
@@ -757,10 +769,16 @@ class ProblemGradeReport(GradeReportBase):
         """
         Returns a list of rows for the given users for this report.
         """
+        if six.text_type(context.course_id) == 'course-v1:MITx+CTL.SC0x+1T2019':
+            context.update_status('ProblemGradeReport Investigation log: Start of row creation for users')
         success_rows, error_rows = [], []
         for student, course_grade, error in CourseGradeFactory().iter(users, context.course):
             student_fields = [getattr(student, field_name) for field_name in header_row]
             context.task_progress.attempted += 1
+            if context.task_progress.attempted % 2 == 0 and \
+                    six.text_type(context.course_id) == 'course-v1:MITx+CTL.SC0x+1T2019':
+                context.update_status('ProblemGradeReport Investigation log: Processing user {}'.format(
+                    context.task_progress.attempted))
             if not course_grade:
                 err_msg = text_type(error)
                 # There was an error grading this student.
@@ -806,6 +824,7 @@ class ProblemResponses(object):
     """
     Class to encapsulate functionality related to generating Problem Responses Reports.
     """
+
     @classmethod
     def _build_problem_list(cls, course_blocks, root, path=None):
         """

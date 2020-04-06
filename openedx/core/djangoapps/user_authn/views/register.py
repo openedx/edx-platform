@@ -186,7 +186,7 @@ def create_account_with_params(request, params):
             is_third_party_auth_enabled, third_party_auth_credentials_in_api, user, request, params,
         )
 
-        new_user = authenticate_new_user(request, user.username, params['password'])
+        new_user = authenticate_new_user(request, user.username, form.cleaned_data['password'])
         django_login(request, new_user)
         request.session.set_expiry(0)
 

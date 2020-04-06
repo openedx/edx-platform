@@ -1136,7 +1136,7 @@ class CheckoutTestMixin(object):
         Ensures that checkout functions were invoked as
         expected during execution of the create_order endpoint.
         """
-        post_params.setdefault('processor', None)
+        post_params.setdefault('processor', '')
         response = self.client.post(reverse('verify_student_create_order'), post_params)
         self.assertEqual(response.status_code, expected_status_code)
         if expected_status_code == 200:
@@ -1394,7 +1394,7 @@ class TestCreateOrderView(ModuleStoreTestCase):
         data = {
             'contribution': contribution,
             'course_id': course_id,
-            'processor': None,
+            'processor': '',
         }
 
         response = self.client.post(url, data)

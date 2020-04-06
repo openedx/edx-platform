@@ -698,7 +698,7 @@ class SingleThreadAccessTestCase(CohortedTestCase):
                 mock_request,
                 'non_cohorted_topic',
                 user_not_in_team,
-                None
+                ''
             )
             self.assertEqual(403, response.status_code)
             self.assertEqual(
