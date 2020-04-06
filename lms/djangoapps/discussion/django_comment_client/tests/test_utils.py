@@ -12,6 +12,7 @@ from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from edx_django_utils.cache import RequestCache
 from mock import Mock, patch
+from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import text_type
 
@@ -535,7 +536,6 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         )
 
     def test_get_unstarted_discussion_xblocks(self):
-
         self.create_discussion("Chapter 1", "Discussion 1", start=self.later)
 
         self.assert_category_map_equals(
@@ -572,7 +572,6 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter 3 / Section 1", "Discussion")
 
         def check_divided(is_divided):
-
             self.assert_category_map_equals(
                 {
                     "entries": {},
@@ -1855,3 +1854,48 @@ def set_discussion_division_settings(
         always_divide_inline_discussions=always_divide_inline_discussions,
     )
     set_course_cohorted(course_key, enable_cohorts)
+
+
+@ddt.ddt
+class MiscUtilsTests(TestCase):
+    @ddt.data(
+        ('course-v1:edX+foo101+bar_t2', '99', '99'),
+        ('course-v1:edX+foo101+bar_t2', 99, 99)
+    )
+    @ddt.unpack
+    def test_permalink_does_not_break_for_thread(self, course_id, discussion_id, content_id):
+        """
+        Tests that the method does not break.
+
+        Test with permalink method for thread type of content data.
+        """
+        url_kwargs = {'course_id': course_id, 'discussion_id': discussion_id, 'thread_id': content_id}
+        thread_data = {'id': content_id, 'course_id': course_id, 'commentable_id': discussion_id, 'type': 'thread'}
+        expected_url = reverse('single_thread', kwargs=url_kwargs)
+
+        self.assertEqual(utils.permalink(thread_data), expected_url)
+
+        thread_data['course_id'] = CourseKey.from_string(course_id)
+        self.assertEqual(utils.permalink(thread_data), expected_url)
+
+    @ddt.data(
+        ('course-v1:edX+foo101+bar_t2', '99', '99'),
+        ('course-v1:edX+foo101+bar_t2', 99, 99)
+    )
+    @ddt.unpack
+    def test_permalink_does_not_break_for_non_thread(self, course_id, discussion_id, thread_id):
+        """
+        Tests that the method does not break.
+
+        Test with permalink method for non thread type of content data.
+        """
+        url_kwargs = {'course_id': course_id, 'discussion_id': discussion_id, 'thread_id': thread_id}
+        thread_data = {
+            'id': '101', 'thread_id': thread_id, 'course_id': course_id, 'commentable_id': discussion_id, 'type': 'foo'
+        }
+        expected_url = reverse('single_thread', kwargs=url_kwargs) + '#' + thread_data['id']
+
+        self.assertEqual(utils.permalink(thread_data), expected_url)
+
+        thread_data['course_id'] = CourseKey.from_string(course_id)
+        self.assertEqual(utils.permalink(thread_data), expected_url)
