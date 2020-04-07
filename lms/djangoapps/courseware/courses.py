@@ -29,7 +29,6 @@ from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access_response import (
     MilestoneAccessError,
     StartDateError,
-    SurveyRequiredAccessError,
     EnrollmentRequiredAccessError,
 )
 from lms.djangoapps.courseware.date_summary import (
@@ -47,11 +46,7 @@ from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.certificates import api as certs_api
-from lms.djangoapps.courseware.access_utils import (
-    check_survey,
-    check_enrollment,
-    check_public_access,
-)
+from lms.djangoapps.courseware.access_utils import check_enrollment, check_public_access,
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -62,7 +57,7 @@ from openedx.features.course_duration_limits.access import AuditExpiredError
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, RELATIVE_DATES_FLAG
 from static_replace import replace_static_urls
 from student.models import CourseEnrollment
-from survey.utils import is_survey_required_and_unanswered
+from survey.utils import SurveyRequiredAccessError, is_survey_required_and_unanswered
 from util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -174,7 +169,7 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
 
     # Redirect if the user must answer a survey before entering the course.
     if check_survey_complete and action == 'load':
-        survey_access_response = check_survey(user, course)
+        survey_access_response = is_survey_required_and_unanswered(user, course)
         if not survey_access_response:
             return survey_access_response
 

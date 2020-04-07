@@ -20,7 +20,6 @@ from openedx.features.course_experience import (
 )
 from student.models import CourseEnrollment
 from student.roles import CourseBetaTesterRole
-from survey.utils import is_survey_required_and_unanswered
 from xmodule.util.xmodule_django import get_current_request_hostname
 DEBUG_ACCESS = False
 log = getLogger(__name__)
@@ -116,19 +115,6 @@ def check_enrollment(user, course):
     """
     if not check_public_access(course, [COURSE_VISIBILITY_PUBLIC]) and CourseEnrollment.is_enrolled(user, course.id):
         return EnrollmentRequiredAccessError()
-
-    return ACCESS_GRANTED
-
-
-def check_survey(user, course):
-    """
-    Check if the user must answer a survey before accessing a course
-
-    Returns:
-        AccessResponse: Either ACCESS_GRANTED or SurveyRequiredAccessError.
-    """
-    if is_survey_required_and_unanswered(user, course):
-        return SurveyRequiredAccessError()
 
     return ACCESS_GRANTED
 
