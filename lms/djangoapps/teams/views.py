@@ -1247,7 +1247,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         if not has_specific_team_access(request.user, team):
-            return Response(status=status.HTTP_403_FORBIDDEN)
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
         try:
             user = User.objects.get(username=username)
