@@ -46,7 +46,11 @@ from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.certificates import api as certs_api
-from lms.djangoapps.courseware.access_utils import check_enrollment, check_public_access
+from lms.djangoapps.courseware.access_utils import (
+    check_authentication,
+    check_enrollment,
+    check_public_access
+)
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -57,7 +61,7 @@ from openedx.features.course_duration_limits.access import AuditExpiredError
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, RELATIVE_DATES_FLAG
 from static_replace import replace_static_urls
 from student.models import CourseEnrollment
-from survey.utils import SurveyRequiredAccessError, is_survey_required_and_unanswered
+from survey.utils import SurveyRequiredAccessError, check_survey_required_and_unanswered
 from util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -145,7 +149,7 @@ def get_course_overview_with_access(user, action, course_key, check_if_enrolled=
     check_course_access_with_redirect(course_overview, user, action, check_if_enrolled)
     return course_overview
 
-def check_course_access(course, user, action, check_if_enrolled=False, check_survey_complete=True):
+def check_course_access(course, user, action, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):
     """
     Check that the user has the access to perform the specified action
     on the course (CourseDescriptor|CourseOverview).
@@ -162,6 +166,11 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
     if not access_response:
         return access_response
 
+    if check_if_authenticated:
+        authentication_access_response = check_authentication(user, course)
+        if not authentication_access_response:
+            return authentication_access_response
+
     if check_if_enrolled:
         enrollment_access_response = check_enrollment(user, course)
         if not enrollment_access_response:
@@ -169,7 +178,7 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
 
     # Redirect if the user must answer a survey before entering the course.
     if check_survey_complete and action == 'load':
-        survey_access_response = is_survey_required_and_unanswered(user, course)
+        survey_access_response = check_survey_required_and_unanswered(user, course)
         if not survey_access_response:
             return survey_access_response
 

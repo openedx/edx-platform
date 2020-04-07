@@ -103,7 +103,7 @@ class CoursewareInformation(RetrieveAPIView):
         overview.enrollment = {'mode': mode, 'is_active': is_active}
 
         overview.is_staff = has_access(self.request.user, 'staff', overview).has_access
-        overview.can_load_courseware = check_course_access(overview, self.request.user, 'load', check_if_enrolled=True).has_access
+        overview.can_load_courseware = check_course_access(overview, self.request.user, 'load', check_if_enrolled=True, check_survey_complete=False, check_if_authenticated=True).has_access
         # TODO: If can_load_courseware is false add error codes to an error messages object
 
         # TODO: TNL-7053 Legacy: Delete these two once ready to contract

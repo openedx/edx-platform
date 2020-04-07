@@ -10,7 +10,11 @@ from logging import getLogger
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from pytz import UTC
-from lms.djangoapps.courseware.access_response import AccessResponse, StartDateError
+from lms.djangoapps.courseware.access_response import (
+    AccessResponse,
+    StartDateError,
+    EnrollmentRequiredAccessError
+)
 from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_student
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML
@@ -115,10 +119,24 @@ def check_enrollment(user, course):
     Returns:
         AccessResponse: Either ACCESS_GRANTED or EnrollmentRequiredAccessError.
     """
-    if not check_public_access(course, [COURSE_VISIBILITY_PUBLIC]) and CourseEnrollment.is_enrolled(user, course.id):
-        return EnrollmentRequiredAccessError()
+    if CourseEnrollment.is_enrolled(user, course.id):
+        return ACCESS_GRANTED
 
-    return ACCESS_GRANTED
+    if check_public_access(course, [COURSE_VISIBILITY_PUBLIC]):
+        return ACCESS_GRANTED
+
+    return EnrollmentRequiredAccessError()
+
+
+def check_authentication(user, course):
+    if user.is_authenticated:
+        return ACCESS_GRANTED
+
+    if check_public_access(course, [COURSE_VISIBILITY_PUBLIC]):
+        return ACCESS_GRANTED
+
+    return ACCESS_DENIED
+
 
 def check_public_access(course, visibilities):
     """
