@@ -1396,7 +1396,7 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         if not has_specific_team_access(request.user, team):
-            return Response(status=status.HTTP_403_FORBIDDEN)
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
         membership = self.get_membership(username, team)
 
@@ -1410,7 +1410,7 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         if not has_specific_team_access(request.user, team):
-            return Response(status=status.HTTP_403_FORBIDDEN)
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
         if not can_user_modify_team(request.user, team):
             return Response(
