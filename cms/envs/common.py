@@ -837,7 +837,7 @@ DATABASES = {
         'CONN_MAX_AGE': 0,
         'ENGINE': 'django.db.backends.mysql',
         'HOST': 'localhost',
-        'NAME': 'dxapp',
+        'NAME': 'edxapp',
         'OPTIONS': {},
         'PASSWORD': 'password',
         'PORT': '3306',
