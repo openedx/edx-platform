@@ -74,7 +74,7 @@ class CourseApiTestViews(BaseCoursewareTests):
     def test_course_metadata(self, logged_in, enrollment_mode, enable_anonymous):
         check_public_access = mock.Mock()
         check_public_access.return_value = enable_anonymous
-        with mock.patch('openedx.core.djangoapps.courseware.access_utils.check_public_access', check_public_access):
+        with mock.patch('lms.djangoapps.courseware.access_utils.check_public_access', check_public_access):
             if not logged_in:
                 self.client.logout()
             if enrollment_mode:
