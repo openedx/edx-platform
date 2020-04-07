@@ -65,9 +65,9 @@ from xmodule.modulestore.django import modulestore
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
 from ..access import has_access
+from ..access_utils import check_public_access
 from ..courses import (
-    allow_public_access,
-    check_course_access,
+    check_course_access_with_redirect,
     get_course_with_access,
     get_current_child,
     get_studio_url
@@ -163,7 +163,7 @@ class CoursewareIndex(View):
                 if self.enable_unenrolled_access:
                     # Check if the user is considered enrolled (i.e. is an enrolled learner or staff).
                     try:
-                        check_course_access(
+                        check_course_access_with_redirect(
                             self.course, request.user, 'load', check_if_enrolled=True,
                         )
                     except CourseAccessRedirect as exception:
@@ -250,7 +250,7 @@ class CoursewareIndex(View):
                 'email_opt_in': False,
             })
 
-            allow_anonymous = allow_public_access(self.course, [COURSE_VISIBILITY_PUBLIC])
+            allow_anonymous = check_public_access(self.course, [COURSE_VISIBILITY_PUBLIC])
 
             if not allow_anonymous:
                 PageLevelMessages.register_warning_message(
@@ -462,7 +462,7 @@ class CoursewareIndex(View):
         )
         staff_access = self.is_staff
 
-        allow_anonymous = allow_public_access(self.course, [COURSE_VISIBILITY_PUBLIC])
+        allow_anonymous = check_public_access(self.course, [COURSE_VISIBILITY_PUBLIC])
         display_reset_dates_banner = False
         if not allow_anonymous and RELATIVE_DATES_FLAG.is_enabled(self.course.id):
             display_reset_dates_banner = reset_deadlines_banner_should_display(self.course_key, request)

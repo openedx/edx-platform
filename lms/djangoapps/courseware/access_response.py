@@ -214,3 +214,25 @@ class NoAllowedPartitionGroupsError(AccessError):
         error_code = "no_allowed_user_groups"
         developer_message = u"Group access for {} excludes all students".format(partition.name)
         super(NoAllowedPartitionGroupsError, self).__init__(error_code, developer_message, user_message)
+
+
+class SurveyRequiredAccessError(AccessError):
+    """
+    Access denied because the user has not completed a required survey
+    """
+    def __init__(self):
+        error_code = "survey_required"
+        developer_message = u"User must complete a survey"
+        user_message = _(u"You must complete a survey")
+        super(SurveyRequiredAccessError, self).__init__(error_code, developer_message, user_message)
+
+
+class EnrollmentRequiredAccessError(AccessError):
+    """
+    Access denied because the user must be enrolled in the course
+    """
+    def __init__(self):
+        error_code = "enrollment_required"
+        developer_message = u"User must be enrolled in the course"
+        user_message = _(u"You must be enrolled in the course")
+        super(EnrollmentRequiredAccessError, self).__init__(error_code, developer_message, user_message)

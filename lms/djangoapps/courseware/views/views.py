@@ -82,7 +82,7 @@ from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.commerce.utils import EcommerceService
-from lms.djangoapps.courseware.courses import allow_public_access
+from lms.djangoapps.courseware.access_utils import check_public_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -620,7 +620,7 @@ class CourseTabView(EdxFragmentView):
         """
         Register messages to be shown to the user if they have limited access.
         """
-        allow_anonymous = allow_public_access(course, [COURSE_VISIBILITY_PUBLIC])
+        allow_anonymous = check_public_access(course, [COURSE_VISIBILITY_PUBLIC])
 
         if request.user.is_anonymous and not allow_anonymous:
             if CourseTabView.course_open_for_learner_enrollment(course):
@@ -981,7 +981,7 @@ def course_about(request, course_id):
 
         sidebar_html_enabled = course_experience_waffle().is_enabled(ENABLE_COURSE_ABOUT_SIDEBAR_HTML)
 
-        allow_anonymous = allow_public_access(course, [COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE])
+        allow_anonymous = check_public_access(course, [COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE])
 
         # This local import is due to the circularity of lms and openedx references.
         # This may be resolved by using stevedore to allow web fragments to be used

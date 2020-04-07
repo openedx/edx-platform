@@ -25,7 +25,7 @@ from lms.djangoapps.course_goals.api import (
     valid_course_goals_ordered
 )
 from lms.djangoapps.course_goals.models import GOAL_KEY_CHOICES
-from lms.djangoapps.courseware.courses import allow_public_access
+from lms.djangoapps.courseware.access_utils import check_public_access
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import CourseHomeMessages
@@ -111,7 +111,7 @@ def _register_course_home_messages(request, course, user_access, course_start_da
     """
     Register messages to be shown in the course home content page.
     """
-    allow_anonymous = allow_public_access(course, [COURSE_VISIBILITY_PUBLIC])
+    allow_anonymous = check_public_access(course, [COURSE_VISIBILITY_PUBLIC])
 
     if user_access['is_anonymous'] and not allow_anonymous:
         sign_in_or_register_text = (_(u'{sign_in_link} or {register_link} and then enroll in this course.')

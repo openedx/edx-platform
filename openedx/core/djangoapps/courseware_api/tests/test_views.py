@@ -8,6 +8,10 @@ import mock
 
 from django.conf import settings
 
+from lms.djangoapps.courseware.access_utils import (
+    ACCESS_DENIED,
+    ACCESS_GRANTED
+)
 from xmodule.modulestore.django import modulestore
 
 from xmodule.modulestore.tests.django_utils import (
@@ -60,17 +64,17 @@ class CourseApiTestViews(BaseCoursewareTests):
     Tests for the courseware REST API
     """
     @ddt.data(
-        (True, None, False),
-        (True, 'audit', False),
-        (True, 'verified', False),
-        (False, None, False),
-        (False, None, True),
+        (True, None, ACCESS_DENIED),
+        (True, 'audit', ACCESS_DENIED),
+        (True, 'verified', ACCESS_DENIED),
+        (False, None, ACCESS_DENIED),
+        (False, None, ACCESS_GRANTED),
     )
     @ddt.unpack
     def test_course_metadata(self, logged_in, enrollment_mode, enable_anonymous):
-        allow_public_access = mock.Mock()
-        allow_public_access.return_value = enable_anonymous
-        with mock.patch('openedx.core.djangoapps.courseware_api.views.allow_public_access', allow_public_access):
+        check_public_access = mock.Mock()
+        check_public_access.return_value = enable_anonymous
+        with mock.patch('openedx.core.djangoapps.courseware.access_utils.check_public_access', check_public_access):
             if not logged_in:
                 self.client.logout()
             if enrollment_mode:
@@ -83,7 +87,7 @@ class CourseApiTestViews(BaseCoursewareTests):
                 assert enrollment['is_active']
                 assert len(response.data['tabs']) == 4
             elif enable_anonymous and not logged_in:
-                allow_public_access.assert_called_once()
+                check_public_access.assert_called_once()
                 assert response.data['enrollment']['mode'] is None
                 assert response.data['user_has_access']
             else:

@@ -26,7 +26,12 @@ from six import text_type
 import branding
 from course_modes.models import CourseMode
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.courseware.access_response import MilestoneAccessError, StartDateError
+from lms.djangoapps.courseware.access_response import (
+    MilestoneAccessError,
+    StartDateError,
+    SurveyRequiredAccessError,
+    EnrollmentRequiredAccessError,
+)
 from lms.djangoapps.courseware.date_summary import (
     CertificateAvailableDate,
     CourseAssignmentDate,
@@ -42,6 +47,11 @@ from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.certificates import api as certs_api
+from lms.djangoapps.courseware.access_utils import (
+    check_survey,
+    check_enrollment,
+    check_public_access,
+)
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -118,7 +128,7 @@ def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=
       be plugged in as additional callback checks for different actions.
     """
     course = get_course_by_id(course_key, depth)
-    check_course_access(course, user, action, check_if_enrolled, check_survey_complete)
+    check_course_access_with_redirect(course, user, action, check_if_enrolled, check_survey_complete)
     return course
 
 
@@ -137,9 +147,8 @@ def get_course_overview_with_access(user, action, course_key, check_if_enrolled=
         course_overview = CourseOverview.get_from_id(course_key)
     except CourseOverview.DoesNotExist:
         raise Http404("Course not found.")
-    check_course_access(course_overview, user, action, check_if_enrolled)
+    check_course_access_with_redirect(course_overview, user, action, check_if_enrolled)
     return course_overview
-
 
 def check_course_access(course, user, action, check_if_enrolled=False, check_survey_complete=True):
     """
@@ -150,13 +159,42 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
     check_survey_complete: If true, additionally verifies that the user has completed the survey.
     """
     # Allow staff full access to the course even if not enrolled
-    if has_access(user, 'staff', course.id):
-        return
+    staff_access_response = has_access(user, 'staff', course.id):
+    if staff_access_response:
+        return staff_access_response
 
+    access_response = has_access(user, action, course, course.id)
+    if not access_response:
+        return access_response
+
+    if check_if_enrolled:
+        enrollment_access_response = check_enrollment(user, course.id)
+        if not enrollment_access_response:
+            return enrollment_access_response
+
+    # Redirect if the user must answer a survey before entering the course.
+    if check_survey_complete and action == 'load':
+        survey_access_response = check_survey(user, course)
+        if not survey_access_response:
+            return survey_access_response
+
+    # This access_response will be ACCESS_GRANTED
+    return access_response
+
+
+def check_course_access_with_redirect(course, user, action, check_if_enrolled=False, check_survey_complete=True):
+    """
+    Check that the user has the access to perform the specified action
+    on the course (CourseDescriptor|CourseOverview).
+
+    check_if_enrolled: If true, additionally verifies that the user is enrolled.
+    check_survey_complete: If true, additionally verifies that the user has completed the survey.
+    """
     request = get_current_request()
     check_content_start_date_for_masquerade_user(course.id, user, request, course.start)
 
-    access_response = has_access(user, action, course, course.id)
+    access_response = check_course_access(course, user, action, check_if_enrolled, check_survey_complete)
+
     if not access_response:
         # Redirect if StartDateError
         if isinstance(access_response, StartDateError):
@@ -183,19 +221,17 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
                 dashboard_url=reverse('dashboard'),
             ), access_response)
 
+        # Redirect if the user is not enrolled and must be to see content
+        if isinstance(access_response, EnrollmentRequiredAccessError):
+            raise CourseAccessRedirect(reverse('about_course', args=[six.text_type(course.id)]))
+
+        # Redirect if the user must answer a survey before entering the course.
+        if isinstance(access_response, SurveyRequiredAccessError):
+            raise CourseAccessRedirect(reverse('course_survey', args=[six.text_type(course.id)]))
+
         # Deliberately return a non-specific error message to avoid
         # leaking info about access control settings
         raise CoursewareAccessException(access_response)
-
-    if check_if_enrolled:
-        # If the user is not enrolled, redirect them to the about page
-        if not CourseEnrollment.is_enrolled(user, course.id):
-            raise CourseAccessRedirect(reverse('about_course', args=[six.text_type(course.id)]))
-
-    # Redirect if the user must answer a survey before entering the course.
-    if check_survey_complete and action == 'load':
-        if is_survey_required_and_unanswered(user, course):
-            raise CourseAccessRedirect(reverse('course_survey', args=[six.text_type(course.id)]))
 
 
 def can_self_enroll_in_course(course_key):
@@ -746,13 +782,3 @@ def get_course_chapter_ids(course_key):
         log.exception('Failed to retrieve course from modulestore.')
         return []
     return [six.text_type(chapter_key) for chapter_key in chapter_keys if chapter_key.block_type == 'chapter']
-
-
-def allow_public_access(course, visibilities):
-    """
-    This checks if the unenrolled access waffle flag for the course is set
-    and the course visibility matches any of the input visibilities.
-    """
-    unenrolled_access_flag = COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course.id)
-    allow_access = unenrolled_access_flag and course.course_visibility in visibilities
-    return allow_access

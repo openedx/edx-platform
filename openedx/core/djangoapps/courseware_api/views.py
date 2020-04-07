@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 
 from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.courseware.courses import allow_public_access
+from lms.djangoapps.courseware.courses import check_course_access
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from student.models import CourseEnrollment
 
@@ -80,26 +80,6 @@ class CoursewareInformation(RetrieveAPIView):
 
     serializer_class = CourseInfoSerializer
 
-    def _check_access(self, user, overview, is_staff):
-        if is_staff:
-            return True
-
-        # We can only trust has_access in its false case because it doesn't check everything we
-        # need to check.
-        if not has_access(user, 'load', overview):
-            return False
-
-        # Anonymous or unenrolled users
-        if user.is_anonymous or not CourseEnrollment.is_enrolled(user, overview.id):
-            # do not have access if the course is not public
-            if not allow_public_access(overview, [COURSE_VISIBILITY_PUBLIC]):
-                return False
-
-        # if is_survey_required_and_unanswered(user, course):
-            # TODO: This.
-
-        return True
-
     def get_object(self):
         """
         Return the requested course object, if the user has appropriate
@@ -123,7 +103,8 @@ class CoursewareInformation(RetrieveAPIView):
         overview.enrollment = {'mode': mode, 'is_active': is_active}
 
         overview.is_staff = has_access(self.request.user, 'staff', overview).has_access
-        overview.can_load_courseware = self._check_access(self.request.user, overview, overview.is_staff)
+        overview.can_load_courseware = check_course_access(overview, self.request.user, 'load', check_if_enrolled=True).has_access
+        # TODO: If can_load_courseware is false add error codes to an error messages object
 
         # TODO: TNL-7053 Legacy: Delete these two once ready to contract
         overview.user_has_access = overview.can_load_courseware
