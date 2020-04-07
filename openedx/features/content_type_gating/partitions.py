@@ -99,7 +99,7 @@ class ContentTypeGatingPartition(UserPartition):
         upgrade_price, _ = format_strikeout_price(user, course)
 
         frag = Fragment(render_to_string('content_type_gating/access_denied_message.html', {
-            'mobile_app': False,
+            'mobile_app': request and is_request_from_mobile_app(request),
             'ecommerce_checkout_link': ecommerce_checkout_link,
             'min_price': upgrade_price,
         }))
@@ -114,7 +114,7 @@ class ContentTypeGatingPartition(UserPartition):
             return None
 
         request = crum.get_current_request()
-        if False:
+        if request and is_request_from_mobile_app(request):
             return _(u"Graded assessments are available to Verified Track learners.")
         else:
             return _(u"Graded assessments are available to Verified Track learners. Upgrade to Unlock.")
