@@ -136,6 +136,7 @@ class CoursewareInformation(RetrieveAPIView):
             user=self.request.user,
             course_key=course_key,
         )
+        overview.course_expired_message = generate_course_expired_message(self.request.user, overview)
         return overview
 
     def get_serializer_context(self):
