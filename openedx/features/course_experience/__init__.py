@@ -85,6 +85,9 @@ RELATIVE_DATES_FLAG = ExperimentWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'relative_date
 # Waffle flag to enable user calendar syncing
 CALENDAR_SYNC_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'calendar_sync')
 
+# Waffle flag to ellipsize course welcome messages if they are too long
+SHORTEN_WELCOME_MESSAGE_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'shorten_welcome_message')
+
 
 def course_home_page_title(course):  # pylint: disable=unused-argument
     """
