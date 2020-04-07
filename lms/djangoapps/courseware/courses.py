@@ -149,6 +149,7 @@ def get_course_overview_with_access(user, action, course_key, check_if_enrolled=
     check_course_access_with_redirect(course_overview, user, action, check_if_enrolled)
     return course_overview
 
+
 def check_course_access(course, user, action, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):
     """
     Check that the user has the access to perform the specified action

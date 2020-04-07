@@ -112,6 +112,7 @@ def check_course_open_for_learner(user, course):
         return ACCESS_GRANTED
     return check_start_date(user, course.days_early_for_beta, course.start, course.id)
 
+
 def check_enrollment(user, course):
     """
     Check if the course requires a learner to be enrolled for access.
