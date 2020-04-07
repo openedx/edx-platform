@@ -111,6 +111,7 @@ def send_request_to_ss_for_user(self, user_verification_id, copy_id_photo_from):
     Returns:
         request.Response
     """
+    log.info('=>New Verification Task Received')  # todo -- remove before merge.
     user_verification = SoftwareSecurePhotoVerification.objects.get(id=user_verification_id)
     try:
         headers, body = user_verification.create_request(copy_id_photo_from)
