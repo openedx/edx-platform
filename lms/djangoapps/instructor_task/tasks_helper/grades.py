@@ -671,19 +671,6 @@ class CourseGradeReport(object):
             is_whitelisted,
             bulk_certs.certificates_by_user.get(user.id),
         )
-        TASK_LOG.info(
-            u'Student certificate eligibility: %s '
-            u'(user=%s, course_id=%s, grade_percent=%s letter_grade=%s gradecutoffs=%s, allow_certificate=%s, '
-            u'is_whitelisted=%s)',
-            certificate_info[0],
-            user,
-            context.course_id,
-            course_grade.percent,
-            course_grade.letter_grade,
-            context.course.grade_cutoffs,
-            user.profile.allow_certificate,
-            is_whitelisted,
-        )
         return certificate_info
 
     def _rows_for_users(self, context, users):
