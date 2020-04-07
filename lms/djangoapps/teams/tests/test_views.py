@@ -1637,7 +1637,7 @@ class TestListTopicsAPI(TeamAPITestCase):
         sot1ps1 and sot2ps3 should only see their teamset
         """
         topics = self.get_topics_list(
-            data={'course_id': self.test_course_1.id},
+            data={'course_id': str(self.test_course_1.id)},
             user=requesting_user
         )
         private_teamsets_returned = [
