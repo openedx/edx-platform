@@ -225,3 +225,14 @@ class EnrollmentRequiredAccessError(AccessError):
         developer_message = u"User must be enrolled in the course"
         user_message = _(u"You must be enrolled in the course")
         super(EnrollmentRequiredAccessError, self).__init__(error_code, developer_message, user_message)
+
+
+class AuthenticationRequiredAccessError(AccessError):
+    """
+    Access denied because the user must be authenticated to see it
+    """
+    def __init__(self):
+        error_code = "authentication_required"
+        developer_message = u"User must be authenticated to view the course"
+        user_message = _(u"You must be logged in to see this course")
+        super(AuthenticationRequiredAccessError, self).__init__(error_code, developer_message, user_message)

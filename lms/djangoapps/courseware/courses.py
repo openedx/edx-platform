@@ -230,6 +230,10 @@ def check_course_access_with_redirect(course, user, action, check_if_enrolled=Fa
         if isinstance(access_response, EnrollmentRequiredAccessError):
             raise CourseAccessRedirect(reverse('about_course', args=[six.text_type(course.id)]))
 
+        # Redirect if user must be authenticated to view the content
+        if isinstance(access_response, AuthenticationRequiredAccessError):
+            raise CourseAccessRedirect(reverse('about_course', args=[six.text_type(course.id)]))
+
         # Redirect if the user must answer a survey before entering the course.
         if isinstance(access_response, SurveyRequiredAccessError):
             raise CourseAccessRedirect(reverse('course_survey', args=[six.text_type(course.id)]))

@@ -13,7 +13,8 @@ from pytz import UTC
 from lms.djangoapps.courseware.access_response import (
     AccessResponse,
     StartDateError,
-    EnrollmentRequiredAccessError
+    EnrollmentRequiredAccessError,
+    AuthenticationRequiredAccessError,
 )
 from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_student
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
@@ -136,7 +137,7 @@ def check_authentication(user, course):
     if check_public_access(course, [COURSE_VISIBILITY_PUBLIC]):
         return ACCESS_GRANTED
 
-    return ACCESS_DENIED
+    return AuthenticationRequiredAccessError()
 
 
 def check_public_access(course, visibilities):
