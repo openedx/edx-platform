@@ -1489,6 +1489,7 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
             "AWS_ACCESS_KEY": "c987c7efe35c403caa821f7328febfa1",
             "AWS_SECRET_KEY": "fc595fc657c04437bb23495d8fe64881",
             "S3_BUCKET": "test.example.com",
+            "CERT_VERIFICATION_PATH": False,
         },
         "DAYS_GOOD_FOR": 10,
     })
