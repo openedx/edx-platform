@@ -163,7 +163,7 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
         return access_response
 
     if check_if_enrolled:
-        enrollment_access_response = check_enrollment(user, course.id)
+        enrollment_access_response = check_enrollment(user, course)
         if not enrollment_access_response:
             return enrollment_access_response
 

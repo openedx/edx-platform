@@ -21,6 +21,8 @@ from openedx.features.course_experience import (
 from student.models import CourseEnrollment
 from student.roles import CourseBetaTesterRole
 from xmodule.util.xmodule_django import get_current_request_hostname
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
+
 DEBUG_ACCESS = False
 log = getLogger(__name__)
 
