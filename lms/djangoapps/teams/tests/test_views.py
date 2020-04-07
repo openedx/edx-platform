@@ -594,7 +594,14 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         team_list = self.get_teams_list(user=user, expected_status=200, data=course_two_data)
         self.assertEqual(team_list['count'], 0)
 
-    def build_team_data(self, name="Test team", course=None, description="Filler description", **kwargs):
+    def build_team_data(
+        self,
+        name="Test team",
+        course=None,
+        description="Filler description",
+        topic_id="topic_0",
+        **kwargs
+    ):
         """Creates the payload for creating a team. kwargs can be used to specify additional fields."""
         data = kwargs
         course = course if course else self.test_course_1
@@ -602,6 +609,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             'name': name,
             'course_id': str(course.id),
             'description': description,
+            'topic_id': topic_id,
         })
         return data
 
@@ -1012,7 +1020,19 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
     def test_bad_course_data(self, status, data):
         self.post_create_team(status, data)
 
-    def test_student_in_team(self):
+    def test_bad_topic_id(self):
+        self.post_create_team(
+            404,
+            data=self.build_team_data(topic_id='asdfasdfasdfa'),
+            user='staff'
+        )
+
+    def test_missing_topic_id(self):
+        data = self.build_team_data()
+        data.pop('topic_id')
+        self.post_create_team(400, data=data, user='staff')
+
+    def test_student_in_teamset(self):
         response = self.post_create_team(
             400,
             data=self.build_team_data(
@@ -1023,11 +1043,12 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
             user='student_enrolled'
         )
         self.assertEqual(
-            "You are already in a team in this course.",
+            "You are already in a team in this teamset.",
             json.loads(response.content.decode('utf-8'))["user_message"]
         )
 
     @patch('lms.djangoapps.teams.views.can_user_create_team_in_topic', return_value=False)
+    @patch('lms.djangoapps.teams.views.has_specific_teamset_access', return_value=True)
     def test_student_create_team_instructor_managed_topic(self, *args):  # pylint: disable=unused-argument
         response = self.post_create_team(
             403,
@@ -1035,7 +1056,7 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
                 name="student create team in instructor managed topic",
                 course=self.test_course_1,
                 description="student cannot create team in instructor-managed topic",
-                topic_id='great-topic'
+                topic_id='private_topic_1_id'
             ),
             user='student_enrolled_not_on_team'
         )
@@ -1058,7 +1079,8 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
             data=self.build_team_data(
                 name="Another team",
                 course=self.test_course_1,
-                description="Privileged users are the best"
+                description="Privileged users are the best",
+                topic_id=self.solar_team.topic_id
             ),
             user=user
         )
@@ -1143,12 +1165,12 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
 
     @ddt.unpack
     @ddt.data(
-        ('student_enrolled', 400, 'You are already in a team in this course.'),
+        ('student_enrolled', 404, None),
         ('student_unenrolled', 403, None),
-        ('student_enrolled_not_on_team', 403, "You can't create a team in an instructor managed topic."),
-        ('student_masters', 400, 'You are already in a team in this course.'),
-        ('student_on_team_1_private_set_1', 400, 'You are already in a team in this course.'),
-        ('student_on_team_2_private_set_1', 400, 'You are already in a team in this course.'),
+        ('student_enrolled_not_on_team', 404, None),
+        ('student_masters', 404, None),
+        ('student_on_team_1_private_set_1', 403, "You can't create a team in an instructor managed topic."),
+        ('student_on_team_2_private_set_1', 403, "You can't create a team in an instructor managed topic."),
         ('staff', 200, None)
     )
     def test_private_managed_access(self, user, expected_response, msg):
@@ -1157,10 +1179,6 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
         Only staff should be able to create teams in managed teamsets, but they're also
         the only ones who should know that private_managed teamsets exist. If the team hasn't been created yet,
         no one can be in it, so no non-staff should get any info at all from this endpoint.
-
-        TODO: This endpoint should check for teamset enrollment rather than course enrollment.
-        I'm not sure of the severity of the 'user_message' info, but it seems like we might not want to
-        return that for student_enrolled_not_on_team (they should just get 403, like student_unenrolled)
         """
         response = self.post_create_team(
             expected_response,
