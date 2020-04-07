@@ -32,7 +32,7 @@ from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.certificates.models import CertificateStatuses  # pylint: disable=import-error
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.tests import TestVerificationBase
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory, generate_course_run_key
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
@@ -291,7 +291,7 @@ class CourseEndingTest(TestCase):
 
 
 @ddt.ddt
-class DashboardTest(ModuleStoreTestCase):
+class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
     """
     Tests for dashboard utility functions
     """
@@ -314,9 +314,7 @@ class DashboardTest(ModuleStoreTestCase):
 
         if mode == 'verified':
             # Simulate a successful verification attempt
-            attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
-            attempt.mark_ready()
-            attempt.submit()
+            attempt = self.create_and_submit_attempt_for_user(self.user)
             attempt.approve()
 
         response = self.client.get(reverse('dashboard'))
@@ -351,9 +349,7 @@ class DashboardTest(ModuleStoreTestCase):
 
         if mode == 'verified':
             # Simulate a successful verification attempt
-            attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
-            attempt.mark_ready()
-            attempt.submit()
+            attempt = self.create_and_submit_attempt_for_user(self.user)
             attempt.approve()
 
         response = self.client.get(reverse('dashboard'))

@@ -50,7 +50,7 @@ CONFIG_FILE = get_env_setting('LMS_CFG')
 with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
     __config__ = yaml.safe_load(f)
 
-    # ENV_TOKENS and AUTH_TOKENS are included for reverse compatability.
+    # ENV_TOKENS and AUTH_TOKENS are included for reverse compatibility.
     # Removing them may break plugins that rely on them.
     ENV_TOKENS = __config__
     AUTH_TOKENS = __config__
@@ -945,6 +945,10 @@ CREDENTIALS_GENERATION_ROUTING_KEY = ENV_TOKENS.get('CREDENTIALS_GENERATION_ROUT
 
 # Queue to use for award program certificates
 PROGRAM_CERTIFICATES_ROUTING_KEY = ENV_TOKENS.get('PROGRAM_CERTIFICATES_ROUTING_KEY', DEFAULT_PRIORITY_QUEUE)
+SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = ENV_TOKENS.get(
+    'SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY',
+    HIGH_PRIORITY_QUEUE
+)
 
 API_ACCESS_MANAGER_EMAIL = ENV_TOKENS.get('API_ACCESS_MANAGER_EMAIL')
 API_ACCESS_FROM_EMAIL = ENV_TOKENS.get('API_ACCESS_FROM_EMAIL')

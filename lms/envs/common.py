@@ -511,6 +511,13 @@ XQUEUE_INTERFACE = {
 # Used with Email sending
 RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS = 5
 RETRY_ACTIVATION_EMAIL_TIMEOUT = 0.5
+
+# Software Secure request retry settings
+# Time in seconds before a retry of the task should be 60 mints.
+SOFTWARE_SECURE_REQUEST_RETRY_DELAY = 60 * 60
+# Maximum of 6 retries before giving up.
+SOFTWARE_SECURE_RETRY_MAX_ATTEMPTS = 6
+
 PASSWORD_RESET_EMAIL_RATE_LIMIT = {
     'no_of_emails': 1,
     'per_seconds': 60
@@ -2154,7 +2161,6 @@ CELERY_BROKER_TRANSPORT = 'amqp'
 CELERY_BROKER_HOSTNAME = 'localhost'
 CELERY_BROKER_USER = 'celery'
 CELERY_BROKER_PASSWORD = 'celery'
-CELERY_TIMEZONE = 'UTC'
 
 ################################ Block Structures ###################################
 
@@ -2836,6 +2842,8 @@ GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 POLICY_CHANGE_GRADES_ROUTING_KEY = 'edx.lms.core.default'
 
 RECALCULATE_GRADES_ROUTING_KEY = 'edx.lms.core.default'
+
+SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = 'edx.lms.core.default'
 
 GRADES_DOWNLOAD = {
     'STORAGE_CLASS': 'django.core.files.storage.FileSystemStorage',

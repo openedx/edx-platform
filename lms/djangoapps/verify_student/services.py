@@ -148,9 +148,11 @@ class IDVerificationService(object):
             'created_at__gte': earliest_allowed_verification_date()
         }
 
-        return (SoftwareSecurePhotoVerification.objects.filter(**filter_kwargs).exists() or
-                SSOVerification.objects.filter(**filter_kwargs).exists() or
-                ManualVerification.objects.filter(**filter_kwargs).exists())
+        return (
+            SoftwareSecurePhotoVerification.objects.filter(**filter_kwargs).exists() or
+            SSOVerification.objects.filter(**filter_kwargs).exists() or
+            ManualVerification.objects.filter(**filter_kwargs).exists()
+        )
 
     @classmethod
     def user_status(cls, user):

@@ -3,7 +3,6 @@
 Tests of verify_student views.
 """
 
-
 from datetime import timedelta
 from uuid import uuid4
 
@@ -45,6 +44,7 @@ from shoppingcart.models import CertificateItem, Order
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
+from verify_student.tests import TestVerificationBase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -53,6 +53,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 def mock_render_to_response(*args, **kwargs):
     return render_to_response(*args, **kwargs)
+
 
 render_mock = Mock(side_effect=mock_render_to_response)
 
@@ -64,6 +65,7 @@ class StartView(TestCase):
     This view is for the first time student is
     attempting a Photo Verification.
     """
+
     def start_url(self, course_id=""):
         return "/verify_student/{0}".format(six.moves.urllib.parse.quote(course_id))
 
@@ -80,7 +82,7 @@ class StartView(TestCase):
 
 
 @ddt.ddt
-class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
+class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, TestVerificationBase):
     """
     Tests for the payment and verification flow views.
     """
@@ -897,7 +899,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
         if status in ["submitted", "approved", "expired", "denied", "error"]:
             attempt.mark_ready()
-            attempt.submit()
+            attempt = self.submit_attempt(attempt)
 
         if status in ["approved", "expired"]:
             attempt.approve()
@@ -1112,6 +1114,7 @@ class CheckoutTestMixin(object):
     compatibility, the effect of using this endpoint is to choose a specific product
     (i.e. course mode) and trigger immediate checkout.
     """
+
     def setUp(self):
         """ Create a user and course. """
         super(CheckoutTestMixin, self).setUp()
@@ -1123,12 +1126,12 @@ class CheckoutTestMixin(object):
         self.client.login(username="test", password="test")
 
     def _assert_checked_out(
-            self,
-            post_params,
-            patched_create_order,
-            expected_course_key,
-            expected_mode_slug,
-            expected_status_code=200
+        self,
+        post_params,
+        patched_create_order,
+        expected_course_key,
+        expected_mode_slug,
+        expected_status_code=200
     ):
         """
         DRY helper.
@@ -1413,7 +1416,7 @@ class TestCreateOrderView(ModuleStoreTestCase):
 
 @ddt.ddt
 @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-class TestSubmitPhotosForVerification(MockS3BotoMixin, TestCase):
+class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
     """
     Tests for submitting photos for verification.
     """
@@ -1571,6 +1574,7 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestCase):
         # Now the request should succeed
         self._submit_photos(face_image=self.IMAGE_DATA)
 
+    #
     def _submit_photos(self, face_image=None, photo_id_image=None, full_name=None, expected_status_code=200):
         """Submit photos for verification.
 
@@ -1596,7 +1600,8 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestCase):
         if full_name is not None:
             params['full_name'] = full_name
 
-        response = self.client.post(url, params)
+        with self.immediate_on_commit():
+            response = self.client.post(url, params)
         self.assertEqual(response.status_code, expected_status_code)
 
         return response
@@ -1637,10 +1642,11 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestCase):
         return json.loads(last_request.body)
 
 
-class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
+class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerificationBase):
     """
     Tests for the results_callback view.
     """
+
     def setUp(self):
         super(TestPhotoVerificationResultsCallback, self).setUp()
 
@@ -1750,9 +1756,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         expiry_date = now() + timedelta(
             days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
         )
-        verification = SoftwareSecurePhotoVerification.objects.create(user=self.user)
-        verification.mark_ready()
-        verification.submit()
+        verification = self.create_and_submit_attempt_for_user(self.user)
         verification.approve()
         verification.expiry_date = now()
         verification.expiry_email_date = now()
@@ -1896,11 +1900,11 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertContains(response, 'Result Unknown not understood', status_code=400)
 
 
-class TestReverifyView(TestCase):
+class TestReverifyView(TestVerificationBase):
     """
-    Tests for the reverification view.
+    Tests for the re-verification view.
 
-    Reverification occurs when a verification attempt is denied or expired,
+    Re-verification occurs when a verification attempt is denied or expired,
     and the student is given the option to resubmit.
     """
 
@@ -1915,30 +1919,26 @@ class TestReverifyView(TestCase):
 
     def test_reverify_view_can_do_initial_verification(self):
         """
-        Test that a User can use reverify link for initial verification.
+        Test that a User can use re-verify link for initial verification.
         """
         self._assert_can_reverify()
 
     def test_reverify_view_can_reverify_denied(self):
-        # User has a denied attempt, so can reverify
-        attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
-        attempt.mark_ready()
-        attempt.submit()
+        # User has a denied attempt, so can re-verify
+        attempt = self.create_and_submit_attempt_for_user(self.user)
         attempt.deny("error")
         self._assert_can_reverify()
 
     def test_reverify_view_can_reverify_expired(self):
         # User has a verification attempt, but it's expired
-        attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
-        attempt.mark_ready()
-        attempt.submit()
+        attempt = self.create_and_submit_attempt_for_user(self.user)
         attempt.approve()
 
         days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
         attempt.created_at = now() - timedelta(days=(days_good_for + 1))
         attempt.save()
 
-        # Allow the student to reverify
+        # Allow the student to re-verify
         self._assert_can_reverify()
 
     def test_reverify_view_can_reverify_pending(self):
@@ -1951,21 +1951,17 @@ class TestReverifyView(TestCase):
         """
 
         # User has submitted a verification attempt, but Software Secure has not yet responded
-        attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
-        attempt.mark_ready()
-        attempt.submit()
+        attempt = self.create_and_submit_attempt_for_user(self.user)
 
         # Can re-verify because an attempt has already been submitted.
         self._assert_can_reverify()
 
     def test_reverify_view_cannot_reverify_approved(self):
         # Submitted attempt has been approved
-        attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
-        attempt.mark_ready()
-        attempt.submit()
+        attempt = self.create_and_submit_attempt_for_user(self.user)
         attempt.approve()
 
-        # Cannot reverify because the user is already verified.
+        # Cannot re-verify because the user is already verified.
         self._assert_cannot_reverify()
 
     @override_settings(VERIFY_STUDENT={"DAYS_GOOD_FOR": 5, "EXPIRING_SOON_WINDOW": 10})
@@ -1976,10 +1972,7 @@ class TestReverifyView(TestCase):
         and learner can submit photos if verification is set to expire in
         EXPIRING_SOON_WINDOW(i.e here it is 10 days) or less days.
         """
-
-        attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
-        attempt.mark_ready()
-        attempt.submit()
+        attempt = self.create_and_submit_attempt_for_user(self.user)
         attempt.approve()
 
         # Can re-verify because verification is set to expired soon.
@@ -1987,21 +1980,21 @@ class TestReverifyView(TestCase):
 
     def _get_reverify_page(self):
         """
-        Retrieve the reverification page and return the response.
+        Retrieve the re-verification page and return the response.
         """
         url = reverse("verify_student_reverify")
         return self.client.get(url)
 
     def _assert_can_reverify(self):
         """
-        Check that the reverification flow is rendered.
+        Check that the re-verification flow is rendered.
         """
         response = self._get_reverify_page()
         self.assertContains(response, "reverify-container")
 
     def _assert_cannot_reverify(self):
         """
-        Check that the user is blocked from reverifying.
+        Check that the user is blocked from re-verifying.
         """
         response = self._get_reverify_page()
         self.assertContains(response, "reverify-blocked")
