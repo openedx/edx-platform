@@ -41,7 +41,6 @@ def import_course_on_site_creation_apply_async(organization):
     return import_course_on_site_creation.apply_async(
         kwargs={'organization_id': organization.id},
         retry=False,  # The task is not expected to be able to recover after a failure.
-        queue="edx.core.cms.high"
     )
 
 
