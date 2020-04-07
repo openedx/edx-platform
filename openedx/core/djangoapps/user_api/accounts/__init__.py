@@ -52,7 +52,8 @@ EMAIL_CONFLICT_MSG = _(
 )
 USERNAME_CONFLICT_MSG = _(
     u"It looks like {username} belongs to an existing account. "
-    u"Try again with a different username."
+    u"Please use a different public username. "
+    u"Your email address is still your unique identifier for your account."
 )
 
 # Translators: This message is shown to users who enter a username/email/password
