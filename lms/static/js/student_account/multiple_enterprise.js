@@ -46,9 +46,12 @@
                                 }).done(function() {
                                     view.redirect(next);
                                 });
+                            } else {
+                                view.redirect(selectionPageUrl);
                             }
+                        } else {
+                            view.redirect(selectionPageUrl);
                         }
-                        view.redirect(selectionPageUrl);
                     } else {
                         view.redirect(next);
                     }
