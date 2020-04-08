@@ -2069,8 +2069,8 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
         ('student_masters', 400, 'is already a member'),
         ('student_masters_not_on_team', 200, None),
         ('student_unenrolled', 404, None),
-        ('student_enrolled', 403, None),
-        ('student_enrolled_both_courses_other_team', 403, None),
+        ('student_enrolled', 404, None),
+        ('student_enrolled_both_courses_other_team', 404, None),
         ('staff', 200, None),
     )
     @ddt.unpack
@@ -2079,10 +2079,6 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
         As different users, attempt to join masters_only team.
         Only staff or users within the organization_protected bubble should be able to join the team.
         Anyone else should not be able to join or even tell that the team exists.
-
-        TODO: student_enrolled and student_enrolled_both_courses_other_team are correctly not being allowed
-        to join the team, but they are getting a 403 rather than a 404, telling them that a team with the
-        given name does exist. They should recieve 404s.
         """
         response = self.post_create_membership(
             expected_status,
@@ -2096,9 +2092,9 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
     @ddt.data(
         ('student_on_team_1_private_set_1', 403),
         ('student_unenrolled', 404),
-        ('student_enrolled', 403),
-        ('student_on_team_2_private_set_1', 403),
-        ('student_masters', 403),
+        ('student_enrolled', 404),
+        ('student_on_team_2_private_set_1', 404),
+        ('student_masters', 404),
         ('staff', 200)
     )
     def test_student_join_private_managed_team(self, user, expected_status):
@@ -2108,10 +2104,6 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
         Anyone else should not be able to join, and only student_on_team_1_private_set_1 should
         be able to tell that the team exists at all.
         (A nonexistant team results in a 404)
-
-        TODO: student_on_team_1_private_set_1 is okay to get a 403,
-        but everyone else getting a 403 should instead be getting a 404. They should not be able
-        to tell that the team exists at all.
         """
         self.post_create_membership(
             expected_status,
