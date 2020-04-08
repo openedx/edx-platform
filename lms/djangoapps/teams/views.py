@@ -53,6 +53,7 @@ from .api import (
     can_user_create_team_in_topic,
     has_course_staff_privileges,
     has_specific_team_access,
+    has_specific_teamset_access,
     has_team_api_access,
     user_organization_protection_status
 )
@@ -363,7 +364,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         **Response Values for POST**
 
             Any logged in user who has verified their email address can create
-            a team. The format mirrors that of a GET for an individual team,
+            a team in an open teamset. The format mirrors that of a GET for an individual team,
             but does not include the id, date_created, or membership fields.
             id is automatically computed based on name.
 
@@ -373,10 +374,13 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             global staff, or does not have discussion privileges a 403 error
             is returned.
 
-            If the course_id is not valid or extra fields are included in the
-            request, a 400 error is returned.
+            If the course_id is not valid, or the topic_id is missing, or extra fields
+            are included in the request, a 400 error is returned.
 
             If the specified course does not exist, a 404 error is returned.
+            If the specified teamset does not exist, a 404 error is returned.
+            If the specified teamset does exist, but the requesting user shouldn't be
+            able to see it, a 404 is returned.
     """
 
     # BearerAuthentication must come first to return a 401 for unauthenticated users
@@ -547,12 +551,13 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         """POST /api/team/v0/teams/"""
         field_errors = {}
         course_key = None
-
         course_id = request.data.get('course_id')
+        #Handle field errors and check that the course exists
         try:
             course_key = CourseKey.from_string(course_id)
             # Ensure the course exists
-            if not modulestore().has_course(course_key):
+            course_module = modulestore().get_course(course_key)
+            if not course_module:
                 return Response(status=status.HTTP_404_NOT_FOUND)
         except InvalidKeyError:
             field_errors['course_id'] = build_api_error(
@@ -563,26 +568,45 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 'field_errors': field_errors,
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Course and global staff, as well as discussion "privileged" users, will not automatically
-        # be added to a team when they create it. They are allowed to create multiple teams.
-        team_administrator = (has_access(request.user, 'staff', course_key)
-                              or has_discussion_privileges(request.user, course_key))
-        if not team_administrator and CourseTeamMembership.user_in_team_for_course(request.user, course_key):
-            error_message = build_api_error(
-                ugettext_noop('You are already in a team in this course.'),
+        topic_id = request.data.get('topic_id')
+        if not topic_id:
+            field_errors['topic_id'] = build_api_error(
+                ugettext_noop(u'topic_id is required'),
                 course_id=course_id
             )
-            return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'field_errors': field_errors,
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         if course_key and not has_team_api_access(request.user, course_key):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        topic_id = request.data.get('topic_id')
+        if topic_id not in course_module.teams_configuration.teamsets_by_id or (
+            not has_specific_teamset_access(request.user, course_module, topic_id)
+        ):
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        # The user has to have access to this teamset at this point, so we can return 403
+        # and not leak the existance of a private teamset
         if not can_user_create_team_in_topic(request.user, course_key, topic_id):
             return Response(
                 build_api_error(ugettext_noop("You can't create a team in an instructor managed topic.")),
                 status=status.HTTP_403_FORBIDDEN
             )
+
+        # Course and global staff, as well as discussion "privileged" users, will not automatically
+        # be added to a team when they create it. They are allowed to create multiple teams.
+        is_team_administrator = (has_access(request.user, 'staff', course_key)
+                                 or has_discussion_privileges(request.user, course_key))
+        if not is_team_administrator and (
+            CourseTeamMembership.user_in_team_for_course(request.user, course_key, topic_id=topic_id)
+        ):
+            error_message = build_api_error(
+                ugettext_noop('You are already in a team in this teamset.'),
+                course_id=course_id,
+                teamset_id=topic_id,
+            )
+            return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
 
         data = request.data.copy()
         data['course_id'] = six.text_type(course_key)
@@ -603,7 +627,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             emit_team_event('edx.team.created', course_key, {
                 'team_id': team.team_id
             })
-            if not team_administrator:
+            if not is_team_administrator:
                 # Add the creating user to the team.
                 team.add_user(request.user)
                 emit_team_event(
