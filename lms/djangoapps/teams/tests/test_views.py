@@ -2226,17 +2226,14 @@ class TestDetailMembershipAPI(TeamAPITestCase):
         ('student_masters', 200),
         ('student_masters_not_on_team', 200),
         ('student_unenrolled', 404),
-        ('student_enrolled', 403),
-        ('student_enrolled_both_courses_other_team', 403),
+        ('student_enrolled', 404),
+        ('student_enrolled_both_courses_other_team', 404),
         ('staff', 200),
     )
     @ddt.unpack
     def test_organization_protected(self, user, expected_status):
         """
         Users should not be able to see memberships for users in a different bubble than them
-
-        TODO: No information is leaked, but the 403 gives away that the membership does exist.
-        All 403s should be 404s.
         """
         self.get_membership_detail(
             self.masters_only_team.team_id,
@@ -2249,16 +2246,14 @@ class TestDetailMembershipAPI(TeamAPITestCase):
     @ddt.data(
         ('student_on_team_1_private_set_1', 200),
         ('student_unenrolled', 404),
-        ('student_enrolled', 403),
-        ('student_on_team_2_private_set_1', 403),
+        ('student_enrolled', 404),
+        ('student_on_team_2_private_set_1', 404),
         ('staff', 200)
     )
     def test_private_managed_team(self, user, expected_status):
         """
         Users should not be able to see memberships for users in private_managed
         teams that they are not a member of
-
-        TODO: same as `test_organization_protected`
         """
         self.get_membership_detail(
             self.team_1_in_private_teamset_1.team_id,
@@ -2271,13 +2266,11 @@ class TestDetailMembershipAPI(TeamAPITestCase):
         """
         A user who is not on a private team requests membership info about that team.
         They are added to the team and then try again.
-
-        TODO: The first call should be a 404, the user should not be able to tell that the membership exists.
         """
         self.get_membership_detail(
             self.team_1_in_private_teamset_1.team_id,
             self.users['student_on_team_1_private_set_1'].username,
-            403,
+            404,
             user='student_masters'
         )
         self.team_1_in_private_teamset_1.add_user(self.users['student_masters'])
@@ -2357,7 +2350,7 @@ class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
     @ddt.unpack
     @ddt.data(
         ('student_enrolled', 'student_masters', 404),
-        ('student_enrolled', 'student_enrolled', 403),
+        ('student_enrolled', 'student_enrolled', 404),
         ('student_masters_not_on_team', 'student_masters', 404),
         ('student_masters_not_on_team', 'student_masters_not_on_team', 404),
         ('student_masters', 'student_masters', 204),
@@ -2385,10 +2378,10 @@ class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
     @ddt.unpack
     @ddt.data(
         ('student_enrolled', 'student_on_team_1_private_set_1', 404),
-        ('student_enrolled', 'student_enrolled', 403),
+        ('student_enrolled', 'student_enrolled', 404),
         ('student_on_team_1_private_set_1', 'student_on_team_1_private_set_1', 403),
         ('student_on_team_2_private_set_1', 'student_on_team_1_private_set_1', 404),
-        ('student_on_team_2_private_set_1', 'student_on_team_2_private_set_1', 403),
+        ('student_on_team_2_private_set_1', 'student_on_team_2_private_set_1', 404),
         ('staff', 'student_on_team_1_private_set_1', 204),
         ('staff', 'staff', 404),
     )
