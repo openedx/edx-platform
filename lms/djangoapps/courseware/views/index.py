@@ -7,7 +7,6 @@ View for Courseware Index
 
 import logging
 
-from datetime import timedelta
 import six
 import six.moves.urllib as urllib  # pylint: disable=import-error
 import six.moves.urllib.error  # pylint: disable=import-error
@@ -20,7 +19,6 @@ from django.db import transaction
 from django.http import Http404
 from django.template.context_processors import csrf
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
@@ -32,7 +30,6 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from web_fragments.fragment import Fragment
 
-from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response, render_to_string
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
@@ -52,7 +49,6 @@ from openedx.features.course_experience import (
     RELATIVE_DATES_FLAG,
 )
 from openedx.features.course_experience.urls import COURSE_HOME_VIEW_NAME
-from openedx.features.course_experience.utils import get_course_outline_block_tree
 from openedx.features.course_experience.utils import reset_deadlines_banner_should_display
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
