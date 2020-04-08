@@ -151,7 +151,7 @@ def invalid_args(func, argdict):
     Given a function and a dictionary of arguments, returns a set of arguments
     from argdict that aren't accepted by func
     """
-    args, _, keywords, _ = inspect.getargspec(func)
+    args, _, keywords, _, _, _, _ = inspect.getfullargspec(func)
     if keywords:
         return set()  # All accepted
     return set(argdict) - set(args)
