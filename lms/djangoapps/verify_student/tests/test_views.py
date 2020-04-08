@@ -1779,6 +1779,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertIsNone(old_verification.expiry_email_date)
         self.assertEqual(response.content.decode('utf-8'), 'OK!')
         self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].content_subtype, 'html')
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
@@ -1813,6 +1814,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEqual(attempt.expiry_date.date(), expiry_date.date())
         self.assertEqual(response.content.decode('utf-8'), 'OK!')
         self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].content_subtype, 'html')
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
@@ -1844,6 +1846,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEqual(attempt.error_msg, u'[{"photoIdReasons": ["Not provided"]}]')
         self.assertEqual(response.content.decode('utf-8'), 'OK!')
         self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].content_subtype, 'html')
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
