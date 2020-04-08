@@ -30,10 +30,10 @@ class Location(models.Model):
 class VisualAttachment(models.Model):
 
     video_link = models.URLField(blank=True, null=True)
-    image = models.FileField(
+    image = models.ImageField(
         upload_to=partial(upload_to_path, folder='images'), blank=True, null=True,
-        validators=[FileExtensionValidator(['jpg', 'png', 'pdf'])],
-        help_text='Accepted extensions: .jpg, .png, .pdf'
+        validators=[FileExtensionValidator(['jpg', 'png'])],
+        help_text='Accepted extensions: .jpg, .png'
     )
     file = models.FileField(
         upload_to=partial(upload_to_path, folder='files'), blank=True, null=True,
