@@ -2,9 +2,10 @@
 :class:`~django_require.staticstorage.OptimizedCachedRequireJsStorage`
 """
 
-from openedx.core.storage import PipelineForgivingMixin
 from pipeline.storage import PipelineCachedStorage
 from require.storage import OptimizedFilesMixin
+
+from openedx.core.storage import PipelineForgivingMixin
 
 
 class OptimizedCachedRequireJsStorage(OptimizedFilesMixin, PipelineForgivingMixin, PipelineCachedStorage):

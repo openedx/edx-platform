@@ -6,9 +6,6 @@ Utility methods related to course
 import logging
 
 import six
-import six.moves.urllib.error
-import six.moves.urllib.parse
-import six.moves.urllib.request
 from django.conf import settings
 from django.utils.timezone import now
 

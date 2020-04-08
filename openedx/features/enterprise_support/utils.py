@@ -7,18 +7,18 @@ import hashlib
 import json
 
 import six
-
 from crum import get_current_request
-import third_party_auth
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import TieredCache
 from enterprise.models import EnterpriseCustomerUser
+from social_django.models import UserSocialAuth
+
+import third_party_auth
 from lms.djangoapps.branding.api import get_privacy_url
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings
 from openedx.core.djangolib.markup import HTML, Text
-from social_django.models import UserSocialAuth
 
 
 def get_cache_key(**kwargs):

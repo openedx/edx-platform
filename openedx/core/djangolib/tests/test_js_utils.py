@@ -4,15 +4,14 @@
 Tests for js_utils.py
 """
 
-import re
-import six.moves.html_parser  # pylint: disable=import-error
 import json
+import re
 from unittest import TestCase
 
+import six
 from mako.template import Template
 
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
-import six  # pylint: disable=ungrouped-imports
 
 
 class TestJSUtils(TestCase):

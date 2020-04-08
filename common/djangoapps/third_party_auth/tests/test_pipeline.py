@@ -2,9 +2,10 @@
 
 
 import json
+import unittest
+
 import ddt
 import mock
-import unittest
 
 from third_party_auth import pipeline
 from third_party_auth.tests import testutil

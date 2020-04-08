@@ -4,14 +4,14 @@ Support for inheritance of fields down an XBlock hierarchy.
 
 
 from django.utils import timezone
-
-from xmodule.partitions.partitions import UserPartition
 from xblock.core import XBlockMixin
-from xblock.fields import Scope, Boolean, String, Float, Dict, Integer, List
+from xblock.fields import Boolean, Dict, Float, Integer, List, Scope, String
 from xblock.runtime import KeyValueStore, KvsFieldData
-from xmodule.fields import Date, Timedelta
-from ..course_metadata_utils import DEFAULT_START_DATE
 
+from xmodule.fields import Date, Timedelta
+from xmodule.partitions.partitions import UserPartition
+
+from ..course_metadata_utils import DEFAULT_START_DATE
 
 # Make '_' a no-op so we can scrape strings
 # Using lambda instead of `django.utils.translation.ugettext_noop` because Django cannot be imported in this file

@@ -24,7 +24,6 @@ from importlib import import_module
 
 import six
 from config_models.models import ConfigurationModel
-from course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -34,7 +33,7 @@ from django.core.cache import cache
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.core.validators import FileExtensionValidator, RegexValidator
 from django.db import IntegrityError, models
-from django.db.models import Count, Q, Index
+from django.db.models import Count, Index, Q
 from django.db.models.signals import post_save, pre_save
 from django.db.utils import ProgrammingError
 from django.dispatch import receiver
@@ -55,14 +54,10 @@ from six import text_type
 from six.moves import range
 from six.moves.urllib.parse import urlencode
 from slumber.exceptions import HttpClientError, HttpServerError
-from student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
-from track import contexts, segment
 from user_util import user_util
-from util.milestones_helpers import is_entrance_exams_enabled
-from util.model_utils import emit_field_changed_events, get_changed_fields_dict
-from util.query import use_read_replica_if_available
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
+from course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
@@ -79,6 +74,11 @@ from openedx.core.djangoapps.enrollments.api import (
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
+from student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
+from track import contexts, segment
+from util.milestones_helpers import is_entrance_exams_enabled
+from util.model_utils import emit_field_changed_events, get_changed_fields_dict
+from util.query import use_read_replica_if_available
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")

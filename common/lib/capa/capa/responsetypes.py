@@ -19,7 +19,6 @@ import inspect
 import json
 import logging
 import numbers
-import random2 as random
 import re
 import sys
 import textwrap
@@ -31,6 +30,7 @@ from sys import float_info
 
 import html5lib
 import numpy
+import random2 as random
 import requests
 import six
 # specific library imports

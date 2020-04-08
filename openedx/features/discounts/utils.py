@@ -4,24 +4,23 @@ Utility functions for working with discounts and discounted pricing.
 
 from datetime import datetime
 
+import pytz
 import six
 from django.utils.translation import get_language
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import RequestCache
-import pytz
+from web_fragments.fragment import Fragment
 
-from course_modes.models import get_course_prices, format_course_price
+from course_modes.models import format_course_price, get_course_prices
+from experiments.models import ExperimentData
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from experiments.models import ExperimentData
-
 from openedx.core.djangolib.markup import HTML, Text
-from web_fragments.fragment import Fragment
 from openedx.features.discounts.applicability import (
+    REV1008_EXPERIMENT_ID,
     can_receive_discount,
-    get_discount_expiration_date,
     discount_percentage,
-    REV1008_EXPERIMENT_ID
+    get_discount_expiration_date
 )
 
 

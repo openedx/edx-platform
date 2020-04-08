@@ -4,17 +4,13 @@
 import ddt
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
-from django.test import TestCase, RequestFactory
+from django.test import RequestFactory, TestCase
+from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import GenericAPIView
 
-from student.roles import CourseStaffRole, CourseInstructorRole
-from openedx.core.lib.api.permissions import (
-    IsStaffOrOwner,
-    IsCourseStaffInstructor,
-    IsMasterCourseStaffInstructor,
-)
+from openedx.core.lib.api.permissions import IsCourseStaffInstructor, IsMasterCourseStaffInstructor, IsStaffOrOwner
+from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
-from opaque_keys.edx.keys import CourseKey
 
 
 class TestObject(object):

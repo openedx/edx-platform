@@ -9,12 +9,10 @@ from functools import wraps
 from logging import getLogger
 
 import six
-import six.moves.urllib.error  # pylint: disable=import-error
-import six.moves.urllib.parse  # pylint: disable=import-error
-import six.moves.urllib.request  # pylint: disable=import-error
 from lazy import lazy
 from six.moves.BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer  # pylint: disable=import-error
 from six.moves.socketserver import ThreadingMixIn  # pylint: disable=import-error
+
 LOGGER = getLogger(__name__)
 
 

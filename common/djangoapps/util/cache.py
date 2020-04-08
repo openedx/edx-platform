@@ -10,9 +10,6 @@ not migrating so as not to inconvenience users by logging them all out.
 from functools import wraps
 
 import six
-import six.moves.urllib.error
-import six.moves.urllib.parse
-import six.moves.urllib.request
 from django.conf import settings
 from django.core import cache
 # If we can't find a 'general' CACHE defined in settings.py, we simply fall back

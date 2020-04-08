@@ -61,25 +61,24 @@ import logging
 import textwrap
 from xml.sax.saxutils import escape
 
-from pkg_resources import resource_string
-
 import bleach
 import mock
 import oauthlib.oauth1
 import six
-import six.moves.urllib.parse
 from lxml import etree
 from oauthlib.oauth1.rfc5849 import signature
+from pkg_resources import resource_string
 from pytz import UTC
 from six import text_type
 from webob import Response
 from xblock.core import List, Scope, String, XBlock
 from xblock.fields import Boolean, Float
+
+from openedx.core.djangolib.markup import HTML, Text
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.lti_2_util import LTI20ModuleMixin, LTIError
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.x_module import XModule, module_attr
-from openedx.core.djangolib.markup import HTML, Text
 
 log = logging.getLogger(__name__)
 

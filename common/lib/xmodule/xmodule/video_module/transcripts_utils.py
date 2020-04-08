@@ -5,27 +5,27 @@ Utility functions for transcripts.
 
 
 import copy
-import simplejson as json
 import logging
 import os
 from functools import wraps
 
 import requests
+import simplejson as json
 import six
 from django.conf import settings
 from lxml import etree
+from opaque_keys.edx.locator import BundleDefinitionLocator
 from pysrt import SubRipFile, SubRipItem, SubRipTime
 from pysrt.srtexc import Error
 from six import text_type
 from six.moves import range, zip
 from six.moves.html_parser import HTMLParser  # pylint: disable=import-error
 
-from opaque_keys.edx.locator import BundleDefinitionLocator
+from openedx.core.djangolib import blockstore_cache
+from openedx.core.lib import blockstore_api
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
-from openedx.core.djangolib import blockstore_cache
-from openedx.core.lib import blockstore_api
 
 from .bumper_utils import get_bumper_settings
 

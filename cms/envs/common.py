@@ -37,8 +37,8 @@ When refering to XBlocks, we use the entry-point name. For example,
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=unused-import
 
+# pylint: disable=unused-import, useless-suppression, wrong-import-order, wrong-import-position
 
 import imp
 import os
@@ -111,7 +111,7 @@ from lms.envs.common import (
     _make_locale_paths,
 )
 from path import Path as path
-from django.urls import reverse_lazy  # pylint: disable=wrong-import-order
+from django.urls import reverse_lazy
 
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.authoring_mixin import AuthoringMixin
@@ -123,6 +123,8 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
 from openedx.core.lib.license import LicenseMixin
 from openedx.core.lib.derived import derived, derived_collection_entry
 from openedx.core.release import doc_version
+
+# pylint: enable=useless-suppression
 
 ################ Enable credit eligibility feature ####################
 ENABLE_CREDIT_ELIGIBILITY = True

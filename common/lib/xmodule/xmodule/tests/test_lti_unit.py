@@ -7,9 +7,6 @@ import textwrap
 from copy import copy
 
 import six
-import six.moves.urllib.error
-import six.moves.urllib.parse
-import six.moves.urllib.request
 from lxml import etree
 from mock import Mock, PropertyMock, patch
 from pytz import UTC

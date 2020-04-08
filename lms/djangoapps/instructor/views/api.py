@@ -14,7 +14,6 @@ import logging
 import random
 import re
 import string
-from six import StringIO
 import time
 
 import six
@@ -41,7 +40,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from six import text_type
+from six import StringIO, text_type
 from six.moves import map, range
 from submissions import api as sub_api  # installed from the edx-submissions repository
 
@@ -50,9 +49,6 @@ import instructor_analytics.csvs
 import instructor_analytics.distributions
 from bulk_email.api import is_bulk_email_feature_enabled
 from bulk_email.models import CourseEmail
-from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.courseware.courses import get_course_by_id, get_course_with_access
-from lms.djangoapps.courseware.models import StudentModule
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
@@ -61,6 +57,9 @@ from lms.djangoapps.certificates.models import (
     CertificateWhitelist,
     GeneratedCertificate
 )
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_by_id, get_course_with_access
+from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.discussion.django_comment_client.utils import (
     get_course_discussion_settings,
     get_group_id_for_user,
@@ -136,6 +135,18 @@ from util.json_request import JsonResponse, JsonResponseBadRequest
 from util.views import require_global_staff
 from xmodule.modulestore.django import modulestore
 
+from ..permissions import (
+    ALLOW_STUDENT_TO_BYPASS_ENTRANCE_EXAM,
+    ASSIGN_TO_COHORTS,
+    EDIT_COURSE_ACCESS,
+    EDIT_FORUM_ROLES,
+    EDIT_INVOICE_VALIDATION,
+    ENABLE_CERTIFICATE_GENERATION,
+    GENERATE_BULK_CERTIFICATE_EXCEPTIONS,
+    GENERATE_CERTIFICATE_EXCEPTIONS,
+    GIVE_STUDENT_EXTENSION,
+    VIEW_ISSUED_CERTIFICATES
+)
 from .tools import (
     dump_module_extensions,
     dump_student_extensions,
@@ -147,20 +158,6 @@ from .tools import (
     set_due_date_extension,
     strip_if_string
 )
-
-from ..permissions import (
-    ALLOW_STUDENT_TO_BYPASS_ENTRANCE_EXAM,
-    ASSIGN_TO_COHORTS,
-    EDIT_COURSE_ACCESS,
-    EDIT_FORUM_ROLES,
-    EDIT_INVOICE_VALIDATION,
-    ENABLE_CERTIFICATE_GENERATION,
-    GENERATE_CERTIFICATE_EXCEPTIONS,
-    GENERATE_BULK_CERTIFICATE_EXCEPTIONS,
-    GIVE_STUDENT_EXTENSION,
-    VIEW_ISSUED_CERTIFICATES,
-)
-
 
 log = logging.getLogger(__name__)
 

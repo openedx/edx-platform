@@ -7,7 +7,6 @@ instance when using a mongo modulestore
 import logging
 import os
 import re
-from six import StringIO
 import subprocess
 
 import mongoengine
@@ -17,6 +16,7 @@ from django.core.management.base import CommandError
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from opaque_keys.edx.locator import CourseLocator
+from six import StringIO
 
 from dashboard.models import CourseImportLog
 from xmodule.util.sandboxing import DEFAULT_PYTHON_LIB_FILENAME

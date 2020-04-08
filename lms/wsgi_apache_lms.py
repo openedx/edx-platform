@@ -5,7 +5,6 @@ This module contains the WSGI application used for Apache deployment.
 It exposes a module-level variable named ``application``.
 """
 
-
 from openedx.core.lib.logsettings import log_python_warnings
 log_python_warnings()
 

@@ -9,10 +9,6 @@ import json
 import logging
 
 import six
-import six.moves.urllib.error  # pylint: disable=import-error
-import six.moves.urllib.parse  # pylint: disable=import-error
-import six.moves.urllib.request  # pylint: disable=import-error
-from course_modes.models import CourseMode
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -29,18 +25,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic.base import View
 from edx_rest_api_client.exceptions import SlumberBaseException
-from edxmako.shortcuts import render_to_response, render_to_string
 from ipware.ip import get_ip
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from shoppingcart.models import CertificateItem, Order
-from shoppingcart.processors import get_purchase_endpoint, get_signed_purchase_params
-from student.models import CourseEnrollment
-from track import segment
-from util.db import outer_atomic
-from util.json_request import JsonResponse
-from xmodule.modulestore.django import modulestore
-
+from course_modes.models import CourseMode
+from edxmako.shortcuts import render_to_response, render_to_string
 from lms.djangoapps.commerce.utils import EcommerceService, is_account_activation_requirement_disabled
 from lms.djangoapps.verify_student.image import InvalidImageData, decode_image_data
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
@@ -55,6 +44,13 @@ from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
 from openedx.core.djangoapps.user_api.accounts.api import update_account_settings
 from openedx.core.djangoapps.user_api.errors import AccountValidationError, UserNotFound
 from openedx.core.lib.log_utils import audit_log
+from shoppingcart.models import CertificateItem, Order
+from shoppingcart.processors import get_purchase_endpoint, get_signed_purchase_params
+from student.models import CourseEnrollment
+from track import segment
+from util.db import outer_atomic
+from util.json_request import JsonResponse
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 

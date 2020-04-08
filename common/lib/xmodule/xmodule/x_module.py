@@ -7,8 +7,6 @@ import time
 from collections import namedtuple
 from functools import partial
 
-from pkg_resources import resource_exists, resource_isdir, resource_listdir, resource_string
-
 import six
 import yaml
 from contracts import contract, new_contract
@@ -17,7 +15,7 @@ from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.asides import AsideDefinitionKeyV2, AsideUsageKeyV2
 from opaque_keys.edx.keys import UsageKey
-from openedx.core.djangolib.markup import HTML
+from pkg_resources import resource_exists, resource_isdir, resource_listdir, resource_string
 from six import text_type
 from six.moves import map
 from web_fragments.fragment import Fragment
@@ -38,6 +36,8 @@ from xblock.fields import (
     UserScope
 )
 from xblock.runtime import IdGenerator, IdReader, Runtime
+
+from openedx.core.djangolib.markup import HTML
 from xmodule import block_metadata_utils
 from xmodule.errortracker import exc_info_to_str
 from xmodule.exceptions import UndefinedContext

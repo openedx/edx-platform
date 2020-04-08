@@ -12,29 +12,20 @@ from datetime import datetime, timedelta
 import ddt
 import six
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
-from course_modes.models import CourseMode
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.timezone import now
-from entitlements.tests.factories import CourseEntitlementFactory
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pyquery import PyQuery as pq
 from six.moves import range
-from student.helpers import DISABLE_UNENROLL_CERT_STATES
-from student.models import CourseEnrollment, UserProfile
-from student.signals import REFUND_ORDER
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.milestones_helpers import get_course_milestones, remove_prerequisite_course, set_prerequisite_courses
-from util.testing import UrlResetMixin
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
+from course_modes.models import CourseMode
+from entitlements.tests.factories import CourseEntitlementFactory
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -45,6 +36,15 @@ from openedx.core.djangoapps.site_configuration.tests.test_util import with_site
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
+from student.helpers import DISABLE_UNENROLL_CERT_STATES
+from student.models import CourseEnrollment, UserProfile
+from student.signals import REFUND_ORDER
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from util.milestones_helpers import get_course_milestones, remove_prerequisite_course, set_prerequisite_courses
+from util.testing import UrlResetMixin
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 PASSWORD = 'test'
 

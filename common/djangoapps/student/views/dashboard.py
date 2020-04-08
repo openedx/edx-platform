@@ -7,10 +7,6 @@ import datetime
 import logging
 from collections import defaultdict
 
-import track.views
-from bulk_email.api import is_bulk_email_feature_enabled
-from bulk_email.models import Optout  # pylint: disable=import-error
-from course_modes.models import CourseMode
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -19,12 +15,37 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from edx_django_utils import monitoring as monitoring_utils
-from edxmako.shortcuts import render_to_response, render_to_string
-from entitlements.models import CourseEntitlement
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
-from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
 from six import iteritems, text_type
+
+import track.views
+from bulk_email.api import is_bulk_email_feature_enabled
+from bulk_email.models import Optout
+from course_modes.models import CourseMode
+from edxmako.shortcuts import render_to_response, render_to_string
+from entitlements.models import CourseEntitlement
+from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.experiments.utils import get_dashboard_course_info
+from lms.djangoapps.verify_student.services import IDVerificationService
+from openedx.core.djangoapps.catalog.utils import (
+    get_programs,
+    get_pseudo_session_for_entitlement,
+    get_visible_sessions_for_entitlement
+)
+from openedx.core.djangoapps.credit.email_utils import get_credit_provider_attribute_values, make_providers_strings
+from openedx.core.djangoapps.plugins import constants as plugin_constants
+from openedx.core.djangoapps.plugins.plugin_contexts import get_plugins_view_context
+from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramProgressMeter
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled_for_user
+from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
+from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
+from openedx.core.djangolib.markup import HTML, Text
+from openedx.features.enterprise_support.api import get_dashboard_consent_notification
+from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
 from student.api import COURSE_DASHBOARD_PLUGIN_VIEW_NAME
 from student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
 from student.models import (
@@ -37,27 +58,6 @@ from student.models import (
 )
 from util.milestones_helpers import get_pre_requisite_courses_not_completed
 from xmodule.modulestore.django import modulestore
-
-from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
-from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.experiments.utils import get_dashboard_course_info
-from lms.djangoapps.verify_student.services import IDVerificationService
-from openedx.core.djangoapps.catalog.utils import (
-    get_programs,
-    get_pseudo_session_for_entitlement,
-    get_visible_sessions_for_entitlement
-)
-from openedx.core.djangoapps.credit.email_utils import get_credit_provider_attribute_values, make_providers_strings
-from openedx.core.djangoapps.plugins.plugin_contexts import get_plugins_view_context
-from openedx.core.djangoapps.plugins import constants as plugin_constants
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramProgressMeter
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled_for_user
-from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
-from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
-from openedx.core.djangolib.markup import HTML, Text
-from openedx.features.enterprise_support.api import get_dashboard_consent_notification
 
 log = logging.getLogger("edx.student")
 

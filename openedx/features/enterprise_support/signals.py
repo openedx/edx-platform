@@ -4,22 +4,19 @@ This module contains signals related to enterprise.
 
 
 import logging
-import six
 
+import six
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
-from email_marketing.tasks import update_user
-
 from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomer, EnterpriseCustomerUser
 from integrated_channels.integrated_channel.tasks import transmit_single_learner_data
+
+from email_marketing.tasks import update_user
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED
 from openedx.features.enterprise_support.api import enterprise_enabled
 from openedx.features.enterprise_support.tasks import clear_enterprise_customer_data_consent_share_cache
-from openedx.features.enterprise_support.utils import (
-    clear_data_consent_share_cache,
-    is_enterprise_learner,
-)
+from openedx.features.enterprise_support.utils import clear_data_consent_share_cache, is_enterprise_learner
 
 log = logging.getLogger(__name__)
 

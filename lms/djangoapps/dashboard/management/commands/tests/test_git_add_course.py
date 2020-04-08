@@ -6,17 +6,17 @@ Provide tests for git_add_course management command.
 import logging
 import os
 import shutil
-import six
-from six import StringIO
 import subprocess
 import unittest
 from uuid import uuid4
 
+import six
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
+from six import StringIO
 
 import dashboard.git_import as git_import
 from dashboard.git_import import (

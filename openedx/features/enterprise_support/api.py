@@ -4,8 +4,8 @@ APIs providing support for enterprise functionality.
 
 
 import logging
-from functools import wraps
 import traceback
+from functools import wraps
 
 from crum import get_current_request
 from django.conf import settings
@@ -19,10 +19,11 @@ from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import TieredCache
 from edx_rest_api_client.client import EdxRestApiClient
+from slumber.exceptions import HttpClientError, HttpNotFoundError, HttpServerError
+
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.features.enterprise_support.utils import get_cache_key, get_data_consent_share_cache_key
-from slumber.exceptions import HttpClientError, HttpNotFoundError, HttpServerError
 from third_party_auth.pipeline import get as get_partial_pipeline
 from third_party_auth.provider import Registry
 

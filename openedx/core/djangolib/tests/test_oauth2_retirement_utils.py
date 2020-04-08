@@ -6,18 +6,15 @@ Contains tests for OAuth2 model-retirement methods.
 import datetime
 
 from django.test import TestCase
+from oauth2_provider.models import AccessToken as DOTAccessToken
+from oauth2_provider.models import Application as DOTApplication
+from oauth2_provider.models import Grant as DOTGrant
+from oauth2_provider.models import RefreshToken as DOTRefreshToken
+
 from openedx.core.djangoapps.oauth_dispatch.tests import factories
 from student.tests.factories import UserFactory
-from oauth2_provider.models import (
-    AccessToken as DOTAccessToken,
-    Application as DOTApplication,
-    RefreshToken as DOTRefreshToken,
-    Grant as DOTGrant,
-)
 
-from ..oauth2_retirement_utils import (
-    retire_dot_oauth2_models,
-)
+from ..oauth2_retirement_utils import retire_dot_oauth2_models
 
 
 class RetireDOTModelsTest(TestCase):

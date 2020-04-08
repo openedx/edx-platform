@@ -3,34 +3,30 @@
 import logging
 
 from django import forms
-
-from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
-
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth.views import (
-    INTERNAL_RESET_SESSION_TOKEN, PasswordResetConfirmView)
+from django.contrib.auth.views import INTERNAL_RESET_SESSION_TOKEN, PasswordResetConfirmView
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import ValidationError
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
 from django.template.response import TemplateResponse
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import base36_to_int, int_to_base36, urlsafe_base64_encode
 from django.utils.translation import ugettext_lazy as _
-from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_POST
-
 from edx_ace import ace
 from edx_ace.recipient import Recipient
-from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from rest_framework.views import APIView
 
+from edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.oauth_dispatch.api import destroy_oauth_tokens
@@ -38,16 +34,14 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming.helpers import get_current_request, get_current_site
 from openedx.core.djangoapps.user_api import accounts, errors, helpers
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
+from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangoapps.user_api.helpers import FormDescription
 from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
-from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangoapps.user_authn.message_types import PasswordReset
 from openedx.core.djangolib.markup import HTML
-
-from student.models import AccountRecovery
 from student.forms import send_account_recovery_email_for_user
-
+from student.models import AccountRecovery
 from util.json_request import JsonResponse
 from util.password_policy_validators import normalize_password, validate_password
 from util.request_rate_limiter import BadRequestRateLimiter, PasswordResetEmailRateLimiter

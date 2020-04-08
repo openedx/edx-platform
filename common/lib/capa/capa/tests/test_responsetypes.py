@@ -7,21 +7,20 @@ Tests of responsetypes
 import io
 import json
 import os
-import random2 as random
 import textwrap
 import unittest
 import zipfile
-from six import StringIO
 from datetime import datetime
 
+import calc
 import mock
 import pyparsing
+import random2 as random
 import requests
 import six
 from pytz import UTC
 from six import text_type
 
-import calc
 from capa.correctmap import CorrectMap
 from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
 from capa.tests.helpers import load_fixture, new_loncapa_problem, test_capa_system

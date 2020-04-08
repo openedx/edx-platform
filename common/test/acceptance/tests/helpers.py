@@ -17,7 +17,6 @@ from unittest import SkipTest, TestCase
 
 import requests
 import six
-import six.moves.urllib.parse  # pylint: disable=import-error
 from bok_choy.javascript import js_defined
 from bok_choy.page_object import XSS_INJECTION
 from bok_choy.promise import EmptyPromise, Promise

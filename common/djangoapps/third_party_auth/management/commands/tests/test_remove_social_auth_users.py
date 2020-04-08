@@ -6,13 +6,13 @@ Tests for `remove_social_auth_users` management command
 import sys
 import unittest
 from contextlib import contextmanager
-from six import StringIO
 from uuid import uuid4
 
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase, override_settings
+from six import StringIO
 from social_django.models import UserSocialAuth
 
 from student.models import User
