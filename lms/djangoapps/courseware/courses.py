@@ -27,9 +27,10 @@ import branding
 from course_modes.models import CourseMode
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access_response import (
+    AuthenticationRequiredAccessError,
+    EnrollmentRequiredAccessError,
     MilestoneAccessError,
     StartDateError,
-    EnrollmentRequiredAccessError,
 )
 from lms.djangoapps.courseware.date_summary import (
     CertificateAvailableDate,
