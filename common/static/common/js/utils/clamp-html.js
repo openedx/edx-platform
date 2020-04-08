@@ -12,6 +12,10 @@
 function clampHtmlByWords(root, wordsLeft) {
     'use strict';
 
+    if (root.nodeName === 'SCRIPT' || root.nodeName === 'LINK') {
+        return wordsLeft; // early exit and ignore
+    }
+
     var remaining = wordsLeft;
     var nodes = Array.from(root.childNodes ? root.childNodes : []);
     var words, chopped;
