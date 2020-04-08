@@ -2,7 +2,7 @@
   <div class="idphoto view">
     <h3 class="title"><%- gettext( "Take a Photo of Your ID" ) %></h3>
     <div class="instruction">
-      <p><%- gettext("Use your webcam to take a photo of your ID. We will match this photo with the photo of your face and the name on your account.") %></p>
+      <p><%- gettext("Use your webcam to take a photo of your ID.") %></p>
     </div>
 
     <div class="wrapper-task">
@@ -10,7 +10,7 @@
 
       <div class="wrapper-help">
          <div class="help help-task photo-tips idtips">
-          <p class="photo-tip"><%- gettext( "You need an ID with your name and photo. A driver's license, passport, or other government-issued IDs are all acceptable." ) %></p>
+          <p class="photo-tip"><%- gettext( "You need an ID with your name and photo. A driver's license, passport, or ID are all acceptable." ) %></p>
 
           <h4 class="title"><%- gettext( "Tips on taking a successful photo" ) %></h4>
 
@@ -35,7 +35,7 @@
                 <%- _.sprintf( gettext( "Why does %(platformName)s need my photo?" ), { platformName: platformName } ) %>
               </dt>
               <dd class="faq-answer">
-                <%- gettext( "As part of the verification process, you take a photo of both your face and a government-issued photo ID. Our authorization service confirms your identity by comparing the photo you take with the photo on your ID." ) %>
+                <%- gettext( "As part of the verification process, you take a photo of both your face and a photo ID. Our authorization service confirms your identity by comparing the photo you take with the photo on your ID." ) %>
               </dd>
               <dt class="faq-question">
                 <%- _.sprintf( gettext( "What does %(platformName)s do with this photo?" ), { platformName: platformName } ) %>
