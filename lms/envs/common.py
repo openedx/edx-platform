@@ -148,6 +148,10 @@ FEATURES = {
     # Set to hide the courses list on the Learner Dashboard if they are not enrolled in any courses yet.
     'HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED': False,
 
+    # Allow for restricting enrollment to a specific social auth provider
+    # example value: 'mitx-kerberos'
+    # This will be matched against the beginning portion of the user's social auth uid
+    'RESTRICT_ENROLL_SOCIAL_PROVIDERS': [],
     # Give a UI to show a student's submission history in a problem by the
     # Staff Debug tool.
     'ENABLE_STUDENT_HISTORY_VIEW': True,

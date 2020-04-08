@@ -255,6 +255,21 @@ def _can_enroll_courselike(user, courselike):
     # which actually points to a CourseKey. Sigh.
     course_key = courselike.id
 
+    if settings.FEATURES.get('RESTRICT_ENROLL_SOCIAL_PROVIDERS'):
+        try:
+            social_providers = user.social_auth.all()
+        except AttributeError:
+            social_providers = []
+        allowed_providers = settings.FEATURES.get('RESTRICT_ENROLL_SOCIAL_PROVIDERS')
+        if social_providers and not any(
+            [any([social_provider.uid.startswith(allowed_provider)
+                  for allowed_provider in allowed_providers])
+             for social_provider in social_providers]):
+            log.warning(
+                "ENROLLMENT DENIED in %s because user %s not authenticated by %s",
+                course_key, user.username, allowed_provider)
+            return ACCESS_DENIED
+
     # If the user appears in CourseEnrollmentAllowed paired with the given course key,
     # they may enroll, except if the CEA has already been used by a different user.
     # Note that as dictated by the legacy database schema, the filter call includes
