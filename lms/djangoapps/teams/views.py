@@ -461,6 +461,30 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 size=MAXIMUM_SEARCH_SIZE,
             )
 
+            # We need to manually exclude some potential private_managed teams from results, because
+            # it doesn't appear that the search supports "field__in" style lookups
+
+            # Non-staff users should not be able to see private_managed teams that they are not on.
+            # Staff shouldn't have any excluded teams.
+
+            if not has_access(request.user, 'staff', course_key):
+                private_teamset_ids = [ts.teamset_id for ts in course_module.teamsets if ts.is_private_managed]
+                excluded_team_ids = CourseTeam.objects.filter(
+                    course_id=course_key,
+                    topic_id__in=private_teamset_ids
+                ).exclude(
+                    membership__user=request.user
+                ).values_list('team_id', flat=True)
+                excluded_team_ids = set(excluded_team_ids)
+            else:
+                excluded_team_ids = set()
+
+            search_results['results'] = [
+                result for result in search_results['results']
+                if result['data']['id'] not in excluded_team_ids
+            ]
+            search_results['total'] = len(search_results['results'])
+
             paginated_results = paginate_search_results(
                 CourseTeam,
                 search_results,

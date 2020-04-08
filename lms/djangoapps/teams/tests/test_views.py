@@ -824,10 +824,10 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
 
     @ddt.unpack
     @ddt.data(
-        ('student_on_team_1_private_set_1', True, True, True),
-        ('student_on_team_2_private_set_1', True, True, True),
+        ('student_on_team_1_private_set_1', True, False, False),
+        ('student_on_team_2_private_set_1', False, True, False),
         ('student_enrolled', False, False, False),
-        ('student_masters', True, True, True),
+        ('student_masters', False, False, False),
         ('staff', True, True, True),
     )
     def test_text_search_private_teamset(self, user, can_see_private_1_1, can_see_private_1_2, can_see_private_2_1):
@@ -835,10 +835,6 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         When doing a text search as different users, will private_managed teams show up?
         Only staff should be able to see all private_managed teams.
         Students enrolled in a private_managed teams should be able to see their team, and no others.
-
-        TODO: Currently, anyone within the organization_protected bubble can see all private teams regardless of
-        team membership. If our test data contained a non-protected private_managed topic, everyone would see that
-        as well.
         """
         self.reset_search_index()
         result = self.get_teams_list(
