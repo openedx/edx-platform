@@ -221,9 +221,9 @@ class BlockStructureStore(object):
             return text_type(bs_model)
 
         else:
-            return u"v{version}.root.key.{root_usage_key}".format(
-                version=six.text_type(BlockStructureBlockData.VERSION),
-                root_usage_key=six.text_type(bs_model.data_usage_key),
+            return text_type("v{version}.root.key.{root_usage_key}").format(
+                version=text_type(BlockStructureBlockData.VERSION),
+                root_usage_key=text_type(bs_model.data_usage_key),
             )
 
     @staticmethod
