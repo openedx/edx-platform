@@ -41,7 +41,7 @@
                 <%- _.sprintf( gettext( "What does %(platformName)s do with this photo?" ), { platformName: platformName } ) %>
               </dt>
               <dd class="faq-answer">
-                <%- _.sprintf( gettext( "We use the highest levels of security available to encrypt your photo and send it to our authorization service for review. Your photo and information are not saved or visible anywhere on %(platformName)s after the verification process is complete." ), { platformName: platformName } ) %>
+                <%- _.sprintf( gettext( "We securely encrypt your photo and send it to our authorization service for review. Your photo and information are not saved or visible anywhere on %(platformName)s after the verification process is complete." ), { platformName: platformName } ) %>
               </dd>
               <dt class="faq-question">
                 <%- gettext( "What if I can't see the camera image, or if I can't see my photo do determine which side is visible?" ) %>
