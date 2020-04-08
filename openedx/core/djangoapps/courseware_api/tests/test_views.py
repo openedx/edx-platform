@@ -87,7 +87,7 @@ class CourseApiTestViews(BaseCoursewareTests):
                 assert enrollment['is_active']
                 assert len(response.data['tabs']) == 4
             elif enable_anonymous and not logged_in:
-                check_public_access.assert_called_once()
+                check_public_access.assert_called() # multiple checks use this handler
                 assert response.data['enrollment']['mode'] is None
                 assert response.data['user_has_access']
             else:

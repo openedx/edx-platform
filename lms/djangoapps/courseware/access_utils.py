@@ -121,10 +121,10 @@ def check_enrollment(user, course):
     Returns:
         AccessResponse: Either ACCESS_GRANTED or EnrollmentRequiredAccessError.
     """
-    if CourseEnrollment.is_enrolled(user, course.id):
+    if check_public_access(course, [COURSE_VISIBILITY_PUBLIC]):
         return ACCESS_GRANTED
 
-    if check_public_access(course, [COURSE_VISIBILITY_PUBLIC]):
+    if CourseEnrollment.is_enrolled(user, course.id):
         return ACCESS_GRANTED
 
     return EnrollmentRequiredAccessError()

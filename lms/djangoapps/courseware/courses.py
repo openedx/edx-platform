@@ -109,7 +109,7 @@ def get_course_by_id(course_key, depth=0):
         raise Http404(u"Course not found: {}.".format(six.text_type(course_key)))
 
 
-def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=False, check_survey_complete=True):
+def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):
     """
     Given a course_key, look up the corresponding course descriptor,
     check that the user has the access to perform the specified action
@@ -128,7 +128,7 @@ def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=
       be plugged in as additional callback checks for different actions.
     """
     course = get_course_by_id(course_key, depth)
-    check_course_access_with_redirect(course, user, action, check_if_enrolled, check_survey_complete)
+    check_course_access_with_redirect(course, user, action, check_if_enrolled, check_survey_complete, check_if_authenticated)
     return course
 
 
@@ -188,7 +188,7 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
     return access_response
 
 
-def check_course_access_with_redirect(course, user, action, check_if_enrolled=False, check_survey_complete=True):
+def check_course_access_with_redirect(course, user, action, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):
     """
     Check that the user has the access to perform the specified action
     on the course (CourseDescriptor|CourseOverview).
@@ -199,7 +199,7 @@ def check_course_access_with_redirect(course, user, action, check_if_enrolled=Fa
     request = get_current_request()
     check_content_start_date_for_masquerade_user(course.id, user, request, course.start)
 
-    access_response = check_course_access(course, user, action, check_if_enrolled, check_survey_complete)
+    access_response = check_course_access(course, user, action, check_if_enrolled, check_survey_complete, check_if_authenticated)
 
     if not access_response:
         # Redirect if StartDateError

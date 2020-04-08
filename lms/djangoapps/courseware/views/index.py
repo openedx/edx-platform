@@ -152,34 +152,24 @@ class CoursewareIndex(View):
 
                 self.view = STUDENT_VIEW
 
-                # Do the enrollment check if enable_unenrolled_access is not enabled.
                 self.course = get_course_with_access(
                     request.user, 'load', self.course_key,
                     depth=CONTENT_DEPTH,
-                    check_if_enrolled=not self.enable_unenrolled_access,
+                    check_if_enrolled=True,
+                    check_if_authenticated=True
                 )
                 self.course_overview = CourseOverview.get_from_id(self.course.id)
+                self.is_staff = has_access(request.user, 'staff', self.course)
 
-                if self.enable_unenrolled_access:
-                    # Check if the user is considered enrolled (i.e. is an enrolled learner or staff).
-                    try:
-                        check_course_access_with_redirect(
-                            self.course, request.user, 'load', check_if_enrolled=True,
-                        )
-                    except CourseAccessRedirect as exception:
-                        # If the user is not considered enrolled:
-                        if self.course.course_visibility == COURSE_VISIBILITY_PUBLIC:
-                            # If course visibility is public show the XBlock public_view.
-                            self.view = PUBLIC_VIEW
-                        else:
-                            # Otherwise deny them access.
-                            raise exception
-                    else:
-                        # If the user is considered enrolled show the default XBlock student_view.
-                        pass
+                # There's only one situation where we want to show the public view
+                if (not self.is_staff and
+                    self.enable_unenrolled_access and
+                    self.course.course_visibility == COURSE_VISIBILITY_PUBLIC and
+                    not CourseEnrollment.is_enrolled(request.user, self.course_key)
+                ):
+                    self.view = PUBLIC_VIEW
 
                 self.can_masquerade = request.user.has_perm(MASQUERADE_AS_STUDENT, self.course)
-                self.is_staff = has_access(request.user, 'staff', self.course)
                 self._setup_masquerade_for_effective_user()
 
                 return self.render(request)
