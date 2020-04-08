@@ -48,7 +48,8 @@ from .transcripts_utils import (
     VideoTranscriptsMixin,
     clean_video_id,
     subs_filename,
-    get_transcript_for_video
+    get_transcript_for_video,
+    get_transcript
 )
 
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
@@ -1040,6 +1041,13 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         if self.sub:
             _update_transcript_for_index()
+        else:
+            try:
+                transcript = get_transcript(self, lang=self.transcript_language, output_format=Transcript.TXT)[0].replace("\n", " ")
+                transcript_index_name = "transcript_{}".format(self.transcript_language)
+                video_body.update({transcript_index_name: transcript})
+            except NotFoundError:
+                pass
 
         # Check to see if there are transcripts in other languages besides default transcript
         if self.transcripts:
