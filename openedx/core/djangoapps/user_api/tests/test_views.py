@@ -914,7 +914,8 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
                 "username": [{
                     "user_message": (
                         "It looks like {} belongs to an existing account. "
-                        "Try again with a different username."
+                        "Please use a different public username. "
+                        "Your email address is still your unique identifier for your account."
                     ).format(
                         self.USERNAME
                     )
@@ -2220,7 +2221,8 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "username": [{
                     "user_message": (
                         "It looks like {} belongs to an existing account. "
-                        "Try again with a different username."
+                        "Please use a different public username. "
+                        "Your email address is still your unique identifier for your account."
                     ).format(
                         self.USERNAME
                     )
@@ -2255,7 +2257,8 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "username": [{
                     "user_message": (
                         "It looks like {} belongs to an existing account. "
-                        "Try again with a different username."
+                        "Please use a different public username. "
+                        "Your email address is still your unique identifier for your account."
                     ).format(
                         self.USERNAME
                     )

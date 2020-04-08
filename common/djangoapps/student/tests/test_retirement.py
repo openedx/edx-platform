@@ -264,7 +264,9 @@ class TestRegisterRetiredUsername(TestCase):
     # The returned message here varies depending on whether a ValidationError -or-
     # an AccountValidationError occurs.
     INVALID_ACCT_ERR_MSG = ('An account with the Public Username', 'already exists.')
-    INVALID_ERR_MSG = ('It looks like', 'belongs to an existing account. Try again with a different username.')
+    INVALID_ERR_MSG = ('It looks like', 'belongs to an existing account. Please use a different public username. '
+                                        'Your email address is still your unique identifier for your account.')
+
 
     def setUp(self):
         super(TestRegisterRetiredUsername, self).setUp()

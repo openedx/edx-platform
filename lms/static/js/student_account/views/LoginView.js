@@ -231,12 +231,17 @@
             },
 
             renderAuthWarning: function() {
-                var message = _.sprintf(
-                    gettext('You have successfully signed into %(currentProvider)s, but your %(currentProvider)s' +
-                            ' account does not have a linked %(platformName)s account. To link your accounts,' +
-                            ' sign in now using your %(platformName)s password.'),
-                    {currentProvider: this.currentProvider, platformName: this.platformName}
-                );
+                var message = HtmlUtils.interpolateHtml(
+                        gettext('{paragraphStart}You have successfully signed into {currentProvider}, but your {currentProvider} account does not have a linked {platformName} account.{paragraphEnd}' + // eslint-disable-line max-len
+                        '{blankLine}{paragraphStart}If you already have a {platformName} account, please log in below to link it to your {currentProvider} account.{paragraphEnd}' + // eslint-disable-line max-len
+                        '{blankLine}{paragraphStart}If you do not have a {platformName} account, please click the "Create a {platformName} Account" button.{paragraphEnd}'), { // eslint-disable-line max-len
+                            currentProvider: this.currentProvider,
+                            platformName: this.platformName,
+                            paragraphStart: HtmlUtils.HTML('<p>'),
+                            paragraphEnd: HtmlUtils.HTML('</p>'),
+                            blankLine: HtmlUtils.HTML('<br>')
+                        }
+                    );
 
                 this.clearAuthWarning();
                 this.renderFormFeedback(this.formStatusTpl, {
