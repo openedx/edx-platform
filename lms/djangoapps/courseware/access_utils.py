@@ -131,6 +131,12 @@ def check_enrollment(user, course):
 
 
 def check_authentication(user, course):
+    """
+    Grants access if the user is authenticated, or if the course allows public access.
+
+    Returns:
+        AccessResponse: Either ACCESS_GRANTED or AuthenticationRequiredAccessError
+    """
     if user.is_authenticated:
         return ACCESS_GRANTED
 

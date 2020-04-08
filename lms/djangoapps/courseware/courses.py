@@ -159,33 +159,43 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
     check_if_enrolled: If true, additionally verifies that the user is enrolled.
     check_survey_complete: If true, additionally verifies that the user has completed the survey.
     """
-    # Allow staff full access to the course even if not enrolled
-    staff_access_response = has_access(user, 'staff', course.id)
-    if staff_access_response:
-        return staff_access_response
+    def _check_nonstaff_access():
+        # Below is a series of checks that must all pass for a user to be granted access
+        # to a course. (Essentially check this AND check that AND...)
+        # Also note: access_response (AccessResponse) objects are compared as booleans
+        access_response = has_access(user, action, course, course.id)
+        if not access_response:
+            return access_response
 
-    access_response = has_access(user, action, course, course.id)
-    if not access_response:
+        if check_if_authenticated:
+            authentication_access_response = check_authentication(user, course)
+            if not authentication_access_response:
+                return authentication_access_response
+
+        if check_if_enrolled:
+            enrollment_access_response = check_enrollment(user, course)
+            if not enrollment_access_response:
+                return enrollment_access_response
+
+        # Redirect if the user must answer a survey before entering the course.
+        if check_survey_complete and action == 'load':
+            survey_access_response = check_survey_required_and_unanswered(user, course)
+            if not survey_access_response:
+                return survey_access_response
+
+        # This access_response will be ACCESS_GRANTED
         return access_response
 
-    if check_if_authenticated:
-        authentication_access_response = check_authentication(user, course)
-        if not authentication_access_response:
-            return authentication_access_response
 
-    if check_if_enrolled:
-        enrollment_access_response = check_enrollment(user, course)
-        if not enrollment_access_response:
-            return enrollment_access_response
-
-    # Redirect if the user must answer a survey before entering the course.
-    if check_survey_complete and action == 'load':
-        survey_access_response = check_survey_required_and_unanswered(user, course)
-        if not survey_access_response:
-            return survey_access_response
+    # Allow staff full access to the course even if other checks fail
+    nonstaff_access_response = _check_nonstaff_access()
+    if not nonstaff_access_response:
+        staff_access_response = has_access(user, 'staff', course.id)
+        if staff_access_response:
+            return staff_access_response
 
     # This access_response will be ACCESS_GRANTED
-    return access_response
+    return nonstaff_access_response
 
 
 def check_course_access_with_redirect(course, user, action, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):
