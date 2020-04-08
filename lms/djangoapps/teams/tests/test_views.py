@@ -1212,7 +1212,8 @@ class TestDetailTeamAPI(TeamAPITestCase):
 
     @ddt.unpack
     @ddt.data(
-        ('student_enrolled', 200),
+        ('student_unenrolled', 403),
+        ('student_enrolled', 404),
         ('student_masters_not_on_team', 200),
         ('student_masters', 200),
         ('staff', 200)
@@ -1222,8 +1223,6 @@ class TestDetailTeamAPI(TeamAPITestCase):
         As different users, check if we can request the masters_only team detail.
         Only staff and users within the organization_protection bubble should be able to get info about
         an organization_protected team, or be able to tell that it exists.
-
-        TODO: student_enrolled should not be able to see this data
         """
         team = self.get_team_detail(
             self.masters_only_team.team_id,
@@ -1235,10 +1234,11 @@ class TestDetailTeamAPI(TeamAPITestCase):
 
     @ddt.unpack
     @ddt.data(
-        ('student_enrolled', 200),
-        ('student_masters', 200),
+        ('student_unenrolled', 403),
+        ('student_enrolled', 404),
+        ('student_masters', 404),
         ('student_on_team_1_private_set_1', 200),
-        ('student_on_team_2_private_set_1', 200),
+        ('student_on_team_2_private_set_1', 404),
         ('staff', 200)
     )
     def test_teamset_types(self, requesting_user, expected_response):
@@ -1246,8 +1246,6 @@ class TestDetailTeamAPI(TeamAPITestCase):
         As different users, check if we can request the masters_only team detail.
         Only staff or users enrolled in the team should be able to get info about a private_managed team,
         or even be able to tell that it exists.
-
-        TODO: Only staff and sot1ps1 should be able to get any information about team_1_in_private_teamset_1
         """
         team = self.get_team_detail(
             self.team_1_in_private_teamset_1.team_id,
@@ -1309,7 +1307,8 @@ class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
 
     @ddt.unpack
     @ddt.data(
-        ('student_enrolled', 403),
+        ('student_unenrolled', 403),
+        ('student_enrolled', 404),
         ('student_masters_not_on_team', 403),
         ('student_masters', 403),
         ('staff', 204)
@@ -1319,12 +1318,6 @@ class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
         As different users, try to delete the masters-only team.
         Only staff should be able to delete this team, and people outside the bubble shouldn't be able to
         tell that it even exists.
-
-        TODO: This leaks info - if you try to request a team that doesn't exist you get a 404,
-        but you get a 403 if it exists and you can't delete it.
-        Change the behavior so that either the 403 takes precedence
-        ("You can't do any deletes, we didn't even check if it exists"), or only show the 403
-        if the user has_specific_access to the team
         """
         self.delete_team(
             self.masters_only_team.team_id,
@@ -1334,9 +1327,10 @@ class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
 
     @ddt.unpack
     @ddt.data(
-        ('student_enrolled', 403),
+        ('student_unenrolled', 403),
+        ('student_enrolled', 404),
         ('student_on_team_1_private_set_1', 403),
-        ('student_on_team_2_private_set_1', 403),
+        ('student_on_team_2_private_set_1', 404),
         ('staff', 204)
     )
     def test_teamset_type(self, requesting_user, expected_status):
@@ -1344,8 +1338,6 @@ class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
         As different users, try to delete a private_managed team
         Only staff should be able to delete a private_managed team, and only they and users enrolled in that
         team should even be able to tell that it exists.
-
-        TODO: Same as `test_organization_protection_status`
         """
         self.delete_team(
             self.team_1_in_private_teamset_1.team_id,
@@ -1431,7 +1423,8 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
 
     @ddt.unpack
     @ddt.data(
-        ('student_enrolled', 403),
+        ('student_unenrolled', 403),
+        ('student_enrolled', 404),
         ('student_masters_not_on_team', 403),
         ('student_masters', 403),
         ('staff', 200)
@@ -1441,12 +1434,6 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
         As different users, try to modify the masters-only team.
         Only staff should be able to modify this team, and people outside the bubble shouldn't be able to
         tell that it even exists.
-
-        TODO: This leaks info - if you try to request a team that doesn't exist you get a 404,
-        but you get a 403 if it exists and you can't modify it.
-        Change the behavior so that either the 403 takes precedence
-        ("You can't do any modifications, we didn't even check if it exists"), or only show the 403
-        if the user has_specific_access to the team
         """
         team = self.patch_team_detail(
             self.masters_only_team.team_id,
@@ -1459,9 +1446,10 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
 
     @ddt.unpack
     @ddt.data(
-        ('student_enrolled', 403),
+        ('student_unenrolled', 403),
+        ('student_enrolled', 404),
         ('student_on_team_1_private_set_1', 403),
-        ('student_on_team_2_private_set_1', 403),
+        ('student_on_team_2_private_set_1', 404),
         ('staff', 200)
     )
     def test_teamset_type(self, requesting_user, expected_status):
@@ -1469,8 +1457,6 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
         As different users, try to modify a private_managed team
         Only staff should be able to modify a private_managed team, and only they and users enrolled in that
         team should even be able to tell that it exists.
-
-        TODO: Same as `test_organization_protection_status`
         """
         team = self.patch_team_detail(
             self.team_1_in_private_teamset_1.team_id,
