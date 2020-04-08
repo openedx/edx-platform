@@ -186,7 +186,6 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
         # This access_response will be ACCESS_GRANTED
         return access_response
 
-
     # Allow staff full access to the course even if other checks fail
     nonstaff_access_response = _check_nonstaff_access()
     if not nonstaff_access_response:

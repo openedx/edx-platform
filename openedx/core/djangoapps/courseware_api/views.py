@@ -61,7 +61,8 @@ class CoursewareInformation(RetrieveAPIView):
         * enrollment: Enrollment status of authenticated user
             * mode: `audit`, `verified`, etc
             * is_active: boolean
-        * user_has_access: Whether the user can view the course
+        * can_load_course: Whether the user can view the course (AccessResponse object)
+        * is_staff: Whether the user has staff access to the course
 
     **Parameters:**
 

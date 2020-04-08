@@ -90,9 +90,9 @@ class CourseApiTestViews(BaseCoursewareTests):
                 # multiple checks use this handler
                 check_public_access.assert_called()
                 assert response.data['enrollment']['mode'] is None
-                assert response.data['user_has_access']
+                assert response.data['can_load_courseware']['has_access']
             else:
-                assert not response.data['user_has_access']
+                assert not response.data['can_load_courseware']['has_access']
 
 
 class SequenceApiTestViews(BaseCoursewareTests):
