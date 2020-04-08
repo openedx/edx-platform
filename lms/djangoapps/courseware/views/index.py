@@ -162,10 +162,11 @@ class CoursewareIndex(View):
                 self.is_staff = has_access(request.user, 'staff', self.course)
 
                 # There's only one situation where we want to show the public view
-                if (not self.is_staff and
-                    self.enable_unenrolled_access and
-                    self.course.course_visibility == COURSE_VISIBILITY_PUBLIC and
-                    not CourseEnrollment.is_enrolled(request.user, self.course_key)
+                if (
+                        not self.is_staff and
+                        self.enable_unenrolled_access and
+                        self.course.course_visibility == COURSE_VISIBILITY_PUBLIC and
+                        not CourseEnrollment.is_enrolled(request.user, self.course_key)
                 ):
                     self.view = PUBLIC_VIEW
 
