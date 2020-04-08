@@ -205,7 +205,6 @@ def reset_course_deadlines(request):
     from openedx.features.course_experience.urls import COURSE_HOME_VIEW_NAME
 
     detail_id_dict = ast.literal_eval(request.POST.get('reset_deadlines_redirect_url_id_dict'))
-    print('***************', detail_id_dict)
     redirect_url = request.POST.get('reset_deadlines_redirect_url_base', COURSE_HOME_VIEW_NAME)
     course_key = CourseKey.from_string(detail_id_dict['course_id'])
     masquerade_details, masquerade_user = setup_masquerade(
