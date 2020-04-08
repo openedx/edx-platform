@@ -3,7 +3,6 @@ Signal Tests for External User Ids that are sent out of Open edX
 """
 
 from opaque_keys.edx.keys import CourseKey
-from django.conf import settings
 from django.core.cache import cache
 from edx_django_utils.cache import RequestCache
 
@@ -18,19 +17,14 @@ from openedx.core.djangoapps.catalog.cache import (
     COURSE_PROGRAMS_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
 )
+from openedx.core.djangoapps.external_user_ids.models import ExternalId, ExternalIdType
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
-from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-# external_ids is not in CMS' INSTALLED_APPS so these imports will error during test collection
-if settings.ROOT_URLCONF == 'lms.urls':
-    from openedx.core.djangoapps.external_user_ids.models import ExternalId, ExternalIdType
 
-
-@skip_unless_lms
 class MicrobachelorsExternalIDTest(ModuleStoreTestCase, CacheIsolationTestCase):
     """
     Test cases for Signals for External User Ids

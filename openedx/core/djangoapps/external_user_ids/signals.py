@@ -8,6 +8,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from openedx.core.djangoapps.catalog.utils import get_programs
+
 from .models import ExternalId, ExternalIdType
 
 LOGGER = getLogger(__name__)
