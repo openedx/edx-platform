@@ -963,7 +963,6 @@ class TopicListView(GenericAPIView):
         Return a filtered list of teamsets, removing any private teamsets that a user doesn't have access to.
         Follows the same logic as `has_specific_teamset_access` but in bulk rather than for one teamset at a time
         """
-        # import pdb; pdb.set_trace()
         if has_course_staff_privileges(self.request.user, course_module.id):
             return teamsets
         private_teamset_ids = [teamset.teamset_id for teamset in course_module.teamsets if teamset.is_private_managed]
