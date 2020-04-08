@@ -30,17 +30,21 @@ class BaseSoftwareSecureTask(Task):
     """
     abstract = True
 
-    def on_success(self, response, task_id, args, kwargs):
+    def on_success(self, retval, task_id, args, kwargs):
         """
         Update SoftwareSecurePhotoVerification object corresponding to this
         task with info about success.
 
         Updates user verification attempt to "submitted" if the response was ok otherwise
         set it to "must_retry".
+
+        Assumes `retval` is a dict containing the task's result, with the following keys:
+            'response_ok': boolean, indicating if the response was ok
+            'response_text': string, indicating the response text in case of failure.
         """
         user_verification_id = kwargs['user_verification_id']
         user_verification = SoftwareSecurePhotoVerification.objects.get(id=user_verification_id)
-        if response.ok:
+        if retval['response_ok']:
             user_verification.mark_submit()
             log.info(
                 'Sent request to Software Secure for user: %r and receipt ID %r.',
@@ -49,7 +53,7 @@ class BaseSoftwareSecureTask(Task):
             )
             return user_verification
 
-        user_verification.mark_must_retry(response.text)
+        user_verification.mark_must_retry(retval['response_text'])
 
     def after_return(self, status, retval, task_id, args, kwargs, einfo):
         """
@@ -111,7 +115,7 @@ def send_request_to_ss_for_user(self, user_verification_id, copy_id_photo_from):
     Returns:
         request.Response
     """
-    log.info('=>New Verification Task Received')  # todo -- remove before merge.
+    log.info('=>New Verification Task Received')
     user_verification = SoftwareSecurePhotoVerification.objects.get(id=user_verification_id)
     try:
         headers, body = user_verification.create_request(copy_id_photo_from)
@@ -121,7 +125,10 @@ def send_request_to_ss_for_user(self, user_verification_id, copy_id_photo_from):
             data=simplejson.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8'),
             verify=False
         )
-        return response
+        return {
+            'response_ok': getattr(response, 'ok', False),
+            'response_text': getattr(response, 'text', '')
+        }
     except Exception as exc:  # pylint: disable=bare-except
         log.error(
             (
