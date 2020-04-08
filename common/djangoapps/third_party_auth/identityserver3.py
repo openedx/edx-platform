@@ -39,11 +39,26 @@ class IdentityServer3(BaseOAuth2):
         header = {"Authorization": u"Bearer %s" % access_token}
         return self.get_json(url, headers=header)
 
+    def get_setting_if_exist(self, name, default):
+        """
+        Return provider config setting if exist otherwise return default
+        """
+        try:
+            return self.get_config().get_setting(name)
+        except KeyError:
+            return default
+
     def get_user_details(self, response):
         """
         Return details about the user account from the service
         """
-        details = {"fullname": response["name"], "email": response["email"]}
+        details = {
+            "fullname": response.get(self.get_setting_if_exist("full_name_claim_key", "name")),
+            "email": response.get(self.get_setting_if_exist("email_claim_key", "email")),
+            "username": response.get(self.get_setting_if_exist("username_claim_key", "given_name")),
+            "first_name": response.get(self.get_setting_if_exist("first_name_claim_key", "given_name")),
+            "last_name": response.get(self.get_setting_if_exist("last_name_claim_key", "family_name")),
+        }
         return details
 
     def get_user_id(self, details, response):
