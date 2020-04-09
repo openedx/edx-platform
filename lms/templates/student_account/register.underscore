@@ -3,7 +3,7 @@
 
 <% if (!context.syncLearnerProfileData) { %>
 	<div class="toggle-form">
-		<span class="text"><%- edx.StringUtils.interpolate(gettext('Already have an {platformName} account?'), {platformName: context.platformName }) %></span>
+		<span class="text"><%- gettext("Already have an account?") %></span>
 		<a href="#login" class="form-toggle" data-type="login"><%- gettext("Sign in.") %></a>
 	</div>
 <% } %>
