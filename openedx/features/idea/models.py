@@ -10,15 +10,16 @@ from functools import partial
 
 from lms.djangoapps.onboarding.models import Organization
 from .helpers import upload_to_path
+from .constants import CITY_MAX_LENGTH, TITLE_MAX_LENGTH, OVERVIEW_MAX_LENGTH
 
 
 class Location(models.Model):
     country = CountryField()
-    city = models.CharField(max_length=255)
+    city = models.CharField(max_length=CITY_MAX_LENGTH)
 
     @property
     def location(self):
-        return '{city}, {country}'.format(city=self.city, country=self.country)
+        return '{city}, {country}'.format(city=self.city, country=self.country.name)
 
     class Meta:
         abstract = True
@@ -57,8 +58,8 @@ class OrganizationBase(models.Model):
 
 class Idea(OrganizationBase, Location, VisualAttachment):
     user = models.ForeignKey(User, related_name='ideas', related_query_name='idea', on_delete=models.CASCADE)
-    title = models.CharField(max_length=50)
-    overview = models.CharField(max_length=150)
+    title = models.CharField(max_length=TITLE_MAX_LENGTH)
+    overview = models.CharField(max_length=OVERVIEW_MAX_LENGTH)
     description = models.TextField()
     implementation = models.TextField(blank=True)
 
