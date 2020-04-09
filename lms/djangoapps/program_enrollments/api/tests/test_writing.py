@@ -149,6 +149,9 @@ class WritingProgramEnrollmentTest(EnrollmentTestMixin):
 class WriteProgramCourseEnrollmentTest(EnrollmentTestMixin):
     
     def course_enrollment_request(self, external_key, status='active', course_staff=None):
+        """
+        Constructs a single course enrollment request object
+        """
         return {
             'external_user_key': external_key,
             'status': status,
@@ -176,12 +179,18 @@ class WriteProgramCourseEnrollmentTest(EnrollmentTestMixin):
             self.assertIsNone(course_enrollment)
 
     def setup_change_test_data(self, initial_statuses):
+        """
+        Helper method to setup initial state for update tests
+        """
         self.create_program_and_course_enrollments('learner-1', course_status=initial_statuses[0])
         self.create_program_and_course_enrollments('learner-2', course_status=initial_statuses[1])
         self.create_program_and_course_enrollments('learner-3', course_status=initial_statuses[2], user=None)
         self.create_program_and_course_enrollments('learner-4', course_status=initial_statuses[3], user=None)
 
     def test_create_only(self):
+        """
+        Test creating new program course enrollments with only the create flag true
+        """
         self.create_program_enrollment('learner-1')
         self.create_program_enrollment('learner-2')
         self.create_program_enrollment('learner-3', user=None)
@@ -221,7 +230,9 @@ class WriteProgramCourseEnrollmentTest(EnrollmentTestMixin):
         ('inactive', 'inactive', 'inactive', 'inactive'),
     )
     def test_update_only(self, initial_statuses):
-
+        """
+        Test updating existing enrollments with only the update flag true
+        """
         self.setup_change_test_data(initial_statuses)
 
         course_enrollment_requests = [
@@ -253,6 +264,10 @@ class WriteProgramCourseEnrollmentTest(EnrollmentTestMixin):
         self.assert_program_course_enrollment('learner-4', 'active', False)
 
     def test_create_or_update(self):
+        """
+        Test writing enrollments with both create and update flags true.
+        Existing enrollments should be updated. If no matching enrollment is found, create one. 
+        """
         # learners 1-4 are already enrolled in courses, 5-6 only have a program enrollment
         self.setup_change_test_data(['active','active','active','active'])
         self.create_program_enrollment('learner-5')
@@ -333,7 +348,7 @@ class WriteProgramCourseEnrollmentTest(EnrollmentTestMixin):
 
     def test_create_enrollments_and_assign_staff(self):
         """
-        Successfully creates/updates both waiting and linked program course enrollments with the course staff role.
+        Successfully creates both waiting and linked program course enrollments with the course staff role.
         """
         course_staff_role = CourseStaffRole(self.course_id)
         course_staff_role.add_users(self.student_1)
@@ -374,8 +389,10 @@ class WriteProgramCourseEnrollmentTest(EnrollmentTestMixin):
         ) 
 
     def test_update_and_assign_or_revoke_staff(self):
+        """
+        Successfully updates existing enrollments to assign or revoke the CourseStaff role.
+        """
         course_staff_role = CourseStaffRole(self.course_id)
-        course_staff_role.add_users(self.student_1)
         course_staff_role.add_users(self.student_2)
 
         self.create_program_and_course_enrollments('learner-1', user=self.student_1)

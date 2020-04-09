@@ -8,16 +8,15 @@ from `lms.djangoapps.program_enrollments.api`.
 
 import logging
 
+from opaque_keys.edx.keys import CourseKey
 from simple_history.utils import bulk_create_with_history
 
 from course_modes.models import CourseMode
-from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment, NonExistentCourseError
 from student.roles import CourseStaffRole
 
-from ..constants import ProgramCourseEnrollmentStatuses
-from ..constants import ProgramCourseEnrollmentRoles
+from ..constants import ProgramCourseEnrollmentRoles, ProgramCourseEnrollmentStatuses
 from ..constants import ProgramCourseOperationStatuses as ProgramCourseOpStatuses
 from ..constants import ProgramEnrollmentStatuses
 from ..constants import ProgramOperationStatuses as ProgramOpStatuses
@@ -184,6 +183,7 @@ def write_program_course_enrollments(
         enrollment_requests (list[dict]): dicts in the form:
             * 'external_user_key': str
             * 'status': str from ProgramCourseEnrollmentStatuses
+            * 'course_staff': Boolean if the user should have the CourseStaff role
         create (bool): non-existent enrollments will be created iff `create`,
             otherwise they will be skipped as 'duplicate'.
         update (bool): existing enrollments will be updated iff `update`,
@@ -253,7 +253,7 @@ def write_program_course_enrollments(
     enrollments_to_save = []
     created_enrollments = []
     updated_enrollments = []
-    staff_assignments_by_user_course_key = {}
+    staff_assignments_by_user_key = {}
     for external_key, request in requests_by_key.items():
         course_staff = request['course_staff']
         status = request['status']
@@ -285,7 +285,7 @@ def write_program_course_enrollments(
 
         if course_staff is not None:
             course_enrollment = existing_course_enrollment or new_course_enrollment
-            staff_assignments_by_user_course_key[(external_key, course_enrollment.course_key)] = course_staff
+            staff_assignments_by_user_key[external_key] = course_staff
 
     # Bulk-create all new program-course enrollments and corresponding history records.
     # Note: this will NOT invoke `save()` or `pre_save`/`post_save` signals!
@@ -293,18 +293,20 @@ def write_program_course_enrollments(
     if enrollments_to_save:
         created_enrollments = bulk_create_with_history(enrollments_to_save, ProgramCourseEnrollment)
 
-    # todo
-    created = ProgramCourseEnrollment.objects.filter(
+    # For every created/updated enrollment, check if the user should be course staff.
+    # If that enrollment has a linked user, assign the user the course staff role
+    # If that enrollment does not have a linked user, create a CourseAccessRoleAssignment
+    # for that enrollment.
+    written_enrollments = ProgramCourseEnrollment.objects.filter(
         id__in=[enrollment.id for enrollment in created_enrollments + updated_enrollments]
     ).select_related('program_enrollment')
 
     role_assignments_to_save = []
     enrollment_role_assignments_to_delete = [] 
-    for enrollment in created:
-        course_key = enrollment.course_key  # nope to this variable name
+    for enrollment in written_enrollments:
         external_key = enrollment.program_enrollment.external_user_key
         user = enrollment.program_enrollment.user
-        course_staff = staff_assignments_by_user_course_key.get((external_key, course_key))
+        course_staff = staff_assignments_by_user_key.get(external_key)
 
         if user:
             if course_staff is True:
@@ -368,23 +370,6 @@ def create_program_course_enrollment(program_enrollment, course_key, status, sav
         program_course_enrollment.save()
     return program_course_enrollment
 
-
-def create_program_course_enrollment_role(program_course_enrollment, role, save=True):
-    """
-    TODO
-    """
-    if user:
-        # create real role
-        CourseStaffRole(course_key)
-
-    else:
-        role_assignment = CourseAccessRoleAssignment(
-            enrollment=program_course_enrollment,
-            role=role,
-        )
-
-
-
 def change_program_course_enrollment_status(program_course_enrollment, new_status):
     """
     Update a program course enrollment with a new status.
@@ -396,7 +381,8 @@ def change_program_course_enrollment_status(program_course_enrollment, new_statu
         program_course_enrollment (ProgramCourseEnrollment)
         status (str): from ProgramCourseEnrollmentStatuses
 
-    Returns: ProgramCourseEnrollment
+    Returns: str
+        String from ProgramOperationCourseStatuses.
     """
     if new_status == program_course_enrollment.status:
         return new_status
