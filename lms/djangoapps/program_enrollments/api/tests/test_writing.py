@@ -378,7 +378,7 @@ class WriteProgramCourseEnrollmentTest(EnrollmentTestMixin):
 
     def test_create_enrollments_and_assign_staff(self):
         """
-        Successfully creates/updates both waiting and linked program course enrollments with the course staff role.
+        Successfully creates both waiting and linked program course enrollments with the course staff role.
         """
         course_staff_role = CourseStaffRole(self.course_id)
         course_staff_role.add_users(self.student_1)
@@ -419,8 +419,10 @@ class WriteProgramCourseEnrollmentTest(EnrollmentTestMixin):
         ) 
 
     def test_update_and_assign_or_revoke_staff(self):
+        """
+        Successfully updates existing enrollments to assign or revoke the CourseStaff role.
+        """
         course_staff_role = CourseStaffRole(self.course_id)
-        course_staff_role.add_users(self.student_1)
         course_staff_role.add_users(self.student_2)
 
         self.create_program_and_course_enrollments('learner-1', user=self.student_1)

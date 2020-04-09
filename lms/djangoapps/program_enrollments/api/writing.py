@@ -8,10 +8,10 @@ from `lms.djangoapps.program_enrollments.api`.
 
 import logging
 
+from opaque_keys.edx.keys import CourseKey
 from simple_history.utils import bulk_create_with_history
 
 from course_modes.models import CourseMode
-from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment, NonExistentCourseError
 from student.roles import CourseStaffRole
@@ -342,23 +342,6 @@ def create_program_course_enrollment(program_enrollment, course_key, status, sav
         program_course_enrollment.save()
     return program_course_enrollment
 
-
-def create_program_course_enrollment_role(program_course_enrollment, role, save=True):
-    """
-    TODO
-    """
-    if user:
-        # create real role
-        CourseStaffRole(course_key)
-
-    else:
-        role_assignment = CourseAccessRoleAssignment(
-            enrollment=program_course_enrollment,
-            role=role,
-        )
-
-
-
 def change_program_course_enrollment_status(program_course_enrollment, new_status):
     """
     Update a program course enrollment with a new status.
@@ -370,7 +353,8 @@ def change_program_course_enrollment_status(program_course_enrollment, new_statu
         program_course_enrollment (ProgramCourseEnrollment)
         status (str): from ProgramCourseEnrollmentStatuses
 
-    Returns: ProgramCourseEnrollment
+    Returns: str
+        String from ProgramOperationCourseStatuses.
     """
     if new_status == program_course_enrollment.status:
         return new_status
