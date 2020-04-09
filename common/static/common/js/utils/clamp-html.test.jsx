@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import { clampHtmlByWords } from './clamp-html';
 
 let container;
-const scriptTag = '<script src="/asset-v1:edX+testX+1T2021+type@asset+block/script.js"></script>';
-const stylesheet = '<link rel="stylesheet" type="text/css" href="/asset-v1:edX+testX+1T2021+type@asset+block/introjs.css">';
+const scriptTag = '<script src="/asset-v1:edX+testX+1T2021+type@asset+block/script.js">const ignore = "me here"; alert("BAD");</script>';
+const styleTag = '<style>h1 {color: orange;}</style>';
 
 beforeEach(() => {
   container = document.createElement("div");
@@ -28,8 +28,8 @@ describe('ClampHtml', () => {
     ['a <i>aa <em>aaa</em> ab</i>', 3, 'a <i>aa <em>aaa…</em></i>'],
     ['a <i>aa ab</i> b c', 4, 'a <i>aa ab</i> b…'],
     [scriptTag + 'a b c', 2, scriptTag + 'a b…'],
-    [stylesheet + 'a b c', 2, stylesheet + 'a b…'],
-    [scriptTag + stylesheet + 'a b c', 2, scriptTag + stylesheet + 'a b…'],
+    [styleTag + 'a b c', 2, styleTag + 'a b…'],
+    [scriptTag + styleTag + 'a b c', 2, scriptTag + styleTag + 'a b…'],
   ])('clamps by words: %s, %i', (input, wordsLeft, expected) => {
     const div = ReactDOM.render(<div dangerouslySetInnerHTML={{ __html: input }} />, container);
     clampHtmlByWords(div, wordsLeft);
