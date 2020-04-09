@@ -46,29 +46,23 @@ ${static.get_page_title_breadcrumbs(course_name())}
 <%static:css group='style-student-notes'/>
 % endif
 
-<script type="text/javascript" src="${static.url('js/jquery.autocomplete.js')}"></script>
-<script type="text/javascript" src="${static.url('js/src/tooltip_manager.js')}"></script>
+<script type="text/javascript" src="${static.url('js/jquery.autocomplete.js')}" async></script>
+<script type="text/javascript" src="${static.url('js/src/tooltip_manager.js')}" async></script>
 
-<link href="${static.url('css/vendor/jquery.autocomplete.css')}" rel="stylesheet" type="text/css">
+<link href="${static.url('css/vendor/jquery.autocomplete.css')}" rel="preload" type="text/css">
   ${HTML(fragment.head_html())}
 
-  <script type="text/javascript">
-    // If this chromeless view is in an iframe in the learning microfrontend app
-    // then add a base tag in the head (of the iframe document) to force links
-    // in this iframe to navigate the parent window.
-    var learningAppUrl = "${settings.LEARNING_MICROFRONTEND_URL | n, js_escaped_string}";
-    var parentIsLearningApp = document.referrer.indexOf(learningAppUrl) === 0;
-    if (window !== window.parent && parentIsLearningApp) {
-      var baseElement = document.createElement('base');
-      baseElement.setAttribute('target', '_parent');
-      document.head.appendChild(baseElement);
-    }
-  </script>
+% if is_learning_mfe:
+  ## If this chromeless view is in an iframe in the learning microfrontend app
+  ## then add a base tag in the head (of the iframe document) to force links
+  ## in this iframe to navigate the parent window.
+  <base target="_parent">
+%endif
 </%block>
 
 <%block name="js_extra">
-  <script type="text/javascript" src="${static.url('common/js/vendor/jquery.scrollTo.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+  <script type="text/javascript" src="${static.url('common/js/vendor/jquery.scrollTo.js')}" async></script>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}" async></script>
 
   <%static:js group='courseware'/>
 
@@ -99,7 +93,9 @@ ${HTML(fragment.foot_html())}
       </main>
   </section>
 </div>
-% if course.show_calculator or edx_notes_enabled:
+% if not is_learning_mfe:
+
+  % if course.show_calculator or edx_notes_enabled:
     <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
       ## Utility: Notes
       % if edx_notes_enabled:
@@ -111,17 +107,20 @@ ${HTML(fragment.foot_html())}
         <%include file="/calculator/toggle_calculator.html" />
       % endif
     </nav>
+  % endif
+% else:
+  % if edx_notes_enabled:
+    <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
+  % endif
 % endif
 
+% if is_learning_mfe:
 <script type="text/javascript">
   (function() {
     // If this view is rendered in an iframe within the learning microfrontend app
     // it will report the height of its contents to the parent window when the
     // document loads, window resizes, or DOM mutates.
-    var learningAppUrl = "${settings.LEARNING_MICROFRONTEND_URL | n, js_escaped_string}";
-    var parentIsLearningApp = document.referrer.indexOf(learningAppUrl) === 0;
-
-    if (window !== window.parent && parentIsLearningApp) {
+    if (window !== window.parent) {
       var lastHeight = window.offsetHeight;
       var lastWidth = window.offsetWidth;
       var contentElement = document.getElementById('content');
@@ -166,3 +165,4 @@ ${HTML(fragment.foot_html())}
     }
   }());
 </script>
+% endif

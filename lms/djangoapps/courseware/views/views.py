@@ -1682,7 +1682,8 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'staff_access': bool(request.user.has_perm(VIEW_XQA_INTERFACE, course)),
             'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
             'display_reset_dates_banner': display_reset_dates_banner,
-            'web_app_course_url': reverse(COURSE_HOME_VIEW_NAME, args=[course.id])
+            'web_app_course_url': reverse(COURSE_HOME_VIEW_NAME, args=[course.id]),
+            'is_learning_mfe': request.META.get('HTTP_REFERER', '').startswith(settings.LEARNING_MICROFRONTEND_URL),
         }
         return render_to_response('courseware/courseware-chromeless.html', context)
 
