@@ -16,12 +16,12 @@ class PartnerAdmin(admin.ModelAdmin):
             return reverse('partner_url', kwargs={'slug': obj.slug})
 
 
-admin.site.register(Partner, PartnerAdmin)
+class PartnerUserModelAdmin(admin.ModelAdmin):
+    """
+    Django admin to verify if user is affiliated with partner or not after login or registration
+    """
 
-"""
-Django admin model to verify if user is affiliated with partner or not after login or registration  
-"""
-admin.site.register(PartnerUser)
+    raw_id_fields = ('user',)
 
 
 class PartnerCommunityModelAdmin(admin.ModelAdmin):
@@ -36,5 +36,7 @@ class PartnerCommunityModelAdmin(admin.ModelAdmin):
         verbose_name_plural = 'Partner Communities'
 
 
+admin.site.register(Partner, PartnerAdmin)
 admin.site.register(PartnerCommunity, PartnerCommunityModelAdmin)
+admin.site.register(PartnerUser, PartnerUserModelAdmin)
 
