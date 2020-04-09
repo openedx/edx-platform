@@ -3,28 +3,3 @@
 @import 'bourbon/bourbon';
 @import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
 @import 'build-mobile';
-
-.reset-deadlines-banner {
-  background-color: theme-color("primary");
-  display: flex;
-  flex-wrap: wrap;
-  padding: 15px 20px;
-  margin-top: 5px;
-
-  div,
-  button {
-    flex: 0 1 auto;
-
-    &.reset-deadlines-text {
-      color: theme-color("inverse");
-      padding-top: 10px;
-      margin-right: 10px;
-    }
-
-    &.reset-deadlines-button {
-      color: #0075b4;
-      background-color: theme-color("inverse");
-      cursor: pointer;
-    }
-  }
-}

@@ -1627,6 +1627,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
     The returned HTML is a chromeless rendering of the xBlock (excluding content of the containing courseware).
     """
     from lms.urls import RENDER_XBLOCK_NAME, RESET_COURSE_DEADLINES_NAME
+    from openedx.features.course_experience.urls import COURSE_HOME_VIEW_NAME
 
     usage_key = UsageKey.from_string(usage_key_string)
 
@@ -1668,10 +1669,6 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
         if RELATIVE_DATES_FLAG.is_enabled(course.id):
             display_reset_dates_banner = reset_deadlines_banner_should_display(course_key, request)
 
-        reset_deadlines_url = reverse(RESET_COURSE_DEADLINES_NAME) if display_reset_dates_banner else None
-
-        reset_deadlines_redirect_url_base = RENDER_XBLOCK_NAME if reset_deadlines_url else None
-
         context = {
             'fragment': block.render('student_view', context=student_view_context),
             'course': course,
@@ -1685,9 +1682,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'staff_access': bool(request.user.has_perm(VIEW_XQA_INTERFACE, course)),
             'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
             'display_reset_dates_banner': display_reset_dates_banner,
-            'reset_deadlines_url': reset_deadlines_url,
-            'reset_deadlines_redirect_url_base': reset_deadlines_redirect_url_base,
-            'reset_deadlines_redirect_url_id_dict': {'course_id': str(course.id), 'usage_key_string': usage_key_string}
+            'web_app_course_url': reverse(COURSE_HOME_VIEW_NAME, args=[course.id])
         }
         return render_to_response('courseware/courseware-chromeless.html', context)
 

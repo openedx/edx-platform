@@ -270,5 +270,4 @@ def reset_deadlines_banner_should_display(course_key, request):
                             and subsection.get('due', timezone.now() + timedelta(1)) < timezone.now()):
                         display_reset_dates_banner = True
                         break
-
     return display_reset_dates_banner
