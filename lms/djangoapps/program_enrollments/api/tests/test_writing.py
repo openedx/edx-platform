@@ -78,8 +78,6 @@ class EnrollmentTestMixin(CacheIsolationTestCase):
         super(EnrollmentTestMixin, self).setUp()
         cache.set(PROGRAM_CACHE_KEY_TPL.format(uuid=self.program_uuid), self.program, None)
 
-
-
     def create_program_enrollment(self, external_user_key, user=False):
         """
         Creates and returns a ProgramEnrollment for the given external_user_key and
@@ -416,7 +414,7 @@ class WriteProgramCourseEnrollmentTest(EnrollmentTestMixin):
         pending_role_assingments.get(
             enrollment__program_enrollment__external_user_key='learner-1',
             enrollment__course_key=self.course_id
-        ) 
+        )
 
     def test_update_and_assign_or_revoke_staff(self):
         """
