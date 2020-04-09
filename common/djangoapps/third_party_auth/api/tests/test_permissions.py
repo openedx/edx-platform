@@ -36,8 +36,8 @@ class ThirdPartyAuthPermissionTest(TestCase):
         def get(self, request, provider_id=None):
             return Response(data="Success")
 
-    def _create_user(self, is_superuser=False):
-        return UserFactory(username='this_user', is_superuser=is_superuser)
+    def _create_user(self, is_superuser=False, is_staff=False):
+        return UserFactory(username='this_user', is_superuser=is_superuser, is_staff=is_staff)
 
     def _create_request(self, auth_header=None):
         url = '/'
@@ -56,21 +56,19 @@ class ThirdPartyAuthPermissionTest(TestCase):
         response = self.SomeTpaClassView().dispatch(request)
         self.assertEqual(response.status_code, 401)
 
-    def test_session_superuser_succeeds(self):
-        user = self._create_user(is_superuser=True)
+    @ddt.data(
+        (True, False, 200),
+        (False, True, 200),
+        (False, False, 403),
+    )
+    @ddt.unpack
+    def test_session_with_user_permission(self, is_superuser, is_staff, expected_status_code):
+        user = self._create_user(is_superuser=is_superuser, is_staff=is_staff)
         request = self._create_request()
         self._create_session(request, user)
 
         response = self.SomeTpaClassView().dispatch(request)
-        self.assertEqual(response.status_code, 200)
-
-    def test_session_user_fails(self):
-        user = self._create_user()
-        request = self._create_request()
-        self._create_session(request, user)
-
-        response = self.SomeTpaClassView().dispatch(request)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, expected_status_code)
 
     @ddt.data(
         # unrestricted (for example, jwt cookies)
