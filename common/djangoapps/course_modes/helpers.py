@@ -4,8 +4,12 @@
 import six
 from django.utils.translation import ugettext_lazy as _
 
+from requests.exceptions import ConnectionError, Timeout  # pylint: disable=redefined-builtin
+from slumber.exceptions import SlumberBaseException
+
 from course_modes.models import CourseMode
 from student.helpers import VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 
 DISPLAY_VERIFIED = "verified"
 DISPLAY_HONOR = "honor"
@@ -83,3 +87,19 @@ def _enrollment_mode_display(enrollment_mode, verification_status, course_id):
         display_mode = enrollment_mode
 
     return display_mode
+
+
+def get_course_final_price(user, sku, min_price):
+    """
+    Return the course's discounted price for a user if user is entitled other None.
+    """
+    price_details = {}
+    try:
+        price_details = ecommerce_api_client(user).baskets.calculate.get(
+            sku=[sku],
+            username=user.username,
+        )
+    except (SlumberBaseException, ConnectionError, Timeout) as exc:     # pylint: disable=unused-variable
+        pass
+    price = price_details.get('total_incl_tax', min_price)
+    return price if price != min_price else None

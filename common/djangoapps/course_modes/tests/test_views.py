@@ -199,6 +199,41 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
             self.assertNotContains(response, "Credit")
 
     @httpretty.activate
+    @patch('course_modes.views.is_enterprise_learner')
+    @patch('course_modes.views.get_course_final_price')
+    @ddt.data(
+        (1.0, True),
+        (50.0, False),
+        (0.0, True),
+        (None, False),
+    )
+    @ddt.unpack
+    def test_display_after_discounted_price(
+        self,
+        discounted_price,
+        is_enterprise_learner,
+        mock_get_course_final_price,
+        mock_is_enterprise_learner
+    ):
+        # Create the course modes
+        CourseModeFactory.create(mode_slug='audit', course_id=self.course.id)
+        verified_mode = CourseModeFactory.create(mode_slug='verified', course_id=self.course.id, sku='dummy')
+        CourseEnrollmentFactory(
+            is_active=True,
+            course_id=self.course.id,
+            user=self.user
+        )
+
+        mock_is_enterprise_learner.return_value = is_enterprise_learner
+        mock_get_course_final_price.return_value = discounted_price
+        url = reverse('course_modes_choose', args=[six.text_type(self.course.id)])
+        response = self.client.get(url)
+
+        price = discounted_price if is_enterprise_learner else verified_mode.min_price
+        # response will have after discounted price.
+        self.assertContains(response, price)
+
+    @httpretty.activate
     @ddt.data(True, False)
     def test_congrats_on_enrollment_message(self, create_enrollment):
         # Create the course mode
