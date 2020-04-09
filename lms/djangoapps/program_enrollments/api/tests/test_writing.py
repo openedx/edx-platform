@@ -11,11 +11,13 @@ mocks in the view tests.
 
 from uuid import UUID
 
+import ddt
 from django.core.cache import cache
 from opaque_keys.edx.keys import CourseKey
 from organizations.tests.factories import OrganizationFactory
 
 from course_modes.models import CourseMode
+from lms.djangoapps.program_enrollments.constants import ProgramCourseEnrollmentRoles
 from lms.djangoapps.program_enrollments.constants import ProgramCourseEnrollmentStatuses as PCEStatuses
 from lms.djangoapps.program_enrollments.constants import ProgramCourseOperationStatuses as CourseStatuses
 from lms.djangoapps.program_enrollments.constants import ProgramEnrollmentStatuses as PEStatuses
@@ -38,7 +40,7 @@ from third_party_auth.tests.factories import SAMLProviderConfigFactory
 from ..writing import write_program_course_enrollments, write_program_enrollments
 
 
-class EnrollmentWriteTest(CacheIsolationTestCase):
+class EnrollmentTestMixin(CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     organization_key = 'test'
@@ -52,7 +54,7 @@ class EnrollmentWriteTest(CacheIsolationTestCase):
         """
         Set up test data
         """
-        super(EnrollmentWriteTest, cls).setUpClass()
+        super(EnrollmentTestMixin, cls).setUpClass()
         catalog_org = CatalogOrganizationFactory.create(key=cls.organization_key)
         cls.program = ProgramFactory.create(
             uuid=cls.program_uuid,
@@ -71,8 +73,10 @@ class EnrollmentWriteTest(CacheIsolationTestCase):
         cls.student_2 = UserFactory(username='student-2')
 
     def setUp(self):
-        super(EnrollmentWriteTest, self).setUp()
+        super(EnrollmentTestMixin, self).setUp()
         cache.set(PROGRAM_CACHE_KEY_TPL.format(uuid=self.program_uuid), self.program, None)
+
+
 
     def create_program_enrollment(self, external_user_key, user=False):
         """
@@ -87,9 +91,34 @@ class EnrollmentWriteTest(CacheIsolationTestCase):
             program_enrollment.user = user
             program_enrollment.save()
         return program_enrollment
-        
 
-class WritingProgramEnrollmentTest(EnrollmentWriteTest):
+    def create_program_course_enrollment(self, program_enrollment, course_status='active'):
+        """
+        Creates and returns a ProgramCourseEnrollment for the given program_enrollment and
+        self.course_key, creating a CourseEnrollment if the program enrollment has a user
+        """
+        course_enrollment = None
+        if program_enrollment.user:
+            course_enrollment = CourseEnrollmentFactory.create(
+                course_id=self.course_id,
+                user=program_enrollment.user,
+                mode=CourseMode.MASTERS
+            )
+            course_enrollment.is_active = course_status == "active"
+            course_enrollment.save()
+        return ProgramCourseEnrollmentFactory.create(
+            program_enrollment=program_enrollment,
+            course_key=self.course_id,
+            course_enrollment=course_enrollment,
+            status=course_status,
+        )
+    
+    def create_program_and_course_enrollments(self, external_user_key, user=False, course_status='active'):
+        program_enrollment = self.create_program_enrollment(external_user_key, user)
+        return self.create_program_course_enrollment(program_enrollment, course_status=course_status)
+
+
+class WritingProgramEnrollmentTest(EnrollmentTestMixin):
     """
     Test cases for program enrollment writing functions.
     """
@@ -116,40 +145,15 @@ class WritingProgramEnrollmentTest(EnrollmentWriteTest):
         assert ProgramEnrollment.historical_records.count() == 2  # pylint: disable=no-member
         assert ProgramEnrollment.objects.filter(status=PEStatuses.ENDED).exists()
 
-
-class WritingProgramCourseEnrollmentTest(EnrollmentWriteTest):
-
+@ddt.ddt
+class WriteProgramCourseEnrollmentTest(EnrollmentTestMixin):
+    
     def course_enrollment_request(self, external_key, status='active', course_staff=None):
         return {
             'external_user_key': external_key,
             'status': status,
             'course_staff': course_staff
         }
-
-    def create_program_course_enrollment(self, program_enrollment, course_status='active'):
-        """
-        Creates and returns a ProgramCourseEnrollment for the given program_enrollment and
-        self.course_key, creating a CourseEnrollment if the program enrollment has a user
-        """
-        course_enrollment = None
-        if program_enrollment.user:
-            course_enrollment = CourseEnrollmentFactory.create(
-                course_id=self.course_id,
-                user=program_enrollment.user,
-                mode=CourseMode.MASTERS
-            )
-            course_enrollment.is_active = course_status == "active"
-            course_enrollment.save()
-        return ProgramCourseEnrollmentFactory.create(
-            program_enrollment=program_enrollment,
-            course_key=self.course_id,
-            course_enrollment=course_enrollment,
-            status=course_status,
-        )
-
-    def create_program_and_course_enrollments(self, external_user_key, user=False, course_status='active'):
-        program_enrollment = self.create_program_enrollment(external_user_key, user)
-        return self.create_program_course_enrollment(program_enrollment, course_status=course_status)
 
     def assert_program_course_enrollment(self, external_user_key, expected_status, has_user, mode=CourseMode.MASTERS):
         """
@@ -171,7 +175,13 @@ class WritingProgramCourseEnrollmentTest(EnrollmentWriteTest):
         else:
             self.assertIsNone(course_enrollment)
 
-    def test_create_enrollments(self):
+    def setup_change_test_data(self, initial_statuses):
+        self.create_program_and_course_enrollments('learner-1', course_status=initial_statuses[0])
+        self.create_program_and_course_enrollments('learner-2', course_status=initial_statuses[1])
+        self.create_program_and_course_enrollments('learner-3', course_status=initial_statuses[2], user=None)
+        self.create_program_and_course_enrollments('learner-4', course_status=initial_statuses[3], user=None)
+
+    def test_create_only(self):
         self.create_program_enrollment('learner-1')
         self.create_program_enrollment('learner-2')
         self.create_program_enrollment('learner-3', user=None)
@@ -204,7 +214,79 @@ class WritingProgramCourseEnrollmentTest(EnrollmentWriteTest):
         self.assert_program_course_enrollment('learner-3', 'active', False)
         self.assert_program_course_enrollment('learner-4', 'inactive', False)
 
-    def test_program_course_enrollment_exists(self):
+    @ddt.data(
+        ('active', 'inactive', 'active', 'inactive'),
+        ('inactive', 'active', 'inactive', 'active'),
+        ('active', 'active', 'active', 'active'),
+        ('inactive', 'inactive', 'inactive', 'inactive'),
+    )
+    def test_update_only(self, initial_statuses):
+
+        self.setup_change_test_data(initial_statuses)
+
+        course_enrollment_requests = [
+            self.course_enrollment_request('learner-1', 'inactive'),
+            self.course_enrollment_request('learner-2', 'active'),
+            self.course_enrollment_request('learner-3', 'inactive'),
+            self.course_enrollment_request('learner-4', 'active'),
+        ]
+
+        result = write_program_course_enrollments(
+            self.program_uuid,
+            self.course_id,
+            course_enrollment_requests,
+            False,
+            True,
+        )
+        self.assertDictEqual(
+            {
+                'learner-1': 'inactive',
+                'learner-2': 'active',
+                'learner-3': 'inactive',
+                'learner-4': 'active',
+            },
+            result,
+        )
+        self.assert_program_course_enrollment('learner-1', 'inactive', True)
+        self.assert_program_course_enrollment('learner-2', 'active', True)
+        self.assert_program_course_enrollment('learner-3', 'inactive', False)
+        self.assert_program_course_enrollment('learner-4', 'active', False)
+
+    def test_create_or_update(self):
+        # learners 1-4 are already enrolled in courses, 5-6 only have a program enrollment
+        self.setup_change_test_data(['active','active','active','active'])
+        self.create_program_enrollment('learner-5')
+        self.create_program_enrollment('learner-6', user=None)
+
+        course_enrollment_requests = [
+            self.course_enrollment_request('learner-1', 'inactive'),
+            self.course_enrollment_request('learner-2', 'active'),
+            self.course_enrollment_request('learner-5', 'active'),
+            self.course_enrollment_request('learner-6', 'active'),
+        ]
+
+        result = write_program_course_enrollments(
+            self.program_uuid,
+            self.course_id,
+            course_enrollment_requests,
+            True,
+            True,
+        )
+        self.assertDictEqual(
+            {
+                'learner-1': 'inactive',
+                'learner-2': 'active',
+                'learner-5': 'active',
+                'learner-6': 'active',
+            },
+            result,
+        )
+        self.assert_program_course_enrollment('learner-1', 'inactive', True)
+        self.assert_program_course_enrollment('learner-2', 'active', True)
+        self.assert_program_course_enrollment('learner-5', 'active', True)
+        self.assert_program_course_enrollment('learner-6', 'active', False)
+
+    def test_create_conflicting_enrollment(self):
         """
         The program enrollments application already has a program_course_enrollment
         record for this user and course
@@ -216,39 +298,66 @@ class WritingProgramCourseEnrollmentTest(EnrollmentWriteTest):
             self.course_id,
             course_enrollment_requests,
             True,
-            False 
+            False,
         )
         self.assertDictEqual({'learner-1': CourseStatuses.CONFLICT}, result)
 
+    def test_update_nonexistent_enrollment(self):
+        self.create_program_enrollment('learner-1')
+        result = write_program_course_enrollments(
+            self.program_uuid,
+            self.course_id,
+            [self.course_enrollment_request('learner-1')],
+            False,
+            True,
+        )
+        self.assertDictEqual({'learner-1': CourseStatuses.NOT_FOUND}, result)
+
+    def test_invalid_status(self):
+        self.create_program_enrollment('learner-1')
+        result = write_program_course_enrollments(
+            self.program_uuid,
+            self.course_id,
+            [self.course_enrollment_request('learner-1', 'not-a-status')],
+            True,
+            False,
+        )
+        self.assertDictEqual({'learner-1': CourseStatuses.INVALID_STATUS}, result)
+
+    def test_duplicate_external_keys(self):
+        self.create_program_enrollment('learner-1')
+        course_enrollment_requests = [
+            self.course_enrollment_request('learner-1'),
+            self.course_enrollment_request('learner-1'),
+        ]
+
     def test_create_enrollments_and_assign_staff(self):
         """
-        Successfully creates both waiting and linked program course enrollments with the course staff role.
+        Successfully creates/updates both waiting and linked program course enrollments with the course staff role.
         """
         course_staff_role = CourseStaffRole(self.course_id)
         course_staff_role.add_users(self.student_1)
 
         self.create_program_enrollment('learner-1', user=None)
-        self.create_program_enrollment('learner-2', user=None)
-        self.create_program_enrollment('learner-3', user=self.student_1)
-        self.create_program_enrollment('learner-4', user=self.student_2)
+        self.create_program_enrollment('learner-2', user=self.student_1)
+        self.create_program_enrollment('learner-3', user=self.student_2)
+
         course_enrollment_requests = [
             self.course_enrollment_request('learner-1', 'active', True),
             self.course_enrollment_request('learner-2', 'active', True),
             self.course_enrollment_request('learner-3', 'active', True),
-            self.course_enrollment_request('learner-4', 'active', True),
         ]
         write_program_course_enrollments(
             self.program_uuid,
             self.course_id,
             course_enrollment_requests,
             True,
-            False
+            True,
         )
 
         self.assert_program_course_enrollment('learner-1', 'active', False)
-        self.assert_program_course_enrollment('learner-2', 'active', False)
-        self.assert_program_course_enrollment('learner-3', 'active', True)
-        self.assert_program_course_enrollment('learner-4', 'active', True)
+        self.assert_program_course_enrollment('learner-2', 'active', True)
+        self.assert_program_course_enrollment('learner-3', 'active', True) 
 
         # Users linked to either enrollment are given the course staff role
         self.assertListEqual(
@@ -258,15 +367,51 @@ class WritingProgramCourseEnrollmentTest(EnrollmentWriteTest):
 
         # CourseAccessRoleAssignment objects are created for enrollments with no linked user
         pending_role_assingments = CourseAccessRoleAssignment.objects.all()
-        assert pending_role_assingments.count() == 2
+        assert pending_role_assingments.count() == 1
         pending_role_assingments.get(
             enrollment__program_enrollment__external_user_key='learner-1',
             enrollment__course_key=self.course_id
+        ) 
+
+    def test_update_and_assign_or_revoke_staff(self):
+        course_staff_role = CourseStaffRole(self.course_id)
+        course_staff_role.add_users(self.student_1)
+        course_staff_role.add_users(self.student_2)
+
+        self.create_program_and_course_enrollments('learner-1', user=self.student_1)
+        self.create_program_and_course_enrollments('learner-2', user=self.student_2)
+        self.create_program_and_course_enrollments('learner-3', user=None)
+        enrollment = self.create_program_and_course_enrollments('learner-4', user=None)
+        CourseAccessRoleAssignment.objects.create(
+            enrollment=enrollment,
+            role=ProgramCourseEnrollmentRoles.COURSE_STAFF,
         )
+        course_enrollment_requests = [
+            self.course_enrollment_request('learner-1', 'active', True),
+            self.course_enrollment_request('learner-2', 'active', False),
+            self.course_enrollment_request('learner-3', 'active', True),
+            self.course_enrollment_request('learner-4', 'active', False),
+        ]
+        write_program_course_enrollments(
+            self.program_uuid,
+            self.course_id,
+            course_enrollment_requests,
+            True,
+            True,
+        )
+        # Role is revoked for user's with a linked enrollment
+        self.assertListEqual(
+            [self.student_1],
+            list(course_staff_role.users_with_role())
+        )
+
+        # CourseAccessRoleAssignment objects are created/revoked for enrollments with no linked user
+        pending_role_assingments = CourseAccessRoleAssignment.objects.all()
+        assert pending_role_assingments.count() == 1
         pending_role_assingments.get(
-            enrollment__program_enrollment__external_user_key='learner-2',
+            enrollment__program_enrollment__external_user_key='learner-3',
             enrollment__course_key=self.course_id
-        )
+        ) 
     
     def test_user_currently_enrolled_in_course(self):
         """

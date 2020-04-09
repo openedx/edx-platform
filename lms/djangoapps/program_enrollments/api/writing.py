@@ -269,11 +269,10 @@ def write_program_course_enrollments(
             if not update:
                 results[external_key] = ProgramCourseOpStatuses.CONFLICT
                 continue
-            updated_course_enrollment = change_program_course_enrollment_status(
+            results[external_key] = change_program_course_enrollment_status(
                 existing_course_enrollment, status
             )
-            results[external_key] = updated_course_enrollment.status
-            updated_enrollments.append(updated_course_enrollment)
+            updated_enrollments.append(existing_course_enrollment)
         else:
             if not create:
                 results[external_key] = ProgramCourseOpStatuses.NOT_FOUND
@@ -285,7 +284,8 @@ def write_program_course_enrollments(
             results[external_key] = new_course_enrollment.status
 
         if course_staff is not None:
-            staff_assignments_by_user_course_key[(external_key, new_course_enrollment.course_key)] = course_staff
+            course_enrollment = existing_course_enrollment or new_course_enrollment
+            staff_assignments_by_user_course_key[(external_key, course_enrollment.course_key)] = course_staff
 
     # Bulk-create all new program-course enrollments and corresponding history records.
     # Note: this will NOT invoke `save()` or `pre_save`/`post_save` signals!
@@ -298,8 +298,6 @@ def write_program_course_enrollments(
         id__in=[enrollment.id for enrollment in created_enrollments + updated_enrollments]
     ).select_related('program_enrollment')
 
-    add_course_staff_users_by_course_key = {}
-    remove_course_staff_users_by_course_key = {}
     role_assignments_to_save = []
     enrollment_role_assignments_to_delete = [] 
     for enrollment in created:
@@ -398,8 +396,7 @@ def change_program_course_enrollment_status(program_course_enrollment, new_statu
         program_course_enrollment (ProgramCourseEnrollment)
         status (str): from ProgramCourseEnrollmentStatuses
 
-    Returns: str
-        String from ProgramOperationCourseStatuses.
+    Returns: ProgramCourseEnrollment
     """
     if new_status == program_course_enrollment.status:
         return new_status
