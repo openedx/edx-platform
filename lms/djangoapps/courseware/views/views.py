@@ -1654,7 +1654,6 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
 
         student_view_context = request.GET.dict()
         student_view_context['show_bookmark_button'] = request.GET.get('show_bookmark_button', '0') == '1'
-        student_view_context['in_mfe'] = request.GET.get('in_mfe', '0') == '1'
         student_view_context['show_title'] = request.GET.get('show_title', '1') == '1'
 
         enable_completion_on_view_service = False
