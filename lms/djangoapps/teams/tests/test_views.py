@@ -1650,7 +1650,7 @@ class TestListTopicsAPI(TeamAPITestCase):
         TODO: the two students should probably not see that there's another team that they don't see
         """
         topics = self.get_topics_list(
-            data={'course_id': self.test_course_1.id},
+            data={'course_id': str(self.test_course_1.id)},
             user=requesting_user
         )
         private_teamset_1 = [topic for topic in topics['results'] if topic['name'] == 'private_topic_1_name'][0]
