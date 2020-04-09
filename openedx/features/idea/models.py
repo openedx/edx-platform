@@ -20,9 +20,6 @@ class Location(models.Model):
     def location(self):
         return '{city}, {country}'.format(city=self.city, country=self.country)
 
-    def __unicode__(self):
-        return self.location
-
     class Meta:
         abstract = True
 
@@ -41,9 +38,6 @@ class VisualAttachment(models.Model):
         help_text='Accepted extensions: .docx, .pdf, .txt'
     )
 
-    def __unicode__(self):
-        return self.video_link
-
     class Meta:
         abstract = True
 
@@ -56,9 +50,6 @@ class OrganizationBase(models.Model):
         on_delete=models.CASCADE
     )
     organization_mission = models.TextField()
-
-    def __unicode__(self):
-        return self.organization.label
 
     class Meta:
         abstract = True
