@@ -4,7 +4,7 @@ Unit tests for ProgramEnrollment views.
 
 
 import json
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from datetime import datetime, timedelta
 from uuid import UUID, uuid4
 
@@ -153,11 +153,14 @@ class EnrollmentsDataMixin(ProgramCacheMixin):
     def log_in_staff(self):
         self.client.login(username=self.global_staff.username, password=self.password)
 
-    def learner_enrollment(self, student_key, enrollment_status="active"):
+    def learner_enrollment(self, student_key, enrollment_status="active", course_staff=None):
         """
         Convenience method to create a learner enrollment record
         """
-        return {"student_key": student_key, "status": enrollment_status}
+        enrollment_record = {"student_key": student_key, "status": enrollment_status}
+        if course_staff is not None:
+            enrollment_record["course_staff"] = course_staff
+        return enrollment_record
 
     def request(self, path, data, **kwargs):
         pass
@@ -766,6 +769,7 @@ class ProgramCourseEnrollmentsMixin(EnrollmentsDataMixin):
     Children should override self.request()
     """
     view_name = 'programs_api:v1:program_course_enrollments'
+    write_enrollments_function = ''
 
     @classmethod
     def setUpClass(cls):
@@ -781,26 +785,6 @@ class ProgramCourseEnrollmentsMixin(EnrollmentsDataMixin):
         super(ProgramCourseEnrollmentsMixin, self).setUp()
         self.default_url = self.get_url(course_id=self.course_id)
         self.log_in_staff()
-
-    def assert_program_course_enrollment(self, external_user_key, expected_status, has_user, mode=CourseMode.MASTERS):
-        """
-        Convenience method to assert that a ProgramCourseEnrollment exists,
-        and potentially that a CourseEnrollment also exists
-        """
-        enrollment = ProgramCourseEnrollment.objects.get(
-            program_enrollment__external_user_key=external_user_key,
-            program_enrollment__program_uuid=self.program_uuid
-        )
-        self.assertEqual(expected_status, enrollment.status)
-        self.assertEqual(self.course_id, enrollment.course_key)
-        course_enrollment = enrollment.course_enrollment
-        if has_user:
-            self.assertIsNotNone(course_enrollment)
-            self.assertEqual(expected_status == "active", course_enrollment.is_active)
-            self.assertEqual(self.course_id, course_enrollment.course_id)
-            self.assertEqual(mode, course_enrollment.mode)
-        else:
-            self.assertIsNone(course_enrollment)
 
     def test_401_not_logged_in(self):
         self.client.logout()
@@ -839,40 +823,6 @@ class ProgramCourseEnrollmentsMixin(EnrollmentsDataMixin):
             response = self.request(self.default_url, request_data)
             self.assertEqual(404, response.status_code)
 
-    def test_duplicate_learner(self):
-        request_data = [
-            self.learner_enrollment("learner-1", "active"),
-            self.learner_enrollment("learner-1", "active"),
-        ]
-        response = self.request(self.default_url, request_data)
-        self.assertEqual(422, response.status_code)
-        self.assertDictEqual(
-            {
-                "learner-1": CourseStatuses.DUPLICATED
-            },
-            response.data
-        )
-
-    def test_user_not_in_program(self):
-        request_data = [
-            self.learner_enrollment("learner-1"),
-        ]
-        response = self.request(self.default_url, request_data)
-        self.assertEqual(422, response.status_code)
-        self.assertDictEqual(
-            {
-                "learner-1": CourseStatuses.NOT_IN_PROGRAM,
-            },
-            response.data
-        )
-
-    def test_invalid_status(self):
-        self.prepare_student('learner-1')
-        request_data = [self.learner_enrollment('learner-1', 'this-is-not-a-status')]
-        response = self.request(self.default_url, request_data)
-        self.assertEqual(422, response.status_code)
-        self.assertDictEqual({'learner-1': CourseStatuses.INVALID_STATUS}, response.data)
-
     @ddt.data(
         [{'status': 'active'}],
         [{'student_key': '000'}],
@@ -896,17 +846,42 @@ class ProgramCourseEnrollmentsMixin(EnrollmentsDataMixin):
         self.assertEqual(response.status_code, 400)
 
     def test_extra_field(self):
-        self.prepare_student('learner-1')
         enrollment = self.learner_enrollment('learner-1', 'inactive')
         enrollment['favorite_author'] = 'Hemingway'
         request_data = [enrollment]
-        response = self.request(self.default_url, request_data)
+        mock_write_response = {'learner-1': 'inactive'}
+        with mock.patch(
+            _VIEW_PATCH_FORMAT.format('write_program_course_enrollments'),
+            autospec=True,
+            return_value=mock_write_response,
+        ):
+            response = self.request(self.default_url, request_data)
+            self.assertEqual(200, response.status_code)
+            self.assertDictEqual(
+                mock_write_response,
+                response.data,
+            )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertDictEqual(
-            response.data,
-            {'learner-1': 'inactive'}
-        )
+    def test_207_multistatus(self):
+        """
+        If errors occur but some requests succeed return a 207
+        """
+        request_data = [self.learner_enrollment("learner-1"), self.learner_enrollment("learner-2")]
+        mock_write_response = {
+            'learner-1': CourseStatuses.ACTIVE,
+            'learner-2': CourseStatuses.NOT_IN_PROGRAM,
+        }
+        with mock.patch(
+            _VIEW_PATCH_FORMAT.format('write_program_course_enrollments'),
+            autospec=True,
+            return_value=mock_write_response,
+        ):
+            response = self.request(self.default_url, request_data)
+            self.assertEqual(207, response.status_code)
+            self.assertDictEqual(
+                {'learner-1': CourseStatuses.ACTIVE, 'learner-2': CourseStatuses.NOT_IN_PROGRAM},
+                response.data
+            )
 
 
 class ProgramCourseEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
@@ -1043,164 +1018,103 @@ class ProgramCourseEnrollmentsPostTests(ProgramCourseEnrollmentsMixin, APITestCa
     def request(self, path, data, **kwargs):
         return self.client.post(path, data, format='json', **kwargs)
 
-    def prepare_student(self, key):
-        self.create_program_enrollment(key)
-
     def test_create_enrollments(self):
-        self.create_program_enrollment('learner-1')
-        self.create_program_enrollment('learner-2')
-        self.create_program_enrollment('learner-3', user=None)
-        self.create_program_enrollment('learner-4', user=None)
+        mock_write_response = {
+            "learner-1": "active",
+            "learner-2": "inactive",
+            "learner-3": "active",
+            "learner-4": "inactive",
+        }
         post_data = [
             self.learner_enrollment("learner-1", "active"),
             self.learner_enrollment("learner-2", "inactive"),
-            self.learner_enrollment("learner-3", "active"),
-            self.learner_enrollment("learner-4", "inactive"),
+            self.learner_enrollment("learner-3", "active", True),
+            self.learner_enrollment("learner-4", "inactive", False),
         ]
-        response = self.request(self.default_url, post_data)
-        self.assertEqual(200, response.status_code)
-        self.assertDictEqual(
-            {
-                "learner-1": "active",
-                "learner-2": "inactive",
-                "learner-3": "active",
-                "learner-4": "inactive",
-            },
-            response.data
-        )
-        self.assert_program_course_enrollment("learner-1", "active", True)
-        self.assert_program_course_enrollment("learner-2", "inactive", True)
-        self.assert_program_course_enrollment("learner-3", "active", False)
-        self.assert_program_course_enrollment("learner-4", "inactive", False)
 
-    def test_program_course_enrollment_exists(self):
-        """
-        The program enrollments application already has a program_course_enrollment
-        record for this user and course
-        """
+        with mock.patch(
+            _VIEW_PATCH_FORMAT.format('write_program_course_enrollments'),
+            autospec=True,
+            return_value=mock_write_response,
+        ) as mock_write:
+            response = self.request(self.default_url, post_data)
+            self.assertEqual(200, response.status_code)
+            self.assertDictEqual(
+                mock_write_response,
+                response.data,
+            )
+        mock_write.assert_called_once_with(
+            str(self.program_uuid),
+            self.course_id,
+            [
+                OrderedDict([('external_user_key', 'learner-1'), ('status', 'active'), ('course_staff', None)]),
+                OrderedDict([('external_user_key', 'learner-2'), ('status', 'inactive'), ('course_staff', None)]),
+                OrderedDict([('external_user_key', 'learner-3'), ('status', 'active'), ('course_staff', True)]),
+                OrderedDict([('external_user_key', 'learner-4'), ('status', 'inactive'), ('course_staff', False)]),
+            ],
+            create=True,
+            update=False,
+        )
+
+    def test_no_successful_enrollments(self):
         self.create_program_and_course_enrollments('learner-1')
         post_data = [self.learner_enrollment("learner-1")]
-        response = self.request(self.default_url, post_data)
-        self.assertEqual(422, response.status_code)
-        self.assertDictEqual({'learner-1': CourseStatuses.CONFLICT}, response.data)
-
-    def test_user_currently_enrolled_in_course(self):
-        """
-        If a user is already enrolled in a course through a different method
-        that enrollment should be linked but not overwritten as masters.
-        """
-        CourseEnrollmentFactory.create(
-            course_id=self.course_id,
-            user=self.student,
-            mode=CourseMode.VERIFIED
-        )
-
-        self.create_program_enrollment('learner-1', user=self.student)
-
-        post_data = [
-            self.learner_enrollment("learner-1", "active")
-        ]
-        response = self.request(self.default_url, post_data)
-
-        self.assertEqual(200, response.status_code)
-        self.assertDictEqual(
-            {
-                "learner-1": "active"
-            },
-            response.data
-        )
-        self.assert_program_course_enrollment("learner-1", "active", True, mode=CourseMode.VERIFIED)
-
-    def test_207_multistatus(self):
-        self.create_program_enrollment('learner-1')
-        post_data = [self.learner_enrollment("learner-1"), self.learner_enrollment("learner-2")]
-        response = self.request(self.default_url, post_data)
-        self.assertEqual(207, response.status_code)
-        self.assertDictEqual(
-            {'learner-1': CourseStatuses.ACTIVE, 'learner-2': CourseStatuses.NOT_IN_PROGRAM},
-            response.data
-        )
+        mock_write_response = {'learner-1': CourseStatuses.CONFLICT}
+        with mock.patch(
+            _VIEW_PATCH_FORMAT.format('write_program_course_enrollments'),
+            autospec=True,
+            return_value=mock_write_response,
+        ):
+            response = self.request(self.default_url, post_data)
+            self.assertEqual(422, response.status_code)
+            self.assertDictEqual({'learner-1': CourseStatuses.CONFLICT}, response.data)
 
 
-@ddt.ddt
 class ProgramCourseEnrollmentsModifyMixin(ProgramCourseEnrollmentsMixin):
     """
     Base class for both the PATCH and PUT endpoints for Course Enrollment API
-    Children needs to implement assert_user_not_enrolled_test_result and
-    setup_change_test_data
     """
-
-    def prepare_student(self, key):
-        self.create_program_and_course_enrollments(key)
-
-    def test_207_multistatus(self):
-        self.create_program_and_course_enrollments('learner-1')
-        mod_data = [self.learner_enrollment("learner-1"), self.learner_enrollment("learner-2")]
-        response = self.request(self.default_url, mod_data)
-        self.assertEqual(207, response.status_code)
-        self.assertDictEqual(
-            {'learner-1': CourseStatuses.ACTIVE, 'learner-2': CourseStatuses.NOT_IN_PROGRAM},
-            response.data
+    def test_update_enrollment(self):
+        request_data = [self.learner_enrollment('learner-1', 'active')]
+        mock_write_response = {'learner-1': 'active'}
+        with mock.patch(
+            _VIEW_PATCH_FORMAT.format('write_program_course_enrollments'),
+            autospec=True,
+            return_value=mock_write_response,
+        ) as mock_write:
+            response = self.request(self.default_url, request_data)
+            self.assertEqual(200, response.status_code)
+            self.assertDictEqual(
+                mock_write_response,
+                response.data,
+            )
+        mock_write.assert_called_once_with(
+            str(self.program_uuid),
+            self.course_id,
+            [
+                OrderedDict([('external_user_key', 'learner-1'), ('status', 'active'), ('course_staff', None)])
+            ],
+            create=self.create,
+            update=self.update,
         )
-
-    def test_user_not_enrolled_in_course(self):
-        self.create_program_enrollment('learner-1')
-        patch_data = [self.learner_enrollment('learner-1')]
-        response = self.request(self.default_url, patch_data)
-        self.assert_user_not_enrolled_test_result(response)
-
-    def assert_user_not_enrolled_test_result(self, response):
-        pass
-
-    def setup_change_test_data(self, initial_statuses):
-        pass
-
-    @ddt.data(
-        ('active', 'inactive', 'active', 'inactive'),
-        ('inactive', 'active', 'inactive', 'active'),
-        ('active', 'active', 'active', 'active'),
-        ('inactive', 'inactive', 'inactive', 'inactive'),
-    )
-    def test_change_status(self, initial_statuses):
-        self.setup_change_test_data(initial_statuses)
-        mod_data = [
-            self.learner_enrollment('learner-1', 'inactive'),
-            self.learner_enrollment('learner-2', 'active'),
-            self.learner_enrollment('learner-3', 'inactive'),
-            self.learner_enrollment('learner-4', 'active'),
-        ]
-        response = self.request(self.default_url, mod_data)
-        self.assertEqual(200, response.status_code)
-        self.assertDictEqual(
-            {
-                'learner-1': 'inactive',
-                'learner-2': 'active',
-                'learner-3': 'inactive',
-                'learner-4': 'active',
-            },
-            response.data
-        )
-        self.assert_program_course_enrollment('learner-1', 'inactive', True)
-        self.assert_program_course_enrollment('learner-2', 'active', True)
-        self.assert_program_course_enrollment('learner-3', 'inactive', False)
-        self.assert_program_course_enrollment('learner-4', 'active', False)
 
 
 class ProgramCourseEnrollmentsPatchTests(ProgramCourseEnrollmentsModifyMixin, APITestCase):
-    """ Tests for course enrollment PATCH """
+    """ Test PATCH ProgramCourseEnrollments """
+    update = True
+    create = False
 
     def request(self, path, data, **kwargs):
         return self.client.patch(path, data, format='json', **kwargs)
 
-    def assert_user_not_enrolled_test_result(self, response):
-        self.assertEqual(422, response.status_code)
-        self.assertDictEqual({'learner-1': CourseStatuses.NOT_FOUND}, response.data)
 
-    def setup_change_test_data(self, initial_statuses):
-        self.create_program_and_course_enrollments('learner-1', course_status=initial_statuses[0])
-        self.create_program_and_course_enrollments('learner-2', course_status=initial_statuses[1])
-        self.create_program_and_course_enrollments('learner-3', course_status=initial_statuses[2], user=None)
-        self.create_program_and_course_enrollments('learner-4', course_status=initial_statuses[3], user=None)
+class ProgramCourseEnrollmentsPutTests(ProgramCourseEnrollmentsModifyMixin, APITestCase):
+    """ Test PUT ProgramCourseEnrollments """
+    update = True
+    create = True
+
+    def request(self, path, data, **kwargs):
+        return self.client.put(path, data, format='json', **kwargs)
 
 
 @ddt.ddt
@@ -1367,23 +1281,6 @@ class MultiprogramEnrollmentsTest(EnrollmentsDataMixin, APITestCase):
         )
         expected_results = {self.external_user_key: CourseStatuses.CONFLICT}
         self.assertDictEqual(expected_results, response.data)
-
-
-class ProgramCourseEnrollmentsPutTests(ProgramCourseEnrollmentsModifyMixin, APITestCase):
-    """ Tests for course enrollment PUT """
-
-    def request(self, path, data, **kwargs):
-        return self.client.put(path, data, format='json', **kwargs)
-
-    def assert_user_not_enrolled_test_result(self, response):
-        self.assertEqual(200, response.status_code)
-        self.assertDictEqual({'learner-1': CourseStatuses.ACTIVE}, response.data)
-
-    def setup_change_test_data(self, initial_statuses):
-        self.create_program_and_course_enrollments('learner-1', course_status=initial_statuses[0])
-        self.create_program_enrollment('learner-2')
-        self.create_program_enrollment('learner-3', user=None)
-        self.create_program_and_course_enrollments('learner-4', course_status=initial_statuses[3], user=None)
 
 
 class ProgramCourseGradesGetTests(EnrollmentsDataMixin, APITestCase):

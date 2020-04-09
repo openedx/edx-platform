@@ -102,6 +102,7 @@ class ProgramCourseEnrollmentRequestSerializer(serializers.Serializer, InvalidSt
     # returning INVALID_STATUS for individual bad statuses instead of raising
     # a ValidationError for the entire request.
     status = serializers.CharField(allow_blank=False)
+    course_staff = serializers.BooleanField(required=False, default=None)
 
 
 class ProgramCourseGradeSerializer(serializers.Serializer):
