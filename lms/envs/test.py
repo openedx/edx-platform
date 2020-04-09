@@ -57,8 +57,6 @@ for log_name, log_level in LOG_OVERRIDES:
 MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
 MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
 
-os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8000-9000'
-
 THIS_UUID = uuid4().hex[:5]
 
 FEATURES['DISABLE_SET_JWT_COOKIES_FOR_TESTS'] = True
