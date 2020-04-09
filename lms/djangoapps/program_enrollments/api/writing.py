@@ -269,7 +269,7 @@ def write_program_course_enrollments(
             if not update:
                 results[external_key] = ProgramCourseOpStatuses.CONFLICT
                 continue
-            updated_course_enrollment = change_program_course_enrollment_status(
+            results[external_key] = change_program_course_enrollment_status(
                 existing_course_enrollment, status
             )
             updated_enrollments.append(existing_course_enrollment)
@@ -370,8 +370,7 @@ def change_program_course_enrollment_status(program_course_enrollment, new_statu
         program_course_enrollment (ProgramCourseEnrollment)
         status (str): from ProgramCourseEnrollmentStatuses
 
-    Returns: str
-        String from ProgramOperationCourseStatuses.
+    Returns: ProgramCourseEnrollment
     """
     if new_status == program_course_enrollment.status:
         return new_status

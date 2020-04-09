@@ -78,6 +78,8 @@ class EnrollmentTestMixin(CacheIsolationTestCase):
         super(EnrollmentTestMixin, self).setUp()
         cache.set(PROGRAM_CACHE_KEY_TPL.format(uuid=self.program_uuid), self.program, None)
 
+
+
     def create_program_enrollment(self, external_user_key, user=False):
         """
         Creates and returns a ProgramEnrollment for the given external_user_key and
@@ -376,7 +378,7 @@ class WriteProgramCourseEnrollmentTest(EnrollmentTestMixin):
 
     def test_create_enrollments_and_assign_staff(self):
         """
-        Successfully creates both waiting and linked program course enrollments with the course staff role.
+        Successfully creates/updates both waiting and linked program course enrollments with the course staff role.
         """
         course_staff_role = CourseStaffRole(self.course_id)
         course_staff_role.add_users(self.student_1)
@@ -414,6 +416,20 @@ class WriteProgramCourseEnrollmentTest(EnrollmentTestMixin):
         pending_role_assingments.get(
             enrollment__program_enrollment__external_user_key='learner-1',
             enrollment__course_key=self.course_id
+        ) 
+
+    def test_update_and_assign_or_revoke_staff(self):
+        course_staff_role = CourseStaffRole(self.course_id)
+        course_staff_role.add_users(self.student_1)
+        course_staff_role.add_users(self.student_2)
+
+        self.create_program_and_course_enrollments('learner-1', user=self.student_1)
+        self.create_program_and_course_enrollments('learner-2', user=self.student_2)
+        self.create_program_and_course_enrollments('learner-3', user=None)
+        enrollment = self.create_program_and_course_enrollments('learner-4', user=None)
+        CourseAccessRoleAssignment.objects.create(
+            enrollment=enrollment,
+            role=ProgramCourseEnrollmentRoles.COURSE_STAFF,
         )
 
     def test_update_and_assign_or_revoke_staff(self):
