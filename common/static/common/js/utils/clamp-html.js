@@ -12,7 +12,7 @@
 function clampHtmlByWords(root, wordsLeft) {
     'use strict';
 
-    if (root.nodeName === 'SCRIPT' || root.nodeName === 'LINK') {
+    if (root.nodeName === 'SCRIPT' || root.nodeName === 'STYLE') {
         return wordsLeft; // early exit and ignore
     }
 
