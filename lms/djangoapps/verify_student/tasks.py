@@ -8,8 +8,7 @@ from smtplib import SMTPException
 
 from celery import task
 from django.conf import settings
-from django.core.mail import send_mail
-
+from django.core.mail import EmailMessage
 from edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
@@ -31,12 +30,8 @@ def send_verification_status_email(context):
     dest_addr = context.get('email')
 
     try:
-        send_mail(
-            subject,
-            message,
-            from_addr,
-            [dest_addr],
-            fail_silently=False
-        )
+        msg = EmailMessage(subject, message, from_addr, [dest_addr])
+        msg.content_subtype = 'html'
+        msg.send(fail_silently=False)
     except SMTPException:
         log.warning(u"Failure in sending verification status e-mail to %s", dest_addr)
