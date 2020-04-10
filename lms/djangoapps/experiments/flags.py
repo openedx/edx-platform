@@ -178,4 +178,8 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         if not active:
             bucket = 0
         with patch.object(self, 'get_bucket', return_value=bucket):
-            yield
+            # TODO We can move this import to the top of the file once this code is
+            # not all contained within the __init__ module.
+            from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+            with override_waffle_flag(self, active):
+                yield
