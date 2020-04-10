@@ -126,5 +126,5 @@ class ProgramCourseEnrollmentRoles(object):
     # Note: Any changes to this value will trigger a migration on
     # CourseAccessRoleAssignment!
     __MODEL_CHOICES__ = (
-        (role, role) for role in __ALL__ 
+        (role, role) for role in __ALL__
     )
