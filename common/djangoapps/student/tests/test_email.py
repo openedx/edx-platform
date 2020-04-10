@@ -21,7 +21,6 @@ from edxmako.shortcuts import marketing_link, render_to_string
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
-from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase
 from openedx.core.lib.request_utils import safe_get_host
 from student.models import PendingEmailChange, Registration, UserProfile
@@ -512,14 +511,6 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
             User.objects.get(username=self.user.username).email
         )
         self.assertEqual(0, PendingEmailChange.objects.count())
-
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
-    def test_prevent_auth_user_writes(self):
-        with waffle().override(PREVENT_AUTH_USER_WRITES, True):
-            self.check_confirm_email_change('email_change_failed.html', {
-                'err_msg': SYSTEM_MAINTENANCE_MSG
-            })
-            self.assertRolledBack()
 
     @patch('student.views.PendingEmailChange.objects.get', Mock(side_effect=TestException))
     def test_always_rollback(self):
