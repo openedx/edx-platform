@@ -35,6 +35,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from django.views.generic import View
+from edx_django_utils import monitoring as monitoring_utils
 from edx_django_utils.monitoring import set_custom_metrics_for_course_key
 from edxnotes.helpers import is_feature_enabled
 from ipware.ip import get_ip
@@ -1060,8 +1061,13 @@ def dates(request, course_id):
     Display the course's dates.html, or 404 if there is no such course.
     Assumes the course_id is in a valid format.
     """
-
     course_key = CourseKey.from_string(course_id)
+
+    # Enable NR tracing for this view based on course
+    monitoring_utils.set_custom_metric('course_id', text_type(course_key))
+    monitoring_utils.set_custom_metric('user_id', request.user.id)
+    monitoring_utils.set_custom_metric('is_staff', request.user.is_staff)
+
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
     course_date_blocks = get_course_date_blocks(course, request.user, request,
                                                 include_access=True, include_past_dates=True)
