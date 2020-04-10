@@ -28,7 +28,8 @@ from .reading import (
     get_saml_provider_for_organization,
     get_org_key_for_program,
     get_users_by_external_keys,
-    get_users_by_external_keys_and_org_key
+    get_users_by_external_keys_and_org_key,
+    is_course_staff_enrollment
 )
 from .writing import (
     change_program_course_enrollment_status,
