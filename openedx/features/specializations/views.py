@@ -42,6 +42,7 @@ def specialization_about(request, specialization_uuid):
         course_rerun['opened'] = opened
 
         course_id = CourseKey.from_string(course_rerun['key'])
+        # course object is required in order to fetch first chapter link
         current_course = modulestore().get_course(course_id)
 
         course_rerun['enrolled'] = CourseEnrollment.is_enrolled(request.user, course_id)
