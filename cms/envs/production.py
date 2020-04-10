@@ -8,6 +8,7 @@ This is the default template for our main set of AWS servers.
 
 
 import codecs
+import copy
 import os
 import yaml
 
@@ -42,6 +43,25 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
     # Removing them may break plugins that rely on them.
     ENV_TOKENS = __config__
     AUTH_TOKENS = __config__
+
+    # Add the key/values from config into the global namespace of this module.
+    # But don't override the FEATURES dict because we do that in an additive way.
+    __config_copy__ = copy.deepcopy(__config__)
+
+    KEYS_WITH_MERGED_VALUES = [
+        'FEATURES',
+        'TRACKING_BACKENDS',
+        'EVENT_TRACKING_BACKENDS',
+        'JWT_AUTH',
+        'CELERY_QUEUES',
+        'MKTG_URL_LINK_MAP',
+        'MKTG_URL_OVERRIDES',
+    ]
+    for key in KEYS_WITH_MERGED_VALUES:
+        if key in __config_copy__:
+            del __config_copy__[key]
+
+    vars().update(__config_copy__)
 
 
 # A file path to a YAML file from which to load all the code revisions currently deployed
