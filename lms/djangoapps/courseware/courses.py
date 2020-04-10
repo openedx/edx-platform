@@ -50,7 +50,6 @@ from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.courseware.access_utils import (
     check_authentication,
     check_enrollment,
-    check_public_access
 )
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
@@ -238,15 +237,15 @@ def check_course_access_with_redirect(course, user, action, check_if_enrolled=Fa
 
         # Redirect if the user is not enrolled and must be to see content
         if isinstance(access_response, EnrollmentRequiredAccessError):
-            raise CourseAccessRedirect(reverse('about_course', args=[six.text_type(course.id)]))
+            raise CourseAccessRedirect(reverse('about_course', args=[str(course.id)]))
 
         # Redirect if user must be authenticated to view the content
         if isinstance(access_response, AuthenticationRequiredAccessError):
-            raise CourseAccessRedirect(reverse('about_course', args=[six.text_type(course.id)]))
+            raise CourseAccessRedirect(reverse('about_course', args=[str(course.id)]))
 
         # Redirect if the user must answer a survey before entering the course.
         if isinstance(access_response, SurveyRequiredAccessError):
-            raise CourseAccessRedirect(reverse('course_survey', args=[six.text_type(course.id)]))
+            raise CourseAccessRedirect(reverse('course_survey', args=[str(course.id)]))
 
         # Deliberately return a non-specific error message to avoid
         # leaking info about access control settings
