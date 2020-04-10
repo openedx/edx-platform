@@ -34,7 +34,6 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming.helpers import get_current_request, get_current_site
 from openedx.core.djangoapps.user_api import accounts, errors, helpers
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
-from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangoapps.user_api.helpers import FormDescription
 from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
@@ -367,22 +366,6 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
             request, 'registration/password_reset_confirm.html', context
         )
 
-    def _handle_system_unavailability(self, request):
-        """
-        method to stop password reset process if system is under maintenance
-        """
-
-        context = {
-            'validlink': False,
-            'form': None,
-            'title': _('Password reset unsuccessful'),
-            'err_msg': SYSTEM_MAINTENANCE_MSG,
-        }
-        context.update(self.platform_name)
-        return TemplateResponse(
-            request, 'registration/password_reset_confirm.html', context
-        )
-
     def _validate_password(self, password, request):
         try:
             validate_password(password, user=self.user)
@@ -493,8 +476,6 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
             return response
         if UserRetirementRequest.has_user_requested_retirement(self.user):
             return self._handle_retired_user(self.request)
-        if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
-            return self._handle_system_unavailability(self.request)
 
         if self.request.method == 'POST':
             return self.post(self.request, *args, **kwargs)
