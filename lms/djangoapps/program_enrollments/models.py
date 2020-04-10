@@ -13,6 +13,7 @@ from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords
 
 from student.models import CourseEnrollment
+from student.roles import CourseStaffRole
 
 from .constants import ProgramCourseEnrollmentRoles, ProgramCourseEnrollmentStatuses, ProgramEnrollmentStatuses
 
@@ -135,6 +136,18 @@ class ProgramCourseEnrollment(TimeStampedModel):
     @property
     def is_active(self):
         return self.status == ProgramCourseEnrollmentStatuses.ACTIVE
+
+    @property
+    def course_staff(self):
+        role_assignment_exists = CourseAccessRoleAssignment.objects.filter(
+            enrollment=self,
+            role=ProgramCourseEnrollmentRoles.COURSE_STAFF,
+        ).exists()
+        if role_assignment_exists:
+            return True
+        elif self.program_enrollment.user:
+            return CourseStaffRole(self.course_key).has_user(self.program_enrollment.user)
+        return False
 
     def __str__(self):
         return '[ProgramCourseEnrollment id={}]'.format(self.id)

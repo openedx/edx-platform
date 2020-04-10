@@ -78,6 +78,7 @@ class ProgramCourseEnrollmentSerializer(serializers.Serializer):
     status = serializers.CharField()
     account_exists = serializers.SerializerMethodField()
     curriculum_uuid = serializers.SerializerMethodField()
+    course_staff = serializers.BooleanField()
 
     class Meta(object):
         model = ProgramCourseEnrollment

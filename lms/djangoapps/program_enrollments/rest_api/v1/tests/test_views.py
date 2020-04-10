@@ -35,7 +35,11 @@ from lms.djangoapps.program_enrollments.constants import ProgramCourseOperationS
 from lms.djangoapps.program_enrollments.constants import ProgramOperationStatuses as ProgramStatuses
 from lms.djangoapps.program_enrollments.exceptions import ProviderDoesNotExistException
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
-from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
+from lms.djangoapps.program_enrollments.tests.factories import (
+    CourseAccessRoleAssignmentFactory,
+    ProgramCourseEnrollmentFactory,
+    ProgramEnrollmentFactory,
+)
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL, PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL
 from openedx.core.djangoapps.catalog.tests.factories import (
     CourseFactory,
@@ -892,10 +896,13 @@ class ProgramCourseEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
         program_enrollment_2 = ProgramEnrollmentFactory.create(
             program_uuid=self.program_uuid, curriculum_uuid=self.other_curriculum_uuid, external_user_key='user-0',
         )
-        ProgramCourseEnrollmentFactory.create(
+        program_course_enrollment_1 = ProgramCourseEnrollmentFactory.create(
             program_enrollment=program_enrollment_1,
             course_key=self.course_id,
             status='active',
+        )
+        CourseAccessRoleAssignmentFactory.create(
+            enrollment=program_course_enrollment_1
         )
         ProgramCourseEnrollmentFactory.create(
             program_enrollment=program_enrollment_2,
@@ -959,11 +966,11 @@ class ProgramCourseEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
             'results': [
                 {
                     'student_key': 'user-0', 'status': 'active', 'account_exists': True,
-                    'curriculum_uuid': text_type(self.curriculum_uuid),
+                    'curriculum_uuid': text_type(self.curriculum_uuid), 'course_staff': True
                 },
                 {
                     'student_key': 'user-0', 'status': 'inactive', 'account_exists': True,
-                    'curriculum_uuid': text_type(self.other_curriculum_uuid),
+                    'curriculum_uuid': text_type(self.other_curriculum_uuid), 'course_staff': False
                 },
             ],
         }
@@ -980,7 +987,7 @@ class ProgramCourseEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
         expected_results = [
             {
                 'student_key': 'user-0', 'status': 'active', 'account_exists': True,
-                'curriculum_uuid': text_type(self.curriculum_uuid),
+                'curriculum_uuid': text_type(self.curriculum_uuid), 'course_staff': True
             },
         ]
         assert expected_results == response.data['results']
@@ -995,7 +1002,7 @@ class ProgramCourseEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
         next_expected_results = [
             {
                 'student_key': 'user-0', 'status': 'inactive', 'account_exists': True,
-                'curriculum_uuid': text_type(self.other_curriculum_uuid),
+                'curriculum_uuid': text_type(self.other_curriculum_uuid), 'course_staff': False
             },
         ]
         assert next_expected_results == next_response.data['results']
