@@ -8,7 +8,6 @@ from `lms.djangoapps.program_enrollments.api`.
 
 import logging
 
-from opaque_keys.edx.keys import CourseKey
 from simple_history.utils import bulk_create_with_history
 
 from course_modes.models import CourseMode
@@ -284,7 +283,6 @@ def write_program_course_enrollments(
             results[external_key] = new_course_enrollment.status
 
         if course_staff is not None:
-            course_enrollment = existing_course_enrollment or new_course_enrollment
             staff_assignments_by_user_key[external_key] = course_staff
 
     # Bulk-create all new program-course enrollments and corresponding history records.
@@ -301,34 +299,7 @@ def write_program_course_enrollments(
         id__in=[enrollment.id for enrollment in created_enrollments + updated_enrollments]
     ).select_related('program_enrollment')
 
-    role_assignments_to_save = []
-    enrollment_role_assignments_to_delete = [] 
-    for enrollment in written_enrollments:
-        external_key = enrollment.program_enrollment.external_user_key
-        user = enrollment.program_enrollment.user
-        course_staff = staff_assignments_by_user_key.get(external_key)
-
-        if user:
-            if course_staff is True:
-                CourseStaffRole(course_key).add_users(user) 
-            elif course_staff is False:
-                CourseStaffRole(course_key).remove_users(user)
-        else:
-            if course_staff is True:
-                role_assignments_to_save.append(CourseAccessRoleAssignment(
-                    enrollment=enrollment,
-                    role=ProgramCourseEnrollmentRoles.COURSE_STAFF
-                ))
-            elif course_staff is False:
-                enrollment_role_assignments_to_delete.append(enrollment)
-    
-    if role_assignments_to_save:
-        CourseAccessRoleAssignment.objects.bulk_create(role_assignments_to_save)
-
-    if enrollment_role_assignments_to_delete:
-        CourseAccessRoleAssignment.objects.filter(
-            enrollment__in=enrollment_role_assignments_to_delete
-        ).delete()
+    _assign_course_staff_role(course_key, written_enrollments, staff_assignments_by_user_key)
 
     return results
 
@@ -369,6 +340,7 @@ def create_program_course_enrollment(program_enrollment, course_key, status, sav
     if save:
         program_course_enrollment.save()
     return program_course_enrollment
+
 
 def change_program_course_enrollment_status(program_course_enrollment, new_status):
     """
@@ -453,6 +425,49 @@ def enroll_in_masters_track(user, course_key, status):
         if status == ProgramCourseEnrollmentStatuses.INACTIVE:
             course_enrollment.deactivate()
     return course_enrollment
+
+
+def _assign_course_staff_role(course_key, enrollments, staff_assignments):
+    """
+    Grant or remove the course staff role for a set of enrollments on a course.
+    For enrollment without a linked user, a CourseAccessRoleAssignment will be
+    created (or removed) for that enrollment.
+
+    Arguments:
+        enrollments (list): ProgramCourseEnrollments to update
+        staff_assignments (dict): Maps an enrollment's external key to a course staff value
+    """
+    role_assignments_to_save = []
+    enrollment_role_assignments_to_delete = []
+    for enrollment in enrollments:
+        if enrollment.course_key != course_key:
+            continue
+
+        external_key = enrollment.program_enrollment.external_user_key
+        user = enrollment.program_enrollment.user
+        course_staff = staff_assignments.get(external_key)
+
+        if user:
+            if course_staff is True:
+                CourseStaffRole(course_key).add_users(user)
+            elif course_staff is False:
+                CourseStaffRole(course_key).remove_users(user)
+        else:
+            if course_staff is True:
+                role_assignments_to_save.append(CourseAccessRoleAssignment(
+                    enrollment=enrollment,
+                    role=ProgramCourseEnrollmentRoles.COURSE_STAFF
+                ))
+            elif course_staff is False:
+                enrollment_role_assignments_to_delete.append(enrollment)
+
+    if role_assignments_to_save:
+        CourseAccessRoleAssignment.objects.bulk_create(role_assignments_to_save)
+
+    if enrollment_role_assignments_to_delete:
+        CourseAccessRoleAssignment.objects.filter(
+            enrollment__in=enrollment_role_assignments_to_delete
+        ).delete()
 
 
 def _ensure_course_exists(course_key, user_key_or_id):
