@@ -108,9 +108,9 @@ edx-celeryutils==0.5.0    # via -r requirements/edx/base.txt, super-csv
 edx-completion==3.1.1     # via -r requirements/edx/base.txt
 edx-django-release-util==0.4.2  # via -r requirements/edx/base.txt
 edx-django-sites-extensions==2.4.3  # via -r requirements/edx/base.txt
-edx-django-utils==3.1     # via -r requirements/edx/base.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
+edx-django-utils==3.2.0   # via -r requirements/edx/base.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==5.0.2  # via -r requirements/edx/base.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.0.10    # via -r requirements/edx/base.txt
+edx-enterprise==3.0.11    # via -r requirements/edx/base.txt
 edx-i18n-tools==0.5.0     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, ora2
 edx-lint==1.4.1           # via -r requirements/edx/testing.in
 edx-milestones==0.2.6     # via -r requirements/edx/base.txt
@@ -291,7 +291,7 @@ unidiff==0.5.5            # via -r requirements/edx/testing.in, coverage-pytest-
 uritemplate==3.0.1        # via -r requirements/edx/base.txt, coreapi, drf-yasg
 urllib3==1.25.8           # via -r requirements/edx/base.txt, elasticsearch, geoip2, requests, selenium, transifex-client
 user-util==0.1.5          # via -r requirements/edx/base.txt
-virtualenv==20.0.16       # via tox
+virtualenv==20.0.17       # via tox
 voluptuous==0.11.7        # via -r requirements/edx/base.txt, ora2
 watchdog==0.10.2          # via -r requirements/edx/base.txt
 wcwidth==0.1.9            # via pytest

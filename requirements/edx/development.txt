@@ -112,9 +112,9 @@ edx-celeryutils==0.5.0    # via -r requirements/edx/testing.txt, super-csv
 edx-completion==3.1.1     # via -r requirements/edx/testing.txt
 edx-django-release-util==0.4.2  # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==2.4.3  # via -r requirements/edx/testing.txt
-edx-django-utils==3.1     # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
+edx-django-utils==3.2.0   # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==5.0.2  # via -r requirements/edx/testing.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.0.10    # via -r requirements/edx/testing.txt
+edx-enterprise==3.0.11    # via -r requirements/edx/testing.txt
 edx-i18n-tools==0.5.0     # via -r requirements/edx/testing.txt, ora2
 edx-lint==1.4.1           # via -r requirements/edx/testing.txt
 edx-milestones==0.2.6     # via -r requirements/edx/testing.txt
@@ -287,7 +287,7 @@ social-auth-core==3.3.3   # via -r requirements/edx/testing.txt, social-auth-app
 git+https://github.com/jazzband/sorl-thumbnail.git@13bedfb7d2970809eda597e3ef79318a6fa80ac2#egg=sorl-thumbnail  # via -r requirements/edx/testing.txt
 sortedcontainers==2.1.0   # via -r requirements/edx/testing.txt, pdfminer.six
 soupsieve==2.0            # via -r requirements/edx/testing.txt, beautifulsoup4
-sphinx==3.0.0             # via edx-sphinx-theme, sphinxcontrib-httpdomain
+sphinx==3.0.1             # via edx-sphinx-theme, sphinxcontrib-httpdomain
 sphinxcontrib-applehelp==1.0.2  # via sphinx
 sphinxcontrib-devhelp==1.0.2  # via sphinx
 sphinxcontrib-htmlhelp==1.0.3  # via sphinx
@@ -313,7 +313,7 @@ unidiff==0.5.5            # via -r requirements/edx/testing.txt, coverage-pytest
 uritemplate==3.0.1        # via -r requirements/edx/testing.txt, coreapi, drf-yasg
 urllib3==1.25.8           # via -r requirements/edx/testing.txt, elasticsearch, geoip2, requests, selenium, transifex-client
 user-util==0.1.5          # via -r requirements/edx/testing.txt
-virtualenv==20.0.16       # via -r requirements/edx/testing.txt, tox
+virtualenv==20.0.17       # via -r requirements/edx/testing.txt, tox
 voluptuous==0.11.7        # via -r requirements/edx/testing.txt, ora2
 vulture==1.4              # via -r requirements/edx/development.in
 watchdog==0.10.2          # via -r requirements/edx/testing.txt
