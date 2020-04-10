@@ -16,20 +16,20 @@ class IdeaModelTest(TestCase):
         """Create an idea, and assert that it is saved successfully with all mandatory data"""
         idea = IdeaFactory()
 
-        idea_from_databased = Idea.objects.get(pk=idea.id)
+        idea_from_database = Idea.objects.get(pk=idea.id)
 
-        self.assertIsNotNone(idea_from_databased)
-        self.assertEqual(idea.title, idea_from_databased.title)
+        self.assertIsNotNone(idea_from_database)
+        self.assertEqual(idea.title, idea_from_database.title)
 
     def test_location_from_city_and_country(self):
-        """Create an idea and asset that location property is accessible in specific format"""
+        """Create an idea and assert that location property is accessible in specific format"""
         idea = IdeaFactory(country='PK', city='Lahore')
         self.assertIsNotNone(idea.location, 'Lahore, Pakistan')
 
     @data('user', 'title', 'overview', 'description', 'organization',
           'organization_mission', 'country', 'city')
     def test_required_fields(self, field_name):
-        """Create idea for each required field and asset that idea fail to save if that field is not provided"""
+        """Create idea for each required field and assert that idea fail to save if that field is not provided"""
         with self.assertRaises(IntegrityError):
             IdeaFactory(**{field_name: None})
 
@@ -49,7 +49,7 @@ class IdeaModelTest(TestCase):
         idea = IdeaFactory(
             image='my_image.jpg',
             file='my_file.docx',
-            video_link='https://www.dummy.com/video'
+            video_link='https://example.com'
         )
 
         idea_from_databased = Idea.objects.get(pk=idea.id)
