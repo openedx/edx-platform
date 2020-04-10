@@ -70,6 +70,7 @@
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
 -e git+https://github.com/mitodl/django-cas.git@afac57bc523f145ae826f4ed3d4fa8b2c86c5364#egg=django-cas==2.1.1
 -e git+https://github.com/dgrtwo/ParsePy.git@7949b9f754d1445eff8e8f20d0e967b9a6420639#egg=parse_rest
+-e git+https://github.com/appsembler/tahoe-lti.git@release-0.2.0#egg=tahoe-lti==release-0.2.0
 
 # Forked to get Django 1.10+ compat that is in origin BitBucket repo, without an official build.
 # This can go away when we update auth to not use django-rest-framework-oauth
@@ -95,7 +96,7 @@
 -e git+https://github.com/edx/RateXBlock.git@367e19c0f6eac8a5f002fd0f1559555f8e74bfff#egg=rate-xblock
 -e git+https://github.com/edx/DoneXBlock.git@01a14f3bd80ae47dd08cdbbe2f88f3eb88d00fba#egg=done-xblock
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
--e git+https://github.com/edx/xblock-lti-consumer.git@v1.1.8#egg=lti_consumer-xblock==1.1.8
+-e git+https://github.com/edx/xblock-lti-consumer.git@v1.2.5#egg=lti_consumer-xblock==1.2.5
 
 # Third Party XBlocks
 
