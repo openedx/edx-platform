@@ -26,7 +26,7 @@ from django.urls import reverse, reverse_lazy
 from freezegun import freeze_time
 from markupsafe import escape
 from milestones.tests.utils import MilestonesTestCaseMixin
-from mock import MagicMock, PropertyMock, create_autospec, patch
+from mock import MagicMock, PropertyMock, call, create_autospec, patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC
 from six import text_type
@@ -3162,12 +3162,16 @@ class DatesTabTestCase(ModuleStoreTestCase):
             deadline=now + timedelta(days=2)
         )
 
+        self.user = UserFactory()
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+
     def _get_response(self, course):
         """ Returns the HTML for the progress page """
         return self.client.get(reverse('dates', args=[six.text_type(course.id)]))
 
     @RELATIVE_DATES_FLAG.override(active=True)
-    def test_defaults(self):
+    @patch('edx_django_utils.monitoring.set_custom_metric')
+    def test_defaults(self, mock_set_custom_metric):
         enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.VERIFIED)
         now = datetime.now(utc)
         with self.store.bulk_operations(self.course.id):
@@ -3210,7 +3214,15 @@ class DatesTabTestCase(ModuleStoreTestCase):
                     'mode': enrollment.mode
                 }
 
+                expected_calls = [
+                    call('course_id', text_type(self.course.id)),
+                    call('user_id', self.user.id),
+                    call('is_staff', self.user.is_staff),
+                ]
+
                 response = self._get_response(self.course)
+
+                mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
                 self.assertContains(response, subsection.display_name)
                 # Show the Verification Deadline for everyone
                 self.assertContains(response, 'Verification Deadline')
