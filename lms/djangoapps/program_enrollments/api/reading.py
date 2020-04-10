@@ -10,8 +10,10 @@ from organizations.models import Organization
 from social_django.models import UserSocialAuth
 
 from openedx.core.djangoapps.catalog.utils import get_programs
+from student.roles import CourseStaffRole
 from third_party_auth.models import SAMLProviderConfig
 
+from ..constants import ProgramCourseEnrollmentRoles
 from ..exceptions import (
     BadOrganizationShortNameException,
     ProgramDoesNotExistException,
@@ -509,3 +511,21 @@ def get_provider_slug(provider_config):
     Returns: str
     """
     return provider_config.provider_id.strip('saml-')
+
+
+def is_course_staff_enrollment(program_course_enrollment):
+    """
+    Returns whether the provided program_course_enrollment have the
+    course staff role on the course.
+
+    Arguments:
+        program_course_enrollment: ProgramCourseEnrollment
+
+    returns: bool
+    """
+    associated_user = program_course_enrollment.program_enrollment.user
+    if associated_user:
+        return CourseStaffRole(program_course_enrollment.course_key).has_user(associated_user)
+    return program_course_enrollment.courseaccessroleassignment_set.filter(
+        role=ProgramCourseEnrollmentRoles.COURSE_STAFF
+    ).exists()

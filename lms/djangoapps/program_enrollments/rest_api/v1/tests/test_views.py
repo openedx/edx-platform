@@ -35,7 +35,11 @@ from lms.djangoapps.program_enrollments.constants import ProgramCourseOperationS
 from lms.djangoapps.program_enrollments.constants import ProgramOperationStatuses as ProgramStatuses
 from lms.djangoapps.program_enrollments.exceptions import ProviderDoesNotExistException
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
-from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
+from lms.djangoapps.program_enrollments.tests.factories import (
+    CourseAccessRoleAssignmentFactory,
+    ProgramCourseEnrollmentFactory,
+    ProgramEnrollmentFactory,
+)
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL, PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL
 from openedx.core.djangoapps.catalog.tests.factories import (
     CourseFactory,
@@ -890,17 +894,26 @@ class ProgramCourseEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
             program_uuid=self.program_uuid, curriculum_uuid=self.curriculum_uuid, external_user_key='user-0',
         )
         program_enrollment_2 = ProgramEnrollmentFactory.create(
-            program_uuid=self.program_uuid, curriculum_uuid=self.other_curriculum_uuid, external_user_key='user-0',
+            program_uuid=self.program_uuid,
+            curriculum_uuid=self.other_curriculum_uuid,
+            external_user_key='user-0',
+            user=None
         )
+
         ProgramCourseEnrollmentFactory.create(
             program_enrollment=program_enrollment_1,
             course_key=self.course_id,
             status='active',
         )
-        ProgramCourseEnrollmentFactory.create(
+        CourseStaffRole(self.course_id).add_users(program_enrollment_1.user)
+
+        program_course_enrollment_2 = ProgramCourseEnrollmentFactory.create(
             program_enrollment=program_enrollment_2,
             course_key=self.course_id,
             status='inactive',
+        )
+        CourseAccessRoleAssignmentFactory.create(
+            enrollment=program_course_enrollment_2
         )
 
         self.addCleanup(self.destroy_course_enrollments)
@@ -959,11 +972,11 @@ class ProgramCourseEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
             'results': [
                 {
                     'student_key': 'user-0', 'status': 'active', 'account_exists': True,
-                    'curriculum_uuid': text_type(self.curriculum_uuid),
+                    'curriculum_uuid': text_type(self.curriculum_uuid), 'course_staff': True
                 },
                 {
-                    'student_key': 'user-0', 'status': 'inactive', 'account_exists': True,
-                    'curriculum_uuid': text_type(self.other_curriculum_uuid),
+                    'student_key': 'user-0', 'status': 'inactive', 'account_exists': False,
+                    'curriculum_uuid': text_type(self.other_curriculum_uuid), 'course_staff': True
                 },
             ],
         }
@@ -980,7 +993,7 @@ class ProgramCourseEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
         expected_results = [
             {
                 'student_key': 'user-0', 'status': 'active', 'account_exists': True,
-                'curriculum_uuid': text_type(self.curriculum_uuid),
+                'curriculum_uuid': text_type(self.curriculum_uuid), 'course_staff': True
             },
         ]
         assert expected_results == response.data['results']
@@ -994,12 +1007,12 @@ class ProgramCourseEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
         assert status.HTTP_200_OK == next_response.status_code
         next_expected_results = [
             {
-                'student_key': 'user-0', 'status': 'inactive', 'account_exists': True,
-                'curriculum_uuid': text_type(self.other_curriculum_uuid),
+                'student_key': 'user-0', 'status': 'inactive', 'account_exists': False,
+                'curriculum_uuid': text_type(self.other_curriculum_uuid), 'course_staff': True
             },
         ]
         assert next_expected_results == next_response.data['results']
-        assert next_response.data['next'] is None
+
         # there's going to be a 'cursor' query param, but we have no way of knowing it's value
         assert next_response.data['previous'] is not None
         assert self.get_url(course_id=self.course_id) in next_response.data['previous']
