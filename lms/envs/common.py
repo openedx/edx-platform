@@ -1472,7 +1472,9 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 ################################# Middleware ###################################
 
 MIDDLEWARE = [
-    'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
+    # Avoid issue with https://blog.heroku.com/chrome-changes-samesite-cookie
+    # Override was found here https://github.com/django/django/pull/11894
+    'django_cookies_samesite.middleware.CookiesSameSite',
 
     'crum.CurrentRequestUserMiddleware',
 
@@ -1567,9 +1569,6 @@ MIDDLEWARE = [
 
     # Handles automatically storing user ids in django-simple-history tables when possible.
     'simple_history.middleware.HistoryRequestMiddleware',
-
-    # Sets SameSite flag for session and csrf cookies in legacy versions of Django.
-    'django_cookies_samesite.middleware.CookiesSameSite',
 
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
