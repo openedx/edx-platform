@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-05 20:52+0000\n"
-"PO-Revision-Date: 2020-04-05 20:52:25.232683\n"
+"POT-Creation-Date: 2020-04-12 20:53+0000\n"
+"PO-Revision-Date: 2020-04-12 20:53:38.526475\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -9629,12 +9629,14 @@ msgid "{mode_name} for course {course}"
 msgstr "{mode_name} för çöürsé {course} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid ""
-"You can unenroll in the course and receive a full refund for 14 days after "
-"the course start date. "
+"To receive a refund you may unenroll from the course on your edX Dashboard "
+"({dashboard_url}) up to 14 days after your payment or 14 days after your "
+"course starts (up to six months after your payment).\n"
 msgstr ""
-"Ýöü çän ünénröll ïn thé çöürsé änd réçéïvé ä füll réfünd för 14 däýs äftér "
-"thé çöürsé stärt däté.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+"Tö réçéïvé ä réfünd ýöü mäý ünénröll fröm thé çöürsé ön ýöür édX Däshßöärd ({dashboard_url}) üp tö 14 däýs äftér ýöür päýmént ör 14 däýs äftér ýöür çöürsé stärts (üp tö sïx mönths äftér ýöür päýmént).\n"
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρя#\n"
 
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
@@ -9648,27 +9650,20 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
 "You can unenroll in the course and receive a full refund for 2 days after "
-"the course start date. "
+"the course start date.\n"
 msgstr ""
-"Ýöü çän ünénröll ïn thé çöürsé änd réçéïvé ä füll réfünd för 2 däýs äftér "
-"thé çöürsé stärt däté.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+"Ýöü çän ünénröll ïn thé çöürsé änd réçéïvé ä füll réfünd för 2 däýs äftér thé çöürsé stärt däté.\n"
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #\n"
 
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
 msgid ""
-"{refund_reminder_msg}To receive your refund, contact {billing_email}. Please"
-" include your order number in your email. Please do NOT include your credit "
-"card information."
+"{refund_reminder_msg}For help unenrolling, Please see How do I unenroll from"
+" a course? ({how_to_unenroll_link}) in our edX HelpCenter."
 msgstr ""
-"{refund_reminder_msg}Tö réçéïvé ýöür réfünd, çöntäçt {billing_email}. Pléäsé"
-" ïnçlüdé ýöür ördér nümßér ïn ýöür émäïl. Pléäsé dö NÖT ïnçlüdé ýöür çrédït "
-"çärd ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт,"
-" ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
-"α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ "
-"єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
-" νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
-"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ "
-"єѕт łα#"
+"{refund_reminder_msg}För hélp ünénröllïng, Pléäsé séé Höw dö Ì ünénröll fröm"
+" ä çöürsé? ({how_to_unenroll_link}) ïn öür édX HélpÇéntér. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, #"
 
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
@@ -10620,16 +10615,20 @@ msgstr ""
 "αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/djangoapps/teams/views.py
-msgid "You are already in a team in this course."
-msgstr ""
-"Ýöü äré älréädý ïn ä téäm ïn thïs çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
+msgid "topic_id is required"
+msgstr "töpïç_ïd ïs réqüïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/djangoapps/teams/views.py
 msgid "You can't create a team in an instructor managed topic."
 msgstr ""
 "Ýöü çän't çréäté ä téäm ïn än ïnstrüçtör mänägéd töpïç. Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/teams/views.py
+msgid "You are already in a team in this teamset."
+msgstr ""
+"Ýöü äré älréädý ïn ä téäm ïn thïs téämsét. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
 
 #: lms/djangoapps/teams/views.py
 msgid "teamset_id and team_id are mutually exclusive options."
@@ -16313,7 +16312,6 @@ msgstr ""
 
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
-#: lms/templates/courseware/error-message.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
 " fix it as soon as possible. Please email us at {tech_support_email} to "
@@ -16448,6 +16446,22 @@ msgstr "É-mäïl Ⱡ'σяєм ιρѕυ#"
 #, python-format
 msgid "Return To %s"
 msgstr "Rétürn Tö %s Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/templates/reset_deadlines_banner.html
+msgid "It looks like you've missed some important deadlines. Visit "
+msgstr ""
+"Ìt lööks lïké ýöü'vé mïsséd sömé ïmpörtänt déädlïnés. Vïsït  Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/reset_deadlines_banner.html
+msgid "edx.org"
+msgstr "édx.örg Ⱡ'σяєм ιρѕυм #"
+
+#: lms/templates/reset_deadlines_banner.html
+msgid " to reset your deadlines and get started today."
+msgstr ""
+" tö rését ýöür déädlïnés änd gét stärtéd tödäý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/reset_deadlines_banner.html
 msgid ""
@@ -18879,8 +18893,9 @@ msgid "You are enrolled in this course"
 msgstr "Ýöü äré énrölléd ïn thïs çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/courseware/course_about.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
 #: lms/templates/shoppingcart/registration_code_receipt.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
 msgid "View Course"
 msgstr "Vïéw Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
@@ -19094,6 +19109,14 @@ msgstr ""
 "{a_start}Ûpgrädé{a_end}{space}tö ä Vérïfïéd Çértïfïçäté för füll äççéss. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
+#: lms/templates/courseware/error-message.html
+msgid ""
+"We're sorry, this module is temporarily unavailable. Our staff is working to"
+" fix it as soon as possible."
+msgstr ""
+"Wé'ré sörrý, thïs mödülé ïs témpörärïlý ünäväïläßlé. Öür stäff ïs wörkïng tö"
+" fïx ït äs söön äs pössïßlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
 msgstr "Grädéßöök Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -19146,8 +19169,9 @@ msgid "Welcome to {course_title}!"
 msgstr "Wélçömé tö {course_title}! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/courseware/info.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
 msgid "Resume Course"
 msgstr "Résümé Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
@@ -24019,18 +24043,10 @@ msgstr "Çönfïrmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #: lms/templates/static_templates/404.html
 msgid ""
 "The page that you were looking for was not found. Go back to the "
-"{link_start}homepage{link_end} or let us know about any pages that may have "
-"been moved at {email}."
+"{link_start}homepage{link_end} ."
 msgstr ""
 "Thé pägé thät ýöü wéré löökïng för wäs nöt föünd. Gö ßäçk tö thé "
-"{link_start}hömépägé{link_end} ör lét üs knöw äßöüt äný pägés thät mäý hävé "
-"ßéén mövéd ät {email}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
-"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
-"єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
-"αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
-"νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт "
-"σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт "
-"αηιм ι∂ єѕ#"
+"{link_start}hömépägé{link_end} . Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/static_templates/about.html
 #: lms/templates/static_templates/blog.html
@@ -24091,16 +24107,9 @@ msgstr ""
 #: lms/templates/static_templates/server-overloaded.html
 msgid ""
 "Our staff is currently working to get the site back up as soon as possible. "
-"Please email us at {tech_support_email} to report any problems or downtime."
 msgstr ""
-"Öür stäff ïs çürréntlý wörkïng tö gét thé sïté ßäçk üp äs söön äs pössïßlé. "
-"Pléäsé émäïl üs ät {tech_support_email} tö répört äný prößléms ör döwntïmé. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
-" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσяυм#"
+"Öür stäff ïs çürréntlý wörkïng tö gét thé sïté ßäçk üp äs söön äs pössïßlé."
+"  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
 #: lms/templates/static_templates/server-error.html
 msgid "There has been a 500 error on the {platform_name} servers"
@@ -24109,12 +24118,10 @@ msgstr ""
 " ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/static_templates/server-error.html
-msgid ""
-"Please wait a few seconds and then reload the page. If the problem persists,"
-" please email us at {email}."
+msgid "Please wait a few seconds and then reload the page."
 msgstr ""
-"Pléäsé wäït ä féw séçönds änd thén rélöäd thé pägé. Ìf thé prößlém pérsïsts,"
-" pléäsé émäïl üs ät {email}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+"Pléäsé wäït ä féw séçönds änd thén rélöäd thé pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/static_templates/server-overloaded.html
 msgid "Currently the {platform_name} servers are overloaded"
@@ -24670,6 +24677,10 @@ msgstr "Lätést Ûpdäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #: openedx/features/course_experience/templates/course_experience/next-up-banner-fragment.html
 msgid "Get started on what's next: "
 msgstr "Gét stärtéd ön whät's néxt:  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
+msgid "Show More"
+msgstr "Shöw Möré Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
 msgid "Search Results"

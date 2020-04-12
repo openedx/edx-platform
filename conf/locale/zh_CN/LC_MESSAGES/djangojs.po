@@ -225,7 +225,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-05 20:42+0000\n"
+"POT-Creation-Date: 2020-04-12 20:42+0000\n"
 "PO-Revision-Date: 2019-09-29 20:43+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -5188,6 +5188,14 @@ msgstr "展开全部"
 msgid "Collapse All"
 msgstr "折叠全部"
 
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr "显示更多"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr "查看收起"
+
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
@@ -7273,14 +7281,6 @@ msgid ""
 "To receive credit for problems, you must select \"Submit\" for each problem "
 "before you select \"End My Exam\"."
 msgstr "在点击 “结束我的考试” 之前，您必须点击 \"提交\" 按钮以获得学分。"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show More"
-msgstr "显示更多"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show Less"
-msgstr "查看收起"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "Exam timer and end exam button"

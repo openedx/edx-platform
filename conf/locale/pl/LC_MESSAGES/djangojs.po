@@ -95,7 +95,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-05 20:42+0000\n"
+"POT-Creation-Date: 2020-04-12 20:42+0000\n"
 "PO-Revision-Date: 2019-09-29 20:43+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Polish (http://www.transifex.com/open-edx/edx-platform/language/pl/)\n"
@@ -5359,6 +5359,16 @@ msgstr "Rozwiń wszystko"
 msgid "Collapse All"
 msgstr "Zwiń wszystko"
 
+#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr ""
+
+#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr ""
+
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
@@ -7522,14 +7532,6 @@ msgid ""
 msgstr ""
 "Aby otrzymać punkty za ćwiczenia, musisz kliknąć \"Wyślij\" dla każdego "
 "pojedynczego ćwiczenia, zanim wybierzesz \"Zakończ mój egzamin\"."
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show More"
-msgstr ""
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show Less"
-msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "Exam timer and end exam button"
