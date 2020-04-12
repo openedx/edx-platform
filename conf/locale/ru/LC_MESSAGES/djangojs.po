@@ -101,6 +101,7 @@
 # Danil Moskovoy <tenrius@gmail.com>, 2013
 # Viktoria Surovtseva <viktoria@cde.ifmo.ru>, 2013
 # Viktoria Surovtseva <viktoria@cde.ifmo.ru>, 2013
+# Volodia Bickov <1@ja2t.ru>, 2020
 # Weyedide <weyedide@gmail.com>, 2014-2016
 # Yana Malinovskaya <y.malinovskaya@itransition.com>, 2014
 # Андрей Сандлер <inactive+asandler@transifex.com>, 2013
@@ -165,6 +166,7 @@
 # Michael Savin <m.savin.ru@gmail.com>, 2015-2016
 # Natalia Vavilina <nfgenius@gmail.com>, 2015
 # ovoschee <all.spam.there@gmail.com>, 2014
+# Volodia Bickov <1@ja2t.ru>, 2020
 # webslavic <webslavic@yahoo.com>, 2014
 # webslavic <webslavic@yahoo.com>, 2014
 # Weyedide <weyedide@gmail.com>, 2014-2016
@@ -177,9 +179,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-05 20:42+0000\n"
-"PO-Revision-Date: 2020-03-27 18:42+0000\n"
-"Last-Translator: Александр Печников <cfic34@ya.ru>\n"
+"POT-Creation-Date: 2020-04-12 20:42+0000\n"
+"PO-Revision-Date: 2020-04-11 16:25+0000\n"
+"Last-Translator: Volodia Bickov <1@ja2t.ru>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -5475,6 +5477,16 @@ msgstr "Развернуть всё"
 msgid "Collapse All"
 msgstr "Свернуть все"
 
+#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr ""
+
+#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr ""
+
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
@@ -7626,14 +7638,6 @@ msgstr ""
 "Чтобы получить зачётные баллы за задания, необходимо нажать «Отправить» для "
 "каждого отдельного задания, прежде чем вы выберете «Завершить сдачу "
 "экзамена»"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show More"
-msgstr ""
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show Less"
-msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "Exam timer and end exam button"

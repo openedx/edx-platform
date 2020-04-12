@@ -129,7 +129,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-03-29 20:42+0000\n"
+"POT-Creation-Date: 2020-04-05 20:42+0000\n"
 "PO-Revision-Date: 2020-01-06 08:48+0000\n"
 "Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>\n"
 "Language-Team: German (Germany) (http://www.transifex.com/open-edx/edx-platform/language/de_DE/)\n"
@@ -2590,7 +2590,7 @@ msgstr "Master"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "MicroMasters"
-msgstr ""
+msgstr "MicroMasters"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "MicroBachelors"
@@ -2898,7 +2898,7 @@ msgstr "Bestätigen"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "You already belong to another team in this team set."
-msgstr ""
+msgstr "Sie gehören bereits zu einem anderen Team in diesem Team-Set."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "This team is full."
@@ -2911,8 +2911,8 @@ msgstr "Kann nicht dem von einem Dozenten verwalteten Team beitreten"
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
 msgid " Member"
 msgid_plural " Members"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Mitglied"
+msgstr[1] "Mitglieder"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "All teams"
@@ -2928,7 +2928,7 @@ msgstr "Themen"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "My Teams"
-msgstr ""
+msgstr "Meine Teams"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
@@ -3006,16 +3006,22 @@ msgid ""
 "by topic. Join an open public team to collaborate with other learners who "
 "are interested in the same topic as you are."
 msgstr ""
+"Lassen Sie alle Teams, denen Sie angehören, und alle öffentlichen Teams in "
+"Ihrem Kurs, die nach Themen geordnet sind anzeigen. Schließen Sie sich einem"
+" öffentlichen Team an, um mit anderen Teilnehmen zusammenzuarbeiten, die "
+"sich für dasselbe Thema interessieren wie Sie."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
 "See all teams you belong to and all public teams in your course, organized "
 "by topic."
 msgstr ""
+"Lassen Sie alle Teams, denen Sie angehören, und alle öffentlichen Teams in "
+"Ihrem Kurs, geordnet nach Themen anzeigen."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "See all teams you belong to."
-msgstr ""
+msgstr "Alle Teams anzeigen, denen Sie angehören."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 #: lms/djangoapps/discussion/static/discussion/templates/fake-breadcrumbs.underscore
@@ -7638,7 +7644,7 @@ msgstr "Mitgliedschaft hochladen"
 
 #: lms/djangoapps/teams/static/teams/templates/manage.underscore
 msgid "Error assigning team memberships"
-msgstr ""
+msgstr "Fehler beim zuweisen von Team-Mitgliedschaften"
 
 #: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
 msgid "Are you having trouble finding a team to join?"
