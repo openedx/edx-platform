@@ -162,12 +162,6 @@ class EnrollmentsDataMixin(ProgramCacheMixin):
             enrollment_record["course_staff"] = course_staff
         return enrollment_record
 
-    def request(self, path, data, **kwargs):
-        pass
-
-    def prepare_student(self, key):
-        pass
-
     def create_program_enrollment(self, external_user_key, user=False):
         """
         Creates and returns a ProgramEnrollment for the given external_user_key and
