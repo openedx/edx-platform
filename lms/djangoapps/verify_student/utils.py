@@ -101,3 +101,18 @@ def most_recent_verification(photo_id_verifications, sso_id_verifications, manua
     }
 
     return max(verifications_map, key=lambda k: verifications_map[k]) if verifications_map else None
+
+
+def auto_verify_for_testing_enabled(override=None):
+    """
+    If AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING is True, we want to skip posting
+    anything to Software Secure.
+
+    Bypass posting anything to Software Secure if auto verify feature for testing is enabled.
+    We actually don't even create the message because that would require encryption and message
+    signing that rely on settings.VERIFY_STUDENT values that aren't set in dev. So we just
+    pretend like we successfully posted.
+    """
+    if override is not None:
+        return override
+    return settings.FEATURES.get('AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING')

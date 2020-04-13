@@ -239,7 +239,7 @@ class PayAndVerifyView(View):
 
         # Verify that the course exists
         if course is None:
-            log.warn(u"Could not find course with ID %s.", course_id)
+            log.warning(u"Could not find course with ID %s.", course_id)
             raise Http404
 
         # Check whether the user has access to this course
@@ -295,7 +295,7 @@ class PayAndVerifyView(View):
         else:
             # Otherwise, there has never been a verified/paid mode,
             # so return a page not found response.
-            log.warn(
+            log.warning(
                 u"No paid/verified course mode found for course '%s' for verification/payment flow request",
                 course_id
             )
@@ -818,12 +818,12 @@ def create_order(request):
         paid_modes = CourseMode.paid_modes_for_course(course_id)
         if paid_modes:
             if len(paid_modes) > 1:
-                log.warn(u"Multiple paid course modes found for course '%s' for create order request", course_id)
+                log.warning(u"Multiple paid course modes found for course '%s' for create order request", course_id)
             current_mode = paid_modes[0]
 
     # Make sure this course has a paid mode
     if not current_mode:
-        log.warn(u"Create order requested for course '%s' without a paid mode.", course_id)
+        log.warning(u"Create order requested for course '%s' without a paid mode.", course_id)
         return HttpResponseBadRequest(_("This course doesn't support paid certificates"))
 
     if CourseMode.is_professional_mode(current_mode):
@@ -899,7 +899,7 @@ class SubmitPhotosView(View):
 
         # Retrieve the image data
         # Validation ensures that we'll have a face image, but we may not have
-        # a photo ID image if this is a reverification.
+        # a photo ID image if this is a re-verification.
         face_image, photo_id_image, response = self._decode_image_data(
             params["face_image"], params.get("photo_id_image")
         )
