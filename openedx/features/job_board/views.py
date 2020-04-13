@@ -1,4 +1,3 @@
-import re
 from django.core.urlresolvers import reverse
 
 from django_countries import countries
