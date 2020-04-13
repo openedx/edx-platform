@@ -23,6 +23,7 @@ from tempfile import mkdtemp
 from lxml import etree
 from mock import ANY, Mock, patch, MagicMock
 import ddt
+import httpretty
 
 from django.conf import settings
 from django.test import TestCase
@@ -62,28 +63,18 @@ Kako ste danas?
 '''
 
 YOUTUBE_SUBTITLES = (
-    "LILA FISHER: Hi, welcome to Edx. I'm Lila Fisher, an Edx fellow helping to put together these"
-    " courses. As you know, our courses are entirely online. So before we start learning about the"
-    " subjects that brought you here, let's learn about the tools that you will use to navigate through"
-    " the course material. Let's start with what is on your screen right now. You are watching a video"
-    " of me talking. You have several tools associated with these videos. Some of them are standard"
-    " video buttons, like the play Pause Button on the bottom left. Like most video players, you can see"
-    " how far you are into this particular video segment and how long the entire video segment is."
-    " Something that you might not be used to is the speed option. While you are going through the"
-    " videos, you can speed up or slow down the video player with these buttons. Go ahead and try that"
-    " now. Make me talk faster and slower. If you ever get frustrated by the pace of speech, you can"
-    " adjust it this way. Another great feature is the transcript on the side. This will follow along"
-    " with everything that I am saying as I am saying it, so you can read along if you like. You can"
-    " also click on any of the words, and you will notice that the video jumps to that word. The video"
-    " slider at the bottom of the video will let you navigate through the video quickly. If you ever"
-    " find the transcript distracting, you can toggle the captioning button in order to make it go away"
-    " or reappear. Now that you know about the video player, I want to point out the sequence navigator."
-    " Right now you're in a lecture sequence, which interweaves many videos and practice exercises. You"
-    " can see how far you are in a particular sequence by observing which tab you're on. You can"
-    " navigate directly to any video or exercise by clicking on the appropriate tab. You can also"
-    " progress to the next element by pressing the Arrow button, or by clicking on the next tab. Try"
-    " that now. The tutorial will continue in the next video."
+    "Sample trascript line 1. "
+    "Sample trascript line 2. "
+    "Sample trascript line 3."
 )
+
+MOCKED_YOUTUBE_TRANSCRIPT_API_RESPONSE = '''
+    <transcript>
+        <text start="27.88" dur="3.68">Sample trascript line 1.</text>
+        <text start="31.76" dur="9.54">Sample trascript line 2.</text>
+        <text start="44.04" dur="3.1">Sample trascript line 3.</text>
+    </transcript>
+'''
 
 ALL_LANGUAGES = (
     [u"en", u"English"],
@@ -1038,6 +1029,7 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
             "content_type": "Video"
         })
 
+    @httpretty.activate
     def test_video_with_youtube_subs_index_dictionary(self):
         """
         Test index dictionary of a video module with YouTube subtitles.
@@ -1057,6 +1049,13 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
             </video>
         '''
         yt_subs_id = 'OEoXaMPEzfM'
+        url = 'http://video.google.com/timedtext?lang=en&v={}'.format(yt_subs_id)
+        httpretty.register_uri(
+            method=httpretty.GET,
+            uri=url,
+            body=MOCKED_YOUTUBE_TRANSCRIPT_API_RESPONSE,
+            content_type='application/xml'
+        )
         descriptor = instantiate_descriptor(data=xml_data_sub)
         subs = download_youtube_subs(yt_subs_id, descriptor, settings)
         save_subs_to_store(json.loads(subs), yt_subs_id, descriptor)
@@ -1068,6 +1067,7 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
             "content_type": "Video"
         })
 
+    @httpretty.activate
     def test_video_with_subs_and_transcript_index_dictionary(self):
         """
         Test index dictionary of a video module with
@@ -1089,6 +1089,13 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
             </video>
         '''
         yt_subs_id = 'OEoXaMPEzfM'
+        url = 'http://video.google.com/timedtext?lang=en&v={}'.format(yt_subs_id)
+        httpretty.register_uri(
+            method=httpretty.GET,
+            uri=url,
+            body=MOCKED_YOUTUBE_TRANSCRIPT_API_RESPONSE,
+            content_type='application/xml'
+        )
         descriptor = instantiate_descriptor(data=xml_data_sub_transcript)
         subs = download_youtube_subs(yt_subs_id, descriptor, settings)
         save_subs_to_store(json.loads(subs), yt_subs_id, descriptor)
