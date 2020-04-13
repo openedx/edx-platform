@@ -26,6 +26,7 @@ class JobListView(ListView):
         self.param_job_hours = self.request.GET.getlist('hours')
         self.param_job_compensation = self.request.GET.getlist('compensation')
 
+        country_codes = []
         if self.param_job_country:
             country_codes = [country[0] for country in countries if
                              self. param_job_country.lower() in country[1].lower()]
@@ -39,7 +40,7 @@ class JobListView(ListView):
         if self.param_job_compensation:
             queryset = queryset.filter(compensation__in=self.param_job_compensation)
         if country_codes:
-            queryset = queryset.filter(country__in__exact=country_codes)
+            queryset = queryset.filter(country__in=country_codes).filter(country__in=country_codes)
         if self.param_job_city:
             queryset = queryset.filter(city__icontains=self.param_job_city)
         if self.param_job_query:
@@ -50,16 +51,21 @@ class JobListView(ListView):
     def get_context_data(self, **kwargs):
         context = super(JobListView, self).get_context_data(**kwargs)
 
-        context['remote'] = True if 'remote' in self.param_job_type else False
-        context['onsite'] = True if 'onsite' in self.param_job_type else False
-        context['volunteer'] = True if 'volunteer' in self.param_job_compensation else False
-        context['hourly'] = True if 'hourly' in self.param_job_compensation else False
-        context['salaried'] = True if 'salaried' in self.param_job_compensation else False
-        context['fulltime'] = True if 'fulltime' in self.param_job_hours else False
-        context['parttime'] = True if 'parttime' in self.param_job_hours else False
-        context['freelance'] = True if 'freelance' in self.param_job_hours else False
-        context['country'] = self.param_job_country if self.param_job_country else None
-        context['city'] = self.param_job_city if self.param_job_city else None
+        context['search_fields'] = {
+            'query': self.param_job_query if self.param_job_query else False,
+            'remote': True if 'remote' in self.param_job_type else False,
+            'onsite': True if 'onsite' in self.param_job_type else False,
+            'country': self.param_job_country if self.param_job_country else False,
+            'city': self.param_job_city if self.param_job_city else False,
+            'fulltime': True if 'fulltime' in self.param_job_hours else False,
+            'parttime': True if 'parttime' in self.param_job_hours else False,
+            'freelance': True if 'freelance' in self.param_job_hours else False,
+            'volunteer': True if 'volunteer' in self.param_job_compensation else False,
+            'hourly': True if 'hourly' in self.param_job_compensation else False,
+            'salaried': True if 'salaried' in self.param_job_compensation else False,
+        }
+
+        context['filtered'] = any(value is not False for value in context['search_fields'].values())
 
         return context
 
