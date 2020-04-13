@@ -16,13 +16,27 @@ import openedx.core.djangolib.model_mixins
 import simple_history.models
 import uuid
 
+from experiments.models import ExperimentData
+from openedx.features.course_duration_limits.config import EXPERIMENT_DATA_HOLDBACK_KEY, EXPERIMENT_ID
+from student.models import CourseAccessRole, CourseEnrollment, FBEEnrollmentExclusion
 
-# Functions from the following migrations need manual copying.
-# Move them and any dependencies into this file, then update the
-# RunPython operations to refer to the local versions:
-# student.migrations.0011_course_key_field_to_foreign_key
-# student.migrations.0025_auto_20191101_1846
+# These data migrations do not require changes when building from scratch.
 # student.migrations.0029_add_data_researcher
+# student.migrations.0011_course_key_field_to_foreign_key
+
+# student.migrations.0025_auto_20191101_1846
+def populate_fbeenrollmentexclusion(apps, schema_editor):
+    holdback_entries = ExperimentData.objects.filter(
+        experiment_id=EXPERIMENT_ID,
+        key=EXPERIMENT_DATA_HOLDBACK_KEY,
+        value='True'
+    )
+    for holdback_entry in holdback_entries:
+        enrollments = [FBEEnrollmentExclusion(enrollment=enrollment)
+                       for enrollment in CourseEnrollment.objects.filter(user=holdback_entry.user)]
+        if enrollments:
+            FBEEnrollmentExclusion.objects.bulk_create(enrollments)
+
 
 class Migration(migrations.Migration):
 
@@ -33,6 +47,7 @@ class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('course_overviews', '0013_courseoverview_language'),
+        ('experiments', '0001_initial'),
         ('sites', '0002_alter_domain_unique'),
         ('course_overviews', '0014_courseoverview_certificate_available_date'),
     ]
@@ -61,7 +76,7 @@ class Migration(migrations.Migration):
             name='CourseEnrollment',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('course_id', opaque_keys.edx.django.models.CourseKeyField(db_index=True, max_length=255)),
+                ('course', models.ForeignKey(db_constraint=False, on_delete=django.db.models.deletion.CASCADE, to='course_overviews.CourseOverview')),
                 ('created', models.DateTimeField(auto_now_add=True, db_index=True, null=True)),
                 ('is_active', models.BooleanField(default=True)),
                 ('mode', models.CharField(default=b'honor', max_length=100)),
@@ -344,21 +359,6 @@ class Migration(migrations.Migration):
                 'abstract': False,
             },
         ),
-        migrations.RenameField(
-            model_name='courseenrollment',
-            old_name='course_id',
-            new_name='course',
-        ),
-        migrations.AlterField(
-            model_name='courseenrollment',
-            name='course',
-            field=opaque_keys.edx.django.models.CourseKeyField(db_column='course_id', db_index=True, max_length=255),
-        ),
-        student.migrations.0011_course_key_field_to_foreign_key.NoSqlAlterField(
-            model_name='courseenrollment',
-            name='course',
-            field=models.ForeignKey(db_constraint=False, on_delete=django.db.models.deletion.CASCADE, to='course_overviews.CourseOverview'),
-        ),
         migrations.AlterModelOptions(
             name='courseenrollment',
             options={'ordering': ('user', 'course')},
@@ -375,11 +375,6 @@ class Migration(migrations.Migration):
                 ('social_link', models.CharField(blank=True, max_length=100)),
                 ('user_profile', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='social_links', to='student.UserProfile')),
             ],
-        ),
-        migrations.AlterField(
-            model_name='courseenrollment',
-            name='course',
-            field=models.ForeignKey(db_constraint=False, on_delete=django.db.models.deletion.DO_NOTHING, to='course_overviews.CourseOverview'),
         ),
         migrations.CreateModel(
             name='AccountRecovery',
@@ -452,8 +447,8 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.RunPython(
-            code=student.migrations.0025_auto_20191101_1846.populate_fbeenrollmentexclusion,
-            reverse_code=django.db.migrations.operations.special.RunPython.noop,
+            code=populate_fbeenrollmentexclusion,
+            reverse_code=migrations.operations.special.RunPython.noop,
         ),
         migrations.CreateModel(
             name='AllowedAuthUser',
@@ -501,10 +496,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'historical manual enrollment audit',
             },
             bases=(simple_history.models.HistoricalChanges, models.Model),
-        ),
-        migrations.RunPython(
-            code=student.migrations.0029_add_data_researcher.add_data_researcher,
-            reverse_code=django.db.migrations.operations.special.RunPython.noop,
         ),
         migrations.AddField(
             model_name='userprofile',
