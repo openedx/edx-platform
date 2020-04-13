@@ -89,9 +89,9 @@ def _enrollment_mode_display(enrollment_mode, verification_status, course_id):
     return display_mode
 
 
-def get_course_final_price(user, sku, min_price):
+def get_course_final_price(user, sku, course_price):
     """
-    Return the course's discounted price for a user if user is entitled other None.
+    Return the course's discounted price for a user if user is eligible for any otherwise return course original price.
     """
     price_details = {}
     try:
@@ -101,5 +101,4 @@ def get_course_final_price(user, sku, min_price):
         )
     except (SlumberBaseException, ConnectionError, Timeout) as exc:     # pylint: disable=unused-variable
         pass
-    price = price_details.get('total_incl_tax', min_price)
-    return price if price != min_price else None
+    return price_details.get('total_incl_tax', course_price)

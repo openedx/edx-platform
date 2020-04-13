@@ -35,7 +35,7 @@ from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from openedx.features.enterprise_support.utils import is_enterprise_learner
+from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from student.models import CourseEnrollment
 from util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
@@ -203,17 +203,19 @@ class ChooseModeView(View):
                 for x in verified_mode.suggested_prices.split(",")
                 if x.strip()
             ]
-            price_after_discount = None
             price_before_discount = verified_mode.min_price
-            if is_enterprise_learner(request.user) and verified_mode.sku:
-                price_after_discount = get_course_final_price(request.user, verified_mode.sku, price_before_discount)
+            course_price = price_before_discount
+            enterprise_customer = enterprise_customer_for_request(request)
+            if enterprise_customer and verified_mode.sku:
+                course_price = get_course_final_price(request.user, verified_mode.sku, price_before_discount)
 
             context["currency"] = verified_mode.currency.upper()
             context["currency_symbol"] = get_currency_symbol(verified_mode.currency.upper())
-            context["min_price"] = price_after_discount if price_after_discount is not None else price_before_discount
+            context["min_price"] = course_price
             context["verified_name"] = verified_mode.name
             context["verified_description"] = verified_mode.description
-            if price_after_discount is not None:
+            # if course_price is equal to price_before_discount then user doesn't entitle to any discount.
+            if course_price != price_before_discount:
                 context["price_before_discount"] = price_before_discount
 
             if verified_mode.sku:
