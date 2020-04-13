@@ -1144,8 +1144,10 @@ SESSION_SAVE_EVERY_REQUEST = False
 SESSION_SERIALIZER = 'openedx.core.lib.session_serializers.PickleSerializer'
 SESSION_COOKIE_DOMAIN = ""
 SESSION_COOKIE_NAME = 'sessionid'
-SESSION_COOKIE_SAMESITE = 'None'
-SESSION_COOKIE_SAMESITE_FORCE_ALL = True
+
+# django-session-cookie middleware
+DCS_SESSION_COOKIE_SAMESITE = 'None'
+DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = True
 
 # CMS base
 CMS_BASE = 'localhost:18010'
