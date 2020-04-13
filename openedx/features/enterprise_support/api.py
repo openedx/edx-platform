@@ -18,12 +18,13 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import TieredCache
+from edx_django_utils.cache.utils import get_cache_key
 from edx_rest_api_client.client import EdxRestApiClient
 from slumber.exceptions import HttpClientError, HttpNotFoundError, HttpServerError
 
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.features.enterprise_support.utils import get_cache_key, get_data_consent_share_cache_key
+from openedx.features.enterprise_support.utils import get_data_consent_share_cache_key
 from third_party_auth.pipeline import get as get_partial_pipeline
 from third_party_auth.provider import Registry
 
