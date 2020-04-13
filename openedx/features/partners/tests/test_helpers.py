@@ -32,14 +32,6 @@ class PartnerHelpersTest(ModuleStoreTestCase):
         self.partner_user = PartnerUserFactory(user=self.user, partner=self.partner)
         self.course = CourseFactory.create()
 
-    def test_import_form_using_slug_with_invalid_slug(self):
-        """
-        Test None is returned for an invalid partner slug
-        :return : None
-        """
-        form = helpers.import_form_using_slug('invalid')
-        self.assertIsNone(form)
-
     def test_get_course_description_with_invalid_course(self):
         """
         Verify that empty string is returned for invalid course
