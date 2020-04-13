@@ -15,14 +15,18 @@ jobs:
       - name: Pull latest cache
         run: docker pull eoluchile/edx-platform:latest
 
-      - name: Build OpenedX
-        run: docker build . --file .github/build/Dockerfile --tag eoluchile/edx-platform:${GITHUB_SHA} --tag eoluchile/edx-platform:latest
+      - name: Build Open edX Base
+        run: docker build . --file .github/build/Dockerfile --target base --tag eoluchile/edx-platform:${GITHUB_SHA} --tag eoluchile/edx-platform:latest
+
+      - name: Build Open edX Testing version
+        run: docker build . --file .github/build/Dockerfile --target testing --tag eoluchile/edx-platform:testing
 
       - name: Push
         run: |
           echo "${DOCKERHUB_PASSWORD}" | docker login --username ${DOCKERHUB_USER} --password-stdin
           docker push eoluchile/edx-platform:${GITHUB_SHA}
           docker push eoluchile/edx-platform:latest
+          docker push eoluchile/edx-platform:testing
         env:
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
