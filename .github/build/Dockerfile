@@ -85,6 +85,6 @@ CMD gunicorn --name ${SERVICE_VARIANT} --workers ${WORKER_COUNT:-1} --bind=0.0.0
 FROM base as testing
 
 # Install testing packages
-RUN grep -v -x -f /openedx/edx-platform/requirements/edx/base.txt /openedx/edx-platform/requirements/edx/testing.txt > /tmp/requirements.txt \
+RUN grep -v -x -f /openedx/edx-platform/requirements/edx/base.txt /openedx/edx-platform/requirements/edx/development.txt > /tmp/requirements.txt \
     && pip install -r /tmp/requirements.txt \
     && rm /tmp/requirements.txt
