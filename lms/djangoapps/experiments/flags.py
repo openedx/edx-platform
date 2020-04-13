@@ -170,16 +170,19 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         return self.is_enabled()
 
     def is_experiment_on(self, course_key=None):
-        return super().is_enabled(course_key)
+        # If no course_key is supplied check the global flag irrespective of courses
+        if course_key is None:
+            return super().is_enabled_without_course_context()
+
+        return super().is_enabled(course_key=course_key)
 
     @contextmanager
     def override(self, active=True, bucket=1):  # pylint: disable=arguments-differ
-        from mock import patch
-        if not active:
-            bucket = 0
-        with patch.object(self, 'get_bucket', return_value=bucket):
-            # TODO We can move this import to the top of the file once this code is
-            # not all contained within the __init__ module.
-            from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-            with override_waffle_flag(self, active):
+        # Let CourseWaffleFlag override the base waffle flag value
+        with super().override(active=active):
+            # Now override the experiment bucket value
+            from mock import patch
+            if not active:
+                bucket = 0
+            with patch.object(self, 'get_bucket', return_value=bucket):
                 yield
