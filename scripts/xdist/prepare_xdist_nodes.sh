@@ -18,7 +18,7 @@ elif [[ ${TOXENV} == *'django20'* ]]; then
 elif [[ ${TOXENV} == *'django21'* ]]; then
     DJANGO_REQUIREMENT="-r requirements/edx/django21.txt"
 elif [[ ${TOXENV} == *'django22'* ]]; then
-    DJANGO_REQUIREMENT="-r requirements/edx/django22.txt"
+    DJANGO_REQUIREMENT="-r requirements/edx/django.txt"
 fi
 
 ip_list=$(<pytest_worker_ips.txt)
