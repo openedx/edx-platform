@@ -463,24 +463,21 @@ def get_course_assignments(course_key, user, request, include_access=False):
     """
     store = modulestore()
     all_course_dates = get_dates_for_course(course_key, user)
+    block_data = course_blocks_api.get_course_blocks(user, store.make_course_usage_key(course_key))
     assignments = []
     for (block_key, date_type), date in all_course_dates.items():
         if date_type != 'due' or block_key.block_type != 'sequential':
             continue
 
-        try:
-            item = store.get_item(block_key)
-        except ItemNotFoundError:
+        block = block_data[block_key]
+        if not block.graded:
             continue
 
-        if not item.graded:
-            continue
-
-        requires_full_access = include_access and _requires_full_access(store, user, block_key)
-        title = item.display_name or _('Assignment')
+        requires_full_access = include_access and _requires_full_access(block_data, block, user)
+        title = block.display_name or _('Assignment')
 
         url = None
-        assignment_released = not item.start or item.start < datetime.now(pytz.UTC)
+        assignment_released = not block.start or block.start < datetime.now(pytz.UTC)
         if assignment_released:
             url = reverse('jump_to', args=[course_key, block_key])
             url = request and request.build_absolute_uri(url)
@@ -490,16 +487,15 @@ def get_course_assignments(course_key, user, request, include_access=False):
     return assignments
 
 
-def _requires_full_access(store, user, block_key):
+def _requires_full_access(block_data, block, user):
     """
     Returns a boolean if any child of the block_key specified has a group_access array consisting of just full_access
     """
-    child_block_keys = course_blocks_api.get_course_blocks(user, block_key)
-    for child_block_key in child_block_keys:
-        child_block = store.get_item(child_block_key)
+    for child_block_key in block_data.get_children(block.location):
+        group_access = block_data.get_xblock_field(child_block_key, 'group_access')
         # If group_access is set on the block, and the content gating is
         # only full access, set the value on the CourseAssignmentDate object
-        if(child_block.group_access and child_block.group_access.get(CONTENT_GATING_PARTITION_ID) == [
+        if(group_access and group_access.get(CONTENT_GATING_PARTITION_ID) == [
             settings.CONTENT_TYPE_GATE_GROUP_IDS['full_access']
         ]):
             return True
