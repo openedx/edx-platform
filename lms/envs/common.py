@@ -55,7 +55,7 @@ from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
 #: The display name of the LMS platform to be used in templates/emails/etc. Note that
-#: this is only valid for the LMS. For the Studio, see 
+#: this is only valid for the LMS. For the Studio, see
 #: :py:data:`cms.envs.common.STUDIO_NAME`.
 PLATFORM_NAME = _('Your Platform Name Here')
 PLATFORM_DESCRIPTION = _('Your Platform Description Here')
@@ -2689,6 +2689,11 @@ EDXMKTG_LOGGED_IN_COOKIE_NAME = 'edxloggedin'
 EDXMKTG_USER_INFO_COOKIE_NAME = 'edx-user-info'
 EDXMKTG_USER_INFO_COOKIE_VERSION = 1
 
+#: This is a :py:class:`dict` of marketing page names along with the paths to
+#: add on top of the root of the marketing site that they should navigate to.
+#: Note that in this dict you must define an item with the key "ROOT" which
+#: points to the root of the marketing site.
+#: Only used if FEATURES['ENABLE_MKTG_SITE'] == True.
 MKTG_URLS = {}
 MKTG_URL_OVERRIDES = {}
 MKTG_URL_LINK_MAP = {
@@ -3323,7 +3328,7 @@ COUNTRIES_OVERRIDE = {
 #: Name of the access permission to check in order to determine if a course is visible
 #: in the course catalog. The accepted values for access permission names are the same
 #: as listed in the :py:func:`courseware.access._has_access_course` function, namely:
-#: 
+#:
 #: * "load": load the courseware, see inside the course
 #: * "load_forum": can load and contribute to the forums (one access level for now)
 #: * "load_mobile": can load from a mobile context
@@ -3742,6 +3747,7 @@ COMPREHENSIVE_THEME_LOCALE_PATHS = []
 #: set to None if you want to use openedx theme
 DEFAULT_SITE_THEME = None
 
+#: Flag to enable the use of themes
 ENABLE_COMPREHENSIVE_THEMING = False
 
 # DOCUMENTME
