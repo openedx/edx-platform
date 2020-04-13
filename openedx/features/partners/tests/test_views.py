@@ -250,5 +250,3 @@ class PartnerRegistrationViewTest(ApiTestCase):
         user = User.objects.filter(username=self.USERNAME).first()
         self.assertIsNotNone(user)
         self.assertEqual(PartnerUser.objects.filter(user=user).first().status, PARTNER_USER_STATUS_WAITING)
-
-
