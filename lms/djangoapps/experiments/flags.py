@@ -40,6 +40,21 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
     Bucket 0 is assumed to be the control bucket.
 
     See a HOWTO here: https://openedx.atlassian.net/wiki/spaces/AC/pages/1250623700/Bucketing+users+for+an+experiment
+
+    When writing tests involving an ExperimentWaffleFlag you must not use the
+    override_waffle_flag utility. That will only turn the experiment on or off and won't
+    override bucketing. Instead use ExperimentWaffleFlag's override method which
+    will do both. Example:
+
+        with MY_EXPERIMENT_WAFFLE_FLAG.override(active=True, bucket=1):
+            ...
+
+    or as a decorator:
+
+        @MY_EXPERIMENT_WAFFLE_FLAG.override(active=True, bucket=1)
+        def test_my_experiment(self):
+            ...
+
     """
     def __init__(self, waffle_namespace, flag_name, num_buckets=2, experiment_id=None, **kwargs):
         super().__init__(waffle_namespace, flag_name, **kwargs)
