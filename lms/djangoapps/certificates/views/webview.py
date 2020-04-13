@@ -136,6 +136,7 @@ def _update_certificate_context(context, course, user_certificate, platform_name
 
     # Translators:  This text fragment appears after the student's name (displayed in a large font) on the certificate
     # screen.  The text describes the accomplishment represented by the certificate information displayed to the user
+    # edx-417
     context['accomplishment_copy_description_full'] = _("has successfully completed an offering of")
     context['accomplishment_disclaimer'] = _("A Statement of accomplishment acknowledges that a {platform_name} " +
                                              "course offered on online.ucsd.edu was completed with a score indicating mastery of material by a particular learner. " +
