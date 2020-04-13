@@ -2105,6 +2105,7 @@ DEBUG_TOOLBAR_PATCH_SETTINGS = False
 # Tasks are only registered when the module they are defined in is imported.
 CELERY_IMPORTS = (
     'openedx.core.djangoapps.programs.tasks.v1.tasks',
+    'poll.tasks'
 )
 
 # Message configuration
