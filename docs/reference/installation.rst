@@ -13,6 +13,7 @@ Dependencies
 
 Open edX depends on several services that need to be running in order to operate properly.
 
+* Elasticsearch 1.5.2
 * Memcached
 * MySQL v5.6
 * MongoDb v3.6.17
