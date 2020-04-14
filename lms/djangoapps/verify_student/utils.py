@@ -3,15 +3,34 @@
 Common Utilities for the verify_student application.
 """
 
-
 import datetime
 import logging
 
 from django.conf import settings
 from django.utils.timezone import now
-from sailthru import SailthruClient
+from six import text_type
+
+from lms.djangoapps.verify_student.tasks import send_request_to_ss_for_user
 
 log = logging.getLogger(__name__)
+
+
+def submit_request_to_ss(user_verification, copy_id_photo_from):
+    """
+    Submit our verification attempt to Software Secure for validation.
+
+    Submits the task to software secure and If the task creation fails,
+    set the verification status to "must_retry".
+    """
+    try:
+        send_request_to_ss_for_user.delay(
+            user_verification_id=user_verification.id, copy_id_photo_from=copy_id_photo_from
+        )
+    except Exception as error:
+        log.error(
+            "Software Secure submit request %r failed, result: %s", user_verification.user.username, text_type(error)
+        )
+        user_verification.mark_must_retry()
 
 
 def is_verification_expiring_soon(expiration_datetime):
@@ -19,8 +38,7 @@ def is_verification_expiring_soon(expiration_datetime):
     Returns True if verification is expiring within EXPIRING_SOON_WINDOW.
     """
     if expiration_datetime:
-        if (expiration_datetime - now()).days <= settings.VERIFY_STUDENT.get(
-                "EXPIRING_SOON_WINDOW"):
+        if (expiration_datetime - now()).days <= settings.VERIFY_STUDENT.get("EXPIRING_SOON_WINDOW"):
             return True
 
     return False
