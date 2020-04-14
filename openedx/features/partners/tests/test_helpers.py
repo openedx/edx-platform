@@ -32,6 +32,26 @@ class PartnerHelpersTest(ModuleStoreTestCase):
         self.partner_user = PartnerUserFactory(user=self.user, partner=self.partner)
         self.course = CourseFactory.create()
 
+    '''
+    We need to comment this because we have already generalized the partners application
+    This test is not valid for now!
+    '''
+    # def test_import_form_using_slug_with_valid_slug(self):
+    #     """
+    #     Test if form is available for a valid slug
+    #     :return : partner view
+    #     """
+    #     form = helpers.import_form_using_slug(self.PARTNER_SLUG)
+    #     self.assertIsNotNone(form)
+
+    def test_import_form_using_slug_with_invalid_slug(self):
+        """
+        Test None is returned for an invalid partner slug
+        :return : None
+        """
+        form = helpers.import_form_using_slug('invalid')
+        self.assertIsNone(form)
+
     def test_get_course_description_with_invalid_course(self):
         """
         Verify that empty string is returned for invalid course
