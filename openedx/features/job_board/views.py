@@ -39,7 +39,7 @@ class JobListView(ListView):
         if self.param_job_compensation:
             queryset = queryset.filter(compensation__in=self.param_job_compensation)
         if country_codes:
-            queryset = queryset.filter(country__in=country_codes).filter(country__in=country_codes)
+            queryset = queryset.filter(country__in=country_codes)
         if self.param_job_city:
             queryset = queryset.filter(city__icontains=self.param_job_city)
         if self.param_job_query:
