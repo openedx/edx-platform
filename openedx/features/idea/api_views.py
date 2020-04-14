@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -15,17 +16,14 @@ class FavoriteAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, idea_id):
-        response = dict(message='User is added to favorites')
+        response = dict(message='Idea is added to favorites')
         toggle_status = status.HTTP_201_CREATED
         user = request.user
-        try:
-            idea = Idea.objects.get(pk=idea_id)
-            toggle_favorite_status = idea.toggle_favorite(user)
-            if not toggle_favorite_status:
-                response['message'] = 'User is removed from favorites'
-                toggle_status = status.HTTP_200_OK
-        except Exception as ex:
-            response['message'] = 'Idea not found'
-            toggle_status = status.HTTP_404_NOT_FOUND
+        idea = get_object_or_404(Idea, pk=idea_id)
+        toggle_favorite_status = idea.toggle_favorite(user)
+
+        if not toggle_favorite_status:
+            response['message'] = 'Idea is removed from favorites'
+            toggle_status = status.HTTP_200_OK
 
         return JsonResponse(response, status=toggle_status)

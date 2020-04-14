@@ -61,7 +61,7 @@ class Idea(OrganizationBase, Location, VisualAttachment):
     overview = models.CharField(max_length=OVERVIEW_MAX_LENGTH)
     description = models.TextField()
     implementation = models.TextField(blank=True)
-    favorites = models.ManyToManyField(User, related_name='favorited')
+    favorites = models.ManyToManyField(User, related_name='favorite_ideas')
 
     def toggle_favorite(self, user):
 

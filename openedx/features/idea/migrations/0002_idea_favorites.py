@@ -17,6 +17,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='idea',
             name='favorites',
-            field=models.ManyToManyField(related_name='favorited_by', to=settings.AUTH_USER_MODEL),
+            field=models.ManyToManyField(related_name='favorite_ideas', to=settings.AUTH_USER_MODEL),
         ),
     ]
