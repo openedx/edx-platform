@@ -1,5 +1,5 @@
 /* global gettext */
-import { Button } from '@edx/paragon';
+import { Button, Icon } from '@edx/paragon';
 import BlockBrowserContainer from 'BlockBrowser/components/BlockBrowser/BlockBrowserContainer';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
@@ -29,35 +29,56 @@ export default class Main extends React.Component {
       this.props.problemResponsesEndpoint,
       this.props.taskStatusEndpoint,
       this.props.reportDownloadEndpoint,
-      this.props.selectedBlock,
-    );
+      this.props.selectedBlock);
   }
+
 
   render() {
     const { selectedBlock, onSelectBlock } = this.props;
+    let selectorType = <Button onClick={this.handleToggleDropdown} label={gettext('Select a section or problem')} />;
+    if (this.props.showBtnUi === 'false') {
+      selectorType =
+          // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+        (<span
+          onClick={this.handleToggleDropdown}
+          className={['problem-selector']}
+        >
+          <span>{selectedBlock || 'Select a section or problem'}</span>
+          <span className={['pull-right']}>
+            <Icon
+              className={['fa', 'fa-sort']}
+            />
+          </span>
+        </span>);
+    }
+
 
     return (
       <div className="problem-browser-container">
         <div className="problem-browser">
-          <Button
-            onClick={this.handleToggleDropdown}
-            label={gettext('Select a section or problem')}
+          {selectorType}
+          <input
+            type="text"
+            name="problem-location"
+            value={selectedBlock}
+            disabled
+            hidden={this.props.showBtnUi === 'false'}
           />
-          <input type="text" name="problem-location" value={selectedBlock} disabled />
           {this.state.showDropdown &&
-          <BlockBrowserContainer
-            onSelectBlock={(blockId) => {
-              this.hideDropdown();
-              onSelectBlock(blockId);
-            }}
-          />}
+            <BlockBrowserContainer
+              onSelectBlock={(blockId) => {
+                this.hideDropdown();
+                onSelectBlock(blockId);
+              }}
+            />}
           <Button
             onClick={this.initiateReportGeneration}
             name="list-problem-responses-csv"
             label={gettext('Create a report of problem responses')}
           />
+          <ReportStatusContainer />
         </div>
-        <ReportStatusContainer />
+
       </div>
     );
   }
@@ -73,6 +94,7 @@ Main.propTypes = {
   selectedBlock: PropTypes.string,
   taskStatusEndpoint: PropTypes.string.isRequired,
   reportDownloadEndpoint: PropTypes.string.isRequired,
+  ShowBtnUi: PropTypes.string.isRequired,
 };
 
 Main.defaultProps = {

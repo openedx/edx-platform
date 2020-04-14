@@ -18,6 +18,7 @@ exports[`ProblemBrowser Main component render with basic parameters 1`] = `
     </button>
     <input
       disabled={true}
+      hidden={false}
       name="problem-location"
       type="text"
       value={null}
@@ -32,11 +33,11 @@ exports[`ProblemBrowser Main component render with basic parameters 1`] = `
     >
       Create a report of problem responses
     </button>
+    <div
+      aria-live="polite"
+      className="report-generation-status"
+    />
   </div>
-  <div
-    aria-live="polite"
-    className="report-generation-status"
-  />
 </div>
 `;
 
@@ -58,6 +59,7 @@ exports[`ProblemBrowser Main component render with selected block 1`] = `
     </button>
     <input
       disabled={true}
+      hidden={false}
       name="problem-location"
       type="text"
       value="some-selected-block"
@@ -72,10 +74,10 @@ exports[`ProblemBrowser Main component render with selected block 1`] = `
     >
       Create a report of problem responses
     </button>
+    <div
+      aria-live="polite"
+      className="report-generation-status"
+    />
   </div>
-  <div
-    aria-live="polite"
-    className="report-generation-status"
-  />
 </div>
 `;

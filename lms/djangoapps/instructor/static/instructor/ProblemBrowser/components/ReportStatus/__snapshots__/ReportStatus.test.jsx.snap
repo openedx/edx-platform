@@ -42,7 +42,7 @@ exports[`ReportStatus component render success status 1`] = `
   <div
     className="msg success"
   >
-    Your report has being successfully generated.
+    Your report has been successfully generated.
     <a
       href="/some/report/path.csv"
     >
