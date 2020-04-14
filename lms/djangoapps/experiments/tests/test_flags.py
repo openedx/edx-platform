@@ -102,7 +102,7 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
         (False, 1),
     )
     @ddt.unpack
-    def test_bucket_override(self, active, expected_bucket):
+    def test_forcing_bucket(self, active, expected_bucket):
         bucket_flag = CourseWaffleFlag('experiments', 'test.0')
         with bucket_flag.override(active=active):
             self.assertEqual(self.get_bucket(), expected_bucket)
@@ -143,3 +143,16 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
             self.assertEqual(self.flag.is_enabled_without_course_context(), False)
             self.assertEqual(self.flag.is_enabled(self.key), False)
             self.assertEqual(self.flag.is_enabled(), False)
+
+    @ddt.data(
+        (True, 1, 1),
+        (True, 0, 0),
+        (False, 1, 0),  # bucket is always 0 if the experiment is off
+        (False, 0, 0),
+    )
+    @ddt.unpack
+    # Test the override method
+    def test_override_method(self, active, bucket_override, expected_bucket):
+        with self.flag.override(active=active, bucket=bucket_override):
+            self.assertEqual(self.flag.get_bucket(), expected_bucket)
+            self.assertEqual(self.flag.is_experiment_on(), active)
