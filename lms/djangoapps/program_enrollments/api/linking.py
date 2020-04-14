@@ -12,6 +12,7 @@ import logging
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
 
+from student.api import get_access_role_by_role_name
 from student.models import CourseEnrollmentException
 
 from .reading import fetch_program_enrollments
@@ -159,7 +160,7 @@ def link_program_enrollment_to_lms_user(program_enrollment, user):
         program_enrollment.external_user_key,
         program_enrollment.program_uuid,
     )
-    logger.info("Linking " + link_log_info)
+    logger.info("Linking %s", link_log_info)
     program_enrollment.user = user
     try:
         program_enrollment.save()
@@ -169,8 +170,9 @@ def link_program_enrollment_to_lms_user(program_enrollment, user):
                 user, pce.course_key, pce.status
             )
             pce.save()
+            _fulfill_course_access_roles(user, pce)
     except IntegrityError:
-        logger.error("Integrity error while linking " + link_log_info)
+        logger.error("Integrity error while linking %s", link_log_info)
         raise
     except CourseEnrollmentException as e:
         logger.error(
@@ -179,3 +181,53 @@ def link_program_enrollment_to_lms_user(program_enrollment, user):
             )
         )
         raise
+
+
+def _fulfill_course_access_roles(user, program_course_enrollment):
+    """
+    Convert any CourseAccessRoleAssignment objects, which represent pending CourseAccessRoles, into fulfilled
+    CourseAccessRole objects as part of a program course enrollment.
+
+    Arguments:
+        user: User object for whom we are fulfilling CourseAccessRoleAssignments into CourseAccessRoles
+        program_course_enrollment: the ProgramCourseEnrollment object that represents the course the user
+            should be granted a CourseAccessRole in the context of
+    """
+    role_assignments = program_course_enrollment.courseaccessroleassignment_set.all()
+    program_enrollment = program_course_enrollment.program_enrollment
+
+    for role_assignment in role_assignments:
+        # currently, we only allow for an assignment of a "staff" role, but
+        # this allows us to expand the functionality to other roles, if need be
+        # get_access_role_by_role_name gets us the class, so we need to instantiate it
+        role = get_access_role_by_role_name(role_assignment.role)(program_course_enrollment.course_key)
+
+        logger_format_values = {
+            'course_key': program_course_enrollment.course_key,
+            'program_course_enrollment': program_course_enrollment,
+            'program_uuid': program_enrollment.program_uuid,
+            'role': role_assignment.role,
+            'user_id': user.id,
+            'user_key': program_enrollment.external_user_key,
+        }
+
+        try:
+            with transaction.atomic():
+                logger.info('Creating access role %(role)s for user with user id %(user_id)s and '
+                            'external user key %(user_key)s for course with course key %(course_key)s '
+                            'in program with uuid %(program_uuid)s.',
+                            logger_format_values
+                            )
+                # if the user already has the role, then the add users method ignores this
+                # and the operation is a no-op
+                role.add_users(user)
+                # because the user now has a corresponding CourseAccessRole, we no longer need
+                # the CourseAccessRoleAssignment object
+                role_assignment.delete()
+        except Exception:  # pylint: disable=broad-except
+            logger.error('Unable to create access role %(role)s for user with user id %(user_id)s and '
+                         'external user key %(user_key)s for course with course key %(course_key)s '
+                         'in program with uuid %(program_uuid)s or to delete the CourseAccessRoleAssignment '
+                         'with role %(role)s and ProgramCourseEnrollment %(program_course_enrollment)r.',
+                         logger_format_values
+                         )
