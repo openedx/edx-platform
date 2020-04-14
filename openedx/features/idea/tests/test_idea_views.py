@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 from django.contrib.sites.models import Site
 from django.test import TestCase
-
 from django.urls import reverse
 
 from openedx.core.djangoapps.theming.models import SiteTheme

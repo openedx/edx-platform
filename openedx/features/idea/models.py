@@ -26,7 +26,6 @@ class Location(models.Model):
 
 
 class VisualAttachment(models.Model):
-
     video_link = models.URLField(blank=True, null=True)
     image = models.ImageField(
         upload_to=partial(upload_to_path, folder='images'), blank=True, null=True,
@@ -62,6 +61,16 @@ class Idea(OrganizationBase, Location, VisualAttachment):
     overview = models.CharField(max_length=OVERVIEW_MAX_LENGTH)
     description = models.TextField()
     implementation = models.TextField(blank=True)
+    favorites = models.ManyToManyField(User, related_name='favorited')
+
+    def toggle_favorite(self, user):
+        created = True
+        if self.favorites.filter(pk=user.id).exists():
+            created = False
+            self.favorites.remove(user)
+        else:
+            self.favorites.add(user)
+        return created
 
     def __unicode__(self):
         return self.title
