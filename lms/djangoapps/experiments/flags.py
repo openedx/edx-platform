@@ -138,7 +138,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
             return cache_response.value
 
         # Check if the main flag is even enabled for this user and course.
-        if not self._is_enabled(course_key):  # grabs user from the current request, if any
+        if not self.is_experiment_on(course_key):  # grabs user from the current request, if any
             return self._cache_bucket(experiment_name, 0)
 
         # Check if the enrollment should even be considered (if it started before the experiment wants, we ignore)
@@ -189,7 +189,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         if course_key is None:
             return super().is_enabled_without_course_context()
 
-        return super().is_enabled(course_key=course_key)
+        return super().is_enabled(course_key)
 
     @contextmanager
     def override(self, active=True, bucket=1):  # pylint: disable=arguments-differ
