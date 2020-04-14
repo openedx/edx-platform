@@ -1,0 +1,93 @@
+<%page args="section_data" expression_filter="h"/>
+<%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<div class="data-download-container  action-type-container">
+    <ul class="data-download-nav">
+
+        <li class="nav-item ">
+            <button type="button" class="btn-link reports  active-section" data-section="reports">Reports</button>
+        </li>
+        %if settings.FEATURES.get('ENABLE_GRADE_DOWNLOADS'):
+        <li class="nav-item">
+            <button type="button" class="btn-link problem-report" data-section="problem">Problem Report</button>
+        </li>
+        <li class="nav-item">
+            <button type="button" class="btn-link certificates" data-section="certificate">Certificates</button>
+        </li>
+        %if settings.FEATURES.get('ALLOW_COURSE_STAFF_GRADE_DOWNLOADS') or section_data['access']['admin']:
+        <li class="nav-item">
+            <button type="button" class="btn-link grading" data-section="grading">Grading</button>
+        </li>
+        %endif
+        %endif
+
+    </ul>
+    <%include file="./data_download_2/reports.html" args="section_data=section_data, **context.kwargs" />
+
+    <%include file="./data_download_2/grading.html" args="section_data=section_data, **context.kwargs" />
+
+    %if settings.FEATURES.get('ENABLE_GRADE_DOWNLOADS'):
+      <%include file="./data_download_2/certificates.html" args="section_data=section_data, **context.kwargs" />
+      <%include file="./data_download_2/problem_report.html" args="section_data=section_data, **context.kwargs" />
+    %endif
+    <div class="request-response message msg-confirm copy" id="report-request-response"></div>
+    <div class="request-response-error message msg-error copy" id="report-request-response-error"></div>
+
+</div>
+
+<div class="reports-download-container action-type-container">
+    <div class="data-display-text" id="data-grade-config-text"></div>
+    <div class="data-display-table profile-data-display-table" id="data-student-profiles-table"></div>
+    <div class="data-display-table data-display-table-holder" id="data-issued-certificates-table"></div>
+    <hr>
+
+    <h3 class="hd hd-3">${_("Reports Available for Download")}</h3>
+    <p>
+        ${_("The reports listed below are available for download, identified by UTC date and time of generation.")}
+    </p>
+
+    %if settings.FEATURES.get('ENABLE_ASYNC_ANSWER_DISTRIBUTION'):
+    <p>
+        ${_("The answer distribution report listed below is generated periodically by an automated background process. \
+        The report is cumulative, so answers submitted after the process starts are included in a subsequent report. \
+        The report is generated several times per day.")}
+    </p>
+    %endif
+
+    ## Translators: a table of URL links to report files appears after this sentence.
+    <p>
+        ${Text(_("{strong_start}Note{strong_end}: {ul_start}{li_start}To keep student data secure, you cannot save or \
+        email these links for direct access. Copies of links expire within 5 minutes.{li_end}{li_start}Report files \
+        are deleted 90 days after generation. If you will need access to old reports, download and store the files, \
+        in accordance with your institution's data security policies.{li_end}{ul_end}")).format(
+            strong_start=HTML("<strong>"),
+            strong_end=HTML("</strong>"),
+            ul_start=HTML("<ul>"),
+            ul_end=HTML("</ul>"),
+            li_start=HTML("<li>"),
+            li_end=HTML("</li>"),
+        )}
+    </p><br>
+
+    <div class="report-downloads-table" id="report-downloads-table"
+         data-endpoint="${ section_data['list_report_downloads_url'] }"></div>
+
+</div>
+
+%if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+<div class="running-tasks-container action-type-container">
+    <hr>
+    <h3 class="hd hd-3">${_("Pending Tasks")}</h3>
+    <div class="running-tasks-section">
+        <p>${_("The status for any active tasks appears in a table below.")} </p>
+        <br/>
+        <div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>
+    </div>
+    <div class="no-pending-tasks-message"></div>
+</div>
+%endif
+
