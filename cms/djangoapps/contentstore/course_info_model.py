@@ -23,6 +23,7 @@ from openedx.core.lib.xblock_utils import get_course_update_items
 from xmodule.html_module import CourseInfoBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from util.json_request import JsonResponse
 
 # # This should be in a class which inherits from XmlDescriptor
 log = logging.getLogger(__name__)
@@ -58,19 +59,22 @@ def update_course_updates(location, update, passed_id=None, user=None):
 
     course_update_items = list(reversed(get_course_update_items(course_updates)))
 
+    course_update_items_ids = [course_update_item['id'] for course_update_item in course_update_items]
+
     if passed_id is not None:
         passed_index = _get_index(passed_id)
-        # oldest update at start of list
-        if 0 < passed_index <= len(course_update_items):
-            course_update_dict = course_update_items[passed_index - 1]
-            course_update_dict["date"] = update["date"]
-            course_update_dict["content"] = update["content"]
-            course_update_items[passed_index - 1] = course_update_dict
+
+        if passed_index in course_update_items_ids:
+            for course_update_item in course_update_items:
+                if course_update_item["id"] == passed_index:
+                    course_update_dict = course_update_item
+                    course_update_item["date"] = update["date"]
+                    course_update_item["content"] = update["content"]
         else:
             return HttpResponseBadRequest(_("Invalid course update id."))
     else:
         course_update_dict = {
-            "id": len(course_update_items) + 1,
+            "id": max(course_update_items_ids) + 1,
             "date": update["date"],
             "content": update["content"],
             "status": CourseInfoBlock.STATUS_VISIBLE
@@ -130,12 +134,14 @@ def delete_course_update(location, update, passed_id, user):
     course_update_items = list(reversed(get_course_update_items(course_updates)))
     passed_index = _get_index(passed_id)
 
+    course_update_items_ids = [course_update_item['id'] for course_update_item in course_update_items]
+
     # delete update item from given index
-    if 0 < passed_index <= len(course_update_items):
-        course_update_item = course_update_items[passed_index - 1]
-        # soft delete course update item
-        course_update_item["status"] = CourseInfoBlock.STATUS_DELETED
-        course_update_items[passed_index - 1] = course_update_item
+    if passed_index in course_update_items_ids:
+        for course_update_item in course_update_items:
+            if course_update_item["id"] == passed_index:
+                # soft delete course update item
+                course_update_item["status"] = CourseInfoBlock.STATUS_DELETED
 
         # update db record
         save_course_update_items(location, course_updates, course_update_items, user)
