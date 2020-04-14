@@ -10,7 +10,6 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.utils import timezone
 from django.db.models import signals
-from django.contrib.sites.models import Site
 from django.http import HttpRequest
 from django.http import Http404
 from django.test.utils import override_settings
@@ -28,7 +27,7 @@ from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from certificates.tests.factories import GeneratedCertificateFactory
 from course_modes.tests.factories import CourseModeFactory
-from openedx.core.djangoapps.theming.models import SiteTheme
+from openedx.core.djangolib.testing.philu_utils import configure_philu_theme
 from custom_settings.models import CustomSettings
 from lms.djangoapps.onboarding.helpers import get_current_utc_date
 from openedx.features.student_certificates.helpers import get_philu_certificate_social_context
@@ -48,10 +47,7 @@ class GenerateStudentCertificateViewsTestCase(SharedModuleStoreTestCase):
     @factory.django.mute_signals(signals.pre_save, signals.post_save)
     def setUpClass(cls):
         super(GenerateStudentCertificateViewsTestCase, cls).setUpClass()
-        site = Site(domain='testserver', name='test')
-        site.save()
-        theme = SiteTheme(site=site, theme_dir_name='philu')
-        theme.save()
+        configure_philu_theme()
 
         cls.download_url = '/certificate.pdf'
         cls.course = CourseFactory.create()
@@ -135,7 +131,7 @@ class GenerateStudentCertificateViewsTestCase(SharedModuleStoreTestCase):
         request.user = self.user
         student_certificates(request)
         mock_method.assert_called_once_with('certificates.html', expected_context)
-    
+
     @mock.patch('openedx.features.student_certificates.views.render_to_response')
     def test_student_certificates_course_title_index_error(self, mock_method):
         """
@@ -203,11 +199,11 @@ class GenerateStudentCertificateViewsTestCase(SharedModuleStoreTestCase):
             'meta_tags': {
                 'description': '',
                 'title': TWITTER_META_TITLE_FMT.format(course_name=self.course.display_name),
-                'image': 'https://s3.amazonaws.com/edxuploads/certificates_images/{0}.jpg'.format(self.certificate.verify_uuid), 
-                'robots': '', 
-                'utm_params': {}, 
+                'image': 'https://s3.amazonaws.com/edxuploads/certificates_images/{0}.jpg'.format(self.certificate.verify_uuid),
+                'robots': '',
+                'utm_params': {},
                 'keywords': ''
-                }, 
+                },
             'course_url': COURSE_URL_FMT.format(
                 base_url = settings.LMS_ROOT_URL,
                 course_url = 'courses',

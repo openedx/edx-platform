@@ -1,28 +1,20 @@
-from mock import Mock, patch
+from mock import patch
 
-from django.contrib.sites.models import Site
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from common.lib.discovery_client.client import DiscoveryClient
-from edxmako.shortcuts import render_to_response
-from openedx.core.djangoapps.theming.models import SiteTheme
+from openedx.core.djangolib.testing.philu_utils import (
+    intercept_renderer, configure_philu_theme
+)
 
-from mock_get_program_helpers import *
+from mock_get_program_helpers import (
+    mock_get_program, mock_course,
+    mock_get_program_with_runs_having_no_dates,
+    mock_get_program_with_open_course_runs,
+    mock_get_program_with_closed_course_runs,
+    mock_get_program_with_future_course_runs,
+)
 
-
-def intercept_renderer(path, context):
-    """
-    Intercept calls to `render_to_response` and attach the context dict to the
-    response for examination in unit tests.
-    """
-    # I think Django already does this for you in their TestClient, except
-    # we're bypassing that by using edxmako.  Probably edxmako should be
-    # integrated better with Django's rendering and event system.
-    response = render_to_response(path, context)
-    response.mako_context = context
-    response.mako_template = path
-    return response
 
 class AboutViewTest(TestCase):
 
@@ -36,63 +28,62 @@ class AboutViewTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super(AboutViewTest, cls).setUpClass()
-        site = Site(domain='testserver', name='test')
-        site.save()
-        theme = SiteTheme(site=site, theme_dir_name='philu')
-        theme.save()
+        configure_philu_theme()
 
     @patch('openedx.features.specializations.views.render_to_response', intercept_renderer)
-    @patch.object(DiscoveryClient, '__init__', Mock(return_value=None))
-    @patch.object(DiscoveryClient, 'get_program', Mock(return_value=mock_get_program()))
+    @patch('openedx.features.specializations.views.DiscoveryClient')
     @patch('webpack_loader.loader.WebpackLoader.get_bundle')
-    def test_program_has_no_courses(self, mock_webpack_loader):
+    def test_program_has_no_courses(self, mock_webpack_loader, mock_discovery_client):
+        """Mock get_program to return programs having no courses"""
+        mock_discovery_client().get_program.return_value = mock_get_program()
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.mako_context['courses']), 0)
 
     @patch('openedx.features.specializations.views.render_to_response', intercept_renderer)
-    @patch.object(DiscoveryClient, '__init__', Mock(return_value=None))
-    @patch.object(DiscoveryClient, 'get_program', Mock(return_value=mock_get_program([mock_course()])))
+    @patch('openedx.features.specializations.views.DiscoveryClient')
     @patch('webpack_loader.loader.WebpackLoader.get_bundle')
-    def test_courses_without_runs(self, mock_webpack_loader):
+    def test_courses_without_runs(self, mock_webpack_loader, mock_discovery_client):
+        """Mock get_program to return programs having courses which don't include any run"""
+        mock_discovery_client().get_program.return_value = mock_get_program([mock_course()])
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.mako_context['courses']), 0)
 
     @patch('openedx.features.specializations.views.render_to_response', intercept_renderer)
-    @patch.object(DiscoveryClient, '__init__', Mock(return_value=None))
-    @patch.object(DiscoveryClient, 'get_program', Mock(return_value=mock_get_program_with_runs_having_no_dates()))
+    @patch('openedx.features.specializations.views.DiscoveryClient')
     @patch('webpack_loader.loader.WebpackLoader.get_bundle')
-    def test_courses_with_runs_having_no_dates(self, mock_webpack_loader):
+    def test_courses_with_runs_having_no_dates(self, mock_webpack_loader, mock_discovery_client):
+        mock_discovery_client().get_program.return_value = mock_get_program_with_runs_having_no_dates()
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.mako_context['courses']), 1)
 
     @patch('openedx.features.specializations.views.render_to_response', intercept_renderer)
-    @patch.object(DiscoveryClient, '__init__', Mock(return_value=None))
-    @patch.object(DiscoveryClient, 'get_program', Mock(return_value=mock_get_program_with_open_course_runs()))
+    @patch('openedx.features.specializations.views.DiscoveryClient')
     @patch('webpack_loader.loader.WebpackLoader.get_bundle')
-    def test_courses_with_open_runs(self, mock_webpack_loader):
+    def test_courses_with_open_runs(self, mock_webpack_loader, mock_discovery_client):
+        mock_discovery_client().get_program.return_value = mock_get_program_with_open_course_runs()
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.mako_context['courses']), 1)
         self.assertTrue(response.mako_context['courses'][0]['opened'])
 
     @patch('openedx.features.specializations.views.render_to_response', intercept_renderer)
-    @patch.object(DiscoveryClient, '__init__', Mock(return_value=None))
-    @patch.object(DiscoveryClient, 'get_program', Mock(return_value=mock_get_program_with_closed_course_runs()))
+    @patch('openedx.features.specializations.views.DiscoveryClient')
     @patch('webpack_loader.loader.WebpackLoader.get_bundle')
-    def test_courses_with_closed_runs(self, mock_webpack_loader):
+    def test_courses_with_closed_runs(self, mock_webpack_loader, mock_discovery_client):
+        mock_discovery_client().get_program.return_value = mock_get_program_with_closed_course_runs()
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.mako_context['courses']), 1)
         self.assertFalse(response.mako_context['courses'][0]['opened'])
 
     @patch('openedx.features.specializations.views.render_to_response', intercept_renderer)
-    @patch.object(DiscoveryClient, '__init__', Mock(return_value=None))
-    @patch.object(DiscoveryClient, 'get_program', Mock(return_value=mock_get_program_with_future_course_runs()))
+    @patch('openedx.features.specializations.views.DiscoveryClient')
     @patch('webpack_loader.loader.WebpackLoader.get_bundle')
-    def test_courses_with_future_runs(self, mock_webpack_loader):
+    def test_courses_with_future_runs(self, mock_webpack_loader, mock_discovery_client):
+        mock_discovery_client().get_program.return_value = mock_get_program_with_future_course_runs()
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.mako_context['courses']), 1)

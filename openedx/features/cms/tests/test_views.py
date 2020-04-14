@@ -6,10 +6,9 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory
 from django.test.client import Client
-from django.contrib.sites.models import Site
 from django.contrib.auth.models import AnonymousUser
 
-from openedx.core.djangoapps.theming.models import SiteTheme
+from openedx.core.djangolib.testing.philu_utils import configure_philu_theme
 from openedx.features.cms import views as rerun_views
 from opaque_keys.edx.locator import CourseLocator
 from cms.djangoapps.contentstore.views.course import get_in_process_course_actions
@@ -37,10 +36,7 @@ class CourseRerunAutomationViewTestCase(ModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super(CourseRerunAutomationViewTestCase, cls).setUpClass()
-        site = Site(domain='testserver', name='test')
-        site.save()
-        theme = SiteTheme(site=site, theme_dir_name='philu')
-        theme.save()
+        configure_philu_theme()
 
     def test_course_multiple_rerun_handler_denies_anonymous(self):
         """This method test API call without logged-in user. In this case user must be redirected

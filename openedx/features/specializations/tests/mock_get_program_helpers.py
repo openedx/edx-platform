@@ -3,7 +3,9 @@ from datetime import datetime, timedelta
 from openedx.features.specializations.helpers import DISCOVERY_DATE_FORMAT
 
 
-def mock_get_program(courses=[]):
+def mock_get_program(courses=None):
+    if courses is None:
+        courses = []
     return {
         'uuid': 'eb228773-a9a5-48cf-bb0e-94725d5aa4f1',
         'title': 'Specialization',
@@ -77,7 +79,9 @@ def mock_get_program(courses=[]):
     }
 
 
-def mock_course(course_runs=[]):
+def mock_course(course_runs=None):
+    if course_runs is None:
+        course_runs = []
     return {
         'key': 'Arbisoft+TCA102',
         'uuid': 'c8b485e5-20a2-41c2-a089-513cb8ef3952',

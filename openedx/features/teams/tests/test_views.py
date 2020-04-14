@@ -8,10 +8,9 @@ from django.db.models import signals
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.test import modify_settings, override_settings
-from django.contrib.sites.models import Site
 from w3lib.url import add_or_replace_parameter
 
-from openedx.core.djangoapps.theming.models import SiteTheme
+from openedx.core.djangolib.testing.philu_utils import configure_philu_theme
 from lms.djangoapps.teams.tests.factories import CourseTeamMembershipFactory
 from lms.djangoapps.onboarding.tests.factories import UserFactory
 from student.tests.factories import CourseEnrollmentFactory
@@ -19,7 +18,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-from openedx.features.teams.serializers import CustomCourseTeamCreationSerializer
 from openedx.features.teams.tests.factories import CourseTeamFactory
 
 TOTAL_TEAMS = 3
@@ -46,10 +44,7 @@ class TeamsTestsBaseClass(ModuleStoreTestCase):
     def setUpClass(cls):
         """ Setup "philu" theme for testing. Required for testing templates that exist in the theme ."""
         super(TeamsTestsBaseClass, cls).setUpClass()
-        site = Site(domain='testserver', name='test')
-        site.save()
-        theme = SiteTheme(site=site, theme_dir_name='philu')
-        theme.save()
+        configure_philu_theme()
 
     def setUp(self):
         """Setup all test data required for testing any of the test cases. """
