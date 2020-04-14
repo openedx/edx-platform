@@ -20,8 +20,8 @@ class FavoriteAPIView(APIView):
         user = request.user
         try:
             idea = Idea.objects.get(pk=idea_id)
-
-            if not idea.toggle_favorite(user):
+            toggle_favorite_status = idea.toggle_favorite(user)
+            if not toggle_favorite_status:
                 response['message'] = 'User is removed from favorites'
                 toggle_status = status.HTTP_200_OK
         except Exception as ex:
