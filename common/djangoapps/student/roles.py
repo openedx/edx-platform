@@ -343,6 +343,14 @@ class OrgLibraryUserRole(OrgRole):
         super(OrgLibraryUserRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
+class OrgDataResearcherRole(OrgRole):
+    """A Data Researcher"""
+    ROLE = 'data_researcher'
+
+    def __init__(self, *args, **kwargs):
+        super(OrgDataResearcherRole, self).__init__(self.ROLE, *args, **kwargs)
+
+
 @register_access_role
 class CourseCreatorRole(RoleBase):
     """

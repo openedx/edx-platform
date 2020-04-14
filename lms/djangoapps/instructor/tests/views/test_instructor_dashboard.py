@@ -31,7 +31,7 @@ from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from shoppingcart.models import CourseRegCodeItem, Order, PaidCourseRegistration
 from student.models import CourseEnrollment
 from student.roles import CourseFinanceAdminRole
-from student.tests.factories import AdminFactory, CourseEnrollmentFactory
+from student.tests.factories import AdminFactory, CourseAccessRoleFactory, CourseEnrollmentFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
@@ -117,6 +117,24 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
         student = UserFactory.create()
         self.assertFalse(has_instructor_tab(student, self.course))
+
+        researcher = UserFactory.create()
+        CourseAccessRoleFactory(
+            course_id=self.course.id,
+            user=researcher,
+            role='data_researcher',
+            org=self.course.id.org
+        )
+        self.assertTrue(has_instructor_tab(researcher, self.course))
+
+        org_researcher = UserFactory.create()
+        CourseAccessRoleFactory(
+            course_id=None,
+            user=org_researcher,
+            role='data_researcher',
+            org=self.course.id.org
+        )
+        self.assertTrue(has_instructor_tab(org_researcher, self.course))
 
     @ddt.data(
         ("How to defeat the Road Runner", "2017", "001", "ACME"),
