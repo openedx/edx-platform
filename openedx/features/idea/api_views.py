@@ -9,18 +9,23 @@ from openedx.features.idea.models import Idea
 
 class FavoriteAPIView(APIView):
     """
-    FavoriteAPIView is used t toggle favorite idea for the user
+    FavoriteAPIView is used to toggle favorite idea for the user
     """
     authentication_classes = (SessionAuthentication, BasicAuthentication)
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, idea_id):
         response = dict(message='User is added to favorites')
-        http_status = status.HTTP_201_CREATED
+        toggle_status = status.HTTP_201_CREATED
         user = request.user
-        idea = Idea.objects.get(pk=idea_id)
-        if not idea.toggle_favorite(user):
-            response['message'] = 'User is removed from favorites'
-            http_status = status.HTTP_200_OK
+        try:
+            idea = Idea.objects.get(pk=idea_id)
 
-        return JsonResponse(response, status=http_status)
+            if not idea.toggle_favorite(user):
+                response['message'] = 'User is removed from favorites'
+                toggle_status = status.HTTP_200_OK
+        except Exception as ex:
+            response['message'] = 'Idea not found'
+            toggle_status = status.HTTP_404_NOT_FOUND
+
+        return JsonResponse(response, status=toggle_status)

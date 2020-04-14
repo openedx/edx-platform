@@ -64,13 +64,13 @@ class Idea(OrganizationBase, Location, VisualAttachment):
     favorites = models.ManyToManyField(User, related_name='favorited')
 
     def toggle_favorite(self, user):
-        created = True
+
         if self.favorites.filter(pk=user.id).exists():
-            created = False
             self.favorites.remove(user)
-        else:
-            self.favorites.add(user)
-        return created
+            return False
+
+        self.favorites.add(user)
+        return True
 
     def __unicode__(self):
         return self.title

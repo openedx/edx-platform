@@ -13,11 +13,7 @@ class IdeaFavoriteApiTestCase(TestCase):
         self.user = UserFactory()
 
     def test_toggle_favorite_idea(self):
-        idea = IdeaFactory(
-            image='my_image.jpg',
-            file='my_file.docx',
-            video_link='https://example.com'
-        )
+        idea = IdeaFactory()
 
         self.client.login(username=self.user.username, password='test')
 
