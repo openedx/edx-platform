@@ -489,6 +489,9 @@ class DeactivateLogoutView(APIView):
             else:
                 self._handle_failed_authentication(request.user)
         except AuthFailedError as err:
+            log.exception(
+                "The user password to deactivate was incorrect. {}".format(request.user.username)
+            )
             return Response(text_type(err), status=status.HTTP_403_FORBIDDEN)
         except Exception as err:  # pylint: disable=broad-except
             return Response(u"Could not verify user password: {}".format(err), status=status.HTTP_400_BAD_REQUEST)
