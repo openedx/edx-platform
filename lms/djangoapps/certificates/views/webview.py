@@ -139,7 +139,7 @@ def _update_certificate_context(context, course, user_certificate, platform_name
     # edx-417
     context['accomplishment_copy_description_full'] = _("has successfully completed an offering of")
     context['accomplishment_disclaimer'] = _("A Statement of accomplishment acknowledges that a {platform_name} " +
-                                             "course offered on online.ucsd.edu was completed with a score indicating mastery of material by a particular learner. " +
+                                             "course offered on {{ROOT_URL_VARIABLE}} was completed with a score indicating mastery of material by a particular learner. " +
                                              "A Statement of accomplishment is not a certificate.  It does not convey any academic credit, grade or degree, " +
                                              "or indicate enrollment at UC San Diego").format(
         platform_name=platform_name
