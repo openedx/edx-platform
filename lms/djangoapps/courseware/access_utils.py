@@ -10,14 +10,23 @@ from logging import getLogger
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from pytz import UTC
-
-from lms.djangoapps.courseware.access_response import AccessResponse, StartDateError
+from lms.djangoapps.courseware.access_response import (
+    AccessResponse,
+    StartDateError,
+    EnrollmentRequiredAccessError,
+    AuthenticationRequiredAccessError,
+)
 from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_student
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML
-from openedx.features.course_experience import COURSE_PRE_START_ACCESS_FLAG
+from openedx.features.course_experience import (
+    COURSE_PRE_START_ACCESS_FLAG,
+    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
+)
+from student.models import CourseEnrollment
 from student.roles import CourseBetaTesterRole
 from xmodule.util.xmodule_django import get_current_request_hostname
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 
 DEBUG_ACCESS = False
 log = getLogger(__name__)
@@ -103,3 +112,57 @@ def check_course_open_for_learner(user, course):
     if COURSE_PRE_START_ACCESS_FLAG.is_enabled():
         return ACCESS_GRANTED
     return check_start_date(user, course.days_early_for_beta, course.start, course.id)
+
+
+def check_enrollment(user, course):
+    """
+    Check if the course requires a learner to be enrolled for access.
+
+    Returns:
+        AccessResponse: Either ACCESS_GRANTED or EnrollmentRequiredAccessError.
+    """
+    if check_public_access(course, [COURSE_VISIBILITY_PUBLIC]):
+        return ACCESS_GRANTED
+
+    if CourseEnrollment.is_enrolled(user, course.id):
+        return ACCESS_GRANTED
+
+    return EnrollmentRequiredAccessError()
+
+
+def check_authentication(user, course):
+    """
+    Grants access if the user is authenticated, or if the course allows public access.
+
+    Returns:
+        AccessResponse: Either ACCESS_GRANTED or AuthenticationRequiredAccessError
+    """
+    if user.is_authenticated:
+        return ACCESS_GRANTED
+
+    if check_public_access(course, [COURSE_VISIBILITY_PUBLIC]):
+        return ACCESS_GRANTED
+
+    return AuthenticationRequiredAccessError()
+
+
+def check_public_access(course, visibilities):
+    """
+    This checks if the unenrolled access waffle flag for the course is set
+    and the course visibility matches any of the input visibilities.
+
+    The "visibilities" argument is one of these constants from xmodule.course_module:
+    - COURSE_VISIBILITY_PRIVATE
+    - COURSE_VISIBILITY_PUBLIC
+    - COURSE_VISIBILITY_PUBLIC_OUTLINE
+
+    Returns:
+        AccessResponse: Either ACCESS_GRANTED or ACCESS_DENIED.
+    """
+
+    unenrolled_access_flag = COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course.id)
+    allow_access = unenrolled_access_flag and course.course_visibility in visibilities
+    if allow_access:
+        return ACCESS_GRANTED
+
+    return ACCESS_DENIED

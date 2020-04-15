@@ -7,7 +7,6 @@ View for Courseware Index
 
 import logging
 
-from datetime import timedelta
 import six
 import six.moves.urllib as urllib  # pylint: disable=import-error
 import six.moves.urllib.error  # pylint: disable=import-error
@@ -20,7 +19,6 @@ from django.db import transaction
 from django.http import Http404
 from django.template.context_processors import csrf
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
@@ -32,7 +30,6 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from web_fragments.fragment import Fragment
 
-from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response, render_to_string
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
@@ -52,7 +49,6 @@ from openedx.features.course_experience import (
     RELATIVE_DATES_FLAG,
 )
 from openedx.features.course_experience.urls import COURSE_HOME_VIEW_NAME
-from openedx.features.course_experience.utils import get_course_outline_block_tree
 from openedx.features.course_experience.utils import reset_deadlines_banner_should_display
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
@@ -65,9 +61,9 @@ from xmodule.modulestore.django import modulestore
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
 from ..access import has_access
+from ..access_utils import check_public_access
 from ..courses import (
-    allow_public_access,
-    check_course_access,
+    check_course_access_with_redirect,
     get_course_with_access,
     get_current_child,
     get_studio_url
@@ -152,34 +148,25 @@ class CoursewareIndex(View):
 
                 self.view = STUDENT_VIEW
 
-                # Do the enrollment check if enable_unenrolled_access is not enabled.
                 self.course = get_course_with_access(
                     request.user, 'load', self.course_key,
                     depth=CONTENT_DEPTH,
-                    check_if_enrolled=not self.enable_unenrolled_access,
+                    check_if_enrolled=True,
+                    check_if_authenticated=True
                 )
                 self.course_overview = CourseOverview.get_from_id(self.course.id)
+                self.is_staff = has_access(request.user, 'staff', self.course)
 
-                if self.enable_unenrolled_access:
-                    # Check if the user is considered enrolled (i.e. is an enrolled learner or staff).
-                    try:
-                        check_course_access(
-                            self.course, request.user, 'load', check_if_enrolled=True,
-                        )
-                    except CourseAccessRedirect as exception:
-                        # If the user is not considered enrolled:
-                        if self.course.course_visibility == COURSE_VISIBILITY_PUBLIC:
-                            # If course visibility is public show the XBlock public_view.
-                            self.view = PUBLIC_VIEW
-                        else:
-                            # Otherwise deny them access.
-                            raise exception
-                    else:
-                        # If the user is considered enrolled show the default XBlock student_view.
-                        pass
+                # There's only one situation where we want to show the public view
+                if (
+                        not self.is_staff and
+                        self.enable_unenrolled_access and
+                        self.course.course_visibility == COURSE_VISIBILITY_PUBLIC and
+                        not CourseEnrollment.is_enrolled(request.user, self.course_key)
+                ):
+                    self.view = PUBLIC_VIEW
 
                 self.can_masquerade = request.user.has_perm(MASQUERADE_AS_STUDENT, self.course)
-                self.is_staff = has_access(request.user, 'staff', self.course)
                 self._setup_masquerade_for_effective_user()
 
                 return self.render(request)
@@ -250,7 +237,7 @@ class CoursewareIndex(View):
                 'email_opt_in': False,
             })
 
-            allow_anonymous = allow_public_access(self.course, [COURSE_VISIBILITY_PUBLIC])
+            allow_anonymous = check_public_access(self.course, [COURSE_VISIBILITY_PUBLIC])
 
             if not allow_anonymous:
                 PageLevelMessages.register_warning_message(
@@ -462,7 +449,7 @@ class CoursewareIndex(View):
         )
         staff_access = self.is_staff
 
-        allow_anonymous = allow_public_access(self.course, [COURSE_VISIBILITY_PUBLIC])
+        allow_anonymous = check_public_access(self.course, [COURSE_VISIBILITY_PUBLIC])
         display_reset_dates_banner = False
         if not allow_anonymous and RELATIVE_DATES_FLAG.is_enabled(self.course.id):
             display_reset_dates_banner = reset_deadlines_banner_should_display(self.course_key, request)
