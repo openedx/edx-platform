@@ -22,9 +22,6 @@ django-cors-headers<3.0.0
 # It seems like django-countries > 5.5 may cause performance issues for us.
 django-countries==5.5
 
-# Version 4.0.0 dropped support for Django < 2.0.1
-django-model-utils<4.0.0
-
 # django-storages version 1.9 drops support for boto storage backend.
 django-storages<1.9
 
@@ -60,9 +57,6 @@ matplotlib<3.1
 
 # mock version 4.0.0 drops support for python 3.5
 mock<4.0.0
-
-# mysqlclient 1.5 is scheduled to change internal APIs used by Django 1.11
-mysqlclient<1.5
 
 # oauthlib>3.0.1 causes test failures
 oauthlib==3.0.1
