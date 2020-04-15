@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-02-18 12:24+0000\n"
-"PO-Revision-Date: 2020-02-18 12:25:03.133769\n"
+"POT-Creation-Date: 2020-04-15 09:47+0000\n"
+"PO-Revision-Date: 2020-04-15 09:47:13.244177\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -3441,6 +3441,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 #: cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Library"
 msgstr ""
 
@@ -3568,7 +3570,7 @@ msgstr ""
 msgid ""
 "Enter the LTI ID for the external LTI provider.  This value must be the same"
 " LTI ID that you entered in the LTI Passports setting on the Advanced "
-"Settings page.<br />See {docs_anchor_open}the edX LTI "
+"Settings page.{break_tag}See {docs_anchor_open}the edX LTI "
 "documentation{anchor_close} for more details on this setting."
 msgstr ""
 
@@ -3580,7 +3582,7 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "Enter the URL of the external tool that this component launches. This "
-"setting is only used when Hide External Tool is set to False.<br />See "
+"setting is only used when Hide External Tool is set to False.{break_tag}See "
 "{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
 "on this setting."
 msgstr ""
@@ -3593,9 +3595,9 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "Add the key/value pair for any custom parameters, such as the page your "
-"e-book should open to or the background color for this component.<br />See "
-"{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
-"on this setting."
+"e-book should open to or the background color for this "
+"component.{break_tag}See {docs_anchor_open}the edX LTI "
+"documentation{anchor_close} for more details on this setting."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
@@ -3830,6 +3832,8 @@ msgstr ""
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
 #: cms/templates/settings_graders.html cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Group Configurations"
 msgstr ""
 
@@ -4143,6 +4147,8 @@ msgstr ""
 #: lms/templates/courseware/course_navigation.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Course"
 msgstr ""
 
@@ -5716,6 +5722,8 @@ msgstr ""
 #. course' textbooks
 #: lms/djangoapps/courseware/tabs.py cms/templates/textbooks.html
 #: cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Textbooks"
 msgstr ""
 
@@ -6945,6 +6953,8 @@ msgstr ""
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/djangoapps/support/views/index.py cms/templates/certificates.html
 #: cms/templates/export.html cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Certificates"
 msgstr ""
 
@@ -8906,7 +8916,9 @@ msgid ""
 "here to go to the home page</a>."
 msgstr ""
 
-#: lms/templates/main_django.html cms/templates/base.html
+#: lms/templates/main_django.html
+#: themes/st-lutherx/lms/templates/main_django.html
+#: themes/st-normanx/lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html themes/st-lutherx/cms/templates/base.html
 #: themes/st-lutherx/lms/templates/main.html
 #: themes/st-normanx/cms/templates/base.html
@@ -9446,6 +9458,8 @@ msgstr ""
 #: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 #: cms/templates/login.html cms/templates/widgets/header.html
 #: themes/red-theme/cms/templates/login.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Sign In"
 msgstr ""
 
@@ -11019,6 +11033,8 @@ msgstr ""
 #: cms/templates/widgets/header.html
 #: lms/templates/api_admin/terms_of_service.html
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Updates"
 msgstr ""
 
@@ -11198,6 +11214,21 @@ msgstr ""
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_base_navbar.html
 #: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_base_navbar.html
 msgid "Login"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_staff_navbar.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_staff_navbar.html
+msgid "E-Commerce Course Administration"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_staff_navbar.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_staff_navbar.html
+msgid "E-Commerce Coupon Administration"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_staff_navbar.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_staff_navbar.html
+msgid "E-Commerce Program Offers Administration"
 msgstr ""
 
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/add_voucher_form.html
@@ -11522,10 +11553,6 @@ msgstr ""
 
 #: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/footer.html
 msgid "&copy; Edly 2019. All rights reserved."
-msgstr ""
-
-#: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_head.html
-msgid "St. NormanX Email"
 msgstr ""
 
 #: cms/djangoapps/api/v1/serializers/course_runs.py
@@ -12226,11 +12253,19 @@ msgstr ""
 msgid "Page not found"
 msgstr ""
 
+#: cms/templates/asset_index.html cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Files & Uploads"
+msgstr ""
+
 #: cms/templates/asset_index.html cms/templates/course_info.html
 #: cms/templates/course_outline.html cms/templates/edit-tabs.html
 #: cms/templates/textbooks.html cms/templates/videos_index.html
 #: cms/templates/widgets/header.html lms/templates/static_htmlbook.html
 #: lms/templates/static_pdfbook.html lms/templates/staticbook.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Content"
 msgstr ""
 
@@ -12239,6 +12274,8 @@ msgstr ""
 #: cms/templates/settings.html cms/templates/settings_advanced.html
 #: cms/templates/settings_graders.html cms/templates/widgets/header.html
 #: lms/templates/wiki/includes/article_menu.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 #: wiki/templates/wiki/settings.html
 #: wiki/templates/wiki/includes/article_menu.html
 msgid "Settings"
@@ -12257,6 +12294,45 @@ msgstr ""
 msgid "Loading"
 msgstr ""
 
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/settings.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Grading"
+msgstr ""
+
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/manage_users.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+#: cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Course Team"
+msgstr ""
+
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/settings.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Advanced Settings"
+msgstr ""
+
+#: cms/templates/checklists.html cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Checklists"
+msgstr ""
+
+#: cms/templates/checklists.html cms/templates/export.html
+#: cms/templates/export_git.html cms/templates/import.html
+#: cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Tools"
+msgstr ""
+
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
 msgid "Course Number"
@@ -12265,6 +12341,21 @@ msgstr ""
 #: cms/templates/course_outline.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Course Outline"
+msgstr ""
+
+#. Translators: Pages refer to the tabs that appear in the top navigation of
+#. each course.
+#: cms/templates/edit-tabs.html cms/templates/export.html
+#: cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Pages"
+msgstr ""
+
+#: cms/templates/export_git.html cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Export to Git"
 msgstr ""
 
 #: cms/templates/html_error.html lms/templates/module-error.html
@@ -12343,6 +12434,18 @@ msgstr ""
 msgid "Forgot password?"
 msgstr ""
 
+#: cms/templates/manage_users_lib.html cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "User Access"
+msgstr ""
+
+#: cms/templates/register.html cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Sign Up"
+msgstr ""
+
 #. Translators: This is the placeholder text for a field that requests the
 #. user's full name.
 #: cms/templates/register.html lms/templates/register-form.html
@@ -12357,6 +12460,12 @@ msgstr ""
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: JaneDoe"
+msgstr ""
+
+#: cms/templates/settings.html cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Schedule & Details"
 msgstr ""
 
 #: cms/templates/settings.html
@@ -12384,6 +12493,12 @@ msgstr ""
 #: lms/templates/wiki/includes/article_menu.html
 #: wiki/templates/wiki/includes/article_menu.html
 msgid "View"
+msgstr ""
+
+#: cms/templates/videos_index.html cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Video Uploads"
 msgstr ""
 
 #: cms/templates/maintenance/_force_publish_course.html
@@ -12420,17 +12535,75 @@ msgid ""
 "{link_start}edX Inc.{link_end}"
 msgstr ""
 
+#: cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Current Course:"
+msgstr ""
+
+#: cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Course Navigation"
+msgstr ""
+
+#: cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Outline"
+msgstr ""
+
+#: cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Import"
+msgstr ""
+
+#: cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Export"
+msgstr ""
+
+#: cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Current Library:"
+msgstr ""
+
+#: cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Language preference"
+msgstr ""
+
 #: cms/templates/widgets/header.html lms/templates/header/header.html
 #: lms/templates/navigation/navigation.html
 #: lms/templates/widgets/footer-language-selector.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Choose Language"
 msgstr ""
 
 #: cms/templates/widgets/header.html lms/templates/user_dropdown.html
 #: lms/templates/header/user_dropdown.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
 #: themes/st-lutherx/lms/templates/header/user_dropdown.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 #: themes/st-normanx/lms/templates/header/user_dropdown.html
 msgid "Account"
+msgstr ""
+
+#: cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Account Navigation"
+msgstr ""
+
+#: cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Contextual Online Help"
 msgstr ""
 
 #: cms/templates/widgets/header.html
@@ -12439,7 +12612,9 @@ msgstr ""
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/static_templates/help.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
 #: themes/st-lutherx/lms/templates/header/user_dropdown.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 #: themes/st-normanx/lms/templates/header/user_dropdown.html
 #: wiki/plugins/help/wiki_plugin.py
 msgid "Help"
@@ -13151,8 +13326,8 @@ msgstr ""
 #: lms/templates/login.html
 msgid ""
 "Please provide the following information to log into your {platform_name} "
-"account. Required fields are noted by <strong class=\"indicator\">bold text "
-"and an asterisk (*)</strong>."
+"account. Required fields are noted by {strong_start}bold text and an "
+"asterisk (*){strong_end}."
 msgstr ""
 
 #: lms/templates/login.html
@@ -13385,9 +13560,8 @@ msgstr ""
 msgid "Create your own {platform_name} account below"
 msgstr ""
 
-#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
@@ -13501,6 +13675,12 @@ msgstr ""
 #: lms/templates/register-shib.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Welcome {username}!  Please set your preferences below"
+msgstr ""
+
+#: lms/templates/register-shib.html
+msgid ""
+"Required fields are noted by {strong_start}bold text and an asterisk "
+"(*){strong_end}."
 msgstr ""
 
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
@@ -13643,7 +13823,7 @@ msgid "e.g. Your Name (for certificates)"
 msgstr ""
 
 #: lms/templates/signup_modal.html
-msgid "<i>Welcome</i> {name}"
+msgid "{italic_start}Welcome{italic_end} {name}"
 msgstr ""
 
 #: lms/templates/signup_modal.html
@@ -16298,7 +16478,7 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
 "You have completed this course and are eligible to purchase course credit. "
-"Select <strong>Get Credit</strong> to get started."
+"Select {strong_start}Get Credit{strong_end} to get started."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
@@ -16315,8 +16495,8 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
 "Thank you for your payment. To receive course credit, you must now request "
-"credit at the {link_to_provider_site} website. Select <b>Request Credit</b> "
-"to get started."
+"credit at the {link_to_provider_site} website. Select {break_start}Request "
+"Credit{break_end} to get started."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
@@ -16339,9 +16519,9 @@ msgstr ""
 #. provider.
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"<b>Congratulations!</b> {provider_name} has approved your request for course"
-" credit. To see your course credit, visit the {link_to_provider_site} "
-"website."
+"{break_start}Congratulations!{break_end} {provider_name} has approved your "
+"request for course credit. To see your course credit, visit the "
+"{link_to_provider_site} website."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
@@ -20490,6 +20670,12 @@ msgstr ""
 msgid "For anyone, anywhere, anytime"
 msgstr ""
 
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid ""
+"Required fields are noted by {strong_indicator}bold text and an asterisk "
+"(*).{strong_close}"
+msgstr ""
+
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
 "You will receive an activation email.  You must click on the activation link"
@@ -20648,10 +20834,6 @@ msgid ""
 "you can also return to {link_start}the {studio_name} homepage.{link_end}"
 msgstr ""
 
-#: cms/templates/asset_index.html cms/templates/widgets/header.html
-msgid "Files & Uploads"
-msgstr ""
-
 #: cms/templates/certificates.html
 msgid "Course Certificates"
 msgstr ""
@@ -20715,37 +20897,9 @@ msgstr ""
 msgid "Learn more about certificates"
 msgstr ""
 
-#: cms/templates/certificates.html cms/templates/settings_graders.html
-msgid "Details &amp; Schedule"
-msgstr ""
-
 #: cms/templates/certificates.html cms/templates/group_configurations.html
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html cms/templates/widgets/header.html
-msgid "Grading"
-msgstr ""
-
-#: cms/templates/certificates.html cms/templates/group_configurations.html
-#: cms/templates/manage_users.html cms/templates/settings.html
-#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
-#: cms/templates/widgets/header.html
-msgid "Course Team"
-msgstr ""
-
-#: cms/templates/certificates.html cms/templates/group_configurations.html
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html cms/templates/widgets/header.html
-msgid "Advanced Settings"
-msgstr ""
-
-#: cms/templates/checklists.html cms/templates/widgets/header.html
-msgid "Checklists"
-msgstr ""
-
-#: cms/templates/checklists.html cms/templates/export.html
-#: cms/templates/export_git.html cms/templates/import.html
-#: cms/templates/widgets/header.html
-msgid "Tools"
+#: cms/templates/settings_advanced.html
+msgid "Details & Schedule"
 msgstr ""
 
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
@@ -20905,11 +21059,6 @@ msgstr ""
 msgid "Organization"
 msgstr ""
 
-#. Translators: This is an example for the name of the organization sponsoring
-#. a course, seen when filling out the form to create a new course. The
-#. organization name cannot contain spaces.
-#. Translators: "e.g. UniversityX or OrganizationX" is a placeholder displayed
-#. when user put no data into this field.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 msgid "e.g. UniversityX or OrganizationX"
 msgstr ""
@@ -21156,13 +21305,6 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid "Learn more about content visibility settings"
-msgstr ""
-
-#. Translators: Pages refer to the tabs that appear in the top navigation of
-#. each course.
-#: cms/templates/edit-tabs.html cms/templates/export.html
-#: cms/templates/widgets/header.html
-msgid "Pages"
 msgstr ""
 
 #: cms/templates/edit-tabs.html
@@ -21537,10 +21679,6 @@ msgstr ""
 msgid "Export Course to Git"
 msgstr ""
 
-#: cms/templates/export_git.html cms/templates/widgets/header.html
-msgid "Export to Git"
-msgstr ""
-
 #: cms/templates/export_git.html
 msgid "About Export to Git"
 msgstr ""
@@ -21651,11 +21789,6 @@ msgid ""
 "{em_start}Edit{em_end}. You can delete a group configuration only if it is "
 "not in use in an experiment. To delete a configuration, hover over its box "
 "and click the delete icon."
-msgstr ""
-
-#: cms/templates/group_configurations.html
-#: cms/templates/settings_advanced.html
-msgid "Details & Schedule"
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -22115,6 +22248,10 @@ msgid ""
 msgstr ""
 
 #: cms/templates/index.html
+msgid "Select the organization"
+msgstr ""
+
+#: cms/templates/index.html
 msgid ""
 "The name of the organization sponsoring the course. {strong_start}Note: The "
 "organization name is part of the course URL.{strong_end} This cannot be "
@@ -22536,10 +22673,6 @@ msgstr ""
 msgid "Library User Access"
 msgstr ""
 
-#: cms/templates/manage_users_lib.html cms/templates/widgets/header.html
-msgid "User Access"
-msgstr ""
-
 #: cms/templates/manage_users_lib.html
 msgid "Grant Access to This Library"
 msgstr ""
@@ -22587,10 +22720,6 @@ msgid ""
 "Library Admins have full editing privileges and can also add and remove "
 "other team members. There must be at least one user with the Admin role in a"
 " library."
-msgstr ""
-
-#: cms/templates/register.html cms/templates/widgets/header.html
-msgid "Sign Up"
 msgstr ""
 
 #: cms/templates/register.html
@@ -22677,10 +22806,6 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Schedule & Details Settings"
-msgstr ""
-
-#: cms/templates/settings.html cms/templates/widgets/header.html
-msgid "Schedule & Details"
 msgstr ""
 
 #: cms/templates/settings.html
@@ -23279,6 +23404,10 @@ msgid ""
 "worth."
 msgstr ""
 
+#: cms/templates/settings_graders.html
+msgid "Details &amp; Schedule"
+msgstr ""
+
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
 msgstr ""
@@ -23324,10 +23453,6 @@ msgstr ""
 
 #: cms/templates/textbooks.html
 msgid "Learn more about textbooks"
-msgstr ""
-
-#: cms/templates/videos_index.html cms/templates/widgets/header.html
-msgid "Video Uploads"
 msgstr ""
 
 #: cms/templates/videos_index.html
@@ -23541,42 +23666,6 @@ msgstr ""
 msgid ""
 "We've sent an email message to {email} with instructions for activating your"
 " account."
-msgstr ""
-
-#: cms/templates/widgets/header.html
-msgid "Current Course:"
-msgstr ""
-
-#: cms/templates/widgets/header.html
-msgid "Course Navigation"
-msgstr ""
-
-#: cms/templates/widgets/header.html
-msgid "Outline"
-msgstr ""
-
-#: cms/templates/widgets/header.html
-msgid "Import"
-msgstr ""
-
-#: cms/templates/widgets/header.html
-msgid "Export"
-msgstr ""
-
-#: cms/templates/widgets/header.html
-msgid "Current Library:"
-msgstr ""
-
-#: cms/templates/widgets/header.html
-msgid "Language preference"
-msgstr ""
-
-#: cms/templates/widgets/header.html
-msgid "Account Navigation"
-msgstr ""
-
-#: cms/templates/widgets/header.html
-msgid "Contextual Online Help"
 msgstr ""
 
 #: cms/templates/widgets/metadata-edit.html

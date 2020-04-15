@@ -201,7 +201,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-02-18 12:24+0000\n"
+"POT-Creation-Date: 2020-04-15 09:47+0000\n"
 "PO-Revision-Date: 2018-07-23 07:15+0000\n"
 "Last-Translator: Muhammad Ayub khan <ayubkhan@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -3907,7 +3907,6 @@ msgid "Any Type"
 msgstr "أي نوع"
 
 #: common/lib/xmodule/xmodule/library_content_module.py
-#: cms/templates/widgets/header.html
 msgid "Library"
 msgstr "مكتبة"
 
@@ -4360,6 +4359,8 @@ msgstr ""
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
 #: cms/templates/settings_graders.html cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Group Configurations"
 msgstr "إعدادات المجموعة"
 
@@ -4715,6 +4716,8 @@ msgstr "الصفحة الرئيسية"
 #: lms/templates/courseware/course_navigation.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Course"
 msgstr "المساق "
 
@@ -6350,7 +6353,7 @@ msgstr ""
 #: themes/st-lutherx/lms/templates/learner_profile/learner_profile.html
 #: themes/st-normanx/lms/templates/learner_profile/learner_profile.html
 msgid "Learner Profile"
-msgstr "المتعلم الشخصي"
+msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "We are working on generating course certificates."
@@ -6491,8 +6494,7 @@ msgstr "العلامات"
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Textbooks' refers to the tab in the course that leads to the
 #. course' textbooks
-#: lms/djangoapps/courseware/tabs.py cms/templates/textbooks.html
-#: cms/templates/widgets/header.html
+#: lms/djangoapps/courseware/tabs.py
 msgid "Textbooks"
 msgstr "الكتب"
 
@@ -7742,6 +7744,8 @@ msgstr "امتحانات مخصّصة"
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/djangoapps/support/views/index.py cms/templates/certificates.html
 #: cms/templates/export.html cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Certificates"
 msgstr "الشهادات"
 
@@ -10380,6 +10384,8 @@ msgstr ""
 
 #: cms/templates/login.html cms/templates/widgets/header.html
 #: themes/red-theme/cms/templates/login.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Sign In"
 msgstr "تسجيل الدخول"
 
@@ -12184,6 +12190,8 @@ msgstr ""
 #: cms/templates/widgets/header.html
 #: lms/templates/api_admin/terms_of_service.html
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Updates"
 msgstr ""
 
@@ -13060,6 +13068,8 @@ msgstr "هذه الصفحة غير موجودة"
 #: cms/templates/textbooks.html cms/templates/videos_index.html
 #: cms/templates/widgets/header.html lms/templates/static_htmlbook.html
 #: lms/templates/static_pdfbook.html lms/templates/staticbook.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Content"
 msgstr "المحتوى"
 
@@ -13068,6 +13078,8 @@ msgstr "المحتوى"
 #: cms/templates/settings.html cms/templates/settings_advanced.html
 #: cms/templates/settings_graders.html cms/templates/widgets/header.html
 #: lms/templates/wiki/includes/article_menu.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Settings"
 msgstr "الإعدادات"
 
@@ -13084,6 +13096,45 @@ msgstr "الإعدادات"
 msgid "Loading"
 msgstr "جاري التحميل"
 
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/settings.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Grading"
+msgstr "تقييم الزملاء"
+
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/manage_users.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+#: cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Course Team"
+msgstr "اسم المساق"
+
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/settings.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Advanced Settings"
+msgstr "حفظ الإعدادات"
+
+#: cms/templates/checklists.html cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Checklists"
+msgstr ""
+
+#: cms/templates/checklists.html cms/templates/export.html
+#: cms/templates/export_git.html cms/templates/import.html
+#: cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Tools"
+msgstr "المدارس"
+
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
 msgid "Course Number"
@@ -13093,6 +13144,16 @@ msgstr "رقم المساق "
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Course Outline"
 msgstr ""
+
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: Pages refer to the tabs that appear in the top navigation of
+#. each course.
+#: cms/templates/edit-tabs.html cms/templates/export.html
+#: cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Pages"
+msgstr "الصفحة"
 
 #: cms/templates/html_error.html lms/templates/module-error.html
 msgid "Error:"
@@ -13170,6 +13231,18 @@ msgstr "مثال:  username@domain.com "
 msgid "Forgot password?"
 msgstr ""
 
+#: cms/templates/manage_users_lib.html cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "User Access"
+msgstr "إلغاء صلاحيات الوصول"
+
+#: cms/templates/register.html cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Sign Up"
+msgstr "تسجيل الدخول"
+
 #. Translators: This is the placeholder text for a field that requests the
 #. user's full name.
 #: cms/templates/register.html lms/templates/register-form.html
@@ -13185,6 +13258,12 @@ msgstr "مثال: عبد الحليم حافظ"
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: JaneDoe"
 msgstr "مثال: فاطمة_الفهري"
+
+#: cms/templates/settings.html cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Schedule & Details"
+msgstr "وضع جدول لوحدة"
 
 #: cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
@@ -13222,19 +13301,19 @@ msgstr "إعادة الضبط"
 #: themes/st-lutherx/cms/templates/widgets/footer.html
 #: themes/st-normanx/cms/templates/widgets/footer.html
 msgid "Policies"
-msgstr "سياسات"
+msgstr ""
 
 #: cms/templates/widgets/footer.html
 #: themes/st-lutherx/cms/templates/widgets/footer.html
 #: themes/st-normanx/cms/templates/widgets/footer.html
 msgid "Accessibility Accommodation Request"
-msgstr "طلب الإقامة الوصول"
+msgstr ""
 
 #: cms/templates/widgets/footer.html
 #: themes/st-lutherx/cms/templates/widgets/footer.html
 #: themes/st-normanx/cms/templates/widgets/footer.html
 msgid "LMS"
-msgstr "LMS"
+msgstr ""
 
 #: cms/templates/widgets/footer.html lms/templates/footer.html
 #: themes/red-theme/lms/templates/footer.html
@@ -13254,18 +13333,52 @@ msgid ""
 "{link_start}edX Inc.{link_end}"
 msgstr ""
 
+#: cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Current Course:"
+msgstr "تابع المساق"
+
+#: cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Course Navigation"
+msgstr "تصفّح النشرات"
+
+#: cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Import"
+msgstr "دعم الطلاب"
+
+#: cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Export"
+msgstr "دعم الطلاب"
+
 #: cms/templates/widgets/header.html lms/templates/header/header.html
 #: lms/templates/navigation/navigation.html
 #: lms/templates/widgets/footer-language-selector.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Choose Language"
 msgstr "اختر لغة"
 
 #: cms/templates/widgets/header.html lms/templates/user_dropdown.html
 #: lms/templates/header/user_dropdown.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
 #: themes/st-lutherx/lms/templates/header/user_dropdown.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 #: themes/st-normanx/lms/templates/header/user_dropdown.html
 msgid "Account"
 msgstr "الحساب"
+
+#: cms/templates/widgets/header.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
+#: themes/st-normanx/cms/templates/widgets/header.html
+msgid "Account Navigation"
+msgstr "تصفّح النشرات"
 
 #: cms/templates/widgets/header.html
 #: lms/templates/header/navbar-authenticated.html
@@ -13273,7 +13386,9 @@ msgstr "الحساب"
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/static_templates/help.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
+#: themes/st-lutherx/cms/templates/widgets/header.html
 #: themes/st-lutherx/lms/templates/header/user_dropdown.html
+#: themes/st-normanx/cms/templates/widgets/header.html
 #: themes/st-normanx/lms/templates/header/user_dropdown.html
 #: wiki/plugins/help/wiki_plugin.py
 msgid "Help"
@@ -13542,7 +13657,7 @@ msgstr "تصفح المساقات"
 #: themes/st-lutherx/lms/templates/dashboard.html
 #: themes/st-normanx/lms/templates/dashboard.html
 msgid "Activate your account!"
-msgstr "فعل حسابك!"
+msgstr ""
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 #: themes/st-lutherx/lms/templates/dashboard.html
@@ -14017,8 +14132,8 @@ msgstr "أهداف تسجيل العضوية لدى {platform_name}"
 #: lms/templates/login.html
 msgid ""
 "Please provide the following information to log into your {platform_name} "
-"account. Required fields are noted by <strong class=\"indicator\">bold text "
-"and an asterisk (*)</strong>."
+"account. Required fields are noted by {strong_start}bold text and an "
+"asterisk (*){strong_end}."
 msgstr ""
 "يُشار إلى الحقول الإلزامية باستخدام <strong class=\"indicator\">أحرف عريضة "
 "وعلامة النجمة (*)</strong>."
@@ -14274,9 +14389,8 @@ msgstr "تسجيل العضوية باستخدام {provider_name}"
 msgid "Create your own {platform_name} account below"
 msgstr "أنشِئ حسابك الخاص بك لدى {platform_name} أدناه"
 
-#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
@@ -14395,6 +14509,14 @@ msgstr "تحديث حسابي لدى {platform_name}"
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Welcome {username}!  Please set your preferences below"
 msgstr "مرحبًا بك {username}! يُرجى منك تحديد تفضيلاتك أدناه"
+
+#: lms/templates/register-shib.html
+msgid ""
+"Required fields are noted by {strong_start}bold text and an asterisk "
+"(*){strong_end}."
+msgstr ""
+"يُشار إلى الحقول الإلزامية باستخدام <strong class=\"indicator\">أحرف عريضة "
+"وعلامة النجمة (*)</strong>."
 
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -14539,8 +14661,8 @@ msgid "e.g. Your Name (for certificates)"
 msgstr " مثلًا، اسمك (كما سيظهر على الشهادات)"
 
 #: lms/templates/signup_modal.html
-msgid "<i>Welcome</i> {name}"
-msgstr "مرحبًا بك {username}"
+msgid "{italic_start}Welcome{italic_end} {name}"
+msgstr ""
 
 #: lms/templates/signup_modal.html
 msgid "Full Name *"
@@ -14873,7 +14995,7 @@ msgstr ""
 #: themes/st-lutherx/lms/templates/header/user_dropdown.html
 #: themes/st-normanx/lms/templates/header/user_dropdown.html
 msgid "More Options"
-msgstr "المزيد من الخيارات"
+msgstr ""
 
 #: lms/templates/using.html
 msgid "Using the system"
@@ -17101,7 +17223,7 @@ msgstr ""
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course details"
-msgstr "تفاصيل الدورة"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
@@ -17149,37 +17271,37 @@ msgstr "يبدأ  - {date}"
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "for {course_display_name}"
-msgstr "لـ {course_display_name}"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You must select a session by {expiration_date} to access the course."
-msgstr "يجب عليك تحديد جلسة بحلول {expiration_date} للوصول إلى الدورة التدريبية."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You must select a session to access the course."
-msgstr "يجب عليك تحديد جلسة للوصول إلى الدورة التدريبية."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Change or Leave Session"
-msgstr "تغيير أو مغادرة الجلسة"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You can no longer change sessions."
-msgstr "لم يعد بإمكانك تغيير الجلسات."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You can change sessions until {entitlement_expiration_date}."
-msgstr "يمكنك تغيير الجلسات حتى {entitlement_expiration_date}."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
@@ -17189,13 +17311,13 @@ msgstr "استعراض المساق"
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {facebook_brand}. Check it out!"
-msgstr "أنا أتناول {course_name} عبر الإنترنت مع {facebook_brand}. تحقق من ذلك!"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share {course_name} on Facebook"
-msgstr "شارك {course_name} على Facebook"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
@@ -17208,13 +17330,13 @@ msgstr "شارك على فيسبوك"
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {twitter_brand}. Check it out!"
-msgstr "أنا أتناول {course_name} عبر الإنترنت باستخدام {twitter_brand}. تحقق من ذلك!"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-normanx/lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share {course_name} on Twitter"
-msgstr "شارك {course_name} على Twitter"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
@@ -17250,9 +17372,6 @@ msgid ""
 "received. You can contact the account holder to request payment, or you can "
 "unenroll from this course"
 msgstr ""
-"لم يعد بإمكانك الوصول إلى هذه الدورة التدريبية لأن الدفع لم يتم بعد"
-"تم استلامه. يمكنك الاتصال بصاحب الحساب لطلب الدفع ، أو يمكنك"
-"إلغاء التسجيل من هذه الدورة التدريبية"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
@@ -17394,7 +17513,7 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
 "You have completed this course and are eligible to purchase course credit. "
-"Select <strong>Get Credit</strong> to get started."
+"Select {strong_start}Get Credit{strong_end} to get started."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
@@ -17411,8 +17530,8 @@ msgstr "احصل على مادّة دراسية"
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
 "Thank you for your payment. To receive course credit, you must now request "
-"credit at the {link_to_provider_site} website. Select <b>Request Credit</b> "
-"to get started."
+"credit at the {link_to_provider_site} website. Select {break_start}Request "
+"Credit{break_end} to get started."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
@@ -17437,9 +17556,9 @@ msgstr "استعرض التفاصيل"
 #. provider.
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"<b>Congratulations!</b> {provider_name} has approved your request for course"
-" credit. To see your course credit, visit the {link_to_provider_site} "
-"website."
+"{break_start}Congratulations!{break_end} {provider_name} has approved your "
+"request for course credit. To see your course credit, visit the "
+"{link_to_provider_site} website."
 msgstr ""
 "لقد رفض {provider_name} طلبك للحصول على مادة للمساق. للمزيد من المعلومات، "
 "يرجى الاتصال {link_to_provider_site} مباشرةً."
@@ -17802,9 +17921,6 @@ msgid ""
 "engaging, high-quality {platform_name} courses. Note that you will not be "
 "able to log back into your account until you have activated it."
 msgstr ""
-"أنت تقريبًا هناك! استخدم الرابط لتنشيط حسابك للوصول"
-"دورات جذابة عالية الجودة {platform_name}. لاحظ أنك لن تكون"
-"قادر على تسجيل الدخول مرة أخرى إلى حسابك حتى تقوم بتنشيطه."
 
 #: lms/templates/emails/activation_email.txt
 #: themes/st-lutherx/lms/templates/emails/activation_email.txt
@@ -17817,8 +17933,6 @@ msgid ""
 "If you need help, please use our web form at {support_url} or email "
 "{support_email}."
 msgstr ""
-"إذا كنت بحاجة إلى مساعدة ، فيرجى استخدام نموذج الويب الخاص بنا على {support_url} أو البريد الإلكتروني"
-"{البريد الإلكتروني للدعم}."
 
 #: lms/templates/emails/activation_email.txt
 #: themes/st-lutherx/lms/templates/emails/activation_email.txt
@@ -17827,8 +17941,6 @@ msgid ""
 "This email message was automatically sent by {lms_url} because someone "
 "attempted to create an account on {platform_name} using this email address."
 msgstr ""
-"تم إرسال رسالة البريد الإلكتروني هذه تلقائيًا بواسطة {lms_url} لأن هناك شخصًا ما"
-"جرت محاولة إنشاء حساب على {platform_name} باستخدام عنوان البريد الإلكتروني هذا."
 
 #: lms/templates/emails/activation_email_subject.txt
 msgid "Action Required: Activate your {platform_name} account"
@@ -18442,7 +18554,7 @@ msgstr "الصفحة الرئيسية لمنصّة {platform_name}"
 #: themes/st-lutherx/lms/templates/header/user_dropdown.html
 #: themes/st-normanx/lms/templates/header/user_dropdown.html
 msgid "Options Menu"
-msgstr "قائمة الخيارات"
+msgstr ""
 
 #: lms/templates/header/header.html lms/templates/navigation/navigation.html
 msgid ""
@@ -18471,7 +18583,7 @@ msgstr "الملف الشخصي"
 
 #: lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
-msgstr "اكتشف الجديد"
+msgstr ""
 
 #. Translators: This is short for "System administration".
 #: lms/templates/header/navbar-authenticated.html
@@ -18494,7 +18606,7 @@ msgstr "سلّة التسوّق"
 #: themes/st-lutherx/lms/templates/header/navbar-not-authenticated.html
 #: themes/st-normanx/lms/templates/header/navbar-not-authenticated.html
 msgid "Supplemental Links"
-msgstr "روابط تكميلية"
+msgstr ""
 
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
@@ -18511,7 +18623,7 @@ msgstr "المدارس"
 #: themes/st-lutherx/lms/templates/header/user_dropdown.html
 #: themes/st-normanx/lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
-msgstr "استئناف الدورة الأخيرة الخاصة بك"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -21640,7 +21752,7 @@ msgstr ""
 #: themes/st-lutherx/lms/templates/learner_profile/learner_profile.html
 #: themes/st-normanx/lms/templates/learner_profile/learner_profile.html
 msgid "My Profile"
-msgstr "ملفي"
+msgstr ""
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid ""
@@ -21651,7 +21763,7 @@ msgstr ""
 #: themes/st-lutherx/lms/templates/learner_profile/learner_profile.html
 #: themes/st-normanx/lms/templates/learner_profile/learner_profile.html
 msgid "An error occurred. Try loading the page again."
-msgstr "حدث خطأ. حاول تحميل الصفحة مرة أخرى."
+msgstr ""
 
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid ""
@@ -21790,15 +21902,13 @@ msgid ""
 "St. LutherX is an initiative of St. Luther University, Inc., a tax-exempt "
 "501(c)(3) nonprofit organization based in McKinney, Texas."
 msgstr ""
-"St. LutherX هي مبادرة من جامعة St. Luther، Inc. ، معفاة من الضرائب"
-"501 (c) (3) منظمة غير ربحية مقرها في ماكيني ، تكساس."
 
 #: themes/st-lutherx/cms/templates/widgets/footer.html
 #: themes/st-lutherx/lms/templates/footer.html
 #: themes/st-normanx/cms/templates/widgets/footer.html
 #: themes/st-normanx/lms/templates/footer.html
 msgid "Edly"
-msgstr "Edly"
+msgstr ""
 
 #: themes/st-lutherx/cms/templates/widgets/footer.html
 #: themes/st-lutherx/lms/templates/footer.html
@@ -21820,8 +21930,6 @@ msgid ""
 "Please wait for the confirmation email as your request is being processed. "
 "Course: {course_name} will be upgraded soon."
 msgstr ""
-"الرجاء الانتظار لتأكيد رسالة البريد الإلكتروني أثناء معالجة طلبك."
-"الدورة التدريبية: {course_name} ستتم ترقيته قريبًا."
 
 #: themes/st-lutherx/lms/templates/dashboard.html
 #: themes/st-normanx/lms/templates/dashboard.html
@@ -21831,22 +21939,22 @@ msgstr "لائحة المساقات"
 #: themes/st-lutherx/lms/templates/footer.html
 #: themes/st-normanx/lms/templates/footer.html
 msgid "COMPANY"
-msgstr "شركة"
+msgstr ""
 
 #: themes/st-lutherx/lms/templates/footer.html
 #: themes/st-normanx/lms/templates/footer.html
 msgid "FAQs"
-msgstr "أسئلة وأجوبة"
+msgstr ""
 
 #: themes/st-lutherx/lms/templates/footer.html
 #: themes/st-normanx/lms/templates/footer.html
 msgid "GET INVOLVED"
-msgstr "شارك"
+msgstr ""
 
 #: themes/st-lutherx/lms/templates/footer.html
 #: themes/st-normanx/lms/templates/footer.html
 msgid "CONNECT"
-msgstr "الاتصال"
+msgstr ""
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
@@ -21856,8 +21964,6 @@ msgid ""
 "EdX, Open edX, and the edX and Open edX logos are registered trademarks or "
 "trademarks of {link_start}edX Inc.{link_end}"
 msgstr ""
-"EdX و Open edX وشعارات edX و Open edX هي علامات تجارية مسجلة أو"
-"العلامات التجارية لـ {link_start} edX Inc. {link_end}"
 
 #: themes/st-lutherx/lms/templates/footer.html
 #: themes/st-normanx/lms/templates/footer.html
@@ -21871,7 +21977,7 @@ msgstr ""
 #: themes/st-lutherx/lms/templates/emails/activation_email.txt
 #: themes/st-normanx/lms/templates/emails/activation_email.txt
 msgid "If you need help, please use our email {support_email}."
-msgstr "إذا كنت بحاجة إلى مساعدة ، فيرجى استخدام البريد الإلكتروني {support_email}."
+msgstr ""
 
 #: themes/st-lutherx/lms/templates/header/navbar-authenticated.html
 #: themes/st-lutherx/lms/templates/header/navbar-not-authenticated.html
@@ -21892,14 +21998,11 @@ msgid ""
 "you continue to have issues, please visit our  {link_start}FAQ{link_end} "
 "page or contact {support_link_start}Support{link_end}."
 msgstr ""
-"الصفحة التي تبحث عنها ربما تم نقلها أو إعادة تسميتها. {line_break} إذا"
-"لا تزال تواجه مشكلات ، يرجى زيارة {link_start} الأسئلة الشائعة {link_end}"
-"الصفحة أو جهة الاتصال {support_link_start} الدعم {link_end}."
 
 #: themes/st-lutherx/lms/templates/static_templates/server-error.html
 #: themes/st-normanx/lms/templates/static_templates/server-error.html
 msgid "Internal Server Error!"
-msgstr "خطأ في الخادم الداخلي!"
+msgstr ""
 
 #: themes/st-lutherx/lms/templates/static_templates/server-error.html
 #: themes/st-normanx/lms/templates/static_templates/server-error.html
@@ -21907,16 +22010,12 @@ msgid ""
 "There seems to be a small problem with our servers. We apologize for the "
 "inconvenience.{line_break}Please refresh this page after a few seconds."
 msgstr ""
-"يبدو أن هناك مشكلة صغيرة مع خوادمنا. نعتذر عن"
-"إزعاج. {line_break} يرجى تحديث هذه الصفحة بعد بضع ثوانٍ."
 
 #: themes/st-normanx/lms/templates/footer.html
 msgid ""
 "St. NormanX is an initiative of St. NormanX University, Inc., a tax-exempt "
 "501(c)(3) nonprofit organization based in McKinney, Texas."
 msgstr ""
-"St. NormanX هي مبادرة من جامعة St. NormanX، Inc. ، معفاة من الضرائب"
-"501 (c) (3) منظمة غير ربحية مقرها في ماكيني ، تكساس."
 
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -21930,6 +22029,14 @@ msgstr "جميع حقوق النشر والطبع محفوظة {year}"
 #: themes/stanford-style/lms/templates/index.html
 msgid "For anyone, anywhere, anytime"
 msgstr "لأي شخص، في أي مكان، و في أي وقت"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid ""
+"Required fields are noted by {strong_indicator}bold text and an asterisk "
+"(*).{strong_close}"
+msgstr ""
+"يُشار إلى الحقول الإلزامية باستخدام <strong class=\"indicator\">أحرف عريضة "
+"وعلامة النجمة (*)</strong>."
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
@@ -22106,10 +22213,6 @@ msgid ""
 "you can also return to {link_start}the {studio_name} homepage.{link_end}"
 msgstr ""
 
-#: cms/templates/asset_index.html cms/templates/widgets/header.html
-msgid "Files & Uploads"
-msgstr "الملفات والتحميل "
-
 #: cms/templates/certificates.html
 msgid "Course Certificates"
 msgstr "شهادات المساق"
@@ -22186,38 +22289,10 @@ msgstr ""
 msgid "Learn more about certificates"
 msgstr "اعرف المزيد عن الشهادات"
 
-#: cms/templates/certificates.html cms/templates/settings_graders.html
-msgid "Details &amp; Schedule"
-msgstr "التفاصيل والجدول"
-
 #: cms/templates/certificates.html cms/templates/group_configurations.html
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html cms/templates/widgets/header.html
-msgid "Grading"
-msgstr "التقييم"
-
-#: cms/templates/certificates.html cms/templates/group_configurations.html
-#: cms/templates/manage_users.html cms/templates/settings.html
-#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
-#: cms/templates/widgets/header.html
-msgid "Course Team"
-msgstr "فريق المساق"
-
-#: cms/templates/certificates.html cms/templates/group_configurations.html
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html cms/templates/widgets/header.html
-msgid "Advanced Settings"
-msgstr "الإعدادات المتقدّمة "
-
-#: cms/templates/checklists.html cms/templates/widgets/header.html
-msgid "Checklists"
-msgstr ""
-
-#: cms/templates/checklists.html cms/templates/export.html
-#: cms/templates/export_git.html cms/templates/import.html
-#: cms/templates/widgets/header.html
-msgid "Tools"
-msgstr "الأدوات"
+#: cms/templates/settings_advanced.html
+msgid "Details & Schedule"
+msgstr "التفاصيل والجدول الزمني"
 
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 msgid "Duplicate"
@@ -22388,11 +22463,6 @@ msgstr ""
 msgid "Organization"
 msgstr "المؤسّسة"
 
-#. Translators: This is an example for the name of the organization sponsoring
-#. a course, seen when filling out the form to create a new course. The
-#. organization name cannot contain spaces.
-#. Translators: "e.g. UniversityX or OrganizationX" is a placeholder displayed
-#. when user put no data into this field.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 msgid "e.g. UniversityX or OrganizationX"
 msgstr "مثلًا: الجامعةX أو المؤسّسةX"
@@ -22671,13 +22741,6 @@ msgstr ""
 #: cms/templates/course_outline.html
 msgid "Learn more about content visibility settings"
 msgstr "تعلّم المزيد عن إعدادات رؤية المحتوى."
-
-#. Translators: Pages refer to the tabs that appear in the top navigation of
-#. each course.
-#: cms/templates/edit-tabs.html cms/templates/export.html
-#: cms/templates/widgets/header.html
-msgid "Pages"
-msgstr "الصفحات"
 
 #: cms/templates/edit-tabs.html
 msgid "New Page"
@@ -23097,10 +23160,6 @@ msgstr "تعلّم المزيد عن تصدير المساقات"
 msgid "Export Course to Git"
 msgstr "تصدير المساق إلى Git"
 
-#: cms/templates/export_git.html cms/templates/widgets/header.html
-msgid "Export to Git"
-msgstr "التصدير إلى Git"
-
 #: cms/templates/export_git.html
 msgid "About Export to Git"
 msgstr "حول التصدير إلى Git"
@@ -23230,11 +23289,6 @@ msgstr ""
 "{em_start}تعديل{em_end}. ويُرجى الانتباه إلى أنّه لا يمكن حذف أحد إعدادات "
 "المجموعة إلّا إذا لم تكن قيد الاستخدام في إحدى التجارب. ولحذف أحد الإعدادات،"
 " حرِّك الماوس فوق خانتها وانقر على رمز الحذف."
-
-#: cms/templates/group_configurations.html
-#: cms/templates/settings_advanced.html
-msgid "Details & Schedule"
-msgstr "التفاصيل والجدول الزمني"
 
 #: cms/templates/howitworks.html
 msgid "Welcome"
@@ -23772,6 +23826,10 @@ msgstr ""
 "عرض مختلف من خلال ’الإعدادات المتقدّمة‘."
 
 #: cms/templates/index.html
+msgid "Select the organization"
+msgstr "المؤسّسة"
+
+#: cms/templates/index.html
 msgid ""
 "The name of the organization sponsoring the course. {strong_start}Note: The "
 "organization name is part of the course URL.{strong_end} This cannot be "
@@ -24273,10 +24331,6 @@ msgstr ""
 msgid "Library User Access"
 msgstr "إمكانية دخول المستخدم إلى المكتبة"
 
-#: cms/templates/manage_users_lib.html cms/templates/widgets/header.html
-msgid "User Access"
-msgstr "إمكانية دخول المستخدم"
-
 #: cms/templates/manage_users_lib.html
 msgid "Grant Access to This Library"
 msgstr "منح إمكانية الدخول إلى هذه المكتبة"
@@ -24335,10 +24389,6 @@ msgstr ""
 "يملك المشرفون على المكتبات كامل صلاحيات التحرير، كما يمكنهم إضافة أعضاء "
 "الفريق الآخرين وحذفهم. ويجب أن يكون لدى مستخدم واحد على الأقلّ صلاحيات "
 "المشرِف في أي مكتبة."
-
-#: cms/templates/register.html cms/templates/widgets/header.html
-msgid "Sign Up"
-msgstr "تسجيل العضوية"
 
 #: cms/templates/register.html
 msgid "Sign Up for {studio_name}"
@@ -24425,10 +24475,6 @@ msgstr ""
 #: cms/templates/settings.html
 msgid "Schedule & Details Settings"
 msgstr "إعدادات الجدول والتفاصيل "
-
-#: cms/templates/settings.html cms/templates/widgets/header.html
-msgid "Schedule & Details"
-msgstr "الجدول والتفاصيل"
 
 #: cms/templates/settings.html
 msgid "Basic Information"
@@ -25083,6 +25129,10 @@ msgstr ""
 "يمكنك أيضًا إنشاء أنواع للواجبات، مثل فروض منزلية، ومختبرات، واختبارات "
 "موجزة، وامتحانات، كما يمكنك تحديد حصّة كلّ نوع من مجموع درجة الطالب."
 
+#: cms/templates/settings_graders.html
+msgid "Details &amp; Schedule"
+msgstr "التفاصيل والجدول"
+
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
 msgstr "تكبير أو تصغير"
@@ -25134,10 +25184,6 @@ msgstr ""
 #: cms/templates/textbooks.html
 msgid "Learn more about textbooks"
 msgstr "تعلّم المزيد عن الكتب."
-
-#: cms/templates/videos_index.html cms/templates/widgets/header.html
-msgid "Video Uploads"
-msgstr "تحميلات الفيديو"
 
 #: cms/templates/videos_index.html
 msgid "Course Video Settings"
@@ -25364,42 +25410,6 @@ msgid ""
 "We've sent an email message to {email} with instructions for activating your"
 " account."
 msgstr ""
-
-#: cms/templates/widgets/header.html
-msgid "Current Course:"
-msgstr "المساق الحالي:"
-
-#: cms/templates/widgets/header.html
-msgid "Course Navigation"
-msgstr "تصفّح المساق"
-
-#: cms/templates/widgets/header.html
-msgid "Outline"
-msgstr "المخطّط الكلّي"
-
-#: cms/templates/widgets/header.html
-msgid "Import"
-msgstr "استيراد"
-
-#: cms/templates/widgets/header.html
-msgid "Export"
-msgstr "تصدير"
-
-#: cms/templates/widgets/header.html
-msgid "Current Library:"
-msgstr "المكتبة الحالية:"
-
-#: cms/templates/widgets/header.html
-msgid "Language preference"
-msgstr "تفضيلات اللغة"
-
-#: cms/templates/widgets/header.html
-msgid "Account Navigation"
-msgstr "تصفّح الحساب"
-
-#: cms/templates/widgets/header.html
-msgid "Contextual Online Help"
-msgstr "مساعدة سياقية مباشرة"
 
 #: cms/templates/widgets/metadata-edit.html
 msgid "Launch Latex Source Compiler"
@@ -26589,3 +26599,27 @@ msgid ""
 "A new revision was created: Merge between Revision #%(r1)d and Revision "
 "#%(r2)d"
 msgstr "أُنشأت مراجعة جديدة: الدمج بين المراجعة #%(r1)d والمراجعة #%(r2)d "
+
+#~ msgid "Files & Uploads"
+#~ msgstr "الملفات والتحميل "
+
+#~ msgid "Export to Git"
+#~ msgstr "التصدير إلى Git"
+
+#~ msgid "Video Uploads"
+#~ msgstr "تحميلات الفيديو"
+
+#~ msgid "Outline"
+#~ msgstr "المخطّط الكلّي"
+
+#~ msgid "Current Library:"
+#~ msgstr "المكتبة الحالية:"
+
+#~ msgid "Language preference"
+#~ msgstr "تفضيلات اللغة"
+
+#~ msgid "Contextual Online Help"
+#~ msgstr "مساعدة سياقية مباشرة"
+
+#~ msgid "<i>Welcome</i> {name}"
+#~ msgstr "مرحبًا بك {username}"
