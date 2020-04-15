@@ -93,11 +93,12 @@ urlpatterns = [
         contentstore.views.course_info_update_handler, name='course_info_update_handler'
         ),
     url(r'^home/?$', contentstore.views.course_listing, name='home'),
+    url(r'^course/archive/{}?$'.format(settings.COURSE_KEY_PATTERN), contentstore.views.course_archive_handler, name='course_archive_handler'),
+    url(r'^course/unarchive/{}?$'.format(settings.COURSE_KEY_PATTERN), contentstore.views.course_unarchive_handler, name='course_unarchive_handler'),
     url(r'^course/{}/search_reindex?$'.format(settings.COURSE_KEY_PATTERN),
         contentstore.views.course_search_index_handler,
         name='course_search_index_handler'
         ),
-    url(r'^course/archive/{}?$'.format(settings.COURSE_KEY_PATTERN), contentstore.views.course_archive_handler, name='course_archive_handler'),
 
     url(r'^course/{}?$'.format(settings.COURSE_KEY_PATTERN), contentstore.views.course_handler, name='course_handler'),
 

@@ -5,7 +5,7 @@ from __future__ import print_function
 import copy
 import shutil
 from datetime import datetime, timedelta
-import pytz
+from dateutil.relativedelta import relativedelta
 from functools import wraps
 from json import loads
 from textwrap import dedent
@@ -1815,6 +1815,14 @@ class ContentStoreTest(ContentStoreTestCase):
         self.client.get(get_url('course_archive_handler', course.id, 'course_key_string'))
         course_module = self.store.get_course(course.id)
         self.assertEqual(course_module.has_ended(), True)
+
+    def test_course_unarchive_handler(self):
+        """Test course_unarchive_handler view unarchives the course"""
+
+        course = CourseFactory.create()
+        self.client.get(get_url('course_unarchive_handler', course.id, 'course_key_string'))
+        course_module = self.store.get_course(course.id)
+        self.assertEqual(course_module.end.date(), (datetime.today() + relativedelta(years=1)).date())
 
 
 class MetadataSaveTestCase(ContentStoreTestCase):
