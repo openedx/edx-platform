@@ -1,0 +1,16 @@
+version: "3"
+services:
+  memcached:
+    image: memcached:1.4.38
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:3.2.16
+    command: mongod --smallfiles --nojournal --storageEngine wiredTiger
+    restart: unless-stopped
+
+  lms:
+    image: eoluchile/edx-platform:testing
+    depends_on:
+      - memcached
+      - mongodb
