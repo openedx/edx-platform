@@ -129,11 +129,21 @@ def _update_certificate_context(context, course, user_certificate, platform_name
         platform_name=platform_name
     )
 
+    # edx-417: this is used in SOA, replaces document_title there
+    context['document_title_1_a'] = _("UC San Diego").upper()
+    context['document_title_1_b'] = _("Online").upper()
+    context['document_title_2'] = _("Statement of Accomplishment").upper()
+
     # Translators:  This text fragment appears after the student's name (displayed in a large font) on the certificate
     # screen.  The text describes the accomplishment represented by the certificate information displayed to the user
-    context['accomplishment_copy_description_full'] = _("successfully completed, received a passing grade, and was "
-                                                        "awarded this {platform_name} "
-                                                        "Statement of Accomplishment in ").format(platform_name=platform_name)
+    # edx-417
+    context['accomplishment_copy_description_full'] = _("has successfully completed an offering of")
+    context['accomplishment_disclaimer'] = _("A Statement of accomplishment acknowledges that a {platform_name} " +
+                                             "course offered on {{ROOT_URL_VARIABLE}} was completed with a score indicating mastery of material by a particular learner. " +
+                                             "A Statement of accomplishment is not a certificate.  It does not convey any academic credit, grade or degree, " +
+                                             "or indicate enrollment at UC San Diego").format(
+        platform_name=platform_name
+    ).upper()
 
     certificate_type_description = get_certificate_description(user_certificate.mode, certificate_type, platform_name)
     if certificate_type_description:

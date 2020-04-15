@@ -1620,6 +1620,7 @@ PIPELINE_CSS = {
     'style-certificates': {
         'source_filenames': [
             'certificates/css/main-ltr.css',
+            'css/lms-main-v1.css',
             'css/vendor/font-awesome.css',
         ],
         'output_filename': 'css/certificates-style.css'
