@@ -46,7 +46,7 @@ def specialization_about(request, specialization_uuid):
         current_course = modulestore().get_course(course_id)
 
         course_rerun['enrolled'] = CourseEnrollment.is_enrolled(request.user, course_id)
-        course_rerun['course_first_chapter_link'] = get_course_first_chapter_link(current_course) if current_course else ''
+        course_rerun['first_chapter_link'] = get_course_first_chapter_link(current_course) if current_course else ''
 
         courses.append(course_rerun)
 
