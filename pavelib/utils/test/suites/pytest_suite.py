@@ -166,6 +166,7 @@ class SystemTestSuite(PytestSuite):
         ])
         cmd.extend(self.test_options_flags)
         cmd.append("-vvv")
+        cmd.append("--create-db")
 
         if self.disable_capture:
             cmd.append("-s")
