@@ -438,8 +438,13 @@ class CourseGradeReport(object):
         """
         Returns a list of all applicable column headers for this grade report.
         """
+        aux = ["Student ID", "Email", "Username"]
+        
+        if settings.UCHILEEDXLOGIN_TASK_RUN_ENABLE:                              
+            aux = ["Student ID", "Run", "Email", "Username"]
+        
         return (
-            ["Student ID", "Email", "Username"] +
+            aux +
             self._grades_header(context) +
             (['Cohort Name'] if context.cohorts_enabled else []) +
             [u'Experiment Group ({})'.format(partition.name) for partition in context.course_experiments] +
@@ -686,6 +691,13 @@ class CourseGradeReport(object):
         """
         Returns a list of rows for the given users for this report.
         """
+        user_runs= {}
+        if settings.UCHILEEDXLOGIN_TASK_RUN_ENABLE: 
+            from uchileedxlogin.models import EdxLoginUser
+            edxlogin_user = EdxLoginUser.objects.all().values('user_id','run')
+            for x in edxlogin_user:
+                user_runs[x['user_id']] = x['run']
+            
         with modulestore().bulk_operations(context.course_id):
             bulk_context = _CourseGradeBulkContext(context, users)
 
@@ -700,8 +712,17 @@ class CourseGradeReport(object):
                     # An empty gradeset means we failed to grade a student.
                     error_rows.append([user.id, user.username, text_type(error)])
                 else:
+                    aux = [user.id, user.email, user.username]
+                    ########### EOL ##########################                    
+                    if settings.UCHILEEDXLOGIN_TASK_RUN_ENABLE: 
+                        if user.id in user_runs:
+                            aux = [user.id, user_runs[user.id], user.email, user.username] 
+                        else:
+                            aux = [user.id, "", user.email, user.username] 
+                    ###########################################
+
                     success_rows.append(
-                        [user.id, user.email, user.username] +
+                        aux +
                         self._user_grades(course_grade, context) +
                         self._user_cohort_group_names(user, context) +
                         self._user_experiment_group_names(user, context) +
