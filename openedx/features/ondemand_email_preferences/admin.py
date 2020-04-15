@@ -29,6 +29,7 @@ class OnDemandEmailPreferencesAdminModel(admin.ModelAdmin):
     form = OnDemandEmailPreferencesAdminForm
     list_display = ['user', 'course_id', 'is_enabled']
     search_fields = ('user__username', 'course_id',)
+    raw_id_fields = ('user',)
 
 
 admin.site.register(OnDemandEmailPreferences, OnDemandEmailPreferencesAdminModel)

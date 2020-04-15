@@ -76,6 +76,7 @@ class CurrencyAdmin(admin.ModelAdmin):
 
 class EmailPreferenceAdmin(admin.ModelAdmin):
     list_display = ('user', 'opt_in', 'modified_time', )
+    raw_id_fields = ('user',)
 
     def modified_time(self, obj):
         return "{}".format(obj.modified.strftime("%B %d, %Y %H:%M:%S"))
@@ -85,14 +86,17 @@ class OrganizationMetricAdmin(admin.ModelAdmin):
     list_display = ('org', 'user', 'submission_date', 'actual_data', 'effective_date', 'total_clients',
                     'total_employees', 'local_currency', 'total_revenue', 'total_donations', 'total_expenses',
                     'total_program_expenses')
+    raw_id_fields = ('user',)
 
 
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = ('label', 'admin', 'country', 'unclaimed_org_admin_email', 'founding_year', )
+    raw_id_fields = ('admin',)
 
 
 class UserExtendedProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'organization', 'country_of_employment', 'role_in_org', 'hours_per_week', )
+    raw_id_fields = ('user',)
 
 
 class OrganizationPartnerAdmin(admin.ModelAdmin):
@@ -104,6 +108,7 @@ class OrganizationMetricUpdatePromptAdmin(admin.ModelAdmin):
     list_display = ('latest_metric_submission', 'year', 'year_month', 'year_three_month', 'year_six_month',
                     'org', 'responsible_user')
     search_fields = ('org__label', 'responsible_user__username')
+    raw_id_fields = ('responsible_user',)
 
 
 class MetricUpdatePromptRecordAdmin(admin.ModelAdmin):
@@ -118,15 +123,18 @@ class GranteeOptInAdmin(admin.ModelAdmin):
 class EducationAdmin(admin.ModelAdmin):
     list_display = ('id', 'linkedin_id', 'user', 'school_name', 'degree_name', 'start_month_year',
                     'end_month_year', 'description')
+    raw_id_fields = ('user',)
 
 
 class ExperienceAdmin(admin.ModelAdmin):
     list_display = ('id', 'linkedin_id', 'start_date', 'end_date', 'is_current', 'title',
                     'company', 'summary')
+    raw_id_fields = ('user',)
 
 
 class SkillAdmin(admin.ModelAdmin):
     list_display = ('id', 'linkedin_id', 'name')
+    raw_id_fields = ('user',)
 
 
 admin.site.register(Currency, CurrencyAdmin)

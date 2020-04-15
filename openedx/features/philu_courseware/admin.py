@@ -1,4 +1,10 @@
 from django.contrib import admin
+
 from .models import CompetencyAssessmentRecord
 
-admin.site.register(CompetencyAssessmentRecord)
+
+class CompetencyAssessmentRecordModelAdmin(admin.ModelAdmin):
+    raw_id_fields = ('user',)
+
+
+admin.site.register(CompetencyAssessmentRecord, CompetencyAssessmentRecordModelAdmin)
