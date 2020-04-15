@@ -165,10 +165,7 @@ class SystemTestSuite(PytestSuite):
             "--junitxml={}".format(self.xunit_report),
         ])
         cmd.extend(self.test_options_flags)
-        if self.verbosity < 1:
-            cmd.append("--quiet")
-        elif self.verbosity > 1:
-            cmd.append("--verbose")
+        cmd.append("-vvv")
 
         if self.disable_capture:
             cmd.append("-s")
