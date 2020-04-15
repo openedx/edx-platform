@@ -26,7 +26,7 @@ class DiscoveryClient(OAuthAPIClient):
 
     def _get(self, path):
         try:
-            self.response = self.request('GET', '{}{path}'.format("http://local.philanthropyu.org:18381/api/v1", path=path))
+            self.response = self.request('GET', '{api_url}{path}'.format(api_url=self._api_url, path=path))
         except RequestException as exc:
             logger.error(exc.response.text)
             raise ValidationError(json.loads(exc.response.text).get('error'))
