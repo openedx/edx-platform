@@ -1,9 +1,6 @@
 name: Docker Image CI
 
-on:
-  push:
-    branches:
-      - eol/ironwood.master
+on: [push]
 
 jobs:
   build:
@@ -21,7 +18,13 @@ jobs:
       - name: Build Open edX Testing version
         run: docker build . --file .github/build/Dockerfile --target testing --tag eoluchile/edx-platform:testing
 
+      - name: Test eol changes
+        run: |
+          cd .github/test
+          docker-compose run lms /openedx/edx-platform/.github/test/tests.sh
+
       - name: Push
+        if: github.ref == 'ref/heads/eol/ironwood.master'
         run: |
           echo "${DOCKERHUB_PASSWORD}" | docker login --username ${DOCKERHUB_USER} --password-stdin
           docker push eoluchile/edx-platform:${GITHUB_SHA}
@@ -30,4 +33,3 @@ jobs:
         env:
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-
