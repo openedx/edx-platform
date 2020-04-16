@@ -65,7 +65,6 @@ from student.models import (
     get_potentially_retired_user_by_username,
     get_retired_email_by_email,
     get_retired_username_by_username,
-    is_username_retired
 )
 
 from ..errors import AccountUpdateError, AccountValidationError, UserNotAuthorized, UserNotFound

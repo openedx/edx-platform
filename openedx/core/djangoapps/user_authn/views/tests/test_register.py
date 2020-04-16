@@ -415,8 +415,8 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 u"type": u"text",
                 u"required": True,
                 u"label": u"Public Username",
-                u"instructions": u"The name that will identify you in your courses. "
-                                 u"It cannot be changed later.",
+                u"instructions": u"This name will identify you in your courses and is visible to "
+                                 u"other members in the course.",
                 u"restrictions": {
                     "min_length": USERNAME_MIN_LENGTH,
                     "max_length": USERNAME_MAX_LENGTH
@@ -609,8 +609,8 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                     u"type": u"text",
                     u"required": True,
                     u"label": u"Public Username",
-                    u"instructions": u"The name that will identify you in your courses. "
-                                     u"It cannot be changed later.",
+                    u"instructions": u"This name will identify you in your courses and is visible to "
+                                     u"other members in the course.",
                     u"restrictions": {
                         "min_length": USERNAME_MIN_LENGTH,
                         "max_length": USERNAME_MAX_LENGTH
