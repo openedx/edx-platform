@@ -252,11 +252,11 @@ def is_username_retired(username):
         raise
 
 
-def does_public_username_exist(username):
+def does_display_name_exist(username):
     """
-    Check whether a public username conflicts with the given username.
+    Check whether a display_name conflicts with the given username.
     """
-    return UserProfile.objects.filter(public_username=username).exists()
+    return UserProfile.objects.filter(display_name=username).exists()
 
 
 def username_exists_or_retired(username):
@@ -266,7 +266,7 @@ def username_exists_or_retired(username):
     return (
         User.objects.filter(username=username).exists() or
         is_username_retired(username) or
-        does_public_username_exist(username)
+        does_display_name_exist(username)
     )
 
 
@@ -517,7 +517,7 @@ class UserProfile(models.Model):
     profile_image_uploaded_at = models.DateTimeField(null=True, blank=True)
     phone_regex = RegexValidator(regex=r'^\+?1?\d*$', message="Phone number can only contain numbers.")
     phone_number = models.CharField(validators=[phone_regex], blank=True, null=True, max_length=50)
-    public_username = models.CharField(validators=[validate_slug], null=True, max_length=150)
+    display_name = models.CharField(validators=[validate_slug], null=True, max_length=150)
 
     @property
     def has_profile_image(self):

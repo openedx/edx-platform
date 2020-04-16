@@ -182,19 +182,18 @@ def _attach_profile_claim(payload, user):
         # Some users (e.g., service users) may not have user profiles.
         user_profile = UserProfile.objects.get(user=user)
         name = user_profile.name
-        # TODO: country.name => public_username when it exists.
-        public_username = user_profile.public_username
+        public_username = user_profile.display_name
     except UserProfile.DoesNotExist:
         name = None
-        public_username = None
+        display_name = None
 
     payload.update({
         'name': name,
+        'display_name': display_name,
         'family_name': user.last_name,
         'given_name': user.first_name,
         'administrator': user.is_staff,
         'superuser': user.is_superuser,
-        'public_username': public_username,
     })
 
 
