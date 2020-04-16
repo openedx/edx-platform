@@ -80,7 +80,7 @@ git+https://gitlab.com/Ayub-khan/django-method-override.git@5270af321be2e576d8e8
 django-model-utils==3.2.0  # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, django-user-tasks, edx-bulk-grades, edx-celeryutils, edx-completion, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-rbac, edx-submissions, edx-when, edxval, ora2, super-csv
 django-mptt==0.11.0       # via -r requirements/edx/testing.txt, django-wiki
 django-multi-email-field==0.6.1  # via -r requirements/edx/testing.txt, edx-enterprise
-django-mysql==3.3.0       # via -r requirements/edx/testing.txt
+django-mysql==3.4.0       # via -r requirements/edx/testing.txt
 django-oauth-toolkit==1.3.2  # via -r requirements/edx/testing.txt
 django-object-actions==2.0.0  # via -r requirements/edx/testing.txt, edx-enterprise
 django-pipeline==1.7.0    # via -r requirements/edx/testing.txt
@@ -114,7 +114,7 @@ edx-django-release-util==0.4.2  # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==2.4.3  # via -r requirements/edx/testing.txt
 edx-django-utils==3.2.0   # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==5.0.2  # via -r requirements/edx/testing.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.0.15    # via -r requirements/edx/testing.txt
+edx-enterprise==3.1.0     # via -r requirements/edx/testing.txt
 edx-i18n-tools==0.5.0     # via -r requirements/edx/testing.txt, ora2
 edx-lint==1.4.1           # via -r requirements/edx/testing.txt
 edx-milestones==0.2.6     # via -r requirements/edx/testing.txt
@@ -215,7 +215,7 @@ pbr==5.4.5                # via -r requirements/edx/testing.txt, stevedore
 pdfminer.six==20200402    # via -r requirements/edx/testing.txt
 piexif==1.1.3             # via -r requirements/edx/testing.txt
 pillow==7.1.1             # via -r requirements/edx/testing.txt, edx-enterprise, edx-organizations
-pip-tools==4.5.1          # via -r requirements/edx/pip-tools.txt
+pip-tools==5.0.0          # via -r requirements/edx/pip-tools.txt
 pkgconfig==1.5.1          # via -r requirements/edx/testing.txt, xmlsec
 pluggy==0.13.1            # via -r requirements/edx/testing.txt, diff-cover, pytest, tox
 polib==1.1.0              # via -r requirements/edx/testing.txt, edx-i18n-tools
@@ -334,4 +334,5 @@ xss-utils==0.1.2          # via -r requirements/edx/testing.txt
 zipp==1.0.0               # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, importlib-metadata, importlib-resources
 
 # The following packages are considered to be unsafe in a requirements file:
+# pip
 # setuptools
