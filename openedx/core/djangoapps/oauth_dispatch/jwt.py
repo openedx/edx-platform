@@ -182,7 +182,7 @@ def _attach_profile_claim(payload, user):
         # Some users (e.g., service users) may not have user profiles.
         user_profile = UserProfile.objects.get(user=user)
         name = user_profile.name
-        public_username = user_profile.display_name
+        display_name = user_profile.display_name
     except UserProfile.DoesNotExist:
         name = None
         display_name = None
