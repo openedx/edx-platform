@@ -89,15 +89,15 @@ def get_login_session_form(request):
 
     # Translators: This label appears above a field on the login form
     # meant to hold the user's email address.
-    email_label = _(u"Email")
+    email_label = _("Email")
 
     # Translators: This example email address is used as a placeholder in
     # a field on the login form meant to hold the user's email address.
-    email_placeholder = _(u"username@domain.com")
+    email_placeholder = _("example@domain.com")
 
     # Translators: These instructions appear on the login form, immediately
     # below a field meant to hold the user's email address.
-    email_instructions = _(u"The email address you used to register with {platform_name}").format(
+    email_instructions = _("The email address you used to register with {platform_name}").format(
         platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
     )
 
