@@ -7,7 +7,7 @@ import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 
 import FileUpload from './file_upload';
 
-function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitForm }) {
+function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, setDisplay, submitForm, showDisplay }) {
   let courseElement;
   if (userInformation.enrollments) {
     courseElement = (<div>
@@ -37,7 +37,7 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitFo
   let subjectElement;
   subjectElement = (<div>
     <label htmlFor="subject">{gettext('Subject')}</label>
-    <select className="form-control select-subject" id="subject">
+    <select className="form-control select-subject" id="subject" onChange={setDisplay} value={this.state.value}>
       <option value="">--------</option>
       <option value="Account Settings">{gettext('Account Settings')}</option>
       <option value="Billing/Payment Options">{gettext('Billing/Payment Options')}</option>
@@ -87,14 +87,14 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitFo
         </div>
       </div>
     </div>
-
+    showDisplay ? (
     <div className="row">
       <div className="col-sm-12">
         <div className="form-group">
           <label htmlFor="message">{gettext('Details')}</label>
           <p
             className="message-desc"
-          >{gettext('The more you tell us, the more quickly and helpfully we can respond!')}</p>
+          >{gettext('the more quickly and helpfully we can respond!')}</p>
           <textarea
             aria-describedby="message"
             className="form-control"
@@ -104,6 +104,24 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitFo
         </div>
       </div>
     </div>
+    ) : (
+    <div className="row">
+      <div className="col-sm-12">
+        <div className="form-group">
+          <label htmlFor="message">{gettext('Details')}</label>
+          <p
+            className="message-desc"
+          >{gettext('Hahahhahahahha')}</p>
+          <textarea
+            aria-describedby="message"
+            className="form-control"
+            rows="7"
+            id="message"
+          />
+        </div>
+      </div>
+    </div>
+    )
 
     {/* TODO file uploading will be done after initial release */}
     {/* <FileUpload */}
