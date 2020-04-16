@@ -1,15 +1,10 @@
-from datetime import datetime
-
-from custom_settings.models import CustomSettings
-from opaque_keys.edx.keys import CourseKey
 from pyquery import PyQuery as pq
 from django.core.urlresolvers import reverse
-from django.contrib.sites.models import Site
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from openedx.core.djangoapps.theming.models import SiteTheme
+from openedx.core.djangolib.testing.philu_utils import configure_philu_theme
 from student.models import CourseEnrollment
 from course_action_state.models import CourseRerunState
 
@@ -47,10 +42,7 @@ class CourseCardBaseClass(ModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super(CourseCardBaseClass, cls).setUpClass()
-        site = Site(domain='testserver', name='test')
-        site.save()
-        theme = SiteTheme(site=site, theme_dir_name='philu')
-        theme.save()
+        configure_philu_theme()
 
 
 class CourseCardViewBaseClass(CourseCardBaseClass):
