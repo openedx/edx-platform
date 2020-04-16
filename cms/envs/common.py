@@ -436,7 +436,7 @@ AUTHENTICATION_BACKENDS = [
     'openedx.core.djangoapps.oauth_dispatch.dot_overrides.backends.EdxRateLimitedAllowAllUsersModelBackend',
 ]
 
-LMS_BASE = None
+LMS_BASE = "localhost:8000"
 LMS_ROOT_URL = "http://localhost:8000"
 LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
 LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
