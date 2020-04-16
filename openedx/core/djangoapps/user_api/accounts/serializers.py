@@ -130,6 +130,7 @@ class UserReadOnlySerializer(serializers.Serializer):
             "profile_image": None,
             "language_proficiencies": None,
             "name": None,
+            "display_name": None,
             "gender": None,
             "goals": None,
             "year_of_birth": None,
@@ -155,6 +156,7 @@ class UserReadOnlySerializer(serializers.Serializer):
                         user_profile.language_proficiencies.all().order_by('code'), many=True
                     ).data,
                     "name": user_profile.name,
+                    "display_name": user_profile.display_name,
                     "gender": AccountLegacyProfileSerializer.convert_empty_to_None(user_profile.gender),
                     "goals": user_profile.goals,
                     "year_of_birth": user_profile.year_of_birth,

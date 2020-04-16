@@ -3257,7 +3257,8 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
     "public_fields": [
         'account_privacy',
         'profile_image',
-        'username',
+        'username',  # TODO: deprecate username in favor of display_name as a public field
+        'display_name',
     ],
 }
 

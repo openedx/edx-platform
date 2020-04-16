@@ -84,6 +84,7 @@ from .signals import USER_RETIRE_LMS_CRITICAL, USER_RETIRE_LMS_MISC, USER_RETIRE
 log = logging.getLogger(__name__)
 
 USER_PROFILE_PII = {
+    'display_name': '',
     'name': '',
     'meta': '',
     'location': '',
@@ -198,6 +199,7 @@ class AccountViewSet(ViewSet):
             * mailing_address: The textual representation of the user's mailing
               address, or null.
             * name: The full name of the user.
+            * display_name: The display name of the user.
             * profile_image: A JSON representation of a user's profile image
               information. This representation has the following keys.
 
