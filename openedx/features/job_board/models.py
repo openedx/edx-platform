@@ -1,5 +1,7 @@
-from django.db import models
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
+from django.db import models
 from django_countries.fields import CountryField
 from model_utils.models import TimeStampedModel
 
@@ -28,4 +30,4 @@ class Job(TimeStampedModel):
     @property
     def location(self):
         """Get the full location (city, country) of job."""
-        return '{city}, {country}'.format(city=self.city, country=self.country.name.encode('utf-8'))
+        return '{city}, {country}'.format(city=self.city, country=self.country.name)
