@@ -46,20 +46,20 @@ class JobListView(ListView):
         salaried = params.get(JOB_COMP_SALARIED_KEY)
 
         job_type_list = [job_type for job_type in (
-            JOB_TYPE_REMOTE_KEY if remote else [],
-            JOB_TYPE_ONSITE_KEY if onsite else [])
+            JOB_TYPE_REMOTE_KEY if remote else '',
+            JOB_TYPE_ONSITE_KEY if onsite else '')
                          if job_type]
 
         job_hours_list = [job_hours for job_hours in (
-            JOB_HOURS_FULLTIME_KEY if fulltime else [],
-            JOB_HOURS_PARTTIME_KEY if parttime else [],
-            JOB_HOURS_FREELANCE_KEY if freelance else [])
+            JOB_HOURS_FULLTIME_KEY if fulltime else '',
+            JOB_HOURS_PARTTIME_KEY if parttime else '',
+            JOB_HOURS_FREELANCE_KEY if freelance else '')
                           if job_hours]
 
         job_compensation_list = [job_comp for job_comp in (
-            JOB_COMP_VOLUNTEER_KEY if volunteer else [],
-            JOB_COMP_HOURLY_KEY if hourly else [],
-            JOB_COMP_SALARIED_KEY if salaried else [])
+            JOB_COMP_VOLUNTEER_KEY if volunteer else '',
+            JOB_COMP_HOURLY_KEY if hourly else '',
+            JOB_COMP_SALARIED_KEY if salaried else '')
                                  if job_comp]
 
         queryset = super(JobListView, self).get_queryset()
