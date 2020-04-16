@@ -5,6 +5,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { StatusAlert } from '@edx/paragon';
 
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 
@@ -17,13 +18,24 @@ import Success from './success';
 class RenderForm extends React.Component {
   constructor(props) {
     super(props);
+    this.userInformation = this.props.context.user;
+    const course = this.userInformation ? this.userInformation.course_id : '';
     this.state = {
       currentRequest: null,
       errorList: [],
       success: false,
+      formData: {
+        subject: '',
+        message: '',
+        course,
+      },
     };
     this.submitForm = this.submitForm.bind(this);
+    this.reDirectUser = this.reDirectUser.bind(this);
     this.setErrorState = this.setErrorState.bind(this);
+    this.formOnChangeCallback = this.formOnChangeCallback.bind(this);
+    this.showWarningMessage = this.showWarningMessage.bind(this);
+    this.showDiscussionButton = this.showDiscussionButton.bind(this);
   }
 
   setErrorState(errors) {
@@ -32,26 +44,48 @@ class RenderForm extends React.Component {
     });
   }
 
-  submitForm() {
+  formOnChangeCallback(event) {
+    const eventTarget = event.target;
+    let formData = this.state.formData;
+    formData[eventTarget.id] = eventTarget.value;
+    this.setState({ formData });
+  }
+
+  showWarningMessage() {
+    return this.state.formData && this.state.formData.subject === 'Course Content';
+  }
+
+  showDiscussionButton() {
+    const selectCourse = this.state.formData.course;
+    return this.state.formData && (selectCourse !== '' && selectCourse !== 'Not specific to a course');
+  }
+
+  reDirectUser(event) {
+    event.preventDefault();
+    window.location.href = `/courses/${this.state.formData.course}/discussion/forum`;
+  }
+
+  submitForm(event) {
+    event.preventDefault();
+    let subject,
+      course;
     const url = this.props.context.submitFormUrl,
-      $userInfo = $('.user-info'),
       request = new XMLHttpRequest(),
       $course = $('#course'),
-      $topic = $('#topic'),
+      $subject = $('#subject'),
       data = {
         comment: {
-          body: $('#message').val(),
+          body: this.state.formData.message,
         },
         tags: this.props.context.tags,
       },
       errors = [];
 
-    let course;
     this.clearErrors();
 
     data.requester = {
-      email: $userInfo.data('email'),
-      name: $userInfo.data('username'),
+      email: this.userInformation.email,
+      name: this.userInformation.username,
     };
 
     course = $course.find(':selected').val();
@@ -66,17 +100,15 @@ class RenderForm extends React.Component {
       id: this.props.context.customFields.course_id,
       value: course,
     }];
-
-    let topic;
-    topic = $topic.find(':selected').val();
-    if (!topic) {
-      topic = $topic.val();
+    subject = $subject.find(':selected').val();
+    if (!subject) {
+      subject = $subject.val();
     }
-    if (!topic) {
-      $('#topic').closest('.form-group').addClass('has-error');
-      errors.push(gettext('Select a topic for your support request.'));
+    if (!subject) {
+      $subject.closest('.form-group').addClass('has-error');
+      errors.push(gettext('Select a subject for your support request.'));
     }
-    data.subject = topic; // Zendesk API requires 'subject'
+    data.subject = subject; // Zendesk API requires 'subject'
 
     if (this.validateData(data, errors)) {
       request.open('POST', url, true);
@@ -124,19 +156,21 @@ class RenderForm extends React.Component {
         platformName={this.props.context.platformName}
         homepageUrl={this.props.context.homepageUrl}
         dashboardUrl={this.props.context.dashboardUrl}
-        isLoggedIn={this.props.context.user !== undefined}
+        isLoggedIn={this.userInformation !== undefined}
       />
     );
   }
 
   renderSupportForm() {
     let userElement;
-    if (this.props.context.user) {
+    if (this.userInformation) {
       userElement = (<LoggedInUser
-        userInformation={this.props.context.user}
-        submitFormUrl={this.props.context.submitFormUrl}
-        setErrorState={this.setErrorState}
+        userInformation={this.userInformation}
+        onChangeCallback={this.formOnChangeCallback}
         submitForm={this.submitForm}
+        showWarning={this.showWarningMessage()}
+        showDiscussionButton={this.showDiscussionButton()}
+        reDirectUser={this.reDirectUser}
       />);
     } else {
       userElement = (<LoggedOutUser
@@ -149,7 +183,8 @@ class RenderForm extends React.Component {
     return (
       <div className="contact-us-wrapper">
 
-         {/* Note: not using Paragon bc component shows in the DOM but not rendered, even when using version 2.6.4. */}
+        {/* Note: not using Paragon bc component shows in the DOM but not rendered, even when using
+         version 2.6.4. */}
         <div className="alert alert-warning" role="alert" style={{ marginBottom: '1rem', padding: '1.5rem', left: '0px', fontSize: '16px', backgroundColor: '#fffaed', color: '#171C29', border: '1px solid #FFD875', borderRadius: '0.3rem' }}>
           <div>{gettext('Due to the recent increase in interest in online education and edX, we are currently experiencing an unusually high volume of support requests. We appreciate your patience as we work to review each request. Please check the ')}<a href="https://support.edx.org/hc/en-us" className="alert-link">Help Center</a>{gettext(' as many questions may have already been answered.')}</div>
         </div>
@@ -199,7 +234,18 @@ class RenderForm extends React.Component {
 }
 
 RenderForm.propTypes = {
-  context: PropTypes.arrayOf(PropTypes.object).isRequired,
+  context: PropTypes.shape({
+    customFields: PropTypes.object,
+    dashboardUrl: PropTypes.string,
+    homepageUrl: PropTypes.string,
+    marketingUrl: PropTypes.string,
+    loginQuery: PropTypes.string,
+    platformName: PropTypes.string,
+    submitFormUrl: PropTypes.string,
+    supportEmail: PropTypes.string,
+    tags: PropTypes.arrayOf(PropTypes.string),
+    user: PropTypes.object,
+  }).isRequired,
 };
 
 export class SingleSupportForm {
