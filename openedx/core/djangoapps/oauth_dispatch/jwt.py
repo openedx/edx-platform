@@ -180,9 +180,13 @@ def _attach_profile_claim(payload, user):
     """Add the profile claim details to the JWT payload."""
     try:
         # Some users (e.g., service users) may not have user profiles.
-        name = UserProfile.objects.get(user=user).name
+        user_profile = UserProfile.objects.get(user=user)
+        name = user_profile.name
+        # TODO: country.name => public_username when it exists.
+        public_username = user_profile.public_username
     except UserProfile.DoesNotExist:
         name = None
+        public_username = None
 
     payload.update({
         'name': name,
@@ -190,6 +194,7 @@ def _attach_profile_claim(payload, user):
         'given_name': user.first_name,
         'administrator': user.is_staff,
         'superuser': user.is_superuser,
+        'public_username': public_username,
     })
 
 
