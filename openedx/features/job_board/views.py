@@ -34,6 +34,12 @@ class JobListView(ListView):
     template_engine = 'mako'
 
     def get_checked_choices(self, choices):
+        """
+        This method takes list of tuples (choices) and returns a list
+        of choice keys that exist in self.request.GET
+        :param: choices
+        :return: list of choice keys that are also in self.request.GET
+        """
         params = self.request.GET
         tuple_key_index = 0
         return [choice[tuple_key_index] for choice in choices if params.get(choice[tuple_key_index])]
