@@ -46,6 +46,7 @@ django-crum                         # Middleware that stores the current request
 django-fernet-fields                # via edx-enterprise (should be added to its setup.py)
 django-filter                       # Allows users to filter Django querysets dynamically
 django-ipware                       # Get the client's real IP address
+django-method-override              # Allow use of HTTP methods normally not supported by browsers via the X-HTTP-Method-Override header
 django-model-utils
 django-mptt
 django-mysql
@@ -87,6 +88,7 @@ edx-submissions
 edx-user-state-client
 edx-when
 edxval
+enmerkar                            # Internationalization utilities
 event-tracking
 fs==2.0.18
 fs-s3fs==0.1.8
