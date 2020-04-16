@@ -50,7 +50,6 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
         % endif
     </div>
 
-    % if not section_data['is_self_paced']:
     <hr />
 
     <div class="enable-certificates">
@@ -72,7 +71,6 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
             <button class="is-disabled" disabled>${_('Enable Student-Generated Certificates')}</button>
         % endif
     </div>
-    % endif
 
     % if section_data['instructor_generation_enabled'] and not (section_data['enabled_for_course'] and section_data['html_cert_enabled']):
     <hr class="section-divider" />
