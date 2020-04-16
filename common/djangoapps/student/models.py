@@ -31,7 +31,7 @@ from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from django.core.validators import FileExtensionValidator, RegexValidator
+from django.core.validators import FileExtensionValidator, RegexValidator, validate_unicode_slug
 from django.db import IntegrityError, models
 from django.db.models import Count, Index, Q
 from django.db.models.signals import post_save, pre_save
@@ -506,6 +506,7 @@ class UserProfile(models.Model):
     profile_image_uploaded_at = models.DateTimeField(null=True, blank=True)
     phone_regex = RegexValidator(regex=r'^\+?1?\d*$', message="Phone number can only contain numbers.")
     phone_number = models.CharField(validators=[phone_regex], blank=True, null=True, max_length=50)
+    public_username = models.CharField(validators=[validate_unicode_slug], null=True, max_length=150)
 
     @property
     def has_profile_image(self):
