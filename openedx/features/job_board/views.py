@@ -7,21 +7,17 @@ from django_countries import countries
 from .constants import (
     DJANGO_COUNTRIES_KEY_INDEX,
     DJANGO_COUNTRIES_VALUE_INDEX,
-    JOB_COMP_HOURLY_INDEX,
-    JOB_COMP_SALARIED_INDEX,
-    JOB_COMP_VOLUNTEER_INDEX,
-    JOB_COMPENSATION_CHOICES,
-    JOB_HOURS_CHOICES,
-    JOB_HOURS_FREELANCE_INDEX,
-    JOB_HOURS_FULLTIME_INDEX,
-    JOB_HOURS_PARTTIME_INDEX,
+    JOB_COMP_HOURLY_KEY,
+    JOB_COMP_SALARIED_KEY,
+    JOB_COMP_VOLUNTEER_KEY,
+    JOB_HOURS_FREELANCE_KEY,
+    JOB_HOURS_FULLTIME_KEY,
+    JOB_HOURS_PARTTIME_KEY,
     JOB_PARAM_CITY_KEY,
     JOB_PARAM_COUNTRY_KEY,
     JOB_PARAM_QUERY_KEY,
-    JOB_TUPLE_KEY_INDEX,
-    JOB_TYPE_CHOICES,
-    JOB_TYPE_ONSITE_INDEX,
-    JOB_TYPE_REMOTE_INDEX
+    JOB_TYPE_ONSITE_KEY,
+    JOB_TYPE_REMOTE_KEY
 )
 from .models import Job
 
@@ -40,30 +36,30 @@ class JobListView(ListView):
         query = params.get(JOB_PARAM_QUERY_KEY)
         city = params.get(JOB_PARAM_CITY_KEY)
         country = params.get(JOB_PARAM_COUNTRY_KEY)
-        remote = params.get(JOB_TYPE_CHOICES[JOB_TYPE_REMOTE_INDEX][JOB_TUPLE_KEY_INDEX])
-        onsite = params.get(JOB_TYPE_CHOICES[JOB_TYPE_ONSITE_INDEX][JOB_TUPLE_KEY_INDEX])
-        fulltime = params.get(JOB_HOURS_CHOICES[JOB_HOURS_FULLTIME_INDEX][JOB_TUPLE_KEY_INDEX])
-        parttime = params.get(JOB_HOURS_CHOICES[JOB_HOURS_PARTTIME_INDEX][JOB_TUPLE_KEY_INDEX])
-        freelance = params.get(JOB_HOURS_CHOICES[JOB_HOURS_FREELANCE_INDEX][JOB_TUPLE_KEY_INDEX])
-        volunteer = params.get(JOB_COMPENSATION_CHOICES[JOB_COMP_VOLUNTEER_INDEX][JOB_TUPLE_KEY_INDEX])
-        hourly = params.get(JOB_COMPENSATION_CHOICES[JOB_COMP_HOURLY_INDEX][JOB_TUPLE_KEY_INDEX])
-        salaried = params.get(JOB_COMPENSATION_CHOICES[JOB_COMP_SALARIED_INDEX][JOB_TUPLE_KEY_INDEX])
+        remote = params.get(JOB_TYPE_REMOTE_KEY)
+        onsite = params.get(JOB_TYPE_ONSITE_KEY)
+        fulltime = params.get(JOB_HOURS_FULLTIME_KEY)
+        parttime = params.get(JOB_HOURS_PARTTIME_KEY)
+        freelance = params.get(JOB_HOURS_FREELANCE_KEY)
+        volunteer = params.get(JOB_COMP_VOLUNTEER_KEY)
+        hourly = params.get(JOB_COMP_HOURLY_KEY)
+        salaried = params.get(JOB_COMP_SALARIED_KEY)
 
         job_type_list = [job_type for job_type in (
-            JOB_TYPE_CHOICES[JOB_TYPE_REMOTE_INDEX][JOB_TUPLE_KEY_INDEX] if remote else [],
-            JOB_TYPE_CHOICES[JOB_TYPE_ONSITE_INDEX][JOB_TUPLE_KEY_INDEX] if onsite else [])
+            JOB_TYPE_REMOTE_KEY if remote else [],
+            JOB_TYPE_ONSITE_KEY if onsite else [])
                          if job_type]
 
         job_hours_list = [job_hours for job_hours in (
-            JOB_HOURS_CHOICES[JOB_HOURS_FULLTIME_INDEX][JOB_TUPLE_KEY_INDEX] if fulltime else [],
-            JOB_HOURS_CHOICES[JOB_HOURS_PARTTIME_INDEX][JOB_TUPLE_KEY_INDEX] if parttime else [],
-            JOB_HOURS_CHOICES[JOB_HOURS_FREELANCE_INDEX][JOB_TUPLE_KEY_INDEX] if freelance else [])
+            JOB_HOURS_FULLTIME_KEY if fulltime else [],
+            JOB_HOURS_PARTTIME_KEY if parttime else [],
+            JOB_HOURS_FREELANCE_KEY if freelance else [])
                           if job_hours]
 
         job_compensation_list = [job_comp for job_comp in (
-            JOB_COMPENSATION_CHOICES[JOB_COMP_VOLUNTEER_INDEX][JOB_TUPLE_KEY_INDEX] if volunteer else [],
-            JOB_COMPENSATION_CHOICES[JOB_COMP_HOURLY_INDEX][JOB_TUPLE_KEY_INDEX] if hourly else [],
-            JOB_COMPENSATION_CHOICES[JOB_COMP_SALARIED_INDEX][JOB_TUPLE_KEY_INDEX] if salaried else [])
+            JOB_COMP_VOLUNTEER_KEY if volunteer else [],
+            JOB_COMP_HOURLY_KEY if hourly else [],
+            JOB_COMP_SALARIED_KEY if salaried else [])
                                  if job_comp]
 
         queryset = super(JobListView, self).get_queryset()
@@ -92,16 +88,16 @@ class JobListView(ListView):
 
         context['search_fields'] = {
             'query': params.get(JOB_PARAM_QUERY_KEY),
-            'remote': params.get(JOB_TYPE_CHOICES[JOB_TYPE_REMOTE_INDEX][JOB_TUPLE_KEY_INDEX]),
-            'onsite': params.get(JOB_TYPE_CHOICES[JOB_TYPE_ONSITE_INDEX][JOB_TUPLE_KEY_INDEX]),
+            'remote': params.get(JOB_TYPE_REMOTE_KEY),
+            'onsite': params.get(JOB_TYPE_ONSITE_KEY),
             'city': params.get(JOB_PARAM_CITY_KEY),
             'country': params.get(JOB_PARAM_COUNTRY_KEY),
-            'fulltime': params.get(JOB_HOURS_CHOICES[JOB_HOURS_FULLTIME_INDEX][JOB_TUPLE_KEY_INDEX]),
-            'parttime': params.get(JOB_HOURS_CHOICES[JOB_HOURS_PARTTIME_INDEX][JOB_TUPLE_KEY_INDEX]),
-            'freelance': params.get(JOB_HOURS_CHOICES[JOB_HOURS_FREELANCE_INDEX][JOB_TUPLE_KEY_INDEX]),
-            'volunteer': params.get(JOB_COMPENSATION_CHOICES[JOB_COMP_VOLUNTEER_INDEX][JOB_TUPLE_KEY_INDEX]),
-            'hourly': params.get(JOB_COMPENSATION_CHOICES[JOB_COMP_HOURLY_INDEX][JOB_TUPLE_KEY_INDEX]),
-            'salaried': params.get(JOB_COMPENSATION_CHOICES[JOB_COMP_SALARIED_INDEX][JOB_TUPLE_KEY_INDEX]),
+            'fulltime': params.get(JOB_HOURS_FULLTIME_KEY),
+            'parttime': params.get(JOB_HOURS_PARTTIME_KEY),
+            'freelance': params.get(JOB_HOURS_FREELANCE_KEY),
+            'volunteer': params.get(JOB_COMP_VOLUNTEER_KEY),
+            'hourly': params.get(JOB_COMP_HOURLY_KEY),
+            'salaried': params.get(JOB_COMP_SALARIED_KEY),
         }
 
         context['filtered'] = any(context['search_fields'].values())
