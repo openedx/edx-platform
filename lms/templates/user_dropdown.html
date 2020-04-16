@@ -13,7 +13,7 @@ from openedx.features.enterprise_support.utils import get_enterprise_learner_gen
 <%
 ## This template should not use the target student's details when masquerading, see TNL-4895
 self.real_user = getattr(user, 'real_user', user)
-username = get_enterprise_learner_generic_name(request) or self.real_user.username
+display_name = get_enterprise_learner_generic_name(request) or self.real_user.profile.display_name
 profile_image_url = get_profile_image_urls_for_user(self.real_user)['medium']
 %>
 
@@ -22,7 +22,7 @@ profile_image_url = get_profile_image_urls_for_user(self.real_user)['medium']
         <div class="nav align-items-center">
             <a class="menu-title mr-2" href="${reverse('dashboard')}">
                 <span class="sr-only">${_("Dashboard for:")}</span>
-                <img class="user-image-frame" src="${profile_image_url}" alt="${username}">
+                <img class="user-image-frame" src="${profile_image_url}" alt="${display_name}">
             </a>
             <div class="dropdown">
                 <a class="dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${username}</a>

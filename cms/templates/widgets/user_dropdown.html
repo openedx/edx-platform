@@ -17,7 +17,7 @@
   <div class="wrapper-user-menu dropdown-menu-container logged-in js-header-user-menu">
       <h3 class="title menu-title">
           <span class="sr-only">${_("Currently signed in as:")}</span>
-          <span class="account-username" title="${ user.username }">${ user.username }</span>
+          <span class="account-username" title="${ user.profile.display_name }">${ user.profile.display_name }</span>
       </h3>
       <button type="button" class="menu-button button-more has-dropdown js-dropdown-button" aria-haspopup="true" aria-expanded="false" aria-controls="${_("Usermenu")}">
           <span class="icon-fallback icon-fallback-img">
@@ -44,7 +44,7 @@
   <h3 class="title">
     <span class="label">
       <span class="label-prefix sr-only">${_("Currently signed in as:")}</span>
-      <span class="account-username" title="${ user.username }">${ user.username }</span>
+      <span class="account-username" title="${ user.profile.display_name }">${ user.profile.display_name }</span>
     </span>
     <span class="icon fa fa-caret-down ui-toggle-dd" aria-hidden="true"></span>
   </h3>
