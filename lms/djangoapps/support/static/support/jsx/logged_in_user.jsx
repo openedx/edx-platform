@@ -34,10 +34,10 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitFo
     </div>);
   }
 
-  let subjectElement;
-  subjectElement = (<div>
-    <label htmlFor="subject">{gettext('Subject')}</label>
-    <select className="form-control select-subject" id="subject">
+  let topicElement;
+  topicElement = (<div>
+    <label htmlFor="topic">{gettext('Topic')}</label>
+    <select className="form-control select-subject" id="topic">
       <option value="">--------</option>
       <option value="Account Settings">{gettext('Account Settings')}</option>
       <option value="Billing/Payment Options">{gettext('Billing/Payment Options')}</option>
@@ -83,7 +83,7 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitFo
     <div className="row">
       <div className="col-sm-12">
         <div className="form-group">
-          {subjectElement}
+          {topicElement}
         </div>
       </div>
     </div>

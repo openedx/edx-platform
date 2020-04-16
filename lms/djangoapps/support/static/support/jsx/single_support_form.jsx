@@ -37,7 +37,7 @@ class RenderForm extends React.Component {
       $userInfo = $('.user-info'),
       request = new XMLHttpRequest(),
       $course = $('#course'),
-      $subject = $('#subject'),
+      $topic = $('#topic'),
       data = {
         comment: {
           body: $('#message').val(),
@@ -67,16 +67,16 @@ class RenderForm extends React.Component {
       value: course,
     }];
 
-    let subject;
-    subject = $subject.find(':selected').val();
-    if (!subject) {
-      subject = $subject.val();
+    let topic;
+    topic = $topic.find(':selected').val();
+    if (!topic) {
+      topic = $topic.val();
     }
-    if (!subject) {
-      $('#subject').closest('.form-group').addClass('has-error');
-      errors.push(gettext('Select a subject for your support request.'));
+    if (!topic) {
+      $('#topic').closest('.form-group').addClass('has-error');
+      errors.push(gettext('Select a topic for your support request.'));
     }
-    data.subject = subject;
+    data.topic = topic;
 
     if (this.validateData(data, errors)) {
       request.open('POST', url, true);
