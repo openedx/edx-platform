@@ -5,8 +5,7 @@ import PropTypes from 'prop-types';
 import { Button, StatusAlert } from '@edx/paragon';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 
-
-function LoggedInUser({ userInformation, onChangeCallback, submitForm, showWarning, showDiscussionButton, reDirectUser }) {
+function LoggedInUser({ userInformation, onChangeCallback, submitForm, showWarning, showDiscussionButton, reDirectUser, errorList }) {
   let courseElement;
   let detailElement;
   let discussionElement = '';
@@ -97,7 +96,7 @@ function LoggedInUser({ userInformation, onChangeCallback, submitForm, showWarni
       <div>
         <div className="row">
           <div className="col-sm-12">
-            <div className="form-group">
+            <div className={`form-group ${errorList.message ? 'has-error' : ''}`}>
               <label htmlFor="message">{gettext('Details')}</label>
               <p className="message-desc">{gettext('the more quickly and helpfully we can respond!')}</p>
               <textarea aria-describedby="message" className="form-control" rows="7" id="message" />
@@ -138,7 +137,7 @@ function LoggedInUser({ userInformation, onChangeCallback, submitForm, showWarni
 
     <div className="row">
       <div className="col-sm-12">
-        <div className="form-group">
+        <div className={`form-group ${errorList.subject ? 'has-error' : ''}`}>
           {subjectElement}
         </div>
       </div>
@@ -146,7 +145,7 @@ function LoggedInUser({ userInformation, onChangeCallback, submitForm, showWarni
 
     <div className="row">
       <div className="col-sm-12">
-        <div className="form-group">
+        <div className={`form-group ${errorList.course ? 'has-error' : ''}`}>
           {courseElement}
         </div>
       </div>
@@ -174,6 +173,7 @@ LoggedInUser.propTypes = {
   }).isRequired,
   showWarning: PropTypes.bool.isRequired,
   showDiscussionButton: PropTypes.bool.isRequired,
+  errorList: PropTypes.objectOf(PropTypes.string).isRequired,
 };
 
 export default LoggedInUser;
