@@ -10,12 +10,15 @@ from .constants import (
     JOB_COMP_HOURLY_KEY,
     JOB_COMP_SALARIED_KEY,
     JOB_COMP_VOLUNTEER_KEY,
+    JOB_COMPENSATION_CHOICES,
+    JOB_HOURS_CHOICES,
     JOB_HOURS_FREELANCE_KEY,
     JOB_HOURS_FULLTIME_KEY,
     JOB_HOURS_PARTTIME_KEY,
     JOB_PARAM_CITY_KEY,
     JOB_PARAM_COUNTRY_KEY,
     JOB_PARAM_QUERY_KEY,
+    JOB_TYPE_CHOICES,
     JOB_TYPE_ONSITE_KEY,
     JOB_TYPE_REMOTE_KEY
 )
@@ -30,37 +33,21 @@ class JobListView(ListView):
     ordering = ['-created']
     template_engine = 'mako'
 
+    def get_checked_choices(self, choices):
+        params = self.request.GET
+        tuple_key_index = 0
+        return [choice[tuple_key_index] for choice in choices if params.get(choice[tuple_key_index])]
+
     def get_queryset(self):
         params = self.request.GET
 
         query = params.get(JOB_PARAM_QUERY_KEY)
         city = params.get(JOB_PARAM_CITY_KEY)
         country = params.get(JOB_PARAM_COUNTRY_KEY)
-        remote = params.get(JOB_TYPE_REMOTE_KEY)
-        onsite = params.get(JOB_TYPE_ONSITE_KEY)
-        fulltime = params.get(JOB_HOURS_FULLTIME_KEY)
-        parttime = params.get(JOB_HOURS_PARTTIME_KEY)
-        freelance = params.get(JOB_HOURS_FREELANCE_KEY)
-        volunteer = params.get(JOB_COMP_VOLUNTEER_KEY)
-        hourly = params.get(JOB_COMP_HOURLY_KEY)
-        salaried = params.get(JOB_COMP_SALARIED_KEY)
 
-        job_type_list = [job_type for job_type in (
-            JOB_TYPE_REMOTE_KEY if remote else '',
-            JOB_TYPE_ONSITE_KEY if onsite else '')
-                         if job_type]
-
-        job_hours_list = [job_hours for job_hours in (
-            JOB_HOURS_FULLTIME_KEY if fulltime else '',
-            JOB_HOURS_PARTTIME_KEY if parttime else '',
-            JOB_HOURS_FREELANCE_KEY if freelance else '')
-                          if job_hours]
-
-        job_compensation_list = [job_comp for job_comp in (
-            JOB_COMP_VOLUNTEER_KEY if volunteer else '',
-            JOB_COMP_HOURLY_KEY if hourly else '',
-            JOB_COMP_SALARIED_KEY if salaried else '')
-                                 if job_comp]
+        job_type_list = self.get_checked_choices(JOB_TYPE_CHOICES)
+        job_hours_list = self.get_checked_choices(JOB_HOURS_CHOICES)
+        job_compensation_list = self.get_checked_choices(JOB_COMPENSATION_CHOICES)
 
         queryset = super(JobListView, self).get_queryset()
 
