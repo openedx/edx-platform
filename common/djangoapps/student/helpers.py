@@ -651,6 +651,7 @@ def do_create_account(form, custom_form=None):
     ]
     profile = UserProfile(
         user=user,
+        public_username=user.username,
         **{key: form.cleaned_data.get(key) for key in profile_fields}
     )
     extended_profile = form.cleaned_extended_profile

@@ -519,8 +519,8 @@ class RegistrationFormFactory(object):
         username_instructions = _(
             # Translators: These instructions appear on the registration form, immediately
             # below a field meant to hold the user's public username.
-            u"The name that will identify you in your courses. "
-            u"It cannot be changed later."
+            u"This name will identify you in your courses and is visible to "
+            u"other members in the course."
         )
         form_desc.add_field(
             "username",

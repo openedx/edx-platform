@@ -252,11 +252,22 @@ def is_username_retired(username):
         raise
 
 
+def does_public_username_exist(username):
+    """
+    Check whether a public username conflicts with the given username.
+    """
+    return UserProfile.objects.filter(public_username=username).exists()
+
+
 def username_exists_or_retired(username):
     """
     Check a username for existence -or- retirement against the User model.
     """
-    return User.objects.filter(username=username).exists() or is_username_retired(username)
+    return (
+        User.objects.filter(username=username).exists() or
+        is_username_retired(username) or
+        does_public_username_exist(username)
+    )
 
 
 def is_email_retired(email):
