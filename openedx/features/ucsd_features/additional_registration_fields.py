@@ -13,12 +13,34 @@ class AdditionalRegistrationFieldsForm(ModelForm):
     """
     The fields on this form are derived from the AdditionalRegistrationFields model in models.py.
     """
-    def __init__(self, *args, **kwargs):
-        super(AdditionalRegistrationFieldsForm, self).__init__(*args, **kwargs)
 
     class Meta(object):
         model = AdditionalRegistrationFields
         fields = ('gender_nb', 'ethnicity', 'age', 'education', 'howheard')
+        error_messages = {
+            'gender_nb': {
+                'required': 'Please select your Gender.',
+            },
+            'ethnicity': {
+                'required': 'Please select your Ethnicity.',
+            },
+            'age': {
+                'required': 'Please select your Age Group.',
+            },
+            'education': {
+                'required': 'Please select your Education Level.',
+            },
+            'howheard': {
+                'required': 'Please tell, how did you hear about us.'
+            },
+        }
+        help_texts = {
+            'gender_nb': 'Select "Decline to State" if you prefer not to tell.',
+            'ethnicity': 'The ethnic or social group you belong to.',
+            'age': 'Select the range in which your current age falls.',
+            'education': 'Your most recent educational qualification.',
+            'howheard': 'From where did you learn about us?',
+        }
 
 
 # Admin Customization
