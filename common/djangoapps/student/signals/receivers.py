@@ -6,7 +6,7 @@ Signal receivers for the "student" application.
 from django.conf import settings
 
 from student.helpers import USERNAME_EXISTS_MSG_FMT, AccountValidationError
-from student.models import is_email_retired, is_username_retired
+from student.models_api import is_email_retired, is_username_retired
 
 
 def on_user_updated(sender, instance, **kwargs):  # pylint: disable=unused-argument

@@ -15,7 +15,8 @@ from .accounts.views import (
     AccountViewSet,
     DeactivateLogoutView,
     LMSAccountRetirementView,
-    UsernameReplacementView
+    UsernameReplacementView,
+    UserRetirementInformationView,
 )
 from .preferences.views import PreferencesDetailView, PreferencesView
 from .verification_api.views import IDVerificationStatusView
@@ -166,4 +167,9 @@ urlpatterns = [
         PreferencesDetailView.as_view(),
         name='preferences_detail_api'
     ),
+    url(
+        r'^v1/accounts/{}/retirement_information/$'.format(settings.USERNAME_PATTERN),
+        UserRetirementInformationView.as_view(),
+        name='retirement_information',
+    )
 ]

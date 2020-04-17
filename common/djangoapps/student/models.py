@@ -222,60 +222,19 @@ def user_by_anonymous_id(uid):
         return None
 
 
-def is_username_retired(username):
-    """
-    Checks to see if the given username has been previously retired
-    """
-    locally_hashed_usernames = user_util.get_all_retired_usernames(
-        username,
-        settings.RETIRED_USER_SALTS,
-        settings.RETIRED_USERNAME_FMT
-    )
-
-    # TODO: Revert to this after username capitalization issues detailed in
-    # PLAT-2276, PLAT-2277, PLAT-2278 are sorted out:
-    # return User.objects.filter(username__in=list(locally_hashed_usernames)).exists()
-
-    # Avoid circular import issues
-    from openedx.core.djangoapps.user_api.models import UserRetirementStatus
-
-    # Sandbox clean builds attempt to create users during migrations, before the database
-    # is stable so UserRetirementStatus may not exist yet. This workaround can also go
-    # when we are done with the username updates.
-    try:
-        return User.objects.filter(username__in=list(locally_hashed_usernames)).exists() or \
-            UserRetirementStatus.objects.filter(original_username=username).exists()
-    except ProgrammingError as exc:
-        # Check the error message to make sure it's what we expect
-        if "user_api_userretirementstatus" in text_type(exc):
-            return User.objects.filter(username__in=list(locally_hashed_usernames)).exists()
-        raise
-
-
 def username_exists_or_retired(username):
     """
     Check a username for existence -or- retirement against the User model.
     """
+    from student.models_api import is_username_retired
     return User.objects.filter(username=username).exists() or is_username_retired(username)
-
-
-def is_email_retired(email):
-    """
-    Checks to see if the given email has been previously retired
-    """
-    locally_hashed_emails = user_util.get_all_retired_emails(
-        email,
-        settings.RETIRED_USER_SALTS,
-        settings.RETIRED_EMAIL_FMT
-    )
-
-    return User.objects.filter(email__in=list(locally_hashed_emails)).exists()
 
 
 def email_exists_or_retired(email):
     """
     Check an email against the User model for existence.
     """
+    from student.models_api import is_email_retired
     return User.objects.filter(email=email).exists() or is_email_retired(email)
 
 

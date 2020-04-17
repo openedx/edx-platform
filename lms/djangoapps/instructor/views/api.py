@@ -121,9 +121,9 @@ from student.models import (
     UserProfile,
     anonymous_id_for_user,
     get_user_by_username_or_email,
-    is_email_retired,
     unique_id_for_user
 )
+from student.models_api import is_email_retired
 from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
 from util.file import (
     FileValidationException,

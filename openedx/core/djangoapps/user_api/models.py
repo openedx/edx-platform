@@ -27,7 +27,7 @@ from student.models import (
     Registration,
     UserProfile,
     get_retired_email_by_email,
-    get_retired_username_by_username
+    get_retired_username_by_username,
 )
 from util.model_utils import emit_setting_changed_event, get_changed_fields_dict
 
@@ -245,6 +245,22 @@ class UserRetirementRequest(TimeStampedModel):
         Checks to see if a UserRetirementRequest has been created for the specified user.
         """
         return cls.objects.filter(user=user).exists()
+
+    @classmethod
+    def get_user_requested_retirement_time(cls, user):
+        """
+        Get the time a user requested retirement. If there does not exist a UserRetirementRequest
+        record for the User, return None.
+
+        Arguments:
+            user: the retired username of the user
+        """
+        try:
+            return cls.objects.get(user=user).modified
+        # TODO: add better handling
+        except (cls.DoesNotExist):
+            return None
+
 
     def __str__(self):
         return u'User: {} Requested: {}'.format(self.user.id, self.created)

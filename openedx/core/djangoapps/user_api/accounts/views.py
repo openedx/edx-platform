@@ -47,6 +47,7 @@ from openedx.core.djangoapps.credit.models import CreditRequest, CreditRequireme
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.profile_images.images import remove_profile_images
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
+from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
@@ -65,7 +66,12 @@ from student.models import (
     get_potentially_retired_user_by_username,
     get_retired_email_by_email,
     get_retired_username_by_username,
-    is_username_retired
+)
+from student.api import (
+    is_email_retired,
+    is_username_retired,
+    get_user_last_login_by_username, 
+    get_user_retirement_date
 )
 
 from ..errors import AccountUpdateError, AccountValidationError, UserNotAuthorized, UserNotFound
@@ -79,7 +85,7 @@ from ..models import (
 )
 from .api import get_account_settings, update_account_settings
 from .permissions import CanDeactivateUser, CanReplaceUsername, CanRetireUser
-from .serializers import UserRetirementPartnerReportSerializer, UserRetirementStatusSerializer
+from .serializers import UserRetirementPartnerReportSerializer, UserRetirementStatusSerializer, UserRetirementInformationSerializer
 from .signals import USER_RETIRE_LMS_CRITICAL, USER_RETIRE_LMS_MISC, USER_RETIRE_MAILINGS
 
 log = logging.getLogger(__name__)
@@ -1201,3 +1207,36 @@ class UsernameReplacementView(APIView):
                 new_username,
             )
         return True
+
+class UserRetirementInformationView(APIView):
+    def get(self, request, username):
+        # user might still be in the retirement pipeline and have their
+        # original username, so find the user by either their original
+        # username or their retired username
+        retired_username = get_retired_username_by_username(username)
+        possible_usernames = [username, retired_username]
+        
+        user_model = get_user_model()
+        try:
+            user = user_model.objects.get(username__in=possible_usernames)
+        except user_model.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        # this does not mean they are irreperably retired; 
+        # it may be within the 7 day window
+        is_retired = is_username_retired(username)
+        if is_retired:  
+            retirement_request_date = UserRetirementRequest.get_user_requested_retirement_time(user)
+            retirement_date = get_user_retirement_date(user)
+        else:
+            retirement_request_date = None
+            retirement_date = None
+
+        data = {
+            'username': username,
+            'is_retired': is_retired,
+            'retirement_request_date': retirement_request_date,
+            'retirement_date': retirement_date,
+        }
+        return Response(data)
+
