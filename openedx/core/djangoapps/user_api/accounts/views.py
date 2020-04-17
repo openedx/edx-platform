@@ -70,7 +70,7 @@ from student.models import (
 from student.api import (
     is_email_retired,
     is_username_retired,
-    get_user_last_login_by_username, 
+    get_user_last_login_by_username,
     get_user_retirement_date
 )
 
@@ -1208,6 +1208,7 @@ class UsernameReplacementView(APIView):
             )
         return True
 
+
 class UserRetirementInformationView(APIView):
     def get(self, request, username):
         # user might still be in the retirement pipeline and have their
@@ -1215,17 +1216,17 @@ class UserRetirementInformationView(APIView):
         # username or their retired username
         retired_username = get_retired_username_by_username(username)
         possible_usernames = [username, retired_username]
-        
+
         user_model = get_user_model()
         try:
             user = user_model.objects.get(username__in=possible_usernames)
         except user_model.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        # this does not mean they are irreperably retired; 
+        # this does not mean they are irreperably retired;
         # it may be within the 7 day window
         is_retired = is_username_retired(username)
-        if is_retired:  
+        if is_retired:
             retirement_request_date = UserRetirementRequest.get_user_requested_retirement_time(user)
             retirement_date = get_user_retirement_date(user)
         else:
@@ -1239,4 +1240,3 @@ class UserRetirementInformationView(APIView):
             'retirement_date': retirement_date,
         }
         return Response(data)
-

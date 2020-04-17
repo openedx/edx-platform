@@ -260,7 +260,6 @@ class UserRetirementRequest(TimeStampedModel):
         except (cls.DoesNotExist):
             return None
 
-
     def __str__(self):
         return u'User: {} Requested: {}'.format(self.user.id, self.created)
 
