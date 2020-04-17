@@ -6,7 +6,9 @@ from opaque_keys.edx.keys import CourseKey
 
 from common.lib.discovery_client.client import DiscoveryClient
 from edxmako.shortcuts import render_to_response
+from openedx.core.djangoapps.timed_notification.core import get_course_first_chapter_link
 from student.models import CourseEnrollment
+from xmodule.modulestore.django import modulestore
 
 from .helpers import date_from_str
 
@@ -38,8 +40,13 @@ def specialization_about(request, specialization_uuid):
                         key=lambda open_rerun: date_from_str(open_rerun['enrollment_start']))[0]
                         if opened else course['course_runs'][0])
         course_rerun['opened'] = opened
-        course_rerun['enrolled'] = CourseEnrollment.is_enrolled(request.user,
-                                                                CourseKey.from_string(course_rerun['key']))
+
+        course_id = CourseKey.from_string(course_rerun['key'])
+        # course object is required in order to fetch first chapter link
+        current_course = modulestore().get_course(course_id)
+
+        course_rerun['enrolled'] = CourseEnrollment.is_enrolled(request.user, course_id)
+        course_rerun['first_chapter_link'] = get_course_first_chapter_link(current_course) if current_course else ''
 
         courses.append(course_rerun)
 
