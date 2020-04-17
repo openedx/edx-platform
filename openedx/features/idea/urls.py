@@ -1,5 +1,6 @@
 from django.conf.urls import url
 
+from openedx.features.idea.api_views import FavoriteAPIView
 from openedx.features.idea.views import (ChallengeLandingView, IdeaListingView, IdeaCreateView, IdeaDetailView)
 
 urlpatterns = [
@@ -23,4 +24,9 @@ urlpatterns = [
         IdeaDetailView.as_view(),
         name='idea-details'
     ),
+    url(
+        r'^api/favorite/(?P<idea_id>[0-9]+)/$',
+        FavoriteAPIView.as_view(),
+        name='mark-favorite-api-view'
+    )
 ]
