@@ -222,7 +222,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
             user=self.user
         )
 
-        mock_enterprise_customer_for_request.return_value = is_enterprise_enabled
+        mock_enterprise_customer_for_request.return_value = {'name': 'dummy'} if is_enterprise_enabled else {}
         mock_get_course_final_price.return_value = discounted_price
         url = reverse('course_modes_choose', args=[self.course.id])
         response = self.client.get(url)

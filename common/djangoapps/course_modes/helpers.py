@@ -1,6 +1,7 @@
 """ Helper methods for CourseModes. """
 
 
+import logging
 import six
 from django.utils.translation import ugettext_lazy as _
 
@@ -15,6 +16,8 @@ DISPLAY_VERIFIED = "verified"
 DISPLAY_HONOR = "honor"
 DISPLAY_AUDIT = "audit"
 DISPLAY_PROFESSIONAL = "professional"
+
+LOGGER = logging.getLogger(__name__)
 
 
 def enrollment_mode_display(mode, verification_status, course_id):
@@ -99,6 +102,18 @@ def get_course_final_price(user, sku, course_price):
             sku=[sku],
             username=user.username,
         )
-    except (SlumberBaseException, ConnectionError, Timeout) as exc:     # pylint: disable=unused-variable
-        pass
+    except (SlumberBaseException, ConnectionError, Timeout) as exc:
+        LOGGER.info(
+            '[e-commerce calculate endpoint] Exception raise for sku [%s] - user [%s] and exception: %s',
+            sku,
+            user.username,
+            str(exc)
+        )
+
+    LOGGER.info(
+        '[e-commerce calculate endpoint] The discounted price for sku [%s] and user [%s] is [%s]',
+        sku,
+        user.username,
+        price_details.get('total_incl_tax')
+    )
     return price_details.get('total_incl_tax', course_price)
