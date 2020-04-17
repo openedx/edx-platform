@@ -19,8 +19,8 @@ class PartnerFactory(DjangoModelFactory):
     performance_url = factory.Faker('url')
     label = factory.Faker('name')
     slug = factory.Faker('slug')
-    main_logo = 'dummy'
-    small_logo = 'dummy'
+    logo = 'dummy'
+    email = 'dummy'
     configuration = {'USER_LIMIT': None}
 
 

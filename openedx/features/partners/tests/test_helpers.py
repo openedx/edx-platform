@@ -32,14 +32,6 @@ class PartnerHelpersTest(ModuleStoreTestCase):
         self.partner_user = PartnerUserFactory(user=self.user, partner=self.partner)
         self.course = CourseFactory.create()
 
-    def test_import_form_using_slug_with_valid_slug(self):
-        """
-        Test if form is available for a valid slug
-        :return : partner view
-        """
-        form = helpers.import_form_using_slug(self.PARTNER_SLUG)
-        self.assertIsNotNone(form)
-
     def test_import_form_using_slug_with_invalid_slug(self):
         """
         Test None is returned for an invalid partner slug
