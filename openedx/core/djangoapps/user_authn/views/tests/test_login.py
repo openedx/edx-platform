@@ -811,6 +811,7 @@ class LoginSessionViewTest(ApiTestCase):
                 "type": "email",
                 "required": True,
                 "label": "Email",
+                "placeholder": "",
                 "instructions": "The email address you used to register with {platform_name}".format(
                     platform_name=settings.PLATFORM_NAME
                 ),
