@@ -91,10 +91,6 @@ def get_login_session_form(request):
     # meant to hold the user's email address.
     email_label = _("Email")
 
-    # Translators: This example email address is used as a placeholder in
-    # a field on the login form meant to hold the user's email address.
-    email_placeholder = _("example@domain.com")
-
     # Translators: These instructions appear on the login form, immediately
     # below a field meant to hold the user's email address.
     email_instructions = _("The email address you used to register with {platform_name}").format(
@@ -105,7 +101,6 @@ def get_login_session_form(request):
         "email",
         field_type="email",
         label=email_label,
-        placeholder=email_placeholder,
         instructions=email_instructions,
         restrictions={
             "min_length": accounts.EMAIL_MIN_LENGTH,
