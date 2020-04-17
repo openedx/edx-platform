@@ -117,7 +117,7 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitFo
         <button
           className="btn btn-primary btn-submit"
           onClick={submitForm}
-        >{gettext('Submit')}</button>
+        >{gettext('Create Support Ticket')}</button>
       </div>
     </div>
   </div>);
