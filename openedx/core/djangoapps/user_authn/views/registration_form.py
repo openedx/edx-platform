@@ -350,10 +350,11 @@ class RegistrationFormFactory(object):
         field_order = configuration_helpers.get_value('REGISTRATION_FIELD_ORDER')
         if not field_order:
             field_order = settings.REGISTRATION_FIELD_ORDER or valid_fields
-
-        # Check that all of the valid_fields are in the field order and vice versa, if not set to the default order
+        # Check that all of the valid_fields are in the field order and vice versa,
+        # if not append missing fields at end of field order
         if set(valid_fields) != set(field_order):
-            field_order = valid_fields
+            difference = set(valid_fields).difference(set(field_order))
+            field_order.extend(difference)
 
         self.field_order = field_order
 
