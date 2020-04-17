@@ -58,6 +58,9 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitFo
 
   return (<div>
     <div className="row">
+      <hr className="col-sm-12"></hr>
+    </div>
+    <div className="row">
       <div
         className="col-sm-12 user-info"
         data-username={userInformation.username}
