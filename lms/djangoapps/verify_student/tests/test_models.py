@@ -43,6 +43,7 @@ iwIDAQAB
         "AWS_ACCESS_KEY": "FAKEACCESSKEY",
         "AWS_SECRET_KEY": "FAKESECRETKEY",
         "S3_BUCKET": "fake-bucket",
+        "CERT_VERIFICATION_PATH": False,
     },
     "DAYS_GOOD_FOR": 10,
 }

@@ -114,11 +114,12 @@ def send_request_to_ss_for_user(self, user_verification_id, copy_id_photo_from):
     log.info('=>New Verification Task Received %r', user_verification.user.username)
     try:
         headers, body = user_verification.create_request(copy_id_photo_from)
+        # checkout PROD-1395 for detail why we are adding system certificate paths for verification.
         response = requests.post(
             settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["API_URL"],
             headers=headers,
             data=simplejson.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8'),
-            verify=False
+            verify=settings.VERIFY_STUDENT["SOFTWARE_SECURE"]['CERT_VERIFICATION_PATH']
         )
         return {
             'response_ok': getattr(response, 'ok', False),
