@@ -7,7 +7,8 @@ import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 
 import FileUpload from './file_upload';
 
-function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, setDisplay, submitForm, showDisplay }) {
+
+function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, setDisplay, submitForm, showDisplay, reDirectUser}) {
   let courseElement;
   if (userInformation.enrollments) {
     courseElement = (<div>
@@ -37,7 +38,7 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, setDispl
   let subjectElement;
   subjectElement = (<div>
     <label htmlFor="subject">{gettext('Subject')}</label>
-    <select className="form-control select-subject" id="subject" onChange={setDisplay} value={this.state.value}>
+    <select className="form-control select-subject" id="subject" onChange={setDisplay}>
       <option value="">--------</option>
       <option value="Account Settings">{gettext('Account Settings')}</option>
       <option value="Billing/Payment Options">{gettext('Billing/Payment Options')}</option>
@@ -75,7 +76,7 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, setDispl
     <div className="row">
       <div className="col-sm-12">
         <div className="form-group">
-          {courseElement}
+          {subjectElement}
         </div>
       </div>
     </div>
@@ -83,11 +84,14 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, setDispl
     <div className="row">
       <div className="col-sm-12">
         <div className="form-group">
-          {subjectElement}
+          {courseElement}
         </div>
       </div>
     </div>
-    showDisplay ? (
+
+
+{  showDisplay ? (
+  <div>
     <div className="row">
       <div className="col-sm-12">
         <div className="form-group">
@@ -104,31 +108,7 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, setDispl
         </div>
       </div>
     </div>
-    ) : (
-    <div className="row">
-      <div className="col-sm-12">
-        <div className="form-group">
-          <label htmlFor="message">{gettext('Details')}</label>
-          <p
-            className="message-desc"
-          >{gettext('Hahahhahahahha')}</p>
-          <textarea
-            aria-describedby="message"
-            className="form-control"
-            rows="7"
-            id="message"
-          />
-        </div>
-      </div>
-    </div>
     )
-
-    {/* TODO file uploading will be done after initial release */}
-    {/* <FileUpload */}
-    {/* setErrorState={setErrorState} */}
-    {/* zendeskApiHost={zendeskApiHost} */}
-    {/* accessToken={accessToken} */}
-    {/* /> */}
 
     <div className="row">
       <div className="col-sm-12">
@@ -138,8 +118,38 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, setDispl
         >{gettext('Submit')}</button>
       </div>
     </div>
+  </div>
+    ) : ( 
+  <div>
+    <div className="row">
+      <div className="col-sm-12">
+        <div className="form-group">
+          <p> "While our support team is happy to assist with the edX platform. We are unable to assist with specific assignment questions, grading or the proper procedures in each course. Please post all course related questions within the Discussion Forum where the Course Staff can directly respond."</p>
+        </div>
+      </div>
+    </div>
+
+    <div className="row">
+      <div className="col-sm-12">
+        <button
+          className="btn btn-primary btn-submit"
+          onClick={reDirectUser}
+        >{gettext('Course Discussion Forum')}</button>
+      </div>
+    </div>
+  </div>
+    )
+}
+
   </div>);
 }
+
+    {/* TODO file uploading will be done after initial release */}
+    {/* <FileUpload */}
+    {/* setErrorState={setErrorState} */}
+    {/* zendeskApiHost={zendeskApiHost} */}
+    {/* accessToken={accessToken} */}
+    {/* /> */}
 
 LoggedInUser.propTypes = {
   setErrorState: PropTypes.func.isRequired,
