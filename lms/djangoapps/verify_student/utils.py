@@ -116,3 +116,30 @@ def auto_verify_for_testing_enabled(override=None):
     if override is not None:
         return override
     return settings.FEATURES.get('AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING')
+
+
+def can_verify_now(verification_status, expiration_datetime):
+    """
+    Returns whether one is eligible for verification now based on status and expiration.
+
+    Arguments:
+        verification_status (str)
+        expiration_datetime (datetime)
+
+    Returns: bool
+    """
+    return (
+        # If the user has no initial verification or if the verification
+        # process is still ongoing 'pending' or expired then allow the user to
+        # submit the photo verification.
+        # A photo verification is marked as 'pending' if its status is either
+        # 'submitted' or 'must_retry'.
+        verification_status['status'] in {"none", "must_reverify", "expired", "pending"}
+        or (
+            # The user has an active verification, but the verification
+            # is set to expire within "EXPIRING_SOON_WINDOW" days (default is 4 weeks).
+            # In this case user can resubmit photos for reverification.
+            expiration_datetime
+            and is_verification_expiring_soon(expiration_datetime)
+        )
+    )
