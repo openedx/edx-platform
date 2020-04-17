@@ -43,6 +43,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django_countries.fields import CountryField
 from edx_django_utils.cache import RequestCache
+from edx_django_utils.monitoring import set_custom_metric
 from edx_rest_api_client.exceptions import SlumberBaseException
 from eventtracking import tracker
 from model_utils.models import TimeStampedModel
@@ -540,6 +541,16 @@ class UserProfile(models.Model):
         """ Convenience method that returns the human readable level of education. """
         if self.level_of_education:
             return self.__enumerable_to_display(self.LEVEL_OF_EDUCATION_CHOICES, self.level_of_education)
+
+    @property
+    def display_name_with_default(self):
+        set_custom_metric('missing_user_profile_display_name', False)
+        if not self.display_name:
+            set_custom_metric('missing_user_profile_display_name', True)
+            self.display_name = self.user.username
+            self.save()
+
+        return self.display_name
 
     @property
     def gender_display(self):
