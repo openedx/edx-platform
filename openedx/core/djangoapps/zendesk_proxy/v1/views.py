@@ -65,7 +65,7 @@ class ZendeskPassthroughView(APIView):
                 tags=request.data['tags']
             )
         except KeyError as key:
-            logger.error('Zendesk Proxy Bad Request: %s', key)
+            logger.error('Zendesk Proxy Bad Request KeyError: %s', key)
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         return Response(
