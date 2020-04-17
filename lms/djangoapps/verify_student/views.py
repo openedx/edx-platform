@@ -28,6 +28,9 @@ from edx_rest_api_client.exceptions import SlumberBaseException
 from ipware.ip import get_ip
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response, render_to_string
 from lms.djangoapps.commerce.utils import EcommerceService, is_account_activation_requirement_disabled
@@ -36,7 +39,7 @@ from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.ssencrypt import has_valid_signature
 from lms.djangoapps.verify_student.tasks import send_verification_status_email
-from lms.djangoapps.verify_student.utils import is_verification_expiring_soon
+from lms.djangoapps.verify_student.utils import can_verify_now
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -1224,6 +1227,43 @@ def results_callback(request):
     return HttpResponse("OK!")
 
 
+class VerificationStatusAPIView(APIView):
+    """
+    GET /verify_student/status/
+
+    Parameters: None
+
+    Returns:
+        200 OK
+        {
+            "status": String,
+            "expires": String,
+            "can_verify": Boolean
+        }
+
+    Notes:
+        * "status" is a verification status string, or "none" if there is none.
+        * Verification should be allowed if and only if "can_verify" is true.
+        * If there is a current verification, then "expires" is a ISO datetime string.
+        * Otherwise, "expires" is omitted.
+    """
+    @method_decorator(login_required)
+    def get(self, request):
+        """
+        Handle the GET request.
+        """
+        verification_status = IDVerificationService.user_status(request.user)
+        expiration_datetime = IDVerificationService.get_expiration_datetime(request.user, ['approved'])
+        can_verify = can_verify_now(verification_status, expiration_datetime)
+        data = {
+            'status': verification_status['status'],
+            'can_verify': can_verify,
+        }
+        if expiration_datetime:
+            data['expires'] = expiration_datetime
+        return Response(data)
+
+
 class ReverifyView(View):
     """
     Reverification occurs when a user's initial verification is denied
@@ -1246,23 +1286,8 @@ class ReverifyView(View):
         Backbone views used in the initial verification flow.
         """
         verification_status = IDVerificationService.user_status(request.user)
-
         expiration_datetime = IDVerificationService.get_expiration_datetime(request.user, ['approved'])
-        can_reverify = False
-        if expiration_datetime:
-            if is_verification_expiring_soon(expiration_datetime):
-                # The user has an active verification, but the verification
-                # is set to expire within "EXPIRING_SOON_WINDOW" days (default is 4 weeks).
-                # In this case user can resubmit photos for reverification.
-                can_reverify = True
-
-        # If the user has no initial verification or if the verification
-        # process is still ongoing 'pending' or expired then allow the user to
-        # submit the photo verification.
-        # A photo verification is marked as 'pending' if its status is either
-        # 'submitted' or 'must_retry'.
-
-        if verification_status['status'] in ["none", "must_reverify", "expired", "pending"] or can_reverify:
+        if can_verify_now(verification_status, expiration_datetime):
             context = {
                 "user_full_name": request.user.profile.name,
                 "platform_name": configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
