@@ -1229,12 +1229,28 @@ def results_callback(request):
 
 class VerificationStatusAPIView(APIView):
     """
-    TODO
+    GET /verify_student/status/
+
+    Parameters: None
+
+    Returns:
+        200 OK
+        {
+            "status": String,
+            "expires": String,
+            "can_verify": Boolean
+        }
+
+    Notes:
+        * "status" is a verification status string, or "none" if there is none.
+        * Verification should be allowed if and only if "can_verify" is true.
+        * If there is a current verification, then "expires" is a ISO datetime string.
+        * Otherwise, "expires" is omitted.
     """
     @method_decorator(login_required)
     def get(self, request):
         """
-        TODO
+        Handle the GET request.
         """
         verification_status = IDVerificationService.user_status(request.user)
         expiration_datetime = IDVerificationService.get_expiration_datetime(request.user, ['approved'])
