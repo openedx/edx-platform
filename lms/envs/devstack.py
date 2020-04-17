@@ -265,8 +265,13 @@ LOGIN_REDIRECT_WHITELIST = [CMS_BASE]
 ###################### JWTs ######################
 # pylint: disable=unicode-format-string
 JWT_AUTH.update({
-    'JWT_ISSUER': '{}/oauth2'.format(LMS_ROOT_URL),
     'JWT_AUDIENCE': 'lms-key',
+    'JWT_ISSUER': '{}/oauth2'.format(LMS_ROOT_URL),
+    'JWT_ISSUERS': [{
+        'AUDIENCE': 'lms-key',
+        'ISSUER': '{}/oauth2'.format(LMS_ROOT_URL),
+        'SECRET_KEY': 'lms-secret',
+    }],
     'JWT_SECRET_KEY': 'lms-secret',
     'JWT_SIGNING_ALGORITHM': 'RS512',
     'JWT_PRIVATE_SIGNING_JWK': (

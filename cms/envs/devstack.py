@@ -151,8 +151,13 @@ REQUIRE_DEBUG = DEBUG
 
 ########################### OAUTH2 #################################
 JWT_AUTH.update({
-    'JWT_SECRET_KEY': 'lms-secret',
     'JWT_ISSUER': '{}/oauth2'.format(LMS_ROOT_URL),
+    'JWT_ISSUERS': [{
+        'AUDIENCE': 'lms-key',
+        'ISSUER': '{}/oauth2'.format(LMS_ROOT_URL),
+        'SECRET_KEY': 'lms-secret',
+    }],
+    'JWT_SECRET_KEY': 'lms-secret',
     'JWT_AUDIENCE': 'lms-key',
     'JWT_PUBLIC_SIGNING_JWK_SET': (
         '{"keys": [{"kid": "devstack_key", "e": "AQAB", "kty": "RSA", "n": "smKFSYowG6nNUAdeqH1jQQnH1PmIHphzBmwJ5vRf1vu'
