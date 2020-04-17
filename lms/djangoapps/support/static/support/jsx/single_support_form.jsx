@@ -35,7 +35,7 @@ class RenderForm extends React.Component {
     });
   }
   setDisplay(event){
-   event.target.value == "Course Content" ? this.setState({
+   event.target.value === "Course Content" ? this.setState({
             show_details: false,
           }) : this.setState({
             show_details: true,
