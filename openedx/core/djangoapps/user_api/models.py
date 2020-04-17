@@ -257,7 +257,6 @@ class UserRetirementRequest(TimeStampedModel):
         """
         try:
             return cls.objects.get(user=user).modified
-        # TODO: add better handling
         except (cls.DoesNotExist):
             return None
 

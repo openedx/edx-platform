@@ -85,7 +85,7 @@ from ..models import (
 )
 from .api import get_account_settings, update_account_settings
 from .permissions import CanDeactivateUser, CanReplaceUsername, CanRetireUser
-from .serializers import UserRetirementPartnerReportSerializer, UserRetirementStatusSerializer, UserRetirementInformationSerializer
+from .serializers import UserRetirementPartnerReportSerializer, UserRetirementStatusSerializer
 from .signals import USER_RETIRE_LMS_CRITICAL, USER_RETIRE_LMS_MISC, USER_RETIRE_MAILINGS
 
 log = logging.getLogger(__name__)

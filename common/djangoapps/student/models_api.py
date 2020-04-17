@@ -21,6 +21,7 @@ from student.models import (
     DEFAULT_TRANSITION_STATE as _DEFAULT_TRANSITION_STATE,
 )
 from student.models import UserProfile as _UserProfile
+
 # This is done so that if these strings change within the app, we can keep exported constants the same
 ENROLLED_TO_ENROLLED = _ENROLLED_TO_ENROLLED
 ENROLLED_TO_UNENROLLED = _ENROLLED_TO_UNENROLLED

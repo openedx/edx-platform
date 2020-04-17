@@ -1,7 +1,12 @@
 from django.contrib.auth import get_user_model
 from django.conf import settings
 
-from student.models_api import is_email_retired, is_username_retired, get_user_last_login_by_username, get_user_retirement_date
+from student.models_api import (
+    is_email_retired,
+    is_username_retired,
+    get_user_last_login_by_username, 
+    get_user_retirement_date,
+)
 from student.models_api import create_manual_enrollment_audit as _create_manual_enrollment_audit
 from student.models_api import get_course_enrollment as _get_course_enrollment
 from student.models_api import (
