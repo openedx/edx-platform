@@ -452,7 +452,7 @@ class CertificateAvailableDate(DateSummary):
                     learner_profile_link=HTML(
                         u'<a href="{learner_profile_url}">{learner_profile_name}</a>'
                     ).format(
-                        learner_profile_url=reverse('learner_profile', kwargs={'username': request.user.username}),
+                        learner_profile_url=reverse('learner_profile', kwargs={'username': request.user.profile.display_name}),
                         learner_profile_name=_('Learner Profile'),
                     ),
                 ),

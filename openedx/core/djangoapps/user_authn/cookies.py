@@ -221,7 +221,7 @@ def _get_user_info_cookie_data(request, user):
     # (most likely just hiding the links).
     try:
         header_urls['account_settings'] = reverse('account_settings')
-        header_urls['learner_profile'] = reverse('learner_profile', kwargs={'username': user.username})
+        header_urls['learner_profile'] = reverse('learner_profile', kwargs={'username': user.profile.display_name})
     except NoReverseMatch:
         pass
 

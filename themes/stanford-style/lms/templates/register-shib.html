@@ -111,8 +111,8 @@ from openedx.core.djangolib.markup import HTML, Text
           strong_close=HTML('</strong>')
         )}
       </p>
-      
-        
+
+
       <fieldset class="group group-form group-form-requiredinformation">
         <legend class="sr">${_('Required Information')}</legend>
 
@@ -132,7 +132,7 @@ from openedx.core.djangolib.markup import HTML, Text
 
           <li class="field required text" id="field-email">
             <label for="email">${_("E-mail")}</label>
-            <input class="" id="email" type="email" name="email" value="" placeholder="${_('example: username@domain.com')}" />
+            <input class="" id="email" type="email" name="email" value="" />
           </li>
 
           % endif

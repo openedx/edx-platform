@@ -58,6 +58,7 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
             end=datetime.datetime.now(),
             certificate_available_date=datetime.datetime.now(),
         )
+        self.display_name = self.user.profile.display_name
 
     def test_context(self):
         """
@@ -112,7 +113,7 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
         """
         Verify learner profile page view.
         """
-        profile_path = reverse('learner_profile', kwargs={'username': self.USERNAME})
+        profile_path = reverse('learner_profile', kwargs={'username': self.display_name})
         response = self.client.get(path=profile_path)
 
         for attribute in self.CONTEXT_DATA:
@@ -120,7 +121,7 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
 
     def test_redirect_view(self):
         with override_waffle_flag(REDIRECT_TO_PROFILE_MICROFRONTEND, active=True):
-            profile_path = reverse('learner_profile', kwargs={'username': self.USERNAME})
+            profile_path = reverse('learner_profile', kwargs={'username': self.display_name})
 
             # Test with waffle flag active and site setting disabled, does not redirect
             response = self.client.get(path=profile_path)
@@ -139,7 +140,7 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
             self.assertRedirects(response, profile_url + self.USERNAME, fetch_redirect_response=False)
 
     def test_records_link(self):
-        profile_path = reverse('learner_profile', kwargs={'username': self.USERNAME})
+        profile_path = reverse('learner_profile', kwargs={'username': self.display_name})
         response = self.client.get(path=profile_path)
         self.assertContains(response, u'<a href="{}/records/">'.format(CREDENTIALS_PUBLIC_SERVICE_URL))
 

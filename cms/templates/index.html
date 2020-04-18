@@ -562,7 +562,7 @@ from openedx.core.djangolib.js_utils import (
   <section class="content">
     <article class="content-primary" role="main">
       <div class="introduction">
-        <h2 class="title">${_("Thanks for signing up, {name}!").format(name=user.username)}</h2>
+        <h2 class="title">${_("Thanks for signing up, {name}!").format(name=user.profile.display_name)}</h2>
       </div>
 
       <div class="notice notice-incontext notice-instruction notice-instruction-verification">

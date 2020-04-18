@@ -22,6 +22,8 @@ class CookieTests(TestCase):
     def setUp(self):
         super(CookieTests, self).setUp()
         self.user = UserFactory.create()
+        self.user.profile = MagicMock()
+        self.user.profile.display_name = u"user_display_name"
         self.request = RequestFactory().get('/')
         self.request.user = self.user
         self.request.session = self._get_stub_session()
@@ -36,7 +38,7 @@ class CookieTests(TestCase):
             'logout': reverse('logout'),
             'resume_block': retrieve_last_sitewide_block_completed(self.user),
             'account_settings': reverse('account_settings'),
-            'learner_profile': reverse('learner_profile', kwargs={'username': self.user.username}),
+            'learner_profile': reverse('learner_profile', kwargs={'username': self.user.profile.display_name}),
         }
 
         # Convert relative URL paths to absolute URIs

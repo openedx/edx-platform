@@ -16,7 +16,7 @@
     {% endif %}
 
     {% filter force_escape %}
-    {% blocktrans with username=retirement.user.username %}Are you sure you want to cancel retirement for user "{{ username }}"? {% endblocktrans %}
+    {% blocktrans with display_name=retirement.user.profile.display_name %}Are you sure you want to cancel retirement for user "{{ display_name }}"? {% endblocktrans %}
     {% endfilter %}
 
     <fieldset class="module aligned">

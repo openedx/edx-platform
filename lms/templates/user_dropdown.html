@@ -25,7 +25,7 @@ profile_image_url = get_profile_image_urls_for_user(self.real_user)['medium']
                 <img class="user-image-frame" src="${profile_image_url}" alt="${display_name}">
             </a>
             <div class="dropdown">
-                <a class="dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${username}</a>
+                <a class="dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${display_name}</a>
                 <ul role="menu" class="dropdown-menu dropdown-menu-right" id="${_("Usermenu")}" aria-labelledby="dropdownMenuLink" tabindex="-1">
                     <li role="presentation"><a role="menuitem" class="dropdown-item" href="${reverse('dashboard')}">${_("Dashboard")}</a></li>
                     <li role="presentation"><a role="menuitem" class="dropdown-item" href="${reverse('account_settings')}">${_("Account")}</a></li>
@@ -43,8 +43,8 @@ profile_image_url = get_profile_image_urls_for_user(self.real_user)['medium']
     <div class="wrapper-user-menu dropdown-menu-container logged-in js-header-user-menu">
         <a href="${reverse('dashboard')}" class="menu-title">
             <span class="sr-only">${_("Dashboard for:")}</span>
-            <img class="menu-image" src="${profile_image_url}" alt="${username}">
-            ${username}
+            <img class="menu-image" src="${profile_image_url}" alt="${display_name}">
+            ${display_name}
         </a>
         <div role="group" aria-label="User menu" class="user-menu">
             <button type="button" class="menu-button button-more has-dropdown js-dropdown-button" aria-expanded="false" aria-controls="${_("Usermenu")}">
@@ -66,7 +66,7 @@ profile_image_url = get_profile_image_urls_for_user(self.real_user)['medium']
             <a href="${reverse('dashboard')}" class="user-link">
                 <span class="sr">${_("Dashboard for:")}</span>
                 <img class="user-image-frame" src="${profile_image_url}" alt="">
-                <div class="label-username">${username}</div>
+                <div class="label-username">${display_name}</div>
             </a>
         </li>
         <li class="primary">
