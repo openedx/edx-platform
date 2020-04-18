@@ -126,6 +126,7 @@ class AccountViewSet(ViewSet):
             GET /api/user/v1/me[?view=shared]
             GET /api/user/v1/accounts?usernames={username1,username2}[?view=shared]
             GET /api/user/v1/accounts?email={user_email}
+            GET /api/user/v1/accounts?display_name={display_name}
             GET /api/user/v1/accounts/{username}/[?view=shared]
 
             PATCH /api/user/v1/accounts/{username}/{"key":"value"} "application/merge-patch+json"
@@ -287,9 +288,11 @@ class AccountViewSet(ViewSet):
         """
         GET /api/user/v1/accounts?username={username1,username2}
         GET /api/user/v1/accounts?email={user_email}
+        GET /api/user/v1/accounts?display_name={display_name}
         """
         usernames = request.GET.get('username')
         user_email = request.GET.get('email')
+        display_name = request.GET.get('display_name')
         search_usernames = []
 
         if usernames:
@@ -301,6 +304,13 @@ class AccountViewSet(ViewSet):
             except (UserNotFound, User.DoesNotExist):
                 return Response(status=status.HTTP_404_NOT_FOUND)
             search_usernames = [user.username]
+        elif display_name:
+            display_name = display_name.strip('')
+            try:
+                user_profile = UserProfile.objects.get(display_name=display_name)
+            except (UserProfile.DoesNotExist):
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            search_usernames = [user_profile.user.username]
         try:
             account_settings = get_account_settings(
                 request, search_usernames, view=request.query_params.get('view'))
