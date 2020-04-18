@@ -11,7 +11,7 @@ from student.models import is_email_retired, username_exists_or_retired
 
 def on_user_updated(sender, instance, **kwargs):  # pylint: disable=unused-argument
     """
-    Check for retired usernames.
+    Check for username conflicts.
     """
     # Check only when not raw and only at User creation time (since validation
     # for the update path is done elsewhere in user_api).

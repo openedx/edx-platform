@@ -19,7 +19,7 @@ from openedx.core.djangoapps.user_api import errors
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled_for_user
 from openedx.core.djangoapps.user_api.models import RetirementState, UserPreference, UserRetirementStatus
 from openedx.core.djangoapps.user_api.serializers import ReadOnlyFieldsSerializerMixin
-from student.models import LanguageProficiency, SocialLink, UserProfile
+from student.models import LanguageProficiency, SocialLink, UserProfile, username_exists_or_retired
 
 from . import (
     ACCOUNT_VISIBILITY_PREF_KEY,
@@ -229,7 +229,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
     class Meta(object):
         model = UserProfile
         fields = (
-            "name", "gender", "goals", "year_of_birth", "level_of_education", "country", "social_links",
+            "name", "display_name", "gender", "goals", "year_of_birth", "level_of_education", "country", "social_links",
             "mailing_address", "bio", "profile_image", "requires_parental_consent", "language_proficiencies",
             "phone_number"
         )
@@ -252,6 +252,19 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
                 u"The name field must be at least {} character long.".format(NAME_MIN_LENGTH)
             )
         return new_name
+
+    def validate_display_name(self, new_display_name):
+        """ Verify there are no collisions with existing display_names or usernames. """
+        if (
+            new_display_name is not None and  # if updating the value
+            self.instance.display_name != new_display_name and  # and actually updating the value
+            self.instance.user.username != new_display_name and  # and not setting to our own username
+            username_exists_or_retired(new_display_name)  # verify conflicts with other users
+        ):
+            raise serializers.ValidationError(
+                u"The name '{}' is already in use.".format(new_display_name)
+            )
+        return new_display_name
 
     def validate_language_proficiencies(self, value):
         """
