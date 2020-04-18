@@ -10,9 +10,15 @@ from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.keys import CourseKey
 from testfixtures import LogCapture
 
-from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
+from lms.djangoapps.program_enrollments.tests.factories import (
+    CourseAccessRoleAssignmentFactory,
+    ProgramCourseEnrollmentFactory,
+    ProgramEnrollmentFactory,
+)
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from student.tests.factories import UserFactory
+from student.api import get_course_access_role
+from student.roles import CourseStaffRole
+from student.tests.factories import UserFactory, CourseAccessRoleFactory
 
 from ..linking import (
     NO_LMS_USER_TEMPLATE,
@@ -178,6 +184,77 @@ class TestLinkProgramEnrollments(TestLinkProgramEnrollmentsMixin, TestCase):
         self.assertIsNotNone(inactive_enrollment.course_enrollment)
         self.assertEqual(inactive_enrollment.course_enrollment.course.id, self.animal_course)
         self.assertFalse(inactive_enrollment.course_enrollment.is_active)
+
+    def test_realize_course_access_roles(self):
+        program_enrollment = self._create_waiting_enrollment(self.program, '0001')
+        active_enrollment_1 = self._create_waiting_course_enrollment(
+            program_enrollment,
+            self.fruit_course,
+            status='active'
+        )
+        active_enrollment_2 = self._create_waiting_course_enrollment(
+            program_enrollment,
+            self.animal_course,
+            status='active'
+        )
+        CourseAccessRoleAssignmentFactory(enrollment=active_enrollment_1)
+        CourseAccessRoleAssignmentFactory(enrollment=active_enrollment_2)
+        link_program_enrollments(self.program, {'0001': self.user_1.username})
+
+        # assert that staff CourseAccessRoles are created for the user in the courses
+        fruit_course_staff_role = get_course_access_role(
+            self.user_1,
+            self.fruit_course.org,
+            self.fruit_course,
+            CourseStaffRole.ROLE
+        )
+        assert fruit_course_staff_role is not None
+
+        animal_course_staff_role = get_course_access_role(
+            self.user_1,
+            self.animal_course.org,
+            self.animal_course,
+            CourseStaffRole.ROLE
+        )
+        assert animal_course_staff_role is not None
+
+        # assert that all CourseAccessRoleAssignment objects are deleted
+        assert not active_enrollment_1.courseaccessroleassignment_set.all().exists()
+        assert not active_enrollment_2.courseaccessroleassignment_set.all().exists()
+
+    def test_realize_course_access_roles_user_with_existing_course_access_role(self):
+        """
+        This test asserts that, given a user that already has a staff CourseAccessRole in a course,
+        if that user has a CourseAccessRoleAssignment that describes a staff role in that same course,
+        that we do not mistakenly violate the unique_together constraint on the CourseAccessRole model by
+        creating a duplicate. As of now, this is handled by the CourseStaffRole code itself, which silently
+        ignores such duplicates, but this test is to ensure we do not regress.
+        """
+        program_enrollment = self._create_waiting_enrollment(self.program, '0001')
+        active_enrollment_1 = self._create_waiting_course_enrollment(
+            program_enrollment,
+            self.fruit_course,
+            status='active'
+        )
+        # create an CourseAccessRole for the user
+        CourseAccessRoleFactory(user=self.user_1, course_id=self.fruit_course, role=CourseStaffRole.ROLE)
+
+        # create a corresponding CourseAccessRoleAssignmentFactory that would, theoretically, cause a
+        # duplicate object to be created, violating the CourseAccessRole integrity constraints
+        CourseAccessRoleAssignmentFactory(enrollment=active_enrollment_1)
+        link_program_enrollments(self.program, {'0001': self.user_1.username})
+
+        # assert that staff CourseAccessRoles remains
+        fruit_course_staff_role = get_course_access_role(
+            self.user_1,
+            self.fruit_course.org,
+            self.fruit_course,
+            CourseStaffRole.ROLE
+        )
+        assert fruit_course_staff_role is not None
+
+        # assert that all CourseAccessRoleAssignment objects are deleted
+        assert not active_enrollment_1.courseaccessroleassignment_set.all().exists()
 
 
 class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase):
