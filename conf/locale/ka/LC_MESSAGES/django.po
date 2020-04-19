@@ -60,7 +60,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-05 20:42+0000\n"
+"POT-Creation-Date: 2020-04-12 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Georgian (https://www.transifex.com/open-edx/teams/6205/ka/)\n"
@@ -8195,12 +8195,12 @@ msgid "{mode_name} for course {course}"
 msgstr "{course} კურსის {mode_name} "
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid ""
-"You can unenroll in the course and receive a full refund for 14 days after "
-"the course start date. "
+"To receive a refund you may unenroll from the course on your edX Dashboard "
+"({dashboard_url}) up to 14 days after your payment or 14 days after your "
+"course starts (up to six months after your payment).\n"
 msgstr ""
-"შეგიძლიათ კურსზე ჩარიცხვის გაუქმება. გადახდილი თანხა სრულად აგინაზღაურდებათ "
-"კურსის დაწყების თარიღიდან 14 დღის განმავლობაში."
 
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
@@ -8214,21 +8214,15 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
 "You can unenroll in the course and receive a full refund for 2 days after "
-"the course start date. "
+"the course start date.\n"
 msgstr ""
-"შეგიძლიათ კურსზე რჩარიცხვის გაუქმება. გადახდილი თანხა სრულად აგინაზღაურდებათ"
-" კურსის დაწყებიდან 2 დღეში."
 
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
 msgid ""
-"{refund_reminder_msg}To receive your refund, contact {billing_email}. Please"
-" include your order number in your email. Please do NOT include your credit "
-"card information."
+"{refund_reminder_msg}For help unenrolling, Please see How do I unenroll from"
+" a course? ({how_to_unenroll_link}) in our edX HelpCenter."
 msgstr ""
-"{refund_reminder_msg} ანაზღაურების მისაღებად, დაუკავშირდით "
-"{billing_email}-ს. გთხოვთ ელ-შეტყობინებაში მიუთითეთ თქვენი შეკვეთის ნომერი "
-"და ნუ შეიყვანთ თქვენი საკრედიტო ბარათის მონაცემებს."
 
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
@@ -9058,11 +9052,15 @@ msgid "The supplied course_id {course_id} is not valid."
 msgstr "მითითებული course_id {course_id} არასწორია."
 
 #: lms/djangoapps/teams/views.py
-msgid "You are already in a team in this course."
-msgstr "თქვენ უკვე ამ კურსის გუნდის წევრი ხართ."
+msgid "topic_id is required"
+msgstr ""
 
 #: lms/djangoapps/teams/views.py
 msgid "You can't create a team in an instructor managed topic."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "You are already in a team in this teamset."
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
@@ -13684,7 +13682,6 @@ msgstr " {platform_name} სერვერებზე დაფიქსირ
 
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
-#: lms/templates/courseware/error-message.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
 " fix it as soon as possible. Please email us at {tech_support_email} to "
@@ -13796,6 +13793,18 @@ msgstr "ელფოსტა"
 #, python-format
 msgid "Return To %s"
 msgstr "%s -ზე დაბრუნება"
+
+#: lms/templates/reset_deadlines_banner.html
+msgid "It looks like you've missed some important deadlines. Visit "
+msgstr ""
+
+#: lms/templates/reset_deadlines_banner.html
+msgid "edx.org"
+msgstr ""
+
+#: lms/templates/reset_deadlines_banner.html
+msgid " to reset your deadlines and get started today."
+msgstr ""
 
 #: lms/templates/reset_deadlines_banner.html
 msgid ""
@@ -15809,8 +15818,9 @@ msgid "You are enrolled in this course"
 msgstr "თქვენ ჩაირიცხეთ ამ კურსზე"
 
 #: lms/templates/courseware/course_about.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
 #: lms/templates/shoppingcart/registration_code_receipt.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
 msgid "View Course"
 msgstr "იხილეთ კურსი"
 
@@ -15999,6 +16009,12 @@ msgid ""
 "{a_start}Upgrade{a_end}{space}to a Verified Certificate for full access."
 msgstr ""
 
+#: lms/templates/courseware/error-message.html
+msgid ""
+"We're sorry, this module is temporarily unavailable. Our staff is working to"
+" fix it as soon as possible."
+msgstr ""
+
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
 msgstr "შეფასების წიგნაკი"
@@ -16049,8 +16065,9 @@ msgid "Welcome to {course_title}!"
 msgstr ""
 
 #: lms/templates/courseware/info.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
 msgid "Resume Course"
 msgstr "კურსზე დაბრუნება"
 
@@ -20229,12 +20246,8 @@ msgstr "დადასტურება"
 #: lms/templates/static_templates/404.html
 msgid ""
 "The page that you were looking for was not found. Go back to the "
-"{link_start}homepage{link_end} or let us know about any pages that may have "
-"been moved at {email}."
+"{link_start}homepage{link_end} ."
 msgstr ""
-"გვერდი რომელსაც ეძებდით ვერ მოიძებნა. დაუბრუნდით {link_start}-ის მთავარ "
-"გვერდს{link_end} ან გვაცნობეთ ნებისმიერი გვერდის შესახებ რომელიც შესაძლოა "
-"გადავიდა {email}-ზე."
 
 #: lms/templates/static_templates/about.html
 #: lms/templates/static_templates/blog.html
@@ -20285,23 +20298,15 @@ msgstr "ამჟამად {platform_name}-ის სერვერები
 #: lms/templates/static_templates/server-overloaded.html
 msgid ""
 "Our staff is currently working to get the site back up as soon as possible. "
-"Please email us at {tech_support_email} to report any problems or downtime."
 msgstr ""
-"ჩვენი პერსონალი ამჟამად მუშაობს რაც შეიძლება სწრაფად მოიპოვოს საიტის "
-"მხარდაჭერა. გთხოვთ, შეგვატყობინოთ {tech_support_email}-ზე ნებისმიერ "
-"პრობლემასთან ან ტექნიკურ გაუმართაობასთან დაკავშირებით."
 
 #: lms/templates/static_templates/server-error.html
 msgid "There has been a 500 error on the {platform_name} servers"
 msgstr " 500 შეცდომა დაფიქსირდა {platform_name}-ის სერვერებზე"
 
 #: lms/templates/static_templates/server-error.html
-msgid ""
-"Please wait a few seconds and then reload the page. If the problem persists,"
-" please email us at {email}."
+msgid "Please wait a few seconds and then reload the page."
 msgstr ""
-"გთხოვთ, დაელოდეთ რამდენიმე წამი და გადატვირთეთ გვერდი. თუ პრობლემა "
-"განმეროდა, გთხოვთ შეგვატყობინეთ {email}-ზე."
 
 #: lms/templates/static_templates/server-overloaded.html
 msgid "Currently the {platform_name} servers are overloaded"
@@ -20778,6 +20783,10 @@ msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/next-up-banner-fragment.html
 msgid "Get started on what's next: "
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
+msgid "Show More"
 msgstr ""
 
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html

@@ -622,7 +622,6 @@
     "Do you want to upload your file before submitting?": " G\u00f6ndermeden \u00f6nce dosyan\u0131z\u0131 y\u00fcklemek istiyor musunuz?",
     "Document properties": "Belge \u00f6zellikleri",
     "Does the name on your ID match your account name: %(fullName)s?": "ID niz \u00fczerindeki isim hesab\u0131n\u0131zdaki isimle e\u015fle\u015fiyor mu: %(fullName)s?",
-    "Does the photo of you match your ID photo?": "Foto\u011fraf kimlik foto\u011fraf\u0131na uyuyor mu?",
     "Does the photo of you show your whole face?": "Foto\u011fraf y\u00fcz\u00fcn\u00fcz\u00fcn tamam\u0131n\u0131 g\u00f6steriyor mu?",
     "Doing so means that you are no longer eligible for academic credit.": "Bu \u015fekilde yapmak, akademik kredinizi dolduramayaca\u011f\u0131n\u0131z anlam\u0131na gelir.",
     "Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission.": "Resminizi g\u00f6rm\u00fcyor musunuz? Web izleyiciniz izin istedi\u011finde kameran\u0131z\u0131 kullanabilmesi i\u00e7in izin veriniz.",
@@ -1627,7 +1626,6 @@
     "Textbook name is required": "Ders kitab\u0131 ad\u0131 gerekli",
     "Thank you %(full_name)s! We have received your payment for %(course_name)s.": "%(course_name)s dersi i\u00e7in \u00f6demenizi ald\u0131k. Te\u015fekk\u00fcrler %(full_name)s!",
     "Thank you for setting your course goal to {goal}!": "Ders hedefinizi {goal} olarak belirledi\u011finiz i\u00e7in te\u015fekk\u00fcr ederiz!",
-    "Thank you for submitting a request! We will contact you within 24 hours.": "Bize talebinizi iletti\u011finiz i\u00e7in te\u015fekk\u00fcr ederiz! Size 24 saat i\u00e7inde geri d\u00f6nece\u011fiz.",
     "Thank you for submitting your financial assistance application for {course_name}! You can expect a response in 2-4 business days.": "{course_name} i\u00e7in mali yard\u0131m ba\u015fvurunuzu g\u00f6nderdi\u011finiz i\u00e7in te\u015fekk\u00fcrler ! 2-4 i\u015f g\u00fcn\u00fc i\u00e7erisinde size geri d\u00f6nece\u011fiz. ",
     "Thank you for submitting your photos. We will review them shortly. You can now sign up for any %(platformName)s course that offers verified certificates. Verification is good for one year. After one year, you must submit photos for verification again.": "Foto\u011fraflar\u0131n\u0131z\u0131 g\u00f6nderdi\u011finiz i\u00e7in te\u015fekk\u00fcr ederiz. K\u0131sa s\u00fcre i\u00e7inde de\u011ferlendirece\u011fiz. \u015eimdi onayl\u0131 sertifika sunan herhangi bir %(platformName)s derse kay\u0131t olabilirsiniz. Do\u011frulama bir y\u0131l i\u00e7indir. Bir y\u0131ldan sonra yeniden do\u011frulama i\u00e7in foto\u011fraflar\u0131n\u0131z\u0131 tekrar g\u00f6ndermelisiniz.",
     "Thank you! We have received your payment for {courseName}.": "Te\u015fekk\u00fcrler! {courseName} i\u00e7in olan \u00f6demenizi ald\u0131k.",
@@ -1676,7 +1674,6 @@
     "The number of subsections in the course that contain problems of this assignment type.": "Bu g\u00f6rev t\u00fcr\u00fc problemlerini i\u00e7eren ders altb\u00f6l\u00fcmlerinin say\u0131s\u0131.",
     "The organization that this signatory belongs to, as it should appear on certificates.": "Bu imza sahibine ait olan organizasyon, sertifikalarda g\u00f6r\u00fcnmeli.",
     "The page \"{route}\" could not be found.": "\"{route}\" sayfas\u0131 bulunamad\u0131.",
-    "The photo of your face matches the photo on your ID.": "Foto\u011fraf\u0131n\u0131z, kimlik kart\u0131n\u0131zdaki ile uygun olmal\u0131.",
     "The post you selected has been deleted.": "Se\u00e7ti\u011finiz ileti silindi.",
     "The raw error message is:": "\u0130\u015flenmemi\u015f hata mesaj\u0131:",
     "The refund deadline for this course has passed,so you will not receive a refund.": "Bu ders i\u00e7in iadenin son g\u00fcn\u00fc ge\u00e7ti, bu y\u00fczden iade alamayacaks\u0131n\u0131z.",
@@ -1923,7 +1920,6 @@
     "Use enrollment tracks as the basis for dividing discussions. All learners, regardless of their enrollment track, see the same discussion topics, but within divided topics, only learners who are in the same enrollment track see and respond to each others\u2019 posts.": "Tart\u0131\u015fmalar\u0131 b\u00f6lmek i\u00e7in kay\u0131tlanma yollar\u0131n\u0131 kullan. Kay\u0131tlanma yollar\u0131na ba\u011fl\u0131 olmaks\u0131z\u0131n t\u00fcm \u00f6\u011frenciler ayn\u0131 tart\u0131\u015fma ba\u015fl\u0131klar\u0131n\u0131 g\u00f6r\u00fcr; b\u00f6l\u00fcnm\u00fc\u015f ba\u015fl\u0131klarda ise sadece ayn\u0131 ayn\u0131 kay\u0131tlanma yolundaki \u00f6\u011frenciler birbirini g\u00f6r\u00fcp, bir di\u011ferine cevap verebilir.",
     "Use my institution/campus credentials": "Benim kurum / kamp\u00fcs kimlik bilgilerimi kullan\u0131n",
     "Use the All Topics menu to find specific topics.": "\u00d6zel konular\u0131 bulmak i\u00e7in T\u00fcm Konular men\u00fcs\u00fcn\u00fc kullan",
-    "Use your webcam to take a photo of your ID. We will match this photo with the photo of your face and the name on your account.": "Kimli\u011finizin foto\u011fraf\u0131n\u0131 \u00e7ekmek i\u00e7in web kameran\u0131z\u0131 kullan\u0131n. Biz bu foto\u011fraf\u0131n\u0131z\u0131 kimli\u011finiz \u00fczerindeki foto\u011fraf ile e\u015fle\u015ftirece\u011fiz.",
     "Use your webcam to take a photo of your face. We will match this photo with the photo on your ID.": "Y\u00fcz\u00fcn\u00fcz\u00fcn foto\u011fraf\u0131n\u0131 \u00e7ekmek i\u00e7in web kameran\u0131z\u0131 kullan\u0131n. Biz bu foto\u011fraf\u0131n\u0131z\u0131 kimli\u011finiz \u00fczerindeki foto\u011fraf ile e\u015fle\u015ftirece\u011fiz.",
     "Used": "Kullan\u0131ld\u0131",
     "User Email": "Kullan\u0131c\u0131 E-posta",
@@ -2080,8 +2076,6 @@
     "You must specify a name": "\u0130sim belirtmelisiniz",
     "You must specify a name for the cohort": "Topluluk i\u00e7in bir isim belirtmelisiniz",
     "You must specify your birth year before you can share your full profile. To specify your birth year, go to the {account_settings_page_link}": "T\u00fcm profilinizi payla\u015fmadan \u00f6nce do\u011fum y\u0131l\u0131n\u0131z\u0131 belirlemek zorundas\u0131n\u0131z. Do\u011fum y\u0131l\u0131n\u0131z\u0131 belirlemek i\u00e7in, {account_settings_page_link} gidin",
-    "You need a driver's license, passport, or other government-issued ID that has your name and photo.": "Ad\u0131n\u0131z\u0131 ve foto\u011fraf\u0131n\u0131z\u0131 i\u00e7eren bir ehliyet, pasaport veya di\u011fer devlet taraf\u0131ndan verilen kimli\u011fe ihtiyac\u0131n\u0131z var.",
-    "You need an ID with your name and photo. A driver's license, passport, or other government-issued IDs are all acceptable.": "Ad\u0131n\u0131z\u0131 ve foto\u011fraf\u0131n\u0131z\u0131 i\u00e7eren bir kimli\u011fe ihtiyac\u0131n\u0131z vard\u0131r. Bir ehliyet, pasaport veya di\u011fer h\u00fck\u00fcmet taraf\u0131ndan verilen kimlikler t\u00fcm kabul edilebilir.",
     "You need to activate your account before you can enroll in courses. Check your inbox for an activation email.": "Derse kay\u0131t olmadan \u00f6nce hesab\u0131n\u0131z\u0131 aktive edin. Etkinle\u015ftirme e-posta i\u00e7in gelen kutunuzu kontrol edin.",
     "You need to activate your account before you can enroll in courses. Check your inbox for an activation email. After you complete activation you can return and refresh this page.": "Derse kay\u0131t olmadan \u00f6nce hesab\u0131n\u0131z\u0131 aktive edin. Etkinle\u015ftirme e-posta i\u00e7in gelen kutunuzu kontrol edin. Etkinle\u015ftirmeyi tamamlad\u0131ktan sonra bu sayfaya d\u00f6nebilir ve yenileyebilirsiniz.",
     "You receive messages from {platform_name} and course teams at this address.": "{platform_name} platformundan ve ders tak\u0131mlar\u0131ndan iletileri bu adrese alacaks\u0131n\u0131z.",
@@ -2325,7 +2319,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -2378,9 +2372,9 @@
       "%Y-%m-%d"
     ],
     "DECIMAL_SEPARATOR": ",",
-    "FIRST_DAY_OF_WEEK": "1",
+    "FIRST_DAY_OF_WEEK": 1,
     "MONTH_DAY_FORMAT": "d F",
-    "NUMBER_GROUPING": "3",
+    "NUMBER_GROUPING": 3,
     "SHORT_DATETIME_FORMAT": "d M Y H:i",
     "SHORT_DATE_FORMAT": "d M Y",
     "THOUSAND_SEPARATOR": ".",

@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-12 20:53+0000\n"
-"PO-Revision-Date: 2020-04-12 20:53:38.541186\n"
+"POT-Creation-Date: 2020-04-19 20:50+0000\n"
+"PO-Revision-Date: 2020-04-19 20:50:19.017884\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2544,10 +2544,8 @@ msgid "Go to {platform} Home"
 msgstr "لخ فخ {platform} اخوث"
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid ""
-"Thank you for submitting a request! We will contact you within 24 hours."
-msgstr ""
-"فاشرن غخع بخق سعزوهففهرل ش قثضعثسف! صث صهمم ذخرفشذف غخع صهفاهر 24 اخعقس."
+msgid "Thank you for submitting a request!"
+msgstr "فاشرن غخع بخق سعزوهففهرل ش قثضعثسف!"
 
 #: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
 msgid "Cancel upload"
@@ -8493,32 +8491,24 @@ msgid "What You Need for Verification"
 msgstr "صاشف غخع رثثي بخق دثقهبهذشفهخر"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/make_payment_step.underscore
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Webcam"
-msgstr "صثزذشو"
+msgid "Device with Camera"
+msgstr "يثدهذث صهفا ذشوثقش"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"You need a computer or cell phone that has a webcam. When you receive a "
-"browser prompt, make sure that you allow access to the camera."
+"You need a device that has a webcam. If you receive a browser prompt for "
+"access to your camera, please make sure to click 'Allow'."
 msgstr ""
-"غخع رثثي ش ذخوحعفثق خق ذثمم حاخرث فاشف اشس ش صثزذشو. صاثر غخع قثذثهدث ش "
-"زقخصسثق حقخوحف, وشنث سعقث فاشف غخع شممخص شذذثسس فخ فاث ذشوثقش."
+"غخع رثثي ش يثدهذث فاشف اشس ش صثزذشو. هب غخع قثذثهدث ش زقخصسثق حقخوحف بخق "
+"شذذثسس فخ غخعق ذشوثقش, حمثشسث وشنث سعقث فخ ذمهذن 'شممخص'."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "Photo Identification"
 msgstr "حاخفخ هيثرفهبهذشفهخر"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-msgid ""
-"You need a driver's license, passport, or other government-issued ID that "
-"has your name and photo."
-msgstr ""
-"غخع رثثي ش يقهدثق'س مهذثرسث, حشسسحخقف, خق خفاثق لخدثقروثرف-هسسعثي هي فاشف "
-"اشس غخعق رشوث شري حاخفخ."
+msgid "You need a valid ID that contains your full name and photo."
+msgstr "غخع رثثي ش دشمهي هي فاشف ذخرفشهرس غخعق بعمم رشوث شري حاخفخ."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -8546,16 +8536,12 @@ msgid "Your entire face fits inside the frame."
 msgstr "غخعق ثرفهقث بشذث بهفس هرسهيث فاث بقشوث."
 
 #: lms/templates/verify_student/face_photo_step.underscore
-msgid "The photo of your face matches the photo on your ID."
-msgstr "فاث حاخفخ خب غخعق بشذث وشفذاثس فاث حاخفخ خر غخعق هي."
-
-#: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"To use the current photo, select the Take Photo button {icon}. To take "
-"another photo, select the Retake Photo button {icon}."
+"To take the photo of your face, click on the camera button {icon}. If you "
+"need to try again, click 'Retake Photo'."
 msgstr ""
-"فخ عسث فاث ذعققثرف حاخفخ, سثمثذف فاث فشنث حاخفخ زعففخر {icon}. فخ فشنث "
-"شرخفاثق حاخفخ, سثمثذف فاث قثفشنث حاخفخ زعففخر {icon}."
+"فخ فشنث فاث حاخفخ خب غخعق بشذث, ذمهذن خر فاث ذشوثقش زعففخر {icon}. هب غخع "
+"رثثي فخ فقغ شلشهر, ذمهذن 'قثفشنث حاخفخ'."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8571,16 +8557,12 @@ msgid "Why does %(platformName)s need my photo?"
 msgstr "صاغ يخثس %(platformName)s رثثي وغ حاخفخ?"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
 msgid ""
-"As part of the verification process, you take a photo of both your face and "
-"a government-issued photo ID. Our authorization service confirms your "
-"identity by comparing the photo you take with the photo on your ID."
+"We use your verification photos to confirm your identity and ensure the "
+"validity of your certificate."
 msgstr ""
-"شس حشقف خب فاث دثقهبهذشفهخر حقخذثسس, غخع فشنث ش حاخفخ خب زخفا غخعق بشذث شري "
-"ش لخدثقروثرف-هسسعثي حاخفخ هي. خعق شعفاخقهظشفهخر سثقدهذث ذخربهقوس غخعق "
-"هيثرفهفغ زغ ذخوحشقهرل فاث حاخفخ غخع فشنث صهفا فاث حاخفخ خر غخعق هي."
+"صث عسث غخعق دثقهبهذشفهخر حاخفخس فخ ذخربهقو غخعق هيثرفهفغ شري ثرسعقث فاث "
+"دشمهيهفغ خب غخعق ذثقفهبهذشفث."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8591,18 +8573,15 @@ msgstr "صاشف يخثس %(platformName)s يخ صهفا فاهس حاخفخ?"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
 #, python-format
 msgid ""
-"We use the highest levels of security available to encrypt your photo and "
-"send it to our authorization service for review. Your photo and information "
-"are not saved or visible anywhere on %(platformName)s after the verification"
-" process is complete."
+"We securely encrypt your photo and send it to our authorization service for "
+"review. Your photo and information are not saved or visible anywhere on "
+"%(platformName)s after the verification process is complete."
 msgstr ""
-"صث عسث فاث اهلاثسف مثدثمس خب سثذعقهفغ شدشهمشزمث فخ ثرذقغحف غخعق حاخفخ شري "
-"سثري هف فخ خعق شعفاخقهظشفهخر سثقدهذث بخق قثدهثص. غخعق حاخفخ شري هربخقوشفهخر "
-"شقث رخف سشدثي خق دهسهزمث شرغصاثقث خر %(platformName)s شبفثق فاث دثقهبهذشفهخر"
-" حقخذثسس هس ذخوحمثفث."
+"صث سثذعقثمغ ثرذقغحف غخعق حاخفخ شري سثري هف فخ خعق شعفاخقهظشفهخر سثقدهذث بخق "
+"قثدهثص. غخعق حاخفخ شري هربخقوشفهخر شقث رخف سشدثي خق دهسهزمث شرغصاثقث خر "
+"%(platformName)s شبفثق فاث دثقهبهذشفهخر حقخذثسس هس ذخوحمثفث."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8676,20 +8655,16 @@ msgid "Take a Photo of Your ID"
 msgstr "فشنث ش حاخفخ خب غخعق هي"
 
 #: lms/templates/verify_student/id_photo_step.underscore
-msgid ""
-"Use your webcam to take a photo of your ID. We will match this photo with "
-"the photo of your face and the name on your account."
-msgstr ""
-"عسث غخعق صثزذشو فخ فشنث ش حاخفخ خب غخعق هي. صث صهمم وشفذا فاهس حاخفخ صهفا "
-"فاث حاخفخ خب غخعق بشذث شري فاث رشوث خر غخعق شذذخعرف."
+msgid "Use your webcam to take a photo of your ID."
+msgstr "عسث غخعق صثزذشو فخ فشنث ش حاخفخ خب غخعق هي."
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
-"You need an ID with your name and photo. A driver's license, passport, or "
-"other government-issued IDs are all acceptable."
+"You need an ID with your name and photo. A driver's license, passport, or ID"
+" are all acceptable."
 msgstr ""
-"غخع رثثي شر هي صهفا غخعق رشوث شري حاخفخ. ش يقهدثق'س مهذثرسث, حشسسحخقف, خق "
-"خفاثق لخدثقروثرف-هسسعثي هيس شقث شمم شذذثحفشزمث."
+"غخع رثثي شر هي صهفا غخعق رشوث شري حاخفخ. ش يقهدثق'س مهذثرسث, حشسسحخقف, خق هي"
+" شقث شمم شذذثحفشزمث."
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -8712,6 +8687,16 @@ msgstr "خرذث هر حخسهفهخر, عسث فاث فشنث حاخفخ زعف
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Use the Retake Photo button if you are not pleased with your photo"
 msgstr "عسث فاث قثفشنث حاخفخ زعففخر هب غخع شقث رخف حمثشسثي صهفا غخعق حاخفخ"
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid ""
+"As part of the verification process, you take a photo of both your face and "
+"a photo ID. Our authorization service confirms your identity by comparing "
+"the photo you take with the photo on your ID."
+msgstr ""
+"شس حشقف خب فاث دثقهبهذشفهخر حقخذثسس, غخع فشنث ش حاخفخ خب زخفا غخعق بشذث شري "
+"ش حاخفخ هي. خعق شعفاخقهظشفهخر سثقدهذث ذخربهقوس غخعق هيثرفهفغ زغ ذخوحشقهرل "
+"فاث حاخفخ غخع فشنث صهفا فاث حاخفخ خر غخعق هي."
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
@@ -8769,6 +8754,29 @@ msgstr ""
 msgid "Can we match the photo you took with the one on your ID?"
 msgstr "ذشر صث وشفذا فاث حاخفخ غخع فخخن صهفا فاث خرث خر غخعق هي?"
 
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"As part of the verification process, you take a photo of both your face and "
+"a government-issued photo ID. Our authorization service confirms your "
+"identity by comparing the photo you take with the photo on your ID."
+msgstr ""
+"شس حشقف خب فاث دثقهبهذشفهخر حقخذثسس, غخع فشنث ش حاخفخ خب زخفا غخعق بشذث شري "
+"ش لخدثقروثرف-هسسعثي حاخفخ هي. خعق شعفاخقهظشفهخر سثقدهذث ذخربهقوس غخعق "
+"هيثرفهفغ زغ ذخوحشقهرل فاث حاخفخ غخع فشنث صهفا فاث حاخفخ خر غخعق هي."
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+#, python-format
+msgid ""
+"We use the highest levels of security available to encrypt your photo and "
+"send it to our authorization service for review. Your photo and information "
+"are not saved or visible anywhere on %(platformName)s after the verification"
+" process is complete."
+msgstr ""
+"صث عسث فاث اهلاثسف مثدثمس خب سثذعقهفغ شدشهمشزمث فخ ثرذقغحف غخعق حاخفخ شري "
+"سثري هف فخ خعق شعفاخقهظشفهخر سثقدهذث بخق قثدهثص. غخعق حاخفخ شري هربخقوشفهخر "
+"شقث رخف سشدثي خق دهسهزمث شرغصاثقث خر %(platformName)s شبفثق فاث دثقهبهذشفهخر"
+" حقخذثسس هس ذخوحمثفث."
+
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: {courseName}"
 msgstr "فاشرنس بخق قثفعقرهرل فخ دثقهبغ غخعق هي هر: {courseName}"
@@ -8801,6 +8809,13 @@ msgid ""
 msgstr ""
 "ش يقهدثق'س مهذثرسث, حشسسحخقف, خق خفاثق لخدثقروثرف-هسسعثي هي صهفا غخعق رشوث "
 "شري حاخفخ"
+
+#: lms/templates/verify_student/intro_step.underscore
+#: lms/templates/verify_student/make_payment_step.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Webcam"
+msgstr "صثزذشو"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
@@ -9029,10 +9044,6 @@ msgstr "حاخفخ قثضعهقثوثرفس:"
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Does the photo of you show your whole face?"
 msgstr "يخثس فاث حاخفخ خب غخع ساخص غخعق صاخمث بشذث?"
-
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Does the photo of you match your ID photo?"
-msgstr "يخثس فاث حاخفخ خب غخع وشفذا غخعق هي حاخفخ?"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Is your name on your ID readable?"
