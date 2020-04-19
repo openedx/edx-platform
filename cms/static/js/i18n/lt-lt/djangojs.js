@@ -51,6 +51,7 @@
     "%(sel)s of %(cnt)s selected": [
       "pasirinktas %(sel)s i\u0161 %(cnt)s",
       "pasirinkti %(sel)s i\u0161 %(cnt)s",
+      "pasirinkti %(sel)s i\u0161 %(cnt)s",
       "pasirinkti %(sel)s i\u0161 %(cnt)s"
     ],
     "%(team_count)s Team": [
@@ -382,11 +383,13 @@
     "Note: You are %s hour ahead of server time.": [
       "Pastaba: J\u016bs\u0173 laikrodis rodo %s valanda daugiau nei serverio laikrodis.",
       "Pastaba: J\u016bs\u0173 laikrodis rodo %s valandomis daugiau nei serverio laikrodis.",
+      "Pastaba: J\u016bs\u0173 laikrodis rodo %s valand\u0173 daugiau nei serverio laikrodis.",
       "Pastaba: J\u016bs\u0173 laikrodis rodo %s valand\u0173 daugiau nei serverio laikrodis."
     ],
     "Note: You are %s hour behind server time.": [
       "Pastaba: J\u016bs\u0173 laikrodis rodo %s valanda ma\u017eiau nei serverio laikrodis.",
       "Pastaba: J\u016bs\u0173 laikrodis rodo %s valandomis ma\u017eiau nei serverio laikrodis.",
+      "Pastaba: J\u016bs\u0173 laikrodis rodo %s valand\u0173 ma\u017eiau nei serverio laikrodis.",
       "Pastaba: J\u016bs\u0173 laikrodis rodo %s valand\u0173 ma\u017eiau nei serverio laikrodis."
     ],
     "Noted in:": "Pa\u017eym\u0117ta:",
@@ -783,7 +786,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -842,9 +845,9 @@
       "%d.%m.%y"
     ],
     "DECIMAL_SEPARATOR": ",",
-    "FIRST_DAY_OF_WEEK": "1",
+    "FIRST_DAY_OF_WEEK": 1,
     "MONTH_DAY_FORMAT": "E j \\d.",
-    "NUMBER_GROUPING": "3",
+    "NUMBER_GROUPING": 3,
     "SHORT_DATETIME_FORMAT": "Y-m-d H:i",
     "SHORT_DATE_FORMAT": "Y-m-d",
     "THOUSAND_SEPARATOR": ".",

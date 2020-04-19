@@ -147,6 +147,8 @@
     "%(programName)s Home Page.": "\u05e2\u05de\u05d5\u05d3 \u05d4\u05d1\u05d9\u05ea \u05e9\u05dc %(programName)s",
     "%(sel)s of %(cnt)s selected": [
       "%(sel)s \u05de %(cnt)s \u05e0\u05d1\u05d7\u05e8\u05d5\u05ea",
+      "%(sel)s \u05de %(cnt)s \u05e0\u05d1\u05d7\u05e8\u05d5\u05ea",
+      "%(sel)s \u05de %(cnt)s \u05e0\u05d1\u05d7\u05e8\u05d5\u05ea",
       "%(sel)s \u05de %(cnt)s \u05e0\u05d1\u05d7\u05e8\u05d5\u05ea"
     ],
     "%(team_count)s Team": [
@@ -840,10 +842,14 @@
     "Note: Do not hide graded assignments after they have been released.": "\u05d4\u05e2\u05e8\u05d4: \u05d0\u05dc \u05ea\u05e1\u05ea\u05d9\u05e8 \u05d0\u05ea \u05d4\u05de\u05d8\u05dc\u05d5\u05ea \u05e9\u05e7\u05d9\u05d1\u05dc\u05d5 \u05e6\u05d9\u05d5\u05df \u05dc\u05d0\u05d7\u05e8 \u05d4\u05e4\u05e6\u05ea\u05df.",
     "Note: You are %s hour ahead of server time.": [
       "\u05d4\u05e2\u05e8\u05d4: \u05d0\u05ea/\u05d4 %s \u05e9\u05e2\u05d4 \u05dc\u05e4\u05e0\u05d9 \u05d6\u05de\u05df \u05d4\u05e9\u05e8\u05ea.",
+      "\u05d4\u05e2\u05e8\u05d4: \u05d0\u05ea/\u05d4 %s \u05e9\u05e2\u05d5\u05ea \u05dc\u05e4\u05e0\u05d9 \u05d6\u05de\u05df \u05d4\u05e9\u05e8\u05ea.",
+      "\u05d4\u05e2\u05e8\u05d4: \u05d0\u05ea/\u05d4 %s \u05e9\u05e2\u05d5\u05ea \u05dc\u05e4\u05e0\u05d9 \u05d6\u05de\u05df \u05d4\u05e9\u05e8\u05ea.",
       "\u05d4\u05e2\u05e8\u05d4: \u05d0\u05ea/\u05d4 %s \u05e9\u05e2\u05d5\u05ea \u05dc\u05e4\u05e0\u05d9 \u05d6\u05de\u05df \u05d4\u05e9\u05e8\u05ea."
     ],
     "Note: You are %s hour behind server time.": [
       "\u05d4\u05e2\u05e8\u05d4: \u05d0\u05ea/\u05d4 %s \u05e9\u05e2\u05d4 \u05d0\u05d7\u05e8\u05d9 \u05d6\u05de\u05df \u05d4\u05e9\u05e8\u05ea.",
+      "\u05d4\u05e2\u05e8\u05d4: \u05d0\u05ea/\u05d4 %s \u05e9\u05e2\u05d5\u05ea \u05d0\u05d7\u05e8\u05d9 \u05d6\u05de\u05df \u05d4\u05e9\u05e8\u05ea.",
+      "\u05d4\u05e2\u05e8\u05d4: \u05d0\u05ea/\u05d4 %s \u05e9\u05e2\u05d5\u05ea \u05d0\u05d7\u05e8\u05d9 \u05d6\u05de\u05df \u05d4\u05e9\u05e8\u05ea.",
       "\u05d4\u05e2\u05e8\u05d4: \u05d0\u05ea/\u05d4 %s \u05e9\u05e2\u05d5\u05ea \u05d0\u05d7\u05e8\u05d9 \u05d6\u05de\u05df \u05d4\u05e9\u05e8\u05ea."
     ],
     "Noted in:": "\u05e6\u05d5\u05d9\u05d9\u05df \u05d1:",
@@ -1731,7 +1737,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -1795,9 +1801,9 @@
       "%d %B, %Y"
     ],
     "DECIMAL_SEPARATOR": ".",
-    "FIRST_DAY_OF_WEEK": "0",
+    "FIRST_DAY_OF_WEEK": 0,
     "MONTH_DAY_FORMAT": "j \u05d1F",
-    "NUMBER_GROUPING": "0",
+    "NUMBER_GROUPING": 0,
     "SHORT_DATETIME_FORMAT": "d/m/Y H:i",
     "SHORT_DATE_FORMAT": "d/m/Y",
     "THOUSAND_SEPARATOR": ",",

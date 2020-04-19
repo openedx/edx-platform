@@ -26,6 +26,8 @@
     ],
     "6 a.m.": "6 a.m.",
     "6 p.m.": "6 p.m.",
+    "April": "Prill",
+    "August": "Gusht",
     "Available %s": "%s i gatsh\u00ebm",
     "Cancel": "Anuloje",
     "Choose": "Zgjidhni",
@@ -36,9 +38,16 @@
     "Chosen %s": "U zgjodh %s",
     "Click to choose all %s at once.": "Klikoni q\u00eb t\u00eb zgjidhen krejt %s nj\u00ebher\u00ebsh.",
     "Click to remove all chosen %s at once.": "Klikoni q\u00eb t\u00eb hiqen krejt %s e zgjedhura nj\u00ebher\u00ebsh.",
+    "December": "Dhjetor",
     "Error": "Problem",
+    "February": "Shkurt",
     "Filter": "Filtro",
     "Hide": "Fshihe",
+    "January": "Janar",
+    "July": "Korrik",
+    "June": "Qershor",
+    "March": "Mars",
+    "May": "Maj",
     "Midnight": "Mesnat\u00eb",
     "Noon": "Mesdit\u00eb",
     "Not Selected": "E pa selektuar",
@@ -50,11 +59,14 @@
       "Sh\u00ebnim: Jeni %s or\u00eb pas koh\u00ebs s\u00eb sh\u00ebrbyesit.",
       "Sh\u00ebnim: Jeni %s or\u00eb pas koh\u00ebs s\u00eb sh\u00ebrbyesit."
     ],
+    "November": "N\u00ebntor",
     "Now": "Tani",
+    "October": "Tetor",
     "Option Deleted": "Opsioni u fshia",
     "Remove": "Hiqe",
     "Remove all": "Hiqi krejt",
     "Saving...": "Ruaj...",
+    "September": "Shtator",
     "Show": "Shfaqe",
     "Status of Your Response": "Statusi i p\u00ebrgjigjjes suaj",
     "This is the list of available %s. You may choose some by selecting them in the box below and then clicking the \"Choose\" arrow between the two boxes.": "Kjo \u00ebsht\u00eb lista e %s t\u00eb gatsh\u00ebm. Mund t\u00eb zgjidhni disa duke i p\u00ebrzgjedhur te kutiza m\u00eb posht\u00eb dhe mandej duke klikuar mbi shigjet\u00ebn \"Zgjidhe\" mes dy kutizave.",
@@ -70,7 +82,14 @@
     "Yesterday": "Dje",
     "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "Keni p\u00ebrzgjedhur nj\u00eb veprim, dhe nuk keni b\u00ebr\u00eb ndonj\u00eb ndryshim te fusha individuale. Ndoshta po k\u00ebrkonit p\u00ebr butonin Shko, n\u00eb vend se p\u00ebr butonin Ruaje.",
     "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "Keni p\u00ebrzgjedhur nj\u00eb veprim, por nuk keni ruajtur ende ndryshimet q\u00eb b\u00ebt\u00eb te fusha individuale. Ju lutemi, klikoni OK q\u00eb t\u00eb b\u00ebhet ruajtja. Do t\u2019ju duhet ta rib\u00ebni veprimin.",
-    "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "Keni ndryshime t\u00eb paruajtura te fusha individuale t\u00eb ndryshueshme. N\u00ebse kryeni nj\u00eb veprim, ndryshimet e paruajtura do t\u00eb humbin."
+    "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "Keni ndryshime t\u00eb paruajtura te fusha individuale t\u00eb ndryshueshme. N\u00ebse kryeni nj\u00eb veprim, ndryshimet e paruajtura do t\u00eb humbin.",
+    "one letter Friday\u0004F": "P",
+    "one letter Monday\u0004M": "H",
+    "one letter Saturday\u0004S": "S",
+    "one letter Sunday\u0004S": "D",
+    "one letter Thursday\u0004T": "E",
+    "one letter Tuesday\u0004T": "M",
+    "one letter Wednesday\u0004W": "M"
   };
   for (var key in newcatalog) {
     django.catalog[key] = newcatalog[key];
@@ -92,7 +111,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -156,9 +175,9 @@
       "%d %B, %Y"
     ],
     "DECIMAL_SEPARATOR": ",",
-    "FIRST_DAY_OF_WEEK": "0",
+    "FIRST_DAY_OF_WEEK": 0,
     "MONTH_DAY_FORMAT": "j F",
-    "NUMBER_GROUPING": "0",
+    "NUMBER_GROUPING": 0,
     "SHORT_DATETIME_FORMAT": "m/d/Y P",
     "SHORT_DATE_FORMAT": "Y-m-d",
     "THOUSAND_SEPARATOR": ".",

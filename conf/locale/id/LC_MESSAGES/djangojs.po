@@ -80,7 +80,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-05 20:42+0000\n"
+"POT-Creation-Date: 2020-04-12 20:42+0000\n"
 "PO-Revision-Date: 2019-09-29 20:43+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)\n"
@@ -5380,6 +5380,14 @@ msgstr "Buka Semua"
 msgid "Collapse All"
 msgstr "Tutup Semua"
 
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr "Tampilkan Lagi"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr "Tampilkan Lebih Sedikit"
+
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
@@ -7482,14 +7490,6 @@ msgid ""
 msgstr ""
 "Untuk menerima kredit untuk permasalahan, Anda harus memilih \"Kirim\" untuk"
 " setiap permasalahan sebelum Anda memilih \"Akhiri Ujian Saya\"."
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show More"
-msgstr "Tampilkan Lagi"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show Less"
-msgstr "Tampilkan Lebih Sedikit"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "Exam timer and end exam button"

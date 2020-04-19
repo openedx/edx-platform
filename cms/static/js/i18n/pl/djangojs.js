@@ -46,10 +46,10 @@
     "%(new_item_message)s": "%(new_item_message)s",
     "%(programName)s Home Page.": "Strona g\u0142\u00f3wna programu %(programName)s.",
     "%(sel)s of %(cnt)s selected": [
-      "Zaznaczono %(sel)s z %(cnt)s",
-      "Zaznaczono %(sel)s z %(cnt)s",
-      "Zaznaczono %(sel)s z %(cnt)s",
-      "Zaznaczono %(sel)s z %(cnt)s"
+      "Wybrano %(sel)s z %(cnt)s",
+      "Wybrano %(sel)s z %(cnt)s",
+      "Wybrano %(sel)s z %(cnt)s",
+      "Wybrano %(sel)s z %(cnt)s"
     ],
     "%(type)s Component Template Menu": "%(type)s menu szablon\u00f3w elementu",
     "(Add signatories for a certificate)": "(Dodaj sygnatariuszy certyfikatu)",
@@ -1792,7 +1792,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -1845,9 +1845,9 @@
       "%Y-%m-%d"
     ],
     "DECIMAL_SEPARATOR": ",",
-    "FIRST_DAY_OF_WEEK": "1",
-    "MONTH_DAY_FORMAT": "j F",
-    "NUMBER_GROUPING": "3",
+    "FIRST_DAY_OF_WEEK": 1,
+    "MONTH_DAY_FORMAT": "j E",
+    "NUMBER_GROUPING": 3,
     "SHORT_DATETIME_FORMAT": "d-m-Y  H:i",
     "SHORT_DATE_FORMAT": "d-m-Y",
     "THOUSAND_SEPARATOR": "\u00a0",

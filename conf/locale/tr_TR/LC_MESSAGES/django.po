@@ -129,7 +129,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-12 20:42+0000\n"
+"POT-Creation-Date: 2020-04-19 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -6042,6 +6042,14 @@ msgstr "Bu ders için erişime sahip değilsiniz"
 msgid "You do not have access to this course on a mobile device"
 msgstr "Bu ders için mobil cihazlardan erişime sahip değilsiniz"
 
+#: lms/djangoapps/courseware/access_response.py
+msgid "You must be enrolled in the course"
+msgstr ""
+
+#: lms/djangoapps/courseware/access_response.py
+msgid "You must be logged in to see this course"
+msgstr ""
+
 #: lms/djangoapps/courseware/course_tools.py
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade to Verified"
@@ -9132,6 +9140,10 @@ msgstr "{course_id} dersinden {user} kullanıcısının kaydı silindi"
 msgid "Refunded {cost} for order id {order_id}"
 msgstr "Kimliği {order_id} olan sipariş için {cost} iade edildi."
 
+#: lms/djangoapps/survey/utils.py
+msgid "You must complete a survey"
+msgstr ""
+
 #: lms/djangoapps/teams/models.py
 msgid "Optional language the team uses as ISO 639-1 code."
 msgstr "Takımın ISO 639-1 kodu olarak kullandığı isteğe bağlı dil."
@@ -11779,15 +11791,6 @@ msgid ""
 "{link_start}{provider} account{link_end}."
 msgstr ""
 
-#. Translators: This example email address is used as a placeholder in
-#. a field on the login form meant to hold the user's email address.
-#. Translators: This example email address is used as a placeholder in
-#. a field on the password reset form meant to hold the user's email address.
-#: openedx/core/djangoapps/user_authn/views/login_form.py
-#: openedx/core/djangoapps/user_authn/views/password_reset.py
-msgid "username@domain.com"
-msgstr "mehmet@siteadi.com"
-
 #. Translators: These instructions appear on the login form, immediately
 #. below a field meant to hold the user's email address.
 #. Translators: These instructions appear on the password reset form,
@@ -11803,6 +11806,12 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/views/login_form.py
 msgid "Create Account"
 msgstr "Hesap Oluştur"
+
+#. Translators: This example email address is used as a placeholder in
+#. a field on the password reset form meant to hold the user's email address.
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "username@domain.com"
+msgstr "mehmet@siteadi.com"
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid ""

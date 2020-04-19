@@ -64,7 +64,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-05 20:42+0000\n"
+"POT-Creation-Date: 2020-04-12 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Abel Camacho <abelcama@gmail.com>, 2019\n"
 "Language-Team: Basque (Spain) (https://www.transifex.com/open-edx/teams/6205/eu_ES/)\n"
@@ -7711,9 +7711,11 @@ msgid "{mode_name} for course {course}"
 msgstr "{mode_name} {course} ikastarorako"
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid ""
-"You can unenroll in the course and receive a full refund for 14 days after "
-"the course start date. "
+"To receive a refund you may unenroll from the course on your edX Dashboard "
+"({dashboard_url}) up to 14 days after your payment or 14 days after your "
+"course starts (up to six months after your payment).\n"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
@@ -7726,15 +7728,14 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
 "You can unenroll in the course and receive a full refund for 2 days after "
-"the course start date. "
+"the course start date.\n"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
 msgid ""
-"{refund_reminder_msg}To receive your refund, contact {billing_email}. Please"
-" include your order number in your email. Please do NOT include your credit "
-"card information."
+"{refund_reminder_msg}For help unenrolling, Please see How do I unenroll from"
+" a course? ({how_to_unenroll_link}) in our edX HelpCenter."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
@@ -8477,11 +8478,15 @@ msgid "The supplied course_id {course_id} is not valid."
 msgstr "Emandako {course_id} ikastaro_id-a ez da baliagarria."
 
 #: lms/djangoapps/teams/views.py
-msgid "You are already in a team in this course."
-msgstr "Dagoeneko ikastaro honetan taldean zaude."
+msgid "topic_id is required"
+msgstr ""
 
 #: lms/djangoapps/teams/views.py
 msgid "You can't create a team in an instructor managed topic."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "You are already in a team in this teamset."
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
@@ -13058,7 +13063,6 @@ msgstr "Errorea gertatu da {platform_name} plataformako zerbitzarietan"
 
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
-#: lms/templates/courseware/error-message.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
 " fix it as soon as possible. Please email us at {tech_support_email} to "
@@ -13163,6 +13167,18 @@ msgstr "E-posta"
 #, python-format
 msgid "Return To %s"
 msgstr "Itzuli hona: %s"
+
+#: lms/templates/reset_deadlines_banner.html
+msgid "It looks like you've missed some important deadlines. Visit "
+msgstr ""
+
+#: lms/templates/reset_deadlines_banner.html
+msgid "edx.org"
+msgstr ""
+
+#: lms/templates/reset_deadlines_banner.html
+msgid " to reset your deadlines and get started today."
+msgstr ""
 
 #: lms/templates/reset_deadlines_banner.html
 msgid ""
@@ -15005,8 +15021,9 @@ msgid "You are enrolled in this course"
 msgstr "Ikastaro honetan matrikulatuta zaude"
 
 #: lms/templates/courseware/course_about.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
 #: lms/templates/shoppingcart/registration_code_receipt.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
 msgid "View Course"
 msgstr "Ikusi ikastaroa"
 
@@ -15194,6 +15211,12 @@ msgid ""
 "{a_start}Upgrade{a_end}{space}to a Verified Certificate for full access."
 msgstr ""
 
+#: lms/templates/courseware/error-message.html
+msgid ""
+"We're sorry, this module is temporarily unavailable. Our staff is working to"
+" fix it as soon as possible."
+msgstr ""
+
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
 msgstr "Kalifikazio-liburua"
@@ -15244,8 +15267,9 @@ msgid "Welcome to {course_title}!"
 msgstr ""
 
 #: lms/templates/courseware/info.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
 msgid "Resume Course"
 msgstr ""
 
@@ -19135,12 +19159,8 @@ msgstr "Konfirmazioa"
 #: lms/templates/static_templates/404.html
 msgid ""
 "The page that you were looking for was not found. Go back to the "
-"{link_start}homepage{link_end} or let us know about any pages that may have "
-"been moved at {email}."
+"{link_start}homepage{link_end} ."
 msgstr ""
-"Bilatzen ari zaren orria ez da aurkitu. Itzuli {link_start}hasiera-"
-"orrira{link_end} edo jakinarazi guri zein orri ezabatu edo desagertu diren "
-"hona idatziz: {email}."
 
 #: lms/templates/static_templates/about.html
 #: lms/templates/static_templates/blog.html
@@ -19189,7 +19209,6 @@ msgstr ""
 #: lms/templates/static_templates/server-overloaded.html
 msgid ""
 "Our staff is currently working to get the site back up as soon as possible. "
-"Please email us at {tech_support_email} to report any problems or downtime."
 msgstr ""
 
 #: lms/templates/static_templates/server-error.html
@@ -19197,12 +19216,8 @@ msgid "There has been a 500 error on the {platform_name} servers"
 msgstr "500 errorea gertatu da {platform_name} zerbitzarietan"
 
 #: lms/templates/static_templates/server-error.html
-msgid ""
-"Please wait a few seconds and then reload the page. If the problem persists,"
-" please email us at {email}."
+msgid "Please wait a few seconds and then reload the page."
 msgstr ""
-"Mesedez, itxaron segundu batzuk eta ondoren eguneratu orria. Arazoak irauten"
-" badu, mesedez, bidali e-posta  {email}-ra."
 
 #: lms/templates/static_templates/server-overloaded.html
 msgid "Currently the {platform_name} servers are overloaded"
@@ -19665,6 +19680,10 @@ msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/next-up-banner-fragment.html
 msgid "Get started on what's next: "
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
+msgid "Show More"
 msgstr ""
 
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html

@@ -163,7 +163,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-05 20:42+0000\n"
+"POT-Creation-Date: 2020-04-12 20:42+0000\n"
 "PO-Revision-Date: 2019-09-29 20:43+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -5541,6 +5541,14 @@ msgstr "Expandir todo"
 msgid "Collapse All"
 msgstr "Colapsar todo"
 
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr "Mostrar más"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr "Mostrar menos"
+
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
@@ -7770,14 +7778,6 @@ msgid ""
 msgstr ""
 "Para recibir crédito por problemas, debe seleccionar \"Enviar\" para cada "
 "problema antes de seleccionar \"Finalizar mi examen\"."
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show More"
-msgstr "Mostrar más"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show Less"
-msgstr "Mostrar menos"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "Exam timer and end exam button"

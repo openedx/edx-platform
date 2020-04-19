@@ -99,7 +99,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-05 20:42+0000\n"
+"POT-Creation-Date: 2020-04-12 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019\n"
 "Language-Team: Indonesian (https://www.transifex.com/open-edx/teams/6205/id/)\n"
@@ -8302,9 +8302,11 @@ msgid "{mode_name} for course {course}"
 msgstr "{mode_name} untuk kursus {course}"
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid ""
-"You can unenroll in the course and receive a full refund for 14 days after "
-"the course start date. "
+"To receive a refund you may unenroll from the course on your edX Dashboard "
+"({dashboard_url}) up to 14 days after your payment or 14 days after your "
+"course starts (up to six months after your payment).\n"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
@@ -8317,15 +8319,14 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
 "You can unenroll in the course and receive a full refund for 2 days after "
-"the course start date. "
+"the course start date.\n"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
 msgid ""
-"{refund_reminder_msg}To receive your refund, contact {billing_email}. Please"
-" include your order number in your email. Please do NOT include your credit "
-"card information."
+"{refund_reminder_msg}For help unenrolling, Please see How do I unenroll from"
+" a course? ({how_to_unenroll_link}) in our edX HelpCenter."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
@@ -9057,11 +9058,15 @@ msgid "The supplied course_id {course_id} is not valid."
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
-msgid "You are already in a team in this course."
+msgid "topic_id is required"
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
 msgid "You can't create a team in an instructor managed topic."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "You are already in a team in this teamset."
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
@@ -13764,7 +13769,6 @@ msgstr "Terjadi kesalahan pada server {platform_name}"
 
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
-#: lms/templates/courseware/error-message.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
 " fix it as soon as possible. Please email us at {tech_support_email} to "
@@ -13876,6 +13880,18 @@ msgstr "Email"
 #, python-format
 msgid "Return To %s"
 msgstr "Kembali ke %s"
+
+#: lms/templates/reset_deadlines_banner.html
+msgid "It looks like you've missed some important deadlines. Visit "
+msgstr ""
+
+#: lms/templates/reset_deadlines_banner.html
+msgid "edx.org"
+msgstr ""
+
+#: lms/templates/reset_deadlines_banner.html
+msgid " to reset your deadlines and get started today."
+msgstr ""
 
 #: lms/templates/reset_deadlines_banner.html
 msgid ""
@@ -16108,8 +16124,9 @@ msgid "You are enrolled in this course"
 msgstr "Anda terdaftar pada pelatihan ini"
 
 #: lms/templates/courseware/course_about.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
 #: lms/templates/shoppingcart/registration_code_receipt.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
 msgid "View Course"
 msgstr "Lihat Kursus"
 
@@ -16309,6 +16326,12 @@ msgid ""
 "{a_start}Upgrade{a_end}{space}to a Verified Certificate for full access."
 msgstr ""
 
+#: lms/templates/courseware/error-message.html
+msgid ""
+"We're sorry, this module is temporarily unavailable. Our staff is working to"
+" fix it as soon as possible."
+msgstr ""
+
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
 msgstr "Buku nilai"
@@ -16361,8 +16384,9 @@ msgid "Welcome to {course_title}!"
 msgstr "Selamat datang di {course_title}!"
 
 #: lms/templates/courseware/info.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
 msgid "Resume Course"
 msgstr "Ringkas Pelatihan"
 
@@ -20632,12 +20656,8 @@ msgstr "Konfirmasi"
 #: lms/templates/static_templates/404.html
 msgid ""
 "The page that you were looking for was not found. Go back to the "
-"{link_start}homepage{link_end} or let us know about any pages that may have "
-"been moved at {email}."
+"{link_start}homepage{link_end} ."
 msgstr ""
-"Halaman yang Anda cari tidak ditemukan. Kembali ke {link_start} beranda "
-"{link_end} atau beri tahu kami tentang laman apa pun yang mungkin telah "
-"dipindahkan ke {email}."
 
 #: lms/templates/static_templates/about.html
 #: lms/templates/static_templates/blog.html
@@ -20693,23 +20713,15 @@ msgstr "Saat ini, server  {platform_name} sedang down"
 #: lms/templates/static_templates/server-overloaded.html
 msgid ""
 "Our staff is currently working to get the site back up as soon as possible. "
-"Please email us at {tech_support_email} to report any problems or downtime."
 msgstr ""
-"Staf kami saat ini sedang berusaha mengembalikan situs sesegera mungkin. "
-"Silakan kirim email kepada kami di {tech_support_email} untuk melaporkan "
-"masalah atau downtime apa pun."
 
 #: lms/templates/static_templates/server-error.html
 msgid "There has been a 500 error on the {platform_name} servers"
 msgstr "Terjadi eror 500 di server {platform_name}"
 
 #: lms/templates/static_templates/server-error.html
-msgid ""
-"Please wait a few seconds and then reload the page. If the problem persists,"
-" please email us at {email}."
+msgid "Please wait a few seconds and then reload the page."
 msgstr ""
-"Harap tunggu beberapa detik lalu muat ulang halaman. Jika permasalahan masih"
-" terjadi, silahkan kirim email kepada kami di {email}."
 
 #: lms/templates/static_templates/server-overloaded.html
 msgid "Currently the {platform_name} servers are overloaded"
@@ -21202,6 +21214,10 @@ msgstr "Perbaruan terakhir"
 
 #: openedx/features/course_experience/templates/course_experience/next-up-banner-fragment.html
 msgid "Get started on what's next: "
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
+msgid "Show More"
 msgstr ""
 
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html

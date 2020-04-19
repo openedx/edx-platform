@@ -1826,7 +1826,7 @@
     "You have not created any certificates yet.": "Vous n'avez pas encore cr\u00e9e de certificat.",
     "You have not created any content groups yet.": "Vous n'avez pas encore cr\u00e9\u00e9 de groupes de contenu.",
     "You have not created any group configurations yet.": "Vous n'avez pas encore cr\u00e9\u00e9 de configuration des groupes.",
-    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "Vous avez s\u00e9lectionn\u00e9 une action, et vous n'avez fait aucune modification sur des champs. Vous cherchez probablement le bouton Envoyer et non le bouton Sauvegarder.",
+    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "Vous avez s\u00e9lectionn\u00e9 une action, et vous n'avez fait aucune modification sur des champs. Vous cherchez probablement le bouton Envoyer et non le bouton Enregistrer.",
     "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "Vous avez s\u00e9lectionn\u00e9 une action, mais vous n'avez pas encore sauvegard\u00e9 certains champs modifi\u00e9s. Cliquez sur OK pour sauver. Vous devrez r\u00e9appliquer l'action.",
     "You have successfully signed into %(currentProvider)s, but your %(currentProvider)s account does not have a linked %(platformName)s account. To link your accounts, sign in now using your %(platformName)s password.": "Vous \u00eates connect\u00e9 \u00e0 %(currentProvider)s avec succ\u00e8s,mais votre compte %(currentProvider)s n'est pas reli\u00e9 \u00e0 votre compte %(platformName)s. Pour lier vos comptes, connectez-vous en utilisant votre mot de passe %(platformName)s.",
     "You have unsaved changes are you sure you want to navigate away?": "Vous avez des modifications non enregistr\u00e9es, \u00eates-vous s\u00fbr de vouloir quitter cette page ?",
@@ -2051,7 +2051,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -2109,9 +2109,9 @@
       "%Y-%m-%d"
     ],
     "DECIMAL_SEPARATOR": ",",
-    "FIRST_DAY_OF_WEEK": "1",
+    "FIRST_DAY_OF_WEEK": 1,
     "MONTH_DAY_FORMAT": "j F",
-    "NUMBER_GROUPING": "3",
+    "NUMBER_GROUPING": 3,
     "SHORT_DATETIME_FORMAT": "j N Y H:i",
     "SHORT_DATE_FORMAT": "j N Y",
     "THOUSAND_SEPARATOR": "\u00a0",
