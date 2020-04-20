@@ -129,6 +129,7 @@ pyjwkest
 # TODO Replace PyJWT usage with pyjwkest
 # PyJWT 1.6.3 contains PyJWTError, which is required by Apple auth in social-auth-core
 PyJWT>=1.6.3
+pylti1p3                            # Required by content_libraries core library to suport LTI 1.3 launches
 pymongo                             # MongoDB driver
 pynliner                            # Inlines CSS styles into HTML for email notifications
 python-dateutil
@@ -163,4 +164,3 @@ XBlock                              # Courseware component architecture
 xblock-utils                        # Provides utilities used by the Discussion XBlock
 xss-utils                           # https://github.com/edx/edx-platform/pull/20633 Fix XSS via Translations
 enmerkar-underscore                 # Implements a underscore extractor for django-babel.
-

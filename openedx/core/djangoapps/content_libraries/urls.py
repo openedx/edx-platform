@@ -46,5 +46,10 @@ urlpatterns = [
             # Future: publish/discard changes for just this one block
             # Future: set a block's tags (tags are stored in a Tag bundle and linked in)
         ])),
+        url(r'^lti/1.3/', include([
+            url(r'^login/$', views.LtiToolLoginView.as_view(), name='lti-login'),
+            url(r'^launch/$', views.LtiToolLaunchView.as_view(), name='lti-launch'),
+            url(r'^pub/jwks/$', views.LtiToolJwksView.as_view(), name='lti-pub-jwks'),
+        ])),
     ])),
 ]
