@@ -17,8 +17,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
-from edx_django_utils.cache import TieredCache
-from edx_django_utils.cache.utils import get_cache_key
+from edx_django_utils.cache import TieredCache, get_cache_key
 from edx_rest_api_client.client import EdxRestApiClient
 from slumber.exceptions import HttpClientError, HttpNotFoundError, HttpServerError
 
