@@ -8,8 +8,7 @@ import json
 from crum import get_current_request
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from edx_django_utils.cache import TieredCache
-from edx_django_utils.cache.utils import get_cache_key
+from edx_django_utils.cache import TieredCache, get_cache_key
 from enterprise.models import EnterpriseCustomerUser
 from social_django.models import UserSocialAuth
 
