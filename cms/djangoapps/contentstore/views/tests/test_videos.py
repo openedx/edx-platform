@@ -731,6 +731,11 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         status = convert_video_status(video, is_video_encodes_ready=True)
         self.assertEqual(status, StatusDisplayStrings.get('file_complete'))
 
+        # The encode status should be converted to `file_complete` if video encodes are complete
+        video['status'] = 'partial_failure'
+        status = convert_video_status(video, is_video_encodes_ready=True)
+        self.assertEqual(status, StatusDisplayStrings.get('file_complete'))
+
         # for all other status, there should not be any conversion
         statuses = list(StatusDisplayStrings._STATUS_MAP.keys())  # pylint: disable=protected-access
         statuses.remove('invalid_token')
