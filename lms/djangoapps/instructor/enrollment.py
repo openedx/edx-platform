@@ -44,6 +44,7 @@ from student.models import (
     anonymous_id_for_user,
     is_email_retired,
 )
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from submissions import api as sub_api  # installed from the edx-submissions repository
 from submissions.models import score_set
 from track.event_transaction_utils import (
@@ -455,6 +456,10 @@ def send_mail_to_student(student, param_dict, language=None):
         'SITE_NAME',
         param_dict['site_name']
     )
+
+    # Get other required context variables for current site
+    context_vars = get_base_template_context(param_dict['site_name'])
+    param_dict.update(context_vars)
 
     # see if there is an activation email template definition available as configuration,
     # if so, then render that
