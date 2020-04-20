@@ -610,6 +610,7 @@ EDX_ROOT_URL = ''
 # use the ratelimit backend to prevent brute force attacks
 AUTHENTICATION_BACKENDS = [
     'rules.permissions.ObjectPermissionBackend',
+    'openedx.core.djangoapps.content_libraries.auth.LtiAuthenticationBackend',
     'openedx.core.djangoapps.oauth_dispatch.dot_overrides.backends.EdxRateLimitedAllowAllUsersModelBackend',
     'bridgekeeper.backends.RulePermissionBackend',
 ]
@@ -1587,6 +1588,9 @@ INSTALLED_APPS = [
 
     # Database-backed Organizations App (http://github.com/edx/edx-organizations)
     'organizations',
+
+    # Content Library LTI 1.3 Support.
+    'pylti1p3.contrib.django.lti1p3_tool_config'
 ]
 
 

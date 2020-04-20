@@ -37,6 +37,10 @@ URL_LIB_BLOCK_OLX = URL_LIB_BLOCK + 'olx/'  # Get or set the OLX of the specifie
 URL_LIB_BLOCK_ASSETS = URL_LIB_BLOCK + 'assets/'  # List the static asset files of the specified XBlock
 URL_LIB_BLOCK_ASSET_FILE = URL_LIB_BLOCK + 'assets/{file_name}'  # Get, delete, or upload a specific static asset file
 
+URL_LIB_LTI_PREFIX = URL_PREFIX + 'lti/1.3/'
+URL_LIB_LTI_JWKS = URL_LIB_LTI_PREFIX + 'pub/jwks/'
+URL_LIB_LTI_LAUNCH = URL_LIB_LTI_PREFIX + 'launch/'
+
 URL_BLOCK_RENDER_VIEW = '/api/xblock/v2/xblocks/{block_key}/view/{view_name}/'
 URL_BLOCK_GET_HANDLER_URL = '/api/xblock/v2/xblocks/{block_key}/handler_url/{handler_name}/'
 URL_BLOCK_METADATA_URL = '/api/xblock/v2/xblocks/{block_key}/'

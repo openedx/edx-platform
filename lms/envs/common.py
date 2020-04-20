@@ -3090,6 +3090,9 @@ INSTALLED_APPS = [
     # in the LMS process at the moment, so anything that has Django admin access
     # permissions needs to be listed as an LMS app or the script will fail.
     'user_tasks',
+
+    # Content Library LTI 1.3 Support.
+    'pylti1p3.contrib.django.lti1p3_tool_config',
 ]
 
 ######################### CSRF #########################################

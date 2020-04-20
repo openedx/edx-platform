@@ -19,7 +19,16 @@ class ContentLibraryAdmin(admin.ModelAdmin):
     """
     Definition of django admin UI for Content Libraries
     """
-    fields = ("library_key", "org", "slug", "bundle_uuid", "allow_public_learning", "allow_public_read")
+
+    fields = (
+        "library_key",
+        "org",
+        "slug",
+        "bundle_uuid",
+        "allow_public_learning",
+        "allow_public_read",
+        "lti_tool",
+    )
     list_display = ("slug", "org", "bundle_uuid")
     inlines = (ContentLibraryPermissionInline, )
 
