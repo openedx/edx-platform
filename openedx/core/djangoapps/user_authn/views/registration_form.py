@@ -4,6 +4,7 @@ Objects and utilities used to construct registration forms.
 
 
 import copy
+import json
 from importlib import import_module
 import re
 
@@ -1097,3 +1098,13 @@ class RegistrationFormFactory(object):
                         default=current_provider.name if current_provider.name else "Third Party",
                         required=False,
                     )
+
+                    if hasattr(current_provider, 'other_settings'):
+                        if current_provider.other_settings:
+                            other_settings = json.loads(current_provider.other_settings)
+                            if 'PROVIDER_READ_ONLY_FIELDS' in other_settings:
+                                for field in other_settings['PROVIDER_READ_ONLY_FIELDS']:
+                                    form_desc.override_field_properties(
+                                        field,
+                                        restrictions={"readonly": "readonly"}
+                                    )
