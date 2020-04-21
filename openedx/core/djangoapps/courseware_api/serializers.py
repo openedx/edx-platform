@@ -79,6 +79,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     media = _CourseApiMediaCollectionSerializer(source='*')
     name = serializers.CharField(source='display_name_with_default_escaped')
     number = serializers.CharField(source='display_number_with_default')
+    offer_html = serializers.CharField()
     org = serializers.CharField(source='display_org_with_default')
     short_description = serializers.CharField()
     start = serializers.DateTimeField()
