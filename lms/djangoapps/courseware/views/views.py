@@ -1704,10 +1704,13 @@ FINANCIAL_ASSISTANCE_HEADER = _(
     ' Note that you must complete a separate application for each course you take.\n We plan to use this'
     ' information to evaluate your application for financial assistance and to further develop our'
     ' financial assistance program.'
-).format(
-    percent_sign="%",
-    platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
-).split('\n')
+)
+
+
+def _get_fa_header(header):
+    return header.\
+        format(percent_sign="%",
+               platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)).split('\n')
 
 
 FA_INCOME_LABEL = _('Annual Household Income')
@@ -1725,7 +1728,7 @@ FA_SHORT_ANSWER_INSTRUCTIONS = _('Use between 1250 and 2500 characters or so in 
 def financial_assistance(_request):
     """Render the initial financial assistance page."""
     return render_to_response('financial-assistance/financial-assistance.html', {
-        'header_text': FINANCIAL_ASSISTANCE_HEADER
+        'header_text': _get_fa_header(FINANCIAL_ASSISTANCE_HEADER)
     })
 
 
@@ -1810,7 +1813,7 @@ def financial_assistance_form(request):
         {'name': _(income), 'value': income} for income in incomes
     ]
     return render_to_response('financial-assistance/apply.html', {
-        'header_text': FINANCIAL_ASSISTANCE_HEADER,
+        'header_text': _get_fa_header(FINANCIAL_ASSISTANCE_HEADER),
         'student_faq_url': marketing_link('FAQ'),
         'dashboard_url': reverse('dashboard'),
         'account_settings_url': reverse('account_settings'),
