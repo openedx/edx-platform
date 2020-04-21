@@ -14,7 +14,7 @@ def upload_to_path(instance, filename, folder):
     )
 
 
-def pretty_date(time=False):
+def pretty_date(time):
     """
     Get a datetime object and return a pretty string like 'an hour ago',
     'Yesterday', '3 months ago', 'just now', etc
