@@ -23980,7 +23980,7 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid "Archived Courses"
-msgstr ""
+msgstr "الدورات المؤرشفة"
 
 #: cms/templates/index.html
 msgid "Libraries"
