@@ -4,6 +4,7 @@ Views related to operations on course objects
 from collections import defaultdict
 import copy
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 import json
 import logging
 import pytz
@@ -102,7 +103,8 @@ from .library import LIBRARIES_ENABLED, get_library_creator_status
 
 log = logging.getLogger(__name__)
 
-__all__ = ['course_info_handler', 'course_archive_handler', 'course_handler', 'course_listing',
+__all__ = ['course_info_handler', 'course_handler', 'course_listing',
+           'course_archive_handler', 'course_unarchive_handler',
            'course_info_update_handler', 'course_search_index_handler',
            'course_rerun_handler',
            'settings_handler',
@@ -286,18 +288,37 @@ def course_archive_handler(request, course_key_string=None):
     GET
         html: return home page after archiving the given course
     """
-    if request.method == 'GET':
-        if course_key_string:
-            course_key = CourseKey.from_string(course_key_string)
-            course_details = CourseDetails.fetch(course_key)
-            archive_settings = {
-                'start_date': course_details.start_date,
-                'end_date': (datetime.today() - timedelta(days=1)).replace(tzinfo=pytz.UTC),
-                'intro_video': course_details.intro_video
-            }
-            CourseDetails.update_from_json(course_key, archive_settings, request.user)
+    if request.method == 'GET' and course_key_string:
+        _update_end_date(request, course_key_string, (datetime.today() - timedelta(days=1)).replace(tzinfo=pytz.UTC))
 
     return redirect(reverse('home'))
+
+
+@login_required
+def course_unarchive_handler(request, course_key_string=None):
+    """
+    The restful handler to unarchive a course.
+    GET
+        html: return home page after archiving the given course
+    """
+    if request.method == 'GET' and course_key_string:
+        _update_end_date(request, course_key_string, (datetime.today() + relativedelta(years=1)).replace(tzinfo=pytz.UTC))
+
+    return redirect(reverse('home'))
+
+
+def _update_end_date(request, course_key_string, end_date):
+    """
+    Method to update end date of a course
+    """
+    course_key = CourseKey.from_string(course_key_string)
+    course_details = CourseDetails.fetch(course_key)
+    archive_settings = {
+        'start_date': course_details.start_date,
+        'end_date': end_date,
+        'intro_video': course_details.intro_video
+    }
+    CourseDetails.update_from_json(course_key, archive_settings, request.user)
 
 
 @login_required
@@ -750,6 +771,9 @@ def _process_courses_list(courses_iter, in_process_course_actions, split_archive
 
         formatted_course = format_course_for_view(course)
         if split_archived and course.has_ended():
+            formatted_course.update({
+                'unarchive_link': reverse_course_url('course_unarchive_handler', course.id),
+            })
             archived_courses.append(formatted_course)
         else:
             formatted_course.update({
