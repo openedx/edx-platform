@@ -7,6 +7,7 @@ CACHE_NAME = 'context_processor.dynamic_theming'
 EDLY_CACHE_NAME = 'context_processor.edly_app'
 DEFAULT_SERVICES_COOKIE_EXPIRY = 180
 CACHE_TIMEOUT = 60
+
 DEFAULT_COLOR_DICT = {
     'primary': '#3E99D4',
     'secondary': '#1197EA'
@@ -20,6 +21,7 @@ DEFAULT_BRANDING_DICT = {
     'logo': "https://edly-edx-theme-files.s3.amazonaws.com/st-lutherx-logo.png",
     'favicon': "https://edly-edx-theme-files.s3.amazonaws.com/favicon.ico",
 }
+
 
 DEFAULT_SERVICES_NOTIFICATIONS_URL = 'https://staging.staging.panel.backend.edly.io/api/v1/all_services_notifications/'
 DEFAULT_SERVICES_NOTIFICATIONS_COOKIE_DOMAIN = '.edly.io'
@@ -55,6 +57,12 @@ def edly_app_context(request):  # pylint: disable=unused-argument
         edly_app_context = {}
         edly_app_context.update(
             {
+                'edly_copyright_text': configuration_helpers.get_value('EDLY_COPYRIGHT_TEXT')
+            }
+        )
+
+        edly_app_context.update(
+            {
                 'services_notifications_url': configuration_helpers.get_value(
                     'SERVICES_NOTIFICATIONS_URL', DEFAULT_SERVICES_NOTIFICATIONS_URL
                 )
@@ -76,6 +84,7 @@ def edly_app_context(request):  # pylint: disable=unused-argument
                 )
             }
         )
+
         cache.set(EDLY_CACHE_NAME, edly_app_context, CACHE_TIMEOUT)
 
     return edly_app_context
