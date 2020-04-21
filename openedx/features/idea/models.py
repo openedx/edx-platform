@@ -5,6 +5,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
 from django_countries.fields import CountryField
+from model_utils.models import TimeStampedModel
 
 from functools import partial
 
@@ -55,7 +56,7 @@ class OrganizationBase(models.Model):
         abstract = True
 
 
-class Idea(OrganizationBase, Location, VisualAttachment):
+class Idea(OrganizationBase, Location, TimeStampedModel, VisualAttachment):
     user = models.ForeignKey(User, related_name='ideas', related_query_name='idea', on_delete=models.CASCADE)
     title = models.CharField(max_length=TITLE_MAX_LENGTH)
     overview = models.CharField(max_length=OVERVIEW_MAX_LENGTH)
