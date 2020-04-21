@@ -9,13 +9,14 @@ This management command will manually trigger the receivers we care about.
 (We don't want to trigger all receivers for these signals, since these are busy
 signals.)
 """
-from __future__ import absolute_import, division, print_function
+
 
 import logging
 import math
 import sys
 import time
 
+from datetime import datetime, timedelta
 import dateutil.parser
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
@@ -64,9 +65,10 @@ def paged_query(queryset, delay, page_size):
 
         if delay and page:
             time.sleep(delay)
-
-        for i, item in enumerate(subquery, start=1):
-            yield page_start + i, item
+        index = 0
+        for item in subquery.iterator():
+            index += 1
+            yield page_start + index, item
 
 
 class Command(BaseCommand):
@@ -137,6 +139,11 @@ class Command(BaseCommand):
             help="Number of items to query at once.",
         )
         parser.add_argument(
+            '--auto',
+            action='store_true',
+            help='Use to run the management command periodically',
+        )
+        parser.add_argument(
             '--args-from-database',
             action='store_true',
             help='Use arguments from the NotifyCredentialsConfig model instead of the command line.',
@@ -163,11 +170,20 @@ class Command(BaseCommand):
         if options['args_from_database']:
             options = self.get_args_from_database()
 
+        if options['auto']:
+            options['end_date'] = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+            options['start_date'] = options['end_date'] - timedelta(days=1)
+
         log.info(
-            u"notify_credentials starting, dry-run=%s, site=%s, delay=%d seconds",
+            u"notify_credentials starting, dry-run=%s, site=%s, delay=%d seconds, page_size=%d, "
+            u"from=%s, to=%s, execution=%s",
             options['dry_run'],
             options['site'],
-            options['delay']
+            options['delay'],
+            options['page_size'],
+            options['start_date'] if options['start_date'] else 'NA',
+            options['end_date'] if options['end_date'] else 'NA',
+            'auto' if options['auto'] else 'manual',
         )
 
         try:

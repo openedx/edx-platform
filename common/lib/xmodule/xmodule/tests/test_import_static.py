@@ -1,7 +1,7 @@
 """
 Tests that check that we ignore the appropriate files when importing courses.
 """
-from __future__ import absolute_import
+
 
 import unittest
 
@@ -19,7 +19,9 @@ from xmodule.tests import DATA_DIR
 
 
 class IgnoredFilesTestCase(unittest.TestCase):
-    "Tests for ignored files"
+    """
+    Tests for ignored files
+    """
     course_dir = DATA_DIR / "course_ignore"
     dict_list = [DOT_FILES_DICT, TILDA_FILES_DICT]
 
@@ -47,8 +49,8 @@ class IgnoredFilesTestCase(unittest.TestCase):
         name_val = {sc.name: sc.data for sc in saved_static_content}
         self.assertIn("example.txt", name_val)
         self.assertIn(".example.txt", name_val)
-        self.assertIn("GREEN", name_val["example.txt"])
-        self.assertIn("BLUE", name_val[".example.txt"])
+        self.assertIn(b"GREEN", name_val["example.txt"])
+        self.assertIn(b"BLUE", name_val[".example.txt"])
         self.assertNotIn("._example.txt", name_val)
         self.assertNotIn(".DS_Store", name_val)
         self.assertNotIn("example.txt~", name_val)

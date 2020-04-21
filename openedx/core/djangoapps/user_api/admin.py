@@ -1,14 +1,14 @@
 """
 Django admin configuration pages for the user_api app
 """
-from __future__ import absolute_import
+
 
 from django.conf.urls import url
 from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.template.response import TemplateResponse
+from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import ugettext as _
 

@@ -1,7 +1,7 @@
 """
 Tests for permissions defined in courseware.rules
 """
-from __future__ import absolute_import
+
 
 import ddt
 import six

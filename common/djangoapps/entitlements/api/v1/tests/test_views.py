@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 import json
 import logging
@@ -14,7 +14,7 @@ from opaque_keys.edx.locator import CourseKey
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.models import DynamicUpgradeDeadlineConfiguration
+from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
@@ -140,6 +140,59 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
             course_uuid=course_uuid
         )
         assert results == CourseEntitlementSerializer(course_entitlement).data
+
+    def test_add_duplicate_entitlement(self):
+        """
+        Request with identical course_uuid and order_number should not create duplicate
+        entitlement
+        """
+        course_uuid = uuid.uuid4()
+        entitlement_data = self._get_data_set(self.user, str(course_uuid))
+
+        response = self.client.post(
+            self.entitlements_list_url,
+            data=json.dumps(entitlement_data),
+            content_type='application/json',
+        )
+        assert response.status_code == 201
+        response = self.client.post(
+            self.entitlements_list_url,
+            data=json.dumps(entitlement_data),
+            content_type='application/json',
+        )
+        assert response.status_code == 400
+        course_entitlement = CourseEntitlement.objects.filter(
+            course_uuid=course_uuid,
+            order_number=entitlement_data['order_number']
+        )
+        assert course_entitlement.count() == 1
+
+    def test_order_number_null(self):
+        """
+        Test that for same course_uuid order_number set to null is treated as unique
+        entitlement
+        """
+        course_uuid = uuid.uuid4()
+        entitlement_data = self._get_data_set(self.user, str(course_uuid))
+        entitlement_data['order_number'] = None
+
+        response = self.client.post(
+            self.entitlements_list_url,
+            data=json.dumps(entitlement_data),
+            content_type='application/json',
+        )
+        assert response.status_code == 201
+        response = self.client.post(
+            self.entitlements_list_url,
+            data=json.dumps(entitlement_data),
+            content_type='application/json',
+        )
+        assert response.status_code == 201
+        course_entitlement = CourseEntitlement.objects.filter(
+            course_uuid=course_uuid,
+            order_number=entitlement_data['order_number']
+        )
+        assert course_entitlement.count() == 2
 
     def test_default_no_policy_entry(self):
         """

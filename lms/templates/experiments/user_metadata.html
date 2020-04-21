@@ -3,6 +3,7 @@
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
+import six
 %>
 <%
 user_metadata = {
@@ -15,6 +16,7 @@ user_metadata = {
         'upgrade_link',
         'upgrade_price',
         'audit_access_deadline',
+        'course_duration',
         'pacing_type',
         'has_staff_access',
         'forum_roles',
@@ -39,10 +41,19 @@ for datekey in (
         'enrollment_time',
         'course_start',
         'course_end',
-        'upgrade_deadline'
+        'dynamic_upgrade_deadline',
+        'course_upgrade_deadline',
+        'audit_access_deadline',
 ):
     user_metadata[datekey] = (
         context.get(datekey).isoformat() if context.get(datekey) else None
+    )
+
+for timedeltakey in (
+    'course_duration',
+):
+    user_metadata[timedeltakey] = (
+        context.get(timedeltakey).total_seconds() if context.get(timedeltakey) else None
     )
 
 course_key = context.get('course_key')
@@ -58,8 +69,8 @@ if course_key:
         }
 
         if not course_id:
-            user_metadata['course_id'] = unicode(course_key)
-    elif isinstance(course_key, basestring):
+            user_metadata['course_id'] = six.text_type(course_key)
+    elif isinstance(course_key, six.string_types):
         user_metadata['course_id'] = course_key
 
 %>

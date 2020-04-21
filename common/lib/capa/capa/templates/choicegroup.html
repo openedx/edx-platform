@@ -1,9 +1,12 @@
 <%page expression_filter="h"/>
-<%! from openedx.core.djangolib.markup import HTML %>
+<%!
+from openedx.core.djangolib.markup import HTML
+import six
+%>
 <%
   def is_radio_input(choice_id):
-    return input_type == 'radio' and ((isinstance(value, basestring) and (choice_id == value)) or (
-      not isinstance(value, basestring) and choice_id in value
+    return input_type == 'radio' and ((isinstance(value, six.string_types) and (choice_id == value)) or (
+      not isinstance(value, six.string_types) and choice_id in value
     ))
 %>
 <div class="choicegroup capa_inputtype" id="inputtype_${id}">
@@ -15,47 +18,39 @@
         <p class="question-description" id="${description_id}">${description_text}</p>
       % endfor
         % for choice_id, choice_label in choices:
+          <%
+            label_class = 'response-label field-label label-inline'
+            input_class = 'field-input input-' + input_type
+            input_checked = ''
+
+            if is_radio_input(choice_id) or (input_type != 'radio' and choice_id in value):
+              input_class += ' submitted'
+              if status.classname and not show_correctness == 'never':
+                label_class += ' choicegroup_' + status.classname
+          %>
           <div class="field">
-            <%
-              label_class = 'response-label field-label label-inline'
-            %>
-
-            <label id="${id}-${choice_id}-label"
-                ## If the student has selected this choice...
-                % if is_radio_input(choice_id):
-
-                    % if status.classname and not show_correctness == 'never':
-                        <% label_class += ' choicegroup_' + status.classname %>
-                    % endif
-                % endif
-                class="${label_class}"
-                ${describedby_html}
-                >
-                <input type="${input_type}" name="input_${id}${name_array_suffix}" id="input_${id}_${choice_id}" class="field-input input-${input_type}" value="${choice_id}"
+            <input type="${input_type}" name="input_${id}${name_array_suffix}" id="input_${id}_${choice_id}"
+              class="${input_class}" value="${choice_id}"
                 ## If the student selected this choice...
                 % if is_radio_input(choice_id):
                 checked="true"
                 % elif input_type != 'radio' and choice_id in value:
                 checked="true"
                 % endif
-                /> ${HTML(choice_label)}
-                % if is_radio_input(choice_id):
-                  % if not show_correctness == 'never' and status.classname != 'unanswered':
-                    <%include file="status_span.html" args="status=status, status_id=id"/>
-                  % endif
-                % endif
+            /><label id="${id}-${choice_id}-label" for="input_${id}_${choice_id}"
+                class="${label_class}"
+                ${describedby_html}
+                > ${HTML(choice_label)}
             </label>
           </div>
         % endfor
         <span id="answer_${id}"></span>
     </fieldset>
     <div class="indicator-container">
-        % if input_type == 'checkbox' or status.classname == 'unanswered':
-          % if show_correctness != 'never':
-            <%include file="status_span.html" args="status=status, status_id=id"/>
-          % else:
-            <%include file="status_span.html" args="status=status, status_id=id, hide_correctness=True"/>
-          % endif
+        % if show_correctness != 'never':
+          <%include file="status_span.html" args="status=status, status_id=id"/>
+        % else:
+          <%include file="status_span.html" args="status=status, status_id=id, hide_correctness=True"/>
         % endif
     </div>
     % if show_correctness == "never" and (value or status not in ['unsubmitted']):

@@ -1,7 +1,7 @@
 """
 Tests for Cohort API
 """
-from __future__ import absolute_import
+
 
 import json
 import tempfile
@@ -10,8 +10,8 @@ import ddt
 import six
 from six.moves import range
 from django.urls import reverse
-from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory, AccessTokenFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -54,8 +54,8 @@ class TestCohortOauth(SharedModuleStoreTestCase):
         """ Verify the endpoints supports OAuth, and only allows authorization for staff users. """
         path = reverse(path_name, kwargs={'course_key_string': self.course_str})
         user = UserFactory(is_staff=False)
-        oauth_client = ClientFactory.create()
-        access_token = AccessTokenFactory.create(user=user, client=oauth_client).token
+        oauth_client = ApplicationFactory.create()
+        access_token = AccessTokenFactory.create(user=user, application=oauth_client).token
         headers = {
             'HTTP_AUTHORIZATION': 'Bearer ' + access_token
         }
@@ -75,8 +75,8 @@ class TestCohortOauth(SharedModuleStoreTestCase):
         cohorts.add_cohort(self.course_key, "DEFAULT", "random")
         path = reverse('api_cohorts:cohort_users', kwargs={'course_key_string': self.course_str, 'cohort_id': 1})
         user = UserFactory(is_staff=False)
-        oauth_client = ClientFactory.create()
-        access_token = AccessTokenFactory.create(user=user, client=oauth_client).token
+        oauth_client = ApplicationFactory.create()
+        access_token = AccessTokenFactory.create(user=user, application=oauth_client).token
         headers = {
             'HTTP_AUTHORIZATION': 'Bearer ' + access_token
         }
@@ -99,8 +99,8 @@ class TestCohortOauth(SharedModuleStoreTestCase):
         cohorts.add_cohort(self.course_key, "DEFAULT", "random")
         path = reverse('api_cohorts:cohort_users_csv', kwargs={'course_key_string': self.course_str})
         user = UserFactory(is_staff=False)
-        oauth_client = ClientFactory.create()
-        access_token = AccessTokenFactory.create(user=user, client=oauth_client).token
+        oauth_client = ApplicationFactory.create()
+        access_token = AccessTokenFactory.create(user=user, application=oauth_client).token
         headers = {
             'HTTP_AUTHORIZATION': 'Bearer ' + access_token
         }
@@ -309,7 +309,7 @@ class TestCohortApi(SharedModuleStoreTestCase):
         assert response.status_code == status
 
         if status == 200:
-            results = json.loads(response.content)['results']
+            results = json.loads(response.content.decode('utf-8'))['results']
             expected_results = [{
                 'username': user.username,
                 'email': user.email,
@@ -408,7 +408,7 @@ class TestCohortApi(SharedModuleStoreTestCase):
             "invalid": ["foo@bar"],
             "present": ["user2"]
         }
-        assert json.loads(response.content) == expected_response
+        assert json.loads(response.content.decode('utf-8')) == expected_response
 
     def test_remove_user_from_cohort_missing_username(self):
         """
@@ -452,7 +452,7 @@ class TestCohortApi(SharedModuleStoreTestCase):
         # this temporary file will be removed in `self.tearDown()`
         __, file_name = tempfile.mkstemp(suffix='.csv', dir=tempfile.mkdtemp())
         with open(file_name, 'w') as file_pointer:
-            file_pointer.write(payload.encode('utf-8'))
+            file_pointer.write(payload)
         path = reverse('api_cohorts:cohort_users_csv', kwargs={'course_key_string': self.course_str})
         user = self.staff_user if is_staff else self.user
         assert self.client.login(username=user.username, password=self.password)

@@ -13,7 +13,6 @@ Main module which shows problems (of "capa" type).
 This is used by capa_module.
 """
 
-from __future__ import absolute_import
 
 import logging
 import os.path
@@ -24,6 +23,7 @@ from datetime import datetime
 from xml.sax.saxutils import unescape
 
 import six
+from django.utils.encoding import python_2_unicode_compatible
 from lxml import etree
 from pytz import UTC
 
@@ -35,6 +35,7 @@ from capa.correctmap import CorrectMap
 from capa.safe_exec import safe_exec
 from capa.util import contextualize_text, convert_files_to_filenames
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.lib.edx_six import get_gettext
 from xmodule.stringify import stringify_children
 
 # extra things displayed after "show answers" is pressed
@@ -63,6 +64,7 @@ html_transforms = {
 
 # These should be removed from HTML output, including all subelements
 html_problem_semantics = [
+    "additional_answer",
     "codeparam",
     "responseparam",
     "answer",
@@ -126,6 +128,7 @@ class LoncapaSystem(object):
         self.matlab_api_key = matlab_api_key
 
 
+@python_2_unicode_compatible
 class LoncapaProblem(object):
     """
     Main class for capa Problems.
@@ -182,6 +185,9 @@ class LoncapaProblem(object):
         self.problem_text = problem_text
 
         # parse problem XML file into an element tree
+        if isinstance(problem_text, six.text_type):
+            # etree chokes on Unicode XML with an encoding declaration
+            problem_text = problem_text.encode('utf-8')
         self.tree = etree.XML(problem_text)
 
         self.make_xml_compatible(self.tree)
@@ -240,6 +246,22 @@ class LoncapaProblem(object):
         This translation takes in the new format and synthesizes the old option= attribute
         so all downstream logic works unchanged with the new <option> tag format.
         """
+        def is_optioninput_valid(optioninput):
+            """
+            Verifies if a given optioninput xml is valid or not.
+
+            A given optioninput(Dropdown) problem is invalid if it has more than one correct answer.
+
+            Argument:
+                optioninput: dropdown specification tree
+            Returns:
+                boolean: signifying if the optioninput is valid or not.
+            """
+            correct_options = [
+                option.get('correct').upper() == 'TRUE' for option in optioninput.findall('./option')
+            ]
+            return correct_options.count(True) in (0, 1)
+
         additionals = tree.xpath('//stringresponse/additional_answer')
         for additional in additionals:
             answer = additional.get('answer')
@@ -247,8 +269,9 @@ class LoncapaProblem(object):
             if not answer and text:  # trigger of old->new conversion
                 additional.set('answer', text)
                 additional.text = ''
-
         for optioninput in tree.xpath('//optioninput'):
+            if not is_optioninput_valid(optioninput):
+                raise responsetypes.LoncapaProblemError("Dropdown questions can only have one correct answer.")
             correct_option = None
             child_options = []
             for option_element in optioninput.findall('./option'):
@@ -283,7 +306,7 @@ class LoncapaProblem(object):
 
         self.student_answers = initial_answers
 
-    def __unicode__(self):
+    def __str__(self):
         return u"LoncapaProblem ({0})".format(self.problem_id)
 
     def get_state(self):
@@ -451,7 +474,7 @@ class LoncapaProblem(object):
             # an earlier submission, so for now skip these entirely.
             # TODO: figure out where to get file submissions when rescoring.
             if 'filesubmission' in responder.allowed_inputfields and student_answers is None:
-                _ = self.capa_system.i18n.ugettext
+                _ = get_gettext(self.capa_system.i18n)
                 raise Exception(_(u"Cannot rescore problems with possible file submissions"))
 
             # use 'student_answers' only if it is provided, and if it might contain a file
@@ -479,7 +502,7 @@ class LoncapaProblem(object):
 
         # include solutions from <solution>...</solution> stanzas
         for entry in self.tree.xpath("//" + "|//".join(solution_tags)):
-            answer = etree.tostring(entry)
+            answer = etree.tostring(entry).decode('utf-8')
             if answer:
                 answer_map[entry.get('id')] = contextualize_text(answer, self.context)
 
@@ -537,9 +560,23 @@ class LoncapaProblem(object):
         Returns:
             a string with the question text
         """
-        _ = self.capa_system.i18n.ugettext
+
+        def generate_default_question_label():
+            """
+            To create question string like "Question 2" by adding "Question" and its position number.
+            For instance 'd2e35c1d294b4ba0b3b1048615605d2a_2_1' contains 2,
+            which is used in question number 1 (see example XML in comment above)
+            There's no question 0 (question IDs start at 1, answer IDs at 2)
+            """
+            question_nr = int(answer_id.split('_')[-2]) - 1
+            return _("Question {}").format(question_nr)
+
+        _ = get_gettext(self.capa_system.i18n)
         # Some questions define a prompt with this format:   >>This is a prompt<<
-        prompt = self.problem_data[answer_id].get('label')
+        try:
+            prompt = self.problem_data[answer_id].get('label')
+        except KeyError:
+            prompt = None
 
         if prompt:
             question_text = prompt.striptags()
@@ -555,7 +592,9 @@ class LoncapaProblem(object):
             #
             # Starting from  answer (the optioninput in this example) we go up and backwards
             xml_elems = self.tree.xpath('//*[@id="' + answer_id + '"]')
-            assert len(xml_elems) == 1
+            if len(xml_elems) != 1:
+                return generate_default_question_label()
+
             xml_elem = xml_elems[0].getparent()
 
             # Get the element that probably contains the question text
@@ -578,11 +617,7 @@ class LoncapaProblem(object):
             if questiontext_elem is not None and questiontext_elem.tag in LABEL_ELEMS:
                 question_text = questiontext_elem.text
             else:
-                # For instance 'd2e35c1d294b4ba0b3b1048615605d2a_2_1' contains 2,
-                # which is used in question number 1 (see example XML in comment above)
-                # There's no question 0 (question IDs start at 1, answer IDs at 2)
-                question_nr = int(answer_id.split('_')[-2]) - 1
-                question_text = _("Question {0}").format(question_nr)
+                question_text = generate_default_question_label()
 
         return question_text
 
@@ -643,7 +678,7 @@ class LoncapaProblem(object):
         choice-level explanations shown to a student after submission.
         Does nothing if there is no targeted-feedback attribute.
         """
-        _ = self.capa_system.i18n.ugettext
+        _ = get_gettext(self.capa_system.i18n)
         # Note that the modifications has been done, avoiding problems if called twice.
         if hasattr(self, 'has_targeted'):
             return
@@ -728,7 +763,10 @@ class LoncapaProblem(object):
         Main method called externally to get the HTML to be rendered for this capa Problem.
         """
         self.do_targeted_feedback(self.tree)
-        html = contextualize_text(etree.tostring(self._extract_html(self.tree)), self.context)
+        html = contextualize_text(
+            etree.tostring(self._extract_html(self.tree)).decode('utf-8'),
+            self.context
+        )
         return html
 
     def handle_input_ajax(self, data):
@@ -756,7 +794,7 @@ class LoncapaProblem(object):
         """
         includes = self.tree.findall('.//include')
         for inc in includes:
-            filename = inc.get('file').decode('utf-8')
+            filename = inc.get('file') if six.PY3 else inc.get('file').decode('utf-8')
             if filename is not None:
                 try:
                     # open using LoncapaSystem OSFS filestore

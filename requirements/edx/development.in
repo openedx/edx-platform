@@ -14,13 +14,8 @@
 -r testing.txt                      # Dependencies for running the various test suites
 
 click                               # Used for perf_tests utilities in modulestore
-django-debug-toolbar==1.8           # A set of panels that display debug information about the current request/response
+django-debug-toolbar                # A set of panels that display debug information about the current request/response
 edx-sphinx-theme                    # Documentation theme
 pyinotify                           # More efficient checking for runserver reload trigger events
-snakefood                           # Lists dependencies between Python modules, used in scripts/dependencies/*
-sphinx==1.8.5                       # Pinned because 2.0.0 release requires Python '>=3.5' but current Python is 2.7.12
+sphinxcontrib-openapi[markdown]     # OpenAPI (fka Swagger) spec renderer for Sphinx
 vulture                             # Detects possible dead/unused code, used in scripts/find-dead-code.sh
-modernize                           # Used to make Python 2 code more modern with the intention of eventually porting it over to Python 3.
-
-# The officially released version of django-debug-toolbar-mongo doesn't support DJDT 1.x. This commit does.
--e git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c4aee6e76b9abe61cc808#egg=django-debug-toolbar-mongo==0.1.10

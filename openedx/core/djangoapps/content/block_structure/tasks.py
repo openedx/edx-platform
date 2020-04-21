@@ -1,7 +1,7 @@
 """
 Asynchronous tasks related to the Course Blocks sub-application.
 """
-from __future__ import absolute_import
+
 
 import logging
 

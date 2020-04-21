@@ -1,5 +1,5 @@
 """ Tests for editing descriptors"""
-from __future__ import absolute_import
+
 
 import logging
 import os
@@ -33,13 +33,13 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
                     'scss': [
                         resource_string(
                             __name__,
-                            '../../test_files/test_tabseditingdescriptor.scss'
+                            'test_files/test_tabseditingdescriptor.scss'
                         )
                     ],
                     'css': [
                         resource_string(
                             __name__,
-                            '../../test_files/test_tabseditingdescriptor.css'
+                            'test_files/test_tabseditingdescriptor.css'
                         )
                     ]
                 }
@@ -66,12 +66,12 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
     def test_get_css(self):
         """test get_css"""
         css = self.descriptor.get_css()
-        test_files_dir = os.path.dirname(__file__).replace('xmodule/tests', 'test_files')
-        test_css_file = os.path.join(test_files_dir, 'test_tabseditingdescriptor.scss')
+        current_dir = os.path.dirname(__file__)
+        test_css_file = os.path.join(current_dir, 'test_files/test_tabseditingdescriptor.scss')
         with open(test_css_file) as new_css:
             added_css = new_css.read()
-        self.assertEqual(css['scss'].pop(), added_css)
-        self.assertEqual(css['css'].pop(), added_css)
+        self.assertEqual(css['scss'].pop().decode('utf-8'), added_css)
+        self.assertEqual(css['css'].pop().decode('utf-8'), added_css)
 
     def test_get_context(self):
         """"test get_context"""

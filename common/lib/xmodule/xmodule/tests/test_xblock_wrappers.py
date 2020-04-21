@@ -6,12 +6,12 @@ functionality
 # For tests, ignore access to protected members
 # pylint: disable=protected-access
 
-from __future__ import absolute_import
 
 from unittest.case import SkipTest, TestCase
 
 import ddt
 import webob
+from webob.multidict import MultiDict
 from factory import (
     BUILD_STRATEGY,
     Factory,
@@ -33,7 +33,7 @@ from xblock.fields import ScopeIds
 from xmodule.annotatable_module import AnnotatableDescriptor
 from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.course_module import CourseDescriptor
-from xmodule.html_module import HtmlDescriptor
+from xmodule.html_module import HtmlBlock
 from xmodule.poll_module import PollDescriptor
 from xmodule.randomize_module import RandomizeDescriptor
 from xmodule.seq_module import SequenceDescriptor
@@ -56,7 +56,7 @@ from xmodule.x_module import (
 # TODO: Add more types of sample data
 LEAF_XMODULES = {
     AnnotatableDescriptor: [{}],
-    HtmlDescriptor: [{}],
+    HtmlBlock: [{}],
     PollDescriptor: [{'display_name': 'Poll Display Name'}],
     WordCloudDescriptor: [{}],
 }
@@ -136,7 +136,7 @@ class ContainerModuleRuntimeFactory(ModuleSystemFactory):
         """
         # pylint: disable=no-member
         if depth == 0:
-            self.get_module.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlDescriptor)
+            self.get_module.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlBlock)
         else:
             self.get_module.side_effect = lambda x: ContainerModuleFactory(
                 descriptor_cls=VerticalBlock,
@@ -164,7 +164,7 @@ class ContainerDescriptorRuntimeFactory(DescriptorSystemFactory):
         """
         # pylint: disable=no-member
         if depth == 0:
-            self.load_item.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlDescriptor)
+            self.load_item.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlBlock)
         else:
             self.load_item.side_effect = lambda x: ContainerModuleFactory(
                 descriptor_cls=VerticalBlock,
@@ -385,16 +385,16 @@ class TestXModuleHandler(TestCase):
 
     def test_xmodule_handler_passed_data(self):
         self.module.xmodule_handler(self.request)
-        self.module.handle_ajax.assert_called_with(None, self.request.POST)
+        self.module.handle_ajax.assert_called_with(None, MultiDict(self.request.POST))
 
     def test_xmodule_handler_dispatch(self):
         self.module.xmodule_handler(self.request, 'dispatch')
-        self.module.handle_ajax.assert_called_with('dispatch', self.request.POST)
+        self.module.handle_ajax.assert_called_with('dispatch', MultiDict(self.request.POST))
 
     def test_xmodule_handler_return_value(self):
         response = self.module.xmodule_handler(self.request)
         self.assertIsInstance(response, webob.Response)
-        self.assertEqual(response.body, '{}')
+        self.assertEqual(response.body.decode('utf-8'), '{}')
 
     @ddt.data(
         u'{"test_key": "test_value"}',
@@ -409,7 +409,7 @@ class TestXModuleHandler(TestCase):
         self.module.handle_ajax = Mock(return_value=response_data)
         response = self.module.xmodule_handler(self.request)
         self.assertIsInstance(response, webob.Response)
-        self.assertEqual(response.body, '{"test_key": "test_value"}')
+        self.assertEqual(response.body.decode('utf-8'), '{"test_key": "test_value"}')
 
 
 class TestXmlExport(XBlockWrapperTestMixin, TestCase):
@@ -431,8 +431,8 @@ class TestXmlExport(XBlockWrapperTestMixin, TestCase):
 
         xmodule_node = etree.fromstring(descriptor.export_to_xml(xmodule_api_fs))
 
-        self.assertEquals(list(xmodule_api_fs.walk()), list(xblock_api_fs.walk()))
-        self.assertEquals(etree.tostring(xmodule_node), etree.tostring(xblock_node))
+        self.assertEqual(list(xmodule_api_fs.walk()), list(xblock_api_fs.walk()))
+        self.assertEqual(etree.tostring(xmodule_node), etree.tostring(xblock_node))
 
 
 class TestPublicView(XBlockWrapperTestMixin, TestCase):

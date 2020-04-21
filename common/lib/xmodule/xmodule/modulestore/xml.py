@@ -1,7 +1,9 @@
-from __future__ import absolute_import
 
+
+import codecs
 import glob
 import hashlib
+import io
 import itertools
 import json
 import logging
@@ -11,9 +13,9 @@ import sys
 from collections import defaultdict
 from contextlib import contextmanager
 from importlib import import_module
-from io import BytesIO
 
 import six
+from django.utils.encoding import python_2_unicode_compatible
 from fs.osfs import OSFS
 from lazy import lazy
 from lxml import etree
@@ -47,16 +49,6 @@ edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
 etree.set_default_parser(edx_xml_parser)
 
 log = logging.getLogger(__name__)
-
-
-# VS[compat]
-# TODO (cpennington): Remove this once all fall 2012 courses have been imported
-# into the cms from xml
-def clean_out_mako_templating(xml_string):
-    orig_xml = xml_string
-    xml_string = xml_string.replace('%include', 'include')
-    xml_string = re.sub(r"(?m)^\s*%.*$", '', xml_string)
-    return xml_string
 
 
 class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
@@ -127,7 +119,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                         orig_name = orig_name[len(tag) + 1:-12]
                     # append the hash of the content--the first 12 bytes should be plenty.
                     orig_name = "_" + orig_name if orig_name not in (None, "") else ""
-                    xml_bytes = xml.encode('utf8')
+                    xml_bytes = xml if isinstance(xml, bytes) else xml.encode('utf-8')
                     return tag + orig_name + "_" + hashlib.sha1(xml_bytes).hexdigest()[:12]
 
                 # Fallback if there was nothing we could use:
@@ -171,10 +163,6 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 xml_data.set('url_name', url_name)
 
             try:
-                # VS[compat]
-                # TODO (cpennington): Remove this once all fall 2012 courses
-                # have been imported into the cms from xml
-                xml = clean_out_mako_templating(xml)
                 xml_data = etree.fromstring(xml)
 
                 make_name_unique(xml_data)
@@ -315,6 +303,7 @@ class CourseImportLocationManager(CourseLocationManager):
         self.target_course_id = target_course_id
 
 
+@python_2_unicode_compatible
 class XMLModuleStore(ModuleStoreReadBase):
     """
     An XML backed ModuleStore
@@ -408,7 +397,7 @@ class XMLModuleStore(ModuleStoreReadBase):
             course_id = self.id_from_descriptor(course_descriptor)
             self._course_errors[course_id] = errorlog
 
-    def __unicode__(self):
+    def __str__(self):
         '''
         String representation - for debugging
         '''
@@ -450,12 +439,6 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         log.debug('========> Starting courselike import from %s', course_dir)
         with open(self.data_dir / course_dir / self.parent_xml) as course_file:
-
-            # VS[compat]
-            # TODO (cpennington): Remove this once all fall 2012 courses have
-            # been imported into the cms from xml
-            course_file = BytesIO(clean_out_mako_templating(course_file.read()))
-
             course_data = etree.parse(course_file, parser=edx_xml_parser).getroot()
 
             org = course_data.get('org')
@@ -644,7 +627,7 @@ class XMLModuleStore(ModuleStoreReadBase):
             if filepath.endswith('~'):  # skip *~ files
                 continue
 
-            with open(filepath) as f:
+            with io.open(filepath) as f:
                 try:
                     if filepath.find('.json') != -1:
                         # json file with json data content
@@ -666,7 +649,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                         slug = os.path.splitext(os.path.basename(filepath))[0]
                         loc = course_descriptor.scope_ids.usage_id.replace(category=category, name=slug)
                         # html file with html data content
-                        html = f.read().decode('utf-8')
+                        html = f.read()
                         try:
                             module = system.load_item(loc)
                             module.data = html

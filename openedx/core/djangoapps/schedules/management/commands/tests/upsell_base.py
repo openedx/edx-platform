@@ -1,7 +1,7 @@
 """
 Base file for testing schedules with upsell
 """
-from __future__ import absolute_import
+
 
 import datetime
 import itertools
@@ -13,7 +13,7 @@ from edx_ace.utils.date import serialize
 from freezegun import freeze_time
 from mock import PropertyMock, patch
 
-from courseware.models import DynamicUpgradeDeadlineConfiguration
+from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 
 
 @ddt.ddt

@@ -1,5 +1,5 @@
 """ API v0 views. """
-from __future__ import absolute_import
+
 
 import logging
 
@@ -16,14 +16,14 @@ from rest_framework.views import APIView
 from six import text_type
 
 from course_modes.models import CourseMode
-from courseware import courses
+from lms.djangoapps.courseware import courses
 from entitlements.models import CourseEntitlement
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.enrollments.api import add_enrollment
 from openedx.core.djangoapps.enrollments.views import EnrollmentCrossDomainSessionAuth
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from student.models import CourseEnrollment
 from student.signals import SAILTHRU_AUDIT_PURCHASE
 from util.json_request import JsonResponse
@@ -40,7 +40,7 @@ class BasketsView(APIView):
 
     # LMS utilizes User.user_is_active to indicate email verification, not whether an account is active. Sigh!
     authentication_classes = (JwtAuthentication,
-                              OAuth2AuthenticationAllowInactiveUser,
+                              BearerAuthenticationAllowInactiveUser,
                               EnrollmentCrossDomainSessionAuth)
     permission_classes = (IsAuthenticated,)
 

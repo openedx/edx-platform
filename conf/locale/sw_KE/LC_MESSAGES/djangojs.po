@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Swahili (Kenya) (http://www.transifex.com/open-edx/edx-platform/language/sw_KE/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -17,7 +17,7 @@
 # YAHAYA MWAVURIZI <translations_1@camara.ie>, 2017
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Swahili (Kenya) (http://www.transifex.com/open-edx/edx-platform/language/sw_KE/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -31,9 +31,9 @@
 # YAHAYA MWAVURIZI <translations_1@camara.ie>, 2017
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Swahili (Kenya) (https://www.transifex.com/open-edx/teams/6205/sw_KE/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # Translators:
 # YAHAYA MWAVURIZI <translations_1@camara.ie>, 2019
@@ -41,7 +41,7 @@
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Swahili (Kenya) (http://www.transifex.com/open-edx/edx-platform/language/sw_KE/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -55,7 +55,7 @@
 # YAHAYA MWAVURIZI <translations_1@camara.ie>, 2017
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Swahili (Kenya) (http://www.transifex.com/open-edx/edx-platform/language/sw_KE/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -71,9 +71,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-07-24 06:10+0000\n"
-"PO-Revision-Date: 2019-07-21 20:42+0000\n"
-"Last-Translator: Fabian Hamza <translations_2@camara.ie>\n"
+"POT-Creation-Date: 2020-04-19 20:42+0000\n"
+"PO-Revision-Date: 2019-09-29 20:43+0000\n"
+"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Swahili (Kenya) (http://www.transifex.com/open-edx/edx-platform/language/sw_KE/)\n"
 "Language: sw_KE\n"
 "MIME-Version: 1.0\n"
@@ -248,6 +248,14 @@ msgid "Your changes have been saved."
 msgstr "Marekebisho yako yamehifadhiwa"
 
 #. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: cms/static/js/views/xblock_validation.js
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Warning"
+msgstr ""
+
+#. Translators: This message will be added to the front of messages of type
 #. error,
 #. e.g. "Error: required field is missing".
 #: cms/static/js/views/xblock_validation.js
@@ -313,55 +321,55 @@ msgstr ""
 msgid "Reply to Annotation"
 msgstr ""
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (graded, results hidden)"
-msgid_plural "%(num_points)s points possible (graded, results hidden)"
+msgid "{num_points} point possible (graded, results hidden)"
+msgid_plural "{num_points} points possible (graded, results hidden)"
 msgstr[0] ""
 msgstr[1] ""
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (ungraded, results hidden)"
-msgid_plural "%(num_points)s points possible (ungraded, results hidden)"
+msgid "{num_points} point possible (ungraded, results hidden)"
+msgid_plural "{num_points} points possible (ungraded, results hidden)"
 msgstr[0] ""
 msgstr[1] ""
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (graded)"
-msgid_plural "%(num_points)s points possible (graded)"
+msgid "{num_points} point possible (graded)"
+msgid_plural "{num_points} points possible (graded)"
 msgstr[0] ""
 msgstr[1] ""
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (ungraded)"
-msgid_plural "%(num_points)s points possible (ungraded)"
+msgid "{num_points} point possible (ungraded)"
+msgid_plural "{num_points} points possible (ungraded)"
 msgstr[0] ""
 msgstr[1] ""
 
-#. Translators: %(earned)s is the number of points earned. %(possible)s is the
+#. Translators: {earned} is the number of points earned. {possible} is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
 #. points will always be at least 1. We pluralize based on the total number of
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(earned)s/%(possible)s point (graded)"
-msgid_plural "%(earned)s/%(possible)s points (graded)"
+msgid "{earned}/{possible} point (graded)"
+msgid_plural "{earned}/{possible} points (graded)"
 msgstr[0] ""
 msgstr[1] ""
 
-#. Translators: %(earned)s is the number of points earned. %(possible)s is the
+#. Translators: {earned} is the number of points earned. {possible} is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
 #. points will always be at least 1. We pluralize based on the total number of
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(earned)s/%(possible)s point (ungraded)"
-msgid_plural "%(earned)s/%(possible)s points (ungraded)"
+msgid "{earned}/{possible} point (ungraded)"
+msgid_plural "{earned}/{possible} points (ungraded)"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -408,6 +416,11 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "unsubmitted"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+msgid ""
+"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -2049,16 +2062,16 @@ msgstr ""
 "tena."
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Show Discussion"
+msgstr "Onesha Majadiliano"
+
+#: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Hide Discussion"
 msgstr "Ficha Majadiliano"
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "This discussion could not be loaded. Refresh the page and try again."
 msgstr "Mjadala huu haukuweza kupakiwa. Onesha upya ukurasa na jaribu tena."
-
-#: common/static/common/js/discussion/views/discussion_inline_view.js
-msgid "Show Discussion"
-msgstr "Onesha Majadiliano"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "There are no posts in this topic yet."
@@ -2384,11 +2397,23 @@ msgid "Masters"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "MicroMasters"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "MicroBachelors"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Photo Verification"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Proctoring"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Security"
 msgstr ""
 
 #: cms/templates/js/asset-library.underscore
@@ -2456,8 +2481,7 @@ msgid "Go to {platform} Home"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid ""
-"Thank you for submitting a request! We will contact you within 24 hours."
+msgid "Thank you for submitting a request!"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
@@ -2573,14 +2597,14 @@ msgstr ""
 msgid "This team does not have any members."
 msgstr "Timu hii haina wahusika."
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Joined %(date)s"
 msgstr "Unganishwa %(date)s"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Last Activity %(date)s"
 msgstr "Shughuli ya mwisho %(date)s"
@@ -2591,11 +2615,9 @@ msgstr "Mwanatimu huyu aondolewe?"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid ""
-"This learner will be removed from the team, allowing another learner to take"
-" the available spot."
+"This learner will be removed from the team,allowing another learner to take "
+"the available spot."
 msgstr ""
-"Huyu mwanafunzi  ataondolewa kwenye timu, kuruhusu mwanafunzi mwengine "
-"kuchukua nafasi iliopo."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Delete this team?"
@@ -2603,35 +2625,38 @@ msgstr "Hii timu ifutwe?"
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid ""
-"Deleting a team is permanent and cannot be undone. All members are removed "
+"Deleting a team is permanent and cannot be undone.All members are removed "
 "from the team, and team discussions can no longer be accessed."
 msgstr ""
-"Timu ikifutwa moja kwa moja haiwezi kurudishwa. Wanachama wote wanaondolewa "
-"kwenye timu na majadiliano ya timu hayawezi kupatikana tena. "
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Team \"{team}\" successfully deleted."
 msgstr "Umefanikiwa kufuta timu \"{team}\"."
 
+#: lms/djangoapps/teams/static/teams/js/views/manage.js
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Manage"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
 msgstr "Kwa sasa hivi sio mjumbe wa timu  yoyote."
 
-#. Translators: "and others" refers to fact that additional members of a team
-#. exist that are not displayed.
+#. Translators: "and others" refers to fact that additional
+#. * members of a team exist that are not displayed.
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "and others"
 msgstr "Na wengine"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. http://momentjs.com/)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: http://momentjs.com/)
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "Last activity %(date)s"
-msgstr "Shughuli ya mwisho %(date)s"
+msgid "Last activity {date}"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "View %(span_start)s %(team_name)s %(span_end)s"
-msgstr "Tazama %(span_start)s %(team_name)s %(span_end)s"
+msgid "View {span_start} {team_name} {span_end}"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
@@ -2644,11 +2669,9 @@ msgstr "Ondoka kwenye hii timu?"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 msgid ""
-"If you leave, you can no longer post in this team's discussions. Your place "
+"If you leave, you can no longer post in this team's discussions.Your place "
 "will be available to another learner."
 msgstr ""
-"Kama ukitoka, hutaweza kutuma chochote kwenye mazungumzo ya timu hii. Nafasi"
-" yakoitatumiwa na mwanafunzi 'mwingine'."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/static/js/verify_student/views/reverify_view.js
@@ -2657,18 +2680,22 @@ msgid "Confirm"
 msgstr "Hakikisha"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
-msgid "You already belong to another team."
-msgstr "Tayari uko kwenye timu nyingine."
+msgid "You already belong to another team in this team set."
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "This team is full."
 msgstr "Timu hii imejaa."
 
+#: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
+msgid "Cannot join instructor managed team"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
-msgid "%(memberCount)s / %(maxMemberCount)s Member"
-msgid_plural "%(memberCount)s / %(maxMemberCount)s Members"
-msgstr[0] "%(memberCount)s / %(maxMemberCount)s Mwanachama"
-msgstr[1] "%(memberCount)s / %(maxMemberCount)s Wanachama"
+msgid " Member"
+msgid_plural " Members"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "All teams"
@@ -2683,17 +2710,8 @@ msgid "Topics"
 msgstr "Mada"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid ""
-"See all teams in your course, organized by topic. Join a team to collaborate"
-" with other learners who are interested in the same topic as you are."
+msgid "My Teams"
 msgstr ""
-"Tazama timu zote kwenye kozi yako, zimepangwa kulingana na mada. Jiunge na "
-"timu  ili ushirikiane na wanafunzi wengine  ambao wanaipenda hiyo mada kama "
-"wewe. "
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "My Team"
-msgstr "Timu Yangu"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
@@ -2765,6 +2783,23 @@ msgid "Search teams"
 msgstr "Tafuta timu"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"See all teams you belong to and all public teams in your course, organized "
+"by topic. Join an open public team to collaborate with other learners who "
+"are interested in the same topic as you are."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"See all teams you belong to and all public teams in your course, organized "
+"by topic."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "See all teams you belong to."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 #: lms/djangoapps/discussion/static/discussion/templates/fake-breadcrumbs.underscore
 msgid "All Topics"
 msgstr "Mada Zote"
@@ -2782,27 +2817,19 @@ msgid "The team \"{team}\" could not be found."
 msgstr "Timu ya \"{team}\" haikupatikana."
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "%(team_count)s Team"
-msgid_plural "%(team_count)s Teams"
-msgstr[0] "%(team_count)s Kikosi"
-msgstr[1] "%(team_count)sTimu"
+msgid "{team_count} Team"
+msgid_plural "{team_count} Teams"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "Topic"
 msgstr "Mada"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "View Teams in the %(topic_name)s Topic"
-msgstr "Tazama timu katika %(topic_name)s Mada"
+msgid "View Teams in the {topic_name} Topic"
+msgstr ""
 
-#. Translators: this string is shown at the bottom of the teams page
-#. to find a team to join or else to create a new one. There are three
-#. links that need to be included in the message:
-#. 1. Browse teams in other topics
-#. 2. search teams
-#. 3. create a new team
-#. Be careful to start each link with the appropriate start indicator
-#. (e.g. {browse_span_start} for #1) and finish it with {span_end}.
 #: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
 msgid ""
 "{browse_span_start}Browse teams in other topics{span_end} or "
@@ -4442,27 +4469,31 @@ msgid ""
 "{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read "
 "the above carefully before proceeding. This is an irreversible action, and "
 "{strongStart}you will no longer be able to use the same email on "
-"edX.{strongEnd}"
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "We’re sorry to see you go!"
+"{platformName}.{strongEnd}"
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
 "Please note: Deletion of your account and personal data is permanent and "
-"cannot be undone. EdX will not be able to recover your account or the data "
-"that is deleted."
+"cannot be undone. {platformName} will not be able to recover your account or"
+" the data that is deleted."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
-"Once your account is deleted, you cannot use it to take courses on the edX "
-"app, edx.org, or any other site hosted by edX. This includes access to "
-"edx.org from your employer’s or university’s system and access to private "
-"sites offered by MIT Open Learning, Wharton Executive Education, and Harvard"
-" Medical School."
+"Once your account is deleted, you cannot use it to take courses on the "
+"{platformName} app, {siteName}, or any other site hosted by {platformName}."
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"This includes access to {siteName} from your employer’s or university’s "
+"system{additionalSiteSpecificDeletionText}."
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid "We’re sorry to see you go!"
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
@@ -4495,17 +4526,15 @@ msgstr ""
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "You have selected “Delete my account.” Deletion of your account and personal"
-" data is permanent and cannot be undone. EdX will not be able to recover "
-"your account or the data that is deleted."
+" data is permanent and cannot be undone. {platformName} will not be able to "
+"recover your account or the data that is deleted."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "If you proceed, you will be unable to use this account to take courses on "
-"the edX app, edx.org, or any other site hosted by edX. This includes access "
-"to edx.org from your employer’s or university’s system and access to private"
-" sites offered by MIT Open Learning, Wharton Executive Education, and "
-"Harvard Medical School."
+"the {platformName} app, {siteName}, or any other site hosted by "
+"{platformName}."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
@@ -4589,6 +4618,10 @@ msgstr ""
 msgid ""
 "An error has occurred. Try refreshing the page, or check your Internet "
 "connection."
+msgstr ""
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid "An unexpected error has occurred."
 msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
@@ -5086,28 +5119,6 @@ msgstr ""
 "Huwezi kuangalia kozi kama mwanafunzi au mtumiaji wa kwanza kabla ya tarehe "
 "ya kufungua kozi."
 
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "%(num_students)s student opened Subsection"
-msgid_plural "%(num_students)s students opened Subsection"
-msgstr[0] "%(num_students)s mwanafunzi aliefungua Kifungu kidogo"
-msgstr[1] " wanafunzi %(num_students)s walifungua Vifungu vidogo"
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "%(num_students)s student"
-msgid_plural "%(num_students)s students"
-msgstr[0] "%(num_students)s mwanafunzi"
-msgstr[1] "wanafunzi %(num_students)s "
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "%(num_questions)s question"
-msgid_plural "%(num_questions)s questions"
-msgstr[0] "%(num_questions)s suali"
-msgstr[1] "maswali %(num_questions)s "
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "Number of Students"
-msgstr "Idadi ya Wanafunzi"
-
 #: lms/templates/courseware/progress_graph.js
 msgid "Overall Score"
 msgstr "Alama za Jumla"
@@ -5135,6 +5146,16 @@ msgstr "Refusha Zote"
 #: lms/templates/ccx/schedule.underscore
 msgid "Collapse All"
 msgstr "\"Futa\" Zote"
+
+#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr ""
+
+#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr ""
 
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
@@ -6125,7 +6146,7 @@ msgstr ""
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
-msgid "Editing access for: %(title)s"
+msgid "Editing access for: {title}"
 msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
@@ -6647,13 +6668,6 @@ msgstr "Mitegesho"
 msgid "New {component_type}"
 msgstr ""
 
-#. Translators: This message will be added to the front of messages of type
-#. warning,
-#. e.g. "Warning: this component has not been configured yet".
-#: cms/static/js/views/xblock_validation.js
-msgid "Warning"
-msgstr ""
-
 #: cms/static/js/xblock_asides/structured_tags.js
 msgid "Updating Tags"
 msgstr ""
@@ -7012,6 +7026,26 @@ msgstr "Futa Timu"
 msgid "Edit Membership"
 msgstr "Hariri \"Uwanachama\""
 
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "View Current Team Memberships"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Download Memberships"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Assign Team Memberships"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Upload Memberships"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Error assigning team memberships"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
 msgid "Are you having trouble finding a team to join?"
 msgstr "Je, unashindwa kupata timu ya kujiunga?"
@@ -7214,14 +7248,6 @@ msgstr ""
 msgid ""
 "To receive credit for problems, you must select \"Submit\" for each problem "
 "before you select \"End My Exam\"."
-msgstr ""
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show More"
-msgstr ""
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show Less"
 msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
@@ -8139,32 +8165,22 @@ msgid "What You Need for Verification"
 msgstr "Unachohitaji kwenye Uthibitisho"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/make_payment_step.underscore
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Webcam"
-msgstr "Kamera ya wavuti"
+msgid "Device with Camera"
+msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"You need a computer that has a webcam. When you receive a browser prompt, "
-"make sure that you allow access to the camera."
+"You need a device that has a webcam. If you receive a browser prompt for "
+"access to your camera, please make sure to click 'Allow'."
 msgstr ""
-"Unahitaji kompyuta ambayo ina kamera ya wavuti. Pindi utakapopokea kivinjari"
-" cha haraka, hakikisha unaruhusu kuifikia kamera."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "Photo Identification"
 msgstr "Kitambulisho cha Picha"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-msgid ""
-"You need a driver's license, passport, or other government-issued ID that "
-"has your name and photo."
+msgid "You need a valid ID that contains your full name and photo."
 msgstr ""
-"Unahitaji leseni ya udereva, pasipoti, au Kitambulisho kingine cha serikali "
-"ambacho kina jina lako na picha. "
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -8173,11 +8189,9 @@ msgstr "Piga Picha "
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"When your face is in position, use the camera button {icon} below to take "
-"your photo."
+"When your face is in position, use the Take Photo button {icon} below to "
+"take your photo."
 msgstr ""
-"Wakati uso wako uko katika eneo zuri, tumia kitufe cha kamera {icon} hapo "
-"chini kupiga picha."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "To take a successful photo, make sure that:"
@@ -8192,16 +8206,10 @@ msgid "Your entire face fits inside the frame."
 msgstr "Uso wako wote umetoshea kwenye fremu."
 
 #: lms/templates/verify_student/face_photo_step.underscore
-msgid "The photo of your face matches the photo on your ID."
-msgstr "Picha yako inaendana na picha ya iliyopo kwenye Kitambulisho chako."
-
-#: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"To use the current photo, select the camera button {icon}. To take another "
-"photo, select the retake button {icon}."
+"To take the photo of your face, click on the camera button {icon}. If you "
+"need to try again, click 'Retake Photo'."
 msgstr ""
-"Kutumia picha yako ya sasa, chagua kitufe cha kamera {icon}. Kupiga picha "
-"nyingine, chagua kitufe cha kupiga picha kupiga picha upya {icon}."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8217,17 +8225,10 @@ msgid "Why does %(platformName)s need my photo?"
 msgstr "Kwanini unahitaji %(platformName)s picha yangu?"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
 msgid ""
-"As part of the verification process, you take a photo of both your face and "
-"a government-issued photo ID. Our authorization service confirms your "
-"identity by comparing the photo you take with the photo on your ID."
+"We use your verification photos to confirm your identity and ensure the "
+"validity of your certificate."
 msgstr ""
-"Kama sehemu ya mchakakto wa uhakiki, unapiga picha ya sura yako na "
-"kitambulisho kilichoidhinishwa na serikali. Huduma . Mamlaka ya uthibitisho "
-"wa huduma zetu utathibitisha  kitambulisho kwa kulinganisha picha uliyopiga "
-"na picha ya Kitambulisho chako."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8238,18 +8239,56 @@ msgstr "Tuifanyie nini  %(platformName)s hii picha?"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
+#, python-format
+msgid ""
+"We securely encrypt your photo and send it to our authorization service for "
+"review. Your photo and information are not saved or visible anywhere on "
+"%(platformName)s after the verification process is complete."
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"What if I can't see the camera image, or if I can't see my photo do "
+"determine which side is visible?"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"You may be able to complete the image capture procedure without assistance, "
+"but it may take a couple of submission attempts to get the camera "
+"positioning right.  Optimal camera positioning varies with each computer, "
+"but generally the best position for a headshot is approximately 12-18 inches"
+" (30-45 centimeters) from the camera, with your head centered relative to "
+"the computer screen. "
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"If the photos you submit are rejected, try moving the computer or camera "
+"orientation to change the lighting angle.  The most common reason for "
+"rejection is inability to read the text on the ID card."
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"What if I have difficulty holding my head in position relative to the "
+"camera?"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
 #, python-format
 msgid ""
-"We use the highest levels of security available to encrypt your photo and "
-"send it to our authorization service for review. Your photo and information "
-"are not saved or visible anywhere on %(platformName)s after the verification"
-" process is complete."
+"If you require assistance with taking either photo for submission, contact "
+"%(platformName)s support for additional suggestions."
 msgstr ""
-"Tunatumia viwango vya juu kabisa vya kiusalama vilivyopo kwa ajili ya "
-"kuificha picha yako na kuituma kwenye huduma yetu ya kuidhinisha kwa ajili "
-"ya kuikagua Picha yako na taarifa hazihifadhiwi au kuonekana popote kwenye "
-"%(platformName)s baada ya shughuli za uhakiki kukamilika."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8264,21 +8303,14 @@ msgid "Take a Photo of Your ID"
 msgstr "Piga picha ya Kitambulisho chako"
 
 #: lms/templates/verify_student/id_photo_step.underscore
-msgid ""
-"Use your webcam to take a photo of your ID. We will match this photo with "
-"the photo of your face and the name on your account."
+msgid "Use your webcam to take a photo of your ID."
 msgstr ""
-"Tumia kamera yako ya wavuti  kupiga picha ya Kitambulisho chako. "
-"Tutalinganisha picha hii na picha ya sura yako pamoja na jina kwenye akaunti"
-" yako."
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
-"You need an ID with your name and photo. A driver's license, passport, or "
-"other government-issued IDs are all acceptable."
+"You need an ID with your name and photo. A driver's license, passport, or ID"
+" are all acceptable."
 msgstr ""
-"Unahitaji Kitambulisho chenye jina lako na picha. Leseni ya udereva, "
-"pasipoti, au Vitambulisho vyengine vilivyotolewa na serikali vinakubalika."
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -8294,15 +8326,35 @@ msgid "Make sure your ID is well-lit"
 msgstr "Hakikisha Kitambulisho chako kinaonekana vizuri"
 
 #: lms/templates/verify_student/id_photo_step.underscore
-msgid "Once in position, use the camera button {icon} to capture your ID"
+msgid "Once in position, use the Take Photo button {icon} to capture your ID"
 msgstr ""
-"Ukiwa kwenye nafasi nzuri, tumia kitufe cha kamera {icon}kupiga picha "
-"Kitambulisho chako "
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Use the retake photo button if you are not pleased with your photo"
-msgstr "Piga picha upya kama hujapendezewa na picha 'yako'"
+msgid "Use the Retake Photo button if you are not pleased with your photo"
+msgstr ""
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid ""
+"As part of the verification process, you take a photo of both your face and "
+"a photo ID. Our authorization service confirms your identity by comparing "
+"the photo you take with the photo on your ID."
+msgstr ""
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid ""
+"You may be able to complete the image capture procedure without assistance, "
+"but it may take a couple of submission attempts to get the camera "
+"positioning right.  Optimal camera positioning varies with each computer, "
+"but generally, the best position for a photo of an ID card is 8-12 inches "
+"(20-30 centimeters) from the camera, with the ID card centered relative to "
+"the camera. "
+msgstr ""
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid ""
+"What if I have difficulty holding my ID in position relative to the camera?"
+msgstr ""
 
 #: lms/templates/verify_student/image_input.underscore
 msgid "Preview of uploaded image"
@@ -8329,14 +8381,38 @@ msgid "Be sure your entire face is inside the frame"
 msgstr "Hakikisha  sura yako yote iko ndani ya fremu"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Once in position, use the camera button {icon} to capture your photo"
+msgid ""
+"Once in position, use the Take Photo button {icon} to capture your photo"
 msgstr ""
-"Ukiwa kwenye nafasi nzuri, tumia kitufe cha kamera {icon} kupigia picha yako"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Can we match the photo you took with the one on your ID?"
 msgstr ""
 "Je tunaweza kulinganisha picha yako na iliyopo kwenye Kitambulisho chako?"
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"As part of the verification process, you take a photo of both your face and "
+"a government-issued photo ID. Our authorization service confirms your "
+"identity by comparing the photo you take with the photo on your ID."
+msgstr ""
+"Kama sehemu ya mchakakto wa uhakiki, unapiga picha ya sura yako na "
+"kitambulisho kilichoidhinishwa na serikali. Huduma . Mamlaka ya uthibitisho "
+"wa huduma zetu utathibitisha  kitambulisho kwa kulinganisha picha uliyopiga "
+"na picha ya Kitambulisho chako."
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+#, python-format
+msgid ""
+"We use the highest levels of security available to encrypt your photo and "
+"send it to our authorization service for review. Your photo and information "
+"are not saved or visible anywhere on %(platformName)s after the verification"
+" process is complete."
+msgstr ""
+"Tunatumia viwango vya juu kabisa vya kiusalama vilivyopo kwa ajili ya "
+"kuificha picha yako na kuituma kwenye huduma yetu ya kuidhinisha kwa ajili "
+"ya kuikagua Picha yako na taarifa hazihifadhiwi au kuonekana popote kwenye "
+"%(platformName)s baada ya shughuli za uhakiki kukamilika."
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: {courseName}"
@@ -8371,6 +8447,13 @@ msgid ""
 msgstr ""
 "Leseni ya udereva, 'pasipoti', au Kitambulisho kingine chochote cha "
 "kiserikali kilicho na jina lako na picha yako "
+
+#: lms/templates/verify_student/intro_step.underscore
+#: lms/templates/verify_student/make_payment_step.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Webcam"
+msgstr "Kamera ya wavuti"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
@@ -8602,10 +8685,6 @@ msgid "Does the photo of you show your whole face?"
 msgstr "Je picha yako inaonesha sura yako yote?"
 
 #: lms/templates/verify_student/review_photos_step.underscore
-msgid "Does the photo of you match your ID photo?"
-msgstr "Je picha yako inaendana na Picha kwenye Kitambulisho chako?"
-
-#: lms/templates/verify_student/review_photos_step.underscore
 msgid "Is your name on your ID readable?"
 msgstr "Je jina lako kwenye Kitambulisho chako linasomeka?"
 
@@ -8737,24 +8816,17 @@ msgstr ""
 "zifuatazo kuongeza cheti chako kwenye Hazina yako ya Taarifa."
 
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-#, python-format
 msgid ""
-"Create a %(link_start)sMozilla Backpack%(link_end)s account, or log in to "
-"your existing account"
+"Create a {link_start}Mozilla Backpack{link_end} account, or log in to your "
+"existing account"
 msgstr ""
-"Tengeneza  %(link_start)s akaunti ya Hazina ya Taarifa zako ya Mozilla "
-"%(link_end)s, au ingia mtandaoni kwa kutumia akuanti yako ya sasa "
 
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-#, python-format
 msgid ""
-"%(download_link_start)sDownload this image (right-click or option-click, "
-"save as)%(link_end)s and then %(upload_link_start)supload%(link_end)s it to "
-"your backpack.</li>"
+"{download_link_start}Download this image (right-click or option-click, save "
+"as){link_end} and then {upload_link_start}upload{link_end} it to your "
+"backpack."
 msgstr ""
-"%(download_link_start)sPakua hii picha (right-click or option-click, save "
-"as)%(link_end)s na kisha %(upload_link_start)s ipakie %(link_end)s kwenye "
-"hazina ya taarifa zako.</li>"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"
@@ -9108,6 +9180,10 @@ msgstr ""
 "zilizochapiswaha kwenye kifungu kidogo hiki zitaonekana na wanafunzi "
 "isipokuwa zitakapoamuliwa kufichwa."
 
+#: cms/templates/js/copy-clipboard-button.underscore
+msgid "Copy Component Location"
+msgstr ""
+
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Weekly Highlight Emails"
 msgstr ""
@@ -9455,14 +9531,6 @@ msgid ""
 msgstr ""
 
 #: cms/templates/js/course_info_update.underscore
-msgid "Send push notification to mobile apps"
-msgstr ""
-
-#: cms/templates/js/course_info_update.underscore
-msgid "Send notification to mobile apps"
-msgstr "Tuma taarifa kwenye simu za mkononi"
-
-#: cms/templates/js/course_info_update.underscore
 msgid "Post"
 msgstr "Chapisha"
 
@@ -9535,6 +9603,10 @@ msgstr "Maelezo ya Sura"
 #: cms/templates/js/edit-textbook.underscore
 msgid "Add a Chapter"
 msgstr "\"Ongeza\" Sura"
+
+#: cms/templates/js/edit-title-button.underscore
+msgid "Edit Title"
+msgstr ""
 
 #: cms/templates/js/grading-editor.underscore
 msgid "Grading"
@@ -9698,10 +9770,6 @@ msgstr "Ondoa"
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear Value"
 msgstr ""
-
-#: cms/templates/js/metadata-editor.underscore
-msgid "Component Location ID"
-msgstr "Namba ya Utambulisho wa Kipengele"
 
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video-transcripts.underscore

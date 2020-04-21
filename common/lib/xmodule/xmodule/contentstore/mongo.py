@@ -1,7 +1,7 @@
 """
 MongoDB/GridFS-level code for the contentstore.
 """
-from __future__ import absolute_import
+
 
 import json
 import os
@@ -11,7 +11,7 @@ import pymongo
 import six
 from bson.son import SON
 from fs.osfs import OSFS
-from gridfs.errors import NoFile
+from gridfs.errors import NoFile, FileExists
 from mongodb_proxy import autoretry_read
 from opaque_keys.edx.keys import AssetKey
 
@@ -56,7 +56,7 @@ class MongoContentStore(ContentStore):
         """
         Closes any open connections to the underlying databases
         """
-        self.fs_files.database.connection.close()
+        self.fs_files.database.client.close()
 
     def _drop_database(self, database=True, collections=True, connections=True):
         """
@@ -70,10 +70,10 @@ class MongoContentStore(ContentStore):
 
         If connections is True, then close the connection to the database as well.
         """
-        connection = self.fs_files.database.connection
+        connection = self.fs_files.database.client
 
         if database:
-            connection.drop_database(self.fs_files.database)
+            connection.drop_database(self.fs_files.database.name)
         elif collections:
             self.fs_files.drop()
             self.chunks.drop()
@@ -99,11 +99,21 @@ class MongoContentStore(ContentStore):
                               import_path=content.import_path,
                               # getattr b/c caching may mean some pickled instances don't have attr
                               locked=getattr(content, 'locked', False)) as fp:
-            if hasattr(content.data, '__iter__'):
+
+            # It seems that this code thought that only some specific object would have the `__iter__` attribute
+            # but many more objects have this in python3 and shouldn't be using the chunking logic. For string and
+            # byte streams we write them directly to gridfs and convert them to byetarrys if necessary.
+            if hasattr(content.data, '__iter__') and not isinstance(content.data, (six.binary_type, six.string_types)):
                 for chunk in content.data:
                     fp.write(chunk)
             else:
-                fp.write(content.data)
+                # Ideally we could just ensure that we don't get strings in here and only byte streams
+                # but being confident of that wolud be a lot more work than we have time for so we just
+                # handle both cases here.
+                if isinstance(content.data, six.text_type):
+                    fp.write(content.data.encode('utf-8'))
+                else:
+                    fp.write(content.data)
 
         return content
 
@@ -123,6 +133,10 @@ class MongoContentStore(ContentStore):
         try:
             if as_stream:
                 fp = self.fs.get(content_id)
+                # Need to replace dict IDs with SON for chunk lookup to work under Python 3
+                # because field order can be different and mongo cares about the order
+                if isinstance(fp._id, dict):
+                    fp._file['_id'] = content_id
                 thumbnail_location = getattr(fp, 'thumbnail_location', None)
                 if thumbnail_location:
                     thumbnail_location = location.course_key.make_asset_key(
@@ -138,6 +152,10 @@ class MongoContentStore(ContentStore):
                 )
             else:
                 with self.fs.get(content_id) as fp:
+                    # Need to replace dict IDs with SON for chunk lookup to work under Python 3
+                    # because field order can be different and mongo cares about the order
+                    if isinstance(fp._id, dict):
+                        fp._file['_id'] = content_id
                     thumbnail_location = getattr(fp, 'thumbnail_location', None)
                     if thumbnail_location:
                         thumbnail_location = location.course_key.make_asset_key(
@@ -227,9 +245,9 @@ class MongoContentStore(ContentStore):
                 ('{}.name'.format(prefix), {'$regex': ASSET_IGNORE_REGEX}),
             ])
             items = self.fs_files.find(query)
-            assets_to_delete = assets_to_delete + items.count()
             for asset in items:
                 self.fs.delete(asset[prefix])
+                assets_to_delete += 1
 
             self.fs_files.remove(query)
         return assets_to_delete
@@ -302,15 +320,18 @@ class MongoContentStore(ContentStore):
                 }
             })
 
-        items = self.fs_files.aggregate(pipeline_stages)
-        if items['result']:
-            result = items['result'][0]
-            count = result['count']
-            assets = list(result['results'])
-        else:
-            # no results
-            count = 0
-            assets = []
+        cursor = self.fs_files.aggregate(pipeline_stages)
+        # Set values if result of query is empty
+        count = 0
+        assets = []
+        try:
+            result = cursor.next()
+            if result:
+                count = result['count']
+                assets = list(result['results'])
+        except StopIteration:
+            # Skip if no assets were returned
+            pass
 
         # We're constructing the asset key immediately after retrieval from the database so that
         # callers are insulated from knowing how our identifiers are stored.
@@ -359,8 +380,8 @@ class MongoContentStore(ContentStore):
                 raise AttributeError("{} is a protected attribute.".format(attr))
         asset_db_key, __ = self.asset_db_key(location)
         # catch upsert error and raise NotFoundError if asset doesn't exist
-        result = self.fs_files.update({'_id': asset_db_key}, {"$set": attr_dict}, upsert=False)
-        if not result.get('updatedExisting', True):
+        result = self.fs_files.update_one({'_id': asset_db_key}, {"$set": attr_dict}, upsert=False)
+        if result.matched_count == 0:
             raise NotFoundError(asset_db_key)
 
     @autoretry_read()
@@ -395,6 +416,10 @@ class MongoContentStore(ContentStore):
             if isinstance(asset_key, six.string_types):
                 asset_key = AssetKey.from_string(asset_key)
                 __, asset_key = self.asset_db_key(asset_key)
+            # Need to replace dict IDs with SON for chunk lookup to work under Python 3
+            # because field order can be different and mongo cares about the order
+            if isinstance(source_content._id, dict):
+                source_content._file['_id'] = asset_key.copy()
             asset_key['org'] = dest_course_key.org
             asset_key['course'] = dest_course_key.course
             if getattr(dest_course_key, 'deprecated', False):  # remove the run if exists
@@ -406,18 +431,32 @@ class MongoContentStore(ContentStore):
                 asset_id = six.text_type(
                     dest_course_key.make_asset_key(asset_key['category'], asset_key['name']).for_branch(None)
                 )
+            try:
+                self.create_asset(source_content, asset_id, asset, asset_key)
+            except FileExists:
+                self.fs.delete(file_id=asset_id)
+                self.create_asset(source_content, asset_id, asset, asset_key)
 
-            self.fs.put(
-                source_content.read(),
-                _id=asset_id, filename=asset['filename'], content_type=asset['contentType'],
-                displayname=asset['displayname'], content_son=asset_key,
-                # thumbnail is not technically correct but will be functionally correct as the code
-                # only looks at the name which is not course relative.
-                thumbnail_location=asset['thumbnail_location'],
-                import_path=asset['import_path'],
-                # getattr b/c caching may mean some pickled instances don't have attr
-                locked=asset.get('locked', False)
-            )
+    def create_asset(self, source_content, asset_id, asset, asset_key):
+        """
+        Creates a new asset
+        :param source_content:
+        :param asset_id:
+        :param asset:
+        :param asset_key:
+        :return:
+        """
+        self.fs.put(
+            source_content.read(),
+            _id=asset_id, filename=asset['filename'], content_type=asset['contentType'],
+            displayname=asset['displayname'], content_son=asset_key,
+            # thumbnail is not technically correct but will be functionally correct as the code
+            # only looks at the name which is not course relative.
+            thumbnail_location=asset['thumbnail_location'],
+            import_path=asset['import_path'],
+            # getattr b/c caching may mean some pickled instances don't have attr
+            locked=asset.get('locked', False)
+        )
 
     def delete_all_course_assets(self, course_key):
         """

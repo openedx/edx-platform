@@ -4,7 +4,6 @@ Contentstore Application Configuration
 Above-modulestore level signal handlers are connected here.
 """
 
-from __future__ import absolute_import
 
 from django.apps import AppConfig
 

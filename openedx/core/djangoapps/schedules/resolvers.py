@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 import datetime
 import logging
@@ -14,10 +14,13 @@ from edx_ace.recipient import Recipient
 from edx_ace.recipient_resolver import RecipientResolver
 from edx_django_utils.monitoring import function_trace, set_custom_metric
 
-from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
+from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
+from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
+from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH
 from openedx.core.djangoapps.schedules.content_highlights import get_week_highlights
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
+from openedx.core.djangoapps.schedules.message_types import CourseUpdate, InstructorLedCourseUpdate
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleExperience
 from openedx.core.djangoapps.schedules.utils import PrefixedDebugLoggerMixin
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
@@ -91,6 +94,13 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
             with function_trace('enqueue_send_task'):
                 self.async_send_task.apply_async((self.site.id, str(msg)), retry=False)
 
+    @classmethod
+    def bin_num_for_user_id(cls, user_id):
+        """
+        Returns the bin number used for the given (numeric) user ID.
+        """
+        return user_id % cls.num_bins
+
     def get_schedules_with_target_date_by_bin_and_orgs(
         self, order_by='enrollment__user__id'
     ):
@@ -107,9 +117,10 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
         }
         users = User.objects.filter(
             courseenrollment__is_active=True,
+            is_active=True,
             **schedule_day_equals_target_day_filter
         ).annotate(
-            id_mod=F('id') % self.num_bins
+            id_mod=self.bin_num_for_user_id(F('id'))
         ).filter(
             id_mod=self.bin_num
         )
@@ -121,6 +132,7 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
         schedules = Schedule.objects.select_related(
             'enrollment__user__profile',
             'enrollment__course',
+            'enrollment__fbeenrollmentexclusion',
         ).filter(
             Q(enrollment__course__end__isnull=True) | Q(
                 enrollment__course__end__gte=self.current_datetime
@@ -231,7 +243,7 @@ class RecurringNudgeResolver(BinnedSchedulesBaseResolver):
     Send a message to all users whose schedule started at ``self.current_date`` + ``day_offset``.
     """
     log_prefix = 'Recurring Nudge'
-    schedule_date_field = 'start'
+    schedule_date_field = 'start_date'
     num_bins = RECURRING_NUDGE_NUM_BINS
 
     @property
@@ -244,6 +256,8 @@ class RecurringNudgeResolver(BinnedSchedulesBaseResolver):
 
     def get_template_context(self, user, user_schedules):
         first_schedule = user_schedules[0]
+        if not first_schedule.enrollment.course.self_paced:
+            raise InvalidContextError
         context = {
             'course_name': first_schedule.enrollment.course.display_name,
             'course_url': _get_trackable_course_home_url(first_schedule.enrollment.course_id),
@@ -276,6 +290,10 @@ class UpgradeReminderResolver(BinnedSchedulesBaseResolver):
         first_valid_upsell_context = None
         first_schedule = None
         for schedule in user_schedules:
+            if not schedule.enrollment.course.self_paced:
+                # We don't want to include instructor led courses in this email
+                continue
+
             upsell_context = _get_upsell_information_for_schedule(user, schedule)
             if not upsell_context['show_upsell']:
                 continue
@@ -335,12 +353,26 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
     course has updates.
     """
     log_prefix = 'Course Update'
-    schedule_date_field = 'start'
+    schedule_date_field = 'start_date'
     num_bins = COURSE_UPDATE_NUM_BINS
     experience_filter = Q(experience__experience_type=ScheduleExperience.EXPERIENCES.course_updates)
 
+    def send(self, msg_type):
+        for (user, language, context, is_self_paced) in self.schedules_for_bin():
+            msg_type = CourseUpdate() if is_self_paced else InstructorLedCourseUpdate()
+            msg = msg_type.personalize(
+                Recipient(
+                    user.username,
+                    self.override_recipient_email or user.email,
+                ),
+                language,
+                context,
+            )
+            with function_trace('enqueue_send_task'):
+                self.async_send_task.apply_async((self.site.id, str(msg)), retry=False)  # pylint: disable=no-member
+
     def schedules_for_bin(self):
-        week_num = abs(self.day_offset) / 7
+        week_num = abs(self.day_offset) // 7
         schedules = self.get_schedules_with_target_date_by_bin_and_orgs(
             order_by='enrollment__course',
         )
@@ -348,6 +380,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
         template_context = get_base_template_context(self.site)
         for schedule in schedules:
             enrollment = schedule.enrollment
+            course = schedule.enrollment.course
             user = enrollment.user
 
             try:
@@ -360,6 +393,14 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
                 )
                 # continue to the next schedule, don't yield an email for this one
             else:
+                unsubscribe_url = None
+                if (COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH.is_enabled() and
+                        'bulk_email_optout' in settings.ACE_ENABLED_POLICIES):
+                    unsubscribe_url = reverse('bulk_email_opt_out', kwargs={
+                        'token': UsernameCipher.encrypt(user.username),
+                        'course_id': str(enrollment.course_id),
+                    })
+
                 template_context.update({
                     'course_name': schedule.enrollment.course.display_name,
                     'course_url': _get_trackable_course_home_url(enrollment.course_id),
@@ -369,10 +410,11 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
 
                     # This is used by the bulk email optout policy
                     'course_ids': [str(enrollment.course_id)],
+                    'unsubscribe_url': unsubscribe_url,
                 })
                 template_context.update(_get_upsell_information_for_schedule(user, schedule))
 
-                yield (user, schedule.enrollment.course.closest_released_language, template_context)
+                yield (user, schedule.enrollment.course.closest_released_language, template_context, course.self_paced)
 
 
 def _get_trackable_course_home_url(course_id):

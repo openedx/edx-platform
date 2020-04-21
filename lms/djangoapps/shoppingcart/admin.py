@@ -1,5 +1,5 @@
 """Django admin interface for the shopping cart models. """
-from __future__ import absolute_import
+
 
 from django.contrib import admin
 
@@ -33,7 +33,8 @@ class SoftDeleteCouponAdmin(admin.ModelAdmin):
 
     def get_actions(self, request):
         actions = super(SoftDeleteCouponAdmin, self).get_actions(request)
-        del actions['delete_selected']
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
         return actions
 
     def really_delete_selected(self, request, queryset):

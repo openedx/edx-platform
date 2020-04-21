@@ -3,14 +3,13 @@ Black-box tests of the DjangoUserStateClient against the semantics
 defined in edx_user_state_client.
 """
 
-from __future__ import absolute_import
 
 from collections import defaultdict
 
 from edx_user_state_client.tests import UserStateClientTestBase
 
-from courseware.tests.factories import UserFactory
-from courseware.user_state_client import DjangoXBlockUserStateClient
+from lms.djangoapps.courseware.tests.factories import UserFactory
+from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 

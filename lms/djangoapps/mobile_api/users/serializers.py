@@ -2,13 +2,12 @@
 Serializer for user API
 """
 
-from __future__ import absolute_import
 
 import six
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from courseware.access import has_access
+from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.certificates.api import certificate_downloadable_status
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
@@ -24,6 +23,7 @@ class CourseOverviewField(serializers.RelatedField):
         course_id = six.text_type(course_overview.id)
         request = self.context.get('request')
         api_version = self.context.get('api_version')
+        enrollment = CourseEnrollment.get_enrollment(user=self.context.get('request').user, course_key=course_id)
 
         return {
             # identifiers
@@ -37,6 +37,7 @@ class CourseOverviewField(serializers.RelatedField):
             'start_display': course_overview.start_display,
             'start_type': course_overview.start_type,
             'end': course_overview.end,
+            'dynamic_upgrade_deadline': enrollment.upgrade_deadline,
 
             # notification info
             'subscription_id': course_overview.clean_id(padding_char='_'),

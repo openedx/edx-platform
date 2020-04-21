@@ -2,7 +2,6 @@
 Test helper functions and base classes.
 """
 
-from __future__ import absolute_import
 
 import functools
 import inspect
@@ -18,7 +17,6 @@ from unittest import SkipTest, TestCase
 
 import requests
 import six
-import six.moves.urllib.parse  # pylint: disable=import-error
 from bok_choy.javascript import js_defined
 from bok_choy.page_object import XSS_INJECTION
 from bok_choy.promise import EmptyPromise, Promise
@@ -648,7 +646,7 @@ class EventsTestMixin(TestCase):
             lambda: matching_events
         )
 
-        self.assertEquals(len(matching_events), 0, description)
+        self.assertEqual(len(matching_events), 0, description)
 
     def assert_events_match(self, expected_events, actual_events, in_order=True):
         """Assert that each actual event matches one of the expected events.
@@ -660,11 +658,13 @@ class EventsTestMixin(TestCase):
         """
         if in_order:
             for expected_event, actual_event in zip(expected_events, actual_events):
-                assert_event_matches(
-                    expected_event,
-                    actual_event,
-                    tolerate=EventMatchTolerates.lenient()
-                )
+                expected_field = (None if expected_event.get('event') is None else
+                                  expected_event.get('event').get('field'))
+                has_field = expected_field is not None
+                actual_event_to_compare = (next(item for item in actual_events if item.get('event').get('field') ==
+                                                expected_field)) if has_field else actual_event
+
+                assert_event_matches(expected_event, actual_event_to_compare, tolerate=EventMatchTolerates.lenient())
         else:
             for expected_event in expected_events:
                 actual_event = next(event for event in actual_events if is_matching_event(expected_event, event))
@@ -894,7 +894,7 @@ class YouTubeStubConfig(object):
         response = requests.get(youtube_stub_config_url)
 
         if response.ok:
-            return json.loads(response.content)
+            return json.loads(response.content.decode('utf-8'))
         else:
             return {}
 

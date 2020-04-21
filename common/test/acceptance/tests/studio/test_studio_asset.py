@@ -1,7 +1,7 @@
 """
 Acceptance tests for Studio related to the asset index page.
 """
-from __future__ import absolute_import
+
 
 import os
 

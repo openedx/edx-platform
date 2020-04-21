@@ -2,7 +2,7 @@
 Top-level module for the Block Structure framework with a class for managing
 BlockStructures.
 """
-from __future__ import absolute_import
+
 
 from contextlib import contextmanager
 

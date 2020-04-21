@@ -1,6 +1,6 @@
 # pylint: disable=missing-docstring,unused-argument,broad-except
 """" Common utilities for comment client wrapper """
-from __future__ import absolute_import
+
 
 import logging
 from uuid import uuid4
@@ -73,17 +73,18 @@ def perform_request(method, url, data_or_params=None, raw=False,
     )
 
     metric_tags.append(u'status_code:{}'.format(response.status_code))
-    if response.status_code > 200:
+    status_code = int(response.status_code)
+    if status_code > 200:
         metric_tags.append(u'result:failure')
     else:
         metric_tags.append(u'result:success')
 
-    if 200 < response.status_code < 500:
+    if 200 < status_code < 500:
         raise CommentClientRequestError(response.text, response.status_code)
     # Heroku returns a 503 when an application is in maintenance mode
-    elif response.status_code == 503:
+    elif status_code == 503:
         raise CommentClientMaintenanceError(response.text)
-    elif response.status_code == 500:
+    elif status_code == 500:
         raise CommentClient500Error(response.text)
     else:
         if raw:

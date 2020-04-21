@@ -2,7 +2,6 @@
 Models.
 """
 
-from __future__ import absolute_import
 
 from config_models.models import ConfigurationModel
 from django.db import models
@@ -28,7 +27,7 @@ class XBlockConfiguration(ConfigurationModel):
         verbose_name=_('show deprecation messaging in Studio')
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return (
             "XBlockConfiguration(name={}, enabled={}, deprecated={})"
         ).format(self.name, self.enabled, self.deprecated)
@@ -46,7 +45,7 @@ class XBlockStudioConfigurationFlag(ConfigurationModel):
 
     # boolean field 'enabled' inherited from parent ConfigurationModel
 
-    def __unicode__(self):
+    def __str__(self):
         return "XBlockStudioConfigurationFlag(enabled={})".format(self.enabled)
 
 
@@ -58,9 +57,9 @@ class XBlockStudioConfiguration(ConfigurationModel):
     """
     KEY_FIELDS = ('name', 'template')  # xblock name/template combination is unique
 
-    FULL_SUPPORT = 'fs'
-    PROVISIONAL_SUPPORT = 'ps'
-    UNSUPPORTED = 'us'
+    FULL_SUPPORT = u'fs'
+    PROVISIONAL_SUPPORT = u'ps'
+    UNSUPPORTED = u'us'
 
     SUPPORT_CHOICES = (
         (FULL_SUPPORT, _('Fully Supported')),
@@ -70,13 +69,13 @@ class XBlockStudioConfiguration(ConfigurationModel):
 
     # boolean field 'enabled' inherited from parent ConfigurationModel
     name = models.CharField(max_length=255, null=False, db_index=True)
-    template = models.CharField(max_length=255, blank=True, default='')
+    template = models.CharField(max_length=255, blank=True, default=u'')
     support_level = models.CharField(max_length=2, choices=SUPPORT_CHOICES, default=UNSUPPORTED)
 
     class Meta(object):
         app_label = "xblock_django"
 
-    def __unicode__(self):
+    def __str__(self):
         return (
             "XBlockStudioConfiguration(name={}, template={}, enabled={}, support_level={})"
         ).format(self.name, self.template, self.enabled, self.support_level)

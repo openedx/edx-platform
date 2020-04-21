@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+
 
 from django.db import migrations, models
 
@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='forumsconfig',
             name='connection_timeout',
-            field=models.FloatField(default=5.0, help_text=b'Seconds to wait when trying to connect to the comment service.'),
+            field=models.FloatField(default=5.0, help_text=u'Seconds to wait when trying to connect to the comment service.'),
         ),
     ]

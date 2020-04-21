@@ -2,7 +2,7 @@
 """
 LibraryContent: The XBlock used to include blocks from a library in a course.
 """
-from __future__ import absolute_import
+
 
 import json
 import logging
@@ -10,19 +10,19 @@ import random
 from copy import copy
 from gettext import ngettext
 
-from pkg_resources import resource_string
-
 import six
-from capa.responsetypes import registry
 from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.locator import LibraryLocator
+from pkg_resources import resource_string
 from six import text_type
 from six.moves import zip
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock
 from xblock.fields import Integer, List, Scope, String
+
+from capa.responsetypes import registry
 from xmodule.studio_editable import StudioEditableDescriptor, StudioEditableModule
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.x_module import STUDENT_VIEW, XModule
@@ -237,7 +237,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
                 Function that handles the actual publishing.  Must have
                 the signature:
 
-                    <'removed'|'assigned'> -> result:T -> removed:T -> reason:basestring -> None
+                    <'removed'|'assigned'> -> result:T -> removed:T -> reason:str -> None
 
                 Where T is a collection of block_keys as returned by
                 `format_block_keys`.
@@ -306,10 +306,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         current user.
         """
         for block_type, block_id in self.selected_children():
-            child = self.runtime.get_block(self.location.course_key.make_usage_key(block_type, block_id))
-            if child is None:
-                logger.info("Child not found for %s %s", str(block_type), str(block_id))
-            yield child
+            yield self.runtime.get_block(self.location.course_key.make_usage_key(block_type, block_id))
 
     def student_view(self, context):
         fragment = Fragment()

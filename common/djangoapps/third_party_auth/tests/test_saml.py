@@ -2,7 +2,6 @@
 Unit tests for third_party_auth SAML auth providers
 """
 
-from __future__ import absolute_import
 
 import mock
 

@@ -2,7 +2,6 @@
 Test grading events across apps.
 """
 
-from __future__ import absolute_import
 
 import six
 from crum import set_current_request
@@ -10,7 +9,7 @@ from mock import call as mock_call
 from mock import patch
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
+from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.instructor.enrollment import reset_student_attempts
 from lms.djangoapps.instructor_task.api import submit_rescore_problem_for_student
 from openedx.core.djangolib.testing.utils import get_mock_request

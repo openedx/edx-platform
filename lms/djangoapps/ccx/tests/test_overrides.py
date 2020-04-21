@@ -2,7 +2,7 @@
 """
 tests for overrides
 """
-from __future__ import absolute_import
+
 
 import datetime
 
@@ -13,8 +13,8 @@ from django.test.utils import override_settings
 from edx_django_utils.cache import RequestCache
 from six.moves import range
 
-from courseware.courses import get_course_by_id
-from courseware.testutils import FieldOverrideTestMixin
+from lms.djangoapps.courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.testutils import FieldOverrideTestMixin
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import override_field_for_ccx
 from lms.djangoapps.ccx.tests.utils import flatten, iter_blocks
@@ -98,7 +98,7 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
         chapter = self.ccx_course.get_children()[0]
         override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
-        self.assertEquals(chapter.start, ccx_start)
+        self.assertEqual(chapter.start, ccx_start)
 
     def test_override_num_queries_new_field(self):
         """
@@ -156,8 +156,8 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
         ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
         chapter = self.ccx_course.get_children()[0]
         override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
-        self.assertEquals(chapter.get_children()[0].start, ccx_start)
-        self.assertEquals(chapter.get_children()[1].start, ccx_start)
+        self.assertEqual(chapter.get_children()[0].start, ccx_start)
+        self.assertEqual(chapter.get_children()[1].start, ccx_start)
 
     def test_override_is_inherited_even_if_set_in_mooc(self):
         """

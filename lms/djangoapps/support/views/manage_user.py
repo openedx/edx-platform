@@ -1,7 +1,7 @@
 """
 Support tool for disabling user accounts.
 """
-from __future__ import absolute_import
+
 
 from django.contrib.auth import get_user_model
 from django.db.models import Q
@@ -14,7 +14,7 @@ from rest_framework.generics import GenericAPIView
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.support.decorators import require_support_permission
 from openedx.core.djangoapps.user_api.accounts.serializers import AccountUserSerializer
-from openedx.core.djangoapps.user_api.accounts.utils import generate_password
+from openedx.core.djangoapps.user_authn.utils import generate_password
 from util.json_request import JsonResponse
 
 

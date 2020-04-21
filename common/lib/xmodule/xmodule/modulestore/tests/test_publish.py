@@ -1,7 +1,7 @@
 """
 Test the publish code (mostly testing that publishing doesn't result in orphans)
 """
-from __future__ import absolute_import
+
 
 import itertools
 import os
@@ -218,7 +218,7 @@ class DraftPublishedOpTestCourseSetup(unittest.TestCase):
             parent_id = 'course'
             for idx in range(num_items):
                 if parent_type != 'course':
-                    parent_id = _make_block_id(parent_type, idx / 2)
+                    parent_id = _make_block_id(parent_type, idx // 2)
                 parent_item = getattr(self, parent_id)
                 block_id = _make_block_id(block_type, idx)
                 setattr(self, block_id, ItemFactory.create(
@@ -364,7 +364,7 @@ class OLXFormatChecker(unittest.TestCase):
                 to match against the named attribute.
         """
         for attribute, regex in attrs.items():
-            self.assertRegexpMatches(element.get(attribute), regex)
+            self.assertRegex(element.get(attribute), regex)
 
     def parse_olx(self, block_type, block_id, **kwargs):
         """

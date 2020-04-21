@@ -2,7 +2,7 @@
 """
 Tests for validate Internationalization and Module i18n service.
 """
-from __future__ import absolute_import
+
 
 import gettext
 from unittest import skip
@@ -14,6 +14,7 @@ from django.utils.translation import get_language
 
 from contentstore.tests.utils import AjaxEnabledTestClient
 from contentstore.views.preview import _preview_module_system
+from openedx.core.lib.edx_six import get_gettext
 from xmodule.modulestore.django import ModuleI18nService
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -30,6 +31,8 @@ class FakeTranslations(ModuleI18nService):
         Mock override for ugettext translation operation
         """
         return self.translations.get(msgid, msgid)
+
+    gettext = ugettext
 
     @staticmethod
     def translator(locales_map):  # pylint: disable=method-hidden
@@ -94,7 +97,7 @@ class TestModuleI18nService(ModuleStoreTestCase):
 
             def __init__(self, module):
                 self.module = module
-                self.old_ugettext = module.ugettext
+                self.old_ugettext = get_gettext(module)
 
             def __enter__(self):
                 def new_ugettext(*args, **kwargs):
@@ -102,9 +105,11 @@ class TestModuleI18nService(ModuleStoreTestCase):
                     output = self.old_ugettext(*args, **kwargs)
                     return "XYZ " + output
                 self.module.ugettext = new_ugettext
+                self.module.gettext = new_ugettext
 
             def __exit__(self, _type, _value, _traceback):
                 self.module.ugettext = self.old_ugettext
+                self.module.gettext = self.old_ugettext
 
         i18n_service = self.get_module_i18n_service(self.descriptor)
 
@@ -120,6 +125,7 @@ class TestModuleI18nService(ModuleStoreTestCase):
             self.assertEqual(i18n_service.ugettext(self.test_language), 'dummy language')
 
     @mock.patch('django.utils.translation.ugettext', mock.Mock(return_value='XYZ-TEST-LANGUAGE'))
+    @mock.patch('django.utils.translation.gettext', mock.Mock(return_value='XYZ-TEST-LANGUAGE'))
     def test_django_translator_in_use_with_empty_block(self):
         """
         Test: Django default translator should in use if we have an empty block
@@ -149,9 +155,9 @@ class TestModuleI18nService(ModuleStoreTestCase):
         with mock.patch('gettext.translation', return_value=_translator(domain='text', localedir=localedir,
                                                                         languages=[get_language()])):
             i18n_service = self.get_module_i18n_service(self.descriptor)
-            self.assertEqual(i18n_service.ugettext('Hello'), 'Hello')
-            self.assertNotEqual(i18n_service.ugettext('Hello'), 'fr-hello-world')
-            self.assertNotEqual(i18n_service.ugettext('Hello'), 'es-hello-world')
+            self.assertEqual(get_gettext(i18n_service)('Hello'), 'Hello')
+            self.assertNotEqual(get_gettext(i18n_service)('Hello'), 'fr-hello-world')
+            self.assertNotEqual(get_gettext(i18n_service)('Hello'), 'es-hello-world')
 
         translation.activate("fr")
         with mock.patch('gettext.translation', return_value=_translator(domain='text', localedir=localedir,

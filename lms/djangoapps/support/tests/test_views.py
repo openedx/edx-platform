@@ -3,28 +3,36 @@
 Tests for support views.
 """
 
-from __future__ import absolute_import
 
 import itertools
 import json
 import re
 from datetime import datetime, timedelta
+from uuid import UUID, uuid4
 
 import ddt
 import six
 from django.contrib.auth.models import User
 from django.db.models import signals
+from django.http import HttpResponse
 from django.urls import reverse
 from mock import patch
+from organizations.tests.factories import OrganizationFactory
 from pytz import UTC
+from social_django.models import UserSocialAuth
 
 from common.test.utils import disable_signal
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
+from lms.djangoapps.support.serializers import ProgramEnrollmentSerializer
 from lms.djangoapps.verify_student.models import VerificationDeadline
+from lms.djangoapps.verify_student.services import IDVerificationService
+from lms.djangoapps.verify_student.tests.factories import SSOVerificationFactory
 from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAttribute, ManualEnrollmentAudit
 from student.roles import GlobalStaff, SupportStaffRole
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from third_party_auth.tests.factories import SAMLProviderConfigFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -72,7 +80,7 @@ class SupportViewManageUserTests(SupportViewTestCase):
         """
         url = reverse('support:manage_user_detail') + self.user.username
         response = self.client.get(url)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data['username'], self.user.username)
 
     def test_disable_user_account(self):
@@ -86,7 +94,7 @@ class SupportViewManageUserTests(SupportViewTestCase):
         response = self.client.post(url, data={
             'username_or_email': test_user.username
         })
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data['success_msg'], 'User Disabled Successfully')
         test_user = User.objects.get(username=test_user.username, email=test_user.email)
         self.assertEqual(test_user.has_usable_password(), False)
@@ -109,6 +117,7 @@ class SupportViewAccessTests(SupportViewTestCase):
             'support:enrollment_list',
             'support:manage_user',
             'support:manage_user_detail',
+            'support:link_program_enrollments',
         ), (
             (GlobalStaff, True),
             (SupportStaffRole, True),
@@ -136,6 +145,7 @@ class SupportViewAccessTests(SupportViewTestCase):
         "support:enrollment_list",
         "support:manage_user",
         "support:manage_user_detail",
+        "support:link_program_enrollments",
     )
     def test_require_login(self, url_name):
         url = reverse(url_name)
@@ -160,6 +170,7 @@ class SupportViewIndexTests(SupportViewTestCase):
     EXPECTED_URL_NAMES = [
         "support:certificates",
         "support:refund",
+        "support:link_program_enrollments",
     ]
 
     def setUp(self):
@@ -246,7 +257,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(len(data), 1)
         self.assertDictContainsSubset({
             'mode': CourseMode.AUDIT,
@@ -276,7 +287,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         self.assertDictContainsSubset({
             'enrolled_by': self.user.email,
             'reason': 'Financial Assistance',
-        }, json.loads(response.content)[0]['manual_enrollment'])
+        }, json.loads(response.content.decode('utf-8'))[0]['manual_enrollment'])
 
     @disable_signal(signals, 'post_save')
     @ddt.data('username', 'email')
@@ -297,7 +308,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         self.assert_enrollment(CourseMode.VERIFIED)
 
     @ddt.data(
-        ({}, r"The field \"'\w+'\" is required."),  # The double quoting goes away in Django 2.0.1
+        ({}, r"The field \w+ is required."),
         ({'course_id': 'bad course key'}, 'Could not parse course key.'),
         ({
             'course_id': 'course-v1:TestX+T101+2015',
@@ -323,10 +334,13 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         # `self` isn't available from within the DDT declaration, so
         # assign the course ID here
         if 'course_id' in data and data['course_id'] is None:
-            data['course_id'] = six.text_type(self.course.id)
+            data['course_id'] = str(self.course.id)
         response = self.client.post(self.url, data)
+
         self.assertEqual(response.status_code, 400)
-        self.assertIsNotNone(re.match(error_message, response.content))
+        self.assertIsNotNone(
+            re.match(error_message, response.content.decode('utf-8').replace("'", '').replace('"', ''))
+        )
         self.assert_enrollment(CourseMode.AUDIT)
         self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
 
@@ -381,7 +395,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             })
 
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(len(data), 1)
 
         self.assertEqual(
@@ -420,7 +434,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         self.assert_enrollment(new_mode)
         if new_mode == 'credit':
             enrollment_attr = CourseEnrollmentAttribute.objects.first()
-            self.assertEqual(enrollment_attr.value, unicode(credit_provider[0]))
+            self.assertEqual(enrollment_attr.value, six.text_type(credit_provider[0]))
 
     def set_course_end_date_and_expiry(self):
         """ Set the course-end date and expire its verified mode."""
@@ -434,3 +448,433 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         )
         verified_mode.expiration_datetime = datetime(year=1970, month=1, day=9, tzinfo=UTC)
         verified_mode.save()
+
+
+@ddt.ddt
+class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
+    """
+    Tests for the link_program_enrollments support view.
+    """
+    patch_render = patch(
+        'support.views.program_enrollments.render_to_response',
+        return_value=HttpResponse(),
+        autospec=True,
+    )
+
+    def setUp(self):
+        """Make the user support staff. """
+        super(SupportViewLinkProgramEnrollmentsTests, self).setUp()
+        self.url = reverse("support:link_program_enrollments")
+        SupportStaffRole().add_users(self.user)
+        self.program_uuid = str(uuid4())
+        self.text = '0001,user-0001\n0002,user-02'
+
+    @patch_render
+    def test_get(self, mocked_render):
+        self.client.get(self.url)
+        render_call_dict = mocked_render.call_args[0][1]
+        assert render_call_dict == {
+            'successes': [],
+            'errors': [],
+            'program_uuid': '',
+            'text': ''
+        }
+
+    def test_rendering(self):
+        """
+        Test the view without mocking out the rendering like the rest of the tests.
+        """
+        response = self.client.get(self.url)
+        content = six.text_type(response.content, encoding='utf-8')
+        assert '"programUUID": ""' in content
+        assert '"text": ""' in content
+
+    @patch_render
+    def test_invalid_uuid(self, mocked_render):
+        self.client.post(self.url, data={
+            'program_uuid': 'notauuid',
+            'text': self.text,
+        })
+        msg = u"Supplied program UUID 'notauuid' is not a valid UUID."
+        render_call_dict = mocked_render.call_args[0][1]
+        assert render_call_dict['errors'] == [msg]
+
+    @patch_render
+    @ddt.data(
+        ('program_uuid', ''),
+        ('', 'text'),
+        ('', ''),
+    )
+    @ddt.unpack
+    def test_missing_parameter(self, program_uuid, text, mocked_render):
+        error = (
+            u"You must provide both a program uuid "
+            u"and a series of lines with the format "
+            u"'external_user_key,lms_username'."
+        )
+        self.client.post(self.url, data={
+            'program_uuid': program_uuid,
+            'text': text,
+        })
+        render_call_dict = mocked_render.call_args[0][1]
+        assert render_call_dict['errors'] == [error]
+
+    @ddt.data(
+        '0001,learner-01\n0002,learner-02',                                 # normal
+        '0001,learner-01,apple,orange\n0002,learner-02,purple',             # extra fields
+        '\t0001        ,    \t  learner-01    \n   0002 , learner-02    ',  # whitespace
+    )
+    @patch('support.views.program_enrollments.link_program_enrollments')
+    def test_text(self, text, mocked_link):
+        self.client.post(self.url, data={
+            'program_uuid': self.program_uuid,
+            'text': text,
+        })
+        mocked_link.assert_called_once()
+        mocked_link.assert_called_with(
+            UUID(self.program_uuid),
+            {
+                '0001': 'learner-01',
+                '0002': 'learner-02',
+            }
+        )
+
+    @patch_render
+    def test_junk_text(self, mocked_render):
+        text = 'alsdjflajsdflakjs'
+        self.client.post(self.url, data={
+            'program_uuid': self.program_uuid,
+            'text': text,
+        })
+        msg = u"All linking lines must be in the format 'external_user_key,lms_username'"
+        render_call_dict = mocked_render.call_args[0][1]
+        assert render_call_dict['errors'] == [msg]
+
+
+@ddt.ddt
+class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
+    """
+    View tests for Program Enrollments Inspector
+    """
+    patch_render = patch(
+        'support.views.program_enrollments.render_to_response',
+        return_value=HttpResponse(),
+        autospec=True,
+    )
+
+    def setUp(self):
+        super(ProgramEnrollmentsInspectorViewTests, self).setUp()
+        self.url = reverse("support:program_enrollments_inspector")
+        SupportStaffRole().add_users(self.user)
+        self.program_uuid = str(uuid4())
+        self.external_user_key = 'abcaaa'
+        # Setup three orgs and their SAML providers
+        self.org_key_list = ['test_org', 'donut_org', 'tri_org']
+        for org_key in self.org_key_list:
+            lms_org = OrganizationFactory(
+                short_name=org_key
+            )
+            SAMLProviderConfigFactory(
+                organization=lms_org,
+                slug=org_key,
+                enabled=True,
+            )
+        self.no_saml_org_key = 'no_saml_org'
+        self.no_saml_lms_org = OrganizationFactory(
+            short_name=self.no_saml_org_key
+        )
+
+    def _serialize_datetime(self, dt):
+        return dt.strftime('%Y-%m-%dT%H:%M:%S')
+
+    def test_initial_rendering(self):
+        response = self.client.get(self.url)
+        content = six.text_type(response.content, encoding='utf-8')
+        expected_organization_serialized = '"orgKeys": {}'.format(
+            json.dumps(sorted(self.org_key_list))
+        )
+        assert response.status_code == 200
+        assert expected_organization_serialized in content
+        assert '"learnerInfo": {}' in content
+
+    def _construct_user(self, username, org_key=None, external_user_key=None):
+        """
+        Provided the username, create an edx account user. If the org_key is provided,
+        SSO link the user with the IdP associated with org_key. Return the created user and
+        expected user info object from the view
+        """
+        user = UserFactory(username=username)
+        user_info = {
+            'username': user.username,
+            'email': user.email
+        }
+        if org_key and external_user_key:
+            user_social_auth = UserSocialAuth.objects.create(
+                user=user,
+                uid='{0}:{1}'.format(org_key, external_user_key),
+                provider='tpa-saml'
+            )
+            user_info['sso_list'] = [{
+                'uid': user_social_auth.uid
+            }]
+        return user, user_info
+
+    def _construct_enrollments(self, program_uuids, course_ids, external_user_key, edx_user=None):
+        """
+        A helper function to setup the program enrollments for a given learner.
+        If the edx user is provided, it will try to SSO the user with the enrollments
+        Return the expected info object that should be created based on the model setup
+        """
+        program_enrollments = []
+        for program_uuid in program_uuids:
+            course_enrollment = None
+            program_enrollment = ProgramEnrollmentFactory.create(
+                external_user_key=external_user_key,
+                program_uuid=program_uuid,
+                user=edx_user
+            )
+
+            for course_id in course_ids:
+                if edx_user:
+                    course_enrollment = CourseEnrollmentFactory.create(
+                        course_id=course_id,
+                        user=edx_user,
+                        mode=CourseMode.MASTERS,
+                        is_active=True
+                    )
+
+                program_course_enrollment = ProgramCourseEnrollmentFactory.create(
+                    program_enrollment=program_enrollment,
+                    course_key=course_id,
+                    course_enrollment=course_enrollment,
+                    status='active',
+                )
+
+            program_enrollments.append(program_enrollment)
+
+        serialized = ProgramEnrollmentSerializer(program_enrollments, many=True)
+        return serialized.data
+
+    def _construct_id_verification(self, user):
+        """
+        Helper function to create the SSO verified record for the user
+        so that the user is ID Verified
+        """
+        SSOVerificationFactory(
+            identity_provider_slug=self.org_key_list[0],
+            user=user,
+        )
+        return IDVerificationService.user_status(user)
+
+    @patch_render
+    def test_search_username_well_connected_user(self, mocked_render):
+        created_user, expected_user_info = self._construct_user(
+            'test_user_connected',
+            self.org_key_list[0],
+            self.external_user_key
+        )
+        id_verified = self._construct_id_verification(created_user)
+        expected_enrollments = self._construct_enrollments(
+            [self.program_uuid],
+            [self.course.id],
+            self.external_user_key,
+            created_user
+        )
+        self.client.get(self.url, data={
+            'edx_user': created_user.username,
+            'org_key': self.org_key_list[0]
+        })
+        expected_info = {
+            'user': expected_user_info,
+            'enrollments': expected_enrollments,
+            'id_verification': id_verified
+        }
+
+        render_call_dict = mocked_render.call_args[0][1]
+        assert expected_info == render_call_dict['learner_program_enrollments']
+
+    @patch_render
+    def test_search_username_user_not_connected(self, mocked_render):
+        created_user, expected_user_info = self._construct_user('user_not_connected')
+        self.client.get(self.url, data={
+            'edx_user': created_user.email,
+            'org_key': self.org_key_list[0]
+        })
+        expected_info = {
+            'user': expected_user_info,
+            'id_verification': IDVerificationService.user_status(created_user)
+        }
+
+        render_call_dict = mocked_render.call_args[0][1]
+        assert expected_info == render_call_dict['learner_program_enrollments']
+
+    @patch_render
+    def test_search_username_user_no_enrollment(self, mocked_render):
+        created_user, expected_user_info = self._construct_user(
+            'user_connected',
+            self.org_key_list[0],
+            self.external_user_key
+        )
+        self.client.get(self.url, data={
+            'edx_user': created_user.email,
+            'org_key': self.org_key_list[0]
+        })
+        expected_info = {
+            'user': expected_user_info,
+            'id_verification': IDVerificationService.user_status(created_user),
+        }
+
+        render_call_dict = mocked_render.call_args[0][1]
+        assert expected_info == render_call_dict['learner_program_enrollments']
+
+    @patch_render
+    def test_search_username_user_no_course_enrollment(self, mocked_render):
+        created_user, expected_user_info = self._construct_user(
+            'user_connected',
+            self.org_key_list[0],
+            self.external_user_key
+        )
+        expected_enrollments = self._construct_enrollments(
+            [self.program_uuid],
+            [],
+            self.external_user_key,
+            created_user,
+        )
+        self.client.get(self.url, data={
+            'edx_user': created_user.email,
+            'org_key': self.org_key_list[0]
+        })
+        expected_info = {
+            'user': expected_user_info,
+            'enrollments': expected_enrollments,
+            'id_verification': IDVerificationService.user_status(created_user),
+        }
+
+        render_call_dict = mocked_render.call_args[0][1]
+        assert expected_info == render_call_dict['learner_program_enrollments']
+
+    @patch_render
+    def test_search_username_user_not_connected_with_enrollments(self, mocked_render):
+        created_user, expected_user_info = self._construct_user(
+            'user_not_connected'
+        )
+        self._construct_enrollments(
+            [self.program_uuid],
+            [],
+            self.external_user_key,
+        )
+        self.client.get(self.url, data={
+            'edx_user': created_user.email,
+            'org_key': self.org_key_list[0]
+        })
+        expected_info = {
+            'user': expected_user_info,
+            'id_verification': IDVerificationService.user_status(created_user),
+        }
+
+        render_call_dict = mocked_render.call_args[0][1]
+        assert expected_info == render_call_dict['learner_program_enrollments']
+
+    @patch_render
+    def test_search_username_user_id_verified(self, mocked_render):
+        created_user, expected_user_info = self._construct_user(
+            'user_not_connected'
+        )
+        id_verified = self._construct_id_verification(created_user)
+        expected_info = {
+            'user': expected_user_info,
+            'id_verification': id_verified
+        }
+
+        self.client.get(self.url, data={
+            'edx_user': created_user.email,
+            'org_key': self.org_key_list[0]
+        })
+
+        render_call_dict = mocked_render.call_args[0][1]
+        assert expected_info == render_call_dict['learner_program_enrollments']
+
+    @patch_render
+    def test_search_external_key_well_connected(self, mocked_render):
+        created_user, expected_user_info = self._construct_user(
+            'test_user_connected',
+            self.org_key_list[0],
+            self.external_user_key
+        )
+        expected_enrollments = self._construct_enrollments(
+            [self.program_uuid],
+            [self.course.id],
+            self.external_user_key,
+            created_user
+        )
+        id_verified = self._construct_id_verification(created_user)
+        self.client.get(self.url, data={
+            'external_user_key': self.external_user_key,
+            'org_key': self.org_key_list[0]
+        })
+        expected_info = {
+            'user': expected_user_info,
+            'enrollments': expected_enrollments,
+            'id_verification': id_verified,
+        }
+
+        render_call_dict = mocked_render.call_args[0][1]
+        assert expected_info == render_call_dict['learner_program_enrollments']
+
+    @ddt.data(
+        ('', 'test_org'),
+        ('bad_key', '')
+    )
+    @ddt.unpack
+    @patch_render
+    def test_search_no_external_user_key(self, user_key, org_key, mocked_render):
+        self.client.get(self.url, data={
+            'external_user_key': user_key,
+            'org_key': org_key,
+        })
+
+        expected_error = (
+            "To perform a search, you must provide either the student's "
+            "(a) edX username, "
+            "(b) email address associated with their edX account, or "
+            "(c) Identity-providing institution and external key!"
+        )
+
+        render_call_dict = mocked_render.call_args[0][1]
+        assert {} == render_call_dict['learner_program_enrollments']
+        assert expected_error == render_call_dict['error']
+
+    @patch_render
+    def test_search_external_user_not_connected(self, mocked_render):
+        expected_enrollments = self._construct_enrollments(
+            [self.program_uuid],
+            [self.course.id],
+            self.external_user_key,
+        )
+        self.client.get(self.url, data={
+            'external_user_key': self.external_user_key,
+            'org_key': self.org_key_list[0]
+        })
+        expected_info = {
+            'user': {
+                'external_user_key': self.external_user_key,
+            },
+            'enrollments': expected_enrollments
+        }
+
+        render_call_dict = mocked_render.call_args[0][1]
+        assert expected_info == render_call_dict['learner_program_enrollments']
+
+    @patch_render
+    def test_search_external_user_not_in_system(self, mocked_render):
+        external_user_key = 'not_in_system'
+        self.client.get(self.url, data={
+            'external_user_key': external_user_key,
+            'org_key': self.org_key_list[0],
+        })
+
+        expected_error = 'No user found for external key {} for institution {}'.format(
+            external_user_key, self.org_key_list[0]
+        )
+        render_call_dict = mocked_render.call_args[0][1]
+        assert expected_error == render_call_dict['error']

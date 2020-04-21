@@ -1,9 +1,10 @@
 """
 Problem Page.
 """
-from __future__ import absolute_import
+
 
 from bok_choy.page_object import PageObject
+from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
 
 from common.test.acceptance.pages.common.utils import click_css
@@ -488,30 +489,39 @@ class ProblemPage(PageObject):
         solution_selector = '.solution-span div.detailed-solution'
         return self.q(css=solution_selector).is_present()
 
-    def is_choice_highlighted(self, choice, choices_list):
+    def is_choice_highlighted(self, choice, choices_list, show_answer=True):
         """
         Check if the given answer/choice is highlighted for choice group.
+
+        show_answer: if set, then requires each choice to be marked with a status.
+            If not set, then the status can be elswhere in the problem.
         """
-        choice_status_xpath = (u'//fieldset/div[contains(@class, "field")][{{0}}]'
-                               u'/label[contains(@class, "choicegroup_{choice}")]'
-                               u'/span[contains(@class, "status {choice}")]'.format(choice=choice))
-        any_status_xpath = u'//fieldset/div[contains(@class, "field")][{0}]/label/span'
-        for choice in choices_list:
-            if not self.q(xpath=choice_status_xpath.format(choice)).is_present():
+        if show_answer:
+            choice_status_xpath = (u'//fieldset/div[contains(@class, "field")][{{0}}]'
+                                   u'/label[contains(@class, "choicegroup_{choice}")]'
+                                   u'/span[contains(@class, "status {choice}")]'.format(choice=choice))
+            any_status_xpath = u'//fieldset/div[contains(@class, "field")][{0}]/label/span'
+        else:
+            choice_status_xpath = (u'//fieldset/div[contains(@class, "field")][{{0}}]'
+                                   u'/label[contains(@class, "choicegroup_{choice}")]'.format(choice=choice))
+            any_status_xpath = u'//div[contains(@class, "indicator-container")]/span[contains(@class, "status")]'
+
+        for possible_choice in choices_list:
+            if not self.q(xpath=choice_status_xpath.format(possible_choice)).is_present():
                 return False
 
             # Check that there is only a single status span, as there were some bugs with multiple
             # spans (with various classes) being appended.
-            if not len(self.q(xpath=any_status_xpath.format(choice)).results) == 1:
+            if not len(self.q(xpath=any_status_xpath.format(possible_choice)).results) == 1:
                 return False
 
         return True
 
-    def is_correct_choice_highlighted(self, correct_choices):
+    def is_correct_choice_highlighted(self, correct_choices, show_answer=True):
         """
         Check if correct answer/choice highlighted for choice group.
         """
-        return self.is_choice_highlighted('correct', correct_choices)
+        return self.is_choice_highlighted('correct', correct_choices, show_answer)
 
     def is_submitted_choice_highlighted(self, correct_choices):
         """
@@ -575,3 +585,57 @@ class ProblemPage(PageObject):
         Checks for the presence of the locator
         """
         return self.q(css=selector).present
+
+
+class DragAndDropPage(PageObject):
+    """
+    View for a Drag & Drop problem.
+    """
+
+    url = None
+
+    def is_browser_on_page(self):
+        return self.q(css='.xblock-student_view').present
+
+    def is_submit_disabled(self):
+        """
+        Checks if the submit button is disabled for Drag & Drop problem.
+        """
+        disabled_attr = self.q(css='.submit-answer-button').attrs('disabled')[0]
+        return disabled_attr == 'true'
+
+    def is_present(self, selector):
+        """
+        Checks for the presence of the locator.
+        """
+        return self.q(css=selector).present
+
+    def is_submit_button_present(self):
+        """
+        Verifies if the submit button is present for DnD problems
+        with assessment mode.
+        """
+        return self.is_present('.submit-answer-button')
+
+    def _get_item_by_value(self, item_value):
+        """
+        Get the item that will be placed onto a zone.
+        """
+        return self.q(xpath=(".//div[@data-value='{item_id}']".format(item_id=item_value)))[0]
+
+    def _get_zone_by_id(self, zone_id):
+        """
+        Get zone where the item will be placed.
+        """
+        zones_container = self.browser.find_element_by_css_selector('.target')
+        return zones_container.find_elements_by_xpath(".//div[@data-uid='{zone_id}']".format(zone_id=zone_id))[0]
+
+    def drag_item_to_zone(self, item_value, zone_id):
+        """
+        Drag item to desired zone using mouse interaction.
+        """
+        element = self._get_item_by_value(item_value)
+        target = self._get_zone_by_id(zone_id)
+        action_chains = ActionChains(self.browser)
+        action_chains.drag_and_drop(element, target).perform()
+        self.wait_for_ajax()

@@ -2,7 +2,7 @@
 """
 Tests for UserPartitionTransformer.
 """
-from __future__ import absolute_import
+
 
 import string
 from collections import namedtuple
@@ -475,7 +475,7 @@ class MergedGroupAccessTestData(UserPartitionTestMixin, CourseStructureTestCase)
         for partition_id, group_id in six.iteritems(user_partition_groups):
             user_partition_groups[partition_id] = self.groups[group_id - 1]
 
-        self.assertEquals(
+        self.assertEqual(
             merged_group_access.check_group_access(user_partition_groups),
             expected_access,
         )
@@ -493,7 +493,7 @@ class MergedGroupAccessTestData(UserPartitionTestMixin, CourseStructureTestCase)
     )
     @ddt.unpack
     def test_intersection_method(self, input_value, expected_result):
-        self.assertEquals(
+        self.assertEqual(
             _MergedGroupAccess._intersection(*input_value),
             expected_result,
         )

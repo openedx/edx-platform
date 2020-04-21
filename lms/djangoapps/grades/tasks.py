@@ -2,7 +2,6 @@
 This module contains tasks for asynchronous execution of grade updates.
 """
 
-from __future__ import absolute_import
 
 from logging import getLogger
 
@@ -18,7 +17,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import CourseLocator
 from submissions import api as sub_api
 
-from courseware.model_data import get_score
+from lms.djangoapps.courseware.model_data import get_score
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -139,6 +138,9 @@ def recalculate_course_and_subsection_grades_for_user(self, **kwargs):  # pylint
     Recalculates the course grade and all subsection grades
     for the given ``user`` and ``course_key`` keyword arguments.
     """
+    if 'lms.djangoapps.grades.apps.GradesConfig' not in settings.INSTALLED_APPS:
+        # This task errors when run in-process during Studio tests, just skip it
+        return
     user_id = kwargs.get('user_id')
     course_key_str = kwargs.get('course_key')
 

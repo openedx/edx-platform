@@ -3,7 +3,7 @@ Tests for course group views
 """
 # pylint: disable=attribute-defined-outside-init
 # pylint: disable=no-member
-from __future__ import absolute_import
+
 
 import json
 from collections import namedtuple
@@ -111,7 +111,7 @@ class CohortViewsTestCase(ModuleStoreTestCase):
         else:
             response = handler(request, six.text_type(course.id))
         self.assertEqual(response.status_code, expected_response_code)
-        return json.loads(response.content)
+        return json.loads(response.content.decode('utf-8'))
 
     def put_handler(self, course, cohort=None, data=None, expected_response_code=200, handler=cohort_handler):
         """
@@ -127,7 +127,7 @@ class CohortViewsTestCase(ModuleStoreTestCase):
         else:
             response = handler(request, six.text_type(course.id))
         self.assertEqual(response.status_code, expected_response_code)
-        return json.loads(response.content)
+        return json.loads(response.content.decode('utf-8'))
 
     def patch_handler(self, course, cohort=None, data=None, expected_response_code=200, handler=cohort_handler):
         """
@@ -144,7 +144,7 @@ class CohortViewsTestCase(ModuleStoreTestCase):
         else:
             response = handler(request, six.text_type(course.id))
         self.assertEqual(response.status_code, expected_response_code)
-        return json.loads(response.content)
+        return json.loads(response.content.decode('utf-8'))
 
 
 class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
@@ -624,7 +624,7 @@ class UsersInCohortTestCase(CohortViewsTestCase):
             return
 
         self.assertEqual(response.status_code, 200)
-        return json.loads(response.content)
+        return json.loads(response.content.decode('utf-8'))
 
     def verify_users_in_cohort_and_response(self, cohort, response_dict, expected_users, expected_page,
                                             expected_num_pages):
@@ -762,7 +762,7 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
             response = add_users_to_cohort(request, six.text_type(course.id), cohort.id)
             self.assertEqual(response.status_code, 200)
 
-            return json.loads(response.content)
+            return json.loads(response.content.decode('utf-8'))
 
     def verify_added_users_to_cohort(self, response_dict, cohort, course, expected_added, expected_changed,
                                      expected_present, expected_unknown, expected_preassigned, expected_invalid):
@@ -1144,7 +1144,7 @@ class RemoveUserFromCohortTestCase(CohortViewsTestCase):
         request.user = self.staff_user
         response = remove_user_from_cohort(request, six.text_type(self.course.id), cohort.id)
         self.assertEqual(response.status_code, 200)
-        return json.loads(response.content)
+        return json.loads(response.content.decode('utf-8'))
 
     def verify_removed_user_from_cohort(self, username, response_dict, cohort, expected_error_msg=None):
         """

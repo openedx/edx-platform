@@ -2,32 +2,30 @@
 Test signal handlers for program_enrollments
 """
 
-from __future__ import absolute_import
 
-from django.core.cache import cache
 import mock
-from opaque_keys.edx.keys import CourseKey
 import pytest
+from django.core.cache import cache
+from edx_django_utils.cache import RequestCache
+from opaque_keys.edx.keys import CourseKey
+from organizations.tests.factories import OrganizationFactory
 from social_django.models import UserSocialAuth
 from testfixtures import LogCapture
 
 from course_modes.models import CourseMode
-from edx_django_utils.cache import RequestCache
 from lms.djangoapps.program_enrollments.signals import _listen_for_lms_retire, logger
 from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
-from organizations.tests.factories import OrganizationFactory
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL
-from openedx.core.djangoapps.catalog.tests.factories import (
-    OrganizationFactory as CatalogOrganizationFactory, ProgramFactory
-)
+from openedx.core.djangoapps.catalog.tests.factories import OrganizationFactory as CatalogOrganizationFactory
+from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import fake_completed_retirement
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.models import CourseEnrollmentException
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from third_party_auth.tests.factories import SAMLProviderConfigFactory
 from third_party_auth.models import SAMLProviderConfig
+from third_party_auth.tests.factories import SAMLProviderConfigFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
@@ -122,7 +120,9 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
 
         for course_key in cls.course_keys:
             CourseOverviewFactory(id=course_key)
-        cls.provider_config = SAMLProviderConfigFactory.create(organization=cls.organization, slug=cls.provider_slug)
+        cls.provider_config = SAMLProviderConfigFactory.create(
+            organization=cls.organization, slug=cls.provider_slug
+        )
 
     def setUp(self):
         super(SocialAuthEnrollmentCompletionSignalTest, self).setUp()
@@ -169,6 +169,30 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
         self.assertEqual(student_course_enrollment.user, self.user)
         self.assertEqual(student_course_enrollment.course.id, program_course_enrollment.course_key)
         self.assertEqual(student_course_enrollment.mode, mode)
+
+    def test_update_social_auth(self):
+        """
+        Makes sure we can update a social_auth row to trigger the same program enrollments
+        """
+        program_enrollment = self._create_waiting_program_enrollment()
+        program_course_enrollments = self._create_waiting_course_enrollments(program_enrollment)
+
+        user_social_auth = UserSocialAuth.objects.create(
+            user=self.user,
+            uid='{0}:{1}'.format(self.provider_slug, 'gobbledegook')
+        )
+
+        # Not yet a thing, didn't match
+        program_enrollment.refresh_from_db()
+        self.assertIsNone(program_enrollment.user)
+
+        user_social_auth.uid = '{0}:{1}'.format(self.provider_slug, self.external_id)
+        user_social_auth.save()
+
+        # now we see the enrollments realized
+        self._assert_program_enrollment_user(program_enrollment, self.user)
+        for program_course_enrollment in program_course_enrollments:
+            self._assert_program_course_enrollment(program_course_enrollment)
 
     def test_waiting_course_enrollments_completed(self):
         program_enrollment = self._create_waiting_program_enrollment()
@@ -248,7 +272,9 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
         self._assert_program_enrollment_user(program_enrollment, self.user)
 
         duplicate_program_course_enrollment = program_course_enrollments[0]
-        self._assert_program_course_enrollment(duplicate_program_course_enrollment, CourseMode.VERIFIED)
+        self._assert_program_course_enrollment(
+            duplicate_program_course_enrollment, CourseMode.VERIFIED
+        )
 
         program_course_enrollment = program_course_enrollments[1]
         self._assert_program_course_enrollment(program_course_enrollment)
@@ -309,7 +335,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
                 (
                     logger.name,
                     'WARNING',
-                    u'Got incoming social auth for provider={} but no such provider exists'.format('abc')
+                    'Got incoming social auth for provider={} but no such provider exists'.format('abc')
                 )
             )
 
@@ -326,35 +352,50 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
                 user=self.user,
                 uid='{0}:{1}'.format(self.provider_slug, self.external_id)
             )
-            error_tmpl = (
-                u'Failed to complete waiting enrollments for organization={}.'
-                u' No catalog programs with matching authoring_organization exist.'
+            error_template = (
+                'Failed to complete waiting enrollments for organization={}.'
+                ' No catalog programs with matching authoring_organization exist.'
             )
             log.check_present(
                 (
                     logger.name,
                     'WARNING',
-                    error_tmpl.format('UoX')
+                    error_template.format('UoX')
                 )
             )
 
-    def test_log_on_enrollment_failure(self):
+    def test_exception_on_enrollment_failure(self):
         program_enrollment = self._create_waiting_program_enrollment()
-        program_course_enrollments = self._create_waiting_course_enrollments(program_enrollment)
+        self._create_waiting_course_enrollments(program_enrollment)
 
         with mock.patch('student.models.CourseEnrollment.enroll') as enrollMock:
             enrollMock.side_effect = CourseEnrollmentException('something has gone wrong')
+            with pytest.raises(CourseEnrollmentException):
+                UserSocialAuth.objects.create(
+                    user=self.user,
+                    uid='{0}:{1}'.format(self.provider_slug, self.external_id)
+                )
+
+    def test_log_on_unexpected_exception(self):
+        """
+        unexpected errors as part of the account linking process should be logged and re-raised
+        """
+        program_enrollment = self._create_waiting_program_enrollment()
+        self._create_waiting_course_enrollments(program_enrollment)
+
+        with mock.patch('lms.djangoapps.program_enrollments.api.linking.enroll_in_masters_track') as enrollMock:
+            enrollMock.side_effect = Exception('unexpected error')
             with LogCapture(logger.name) as log:
-                with pytest.raises(CourseEnrollmentException):
+                with self.assertRaisesRegex(Exception, 'unexpected error'):
                     UserSocialAuth.objects.create(
                         user=self.user,
-                        uid='{0}:{1}'.format(self.provider_slug, self.external_id)
+                        uid='{0}:{1}'.format(self.provider_slug, self.external_id),
                     )
-                error_tmpl = u'Failed to enroll user={} with waiting program_course_enrollment={}: {}'
+                error_template = 'Unable to link waiting enrollments for user {}, social auth creation failed: {}'
                 log.check_present(
                     (
                         logger.name,
                         'WARNING',
-                        error_tmpl.format(self.user.id, program_course_enrollments[0].id, 'something has gone wrong')
+                        error_template.format(self.user.id, 'unexpected error')
                     )
                 )

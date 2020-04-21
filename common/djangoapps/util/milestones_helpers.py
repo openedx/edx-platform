@@ -2,7 +2,7 @@
 """
 Utility library for working with the edx-milestones app
 """
-from __future__ import absolute_import
+
 
 import six
 from django.conf import settings
@@ -405,6 +405,7 @@ def any_unfulfilled_milestones(course_id, user_id):
     if not settings.FEATURES.get('MILESTONES_APP'):
         return False
 
+    user_id = None if user_id is None else int(user_id)
     fulfillment_paths = milestones_api.get_course_milestones_fulfillment_paths(course_id, {'id': user_id})
 
     # Returns True if any of the milestones is unfulfilled. False if

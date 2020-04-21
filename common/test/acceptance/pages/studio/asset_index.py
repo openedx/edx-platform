@@ -2,14 +2,10 @@
 The Files and Uploads page for a course in Studio
 """
 
-from __future__ import absolute_import
 
 import os
 
 import six
-import six.moves.urllib.error  # pylint: disable=import-error
-import six.moves.urllib.parse  # pylint: disable=import-error
-import six.moves.urllib.request  # pylint: disable=import-error
 from bok_choy.javascript import wait_for_js
 from bok_choy.promise import EmptyPromise
 from opaque_keys.edx.locator import CourseLocator

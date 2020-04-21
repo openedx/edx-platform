@@ -1,12 +1,12 @@
 """
 API utils in order to communicate to edx-video-pipeline.
 """
-from __future__ import absolute_import
+
 import json
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist
-from provider.oauth2.models import Client
+from oauth2_provider.models import Application
 from slumber.exceptions import HttpClientError
 
 from openedx.core.djangoapps.video_pipeline.models import VideoPipelineIntegration
@@ -32,7 +32,7 @@ def update_3rd_party_transcription_service_credentials(**credentials_payload):
     if pipeline_integration.enabled:
         try:
             video_pipeline_user = pipeline_integration.get_service_user()
-            oauth_client = Client.objects.get(name=pipeline_integration.client_name)
+            oauth_client = Application.objects.get(name=pipeline_integration.client_name)
         except ObjectDoesNotExist:
             return error_response, is_updated
 

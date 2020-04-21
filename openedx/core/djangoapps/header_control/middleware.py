@@ -1,12 +1,12 @@
 """
 Middleware used for adjusting headers in a response before it is sent to the end user.
 """
-from __future__ import absolute_import
 
+from django.utils.deprecation import MiddlewareMixin
 import six
 
 
-class HeaderControlMiddleware(object):
+class HeaderControlMiddleware(MiddlewareMixin):
     """
     Middleware that can modify/remove headers in a response.
 

@@ -4,7 +4,7 @@ This is a Python API for generating certificates asynchronously.
 Other Django apps should use the API functions defined in this module
 rather than importing Django models directly.
 """
-from __future__ import absolute_import
+
 
 import logging
 
@@ -29,6 +29,7 @@ from lms.djangoapps.certificates.models import (
     certificate_status_for_student
 )
 from lms.djangoapps.certificates.queue import XQueueCertInterface
+from lms.djangoapps.instructor.access import list_with_level
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from util.organizations_helpers import get_course_organization_id
 from xmodule.modulestore.django import modulestore
@@ -68,7 +69,8 @@ def format_certificate_for_user(username, cert):
             "is_passing": is_passing_status(cert.status),
             "is_pdf_certificate": bool(cert.download_url),
             "download_url": (
-                cert.download_url or get_certificate_url(cert.user.id, cert.course_id, user_certificate=cert)
+                cert.download_url or get_certificate_url(cert.user.id, cert.course_id, uuid=cert.verify_uuid,
+                                                         user_certificate=cert)
                 if cert.status == CertificateStatuses.downloadable
                 else None
             ),
@@ -172,12 +174,20 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
         forced_grade - a string indicating to replace grade parameter. if present grading
                        will be skipped.
     """
-    xqueue = XQueueCertInterface()
-    if insecure:
-        xqueue.use_https = False
 
     if not course:
         course = modulestore().get_course(course_key, depth=0)
+
+    beta_testers_queryset = list_with_level(course, u'beta')
+
+    if beta_testers_queryset.filter(username=student.username):
+        message = u'Cancelling course certificate generation for user [{}] against course [{}], user is a Beta Tester.'
+        log.info(message.format(course_key, student.username))
+        return
+
+    xqueue = XQueueCertInterface()
+    if insecure:
+        xqueue.use_https = False
 
     generate_pdf = not has_html_certificates_enabled(course)
 
@@ -281,6 +291,7 @@ def certificate_downloadable_status(student, course_key):
     if current_status['status'] == CertificateStatuses.downloadable and may_view_certificate:
         response_data['is_downloadable'] = True
         response_data['download_url'] = current_status['download_url'] or get_certificate_url(student.id, course_key)
+        response_data['is_pdf_certificate'] = bool(current_status['download_url'])
         response_data['uuid'] = current_status['uuid']
 
     return response_data
@@ -458,8 +469,8 @@ def _certificate_download_url(user_id, course_id, user_certificate=None):
         except GeneratedCertificate.DoesNotExist:
             log.critical(
                 u'Unable to lookup certificate\n'
-                u'user id: %d\n'
-                u'course: %s', user_id, six.text_type(course_id)
+                u'user id: %s\n'
+                u'course: %s', six.text_type(user_id), six.text_type(course_id)
             )
 
     if user_certificate:

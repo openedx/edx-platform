@@ -1,7 +1,7 @@
 """
 Tests for programs celery tasks.
 """
-from __future__ import absolute_import
+
 
 import json
 import logging
@@ -14,7 +14,6 @@ import pytz
 from celery.exceptions import MaxRetriesExceededError
 from django.conf import settings
 from django.test import TestCase, override_settings
-from edx_oauth2_provider.tests.factories import ClientFactory
 from edx_rest_api_client import exceptions
 from edx_rest_api_client.client import EdxRestApiClient
 from waffle.testutils import override_switch
@@ -24,6 +23,7 @@ from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
 from openedx.core.djangoapps.programs.tasks.v1 import tasks
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
@@ -109,7 +109,8 @@ class AwardProgramCertificateTestCase(TestCase):
                 }
             ]
         }
-        self.assertEqual(json.loads(httpretty.last_request().body), expected_body)
+        last_request_body = httpretty.last_request().body.decode('utf-8')
+        self.assertEqual(json.loads(last_request_body), expected_body)
 
 
 @skip_unless_lms
@@ -130,7 +131,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         self.site = SiteFactory()
         self.site_configuration = SiteConfigurationFactory(site=self.site)
         self.catalog_integration = self.create_catalog_integration()
-        ClientFactory.create(name='credentials')
+        ApplicationFactory.create(name='credentials')
         UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)
 
     def test_completion_check(
@@ -144,7 +145,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         programs.
         """
         tasks.award_program_certificates.delay(self.student.username).get()
-        mock_get_completed_programs.assert_called(self.site, self.student)
+        mock_get_completed_programs.assert_any_call(self.site, self.student)
 
     @ddt.data(
         ([1], [2, 3]),
@@ -195,7 +196,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         mock_get_certified_programs.return_value = [1]
 
         # programs to be skipped
-        self.site_configuration.values = {
+        self.site_configuration.site_values = {
             "programs_without_certificates": [2]
         }
         self.site_configuration.save()
@@ -471,7 +472,8 @@ class PostCourseCertificateTestCase(TestCase):
                 'value': visible_date.strftime('%Y-%m-%dT%H:%M:%SZ')  # text representation of date
             }]
         }
-        self.assertEqual(json.loads(httpretty.last_request().body), expected_body)
+        last_request_body = httpretty.last_request().body.decode('utf-8')
+        self.assertEqual(json.loads(last_request_body), expected_body)
 
 
 @skip_unless_lms
@@ -504,7 +506,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         self.create_credentials_config()
         self.site = SiteFactory()
 
-        ClientFactory.create(name='credentials')
+        ApplicationFactory.create(name='credentials')
         UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)
 
     @ddt.data(

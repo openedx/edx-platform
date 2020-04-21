@@ -1,30 +1,28 @@
 """
 Tests for the gating API
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import unittest
 
+import six
 from completion.models import BlockCompletion
-from mock import patch, Mock
-from ddt import ddt, data, unpack
+from ddt import data, ddt, unpack
 from django.conf import settings
+from milestones import api as milestones_api
+from milestones.tests.utils import MilestonesTestCaseMixin
+from mock import Mock, patch
+
 from lms.djangoapps.gating import api as lms_gating_api
 from lms.djangoapps.grades.constants import GradeOverrideFeatureEnum
-from lms.djangoapps.grades.models import (
-    PersistentSubsectionGrade,
-    PersistentSubsectionGradeOverride,
-)
+from lms.djangoapps.grades.models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
 from lms.djangoapps.grades.tests.base import GradeTestBase
 from lms.djangoapps.grades.tests.utils import mock_get_score
-from milestones.tests.utils import MilestonesTestCaseMixin
-from milestones import api as milestones_api
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.gating.exceptions import GatingValidationError
 from student.tests.factories import UserFactory
-import six
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @ddt
@@ -266,7 +264,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
             category='html',
             display_name='some html block'
         )
-        with patch.object(BlockCompletion, 'get_course_completions') as course_block_completions_mock:
+        with patch.object(BlockCompletion, 'get_learning_context_completions') as course_block_completions_mock:
             course_block_completions_mock.return_value = {
                 problem_block.location: user_problem_completion,
                 html_block.location: user_html_completion,
@@ -307,7 +305,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
             display_name=u'{} block'.format(component_type)
         )
 
-        with patch.object(BlockCompletion, 'get_course_completions') as course_block_completions_mock:
+        with patch.object(BlockCompletion, 'get_learning_context_completions') as course_block_completions_mock:
             course_block_completions_mock.return_value = {
                 component.location: completed,
             }

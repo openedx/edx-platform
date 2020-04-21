@@ -2,7 +2,6 @@
 URL definitions for the verify_student app.
 """
 
-from __future__ import absolute_import
 
 from django.conf import settings
 from django.conf.urls import url
@@ -94,6 +93,13 @@ urlpatterns = [
         views.SubmitPhotosView.as_view(),
         name="verify_student_submit_photos"
     ),
+
+    url(
+        r'^status/$',
+        views.VerificationStatusAPIView.as_view(),
+        name="verification_status_api"
+    ),
+
 
     # End-point for reverification
     # Reverification occurs when a user's initial verification attempt

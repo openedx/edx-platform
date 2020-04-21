@@ -12,7 +12,7 @@ file and check it in at the same time as your model changes. To do that,
 ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
-from __future__ import absolute_import
+
 
 import codecs
 import csv
@@ -28,6 +28,8 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.db import models, transaction
+from django.utils.encoding import python_2_unicode_compatible
+from django.utils.translation import ugettext as _
 from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
 
@@ -38,8 +40,10 @@ logger = logging.getLogger(__name__)
 # define custom states used by InstructorTask
 QUEUING = 'QUEUING'
 PROGRESS = 'PROGRESS'
+TASK_INPUT_LENGTH = 10000
 
 
+@python_2_unicode_compatible
 class InstructorTask(models.Model):
     """
     Stores information about background tasks that have been submitted to
@@ -89,7 +93,7 @@ class InstructorTask(models.Model):
             'task_output': self.task_output,
         },)
 
-    def __unicode__(self):
+    def __str__(self):
         return six.text_type(repr(self))
 
     @classmethod
@@ -100,6 +104,17 @@ class InstructorTask(models.Model):
         # create the task_id here, and pass it into celery:
         task_id = str(uuid4())
         json_task_input = json.dumps(task_input)
+
+        # check length of task_input, and return an exception if it's too long
+        if len(json_task_input) > TASK_INPUT_LENGTH:
+            logger.error(
+                u'Task input longer than: `%s` for `%s` of course: `%s`',
+                TASK_INPUT_LENGTH,
+                task_type,
+                course_id
+            )
+            error_msg = _('An error has occurred. Task was not created.')
+            raise AttributeError(error_msg)
 
         # create the task, then save it:
         instructor_task = cls(
@@ -197,7 +212,7 @@ class ReportStore(object):
         storage_type = config.get('STORAGE_TYPE', '').lower()
         if storage_type == 's3':
             return DjangoStorageReportStore(
-                storage_class='openedx.core.storage.S3ReportStorage',
+                storage_class='storages.backends.s3boto.S3BotoStorage',
                 storage_kwargs={
                     'bucket': config['BUCKET'],
                     'location': config['ROOT_PATH'],
@@ -222,7 +237,10 @@ class ReportStore(object):
         compatibility.
         """
         for row in rows:
-            yield [six.text_type(item).encode('utf-8') for item in row]
+            if six.PY2:
+                yield [six.text_type(item).encode('utf-8') for item in row]
+            else:
+                yield [six.text_type(item) for item in row]
 
 
 class DjangoStorageReportStore(ReportStore):
@@ -261,6 +279,11 @@ class DjangoStorageReportStore(ReportStore):
         object, ready to be read from the beginning.
         """
         path = self.path_to(course_id, filename)
+        # See https://github.com/boto/boto/issues/2868
+        # Boto doesn't play nice with unicod in python3
+        if not six.PY2:
+            buff = ContentFile(buff.read().encode('utf-8'))
+
         self.storage.save(path, buff)
 
     def store_rows(self, course_id, filename, rows):
@@ -270,7 +293,8 @@ class DjangoStorageReportStore(ReportStore):
         """
         output_buffer = ContentFile('')
         # Adding unicode signature (BOM) for MS Excel 2013 compatibility
-        output_buffer.write(codecs.BOM_UTF8)
+        if six.PY2:
+            output_buffer.write(codecs.BOM_UTF8)
         csvwriter = csv.writer(output_buffer)
         csvwriter.writerows(self._get_utf8_encoded_rows(rows))
         output_buffer.seek(0)
@@ -298,7 +322,7 @@ class DjangoStorageReportStore(ReportStore):
             )
             return []
         files = [(filename, os.path.join(course_dir, filename)) for filename in filenames]
-        files.sort(key=lambda f: self.storage.modified_time(f[1]), reverse=True)
+        files.sort(key=lambda f: self.storage.get_modified_time(f[1]), reverse=True)
         return [
             (filename, self.storage.url(full_path))
             for filename, full_path in files
@@ -308,5 +332,5 @@ class DjangoStorageReportStore(ReportStore):
         """
         Return the full path to a given file for a given course.
         """
-        hashed_course_id = hashlib.sha1(text_type(course_id)).hexdigest()
+        hashed_course_id = hashlib.sha1(text_type(course_id).encode('utf-8')).hexdigest()
         return os.path.join(hashed_course_id, filename)

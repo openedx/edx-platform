@@ -1,7 +1,7 @@
 """
 Serializers for Bulk Enrollment.
 """
-from __future__ import absolute_import
+
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey

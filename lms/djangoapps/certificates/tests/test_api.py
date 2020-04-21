@@ -1,5 +1,5 @@
 """Tests for the certificates Python API. """
-from __future__ import absolute_import
+
 
 import uuid
 from contextlib import contextmanager
@@ -21,7 +21,6 @@ from opaque_keys.edx.locator import CourseLocator
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -32,6 +31,7 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.certificates.queue import XQueueAddToQueueError, XQueueCertInterface
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
+from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from student.models import CourseEnrollment
@@ -173,6 +173,7 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
                 'is_generating': False,
                 'is_unverified': False,
                 'download_url': 'www.google.com',
+                'is_pdf_certificate': True,
                 'uuid': cert.verify_uuid
             }
         )
@@ -202,6 +203,7 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
                     user_id=self.student.id,
                     course_id=self.course.id,
                 ),
+                'is_pdf_certificate': False,
                 'uuid': cert_status['uuid']
             }
         )
@@ -673,7 +675,7 @@ class CertificateGenerationEnabledTest(EventTestMixin, TestCase):
         self.assertEqual(expect_enabled, actual_enabled)
 
 
-class GenerateExampleCertificatesTest(TestCase):
+class GenerateExampleCertificatesTest(ModuleStoreTestCase):
     """Test generation of example certificates. """
 
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')
@@ -737,7 +739,7 @@ class GenerateExampleCertificatesTest(TestCase):
 
 
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-class CertificatesBrandingTest(TestCase):
+class CertificatesBrandingTest(ModuleStoreTestCase):
     """Test certificates branding. """
 
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')
@@ -762,7 +764,8 @@ class CertificatesBrandingTest(TestCase):
         data = certs_api.get_certificate_header_context(is_secure=True)
 
         # Make sure there are not unexpected keys in dict returned by 'get_certificate_header_context'
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             list(data.keys()),
             ['logo_src', 'logo_url']
         )
@@ -787,7 +790,8 @@ class CertificatesBrandingTest(TestCase):
         data = certs_api.get_certificate_footer_context()
 
         # Make sure there are not unexpected keys in dict returned by 'get_certificate_footer_context'
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             list(data.keys()),
             ['company_about_url', 'company_privacy_url', 'company_tos_url']
         )

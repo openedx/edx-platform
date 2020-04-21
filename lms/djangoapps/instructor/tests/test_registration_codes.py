@@ -1,7 +1,7 @@
 """
 Test for the registration code status information.
 """
-from __future__ import absolute_import
+
 
 import json
 
@@ -14,7 +14,7 @@ from six.moves import range
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.tests.factories import InstructorFactory
+from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from shoppingcart.models import (
     CourseRegCodeItem,
     CourseRegistrationCode,
@@ -103,7 +103,7 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
         }
         response = self.client.get(self.lookup_code_url, data)
         self.assertEqual(response.status_code, 400)
-        json_dict = json.loads(response.content)
+        json_dict = json.loads(response.content.decode('utf-8'))
         message = _(u'The enrollment code ({code}) was not found for the {course_name} course.').format(
             course_name=self.course.display_name, code=data['registration_code']
         )
@@ -146,7 +146,7 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
         }
         response = self.client.get(self.lookup_code_url, data)
         self.assertEqual(response.status_code, 200)
-        json_dict = json.loads(response.content)
+        json_dict = json.loads(response.content.decode('utf-8'))
         self.assertTrue(json_dict['is_registration_code_valid'])
         self.assertTrue(json_dict['is_registration_code_redeemed'])
 
@@ -158,7 +158,7 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
         response = self.client.post(self.registration_code_detail_url, data)
         self.assertEqual(response.status_code, 200)
 
-        json_dict = json.loads(response.content)
+        json_dict = json.loads(response.content.decode('utf-8'))
         message = _('This enrollment code has been canceled. It can no longer be used.')
         self.assertEqual(message, json_dict['message'])
 
@@ -203,7 +203,7 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
         }
         response = self.client.get(self.lookup_code_url, data)
         self.assertEqual(response.status_code, 200)
-        json_dict = json.loads(response.content)
+        json_dict = json.loads(response.content.decode('utf-8'))
         self.assertTrue(json_dict['is_registration_code_valid'])
         self.assertTrue(json_dict['is_registration_code_redeemed'])
 
@@ -218,7 +218,7 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
         response = self.client.post(self.registration_code_detail_url, data)
         self.assertEqual(response.status_code, 200)
 
-        json_dict = json.loads(response.content)
+        json_dict = json.loads(response.content.decode('utf-8'))
         message = _('This enrollment code has been marked as unused.')
         self.assertEqual(message, json_dict['message'])
 
@@ -241,7 +241,7 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
         response = self.client.post(self.registration_code_detail_url, data)
         self.assertEqual(response.status_code, 400)
 
-        json_dict = json.loads(response.content)
+        json_dict = json.loads(response.content.decode('utf-8'))
         message = _(u'The enrollment code ({code}) was not found for the {course_name} course.').format(
             course_name=self.course.display_name, code=data['registration_code']
         )
@@ -271,7 +271,7 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
         response = self.client.post(self.registration_code_detail_url, data)
         self.assertEqual(response.status_code, 200)
 
-        json_dict = json.loads(response.content)
+        json_dict = json.loads(response.content.decode('utf-8'))
         message = _('The enrollment code has been restored.')
         self.assertEqual(message, json_dict['message'])
 
@@ -301,6 +301,6 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
         response = self.client.post(self.registration_code_detail_url, data)
         self.assertEqual(response.status_code, 400)
 
-        json_dict = json.loads(response.content)
+        json_dict = json.loads(response.content.decode('utf-8'))
         message = _(u'The redemption does not exist against enrollment code ({code}).').format(code=reg_code.code)
         self.assertEqual(message, json_dict['message'])

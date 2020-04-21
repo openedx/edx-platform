@@ -2,7 +2,7 @@
 Comprehensive Theming support for Django's collectstatic functionality.
 See https://docs.djangoproject.com/en/1.8/ref/contrib/staticfiles/
 """
-from __future__ import absolute_import
+
 
 import os.path
 import posixpath
@@ -28,7 +28,7 @@ from openedx.core.djangoapps.theming.helpers import (
 )
 
 
-class ThemeStorage(StaticFilesStorage):
+class ThemeMixin(object):
     """
     Comprehensive theme aware Static files storage.
     """
@@ -38,16 +38,10 @@ class ThemeStorage(StaticFilesStorage):
     # instead of "images/logo.png"
     prefix = None
 
-    def __init__(self, location=None, base_url=None, file_permissions_mode=None,
-                 directory_permissions_mode=None, prefix=None):
+    def __init__(self, **kwargs):
 
-        self.prefix = prefix
-        super(ThemeStorage, self).__init__(
-            location=location,
-            base_url=base_url,
-            file_permissions_mode=file_permissions_mode,
-            directory_permissions_mode=directory_permissions_mode,
-        )
+        self.prefix = kwargs.pop('prefix', None)
+        super(ThemeMixin, self).__init__(**kwargs)
 
     def url(self, name):
         """
@@ -76,7 +70,7 @@ class ThemeStorage(StaticFilesStorage):
         if prefix and self.themed(name, prefix):
             name = os.path.join(prefix, name)
 
-        return super(ThemeStorage, self).url(name)
+        return super(ThemeMixin, self).url(name)
 
     def themed(self, name, theme):
         """
@@ -110,6 +104,10 @@ class ThemeStorage(StaticFilesStorage):
         # in live mode check static asset in the static files dir defined by "STATIC_ROOT" setting
         else:
             return self.exists(os.path.join(theme, name))
+
+
+class ThemeStorage(ThemeMixin, StaticFilesStorage):
+    pass
 
 
 class ThemeCachedFilesMixin(CachedFilesMixin):

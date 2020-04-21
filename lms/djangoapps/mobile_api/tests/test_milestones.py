@@ -1,15 +1,15 @@
 """
 Milestone related tests for the mobile_api
 """
-from __future__ import absolute_import
+
 
 import six
 from crum import set_current_request
 from django.conf import settings
 from mock import patch
 
-from courseware.access_response import MilestoneAccessError
-from courseware.tests.test_entrance_exam import add_entrance_exam_milestone, answer_entrance_exam_problem
+from lms.djangoapps.courseware.access_response import MilestoneAccessError
+from lms.djangoapps.courseware.tests.test_entrance_exam import add_entrance_exam_milestone, answer_entrance_exam_problem
 from openedx.core.djangolib.testing.utils import get_mock_request
 from util.milestones_helpers import add_prerequisite_course, fulfill_course_milestone
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

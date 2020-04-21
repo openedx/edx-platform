@@ -3,7 +3,7 @@
 Contains code related to computing content gating course duration limits
 and course access based on these limits.
 """
-from __future__ import absolute_import
+
 
 from datetime import timedelta
 
@@ -11,22 +11,22 @@ import six
 from django.utils import timezone
 from django.utils.translation import get_language
 from django.utils.translation import ugettext as _
+from edx_django_utils.cache import RequestCache
 from web_fragments.fragment import Fragment
 
 from course_modes.models import CourseMode
 from lms.djangoapps.courseware.access_response import AccessError
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
-from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
+from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_specific_student
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.course_date_signals.utils import get_expected_duration
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from student.models import CourseEnrollment
 from util.date_utils import strftime_localized
 
-MIN_DURATION = timedelta(weeks=4)
-MAX_DURATION = timedelta(weeks=18)
 EXPIRATION_DATE_FORMAT_STR = u'%b %-d, %Y'
 
 
@@ -54,6 +54,22 @@ class AuditExpiredError(AccessError):
                                                 additional_context_user_message)
 
 
+def get_user_course_duration(user, course):
+    """
+    Return a timedelta measuring the duration of the course for a particular user.
+
+    Business Logic:
+      - Course access duration is bounded by the min and max duration.
+      - If course fields are missing, default course access duration to MIN_DURATION.
+    """
+
+    enrollment = CourseEnrollment.get_enrollment(user, course.id)
+    if enrollment is None or enrollment.mode != CourseMode.AUDIT:
+        return None
+
+    return get_expected_duration(course)
+
+
 def get_user_course_expiration_date(user, course):
     """
     Return expiration date for given user course pair.
@@ -63,11 +79,8 @@ def get_user_course_expiration_date(user, course):
       - Course access duration is bounded by the min and max duration.
       - If course fields are missing, default course access duration to MIN_DURATION.
     """
-    access_duration = MIN_DURATION
-
-    verified_mode = CourseMode.verified_mode_for_course(course=course, include_expired=True)
-
-    if not verified_mode:
+    access_duration = get_user_course_duration(user, course)
+    if access_duration is None:
         return None
 
     enrollment = CourseEnrollment.get_enrollment(user, course.id)
@@ -78,8 +91,8 @@ def get_user_course_expiration_date(user, course):
         # Content availability date is equivalent to max(enrollment date, course start date)
         # for most people. Using the schedule date will provide flexibility to deal with
         # more complex business rules in the future.
-        content_availability_date = enrollment.schedule.start
-        # We have anecdotally observed a case where the schedule.start was
+        content_availability_date = enrollment.schedule.start_date
+        # We have anecdotally observed a case where the schedule.start_date was
         # equal to the course start, but should have been equal to the enrollment start
         # https://openedx.atlassian.net/browse/PROD-58
         # This section is meant to address that case
@@ -87,18 +100,13 @@ def get_user_course_expiration_date(user, course):
             if (content_availability_date.date() == course.start.date() and
                course.start < enrollment.created < timezone.now()):
                 content_availability_date = enrollment.created
+            # If course teams change the course start date, set the content_availability_date
+            # to max of enrollment or course start date
+            elif (content_availability_date.date() < course.start.date() and
+                  content_availability_date.date() < enrollment.created.date()):
+                content_availability_date = max(enrollment.created, course.start)
     except CourseEnrollment.schedule.RelatedObjectDoesNotExist:
         content_availability_date = max(enrollment.created, course.start)
-
-    # The user course expiration date is the content availability date
-    # plus the weeks_to_complete field from course-discovery.
-    discovery_course_details = get_course_run_details(course.id, ['weeks_to_complete'])
-    expected_weeks = discovery_course_details.get('weeks_to_complete')
-    if expected_weeks:
-        access_duration = timedelta(weeks=expected_weeks)
-
-    # Course access duration is bounded by the min and max duration.
-    access_duration = max(MIN_DURATION, min(MAX_DURATION, access_duration))
 
     return content_availability_date + access_duration
 
@@ -209,9 +217,40 @@ def generate_course_expired_message(user, course):
 def generate_course_expired_fragment(user, course):
     message = generate_course_expired_message(user, course)
     if message:
-        return Fragment(HTML(u"""\
+        return generate_fragment_from_message(message)
+
+
+def generate_fragment_from_message(message):
+    return Fragment(HTML(u"""\
             <div class="course-expiration-message">{}</div>
         """).format(message))
+
+
+def generate_course_expired_fragment_from_key(user, course_key):
+    """
+    Like `generate_course_expired_fragment`, but using a CourseKey instead of
+    a CourseOverview and using request-level caching.
+
+    Either returns WebFragment to inject XBlock content into, or None if we
+    shouldn't show a course expired message for this user.
+    """
+    request_cache = RequestCache('generate_course_expired_fragment_from_key')
+    cache_key = u'message:{},{}'.format(user.id, course_key)
+    cache_response = request_cache.get_cached_response(cache_key)
+    if cache_response.is_found:
+        cached_message = cache_response.value
+        # In this case, there is no message to display.
+        if cached_message is None:
+            return None
+        return generate_fragment_from_message(cached_message)
+
+    course = CourseOverview.get_from_id(course_key)
+    message = generate_course_expired_message(user, course)
+    request_cache.set(cache_key, message)
+    if message is None:
+        return None
+
+    return generate_fragment_from_message(message)
 
 
 def course_expiration_wrapper(user, block, view, frag, context):  # pylint: disable=W0613
@@ -222,9 +261,9 @@ def course_expiration_wrapper(user, block, view, frag, context):  # pylint: disa
     if block.category != "vertical":
         return frag
 
-    course = CourseOverview.get_from_id(block.course_id)
-    course_expiration_fragment = generate_course_expired_fragment(user, course)
-
+    course_expiration_fragment = generate_course_expired_fragment_from_key(
+        user, block.course_id
+    )
     if not course_expiration_fragment:
         return frag
 

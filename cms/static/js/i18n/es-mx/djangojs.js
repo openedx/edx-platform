@@ -21,35 +21,65 @@
   
   var newcatalog = {
     "%(sel)s of %(cnt)s selected": [
-      "%(sel)s de %(cnt)s seleccionado/a", 
+      "%(sel)s de %(cnt)s seleccionado/a",
       "%(sel)s de %(cnt)s seleccionados/as"
-    ], 
-    "6 a.m.": "6 a.m.", 
-    "Available %s": "Disponible %s", 
-    "Cancel": "Cancelar", 
-    "Choose": "Seleccionar", 
-    "Choose a time": "Elija una hora", 
-    "Choose all": "Seleccionar todos", 
-    "Chosen %s": "%s seleccionados", 
-    "Click to choose all %s at once.": "Da click para seleccionar todos los %s de una vez.", 
-    "Click to remove all chosen %s at once.": "Da click para eliminar todos los %s seleccionados de una vez.", 
-    "Filter": "Filtro", 
-    "Hide": "Ocultar", 
-    "Midnight": "Medianoche", 
-    "Noon": "Mediod\u00eda", 
-    "Now": "Ahora", 
-    "Remove": "Quitar", 
-    "Remove all": "Eliminar todos", 
-    "Show": "Mostrar", 
-    "This is the list of available %s. You may choose some by selecting them in the box below and then clicking the \"Choose\" arrow between the two boxes.": "Esta es la lista de los %s disponibles. Usted puede elegir algunos seleccion\u00e1ndolos en el cuadro de abajo y haciendo click en la flecha \"Seleccionar\" entre las dos cajas.", 
-    "This is the list of chosen %s. You may remove some by selecting them in the box below and then clicking the \"Remove\" arrow between the two boxes.": "Esta es la lista de los %s elegidos. Usted puede eliminar algunos seleccion\u00e1ndolos en el cuadro de abajo y haciendo click en la flecha \"Eliminar\" entre las dos cajas.", 
-    "Today": "Hoy", 
-    "Tomorrow": "Ma\u00f1ana", 
-    "Type into this box to filter down the list of available %s.": "Escriba en esta casilla para filtrar la lista de %s disponibles.", 
-    "Yesterday": "Ayer", 
-    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "Ha seleccionado una acci\u00f3n pero no ha realizado ninguna modificaci\u00f3n en campos individuales. Es probable que lo que necesite usar en realidad sea el bot\u00f3n Ejecutar y no el bot\u00f3n Guardar.", 
-    "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "Ha seleccionado una acci\u00f3n, pero todav\u00eda no ha grabado las modificaciones que ha realizado en campos individuales. Por favor haga click en Aceptar para grabarlas. Necesitar\u00e1 ejecutar la acci\u00f3n nuevamente.", 
-    "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "Tiene modificaciones sin guardar en campos modificables individuales. Si ejecuta una acci\u00f3n las mismas se perder\u00e1n."
+    ],
+    "6 a.m.": "6 a.m.",
+    "6 p.m.": "6 p.m.",
+    "April": "Abril",
+    "August": "Agosto",
+    "Available %s": "Disponible %s",
+    "Cancel": "Cancelar",
+    "Choose": "Seleccionar",
+    "Choose a Date": "Elija una fecha",
+    "Choose a Time": "Elija una hora",
+    "Choose a time": "Elija una hora",
+    "Choose all": "Seleccionar todos",
+    "Chosen %s": "%s seleccionados",
+    "Click to choose all %s at once.": "Da click para seleccionar todos los %s de una vez.",
+    "Click to remove all chosen %s at once.": "Da click para eliminar todos los %s seleccionados de una vez.",
+    "December": "Diciembre",
+    "February": "Febrero",
+    "Filter": "Filtro",
+    "Hide": "Ocultar",
+    "January": "Enero",
+    "July": "Julio",
+    "June": "Junio",
+    "March": "Marzo",
+    "May": "Mayo",
+    "Midnight": "Medianoche",
+    "Noon": "Mediod\u00eda",
+    "Note: You are %s hour ahead of server time.": [
+      "Nota: Usted esta a %s horas por delante de la hora del servidor.",
+      "Nota: Usted va %s horas por delante de la hora del servidor."
+    ],
+    "Note: You are %s hour behind server time.": [
+      "Nota: Usted esta a %s hora de retraso de tiempo de servidor.",
+      "Nota: Usted va %s horas por detr\u00e1s de la hora del servidor."
+    ],
+    "November": "Noviembre",
+    "Now": "Ahora",
+    "October": "Octubre",
+    "Remove": "Quitar",
+    "Remove all": "Eliminar todos",
+    "September": "Septiembre",
+    "Show": "Mostrar",
+    "This is the list of available %s. You may choose some by selecting them in the box below and then clicking the \"Choose\" arrow between the two boxes.": "Esta es la lista de los %s disponibles. Usted puede elegir algunos seleccion\u00e1ndolos en el cuadro de abajo y haciendo click en la flecha \"Seleccionar\" entre las dos cajas.",
+    "This is the list of chosen %s. You may remove some by selecting them in the box below and then clicking the \"Remove\" arrow between the two boxes.": "Esta es la lista de los %s elegidos. Usted puede eliminar algunos seleccion\u00e1ndolos en el cuadro de abajo y haciendo click en la flecha \"Eliminar\" entre las dos cajas.",
+    "Today": "Hoy",
+    "Tomorrow": "Ma\u00f1ana",
+    "Type into this box to filter down the list of available %s.": "Escriba en esta casilla para filtrar la lista de %s disponibles.",
+    "Yesterday": "Ayer",
+    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "Ha seleccionado una acci\u00f3n pero no ha realizado ninguna modificaci\u00f3n en campos individuales. Es probable que lo que necesite usar en realidad sea el bot\u00f3n Ejecutar y no el bot\u00f3n Guardar.",
+    "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "Ha seleccionado una acci\u00f3n, pero todav\u00eda no ha grabado las modificaciones que ha realizado en campos individuales. Por favor haga click en Aceptar para grabarlas. Necesitar\u00e1 ejecutar la acci\u00f3n nuevamente.",
+    "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "Tiene modificaciones sin guardar en campos modificables individuales. Si ejecuta una acci\u00f3n las mismas se perder\u00e1n.",
+    "one letter Friday\u0004F": "V",
+    "one letter Monday\u0004M": "L",
+    "one letter Saturday\u0004S": "S",
+    "one letter Sunday\u0004S": "D",
+    "one letter Thursday\u0004T": "J",
+    "one letter Tuesday\u0004T": "M",
+    "one letter Wednesday\u0004W": "M"
   };
   for (var key in newcatalog) {
     django.catalog[key] = newcatalog[key];
@@ -71,7 +101,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -105,39 +135,39 @@
     /* formatting library */
 
     django.formats = {
-    "DATETIME_FORMAT": "j \\d\\e F \\d\\e Y \\a \\l\\a\\s H:i", 
+    "DATETIME_FORMAT": "j \\d\\e F \\d\\e Y \\a \\l\\a\\s H:i",
     "DATETIME_INPUT_FORMATS": [
-      "%d/%m/%Y %H:%M:%S", 
-      "%d/%m/%Y %H:%M:%S.%f", 
-      "%d/%m/%Y %H:%M", 
-      "%d/%m/%y %H:%M:%S", 
-      "%d/%m/%y %H:%M:%S.%f", 
-      "%d/%m/%y %H:%M", 
-      "%Y-%m-%d %H:%M:%S", 
-      "%Y-%m-%d %H:%M:%S.%f", 
-      "%Y-%m-%d %H:%M", 
+      "%d/%m/%Y %H:%M:%S",
+      "%d/%m/%Y %H:%M:%S.%f",
+      "%d/%m/%Y %H:%M",
+      "%d/%m/%y %H:%M:%S",
+      "%d/%m/%y %H:%M:%S.%f",
+      "%d/%m/%y %H:%M",
+      "%Y-%m-%d %H:%M:%S",
+      "%Y-%m-%d %H:%M:%S.%f",
+      "%Y-%m-%d %H:%M",
       "%Y-%m-%d"
-    ], 
-    "DATE_FORMAT": "j \\d\\e F \\d\\e Y", 
+    ],
+    "DATE_FORMAT": "j \\d\\e F \\d\\e Y",
     "DATE_INPUT_FORMATS": [
-      "%d/%m/%Y", 
-      "%d/%m/%y", 
-      "%Y%m%d", 
+      "%d/%m/%Y",
+      "%d/%m/%y",
+      "%Y%m%d",
       "%Y-%m-%d"
-    ], 
-    "DECIMAL_SEPARATOR": ".", 
-    "FIRST_DAY_OF_WEEK": "1", 
-    "MONTH_DAY_FORMAT": "j \\d\\e F", 
-    "NUMBER_GROUPING": "3", 
-    "SHORT_DATETIME_FORMAT": "d/m/Y H:i", 
-    "SHORT_DATE_FORMAT": "d/m/Y", 
-    "THOUSAND_SEPARATOR": "\u00a0", 
-    "TIME_FORMAT": "H:i", 
+    ],
+    "DECIMAL_SEPARATOR": ".",
+    "FIRST_DAY_OF_WEEK": 1,
+    "MONTH_DAY_FORMAT": "j \\d\\e F",
+    "NUMBER_GROUPING": 3,
+    "SHORT_DATETIME_FORMAT": "d/m/Y H:i",
+    "SHORT_DATE_FORMAT": "d/m/Y",
+    "THOUSAND_SEPARATOR": ",",
+    "TIME_FORMAT": "H:i",
     "TIME_INPUT_FORMATS": [
-      "%H:%M:%S", 
-      "%H:%M:%S.%f", 
+      "%H:%M:%S",
+      "%H:%M:%S.%f",
       "%H:%M"
-    ], 
+    ],
     "YEAR_MONTH_FORMAT": "F \\d\\e Y"
   };
 

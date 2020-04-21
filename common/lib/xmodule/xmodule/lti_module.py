@@ -53,7 +53,6 @@ What is supported:
             GET / PUT / DELETE HTTP methods respectively
 """
 
-from __future__ import absolute_import
 
 import base64
 import datetime
@@ -62,20 +61,20 @@ import logging
 import textwrap
 from xml.sax.saxutils import escape
 
-from pkg_resources import resource_string
-
 import bleach
 import mock
 import oauthlib.oauth1
 import six
-import six.moves.urllib.parse
 from lxml import etree
 from oauthlib.oauth1.rfc5849 import signature
+from pkg_resources import resource_string
 from pytz import UTC
 from six import text_type
 from webob import Response
 from xblock.core import List, Scope, String, XBlock
 from xblock.fields import Boolean, Float
+
+from openedx.core.djangolib.markup import HTML, Text
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.lti_2_util import LTI20ModuleMixin, LTIError
 from xmodule.raw_module import EmptyDataRawDescriptor
@@ -84,9 +83,10 @@ from xmodule.x_module import XModule, module_attr
 log = logging.getLogger(__name__)
 
 DOCS_ANCHOR_TAG_OPEN = (
-    "<a target='_blank' "
+    "<a rel='noopener' target='_blank' "
     "href='https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/lti_component.html'>"
 )
+BREAK_TAG = '<br />'
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
@@ -124,39 +124,42 @@ class LTIFields(object):
     )
     lti_id = String(
         display_name=_("LTI ID"),
-        help=_(
+        help=Text(_(
             "Enter the LTI ID for the external LTI provider.  "
             "This value must be the same LTI ID that you entered in the "
             "LTI Passports setting on the Advanced Settings page."
-            "<br />See {docs_anchor_open}the edX LTI documentation{anchor_close} for more details on this setting."
-        ).format(
-            docs_anchor_open=DOCS_ANCHOR_TAG_OPEN,
-            anchor_close="</a>"
+            "{break_tag}See {docs_anchor_open}the edX LTI documentation{anchor_close} for more details on this setting."
+        )).format(
+            break_tag=HTML(BREAK_TAG),
+            docs_anchor_open=HTML(DOCS_ANCHOR_TAG_OPEN),
+            anchor_close=HTML("</a>")
         ),
         default='',
         scope=Scope.settings
     )
     launch_url = String(
         display_name=_("LTI URL"),
-        help=_(
+        help=Text(_(
             "Enter the URL of the external tool that this component launches. "
             "This setting is only used when Hide External Tool is set to False."
-            "<br />See {docs_anchor_open}the edX LTI documentation{anchor_close} for more details on this setting."
-        ).format(
-            docs_anchor_open=DOCS_ANCHOR_TAG_OPEN,
-            anchor_close="</a>"
+            "{break_tag}See {docs_anchor_open}the edX LTI documentation{anchor_close} for more details on this setting."
+        )).format(
+            break_tag=HTML(BREAK_TAG),
+            docs_anchor_open=HTML(DOCS_ANCHOR_TAG_OPEN),
+            anchor_close=HTML("</a>")
         ),
         default='http://www.example.com',
         scope=Scope.settings)
     custom_parameters = List(
         display_name=_("Custom Parameters"),
-        help=_(
+        help=Text(_(
             "Add the key/value pair for any custom parameters, such as the page your e-book should open to or "
             "the background color for this component."
-            "<br />See {docs_anchor_open}the edX LTI documentation{anchor_close} for more details on this setting."
-        ).format(
-            docs_anchor_open=DOCS_ANCHOR_TAG_OPEN,
-            anchor_close="</a>"
+            "{break_tag}See {docs_anchor_open}the edX LTI documentation{anchor_close} for more details on this setting."
+        )).format(
+            break_tag=HTML(BREAK_TAG),
+            docs_anchor_open=HTML(DOCS_ANCHOR_TAG_OPEN),
+            anchor_close=HTML("</a>")
         ),
         scope=Scope.settings)
     open_in_a_new_page = Boolean(
@@ -652,7 +655,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         # so '='' becomes '%3D'.
         # We send form via browser, so browser will encode it again,
         # So we need to decode signature back:
-        params[u'oauth_signature'] = six.moves.urllib.parse.unquote(params[u'oauth_signature']).decode('utf8')
+        params[u'oauth_signature'] = six.moves.urllib.parse.unquote(params[u'oauth_signature']).encode('utf-8').decode('utf8')
 
         # Add LTI parameters to OAuth parameters for sending in form.
         params.update(body)
@@ -792,7 +795,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         lti_spec_namespace = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"
         namespaces = {'def': lti_spec_namespace}
 
-        data = body.strip().encode('utf-8')
+        data = body.strip()
         parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
         root = etree.fromstring(data, parser=parser)
 
@@ -831,7 +834,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
 
         sha1 = hashlib.sha1()
         sha1.update(request.body)
-        oauth_body_hash = base64.b64encode(sha1.digest())
+        oauth_body_hash = base64.b64encode(sha1.digest()).decode('utf-8')
         oauth_params = signature.collect_parameters(headers=headers, exclude_oauth_signature=False)
         oauth_headers = dict(oauth_params)
         oauth_signature = oauth_headers.pop('oauth_signature')

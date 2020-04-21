@@ -12,7 +12,7 @@ sessions. Assumes structure:
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
-from __future__ import absolute_import
+
 
 import logging
 import os
@@ -57,8 +57,6 @@ for log_name, log_level in LOG_OVERRIDES:
 MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
 MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
 
-os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8000-9000'
-
 THIS_UUID = uuid4().hex[:5]
 
 FEATURES['DISABLE_SET_JWT_COOKIES_FOR_TESTS'] = True
@@ -82,16 +80,12 @@ FEATURES['ENABLE_VERIFIED_CERTIFICATES'] = True
 # Toggles embargo on for testing
 FEATURES['EMBARGO'] = True
 
-FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
-
 # Enable the milestones app in tests to be consistent with it being enabled in production
 FEATURES['MILESTONES_APP'] = True
 
 FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
 
 FEATURES['ENABLE_BULK_ENROLLMENT_VIEW'] = True
-
-FEATURES['ENABLE_API_DOCS'] = True
 
 DEFAULT_MOBILE_AVAILABLE = True
 
@@ -204,10 +198,6 @@ if os.environ.get('DISABLE_MIGRATIONS'):
     # to Django 1.9, which allows setting MIGRATION_MODULES to None in order to skip migrations.
     MIGRATION_MODULES = NoOpMigrationModules()
 
-# Make sure we test with the extended history table
-FEATURES['ENABLE_CSMH_EXTENDED'] = True
-INSTALLED_APPS.append('coursewarehistoryextended')
-
 CACHES = {
     # This is the cache used for most things.
     # In staging/prod envs, the sessions also live here.
@@ -233,7 +223,21 @@ CACHES = {
     'course_structure_cache': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     },
+    # Blockstore caching tests require a cache that actually works:
+    'blockstore': {
+        'KEY_PREFIX': 'blockstore',
+        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'LOCATION': 'edx_loc_mem_cache',
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    },
 }
+
+############################### BLOCKSTORE #####################################
+# Blockstore tests
+RUN_BLOCKSTORE_TESTS = os.environ.get('EDXAPP_RUN_BLOCKSTORE_TESTS', 'no').lower() in ('true', 'yes', '1')
+BLOCKSTORE_API_URL = os.environ.get('EDXAPP_BLOCKSTORE_API_URL', "http://edx.devstack.blockstore-test:18251/api/v1/")
+BLOCKSTORE_API_AUTH_TOKEN = os.environ.get('EDXAPP_BLOCKSTORE_API_AUTH_TOKEN', 'edxapp-test-key')
+XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'blockstore'  # This must be set to a working cache for the tests to pass
 
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
@@ -255,6 +259,7 @@ AUTHENTICATION_BACKENDS = [
     'social_core.backends.facebook.FacebookOAuth2',
     'social_core.backends.azuread.AzureADOAuth2',
     'social_core.backends.twitter.TwitterOAuth',
+    'third_party_auth.identityserver3.IdentityServer3',
     'third_party_auth.dummy.DummyBackend',
     'third_party_auth.saml.SAMLAuthBackend',
     'third_party_auth.lti.LTIAuthBackend',
@@ -268,15 +273,8 @@ THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = {
     },
 }
 
-OPENID_CREATE_USERS = False
-OPENID_UPDATE_DETAILS_FROM_SREG = True
-OPENID_USE_AS_ADMIN_LOGIN = False
-OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
-
 ############################## OAUTH2 Provider ################################
 FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
-# don't cache courses for testing
-OIDC_COURSE_HANDLER_CACHE_TIMEOUT = 0
 OAUTH_ENFORCE_SECURE = False
 
 ########################### External REST APIs #################################
@@ -337,7 +335,7 @@ MKTG_URL_LINK_MAP = {
     'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
 }
 
-SUPPORT_SITE_LINK = 'https://support.example.com'
+SUPPORT_SITE_LINK = 'https://example.support.edx.org'
 PASSWORD_RESET_SUPPORT_LINK = 'https://support.example.com/password-reset-help.html'
 ACTIVATION_EMAIL_SUPPORT_LINK = 'https://support.example.com/activation-email-help.html'
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = OrderedDict([
@@ -417,77 +415,6 @@ PLATFORM_DESCRIPTION = ugettext_lazy(u"Open édX Platform")
 
 SITE_NAME = "edx.org"
 
-# set up some testing for microsites
-FEATURES['USE_MICROSITES'] = True
-MICROSITE_ROOT_DIR = COMMON_ROOT / 'test' / 'test_sites'
-MICROSITE_CONFIGURATION = {
-    "test_site": {
-        "domain_prefix": "test-site",
-        "university": "test_site",
-        "platform_name": "Test Site",
-        "logo_image_url": "test_site/images/header-logo.png",
-        "email_from_address": "test_site@edx.org",
-        "ACTIVATION_EMAIL_FROM_ADDRESS": "test_activate@edx.org",
-        "payment_support_email": "test_site@edx.org",
-        "ENABLE_MKTG_SITE": False,
-        "SITE_NAME": "test_site.localhost",
-        "course_org_filter": "TestSiteX",
-        "course_about_show_social_links": False,
-        "css_overrides_file": "test_site/css/test_site.css",
-        "show_partners": False,
-        "show_homepage_promo_video": False,
-        "course_index_overlay_text": "This is a Test Site Overlay Text.",
-        "course_index_overlay_logo_file": "test_site/images/header-logo.png",
-        "homepage_overlay_html": "<h1>This is a Test Site Overlay HTML</h1>",
-        "ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER": False,
-        "COURSE_CATALOG_VISIBILITY_PERMISSION": "see_in_catalog",
-        "COURSE_ABOUT_VISIBILITY_PERMISSION": "see_about_page",
-        "ENABLE_SHOPPING_CART": True,
-        "ENABLE_PAID_COURSE_REGISTRATION": True,
-        "SESSION_COOKIE_DOMAIN": "test_site.localhost",
-        "LINKEDIN_COMPANY_ID": "test",
-        "FACEBOOK_APP_ID": "12345678908",
-        "urls": {
-            'ABOUT': 'test-site/about',
-            'PRIVACY': 'test-site/privacy',
-            'TOS_AND_HONOR': 'test-site/tos-and-honor',
-        },
-    },
-    "site_with_logistration": {
-        "domain_prefix": "logistration",
-        "university": "logistration",
-        "platform_name": "Test logistration",
-        "logo_image_url": "test_site/images/header-logo.png",
-        "email_from_address": "test_site@edx.org",
-        "ACTIVATION_EMAIL_FROM_ADDRESS": "test_activate@edx.org",
-        "payment_support_email": "test_site@edx.org",
-        "ENABLE_MKTG_SITE": False,
-        "ENABLE_COMBINED_LOGIN_REGISTRATION": True,
-        "SITE_NAME": "test_site.localhost",
-        "course_org_filter": "LogistrationX",
-        "course_about_show_social_links": False,
-        "css_overrides_file": "test_site/css/test_site.css",
-        "show_partners": False,
-        "show_homepage_promo_video": False,
-        "course_index_overlay_text": "Logistration.",
-        "course_index_overlay_logo_file": "test_site/images/header-logo.png",
-        "homepage_overlay_html": "<h1>This is a Logistration HTML</h1>",
-        "ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER": False,
-        "COURSE_CATALOG_VISIBILITY_PERMISSION": "see_in_catalog",
-        "COURSE_ABOUT_VISIBILITY_PERMISSION": "see_about_page",
-        "ENABLE_SHOPPING_CART": True,
-        "ENABLE_PAID_COURSE_REGISTRATION": True,
-        "SESSION_COOKIE_DOMAIN": "test_logistration.localhost",
-    },
-    "default": {
-        "university": "default_university",
-        "domain_prefix": "www",
-    }
-}
-
-MICROSITE_TEST_HOSTNAME = 'test-site.testserver'
-MICROSITE_LOGISTRATION_HOSTNAME = 'logistration.testserver'
-
 TEST_THEME = COMMON_ROOT / "test" / "test-theme"
 
 # add extra template directory for test-only templates
@@ -541,7 +468,7 @@ FEATURES['CUSTOM_COURSES_EDX'] = True
 
 # Set dummy values for profile image settings.
 PROFILE_IMAGE_BACKEND = {
-    'class': 'storages.backends.overwrite.OverwriteStorage',
+    'class': 'openedx.core.storage.OverwriteStorage',
     'options': {
         'location': MEDIA_ROOT,
         'base_url': 'http://example-storage.com/profile-images/',
@@ -549,7 +476,7 @@ PROFILE_IMAGE_BACKEND = {
 }
 PROFILE_IMAGE_DEFAULT_FILENAME = 'default'
 PROFILE_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
-PROFILE_IMAGE_SECRET_KEY = 'secret'
+PROFILE_IMAGE_HASH_SEED = 'secret'
 PROFILE_IMAGE_MAX_BYTES = 1024 * 1024
 PROFILE_IMAGE_MIN_BYTES = 100
 
@@ -572,7 +499,10 @@ ENABLE_COMPREHENSIVE_THEMING = True
 
 LMS_ROOT_URL = "http://localhost:8000"
 
-FRONTEND_LOGOUT_URL = LMS_ROOT_URL + '/logout'
+# Needed for derived settings used by cms only.
+FRONTEND_LOGIN_URL = '/login'
+FRONTEND_LOGOUT_URL = '/logout'
+FRONTEND_REGISTER_URL = '/register'
 
 ECOMMERCE_API_URL = 'https://ecommerce.example.com/api/v2/'
 ECOMMERCE_PUBLIC_URL_ROOT = None
@@ -655,7 +585,14 @@ PDF_RECEIPT_TAX_ID_LABEL = 'Tax ID'
 PROFILE_MICROFRONTEND_URL = "http://profile-mfe/abc/"
 ORDER_HISTORY_MICROFRONTEND_URL = "http://order-history-mfe/"
 ACCOUNT_MICROFRONTEND_URL = "http://account-mfe/"
+LEARNING_MICROFRONTEND_URL = "http://learning-mfe"
 
 ########################## limiting dashboard courses ######################
 
 DASHBOARD_COURSE_LIMIT = 250
+
+PROCTORING_SETTINGS = {}
+
+############### Settings for Django Rate limit #####################
+
+RATELIMIT_RATE = '2/m'

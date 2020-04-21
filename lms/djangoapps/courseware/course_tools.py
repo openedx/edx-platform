@@ -2,7 +2,6 @@
 Platform plugins to support a verified upgrade tool.
 """
 
-from __future__ import absolute_import
 
 import datetime
 
@@ -11,7 +10,7 @@ from crum import get_current_request
 from django.utils.translation import ugettext as _
 
 from course_modes.models import CourseMode
-from courseware.date_summary import verified_upgrade_deadline_link
+from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from openedx.features.course_experience.course_tools import CourseTool
 from student.models import CourseEnrollment
 

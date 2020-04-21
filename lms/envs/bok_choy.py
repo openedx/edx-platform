@@ -11,7 +11,6 @@ support both generating static assets to a directory and also serving static
 from the same directory.
 """
 
-from __future__ import absolute_import
 
 # Silence noisy logs
 import logging
@@ -36,6 +35,7 @@ os.environ['SERVICE_VARIANT'] = 'bok_choy_docker' if 'BOK_CHOY_HOSTNAME' in os.e
 os.environ['CONFIG_ROOT'] = CONFIG_ROOT
 os.environ['LMS_CFG'] = str.format("{config_root}/{service_variant}.yml",
                                    config_root=os.environ['CONFIG_ROOT'], service_variant=os.environ['SERVICE_VARIANT'])
+os.environ['REVISION_CFG'] = "{config_root}/revisions.yml".format(config_root=os.environ['CONFIG_ROOT'])
 
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-position
 
@@ -244,16 +244,12 @@ SECRET_KEY = "very_secret_bok_choy_key"
 
 # Set dummy values for profile image settings.
 PROFILE_IMAGE_BACKEND = {
-    'class': 'storages.backends.overwrite.OverwriteStorage',
+    'class': 'openedx.core.storage.OverwriteStorage',
     'options': {
         'location': os.path.join(MEDIA_ROOT, 'profile-images/'),
         'base_url': os.path.join(MEDIA_URL, 'profile-images/'),
     },
 }
-
-# Make sure we test with the extended history table
-FEATURES['ENABLE_CSMH_EXTENDED'] = True
-INSTALLED_APPS.append('coursewarehistoryextended')
 
 BADGING_BACKEND = 'lms.djangoapps.badges.backends.tests.dummy_backend.DummyBackend'
 

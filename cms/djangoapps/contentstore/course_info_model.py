@@ -12,7 +12,6 @@ Current db representation:
 }
 """
 
-from __future__ import absolute_import
 
 import logging
 import re
@@ -21,7 +20,7 @@ from django.http import HttpResponseBadRequest
 from django.utils.translation import ugettext as _
 
 from openedx.core.lib.xblock_utils import get_course_update_items
-from xmodule.html_module import CourseInfoModule
+from xmodule.html_module import CourseInfoBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -58,23 +57,29 @@ def update_course_updates(location, update, passed_id=None, user=None):
         course_updates = modulestore().create_item(user.id, location.course_key, location.block_type, location.block_id)
 
     course_update_items = list(reversed(get_course_update_items(course_updates)))
+    course_update_dict = None
 
     if passed_id is not None:
         passed_index = _get_index(passed_id)
-        # oldest update at start of list
-        if 0 < passed_index <= len(course_update_items):
-            course_update_dict = course_update_items[passed_index - 1]
-            course_update_dict["date"] = update["date"]
-            course_update_dict["content"] = update["content"]
-            course_update_items[passed_index - 1] = course_update_dict
-        else:
+
+        # if passed_index in course_update_items_ids:
+        for course_update_item in course_update_items:
+            if course_update_item["id"] == passed_index:
+                course_update_dict = course_update_item
+                course_update_item["date"] = update["date"]
+                course_update_item["content"] = update["content"]
+                break
+        if course_update_dict is None:
             return HttpResponseBadRequest(_("Invalid course update id."))
     else:
+        course_update_items_ids = [course_update_item['id'] for course_update_item in course_update_items]
+
         course_update_dict = {
-            "id": len(course_update_items) + 1,
+            # if no course updates then the id will be 1 otherwise maxid + 1
+            "id": max(course_update_items_ids) + 1 if course_update_items_ids else 1,
             "date": update["date"],
             "content": update["content"],
-            "status": CourseInfoModule.STATUS_VISIBLE
+            "status": CourseInfoBlock.STATUS_VISIBLE
         }
         course_update_items.append(course_update_dict)
 
@@ -103,14 +108,14 @@ def _get_visible_update(course_update_items):
     """
     if isinstance(course_update_items, dict):
         # single course update item
-        if course_update_items.get("status") != CourseInfoModule.STATUS_DELETED:
+        if course_update_items.get("status") != CourseInfoBlock.STATUS_DELETED:
             return _make_update_dict(course_update_items)
         else:
             # requested course update item has been deleted (soft delete)
             return {"error": _("Course update not found."), "status": 404}
 
     return ([_make_update_dict(update) for update in course_update_items
-             if update.get("status") != CourseInfoModule.STATUS_DELETED])
+             if update.get("status") != CourseInfoBlock.STATUS_DELETED])
 
 
 # pylint: disable=unused-argument
@@ -132,17 +137,15 @@ def delete_course_update(location, update, passed_id, user):
     passed_index = _get_index(passed_id)
 
     # delete update item from given index
-    if 0 < passed_index <= len(course_update_items):
-        course_update_item = course_update_items[passed_index - 1]
-        # soft delete course update item
-        course_update_item["status"] = CourseInfoModule.STATUS_DELETED
-        course_update_items[passed_index - 1] = course_update_item
+    for course_update_item in course_update_items:
+        if course_update_item["id"] == passed_index:
+            # soft delete course update item
+            course_update_item["status"] = CourseInfoBlock.STATUS_DELETED
+            # update db record
+            save_course_update_items(location, course_updates, course_update_items, user)
+            return _get_visible_update(course_update_items)
 
-        # update db record
-        save_course_update_items(location, course_updates, course_update_items, user)
-        return _get_visible_update(course_update_items)
-    else:
-        return HttpResponseBadRequest(_("Invalid course update id."))
+    return HttpResponseBadRequest(_("Invalid course update id."))
 
 
 def _get_index(passed_id=None):

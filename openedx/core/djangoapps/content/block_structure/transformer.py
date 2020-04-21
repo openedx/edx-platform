@@ -2,7 +2,7 @@
 This module provides the abstract base class for all Block Structure
 Transformers.
 """
-from __future__ import absolute_import
+
 
 from abc import abstractmethod
 

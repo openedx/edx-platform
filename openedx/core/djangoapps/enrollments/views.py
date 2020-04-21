@@ -3,7 +3,7 @@ The Enrollment API Views should be simple, lean HTTP endpoints for API access. T
 consist primarily of authentication, request validation, and serialization.
 
 """
-from __future__ import absolute_import
+
 
 import logging
 
@@ -30,7 +30,7 @@ from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentsApi
 from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission, ApiKeyHeaderPermissionIsAuthenticated
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.lib.exceptions import CourseNotFoundError
@@ -168,7 +168,7 @@ class EnrollmentView(APIView, ApiKeyPermissionMixIn):
 
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (ApiKeyHeaderPermissionIsAuthenticated,)
@@ -243,7 +243,7 @@ class EnrollmentUserRolesView(APIView):
     """
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         EnrollmentCrossDomainSessionAuth,
     )
     permission_classes = (ApiKeyHeaderPermissionIsAuthenticated,)
@@ -612,7 +612,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
     """
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         EnrollmentCrossDomainSessionAuth,
     )
     permission_classes = (ApiKeyHeaderPermissionIsAuthenticated,)
@@ -696,12 +696,14 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         # Check that the user specified is either the same user, or this is a server-to-server request.
         if not username:
             username = request.user.username
-        if username != request.user.username and not has_api_key_permissions:
+        if username != request.user.username and not has_api_key_permissions \
+                and not GlobalStaff().has_user(request.user):
             # Return a 404 instead of a 403 (Unauthorized). If one user is looking up
             # other users, do not let them deduce the existence of an enrollment.
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        if mode not in (CourseMode.AUDIT, CourseMode.HONOR, None) and not has_api_key_permissions:
+        if mode not in (CourseMode.AUDIT, CourseMode.HONOR, None) and not has_api_key_permissions \
+                and not GlobalStaff().has_user(request.user):
             return Response(
                 status=status.HTTP_403_FORBIDDEN,
                 data={
@@ -766,7 +768,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     for attr in enrollment_attributes
                 ]
                 missing_attrs = set(REQUIRED_ATTRIBUTES.get(mode, [])) - set(actual_attrs)
-            if has_api_key_permissions and (mode_changed or active_changed):
+            if (GlobalStaff().has_user(request.user) or has_api_key_permissions) and (mode_changed or active_changed):
                 if mode_changed and active_changed and not is_active:
                     # if the requester wanted to deactivate but specified the wrong mode, fail
                     # the request (on the assumption that the requester had outdated information
@@ -938,7 +940,7 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
     """
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (permissions.IsAdminUser,)

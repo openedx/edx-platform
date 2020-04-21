@@ -12,7 +12,7 @@ Examples of html5 videos for manual testing:
     https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.webm
     https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.ogv
 """
-from __future__ import absolute_import
+
 
 import copy
 import json
@@ -22,6 +22,7 @@ from operator import itemgetter
 
 import six
 from django.conf import settings
+from edx_django_utils.cache import RequestCache
 from lxml import etree
 from opaque_keys.edx.locator import AssetLocator
 from web_fragments.fragment import Fragment
@@ -30,7 +31,7 @@ from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
 
-from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag
+from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag, CourseYoutubeBlockedFlag
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE, waffle_flags
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.license import LicenseMixin
@@ -199,6 +200,18 @@ class VideoBlock(
         # is enabled for this course
         return waffle_flags()[DEPRECATE_YOUTUBE].is_enabled(self.location.course_key)
 
+    def youtube_disabled_for_course(self):
+        if not self.location.context_key.is_course:
+            return False  # Only courses have this flag
+        request_cache = RequestCache('youtube_disabled_for_course')
+        cache_response = request_cache.get_cached_response(self.location.context_key)
+        if cache_response.is_found:
+            return cache_response.value
+
+        youtube_is_disabled = CourseYoutubeBlockedFlag.feature_enabled(self.location.course_key)
+        request_cache.set(self.location.context_key, youtube_is_disabled)
+        return youtube_is_disabled
+
     def prioritize_hls(self, youtube_streams, html5_sources):
         """
         Decide whether hls can be prioritized as primary playback or not.
@@ -206,7 +219,7 @@ class VideoBlock(
         If both the youtube and hls sources are present then make decision on flag
         If only either youtube or hls is present then play whichever is present
         """
-        yt_present = bool(youtube_streams.strip())
+        yt_present = bool(youtube_streams.strip()) if youtube_streams else False
         hls_present = any(source for source in html5_sources if source.strip().endswith('.m3u8'))
 
         if yt_present and hls_present:
@@ -244,7 +257,14 @@ class VideoBlock(
         """
         Returns a fragment that contains the html for the public view
         """
-        return Fragment(self.get_html(view=PUBLIC_VIEW))
+        if getattr(self.runtime, 'suppports_state_for_anonymous_users', False):
+            # The new runtime can support anonymous users as fully as regular users:
+            return self.student_view(context)
+
+        fragment = Fragment(self.get_html(view=PUBLIC_VIEW))
+        add_webpack_to_fragment(fragment, 'VideoBlockPreview')
+        shim_xmodule_js(fragment, 'Video')
+        return fragment
 
     def get_html(self, view=STUDENT_VIEW):
 
@@ -340,15 +360,12 @@ class VideoBlock(
         cdn_eval = False
         cdn_exp_group = None
 
-        self.youtube_streams = youtube_streams or create_youtube_string(self)  # pylint: disable=W0201
+        if self.youtube_disabled_for_course():
+            self.youtube_streams = ''
+        else:
+            self.youtube_streams = youtube_streams or create_youtube_string(self)  # pylint: disable=W0201
 
         settings_service = self.runtime.service(self, 'settings')
-
-        yt_api_key = None
-        if settings_service:
-            xblock_settings = settings_service.get_settings_bucket(self)
-            if xblock_settings and 'YOUTUBE_API_KEY' in xblock_settings:
-                yt_api_key = xblock_settings['YOUTUBE_API_KEY']
 
         poster = None
         if edxval_api and self.edx_video_id:
@@ -401,8 +418,14 @@ class VideoBlock(
             'transcriptLanguages': sorted_languages,
             'ytTestTimeout': settings.YOUTUBE['TEST_TIMEOUT'],
             'ytApiUrl': settings.YOUTUBE['API'],
-            'ytMetadataUrl': settings.YOUTUBE['METADATA_URL'],
-            'ytKey': yt_api_key,
+            'lmsRootURL': settings.LMS_ROOT_URL,
+            'ytMetadataEndpoint': (
+                # In the new runtime, get YouTube metadata via a handler. The handler supports anonymous users and
+                # can work in sandboxed iframes. In the old runtime, the JS will call the LMS's yt_video_metadata
+                # API endpoint directly (not an XBlock handler).
+                self.runtime.handler_url(self, 'yt_video_metadata')
+                if getattr(self.runtime, 'suppports_state_for_anonymous_users', False) else ''
+            ),
 
             'transcriptTranslationUrl': self.runtime.handler_url(
                 self, 'transcript', 'translation/__lang__'
@@ -477,7 +500,7 @@ class VideoBlock(
                         'There is no transcript file associated with the {lang} language.',
                         'There are no transcript files associated with the {lang} languages.',
                         len(no_transcript_lang)
-                    ).format(lang=', '.join(no_transcript_lang))
+                    ).format(lang=', '.join(sorted(no_transcript_lang)))
                 )
             )
         return validation
@@ -596,6 +619,23 @@ class VideoBlock(
         return editable_fields
 
     @classmethod
+    def parse_xml_new_runtime(cls, node, runtime, keys):
+        """
+        Implement the video block's special XML parsing requirements for the
+        new runtime only. For all other runtimes, use the existing XModule-style
+        methods like .from_xml().
+        """
+        video_block = runtime.construct_xblock_from_class(cls, keys)
+        field_data = cls.parse_video_xml(node)
+        for key, val in field_data.items():
+            if key not in cls.fields:
+                continue  # parse_video_xml returns some old non-fields like 'source'
+            setattr(video_block, key, cls.fields[key].from_json(val))
+        # Don't use VAL in the new runtime:
+        video_block.edx_video_id = None
+        return video_block
+
+    @classmethod
     def from_xml(cls, xml_data, system, id_generator):
         """
         Creates an instance of this descriptor from the supplied xml_data.
@@ -646,16 +686,16 @@ class VideoBlock(
         if youtube_string and youtube_string != '1.00:3_yD_cEKoCk':
             xml.set('youtube', six.text_type(youtube_string))
         xml.set('url_name', self.url_name)
-        attrs = {
-            'display_name': self.display_name,
-            'show_captions': json.dumps(self.show_captions),
-            'start_time': self.start_time,
-            'end_time': self.end_time,
-            'sub': self.sub,
-            'download_track': json.dumps(self.download_track),
-            'download_video': json.dumps(self.download_video),
-        }
-        for key, value in attrs.items():
+        attrs = [
+            ('display_name', self.display_name),
+            ('show_captions', json.dumps(self.show_captions)),
+            ('start_time', self.start_time),
+            ('end_time', self.end_time),
+            ('sub', self.sub),
+            ('download_track', json.dumps(self.download_track)),
+            ('download_video', json.dumps(self.download_video))
+        ]
+        for key, value in attrs:
             # Mild workaround to ensure that tests pass -- if a field
             # is set to its default value, we don't write it out.
             if value:
@@ -722,7 +762,7 @@ class VideoBlock(
                     xml.set('sub', '')
 
                 # Update `transcripts` attribute in the xml
-                xml.set('transcripts', json.dumps(transcripts))
+                xml.set('transcripts', json.dumps(transcripts, sort_keys=True))
 
             except edxval_api.ValVideoNotFoundError:
                 pass
@@ -859,7 +899,7 @@ class VideoBlock(
         Arguments:
             id_generator is used to generate course-specific urls and identifiers
         """
-        if isinstance(xml, str) or isinstance(xml, unicode):
+        if isinstance(xml, six.string_types):
             xml = etree.fromstring(xml)
 
         field_data = {}

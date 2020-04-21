@@ -2,7 +2,7 @@
 Defines asynchronous celery task for sending email notification (through edx-ace)
 pertaining to new discussion forum comments.
 """
-from __future__ import absolute_import
+
 
 import logging
 
@@ -129,12 +129,6 @@ def _is_first_comment(comment_id, thread_id):
         first_comment = thread.children[0]
         return first_comment.get('id') == comment_id
     else:
-        log.info(
-            u"EDUCATOR-3385: No child exists for thread_id %s | course_id %s | username %s ",
-            thread.get('id'),
-            thread['course_id'],
-            thread['username']
-        )
         return False
 
 

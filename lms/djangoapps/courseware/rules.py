@@ -1,26 +1,29 @@
 """
 django-rules and Bridgekeeper rules for courseware related features
 """
-from __future__ import absolute_import
+
 
 import logging
+import traceback
 
 import laboratory
 import rules
-from bridgekeeper.rules import Rule, EMPTY
-from course_modes.models import CourseMode
+import six
+from bridgekeeper.rules import EMPTY, Rule
 from django.conf import settings
 from django.db.models import Q
+from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.models import CourseEnrollment, CourseAccessRole
 from xblock.core import XBlock
+
+from course_modes.models import CourseMode
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from student.models import CourseAccessRole, CourseEnrollment
 from xmodule.course_module import CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
 from xmodule.x_module import XModule
 
 from .access import has_access
-
 
 LOG = logging.getLogger(__name__)
 
@@ -61,15 +64,16 @@ class HasAccessRule(Rule):
 
 class StaffAccessExperiment(laboratory.Experiment):
     def compare(self, control, candidate):
-        return bool(control) == candidate
+        return bool(control.value) == candidate.value
 
     def publish(self, result):
         if not result.match:
+
             LOG.warning(
-                u"StaffAccessExperiment: control=%r, candidate=%r",
+                u"StaffAccessExperiment: control=%r, candidate=%r\n%s",
                 result.control,
                 result.candidates[0],
-                exc_info=True
+                "".join(traceback.format_stack(limit=10))
             )
 
 
@@ -108,7 +112,7 @@ class HasStaffAccessToContent(Rule):
             course_key = instance
         elif isinstance(instance, UsageKey):
             course_key = instance.course_key
-        elif isinstance(instance, basestring):
+        elif isinstance(instance, six.string_types):
             course_key = CourseKey.from_string(instance)
 
         return self.filter(user, CourseOverview.objects.filter(id=course_key)).exists()
@@ -132,13 +136,14 @@ class HasStaffAccessToContent(Rule):
         is_global_staff = user.is_staff
         course_staff_or_instructor_courses = CourseAccessRole.objects.filter(
             user=user,
-            role__in=('staff', 'instructor'),
-            course_id__isnull=False
+            role__in=('staff', 'instructor')
+        ).exclude(
+            course_id=CourseKeyField.Empty,
         ).values('course_id')
         org_staff_or_instructor_courses = CourseAccessRole.objects.filter(
             user=user,
             role__in=('staff', 'instructor'),
-            course_key__isnull=True,
+            course_id=CourseKeyField.Empty,
             org__isnull=False
         ).values('org')
 

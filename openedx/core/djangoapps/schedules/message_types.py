@@ -1,4 +1,6 @@
-from __future__ import absolute_import
+"""
+ACE message types for the schedules module.
+"""
 
 import logging
 
@@ -23,4 +25,8 @@ class UpgradeReminder(ScheduleMessageType):
 
 
 class CourseUpdate(ScheduleMessageType):
+    pass
+
+
+class InstructorLedCourseUpdate(ScheduleMessageType):
     pass

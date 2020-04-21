@@ -11,10 +11,14 @@ python scripts/xdist/pytest_worker_manager.py -a up -n ${XDIST_NUM_WORKERS} \
 -iam ${XDIST_WORKER_IAM_PROFILE_ARN}
 
 # Install the correct version of Django depending on which tox environment (if any) is in use
-if [[ -z ${TOX_ENV+x} ]] || [[ ${TOX_ENV} == 'null' ]]; then
+if [[ -z ${TOXENV+x} ]] || [[ ${TOXENV} == 'null' ]]; then
     DJANGO_REQUIREMENT="-r requirements/edx/django.txt"
-else
-    DJANGO_REQUIREMENT=$(pip freeze | grep "^[Dd]jango==")
+elif [[ ${TOXENV} == *'django20'* ]]; then
+    DJANGO_REQUIREMENT="-r requirements/edx/django20.txt"
+elif [[ ${TOXENV} == *'django21'* ]]; then
+    DJANGO_REQUIREMENT="-r requirements/edx/django21.txt"
+elif [[ ${TOXENV} == *'django22'* ]]; then
+    DJANGO_REQUIREMENT="-r requirements/edx/django.txt"
 fi
 
 ip_list=$(<pytest_worker_ips.txt)
@@ -23,7 +27,9 @@ do
     worker_reqs_cmd="ssh -o StrictHostKeyChecking=no jenkins@$ip
     'git clone --branch master --depth 1 -q https://github.com/edx/edx-platform.git; cd edx-platform;
     git fetch -fq origin ${XDIST_GIT_REFSPEC}; git checkout -q ${XDIST_GIT_BRANCH};
-    source ../edx-venv/bin/activate;
+    rm -rf /home/jenkins/edx-venv-${PYTHON_VERSION}/edx-venv;
+    tar -C /home/jenkins/edx-venv-${PYTHON_VERSION} -xf /home/jenkins/edx-venv_clean-${PYTHON_VERSION}.tar.gz;
+    source ../edx-venv-${PYTHON_VERSION}/edx-venv/bin/activate;
     pip install -q ${DJANGO_REQUIREMENT} -r requirements/edx/testing.txt; mkdir reports' & "
 
     cmd=$cmd$worker_reqs_cmd

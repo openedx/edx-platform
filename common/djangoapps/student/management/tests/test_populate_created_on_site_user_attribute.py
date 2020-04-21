@@ -1,7 +1,7 @@
 """
 Unittests for populate_created_on_site_user_attribute management command.
 """
-from __future__ import absolute_import
+
 
 import ddt
 import mock
@@ -137,7 +137,7 @@ class TestPopulateUserAttribute(SiteMixin, TestCase):
         Test management command with invalid site domain.
         """
         fake_site_domain = 'fake-site-domain'
-        with mock.patch('__builtin__.raw_input', return_value=populate):
+        with mock.patch('six.moves.input', return_value=populate):
             call_command(
                 "populate_created_on_site_user_attribute",
                 "--users", self.user_ids,

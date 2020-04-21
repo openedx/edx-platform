@@ -1,6 +1,5 @@
 """Tests for contents"""
 
-from __future__ import absolute_import
 
 import os
 import unittest
@@ -140,7 +139,7 @@ class ContentTest(unittest.TestCase):
         content_store = ContentStore()
         content = Content(AssetLocator(CourseLocator(u'mitX', u'800', u'ignore_run'), u'asset', "monsters.jpg"),
                           "image/jpeg")
-        content.data = 'mock data'
+        content.data = b'mock data'
         content_store.generate_thumbnail(content)
         self.assertTrue(image_class_mock.open.called, "Image.open not called")
         self.assertTrue(mock_image.close.called, "mock_image.close not called")
@@ -153,7 +152,7 @@ class ContentTest(unittest.TestCase):
         thumbnail_filename = u'test.svg'
         content = Content(AssetLocator(CourseLocator(u'mitX', u'800', u'ignore_run'), u'asset', u'test.svg'),
                           'image/svg+xml')
-        content.data = 'mock svg file'
+        content.data = b'mock svg file'
         (thumbnail_content, thumbnail_file_location) = content_store.generate_thumbnail(content)
         self.assertEqual(thumbnail_content.data.read(), b'mock svg file')
         self.assertEqual(

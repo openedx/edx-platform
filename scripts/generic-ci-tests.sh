@@ -135,6 +135,8 @@ case "$TEST_SUITE" in
                 run_paver_quality run_xsscommitlint || { EXIT=1; }
                 echo "Running PII checker on all Django models..."
                 run_paver_quality run_pii_check || { EXIT=1; }
+                echo "Running reserved keyword checker on all Django models..."
+                run_paver_quality check_keywords || { EXIT=1; }
                 ;;
 
         esac
@@ -179,7 +181,7 @@ case "$TEST_SUITE" in
             PAVER_ARGS="$PAVER_ARGS --with-wtw=origin/master"
         fi
         if [[ -n "$COLLECT_WHO_TESTS_WHAT" ]]; then
-            PAVER_ARGS="$PAVER_ARGS --pytest-contexts --coveragerc=common/test/acceptance/.coveragerc"
+            PAVER_ARGS="$PAVER_ARGS --pytest-remote-contexts --coveragerc=common/test/acceptance/.coveragerc"
         fi
         export BOKCHOY_HEADLESS=true
 
@@ -194,7 +196,7 @@ case "$TEST_SUITE" in
                 ;;
 
             25|"noshard")
-                $TOX paver test_bokchoy --eval-attr="(shard>=$SHARD or not shard) and not a11y" $PAVER_ARGS
+                $TOX paver test_bokchoy --eval-attr="(not shard or shard>=$SHARD) and not a11y" $PAVER_ARGS
                 ;;
 
             # Default case because if we later define another bok-choy shard on Jenkins

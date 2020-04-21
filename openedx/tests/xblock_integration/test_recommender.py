@@ -3,14 +3,14 @@ This test file will run through some XBlock test scenarios regarding the
 recommender system
 """
 
-from __future__ import absolute_import
 
+import codecs
 import itertools
-import json
-import StringIO
 import unittest
 from copy import deepcopy
+from io import BytesIO
 
+import simplejson as json
 import six
 from ddt import data, ddt
 from django.conf import settings
@@ -650,11 +650,12 @@ class TestRecommenderFileUploading(TestRecommender):
         happens or is rejected as expected.
         """
         if 'magic_number' in test_case:
-            f_handler = StringIO.StringIO(test_case['magic_number'].decode('hex'))
+            f_handler = BytesIO(codecs.decode(test_case['magic_number'], 'hex_codec'))
         elif content is not None:
-            f_handler = StringIO.StringIO(json.dumps(content, sort_keys=True))
+            f_handler = BytesIO(
+                json.dumps(content, sort_keys=True) if six.PY2 else json.dumps(content, sort_keys=True).encode('utf-8'))
         else:
-            f_handler = StringIO.StringIO('')
+            f_handler = BytesIO(b'')
 
         f_handler.content_type = test_case['mimetypes']
         f_handler.name = 'file' + test_case['suffixes']

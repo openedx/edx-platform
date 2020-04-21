@@ -1,7 +1,7 @@
 """
 Internationalization tasks
 """
-from __future__ import absolute_import, print_function
+
 
 import re
 import subprocess
@@ -77,20 +77,27 @@ def i18n_generate_strict():
 
 @task
 @needs("pavelib.i18n.i18n_extract")
-@cmdopts([
-    ("settings=", "s", "The settings to use (defaults to devstack)"),
-])
 @timed
-def i18n_dummy(options):
+def i18n_dummy():
     """
     Simulate international translation by generating dummy strings
     corresponding to source strings.
     """
-    settings = options.get('settings', DEFAULT_SETTINGS)
-
     sh("i18n_tool dummy")
     # Need to then compile the new dummy strings
     sh("i18n_tool generate")
+
+
+@task
+@needs(
+    "pavelib.prereqs.install_prereqs",
+)
+@timed
+def i18n_compilejs(options):
+    """
+    Generating djangojs.js files using django-statici18n
+    """
+    settings = 'devstack_docker'
 
     # Generate static i18n JS files.
     for system in ['lms', 'cms']:

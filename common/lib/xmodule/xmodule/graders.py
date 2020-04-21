@@ -2,7 +2,6 @@
 Code used to calculate learner grades.
 """
 
-from __future__ import absolute_import, division
 
 import abc
 import inspect
@@ -152,7 +151,7 @@ def invalid_args(func, argdict):
     Given a function and a dictionary of arguments, returns a set of arguments
     from argdict that aren't accepted by func
     """
-    args, _, keywords, _ = inspect.getargspec(func)
+    args, _, keywords, _, _, _, _ = inspect.getfullargspec(func)
     if keywords:
         return set()  # All accepted
     return set(argdict) - set(args)
@@ -193,7 +192,7 @@ def grader_from_conf(conf):
             msg = ("Unable to parse grader configuration:\n    " +
                    str(subgraderconf) +
                    "\n    Error was:\n    " + str(error))
-            six.reraise(ValueError(msg), None, sys.exc_info()[2])
+            six.reraise(ValueError, ValueError(msg), sys.exc_info()[2])
 
     return WeightedSubsectionsGrader(subgraders)
 
@@ -381,7 +380,7 @@ class AssignmentFormatGrader(CourseGrader):
         scores = list(grade_sheet.get(self.type, {}).values())
         breakdown = []
         labeler = get_short_labeler(self.short_label)
-        for i in range(max(self.min_count, len(scores))):
+        for i in range(max(int(float(self.min_count)), len(scores))):
             if i < len(scores) or generate_random_scores:
                 if generate_random_scores:  	# for debugging!
                     earned = random.randint(2, 15)

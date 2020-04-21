@@ -1,7 +1,7 @@
 """
 Test the heartbeat
 """
-from __future__ import absolute_import, print_function
+
 
 import json
 
@@ -35,7 +35,7 @@ class HeartbeatTestCase(ModuleStoreTestCase):
             mock_connection.cursor.return_value.execute.side_effect = DatabaseError
             response = self.client.get(self.heartbeat_url)
             self.assertEqual(response.status_code, 503)
-            response_dict = json.loads(response.content)
+            response_dict = json.loads(response.content.decode('utf-8'))
             self.assertIn('sql', response_dict)
 
     def test_modulestore_fail(self):

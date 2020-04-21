@@ -2,12 +2,13 @@
 Module for the Storage of BlockStructure objects.
 """
 # pylint: disable=protected-access
-from __future__ import absolute_import
+
 
 from logging import getLogger
 
 import six
 
+from django.utils.encoding import python_2_unicode_compatible
 from openedx.core.lib.cache_utils import zpickle, zunpickle
 
 from . import config
@@ -20,6 +21,7 @@ from .transformer_registry import TransformerRegistry
 logger = getLogger(__name__)  # pylint: disable=C0103
 
 
+@python_2_unicode_compatible
 class StubModel(object):
     """
     Stub model to use when storage backing is disabled.
@@ -29,7 +31,7 @@ class StubModel(object):
     def __init__(self, root_block_usage_key):
         self.data_usage_key = root_block_usage_key
 
-    def __unicode__(self):
+    def __str__(self):
         return six.text_type(self.data_usage_key)
 
     def delete(self):
@@ -205,7 +207,15 @@ class BlockStructureStore(object):
         """
         Deserializes the given data and returns the parsed block_structure.
         """
-        block_relations, transformer_data, block_data_map = zunpickle(serialized_data)
+
+        try:
+            block_relations, transformer_data, block_data_map = zunpickle(serialized_data)
+        except Exception:
+            # Somehow failed to de-serialized the data, assume it's corrupt.
+            bs_model = self._get_model(root_block_usage_key)
+            logger.exception(u"BlockStructure: Failed to load data from cache for %s", bs_model)
+            raise BlockStructureNotFound(bs_model.data_usage_key)
+
         return BlockStructureFactory.create_new(
             root_block_usage_key,
             block_relations,

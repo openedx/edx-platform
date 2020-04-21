@@ -256,8 +256,8 @@ How to output coverage locally
 
 These are examples of how to run a single test and get coverage::
 
-    pytest cms/djangoapps/contentstore/tests/test_import.py --cov --cov-conifg=.coveragerc-local # cms example
-    pytest lms/djangoapps/courseware/tests/test_module_render.py --cov --cov-conifg=.coveragerc-local # lms example
+    pytest cms/djangoapps/contentstore/tests/test_import.py --cov --cov-config=.coveragerc-local # cms example
+    pytest lms/djangoapps/courseware/tests/test_module_render.py --cov --cov-config=.coveragerc-local # lms example
 
 That ``--cov-conifg=.coveragerc-local`` option is important - without it, the coverage
 tool will look for paths that exist on our jenkins test servers, but not on your local devstack.
@@ -350,6 +350,7 @@ console, run these commands::
     paver test_js_run -s cms
     paver test_js_run -s cms-squire
     paver test_js_run -s xmodule
+    paver test_js_run -s xmodule-webpack
     paver test_js_run -s common
     paver test_js_run -s common-requirejs
 
@@ -359,13 +360,14 @@ To run JavaScript tests in a browser, run these commands::
     paver test_js_dev -s cms
     paver test_js_dev -s cms-squire
     paver test_js_dev -s xmodule
+    paver test_js_dev -s xmodule-webpack
     paver test_js_dev -s common
     paver test_js_dev -s common-requirejs
 
 To debug these tests on devstack in a local browser:
 
 * first run the appropriate test_js_dev command from above which will open a browser using XQuartz
-* open http://edx.devstack.lms:19876/debug.html in your host system's browser of choice
+* open http://localhost:19876/debug.html in your host system's browser of choice
 * this will run all the tests and show you the results including details of any failures
 * you can click on an individually failing test and/or suite to re-run it by itself
 * you can now use the browser's developer tools to debug as you would any other JavaScript code

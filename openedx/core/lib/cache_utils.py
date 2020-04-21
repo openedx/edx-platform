@@ -1,18 +1,22 @@
 """
 Utilities related to caching.
 """
-from __future__ import absolute_import
+
+
 import collections
 import functools
 import itertools
 import zlib
-import wrapt
 
+import six
+import wrapt
+from django.db.models.signals import post_save, post_delete
 from django.utils.encoding import force_text
-from edx_django_utils.cache import RequestCache
+
+from edx_django_utils.cache import RequestCache, TieredCache
 from six import iteritems
-from six.moves import map
 from six.moves import cPickle as pickle
+from six.moves import map
 
 
 def request_cached(namespace=None, arg_map_function=None, request_cache_getter=None):
@@ -149,14 +153,68 @@ class process_cached(object):  # pylint: disable=invalid-name
         return functools.partial(self.__call__, obj)
 
 
+class CacheInvalidationManager:
+    """
+    This class provides a decorator for simple functions, which can handle invalidation.
+
+    To use, instantiate with a namespace or django model class:
+    `manager = CacheInvalidationManager(model=User)`
+
+    Then use it as a decorator on functions with no arguments
+    `@manager
+    def get_system_user():
+         ...
+    `
+    When the User model is saved or deleted, all cache keys used by
+    the decorator will be cleared.
+    """
+
+    def __init__(self, namespace=None, model=None, cache_time=86400):
+        if model:
+            post_save.connect(self.invalidate, sender=model)
+            post_delete.connect(self.invalidate, sender=model)
+            namespace = str(model)
+        self.namespace = namespace
+        self.cache_time = cache_time
+        self.keys = set()
+
+    # pylint: disable=unused-argument
+    def invalidate(self, **kwargs):
+        """
+        Invalidate all keys tracked by the manager.
+        """
+        for key in self.keys:
+            TieredCache.delete_all_tiers(key)
+
+    def __call__(self, func):
+        """
+        Decorator for functions with no arguments.
+        """
+        cache_key = '{}.{}.{}'.format(self.namespace, func.__module__, func.__name__)
+        self.keys.add(cache_key)
+
+        @functools.wraps(func)
+        def decorator(*args, **kwargs):  # pylint: disable=unused-argument,missing-docstring
+            result = TieredCache.get_cached_response(cache_key)
+            if result.is_found:
+                return result.value
+            result = func()
+            TieredCache.set_all_tiers(cache_key, result, self.cache_time)
+            return result
+        return decorator
+
+
 def zpickle(data):
     """Given any data structure, returns a zlib compressed pickled serialization."""
-    return zlib.compress(pickle.dumps(data, pickle.HIGHEST_PROTOCOL))
+    return zlib.compress(pickle.dumps(data, 4))  # Keep this constant as we upgrade from python 2 to 3.
 
 
 def zunpickle(zdata):
     """Given a zlib compressed pickled serialization, returns the deserialized data."""
-    return pickle.loads(zlib.decompress(zdata))
+    if six.PY2:
+        return pickle.loads(zlib.decompress(zdata))
+    else:
+        return pickle.loads(zlib.decompress(zdata), encoding='latin1')
 
 
 def get_cache(name):

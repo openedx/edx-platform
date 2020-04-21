@@ -1,7 +1,7 @@
 """
 Tests for the lms_filter_generator
 """
-from __future__ import absolute_import
+
 
 import six
 from mock import Mock, patch
@@ -90,6 +90,10 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         self.assertIn('start_date', filter_dictionary)
         self.assertEqual(0, len(field_dictionary['course']))
 
+    @patch(
+        'openedx.core.djangoapps.site_configuration.helpers.get_all_orgs',
+        Mock(return_value=["LogistrationX", "TestSiteX"])
+    )
     def test_excludes_site_org(self):
         """
         By default site orgs not belonging to current site org should be excluded.
@@ -101,7 +105,7 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         self.assertEqual('LogistrationX', exclude_orgs[0])
         self.assertEqual('TestSiteX', exclude_orgs[1])
 
-    @patch('openedx.core.djangoapps.site_configuration.helpers.get_all_orgs', Mock(return_value=[]))
+    @patch('openedx.core.djangoapps.site_configuration.helpers.get_all_orgs', Mock(return_value=set()))
     def test_no_excludes_with_no_orgs(self):
         """ Test when no org is present - nothing to exclude """
         _, _, exclude_dictionary = LmsSearchFilterGenerator.generate_field_filters(user=self.user)
@@ -116,7 +120,7 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
 
     @patch(
         'openedx.core.djangoapps.site_configuration.helpers.get_all_orgs',
-        Mock(return_value=["TestSite1", "TestSite2", "TestSite3", "TestSite4"])
+        Mock(return_value={"TestSite1", "TestSite2", "TestSite3", "TestSite4"})
     )
     def test_excludes_multi_orgs(self):
         _, _, exclude_dictionary = LmsSearchFilterGenerator.generate_field_filters(user=self.user)
@@ -130,7 +134,7 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
 
     @patch(
         'openedx.core.djangoapps.site_configuration.helpers.get_all_orgs',
-        Mock(return_value=["TestSite1", "TestSite2", "TestSite3", "TestSite4"])
+        Mock(return_value={"TestSite1", "TestSite2", "TestSite3", "TestSite4"})
     )
     @patch('openedx.core.djangoapps.site_configuration.helpers.get_value', Mock(return_value='TestSite3'))
     def test_excludes_multi_orgs_within(self):

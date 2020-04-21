@@ -2,16 +2,14 @@
 Views handling read (GET) requests for the Discussion tab and inline discussions.
 """
 
-from __future__ import absolute_import
 
 from django.conf import settings
 from django.utils.translation import ugettext_noop
 
 import lms.djangoapps.discussion.django_comment_client.utils as utils
-from courseware.tabs import EnrolledTab
+from lms.djangoapps.courseware.tabs import EnrolledTab
+from lms.djangoapps.discussion.config.waffle import use_bootstrap_flag_enabled
 from xmodule.tabs import TabFragmentViewMixin
-
-from .config import USE_BOOTSTRAP_FLAG
 
 
 class DiscussionTab(TabFragmentViewMixin, EnrolledTab):
@@ -40,4 +38,4 @@ class DiscussionTab(TabFragmentViewMixin, EnrolledTab):
         """
         Returns true if this tab is rendered with Bootstrap.
         """
-        return USE_BOOTSTRAP_FLAG.is_enabled()
+        return use_bootstrap_flag_enabled()

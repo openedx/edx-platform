@@ -1,6 +1,5 @@
 """Tests running the delete_orphan command"""
 
-from __future__ import absolute_import
 
 import ddt
 import six
@@ -21,7 +20,11 @@ class TestDeleteOrphan(TestOrphanBase):
         """
         Test delete_orphans command with no arguments
         """
-        with self.assertRaisesRegexp(CommandError, 'Error: too few arguments'):
+        if six.PY2:
+            errstring = 'Error: too few arguments'
+        else:
+            errstring = 'Error: the following arguments are required: course_id'
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('delete_orphans')
 
     @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
@@ -116,6 +119,6 @@ class TestDeleteOrphan(TestOrphanBase):
         # there should be one in published
         self.assertOrphanCount(course.id, 0)
         self.assertOrphanCount(published_branch, 1)
-        self.assertIn(orphan, self.store.get_items(published_branch))
+        self.assertIn(orphan.location, [x.location for x in self.store.get_items(published_branch)])
 
         return course, orphan

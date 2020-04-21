@@ -2,7 +2,6 @@
 Tests for discussion pages
 """
 
-from __future__ import absolute_import
 
 import datetime
 import time
@@ -11,6 +10,7 @@ from uuid import uuid4
 
 import pytest
 from pytz import UTC
+import six
 from six.moves import map
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
@@ -582,16 +582,6 @@ class DiscussionCommentDeletionTest(BaseDiscussionTestCase):
         )
         view.push()
 
-    def test_comment_deletion_as_student(self):
-        self.setup_user()
-        self.setup_view()
-        page = self.create_single_thread_page("comment_deletion_test_thread")
-        page.visit()
-        self.assertTrue(page.is_comment_deletable("comment_self_author"))
-        self.assertTrue(page.is_comment_visible("comment_other_author"))
-        self.assertFalse(page.is_comment_deletable("comment_other_author"))
-        page.delete_comment("comment_self_author")
-
     def test_comment_deletion_as_moderator(self):
         self.setup_user(roles=['Moderator'])
         self.setup_view()
@@ -1040,9 +1030,11 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
         appear in the preview box
         """
         self.page.set_new_post_editor_value(
-            ur'\begin{equation}'
-            ur'\tau_g(\omega) = - \frac{d}{d\omega}\phi(\omega) \hspace{2em} (1) '
-            ur'\end{equation}'
+            six.text_type(
+                r'\begin{equation}'
+                r'\tau_g(\omega) = - \frac{d}{d\omega}\phi(\omega) \hspace{2em} (1) '  # pylint: disable=unicode-format-string
+                r'\end{equation}'
+            )
         )
         self.assertIsNotNone(self.page.get_new_post_preview_text())
         self.page.click_element(".cancel")

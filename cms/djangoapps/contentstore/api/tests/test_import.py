@@ -1,7 +1,7 @@
 """
 Tests for the course import API views
 """
-from __future__ import absolute_import
+
 
 import os
 import tarfile

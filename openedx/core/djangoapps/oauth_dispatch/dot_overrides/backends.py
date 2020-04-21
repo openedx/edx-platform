@@ -1,7 +1,7 @@
 """
 Custom authentication backends.
 """
-from __future__ import absolute_import
+
 
 from django.contrib.auth.backends import AllowAllUsersModelBackend as UserModelBackend
 from ratelimitbackend.backends import RateLimitMixin

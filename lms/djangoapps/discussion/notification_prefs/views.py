@@ -3,11 +3,11 @@
 Views to support notification preferences.
 """
 
-from __future__ import absolute_import, division
 
 import json
 import os
 from base64 import urlsafe_b64decode, urlsafe_b64encode
+from binascii import Error
 from hashlib import sha256
 
 from cryptography.hazmat.backends import default_backend
@@ -20,6 +20,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse
 from django.views.decorators.http import require_GET, require_POST
+import six
 from six import text_type
 
 from edxmako.shortcuts import render_to_response
@@ -56,23 +57,27 @@ class UsernameCipher(object):
     @staticmethod
     def _get_aes_cipher(initialization_vector):
         hash_ = sha256()
-        hash_.update(settings.SECRET_KEY)
+        hash_.update(six.b(settings.SECRET_KEY))
         return Cipher(AES(hash_.digest()), CBC(initialization_vector), backend=default_backend())
 
     @staticmethod
     def encrypt(username):
         initialization_vector = os.urandom(AES_BLOCK_SIZE_BYTES)
+
+        if not isinstance(initialization_vector, (bytes, bytearray)):
+            initialization_vector = initialization_vector.encode('utf-8')
+
         aes_cipher = UsernameCipher._get_aes_cipher(initialization_vector)
         encryptor = aes_cipher.encryptor()
         padder = PKCS7(AES.block_size).padder()
         padded = padder.update(username.encode("utf-8")) + padder.finalize()
-        return urlsafe_b64encode(initialization_vector + encryptor.update(padded) + encryptor.finalize())
+        return urlsafe_b64encode(initialization_vector + encryptor.update(padded) + encryptor.finalize()).decode()
 
     @staticmethod
     def decrypt(token):
         try:
             base64_decoded = urlsafe_b64decode(token)
-        except TypeError:
+        except (TypeError, Error):
             raise UsernameDecryptionException("base64url")
 
         if len(base64_decoded) < AES_BLOCK_SIZE_BYTES:
@@ -182,7 +187,7 @@ def set_subscription(request, token, subscribe):  # pylint: disable=unused-argum
     success, the response will contain a page indicating success.
     """
     try:
-        username = UsernameCipher().decrypt(token.encode())
+        username = UsernameCipher().decrypt(token.encode()).decode()
         user = User.objects.get(username=username)
     except UnicodeDecodeError:
         raise Http404("base64url")

@@ -2,9 +2,8 @@
 Tests for cohorts
 """
 # pylint: disable=no-member
-from __future__ import absolute_import
 
-import before_after
+
 import ddt
 from django.contrib.auth.models import AnonymousUser, User
 from django.db import IntegrityError
@@ -249,13 +248,13 @@ class TestCohorts(ModuleStoreTestCase):
         # Make the course cohorted...
         config_course_cohorts(course, is_cohorted=True)
 
-        self.assertEquals(
+        self.assertEqual(
             cohorts.get_cohort(user, course.id).id,
             cohort.id,
             "user should be assigned to the correct cohort"
         )
 
-        self.assertEquals(
+        self.assertEqual(
             cohorts.get_cohort(other_user, course.id).id,
             cohorts.get_cohort_by_name(course.id, cohorts.DEFAULT_COHORT_NAME).id,
             "other_user should be assigned to the default cohort"
@@ -273,14 +272,14 @@ class TestCohorts(ModuleStoreTestCase):
 
         # Add email address to the cohort
         (user, previous_cohort, prereg) = cohorts.add_user_to_cohort(cohort, "email@example.com")
-        self.assertEquals(
+        self.assertEqual(
             (user, previous_cohort, prereg),
             (None, None, True)
         )
 
         # Create user with this email address
         user = UserFactory(username="test", email="email@example.com")
-        self.assertEquals(
+        self.assertEqual(
             cohorts.get_cohort(user, course.id).id,
             cohort.id,
             "User should be assigned to the right cohort"
@@ -299,21 +298,21 @@ class TestCohorts(ModuleStoreTestCase):
 
         # Add email address to the first cohort
         (user, previous_cohort, prereg) = cohorts.add_user_to_cohort(cohort, "email@example.com")
-        self.assertEquals(
+        self.assertEqual(
             (user, previous_cohort, prereg),
             (None, None, True)
         )
 
         # Add email address to the second cohort
         (user, previous_cohort, prereg) = cohorts.add_user_to_cohort(cohort2, "email@example.com")
-        self.assertEquals(
+        self.assertEqual(
             (user, previous_cohort, prereg),
             (None, None, True)
         )
 
         # Create user with this email address
         user = UserFactory(username="test", email="email@example.com")
-        self.assertEquals(
+        self.assertEqual(
             cohorts.get_cohort(user, course.id).id,
             cohort2.id,
             "User should be assigned to the right cohort"
@@ -358,7 +357,7 @@ class TestCohorts(ModuleStoreTestCase):
         self.assertIsNone(cohorts.get_cohort(user, course.id, assign=False))
 
         # get_cohort should return a group for user
-        self.assertEquals(cohorts.get_cohort(user, course.id).name, "AutoGroup")
+        self.assertEqual(cohorts.get_cohort(user, course.id).name, "AutoGroup")
 
     def test_cohorting_with_auto_cohorts(self):
         """
@@ -380,9 +379,9 @@ class TestCohorts(ModuleStoreTestCase):
             auto_cohorts=["AutoGroup"]
         )
 
-        self.assertEquals(cohorts.get_cohort(user1, course.id).id, cohort.id, "user1 should stay put")
+        self.assertEqual(cohorts.get_cohort(user1, course.id).id, cohort.id, "user1 should stay put")
 
-        self.assertEquals(cohorts.get_cohort(user2, course.id).name, "AutoGroup", "user2 should be auto-cohorted")
+        self.assertEqual(cohorts.get_cohort(user2, course.id).name, "AutoGroup", "user2 should be auto-cohorted")
 
     def test_anonymous_user_cohort(self):
         """
@@ -417,7 +416,7 @@ class TestCohorts(ModuleStoreTestCase):
             auto_cohorts=["AutoGroup"]
         )
 
-        self.assertEquals(cohorts.get_cohort(user1, course.id).name, "AutoGroup", "user1 should be auto-cohorted")
+        self.assertEqual(cohorts.get_cohort(user1, course.id).name, "AutoGroup", "user1 should be auto-cohorted")
 
         # Now set the auto_cohort_group to something different
         # This will have no effect on lms side as we are already done with migrations
@@ -427,11 +426,11 @@ class TestCohorts(ModuleStoreTestCase):
             auto_cohort_groups=["OtherGroup"]
         )
 
-        self.assertEquals(
+        self.assertEqual(
             cohorts.get_cohort(user2, course.id).name, "AutoGroup", "user2 should be assigned to AutoGroups"
         )
 
-        self.assertEquals(
+        self.assertEqual(
             cohorts.get_cohort(user1, course.id).name, "AutoGroup", "user1 should still be in originally placed cohort"
         )
 
@@ -455,7 +454,7 @@ class TestCohorts(ModuleStoreTestCase):
             auto_cohorts=[]
         )
 
-        self.assertEquals(
+        self.assertEqual(
             cohorts.get_cohort(user1, course.id).id,
             cohorts.get_cohort_by_name(course.id, cohorts.DEFAULT_COHORT_NAME).id,
             "No groups->default cohort for user1"
@@ -469,13 +468,13 @@ class TestCohorts(ModuleStoreTestCase):
             auto_cohort_groups=["AutoGroup"]
         )
 
-        self.assertEquals(
+        self.assertEqual(
             cohorts.get_cohort(user1, course.id).name,
             cohorts.get_cohort_by_name(course.id, cohorts.DEFAULT_COHORT_NAME).name,
             "user1 should still be in the default cohort"
         )
 
-        self.assertEquals(
+        self.assertEqual(
             cohorts.get_cohort(user2, course.id).id,
             cohorts.get_cohort_by_name(course.id, cohorts.DEFAULT_COHORT_NAME).id,
             "No groups->default cohort for user2"
@@ -690,45 +689,6 @@ class TestCohorts(ModuleStoreTestCase):
             User.DoesNotExist,
             lambda: cohorts.add_user_to_cohort(first_cohort, "non_existent_username")
         )
-
-    @patch("openedx.core.djangoapps.course_groups.cohorts.tracker")
-    def add_user_to_cohorts_race_condition(self, mock_tracker):
-        """
-        Makes use of before_after to force a race condition, in order to
-        confirm handling of such conditions is done correctly.
-        """
-        course_user = UserFactory(username="Username", email="a@b.com")
-        course = modulestore().get_course(self.toy_course_key)
-        CourseEnrollment.enroll(course_user, self.toy_course_key)
-        first_cohort = CohortFactory(course_id=course.id, name="FirstCohort")
-        second_cohort = CohortFactory(course_id=course.id, name="SecondCohort")
-
-        # This before_after contextmanager allows for reliable reproduction of a race condition.
-        # It will break before the first save() call creates an entry, and then run add_user_to_cohort again.
-        # Because this second call will write before control is returned, the first call will be writing stale data.
-        # This test confirms that the first add_user_to_cohort call can handle this stale read condition properly.
-        # Proper handling is defined as treating calls as sequential, with write time deciding the order.
-        with before_after.before_after(
-            'django.db.models.Model.save',
-            after_ftn=cohorts.add_user_to_cohort(second_cohort, course_user.username),
-            autospec=True
-        ):
-            # This method will read, then break, then try to write stale data.
-            # It should fail at that, then retry with refreshed data
-            cohorts.add_user_to_cohort(first_cohort, course_user.username)
-
-        mock_tracker.emit.assert_any_call(
-            "edx.cohort.user_add_requested",
-            {
-                "user_id": course_user.id,
-                "cohort_id": first_cohort.id,
-                "cohort_name": first_cohort.name,
-                "previous_cohort_id": second_cohort.id,
-                "previous_cohort_name": second_cohort.name,
-            }
-        )
-        # Note that the following get() will fail with MultipleObjectsReturned if race condition is not handled.
-        self.assertEqual(first_cohort.users.get(), course_user)
 
     def test_set_cohorted_with_invalid_data_type(self):
         """

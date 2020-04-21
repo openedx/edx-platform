@@ -3,7 +3,7 @@ DiscountRestrictionConfig Models
 """
 
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+
 
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
@@ -38,4 +38,19 @@ class DiscountRestrictionConfig(StackedConfigurationModel):
     def __str__(self):
         return "DiscountRestrictionConfig(disabled={!r})".format(
             self.disabled
+        )
+
+
+@python_2_unicode_compatible
+class DiscountPercentageConfig(StackedConfigurationModel):
+    """
+    A ConfigurationModel to configure the discount percentage for the first purchase discount
+    """
+    STACKABLE_FIELDS = ('percentage',)
+    percentage = models.PositiveIntegerField()
+
+    def __str__(self):
+        return "DiscountPercentageConfig(enabled={!r},percentage={!r})".format(
+            self.enabled,
+            self.percentage
         )

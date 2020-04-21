@@ -3,12 +3,13 @@ Management command to sync platform users with hubspot
 ./manage.py lms sync_hubspot_contacts
 ./manage.py lms sync_hubspot_contacts --initial-sync-days=7 --batch-size=20
 """
-from __future__ import absolute_import
+
 
 import json
 import time
 import traceback
 from datetime import datetime, timedelta
+from textwrap import dedent
 
 import six.moves.urllib.parse  # pylint: disable=import-error
 from django.contrib.auth.models import User
@@ -28,6 +29,7 @@ class Command(BaseCommand):
     Command to create contacts in hubspot for those partner who has enabled hubspot integration.
     This command is suppose to sync contact with hubspot on daily basis.
     """
+    help = dedent(__doc__).strip()
 
     def _get_hubspot_enabled_sites(self):
         """

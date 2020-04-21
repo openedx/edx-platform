@@ -2,7 +2,6 @@
 Tests for certificate app views used by the support team.
 """
 
-from __future__ import absolute_import
 
 import json
 
@@ -11,10 +10,13 @@ import six
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
+from mock import patch
 from opaque_keys.edx.keys import CourseKey
 
+from lms.djangoapps.certificates import api
 from lms.djangoapps.certificates.models import CertificateInvalidation, CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory
+from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.models import CourseEnrollment
 from student.roles import GlobalStaff, SupportStaffRole
@@ -170,7 +172,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
         response = self._search(user_filter, course_filter)
         if expect_result:
             self.assertEqual(response.status_code, 200)
-            results = json.loads(response.content)
+            results = json.loads(response.content.decode('utf-8'))
             self.assertEqual(len(results), 1)
         else:
             self.assertEqual(response.status_code, 400)
@@ -184,7 +186,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
 
         response = self._search(self.student.email)
         self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(len(results), 1)
         retrieved_data = results[0]
@@ -193,7 +195,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
     def test_results(self):
         response = self._search(self.STUDENT_USERNAME)
         self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(len(results), 1)
         retrieved_cert = results[0]
@@ -216,7 +218,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
 
         response = self._search(self.STUDENT_USERNAME)
         self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(len(results), 1)
         retrieved_cert = results[0]
@@ -298,6 +300,23 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         # we'd expect that the certificate status will be "notpassing"
         cert = GeneratedCertificate.eligible_certificates.get(user=self.student)
         self.assertEqual(cert.status, CertificateStatuses.notpassing)
+
+    @patch('lms.djangoapps.certificates.queue.XQueueCertInterface._generate_cert')
+    def test_regenerate_certificate_for_honor_mode(self, mock_generate_cert):
+        """Test web certificate regenration for the users who have earned the
+           certificate in honor mode
+        """
+        self.cert.mode = 'honor'
+        self.cert.download_url = ''
+        self.cert.save()
+
+        with mock_passing_grade(percent=0.75):
+            with patch('course_modes.models.CourseMode.mode_for_course') as mock_mode_for_course:
+                mock_mode_for_course.return_value = 'honor'
+                api.regenerate_user_certificates(self.student, self.course.id,
+                                                 course=self.course)
+
+                mock_generate_cert.assert_called()
 
     def test_regenerate_certificate_missing_params(self):
         # Missing username

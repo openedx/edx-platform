@@ -1,11 +1,11 @@
 """Middleware classes for third_party_auth."""
 
-from __future__ import absolute_import
 
 import six.moves.urllib.parse  # pylint: disable=import-error
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import ugettext as _
 from requests import HTTPError
 from social_django.middleware import SocialAuthExceptionMiddleware
@@ -15,7 +15,7 @@ from student.helpers import get_next_url_for_login_page
 from . import pipeline
 
 
-class ExceptionMiddleware(SocialAuthExceptionMiddleware):
+class ExceptionMiddleware(SocialAuthExceptionMiddleware, MiddlewareMixin):
     """Custom middleware that handles conditional redirection."""
 
     def get_redirect_uri(self, request, exception):

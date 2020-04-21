@@ -5,11 +5,11 @@ Includes:
     StudioConfig: A ConfigurationModel for managing Studio.
 """
 
-from __future__ import absolute_import
 
 import six
 from config_models.models import ConfigurationModel
 from django.db.models import TextField
+from django.utils.encoding import python_2_unicode_compatible
 from opaque_keys.edx.django.models import CourseKeyField
 
 from openedx.core.lib.cache_utils import request_cached
@@ -22,8 +22,8 @@ class StudioConfig(ConfigurationModel):
     .. no_pii:
     """
     disabled_blocks = TextField(
-        default="about course_info static_tab",
-        help_text="Space-separated list of XBlocks on which XBlockAsides should never render in studio",
+        default=u"about course_info static_tab",
+        help_text=u"Space-separated list of XBlocks on which XBlockAsides should never render in studio",
     )
 
     @classmethod
@@ -37,6 +37,7 @@ class StudioConfig(ConfigurationModel):
 
 # TODO: Move CourseEditLTIFieldsEnabledFlag to LTI XBlock as a part of EDUCATOR-121
 # reference: https://openedx.atlassian.net/browse/EDUCATOR-121
+@python_2_unicode_compatible
 class CourseEditLTIFieldsEnabledFlag(ConfigurationModel):
     """
     Enables the editing of "request username" and "request email" fields
@@ -77,7 +78,7 @@ class CourseEditLTIFieldsEnabledFlag(ConfigurationModel):
 
         return course_specific_config.enabled if course_specific_config else False
 
-    def __unicode__(self):
+    def __str__(self):
         en = "Not "
         if self.enabled:
             en = ""

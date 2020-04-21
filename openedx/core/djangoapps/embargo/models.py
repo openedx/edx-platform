@@ -11,13 +11,13 @@ file and check it in at the same time as your model changes. To do that,
 3. Add the migration file created in edx-platform/openedx/core/djangoapps/embargo/migrations/
 """
 
-from __future__ import absolute_import
 
 import ipaddress
 import json
 import logging
 
 import six
+from django.utils.encoding import python_2_unicode_compatible
 from config_models.models import ConfigurationModel
 from django.core.cache import cache
 from django.db import models
@@ -38,6 +38,7 @@ from .messages import COURSEWARE_MESSAGES, ENROLL_MESSAGES
 log = logging.getLogger(__name__)
 
 
+@python_2_unicode_compatible
 class EmbargoedCourse(models.Model):
     """
     Enable course embargo on a course-by-course basis.
@@ -67,13 +68,14 @@ class EmbargoedCourse(models.Model):
         except cls.DoesNotExist:
             return False
 
-    def __unicode__(self):
+    def __str__(self):
         not_em = "Not "
         if self.embargoed:
             not_em = ""
         return u"Course '{}' is {}Embargoed".format(text_type(self.course_id), not_em)
 
 
+@python_2_unicode_compatible
 class EmbargoedState(ConfigurationModel):
     """
     Register countries to be embargoed.
@@ -85,7 +87,7 @@ class EmbargoedState(ConfigurationModel):
     # The countries to embargo
     embargoed_countries = models.TextField(
         blank=True,
-        help_text="A comma-separated list of country codes that fall under U.S. embargo restrictions"
+        help_text=u"A comma-separated list of country codes that fall under U.S. embargo restrictions"
     )
 
     @property
@@ -97,10 +99,11 @@ class EmbargoedState(ConfigurationModel):
             return []
         return [country.strip().upper() for country in self.embargoed_countries.split(',')]
 
-    def __unicode__(self):
+    def __str__(self):
         return self.embargoed_countries
 
 
+@python_2_unicode_compatible
 class RestrictedCourse(models.Model):
     """
     Course with access restrictions.
@@ -123,15 +126,15 @@ class RestrictedCourse(models.Model):
     COURSE_LIST_CACHE_KEY = 'embargo.restricted_courses'
     MESSAGE_URL_CACHE_KEY = 'embargo.message_url_path.{access_point}.{course_key}'
 
-    ENROLL_MSG_KEY_CHOICES = tuple([
+    ENROLL_MSG_KEY_CHOICES = tuple(sorted([
         (msg_key, msg.description)
         for msg_key, msg in six.iteritems(ENROLL_MESSAGES)
-    ])
+    ]))
 
-    COURSEWARE_MSG_KEY_CHOICES = tuple([
+    COURSEWARE_MSG_KEY_CHOICES = tuple(sorted([
         (msg_key, msg.description)
         for msg_key, msg in six.iteritems(COURSEWARE_MESSAGES)
-    ])
+    ]))
 
     course_key = CourseKeyField(
         max_length=255, db_index=True, unique=True,
@@ -141,14 +144,14 @@ class RestrictedCourse(models.Model):
     enroll_msg_key = models.CharField(
         max_length=255,
         choices=ENROLL_MSG_KEY_CHOICES,
-        default='default',
+        default=u'default',
         help_text=ugettext_lazy(u"The message to show when a user is blocked from enrollment.")
     )
 
     access_msg_key = models.CharField(
         max_length=255,
         choices=COURSEWARE_MSG_KEY_CHOICES,
-        default='default',
+        default=u'default',
         help_text=ugettext_lazy(u"The message to show when a user is blocked from accessing a course.")
     )
 
@@ -267,7 +270,7 @@ class RestrictedCourse(models.Model):
         elif access_point == 'courseware':
             return self.access_msg_key
 
-    def __unicode__(self):
+    def __str__(self):
         return six.text_type(self.course_key)
 
     @classmethod
@@ -372,6 +375,7 @@ class RestrictedCourse(models.Model):
         log.info("Invalidated cached messaging URLs ")
 
 
+@python_2_unicode_compatible
 class Country(models.Model):
     """Representation of a country.
 
@@ -386,7 +390,7 @@ class Country(models.Model):
         help_text=ugettext_lazy(u"Two character ISO country code.")
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return u"{name} ({code})".format(
             name=six.text_type(self.country.name),
             code=six.text_type(self.country)
@@ -397,6 +401,7 @@ class Country(models.Model):
         ordering = ['country']
 
 
+@python_2_unicode_compatible
 class CountryAccessRule(models.Model):
     """Course access rule based on the user's country.
 
@@ -416,12 +421,12 @@ class CountryAccessRule(models.Model):
     .. no_pii:
     """
 
-    WHITELIST_RULE = 'whitelist'
-    BLACKLIST_RULE = 'blacklist'
+    WHITELIST_RULE = u'whitelist'
+    BLACKLIST_RULE = u'blacklist'
 
     RULE_TYPE_CHOICES = (
-        (WHITELIST_RULE, 'Whitelist (allow only these countries)'),
-        (BLACKLIST_RULE, 'Blacklist (block these countries)'),
+        (WHITELIST_RULE, u'Whitelist (allow only these countries)'),
+        (BLACKLIST_RULE, u'Blacklist (block these countries)'),
     )
 
     rule_type = models.CharField(
@@ -519,7 +524,7 @@ class CountryAccessRule(models.Model):
         # that have access to the course.
         return list(whitelist_countries - blacklist_countries)
 
-    def __unicode__(self):
+    def __str__(self):
         if self.rule_type == self.WHITELIST_RULE:
             return _(u"Whitelist {country} for {course}").format(
                 course=six.text_type(self.restricted_course.course_key),
@@ -679,6 +684,7 @@ post_delete.connect(CourseAccessRuleHistory.snapshot_post_delete_receiver, sende
 post_delete.connect(CourseAccessRuleHistory.snapshot_post_delete_receiver, sender=CountryAccessRule)
 
 
+@python_2_unicode_compatible
 class IPFilter(ConfigurationModel):
     """
     Register specific IP addresses to explicitly block or unblock.
@@ -687,12 +693,12 @@ class IPFilter(ConfigurationModel):
     """
     whitelist = models.TextField(
         blank=True,
-        help_text="A comma-separated list of IP addresses that should not fall under embargo restrictions."
+        help_text=u"A comma-separated list of IP addresses that should not fall under embargo restrictions."
     )
 
     blacklist = models.TextField(
         blank=True,
-        help_text="A comma-separated list of IP addresses that should fall under embargo restrictions."
+        help_text=u"A comma-separated list of IP addresses that should fall under embargo restrictions."
     )
 
     class IPFilterList(object):
@@ -737,5 +743,5 @@ class IPFilter(ConfigurationModel):
             return []
         return self.IPFilterList([addr.strip() for addr in self.blacklist.split(',')])
 
-    def __unicode__(self):
+    def __str__(self):
         return "Whitelist: {} - Blacklist: {}".format(self.whitelist_ips, self.blacklist_ips)

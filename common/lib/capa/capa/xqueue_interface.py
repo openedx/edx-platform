@@ -1,7 +1,7 @@
 #
 #  LMS Interface to external queueing system (xqueue)
 #
-from __future__ import absolute_import
+
 
 import hashlib
 import json
@@ -26,7 +26,7 @@ def make_hashkey(seed):
     Generate a string key by hashing
     """
     h = hashlib.md5()
-    h.update(str(seed))
+    h.update(six.b(str(seed)))
     return h.hexdigest()
 
 

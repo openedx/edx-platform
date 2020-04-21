@@ -1,7 +1,7 @@
 """
 CourseGrade Class
 """
-from __future__ import absolute_import
+
 
 from abc import abstractmethod
 from collections import OrderedDict, defaultdict
@@ -9,8 +9,10 @@ from collections import OrderedDict, defaultdict
 import six
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
+from django.utils.encoding import python_2_unicode_compatible
 from lazy import lazy
 
+from openedx.core.lib.grade_utils import round_away_from_zero
 from xmodule import block_metadata_utils
 
 from .config import assume_zero_if_absent
@@ -19,6 +21,7 @@ from .subsection_grade import ZeroSubsectionGrade
 from .subsection_grade_factory import SubsectionGradeFactory
 
 
+@python_2_unicode_compatible
 class CourseGradeBase(object):
     """
     Base class for Course Grades.
@@ -34,7 +37,7 @@ class CourseGradeBase(object):
         self.letter_grade = letter_grade or None
         self.force_update_subsections = force_update_subsections
 
-    def __unicode__(self):
+    def __str__(self):
         return u'Course Grade: percent: {}, letter_grade: {}, passed: {}'.format(
             six.text_type(self.percent),
             self.letter_grade,
@@ -294,7 +297,9 @@ class CourseGrade(CourseGradeBase):
         Computes and returns the grade percentage from the given
         result from the grader.
         """
-        return round(grader_result['percent'] * 100 + 0.05) / 100
+
+        # Confused about the addition of .05 here?  See https://openedx.atlassian.net/browse/TNL-6972
+        return round_away_from_zero(grader_result['percent'] * 100 + 0.05) / 100
 
     @staticmethod
     def _compute_letter_grade(grade_cutoffs, percent):

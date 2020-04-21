@@ -1,7 +1,7 @@
 """
 Bookmarks Python API.
 """
-from __future__ import absolute_import
+
 
 import six
 from django.conf import settings
@@ -74,7 +74,7 @@ def get_bookmarks(user, course_key=None, fields=None, serialized=True):
         else:
             bookmarks_queryset = bookmarks_queryset.select_related('user')
 
-        bookmarks_queryset = bookmarks_queryset.order_by('-created')
+        bookmarks_queryset = bookmarks_queryset.order_by('-id')
     else:
         bookmarks_queryset = Bookmark.objects.none()
 

@@ -4,10 +4,9 @@
 Tests for Django management commands
 """
 
-from __future__ import absolute_import
 
 import json
-from StringIO import StringIO
+from six import StringIO
 
 import factory
 import six
@@ -88,7 +87,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
 
     def test_dump_course_ids(self):
         output = self.call_command('dump_course_ids')
-        dumped_courses = output.decode('utf-8').strip().split('\n')
+        dumped_courses = output.strip().split('\n')
         course_ids = {text_type(course_id) for course_id in self.loaded_courses}
         dumped_ids = set(dumped_courses)
         self.assertEqual(course_ids, dumped_ids)
@@ -135,7 +134,8 @@ class CommandsTestBase(SharedModuleStoreTestCase):
         self.assertEqual(dump[video_id]['category'], 'video')
         video_metadata = dump[video_id]['metadata']
         video_metadata.pop('edx_video_id', None)
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             list(video_metadata.keys()),
             ['youtube_id_0_75', 'youtube_id_1_0', 'youtube_id_1_25', 'youtube_id_1_5']
         )

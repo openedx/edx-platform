@@ -1,7 +1,7 @@
 """
 Model specific tests for user_api
 """
-from __future__ import absolute_import
+
 
 import pytest
 

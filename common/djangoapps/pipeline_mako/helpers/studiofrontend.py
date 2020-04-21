@@ -2,7 +2,7 @@
 Contains code that gets run inside our mako template
 Debugging python-in-mako is terrible, so we've moved the actual code out to its own file
 """
-from __future__ import absolute_import
+
 
 import logging
 

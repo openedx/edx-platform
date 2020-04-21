@@ -3,7 +3,6 @@
 Common Utilities for the verify_student application.
 """
 
-from __future__ import absolute_import
 
 import datetime
 import logging
@@ -102,3 +101,45 @@ def most_recent_verification(photo_id_verifications, sso_id_verifications, manua
     }
 
     return max(verifications_map, key=lambda k: verifications_map[k]) if verifications_map else None
+
+
+def auto_verify_for_testing_enabled(override=None):
+    """
+    If AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING is True, we want to skip posting
+    anything to Software Secure.
+
+    Bypass posting anything to Software Secure if auto verify feature for testing is enabled.
+    We actually don't even create the message because that would require encryption and message
+    signing that rely on settings.VERIFY_STUDENT values that aren't set in dev. So we just
+    pretend like we successfully posted.
+    """
+    if override is not None:
+        return override
+    return settings.FEATURES.get('AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING')
+
+
+def can_verify_now(verification_status, expiration_datetime):
+    """
+    Returns whether one is eligible for verification now based on status and expiration.
+
+    Arguments:
+        verification_status (str)
+        expiration_datetime (datetime)
+
+    Returns: bool
+    """
+    return (
+        # If the user has no initial verification or if the verification
+        # process is still ongoing 'pending' or expired then allow the user to
+        # submit the photo verification.
+        # A photo verification is marked as 'pending' if its status is either
+        # 'submitted' or 'must_retry'.
+        verification_status['status'] in {"none", "must_reverify", "expired", "pending"}
+        or (
+            # The user has an active verification, but the verification
+            # is set to expire within "EXPIRING_SOON_WINDOW" days (default is 4 weeks).
+            # In this case user can resubmit photos for reverification.
+            expiration_datetime
+            and is_verification_expiring_soon(expiration_datetime)
+        )
+    )

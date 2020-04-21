@@ -14,11 +14,13 @@
 <%namespace name='static' file='static_content.html'/>
 <% online_help_token = self.online_help_token() if hasattr(self, 'online_help_token') else None %>
 <%!
+import six
 from branding import api as branding_api
 from django.urls import reverse
 from django.utils.http import urlquote_plus
 from django.utils.translation import ugettext as _
 from django.utils.translation import get_language_bidi
+from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.release import RELEASE_LINE
@@ -89,7 +91,7 @@ from pipeline_mako import render_require_js_path_overrides
       <%
       rtl_css_file = self.attr.main_css.replace('.css', '-rtl.css')
       %>
-      <link rel="stylesheet" href="${unicode(static.url(rtl_css_file))}" type="text/css" media="all" />
+      <link rel="stylesheet" href="${six.text_type(static.url(rtl_css_file))}" type="text/css" media="all" />
     % else:
       <link rel="stylesheet" href="${static.url(self.attr.main_css)}" type="text/css" media="all" />
     % endif
@@ -183,6 +185,11 @@ from pipeline_mako import render_require_js_path_overrides
         <%include file="/preview_menu.html" />
     % endif
 
+    <% is_course_staff = bool(user and course and has_access(user, 'staff', course, course.id)) %>
+    % if course and course.self_paced and display_reset_dates_banner and not is_course_staff:
+        <%include file="/reset_deadlines_banner.html" />
+    % endif
+
     <%include file="/page_banner.html" />
 
     <div class="marketing-hero"><%block name="marketing_hero"></%block></div>
@@ -208,6 +215,7 @@ from pipeline_mako import render_require_js_path_overrides
   <script type="text/javascript" src="${static.url('js/utils/navigation.js')}" charset="utf-8"></script>
   <script type="text/javascript" src="${static.url('js/header/header.js')}"></script>
   <%static:optional_include_mako file="body-extra.html" is_theming_enabled="True" />
+  <script type="text/javascript" src="${static.url('js/src/jquery_extend_patch.js')}"></script>
 </body>
 </html>
 

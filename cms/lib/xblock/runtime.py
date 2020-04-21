@@ -2,10 +2,12 @@
 XBlock runtime implementations for edX Studio
 """
 
-from __future__ import absolute_import
+import logging
 
 import six
 from django.urls import reverse
+
+log = logging.getLogger(__name__)
 
 
 def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
@@ -14,10 +16,10 @@ def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
     """
 
     if thirdparty:
-        raise NotImplementedError("edX Studio doesn't support third-party xblock handler urls")
+        log.warning("edX Studio doesn't support third-party handler urls for XBlock %s", type(block))
 
     url = reverse('component_handler', kwargs={
-        'usage_key_string': six.text_type(block.scope_ids.usage_id).encode('utf-8'),
+        'usage_key_string': six.text_type(block.scope_ids.usage_id),
         'handler': handler_name,
         'suffix': suffix,
     }).rstrip('/')

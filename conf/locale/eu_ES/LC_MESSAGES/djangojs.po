@@ -1,57 +1,57 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Basque (Spain) (http://www.transifex.com/open-edx/edx-platform/language/eu_ES/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # Abel Camacho <abelcama@gmail.com>, 2015-2016
-# Abel Camacho <abelcama@gmail.com>, 2017
+# Abel Camacho <abelcama@gmail.com>, 2017,2019-2020
 # Abel Camacho <abelcama@gmail.com>, 2015
 # Pedro Lonbide <plonbide@gmail.com>, 2015
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Basque (Spain) (http://www.transifex.com/open-edx/edx-platform/language/eu_ES/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # Abel Camacho <abelcama@gmail.com>, 2015,2017
-# Abel Camacho <abelcama@gmail.com>, 2017
+# Abel Camacho <abelcama@gmail.com>, 2017,2019-2020
 # Abel Camacho <abelcama@gmail.com>, 2015
 # Pedro Lonbide <plonbide@gmail.com>, 2015
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Basque (Spain) (https://www.transifex.com/open-edx/teams/6205/eu_ES/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # Translators:
-# Abel Camacho <abelcama@gmail.com>, 2019
+# Abel Camacho <abelcama@gmail.com>, 2020
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Basque (Spain) (http://www.transifex.com/open-edx/edx-platform/language/eu_ES/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # Abel Camacho <abelcama@gmail.com>, 2015-2016
-# Abel Camacho <abelcama@gmail.com>, 2017
+# Abel Camacho <abelcama@gmail.com>, 2017,2019-2020
 # Abel Camacho <abelcama@gmail.com>, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Basque (Spain) (http://www.transifex.com/open-edx/edx-platform/language/eu_ES/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # Abel Camacho <abelcama@gmail.com>, 2015
-# Abel Camacho <abelcama@gmail.com>, 2017
+# Abel Camacho <abelcama@gmail.com>, 2017,2019-2020
 # Abel Camacho <abelcama@gmail.com>, 2015
 # Pedro Lonbide <plonbide@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-07-24 06:10+0000\n"
-"PO-Revision-Date: 2019-07-21 20:42+0000\n"
+"POT-Creation-Date: 2020-04-12 20:42+0000\n"
+"PO-Revision-Date: 2020-03-05 10:11+0000\n"
 "Last-Translator: Abel Camacho <abelcama@gmail.com>\n"
 "Language-Team: Basque (Spain) (http://www.transifex.com/open-edx/edx-platform/language/eu_ES/)\n"
 "Language: eu_ES\n"
@@ -80,6 +80,21 @@ msgstr "Gordetzen"
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/show_textbook.js
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
+#: cms/templates/js/content-group-editor.underscore
+#: cms/templates/js/course-instructor-details.underscore
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/course-settings-learning-fields.underscore
+#: cms/templates/js/course_grade_policy.underscore
+#: cms/templates/js/course_info_update.underscore
+#: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/partition-group-details.underscore
+#: cms/templates/js/show-textbook.underscore
+#: cms/templates/js/signatory-editor.underscore
+#: cms/templates/js/video-transcripts.underscore
+#: cms/templates/js/xblock-outline.underscore
 msgid "Delete"
 msgstr "Ezabatu"
 
@@ -119,7 +134,7 @@ msgstr "Utzi"
 #: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
 #: cms/static/js/views/video_thumbnail.js lms/static/js/views/image_field.js
 msgid "Uploading"
-msgstr "Igotzen"
+msgstr "Kargatzen"
 
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -135,6 +150,11 @@ msgstr "Igotzen"
 msgid "Close"
 msgstr "Itxi"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: cms/static/js/views/assets.js
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/previous-video-upload-list.underscore
@@ -158,6 +178,11 @@ msgstr "Aukeratu fitxategia"
 msgid "OK"
 msgstr "Ondo"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: cms/static/js/views/course_video_settings.js
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "None"
 msgstr "Bat ere ez"
@@ -178,7 +203,7 @@ msgstr "Ezabatu"
 #: cms/static/js/views/manage_users_and_roles.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Ok"
-msgstr ""
+msgstr "Ondo"
 
 #: cms/static/js/views/manage_users_and_roles.js
 #: lms/static/js/instructor_dashboard/util.js
@@ -188,12 +213,18 @@ msgstr "Ezezaguna"
 #: cms/static/js/views/manage_users_and_roles.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Are you sure?"
-msgstr ""
+msgstr "Ziur al zaude?"
 
 #: cms/static/js/views/metadata.js lms/static/js/views/file_uploader.js
 msgid "Upload File"
-msgstr "Igo fitxategia"
+msgstr "Kargatu fitxategia"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: cms/static/js/views/modals/base_modal.js
+#: cms/static/js/views/modals/course_outline_modals.js
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/course_info_handouts.underscore
@@ -209,6 +240,11 @@ msgstr "Igo fitxategia"
 msgid "Save"
 msgstr "Gorde"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: cms/static/js/views/modals/course_outline_modals.js
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Advanced"
 msgstr "Aurreratua"
@@ -225,6 +261,14 @@ msgstr "Ezabatzen"
 #: lms/static/js/views/fields.js
 msgid "Your changes have been saved."
 msgstr "Zure aldaketak ondo gorde dira"
+
+#. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: cms/static/js/views/xblock_validation.js
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Warning"
+msgstr "Kontuz"
 
 #. Translators: This message will be added to the front of messages of type
 #. error,
@@ -254,103 +298,105 @@ msgstr "Falta diren taldeak sortzen"
 
 #: common/lib/xmodule/xmodule/assets/word_cloud/src/js/word_cloud_main.js
 msgid "{start_strong}{total}{end_strong} words submitted in total."
-msgstr ""
+msgstr "{start_strong}{total}{end_strong} denera bidalitako hitzak"
 
 #: common/lib/xmodule/xmodule/assets/word_cloud/src/js/word_cloud_main.js
 msgid "text_word_{uniqueId} title_word_{uniqueId}"
-msgstr ""
+msgstr "text_word_{uniqueId} title_word_{uniqueId}"
 
 #: common/lib/xmodule/xmodule/assets/word_cloud/src/js/word_cloud_main.js
 msgid "title_word_{uniqueId}"
-msgstr ""
+msgstr "title_word_{uniqueId}"
 
 #: common/lib/xmodule/xmodule/assets/word_cloud/src/js/word_cloud_main.js
 msgid "text_word_{uniqueId}"
-msgstr ""
+msgstr "text_word_{uniqueId}"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Show Annotations"
-msgstr ""
+msgstr "Erakutsi oharpenak"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Hide Annotations"
-msgstr ""
+msgstr "Ezkutatu oharpenak"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Expand Instructions"
-msgstr ""
+msgstr "Zabaldu argibideak"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Collapse Instructions"
-msgstr ""
+msgstr "Tolestu argibideak"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Commentary"
-msgstr ""
+msgstr "Iruzkina"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Reply to Annotation"
-msgstr ""
+msgstr "Erantzun oharpenari"
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (graded, results hidden)"
-msgid_plural "%(num_points)s points possible (graded, results hidden)"
+msgid "{num_points} point possible (graded, results hidden)"
+msgid_plural "{num_points} points possible (graded, results hidden)"
 msgstr[0] ""
-msgstr[1] ""
+"puntu posible {num_points} (kalifikatuta, emaitzak ezkutuan hidden)"
+msgstr[1] "{num_points} puntu posible (kalifikatuta, emaitzak ezkutuan)"
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (ungraded, results hidden)"
-msgid_plural "%(num_points)s points possible (ungraded, results hidden)"
-msgstr[0] ""
-msgstr[1] ""
+msgid "{num_points} point possible (ungraded, results hidden)"
+msgid_plural "{num_points} points possible (ungraded, results hidden)"
+msgstr[0] "puntu posible {num_points} (kalifikatu gabea, emaitzak ezkutuan)"
+msgstr[1] "{num_points} puntu posinle (kalifikatu gabea, emaitzak ezkutuan)"
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (graded)"
-msgid_plural "%(num_points)s points possible (graded)"
-msgstr[0] ""
-msgstr[1] ""
+msgid "{num_points} point possible (graded)"
+msgid_plural "{num_points} points possible (graded)"
+msgstr[0] "puntu posible {num_points} (kalifikatuta)"
+msgstr[1] "{num_points} puntu posible (kalifikatuta)"
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (ungraded)"
-msgid_plural "%(num_points)s points possible (ungraded)"
-msgstr[0] ""
-msgstr[1] ""
+msgid "{num_points} point possible (ungraded)"
+msgid_plural "{num_points} points possible (ungraded)"
+msgstr[0] "puntu posible {num_points} (kalifikatu gabea)"
+msgstr[1] "{num_points} puntu posible (kalifikatu gabea)"
 
-#. Translators: %(earned)s is the number of points earned. %(possible)s is the
+#. Translators: {earned} is the number of points earned. {possible} is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
 #. points will always be at least 1. We pluralize based on the total number of
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(earned)s/%(possible)s point (graded)"
-msgid_plural "%(earned)s/%(possible)s points (graded)"
-msgstr[0] ""
-msgstr[1] ""
+msgid "{earned}/{possible} point (graded)"
+msgid_plural "{earned}/{possible} points (graded)"
+msgstr[0] "puntu {earned}/{possible} (kalifikatuta)"
+msgstr[1] "{earned}/{possible} puntu (kalifikatuta)"
 
-#. Translators: %(earned)s is the number of points earned. %(possible)s is the
+#. Translators: {earned} is the number of points earned. {possible} is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
 #. points will always be at least 1. We pluralize based on the total number of
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(earned)s/%(possible)s point (ungraded)"
-msgid_plural "%(earned)s/%(possible)s points (ungraded)"
-msgstr[0] ""
-msgstr[1] ""
+msgid "{earned}/{possible} point (ungraded)"
+msgid_plural "{earned}/{possible} points (ungraded)"
+msgstr[0] "puntu {earned}/{possible} (kalifikatu gabea)"
+msgstr[1] "{earned}/{possible} puntu (kalifikatu gabea)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "The grading process is still running. Refresh the page to see updates."
 msgstr ""
+"Kalifikazio-prozesua abian da. Eguneratu orria azken emaitzak ikusteko."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Could not grade your answer. The submission was aborted."
-msgstr ""
+msgstr "Ezin da zure erantzuna kalifikatu. Bidalketa bertan behera geratu da."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid ""
@@ -358,130 +404,141 @@ msgid ""
 "you can, please use Chrome or Safari which have been verified to support "
 "file uploads."
 msgstr ""
+"Bidalketa bertan behera geratu da!  Zure nabigatzaileak ez du fitxategiak "
+"kargatzea onartzen. Ahal baduzu, erabili Chrome edo Safari zeren horiek "
+"egiaztatu baitute fitxategiak kargatzen dituztela."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "You submitted {filename}; only {allowedFiles} are allowed."
 msgstr ""
+"You submitted {filename} fitxategai bidali duzu; {allowedFiles} fitxategiak "
+"baino ez daude baimenduta."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Your file {filename} is too large (max size: {maxSize}MB)."
-msgstr ""
+msgstr "{filename} fitxategia handiegia da (gehienezko tamaina: {maxSize}MB)."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "You did not submit the required files: {requiredFiles}."
-msgstr ""
+msgstr "Ez dituzu beharrezko fitxategiak bidali: {requiredFiles}."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "You did not select any files to submit."
-msgstr ""
+msgstr "Ez duzu bidaltzeko fitxategirik aukeratu."
 
 #. Translators: This is only translated to allow for reordering of label and
 #. associated status.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{label}: {status}"
-msgstr ""
+msgstr "{label}: {status}"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "This problem has been reset."
-msgstr ""
+msgstr "Ariketa hau berrabiarazi da."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "unsubmitted"
+msgstr "bidali gabea"
+
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+msgid ""
+"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
 msgstr ""
+"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paragraph"
-msgstr ""
+msgstr "Paragrafoa"
 
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Preformatted"
-msgstr ""
+msgstr "Aurreformateatua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 3"
-msgstr ""
+msgstr "3. izenburua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 4"
-msgstr ""
+msgstr "4. izenburua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 5"
-msgstr ""
+msgstr "5. izenburua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 6"
-msgstr ""
+msgstr "6. izenburua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Add to Dictionary"
-msgstr ""
+msgstr "Gehitu hiztegira"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Align center"
-msgstr ""
+msgstr "Lerrokatu erdira"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Align left"
-msgstr ""
+msgstr "Lerrokatu ezkerrera"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Align right"
-msgstr ""
+msgstr "Lerrokatu eskuinera"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Alignment"
-msgstr ""
+msgstr "Lerrokadura"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Alternative source"
-msgstr ""
+msgstr "Ordezko iturburua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Anchor"
-msgstr ""
+msgstr "Aingura"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Anchors"
-msgstr ""
+msgstr "Aingurak"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Author"
-msgstr ""
+msgstr "Egilea"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Background color"
-msgstr ""
+msgstr "Atzeko planoaren kolorea"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -494,97 +551,97 @@ msgstr "Aipua"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Blocks"
-msgstr ""
+msgstr "Blokeak"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Body"
-msgstr ""
+msgstr "Gorputza"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Bold"
-msgstr ""
+msgstr "Beltza"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Border color"
-msgstr ""
+msgstr "Ertzaren kolorea"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Border"
-msgstr ""
+msgstr "Ertza"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Bottom"
-msgstr ""
+msgstr "Behera"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Bullet list"
-msgstr ""
+msgstr "Buletdun zerrenda"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Caption"
-msgstr ""
+msgstr "Epigrafea"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cell padding"
-msgstr ""
+msgstr "Gelaxken betegarria"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cell properties"
-msgstr ""
+msgstr "Gelaxkaren propietateak"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cell spacing"
-msgstr ""
+msgstr "Gelaxka-tartea"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cell type"
-msgstr ""
+msgstr "Gelaxka-mota"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cell"
-msgstr ""
+msgstr "Gelaxka"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Center"
-msgstr ""
+msgstr "Erdiratu"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Circle"
-msgstr ""
+msgstr "Zirkulua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Clear formatting"
-msgstr ""
+msgstr "Garbitu formatua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -592,8 +649,12 @@ msgstr ""
 #. displayed in the browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Code block"
-msgstr ""
+msgstr "Kode-blokea"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Code"
 msgstr "Kodea"
@@ -602,104 +663,108 @@ msgstr "Kodea"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Color"
-msgstr ""
+msgstr "Kolorea"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cols"
-msgstr ""
+msgstr "Zutabeak"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Column group"
-msgstr ""
+msgstr "Zutabe-taldea"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Column"
-msgstr ""
+msgstr "Zutabea"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Constrain proportions"
-msgstr ""
+msgstr "Murriztu proportzioak"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Copy row"
-msgstr ""
+msgstr "Kopiatu errenkada"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Copy"
-msgstr ""
+msgstr "Kopiatu"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Could not find the specified string."
-msgstr ""
+msgstr "Ezin izan da aurkitu adierazitako katea."
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Custom color"
-msgstr ""
+msgstr "Pertsonalizatutako kolorea"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Custom..."
-msgstr ""
+msgstr "Pertsonalizatu..."
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cut row"
-msgstr ""
+msgstr "Ebaki errenkada"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cut"
-msgstr ""
+msgstr "Ebaki"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Decrease indent"
-msgstr ""
+msgstr "Txikitu koska"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Default"
-msgstr ""
+msgstr "Berezkoa"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Delete column"
-msgstr ""
+msgstr "Ezabatu zutabea"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Delete row"
-msgstr ""
+msgstr "Ezabatu lerroa"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Delete table"
-msgstr ""
+msgstr "Ezabatu taula"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/group-configuration-editor.underscore
 #: lms/templates/commerce/receipt.underscore
@@ -711,31 +776,31 @@ msgstr "Deskribapena"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Dimensions"
-msgstr ""
+msgstr "Neurriak"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Disc"
-msgstr ""
+msgstr "Diskoa"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Div"
-msgstr ""
+msgstr "Div"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Document properties"
-msgstr ""
+msgstr "Dokumentuaren propietateak"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Edit HTML"
-msgstr ""
+msgstr "Editatu HTMLa"
 
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -750,92 +815,96 @@ msgstr ""
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
 msgid "Edit"
-msgstr ""
+msgstr "Editatu"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Embed"
-msgstr ""
+msgstr "Enbotatu"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Emoticons"
-msgstr ""
+msgstr "Aurpegierak"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Encoding"
-msgstr ""
+msgstr "Kodifikazioa"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "File"
-msgstr ""
+msgstr "Fitxategia"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Find and replace"
-msgstr ""
+msgstr "Bilatu eta ordezkatu"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Find next"
-msgstr ""
+msgstr "Bilatu hurrengoa"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Find previous"
-msgstr ""
+msgstr "Bilatu aurrekoa"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Find"
-msgstr ""
+msgstr "Bilatu"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Finish"
-msgstr ""
+msgstr "Amaitu"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Font Family"
-msgstr ""
+msgstr "Letra-mota"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Font Sizes"
-msgstr ""
+msgstr "Letra-tamaina"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Footer"
-msgstr ""
+msgstr "Orripekoa"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Format"
-msgstr ""
+msgstr "Formatua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Formats"
-msgstr ""
+msgstr "Formatuak"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/common/templates/image-modal.underscore
 msgid "Fullscreen"
 msgstr "Pantaila osoa"
@@ -844,303 +913,307 @@ msgstr "Pantaila osoa"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "General"
-msgstr ""
+msgstr "Orokorra"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "H Align"
-msgstr ""
+msgstr "Lerrokadura horizontala"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header 1"
-msgstr ""
+msgstr "1. goiburua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header 2"
-msgstr ""
+msgstr "2. goiburua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header 3"
-msgstr ""
+msgstr "3. goiburua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header 4"
-msgstr ""
+msgstr "4. goiburua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header 5"
-msgstr ""
+msgstr "5. goiburua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header 6"
-msgstr ""
+msgstr "6. goiburua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header cell"
-msgstr ""
+msgstr "Goiburuaren gelaxka"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "Header"
-msgstr ""
+msgstr "Goiburua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Headers"
-msgstr ""
+msgstr "Goiburuak"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 1"
-msgstr ""
+msgstr "1. izenburua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 2"
-msgstr ""
+msgstr "2. izenburua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Headings"
-msgstr ""
+msgstr "izenburuak"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Height"
-msgstr ""
+msgstr "Altuera"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Horizontal line"
-msgstr ""
+msgstr "Lerro horizontala"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Horizontal space"
-msgstr ""
+msgstr "Espazio horizontala"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "HTML source code"
-msgstr ""
+msgstr "HTML iturburu-kodea"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Ignore all"
-msgstr ""
+msgstr "Baztertu guztiak"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Ignore"
-msgstr ""
+msgstr "Baztertu"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Image description"
-msgstr ""
+msgstr "Irudiaren deskribapena"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Increase indent"
-msgstr ""
+msgstr "Handitu koska"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Inline"
-msgstr ""
+msgstr "Linean"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert column after"
-msgstr ""
+msgstr "Txertatu zutabea ondoren"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert column before"
-msgstr ""
+msgstr "Txertatu zutabea aurretik"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert date/time"
-msgstr ""
+msgstr "Txertatu data/ordua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert image"
-msgstr ""
+msgstr "Txertatu irudia"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert link"
-msgstr ""
+msgstr "Txertatu esteka"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert row after"
-msgstr ""
+msgstr "Txertatu lerro ondoren"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert row before"
-msgstr ""
+msgstr "Txertatu lerro aurretik"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert table"
-msgstr ""
+msgstr "Txertatu taula"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert template"
-msgstr ""
+msgstr "Txertatu txantiloia"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert video"
-msgstr ""
+msgstr "Txertatu bideoa"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert"
-msgstr ""
+msgstr "Txertatu"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert/edit image"
-msgstr ""
+msgstr "Txertatu/editatu irudia"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert/edit link"
-msgstr ""
+msgstr "Txertatu/editatu esteka"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert/edit video"
-msgstr ""
+msgstr "Txertatu/editatu bideoa"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Italic"
-msgstr ""
+msgstr "Etzana"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Justify"
-msgstr ""
+msgstr "Justifikatu"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Keywords"
-msgstr ""
+msgstr "Gako-hitzak"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Left to right"
-msgstr ""
+msgstr "Ezkerretik eskubitara"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Left"
-msgstr ""
+msgstr "Ezkerra"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Lower Alpha"
-msgstr ""
+msgstr "Lower Alpha"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Lower Greek"
-msgstr ""
+msgstr "Lower Greek"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Lower Roman"
-msgstr ""
+msgstr "Lower Roman"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Match case"
-msgstr ""
+msgstr "Maiuskula/minuskula"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Merge cells"
-msgstr ""
+msgstr "Batu gelaxkak"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Middle"
-msgstr ""
+msgstr "Erdia"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "New document"
-msgstr ""
+msgstr "Beste dokumentu bat"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "New window"
-msgstr ""
+msgstr "Beste lehio bat"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 msgid "Next"
@@ -1150,31 +1223,31 @@ msgstr "Hurrengoa"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "No color"
-msgstr ""
+msgstr "Kolorerik ez"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Nonbreaking space"
-msgstr ""
+msgstr "Espazio zuria"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Numbered list"
-msgstr ""
+msgstr "Zerrenda zenbakiduna"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Page break"
-msgstr ""
+msgstr "Orri-jauzia"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paste as text"
-msgstr ""
+msgstr "Itsatsi testu gisa"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1183,49 +1256,55 @@ msgid ""
 "Paste is now in plain text mode. Contents will now be pasted as plain text "
 "until you toggle this option off."
 msgstr ""
+"Itsasteko funtzioa testu lau gisa dago ezarrita une honetan. Edukiak testu "
+"lau gisa itsatsiko dira ezarpen hau aldatu arte."
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paste row after"
-msgstr ""
+msgstr "Itsatsi lerroa ondoren"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paste row before"
-msgstr ""
+msgstr "Itsatsi lerroa aurretik"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paste your embed code below:"
-msgstr ""
+msgstr "Itsatsi azpian enbotatu duzun kodea:"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paste"
-msgstr ""
+msgstr "Itsatsi"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Poster"
-msgstr ""
+msgstr "Posterra"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Pre"
-msgstr ""
+msgstr "Aurrekoa"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Prev"
-msgstr ""
+msgstr "Aurreik."
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: common/lib/xmodule/xmodule/js/src/html/edit.js lms/static/js/customwmd.js
 #: cms/templates/js/asset-library.underscore
 msgid "Preview"
 msgstr "Aurreikusi"
@@ -1234,32 +1313,36 @@ msgstr "Aurreikusi"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Print"
-msgstr ""
+msgstr "Inprimatu"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Redo"
-msgstr ""
+msgstr "Berregin"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Remove link"
-msgstr ""
+msgstr "Ezabatu esteka"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Replace all"
-msgstr ""
+msgstr "Ordezkatu guztia"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Replace with"
-msgstr ""
+msgstr "Ordezkatu honekin"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video-transcripts.underscore
 #: cms/templates/js/video/metadata-translations-item.underscore
@@ -1270,7 +1353,7 @@ msgstr "Ordezkatu"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Restore last draft"
-msgstr ""
+msgstr "Berreskuratu azken zirriborroa"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1279,180 +1362,182 @@ msgid ""
 "Rich Text Area. Press ALT-F9 for menu. Press ALT-F10 for toolbar. Press "
 "ALT-0 for help"
 msgstr ""
+"Testu-eremu aberastua. Sakatu ALT-F9 menurako. Sakatu ALT-F10 tresna-"
+"barrarako. Sakatu ALT-0 laguntzarako."
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Right to left"
-msgstr ""
+msgstr "Eskubitik ezkerretara"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Right"
-msgstr ""
+msgstr "Eskubia"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Robots"
-msgstr ""
+msgstr "Robotak"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Row group"
-msgstr ""
+msgstr "Errenkada-taldea"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Row properties"
-msgstr ""
+msgstr "Lerroaren ezarpenak"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Row type"
-msgstr ""
+msgstr "Lerro mota"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Row"
-msgstr ""
+msgstr "Lerroa"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Rows"
-msgstr ""
+msgstr "Lerroak"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Scope"
-msgstr ""
+msgstr "Esparrua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Select all"
-msgstr ""
+msgstr "Aukeratu guztiak"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Show blocks"
-msgstr ""
+msgstr "Erakutsi blokeak"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Show invisible characters"
-msgstr ""
+msgstr "Erakutsi ezkutuko karaktereak"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Source code"
-msgstr ""
+msgstr "Iturburu-kodea"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Source"
-msgstr ""
+msgstr "Iturburua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Special character"
-msgstr ""
+msgstr "Karaktere bereziak"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Spellcheck"
-msgstr ""
+msgstr "Zuzenketa ortografikoa"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Split cell"
-msgstr ""
+msgstr "Zatitu gelaxka"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Square"
-msgstr ""
+msgstr "Karratua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Start search"
-msgstr ""
+msgstr "Hasi bilaketa"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Strikethrough"
-msgstr ""
+msgstr "Marratua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Style"
-msgstr ""
+msgstr "Estiloa"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Subscript"
-msgstr ""
+msgstr "Harpidetu"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Superscript"
-msgstr ""
+msgstr "Goi-indizea"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Table properties"
-msgstr ""
+msgstr "Taularen propietateak"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Table"
-msgstr ""
+msgstr "Taula"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Target"
-msgstr ""
+msgstr "Helburua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Templates"
-msgstr ""
+msgstr "Txantiloiak"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Text color"
-msgstr ""
+msgstr "Testuaren kolorea"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Text to display"
-msgstr ""
+msgstr "Erakusteko testua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1461,6 +1546,8 @@ msgid ""
 "The URL you entered seems to be an email address. Do you want to add the "
 "required mailto: prefix?"
 msgstr ""
+"Badirudi sartu duzun URL-a e-posta helbidea dela. Nahi al duzu beharrrezko "
+"den mailto: aurrizkia gehitzea?"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1469,6 +1556,8 @@ msgid ""
 "The URL you entered seems to be an external link. Do you want to add the "
 "required http:// prefix?"
 msgstr ""
+"Badirudi sartu duzun URL-a kanporako esteka dela. Nahi al duzu beharrezko "
+"den http:// aurrizkia gehitzea?"
 
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -1477,62 +1566,66 @@ msgstr ""
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/signatory-details.underscore
 msgid "Title"
-msgstr ""
+msgstr "Izenburua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Tools"
-msgstr ""
+msgstr "Tresnak"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Top"
-msgstr ""
+msgstr "Gora"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Underline"
-msgstr ""
+msgstr "Azpimarratua"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Undo"
-msgstr ""
+msgstr "Desegin"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Upper Alpha"
-msgstr ""
+msgstr "Alfa maiuskula"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Upper Roman"
-msgstr ""
+msgstr "Letra erromatar larria"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Url"
-msgstr ""
+msgstr "URLa"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "V Align"
-msgstr ""
+msgstr "Lerrokadura bertikala"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Vertical space"
-msgstr ""
+msgstr "Espazio bertikala"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
 #: openedx/features/course_search/static/course_search/templates/course_search_item.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_item.underscore
@@ -1543,31 +1636,32 @@ msgstr "Ikusi"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Visual aids"
-msgstr ""
+msgstr "Ikusizko laguntza"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Whole words"
-msgstr ""
+msgstr "Hitz osoak"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Width"
-msgstr ""
+msgstr "Zabala"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Words: {0}"
-msgstr ""
+msgstr "Hitzak: {0}"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "You have unsaved changes are you sure you want to navigate away?"
 msgstr ""
+"Gorde gabeko aldaketak dituzu. Ziur al zaude aurrera egin nahi duzula?"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1576,12 +1670,14 @@ msgid ""
 "Your browser doesn't support direct access to the clipboard. Please use the "
 "Ctrl+X/C/V keyboard shortcuts instead."
 msgstr ""
+"Zure nabigatzaileak ez du sarbide zuzena onartzen arbelera. Horren ordez, "
+"erabili Ctrl+X/C/V teklatu-lasterbidea."
 
 #. Translators: this is a toolbar button tooltip from the raw HTML editor
 #. displayed in the browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert/Edit Image"
-msgstr ""
+msgstr "Txertatu/editatu irudia"
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
 msgid ""
@@ -1589,6 +1685,9 @@ msgid ""
 "\n"
 "Click Cancel to return to this page without sending your information."
 msgstr ""
+"Sakatu ADOS erabiltzaile-izena eta posta elektronikoaren helbidea hirugarrenen aplikazio batera bidaltzeko.\n"
+"\n"
+"Sakatu UTZI  orri honetara itzultzeko zure informazioa bidali gabe."
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
 msgid ""
@@ -1596,6 +1695,9 @@ msgid ""
 "\n"
 "Click Cancel to return to this page without sending your information."
 msgstr ""
+"Sakatu ADOS erabiltzaile-izena hirugarrenen aplikazio batera bidaltzeko.\n"
+"\n"
+"Sakatu UTZI  orri honetara itzultzeko zure informazioa bidali gabe."
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
 msgid ""
@@ -1603,22 +1705,25 @@ msgid ""
 "\n"
 "Click Cancel to return to this page without sending your information."
 msgstr ""
+"Sakatu ADOS posta elektronikoaren helbidea hirugarrenen aplikazio batera bidaltzeko.\n"
+"\n"
+"Sakatu UTZI  orri honetara itzultzeko zure informazioa bidali gabe."
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "incorrect"
-msgstr ""
+msgstr "okerra"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "correct"
-msgstr ""
+msgstr "zuzena"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "answer"
-msgstr ""
+msgstr "erantzuna"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "Short explanation"
-msgstr ""
+msgstr "Azalpen laburra"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid ""
@@ -1629,117 +1734,120 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "Explanation"
-msgstr ""
+msgstr "Azalpena"
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 msgid ""
 "Sequence error! Cannot navigate to %(tab_name)s in the current "
 "SequenceModule. Please contact the course staff."
 msgstr ""
+"Sequence error! Cannot navigate to %(tab_name)s in the current "
+"SequenceModule. Please contact the course staff."
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 #: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
 msgid "Bookmarked"
-msgstr ""
+msgstr "Gogokotzat markatua"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/09_play_pause_control.js
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
 msgid "Play"
-msgstr ""
+msgstr "Erreproduzitu"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/09_play_pause_control.js
 msgid "Pause"
-msgstr ""
+msgstr "Pausa"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Mute"
-msgstr ""
+msgstr "Isildu"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Unmute"
-msgstr ""
+msgstr "Desmututu"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/04_video_full_screen.js
 msgid "Exit full browser"
-msgstr ""
+msgstr "Irten pantaila osotik"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/04_video_full_screen.js
 msgid "Fill browser"
-msgstr ""
+msgstr "Zabaldu nabigatzailea"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid "Speed"
-msgstr ""
+msgstr "Abiadura"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/08_video_auto_advance_control.js
 msgid "Auto-advance"
-msgstr ""
+msgstr "Aurreratze automatikoa"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Volume"
-msgstr ""
+msgstr "Bolumena"
 
 #. Translators: Volume level equals 0%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Muted"
-msgstr ""
+msgstr "Isilduta"
 
 #. Translators: Volume level in range ]0,20]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Very low"
-msgstr ""
+msgstr "Oso baxu"
 
 #. Translators: Volume level in range ]20,40]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Low"
-msgstr ""
+msgstr "Baxu"
 
 #. Translators: Volume level in range ]40,60]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Average"
-msgstr ""
+msgstr "Batez bestekoa"
 
 #. Translators: Volume level in range ]60,80]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Loud"
-msgstr ""
+msgstr "Altu"
 
 #. Translators: Volume level in range ]80,99]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Very loud"
-msgstr ""
+msgstr "Oso altu"
 
 #. Translators: Volume level equals 100%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Maximum"
-msgstr ""
+msgstr "Gehienekoa"
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
 msgid "This browser cannot play .mp4, .ogg, or .webm files."
 msgstr ""
+"Nabigatzaile honek ezin du erakutsi .mp4, .ogg edo .webm fitxategirik."
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
 msgid "Try using a different browser, such as Google Chrome."
-msgstr ""
+msgstr "Saiatu beste nabigatzaile bat erabilita, Google Chrome adibidez."
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "High Definition"
-msgstr ""
+msgstr "Definizio altua"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "off"
-msgstr ""
+msgstr "itzalita"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "on"
-msgstr ""
+msgstr "piztuta"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video position. Press space to toggle playback"
@@ -1747,39 +1855,41 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video ended"
-msgstr ""
+msgstr "Bideoa amaitu da"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video position"
-msgstr ""
+msgstr "Bideoaren kokapena"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s hour"
 msgid_plural "%(value)s hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ordu %(value)s"
+msgstr[1] "%(value)s ordu"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s minute"
 msgid_plural "%(value)s minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "minutu %(value)s"
+msgstr[1] "%(value)s minutu"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s second"
 msgid_plural "%(value)s seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "segundu %(value)s"
+msgstr[1] "%(value)s segundu"
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid ""
 "Click on this button to mute or unmute this video or press UP or DOWN "
 "buttons to increase or decrease volume level."
 msgstr ""
+"Sakatu botio honi bideo hau mututu ala desmututzeko edo sakatu GORA edo "
+"BEHERA botoiei bolumenaren maila igo edo jaisteko."
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Adjust video volume"
-msgstr ""
+msgstr "Doitu bideoaren bolumena"
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid ""
@@ -1790,27 +1900,27 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid "Adjust video speed"
-msgstr ""
+msgstr "Doitu bideoaren abiadura"
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid "Video speed: "
-msgstr ""
+msgstr "Bideoaren abiadura:"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
 msgid "Skip"
-msgstr ""
+msgstr "Jauzi"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_poster.js
 msgid "Play video"
-msgstr ""
+msgstr "Erreproduzitu bideoa"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_skip_control.js
 msgid "Do not show again"
-msgstr ""
+msgstr "Ez erakutsi berriz"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Open language menu"
-msgstr ""
+msgstr "Ireki hizkuntza-menua"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Transcript will be displayed when you start playing the video."
@@ -1824,15 +1934,15 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Video transcript"
-msgstr ""
+msgstr "Bideoaren transkripzioa"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Start of transcript. Skip to the end."
-msgstr ""
+msgstr "Transkripzioaren hasiera. Egin jauzi amaierara."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "End of transcript. Skip to the start."
-msgstr ""
+msgstr "Transkripzioaren amaiera. Egin jauzi hasierara."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid ""
@@ -1843,28 +1953,28 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Hide closed captions"
-msgstr ""
+msgstr "Ezkutatu itxitako azpitituluak"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "(Caption will be displayed when you start playing the video.)"
-msgstr ""
+msgstr "(Azpitituluak erakutsiko dira bideoa ikusten hasten zarenean.)"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on closed captioning"
-msgstr ""
+msgstr "Gaitu itxitako azpitituluak"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on transcripts"
-msgstr ""
+msgstr "Gaitu transkripzioak"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcripts"
-msgstr ""
+msgstr "Desgaitu transkripzioak"
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 #: cms/templates/js/move-xblock-list.underscore
 msgid "View child items"
-msgstr ""
+msgstr "Ikusi beheragoko elementuak"
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Navigate up"
@@ -1876,7 +1986,7 @@ msgstr ""
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Select"
-msgstr ""
+msgstr "Aukeratu"
 
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
@@ -1893,7 +2003,7 @@ msgstr "Mesedez, ez erabili espaziorik edo karaktere berezirik eremu honetan."
 #: common/static/common/js/components/views/paginated_view.js
 #: common/static/common/js/components/views/paging_footer.js
 msgid "Pagination"
-msgstr ""
+msgstr "Orrikatu"
 
 #: common/static/common/js/components/views/paginated_view.js
 msgid ""
@@ -1932,25 +2042,28 @@ msgstr ""
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "there is currently {numVotes} vote"
 msgid_plural "there are currently {numVotes} votes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "une honetan bozka {numVotes} dago"
+msgstr[1] "une honetan {numVotes} bozka daude"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "{numVotes} Vote"
 msgid_plural "{numVotes} Votes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Bozka {numVotes}"
+msgstr[1] "{numVotes} bozka"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
 "You could not be subscribed to this post. Refresh the page and try again."
 msgstr ""
+"Ezin izan zara harpidetu mezu honetar. Freskatu orria eta saiatu berriz."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
 "You could not be unsubscribed from this post. Refresh the page and try "
 "again."
 msgstr ""
+"Ezin izan duzu mezu honetarako harpidetza kendu. Freskatu orria eta saiatu "
+"berriz."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
@@ -1989,20 +2102,25 @@ msgstr ""
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
 "This post could not be flagged for abuse. Refresh the page and try again."
-msgstr ""
+msgstr "Mezu hau ezin da iraintzat markatu. Freskatu orria eta saiatu berri"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
 "This post could not be unflagged for abuse. Refresh the page and try again."
 msgstr ""
+"Mezu hau ezin da iraintzat desmarkatu. Freskatu orria eta saiatu berri"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "This post could not be closed. Refresh the page and try again."
-msgstr ""
+msgstr "Mezu hau ezin da itxi. Freskatu orria eta saiatu berri"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "This post could not be reopened. Refresh the page and try again."
 msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Show Discussion"
+msgstr "Erakutsi eztabaida"
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Hide Discussion"
@@ -2011,10 +2129,6 @@ msgstr "Ezkutatu eztabaida"
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "This discussion could not be loaded. Refresh the page and try again."
 msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_inline_view.js
-msgid "Show Discussion"
-msgstr "Erakutsi eztabaida"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "There are no posts in this topic yet."
@@ -2072,8 +2186,8 @@ msgstr[1] ""
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "{numResponses} response"
 msgid_plural "{numResponses} responses"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "erantzun {numResponses}"
+msgstr[1] "{numResponses} erantzun"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Showing all responses"
@@ -2157,7 +2271,7 @@ msgstr "askatu helburuan"
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%s ago"
-msgstr ""
+msgstr "duela %s"
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
@@ -2167,66 +2281,66 @@ msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "less than a minute"
-msgstr ""
+msgstr "minutu bat baino gutxiago"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a minute"
-msgstr ""
+msgstr "minutu bat gutxigorabehera"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "minutu %d"
+msgstr[1] "%d minutu"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about an hour"
-msgstr ""
+msgstr "ordubete inguru"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "about %d hour"
 msgid_plural "about %d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ordu %d inguru"
+msgstr[1] "%d ordu inguru"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "a day"
-msgstr ""
+msgstr "egun bat"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "egun %d"
+msgstr[1] "%d egun"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a month"
-msgstr ""
+msgstr "hilabete inguru"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "hilabete %d"
+msgstr[1] "%d hilabete"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a year"
-msgstr ""
+msgstr "urtebete inguru"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "urte %d"
+msgstr[1] "%d urte"
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/Main/Main.jsx
 msgid "Select a section or problem"
-msgstr ""
+msgstr "Aukeratu atala edo ariketa"
 
 #: lms/djangoapps/support/static/support/js/views/certificates.js
 msgid "An unexpected error occurred.  Please try again."
@@ -2273,19 +2387,19 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/file_upload.jsx
 msgid "Add Attachment"
-msgstr ""
+msgstr "Gehitu eranskina"
 
 #: lms/djangoapps/support/static/support/jsx/file_upload.jsx
 msgid "(Optional)"
-msgstr ""
+msgstr "(Aukerakoa)"
 
 #: lms/djangoapps/support/static/support/jsx/file_upload.jsx
 msgid "Remove file"
-msgstr ""
+msgstr "Ezabatu fitxategia"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Course Name"
-msgstr ""
+msgstr "Ikastaroaren izena"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid ""
@@ -2302,6 +2416,7 @@ msgstr ""
 msgid "Subject"
 msgstr "Gaia"
 
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "Kontuaren ezarpenak"
@@ -2312,11 +2427,11 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Certificates"
-msgstr ""
+msgstr "Ziurtagiriak"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Course Content"
-msgstr ""
+msgstr "Ikastaroaren edukia"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Deadlines"
@@ -2335,6 +2450,14 @@ msgid "Masters"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "MicroMasters"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "MicroBachelors"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Photo Verification"
 msgstr ""
 
@@ -2342,29 +2465,36 @@ msgstr ""
 msgid "Proctoring"
 msgstr ""
 
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Security"
+msgstr "Segurtasuna"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: cms/templates/js/asset-library.underscore
 msgid "Other"
 msgstr "Bestelako bat"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "What can we help you with, {username}?"
-msgstr ""
+msgstr "Zertan lagundu ahal dizugu, {username}?"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
-msgstr ""
+msgstr "Xehetasunak"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "The more you tell us, the more quickly and helpfully we can respond!"
 msgstr ""
+"Zenbat eta gehiago esan, orduan eta azkarrago eta hobeto erantzungo dizugu!"
 
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Submit"
 msgstr "Bidali"
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
-msgstr ""
+msgstr "Hasi saioa {platform} plataforman laguntza hobea eman ahal izateko."
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid ""
@@ -2379,16 +2509,16 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Select a subject for your support request."
-msgstr ""
+msgstr "Aukeratu laguntza-eskaeraren gaia."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
-msgstr ""
+msgstr "Idatzi laguntza-eskaeraren xehetasunak"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid "Contact Us"
-msgstr ""
+msgstr "Jarri gurekin harremanetan"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Find answers to the top questions asked by learners."
@@ -2396,15 +2526,15 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Search the {platform} Help Center"
-msgstr ""
+msgstr "Bilatu {platform} plataformako Laguntza-zentroa"
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid "Go to my Dashboard"
-msgstr ""
+msgstr "Joan aginte-panelera"
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid "Go to {platform} Home"
-msgstr ""
+msgstr "Joan {platform} plataformako Hasierara"
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid ""
@@ -2524,14 +2654,14 @@ msgstr "Errorea gertatu da partaidea taldetik kentzean. Saiatu berriz."
 msgid "This team does not have any members."
 msgstr "Talde honek ez du partaiderik."
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Joined %(date)s"
-msgstr "Bat eginda ondoko datan: %(date)s"
+msgstr "Erregistratze-data: %(date)s"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Last Activity %(date)s"
 msgstr "Azken jarduera %(date)s"
@@ -2542,8 +2672,8 @@ msgstr "Hau taldetik kendu nahi duzu?"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid ""
-"This learner will be removed from the team, allowing another learner to take"
-" the available spot."
+"This learner will be removed from the team,allowing another learner to take "
+"the available spot."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
@@ -2552,7 +2682,7 @@ msgstr "Talde hau ezabatu nahi duzu?"
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid ""
-"Deleting a team is permanent and cannot be undone. All members are removed "
+"Deleting a team is permanent and cannot be undone.All members are removed "
 "from the team, and team discussions can no longer be accessed."
 msgstr ""
 
@@ -2560,25 +2690,30 @@ msgstr ""
 msgid "Team \"{team}\" successfully deleted."
 msgstr ""
 
+#: lms/djangoapps/teams/static/teams/js/views/manage.js
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Manage"
+msgstr "Kudeatu"
+
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
 msgstr "Une honetan ez zara inongo taldetako partaide."
 
-#. Translators: "and others" refers to fact that additional members of a team
-#. exist that are not displayed.
+#. Translators: "and others" refers to fact that additional
+#. * members of a team exist that are not displayed.
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "and others"
 msgstr "eta beste batzuk"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. http://momentjs.com/)
+#. Translators: 'date' is a placeholder for a fuzzy,
+#. * relative timestamp (see: http://momentjs.com/)
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "Last activity %(date)s"
-msgstr "Azken jarduera %(date)s"
+msgid "Last activity {date}"
+msgstr "Azken jarduera: {date}"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "View %(span_start)s %(team_name)s %(span_end)s"
-msgstr "Ikusi %(span_start)s %(team_name)s %(span_end)s"
+msgid "View {span_start} {team_name} {span_end}"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
@@ -2591,7 +2726,7 @@ msgstr "Talde hau utzi nahi duzu?"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 msgid ""
-"If you leave, you can no longer post in this team's discussions. Your place "
+"If you leave, you can no longer post in this team's discussions.Your place "
 "will be available to another learner."
 msgstr ""
 
@@ -2602,18 +2737,22 @@ msgid "Confirm"
 msgstr "Egiaztatu"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
-msgid "You already belong to another team."
+msgid "You already belong to another team in this team set."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "This team is full."
 msgstr "Taldea beteta dago."
 
+#: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
+msgid "Cannot join instructor managed team"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
-msgid "%(memberCount)s / %(maxMemberCount)s Member"
-msgid_plural "%(memberCount)s / %(maxMemberCount)s Members"
-msgstr[0] "%(memberCount)s / partaide %(maxMemberCount)s"
-msgstr[1] "%(memberCount)s / %(maxMemberCount)s partaide"
+msgid " Member"
+msgid_plural " Members"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "All teams"
@@ -2628,14 +2767,8 @@ msgid "Topics"
 msgstr "Gaiak"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid ""
-"See all teams in your course, organized by topic. Join a team to collaborate"
-" with other learners who are interested in the same topic as you are."
+msgid "My Teams"
 msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "My Team"
-msgstr "Nire taldea"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
@@ -2698,6 +2831,23 @@ msgid "Search teams"
 msgstr "Bilatu taldeak"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"See all teams you belong to and all public teams in your course, organized "
+"by topic. Join an open public team to collaborate with other learners who "
+"are interested in the same topic as you are."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid ""
+"See all teams you belong to and all public teams in your course, organized "
+"by topic."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "See all teams you belong to."
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 #: lms/djangoapps/discussion/static/discussion/templates/fake-breadcrumbs.underscore
 msgid "All Topics"
 msgstr "Gai guztiak"
@@ -2715,27 +2865,19 @@ msgid "The team \"{team}\" could not be found."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "%(team_count)s Team"
-msgid_plural "%(team_count)s Teams"
-msgstr[0] "talde %(team_count)s "
-msgstr[1] "%(team_count)s talde"
+msgid "{team_count} Team"
+msgid_plural "{team_count} Teams"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "Topic"
 msgstr "Gaia"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "View Teams in the %(topic_name)s Topic"
-msgstr "Ikusi %(topic_name)s gaiko taldeak"
+msgid "View Teams in the {topic_name} Topic"
+msgstr ""
 
-#. Translators: this string is shown at the bottom of the teams page
-#. to find a team to join or else to create a new one. There are three
-#. links that need to be included in the message:
-#. 1. Browse teams in other topics
-#. 2. search teams
-#. 3. create a new team
-#. Be careful to start each link with the appropriate start indicator
-#. (e.g. {browse_span_start} for #1) and finish it with {span_end}.
 #: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
 msgid ""
 "{browse_span_start}Browse teams in other topics{span_end} or "
@@ -2758,11 +2900,11 @@ msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Link Description"
-msgstr ""
+msgstr "Estekaren deskribapena"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "e.g. 'google'"
-msgstr ""
+msgstr "adibidez, 'google'"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Please provide a description of the link destination."
@@ -2777,10 +2919,12 @@ msgid ""
 "Type in a URL or use the \"Choose File\" button to upload a file from your "
 "machine. (e.g. 'http://example.com/img/clouds.jpg')"
 msgstr ""
+"Idatzi URL bat edo erabili \"Aukeratu fitxategia\" botoia irufi bat zure "
+"ordenagailutik kargatzeko. (adibidez, 'http://example.com/img/clouds.jpg')"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Image Description"
-msgstr ""
+msgstr "Irudiaren deskribapena"
 
 #: lms/static/js/Markdown.Editor.js
 msgid ""
@@ -2793,6 +2937,8 @@ msgid ""
 "e.g. 'Sky with clouds'. The description is helpful for users who cannot see "
 "the image."
 msgstr ""
+"adibidez, 'Zeru hodeitsua'. Deskribapena erabilgarria da irudia ikusteko "
+"modurik ez dutenentzat."
 
 #: lms/static/js/Markdown.Editor.js
 msgid "How to create useful text alternatives."
@@ -2912,11 +3058,11 @@ msgstr ""
 
 #: lms/static/js/calculator.js
 msgid "Open Calculator"
-msgstr ""
+msgstr "Ireki kalkulagailua"
 
 #: lms/static/js/calculator.js
 msgid "Close Calculator"
-msgstr ""
+msgstr "Itxi kalkulagailua"
 
 #: lms/static/js/ccx/schedule.js
 msgid "All subsections"
@@ -3051,7 +3197,7 @@ msgstr ""
 
 #: lms/static/js/certificates/views/certificate_whitelist_editor.js
 msgid "<%= user %> already in exception list."
-msgstr ""
+msgstr "<%= user %> dagoeneko salbuespenen zerrendan dago."
 
 #: lms/static/js/certificates/views/certificate_whitelist_editor.js
 msgid ""
@@ -3081,7 +3227,7 @@ msgstr ""
 
 #: lms/static/js/customwmd.js
 msgid "Your question or idea (required)"
-msgstr ""
+msgstr "Galdera edo ideia (beharrezkoa)"
 
 #: lms/static/js/dashboard/donation.js
 msgid "Please enter a valid donation amount."
@@ -3335,7 +3481,7 @@ msgstr[1] ""
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "{email}"
-msgstr ""
+msgstr "{email}"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid ""
@@ -3349,7 +3495,7 @@ msgstr[1] ""
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Unknown username: {user}"
-msgstr ""
+msgstr "Erabiltzaile-izen ezezaguna: {user}"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Invalid email address: {email}"
@@ -3387,7 +3533,7 @@ msgstr "Kohortea ezin da gehitu"
 
 #: lms/static/js/groups/views/cohorts.js
 msgid "You currently have no cohorts configured"
-msgstr ""
+msgstr "Une honetan ez duzu kohorterik konfiguratu"
 
 #: lms/static/js/groups/views/cohorts.js
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
@@ -3402,7 +3548,7 @@ msgstr ""
 
 #: lms/static/js/groups/views/cohorts.js
 msgid "Assign students to cohorts by uploading a CSV file."
-msgstr ""
+msgstr "Esleitu ikasleak kohorteetara CSV fitxategia kargatuz."
 
 #: lms/static/js/groups/views/cohorts.js
 msgid "Choose a .csv file"
@@ -3414,7 +3560,7 @@ msgstr "Egoki formateatutako .csv fitxategiak bakarrik onartuko dira."
 
 #: lms/static/js/groups/views/cohorts.js
 msgid "Upload File and Assign Students"
-msgstr ""
+msgstr "Kargatu fitxategia eta esleitu ikasleei"
 
 #: lms/static/js/groups/views/cohorts.js
 msgid ""
@@ -3472,7 +3618,7 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Error while regenerating certificates. Please try again."
-msgstr ""
+msgstr "Errorea ziurtagiriak berriz sortzean. Mesedez, saiatu berriz."
 
 #: lms/static/js/instructor_dashboard/data_download.js
 msgid "Loading data..."
@@ -3533,6 +3679,8 @@ msgid ""
 "There was a problem creating the report. Select \"Create Executive Summary\""
 " to try again."
 msgstr ""
+"Arazoa gerttau da txostena sortzean. Aukeratu \"Sortu laburpena\" berriz ere"
+" saiatzeko. "
 
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid "Enter the enrollment code."
@@ -3560,6 +3708,7 @@ msgid "Username"
 msgstr "Erabiltzaile-izena"
 
 #: lms/static/js/instructor_dashboard/membership.js
+#: lms/djangoapps/support/static/support/templates/manage_user.underscore
 msgid "Email"
 msgstr "E-posta"
 
@@ -4153,7 +4302,7 @@ msgstr ""
 
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "You must select a session to access the course."
-msgstr ""
+msgstr "Saio bat aukeratu behar duzu ikastaroan sartzeko."
 
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "There was an error. Please reload the page and try again."
@@ -4162,12 +4311,12 @@ msgstr ""
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "Change Session"
-msgstr ""
+msgstr "Aldatu saioa"
 
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "Select Session"
-msgstr ""
+msgstr "Aukeratu saioa"
 
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "Leave Current Session"
@@ -4175,7 +4324,7 @@ msgstr ""
 
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "Are you sure you want to select this session?"
-msgstr ""
+msgstr "Ziur al zaude saio hau aukeratu nahi duzula?"
 
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "Are you sure you want to change to a different session?"
@@ -4202,15 +4351,15 @@ msgstr ""
 
 #: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
 msgid "{type} Progress"
-msgstr ""
+msgstr "{type} Aurrerapena"
 
 #: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
 msgid "Earned Certificates"
-msgstr ""
+msgstr "Lortutako ziurtagiriak"
 
 #: lms/static/js/learner_dashboard/views/program_details_view.js
 msgid "Enrolled"
-msgstr ""
+msgstr "Matrikulatua"
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully reset the attempts for user {user}"
@@ -4258,24 +4407,24 @@ msgstr ""
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "New Password"
-msgstr ""
+msgstr "Pasahitz berria"
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Confirm Password"
-msgstr ""
+msgstr "Baieztatu pasahitza"
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Passwords do not match."
-msgstr ""
+msgstr "Pasahitza ez da bat."
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Reset My Password"
-msgstr ""
+msgstr "Berrezarri nire pasahitza"
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Reset Your Password"
-msgstr ""
+msgstr "Berrezarri zure pasahitza"
 
 #: lms/static/js/student_account/components/PasswordResetInput.jsx
 msgid "Error: "
@@ -4310,7 +4459,27 @@ msgid ""
 "{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read "
 "the above carefully before proceeding. This is an irreversible action, and "
 "{strongStart}you will no longer be able to use the same email on "
-"edX.{strongEnd}"
+"{platformName}.{strongEnd}"
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"Please note: Deletion of your account and personal data is permanent and "
+"cannot be undone. {platformName} will not be able to recover your account or"
+" the data that is deleted."
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"Once your account is deleted, you cannot use it to take courses on the "
+"{platformName} app, {siteName}, or any other site hosted by {platformName}."
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"This includes access to {siteName} from your employer’s or university’s "
+"system{additionalSiteSpecificDeletionText}."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
@@ -4318,37 +4487,21 @@ msgid "We’re sorry to see you go!"
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid ""
-"Please note: Deletion of your account and personal data is permanent and "
-"cannot be undone. EdX will not be able to recover your account or the data "
-"that is deleted."
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid ""
-"Once your account is deleted, you cannot use it to take courses on the edX "
-"app, edx.org, or any other site hosted by edX. This includes access to "
-"edx.org from your employer’s or university’s system and access to private "
-"sites offered by MIT Open Learning, Wharton Executive Education, and Harvard"
-" Medical School."
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Delete My Account"
-msgstr ""
+msgstr "Ezabatu nire kontua"
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Password is incorrect"
-msgstr ""
+msgstr "Pasahitza okerra da"
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Unable to delete account"
-msgstr ""
+msgstr "Ezin izan da kontua ezabatu"
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Please re-enter your password."
-msgstr ""
+msgstr "Mesedez, idatzi berriz pasahitza."
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
@@ -4358,22 +4511,20 @@ msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "A Password is required"
-msgstr ""
+msgstr "Pasahitza beharrezkoa da"
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "You have selected “Delete my account.” Deletion of your account and personal"
-" data is permanent and cannot be undone. EdX will not be able to recover "
-"your account or the data that is deleted."
+" data is permanent and cannot be undone. {platformName} will not be able to "
+"recover your account or the data that is deleted."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "If you proceed, you will be unable to use this account to take courses on "
-"the edX app, edx.org, or any other site hosted by edX. This includes access "
-"to edx.org from your employer’s or university’s system and access to private"
-" sites offered by MIT Open Learning, Wharton Executive Education, and "
-"Harvard Medical School."
+"the {platformName} app, {siteName}, or any other site hosted by "
+"{platformName}."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
@@ -4384,11 +4535,11 @@ msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Yes, Delete"
-msgstr ""
+msgstr "Bai, ezabatu"
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "We're sorry to see you go! Your account will be deleted shortly."
-msgstr ""
+msgstr "Sentitzen dugu zu joatea! Zure kontua laster ezabatuko da."
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
@@ -4427,7 +4578,7 @@ msgstr "Errorea gertatu da."
 #. profile forms.
 #: lms/static/js/student_account/views/FormView.js
 msgid "(optional)"
-msgstr ""
+msgstr "(aukerakoa)"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid "We couldn't sign you in."
@@ -4461,6 +4612,10 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
+msgid "An unexpected error has occurred."
+msgstr "Espero gabeko errorea gertatu da."
+
+#: lms/static/js/student_account/views/LoginView.js
 msgid ""
 "You have successfully signed into %(currentProvider)s, but your "
 "%(currentProvider)s account does not have a linked %(platformName)s account."
@@ -4469,16 +4624,16 @@ msgstr ""
 
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "We couldn't create your account."
-msgstr ""
+msgstr "Ezin izan dugu zure kontua sortu."
 
 #: lms/static/js/student_account/views/RegisterView.js
 #: lms/templates/student_account/register.underscore
 msgid "Create Account"
-msgstr ""
+msgstr "Sortu kontua"
 
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "(required)"
-msgstr ""
+msgstr "(beharrezkoa)"
 
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "You've successfully signed into %(currentProvider)s."
@@ -4528,25 +4683,27 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Country or Region of Residence"
-msgstr ""
+msgstr "Bizi zaren estatua edo eskualdea"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "The country or region where you live."
-msgstr ""
+msgstr "Zein estatu edo herrialdetan bizi zaren."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Basic Account Information"
-msgstr ""
+msgstr "Kontuaren oinarrizko informazioa"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "These settings include basic information about your account."
-msgstr ""
+msgstr "Ezarpen hauek zure kontuari buruzko oinarrizko informazioa dute."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "The name that identifies you on {platform_name}. You cannot change your "
 "username."
 msgstr ""
+"{platform_name} plataforman identifikatzen zaituen izena. Ezin duzu "
+"erabiltzaile-izena aldatu."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/templates/student_account/account.underscore
@@ -4563,10 +4720,12 @@ msgid ""
 "a limited number of languages. Changing the value of this field will cause "
 "the page to refresh."
 msgstr ""
+"Gunean zehar erabilitako hizkuntza. Gune honetan hizkuntza kopuru mugatua "
+"dago eskura eskura. Eremu honetan balorea aldatzeak orria freskatuko du."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Time Zone"
-msgstr ""
+msgstr "Ordu-eremua"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -4577,15 +4736,15 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "All Time Zones"
-msgstr ""
+msgstr "Ordu-eremu guztiak"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Default (Local Time Zone)"
-msgstr ""
+msgstr "Berezko (tokian tokiko ordu-eremua)"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Additional Information"
-msgstr ""
+msgstr "Bestelako informazioa"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Education Completed"
@@ -4612,26 +4771,28 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Social Media Links"
-msgstr ""
+msgstr "Sare sozialetako estekak"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "Optionally, link your personal accounts to the social media icons on your "
 "edX profile."
 msgstr ""
+"Nahi izanez gero, estekatu zure profila dituzun sare sozialetako ikonoetara,"
+" edXen profilean."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid " Link"
-msgstr ""
+msgstr "Esteka"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Enter your "
-msgstr ""
+msgstr "Idatzi"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Linked Accounts"
-msgstr ""
+msgstr "Estekatutako kontuak"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -4641,23 +4802,23 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "ORDER NAME"
-msgstr ""
+msgstr "ESKAERAREN IZENA"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "ORDER PLACED"
-msgstr ""
+msgstr "ESKAERA EGINDA"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "TOTAL"
-msgstr ""
+msgstr "DENERA"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "ORDER NUMBER"
-msgstr ""
+msgstr "ESKAERA-ZENBAKIA"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "My Orders"
-msgstr ""
+msgstr "Nire eskaerak"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -4685,11 +4846,11 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Link your {accountName} account"
-msgstr ""
+msgstr "Estekatu zure {accountName} kontuari"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Unlink This Account"
-msgstr ""
+msgstr "Kendu esteka kontuari"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
@@ -4703,7 +4864,7 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Link Your Account"
-msgstr ""
+msgstr "Estekatu zure kontua"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
@@ -4725,7 +4886,7 @@ msgstr "Esteka egoki kenduta."
 
 #: lms/static/js/verify_student/views/image_input_view.js
 msgid "Image Upload Error"
-msgstr "Errorea irudia igotzean"
+msgstr "Errorea irudia kargatzean"
 
 #: lms/static/js/verify_student/views/image_input_view.js
 msgid "Please verify that you have uploaded a valid image (PNG and JPEG)."
@@ -4862,15 +5023,15 @@ msgstr ""
 
 #: lms/static/js/views/file_uploader.js
 msgid "Your upload of '{file}' succeeded."
-msgstr "Egoki igo duzu '{file}'."
+msgstr "'{file}' ondo kargatu da."
 
 #: lms/static/js/views/file_uploader.js
 msgid "Your upload of '{file}' failed."
-msgstr "'{file}' ez duzu egoki igo."
+msgstr "'{file}' ez da ondo kargatu."
 
 #: lms/static/js/views/image_field.js
 msgid "Upload an image"
-msgstr "Igo irudia"
+msgstr "Kargatu irudia"
 
 #: lms/static/js/views/image_field.js
 msgid "Change image"
@@ -4926,35 +5087,13 @@ msgid ""
 "release date."
 msgstr ""
 
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "%(num_students)s student opened Subsection"
-msgid_plural "%(num_students)s students opened Subsection"
-msgstr[0] "%(num_students)s ikaslek irekitako azpiatala"
-msgstr[1] "%(num_students)s ikaslek irekitako azpiatala"
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "%(num_students)s student"
-msgid_plural "%(num_students)s students"
-msgstr[0] "%(num_students)s ikasle"
-msgstr[1] "%(num_students)s ikasle"
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "%(num_questions)s question"
-msgid_plural "%(num_questions)s questions"
-msgstr[0] "%(num_questions)s galdera"
-msgstr[1] "%(num_questions)s questions"
-
-#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "Number of Students"
-msgstr "Ikasle-kopurua"
-
 #: lms/templates/courseware/progress_graph.js
 msgid "Overall Score"
-msgstr ""
+msgstr "Puntuazio orokorra"
 
 #: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
 msgid "Bookmark this page"
-msgstr ""
+msgstr "Markatu orri hau gogokotzat"
 
 #: openedx/features/course_experience/static/course_experience/js/CourseGoals.js
 msgid "Thank you for setting your course goal to {goal}!"
@@ -4962,29 +5101,39 @@ msgstr ""
 
 #: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "You have successfully updated your goal."
-msgstr ""
+msgstr "Helburua ondo eguneratu duzu."
 
 #: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "There was an error updating your goal."
-msgstr ""
+msgstr "Errorea gertatu da helburua eguneratzean."
 
+#: openedx/features/course_experience/static/course_experience/js/CourseOutline.js
 #: lms/templates/ccx/schedule.underscore
 msgid "Expand All"
 msgstr "Zabaldu guztiak"
 
+#: openedx/features/course_experience/static/course_experience/js/CourseOutline.js
 #: lms/templates/ccx/schedule.underscore
 msgid "Collapse All"
 msgstr "Tolestu guztiak"
 
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr "Erakutsi gehiago"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr "Erakutsi gutxiago"
+
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "emaitza {total_results}"
+msgstr[1] "{total_results} emaitza"
 
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Profile Visibility:"
-msgstr ""
+msgstr "Profilaren ikusgarritasuna:"
 
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Limited Profile"
@@ -4996,11 +5145,11 @@ msgstr "Profil osoa"
 
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Joined"
-msgstr ""
+msgstr "Erregistratze-data"
 
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Joined Date"
-msgstr ""
+msgstr "Erregistratze-data"
 
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Location"
@@ -5028,11 +5177,11 @@ msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/badge_list_container.js
 msgid "Accomplishments Pagination"
-msgstr ""
+msgstr "Lorpenen orrikatzea"
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
 msgid "Account Settings page."
-msgstr "Kontuaren Ezarpenen orria."
+msgstr "Kontuaren ezarpenen orria."
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
 msgid ""
@@ -5056,11 +5205,11 @@ msgstr "{username} erabiltzailearentzako profil-irudia"
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "About Me"
-msgstr ""
+msgstr "Niri buruz"
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "Accomplishments"
-msgstr ""
+msgstr "Lorpenak"
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "Profile"
@@ -5072,14 +5221,17 @@ msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
 msgstr ""
+"Zure zerbitzarearen edo zure interneteko konexioaren arazo batengatik "
+"gertatuko zen hau agian. Saiatu orria freskatzen eta ziurtatu on-line "
+"zaudela."
 
 #: cms/static/cms/js/main.js
 msgid "Studio's having trouble saving your work"
-msgstr ""
+msgstr "Studiok arazoak ditu zure lana gordetzeko"
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 msgid "OpenAssessment Save Error"
-msgstr ""
+msgstr "Errorea OpenAssessment gordetzean"
 
 #: cms/static/js/base.js
 msgid "This link will open in a new browser window/tab"
@@ -5142,15 +5294,15 @@ msgstr "Ekintza hau ezin berregin."
 #: cms/static/js/views/show_textbook.js cms/static/js/views/tabs.js
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Deleting"
-msgstr ""
+msgstr "Ezabatzen"
 
 #: cms/static/js/certificates/views/signatory_editor.js
 msgid "Upload signature image."
-msgstr ""
+msgstr "Kargatu sinaduraren irudia"
 
 #: cms/static/js/certificates/views/signatory_editor.js
 msgid "Image must be in PNG format."
-msgstr ""
+msgstr "Irudiak PNG formatua izan behar du."
 
 #: cms/static/js/collections/group.js
 #, javascript-format
@@ -5166,7 +5318,7 @@ msgstr "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 #: cms/static/js/factories/export.js
 msgid "Your export has failed."
-msgstr ""
+msgstr "Zure esportatzeak kale egin du."
 
 #: cms/static/js/factories/manage_users.js
 msgid "Already a course team member"
@@ -5213,10 +5365,11 @@ msgstr "Erakutsi ezarpen zaharkituak"
 #: cms/static/js/views/pages/group_configurations.js
 msgid "You have unsaved changes. Do you really want to leave this page?"
 msgstr ""
+"Gorde gabeko aldaketak dituzu. Ziur al zaude orri hau utzi egin nahi duzula?"
 
 #: cms/static/js/features/import/factories/import.js
 msgid "There was an error during the upload process."
-msgstr ""
+msgstr "Errorea gertatu da kargatze-prozesuan"
 
 #: cms/static/js/features/import/factories/import.js
 msgid "There was an error while unpacking the file."
@@ -5228,7 +5381,7 @@ msgstr ""
 
 #: cms/static/js/features/import/factories/import.js
 msgid "Choose new file"
-msgstr ""
+msgstr "Aukeratu beste fitxategi bat"
 
 #: cms/static/js/features/import/factories/import.js
 msgid ""
@@ -5237,15 +5390,15 @@ msgstr ""
 
 #: cms/static/js/features/import/factories/import.js
 msgid "There was an error while importing the new library to our database."
-msgstr ""
+msgstr "Errorea gertatu da liburutegi berria gure datu-basera inportatzean."
 
 #: cms/static/js/features/import/factories/import.js
 msgid "There was an error while importing the new course to our database."
-msgstr ""
+msgstr "Errorea gertatu da ikastaro berria gure datu-basera inportatzean."
 
 #: cms/static/js/features/import/factories/import.js
 msgid "Your import has failed."
-msgstr ""
+msgstr "Zure inportatzeak kale egin du."
 
 #: cms/static/js/features/import/views/import.js
 msgid "Your import is in progress; navigating away will abort it."
@@ -5253,36 +5406,36 @@ msgstr ""
 
 #: cms/static/js/features/import/views/import.js
 msgid "Error importing course"
-msgstr ""
+msgstr "Errorea ikastaroa inportatzean"
 
 #: cms/static/js/features/import/views/import.js
 msgid "There was an error with the upload"
-msgstr ""
+msgstr "Errorea gertatu da igotzean"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Organization:"
-msgstr ""
+msgstr "Erakundea:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Number:"
-msgstr ""
+msgstr "Ikastaro-zenbakia"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Run:"
-msgstr ""
+msgstr "Ikastaroa ematea:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "(Read-only)"
-msgstr ""
+msgstr "(Irakurtzekoa baino ez)"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Re-run Course"
-msgstr ""
+msgstr "Errepikatu ikastaroa"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
-msgstr ""
+msgstr "Ikusi zuzenean"
 
 #: cms/static/js/maintenance/force_publish_course.js
 msgid "Internal Server Error."
@@ -5303,7 +5456,7 @@ msgstr "Igoera osatu da"
 #. Translators: This is the status of a video upload that has failed
 #: cms/static/js/models/active_video_upload.js
 msgid "Upload failed"
-msgstr "Igotzeak kale egin du"
+msgstr "Kargatzeak kale egin du"
 
 #: cms/static/js/models/chapter.js
 msgid "Chapter name and asset_path are both required"
@@ -5311,7 +5464,7 @@ msgstr ""
 
 #: cms/static/js/models/chapter.js
 msgid "Chapter name is required"
-msgstr ""
+msgstr "Atalaren izena beharrezkoa da"
 
 #: cms/static/js/models/chapter.js
 msgid "asset_path is required"
@@ -5319,7 +5472,7 @@ msgstr ""
 
 #: cms/static/js/models/course.js cms/static/js/models/section.js
 msgid "You must specify a name"
-msgstr ""
+msgstr "Izena zehaztu behar duzu"
 
 #: cms/static/js/models/course_update.js
 msgid "Action required: Enter a valid date."
@@ -5427,11 +5580,11 @@ msgstr ""
 
 #: cms/static/js/models/textbook.js
 msgid "Textbook name is required"
-msgstr ""
+msgstr "Testu-liburuaren izena beharrezkoa da"
 
 #: cms/static/js/models/textbook.js
 msgid "Please add at least one chapter"
-msgstr ""
+msgstr "Gehitu gutxienez atal bat"
 
 #: cms/static/js/models/textbook.js
 msgid "All chapters must have a name and asset"
@@ -5443,6 +5596,7 @@ msgid ""
 "<%= fileExtensions %> to upload."
 msgstr ""
 
+#: cms/static/js/models/uploads.js
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/institution_login.underscore
 #: lms/templates/student_account/institution_register.underscore
@@ -5459,11 +5613,11 @@ msgstr ""
 
 #: cms/static/js/views/active_video_upload.js cms/static/js/views/assets.js
 msgid "Your file could not be uploaded"
-msgstr "Fitxategia ezin izan igo"
+msgstr "Fitxategia ezin izan da kargatu"
 
 #: cms/static/js/views/active_video_upload_list.js
 msgid "Upload Videos"
-msgstr ""
+msgstr "Kargatu bideoak"
 
 #: cms/static/js/views/active_video_upload_list.js
 msgid "Drag and drop or {spanStart}browse your computer{spanEnd}."
@@ -5471,7 +5625,7 @@ msgstr ""
 
 #: cms/static/js/views/active_video_upload_list.js
 msgid "Maximum file size: {maxFileSize} GB"
-msgstr ""
+msgstr "Fitxategien gehienezko tamaina: {maxFileSize} GB"
 
 #: cms/static/js/views/active_video_upload_list.js
 msgid "Supported file types: {supportedVideoTypes}"
@@ -5479,7 +5633,7 @@ msgstr ""
 
 #: cms/static/js/views/active_video_upload_list.js
 msgid "Your video uploads are not complete."
-msgstr ""
+msgstr "Bideoak kargatzea ez da osatu."
 
 #: cms/static/js/views/active_video_upload_list.js
 msgid "Upload completed for video {fileName}"
@@ -5549,7 +5703,7 @@ msgstr ""
 #: cms/static/js/views/assets.js
 #: cms/templates/js/asset-upload-modal.underscore
 msgid "Upload New File"
-msgstr "Igo fitxategia"
+msgstr "Kargatu beste fitxategi bat"
 
 #: cms/static/js/views/assets.js
 msgid "Load Another File"
@@ -5558,7 +5712,7 @@ msgstr ""
 #: cms/static/js/views/components/add_xblock.js
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Adding"
-msgstr ""
+msgstr "Gehitzen"
 
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
@@ -5566,11 +5720,11 @@ msgstr "Ziur al zaude eguneraketa hau ezabatu egin nahi duzula?"
 
 #: cms/static/js/views/course_rerun.js
 msgid "Create Re-run"
-msgstr ""
+msgstr "Sortu ikastaroaren beste edizio bat"
 
 #: cms/static/js/views/course_rerun.js
 msgid "Processing Re-run Request"
-msgstr ""
+msgstr "Ikastaroa berriz emateko eskaria prozesatzen"
 
 #: cms/static/js/views/course_video_settings.js
 msgid "An error has occurred. Wait a few minutes, and then try again."
@@ -5586,7 +5740,7 @@ msgstr ""
 
 #: cms/static/js/views/course_video_settings.js
 msgid "Select language"
-msgstr ""
+msgstr "Aukeratu hizkuntza"
 
 #: cms/static/js/views/course_video_settings.js
 msgid "Press Remove to remove language"
@@ -5594,20 +5748,20 @@ msgstr ""
 
 #: cms/static/js/views/course_video_settings.js
 msgid "Settings updated"
-msgstr ""
+msgstr "Ezarpenak eguneratuta"
 
 #: cms/static/js/views/course_video_settings.js
 #: cms/templates/js/course-video-settings-update-settings-footer.underscore
 msgid "Last updated"
-msgstr ""
+msgstr "Azken eguneraketa"
 
 #: cms/static/js/views/course_video_settings.js
 msgid "Required"
-msgstr ""
+msgstr "Beharrezkoa"
 
 #: cms/static/js/views/course_video_settings.js
 msgid "Automatic transcripts are disabled."
-msgstr ""
+msgstr "Transkripzio automatikoak desgaitta daude."
 
 #: cms/static/js/views/course_video_settings.js
 msgid "{selectedProvider} credentials saved"
@@ -5676,8 +5830,8 @@ msgstr "Errorea gertatu da esportazioan."
 #: cms/static/js/views/group_configuration_details.js
 msgid "Contains {count} group"
 msgid_plural "Contains {count} groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Talde {count} du"
+msgstr[1] "{count} talde ditu"
 
 #: cms/static/js/views/group_configuration_details.js
 #: cms/static/js/views/partition_group_details.js
@@ -5711,13 +5865,13 @@ msgstr "Oraindik ez duzu talde-ezarpenik sortu."
 
 #: cms/static/js/views/instructor_info.js
 msgid "Upload instructor image."
-msgstr "Igo irakaslearen irudia"
+msgstr "Kargatu irakaslearen irudia"
 
 #: cms/static/js/views/instructor_info.js cms/static/js/views/settings/main.js
 msgid "Files must be in JPEG or PNG format."
 msgstr ""
 
-#: cms/templates/js/license-selector.underscore
+#: cms/static/js/views/license.js cms/templates/js/license-selector.underscore
 msgid "All Rights Reserved"
 msgstr "Eskubide guztiak erreserbatuta"
 
@@ -5727,7 +5881,7 @@ msgstr ""
 
 #: cms/static/js/views/license.js
 msgid "Creative Commons"
-msgstr ""
+msgstr "Creative Commons"
 
 #: cms/static/js/views/license.js
 msgid "You waive some rights for your work, such that others can use it too"
@@ -5735,11 +5889,11 @@ msgstr ""
 
 #: cms/static/js/views/license.js
 msgid "Version"
-msgstr ""
+msgstr "Bertsioa"
 
 #: cms/static/js/views/license.js
 msgid "Attribution"
-msgstr ""
+msgstr "Eskubidea"
 
 #: cms/static/js/views/license.js
 msgid ""
@@ -5750,7 +5904,7 @@ msgstr ""
 
 #: cms/static/js/views/license.js
 msgid "Noncommercial"
-msgstr ""
+msgstr "Ez komertziala"
 
 #: cms/static/js/views/license.js
 msgid ""
@@ -5760,7 +5914,7 @@ msgstr ""
 
 #: cms/static/js/views/license.js
 msgid "No Derivatives"
-msgstr ""
+msgstr "Aldaketarik gabeak"
 
 #: cms/static/js/views/license.js
 msgid ""
@@ -5771,7 +5925,7 @@ msgstr ""
 
 #: cms/static/js/views/license.js
 msgid "Share Alike"
-msgstr ""
+msgstr "Share Alike"
 
 #: cms/static/js/views/license.js
 msgid ""
@@ -5860,15 +6014,15 @@ msgstr ""
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Enable"
-msgstr ""
+msgstr "Gaitu"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Not yet"
-msgstr ""
+msgstr "Oraindik ez"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "All Learners and Staff"
-msgstr ""
+msgstr "Ikasle eta arduradun guztiak"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Basic"
@@ -5876,36 +6030,37 @@ msgstr "Oinarrizkoa"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Visibility"
-msgstr "Ikuspena"
+msgstr "Ikusgarritasuna"
 
 #. Translators: "title" is the name of the current component being edited.
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: {title}"
-msgstr ""
+msgstr "Editatzen: {title}"
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Plugins"
-msgstr ""
+msgstr "Pluginak"
 
+#: cms/static/js/views/modals/edit_xblock.js
 #: lms/templates/ccx/schedule.underscore
 msgid "Unit"
 msgstr "Unitatea"
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Component"
-msgstr ""
+msgstr "Osagaia"
 
 #: cms/static/js/views/modals/move_xblock_modal.js
 msgid "Move"
-msgstr ""
+msgstr "Mugitu"
 
 #: cms/static/js/views/modals/move_xblock_modal.js
 msgid "Choose a location to move your component to"
-msgstr ""
+msgstr "Aukeratu kokapena horra mugitzeko osagaia"
 
 #: cms/static/js/views/modals/move_xblock_modal.js
 msgid "Move: {displayName}"
-msgstr ""
+msgstr "Mugitu: {displayName}"
 
 #: cms/static/js/views/modals/validation_error_modal.js
 msgid "Validation Error While Saving"
@@ -5921,28 +6076,30 @@ msgstr "Aldatu eskuz"
 
 #: cms/static/js/views/move_xblock_list.js
 msgid "Sections"
-msgstr ""
+msgstr "Atalak"
 
 #: cms/static/js/views/move_xblock_list.js
 msgid "Subsections"
-msgstr ""
+msgstr "Azpiatalak"
 
 #: cms/static/js/views/move_xblock_list.js
 msgid "Units"
-msgstr ""
+msgstr "Unitateak"
 
 #: cms/static/js/views/move_xblock_list.js
 msgid "Components"
-msgstr ""
+msgstr "Osagaiak"
 
+#: cms/static/js/views/move_xblock_list.js
 #: cms/templates/js/group-configuration-editor.underscore
 msgid "Groups"
 msgstr "Taldeak"
 
 #: cms/static/js/views/move_xblock_list.js
 msgid "This {parentCategory} has no {childCategory}"
-msgstr ""
+msgstr "{parentCategory} honek ez du {childCategory}"
 
+#: cms/static/js/views/move_xblock_list.js
 #: cms/templates/js/group-configuration-details.underscore
 #: cms/templates/js/partition-group-details.underscore
 msgid "Course Outline"
@@ -5950,18 +6107,19 @@ msgstr "Ikastaroaren egitura"
 
 #: cms/static/js/views/paged_container.js
 msgid "Date added"
-msgstr ""
+msgstr "Data gehitu da"
 
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
-msgid "Editing access for: %(title)s"
-msgstr ""
+msgid "Editing access for: {title}"
+msgstr "Sarbidea editatzen honentzat: {title}"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
-msgstr ""
+msgstr "Argitaratzen"
 
+#: cms/static/js/views/pages/container_subviews.js
 #: cms/templates/js/course-video-settings-update-org-credentials-footer.underscore
 #: cms/templates/js/course-video-settings-update-settings-footer.underscore
 #: cms/templates/js/publish-xblock.underscore
@@ -5976,11 +6134,11 @@ msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Discarding Changes"
-msgstr ""
+msgstr "Aldaketak uzten"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Hiding from Students"
-msgstr ""
+msgstr "Ikasleei ezkutatzen"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Explicitly Hiding from Students"
@@ -6015,11 +6173,11 @@ msgstr ""
 
 #: cms/static/js/views/pages/paged_container.js
 msgid "Hide Previews"
-msgstr ""
+msgstr "Ezkutatu aurreikusketak"
 
 #: cms/static/js/views/pages/paged_container.js
 msgid "Show Previews"
-msgstr ""
+msgstr "Erakutsi aurreikusketak"
 
 #. Translators: sample result:
 #. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
@@ -6059,14 +6217,14 @@ msgstr ""
 #. "Showing 0-9 out of 25 total".
 #: cms/static/js/views/paging_header.js
 msgid "{totalItems} total"
-msgstr ""
+msgstr "denera {totalItems}"
 
 #. Translators: This refers to a content group that can be linked to a student
 #. cohort.
 #: cms/static/js/views/partition_group_item.js
 #: cms/static/js/views/partition_group_list.js
 msgid "content group"
-msgstr "eduki-taldea"
+msgstr "eduki-multzoa"
 
 #: cms/static/js/views/partition_group_list.js
 msgid "Add your first content group"
@@ -6125,11 +6283,11 @@ msgstr ""
 
 #: cms/static/js/views/settings/main.js
 msgid "Upload your course image."
-msgstr "Igo ikastaroaren irudia"
+msgstr "Kargatu ikastaroaren irudia"
 
 #: cms/static/js/views/settings/main.js
 msgid "Upload your banner image."
-msgstr ""
+msgstr "Kargatu bannerraren irudia."
 
 #: cms/static/js/views/settings/main.js
 msgid "Upload your video thumbnail image."
@@ -6137,7 +6295,7 @@ msgstr ""
 
 #: cms/static/js/views/show_textbook.js
 msgid "Delete “<%- name %>”?"
-msgstr ""
+msgstr "“<%- name %>” ezabatu nahi al duzu?"
 
 #: cms/static/js/views/show_textbook.js
 msgid ""
@@ -6147,21 +6305,23 @@ msgstr ""
 
 #: cms/static/js/views/tabs.js
 msgid "Delete Page Confirmation"
-msgstr ""
+msgstr "Orria ezabatzeko konfirmazioa"
 
 #: cms/static/js/views/tabs.js
 msgid ""
 "Are you sure you want to delete this page? This action cannot be undone."
 msgstr ""
+"Ziur al zaude orri hau ezabatu egin nahi duzula? Hau ezin da gero desegin."
 
+#: cms/static/js/views/uploads.js
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Upload"
-msgstr "Igo"
+msgstr "Kargatu"
 
 #: cms/static/js/views/uploads.js
 msgid "We're sorry, there was an error"
-msgstr ""
+msgstr "Sentitzen dugu, errorea gertatu da"
 
 #: cms/static/js/views/utils/create_course_utils.js
 msgid ""
@@ -6177,7 +6337,7 @@ msgstr ""
 
 #: cms/static/js/views/utils/move_xblock_utils.js
 msgid "Success! \"{displayName}\" has been moved."
-msgstr ""
+msgstr "Ondo! \"{displayName}\" mugitu da."
 
 #: cms/static/js/views/utils/move_xblock_utils.js
 msgid ""
@@ -6191,19 +6351,19 @@ msgstr ""
 
 #: cms/static/js/views/utils/move_xblock_utils.js
 msgid "Take me to the new location"
-msgstr ""
+msgstr "Eraman nazazu kokapen berrira"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Duplicating"
-msgstr ""
+msgstr "Bikoizten"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Undo moving"
-msgstr ""
+msgstr "Desegin mugitutakoa"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Moving"
-msgstr ""
+msgstr "Mugitzen"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Deleting this {xblock_type} is permanent and cannot be undone."
@@ -6221,20 +6381,21 @@ msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Yes, delete this {xblock_type}"
-msgstr ""
+msgstr "Bai, ezabatu {xblock_type}"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Delete this {xblock_type}?"
-msgstr ""
+msgstr "{xblock_type} ezabatu nahi duzu?"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "section"
-msgstr ""
+msgstr "atala"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "subsection"
-msgstr ""
+msgstr "azpiatala"
 
+#: cms/static/js/views/utils/xblock_utils.js
 #: cms/templates/js/container-access.underscore
 msgid "unit"
 msgstr "unitatea"
@@ -6268,11 +6429,11 @@ msgstr ""
 
 #: cms/static/js/views/video/transcripts/file_uploader.js
 msgid "Error: Uploading failed."
-msgstr ""
+msgstr "Errorea: igotzeak kale egin du."
 
 #: cms/static/js/views/video/transcripts/message_manager.js
 msgid "Error: Import failed."
-msgstr ""
+msgstr "Errorea: inportatzeak kale egin du."
 
 #: cms/static/js/views/video/transcripts/message_manager.js
 msgid "Error: Replacing failed."
@@ -6284,7 +6445,7 @@ msgstr ""
 
 #: cms/static/js/views/video/transcripts/metadata_videolist.js
 msgid "Error: Connection with server failed."
-msgstr ""
+msgstr "Errorea: zerbitzariarekin konektatzeak kale egin du."
 
 #: cms/static/js/views/video/transcripts/metadata_videolist.js
 msgid "Link types should be unique."
@@ -6307,7 +6468,7 @@ msgstr ""
 #: cms/static/js/views/video/translations_editor.js
 #: cms/static/js/views/video_transcripts.js
 msgid "Are you sure you want to remove this transcript?"
-msgstr ""
+msgstr "Ziur al zaude transkripzio hau ezabatu egin nahi duzula?"
 
 #: cms/static/js/views/video/translations_editor.js
 msgid ""
@@ -6317,19 +6478,19 @@ msgstr ""
 
 #: cms/static/js/views/video/translations_editor.js
 msgid "Remove Transcript"
-msgstr ""
+msgstr "Ezabatu transkripzioa"
 
 #: cms/static/js/views/video/translations_editor.js
 msgid "Upload translation"
-msgstr ""
+msgstr "Kargatu itzulpena"
 
 #: cms/static/js/views/video_thumbnail.js
 msgid "Add Thumbnail"
-msgstr ""
+msgstr "Gehitu Thumbnail"
 
 #: cms/static/js/views/video_thumbnail.js
 msgid "Edit Thumbnail"
-msgstr ""
+msgstr "Editatu Thumbnail"
 
 #. Translators: This is a 2 part text which tells the image requirements.
 #: cms/static/js/views/video_thumbnail.js
@@ -6340,7 +6501,7 @@ msgstr ""
 
 #: cms/static/js/views/video_thumbnail.js
 msgid "Image upload failed"
-msgstr ""
+msgstr "irudia kargatzeak kale egin du"
 
 #. Translators: This is a 3 part text which tells the image requirements.
 #: cms/static/js/views/video_thumbnail.js
@@ -6362,7 +6523,7 @@ msgstr ""
 #. Translators: message will be like Add Thumbnail - Arrow.mp4
 #: cms/static/js/views/video_thumbnail.js
 msgid "Add Thumbnail - {videoName}"
-msgstr ""
+msgstr "Gehitu Thumbnail - {videoName}"
 
 #. Translators: humanizeDuration will be like 10 minutes, an hour and 20
 #. minutes etc
@@ -6372,29 +6533,29 @@ msgstr ""
 
 #: cms/static/js/views/video_thumbnail.js
 msgid "minutes"
-msgstr ""
+msgstr "minutu"
 
 #: cms/static/js/views/video_thumbnail.js
 msgid "minute"
-msgstr ""
+msgstr "minutu"
 
 #. Translators: message will be like 15 minutes, 1 minute
 #: cms/static/js/views/video_thumbnail.js
 msgid "{minutes} {unit}"
-msgstr ""
+msgstr "{minutes} {unit}"
 
 #: cms/static/js/views/video_thumbnail.js
 msgid "seconds"
-msgstr ""
+msgstr "segundu"
 
 #: cms/static/js/views/video_thumbnail.js
 msgid "second"
-msgstr ""
+msgstr "segundu"
 
 #. Translators: message will be like 20 seconds, 1 second
 #: cms/static/js/views/video_thumbnail.js
 msgid "{seconds} {unit}"
-msgstr ""
+msgstr "{seconds} {unit}"
 
 #. Translators: `and` will be used to combine both miuntes and seconds like
 #. `13 minutes and 45 seconds`
@@ -6440,11 +6601,11 @@ msgstr ""
 
 #: cms/static/js/views/video_transcripts.js
 msgid "Hide transcripts ({transcriptCount})"
-msgstr ""
+msgstr "Ezkutatu transkripzioak ({transcriptCount})"
 
 #: cms/static/js/views/video_transcripts.js
 msgid "Show transcripts ({transcriptCount})"
-msgstr ""
+msgstr "Erakutsi transkripzioak  ({transcriptCount})"
 
 #: cms/static/js/views/video_transcripts.js
 msgid ""
@@ -6465,34 +6626,28 @@ msgstr ""
 
 #: cms/static/js/views/xblock_editor.js
 msgid "Editor"
-msgstr ""
+msgstr "Editorea"
 
+#: cms/static/js/views/xblock_editor.js
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Settings"
 msgstr "Ezarpenak"
 
 #: cms/static/js/views/xblock_outline.js
 msgid "New {component_type}"
-msgstr ""
-
-#. Translators: This message will be added to the front of messages of type
-#. warning,
-#. e.g. "Warning: this component has not been configured yet".
-#: cms/static/js/views/xblock_validation.js
-msgid "Warning"
-msgstr ""
+msgstr "Beste {component_type} bat"
 
 #: cms/static/js/xblock_asides/structured_tags.js
 msgid "Updating Tags"
-msgstr ""
+msgstr "Etiketak eguneratzen"
 
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Account Information"
-msgstr ""
+msgstr "Kontuaren informazioa"
 
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Order History"
-msgstr "Eskabide-historia"
+msgstr "Eskabideen historia"
 
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid ""
@@ -6516,7 +6671,7 @@ msgstr "Ekintzak"
 #: cms/templates/js/publish-xblock.underscore
 #: lms/templates/ccx/schedule.underscore
 msgid "Unscheduled"
-msgstr ""
+msgstr "Programatu gabea"
 
 #: cms/templates/js/course_info_update.underscore
 #: lms/templates/commerce/receipt.underscore
@@ -6575,12 +6730,12 @@ msgstr "Bilatu"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Discussion Home"
-msgstr ""
+msgstr "Foroaren hasiera"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 #, python-format
 msgid "How to use %(platform_name)s discussions"
-msgstr "Nola erabili %(platform_name)s eztabaidak"
+msgstr "Nola erabili %(platform_name)s plataformako eztabaidak"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Find discussions"
@@ -6588,7 +6743,7 @@ msgstr "Bilatu eztabaidak"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Use the All Topics menu to find specific topics."
-msgstr ""
+msgstr "Erabili Gai guztiak izeneko menua gai jakin bat bilatzeko."
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 #: lms/djangoapps/discussion/static/discussion/templates/search.underscore
@@ -6597,27 +6752,27 @@ msgstr "Bilatu mezu guztiak"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Filter and sort topics"
-msgstr ""
+msgstr "Iragazi eta ordenatu gaiak"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Engage with posts"
-msgstr ""
+msgstr "Inplikatu eztabaidetan"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Vote for good posts and responses"
-msgstr ""
+msgstr "Bozkatu mezuak eta erantzunak"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Report abuse, topics, and responses"
-msgstr ""
+msgstr "Salatu irainak, gaiak eta erantzunak"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Follow or unfollow posts"
-msgstr ""
+msgstr "Jarraitu mezuak edo utzi jarraitzeari"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Receive updates"
-msgstr ""
+msgstr "Jaso eguneraketak"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Toggle Notifications Setting"
@@ -6659,7 +6814,7 @@ msgstr "Egoera"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Download URL"
-msgstr "Jaitsi URLa"
+msgstr "Deskargatu URLa"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Grade"
@@ -6671,7 +6826,7 @@ msgstr "Azken eguneraketa"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Download the user's certificate"
-msgstr "Jaitsi erabiltzailearen ziurtagiria"
+msgstr "Deskargatu erabiltzailearen ziurtagiria"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Not available"
@@ -6679,11 +6834,11 @@ msgstr "Ez dago eskuragarri"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Regenerate"
-msgstr ""
+msgstr "Sortu berriz"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Regenerate the user's certificate"
-msgstr ""
+msgstr "Sortu berriz erabiltzailearen ziurtagiria"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Generate"
@@ -6691,19 +6846,19 @@ msgstr "Sortu"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Generate the user's certificate"
-msgstr ""
+msgstr "Sortu erabiltzailearen ziurtagiria"
 
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 msgid "Current enrollment mode:"
-msgstr ""
+msgstr "Oraingo matrikulazio-modua:"
 
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 msgid "New enrollment mode:"
-msgstr ""
+msgstr "Matrikulazio-modu berria:"
 
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 msgid "Reason for change:"
-msgstr ""
+msgstr "Aldatzeko arrazoia:"
 
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 msgid "Choose One"
@@ -6711,16 +6866,16 @@ msgstr "Aukeratu bat"
 
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 msgid "Explain if other."
-msgstr ""
+msgstr "Azaldu, beste bat bada."
 
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 msgid "Submit enrollment change"
-msgstr ""
+msgstr "Bidali matrikulazio-aldaketa"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Username or email address"
-msgstr ""
+msgstr "Erabiltzaie-izena edo e-posta:"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Course ID"
@@ -6760,28 +6915,28 @@ msgstr "Arrazoia"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Last modified by"
-msgstr ""
+msgstr "Ondokoak egin du azken aldaketa:"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Active"
-msgstr ""
+msgstr "Aktibo"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 #: lms/templates/ccx/schedule.underscore
 msgid "N/A"
-msgstr ""
+msgstr "Ez da aplikatzen"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Change Enrollment"
-msgstr ""
+msgstr "Aldatu matrikulazioa"
 
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 msgid "Date Joined"
-msgstr ""
+msgstr "Erregistratze-data"
 
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 msgid "Password Status"
-msgstr ""
+msgstr "Pasahitzaren egoera"
 
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 msgid "Toggle Account Password (Usable/Unusable)"
@@ -6805,7 +6960,7 @@ msgstr ""
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 msgid "Optional Characteristics"
-msgstr ""
+msgstr "Aukerako ezaugarriak"
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 msgid ""
@@ -6816,7 +6971,7 @@ msgstr ""
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 msgid "Create team."
-msgstr ""
+msgstr "Sortu taldea."
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 msgid "Update team."
@@ -6824,11 +6979,11 @@ msgstr "Eguneratu taldea."
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 msgid "Cancel team creating."
-msgstr ""
+msgstr "Utzi bertan behera taldea sortzea."
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 msgid "Cancel team updating."
-msgstr ""
+msgstr "Utzi bertan behera taldea eguneratzea."
 
 #: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
 msgid "Instructor tools"
@@ -6840,11 +6995,31 @@ msgstr "Ezabatu taldea"
 
 #: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
 msgid "Edit Membership"
+msgstr "Editatu partaidetza"
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "View Current Team Memberships"
+msgstr "Ikusi oraingo taldekideak"
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Download Memberships"
+msgstr "Deskargatu partaidetza"
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Assign Team Memberships"
+msgstr "Esleitu talde-partaidetza"
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Upload Memberships"
+msgstr "Kargatu partaidetza"
+
+#: lms/djangoapps/teams/static/teams/templates/manage.underscore
+msgid "Error assigning team memberships"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
 msgid "Are you having trouble finding a team to join?"
-msgstr ""
+msgstr "Ba al duzu talderen batekin bat egiteko arazorik?"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile-header-actions.underscore
 msgid "Join Team"
@@ -6860,11 +7035,11 @@ msgstr "Talde honetako partaidea zara."
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid "Team member profiles"
-msgstr ""
+msgstr "Taldekideen profilak"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid "Team capacity"
-msgstr ""
+msgstr "Taldearen gaitasuna"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid "Leave Team"
@@ -6883,7 +7058,7 @@ msgstr ""
 
 #: lms/templates/api_admin/catalog-results.underscore
 msgid "This catalog's courses:"
-msgstr ""
+msgstr "Katalogoko ikastaroak:"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Start Date"
@@ -6900,7 +7075,7 @@ msgstr "ezabatu guztiak"
 #: lms/templates/ccx/schedule.underscore
 #, python-format
 msgid "toggle chapter %(displayName)s"
-msgstr ""
+msgstr "Aldatu %(displayName)satalera"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Section"
@@ -6909,7 +7084,7 @@ msgstr "Atala"
 #: lms/templates/ccx/schedule.underscore
 #, python-format
 msgid "Remove chapter %(chapterDisplayName)s"
-msgstr ""
+msgstr "Ezabatu %(chapterDisplayName)s atala"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "remove"
@@ -6927,12 +7102,12 @@ msgstr "Azpiatala"
 #: lms/templates/ccx/schedule.underscore
 #, python-format
 msgid "Remove subsection %(subsectionDisplayName)s"
-msgstr ""
+msgstr "Ezabatu %(subsectionDisplayName)sazpiatala"
 
 #: lms/templates/ccx/schedule.underscore
 #, python-format
 msgid "Remove unit %(unitName)s"
-msgstr ""
+msgstr "Ezabatu %(unitName)s unitatea"
 
 #: lms/templates/commerce/provider.underscore
 #, python-format
@@ -6957,6 +7132,8 @@ msgstr "Lortu kreditua"
 msgid ""
 "Thank you %(full_name)s! We have received your payment for %(course_name)s."
 msgstr ""
+"Eskerrik asko %(full_name)s! Zure ordainketa jaso dugu %(course_name)s dela-"
+"eta."
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -6968,7 +7145,7 @@ msgstr ""
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Order No."
-msgstr ""
+msgstr "Agindu-zenbakia"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -6984,7 +7161,7 @@ msgstr "Denerakoa"
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Please Note"
-msgstr ""
+msgstr "Hartu kontuan"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -6994,12 +7171,12 @@ msgstr ""
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Billed to"
-msgstr ""
+msgstr "Faktura ondokoari egin zaio: "
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "No receipt available"
-msgstr ""
+msgstr "Ordainagiria ez dago eskura"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/financial-assistance/financial_assessment_submitted.underscore
@@ -7016,7 +7193,7 @@ msgstr ""
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Want to confirm your identity later?"
-msgstr ""
+msgstr "Nahi al duzu nortasuna beranduago egiaztatu?"
 
 #: lms/templates/commerce/receipt.underscore
 msgid "Verify Now"
@@ -7024,7 +7201,7 @@ msgstr "Egiaztatu orain!"
 
 #: lms/templates/courseware/proctored-exam-controls.underscore
 msgid "Mark Exam As Completed"
-msgstr ""
+msgstr "Markatu azterketa osatutzat "
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "You are taking \"{exam_link}\" as {exam_type}. "
@@ -7045,14 +7222,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show More"
-msgstr ""
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show Less"
-msgstr ""
-
-#: lms/templates/courseware/proctored-exam-status.underscore
 msgid "Exam timer and end exam button"
 msgstr ""
 
@@ -7062,7 +7231,7 @@ msgstr "Amaitu azterketa"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "Hide Timer"
-msgstr ""
+msgstr "Ezkutatu denbora"
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
@@ -7071,11 +7240,11 @@ msgstr "IKASI GEHIAGO"
 #: lms/templates/discovery/course_card.underscore
 #, python-format
 msgid "Starts: %(start_date)s"
-msgstr ""
+msgstr "Hasiera: %(start_date)s"
 
 #: lms/templates/discovery/course_card.underscore
 msgid "Starts"
-msgstr "Hasiko da"
+msgstr "Hasiera"
 
 #: lms/templates/discovery/filter_bar.underscore
 msgid "Clear All"
@@ -7083,7 +7252,7 @@ msgstr "Garbitu guztiak"
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Highlighted text"
-msgstr ""
+msgstr "Nabarmendutako testua"
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Note"
@@ -7091,11 +7260,11 @@ msgstr "Oharra"
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "You commented..."
-msgstr ""
+msgstr "Zuk komentatu zenuen..."
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Noted in:"
-msgstr ""
+msgstr "Oharra hemen egin da: "
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Last Edited:"
@@ -7107,7 +7276,7 @@ msgstr "Etiketak:"
 
 #: lms/templates/edxnotes/tab-item.underscore
 msgid "Clear search results"
-msgstr ""
+msgstr "Garbitu bilaketaren emaitzak"
 
 #: lms/templates/fields/field_dropdown.underscore
 #: lms/templates/fields/field_dropdown_account.underscore
@@ -7121,7 +7290,7 @@ msgstr "Agindu-zenbakia"
 
 #: lms/templates/fields/field_order_history.underscore
 msgid "Date Placed"
-msgstr ""
+msgstr "Data jarri da"
 
 #: lms/templates/fields/field_order_history.underscore
 msgid "Cost"
@@ -7133,11 +7302,11 @@ msgstr "Aginduaren xehetasunak"
 
 #: lms/templates/fields/field_order_history.underscore
 msgid "for"
-msgstr ""
+msgstr "ondokoarentzat"
 
 #: lms/templates/fields/field_order_history.underscore
 msgid "Product Name"
-msgstr ""
+msgstr "Produktuaren izena"
 
 #: lms/templates/fields/field_textarea.underscore
 msgid ""
@@ -7148,11 +7317,11 @@ msgstr ""
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: lms/templates/financial-assistance/financial_assessment_submitted.underscore
 msgid "Financial Assistance Application"
-msgstr ""
+msgstr "Finantza-laguntzarako eskaria"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "About You"
-msgstr ""
+msgstr "Zuri buruz"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
@@ -7166,19 +7335,19 @@ msgstr "E-posta helbidea"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Legal name"
-msgstr ""
+msgstr "Izena"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Country of residence"
-msgstr ""
+msgstr "Bizi zaren estatua"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Back to {platform} FAQs"
-msgstr ""
+msgstr "Itzuli {platform} plataformako FAQetara"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Submit Application"
-msgstr ""
+msgstr "Bidali eskaria"
 
 #: lms/templates/financial-assistance/financial_assessment_submitted.underscore
 msgid ""
@@ -7188,7 +7357,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Bulk Exceptions"
-msgstr ""
+msgstr "Salbuespen masiboak"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid ""
@@ -7201,12 +7370,12 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Upload a CSV file"
-msgstr ""
+msgstr "Kargatu CSV fitxategia"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Add to Exception List"
-msgstr ""
+msgstr "Gehitu salbuespenen zerrendara"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid ""
@@ -7216,11 +7385,11 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Add notes about this learner"
-msgstr ""
+msgstr "Gehitu oharrak ikasle honi buruz"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Invalidate Certificate"
-msgstr ""
+msgstr "Ziurtagiri baliogabea"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Student"
@@ -7228,11 +7397,11 @@ msgstr "Ikaslea"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Invalidated By"
-msgstr ""
+msgstr "Ondokoak baligabetua: "
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Invalidated"
-msgstr ""
+msgstr "Baliogabetua"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
@@ -7241,11 +7410,11 @@ msgstr "Oharrak"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Remove from Invalidation Table"
-msgstr ""
+msgstr "Ezabatu baliogabetuen taulatik"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Individual Exceptions"
-msgstr ""
+msgstr "Norbanakoen salbuespenak"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid ""
@@ -7255,7 +7424,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Student email or username"
-msgstr ""
+msgstr "Ikaslearen e-posta edo erabiltzaile-izena"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Free text notes"
@@ -7271,11 +7440,11 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "All users on the Exception list"
-msgstr ""
+msgstr "Salbuespenen zerrendako erabiltzaile guztiak"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "User Email"
-msgstr "Erabiltzailearen e-posta"
+msgstr "Erabiltzailearen posta elektronikoa"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Exception Granted"
@@ -7283,23 +7452,23 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Certificate Generated"
-msgstr ""
+msgstr "Ziurtagiria sortu da"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Remove from List"
-msgstr ""
+msgstr "Ezabatu zerrendatik"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-subcategory.underscore
 msgid "Divided"
-msgstr ""
+msgstr "Zatituta"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Manage Learners"
-msgstr ""
+msgstr "Kudeatu ikasleak"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Add learners to this cohort"
-msgstr ""
+msgstr "Gehitu ikasleak kohorte honetara"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid ""
@@ -7320,7 +7489,7 @@ msgstr "(Beharrezko eremua)"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "e.g. johndoe@example.com, JaneDoe, joeydoe@example.com"
-msgstr ""
+msgstr "adibidez, johndoe@example.com, JaneDoe, joeydoe@example.com"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid ""
@@ -7330,7 +7499,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Add Learners"
-msgstr ""
+msgstr "Gehitu ikasleak"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Add a New Cohort"
@@ -7346,7 +7515,7 @@ msgstr "Kohortearen izena"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Cohort Assignment Method"
-msgstr ""
+msgstr "Kohortea esleitzeko metodoa"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Automatic"
@@ -7363,19 +7532,19 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Associated Content Group"
-msgstr "Lotutako eduki-taldea"
+msgstr "Lotutako eduki-multzoa"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "No Content Group"
-msgstr "Ez dago eduki-talderik"
+msgstr "Ez dago eduki-multzorik"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Select a Content Group"
-msgstr "Aukeratu eduki-taldea"
+msgstr "Aukeratu eduki-multzoa"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Choose a content group to associate"
-msgstr ""
+msgstr "Aukeratu eduki-multzo bat lotzeko"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Not selected"
@@ -7383,7 +7552,7 @@ msgstr "Aukeratu gabea"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Deleted Content Group"
-msgstr "Ezabatutako eduki-taldea"
+msgstr "Ezabatutako eduki-multzoa"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid ""
@@ -7402,7 +7571,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Create a content group"
-msgstr "Sartu eduki-taldea"
+msgstr "Sortu eduki-multzoa"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
 #, python-format
@@ -7500,7 +7669,7 @@ msgstr ""
 #: lms/templates/learner_dashboard/certificate_status.underscore
 #: lms/templates/learner_dashboard/upgrade_message.underscore
 msgid "Certificate Status:"
-msgstr ""
+msgstr "Ziurtagiriaren egoera:"
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
 msgid "Certificate Purchased"
@@ -7508,7 +7677,7 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/course_card.underscore
 msgid "Change or Leave Session"
-msgstr ""
+msgstr "Aldatu edo utzi saioa"
 
 #: lms/templates/learner_dashboard/course_card.underscore
 msgid "You must select a session by {expiration_date} to access the course."
@@ -7524,7 +7693,7 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Final Grade"
-msgstr ""
+msgstr "Azken kalifikazioa"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "for {courseName}"
@@ -7532,7 +7701,7 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "View Archived Course"
-msgstr ""
+msgstr "Ikusi artxibatutako ikastaroa"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "View Course"
@@ -7540,7 +7709,7 @@ msgstr "Ikusi ikastaroa"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Select a session:"
-msgstr ""
+msgstr "Aukeratu saioa:"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Enroll Now"
@@ -7568,7 +7737,7 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "To access the course, select a session."
-msgstr ""
+msgstr "Ikastarora joateko, aukeratu saioa."
 
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "Session Selection Dropdown for {courseName}"
@@ -7596,7 +7765,7 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
 msgid "Explore Programs"
-msgstr ""
+msgstr "Arakatu programak"
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
 msgid ""
@@ -7606,7 +7775,7 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
 msgid "Explore New Programs"
-msgstr ""
+msgstr "Arakatu programa berriak"
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
@@ -7626,11 +7795,11 @@ msgstr ""
 #: lms/templates/learner_dashboard/program_card.underscore
 #, python-format
 msgid "%(programName)s Home Page."
-msgstr ""
+msgstr "%(programName)s Hasiera-orria."
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Your {program} Certificate"
-msgstr ""
+msgstr "{program}-ko Ziurtagiria"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 #, python-format
@@ -7651,7 +7820,7 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "View Program Record"
-msgstr ""
+msgstr "Ikusi programaren erregistroa "
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Additional Credit Opportunities"
@@ -7659,7 +7828,7 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Learn More"
-msgstr ""
+msgstr "Ikasi gehiago"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Additional Professional Opportunities"
@@ -7667,7 +7836,7 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Congratulations!"
-msgstr ""
+msgstr "Zorionak!"
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Your Program Journey"
@@ -7685,11 +7854,11 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "${listPrice}"
-msgstr ""
+msgstr "${listPrice}"
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid " ${price} {currency} )"
-msgstr ""
+msgstr " ${price} {currency} )"
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "COURSES IN PROGRESS"
@@ -7697,11 +7866,11 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "REMAINING COURSES"
-msgstr ""
+msgstr "GERATZEN DIREN IKASTAROAK"
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "COMPLETED COURSES"
-msgstr ""
+msgstr "OSATUTAKO IKASTAROAK"
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "As you complete courses, you will see them listed here."
@@ -7787,15 +7956,15 @@ msgstr ""
 #: lms/templates/student_account/institution_register.underscore
 #: lms/templates/student_account/register.underscore
 msgid "Create an Account"
-msgstr ""
+msgstr "Sortu kontua"
 
 #: lms/templates/student_account/login.underscore
 msgid "First time here?"
-msgstr ""
+msgstr "Lehen aldia hemen?"
 
 #: lms/templates/student_account/login.underscore
 msgid "Create an Account."
-msgstr ""
+msgstr "Sortu kontua."
 
 #: lms/templates/student_account/login.underscore
 msgid "Sign in to continue learning as {email}"
@@ -7809,6 +7978,8 @@ msgstr ""
 msgid ""
 "You already have an edX account with your {enterprise_name} email address."
 msgstr ""
+"Dagoeneko edX kontua duzu {enterprise_name} enpresako posta elektronikoaren "
+"helbidearekin."
 
 #: lms/templates/student_account/login.underscore
 msgid ""
@@ -7869,15 +8040,15 @@ msgstr ""
 
 #: lms/templates/student_account/password_reset.underscore
 msgid "Recover my password"
-msgstr ""
+msgstr "Berreskuratu nire pasahitza"
 
 #: lms/templates/student_account/register.underscore
 msgid "Already have an {platformName} account?"
-msgstr ""
+msgstr "Ba al duzu dagoeneko {platformName}-ko kontua?"
 
 #: lms/templates/student_account/register.underscore
 msgid "Sign in."
-msgstr ""
+msgstr "Hasi saioa."
 
 #: lms/templates/student_account/register.underscore
 msgid "Create an account using"
@@ -7894,7 +8065,7 @@ msgstr ""
 
 #: lms/templates/student_account/register.underscore
 msgid "or create a new one here"
-msgstr ""
+msgstr "edo sortu beste bat hemen"
 
 #: lms/templates/student_account/register.underscore
 msgid "Support education research by providing additional information"
@@ -7952,8 +8123,8 @@ msgstr "Web-kamera"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"You need a computer that has a webcam. When you receive a browser prompt, "
-"make sure that you allow access to the camera."
+"You need a computer or cell phone that has a webcam. When you receive a "
+"browser prompt, make sure that you allow access to the camera."
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -7973,8 +8144,8 @@ msgstr "Atera zure argazkia"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"When your face is in position, use the camera button {icon} below to take "
-"your photo."
+"When your face is in position, use the Take Photo button {icon} below to "
+"take your photo."
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -7995,8 +8166,8 @@ msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"To use the current photo, select the camera button {icon}. To take another "
-"photo, select the retake button {icon}."
+"To use the current photo, select the Take Photo button {icon}. To take "
+"another photo, select the Retake Photo button {icon}."
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8010,7 +8181,7 @@ msgstr "Maiz egiten diren galderak"
 #: lms/templates/verify_student/incourse_reverify.underscore
 #, python-format
 msgid "Why does %(platformName)s need my photo?"
-msgstr ""
+msgstr "Zergatik behar du %(platformName)s plataformak nire argazkia?"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8041,6 +8212,50 @@ msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"What if I can't see the camera image, or if I can't see my photo do "
+"determine which side is visible?"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"You may be able to complete the image capture procedure without assistance, "
+"but it may take a couple of submission attempts to get the camera "
+"positioning right.  Optimal camera positioning varies with each computer, "
+"but generally the best position for a headshot is approximately 12-18 inches"
+" (30-45 centimeters) from the camera, with your head centered relative to "
+"the computer screen. "
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"If the photos you submit are rejected, try moving the computer or camera "
+"orientation to change the lighting angle.  The most common reason for "
+"rejection is inability to read the text on the ID card."
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"What if I have difficulty holding my head in position relative to the "
+"camera?"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+#, python-format
+msgid ""
+"If you require assistance with taking either photo for submission, contact "
+"%(platformName)s support for additional suggestions."
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
@@ -8049,7 +8264,7 @@ msgstr "Hurrengoa: %(nextStepTitle)s"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid "Take a Photo of Your ID"
-msgstr ""
+msgstr "Egin argazkia zure ID-ari"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
@@ -8077,12 +8292,27 @@ msgid "Make sure your ID is well-lit"
 msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
-msgid "Once in position, use the camera button {icon} to capture your ID"
+msgid "Once in position, use the Take Photo button {icon} to capture your ID"
 msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Use the retake photo button if you are not pleased with your photo"
+msgid "Use the Retake Photo button if you are not pleased with your photo"
+msgstr ""
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid ""
+"You may be able to complete the image capture procedure without assistance, "
+"but it may take a couple of submission attempts to get the camera "
+"positioning right.  Optimal camera positioning varies with each computer, "
+"but generally, the best position for a photo of an ID card is 8-12 inches "
+"(20-30 centimeters) from the camera, with the ID card centered relative to "
+"the camera. "
+msgstr ""
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid ""
+"What if I have difficulty holding my ID in position relative to the camera?"
 msgstr ""
 
 #: lms/templates/verify_student/image_input.underscore
@@ -8108,7 +8338,8 @@ msgid "Be sure your entire face is inside the frame"
 msgstr ""
 
 #: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Once in position, use the camera button {icon} to capture your photo"
+msgid ""
+"Once in position, use the Take Photo button {icon} to capture your photo"
 msgstr ""
 
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -8129,7 +8360,7 @@ msgstr ""
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Activate Your Account"
-msgstr "Aktibatu zure kontua"
+msgstr "Aktibatu kontua"
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
@@ -8215,7 +8446,7 @@ msgstr "prezioa"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Account Not Activated"
-msgstr ""
+msgstr "Aktibatu gabeko kontua"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Upgrade to a Verified Certificate for {courseName}"
@@ -8228,11 +8459,11 @@ msgstr ""
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Check your email for an activation message."
-msgstr ""
+msgstr "Egiaztatu posta elektronikoa aktibazio-mezua ikusteko."
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Professional Certificate for {courseName}"
-msgstr ""
+msgstr "Zirtagiri profesionala {courseName} ikastarorako"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Verified Certificate for {courseName}"
@@ -8265,7 +8496,7 @@ msgstr ""
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Thank you! We have received your payment for {courseName}."
-msgstr ""
+msgstr "Eskerrik asko! Zure ordainketa jaso dugu {courseName} ikastarorako."
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Next Step: Confirm your identity"
@@ -8409,13 +8640,13 @@ msgstr ""
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
 msgid "Load next {num_items} result"
 msgid_plural "Load next {num_items} results"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kargatu hurrengo emaitza {num_items}"
+msgstr[1] "Kargatu hurrengo  {num_items} emaitzak"
 
 #: openedx/features/course_search/static/course_search/templates/course_search_results.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
 msgid "Sorry, no results were found."
-msgstr "Barkatu, ez da emaitzarik aurkitu."
+msgstr "Sentitzen dugu, ez da emaitzarik aurkitu."
 
 #: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
 #, python-format
@@ -8424,7 +8655,7 @@ msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
 msgid "Share"
-msgstr ""
+msgstr "Partekatu"
 
 #: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
 #, python-format
@@ -8433,7 +8664,7 @@ msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
 msgid "What's Your Next Accomplishment?"
-msgstr ""
+msgstr "Zein izango da hurrengo lorpena?"
 
 #: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
 msgid "Start working toward your next learning goal."
@@ -8449,7 +8680,7 @@ msgstr "Une honetan profil mugatua partekatzen ari zara."
 
 #: openedx/features/learner_profile/static/learner_profile/templates/section_two.underscore
 msgid "This learner is currently sharing a limited profile."
-msgstr ""
+msgstr "Ikasle hau une honetan profil mugatua partekatzen ari da."
 
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Share on Mozilla Backpack"
@@ -8463,23 +8694,21 @@ msgid ""
 msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-#, python-format
 msgid ""
-"Create a %(link_start)sMozilla Backpack%(link_end)s account, or log in to "
-"your existing account"
+"Create a {link_start}Mozilla Backpack{link_end} account, or log in to your "
+"existing account"
 msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-#, python-format
 msgid ""
-"%(download_link_start)sDownload this image (right-click or option-click, "
-"save as)%(link_end)s and then %(upload_link_start)supload%(link_end)s it to "
-"your backpack.</li>"
+"{download_link_start}Download this image (right-click or option-click, save "
+"as){link_end} and then {upload_link_start}upload{link_end} it to your "
+"backpack."
 msgstr ""
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"
-msgstr ""
+msgstr "Mugatu sarbidea"
 
 #: cms/templates/js/access-editor.underscore
 msgid ""
@@ -8490,15 +8719,15 @@ msgstr ""
 
 #: cms/templates/js/access-editor.underscore
 msgid "Prerequisite:"
-msgstr ""
+msgstr "Aurrebaldintza:"
 
 #: cms/templates/js/access-editor.underscore
 msgid "No prerequisite"
-msgstr ""
+msgstr "Ez dago aurrebaldintzarik"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Minimum Score:"
-msgstr ""
+msgstr "Gutxieneko puntuazioa:"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Minimum Completion:"
@@ -8515,7 +8744,7 @@ msgstr ""
 
 #: cms/templates/js/access-editor.underscore
 msgid "Use as a Prerequisite"
-msgstr ""
+msgstr "Erabil aurrebaldintza gisa"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Make this subsection available as a prerequisite to other content"
@@ -8553,7 +8782,7 @@ msgstr ""
 
 #: cms/templates/js/add-xblock-component-support-legend.underscore
 msgid "Provisional"
-msgstr ""
+msgstr "Behin-behinekoa"
 
 #: cms/templates/js/add-xblock-component-support-legend.underscore
 #: cms/templates/js/add-xblock-component-support-level.underscore
@@ -8742,11 +8971,11 @@ msgstr ""
 
 #: cms/templates/js/content-group-editor.underscore
 msgid "Content Group Name"
-msgstr "Eduki-talderen izena"
+msgstr "Eduki-multzoaren izena"
 
 #: cms/templates/js/content-group-editor.underscore
 msgid "Content Group ID"
-msgstr "Eduki-talderen IDa"
+msgstr "Eduki-multzoaren IDa"
 
 #: cms/templates/js/content-group-editor.underscore
 msgid "This is the name of the group"
@@ -8811,17 +9040,21 @@ msgid ""
 "hidden."
 msgstr ""
 
+#: cms/templates/js/copy-clipboard-button.underscore
+msgid "Copy Component Location"
+msgstr ""
+
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Weekly Highlight Emails"
 msgstr ""
 
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Enabled"
-msgstr ""
+msgstr "Gaituta"
 
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Enable Now"
-msgstr ""
+msgstr "Gaitu orain"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Name"
@@ -8858,11 +9091,11 @@ msgstr "Biografia"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Biography"
-msgstr ""
+msgstr "Irakaslearen biografia"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Please add the instructor's biography"
-msgstr ""
+msgstr "Gehitu irakaslearen biografia"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Photo"
@@ -8870,11 +9103,11 @@ msgstr "Argazkia"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Photo"
-msgstr ""
+msgstr "Irakaslearen argazkia"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Photo URL"
-msgstr ""
+msgstr "Irakaslearen argazkiaren URLa"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid ""
@@ -8884,7 +9117,7 @@ msgstr ""
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Upload Photo"
-msgstr ""
+msgstr "Kargatu argazkia"
 
 #: cms/templates/js/course-outline.underscore
 #, python-format
@@ -9012,7 +9245,7 @@ msgstr ""
 
 #: cms/templates/js/course-settings-learning-fields.underscore
 msgid "Learning Outcome"
-msgstr ""
+msgstr "Ikas-emaitza"
 
 #: cms/templates/js/course-settings-learning-fields.underscore
 msgid "Add a learning outcome here"
@@ -9025,7 +9258,7 @@ msgstr ""
 #: cms/templates/js/course-video-settings-update-org-credentials-footer.underscore
 #: cms/templates/js/course-video-settings-update-settings-footer.underscore
 msgid "Update Settings"
-msgstr ""
+msgstr "Eguneratu ezarpenak"
 
 #: cms/templates/js/course-video-settings-update-org-credentials-footer.underscore
 msgid "Press update settings to update the information for your organization."
@@ -9045,7 +9278,7 @@ msgstr ""
 
 #: cms/templates/js/course-video-settings.underscore
 msgid "Course Video Settings"
-msgstr ""
+msgstr "Ikastaroko bideoen ezarpenak"
 
 #: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Transcript Turnaround"
@@ -9061,7 +9294,7 @@ msgstr ""
 
 #: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Transcript Languages"
-msgstr ""
+msgstr "Transkripzio-hizkuntzak"
 
 #: cms/templates/js/course-video-transcript-preferences.underscore
 #: cms/templates/js/metadata-dict-entry.underscore
@@ -9084,7 +9317,7 @@ msgstr ""
 
 #: cms/templates/js/course-video-transcript-provider-selected.underscore
 msgid "Change"
-msgstr ""
+msgstr "Aldatu"
 
 #: cms/templates/js/course-video-transcript-provider-selected.underscore
 msgid "Press change to change selected transcript provider."
@@ -9142,24 +9375,16 @@ msgstr ""
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"
-msgstr "Ikastaroko apunteak"
+msgstr "Ikastaroko materialak"
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "You have no handouts defined"
-msgstr "Ez duzu apunterik zehaztu"
+msgstr "Ez duzu materialik zehaztu"
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid ""
 "There is invalid code in your content. Please check to make sure it is valid"
 " HTML."
-msgstr ""
-
-#: cms/templates/js/course_info_update.underscore
-msgid "Send push notification to mobile apps"
-msgstr ""
-
-#: cms/templates/js/course_info_update.underscore
-msgid "Send notification to mobile apps"
 msgstr ""
 
 #: cms/templates/js/course_info_update.underscore
@@ -9204,7 +9429,7 @@ msgstr ""
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "Upload PDF"
-msgstr "Igo PDFa"
+msgstr "Kargatu PDFa"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "delete chapter"
@@ -9235,6 +9460,10 @@ msgstr "Atalaren informazioa"
 #: cms/templates/js/edit-textbook.underscore
 msgid "Add a Chapter"
 msgstr "Gehitu kapitulua"
+
+#: cms/templates/js/edit-title-button.underscore
+msgid "Edit Title"
+msgstr ""
 
 #: cms/templates/js/grading-editor.underscore
 msgid "Grading"
@@ -9289,7 +9518,7 @@ msgstr "Hau da talde-ezarpenen deskribapena "
 
 #: cms/templates/js/group-configuration-editor.underscore
 msgid "Optional long description"
-msgstr ""
+msgstr "Aukerako deskribapen luzea"
 
 #: cms/templates/js/group-configuration-editor.underscore
 msgid "Group information"
@@ -9377,7 +9606,7 @@ msgstr "%(new_item_message)s"
 #: cms/templates/js/list.underscore
 #, python-format
 msgid "New %(item_type)s"
-msgstr ""
+msgstr "%(item_type)s berria"
 
 #: cms/templates/js/metadata-dict-entry.underscore
 #: cms/templates/js/metadata-file-uploader-entry.underscore
@@ -9395,17 +9624,13 @@ msgstr "Garbitu"
 #: cms/templates/js/metadata-option-entry.underscore
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear Value"
-msgstr ""
-
-#: cms/templates/js/metadata-editor.underscore
-msgid "Component Location ID"
-msgstr ""
+msgstr "Garbitu balorea"
 
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video-transcripts.underscore
 #: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Download"
-msgstr "Jaitsi"
+msgstr "Deskargatu"
 
 #: cms/templates/js/move-xblock-list.underscore
 msgid "{categoryText} in {parentDisplayname}"
@@ -9413,11 +9638,11 @@ msgstr ""
 
 #: cms/templates/js/move-xblock-list.underscore
 msgid "Current location"
-msgstr ""
+msgstr "Oraingo kokapena"
 
 #: cms/templates/js/move-xblock-list.underscore
 msgid "Currently selected"
-msgstr ""
+msgstr "Une honetan aukeratuta"
 
 #: cms/templates/js/no-textbooks.underscore
 msgid "You haven't added any textbooks to this course yet."
@@ -9439,7 +9664,7 @@ msgstr ""
 
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Previous Uploads"
-msgstr "Aurreko igoerak"
+msgstr "Aurreko kargak"
 
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Download available encodings (.csv)"
@@ -9455,11 +9680,11 @@ msgstr "Bideoaren IDa"
 
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Transcripts"
-msgstr ""
+msgstr "Transkripzioak"
 
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Video Status"
-msgstr ""
+msgstr "Bideoaren egoera"
 
 #: cms/templates/js/previous-video-upload.underscore
 msgid "Remove this video"
@@ -9467,7 +9692,7 @@ msgstr ""
 
 #: cms/templates/js/previous-video-upload.underscore
 msgid "Remove {video_name} video"
-msgstr ""
+msgstr "Ezabatu {video_name} bideoa"
 
 #: cms/templates/js/publish-history.underscore
 msgid "Never published"
@@ -9688,7 +9913,7 @@ msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Path to Signature Image"
-msgstr ""
+msgstr "Sinaduraren irudirako bidea"
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Image must be in PNG format"
@@ -9696,15 +9921,15 @@ msgstr "Irudiak PNG formatua izan behar du"
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Upload Signature Image"
-msgstr ""
+msgstr "Kargatu sinaduraren irudia"
 
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "Unit Visibility"
-msgstr ""
+msgstr "Unitatearen ikusgarritasuna"
 
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "Section Visibility"
-msgstr ""
+msgstr "Atalaren ikusgarritasuna"
 
 #: cms/templates/js/staff-lock-editor.underscore
 msgid ""
@@ -9840,7 +10065,7 @@ msgstr ""
 
 #: cms/templates/js/transcript-organization-credentials.underscore
 msgid "Account"
-msgstr ""
+msgstr "Kontua"
 
 #: cms/templates/js/transcript-organization-credentials.underscore
 msgid ""
@@ -9849,11 +10074,11 @@ msgstr ""
 
 #: cms/templates/js/transcript-organization-credentials.underscore
 msgid "Enter the account information for your organization."
-msgstr ""
+msgstr "Idatzi konturaren informazioa zure erakunderako."
 
 #: cms/templates/js/transcript-organization-credentials.underscore
 msgid "API Key"
-msgstr ""
+msgstr "API gakoa"
 
 #: cms/templates/js/transcript-organization-credentials.underscore
 msgid "API Secret"
@@ -9865,19 +10090,19 @@ msgstr ""
 
 #: cms/templates/js/unit-access-editor.underscore
 msgid "Restrict access to:"
-msgstr ""
+msgstr "Mugatu sarbidea hona:"
 
 #: cms/templates/js/unit-access-editor.underscore
 msgid "Select a group type"
-msgstr ""
+msgstr "Aukeratu talde-mota"
 
 #: cms/templates/js/unit-access-editor.underscore
 msgid "Select one or more groups:"
-msgstr ""
+msgstr "Aukera talde bat edo gehiago:"
 
 #: cms/templates/js/unit-access-editor.underscore
 msgid "Deleted Group"
-msgstr ""
+msgstr "Ezabatutako taldea"
 
 #: cms/templates/js/unit-access-editor.underscore
 msgid ""
@@ -9922,7 +10147,7 @@ msgstr ""
 
 #: cms/templates/js/video-transcript-upload-status.underscore
 msgid "Read more"
-msgstr ""
+msgstr "Irakurri gehiago"
 
 #: cms/templates/js/video-transcripts.underscore
 msgid "Show transcripts ({totalTranscripts})"
@@ -9930,11 +10155,11 @@ msgstr ""
 
 #: cms/templates/js/video-transcripts.underscore
 msgid "No transcript uploaded."
-msgstr ""
+msgstr "Ez da transkripzioa kargatu."
 
 #: cms/templates/js/xblock-access-editor.underscore
 msgid "Set Access"
-msgstr ""
+msgstr "Ezarri sarbidea"
 
 #: cms/templates/js/xblock-string-field-editor.underscore
 #, python-format

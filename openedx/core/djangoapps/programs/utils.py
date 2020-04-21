@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Helper functions for working with Programs."""
-from __future__ import absolute_import
+
 
 import datetime
 import logging
@@ -26,13 +26,13 @@ from entitlements.models import CourseEntitlement
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.commerce.utils import EcommerceService
-from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.core.djangoapps.catalog.utils import get_fulfillable_course_runs_for_entitlement, get_programs
 from openedx.core.djangoapps.certificates.api import available_date_for_certificate
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.utils import get_credentials
+from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.core.djangoapps.programs import ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from student.models import CourseEnrollment
@@ -45,9 +45,14 @@ DEFAULT_ENROLLMENT_START_DATE = datetime.datetime(1900, 1, 1, tzinfo=utc)
 log = logging.getLogger(__name__)
 
 
-def get_program_marketing_url(programs_config):
+def get_program_marketing_url(programs_config, mobile_only=False):
     """Build a URL used to link to programs on the marketing site."""
-    return urljoin(settings.MKTG_URLS.get('ROOT'), programs_config.marketing_path).rstrip('/')
+    if mobile_only:
+        marketing_url = 'edxapp://course?programs'
+    else:
+        marketing_url = urljoin(settings.MKTG_URLS.get('ROOT'), programs_config.marketing_path).rstrip('/')
+
+    return marketing_url
 
 
 def attach_program_detail_url(programs, mobile_only=False):
@@ -633,6 +638,7 @@ class ProgramDataExtender(object):
         applicable_seat_types = set(seat for seat in self.data['applicable_seat_types'] if seat != 'credit')
 
         is_learner_eligible_for_one_click_purchase = self.data['is_program_eligible_for_one_click_purchase']
+        bundle_uuid = self.data.get('uuid')
         skus = []
         bundle_variant = 'full'
 
@@ -683,9 +689,18 @@ class ProgramDataExtender(object):
                 # The user specific program price is slow to calculate, so use switch to force the
                 # anonymous price for all users. See LEARNER-5555 for more details.
                 if is_anonymous or ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER.is_enabled():
-                    discount_data = api.baskets.calculate.get(sku=skus, is_anonymous=True)
+                    # The bundle uuid is necessary to see the program's discounted price
+                    if bundle_uuid:
+                        discount_data = api.baskets.calculate.get(sku=skus, is_anonymous=True, bundle=bundle_uuid)
+                    else:
+                        discount_data = api.baskets.calculate.get(sku=skus, is_anonymous=True)
                 else:
-                    discount_data = api.baskets.calculate.get(sku=skus, username=self.user.username)
+                    if bundle_uuid:
+                        discount_data = api.baskets.calculate.get(
+                            sku=skus, username=self.user.username, bundle=bundle_uuid
+                        )
+                    else:
+                        discount_data = api.baskets.calculate.get(sku=skus, username=self.user.username)
 
                 program_discounted_price = discount_data['total_incl_tax']
                 program_full_price = discount_data['total_incl_tax_excl_discounts']
@@ -841,7 +856,7 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
         return {name for name in chain(cls.__dict__, ProgramDataExtender.__dict__) if name.startswith(prefix)}
 
     def _attach_course_run_can_enroll(self, run_mode):
-        run_mode['can_enroll'] = bool(has_access(self.user, 'enroll', self.course_overview))
+        run_mode['can_enroll'] = bool(self.user.has_perm(ENROLL_IN_COURSE, self.course_overview))
 
     def _attach_course_run_certificate_url(self, run_mode):
         """

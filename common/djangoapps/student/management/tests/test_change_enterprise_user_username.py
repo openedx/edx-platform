@@ -2,7 +2,7 @@
 """
 Tests for the django management command `change_enterprise_user_username`.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import mock
 from django.contrib.auth.models import User

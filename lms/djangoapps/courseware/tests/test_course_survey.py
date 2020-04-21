@@ -2,7 +2,6 @@
 Python tests for the Survey workflows
 """
 
-from __future__ import absolute_import
 
 from collections import OrderedDict
 from copy import deepcopy
@@ -13,7 +12,7 @@ from django.urls import reverse
 from six.moves import range
 
 from common.test.utils import XssTestMixin
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from survey.models import SurveyAnswer, SurveyForm
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -102,7 +101,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
                     kwargs={'course_id': six.text_type(course.id)}
                 )
             )
-            self.assertEquals(resp.status_code, 200)
+            self.assertEqual(resp.status_code, 200)
 
     def test_visiting_course_without_survey(self):
         """
@@ -129,7 +128,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
                 kwargs={'course_id': six.text_type(self.course.id)}
             )
         )
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
 
     def test_visiting_course_with_existing_answers(self):
         """
@@ -139,7 +138,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
             self.postback_url,
             self.student_answers
         )
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
 
         self._assert_no_redirect(self.course)
 
@@ -176,7 +175,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
             self.postback_url,
             answers
         )
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
 
         self._assert_no_redirect(self.course)
 
@@ -187,7 +186,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
         )
 
         for answer_obj in answer_objs:
-            self.assertEquals(answer_obj.course_key, self.course.id)
+            self.assertEqual(answer_obj.course_key, self.course.id)
 
     def test_visiting_course_with_bogus_survey(self):
         """

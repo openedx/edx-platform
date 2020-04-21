@@ -6,7 +6,6 @@ If student does not yet answered - `num_inputs` numbers of text inputs.
 If student have answered - words he entered and cloud.
 """
 
-from __future__ import absolute_import
 
 import json
 import logging
@@ -148,11 +147,12 @@ class WordCloudModule(WordCloudFields, XModule):
         """
         list_to_return = []
         percents = 0
-        for num, word_tuple in enumerate(six.iteritems(top_words)):
+        sorted_top_words = sorted(top_words.items(), key=lambda x: x[0].lower())
+        for num, word_tuple in enumerate(sorted_top_words):
             if num == len(top_words) - 1:
                 percent = 100 - percents
             else:
-                percent = round(100.0 * word_tuple[1] / total_count)
+                percent = round((100.0 * word_tuple[1]) / total_count)
                 percents += percent
             list_to_return.append(
                 {

@@ -1,7 +1,7 @@
 """
 Slightly customized python-social-auth backend for SAML 2.0 support
 """
-from __future__ import absolute_import
+
 
 import logging
 from copy import deepcopy
@@ -11,7 +11,6 @@ from django.contrib.sites.models import Site
 from django.http import Http404
 from django.utils.functional import cached_property
 from django_countries import countries
-from enterprise.models import EnterpriseCustomerIdentityProvider, EnterpriseCustomerUser, PendingEnterpriseCustomerUser
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from six import text_type
 from social_core.backends.saml import OID_EDU_PERSON_ENTITLEMENT, SAMLAuth, SAMLIdentityProvider
@@ -20,8 +19,8 @@ from social_core.exceptions import AuthForbidden
 from openedx.core.djangoapps.theming.helpers import get_current_request
 from third_party_auth.exceptions import IncorrectConfigurationException
 
-STANDARD_SAML_PROVIDER_KEY = 'standard_saml_provider'
-SAP_SUCCESSFACTORS_SAML_KEY = 'sap_success_factors'
+STANDARD_SAML_PROVIDER_KEY = u'standard_saml_provider'
+SAP_SUCCESSFACTORS_SAML_KEY = u'sap_success_factors'
 log = logging.getLogger(__name__)
 
 
@@ -134,28 +133,9 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         """
         Override of SAMLAuth.disconnect to unlink the learner from enterprise customer if associated.
         """
-        from . import pipeline, provider
-        running_pipeline = pipeline.get(self.strategy.request)
-        provider_id = provider.Registry.get_from_pipeline(running_pipeline).provider_id
-        try:
-            user_email = kwargs.get('user').email
-        except AttributeError:
-            user_email = None
-
-        try:
-            enterprise_customer_idp = EnterpriseCustomerIdentityProvider.objects.get(provider_id=provider_id)
-        except EnterpriseCustomerIdentityProvider.DoesNotExist:
-            enterprise_customer_idp = None
-
-        if enterprise_customer_idp and user_email:
-            try:
-                # Unlink user email from Enterprise Customer.
-                EnterpriseCustomerUser.objects.unlink_user(
-                    enterprise_customer=enterprise_customer_idp.enterprise_customer, user_email=user_email
-                )
-            except (EnterpriseCustomerUser.DoesNotExist, PendingEnterpriseCustomerUser.DoesNotExist):
-                pass
-
+        from openedx.features.enterprise_support.api import unlink_enterprise_user_from_idp
+        user = kwargs.get('user', None)
+        unlink_enterprise_user_from_idp(self.strategy.request, user, self.name)
         return super(SAMLAuthBackend, self).disconnect(*args, **kwargs)
 
     def _check_entitlements(self, idp, attributes):
@@ -269,8 +249,7 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
 
     # Define the relationships between SAPSF record fields and Open edX logistration fields.
     default_field_mapping = {
-        'username': 'username',
-        'firstName': 'first_name',
+        'firstName': ['username', 'first_name'],
         'lastName': 'last_name',
         'defaultFullName': 'fullname',
         'email': 'email',
@@ -305,10 +284,14 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         field_mapping = self.field_mappings
         value_defaults = self.conf.get('attr_defaults', {})
         value_defaults = {key: value_defaults.get(value, '') for key, value in self.defaults_value_mapping.items()}
-        registration_fields = {
-            edx_name: response['d'].get(odata_name, value_defaults.get(odata_name, ''))
-            for odata_name, edx_name in field_mapping.items()
-        }
+        registration_fields = {}
+        for odata_name, edx_name in field_mapping.items():
+            if isinstance(edx_name, list):
+                for value in edx_name:
+                    registration_fields[value] = response['d'].get(odata_name, value_defaults.get(odata_name, ''))
+            else:
+                registration_fields[edx_name] = response['d'].get(odata_name, value_defaults.get(odata_name, ''))
+
         value_mapping = self.value_mappings
         for field, value in registration_fields.items():
             if field in value_mapping and value in value_mapping[field]:
@@ -508,6 +491,8 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         if self.invalid_configuration():
             return basic_details
         user_id = basic_details['username']
+        # endpoint_url is constructed from field_mappings setting of SAML Provider config.
+        # We convert field_mappings to make comma separated list of the fields which needs to be pulled from BizX
         fields = ','.join(self.field_mappings)
         endpoint_url = '{root_url}User(userId=\'{user_id}\')?$select={fields}'.format(
             root_url=self.odata_api_root_url,
@@ -517,9 +502,7 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         client = self.get_bizx_odata_api_client(user_id=user_id)
         if not client:
             return basic_details
-        transaction_data = {
-            'token_data': client.token_data
-        }
+
         try:
             response = client.get(
                 endpoint_url,
@@ -537,14 +520,9 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
             }
             self.log_bizx_api_exception(transaction_data, err)
             return basic_details
-        registration_fields = self.get_registration_fields(response)
-        # This statement is here for debugging purposes and should be removed when ENT-1500 is resolved.
-        if user_id != registration_fields.get('username'):
-            log.info(u'loggedinuser_id %s is different from BizX username %s',
-                     user_id,
-                     registration_fields.get('username'))
 
-        return registration_fields
+        log.info(u'[THIRD_PARTY_AUTH] BizX Odata response for user [%s] %s', user_id, response)
+        return self.get_registration_fields(response)
 
 
 def get_saml_idp_choices():

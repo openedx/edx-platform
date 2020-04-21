@@ -2,7 +2,6 @@
 Tests for the SignatureValidator class.
 """
 
-from __future__ import absolute_import
 
 import ddt
 from django.test import TestCase
@@ -111,10 +110,10 @@ class SignatureValidatorTest(TestCase):
         Verify that the signature validaton library method is called using the
         correct parameters derived from the HttpRequest.
         """
-        body = 'oauth_signature_method=HMAC-SHA1&oauth_version=1.0'
+        body = u'oauth_signature_method=HMAC-SHA1&oauth_version=1.0'
         content_type = 'application/x-www-form-urlencoded'
         request = RequestFactory().post('/url', body, content_type=content_type)
         headers = {'Content-Type': content_type}
         SignatureValidator(self.lti_consumer).verify(request)
         verify_mock.assert_called_once_with(
-            request.build_absolute_uri(), 'POST', body, headers)
+            request.build_absolute_uri(), 'POST', body.encode('utf-8'), headers)

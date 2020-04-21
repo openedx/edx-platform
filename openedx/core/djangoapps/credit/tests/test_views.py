@@ -2,7 +2,6 @@
 Tests for credit app views.
 """
 
-from __future__ import absolute_import, unicode_literals
 
 import datetime
 import json
@@ -14,7 +13,6 @@ from django.conf import settings
 from django.test import Client, TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
-from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.credit.models import (
@@ -33,6 +31,7 @@ from openedx.core.djangoapps.credit.tests.factories import (
     CreditRequestFactory
 )
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory, AccessTokenFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import AdminFactory, UserFactory
 from util.date_utils import to_timestamp
@@ -78,7 +77,7 @@ class AuthMixin(object):
 
     def test_oauth(self):
         """ Verify the endpoint supports authentication via OAuth 2.0. """
-        access_token = AccessTokenFactory(user=self.user, client=ClientFactory()).token
+        access_token = AccessTokenFactory(user=self.user, application=ApplicationFactory()).token
         headers = {
             'HTTP_AUTHORIZATION': 'Bearer ' + access_token
         }
@@ -160,8 +159,7 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
 
         # POSTs without a CSRF token should fail.
         response = client.post(self.path, data=json.dumps(data), content_type=JSON)
-        self.assertEqual(response.status_code, 403)
-        self.assertIn('CSRF', response.content)
+        self.assertContains(response, 'CSRF', status_code=403)
 
         # Retrieve a CSRF token
         response = client.get('/')
@@ -175,8 +173,8 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
     def test_oauth(self):
         """ Verify the endpoint supports OAuth, and only allows authorization for staff users. """
         user = UserFactory(is_staff=False)
-        oauth_client = ClientFactory.create()
-        access_token = AccessTokenFactory.create(user=user, client=oauth_client).token
+        oauth_client = ApplicationFactory.create()
+        access_token = AccessTokenFactory.create(user=user, application=oauth_client).token
         headers = {
             'HTTP_AUTHORIZATION': 'Bearer ' + access_token
         }
@@ -202,7 +200,7 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
         self.assertEqual(response.status_code, 201)
 
         # Verify the API returns the serialized CreditCourse
-        self.assertDictEqual(json.loads(response.content), data)
+        self.assertDictEqual(json.loads(response.content.decode('utf-8')), data)
 
         # Verify the CreditCourse was actually created
         course_key = CourseKey.from_string(course_id)
@@ -243,7 +241,7 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
         self.assertEqual(response.status_code, 200)
 
         # Verify the API returns the serialized CreditCourse
-        self.assertDictEqual(json.loads(response.content), self._serialize_credit_course(cc1))
+        self.assertDictEqual(json.loads(response.content.decode('utf-8')), self._serialize_credit_course(cc1))
 
     def test_list(self):
         """ Verify the endpoint supports listing all CreditCourse objects. """
@@ -255,7 +253,7 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
         self.assertEqual(response.status_code, 200)
 
         # Verify the API returns a list of serialized CreditCourse objects
-        self.assertListEqual(json.loads(response.content), expected)
+        self.assertListEqual(json.loads(response.content.decode('utf-8')), expected)
 
     def test_update(self):
         """ Verify the endpoint supports updating a CreditCourse object. """
@@ -269,7 +267,7 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
         self.assertEqual(response.status_code, 200)
 
         # Verify the serialized CreditCourse is returned
-        self.assertDictEqual(json.loads(response.content), data)
+        self.assertDictEqual(json.loads(response.content.decode('utf-8')), data)
 
         # Verify the data was persisted
         credit_course = CreditCourse.objects.get(course_key=credit_course.course_key)
@@ -378,7 +376,7 @@ class CreditProviderRequestCreateViewTests(ApiTestCaseMixin, UserMixin, TestCase
         self.assertEqual(request.status, 'pending')
 
         # Check request parameters
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         parameters = content['parameters']
 
         self.assertEqual(content['url'], self.provider.provider_url)

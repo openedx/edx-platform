@@ -1,5 +1,5 @@
 """Provides a function to convert html to plaintext."""
-from __future__ import absolute_import
+
 import logging
 from subprocess import PIPE, Popen
 
@@ -25,4 +25,4 @@ def html_to_text(html_message):
     if err_from_stderr:
         log.info(err_from_stderr)
 
-    return plaintext
+    return plaintext.decode()

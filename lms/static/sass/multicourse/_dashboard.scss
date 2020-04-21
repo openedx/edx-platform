@@ -531,7 +531,7 @@
           margin-bottom: $baseline;
         }
 
-        .ad-link {
+        .marketing-link {
           @include text-align(center);
 
           .btn-neutral {
@@ -564,6 +564,30 @@
               @include margin-right($baseline*0.25);
             }
           }
+        }
+      }
+    }
+
+    .wrapper-coaching {
+      border: 1px solid $border-color-l3;
+      margin: 20px 0;
+
+      .coaching-signup {
+        padding: 20px;
+
+        .coaching-prompt {
+          font-size: 20px;
+          line-height: 28px;
+          font-weight: bold;
+        }
+
+        .coaching-link .btn-neutral {
+          display: block;
+          text-align: center;
+          margin: 20px 20px 0 20px;
+          border-radius: 20px;
+          padding: 10px;
+          border: 1px solid theme-color('primary');
         }
       }
     }
@@ -1250,6 +1274,18 @@
       border-bottom-color: $verified-color-lvl4;
     }
 
+    .action-reverify {
+      @extend %btn-primary-error;
+      @extend %t-weight4;
+
+      display: block;
+
+      @include font-size(14);
+    }
+
+    .btn-reverify {
+      margin-top: ($baseline/2);
+    }
     .deco-arrow {
       @include triangle(($baseline/2), $verified-color-lvl4, up);
     }

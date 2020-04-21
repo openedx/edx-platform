@@ -2,7 +2,6 @@
 Store status messages in the database.
 """
 
-from __future__ import absolute_import
 
 import six
 from config_models.admin import ConfigurationModelAdmin
@@ -10,11 +9,13 @@ from config_models.models import ConfigurationModel
 from django.contrib import admin
 from django.core.cache import cache
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 from opaque_keys.edx.django.models import CourseKeyField
 
 from openedx.core.djangolib.markup import HTML
 
 
+@python_2_unicode_compatible
 class GlobalStatusMessage(ConfigurationModel):
     """
     Model that represents the current status message.
@@ -24,13 +25,13 @@ class GlobalStatusMessage(ConfigurationModel):
     message = models.TextField(
         blank=True,
         null=True,
-        help_text='<p>The contents of this field will be displayed as a warning banner on all views.</p>'
-                  '<p>To override the banner message for a specific course, refer to the Course Message configuration. '
-                  'Course Messages will only work if the global status message is enabled, so if you only want to add '
-                  'a banner to specific courses without adding a global status message, you should add a global status '
-                  'message with <strong>empty</strong> message text.</p>'
-                  '<p>Finally, disable the global status message by adding another empty message with "enabled" '
-                  'unchecked.</p>')
+        help_text=u'<p>The contents of this field will be displayed as a warning banner on all views.</p>'
+                  u'<p>To override the banner message for a specific course, refer to the Course Message configuration. '
+                  u'Course Messages will only work if the global status message is enabled, so if you only want to add '
+                  u'a banner to specific courses without adding a global status message, you should add a global status '
+                  u'message with <strong>empty</strong> message text.</p>'
+                  u'<p>Finally, disable the global status message by adding another empty message with "enabled" '
+                  u'unchecked.</p>')
 
     def full_message(self, course_key):
         """ Returns the full status message, including any course-specific status messages. """
@@ -51,10 +52,11 @@ class GlobalStatusMessage(ConfigurationModel):
         cache.set(cache_key, msg)
         return msg
 
-    def __unicode__(self):
+    def __str__(self):
         return "{} - {} - {}".format(self.change_date, self.enabled, self.message)
 
 
+@python_2_unicode_compatible
 class CourseMessage(models.Model):
     """
     Model that allows the administrator to specify banner messages for individual courses.
@@ -68,7 +70,7 @@ class CourseMessage(models.Model):
     course_key = CourseKeyField(max_length=255, blank=True, db_index=True)
     message = models.TextField(blank=True, null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return six.text_type(self.course_key)
 
 

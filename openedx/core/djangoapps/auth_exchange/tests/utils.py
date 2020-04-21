@@ -2,7 +2,6 @@
 Test utilities for OAuth access token exchange
 """
 
-from __future__ import absolute_import
 
 from django.conf import settings
 from social_django.models import Partial, UserSocialAuth
@@ -78,7 +77,7 @@ class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
         self._assert_error(
             self.data,
             "invalid_client",
-            u"{}_confidential is not a public client".format(self.client_id),
+            "{}_confidential is not a public client".format(self.client_id),
         )
 
     def test_inactive_user(self):

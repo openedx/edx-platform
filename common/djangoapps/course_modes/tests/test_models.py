@@ -4,7 +4,7 @@ when you run "manage.py test".
 
 Replace this with more appropriate tests for your application.
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import itertools
 from datetime import timedelta
@@ -15,11 +15,13 @@ from django.test import TestCase, override_settings
 from django.utils.timezone import now
 from mock import patch
 from opaque_keys.edx.locator import CourseLocator
+import six
 from six.moves import zip
 
 from course_modes.helpers import enrollment_mode_display
 from course_modes.models import CourseMode, Mode, get_cosmetic_display_price, invalidate_course_mode_cache
 from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -399,11 +401,11 @@ class CourseModeModelTest(TestCase):
 
         # Check the selectable modes, which should exclude credit
         selectable_modes = CourseMode.modes_for_course_dict(self.course_key)
-        self.assertItemsEqual(list(selectable_modes.keys()), expected_selectable_modes)
+        six.assertCountEqual(self, list(selectable_modes.keys()), expected_selectable_modes)
 
         # When we get all unexpired modes, we should see credit as well
         all_modes = CourseMode.modes_for_course_dict(self.course_key, only_selectable=False)
-        self.assertItemsEqual(list(all_modes.keys()), available_modes)
+        six.assertCountEqual(self, list(all_modes.keys()), available_modes)
 
     def _enrollment_display_modes_dicts(self, dict_type):
         """
@@ -520,6 +522,19 @@ class CourseModeModelTest(TestCase):
             self.create_mode(mode, mode, 10)
 
         self.assertEqual(CourseMode.is_masters_only(self.course_key), expected_is_masters_only)
+
+
+class TestCourseOverviewIntegration(ModuleStoreTestCase):
+    def test_course_overview_version_update(self):
+        course = CourseFactory.create()
+        course_overview = CourseOverview.get_from_id(course.id)
+        course_overview.version -= 1
+        course_overview.save()
+        course_mode = CourseModeFactory.create(course_id=course_overview.id)
+
+        assert CourseMode.objects.filter(pk=course_mode.pk).exists()
+        CourseOverview.get_from_id(course.id)
+        assert CourseMode.objects.filter(pk=course_mode.pk).exists()
 
 
 class TestDisplayPrices(ModuleStoreTestCase):

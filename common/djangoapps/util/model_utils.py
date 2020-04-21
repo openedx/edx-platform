@@ -1,7 +1,7 @@
 """
 Utilities for django models.
 """
-from __future__ import absolute_import
+
 
 import six
 from django.conf import settings
@@ -114,7 +114,7 @@ def truncate_fields(old_value, new_value):
     """
     # Compute the maximum value length so that two copies can fit into the maximum event size
     # in addition to all the other fields recorded.
-    max_value_length = settings.TRACK_MAX_EVENT / 4
+    max_value_length = settings.TRACK_MAX_EVENT // 4
 
     serialized_old_value, old_was_truncated = _get_truncated_setting_value(old_value, max_length=max_value_length)
     serialized_new_value, new_was_truncated = _get_truncated_setting_value(new_value, max_length=max_value_length)

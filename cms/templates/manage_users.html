@@ -1,5 +1,8 @@
+## xss-lint: disable=mako-missing-default
 <%inherit file="base.html" />
 <%!
+import six
+
 from django.utils.translation import ugettext as _
 from django.urls import reverse
 
@@ -106,6 +109,7 @@ from openedx.core.djangolib.js_utils import (
       % if show_transfer_ownership_hint:
       <div class="bit">
         <h3 class="title-3">${_("Transferring Ownership")}</h3>
+        # xss-lint: disable=python-wrap-html
         <p>${_("Every course must have an Admin. If you are the Admin and you want to transfer ownership of the course, click <strong>Add admin access</strong> to make another user the Admin, then ask that user to remove you from the Course Team list.")}</p>
       </div>
       % endif
@@ -117,9 +121,11 @@ from openedx.core.djangolib.js_utils import (
 <%block name="requirejs">
   require(["js/factories/manage_users"], function(ManageCourseUsersFactory) {
       ManageCourseUsersFactory(
+        // xss-lint: disable=mako-invalid-js-filter
         "${context_course.display_name_with_default | h}",
         ${users | n, dump_js_escaped_json},
-        "${reverse('course_team_handler', kwargs={'course_key_string': unicode(context_course.id), 'email': '@@EMAIL@@'}) | n, js_escaped_string}",
+        // xss-lint: disable=mako-invalid-js-filter
+        "${reverse('course_team_handler', kwargs={'course_key_string': six.text_type(context_course.id), 'email': '@@EMAIL@@'}) | n, js_escaped_string}",
         ${request.user.id | n, dump_js_escaped_json},
         ${allow_actions | n, dump_js_escaped_json}
       );

@@ -1,7 +1,7 @@
 """
 Pages page for a course.
 """
-from __future__ import absolute_import
+
 
 from bok_choy.promise import EmptyPromise
 from selenium.webdriver import ActionChains
@@ -97,7 +97,7 @@ class PagesPage(CoursePage):
             '.wrapper-component-action-header .component-actions',
             "Tab's edit button is visible"
         )
-        return self.q(css='div.xmodule_StaticTabModule').text
+        return self.q(css='div.xmodule_StaticTabBlock').text
 
     @property
     def built_in_page_titles(self):

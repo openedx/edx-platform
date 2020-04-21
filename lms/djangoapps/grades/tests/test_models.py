@@ -1,7 +1,7 @@
 """
 Unit tests for grades models.
 """
-from __future__ import absolute_import
+
 
 import json
 from base64 import b64encode
@@ -28,7 +28,6 @@ from lms.djangoapps.grades.models import (
     PersistentCourseGrade,
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride,
-    PersistentSubsectionGradeOverrideHistory,
     VisibleBlocks
 )
 from student.tests.factories import UserFactory
@@ -166,7 +165,7 @@ class VisibleBlocksTest(GradesModelTestCase):
             'version': BLOCK_RECORD_LIST_VERSION,
         }
         expected_json = json.dumps(expected_data, separators=(',', ':'), sort_keys=True)
-        expected_hash = b64encode(sha1(expected_json).digest())
+        expected_hash = b64encode(sha1(expected_json.encode('utf-8')).digest()).decode('utf-8')
         self.assertEqual(expected_data, json.loads(vblocks.blocks_json))
         self.assertEqual(expected_json, vblocks.blocks_json)
         self.assertEqual(expected_hash, vblocks.hashed)
@@ -320,15 +319,14 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
         grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
         self.assertEqual(self.params['earned_all'], grade.earned_all)
         self.assertEqual(self.params['earned_graded'], grade.earned_graded)
-
+        history = override.get_history()
+        self.assertEqual(1, len(list(history)))
+        self.assertEqual('+', list(history)[0].history_type)
         # Any score values that aren't specified should use the values from grade as defaults
         self.assertEqual(0, override.earned_all_override)
         self.assertEqual(0, override.earned_graded_override)
         self.assertEqual(grade.possible_all, override.possible_all_override)
         self.assertEqual(grade.possible_graded, override.possible_graded_override)
-
-        # An override history record should be created
-        self.assertEqual(1, PersistentSubsectionGradeOverrideHistory.objects.filter(override_id=override.id).count())
 
     def _assert_tracker_emitted_event(self, tracker_mock, grade):
         """

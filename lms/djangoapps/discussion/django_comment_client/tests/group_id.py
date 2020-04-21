@@ -1,5 +1,5 @@
 # pylint: disable=missing-docstring
-from __future__ import absolute_import
+
 
 import json
 import re
@@ -32,10 +32,10 @@ class GroupIdAssertionMixin(object):
 
     def _assert_html_response_contains_group_info(self, response):
         group_info = {"group_id": None, "group_name": None}
-        match = re.search(r'"group_id": (\d*),', response.content)
+        match = re.search(r'"group_id": (\d*),', response.content.decode('utf-8'))
         if match and match.group(1) != '':
             group_info["group_id"] = int(match.group(1))
-        match = re.search(r'"group_name": "(\w*)",', response.content)
+        match = re.search(r'"group_name": "(\w*)"', response.content.decode('utf-8'))
         if match:
             group_info["group_name"] = match.group(1)
         self._assert_thread_contains_group_info(group_info)
@@ -47,7 +47,7 @@ class GroupIdAssertionMixin(object):
             occurrence of a thread model within that payload).  if None is
             passed, the identity function is assumed.
         """
-        payload = json.loads(response.content)
+        payload = json.loads(response.content.decode('utf-8'))
         thread = extract_thread(payload) if extract_thread else payload
         self._assert_thread_contains_group_info(thread)
 
@@ -69,7 +69,7 @@ class CohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
         pass
 
     def test_cohorted_topic_student_without_group_id(self, mock_request):
-        self.call_view(mock_request, "cohorted_topic", self.student, None, pass_group_id=False)
+        self.call_view(mock_request, "cohorted_topic", self.student, '', pass_group_id=False)
         self._assert_comments_service_called_with_group_id(mock_request, self.student_cohort.id)
 
     def test_cohorted_topic_student_none_group_id(self, mock_request):
@@ -85,7 +85,7 @@ class CohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
         self._assert_comments_service_called_with_group_id(mock_request, self.student_cohort.id)
 
     def test_cohorted_topic_moderator_without_group_id(self, mock_request):
-        self.call_view(mock_request, "cohorted_topic", self.moderator, None, pass_group_id=False)
+        self.call_view(mock_request, "cohorted_topic", self.moderator, '', pass_group_id=False)
         self._assert_comments_service_called_without_group_id(mock_request)
 
     def test_cohorted_topic_moderator_none_group_id(self, mock_request):
@@ -133,11 +133,11 @@ class NonCohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
         pass
 
     def test_non_cohorted_topic_student_without_group_id(self, mock_request):
-        self.call_view(mock_request, "non_cohorted_topic", self.student, None, pass_group_id=False)
+        self.call_view(mock_request, "non_cohorted_topic", self.student, '', pass_group_id=False)
         self._assert_comments_service_called_without_group_id(mock_request)
 
     def test_non_cohorted_topic_student_none_group_id(self, mock_request):
-        self.call_view(mock_request, "non_cohorted_topic", self.student, None)
+        self.call_view(mock_request, "non_cohorted_topic", self.student, '')
         self._assert_comments_service_called_without_group_id(mock_request)
 
     def test_non_cohorted_topic_student_with_own_group_id(self, mock_request):
@@ -149,11 +149,11 @@ class NonCohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
         self._assert_comments_service_called_without_group_id(mock_request)
 
     def test_non_cohorted_topic_moderator_without_group_id(self, mock_request):
-        self.call_view(mock_request, "non_cohorted_topic", self.moderator, None, pass_group_id=False)
+        self.call_view(mock_request, "non_cohorted_topic", self.moderator, '', pass_group_id=False)
         self._assert_comments_service_called_without_group_id(mock_request)
 
     def test_non_cohorted_topic_moderator_none_group_id(self, mock_request):
-        self.call_view(mock_request, "non_cohorted_topic", self.moderator, None)
+        self.call_view(mock_request, "non_cohorted_topic", self.moderator, '')
         self._assert_comments_service_called_without_group_id(mock_request)
 
     def test_non_cohorted_topic_moderator_with_own_group_id(self, mock_request):
@@ -170,9 +170,12 @@ class NonCohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
         self._assert_comments_service_called_without_group_id(mock_request)
 
     def test_team_discussion_id_not_cohorted(self, mock_request):
-        team = CourseTeamFactory(course_id=self.course.id)
+        team = CourseTeamFactory(
+            course_id=self.course.id,
+            topic_id='topic-id'
+        )
 
         team.add_user(self.student)
-        self.call_view(mock_request, team.discussion_topic_id, self.student, None)
+        self.call_view(mock_request, team.discussion_topic_id, self.student, '')
 
         self._assert_comments_service_called_without_group_id(mock_request)

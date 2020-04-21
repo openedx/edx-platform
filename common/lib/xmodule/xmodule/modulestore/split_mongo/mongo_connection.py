@@ -1,7 +1,7 @@
 """
 Segregation of pymongo functions from the data modeling mechanisms for split modulestore.
 """
-from __future__ import absolute_import
+
 
 import datetime
 import logging
@@ -14,7 +14,7 @@ from time import time
 import pymongo
 import pytz
 import six
-import six.moves.cPickle as pickle
+from six.moves import cPickle as pickle
 from contracts import check, new_contract
 from mongodb_proxy import autoretry_read
 # Import this just to export it
@@ -226,20 +226,29 @@ class CourseStructureCache(object):
             return None
 
         with TIMER.timer("CourseStructureCache.get", course_context) as tagger:
-            compressed_pickled_data = self.cache.get(key)
-            tagger.tag(from_cache=str(compressed_pickled_data is not None).lower())
+            try:
+                compressed_pickled_data = self.cache.get(key)
+                tagger.tag(from_cache=str(compressed_pickled_data is not None).lower())
 
-            if compressed_pickled_data is None:
-                # Always log cache misses, because they are unexpected
-                tagger.sample_rate = 1
+                if compressed_pickled_data is None:
+                    # Always log cache misses, because they are unexpected
+                    tagger.sample_rate = 1
+                    return None
+
+                tagger.measure('compressed_size', len(compressed_pickled_data))
+
+                pickled_data = zlib.decompress(compressed_pickled_data)
+                tagger.measure('uncompressed_size', len(pickled_data))
+
+                if six.PY2:
+                    return pickle.loads(pickled_data)
+                else:
+                    return pickle.loads(pickled_data, encoding='latin-1')
+            except Exception:
+                # The cached data is corrupt in some way, get rid of it.
+                log.warning("CourseStructureCache: Bad data in cache for %s", course_context)
+                self.cache.delete(key)
                 return None
-
-            tagger.measure('compressed_size', len(compressed_pickled_data))
-
-            pickled_data = zlib.decompress(compressed_pickled_data)
-            tagger.measure('uncompressed_size', len(pickled_data))
-
-            return pickle.loads(pickled_data)
 
     def set(self, key, structure, course_context=None):
         """Given a structure, will pickle, compress, and write to cache."""
@@ -247,7 +256,7 @@ class CourseStructureCache(object):
             return None
 
         with TIMER.timer("CourseStructureCache.set", course_context) as tagger:
-            pickled_data = pickle.dumps(structure, pickle.HIGHEST_PROTOCOL)
+            pickled_data = pickle.dumps(structure, 4)  # Protocol can't be incremented until cache is cleared
             tagger.measure('uncompressed_size', len(pickled_data))
 
             # 1 = Fastest (slightly larger results)
@@ -287,9 +296,11 @@ class MongoConnection(object):
         """
         Check that the db is reachable.
         """
-        if self.database.connection.alive():
+        try:
+            # The ismaster command is cheap and does not require auth.
+            self.database.client.admin.command('ismaster')
             return True
-        else:
+        except pymongo.errors.ConnectionFailure:
             raise HeartbeatFailure("Can't connect to {}".format(self.database.name), 'mongo')
 
     def get_structure(self, key, course_context=None):
@@ -412,7 +423,7 @@ class MongoConnection(object):
         """
         with TIMER.timer("insert_structure", course_context) as tagger:
             tagger.measure("blocks", len(structure["blocks"]))
-            self.structures.insert(structure_to_mongo(structure, course_context))
+            self.structures.insert_one(structure_to_mongo(structure, course_context))
 
     def get_course_index(self, key, ignore_case=False):
         """
@@ -493,7 +504,7 @@ class MongoConnection(object):
         """
         with TIMER.timer("insert_course_index", course_context):
             course_index['last_update'] = datetime.datetime.now(pytz.utc)
-            self.course_index.insert(course_index)
+            self.course_index.insert_one(course_index)
 
     def update_course_index(self, course_index, from_index=None, course_context=None):
         """
@@ -516,7 +527,7 @@ class MongoConnection(object):
                     'run': course_index['run'],
                 }
             course_index['last_update'] = datetime.datetime.now(pytz.utc)
-            self.course_index.update(query, course_index, upsert=False,)
+            self.course_index.replace_one(query, course_index, upsert=False,)
 
     def delete_course_index(self, course_key):
         """
@@ -555,7 +566,7 @@ class MongoConnection(object):
         with TIMER.timer("insert_definition", course_context) as tagger:
             tagger.measure('fields', len(definition['fields']))
             tagger.tag(block_type=definition['block_type'])
-            self.definitions.insert(definition)
+            self.definitions.insert_one(definition)
 
     def ensure_indexes(self):
         """
@@ -580,13 +591,7 @@ class MongoConnection(object):
         """
         Closes any open connections to the underlying databases
         """
-        self.database.connection.close()
-
-    def mongo_wire_version(self):
-        """
-        Returns the wire version for mongo. Only used to unit tests which instrument the connection.
-        """
-        return self.database.connection.max_wire_version
+        self.database.client.close()
 
     def _drop_database(self, database=True, collections=True, connections=True):
         """
@@ -600,7 +605,7 @@ class MongoConnection(object):
 
         If connections is True, then close the connection to the database as well.
         """
-        connection = self.database.connection
+        connection = self.database.client
 
         if database:
             connection.drop_database(self.database.name)

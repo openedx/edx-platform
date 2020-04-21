@@ -1,5 +1,6 @@
 """ Command line script to change user enrollments. """
 
+
 import logging
 
 from django.core.management.base import BaseCommand, CommandError

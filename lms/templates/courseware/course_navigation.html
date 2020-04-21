@@ -4,7 +4,7 @@
 <%namespace name='static' file='/static_content.html'/>
 
 <%!
-from courseware.tabs import get_course_tab_list
+from lms.djangoapps.courseware.tabs import get_course_tab_list
 from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import ugettext as _
@@ -35,7 +35,7 @@ if course is not None:
 
 % if disable_tabs is UNDEFINED or not disable_tabs:
     <%
-    tab_list = get_course_tab_list(request, course)
+    tab_list = get_course_tab_list(request.user, course)
     %>
     % if uses_bootstrap:
         <nav class="navbar course-tabs pb-0 navbar-expand" aria-label="${_('Course')}">

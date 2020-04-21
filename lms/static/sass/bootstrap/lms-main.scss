@@ -15,6 +15,7 @@ $static-path: '../..';
 @import 'layouts';
 @import 'components';
 @import 'course/layout/courseware_preview';
+@import 'course/layout/reset_deadlines';
 @import 'shared/modal';
 @import 'shared/help-tab';
 
@@ -25,7 +26,9 @@ $static-path: '../..';
 @import 'features/course-sock';
 @import 'features/course-upgrade-message';
 @import 'features/course-duration-limits';
-
+@import 'features/enterprise-learner-portal-banner';
+@import 'features/first-purchase-banner';
+@import 'features/next-up-banner';
 
 // Individual Pages
 @import "views/program-marketing-page";

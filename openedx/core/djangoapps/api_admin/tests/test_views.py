@@ -1,6 +1,5 @@
 """ Tests for the api_admin app's views. """
 
-from __future__ import absolute_import
 
 import json
 
@@ -138,8 +137,7 @@ class ApiRequestStatusViewTest(ApiAdminTest):
         """
         ApiAccessRequestFactory(user=self.user, status=status)
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(expected, response.content)
+        self.assertContains(response, expected)
 
     def test_get_with_existing_application(self):
         """
@@ -149,11 +147,9 @@ class ApiRequestStatusViewTest(ApiAdminTest):
         ApiAccessRequestFactory(user=self.user, status=ApiAccessRequest.APPROVED)
         application = ApplicationFactory(user=self.user)
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-        unicode_content = response.content.decode('utf-8')
-        self.assertIn(application.client_secret, unicode_content)
-        self.assertIn(application.client_id, unicode_content)
-        self.assertIn(application.redirect_uris, unicode_content)
+        self.assertContains(response, application.client_secret)
+        self.assertContains(response, application.client_id)
+        self.assertContains(response, application.redirect_uris)
 
     def test_get_anonymous(self):
         """Verify that users must be logged in to see the page."""
@@ -208,7 +204,7 @@ class ApiRequestStatusViewTest(ApiAdminTest):
             'name': 'test.com',
             'redirect_uris': 'not a url'
         })
-        self.assertIn('Enter a valid URL.', response.content)
+        self.assertContains(response, 'Enter a valid URL.')
 
 
 @skip_unless_lms
@@ -222,8 +218,7 @@ class ApiTosViewTest(ApiAdminTest):
         """
         url = reverse('api_admin:api-tos')
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('Terms of Service', response.content)
+        self.assertContains(response, 'Terms of Service')
 
 
 class CatalogTest(ApiAdminTest):
@@ -293,8 +288,7 @@ class CatalogListViewTest(CatalogTest):
         catalog = CatalogFactory(viewers=[self.catalog_user.username])
         self.mock_catalog_endpoint({'results': [catalog.attributes]})
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(catalog.name, response.content.decode('utf-8'))
+        self.assertContains(response, catalog.name)
 
     @httpretty.activate
     def test_get_no_catalogs(self):
@@ -346,8 +340,7 @@ class CatalogEditViewTest(CatalogTest):
     def test_get(self):
         self.mock_catalog_endpoint(self.catalog.attributes, catalog_id=self.catalog.id)
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(self.catalog.name, response.content.decode('utf-8'))
+        self.assertContains(response, self.catalog.name)
 
     @httpretty.activate
     def test_delete(self):
@@ -403,9 +396,12 @@ class CatalogPreviewViewTest(CatalogTest):
         )
         response = self.client.get(self.url, {'q': '*'})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content), data)
+        self.assertEqual(json.loads(response.content.decode('utf-8')), data)
 
     def test_get_without_query(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content), {'count': 0, 'results': [], 'next': None, 'prev': None})
+        self.assertEqual(
+            json.loads(response.content.decode('utf-8')),
+            {'count': 0, 'results': [], 'next': None, 'prev': None}
+        )

@@ -2,9 +2,9 @@
 A managment command that can be used to set up Schedules with various configurations for testing.
 """
 
-from __future__ import absolute_import
 
 import datetime
+from textwrap import dedent
 
 import factory
 import pytz
@@ -26,21 +26,21 @@ class ThreeDayNudgeSchedule(ScheduleFactory):
     """
     A ScheduleFactory that creates a Schedule set up for a 3-day nudge email.
     """
-    start = factory.Faker('date_time_between', start_date='-3d', end_date='-3d', tzinfo=pytz.UTC)
+    start_date = factory.Faker('date_time_between', start_date='-3d', end_date='-3d', tzinfo=pytz.UTC)
 
 
 class TenDayNudgeSchedule(ScheduleFactory):
     """
     A ScheduleFactory that creates a Schedule set up for a 10-day nudge email.
     """
-    start = factory.Faker('date_time_between', start_date='-10d', end_date='-10d', tzinfo=pytz.UTC)
+    start_date = factory.Faker('date_time_between', start_date='-10d', end_date='-10d', tzinfo=pytz.UTC)
 
 
 class UpgradeReminderSchedule(ScheduleFactory):
     """
     A ScheduleFactory that creates a Schedule set up for a 2-days-remaining upgrade reminder.
     """
-    start = factory.Faker('past_datetime', tzinfo=pytz.UTC)
+    start_date = factory.Faker('past_datetime', tzinfo=pytz.UTC)
     upgrade_deadline = factory.Faker('date_time_between', start_date='+2d', end_date='+2d', tzinfo=pytz.UTC)
 
 
@@ -48,7 +48,7 @@ class ContentHighlightSchedule(ScheduleFactory):
     """
     A ScheduleFactory that creates a Schedule set up for a course highlights email.
     """
-    start = factory.Faker('date_time_between', start_date='-7d', end_date='-7d', tzinfo=pytz.UTC)
+    start_date = factory.Faker('date_time_between', start_date='-7d', end_date='-7d', tzinfo=pytz.UTC)
     experience = factory.RelatedFactory(ScheduleExperienceFactory, 'schedule', experience_type=ScheduleExperience.EXPERIENCES.course_updates)
 
 
@@ -57,6 +57,7 @@ class Command(BaseCommand):
     A management command that generates schedule objects for all expected schedule email types, so that it is easy to
     generate test emails of all available types.
     """
+    help = dedent(__doc__).strip()
 
     def handle(self, *args, **options):
         courses = modulestore().get_courses()

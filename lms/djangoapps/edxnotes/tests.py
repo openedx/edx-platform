@@ -1,7 +1,7 @@
 """
 Tests for the EdxNotes app.
 """
-from __future__ import absolute_import
+
 
 import json
 from contextlib import contextmanager
@@ -10,6 +10,7 @@ from unittest import skipUnless
 
 import ddt
 import jwt
+import six
 from six import text_type
 from six.moves.urllib.parse import urlparse, parse_qs  # pylint: disable=import-error
 from django.conf import settings
@@ -21,9 +22,9 @@ from django.urls import reverse
 from mock import MagicMock, patch
 from oauth2_provider.models import Application
 
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module_for_descriptor
-from courseware.tabs import get_course_tab_list
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.module_render import get_module_for_descriptor
+from lms.djangoapps.courseware.tabs import get_course_tab_list
 from edxmako.shortcuts import render_to_string
 from edxnotes import helpers
 from edxnotes.decorators import edxnotes
@@ -169,6 +170,13 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         Tests that get_html is not wrapped when problem is rendered in Studio.
         """
         self.problem.system.is_author_mode = True
+        self.assertEqual("original_get_html", self.problem.get_html())
+
+    def test_edxnotes_blockstore_runtime(self):
+        """
+        Tests that get_html is not wrapped when problem is rendered by Blockstore runtime.
+        """
+        del self.problem.descriptor.runtime.modulestore
         self.assertEqual("original_get_html", self.problem.get_html())
 
     def test_edxnotes_harvard_notes_enabled(self):
@@ -332,9 +340,10 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     }
                 ]
             }
-        )
+        ).encode('utf-8')
 
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             {
                 "count": 2,
                 "current_page": 1,
@@ -401,7 +410,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         Tests the result if incorrect json is received.
         """
-        mock_get.return_value.content = "Error"
+        mock_get.return_value.content = b"Error"
         self.assertRaises(EdxNotesParseError, helpers.get_notes, self.request, self.course)
 
     @patch("edxnotes.helpers.requests.get", autospec=True)
@@ -409,7 +418,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         Tests the result if an empty response is received.
         """
-        mock_get.return_value.content = json.dumps({})
+        mock_get.return_value.content = json.dumps({}).encode('utf-8')
         self.assertRaises(EdxNotesParseError, helpers.get_notes, self.request, self.course)
 
     @patch("edxnotes.helpers.requests.get", autospec=True)
@@ -438,9 +447,10 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     u"updated": datetime(2014, 11, 19, 8, 6, 16, 00000).isoformat(),
                 }
             ]
-        })
+        }).encode('utf-8')
 
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             {
                 "count": 2,
                 "current_page": 1,
@@ -507,7 +517,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         Tests the result if incorrect json is received.
         """
-        mock_get.return_value.content = "Error"
+        mock_get.return_value.content = b"Error"
         self.assertRaises(EdxNotesParseError, helpers.get_notes, self.request, self.course)
 
     @patch("edxnotes.helpers.requests.get", autospec=True)
@@ -515,7 +525,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         Tests the result if incorrect data structure is received.
         """
-        mock_get.return_value.content = json.dumps({"1": 2})
+        mock_get.return_value.content = json.dumps({"1": 2}).encode('utf-8')
         self.assertRaises(EdxNotesParseError, helpers.get_notes, self.request, self.course)
 
     @patch("edxnotes.helpers.requests.get", autospec=True)
@@ -523,8 +533,9 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         Tests no results.
         """
-        mock_get.return_value.content = json.dumps(NOTES_API_EMPTY_RESPONSE)
-        self.assertItemsEqual(
+        mock_get.return_value.content = json.dumps(NOTES_API_EMPTY_RESPONSE).encode('utf-8')
+        six.assertCountEqual(
+            self,
             NOTES_VIEW_EMPTY_RESPONSE,
             helpers.get_notes(self.request, self.course)
         )
@@ -571,7 +582,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             },
         ]
 
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             [{
                 u"quote": u"quote text",
                 u"text": u"text",
@@ -617,7 +629,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         ]
         self.html_module_2.visible_to_staff_only = True
         self.store.update_item(self.html_module_2, self.user.id)
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             [{
                 u"quote": u"quote text",
                 u"text": u"text",
@@ -660,8 +673,10 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat(),
         }]
 
-        self.assertItemsEqual(
-            [], helpers.preprocess_collection(self.user, self.course, initial_collection)
+        six.assertCountEqual(
+            self,
+            [],
+            helpers.preprocess_collection(self.user, self.course, initial_collection)
         )
 
     @override_settings(NOTES_DISABLED_TABS=['course_structure', 'tags'])
@@ -684,7 +699,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             },
         ]
 
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             [
                 {
 
@@ -987,9 +1003,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         """
         def has_notes_tab(user, course):
             """Returns true if the "Notes" tab is shown."""
-            request = RequestFactory().request()
-            request.user = user
-            tabs = get_course_tab_list(request, course)
+            tabs = get_course_tab_list(user, course)
             return len([tab for tab in tabs if tab.type == 'edxnotes']) == 1
 
         self.assertFalse(has_notes_tab(self.user, self.course))
@@ -1045,7 +1059,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         mock_search.return_value = NOTES_VIEW_EMPTY_RESPONSE
         enable_edxnotes_for_the_course(self.course, self.user.id)
         response = self.client.get(self.notes_url, {"text": "test"})
-        self.assertEqual(json.loads(response.content), NOTES_VIEW_EMPTY_RESPONSE)
+        self.assertEqual(json.loads(response.content.decode('utf-8')), NOTES_VIEW_EMPTY_RESPONSE)
         self.assertEqual(response.status_code, 200)
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": False})
@@ -1065,8 +1079,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         mock_search.side_effect = EdxNotesServiceUnavailable
         enable_edxnotes_for_the_course(self.course, self.user.id)
         response = self.client.get(self.notes_url, {"text": "test"})
-        self.assertEqual(response.status_code, 500)
-        self.assertIn("error", response.content)
+        self.assertContains(response, "error", status_code=500)
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
     @patch("edxnotes.views.get_notes", autospec=True)
@@ -1078,8 +1091,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         mock_search.side_effect = EdxNotesParseError
         enable_edxnotes_for_the_course(self.course, self.user.id)
         response = self.client.get(self.notes_url, {"text": "test"})
-        self.assertEqual(response.status_code, 500)
-        self.assertIn("error", response.content)
+        self.assertContains(response, "error", status_code=500)
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
     def test_get_id_token(self):
@@ -1192,7 +1204,7 @@ class EdxNotesRetireAPITest(ModuleStoreTestCase):
         """
         Tests that 204 response is received on success.
         """
-        mock_post.return_value.content = ''
+        mock_post.return_value.content = b''
         mock_post.return_value.status_code = 204
         headers = self._build_jwt_headers(self.superuser)
         response = self.client.post(

@@ -12,7 +12,7 @@ are consistent across the LMS and other sites (such as
 the marketing site and blog).
 
 """
-from __future__ import absolute_import
+
 
 import logging
 
@@ -21,11 +21,11 @@ from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+from six.moves.urllib.parse import urljoin
 
 from branding.models import BrandingApiConfig
 from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-
 
 log = logging.getLogger("edx.footer")
 EMPTY_URL = '#'
@@ -221,20 +221,23 @@ def _build_support_form_url(full_path=False):
     return contact_us_page
 
 
-def _build_help_center_url(language=settings.LANGUAGE_CODE):
+def _build_help_center_url(language):
     """
-    Return the help-center URL based on the
-    language selected on the homepage.
+    Return the help-center URL based on the language selected on the homepage.
+
     :param language: selected language
     :return: help-center URL
     """
     support_url = settings.SUPPORT_SITE_LINK
-    enabled_languages = {
-        'en': 'hc/en-us',
-        'es': 'hc/es-419'
-    }
-    if language in enabled_languages:
-        support_url += '/' + enabled_languages[language]
+    # Changing the site url only for the Edx.org and not for OpenEdx.
+    if support_url and 'support.edx.org' in support_url:
+        enabled_languages = {
+            'en': 'hc/en-us',
+            'es-419': 'hc/es-419'
+        }
+        if language in enabled_languages:
+            support_url = urljoin(support_url, enabled_languages[language])
+
     return support_url
 
 
@@ -243,7 +246,7 @@ def _footer_connect_links(language=settings.LANGUAGE_CODE):
     links = [
         ("blog", (marketing_link("BLOG"), _("Blog"))),
         ("contact", (_build_support_form_url(full_path=True), _("Contact Us"))),
-        ("help-center", (_build_help_center_url(settings.LANGUAGE_CODE), _("Help Center"))),
+        ("help-center", (_build_help_center_url(language), _("Help Center"))),
     ]
 
     if language == settings.LANGUAGE_CODE:
@@ -278,7 +281,7 @@ def _footer_navigation_links(language=settings.LANGUAGE_CODE):
             _(u"{platform_name} for Business").format(platform_name=platform_name)
         )),
         ("blog", (marketing_link("BLOG"), _("Blog"))),
-        ("help-center", (_build_help_center_url(settings.LANGUAGE_CODE), _("Help Center"))),
+        ("help-center", (_build_help_center_url(language), _("Help Center"))),
         ("contact", (_build_support_form_url(), _("Contact"))),
         ("careers", (marketing_link("CAREERS"), _("Careers"))),
         ("donate", (marketing_link("DONATE"), _("Donate"))),

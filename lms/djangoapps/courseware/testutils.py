@@ -2,7 +2,6 @@
 Common test utilities for courseware functionality
 """
 
-from __future__ import absolute_import
 
 from abc import ABCMeta, abstractmethod
 from datetime import datetime, timedelta
@@ -156,9 +155,9 @@ class RenderXBlockTestMixin(six.with_metaclass(ABCMeta, object)):
         return response
 
     @ddt.data(
-        ('vertical_block', ModuleStoreEnum.Type.mongo, 11),
+        ('vertical_block', ModuleStoreEnum.Type.mongo, 13),
         ('vertical_block', ModuleStoreEnum.Type.split, 6),
-        ('html_block', ModuleStoreEnum.Type.mongo, 12),
+        ('html_block', ModuleStoreEnum.Type.mongo, 14),
         ('html_block', ModuleStoreEnum.Type.split, 6),
     )
     @ddt.unpack
@@ -215,7 +214,7 @@ class RenderXBlockTestMixin(six.with_metaclass(ABCMeta, object)):
         Helper method used by test_success_enrolled_staff because one test
         class using this mixin has an increased number of mongo (only) queries.
         """
-        return 5
+        return 9
 
     def test_success_unenrolled_staff(self):
         self.setup_course()

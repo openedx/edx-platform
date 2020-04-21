@@ -1,14 +1,14 @@
 """
 Views for the maintenance app.
 """
-from __future__ import absolute_import
+
 
 import logging
 
 import six
-from django.core.urlresolvers import reverse, reverse_lazy
 from django.core.validators import ValidationError
 from django.db import transaction
+from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import View

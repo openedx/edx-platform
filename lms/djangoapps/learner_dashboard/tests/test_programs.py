@@ -2,7 +2,7 @@
 """
 Unit tests covering the program listing and detail pages.
 """
-from __future__ import absolute_import
+
 
 import json
 import re
@@ -39,8 +39,8 @@ def load_serialized_data(response, key):
     """
     Extract and deserialize serialized data from the response.
     """
-    pattern = re.compile(ur'{key}: (?P<data>\[.*\])'.format(key=key))
-    match = pattern.search(response.content)
+    pattern = re.compile(u'{key}: (?P<data>\\[.*\\])'.format(key=key))
+    match = pattern.search(response.content.decode('utf-8'))
     serialized = match.group('data')
 
     return json.loads(serialized)
@@ -161,6 +161,18 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
 
         response = self.client.get(self.url)
         self.assertContains(response, marketing_root)
+
+    def test_mobile_marketing_url(self, mock_get_programs):
+        """
+        Verify that a link to a programs marketing for mobile appears in the response.
+        """
+        self.create_programs_config(marketing_path='bar')
+        mock_get_programs.return_value = self.data
+
+        mobile_marketing_url = 'edxapp://course?programs'
+
+        response = self.client.get('/dashboard/programs_fragment/?mobile_only=true')
+        self.assertContains(response, mobile_marketing_url)
 
     def test_links_to_detail_pages(self, mock_get_programs):
         """

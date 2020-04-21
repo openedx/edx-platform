@@ -1,11 +1,11 @@
 """
 Certificate tool in the student support app.
 """
-from __future__ import absolute_import
 
-from six.moves.urllib.parse import unquote, quote_plus  # pylint: disable=import-error
+
 from django.utils.decorators import method_decorator
 from django.views.generic import View
+from six.moves.urllib.parse import quote_plus, unquote
 
 from edxmako.shortcuts import render_to_response
 from support.decorators import require_support_permission

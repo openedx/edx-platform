@@ -1,14 +1,14 @@
 """
 Unit tests for gating.signals module
 """
-from __future__ import absolute_import
+
 
 from ddt import data, ddt, unpack
 from milestones import api as milestones_api
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from gating.api import evaluate_prerequisite
 from openedx.core.lib.gating import api as gating_api
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

@@ -2,11 +2,10 @@
 Helper methods for Studio views.
 """
 
-from __future__ import absolute_import
 
-import urllib
 from uuid import uuid4
 
+import six
 from django.conf import settings
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
@@ -111,7 +110,7 @@ def xblock_studio_url(xblock, parent_xblock=None):
     elif category in ('chapter', 'sequential'):
         return u'{url}?show={usage_key}'.format(
             url=reverse_course_url('course_handler', xblock.location.course_key),
-            usage_key=urllib.quote(unicode(xblock.location))
+            usage_key=six.moves.urllib.parse.quote(six.text_type(xblock.location))
         )
     elif category == 'library':
         library_key = xblock.location.course_key
@@ -222,7 +221,7 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
 
         # TODO need to fix components that are sending definition_data as strings, instead of as dicts
         # For now, migrate them into dicts here.
-        if isinstance(data, basestring):
+        if isinstance(data, six.string_types):
             data = {'data': data}
 
         created_block = store.create_child(

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
+
 
 import json
 from io import BytesIO
@@ -15,6 +15,11 @@ from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
 from contentstore.views.transcript_settings import TranscriptionProviderErrorType, validate_transcript_credentials
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
+from openedx.core.djangoapps.video_pipeline.config.waffle import (
+    SAVE_CREDENTIALS_IN_VAL,
+    waffle_flags
+)
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.roles import CourseStaffRole
 
 
@@ -106,7 +111,57 @@ class TranscriptCredentialsTest(CourseTestCase):
             content_type='application/json'
         )
         self.assertEqual(response.status_code, expected_status_code)
-        self.assertEqual(response.content, expected_response)
+        self.assertEqual(response.content.decode('utf-8'), expected_response)
+
+    @override_waffle_flag(waffle_flags()[SAVE_CREDENTIALS_IN_VAL], True)
+    @ddt.data(
+        (
+            {
+                'provider': '3PlayMedia',
+                'api_key': '11111',
+                'api_secret_key': '44444'
+            },
+            {'error_type': TranscriptionProviderErrorType.INVALID_CREDENTIALS},
+            400,
+            '{\n  "error": "The information you entered is incorrect."\n}'
+        ),
+        (
+            {
+                'provider': 'Cielo24',
+                'api_key': '12345',
+                'username': 'test_user'
+            },
+            {'error_type': None},
+            200,
+            ''
+        ),
+        (
+            {
+                'provider': '3PlayMedia',
+                'api_key': '12345',
+                'api_secret_key': '44444'
+            },
+            {'error_type': None},
+            200,
+            ''
+        )
+    )
+    @ddt.unpack
+    @patch('edxval.api.create_or_update_transcript_credentials')
+    def test_val_transcript_credentials_handler(self, request_payload, update_credentials_response,
+                                                expected_status_code, expected_response, api_patch):
+        """
+        Test that credentials handler works fine with VAL api endpoint.
+        """
+        api_patch.return_value = update_credentials_response
+        transcript_credentials_url = self.get_url_for_course_key(self.course.id)
+        response = self.client.post(
+            transcript_credentials_url,
+            data=json.dumps(request_payload),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, expected_status_code)
+        self.assertEqual(response.content.decode('utf-8'), expected_response)
 
 
 @ddt.ddt
@@ -243,7 +298,7 @@ class TranscriptDownloadTest(CourseTestCase):
 
         # Assert the actual response
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, expected_content)
+        self.assertEqual(response.content.decode('utf-8'), expected_content)
         for attribute, value in six.iteritems(expected_headers):
             self.assertEqual(response.get(attribute), value)
 
@@ -270,7 +325,7 @@ class TranscriptDownloadTest(CourseTestCase):
         response = self.client.get(self.view_url, data=request_payload)
         # Assert the response
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(json.loads(response.content)['error'], expected_error_message)
+        self.assertEqual(json.loads(response.content.decode('utf-8'))['error'], expected_error_message)
 
 
 @ddt.ddt
@@ -307,7 +362,7 @@ class TranscriptUploadTest(CourseTestCase):
         """
         Tests that transcript upload handler works as expected.
         """
-        transcript_file_stream = BytesIO('0\n00:00:00,010 --> 00:00:00,100\nПривіт, edX вітає вас.\n\n')
+        transcript_file_stream = six.StringIO('0\n00:00:00,010 --> 00:00:00,100\nПривіт, edX вітає вас.\n\n')
         # Make request to transcript upload handler
         response = self.client.post(
             self.view_url,
@@ -372,7 +427,7 @@ class TranscriptUploadTest(CourseTestCase):
         # Make request to transcript upload handler
         response = self.client.post(self.view_url, request_payload, format='multipart')
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(json.loads(response.content)['error'], expected_error_message)
+        self.assertEqual(json.loads(response.content.decode('utf-8'))['error'], expected_error_message)
 
     @patch('contentstore.views.transcript_settings.get_available_transcript_languages', Mock(return_value=['en', 'es']))
     def test_transcript_upload_handler_existing_transcript(self):
@@ -389,7 +444,7 @@ class TranscriptUploadTest(CourseTestCase):
         response = self.client.post(self.view_url, request_payload, format='multipart')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
-            json.loads(response.content)['error'],
+            json.loads(response.content.decode('utf-8'))['error'],
             u'A transcript with the "es" language code already exists.'
         )
 
@@ -413,7 +468,7 @@ class TranscriptUploadTest(CourseTestCase):
 
             self.assertEqual(response.status_code, 400)
             self.assertEqual(
-                json.loads(response.content)['error'],
+                json.loads(response.content.decode('utf-8'))['error'],
                 u'There is a problem with this transcript file. Try to upload a different file.'
             )
 
@@ -422,7 +477,7 @@ class TranscriptUploadTest(CourseTestCase):
         """
         Tests the transcript upload handler with an invalid transcript file.
         """
-        transcript_file_stream = BytesIO('An invalid transcript SubRip file content')
+        transcript_file_stream = six.StringIO('An invalid transcript SubRip file content')
         # Make request to transcript upload handler
         response = self.client.post(
             self.view_url,
@@ -437,7 +492,7 @@ class TranscriptUploadTest(CourseTestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
-            json.loads(response.content)['error'],
+            json.loads(response.content.decode('utf-8'))['error'],
             u'There is a problem with this transcript file. Try to upload a different file.'
         )
 

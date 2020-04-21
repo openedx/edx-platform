@@ -42,6 +42,15 @@
             </p>
 
             <p style="color: rgba(0,0,0,.75);">
+              <a href="{{ course_url }}">
+                {% filter force_escape %}
+                {% blocktrans %}You may access your course.{% endblocktrans %}
+                {% endfilter %}
+              </a>
+                <br />
+            </p>
+
+            <p style="color: rgba(0,0,0,.75);">
                 {% filter force_escape %}
                 {% blocktrans %}Sincerely yours, The {{ course_name }} Team{% endblocktrans %}
                 {% endfilter %}

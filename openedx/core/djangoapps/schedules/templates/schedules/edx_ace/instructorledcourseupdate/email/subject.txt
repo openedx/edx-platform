@@ -1,0 +1,5 @@
+{% autoescape off %}
+{% load i18n %}
+
+{% blocktrans trimmed %}{{ course_name }} Weekly Update {% endblocktrans %}
+{% endautoescape %}

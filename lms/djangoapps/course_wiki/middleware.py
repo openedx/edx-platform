@@ -1,22 +1,23 @@
 """Middleware for course_wiki"""
-from __future__ import absolute_import
+
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.shortcuts import redirect
+from django.utils.deprecation import MiddlewareMixin
 from six import text_type
 from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 from wiki.models import reverse
 
-from courseware.access import has_access
-from courseware.courses import get_course_overview_with_access, get_course_with_access
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_overview_with_access, get_course_with_access
 from openedx.core.lib.request_utils import course_id_from_url
 from openedx.features.enterprise_support.api import get_enterprise_consent_url
 from student.models import CourseEnrollment
 
 
-class WikiAccessMiddleware(object):
+class WikiAccessMiddleware(MiddlewareMixin):
     """
     This middleware wraps calls to django-wiki in order to handle authentication and redirection
     between the root wiki and the course wikis.

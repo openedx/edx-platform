@@ -2,12 +2,11 @@
 This module creates a sysadmin dashboard for managing and viewing
 courses.
 """
-from __future__ import absolute_import
+
 
 import json
 import logging
 import os
-import StringIO
 import subprocess
 
 import mongoengine
@@ -27,14 +26,14 @@ from django.views.decorators.http import condition
 from django.views.generic.base import TemplateView
 from opaque_keys.edx.keys import CourseKey
 from path import Path as path
-from six import text_type
+from six import StringIO, text_type
 
 import dashboard.git_import as git_import
 import track.views
-from courseware.courses import get_course_by_id
 from dashboard.git_import import GitImportError
 from dashboard.models import CourseImportLog
 from edxmako.shortcuts import render_to_response
+from lms.djangoapps.courseware.courses import get_course_by_id
 from openedx.core.djangolib.markup import HTML
 from student.models import CourseEnrollment, Registration, UserProfile
 from student.roles import CourseInstructorRole, CourseStaffRole
@@ -78,7 +77,7 @@ class SysadminDashboardView(TemplateView):
         data should be iterable and is used to stream object over http
         """
 
-        csv_file = StringIO.StringIO()
+        csv_file = StringIO()
         writer = csv.writer(csv_file, dialect='excel', quotechar='"',
                             quoting=csv.QUOTE_ALL)
 
@@ -261,7 +260,7 @@ class Courses(SysadminDashboardView):
         cmd = ['git', 'log', '-1',
                u'--format=format:{ "commit": "%H", "author": "%an %ae", "date": "%ad"}', ]
         try:
-            output_json = json.loads(subprocess.check_output(cmd, cwd=gdir))
+            output_json = json.loads(subprocess.check_output(cmd, cwd=gdir).decode('utf-8'))
             info = [output_json['commit'],
                     output_json['date'],
                     output_json['author'], ]
@@ -293,7 +292,7 @@ class Courses(SysadminDashboardView):
         log.debug(u'Adding course using git repo %s', gitloc)
 
         # Grab logging output for debugging imports
-        output = StringIO.StringIO()
+        output = StringIO()
         import_log_handler = logging.StreamHandler(output)
         import_log_handler.setLevel(logging.DEBUG)
 
@@ -553,7 +552,7 @@ class GitLogs(TemplateView):
             page = min(max(1, given_page), paginator.num_pages)
             logs = paginator.page(page)
 
-        mdb.disconnect()
+        mdb.close()
         context = {
             'logs': logs,
             'course_id': text_type(course_id) if course_id else None,

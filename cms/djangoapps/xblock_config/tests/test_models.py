@@ -1,7 +1,7 @@
 """
 Tests for the models that configures Edit LTI fields feature.
 """
-from __future__ import absolute_import
+
 
 from contextlib import contextmanager
 

@@ -1,7 +1,7 @@
 """
 Tests for static templates
 """
-from __future__ import absolute_import
+
 
 from django.conf import settings
 from django.test import TestCase
@@ -45,8 +45,8 @@ class MarketingSiteViewTests(TestCase):
         configuration = {test_header_key: test_header, test_content_key: test_content}
         with with_site_configuration_context(configuration=configuration):
             response = self.client.get(reverse("about"))
-        self.assertIn(test_header.encode('utf-8'), response.content)
-        self.assertIn(test_content.encode('utf-8'), response.content)
+        self.assertContains(response, test_header)
+        self.assertContains(response, test_content)
 
     def test_about_with_site_configuration_and_html(self):
         """
@@ -60,8 +60,8 @@ class MarketingSiteViewTests(TestCase):
         configuration = {test_header_key: test_header, test_content_key: test_content}
         with with_site_configuration_context(configuration=configuration):
             response = self.client.get(reverse("about"))
-        self.assertIn(test_header.encode('utf-8'), response.content)
-        self.assertIn(test_content.encode('utf-8'), response.content)
+        self.assertContains(response, test_header)
+        self.assertContains(response, test_content)
 
     def test_404(self):
         """
@@ -71,8 +71,6 @@ class MarketingSiteViewTests(TestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp['Content-Type'], 'text/html')
-        resp = self.client.get(url)
-        self.assertContains(resp, settings.TECH_SUPPORT_EMAIL)
 
     def test_500(self):
         """
@@ -92,4 +90,3 @@ class MarketingSiteViewTests(TestCase):
             ),
             status_code=500
         )
-        self.assertContains(resp, settings.TECH_SUPPORT_EMAIL, status_code=500)

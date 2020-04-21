@@ -1,11 +1,10 @@
 """Mode creation page (used to add modes to courses during testing)."""
 
-from __future__ import absolute_import
 
 import re
 
-from bok_choy.page_object import PageObject
 import six.moves.urllib.parse  # pylint: disable=import-error
+from bok_choy.page_object import PageObject
 
 from common.test.acceptance.pages.lms import BASE_URL
 

@@ -2,12 +2,13 @@
 A pytest plugin that reports test contexts to coverage running in another process.
 """
 
-from pavelib.utils.envs import Env
 import pytest
 import requests
 
+from pavelib.utils.envs import Env
 
-class ContextPlugin(object):
+
+class RemoteContextPlugin(object):
     """
     Pytest plugin for reporting pytests contexts to coverage running in another process
     """
@@ -38,14 +39,14 @@ class ContextPlugin(object):
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_configure(config):
-    config.pluginmanager.register(ContextPlugin(config), "contextplugin")
+    config.pluginmanager.register(RemoteContextPlugin(config), "remotecontextplugin")
 
 
 def pytest_addoption(parser):
     group = parser.getgroup("coverage")
     group.addoption(
-        "--pytest-contexts",
+        "--pytest-remote-contexts",
         action="store_true",
         dest="pytest-contexts",
-        help="Capture the pytest contexts that coverage is being captured in",
+        help="Capture the pytest contexts that coverage is being captured in in another process",
     )

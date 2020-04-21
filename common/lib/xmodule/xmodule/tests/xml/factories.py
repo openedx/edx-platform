@@ -2,7 +2,6 @@
 Factories for generating edXML for testing XModule import
 """
 
-from __future__ import absolute_import
 
 import inspect
 from tempfile import mkdtemp
@@ -110,7 +109,7 @@ class XmlImportFactory(Factory):
         if inline_xml:
             kwargs['xml_node'].set('not_a_pointer', 'true')
 
-        for key in kwargs.keys():
+        for key in list(kwargs.keys()):
             if key not in XML_IMPORT_ARGS:
                 kwargs['xml_node'].set(key, kwargs.pop(key))
 

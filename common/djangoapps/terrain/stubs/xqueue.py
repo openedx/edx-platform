@@ -9,7 +9,6 @@ Configuration values:
 If no grade response is configured, a default response will be returned.
 """
 
-from __future__ import absolute_import
 
 import copy
 import json

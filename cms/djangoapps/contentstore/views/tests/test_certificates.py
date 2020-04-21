@@ -3,7 +3,7 @@
 """
 Certificates Tests.
 """
-from __future__ import absolute_import
+
 
 import itertools
 import json
@@ -146,7 +146,7 @@ class CertificatesBaseTestCase(object):
 
             self.assertEqual(response.status_code, 400)
             self.assertNotIn("Location", response)
-            content = json.loads(response.content)
+            content = json.loads(response.content.decode('utf-8'))
             self.assertIn("error", content)
 
     def test_invalid_json(self):
@@ -167,7 +167,7 @@ class CertificatesBaseTestCase(object):
 
         self.assertEqual(response.status_code, 400)
         self.assertNotIn("Location", response)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertIn("error", content)
 
     def test_certificate_data_validation(self):
@@ -181,7 +181,10 @@ class CertificatesBaseTestCase(object):
         with self.assertRaises(Exception) as context:
             CertificateManager.validate(json_data_1)
 
-        self.assertIn("Unsupported certificate schema version: 100.  Expected version: 1.", context.exception)
+        self.assertIn(
+            "Unsupported certificate schema version: 100.  Expected version: 1.",
+            str(context.exception)
+        )
 
         #Test certificate name is missing
         json_data_2 = {
@@ -192,7 +195,7 @@ class CertificatesBaseTestCase(object):
         with self.assertRaises(Exception) as context:
             CertificateManager.validate(json_data_2)
 
-        self.assertIn('must have name of the certificate', context.exception)
+        self.assertIn('must have name of the certificate', str(context.exception))
 
 
 @ddt.ddt
@@ -235,7 +238,7 @@ class CertificatesListHandlerTestCase(
 
         self.assertEqual(response.status_code, 201)
         self.assertIn("Location", response)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         certificate_id = self._remove_ids(content)
         self.assertEqual(content, expected)
         self.assert_event_emitted(
@@ -264,7 +267,7 @@ class CertificatesListHandlerTestCase(
             course_key=self.course.id,
             mode='honor'
         )
-        self.assertEquals(test_link, None)
+        self.assertEqual(test_link, None)
 
     @override_settings(LMS_BASE="lms_base_url")
     def test_lms_link_for_certificate_web_view(self):
@@ -275,7 +278,7 @@ class CertificatesListHandlerTestCase(
             course_key=self.course.id,
             mode='honor'
         )
-        self.assertEquals(link, test_url)
+        self.assertEqual(link, test_url)
 
     @mock.patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     def test_certificate_info_in_response(self):
@@ -292,13 +295,13 @@ class CertificatesListHandlerTestCase(
 
         # in html response
         result = self.client.get_html(self._url())
-        self.assertIn('Test certificate', result.content)
-        self.assertIn('Test description', result.content)
+        self.assertContains(result, 'Test certificate')
+        self.assertContains(result, 'Test description')
 
         # in JSON response
         response = self.client.get_json(self._url())
-        data = json.loads(response.content)
-        self.assertEquals(len(data), 1)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(len(data), 1)
         self.assertEqual(data[0]['name'], 'Test certificate')
         self.assertEqual(data[0]['description'], 'Test description')
         self.assertEqual(data[0]['version'], CERTIFICATE_SCHEMA_VERSION)
@@ -317,7 +320,7 @@ class CertificatesListHandlerTestCase(
 
         # in html response
         result = self.client.get_html(self._url())
-        self.assertNotIn('Test certificate', result.content)
+        self.assertNotContains(result, 'Test certificate')
 
     def test_unsupported_http_accept_header(self):
         """
@@ -346,8 +349,7 @@ class CertificatesListHandlerTestCase(
             self._url(),
             data=CERTIFICATE_JSON
         )
-        self.assertEqual(response.status_code, 403)
-        self.assertIn("error", response.content)
+        self.assertContains(response, "error", status_code=403)
 
     def test_audit_course_mode_is_skipped(self):
         """
@@ -417,7 +419,7 @@ class CertificatesListHandlerTestCase(
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
 
-        new_certificate = json.loads(response.content)
+        new_certificate = json.loads(response.content.decode('utf-8'))
         for prev_certificate in self.course.certificates['certificates']:
             self.assertNotEqual(new_certificate.get('id'), prev_certificate.get('id'))
 
@@ -471,7 +473,7 @@ class CertificatesDetailHandlerTestCase(
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(content, expected)
         self.assert_event_emitted(
             'edx.certificate.configuration.created',
@@ -503,7 +505,7 @@ class CertificatesDetailHandlerTestCase(
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(content, expected)
         self.assert_event_emitted(
             'edx.certificate.configuration.modified',
@@ -554,7 +556,7 @@ class CertificatesDetailHandlerTestCase(
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 201)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(content, expected)
 
     @ddt.data(C4X_SIGNATORY_PATH, SIGNATORY_PATH)
@@ -782,7 +784,7 @@ class CertificatesDetailHandlerTestCase(
                 HTTP_ACCEPT="application/json",
                 HTTP_X_REQUESTED_WITH="XMLHttpRequest"
             )
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
             course = self.store.get_course(self.course.id)
             certificates = course.certificates['certificates']
             self.assertEqual(certificates[0].get('is_active'), is_active)
@@ -810,7 +812,7 @@ class CertificatesDetailHandlerTestCase(
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
     @ddt.data(C4X_SIGNATORY_PATH, SIGNATORY_PATH)
     def test_certificate_activation_failure(self, signatory_path):
@@ -829,7 +831,7 @@ class CertificatesDetailHandlerTestCase(
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
         course = self.store.get_course(self.course.id)
         certificates = course.certificates['certificates']
         self.assertEqual(certificates[0].get('is_active'), False)

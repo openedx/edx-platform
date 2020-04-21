@@ -1,7 +1,7 @@
 """
 Acceptance tests for discussion component in studio
 """
-from __future__ import absolute_import
+
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.studio.container import ContainerPage
@@ -15,7 +15,7 @@ class DiscussionComponentTest(ContainerBase):
     Feature: CMS.Component Adding
     As a course author, I want to be able to add and edit Discussion component
     """
-    shard = 14
+    shard = 20
 
     def setUp(self, is_staff=True):
         """

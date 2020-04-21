@@ -1,14 +1,13 @@
 """ Tests for rendering functions in the mako pipeline. """
 
-from __future__ import absolute_import
 
-import ddt
-from mock import patch
-from six.moves import map
 from unittest import skipUnless
 
+import ddt
 from django.conf import settings
 from django.test import TestCase
+from mock import patch
+from six.moves import map
 
 from pipeline_mako import compressed_css, compressed_js, render_require_js_path_overrides
 
@@ -39,7 +38,7 @@ class RequireJSPathOverridesTest(TestCase):
     def test_requirejs_path_overrides(self):
         result = render_require_js_path_overrides(self.OVERRIDES)
         # To make the string comparision easy remove the whitespaces
-        self.assertEqual(list(map(str.strip, result.splitlines())), self.OVERRIDES_JS)
+        self.assertCountEqual(list(map(str.strip, result.splitlines())), self.OVERRIDES_JS)
 
 
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')

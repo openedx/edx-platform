@@ -1,7 +1,7 @@
 """
 Tests for users API
 """
-from __future__ import absolute_import
+
 
 import datetime
 
@@ -16,9 +16,10 @@ from django.utils.timezone import now
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
 from six.moves import range
+from six.moves.urllib.parse import parse_qs  # pylint: disable=import-error
 
 from course_modes.models import CourseMode
-from courseware.access_response import MilestoneAccessError, StartDateError, VisibilityError
+from lms.djangoapps.courseware.access_response import MilestoneAccessError, StartDateError, VisibilityError
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
@@ -75,6 +76,21 @@ class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
 
         response = self.api_response(expected_response_code=302, api_version=api_version)
         self.assertIn(self.username, response['location'])
+
+    @ddt.data(API_V05, API_V1)
+    def test_last_loggedin_updated(self, api_version):
+        """Verify that a user's last logged in value updates after hitting the my_user_info endpoint"""
+        self.login()
+
+        self.user.refresh_from_db()
+        last_login_before = self.user.last_login
+
+        # just hit the api endpoint; we don't care about the response here (tested previously)
+        self.api_response(expected_response_code=302, api_version=api_version)
+
+        self.user.refresh_from_db()
+        last_login_after = self.user.last_login
+        assert last_login_after > last_login_before
 
 
 @ddt.ddt
@@ -264,7 +280,10 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
                 user=self.user,
                 course_id=course.id
             )
-            ScheduleFactory(start=self.THREE_YEARS_AGO + datetime.timedelta(days=1), enrollment=enrollment)
+            ScheduleFactory(
+                start_date=self.THREE_YEARS_AGO + datetime.timedelta(days=1),
+                enrollment=enrollment
+            )
         else:
             course = CourseFactory.create(start=self.LAST_WEEK, mobile_available=True)
             self.enroll(course.id)
@@ -346,7 +365,7 @@ class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, Milestone
 
         response = self.api_response()
         certificate_data = response.data[0]['certificate']
-        self.assertEquals(certificate_data['url'], certificate_url)
+        self.assertEqual(certificate_data['url'], certificate_url)
 
     @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
     def test_no_certificate(self):
@@ -386,7 +405,7 @@ class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, Milestone
 
         response = self.api_response()
         certificate_data = response.data[0]['certificate']
-        self.assertRegexpMatches(
+        self.assertRegex(
             certificate_data['url'],
             r'http.*/certificates/user/{user_id}/course/{course_id}'.format(
                 user_id=self.user.id,
@@ -599,11 +618,11 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin)
         self._expiration_in_response(serialized, api_version)
 
         # Assert utm parameters
-        expected_utm_parameters = {
-            'twitter': 'utm_campaign=social-sharing-db&utm_medium=social&utm_source=twitter',
-            'facebook': 'utm_campaign=social-sharing-db&utm_medium=social&utm_source=facebook'
-        }
-        self.assertEqual(serialized['course']['course_sharing_utm_parameters'], expected_utm_parameters)
+        qstwitter = parse_qs('utm_campaign=social-sharing-db&utm_medium=social&utm_source=twitter')
+        qsfacebook = parse_qs('utm_campaign=social-sharing-db&utm_medium=social&utm_source=facebook')
+
+        self.assertDictEqual(qsfacebook, parse_qs(serialized['course']['course_sharing_utm_parameters']['facebook']))
+        self.assertDictEqual(qstwitter, parse_qs(serialized['course']['course_sharing_utm_parameters']['twitter']))
 
     @ddt.data(API_V05, API_V1)
     def test_with_display_overrides(self, api_version):

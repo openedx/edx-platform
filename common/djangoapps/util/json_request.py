@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 import decimal
 import json
@@ -46,7 +46,7 @@ def expect_json(view_function):
         # e.g. 'charset', so we can't do a direct string compare
         if "application/json" in request.META.get('CONTENT_TYPE', '') and request.body:
             try:
-                request.json = json.loads(request.body)
+                request.json = json.loads(request.body.decode('utf8'))
             except ValueError:
                 return JsonResponseBadRequest({"error": "Invalid JSON"})
         else:

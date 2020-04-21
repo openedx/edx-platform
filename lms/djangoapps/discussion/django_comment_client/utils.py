@@ -1,5 +1,5 @@
 # pylint: skip-file
-from __future__ import absolute_import
+
 
 import json
 import logging
@@ -12,14 +12,14 @@ from django.contrib.auth.models import User
 from django.db import connection
 from django.http import HttpResponse
 from django.urls import reverse
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locations import i4xEncoder
+from django.utils.deprecation import MiddlewareMixin
+from opaque_keys.edx.keys import CourseKey, i4xEncoder, UsageKey
 from pytz import UTC
 from six import text_type
 from six.moves import map
 
-from courseware import courses
-from courseware.access import has_access
+from lms.djangoapps.courseware import courses
+from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from lms.djangoapps.discussion.django_comment_client.permissions import (
     check_permissions_by_view,
@@ -305,7 +305,8 @@ def _sort_map_entries(category_map, sort_alpha):
     for title, category in category_map["subcategories"].items():
         things.append((title, category, TYPE_SUBCATEGORY))
         _sort_map_entries(category_map["subcategories"][title], sort_alpha)
-    category_map["children"] = [(x[0], x[2]) for x in sorted(things, key=lambda x: x[1]["sort_key"])]
+    key_method = lambda x: x[1]["sort_key"] if x[1]["sort_key"] is not None else ''
+    category_map["children"] = [(x[0], x[2]) for x in sorted(things, key=key_method)]
 
 
 def get_discussion_category_map(course, user, divided_only_if_explicit=False, exclude_unstarted=True):
@@ -525,7 +526,7 @@ class HtmlResponse(HttpResponse):
         super(HtmlResponse, self).__init__(html, content_type='text/plain')
 
 
-class ViewNameMiddleware(object):
+class ViewNameMiddleware(MiddlewareMixin):
     """
     Django middleware object to inject view name into request context
     """
@@ -536,7 +537,7 @@ class ViewNameMiddleware(object):
         request.view_name = view_func.__name__
 
 
-class QueryCountDebugMiddleware(object):
+class QueryCountDebugMiddleware(MiddlewareMixin):
     """
     This middleware will log the number of queries run
     and the total time taken for each request (with a
@@ -690,10 +691,9 @@ def permalink(content):
     else:
         course_id = content['course_id']
     if content['type'] == 'thread':
-        return reverse('discussion.views.single_thread',
-                       args=[course_id, content['commentable_id'], content['id']])
+        return reverse('single_thread', args=[course_id, content['commentable_id'], content['id']])
     else:
-        return reverse('discussion.views.single_thread',
+        return reverse('single_thread',
                        args=[course_id, content['commentable_id'], content['thread_id']]) + '#' + content['id']
 
 
@@ -906,7 +906,7 @@ def is_comment_too_deep(parent):
     return (
         MAX_COMMENT_DEPTH is not None and (
             MAX_COMMENT_DEPTH < 0 or
-            (parent and parent["depth"] >= MAX_COMMENT_DEPTH)
+            (parent and (parent["depth"] or 0) >= MAX_COMMENT_DEPTH)
         )
     )
 

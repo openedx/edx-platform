@@ -2,7 +2,6 @@
 Django models related to teams functionality.
 """
 
-from __future__ import absolute_import
 
 from datetime import datetime
 from uuid import uuid4
@@ -12,6 +11,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.dispatch import receiver
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy
 from django_countries.fields import CountryField
@@ -35,7 +35,12 @@ from openedx.core.djangoapps.django_comment_common.signals import (
 )
 from student.models import CourseEnrollment, LanguageField
 
-from .errors import AlreadyOnTeamInCourse, ImmutableMembershipFieldException, NotEnrolledInCourseForTeam
+from .errors import (
+    AlreadyOnTeamInCourse,
+    ImmutableMembershipFieldException,
+    NotEnrolledInCourseForTeam,
+    AddToIncompatibleTeamError
+)
 
 
 @receiver(thread_voted)
@@ -95,39 +100,74 @@ def handle_activity(user, post, original_author_id=None):
         CourseTeamMembership.update_last_activity(user, post.commentable_id)
 
 
+def utc_now():
+    return datetime.utcnow().replace(tzinfo=pytz.utc)
+
+
+@python_2_unicode_compatible
 class CourseTeam(models.Model):
     """
     This model represents team related info.
 
     .. no_pii:
     """
+    def __str__(self):
+        return "{} in {}".format(self.name, self.course_id)
+
+    def __repr__(self):
+        return (
+            "<CourseTeam"
+            " id={0.id}"
+            " team_id={0.team_id}"
+            " team_size={0.team_size}"
+            " topic_id={0.topic_id}"
+            " course_id={0.course_id}"
+            ">"
+        ).format(self)
 
     class Meta(object):
         app_label = "teams"
 
-    team_id = models.CharField(max_length=255, unique=True)
-    discussion_topic_id = models.CharField(max_length=255, unique=True)
+    team_id = models.SlugField(max_length=255, unique=True)
+    discussion_topic_id = models.SlugField(max_length=255, unique=True)
     name = models.CharField(max_length=255, db_index=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
-    topic_id = models.CharField(max_length=255, db_index=True, blank=True)
+    topic_id = models.CharField(default='', max_length=255, db_index=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
     description = models.CharField(max_length=300)
-    country = CountryField(blank=True)
+    country = CountryField(default='', blank=True)
     language = LanguageField(
+        default='',
         blank=True,
         help_text=ugettext_lazy("Optional language the team uses as ISO 639-1 code."),
     )
-    last_activity_at = models.DateTimeField(db_index=True)  # indexed for ordering
+    # indexed for ordering
+    last_activity_at = models.DateTimeField(default=utc_now, db_index=True)
     users = models.ManyToManyField(User, db_index=True, related_name='teams', through='CourseTeamMembership')
     team_size = models.IntegerField(default=0, db_index=True)  # indexed for ordering
 
     field_tracker = FieldTracker()
 
+    # This field would divide the teams into two mutually exclusive groups
+    # If the team is org protected, the members in a team is enrolled into a degree bearing institution
+    # If the team is not org protected, the members in a team is part of the general edX learning community
+    # We need this exclusion for learner privacy protection
+    organization_protected = models.BooleanField(default=False)
+
     # Don't emit changed events when these fields change.
     FIELD_BLACKLIST = ['last_activity_at', 'team_size']
 
     @classmethod
-    def create(cls, name, course_id, description, topic_id=None, country=None, language=None):
+    def create(
+        cls,
+        name,
+        course_id,
+        description,
+        topic_id='',
+        country='',
+        language='',
+        organization_protected=False
+    ):
         """Create a complete CourseTeam object.
 
         Args:
@@ -141,6 +181,8 @@ class CourseTeam(models.Model):
               is based, as ISO 3166-1 code.
             language (str, optional): An optional language which the
               team uses, as ISO 639-1 code.
+            organization_protected (bool, optional): specifies whether the team should only
+              contain members who are in a organization context, or not
 
         """
         unique_id = uuid4().hex
@@ -152,24 +194,25 @@ class CourseTeam(models.Model):
             discussion_topic_id=discussion_topic_id,
             name=name,
             course_id=course_id,
-            topic_id=topic_id if topic_id else '',
+            topic_id=topic_id,
             description=description,
-            country=country if country else '',
-            language=language if language else '',
-            last_activity_at=datetime.utcnow().replace(tzinfo=pytz.utc)
+            country=country,
+            language=language,
+            organization_protected=organization_protected
         )
 
         return course_team
 
-    def __repr__(self):
-        return "<CourseTeam team_id={0.team_id}>".format(self)
-
     def add_user(self, user):
         """Adds the given user to the CourseTeam."""
+        from lms.djangoapps.teams.api import user_protection_status_matches_team
+
         if not CourseEnrollment.is_enrolled(user, self.course_id):
             raise NotEnrolledInCourseForTeam
-        if CourseTeamMembership.user_in_team_for_course(user, self.course_id):
+        if CourseTeamMembership.user_in_team_for_course(user, self.course_id, self.topic_id):
             raise AlreadyOnTeamInCourse
+        if not user_protection_status_matches_team(user, self):
+            raise AddToIncompatibleTeamError
         return CourseTeamMembership.objects.create(
             user=user,
             team=self
@@ -181,12 +224,25 @@ class CourseTeam(models.Model):
         self.save()
 
 
+@python_2_unicode_compatible
 class CourseTeamMembership(models.Model):
     """
     This model represents the membership of a single user in a single team.
 
     .. no_pii:
     """
+
+    def __str__(self):
+        return "{} is member of {}".format(self.user.username, self.team)
+
+    def __repr__(self):
+        return (
+            "<CourseTeamMembership"
+            " id={0.id}"
+            " user_id={0.user.id}"
+            " team_id={0.team.id}"
+            ">"
+        ).format(self)
 
     class Meta(object):
         app_label = "teams"
@@ -223,7 +279,7 @@ class CourseTeamMembership(models.Model):
                     )
         super(CourseTeamMembership, self).__setattr__(name, value)
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
         """Customize save method to set the last_activity_at if it does not
         currently exist. Also resets the team's size if this model is
         being created.
@@ -237,13 +293,13 @@ class CourseTeamMembership(models.Model):
         if should_reset_team_size:
             self.team.reset_team_size()
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args, **kwargs):  # pylint: disable=arguments-differ
         """Recompute the related team's team_size after deleting a membership"""
         super(CourseTeamMembership, self).delete(*args, **kwargs)
         self.team.reset_team_size()
 
     @classmethod
-    def get_memberships(cls, username=None, course_ids=None, team_id=None):
+    def get_memberships(cls, username=None, course_ids=None, team_ids=None):
         """
         Get a queryset of memberships.
 
@@ -257,25 +313,31 @@ class CourseTeamMembership(models.Model):
             queryset = queryset.filter(user__username=username)
         if course_ids is not None:
             queryset = queryset.filter(team__course_id__in=course_ids)
-        if team_id is not None:
-            queryset = queryset.filter(team__team_id=team_id)
+        if team_ids is not None:
+            queryset = queryset.filter(team__team_id__in=team_ids)
 
         return queryset
 
     @classmethod
-    def user_in_team_for_course(cls, user, course_id):
+    def user_in_team_for_course(cls, user, course_id, topic_id=None):
         """
-        Checks whether or not a user is already in a team in the given course.
+        Checks user membership in two ways:
+        if topic_id is None, checks to see if a user is assigned to any team in the course
+        if topic_id (teamset) is provided, checks to see if a user is assigned to a specific team in the course.
 
         Args:
             user: the user that we want to query on
             course_id: the course_id of the course we're interested in
+            topic_id: optional the topic_id (teamset) of the course we are interested in
 
         Returns:
             True if the user is on a team in the course already
             False if not
         """
-        return cls.objects.filter(user=user, team__course_id=course_id).exists()
+        if topic_id is None:
+            return cls.objects.filter(user=user, team__course_id=course_id).exists()
+        else:
+            return cls.objects.filter(user=user, team__course_id=course_id, team__topic_id=topic_id).exists()
 
     @classmethod
     def update_last_activity(cls, user, discussion_topic_id):
@@ -298,3 +360,12 @@ class CourseTeamMembership(models.Model):
         emit_team_event('edx.team.activity_updated', membership.team.course_id, {
             'team_id': membership.team.team_id,
         })
+
+    @classmethod
+    def is_user_on_team(cls, user, team):
+        """ Is `user` on `team`?"""
+        try:
+            cls.objects.get(user=user, team=team)
+        except ObjectDoesNotExist:
+            return False
+        return True

@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 import copy
 import json
@@ -394,6 +394,17 @@ class XmlParserMixin(object):
         return xblock
 
     @classmethod
+    def parse_xml_new_runtime(cls, node, runtime, keys):
+        """
+        This XML lives within Blockstore and the new runtime doesn't need this
+        legacy XModule code. Use the "normal" XBlock parsing code.
+        """
+        try:
+            return super(XmlParserMixin, cls).parse_xml_new_runtime(node, runtime, keys)
+        except AttributeError:
+            return super(XmlParserMixin, cls).parse_xml(node, runtime, keys, id_generator=None)
+
+    @classmethod
     def _get_url_name(cls, node):
         """
         Reads url_name attribute from the node
@@ -558,6 +569,17 @@ class XmlMixin(XmlParserMixin):
             return super(XmlParserMixin, cls).parse_xml(node, runtime, keys, id_generator)  # pylint: disable=bad-super-call
         else:
             return super(XmlMixin, cls).parse_xml(node, runtime, keys, id_generator)
+
+    @classmethod
+    def parse_xml_new_runtime(cls, node, runtime, keys):
+        """
+        This XML lives within Blockstore and the new runtime doesn't need this
+        legacy XModule code. Use the "normal" XBlock parsing code.
+        """
+        try:
+            return super(XmlMixin, cls).parse_xml_new_runtime(node, runtime, keys)
+        except AttributeError:
+            return super(XmlMixin, cls).parse_xml(node, runtime, keys, id_generator=None)
 
     def export_to_xml(self, resource_fs):
         """

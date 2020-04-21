@@ -1,7 +1,9 @@
-from __future__ import absolute_import
 
+
+from datetime import timedelta
 import json
 
+from django.utils import timezone
 import factory
 from factory.django import DjangoModelFactory
 from opaque_keys.edx.locator import CourseLocator
@@ -35,3 +37,11 @@ class CourseOverviewFactory(DjangoModelFactory):
     @factory.lazy_attribute
     def display_name(self):
         return "{} Course".format(self.id)
+
+    @factory.lazy_attribute
+    def start(self):
+        return timezone.now()
+
+    @factory.lazy_attribute
+    def end(self):
+        return timezone.now() + timedelta(30)

@@ -1,7 +1,7 @@
 """
 Import/Export pages.
 """
-from __future__ import absolute_import
+
 
 import os
 import re
@@ -68,7 +68,7 @@ class ImportExportMixin(object):
         """
         string = self.q(css='.item-progresspoint-success-date').text[0]
 
-        return re.match(ur'\(([^ ]+).+?(\d{2}:\d{2})', string).groups()
+        return re.match(six.text_type(r'\(([^ ]+).+?(\d{2}:\d{2})'), string).groups()  # pylint: disable=unicode-format-string
 
     def wait_for_tasks(self, completed=False, fail_on=None):
         """

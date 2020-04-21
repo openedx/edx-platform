@@ -3,7 +3,6 @@
 Module contains utils specific for video_module but not for transcripts.
 """
 
-from __future__ import absolute_import
 
 import logging
 from collections import OrderedDict
@@ -70,7 +69,7 @@ def rewrite_video_url(cdn_base_url, original_video_url):
         validator(rewritten_url)
         return rewritten_url
     except ValidationError:
-        log.warn("Invalid CDN rewrite URL encountered, %s", rewritten_url)
+        log.warning("Invalid CDN rewrite URL encountered, %s", rewritten_url)
 
     # Mimic the behavior of removed get_video_from_cdn in this regard and
     # return None causing the caller to use the original URL.

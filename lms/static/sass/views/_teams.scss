@@ -353,7 +353,24 @@
     }
   }
 
-  .team-profile {
+  .team-management {
+    padding: 1%;
+
+    h3,
+    p,
+    .action,
+    .team-management-section,
+    input {
+      margin-bottom: 2%;
+    }
+
+    #upload-team-csv {
+      display: block;
+    }
+  }
+
+  .team-profile,
+  .team-management {
     .page-content-main {
       display: inline-block;
       width: flex-grid(8, 12);
@@ -527,6 +544,11 @@
 
   .action-primary {
     @extend %btn-primary-blue;
+
+    &:focus {
+      border: inherit;
+      box-shadow: none;
+    }
 
     display: inline-block;
     text-shadow: none;

@@ -2,7 +2,6 @@
 Course API Serializers.  Representing course catalog data
 """
 
-from __future__ import absolute_import
 
 import six.moves.urllib.error  # pylint: disable=import-error
 import six.moves.urllib.parse  # pylint: disable=import-error
@@ -122,3 +121,11 @@ class CourseDetailSerializer(CourseSerializer):  # pylint: disable=abstract-meth
         # fields from CourseSerializer, which get their data
         # from the CourseOverview object in SQL.
         return CourseDetails.fetch_about_attribute(course_overview.id, 'overview')
+
+
+class CourseKeySerializer(serializers.BaseSerializer):  # pylint:disable=abstract-method
+    """
+    Serializer that takes a CourseKey and serializes it to a string course_id.
+    """
+    def to_representation(self, instance):
+        return str(instance)

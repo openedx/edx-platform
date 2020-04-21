@@ -3,7 +3,6 @@
 Unit tests for video utils.
 """
 
-from __future__ import absolute_import
 
 from datetime import datetime
 from unittest import TestCase
@@ -37,7 +36,7 @@ class ValidateVideoImageTestCase(TestCase):
         Test that when no file information is provided to validate_video_image, it gives proper error message.
         """
         error = validate_video_image({})
-        self.assertEquals(error, 'The image must have name, content type, and size information.')
+        self.assertEqual(error, 'The image must have name, content type, and size information.')
 
     def test_corrupt_image_file(self):
         """
@@ -50,7 +49,7 @@ class ValidateVideoImageTestCase(TestCase):
                 size=settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MIN_BYTES']
             )
             error = validate_video_image(uploaded_image_file)
-            self.assertEquals(error, 'There is a problem with this image file. Try to upload a different file.')
+            self.assertEqual(error, 'There is a problem with this image file. Try to upload a different file.')
 
 
 @ddt.ddt
@@ -319,7 +318,7 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
             )
         ),
         (
-            'dummy-content',
+            b'dummy-content',
             None,
             u'This image file type is not supported. Supported file types are {supported_file_formats}.'.format(
                 supported_file_formats=list(settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS.keys())

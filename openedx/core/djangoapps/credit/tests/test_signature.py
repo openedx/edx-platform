@@ -3,7 +3,6 @@
 Tests for digital signatures used to validate messages to/from credit providers.
 """
 
-from __future__ import absolute_import
 
 from django.test import TestCase
 from django.test.utils import override_settings

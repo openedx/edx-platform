@@ -4,7 +4,7 @@
 from django.utils.translation import ugettext as _
 from django.utils.translation import pgettext
 from django.urls import reverse
-from courseware.courses import get_course_about_section
+from lms.djangoapps.courseware.courses import get_course_about_section
 from django.conf import settings
 from six import text_type
 from edxmako.shortcuts import marketing_link
@@ -164,7 +164,7 @@ from six import string_types
               reg_href = ecommerce_checkout_link
             else:
               reg_href="#"
-            if professional_mode:
+            if single_paid_mode:
               href_class = "add-to-cart"
             else:
               href_class = "register"
@@ -273,7 +273,7 @@ from six import string_types
           %endif
 
           % if pre_requisite_courses:
-          <% prc_target = reverse('about_course', args=[unicode(pre_requisite_courses[0]['key'])]) %>
+          <% prc_target = reverse('about_course', args=[text_type(pre_requisite_courses[0]['key'])]) %>
           <li class="prerequisite-course important-dates-item">
             <span class="icon fa fa-list-ul" aria-hidden="true"></span>
             <p class="important-dates-item-title">${_("Prerequisites")}</p>

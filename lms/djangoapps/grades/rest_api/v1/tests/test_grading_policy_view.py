@@ -1,16 +1,16 @@
 """
 Tests for the views
 """
-from __future__ import absolute_import
+
 
 from datetime import datetime
 
 import ddt
 import six
 from django.urls import reverse
-from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from pytz import UTC
 
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory, AccessTokenFactory
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, StaffFactory
 from student.tests.factories import UserFactory
@@ -32,8 +32,8 @@ class GradingPolicyTestMixin(object):
 
     def create_user_and_access_token(self):
         self.user = GlobalStaffFactory.create()
-        self.oauth_client = ClientFactory.create()
-        self.access_token = AccessTokenFactory.create(user=self.user, client=self.oauth_client).token
+        self.oauth_client = ApplicationFactory.create()
+        self.access_token = AccessTokenFactory.create(user=self.user, application=self.oauth_client).token
 
     @classmethod
     def create_course_data(cls):
@@ -103,7 +103,7 @@ class GradingPolicyTestMixin(object):
         Returns Bearer auth header with a generated access token
         for the given user.
         """
-        access_token = AccessTokenFactory.create(user=user, client=self.oauth_client).token
+        access_token = AccessTokenFactory.create(user=user, application=self.oauth_client).token
         return 'Bearer ' + access_token
 
     def test_get_invalid_course(self):

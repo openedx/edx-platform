@@ -1,7 +1,7 @@
 """
 Django module for Course Metadata class -- manages advanced settings and related parameters
 """
-from __future__ import absolute_import
+
 
 import six
 from crum import get_current_user
@@ -178,7 +178,8 @@ class CourseMetadata(object):
                 'value': field.read_json(descriptor),
                 'display_name': _(field.display_name),
                 'help': field_help,
-                'deprecated': field.runtime_options.get('deprecated', False)
+                'deprecated': field.runtime_options.get('deprecated', False),
+                'hide_on_enabled_publisher': field.runtime_options.get('hide_on_enabled_publisher', False)
             }
         return result
 

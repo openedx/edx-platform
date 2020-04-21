@@ -1,16 +1,15 @@
 """Tests covering Credentials utilities."""
-from __future__ import absolute_import
+
 
 import uuid
 
 import mock
-from edx_oauth2_provider.tests.factories import ClientFactory
-from provider.constants import CONFIDENTIAL
 
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.tests import factories
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 from openedx.core.djangoapps.credentials.utils import get_credentials
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from student.tests.factories import UserFactory
 
@@ -27,7 +26,7 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
     def setUp(self):
         super(TestGetCredentials, self).setUp()
 
-        ClientFactory(name=CredentialsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
+        ApplicationFactory(name=CredentialsApiConfig.OAUTH2_CLIENT_NAME)
 
         self.credentials_config = self.create_credentials_config(cache_ttl=1)
         self.user = UserFactory()

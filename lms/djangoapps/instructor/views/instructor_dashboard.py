@@ -2,11 +2,11 @@
 Instructor Dashboard Views
 """
 
-from __future__ import absolute_import
 
 import datetime
 import logging
 import uuid
+from functools import reduce  # pylint: disable=redefined-builtin
 
 import pytz
 import six
@@ -30,10 +30,7 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from bulk_email.api import is_bulk_email_feature_enabled
-from class_dashboard.dashboard_data import get_array_section_has_problem, get_section_display_name
 from course_modes.models import CourseMode, CourseModesArchive
-from courseware.access import has_access
-from courseware.courses import get_course_by_id, get_studio_url
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
@@ -44,6 +41,8 @@ from lms.djangoapps.certificates.models import (
     CertificateWhitelist,
     GeneratedCertificate
 )
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_by_id, get_studio_url
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.discussion.django_comment_client.utils import available_division_schemes, has_forum_access
 from lms.djangoapps.grades.api import is_writable_gradebook_enabled
@@ -56,9 +55,12 @@ from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_utils import wrap_xblock
 from shoppingcart.models import Coupon, CourseRegCodeItem, PaidCourseRegistration
 from student.models import CourseEnrollment
-from student.roles import CourseFinanceAdminRole, CourseInstructorRole, CourseSalesAdminRole, CourseStaffRole
+from student.roles import (
+    CourseFinanceAdminRole, CourseInstructorRole,
+    CourseSalesAdminRole, CourseStaffRole
+)
 from util.json_request import JsonResponse
-from xmodule.html_module import HtmlDescriptor
+from xmodule.html_module import HtmlBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab
 
@@ -118,6 +120,7 @@ def instructor_dashboard_2(request, course_id):
         'sales_admin': CourseSalesAdminRole(course_key).has_user(request.user),
         'staff': bool(has_access(request.user, 'staff', course)),
         'forum_admin': has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR),
+        'data_researcher': request.user.has_perm('student.can_research', course_key),
     }
 
     if not access['staff']:
@@ -140,7 +143,7 @@ def instructor_dashboard_2(request, course_id):
     if show_analytics_dashboard_message(course_key):
         # Construct a URL to the external analytics dashboard
         analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, six.text_type(course_key))
-        link_start = HTML(u"<a href=\"{}\" target=\"_blank\">").format(analytics_dashboard_url)
+        link_start = HTML(u"<a href=\"{}\" rel=\"noopener\" target=\"_blank\">").format(analytics_dashboard_url)
         analytics_dashboard_message = _(
             u"To gain insights into student enrollment and participation {link_start}"
             u"visit {analytics_dashboard_name}, our new course analytics product{link_end}."
@@ -169,10 +172,6 @@ def instructor_dashboard_2(request, course_id):
     # Gate access to course email by feature flag & by course-specific authorization
     if is_bulk_email_feature_enabled(course_key):
         sections.append(_section_send_email(course, access))
-
-    # Gate access to Metrics tab by featue flag and staff authorization
-    if settings.FEATURES['CLASS_DASHBOARD'] and access['staff']:
-        sections.append(_section_metrics(course, access))
 
     # Gate access to Ecommerce tab
     if course_mode_has_price and (access['finance_admin'] or access['sales_admin']):
@@ -246,6 +245,7 @@ def instructor_dashboard_2(request, course_id):
         'generate_bulk_certificate_exceptions_url': generate_bulk_certificate_exceptions_url,
         'certificate_exception_view_url': certificate_exception_view_url,
         'certificate_invalidation_view_url': certificate_invalidation_view_url,
+        'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
     }
 
     return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)
@@ -504,7 +504,7 @@ def _section_course_info(course, access):
 
     try:
         sorted_cutoffs = sorted(list(course.grade_cutoffs.items()), key=lambda i: i[1], reverse=True)
-        advance = lambda memo, (letter, score): u"{}: {}, ".format(letter, score) + memo
+        advance = lambda memo, letter_score_tuple: u"{}: {}, ".format(letter_score_tuple[0], letter_score_tuple[1]) + memo  # pylint: disable=line-too-long
         section_data['grade_cutoffs'] = reduce(advance, sorted_cutoffs, "")[:-2]
     except Exception:  # pylint: disable=broad-except
         section_data['grade_cutoffs'] = "Not Available"
@@ -549,7 +549,8 @@ def _section_membership(course, access):
             'update_forum_role_membership',
             kwargs={'course_id': six.text_type(course_key)}
         ),
-        'enrollment_role_choices': enrollment_role_choices
+        'enrollment_role_choices': enrollment_role_choices,
+        'is_reason_field_enabled': configuration_helpers.get_value('ENABLE_MANUAL_ENROLLMENT_REASON_FIELD', False)
     }
     return section_data
 
@@ -708,13 +709,15 @@ def _section_data_download(course, access):
         ),
         'export_ora2_data_url': reverse('export_ora2_data', kwargs={'course_id': six.text_type(course_key)}),
     }
+    if not access.get('data_researcher'):
+        section_data['is_hidden'] = True
     return section_data
 
 
 def null_applicable_aside_types(block):  # pylint: disable=unused-argument
     """
     get_aside method for monkey-patching into applicable_aside_types
-    while rendering an HtmlDescriptor for email text editing. This returns
+    while rendering an HtmlBlock for email text editing. This returns
     an empty list.
     """
     return []
@@ -726,8 +729,8 @@ def _section_send_email(course, access):
 
     # Monkey-patch applicable_aside_types to return no asides for the duration of this render
     with patch.object(course.runtime, 'applicable_aside_types', null_applicable_aside_types):
-        # This HtmlDescriptor is only being used to generate a nice text editor.
-        html_module = HtmlDescriptor(
+        # This HtmlBlock is only being used to generate a nice text editor.
+        html_module = HtmlBlock(
             course.system,
             DictFieldData({'data': ''}),
             ScopeIds(None, None, None, course_key.make_usage_key('html', 'fake'))
@@ -739,7 +742,7 @@ def _section_send_email(course, access):
         usage_id_serializer=lambda usage_id: quote_slashes(six.text_type(usage_id)),
         # Generate a new request_token here at random, because this module isn't connected to any other
         # xblock rendering.
-        request_token=uuid.uuid1().get_hex()
+        request_token=uuid.uuid1().hex
     )
     cohorts = []
     if is_course_cohorted(course_key):
@@ -773,7 +776,7 @@ def _section_send_email(course, access):
 def _get_dashboard_link(course_key):
     """ Construct a URL to the external analytics dashboard """
     analytics_dashboard_url = u'{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, six.text_type(course_key))
-    link = HTML(u"<a href=\"{0}\" target=\"_blank\">{1}</a>").format(
+    link = HTML(u"<a href=\"{0}\" rel=\"noopener\" target=\"_blank\">{1}</a>").format(
         analytics_dashboard_url, settings.ANALYTICS_DASHBOARD_NAME
     )
     return link
@@ -790,23 +793,6 @@ def _section_analytics(course, access):
     return section_data
 
 
-def _section_metrics(course, access):
-    """Provide data for the corresponding dashboard section """
-    course_key = course.id
-    section_data = {
-        'section_key': 'metrics',
-        'section_display_name': _('Metrics'),
-        'access': access,
-        'course_id': six.text_type(course_key),
-        'sub_section_display_name': get_section_display_name(course_key),
-        'section_has_problem': get_array_section_has_problem(course_key),
-        'get_students_opened_subsection_url': reverse('get_students_opened_subsection'),
-        'get_students_problem_grades_url': reverse('get_students_problem_grades'),
-        'post_metrics_data_csv_url': reverse('post_metrics_data_csv'),
-    }
-    return section_data
-
-
 def _section_open_response_assessment(request, course, openassessment_blocks, access):
     """Provide data for the corresponding dashboard section """
     course_key = course.id
@@ -819,10 +805,10 @@ def _section_open_response_assessment(request, course, openassessment_blocks, ac
         result_item_id = six.text_type(block.location)
         if block_parent_id not in parents:
             parents[block_parent_id] = modulestore().get_item(block.parent)
-
+        assessment_name = _("Team") + " : " + block.display_name if block.teams_enabled else block.display_name
         ora_items.append({
             'id': result_item_id,
-            'name': block.display_name,
+            'name': assessment_name,
             'parent_id': block_parent_id,
             'parent_name': parents[block_parent_id].display_name,
             'staff_assessment': 'staff-assessment' in block.assessment_steps,

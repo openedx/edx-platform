@@ -1,11 +1,12 @@
 """
 Helper functions for loading environment settings.
 """
-from __future__ import absolute_import, print_function
+
 
 import io
 import json
 import os
+import re
 import sys
 from time import sleep
 
@@ -76,6 +77,9 @@ class Env(object):
         REPO_ROOT / "node_modules" / "edx-custom-a11y-rules" /
         "lib" / "custom_a11y_rules.js"
     )
+
+    # Which Python version should be used in xdist workers?
+    PYTHON_VERSION = os.environ.get("PYTHON_VERSION", "2.7")
 
     # If set, put reports for run in "unique" directories.
     # The main purpose of this is to ensure that the reports can be 'slurped'
@@ -267,6 +271,25 @@ class Env(object):
             with io.open(cls.PRINT_SETTINGS_LOG_FILE, 'r') as f:
                 print(f.read())
             sys.exit(1)
+
+    @classmethod
+    def get_nested_django_setting(cls, django_setting, nested_django_setting, system, settings=None):
+        """
+        Interrogate Django environment for specific nested settings values
+        :param django_setting: the root django setting to get
+        :param nested_django_setting: the nested django setting to get
+        :param system: the django app to use when asking for the setting (lms | cms)
+        :param settings: the settings file to use when asking for the value
+        :return: unicode value of the django setting
+        """
+        django_setting_value = cls.get_django_setting(django_setting, system, settings)
+        pattern = re.compile(
+            u"[\"']{setting}[\"']: [\"'](?P<setting_value>.*?)[\"']".format(setting=nested_django_setting)
+        )
+        match = pattern.search(django_setting_value)
+        if match:
+            return match.group('setting_value')
+        return None
 
     @classmethod
     def covered_modules(cls):

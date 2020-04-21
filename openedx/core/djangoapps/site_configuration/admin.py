@@ -1,7 +1,7 @@
 """
 Django admin page for Site Configuration models
 """
-from __future__ import absolute_import
+
 
 from django.contrib import admin
 
@@ -12,8 +12,8 @@ class SiteConfigurationAdmin(admin.ModelAdmin):
     """
     Admin interface for the SiteConfiguration object.
     """
-    list_display = ('site', 'enabled', 'values')
-    search_fields = ('site__domain', 'values')
+    list_display = ('site', 'enabled', 'site_values')
+    search_fields = ('site__domain', 'site_values')
 
     class Meta(object):
         """
@@ -29,7 +29,7 @@ class SiteConfigurationHistoryAdmin(admin.ModelAdmin):
     Admin interface for the SiteConfigurationHistory object.
     """
     list_display = ('site', 'enabled', 'created', 'modified')
-    search_fields = ('site__domain', 'values', 'created', 'modified')
+    search_fields = ('site__domain', 'site_values', 'created', 'modified')
 
     ordering = ['-created']
 

@@ -2,7 +2,7 @@
 Data Aggregation Layer of the Enrollment API. Collects all enrollment specific data into a single
 source to be used throughout the API.
 """
-from __future__ import absolute_import
+
 
 import logging
 
@@ -34,13 +34,13 @@ from student.roles import RoleCache
 log = logging.getLogger(__name__)
 
 
-def get_course_enrollments(user_id, include_inactive=False):
+def get_course_enrollments(username, include_inactive=False):
     """Retrieve a list representing all aggregated data for a user's course enrollments.
 
     Construct a representation of all course enrollment data for a specific user.
 
     Args:
-        user_id (str): The name of the user to retrieve course enrollment information for.
+        username: The name of the user to retrieve course enrollment information for.
         include_inactive (bool): Determines whether inactive enrollments will be included
 
 
@@ -49,7 +49,7 @@ def get_course_enrollments(user_id, include_inactive=False):
 
     """
     qset = CourseEnrollment.objects.filter(
-        user__username=user_id,
+        user__username=username,
     ).order_by('created')
 
     if not include_inactive:
@@ -71,7 +71,7 @@ def get_course_enrollments(user_id, include_inactive=False):
             (
                 u"Course enrollments for user %s reference "
                 u"courses that do not exist (this can occur if a course is deleted)."
-            ), user_id,
+            ), username,
         )
 
     return valid
@@ -191,13 +191,13 @@ def update_course_enrollment(username, course_id, mode=None, is_active=None):
         return None
 
 
-def add_or_update_enrollment_attr(user_id, course_id, attributes):
+def add_or_update_enrollment_attr(username, course_id, attributes):
     """Set enrollment attributes for the enrollment of given user in the
     course provided.
 
     Args:
         course_id (str): The Course to set enrollment attributes for.
-        user_id (str): The User to set enrollment attributes for.
+        username: The User to set enrollment attributes for.
         attributes (list): Attributes to be set.
 
     Example:
@@ -214,17 +214,17 @@ def add_or_update_enrollment_attr(user_id, course_id, attributes):
         )
     """
     course_key = CourseKey.from_string(course_id)
-    user = _get_user(user_id)
+    user = _get_user(username)
     enrollment = CourseEnrollment.get_enrollment(user, course_key)
     if not _invalid_attribute(attributes) and enrollment is not None:
         CourseEnrollmentAttribute.add_enrollment_attr(enrollment, attributes)
 
 
-def get_enrollment_attributes(user_id, course_id):
+def get_enrollment_attributes(username, course_id):
     """Retrieve enrollment attributes for given user for provided course.
 
     Args:
-        user_id: The User to get enrollment attributes for
+        username: The User to get enrollment attributes for
         course_id (str): The Course to get enrollment attributes for.
 
     Example:
@@ -240,18 +240,18 @@ def get_enrollment_attributes(user_id, course_id):
     Returns: list
     """
     course_key = CourseKey.from_string(course_id)
-    user = _get_user(user_id)
+    user = _get_user(username)
     enrollment = CourseEnrollment.get_enrollment(user, course_key)
     return CourseEnrollmentAttribute.get_enrollment_attributes(enrollment)
 
 
-def unenroll_user_from_all_courses(user_id):
+def unenroll_user_from_all_courses(username):
     """
     Set all of a user's enrollments to inactive.
-    :param user_id: The user being unenrolled.
+    :param username: The user being unenrolled.
     :return: A list of all courses from which the user was unenrolled.
     """
-    user = _get_user(user_id)
+    user = _get_user(username)
     enrollments = CourseEnrollment.objects.filter(user=user)
     with transaction.atomic():
         for enrollment in enrollments:
@@ -260,18 +260,18 @@ def unenroll_user_from_all_courses(user_id):
     return set([str(enrollment.course_id.org) for enrollment in enrollments])
 
 
-def _get_user(user_id):
-    """Retrieve user with provided user_id
+def _get_user(username):
+    """Retrieve user with provided username
 
     Args:
-        user_id(str): username of the user for which object is to retrieve
+        username: username of the user for which object is to retrieve
 
     Returns: obj
     """
     try:
-        return User.objects.get(username=user_id)
+        return User.objects.get(username=username)
     except User.DoesNotExist:
-        msg = u"Not user with username '{username}' found.".format(username=user_id)
+        msg = u"Not user with username '{username}' found.".format(username=username)
         log.warn(msg)
         raise UserNotFoundError(msg)
 
@@ -286,7 +286,7 @@ def _invalid_attribute(attributes):
     """Validate enrollment attribute
 
     Args:
-        attributes(dict): dict of attribute
+        attributes(List): List of attribute dicts
 
     Return:
         list of invalid attributes
@@ -342,14 +342,14 @@ def get_course_enrollment_info(course_id, include_expired=False):
         return CourseSerializer(course, include_expired=include_expired).data
 
 
-def get_user_roles(user_id):
+def get_user_roles(username):
     """
     Returns a list of all roles that this user has.
-    :param user_id: The id of the selected user.
+    :param username: The id of the selected user.
     :return: All roles for all courses that this user has.
     """
     # pylint: disable=protected-access
-    user = _get_user(user_id)
+    user = _get_user(username)
     if not hasattr(user, '_roles'):
         user._roles = RoleCache(user)
     role_cache = user._roles

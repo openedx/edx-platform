@@ -4,9 +4,9 @@ Enrolls the user in the DemoX course.
 Optionally takes in username, email, and course UUID arguments.
 """
 
-from __future__ import absolute_import, unicode_literals
 
 from datetime import datetime
+from textwrap import dedent
 from uuid import uuid4
 
 from consent.models import DataSharingConsent
@@ -34,8 +34,11 @@ from ...models import UserOrgTag
 
 class Command(BaseCommand):
     """
-    Implementation of the create_user_gdpr_testing command.
+    Create a user with GDPR P1 PII for manual testing.
+    Enrolls the user in the DemoX course.
+    Optionally takes in username, email, and course UUID arguments.
     """
+    help = dedent(__doc__).strip()
 
     def add_arguments(self, parser):
         parser.add_argument(

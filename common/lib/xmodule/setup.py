@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 from setuptools import find_packages, setup
 
@@ -9,10 +9,10 @@ XMODULES = [
     "course = xmodule.course_module:CourseDescriptor",
     "customtag = xmodule.template_module:CustomTagDescriptor",
     "discuss = xmodule.backcompat_module:TranslateCustomTagDescriptor",
-    "html = xmodule.html_module:HtmlDescriptor",
     "image = xmodule.backcompat_module:TranslateCustomTagDescriptor",
     "library_content = xmodule.library_content_module:LibraryContentDescriptor",
     "error = xmodule.error_module:ErrorDescriptor",
+    "nonstaff_error = xmodule.error_module:NonStaffErrorDescriptor",
     "poll_question = xmodule.poll_module:PollDescriptor",
     "problemset = xmodule.seq_module:SequenceDescriptor",
     "randomize = xmodule.randomize_module:RandomizeDescriptor",
@@ -22,10 +22,7 @@ XMODULES = [
     "slides = xmodule.backcompat_module:TranslateCustomTagDescriptor",
     "videodev = xmodule.backcompat_module:TranslateCustomTagDescriptor",
     "videosequence = xmodule.seq_module:SequenceDescriptor",
-    "course_info = xmodule.html_module:CourseInfoDescriptor",
-    "static_tab = xmodule.html_module:StaticTabDescriptor",
     "custom_tag_template = xmodule.raw_module:RawDescriptor",
-    "about = xmodule.html_module:AboutDescriptor",
     "annotatable = xmodule.annotatable_module:AnnotatableDescriptor",
     "word_cloud = xmodule.word_cloud_module:WordCloudDescriptor",
     "hidden = xmodule.hidden_module:HiddenDescriptor",
@@ -33,8 +30,13 @@ XMODULES = [
     "lti = xmodule.lti_module:LTIDescriptor",
 ]
 XBLOCKS = [
+    "about = xmodule.html_module:AboutBlock",
+    "course_info = xmodule.html_module:CourseInfoBlock",
+    "html = xmodule.html_module:HtmlBlock",
     "library = xmodule.library_root_xblock:LibraryRoot",
     "problem = xmodule.capa_module:ProblemBlock",
+    "static_tab = xmodule.html_module:StaticTabBlock",
+    "unit = xmodule.unit_block:UnitBlock",
     "vertical = xmodule.vertical_block:VerticalBlock",
     "video = xmodule.video_module:VideoBlock",
     "videoalpha = xmodule.video_module:VideoBlock",

@@ -1,7 +1,7 @@
 """
 Configuration for the openedx.core.djangoapps.util Django application
 """
-from __future__ import absolute_import
+
 
 from django.apps import AppConfig
 

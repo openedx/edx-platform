@@ -2,7 +2,7 @@
 Tests around our XML modulestore, including importing
 well-formed and not-well-formed XML.
 """
-from __future__ import absolute_import
+
 
 import os.path
 from glob import glob
@@ -42,7 +42,7 @@ class TestXMLModuleStore(TestCase):
         # uniquification of names, would raise a UnicodeError. It no longer does.
 
         # Ensure that there really is a non-ASCII character in the course.
-        with open(os.path.join(DATA_DIR, "toy/sequential/vertical_sequential.xml")) as xmlf:
+        with open(os.path.join(DATA_DIR, "toy/sequential/vertical_sequential.xml"), 'rb') as xmlf:
             xml = xmlf.read()
             with self.assertRaises(UnicodeDecodeError):
                 xml.decode('ascii')
@@ -133,7 +133,7 @@ class TestXMLModuleStore(TestCase):
         self.assertIsNotNone(parent, "get_parent failed to return a value")
         parent_loc = course_key.make_usage_key('vertical', 'vertical_test')
         self.assertEqual(parent.location, parent_loc)
-        self.assertIn(shared_item, parent.get_children())
+        self.assertIn(shared_item.location, [x.location for x in parent.get_children()])
         # ensure it's still a child of the other parent even tho it doesn't claim the other parent as its parent
         other_parent_loc = course_key.make_usage_key('vertical', 'zeta')
         other_parent = store.get_item(other_parent_loc)

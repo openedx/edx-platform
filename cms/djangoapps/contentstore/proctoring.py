@@ -2,7 +2,6 @@
 Code related to the handling of Proctored Exams in Studio
 """
 
-from __future__ import absolute_import
 
 import logging
 

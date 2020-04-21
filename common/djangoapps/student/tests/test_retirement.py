@@ -1,7 +1,7 @@
 """
 Test user retirement methods
 """
-from __future__ import absolute_import
+
 
 import json
 
@@ -13,6 +13,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.models import (
     _get_all_retired_emails_by_email,
     _get_all_retired_usernames_by_username,
@@ -258,6 +259,7 @@ def test_get_potentially_retired_user_bad_hash():
 
 
 @ddt.ddt
+@skip_unless_lms
 class TestRegisterRetiredUsername(TestCase):
     """
     Tests to ensure that retired usernames can no longer be used in registering new accounts.
@@ -284,7 +286,7 @@ class TestRegisterRetiredUsername(TestCase):
         Validates a response stating that a username already exists -or- is invalid.
         """
         assert response.status_code == 409
-        obj = json.loads(response.content)
+        obj = json.loads(response.content.decode('utf-8'))
 
         username_msg = obj['username'][0]['user_message']
         assert username_msg.startswith(start_msg)

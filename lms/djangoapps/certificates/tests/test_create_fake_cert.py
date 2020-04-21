@@ -1,7 +1,7 @@
 """Tests for the create_fake_certs management command. """
 
-from __future__ import absolute_import
 
+import six
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
@@ -46,7 +46,11 @@ class CreateFakeCertTest(TestCase):
         self.assertEqual(cert.mode, 'honor')
 
     def test_too_few_args(self):
-        with self.assertRaisesRegexp(CommandError, 'Error: too few arguments'):
+        if six.PY2:
+            errstring = 'Error: too few arguments'
+        else:
+            errstring = 'Error: the following arguments are required: COURSE_KEY'
+        with self.assertRaisesRegex(CommandError, errstring):
             self._run_command(self.USERNAME)
 
     def _run_command(self, *args, **kwargs):

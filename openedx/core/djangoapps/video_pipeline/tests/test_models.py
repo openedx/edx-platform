@@ -1,7 +1,7 @@
 """
 Tests for the models that configures 'VideoUploadsEnabledByDefault' feature.
 """
-from __future__ import absolute_import
+
 import ddt
 import itertools
 

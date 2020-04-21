@@ -2,7 +2,6 @@
 View logic for handling course messages.
 """
 
-from __future__ import absolute_import
 
 from datetime import datetime
 
@@ -17,7 +16,7 @@ from pytz import UTC
 from web_fragments.fragment import Fragment
 
 from course_modes.models import CourseMode
-from courseware.courses import get_course_date_blocks, get_course_with_access
+from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_with_access
 from lms.djangoapps.course_goals.api import (
     get_course_goal,
     get_course_goal_options,
@@ -26,7 +25,7 @@ from lms.djangoapps.course_goals.api import (
     valid_course_goals_ordered
 )
 from lms.djangoapps.course_goals.models import GOAL_KEY_CHOICES
-from lms.djangoapps.courseware.courses import allow_public_access
+from lms.djangoapps.courseware.access_utils import check_public_access
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import CourseHomeMessages
@@ -112,7 +111,7 @@ def _register_course_home_messages(request, course, user_access, course_start_da
     """
     Register messages to be shown in the course home content page.
     """
-    allow_anonymous = allow_public_access(course, [COURSE_VISIBILITY_PUBLIC])
+    allow_anonymous = check_public_access(course, [COURSE_VISIBILITY_PUBLIC])
 
     if user_access['is_anonymous'] and not allow_anonymous:
         sign_in_or_register_text = (_(u'{sign_in_link} or {register_link} and then enroll in this course.')

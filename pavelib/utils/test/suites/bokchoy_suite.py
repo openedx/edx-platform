@@ -2,7 +2,7 @@
 """
 Class used for defining and running Bok Choy acceptance test suite
 """
-from __future__ import absolute_import, print_function
+
 
 import os
 from time import sleep
@@ -300,6 +300,7 @@ class BokChoyTestSuite(TestSuite):
         # screenshots and XUnit XML reports
         cmd = [
             "DEFAULT_STORE={}".format(self.default_store),
+            "SAVED_SOURCE_DIR='{}'".format(self.log_dir),
             "SCREENSHOT_DIR='{}'".format(self.log_dir),
             "BOK_CHOY_HAR_DIR='{}'".format(self.har_dir),
             "BOKCHOY_A11Y_CUSTOM_RULES_FILE='{}'".format(self.a11y_file),

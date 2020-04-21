@@ -1,19 +1,22 @@
 """
 Common utilities for the course experience, including course outline.
 """
-from __future__ import absolute_import
+
+
+from datetime import timedelta
 
 from completion.models import BlockCompletion
-from django.utils.translation import ugettext as _
+from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 from six.moves import range
-from web_fragments.fragment import Fragment
 
+from course_modes.models import CourseMode
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
-from openedx.core.djangolib.markup import HTML
+from lms.djangoapps.courseware.access import has_access
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.cache_utils import request_cached
-from openedx.features.discounts.applicability import can_receive_discount, discount_percentage
+from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
 
@@ -63,7 +66,7 @@ def get_course_outline_block_tree(request, course_id, user=None):
         if last_completed_child_position:
             # Mutex w/ NOT 'course_block_completions'
             recurse_mark_complete(
-                course_block_completions=BlockCompletion.get_course_completions(user, course_key),
+                course_block_completions=BlockCompletion.get_learning_context_completions(user, course_key),
                 latest_completion=last_completed_child_position,
                 block=block
             )
@@ -125,6 +128,48 @@ def get_course_outline_block_tree(request, course_id, user=None):
                 # we'll use the last child.
                 block['children'][-1]['resume_block'] = True
 
+    def recurse_mark_scored(block):
+        """
+        Mark this block as 'scored' if any of its descendents are 'scored' (that is, 'has_score' and 'weight' > 0).
+        """
+        is_scored = block.get('has_score', False) and block.get('weight', 1) > 0
+        # Use a list comprehension to force the recursion over all children, rather than just stopping
+        # at the first child that is scored.
+        children_scored = any([recurse_mark_scored(child) for child in block.get('children', [])])
+        if is_scored or children_scored:
+            block['scored'] = True
+            return True
+        else:
+            block['scored'] = False
+            return False
+
+    def recurse_num_graded_problems(block):
+        """
+        Marks each block with the number of graded and scored leaf blocks below it as 'num_graded_problems'
+        """
+        is_scored = block.get('has_score') and block.get('weight', 1) > 0
+        is_graded = block.get('graded')
+
+        num_graded_problems = 1 if is_scored and is_graded else 0
+        num_graded_problems += sum(recurse_num_graded_problems(child) for child in block.get('children', []))
+
+        block['num_graded_problems'] = num_graded_problems
+        return num_graded_problems
+
+    def recurse_mark_auth_denial(block):
+        """
+        Mark this block as 'scored' if any of its descendents are 'scored' (that is, 'has_score' and 'weight' > 0).
+        """
+        own_denial_reason = {block['authorization_denial_reason']} if 'authorization_denial_reason' in block else set()
+        # Use a list comprehension to force the recursion over all children, rather than just stopping
+        # at the first child that is scored.
+        child_denial_reasons = own_denial_reason.union(
+            *(recurse_mark_auth_denial(child) for child in block.get('children', []))
+        )
+        if child_denial_reasons:
+            block['all_denial_reasons'] = child_denial_reasons
+        return child_denial_reasons
+
     course_key = CourseKey.from_string(course_id)
     course_usage_key = modulestore().make_course_usage_key(course_key)
 
@@ -154,6 +199,8 @@ def get_course_outline_block_tree(request, course_id, user=None):
             'type',
             'due',
             'graded',
+            'has_score',
+            'weight',
             'special_exam_info',
             'show_gated_sections',
             'format'
@@ -164,6 +211,9 @@ def get_course_outline_block_tree(request, course_id, user=None):
     course_outline_root_block = all_blocks['blocks'].get(all_blocks['root'], None)
     if course_outline_root_block:
         populate_children(course_outline_root_block, all_blocks['blocks'])
+        recurse_mark_scored(course_outline_root_block)
+        recurse_num_graded_problems(course_outline_root_block)
+        recurse_mark_auth_denial(course_outline_root_block)
         if user:
             set_last_accessed_default(course_outline_root_block)
             mark_blocks_completed(
@@ -191,17 +241,33 @@ def get_resume_block(block):
     return block
 
 
-def get_first_purchase_offer_banner_fragment(user, course):
-    if user and course and can_receive_discount(user=user, course=course):
-        # Translator: xgettext:no-python-format
-        offer_message = _(u'{banner_open}{percentage}% off your first upgrade.{span_close}'
-                          u' Discount automatically applied.{div_close}')
-        return Fragment(HTML(offer_message).format(
-            banner_open=HTML(
-                '<div class="first-purchase-offer-banner"><span class="first-purchase-offer-banner-bold">'
-            ),
-            percentage=discount_percentage(),
-            span_close=HTML('</span>'),
-            div_close=HTML('</div>')
-        ))
-    return None
+def reset_deadlines_banner_should_display(course_key, request):
+    """
+    Return whether or not the reset banner should display,
+    determined by whether or not a course has any past-due,
+    incomplete sequentials
+    """
+    display_reset_dates_banner = False
+    course_overview = CourseOverview.objects.get(id=str(course_key))
+    course_end_date = getattr(course_overview, 'end_date', None)
+    is_self_paced = getattr(course_overview, 'self_paced', False)
+    is_course_staff = bool(
+        request.user and course_overview and has_access(request.user, 'staff', course_overview, course_overview.id)
+    )
+    if is_self_paced and (not is_course_staff) and (not course_end_date or timezone.now() < course_end_date):
+        if (CourseEnrollment.objects.filter(
+            course=course_overview, user=request.user, mode=CourseMode.VERIFIED
+        ).exists()):
+            course_block_tree = get_course_outline_block_tree(
+                request, str(course_key), request.user
+            )
+            course_sections = course_block_tree.get('children', [])
+            for section in course_sections:
+                if display_reset_dates_banner:
+                    break
+                for subsection in section.get('children', []):
+                    if (not subsection.get('complete', True)
+                            and subsection.get('due', timezone.now() + timedelta(1)) < timezone.now()):
+                        display_reset_dates_banner = True
+                        break
+    return display_reset_dates_banner

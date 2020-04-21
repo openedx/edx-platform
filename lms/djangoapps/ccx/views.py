@@ -1,7 +1,7 @@
 """
 Views related to the Custom Courses feature.
 """
-from __future__ import absolute_import
+
 
 import csv
 import datetime
@@ -9,7 +9,7 @@ import functools
 import json
 import logging
 from copy import deepcopy
-from cStringIO import StringIO
+from six import StringIO
 
 import pytz
 import six
@@ -26,8 +26,7 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from opaque_keys.edx.keys import CourseKey
 
-from courseware.access import has_access
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import (
@@ -36,6 +35,7 @@ from lms.djangoapps.ccx.overrides import (
     get_override_for_ccx,
     override_field_for_ccx
 )
+from lms.djangoapps.ccx.permissions import VIEW_CCX_COACH_DASHBOARD
 from lms.djangoapps.ccx.utils import (
     add_master_course_staff_to_ccx,
     assign_staff_role_to_ccx,
@@ -90,10 +90,7 @@ def coach_dashboard(view):
         if not course.enable_ccx:
             raise Http404
         else:
-            is_staff = has_access(request.user, 'staff', course)
-            is_instructor = has_access(request.user, 'instructor', course)
-
-            if is_staff or is_instructor:
+            if bool(request.user.has_perm(VIEW_CCX_COACH_DASHBOARD, course)):
                 # if user is staff or instructor then he can view ccx coach dashboard.
                 return view(request, course, ccx)
             else:
@@ -315,7 +312,7 @@ def save_ccx(request, course, ccx=None):
         return earliest, ccx_ids_to_delete
 
     graded = {}
-    earliest, ccx_ids_to_delete = override_fields(course, json.loads(request.body), graded, [])
+    earliest, ccx_ids_to_delete = override_fields(course, json.loads(request.body.decode('utf8')), graded, [])
     bulk_delete_ccx_override_fields(ccx, ccx_ids_to_delete)
     if earliest:
         override_field_for_ccx(ccx, course, 'start', earliest)
@@ -541,7 +538,7 @@ def ccx_grades_csv(request, course, ccx=None):
                 if not header:
                     # Encode the header row in utf-8 encoding in case there are
                     # unicode characters
-                    header = [section['label'].encode('utf-8')
+                    header = [section['label'].encode('utf-8') if six.PY2 else section['label']
                               for section in course_grade.summary[u'section_breakdown']]
                     rows.append(["id", "email", "username", "grade"] + header)
 
@@ -552,7 +549,8 @@ def ccx_grades_csv(request, course, ccx=None):
                 }
 
                 row_percents = [percents.get(label, 0.0) for label in header]
-                rows.append([student.id, student.email, student.username,
+                rows.append([student.id, student.email.encode('utf-8'),
+                             student.username.encode('utf-8'),
                              course_grade.percent] + row_percents)
 
         buf = StringIO()

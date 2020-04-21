@@ -5,7 +5,8 @@
 <%!
 import json
 import pytz
-from courseware.context_processor import user_timezone_locale_prefs
+import six
+from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from datetime import datetime, timedelta
 from django.utils import timezone
 from django.utils.translation import ugettext as _
@@ -136,6 +137,11 @@ from student.models import CourseEnrollment
       </div>
     %endif
 
+    ${static.renderReact(
+      component="EnterpriseLearnerPortalBanner",
+      id="enterprise-learner-portal-banner",
+      props={}
+    )}
 </div>
 
 <section class="dashboard" id="dashboard-main">
@@ -179,7 +185,7 @@ from student.models import CourseEnrollment
                 pseudo_session = unfulfilled_entitlement_pseudo_sessions[str(entitlement.uuid)]
                 if not pseudo_session:
                     continue
-                enrollment = CourseEnrollment(user=user, course_id=pseudo_session['key'], mode=pseudo_session['type'])
+                enrollment = CourseEnrollment(user=user, course=CourseOverview.get_from_id(pseudo_session['key']), mode=pseudo_session['type'])
               # We only show email settings for entitlement cards if the entitlement has an associated enrollment
               show_email_settings = is_fulfilled_entitlement and (entitlement_session.course_id in show_email_settings_for)
             else:
@@ -196,7 +202,7 @@ from student.models import CourseEnrollment
             is_course_blocked = (session_id in block_courses)
             course_verification_status = verification_status_by_course.get(session_id, {})
             course_requirements = courses_requirements_not_met.get(session_id)
-            related_programs = inverted_programs.get(unicode(entitlement.course_uuid if is_unfulfilled_entitlement else session_id))
+            related_programs = inverted_programs.get(six.text_type(entitlement.course_uuid if is_unfulfilled_entitlement else session_id))
             show_consent_link = (session_id in consent_required_courses)
             course_overview = enrollment.course_overview
             resume_button_url = resume_button_urls[dashboard_index]
@@ -272,7 +278,7 @@ from student.models import CourseEnrollment
               <div class="advertise-message">
                   ${_("Browse recently launched courses and see what's new in your favorite subjects.")}
               </div>
-              <div class="ad-link">
+              <div class="marketing-link">
                   <a class="btn-neutral" href="${marketing_link('COURSES')}">
                       <span class="icon fa fa-search" aria-hidden="true"></span>
                       ${_("Explore New Courses")}
@@ -282,6 +288,22 @@ from student.models import CourseEnrollment
       </div>
   % endif
 
+  <% account_mfe_url = getattr(settings, 'ACCOUNT_MICROFRONTEND_URL', '') or '' %>
+  % if plugins.get("coaching", {}).get("show_coaching_aside"):
+    <div class="wrapper-coaching">
+        <div class="coaching-signup">
+            <div class="coaching-prompt">
+                ${_("Take advantage of free coaching!")}
+            </div>
+            <div class="coaching-link">
+                <a class="btn-neutral" href="${account_mfe_url}">
+                  ${_("Get Started")}
+                </a>
+            </div>
+        </div>
+    </div>
+  % endif
+
   % if display_sidebar_on_dashboard:
     <section class="profile-sidebar" id="profile-sidebar" role="region" aria-label="Account Status Info">
       <header class="profile">
@@ -289,15 +311,6 @@ from student.models import CourseEnrollment
       </header>
       <section class="user-info">
         <ul>
-
-          % if len(order_history_list):
-          <li class="order-history">
-            <span class="title">${_("Order History")}</span>
-            % for order_history_item in order_history_list:
-              <span><a href="${order_history_item['receipt_url']}" target="_blank" class="edit-name">${order_history_item['order_date']}</a></span>
-            % endfor
-          </li>
-          % endif
 
           <%include file="${theming_helpers.get_template_path('dashboard/_dashboard_status_verification.html')}" />
 

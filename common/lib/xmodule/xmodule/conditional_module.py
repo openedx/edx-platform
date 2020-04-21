@@ -2,7 +2,6 @@
 some xmodules by conditions.
 """
 
-from __future__ import absolute_import
 
 import json
 import logging
@@ -167,7 +166,7 @@ class ConditionalModule(ConditionalFields, XModule, StudioEditableModule):
                     if module is not None:
                         # We do not want to log when module is None, and it is when requester
                         # does not have access to the requested required module.
-                        log.warn('Error in conditional module: \
+                        log.warning('Error in conditional module: \
                             required module {module} has no {module_attr}'.format(module=module, module_attr=attr_name))
                     return False
 
@@ -320,7 +319,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor, StudioEditabl
                     show_tag_list.append(location)
             else:
                 try:
-                    descriptor = system.process_xml(etree.tostring(child))
+                    descriptor = system.process_xml(etree.tostring(child, encoding='unicode'))
                     children.append(descriptor.scope_ids.usage_id)
                 except:
                     msg = "Unable to load child when parsing Conditional."

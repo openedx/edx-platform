@@ -1,5 +1,5 @@
 """ Management command to cleanup old waiting enrollments """
-from __future__ import absolute_import
+
 
 import logging
 
@@ -32,5 +32,5 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         expiration_days = options.get('expiration_days')
-        logger.info(u'Deleting waiting enrollments unmodified for %s days', expiration_days)
+        logger.info('Deleting waiting enrollments unmodified for %s days', expiration_days)
         tasks.expire_waiting_enrollments(expiration_days)

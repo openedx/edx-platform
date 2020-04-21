@@ -1,5 +1,5 @@
 # pylint: disable=missing-docstring
-from __future__ import absolute_import
+
 
 import itertools
 
@@ -159,7 +159,7 @@ class NotifierUsersViewSetTest(UrlResetMixin, ModuleStoreTestCase):
         )
         return self.list_view(request)
 
-    def _get_list(self, page=1, page_size=None):
+    def _get_list(self, page=1, page_size=''):
         response = self._make_list_request(page, page_size)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -234,7 +234,7 @@ class NotifierUsersViewSetTest(UrlResetMixin, ModuleStoreTestCase):
             users.append(new_user)
             UserPreferenceFactory(user=new_user, key=NOTIFICATION_PREF_KEY)
 
-        num_pages = (num_users - 1) / page_size + 1
+        num_pages = (num_users - 1) // page_size + 1
         result_list = []
         for i in range(1, num_pages + 1):
             result_list.extend(self._get_list(page=i, page_size=page_size))

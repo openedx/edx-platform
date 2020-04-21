@@ -4,7 +4,6 @@ Student and course analytics.
 Format and create csv responses
 """
 
-from __future__ import absolute_import
 
 import csv
 
@@ -32,11 +31,11 @@ def create_csv_response(filename, header, datarows):
         quotechar='"',
         quoting=csv.QUOTE_ALL)
 
-    encoded_header = [six.text_type(s).encode('utf-8') for s in header]
+    encoded_header = [six.text_type(s) for s in header]
     csvwriter.writerow(encoded_header)
 
     for datarow in datarows:
-        encoded_row = [six.text_type(s).encode('utf-8') for s in datarow]
+        encoded_row = [six.text_type(s) for s in datarow]
         csvwriter.writerow(encoded_row)
 
     return response

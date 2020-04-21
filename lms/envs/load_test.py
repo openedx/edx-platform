@@ -6,7 +6,6 @@ Settings for load testing.
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
 
-from __future__ import absolute_import
 
 from six.moves import filter
 
@@ -20,4 +19,4 @@ EXCLUDE_CSRF = lambda elem: elem not in [
 DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] = list(filter(
     EXCLUDE_CSRF, DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors']
 ))
-MIDDLEWARE_CLASSES = list(filter(EXCLUDE_CSRF, MIDDLEWARE_CLASSES))
+MIDDLEWARE = list(filter(EXCLUDE_CSRF, MIDDLEWARE))

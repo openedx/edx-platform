@@ -1,7 +1,7 @@
 """
 Tests for send_email_base_command
 """
-from __future__ import absolute_import
+
 
 import datetime
 from unittest import skipUnless
@@ -35,6 +35,11 @@ class TestSendEmailBaseCommand(CacheIsolationTestCase):
                 datetime.datetime(2017, 9, 29, tzinfo=pytz.UTC),
                 None
             )
+
+    def test_weeks_option(self):
+        with patch.object(self.command, 'enqueue') as enqueue:
+            self.command.handle(site_domain_name=self.site.domain, date='2017-09-29', weeks=12)
+            self.assertEqual(enqueue.call_count, 12)
 
     def test_send_emails(self):
         with patch.multiple(

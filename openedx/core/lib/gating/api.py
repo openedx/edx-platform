@@ -1,26 +1,25 @@
 """
 API for the gating djangoapp
 """
-from __future__ import absolute_import
+
 import json
 import logging
 
+from completion.models import BlockCompletion
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.translation import ugettext as _
-
-from completion.models import BlockCompletion
-from lms.djangoapps.courseware.access import _has_access_to_course
-from lms.djangoapps.course_blocks.api import get_course_blocks
-from lms.djangoapps.grades.api import SubsectionGradeFactory
 from milestones import api as milestones_api
 from opaque_keys.edx.keys import UsageKey
+from xblock.completable import XBlockCompletionMode as CompletionMode
+
+from lms.djangoapps.course_blocks.api import get_course_blocks
+from lms.djangoapps.courseware.access import _has_access_to_course
+from lms.djangoapps.grades.api import SubsectionGradeFactory
 from openedx.core.lib.gating.exceptions import GatingValidationError
 from util import milestones_helpers
-from xblock.completable import XBlockCompletionMode as CompletionMode
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-import six
 
 log = logging.getLogger(__name__)
 
@@ -164,7 +163,7 @@ def get_prerequisites(course_key):
         milestone = milestones_by_block_id.get(block.location.block_id)
         if milestone:
             milestone['block_display_name'] = block.display_name
-            milestone['block_usage_key'] = six.text_type(block.location)
+            milestone['block_usage_key'] = str(block.location)
             result.append(milestone)
 
     return result
@@ -184,7 +183,7 @@ def add_prerequisite(course_key, prereq_content_key):
     """
     milestone = milestones_api.add_milestone(
         {
-            'name': _(u'Gating milestone for {usage_key}').format(usage_key=six.text_type(prereq_content_key)),
+            'name': _(u'Gating milestone for {usage_key}').format(usage_key=str(prereq_content_key)),
             'namespace': "{usage_key}{qualifier}".format(
                 usage_key=prereq_content_key,
                 qualifier=GATING_NAMESPACE_QUALIFIER
@@ -383,7 +382,8 @@ def compute_is_prereq_met(content_id, user_id, recalc_on_unmet=False):
         subsection = store.get_item(subsection_usage_key)
         prereq_meta_info = {
             'url': reverse('jump_to', kwargs={'course_id': course_key, 'location': subsection_usage_key}),
-            'display_name': subsection.display_name
+            'display_name': subsection.display_name,
+            'id': str(subsection_usage_key)
         }
         prereq_met = update_milestone(milestone, subsection_usage_key, milestone, student)
 
@@ -477,7 +477,8 @@ def get_subsection_completion_percentage(subsection_usage_key, user):
             if not completable_blocks:
                 return 100
             subsection_completion_total = 0
-            course_block_completions = BlockCompletion.get_course_completions(user, subsection_usage_key.course_key)
+            course_key = subsection_usage_key.course_key
+            course_block_completions = BlockCompletion.get_learning_context_completions(user, course_key)
             for block in completable_blocks:
                 if course_block_completions.get(block):
                     subsection_completion_total += course_block_completions.get(block)

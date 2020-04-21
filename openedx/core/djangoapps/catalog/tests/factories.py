@@ -1,6 +1,6 @@
 """Factories for generating fake catalog data."""
 # pylint: disable=missing-docstring, invalid-name
-from __future__ import absolute_import
+
 
 import uuid
 from functools import partial
@@ -195,9 +195,20 @@ def generate_curricula():
     return curricula
 
 
+class ProgramTypeFactory(DictFactoryBase):
+    name = factory.Faker('word')
+    logo_image = factory.LazyFunction(generate_sized_stdimage)
+
+
+class ProgramTypeAttrsFactory(DictFactoryBase):
+    uuid = factory.Faker('uuid4')
+    slug = factory.Faker('word')
+    coaching_supported = False
+
+
 class ProgramFactory(DictFactoryBase):
     authoring_organizations = factory.LazyFunction(partial(generate_instances, OrganizationFactory, count=1))
-    applicable_seat_types = []
+    applicable_seat_types = factory.LazyFunction(lambda: [])
     banner_image = factory.LazyFunction(generate_sized_stdimage)
     card_image_url = factory.Faker('image_url')
     corporate_endorsements = factory.LazyFunction(partial(generate_instances, CorporateEndorsementFactory))
@@ -219,6 +230,7 @@ class ProgramFactory(DictFactoryBase):
     subtitle = factory.Faker('sentence')
     title = factory.Faker('catch_phrase')
     type = factory.Faker('word')
+    type_attrs = ProgramTypeAttrsFactory()
     uuid = factory.Faker('uuid4')
     video = VideoFactory()
     weeks_to_complete = fake.random_int(1, 45)
@@ -232,12 +244,7 @@ class CurriculumFactory(DictFactoryBase):
     marketing_text_brief = factory.Faker('word')
     is_active = True
     courses = factory.LazyFunction(partial(generate_instances, CourseFactory))
-    programs = []
-
-
-class ProgramTypeFactory(DictFactoryBase):
-    name = factory.Faker('word')
-    logo_image = factory.LazyFunction(generate_sized_stdimage)
+    programs = factory.LazyFunction(lambda: [])
 
 
 class PathwayFactory(DictFactoryBase):

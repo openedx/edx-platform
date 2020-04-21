@@ -3,7 +3,6 @@ APIs for configuring credit eligibility requirements and tracking
 whether a user has satisfied those requirements.
 """
 
-from __future__ import absolute_import
 
 import logging
 
@@ -89,8 +88,8 @@ def set_credit_requirements(course_key, requirements):
     if requirements_to_disable:
         CreditRequirement.disable_credit_requirements(requirements_to_disable)
 
-    for order, requirement in enumerate(requirements):
-        CreditRequirement.add_or_update_course_requirement(credit_course, requirement, order)
+    for sort_value, requirement in enumerate(requirements):
+        CreditRequirement.add_or_update_course_requirement(credit_course, requirement, sort_value)
 
 
 def get_credit_requirements(course_key, namespace=None):
@@ -377,7 +376,8 @@ def get_credit_requirement_status(course_key, username, namespace=None, name=Non
             "reason": requirement_status.reason if requirement_status else None,
             "status": requirement_status.status if requirement_status else None,
             "status_date": requirement_status.modified if requirement_status else None,
-            "order": requirement.order,
+            # We retain the old name "order" in the API because changing APIs takes a lot more coordination.
+            "order": requirement.sort_value,
         })
     return statuses
 

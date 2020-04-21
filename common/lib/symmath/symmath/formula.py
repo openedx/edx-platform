@@ -11,7 +11,7 @@ Provides sympy representation.
 # Author: I. Chuang <ichuang@mit.edu>
 #
 
-from __future__ import absolute_import
+
 import logging
 import operator
 import os
@@ -20,8 +20,10 @@ import string
 import unicodedata
 #import subprocess
 from copy import deepcopy
+from functools import reduce
 from xml.sax.saxutils import unescape
 
+import six
 import sympy
 from lxml import etree
 from sympy import latex, sympify
@@ -29,8 +31,6 @@ from sympy.physics.quantum.qubit import Qubit
 from sympy.physics.quantum.state import Ket
 from sympy.printing.latex import LatexPrinter
 from sympy.printing.str import StrPrinter
-import six
-from functools import reduce
 
 log = logging.getLogger(__name__)
 
@@ -90,8 +90,8 @@ def to_latex(expr):
 
     #return '<math>%s{}{}</math>' % (xs[1:-1])
     if expr_s[0] == '$':
-        return '[mathjax]%s[/mathjax]<br>' % (expr_s[1:-1])	 # for sympy v6
-    return '[mathjax]%s[/mathjax]<br>' % (expr_s)		# for sympy v7
+        return '[mathjax]%s[/mathjax]<br>' % (expr_s[1:-1])	 # for sympy v6  # xss-lint: disable=python-interpolate-html
+    return '[mathjax]%s[/mathjax]<br>' % (expr_s)		# for sympy v7  # xss-lint: disable=python-interpolate-html
 
 
 def my_evalf(expr, chop=False):
@@ -138,7 +138,7 @@ def my_sympify(expr, normphase=False, matrix=False, abcsym=False, do_qubit=False
             'bit': sympy.Function('bit'),
         })
     if abcsym:			# consider all lowercase letters as real symbols, in the parsing
-        for letter in string.lowercase:
+        for letter in string.ascii_lowercase:
             if letter in varset:	 # exclude those already done
                 continue
             varset.update({letter: sympy.Symbol(letter, real=True)})
@@ -424,7 +424,7 @@ class formula(object):
 
         # pre-process the presentation mathml before sending it to snuggletex to convert to content mathml
         try:
-            xml = self.preprocess_pmathml(self.expr)
+            xml = self.preprocess_pmathml(self.expr).decode('utf-8')
         except Exception as err:  # pylint: disable=broad-except
             log.warning('Err %s while preprocessing; expr=%s', err, self.expr)
             return "<html>Error! Cannot process pmathml</html>"

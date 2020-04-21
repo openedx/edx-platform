@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 import logging
 
@@ -110,7 +110,7 @@ class EntitlementViewSet(viewsets.ModelViewSet):
     lookup_field = 'uuid'
     serializer_class = CourseEntitlementSerializer
     filter_backends = (DjangoFilterBackend,)
-    filter_class = CourseEntitlementFilter
+    filterset_class = CourseEntitlementFilter
     pagination_class = EntitlementsPagination
 
     def get_queryset(self):

@@ -2,7 +2,7 @@
 """
 Classes used for defining and running pytest test suites
 """
-from __future__ import absolute_import
+
 
 import os
 from glob import glob
@@ -180,13 +180,13 @@ class SystemTestSuite(PytestSuite):
                 xdist_remote_processes = self.processes
             for ip in self.xdist_ip_addresses.split(','):
                 # Propogate necessary env vars to xdist containers
-                env_var_cmd = u'export DJANGO_SETTINGS_MODULE={} DISABLE_COURSEENROLLMENT_HISTORY={}'\
+                env_var_cmd = u'export DJANGO_SETTINGS_MODULE={} DISABLE_COURSEENROLLMENT_HISTORY={} PYTHONHASHSEED=0'\
                     .format('{}.envs.{}'.format(self.root, self.settings),
                             self.disable_courseenrollment_history)
                 xdist_string = u'--tx {}*ssh="jenkins@{} -o StrictHostKeyChecking=no"' \
-                               '//python="source edx-venv/bin/activate; {}; python"' \
+                               '//python="source edx-venv-{}/edx-venv/bin/activate; {}; python"' \
                                '//chdir="edx-platform"' \
-                               .format(xdist_remote_processes, ip, env_var_cmd)
+                               .format(xdist_remote_processes, ip, Env.PYTHON_VERSION, env_var_cmd)
                 cmd.append(xdist_string)
             for rsync_dir in Env.rsync_dirs():
                 cmd.append(u'--rsyncdir {}'.format(rsync_dir))
@@ -233,6 +233,7 @@ class SystemTestSuite(PytestSuite):
         if self.root == 'lms':
             default_test_globs.append("{system}/tests.py".format(system=self.root))
             default_test_globs.append("openedx/core/djangolib/*")
+            default_test_globs.append("openedx/core/tests/*")
             default_test_globs.append("openedx/features")
 
         def included(path):
@@ -309,12 +310,18 @@ class LibTestSuite(PytestSuite):
                     .format(django_env_var_cmd, self.disable_courseenrollment_history)
 
                 xdist_string = u'--tx {}*ssh="jenkins@{} -o StrictHostKeyChecking=no"' \
-                               '//python="source edx-venv/bin/activate; {}; python"' \
+                               '//python="source edx-venv-{}/edx-venv/bin/activate; {}; python"' \
                                '//chdir="edx-platform"' \
-                               .format(xdist_remote_processes, ip, env_var_cmd)
+                               .format(xdist_remote_processes, ip, Env.PYTHON_VERSION, env_var_cmd)
                 cmd.append(xdist_string)
             for rsync_dir in Env.rsync_dirs():
                 cmd.append(u'--rsyncdir {}'.format(rsync_dir))
+            # "--rsyncdir" throws off the configuration root, set it explicitly
+            if 'common/lib' in self.test_id:
+                cmd.append('--rootdir=common/lib')
+                cmd.append('-c common/lib/pytest.ini')
+            elif 'pavelib/paver_tests' in self.test_id:
+                cmd.append('--rootdir=pavelib/paver_tests')
         else:
             if self.processes == -1:
                 cmd.append('-n auto')

@@ -1,5 +1,5 @@
 """Views for assets"""
-from __future__ import absolute_import
+
 
 import json
 import logging
@@ -19,7 +19,6 @@ from opaque_keys.edx.keys import AssetKey, CourseKey
 from pymongo import ASCENDING, DESCENDING
 from six import text_type
 
-from contentstore.utils import reverse_course_url
 from contentstore.views.exception import AssetNotFoundException, AssetSizeTooLargeException
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.contentserver.caching import del_cached_content
@@ -31,6 +30,8 @@ from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+
+from ..utils import reverse_course_url
 
 __all__ = ['assets_handler']
 
@@ -538,7 +539,7 @@ def _update_asset(request, course_key, asset_key):
 
         # update existing asset
         try:
-            modified_asset = json.loads(request.body)
+            modified_asset = json.loads(request.body.decode('utf8'))
         except ValueError:
             return HttpResponseBadRequest()
         contentstore().set_attr(asset_key, 'locked', modified_asset['locked'])

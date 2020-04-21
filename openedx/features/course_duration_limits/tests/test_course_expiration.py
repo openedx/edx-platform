@@ -1,7 +1,7 @@
 """
 Contains tests to verify correctness of course expiration functionality
 """
-from __future__ import absolute_import
+
 
 import json
 from datetime import timedelta
@@ -25,6 +25,7 @@ from lms.djangoapps.courseware.tests.factories import (
 )
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.course_date_signals.utils import MAX_DURATION, MIN_DURATION
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
@@ -33,11 +34,10 @@ from openedx.core.djangoapps.django_comment_common.models import (
 )
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, CONTENT_TYPE_GATE_GROUP_IDS
-from openedx.features.course_duration_limits.access import MAX_DURATION, MIN_DURATION, get_user_course_expiration_date
-from openedx.features.course_duration_limits.config import EXPERIMENT_DATA_HOLDBACK_KEY, EXPERIMENT_ID
+from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, FBEEnrollmentExclusion
 from student.roles import CourseInstructorRole
 from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -69,7 +69,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         result = get_user_course_expiration_date(self.user, CourseOverview.get_from_id(self.course.id))
         self.assertEqual(result, None)
 
-    @mock.patch("openedx.features.course_duration_limits.access.get_course_run_details")
+    @mock.patch("openedx.core.djangoapps.course_date_signals.utils.get_course_run_details")
     @ddt.data(
         [int(MIN_DURATION.days / 7) - 1, MIN_DURATION, False],
         [7, timedelta(weeks=7), False],
@@ -103,7 +103,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         )
         self.assertEqual(result, enrollment.created + access_duration)
 
-    @mock.patch("openedx.features.course_duration_limits.access.get_course_run_details")
+    @mock.patch("openedx.core.djangoapps.course_date_signals.utils.get_course_run_details")
     def test_content_availability_date(self, mock_get_course_run_details):
         """
         Content availability date is course start date or enrollment date, whichever is later.
@@ -147,7 +147,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         content_availability_date = start_date.replace(microsecond=0)
         self.assertEqual(result, content_availability_date + access_duration)
 
-    @mock.patch("openedx.features.course_duration_limits.access.get_course_run_details")
+    @mock.patch("openedx.core.djangoapps.course_date_signals.utils.get_course_run_details")
     def test_expired_upgrade_deadline(self, mock_get_course_run_details):
         """
         The expiration date still exists if the upgrade deadline has passed
@@ -166,7 +166,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         content_availability_date = enrollment.created
         self.assertEqual(result, content_availability_date + access_duration)
 
-    @mock.patch("openedx.features.course_duration_limits.access.get_course_run_details")
+    @mock.patch("openedx.core.djangoapps.course_date_signals.utils.get_course_run_details")
     @ddt.data(
         ({'user_partition_id': CONTENT_GATING_PARTITION_ID,
           'group_id': CONTENT_TYPE_GATE_GROUP_IDS['limited_access']}, True),
@@ -216,12 +216,12 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertItemsEqual(response.redirect_chain, [])
+        six.assertCountEqual(self, response.redirect_chain, [])
         banner_text = 'You lose all access to this course, including your progress,'
         if show_expiration_banner:
-            self.assertIn(banner_text, response.content)
+            self.assertContains(response, banner_text)
         else:
-            self.assertNotIn(banner_text, response.content)
+            self.assertNotContains(response, banner_text)
 
     def update_masquerade(self, role='student', group_id=None, username=None, user_partition_id=None):
         """
@@ -246,21 +246,16 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         return response
 
-    @mock.patch("openedx.features.course_duration_limits.access.get_course_run_details")
+    @mock.patch("openedx.core.djangoapps.course_date_signals.utils.get_course_run_details")
     def test_masquerade_in_holdback(self, mock_get_course_run_details):
         mock_get_course_run_details.return_value = {'weeks_to_complete': 12}
         audit_student = UserFactory(username='audit')
-        CourseEnrollmentFactory.create(
+        enrollment = CourseEnrollmentFactory.create(
             user=audit_student,
             course_id=self.course.id,
             mode='audit'
         )
-        ExperimentData.objects.create(
-            user=audit_student,
-            experiment_id=EXPERIMENT_ID,
-            key=EXPERIMENT_DATA_HOLDBACK_KEY,
-            value='True'
-        )
+        FBEEnrollmentExclusion.objects.create(enrollment=enrollment)
         CourseDurationLimitConfig.objects.create(
             enabled=True,
             course=CourseOverview.get_from_id(self.course.id),
@@ -268,7 +263,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         )
 
         instructor = UserFactory.create(username='instructor')
-        CourseEnrollmentFactory.create(
+        enrollment = CourseEnrollmentFactory.create(
             user=instructor,
             course_id=self.course.id,
             mode='audit'
@@ -281,11 +276,11 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertItemsEqual(response.redirect_chain, [])
+        six.assertCountEqual(self, response.redirect_chain, [])
         banner_text = 'You lose all access to this course, including your progress,'
-        self.assertNotIn(banner_text, response.content)
+        self.assertNotContains(response, banner_text)
 
-    @mock.patch("openedx.features.course_duration_limits.access.get_course_run_details")
+    @mock.patch("openedx.core.djangoapps.course_date_signals.utils.get_course_run_details")
     def test_masquerade_expired(self, mock_get_course_run_details):
         mock_get_course_run_details.return_value = {'weeks_to_complete': 1}
 
@@ -317,11 +312,11 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertItemsEqual(response.redirect_chain, [])
+        six.assertCountEqual(self, response.redirect_chain, [])
         banner_text = 'This learner does not have access to this course. Their access expired on'
-        self.assertIn(banner_text, response.content)
+        self.assertContains(response, banner_text)
 
-    @mock.patch("openedx.features.course_duration_limits.access.get_course_run_details")
+    @mock.patch("openedx.core.djangoapps.course_date_signals.utils.get_course_run_details")
     @ddt.data(
         InstructorFactory,
         StaffFactory,
@@ -343,7 +338,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
             expired_staff = role_factory.create(password=TEST_PASSWORD, course_key=self.course.id)
 
         ScheduleFactory(
-            start=self.THREE_YEARS_AGO,
+            start_date=self.THREE_YEARS_AGO,
             enrollment__mode=CourseMode.AUDIT,
             enrollment__course_id=self.course.id,
             enrollment__user=expired_staff
@@ -368,11 +363,11 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertItemsEqual(response.redirect_chain, [])
+        six.assertCountEqual(self, response.redirect_chain, [])
         banner_text = 'This learner does not have access to this course. Their access expired on'
-        self.assertNotIn(banner_text, response.content)
+        self.assertNotContains(response, banner_text)
 
-    @mock.patch("openedx.features.course_duration_limits.access.get_course_run_details")
+    @mock.patch("openedx.core.djangoapps.course_date_signals.utils.get_course_run_details")
     @ddt.data(
         FORUM_ROLE_COMMUNITY_TA,
         FORUM_ROLE_GROUP_MODERATOR,
@@ -391,7 +386,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         role.users.add(expired_staff)
 
         ScheduleFactory(
-            start=self.THREE_YEARS_AGO,
+            start_date=self.THREE_YEARS_AGO,
             enrollment__mode=CourseMode.AUDIT,
             enrollment__course_id=self.course.id,
             enrollment__user=expired_staff
@@ -417,6 +412,6 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertItemsEqual(response.redirect_chain, [])
+        six.assertCountEqual(self, response.redirect_chain, [])
         banner_text = 'This learner does not have access to this course. Their access expired on'
-        self.assertNotIn(banner_text, response.content)
+        self.assertNotContains(response, banner_text)

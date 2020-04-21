@@ -2,8 +2,8 @@
 Models used by the block structure framework.
 """
 
-from __future__ import absolute_import
 
+import errno
 from contextlib import contextmanager
 from datetime import datetime
 from logging import getLogger
@@ -14,6 +14,7 @@ from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.core.files.base import ContentFile
 from django.db import models, transaction
+from django.utils.encoding import python_2_unicode_compatible
 from model_utils.models import TimeStampedModel
 
 from openedx.core.djangoapps.xmodule_django.models import UsageKeyWithRunField
@@ -116,7 +117,9 @@ def _storage_error_handling(bs_model, operation, is_read_operation=False):
         yield
     except Exception as error:  # pylint: disable=broad-except
         log.exception(u'BlockStructure: Exception %s on store %s; %s.', error.__class__, operation, bs_model)
-        if is_read_operation and isinstance(error, (IOError, SuspiciousOperation)):
+        if isinstance(error, OSError) and error.errno in (errno.EACCES, errno.EPERM):  # pylint: disable=no-member
+            raise
+        elif is_read_operation and isinstance(error, (IOError, SuspiciousOperation)):
             # May have been caused by one of the possible error
             # situations listed above.  Raise BlockStructureNotFound
             # so the block structure can be regenerated and restored.
@@ -125,6 +128,7 @@ def _storage_error_handling(bs_model, operation, is_read_operation=False):
             raise
 
 
+@python_2_unicode_compatible
 class BlockStructureModel(TimeStampedModel):
     """
     Model for storing Block Structure information.
@@ -218,7 +222,7 @@ class BlockStructureModel(TimeStampedModel):
 
         return bs_model, created
 
-    def __unicode__(self):
+    def __str__(self):
         """
         Returns a string representation of this model.
         """

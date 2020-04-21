@@ -1,6 +1,6 @@
 # encoding: utf-8
 """Tests of Branding API """
-from __future__ import absolute_import, unicode_literals
+
 
 import mock
 from django.conf import settings
@@ -9,7 +9,6 @@ from django.test.utils import override_settings
 from django.urls import reverse
 
 from branding.api import _footer_business_links, get_footer, get_home_url, get_logo_url
-from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 
 test_config_disabled_contact_us = {   # pylint: disable=invalid-name
@@ -95,7 +94,7 @@ class TestFooter(TestCase):
                 {'url': 'https://business.edx.org', 'name': 'enterprise', 'title': '\xe9dX for Business'},
                 {'url': 'https://edx.org/edx-blog', 'name': 'blog', 'title': 'Blog'},
                 {'url': 'https://edx.org/news-announcements', 'name': 'news', 'title': 'News'},
-                {'url': 'https://support.example.com/hc/en-us', 'name': 'help-center', 'title': 'Help Center'},
+                {'url': 'https://example.support.edx.org/hc/en-us', 'name': 'help-center', 'title': 'Help Center'},
                 {'url': '/support/contact_us', 'name': 'contact', 'title': 'Contact'},
                 {'url': 'https://edx.org/careers', 'name': 'careers', 'title': 'Careers'},
                 {'url': 'https://edx.org/donate', 'name': 'donate', 'title': 'Donate'}
@@ -125,7 +124,7 @@ class TestFooter(TestCase):
                 {'url': 'https://edx.org/edx-blog', 'name': 'blog', 'title': 'Blog'},
                 # pylint: disable=line-too-long
                 {'url': '{base_url}/support/contact_us'.format(base_url=settings.LMS_ROOT_URL), 'name': 'contact', 'title': 'Contact Us'},
-                {'url': 'https://support.example.com/hc/en-us', 'name': 'help-center', 'title': 'Help Center'},
+                {'url': 'https://example.support.edx.org/hc/en-us', 'name': 'help-center', 'title': 'Help Center'},
                 {'url': 'https://edx.org/media-kit', 'name': 'media_kit', 'title': 'Media Kit'},
                 {'url': 'https://edx.org/donate', 'name': 'donate', 'title': 'Donate'}
             ],
@@ -147,12 +146,10 @@ class TestFooter(TestCase):
                  'icon-class': 'fa-facebook-square', 'title': 'Facebook'},
                 {'url': '#', 'action': 'Follow \xe9dX on Twitter', 'name': 'twitter',
                  'icon-class': 'fa-twitter-square', 'title': 'Twitter'},
-                {'url': '#', 'action': 'Subscribe to the \xe9dX YouTube channel',
-                 'name': 'youtube', 'icon-class': 'fa-youtube-square', 'title': 'Youtube'},
                 {'url': '#', 'action': 'Follow \xe9dX on LinkedIn', 'name': 'linkedin',
                  'icon-class': 'fa-linkedin-square', 'title': 'LinkedIn'},
-                {'url': '#', 'action': 'Follow \xe9dX on Google+', 'name': 'google_plus',
-                 'icon-class': 'fa-google-plus-square', 'title': 'Google+'},
+                {'url': '#', 'action': 'Follow \xe9dX on Instagram', 'name': 'instagram',
+                 'icon-class': 'fa-instagram', 'title': 'Instagram'},
                 {'url': '#', 'action': 'Subscribe to the \xe9dX subreddit',
                  'name': 'reddit', 'icon-class': 'fa-reddit-square', 'title': 'Reddit'}
             ],
@@ -164,7 +161,11 @@ class TestFooter(TestCase):
                 'title': 'Powered by Open edX'
             },
             'edx_org_link': {
-                'url': 'https://www.edx.org/?utm_medium=affiliate_partner&utm_source=opensource-partner&utm_content=open-edx-partner-footer-link&utm_campaign=open-edx-footer',
+                'url': 'https://www.edx.org/?'
+                       'utm_medium=affiliate_partner'
+                       '&utm_source=opensource-partner'
+                       '&utm_content=open-edx-partner-footer-link'
+                       '&utm_campaign=open-edx-footer',
                 'text': 'Take free online courses at edX.org',
             },
         }

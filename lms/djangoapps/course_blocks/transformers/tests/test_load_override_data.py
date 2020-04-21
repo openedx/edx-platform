@@ -1,7 +1,7 @@
 """
 Tests for OverrideDataTransformer.
 """
-from __future__ import absolute_import
+
 
 import datetime
 

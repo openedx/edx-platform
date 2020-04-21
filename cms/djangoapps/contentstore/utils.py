@@ -1,14 +1,16 @@
 """
 Common utility functions useful throughout the contentstore
 """
-from __future__ import absolute_import, print_function
+
 
 import logging
+from contextlib import contextmanager
 from datetime import datetime
 
 import six
 from django.conf import settings
 from django.urls import reverse
+from django.utils import translation
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocator
@@ -518,3 +520,82 @@ def is_self_paced(course):
     Returns True if course is self-paced, False otherwise.
     """
     return course and course.self_paced
+
+
+def get_sibling_urls(subsection):
+    """
+    Given a subsection, returns the urls for the next and previous units.
+
+    (the first unit of the next subsection or section, and
+    the last unit of the previous subsection/section)
+    """
+    section = subsection.get_parent()
+    prev_url = next_url = ''
+    prev_loc = next_loc = None
+    last_block = None
+    siblings = list(section.get_children())
+    for i, block in enumerate(siblings):
+        if block.location == subsection.location:
+            if last_block:
+                try:
+                    prev_loc = last_block.get_children()[0].location
+                except IndexError:
+                    pass
+            try:
+                next_loc = siblings[i + 1].get_children()[0].location
+            except IndexError:
+                pass
+            break
+        last_block = block
+    if not prev_loc:
+        try:
+            # section.get_parent SHOULD return the course, but for some reason, it might not
+            sections = section.get_parent().get_children()
+        except AttributeError:
+            log.error(u"URL Retrieval Error # 1: subsection {subsection} included in section {section}".format(
+                section=section.location,
+                subsection=subsection.location
+            ))
+            # This should not be a fatal error. The worst case is that the navigation on the unit page
+            # won't display a link to a previous unit.
+        else:
+            try:
+                prev_section = sections[sections.index(section) - 1]
+                prev_loc = prev_section.get_children()[-1].get_children()[-1].location
+            except IndexError:
+                pass
+    if not next_loc:
+        try:
+            sections = section.get_parent().get_children()
+        except AttributeError:
+            log.error(u"URL Retrieval Error # 2: subsection {subsection} included in section {section}".format(
+                section=section.location,
+                subsection=subsection.location
+            ))
+        else:
+            try:
+                next_section = sections[sections.index(section) + 1]
+                next_loc = next_section.get_children()[0].get_children()[0].location
+            except IndexError:
+                pass
+    if prev_loc:
+        prev_url = reverse_usage_url('container_handler', prev_loc)
+    if next_loc:
+        next_url = reverse_usage_url('container_handler', next_loc)
+    return prev_url, next_url
+
+
+@contextmanager
+def translation_language(language):
+    """Context manager to override the translation language for the scope
+    of the following block. Has no effect if language is None.
+    """
+    if language:
+        previous = translation.get_language()
+        translation.activate(language)
+        try:
+            yield
+        finally:
+            translation.activate(previous)
+    else:
+        yield

@@ -4,6 +4,7 @@
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
 from course_modes.models import CourseMode
+from util.course import should_display_grade
 %>
 <%namespace name='static' file='../static_content.html'/>
 
@@ -44,9 +45,16 @@ else:
     </div>
   % else:
     <div class="message message-status ${status_css_class} is-shown">
-      <p class="message-copy">${_("Your final grade:")}
-        <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>.
-
+      <p class="message-copy">
+        % if should_display_grade(course_overview):
+            ${_("Your final grade:")}
+            <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>.
+        % elif course_overview.certificate_available_date:
+          <%
+            cert_available_date = course_overview.certificate_available_date.strftime('%Y-%m-%d')
+          %>
+          ${_("Grades will be finalized on {cert_available_date}".format(cert_available_date=cert_available_date))}
+        % endif
         % if cert_status['status'] == 'notpassing':
           % if enrollment.mode != 'audit':
             ${_("Grade required for a {cert_name_short}:").format(cert_name_short=cert_name_short)}
@@ -82,7 +90,7 @@ else:
               </li>
             % elif cert_status['status'] == 'downloadable' and cert_status.get('show_cert_web_view', False):
               <li class="action action-certificate">
-                <a class="btn" href="${cert_status['cert_web_view_url']}" target="_blank"
+                <a class="btn" href="${cert_status['cert_web_view_url']}" rel="noopener" target="_blank"
                    title="${_('This link will open the certificate web view')}">
                   ${_("View {cert_name_short}").format(cert_name_short=cert_name_short,)}
                 </a>
@@ -123,7 +131,7 @@ else:
         % if cert_status['status'] == 'downloadable' and cert_status['linked_in_url']:
           <ul class="actions actions-secondary">
               <li class="action action-share">
-                <a class="action-linkedin-profile" target="_blank" href="${cert_status['linked_in_url']}"
+                <a class="action-linkedin-profile" rel="noopener" target="_blank" href="${cert_status['linked_in_url']}"
                  title="${_('Add Certificate to LinkedIn Profile')}"
                  data-course-id="${course_overview.id}"
                  data-certificate-mode="${cert_status['mode']}"

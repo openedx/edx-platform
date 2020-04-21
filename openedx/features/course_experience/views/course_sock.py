@@ -1,12 +1,12 @@
 """
 Fragment for rendering the course's sock and associated toggle button.
 """
-from __future__ import absolute_import
+
 
 from django.template.loader import render_to_string
 from web_fragments.fragment import Fragment
 
-from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
+from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.discounts.utils import format_strikeout_price
 from student.models import CourseEnrollment

@@ -2,15 +2,14 @@
 Views for serving static textbooks.
 """
 
-from __future__ import absolute_import
 
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.views.decorators.clickjacking import xframe_options_exempt
 from opaque_keys.edx.keys import CourseKey
 
-from courseware.access import has_access
-from courseware.courses import get_course_with_access
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
 from static_replace import replace_static_urls
 

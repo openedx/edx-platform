@@ -1,7 +1,7 @@
 """
 Provide tests for sysadmin dashboard feature in sysadmin.py
 """
-from __future__ import absolute_import
+
 
 import glob
 import os
@@ -153,8 +153,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         # Create git loaded course
         response = self._add_edx4edx()
-        self.assertIn(Text(text_type(GitImportErrorNoDir(settings.GIT_REPO_DIR))),
-                      response.content.decode('UTF-8'))
+        self.assertContains(response, Text(text_type(GitImportErrorNoDir(settings.GIT_REPO_DIR))))
 
     def test_mongo_course_add_delete(self):
         """
@@ -183,22 +182,22 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         # Regex of first 3 columns of course information table row for
         # test course loaded from git. Would not have sha1 if
         # git_info_for_course failed.
-        table_re = re.compile(ur"""
-            <tr>\s+
-            <td>edX\sAuthor\sCourse</td>\s+  # expected test git course name
-            <td>course-v1:MITx\+edx4edx\+edx4edx</td>\s+  # expected test git course_id
-            <td>[a-fA-F\d]{40}</td>  # git sha1 hash
+        table_re = re.compile(u"""
+            <tr>\\s+
+            <td>edX\\sAuthor\\sCourse</td>\\s+  # expected test git course name
+            <td>course-v1:MITx\\+edx4edx\\+edx4edx</td>\\s+  # expected test git course_id
+            <td>[a-fA-F\\d]{40}</td>  # git sha1 hash
         """, re.VERBOSE)
         self._setstaff_login()
         self._mkdir(settings.GIT_REPO_DIR)
 
         # Make sure we don't have any git hashes on the page
         response = self.client.get(reverse('sysadmin_courses'))
-        self.assertNotRegexpMatches(response.content, table_re)
+        self.assertNotRegexpMatches(response.content.decode('utf-8'), table_re)
 
         # Now add the course and make sure it does match
         response = self._add_edx4edx()
-        self.assertRegexpMatches(response.content, table_re)
+        self.assertRegex(response.content.decode('utf-8'), table_re)
 
     def test_gitlogs(self):
         """
@@ -212,14 +211,13 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         response = self.client.get(reverse('gitlogs'))
 
         # Check that our earlier import has a log with a link to details
-        self.assertIn('/gitlogs/course-v1:MITx+edx4edx+edx4edx', response.content)
+        self.assertContains(response, '/gitlogs/course-v1:MITx+edx4edx+edx4edx')
 
         response = self.client.get(
             reverse('gitlogs_detail', kwargs={
                 'course_id': 'course-v1:MITx+edx4edx+edx4edx'}))
 
-        self.assertIn('======&gt; IMPORTING course',
-                      response.content)
+        self.assertContains(response, '======&gt; IMPORTING course')
 
         self._rm_edx4edx()
 
@@ -248,7 +246,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
             with (override_settings(TIME_ZONE=timezone)):
                 date_text = get_time_display(date, tz_format, settings.TIME_ZONE)
                 response = self.client.get(reverse('gitlogs'))
-                self.assertIn(date_text, response.content.decode('UTF-8'))
+                self.assertContains(response, date_text)
 
         self._rm_edx4edx()
 
@@ -260,9 +258,9 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         response = self.client.get(
             reverse('gitlogs_detail', kwargs={
                 'course_id': 'Not/Real/Testing'}))
-        self.assertIn(
+        self.assertContains(
+            response,
             'No git import logs have been recorded for this course.',
-            response.content
         )
 
     def test_gitlog_no_logs(self):
@@ -285,10 +283,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
                 'course_id': 'course-v1:MITx+edx4edx+edx4edx'
             })
         )
-        self.assertIn(
-            'No git import logs have been recorded for this course.',
-            response.content
-        )
+        self.assertContains(response, 'No git import logs have been recorded for this course.')
 
         self._rm_edx4edx()
 
@@ -319,10 +314,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
                     page
                 )
             )
-            self.assertIn(
-                u'Page {} of 2'.format(expected),
-                response.content.decode(response.charset)
-            )
+            self.assertContains(response, u'Page {} of 2'.format(expected))
 
         CourseImportLog.objects.delete()
 
@@ -362,7 +354,6 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
             reverse('gitlogs_detail', kwargs={
                 'course_id': 'course-v1:MITx+edx4edx+edx4edx'
             }))
-        self.assertIn('======&gt; IMPORTING course',
-                      response.content)
+        self.assertContains(response, '======&gt; IMPORTING course')
 
         self._rm_edx4edx()

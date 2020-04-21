@@ -1,19 +1,20 @@
 """
 UserPartitionScheme for enrollment tracks.
 """
-from __future__ import absolute_import
+
 
 import logging
+
 import six
+from django.conf import settings
+from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode
-from courseware.masquerade import (
+from lms.djangoapps.courseware.masquerade import (
     get_course_masquerade,
     get_masquerading_user_group,
     is_masquerading_as_specific_student
 )
-from django.conf import settings
-from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
 from student.models import CourseEnrollment
 from xmodule.partitions.partitions import Group, UserPartition

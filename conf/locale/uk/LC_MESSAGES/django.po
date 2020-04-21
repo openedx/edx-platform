@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -32,7 +32,7 @@
 # Валентина Пицик <lushalusha007@gmail.com>, 2019
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -47,7 +47,7 @@
 # Валентина Пицик <lushalusha007@gmail.com>, 2019
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -75,10 +75,11 @@
 # Sergii <inactive+felytic@transifex.com>, 2015
 # Zoriana Zaiats, 2015
 # Tetiana Korshun, 2014
+# Евгений Мовсесов <yevgeniy.movsesov@gmail.com>, 2020
 # Андрей Поляков <polyakov.andrey@gmail.com>, 2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -97,7 +98,7 @@
 # Ксенія Воронова <ksenya.voronova@gmail.com>, 2016
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -110,9 +111,9 @@
 # Ксенія Воронова <ksenya.voronova@gmail.com>, 2016
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Ukrainian (https://www.transifex.com/open-edx/teams/6205/uk/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2020.
 #
 # Translators:
 # Waheed Ahmed <waheed@edx.org>, 2019
@@ -121,7 +122,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-07-24 06:10+0000\n"
+"POT-Creation-Date: 2020-04-19 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Ukrainian (https://www.transifex.com/open-edx/teams/6205/uk/)\n"
@@ -144,11 +145,6 @@ msgid "Discussion"
 msgstr "Обговорення"
 
 #: cms/djangoapps/contentstore/views/component.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "Problem"
-msgstr "Завдання"
-
-#: cms/djangoapps/contentstore/views/component.py
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Advanced"
 msgstr "Додатково"
@@ -159,19 +155,7 @@ msgid "Entrance Exam"
 msgstr "Вступний іспит"
 
 #: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: cms/templates/course_outline.html lms/templates/seq_module.html
-#: lms/templates/ccx/schedule.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Section"
-msgstr "Розділ"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "Subsection"
-msgstr "Підрозділ"
-
-#: cms/djangoapps/contentstore/views/helpers.py
+#: common/lib/xmodule/xmodule/unit_block.py
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Unit"
 msgstr "Блок"
@@ -210,10 +194,8 @@ msgstr ""
 "інший файл."
 
 #: cms/djangoapps/contentstore/views/videos.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
+#: lms/djangoapps/instructor/views/api.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/shoppingcart/billing_details.html
 #: lms/templates/shoppingcart/receipt.html
 msgid "Name"
@@ -309,7 +291,7 @@ msgid "You're enrolled as an honor code student"
 msgstr "Ви зареєстровані як студент за програмою Кодексу честі"
 
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -332,6 +314,7 @@ msgstr "Професійна освіта"
 #: common/lib/xmodule/xmodule/library_content_module.py
 #: common/lib/xmodule/xmodule/lti_module.py
 #: common/lib/xmodule/xmodule/split_test_module.py
+#: common/lib/xmodule/xmodule/unit_block.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: common/lib/xmodule/xmodule/x_module.py
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
@@ -447,12 +430,11 @@ msgstr "Аккаунт відновлено"
 #. meant to hold the user's password.
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's password.
-#: common/djangoapps/student/admin.py openedx/core/djangoapps/user_api/api.py
-#: cms/templates/login.html cms/templates/register.html
-#: lms/templates/login.html lms/templates/provider_login.html
-#: lms/templates/register-form.html lms/templates/signup_modal.html
+#: common/djangoapps/student/admin.py
+#: openedx/core/djangoapps/user_authn/views/login_form.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#: lms/templates/provider_login.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
-#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "Пароль"
@@ -474,93 +456,21 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: common/djangoapps/student/forms.py
-msgid ""
-"That e-mail address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr ""
-"Ця адреса електронної пошти не має відповідного облікового запису. Ви "
-"впевнені, що ви вже зареєстровані?"
-
-#: common/djangoapps/student/forms.py
-msgid ""
-"The user account associated with this e-mail address cannot reset the "
-"password."
-msgstr ""
-"Обліковий запис користувача, пов'язаний з цією адресою електронної пошти, не"
-" може змінити пароль."
-
-#: common/djangoapps/student/forms.py
-msgid "Full Name cannot contain the following characters: < >"
-msgstr "Повне им'я не може містити наступних символів: < >"
-
-#: common/djangoapps/student/forms.py
-msgid "A properly formatted e-mail is required"
-msgstr "Потрібен e-mail встановленої форми"
-
-#: common/djangoapps/student/forms.py
-msgid "Your legal name must be a minimum of one character long"
-msgstr ""
-
-#: common/djangoapps/student/forms.py
-#, python-format
-msgid "Email cannot be more than %(limit_value)s characters long"
-msgstr ""
-"Електронна пошта не може перевищувати довжину в %(limit_value)s символів"
-
-#: common/djangoapps/student/forms.py
-msgid "You must accept the terms of service."
-msgstr "Ви повинні підтвердити умови надання послуг"
-
-#: common/djangoapps/student/forms.py
-msgid "A level of education is required"
-msgstr "Необхідно вказати рівень освіти"
-
-#: common/djangoapps/student/forms.py
-msgid "Your gender is required"
-msgstr "Необхідно вказати стать"
-
-#: common/djangoapps/student/forms.py
-msgid "Your year of birth is required"
-msgstr "Необхідно вказати рік народження"
-
-#: common/djangoapps/student/forms.py
-msgid "Your mailing address is required"
-msgstr "Необхідно вказати поштову адресу"
-
-#: common/djangoapps/student/forms.py
-msgid "A description of your goals is required"
-msgstr "Необхідно зазначити ваші цілі"
-
-#: common/djangoapps/student/forms.py
-msgid "A city is required"
-msgstr "Необхідно вказати місто"
-
-#: common/djangoapps/student/forms.py
-msgid "A country is required"
-msgstr "Необхідно вказати країну"
-
-#: common/djangoapps/student/forms.py
-msgid "To enroll, you must follow the honor code."
-msgstr "Щоб зарееструватись на курс ви повинні слідувати кодексу честі."
-
-#: common/djangoapps/student/forms.py
-msgid "You are missing one or more required fields"
-msgstr "Ви пропустили одне або декілька обов’язкових полів."
-
-#: common/djangoapps/student/forms.py
-msgid "Unauthorized email address."
-msgstr "Неавторизована електронна адреса."
-
-#: common/djangoapps/student/forms.py
-#: common/djangoapps/student/views/management.py
+#: common/djangoapps/student/admin.py
 #, python-brace-format
 msgid ""
-"It looks like {email} belongs to an existing account. Try again with a "
-"different email address."
+"Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' in"
+" SiteConfiguration model's site_values field."
 msgstr ""
-"Схоже, що {email} належить до вже існуючого облікового запису. Повторіть "
-"спробу з іншою адресою електронної пошти."
+
+#: common/djangoapps/student/admin.py
+#, python-brace-format
+msgid "Email doesn't have {domain_name} domain name."
+msgstr ""
+
+#: common/djangoapps/student/admin.py
+msgid "User with this email doesn't exist in system."
+msgstr ""
 
 #: common/djangoapps/student/helpers.py
 #, python-brace-format
@@ -808,6 +718,14 @@ msgid "Name of the affiliate cookie"
 msgstr "Ім'я affiliate сookie"
 
 #: common/djangoapps/student/models.py
+msgid ""
+"It expect that the data will be provided in a csv file format with"
+"                     first row being the header and columns will be as "
+"follows:                     user_id, username, email, course_id, "
+"is_verified, verification_date"
+msgstr ""
+
+#: common/djangoapps/student/models.py
 msgid "Name of this user attribute."
 msgstr "Назва атрибута цього користувача."
 
@@ -823,6 +741,21 @@ msgstr "Вторинна адреса електронної пошти"
 msgid "Secondary email address to recover linked account."
 msgstr ""
 "Вторинна адреса електронної пошти для відновлення пов'язаного аккаунту."
+
+#: common/djangoapps/student/models.py
+msgid ""
+"An employee (a user whose email has current site's domain name) whose email "
+"exists in this model, can be able to login from login screen through email "
+"and password. And if any employee's email doesn't exist in this model then "
+"that employee can login via third party authentication backend only."
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid ""
+"It expect that the data will be provided in a csv file format with"
+"                     first row being the header and columns will be as "
+"follows:                     username, email, new_email"
+msgstr ""
 
 #: common/djangoapps/student/views/dashboard.py
 msgid " and "
@@ -898,14 +831,6 @@ msgstr "Курс, який ви шукаєте не розпочнеться д�
 #, python-brace-format
 msgid "The course you are looking for is closed for enrollment as of {date}."
 msgstr "Курс, який ви шукаєте, закритий для реєстрації з {date}."
-
-#: common/djangoapps/student/views/management.py
-msgid "No inactive user with this e-mail exists"
-msgstr ""
-
-#: common/djangoapps/student/views/management.py
-msgid "Unable to send reactivation email"
-msgstr ""
 
 #: common/djangoapps/student/views/management.py
 msgid "Course id not specified"
@@ -990,42 +915,6 @@ msgstr ""
 "{html_start}Схвалено! Ви активували ваш обліковий запис.{html_end} Тепер ви "
 "отримуватимете від нас електронні оновлення та сповіщення щодо курсу, на "
 "який ви зареєструвалися.  Увійдіть щоб продовжити."
-
-#: common/djangoapps/student/views/management.py
-msgid ""
-"Your previous request is in progress, please try again in a few moments."
-msgstr ""
-
-#: common/djangoapps/student/views/management.py
-msgid "Some error occured during password change. Please try again"
-msgstr "Виникла помилка при скиданні паролю. Будь ласка, спробуйте ще"
-
-#: common/djangoapps/student/views/management.py
-msgid "No email address provided."
-msgstr "Не надано електронну адресу."
-
-#: common/djangoapps/student/views/management.py
-msgid "Password reset unsuccessful"
-msgstr "Не вдалося скинути пароль"
-
-#: common/djangoapps/student/views/management.py
-msgid "Error in resetting your password."
-msgstr "Сталась помилка під час спроби скинути пароль."
-
-#: common/djangoapps/student/views/management.py
-msgid "Error in resetting your password. Please try again."
-msgstr ""
-"Сталася помилка під час скидання паролю. Будь ласка, спробуйте ще раз."
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid ""
-"{html_start}Password Creation Complete{html_end}Your password has been "
-"created. {bold_start}{email}{bold_end} is now your primary login email."
-msgstr ""
-"{html_start}Створення Паролю Завершено{html_end} Ваш Пароль був "
-"створений.{bold_start}{email}{bold_end} тепер є основною електронною адресою"
-" для входу"
 
 #: common/djangoapps/student/views/management.py
 msgid "Valid e-mail address required."
@@ -1856,9 +1745,8 @@ msgid "Cannot rescore problems with possible file submissions"
 msgstr "Неможливо переоцінити задачі з можливими завантаженими файлами"
 
 #: common/lib/capa/capa/capa_problem.py
-#, python-brace-format
-msgid "Question {0}"
-msgstr "Запитання {0}"
+msgid "Question {}"
+msgstr ""
 
 #: common/lib/capa/capa/capa_problem.py
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -2303,6 +2191,7 @@ msgstr "XML-дані для анотації"
 #: common/lib/xmodule/xmodule/library_content_module.py
 #: common/lib/xmodule/xmodule/library_root_xblock.py
 #: common/lib/xmodule/xmodule/poll_module.py
+#: common/lib/xmodule/xmodule/unit_block.py
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: common/lib/xmodule/xmodule/x_module.py
@@ -2559,8 +2448,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
 #: cms/templates/index.html cms/templates/videos_index_pagination.html
-#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
-#: lms/templates/register-shib.html
+#: lms/templates/manage_user_standing.html
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
@@ -3023,23 +2911,24 @@ msgstr "Схема тем обговорення"
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
-"must be unique. In \"id\" values, the only special characters that are "
-"supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
+"category must be unique. In \"id\" values, the only special characters that "
+"are supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 "Введіть категорії обговорення у такому форматі: \"Назва категорії\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. Наприклад, "
-"одна категорія обговорення може бути \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\"}. Значення \"id\" для кожної категорії "
-"має бути унікальним. У значеннях \"id\" підтримуються лише такі спеціальні "
-"символи, як нижнє підкреслення, дефіс та точка. Ви також можете вказати "
-"категорію як стандартну для нових публікацій на сторінці \"Обговорення\", "
-"встановивши її атрибут \"default\" як \"true\". Наприклад, \"Lydian Mode\": "
-"{\"id\": \"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"одна категорія обговорення може бути \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\"}. Значення \"id\" для кожної "
+"категорії має бути унікальним. У значеннях \"id\" підтримуються лише такі "
+"спеціальні символи, як нижнє підкреслення, дефіс та точка. Ви також можете "
+"вказати категорію як стандартну для нових публікацій на сторінці "
+"\"Обговорення\", встановивши її атрибут \"default\" як \"true\". Наприклад, "
+"\"Lydian Mode\": {\"id\": \"i4x-UniversityX-MUS101-course-2015_T1\", "
+"\"default\": true}."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Sorting Alphabetical"
@@ -3653,17 +3542,10 @@ msgid ""
 "for each topic, and another comma after the closing square brackets. For "
 "example, to specify that teams should have a maximum of 5 participants and "
 "provide a list of 2 topics, enter the configuration in this format: "
-"{example_format}. In \"id\" values, the only supported special characters "
-"are underscore, hyphen, and period."
+"{example_format}. If no max_size is provided, it will default to "
+"{default_max}In \"id\" values, the only supported special characters are "
+"underscore, hyphen, and period."
 msgstr ""
-"Вкажіть максимальний розмір команди і теми для команд всередині фігурних "
-"дужок. Переконайтеся, що ви уклали набори тем у квадратних дужках, через "
-"кому після закриваючої фігурної дужки для кожної теми, та іншою комою після "
-"закриття квадратних дужок. Наприклад, щоб вказати, що команди повинні мати "
-"максимум 5 учасників і представити список з 2 тем, введіть конфігурацію в "
-"наступному форматі: {example_format}. В значеннях \\\"id\\\", крім літер і "
-"цифр латинського алфавіту підтримується символи підкреслення, дефіс і "
-"крапка."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable Proctored Exams"
@@ -4107,14 +3989,9 @@ msgstr "LTI ID "
 msgid ""
 "Enter the LTI ID for the external LTI provider.  This value must be the same"
 " LTI ID that you entered in the LTI Passports setting on the Advanced "
-"Settings page.<br />See {docs_anchor_open}the edX LTI "
+"Settings page.{break_tag}See {docs_anchor_open}the edX LTI "
 "documentation{anchor_close} for more details on this setting."
 msgstr ""
-"Введіть ідентифікатор LTI  для зовнішнього оператора LTI . Це значення "
-"повинно збігатися з ідентифікатором LTI введеним вами в налаштуваннях "
-"«Реєстраційні дані LTI » на сторінці розширених налаштувань. <br />Див. "
-"{docs_anchor_open}the edX LTI documentation {anchor_close} для отримання "
-"докладної інформації."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "LTI URL"
@@ -4124,15 +4001,10 @@ msgstr "LTI URL"
 #, python-brace-format
 msgid ""
 "Enter the URL of the external tool that this component launches. This "
-"setting is only used when Hide External Tool is set to False.<br />See "
+"setting is only used when Hide External Tool is set to False.{break_tag}See "
 "{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
 "on this setting."
 msgstr ""
-"Введіть посилання на зовнішній засіб навчання, який запускає цей компонент. "
-"Це налаштування застосовується тільки коли  «Приховати зовнішню програму» "
-"присвоєно значення «false».<br /> Див. {docs_anchor_open} edX LTI "
-"documentation {anchor_close} для отримання детальної інформації по цій "
-"настройці."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Custom Parameters"
@@ -4142,14 +4014,10 @@ msgstr "Персональні параметри"
 #, python-brace-format
 msgid ""
 "Add the key/value pair for any custom parameters, such as the page your "
-"e-book should open to or the background color for this component.<br />See "
-"{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
-"on this setting."
+"e-book should open to or the background color for this "
+"component.{break_tag}See {docs_anchor_open}the edX LTI "
+"documentation{anchor_close} for more details on this setting."
 msgstr ""
-"Додати пару ключ/значення для будь-яких параметрів користувача, таких як "
-"сторінка, на якій повинна відкриватися ваша електронна книга, або колір фону"
-" для даного компонента.<br />Див. {docs_anchor_open} edX LTI documentation "
-"{anchor_close} для отримання детальної інформації по цьому налаштуванню."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Open in New Page"
@@ -5232,6 +5100,65 @@ msgstr ""
 msgid "Close"
 msgstr "Закрити"
 
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#, python-format
+msgid ""
+"This is a routed Account Activation email for %(routed_user)s "
+"(%(routed_user_email)s): %(routed_profile_name)s"
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+msgid "Account Activation"
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#: common/templates/student/edx_ace/accountactivation/email/body.txt
+#, python-format
+msgid ""
+"You're almost there! Use the link below to activate your account to access "
+"engaging, high-quality %(platform_name)s courses. Note that you will not be "
+"able to log back into your account until you have activated it."
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+msgid "Activate Your Account"
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#: common/templates/student/edx_ace/accountactivation/email/body.txt
+#, python-format
+msgid "Enjoy learning with %(platform_name)s."
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#, python-format, python-brace-format
+msgid ""
+"If you need help, please use our web form at "
+"{start_anchor_web}%(support_url)s{end_anchor} or email "
+"{start_anchor_email}%(support_email)s{end_anchor}."
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.html
+#: common/templates/student/edx_ace/accountactivation/email/body.txt
+#, python-format
+msgid ""
+"This email message was automatically sent by %(lms_url)s because someone "
+"attempted to create an account on %(platform_name)s using this email "
+"address."
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/body.txt
+#, python-format
+msgid ""
+"If you need help, please use our web form at %(support_url)s or email "
+"%(support_email)s."
+msgstr ""
+
+#: common/templates/student/edx_ace/accountactivation/email/subject.txt
+#, python-format
+msgid "Action Required: Activate your %(platform_name)s account"
+msgstr ""
+
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 msgid "Create Password"
 msgstr "Створити Пароль"
@@ -5269,8 +5196,8 @@ msgstr ""
 
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 #: common/templates/student/edx_ace/accountrecovery/email/body.txt
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
 msgid ""
 "If you didn't request this change, you can disregard this email - we have "
 "not yet reset your password."
@@ -5279,12 +5206,12 @@ msgstr ""
 "це повідомлення - ваш пароль ще не був змінений."
 
 #: common/templates/student/edx_ace/accountrecovery/email/body.txt
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
 msgid "Thanks for using our site!"
 msgstr "Дякуємо, що користуєтесь нашим сайтом!"
 
 #: common/templates/student/edx_ace/accountrecovery/email/body.txt
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
 #, python-format
 msgid "The %(platform_name)s Team"
 msgstr "Команда %(platform_name)s"
@@ -5360,50 +5287,6 @@ msgstr ""
 "У нас зберігається реєстр старих електронних повідомлень, тому якщо цей "
 "запит був зроблений ненавмисно, ми можемо розглянути цю проблему."
 
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-msgid "Password Reset"
-msgstr "Скинути пароль"
-
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
-#, python-format
-msgid ""
-"You're receiving this e-mail because you requested a password reset for your"
-" user account at %(platform_name)s."
-msgstr ""
-"Ви отримали цього електронного листа тому, що намагалися змінити пароль до "
-"вашого облікового запису на %(platform_name)s."
-
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
-#, python-format
-msgid ""
-"However, there is currently no user account associated with your email "
-"address: %(email_address)s."
-msgstr ""
-"Немає облікового запису користувача, пов'язаного з Вашою електронною "
-"адресою: %(email_address)s."
-
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
-msgid "If you did not request this change, you can ignore this email."
-msgstr ""
-"Якщо ви не надіслали запит на цю зміну, ви можете ігнорувати цей електронний"
-" лист."
-
-#: common/templates/student/edx_ace/passwordreset/email/body.html
-msgid "Change my Password"
-msgstr "Змінити мій пароль"
-
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
-msgid "Please go to the following page and choose a new password:"
-msgstr "Будь ласка, перейдіть до наступної сторінки та оберіть новий пароль:"
-
-#: common/templates/student/edx_ace/passwordreset/email/subject.txt
-#, python-format
-msgid "Password reset on %(platform_name)s"
-msgstr "Пароль скинуто на %(platform_name)s"
-
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
 msgid "Create Recovery Email"
 msgstr "Створіть електронну адресу для відновлення"
@@ -5428,7 +5311,7 @@ msgstr ""
 #. Translators: This label appears above a field on the registration form
 #. meant to confirm the user's email address.
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Confirm Email"
 msgstr "Підтвердити електронну адресу."
 
@@ -5613,7 +5496,8 @@ msgstr "Політика щодо доступності матеріалів"
 
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
-#: lms/djangoapps/branding/api.py openedx/core/djangoapps/user_api/api.py
+#: lms/djangoapps/branding/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Terms of Service"
 msgstr "Умови надання послуг"
 
@@ -6099,50 +5983,6 @@ msgstr ""
 msgid "More about {fullname}'s accomplishment"
 msgstr "Більше про досягнення {fullname}"
 
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor/views/tools.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/schedules/admin.py
-#: lms/templates/staff_problem_info.html
-#: lms/templates/api_admin/catalogs/search.html
-#: lms/templates/ccx/enrollment.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Username"
-msgstr "Ім'я користувача"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "Grade"
-msgstr "Оцінка"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "Percent"
-msgstr "В процентах"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "Opened by this number of students"
-msgstr "Кількість студентів, що відкривали"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "subsections"
-msgstr "підрозділи"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "Count of Students"
-msgstr "Кількість Студентів"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "Percent of Students"
-msgstr "Процент студентів"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "Score"
-msgstr "Бали"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "problems"
-msgstr "завдання"
-
 #: lms/djangoapps/commerce/api/v1/serializers.py
 #, python-brace-format
 msgid "{course_id} is not a valid course key."
@@ -6199,7 +6039,7 @@ msgstr ""
 "Користувач {username} ({email}) подав запит на повернення коштів. Для "
 "обробки цього запиту, будь ласка, перейдіть по посиланню (посиланням) нижче."
 
-#: lms/djangoapps/commerce/views.py lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/commerce/views.py
 msgid "Receipt"
 msgstr "Квитанція"
 
@@ -6311,9 +6151,21 @@ msgstr "У вас немає доступу до цього курсу"
 msgid "You do not have access to this course on a mobile device"
 msgstr "Цей курс недоступний вам з мобільного додатка"
 
+#: lms/djangoapps/courseware/access_response.py
+msgid "You must be enrolled in the course"
+msgstr ""
+
+#: lms/djangoapps/courseware/access_response.py
+msgid "You must be logged in to see this course"
+msgstr ""
+
 #: lms/djangoapps/courseware/course_tools.py
 msgid "Upgrade to Verified"
 msgstr "Підвищити до рівня «Підтверджений сертифікат»"
+
+#: lms/djangoapps/courseware/courses.py
+msgid "Assignment"
+msgstr ""
 
 #. Translators: 'absolute' is a date such as "Jan 01,
 #. 2020". 'relative' is a fuzzy description of the time until
@@ -6380,6 +6232,14 @@ msgstr "Цей курс завершується {time_remaining_string}  {cours
 #, python-brace-format
 msgid "This course is ending in {time_remaining_string} at {course_end_time}."
 msgstr "Цей курс завершується {time_remaining_string}  {course_end_time}."
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "You lose all access to this course, including your progress."
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "Audit Access Expires"
+msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Certificate Available"
@@ -6563,6 +6423,10 @@ msgstr "Прогрес"
 msgid "Textbooks"
 msgstr "Підручники"
 
+#: lms/djangoapps/courseware/tabs.py
+msgid "Dates"
+msgstr ""
+
 #: lms/djangoapps/courseware/views/index.py
 #, python-brace-format
 msgid ""
@@ -6731,8 +6595,8 @@ msgid "Annual Household Income"
 msgstr "Річний сімейний дохід"
 
 #: lms/djangoapps/courseware/views/views.py
-msgid "Use between 250 and 500 words or so in your response."
-msgstr "Використовуйте приблизно 250-500 слів для відповіді."
+msgid "Use between 1250 and 2500 characters or so in your response."
+msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
@@ -6996,6 +6860,10 @@ msgstr "Переглянути тему"
 #, python-format
 msgid "Response to %(thread_title)s"
 msgstr "Відповідь на %(thread_title)s"
+
+#: lms/djangoapps/discussion/views.py
+msgid "Access to this discussion is restricted to team members and staff."
+msgstr ""
 
 #: lms/djangoapps/edxnotes/helpers.py
 msgid "EdxNotes Service is unavailable. Please try again in a few minutes."
@@ -7311,16 +7179,29 @@ msgstr "зареєстровано профіль учня"
 msgid "User ID"
 msgstr "ID користувача"
 
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/tools.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: openedx/core/djangoapps/schedules/admin.py
+#: lms/templates/staff_problem_info.html
+#: lms/templates/api_admin/catalogs/search.html
+#: lms/templates/ccx/enrollment.html
+msgid "Username"
+msgstr "Ім'я користувача"
+
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a field on the password reset
-#. form meant to hold the user's email address.
 #. Translators: This label appears above a field on the login form
 #. meant to hold the user's email address.
+#. Translators: This label appears above a field on the password reset
+#. form meant to hold the user's email address.
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's email address.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: openedx/core/djangoapps/user_api/api.py lms/templates/ccx/enrollment.html
+#: openedx/core/djangoapps/user_authn/views/login_form.py
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Email"
 msgstr "Електронна пошта"
@@ -7342,7 +7223,7 @@ msgstr "Рік Народження"
 #. form used to select the user's gender.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Gender"
 msgstr "Стать"
 
@@ -7353,7 +7234,6 @@ msgstr "Рівень освіти"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Mailing Address"
 msgstr "Ваше місто або населений пункт"
@@ -7372,10 +7252,19 @@ msgid "Verification Status"
 msgstr "Статус перевірки"
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Last Login"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Date Joined"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
 msgstr "Когорта"
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Team"
 msgstr "Команда"
 
@@ -7384,7 +7273,7 @@ msgstr "Команда"
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "City"
 msgstr "Місто"
 
@@ -7420,7 +7309,7 @@ msgstr "Ідентифікатор курсу"
 msgid "% Discount"
 msgstr "% знижка"
 
-#: lms/djangoapps/instructor/views/api.py lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/shoppingcart/reports.py wiki/plugins/attachments/forms.py
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 msgid "Description"
@@ -7475,13 +7364,6 @@ msgid "Unable to generate redeem codes because of course misconfiguration."
 msgstr ""
 "Не вдалося генерувати компенсаційні коди із-за неправильної конфігурації "
 "курсу."
-
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/shoppingcart/models.py
-msgid "pdf download unavailable right now, please contact support."
-msgstr ""
-"зараз скачування не доступно в PDF форматі, будь-ласка, зв'яжіться з "
-"командою підтримки."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -7869,10 +7751,6 @@ msgid "Analytics"
 msgstr "Аналітика"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "Metrics"
-msgstr "Показники"
-
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Open Responses"
 msgstr "Відповіді у вільній формі"
 
@@ -7945,6 +7823,10 @@ msgid "Couldn't find module for url: {0}"
 msgstr "Неможливо знайти модуль за адресою: {0}"
 
 #: lms/djangoapps/instructor/views/tools.py
+msgid "Could not find student enrollment in the course."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/tools.py
 #, python-brace-format
 msgid "Unit {0} has no due date to extend."
 msgstr "У блоку {0} відсутній термін здачі, який можна було б продовжити."
@@ -7960,8 +7842,7 @@ msgstr ""
 #. meant to hold the user's full name.
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/api.py cms/templates/register.html
-#: lms/templates/register-form.html lms/templates/register-shib.html
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -8016,6 +7897,10 @@ msgstr "Результати повинні бути між 0 і значенн�
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "Not all problems in entrance exam support re-scoring."
 msgstr "Не всі завдання у вступному випробуванні підтримують перездачу."
+
+#: lms/djangoapps/instructor_task/models.py
+msgid "An error has occurred. Task was not created."
+msgstr ""
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -8090,7 +7975,7 @@ msgstr "розподілено по групах"
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "First Name"
 msgstr "Ім'я"
 
@@ -8098,7 +7983,7 @@ msgstr "Ім'я"
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Last Name"
 msgstr "Прізвище"
 
@@ -8111,7 +7996,7 @@ msgstr "Ім'я компанії"
 #. which allows the user to input the Title
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_api/api.py wiki/forms.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py wiki/forms.py
 #: wiki/templates/wiki/dir.html
 msgid "Title"
 msgstr "Назва"
@@ -8323,6 +8208,19 @@ msgstr " (пропущено {skipped})"
 msgid " (out of {total})"
 msgstr " (з {total})"
 
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/learner_dashboard/programs.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Programs"
+msgstr "Програми"
+
+#: lms/djangoapps/learner_dashboard/programs.py
+#: lms/templates/learner_dashboard/program_details.html
+msgid "Program Details"
+msgstr ""
+
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
 "This component's access settings refer to deleted or invalid group "
@@ -8426,10 +8324,6 @@ msgstr ""
 "Зверніть увагу, що це поле ігнорується, якщо блок має властивість "
 "visible_to_staff_only."
 
-#: lms/djangoapps/notes/views.py
-msgid "My Notes"
-msgstr "Мої нотатки"
-
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
 msgstr ""
@@ -8526,12 +8420,12 @@ msgid "{mode_name} for course {course}"
 msgstr "{mode_name} для курсу {course}"
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid ""
-"You can unenroll in the course and receive a full refund for 14 days after "
-"the course start date. "
+"To receive a refund you may unenroll from the course on your edX Dashboard "
+"({dashboard_url}) up to 14 days after your payment or 14 days after your "
+"course starts (up to six months after your payment).\n"
 msgstr ""
-"Ви можете відписатись від курсу і повністю повернути кошти протягом 14 днів "
-"після дати запуску курсу."
 
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
@@ -8545,21 +8439,15 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
 "You can unenroll in the course and receive a full refund for 2 days after "
-"the course start date. "
+"the course start date.\n"
 msgstr ""
-"Ви можете відписатись від курсу і повністю повернути кошти протягом 2 днів "
-"після дати запуску курсу."
 
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
 msgid ""
-"{refund_reminder_msg}To receive your refund, contact {billing_email}. Please"
-" include your order number in your email. Please do NOT include your credit "
-"card information."
+"{refund_reminder_msg}For help unenrolling, Please see How do I unenroll from"
+" a course? ({how_to_unenroll_link}) in our edX HelpCenter."
 msgstr ""
-"{refund_reminder_msg} щоб повернути гроші, зв'яжіться {billing_email}. Будь "
-"ласка, включіть в лист ваш номер замовлення. Нікому не повідомляйте "
-"інформацію про вашу кредитну карту!"
 
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
@@ -8587,78 +8475,6 @@ msgstr "Пожертва на курс {course}"
 #, python-brace-format
 msgid "Donation for {platform_name}"
 msgstr "Пожертвування для {platform_name}"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#, python-brace-format
-msgid "Page {page_number} of {page_count}"
-msgstr "Сторінка {page_number} з {page_count}"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Invoice"
-msgstr "Рахунок-фактура"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Order"
-msgstr "Замовлення"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#, python-brace-format
-msgid "{id_label} # {item_id}"
-msgstr "{id_label} # {item_id}"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-#, python-brace-format
-msgid "Date: {date}"
-msgstr "Дата: {date}"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/djangoapps/shoppingcart/reports.py
-msgid "Quantity"
-msgstr "Кількість"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid ""
-"List Price\n"
-"per item"
-msgstr ""
-"Список цін\n"
-"за одиницю"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid ""
-"Discount\n"
-"per item"
-msgstr ""
-"Знижка\n"
-"за одиницю"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Amount"
-msgstr "Кількість"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Total"
-msgstr "Всього"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Payment Received"
-msgstr "Платіж отриманий"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Balance"
-msgstr "Залишок"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Billing Address"
-msgstr "Адреса платника"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Disclaimer"
-msgstr "Відмова від відповідальності"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "TERMS AND CONDITIONS"
-msgstr "ПОЛОЖЕННЯ І УМОВИ"
 
 #. Translators: this text appears when an unfamiliar error code occurs during
 #. payment,
@@ -9111,6 +8927,10 @@ msgid "Order ID"
 msgstr "ID замовлення"
 
 #: lms/djangoapps/shoppingcart/reports.py
+msgid "Quantity"
+msgstr "Кількість"
+
+#: lms/djangoapps/shoppingcart/reports.py
 msgid "Unit Cost"
 msgstr "Вартість блоку"
 
@@ -9306,6 +9126,23 @@ msgstr "Записи на Основі Функцій"
 msgid "View feature based enrollment settings"
 msgstr "Переглянути налаштування реєстрації на основі функцій"
 
+#: lms/djangoapps/support/views/index.py
+#: lms/templates/support/link_program_enrollments.html
+msgid "Link Program Enrollments"
+msgstr ""
+
+#: lms/djangoapps/support/views/index.py
+msgid "Link LMS users to program enrollments"
+msgstr ""
+
+#: lms/djangoapps/support/views/index.py
+msgid "Program Enrollments Inspector Tool"
+msgstr ""
+
+#: lms/djangoapps/support/views/index.py
+msgid "Find information related to a learner's program enrollments"
+msgstr ""
+
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
 msgstr "user_support_url"
@@ -9363,6 +9200,10 @@ msgstr "Користувач {user} відрахований з курсу {cour
 msgid "Refunded {cost} for order id {order_id}"
 msgstr "Повернуто {cost} за замовлення № {order_id}"
 
+#: lms/djangoapps/survey/utils.py
+msgid "You must complete a survey"
+msgstr ""
+
 #: lms/djangoapps/teams/models.py
 msgid "Optional language the team uses as ISO 639-1 code."
 msgstr "Код додаткової мови команди за стандартом ISO 639-1."
@@ -9372,13 +9213,13 @@ msgid "Teams"
 msgstr "Команди"
 
 #: lms/djangoapps/teams/views.py
+msgid "course_id must be provided"
+msgstr "course_id повинен бути наданий"
+
+#: lms/djangoapps/teams/views.py
 #, python-brace-format
 msgid "The supplied course id {course_id} is not valid."
 msgstr "Зазначений ідентифікатор курсу {course_id} недійсний."
-
-#: lms/djangoapps/teams/views.py
-msgid "course_id must be provided"
-msgstr "course_id повинен бути наданий"
 
 #: lms/djangoapps/teams/views.py
 msgid "text_search and order_by cannot be provided together"
@@ -9408,12 +9249,32 @@ msgid "The supplied course_id {course_id} is not valid."
 msgstr "Введений идентификатор_курса {course_id} недійсний."
 
 #: lms/djangoapps/teams/views.py
-msgid "You are already in a team in this course."
-msgstr "Ви вже належите до однієї з команд на цьому курсі."
+msgid "topic_id is required"
+msgstr ""
 
 #: lms/djangoapps/teams/views.py
-msgid "username or team_id must be specified."
-msgstr "необхідно вказати ім'я користувача або team_id."
+msgid "You can't create a team in an instructor managed topic."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "You are already in a team in this teamset."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "teamset_id and team_id are mutually exclusive options."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "teamset_id requires course_id to also be provided."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "No teamset found in given course with given id"
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "username or (team_id or teamset_id) must be specified."
+msgstr ""
 
 #: lms/djangoapps/teams/views.py
 msgid "Username is required."
@@ -9428,6 +9289,10 @@ msgid "This team is already full."
 msgstr "Набір в цю команду закритий."
 
 #: lms/djangoapps/teams/views.py
+msgid "You can't join an instructor managed team."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
 #, python-brace-format
 msgid "The user {username} is already a member of a team in this course."
 msgstr "Користувач {username} вже є членом однієї з команд курсу."
@@ -9438,6 +9303,10 @@ msgid ""
 "The user {username} is not enrolled in the course associated with this team."
 msgstr ""
 "Користувач {username} не зареєстрований на курс, пов'язаний з цією командою."
+
+#: lms/djangoapps/teams/views.py
+msgid "You can't leave an instructor managed team."
+msgstr ""
 
 #: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
@@ -9550,15 +9419,10 @@ msgid "Are you sure you want to cancel retirement for user \"%(username)s\"? "
 msgstr "Ви дійсно бажаєте скасувати вилучення для користувача \"%(username)s\"?"
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
-msgid ""
-"\n"
-"                    Welcome to %(course_name)s\n"
-"                "
-msgstr ""
-"\n"
-"                    Ласкаво просимо до %(course_name)s\n"
-"                "
+msgid "Welcome to %(course_name)s"
+msgstr "Ласкаво просимо до %(course_name)s"
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
 #, python-format
@@ -9587,15 +9451,14 @@ msgid "It is recommended that you change your password."
 msgstr "Рекомендується Вам змінити свій пароль."
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
+msgid "You may access your course."
+msgstr ""
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
 msgid "Sincerely yours, The %(course_name)s Team"
 msgstr "Щиро ваші, команда курсу %(course_name)s"
-
-#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
-#, python-format
-msgid "Welcome to %(course_name)s"
-msgstr "Ласкаво просимо до %(course_name)s"
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
@@ -9605,6 +9468,11 @@ msgid ""
 msgstr ""
 "Щоб приступити, будь ласка, відвідайте  https://%(site_name)s. Дані про "
 "реєстрацію для вашого аккаунту наступні."
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
+#, python-format
+msgid "You may access your course at: %(course_url)s."
+msgstr ""
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/subject.txt
 #: lms/templates/instructor/edx_ace/enrollenrolled/email/subject.txt
@@ -9643,8 +9511,10 @@ msgstr "Відвідати %(course_name)s"
 
 #: lms/templates/instructor/edx_ace/addbetatester/email/body.html
 #, python-format
-msgid "Visit %(site_name)s"
-msgstr "Відвідати %(site_name)s"
+msgid ""
+"Visit %(site_name)s\n"
+"                "
+msgstr ""
 
 #: lms/templates/instructor/edx_ace/addbetatester/email/body.html
 #: lms/templates/instructor/edx_ace/addbetatester/email/body.txt
@@ -9941,6 +9811,24 @@ msgstr "Вийшли"
 #: lms/templates/logout.html
 msgid "You have signed out."
 msgstr "Ви вийшли."
+
+#: lms/templates/logout.html
+#, python-brace-format
+msgid ""
+"{start_anchor}Click here{end_anchor} to delete your single signed on (SSO) "
+"session."
+msgstr ""
+
+#: lms/templates/logout.html
+msgid "We are signing you in."
+msgstr ""
+
+#: lms/templates/logout.html
+msgid ""
+"\n"
+"                  This may take a minute. If you are not redirected, go to the home page.\n"
+"                "
+msgstr ""
 
 #: lms/templates/logout.html
 #, python-brace-format
@@ -10529,8 +10417,6 @@ msgstr "Перейти на домашню сторінку %(platform_name)s"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: cms/templates/login.html cms/templates/widgets/header.html
-#: themes/red-theme/cms/templates/login.html
 msgid "Sign In"
 msgstr "Увійти"
 
@@ -10579,6 +10465,10 @@ msgstr "Завантажте Android додаток у Google Play Store"
 msgid "Our mailing address is"
 msgstr "Наша поштова адреса - "
 
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+msgid "Unsubscribe from these emails."
+msgstr ""
+
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_head.html
 msgid "edX Email"
 msgstr "Електронна пошта edX"
@@ -10596,8 +10486,6 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
-#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.html
-#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.txt
 msgid "Upgrade Now"
 msgstr "Оновити зараз"
 
@@ -10675,6 +10563,11 @@ msgid ""
 msgstr ""
 "Я і моя компанія приймають {link_start}{platform_name} умови обслуговування "
 "API {link_end}."
+
+#: openedx/core/djangoapps/auth_exchange/forms.py
+#, python-format
+msgid "'%s' is not a valid scope."
+msgstr ""
 
 #: openedx/core/djangoapps/bookmarks/apps.py
 #: openedx/features/course_bookmarks/plugins.py
@@ -10769,6 +10662,26 @@ msgstr ""
 "Максимальна кількість записів, відображених по сторінкам, від одного запиту "
 "до служби каталогу."
 
+#: openedx/core/djangoapps/config_model_utils/admin.py
+#, python-brace-format
+msgid ""
+"These define the context to enable this configuration on. If no values are "
+"set, then the configuration applies globally. If a single value is set, then"
+" the configuration applies to all courses within that context. At most one "
+"value can be set at a time.{br}If multiple contexts apply to a course (for "
+"example, if configuration is specified for the course specifically, and for "
+"the org that the course is in, then the more specific context overrides the "
+"more general context."
+msgstr ""
+
+#: openedx/core/djangoapps/config_model_utils/admin.py
+msgid ""
+"If any of these values are left empty or \"Unknown\", then their value at "
+"runtime will be retrieved from the next most specific context that applies. "
+"For example, if \"Enabled\" is left as \"Unknown\" in the course context, "
+"then that course will be Enabled only if the org that it is in is Enabled."
+msgstr ""
+
 #: openedx/core/djangoapps/config_model_utils/models.py
 #, python-format
 msgid "%(value)s should have the form ORG+COURSE"
@@ -10813,6 +10726,22 @@ msgstr ""
 msgid "Configuration may not be specified at more than one level at once."
 msgstr ""
 "Конфігурація не може бути вказана одночасно на більш ніж одному рівні."
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Administer users and author content"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Author content"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "Read-only"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/models.py
+msgid "One and only one of 'user' and 'group' must be set."
+msgstr ""
 
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
@@ -11114,6 +11043,12 @@ msgstr ""
 "програмі"
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
+msgid ""
+"Comma-separated list of filters that this application will be allowed to "
+"request."
+msgstr ""
+
+#: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid "Content Provider"
 msgstr "Постачальник вмісту"
 
@@ -11245,18 +11180,17 @@ msgid " By %(filter_title)s "
 msgstr " За допомогою %(filter_title)s "
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
 #, python-format
 msgid "Welcome to week %(week_num)s of %(course_name)s!"
 msgstr "Вітаємо на тижні %(week_num)s%(course_name)s!"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
-#, python-format
+#, python-brace-format
 msgid ""
-"We hope you're enjoying <strong>%(course_name)s</strong>! We want to let you"
-" know what you can look forward to in week %(week_num)s:"
+"We hope you're enjoying {start_strong}{course_name}{end_strong}! We want to "
+"let you know what you can look forward to in week {week_num}:"
 msgstr ""
-"Ми сподіваємося, що вам подобається!<strong>%(course_name)s</strong>Ми "
-"хочемо повідомити, що ви можете очікувати за тиждень:%(week_num)s"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.txt
@@ -11270,6 +11204,7 @@ msgstr ""
 "підсумку окупиться!"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
 msgid "Resume your course now"
 msgstr "Продовжити ваш курс зараз"
 
@@ -11286,6 +11221,32 @@ msgstr ""
 #, python-format
 msgid "Welcome to week %(week_num)s"
 msgstr "Вітаємо на тижні%(week_num)s"
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
+#, python-brace-format
+msgid ""
+"We hope you're enjoying {start_strong}{course_name}{end_strong}! We want to "
+"let you know what you can look forward to in the coming weeks:"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.txt
+msgid ""
+"We encourage you to spend time with the course each week. Your focused "
+"attention will pay off in the end!"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.txt
+#, python-format
+msgid ""
+"We hope you're enjoying %(course_name)s! We want to let you know what you "
+"can look forward to in the coming weeks:"
+msgstr ""
+
+#: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/subject.txt
+#, python-format
+msgid "%(course_name)s Weekly Update"
+msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
@@ -11316,15 +11277,12 @@ msgid "Keep up the momentum!"
 msgstr "Слідкуйте за імпульсом!"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
-#, python-format
+#, python-brace-format
 msgid ""
-"Many %(platform_name)s learners in <strong>%(course_name)s</strong> are "
-"completing more problems every week, and participating in the discussion "
+"Many {platform_name} learners in {start_strong}{course_name}{end_strong} are"
+" completing more problems every week, and participating in the discussion "
 "forums. What do you want to do to keep learning?"
 msgstr ""
-"Багато %(platform_name)s учнів<strong>%(course_name)s</strong> щотижня "
-"завершують більше задач і беруть участь в обговореннях на форумах. Що ви "
-"хочете зробити, щоб продовжити навчання?"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
@@ -11358,26 +11316,20 @@ msgid "Keep learning today"
 msgstr "Продовжуйте навчатися сьогодні"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
-#, python-format
+#, python-brace-format
 msgid ""
-"Remember when you enrolled in <strong>%(course_name)s</strong>, and other "
-"courses on %(platform_name)s? We do, and we’re glad to have you! Come see "
-"what everyone is learning."
+"Remember when you enrolled in {start_strong}{course_name}{end_strong}, and "
+"other courses on {platform_name}? We do, and we’re glad to have you! Come "
+"see what everyone is learning."
 msgstr ""
-"Пам'ятаєте, коли ви записалися до <strong>%(course_name)s</strong> , та інші"
-" курси на%(platform_name)s?  Ми так, і ми раді, що ви в нас є ! Приходьте "
-"подивитися, що всі вивчають."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
-#, python-format
+#, python-brace-format
 msgid ""
-"Remember when you enrolled in <strong>%(course_name)s</strong> on "
-"%(platform_name)s? We do, and we’re glad to have you! Come see what everyone"
-" is learning."
+"Remember when you enrolled in {start_strong}{course_name}{end_strong} on "
+"{platform_name}? We do, and we’re glad to have you! Come see what everyone "
+"is learning."
 msgstr ""
-"Пам'ятаєте, коли ви записувалися до <strong>%(course_name)s</strong> на "
-"%(platform_name)s ?  Ми так, і ми раді, що ви в нас є ! Приходьте "
-"подивитися, що всі вивчають."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
@@ -11430,35 +11382,29 @@ msgid "Upgrade now"
 msgstr "Оновити зараз"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
 "We hope you are enjoying learning with us so far on "
-"<strong>%(platform_name)s</strong>! A verified certificate allows you to "
-"highlight your new knowledge and skills. An %(platform_name)s certificate is"
-" official and easily shareable."
+"{start_strong}%(platform_name)s{end_strong}! A verified certificate allows "
+"you to highlight your new knowledge and skills. An %(platform_name)s "
+"certificate is official and easily shareable."
 msgstr ""
-"Ми сподіваємося, що вам подобаєтеся навчання у нас до цих пір "
-"<strong>%(platform_name)s</strong> ! Підтверджений сертифікат дозволяє вам "
-"виділити ваші нові знання та навички.  Сертифікат %(platform_name)s є "
-"офіційним і легко доступним для спільного використання."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
-#, python-format
+#, python-brace-format
 msgid ""
 "We hope you are enjoying learning with us so far in "
-"<strong>%(first_course_name)s</strong>! A verified certificate allows you to"
-" highlight your new knowledge and skills. An %(platform_name)s certificate "
-"is official and easily shareable."
+"{start_strong}{first_course_name}{end_strong}! A verified certificate allows"
+" you to highlight your new knowledge and skills. An {platform_name} "
+"certificate is official and easily shareable."
 msgstr ""
-"Ми сподіваємося, що вам подобаєтеся навчання у нас до цих пір в "
-"<strong>%(first_course_name)s</strong> ! Підтверджений сертифікат дозволяє "
-"вам виділити ваші нові знання та навички. Сертифікат %(platform_name)sє "
-"офіційним і легко доступним для спільного використання."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
-#, python-format
-msgid "Upgrade by <strong>%(user_schedule_upgrade_deadline_time)s</strong>."
-msgstr "Оновити до <strong>%(user_schedule_upgrade_deadline_time)s</strong>."
+#, python-format, python-brace-format
+msgid ""
+"Upgrade by "
+"{start_strong}%(user_schedule_upgrade_deadline_time)s{end_strong}."
+msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
 msgid "You are eligible to upgrade in these courses:"
@@ -11608,32 +11554,25 @@ msgstr "Введіть Вашу електронну адресу."
 msgid "The '{field_name}' field cannot be edited."
 msgstr "Поле '{field_name}' не може бути відредаговано."
 
-#: openedx/core/djangoapps/user_api/accounts/api.py
-#: openedx/core/djangoapps/user_api/views.py
-#: openedx/core/djangoapps/user_authn/views/auto_auth.py
-#: openedx/core/djangoapps/user_authn/views/deprecated.py
-msgid "Account creation not allowed."
-msgstr "Створення облікового запису заборонено."
-
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the State/Province/Region in which they
 #. live.
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "State/Province/Region"
 msgstr "Штат/регіон/область"
 
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the Company
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Company"
 msgstr "Компанія"
 
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the Job Title
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Job Title"
 msgstr "Назва посади"
 
@@ -11641,14 +11580,15 @@ msgstr "Назва посади"
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's mailing address.
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_api/api.py lms/templates/signup_modal.html
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#: lms/templates/signup_modal.html
 msgid "Mailing address"
 msgstr "Ваше місто або населений пункт"
 
 #. Translators: This phrase appears above a field on the registration form
 #. meant to hold the user's reasons for registering with edX.
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 #, python-brace-format
 msgid "Tell us why you're interested in {platform_name}"
 msgstr "Розкажіть нам, чому Ви зацікавлені в {platform_name}"
@@ -11656,14 +11596,14 @@ msgstr "Розкажіть нам, чому Ви зацікавлені в {plat
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's profession
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Profession"
 msgstr "Професія"
 
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's specialty
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_api/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Specialty"
 msgstr "Спеціальність"
 
@@ -11705,129 +11645,6 @@ msgstr "Успіх"
 #: openedx/core/djangoapps/user_api/admin.py
 msgid "Actions"
 msgstr "Дії"
-
-#. Translators: This example email address is used as a placeholder in
-#. a field on the password reset form meant to hold the user's email address.
-#. Translators: This example email address is used as a placeholder in
-#. a field on the login form meant to hold the user's email address.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "username@domain.com"
-msgstr "username@domain.com"
-
-#. Translators: These instructions appear on the password reset form,
-#. immediately below a field meant to hold the user's email address.
-#. Translators: These instructions appear on the login form, immediately
-#. below a field meant to hold the user's email address.
-#: openedx/core/djangoapps/user_api/api.py
-#, python-brace-format
-msgid "The email address you used to register with {platform_name}"
-msgstr ""
-"Електронна пошта, яку Ви використовували для реєстрації на {platform_name}"
-
-#. Translators: These instructions appear on the registration form,
-#. immediately
-#. below a field meant to hold the user's email address.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "This is what you will use to login."
-msgstr "Це те, що ви будете використовувати для входу."
-
-#. Translators: These instructions appear on the registration form,
-#. immediately
-#. below a field meant to hold the user's full name.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "This name will be used on any certificates that you earn."
-msgstr "Це ім'я буде використано у кожному отриманому сертіфікаті."
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's public username.
-#: openedx/core/djangoapps/user_api/api.py cms/templates/register.html
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Public Username"
-msgstr "Загальнодоступне ім’я користувача"
-
-#. Translators: These instructions appear on the registration form,
-#. immediately
-#. below a field meant to hold the user's public username.
-#: openedx/core/djangoapps/user_api/api.py
-msgid ""
-"The name that will identify you in your courses. It cannot be changed later."
-msgstr ""
-"Ім'я, за яким Вас будуть ідентифікувати на курсах. Його неможливо змінити "
-"пізніше."
-
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's highest completed level of education.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Highest level of education completed"
-msgstr "Найвищий рівень освіти, що Ви отримали:"
-
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's year of birth.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Year of birth"
-msgstr "Рік народження"
-
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the country in which the user lives.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Country or Region of Residence"
-msgstr "Країна або регіон, де Ви проживаєте."
-
-#. Translators: These instructions appear on the registration form,
-#. immediately
-#. below a field meant to hold the user's country.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "The country or region where you live."
-msgstr "Країна або регіон, де Ви проживаєте."
-
-#. Translators: This is a legal document users must agree to
-#. in order to register a new account.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Terms of Service and Honor Code"
-msgstr "Умови надання послуг та Кодекс Честі"
-
-#: openedx/core/djangoapps/user_api/api.py
-#, python-brace-format
-msgid ""
-"I agree to the {platform_name} "
-"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
-msgstr ""
-"Я погоджуюсь з {platform_name} "
-"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
-
-#. Translators: "Terms of Service" is a legal document users must agree to
-#. in order to register a new account.
-#. Translators: "Terms of service" is a legal document users must agree to
-#. in order to register a new account.
-#: openedx/core/djangoapps/user_api/api.py
-#, python-brace-format
-msgid "You must agree to the {platform_name} {terms_of_service}"
-msgstr "Ви повинні прийняти {terms_of_service} {platform_name}"
-
-#: openedx/core/djangoapps/user_api/api.py
-#, python-brace-format
-msgid ""
-"By creating an account, you agree to the                   "
-"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
-"                   and you acknowledge that {platform_name} and each Member "
-"process your personal data in accordance                   with the "
-"{privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
-msgstr ""
-
-#. Translators: "Terms of service" is a legal document users must agree to
-#. in order to register a new account.
-#: openedx/core/djangoapps/user_api/api.py
-#, python-brace-format
-msgid ""
-"I agree to the {platform_name} "
-"{tos_link_start}{terms_of_service}{tos_link_end}"
-msgstr ""
-"Я погоджуюсь з  {platform_name} "
-"{tos_link_start}{terms_of_service}{tos_link_end}"
 
 #: openedx/core/djangoapps/user_api/config/waffle.py
 msgid "System maintenance in progress. Please try again later."
@@ -11923,6 +11740,50 @@ msgstr "Найкраще, %(platform_name)s"
 msgid "Your Account Has Been Queued For Deletion"
 msgstr "Ваш обліковий запис було внесено в чергу на видалення"
 
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
+msgid "Password Reset"
+msgstr "Скинути пароль"
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
+#, python-format
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your"
+" user account at %(platform_name)s."
+msgstr ""
+"Ви отримали цього електронного листа тому, що намагалися змінити пароль до "
+"вашого облікового запису на %(platform_name)s."
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
+#, python-format
+msgid ""
+"However, there is currently no user account associated with your email "
+"address: %(email_address)s."
+msgstr ""
+"Немає облікового запису користувача, пов'язаного з Вашою електронною "
+"адресою: %(email_address)s."
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
+msgid "If you did not request this change, you can ignore this email."
+msgstr ""
+"Якщо ви не надіслали запит на цю зміну, ви можете ігнорувати цей електронний"
+" лист."
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
+msgid "Change my Password"
+msgstr "Змінити мій пароль"
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
+msgid "Please go to the following page and choose a new password:"
+msgstr "Будь ласка, перейдіть до наступної сторінки та оберіть новий пароль:"
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/subject.txt
+#, python-format
+msgid "Password reset on %(platform_name)s"
+msgstr "Пароль скинуто на %(platform_name)s"
+
 #: openedx/core/djangoapps/user_authn/views/auto_auth.py
 msgid "Superuser creation not allowed"
 msgstr "Створення суперюзера не дозволено"
@@ -11930,6 +11791,11 @@ msgstr "Створення суперюзера не дозволено"
 #: openedx/core/djangoapps/user_authn/views/auto_auth.py
 msgid "Account modification not allowed."
 msgstr "Редагування аккаунта не дозволено"
+
+#: openedx/core/djangoapps/user_authn/views/auto_auth.py
+#: openedx/core/djangoapps/user_authn/views/register.py
+msgid "Account creation not allowed."
+msgstr "Створення облікового запису заборонено."
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
@@ -11965,9 +11831,86 @@ msgstr ""
 msgid "Too many failed login attempts. Try again later."
 msgstr "Надто багато спроб входу. Спробуйте ще раз пізніше."
 
+#: openedx/core/djangoapps/user_authn/views/login.py
+#, python-brace-format
+msgid ""
+"As {allowed_domain} user, You must login with your {allowed_domain} "
+"{link_start}{provider} account{link_end}."
+msgstr ""
+
+#. Translators: These instructions appear on the login form, immediately
+#. below a field meant to hold the user's email address.
+#. Translators: These instructions appear on the password reset form,
+#. immediately below a field meant to hold the user's email address.
+#. pylint: disable=no-member
+#: openedx/core/djangoapps/user_authn/views/login_form.py
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+#, python-brace-format
+msgid "The email address you used to register with {platform_name}"
+msgstr ""
+"Електронна пошта, яку Ви використовували для реєстрації на {platform_name}"
+
 #: openedx/core/djangoapps/user_authn/views/login_form.py
 msgid "Create Account"
 msgstr "Створити обліковий запис"
+
+#. Translators: This example email address is used as a placeholder in
+#. a field on the password reset form meant to hold the user's email address.
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "username@domain.com"
+msgstr "username@domain.com"
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+"Ця адреса електронної пошти не має відповідного облікового запису. Ви "
+"впевнені, що ви вже зареєстровані?"
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"The user account associated with this e-mail address cannot reset the "
+"password."
+msgstr ""
+"Обліковий запис користувача, пов'язаний з цією адресою електронної пошти, не"
+" може змінити пароль."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "Password reset unsuccessful"
+msgstr "Не вдалося скинути пароль"
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "Error in resetting your password."
+msgstr "Сталась помилка під час спроби скинути пароль."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "Error in resetting your password. Please try again."
+msgstr ""
+"Сталася помилка під час скидання паролю. Будь ласка, спробуйте ще раз."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+#, python-brace-format
+msgid ""
+"{html_start}Password Creation Complete{html_end}Your password has been "
+"created. {bold_start}{email}{bold_end} is now your primary login email."
+msgstr ""
+"{html_start}Створення Паролю Завершено{html_end} Ваш Пароль був "
+"створений.{bold_start}{email}{bold_end} тепер є основною електронною адресою"
+" для входу"
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"Your previous request is in progress, please try again in a few moments."
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "Some error occured during password change. Please try again"
+msgstr "Виникла помилка при скиданні паролю. Будь ласка, спробуйте ще"
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "No email address provided."
+msgstr "Не надано електронну адресу."
 
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
@@ -11985,6 +11928,181 @@ msgstr "Наданий access_token вже зв'язано з іншим кор�
 #: openedx/core/djangoapps/user_authn/views/register.py
 msgid "The provided access_token is not valid."
 msgstr "Наданий access_token неприпустимий."
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Full Name cannot contain the following characters: < >"
+msgstr "Повне им'я не може містити наступних символів: < >"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A properly formatted e-mail is required"
+msgstr "Потрібен e-mail встановленої форми"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your legal name must be a minimum of one character long"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-format
+msgid "Email cannot be more than %(limit_value)s characters long"
+msgstr ""
+"Електронна пошта не може перевищувати довжину в %(limit_value)s символів"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "You must accept the terms of service."
+msgstr "Ви повинні підтвердити умови надання послуг"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A level of education is required"
+msgstr "Необхідно вказати рівень освіти"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your gender is required"
+msgstr "Необхідно вказати стать"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your year of birth is required"
+msgstr "Необхідно вказати рік народження"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Your mailing address is required"
+msgstr "Необхідно вказати поштову адресу"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A description of your goals is required"
+msgstr "Необхідно зазначити ваші цілі"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A city is required"
+msgstr "Необхідно вказати місто"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "A country is required"
+msgstr "Необхідно вказати країну"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "To enroll, you must follow the honor code."
+msgstr "Щоб зарееструватись на курс ви повинні слідувати кодексу честі."
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "You are missing one or more required fields"
+msgstr "Ви пропустили одне або декілька обов’язкових полів."
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Unauthorized email address."
+msgstr "Неавторизована електронна адреса."
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid ""
+"It looks like {email} belongs to an existing account. Try again with a "
+"different email address."
+msgstr ""
+"Схоже, що {email} належить до вже існуючого облікового запису. Повторіть "
+"спробу з іншою адресою електронної пошти."
+
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's email address.
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "This is what you will use to login."
+msgstr "Це те, що ви будете використовувати для входу."
+
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's full name.
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "This name will be used on any certificates that you earn."
+msgstr "Це ім'я буде використано у кожному отриманому сертіфікаті."
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's public username.
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Public Username"
+msgstr "Загальнодоступне ім’я користувача"
+
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's public username.
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid ""
+"The name that will identify you in your courses. It cannot be changed later."
+msgstr ""
+"Ім'я, за яким Вас будуть ідентифікувати на курсах. Його неможливо змінити "
+"пізніше."
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's highest completed level of education.
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Highest level of education completed"
+msgstr "Найвищий рівень освіти, що Ви отримали:"
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's year of birth.
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Year of birth"
+msgstr "Рік народження"
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the country in which the user lives.
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Country or Region of Residence"
+msgstr "Країна або регіон, де Ви проживаєте."
+
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's country.
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "The country or region where you live."
+msgstr "Країна або регіон, де Ви проживаєте."
+
+#. Translators: This is a legal document users must agree to
+#. in order to register a new account.
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Terms of Service and Honor Code"
+msgstr "Умови надання послуг та Кодекс Честі"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid ""
+"I agree to the {platform_name} "
+"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
+msgstr ""
+"Я погоджуюсь з {platform_name} "
+"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
+
+#. Translators: "Terms of Service" is a legal document users must agree to
+#. in order to register a new account.
+#. Translators: "Terms of service" is a legal document users must agree to
+#. in order to register a new account.
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid "You must agree to the {platform_name} {terms_of_service}"
+msgstr "Ви повинні прийняти {terms_of_service} {platform_name}"
+
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid ""
+"By creating an account, you agree to the                   "
+"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
+"                   and you acknowledge that {platform_name} and each Member "
+"process your personal data in accordance                   with the "
+"{privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
+msgstr ""
+
+#. Translators: "Terms of service" is a legal document users must agree to
+#. in order to register a new account.
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid ""
+"I agree to the {platform_name} "
+"{tos_link_start}{terms_of_service}{tos_link_end}"
+msgstr ""
+"Я погоджуюсь з  {platform_name} "
+"{tos_link_start}{terms_of_service}{tos_link_end}"
 
 #: openedx/core/djangoapps/util/user_messages.py
 #, python-brace-format
@@ -12030,6 +12148,16 @@ msgstr "Примусово"
 #: openedx/core/djangoapps/waffle_utils/models.py
 msgid "Force Off"
 msgstr "Непримусово"
+
+#: openedx/core/djangoapps/xblock/runtime/mixin.py
+msgid ""
+"This content is only accessible to registered learners. Sign in or register "
+"to view it."
+msgstr ""
+
+#: openedx/core/djangoapps/xblock/runtime/mixin.py
+msgid "This content is only accessible to enrolled learners. "
+msgstr ""
 
 #: openedx/core/lib/api/view_utils.py
 msgid "This value is invalid."
@@ -12096,39 +12224,54 @@ msgstr ""
 "Ви не ввійшли. Щоб переглянути зміст дискусії, {sign_in_link} або "
 "{register_link}, та зареєструйтесь на цьому курсі."
 
-#: openedx/features/content_type_gating/admin.py
-#: openedx/features/course_duration_limits/admin.py
-msgid ""
-"These define the context to enable course duration limits on. If no values "
-"are set, then the configuration applies globally. If a single value is set, "
-"then the configuration applies to all courses within that context. At most "
-"one value can be set at a time.<br>If multiple contexts apply to a course "
-"(for example, if configuration is specified for the course specifically, and"
-" for the org that the course is in, then the more specific context overrides"
-" the more general context."
+#: openedx/features/calendar_sync/ics.py
+#, python-brace-format
+msgid "{assignment} is due for {course}."
 msgstr ""
-"Вони визначають контекст для включення обмежень на тривалість курсу. Якщо "
-"значення не встановлено, тоді конфігурація застосовується глобально. Якщо  "
-"встановлюється одне значення, тоді конфігурація застосовується до всіх "
-"курсів у цьому контексті. Максимум одне значення можна встановити одночасно."
-" <br>Якщо декілька контекстів застосовуються до курсу (наприклад, якщо "
-"конфігурація специфічно вказана для конкретного курсу, і для організацій, в "
-"якому знаходиться курс, то більш конкретний контекст замінює більш загальний"
-" контекст."
 
-#: openedx/features/content_type_gating/admin.py
-#: openedx/features/course_duration_limits/admin.py
-msgid ""
-"If any of these values is left empty or \"Unknown\", then their value at "
-"runtime will be retrieved from the next most specific context that applies. "
-"For example, if \"Enabled\" is left as \"Unknown\" in the course context, "
-"then that course will be Enabled only if the org that it is in is Enabled."
+#: openedx/features/calendar_sync/plugins.py
+msgid "Calendar Sync"
 msgstr ""
-"Якщо будь-яке з цих значень залишається порожнім або \"Невідомим\", то їхнє "
-"значення під час виконання буде вилучено з наступного найбільш конкретного "
-"контексту, який застосовується. Наприклад, якщо \"Увімкнено\" залишилося як "
-"\"Невідомо\" в контексті курсу, то цей курс буде Ввімкнено, лише якщо "
-"організація, в якій вона знаходиться, Увімкнена."
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Unsubscribe from calendar updates"
+msgstr ""
+
+#: openedx/features/calendar_sync/plugins.py
+msgid "Subscribe to calendar updates"
+msgstr ""
+
+#: openedx/features/calendar_sync/views/management.py
+#, python-brace-format
+msgid "Updates for Your {course} Schedule"
+msgstr ""
+
+#: openedx/features/calendar_sync/views/management.py
+msgid "Update Your Calendar"
+msgstr ""
+
+#: openedx/features/calendar_sync/views/management.py
+#, python-brace-format
+msgid ""
+"Your assignment due dates for {course} were recently adjusted. Update your "
+"calendarwith your new schedule to ensure that you stay on track!"
+msgstr ""
+
+#: openedx/features/calendar_sync/views/management.py
+msgid "Stay on Track"
+msgstr ""
+
+#: openedx/features/calendar_sync/views/management.py
+msgid "Mark Your Calendar"
+msgstr ""
+
+#: openedx/features/calendar_sync/views/management.py
+#, python-brace-format
+msgid ""
+"Sticking to a schedule is the best way to ensure that you successfully "
+"complete your self-paced course. This schedule of assignment due dates for "
+"{course} will help you stay on track!"
+msgstr ""
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
@@ -12158,10 +12301,6 @@ msgstr ""
 #: openedx/features/course_duration_limits/models.py
 msgid "enabled_as_of must be set when enabled is True"
 msgstr "enabled_as_of має бути встановлено, коли ввімкнено значення True"
-
-#: openedx/features/content_type_gating/partitions.py
-msgid "Feature-based Enrollments"
-msgstr "Записи на Основі Функцій"
 
 #: openedx/features/content_type_gating/partitions.py
 msgid "Partition for segmenting users by access to gated content types"
@@ -12237,47 +12376,9 @@ msgid ""
 "{expiration_date}{span_close}{a_close}"
 msgstr ""
 "{line_break}Оновіть за {upgrade_deadline}щоб отримати необмежений доступ до "
-"курсу, якщо він існує на сайті. {a_open} Оновити зараз {sronly_span_open} "
-"для збереження доступу до минулого {expiration_date}{span_close}{a_close}"
-
-#: openedx/features/course_duration_limits/resolvers.py
-msgid "%b. %d, %Y"
-msgstr ""
-
-#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.html
-#, python-format
-msgid ""
-"We hope you have enjoyed %(first_course_name)s! You lose all access to this "
-"course in %(time_until_expiration)s."
-msgstr ""
-
-#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.html
-#, python-format
-msgid ""
-"We hope you have enjoyed %(first_course_name)s! You lose all access to this "
-"course, including your progress, on %(first_course_expiration_date)s "
-"(%(time_until_expiration)s)."
-msgstr ""
-
-#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.html
-msgid ""
-"Upgrade now to get unlimited access and for the chance to earn a verified "
-"certificate."
-msgstr ""
-
-#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.txt
-#, python-format
-msgid ""
-"We hope you have enjoyed %(first_course_name)s! You lose all access to this "
-"course, including your progress, on %(first_course_expiration_date)s "
-"(%(time_until_expiration)s). Upgrade now to get unlimited access and for the"
-" chance to earn a verified certificate."
-msgstr ""
-
-#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/subject.txt
-#, python-format
-msgid "Upgrade to keep your access to %(first_course_name)s"
-msgstr ""
+"курсу, якщо він існує на сайті. {a_open} Оновити зараз "
+"{sronly_span_open} для збереження доступу до минулого "
+"{expiration_date}{span_close}{a_close}"
 
 #: openedx/features/course_experience/plugins.py
 #: cms/templates/widgets/header.html
@@ -12289,13 +12390,6 @@ msgstr "Оновлення"
 #: openedx/features/course_experience/plugins.py
 msgid "Reviews"
 msgstr "Відгуки"
-
-#: openedx/features/course_experience/utils.py
-#, no-python-format, python-brace-format
-msgid ""
-"{banner_open}{percentage}% off your first upgrade.{span_close} Discount "
-"automatically applied.{div_close}"
-msgstr ""
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
@@ -12365,6 +12459,15 @@ msgid ""
 "then that course will be Disabled only if the org that it is in is Disabled."
 msgstr ""
 
+#: openedx/features/discounts/admin.py
+msgid ""
+"These define the context to configure the percentage for the first purchase "
+"discount.If multiple contexts apply to a course (for example, if "
+"configuration is specified for the course specifically, and for the org that"
+" the course is in, then the more specific context overrides the more general"
+" context."
+msgstr ""
+
 #: openedx/features/discounts/models.py
 msgid "Disabled"
 msgstr ""
@@ -12374,6 +12477,14 @@ msgstr ""
 msgid ""
 "{s_sr}Original price: {s_op}{original_price}{e_p}, discount price: "
 "{e_sr}{formatted_discount_price}"
+msgstr ""
+
+#: openedx/features/discounts/utils.py
+#, no-python-format, python-brace-format
+msgid ""
+"{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% "
+"[{strikeout_price}]{span_close}{br}Use code {b_open}{code}{b_close} at "
+"checkout! {a_open}Upgrade Now{a_close}{div_close}"
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py
@@ -12689,6 +12800,10 @@ msgstr "{platform_name} Рівні підтримки:"
 msgid "HTML"
 msgstr "HTML"
 
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Problem"
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/component.py lms/templates/video.html
 msgid "Video"
 msgstr "Відео"
@@ -12786,6 +12901,16 @@ msgstr "Навчальний курс успішно експортовано в
 #: cms/djangoapps/contentstore/views/helpers.py
 msgid "Vertical"
 msgstr "Вертикальний"
+
+#: cms/templates/course_outline.html lms/templates/seq_module.html
+#: lms/templates/ccx/schedule.html
+msgid "Section"
+msgstr "Розділ"
+
+#: cms/djangoapps/contentstore/views/helpers.py
+#: lms/templates/ccx/schedule.html
+msgid "Subsection"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "File upload corrupted. Please try again"
@@ -13220,7 +13345,6 @@ msgstr "Налаштування"
 #: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
 #: lms/templates/edxnotes/edxnotes.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "Loading"
 msgstr "Завантаження"
@@ -13234,6 +13358,11 @@ msgstr "Номер Курсу"
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Course Outline"
 msgstr "Структура курсу"
+
+#: cms/templates/course_outline.html
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Warning"
+msgstr ""
 
 #: cms/templates/html_error.html lms/templates/module-error.html
 msgid "Error:"
@@ -13266,60 +13395,11 @@ msgstr ""
 msgid "Courses"
 msgstr "Курси"
 
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Sign In to {studio_name}"
-msgstr "Увійти у {studio_name}"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr "Немає аккаунту {studio_name} ? Створіть його!"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Required Information to Sign In to {studio_name}"
-msgstr ""
-
-#: cms/templates/login.html cms/templates/register.html
-#: lms/templates/help_modal.html lms/templates/login.html
-#: lms/templates/provider_login.html lms/templates/register-form.html
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: themes/red-theme/cms/templates/login.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "E-mail"
-msgstr "Електронна адреса"
-
-#. Translators: This is the placeholder text for a field that requests an
-#. email
-#. address.
-#: cms/templates/login.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html cms/templates/register.html
-#: lms/templates/login.html lms/templates/register-form.html
-#: lms/templates/register-shib.html themes/red-theme/cms/templates/login.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr "приклад: username@domain.com"
-
-#: cms/templates/login.html lms/templates/login.html
-#: themes/red-theme/cms/templates/login.html
-msgid "Forgot password?"
-msgstr "Забули пароль?"
-
-#. Translators: This is the placeholder text for a field that requests the
-#. user's full name.
-#: cms/templates/register.html lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "example: Jane Doe"
-msgstr "приклад:  Петрик П’яточкін"
-
-#. Translators: This is the placeholder text for a field that asks the user to
-#. pick a username
-#: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "example: JaneDoe"
-msgstr ""
 
 #: cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
@@ -13334,8 +13414,7 @@ msgstr "Викладачі"
 msgid "Requirements"
 msgstr "Вимоги"
 
-#: cms/templates/studio_xblock_wrapper.html lms/templates/help_modal.html
-#: lms/templates/module-error.html
+#: cms/templates/studio_xblock_wrapper.html lms/templates/module-error.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Details"
 msgstr ""
@@ -13539,6 +13618,16 @@ msgstr "Форма нової теми"
 msgid "Discussion thread list"
 msgstr ""
 
+#: lms/djangoapps/discussion/templates/discussion/discussion_private_fragment.html
+msgid "Private Discussion"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_private_fragment.html
+msgid ""
+"This is a private discussion. You do not have permissions to view this "
+"discussion"
+msgstr ""
+
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/discussion/_user_profile.html
 #, python-format
@@ -13675,11 +13764,6 @@ msgstr ""
 msgid "Account Status Info"
 msgstr ""
 
-#: lms/templates/dashboard.html lms/templates/header/user_dropdown.html
-#: themes/edx.org/lms/templates/dashboard.html
-msgid "Order History"
-msgstr ""
-
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
 msgstr "Налаштування електронної пошти для  {course_number}"
@@ -13787,8 +13871,7 @@ msgid ""
 "setting a new password."
 msgstr ""
 
-#: lms/templates/forgot_password_modal.html lms/templates/login.html
-#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/forgot_password_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -13803,7 +13886,7 @@ msgstr ""
 msgid "Your E-mail Address"
 msgstr ""
 
-#: lms/templates/forgot_password_modal.html lms/templates/login.html
+#: lms/templates/forgot_password_modal.html
 msgid "This is the e-mail address you used to register with {platform}"
 msgstr ""
 
@@ -13813,132 +13896,6 @@ msgstr "Змінити мій пароль"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Email is incorrect."
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid "Support"
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid ""
-"For {strong_start}questions on course lectures, homework, tools, or "
-"materials for this course{strong_end}, post in the {link_start}course "
-"discussion forum{link_end}."
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid ""
-"Have {strong_start}general questions about {platform_name}{strong_end}? You "
-"can find lots of helpful information in the {platform_name} "
-"{link_start}FAQ{link_end}."
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid ""
-"Have a {strong_start}question about something specific{strong_end}? You can "
-"contact the {platform_name} general support team directly:"
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid "Report a problem"
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid "Make a suggestion"
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid "Ask a question"
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid ""
-"Please note: The {platform_name} support team is English speaking. While we "
-"will do our best to address your inquiry in any language, our responses will"
-" be in English."
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid "Briefly describe your issue"
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid "Tell us the details"
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid ""
-"Describe what you were doing when you encountered the issue. Include any "
-"details that will help us to troubleshoot, including error messages that you"
-" saw."
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid "Thank You!"
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid ""
-"Thank you for your inquiry or feedback.  We typically respond to a request "
-"within one business day, Monday to Friday.  In the meantime, please review "
-"our {link_start}detailed FAQs{link_end} where most questions have already "
-"been answered."
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid "- Select -"
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid "problem"
-msgstr "завдання "
-
-#: lms/templates/help_modal.html
-msgid "Report a Problem"
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid "Brief description of the problem"
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid "Details of the problem you are encountering{asterisk}"
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid "suggestion"
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid "Make a Suggestion"
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid "Brief description of your suggestion"
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid "question"
-msgstr "питання"
-
-#: lms/templates/help_modal.html
-msgid "Ask a Question"
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid "Brief summary of your question"
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid "An error has occurred."
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid "Please {link_start}send us e-mail{link_end}."
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid "Please try again later."
 msgstr ""
 
 #: lms/templates/hidden_content.html
@@ -13968,7 +13925,7 @@ msgstr ""
 msgid "Search for a course"
 msgstr ""
 
-#: lms/templates/index_overlay.html lms/templates/register-sidebar.html
+#: lms/templates/index_overlay.html
 msgid "Welcome to {platform_name}"
 msgstr ""
 
@@ -14013,84 +13970,6 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
-
-#: lms/templates/login-sidebar.html
-msgid "Helpful Information"
-msgstr ""
-
-#: lms/templates/login-sidebar.html
-msgid "Not Enrolled?"
-msgstr ""
-
-#: lms/templates/login-sidebar.html
-msgid "Sign up for {platform_name} today!"
-msgstr ""
-
-#: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Need Help?"
-msgstr "Потрібна допомога?"
-
-#: lms/templates/login-sidebar.html
-msgid "Looking for help signing in or with your {platform_name} account?"
-msgstr ""
-
-#: lms/templates/login-sidebar.html
-msgid "View our help section for answers to commonly asked questions."
-msgstr ""
-
-#: lms/templates/login.html
-msgid "Log into your {platform_name} Account"
-msgstr ""
-
-#: lms/templates/login.html
-msgid "Log into My {platform_name} Account"
-msgstr ""
-
-#: lms/templates/login.html
-msgid "Access My Courses"
-msgstr ""
-
-#: lms/templates/login.html lms/templates/register-shib.html
-#: lms/templates/register.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Processing your account information"
-msgstr ""
-
-#: wiki/templates/wiki/accounts/login.html
-msgid "Please log in"
-msgstr "Будь ласка, увійдіть в систему"
-
-#: lms/templates/login.html
-msgid "to access your account and courses"
-msgstr ""
-
-#: lms/templates/login.html
-msgid "We're Sorry, {platform_name} accounts are unavailable currently"
-msgstr ""
-
-#: lms/templates/login.html
-msgid "We couldn't log you in."
-msgstr ""
-
-#: lms/templates/login.html
-msgid "Your email or password is incorrect"
-msgstr ""
-
-#: lms/templates/login.html
-msgid "An error occurred when signing you in to {platform_name}."
-msgstr ""
-
-#: lms/templates/login.html
-msgid ""
-"Please provide the following information to log into your {platform_name} "
-"account. Required fields are noted by {strong_start}bold text and an "
-"asterisk (*){strong_end}."
-msgstr ""
-
-#: lms/templates/login.html
-msgid "Sign in with {provider_name}"
-msgstr ""
 
 #. Translators:  "External resource" means that this learning module is hosted
 #. on a platform external to the edX LMS
@@ -14186,7 +14065,6 @@ msgstr ""
 
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
-#: lms/templates/courseware/error-message.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
 " fix it as soon as possible. Please email us at {tech_support_email} to "
@@ -14195,10 +14073,6 @@ msgstr ""
 
 #: lms/templates/module-error.html
 msgid "Raw data:"
-msgstr ""
-
-#: lms/templates/notes.html
-msgid "You do not have any notes."
 msgstr ""
 
 #: lms/templates/preview_menu.html
@@ -14231,6 +14105,10 @@ msgstr ""
 
 #: lms/templates/preview_menu.html
 msgid "You are now viewing the course as {i_start}{user_name}{i_end}."
+msgstr ""
+
+#: lms/templates/preview_menu.html
+msgid "View this unit in the new experience"
 msgstr ""
 
 #: lms/templates/problem.html
@@ -14283,228 +14161,37 @@ msgid ""
 "service and privacy policy."
 msgstr ""
 
+#: lms/templates/provider_login.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "E-mail"
+msgstr "Електронна адреса"
+
 #: lms/templates/provider_login.html
 #, python-format
 msgid "Return To %s"
 msgstr ""
 
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
+#: lms/templates/reset_deadlines_banner.html
+msgid "It looks like you've missed some important deadlines. Visit "
+msgstr ""
+
+#: lms/templates/reset_deadlines_banner.html
+msgid "edx.org"
+msgstr ""
+
+#: lms/templates/reset_deadlines_banner.html
+msgid " to reset your deadlines and get started today."
+msgstr ""
+
+#: lms/templates/reset_deadlines_banner.html
 msgid ""
-"We're sorry, but this version of your browser is not supported. Try again "
-"using a different browser or a newer version of your browser."
+"It looks like you've missed some important deadlines. Reset your deadlines "
+"and get started today."
 msgstr ""
 
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "The following errors occurred while processing your registration:"
-msgstr ""
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Sign up with {provider_name}"
-msgstr ""
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Create your own {platform_name} account below"
-msgstr ""
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-msgid ""
-"Required fields are noted by {strong_start}bold text and an asterisk "
-"(*){strong_end}."
-msgstr ""
-
-#. Translators: selected_provider is the name of an external, third-party user
-#. authentication service (like Google or LinkedIn).
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "You've successfully signed in with {selected_provider}."
-msgstr ""
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid ""
-"We just need a little more information before you start learning with "
-"{platform_name}."
-msgstr ""
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Please complete the following fields to register for an account. "
-msgstr ""
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Your legal name, used for any certificates you earn."
-msgstr ""
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Will be shown in any discussions or forums you participate in"
-msgstr ""
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "cannot be changed later"
-msgstr ""
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Welcome {username}"
-msgstr "Ласкаво просимо, {username}"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Enter a Public Display Name:"
-msgstr ""
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Public Display Name"
-msgstr ""
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Additional Personal Information"
-msgstr "Додаткова персональна інформація"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "example: New York"
-msgstr ""
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Highest Level of Education Completed"
-msgstr ""
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Please share with us your reasons for registering with {platform_name}"
-msgstr ""
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Account Acknowledgements"
-msgstr ""
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "I agree to the {link_start}Terms of Service{link_end}"
-msgstr "Я погоджуюсь з {link_start} Умовами Надання Послуг{link_end}"
-
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "I agree to the {link_start}Honor Code{link_end}"
-msgstr "Я погоджуюсь з  {link_start} Кодексом Честі {link_end} "
-
-#: lms/templates/register-form.html lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Create My Account"
-msgstr ""
-
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Preferences for {platform_name}"
-msgstr ""
-
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Update my {platform_name} Account"
-msgstr ""
-
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Welcome {username}!  Please set your preferences below"
-msgstr ""
-
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Enter a public username:"
-msgstr "Введіть загальнодоступне ім’я користувача:"
-
-#: lms/templates/register-shib.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Update My Account"
-msgstr ""
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Registration Help"
-msgstr ""
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Already registered?"
-msgstr ""
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-#: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
-#: wiki/templates/wiki/accounts/signup.html
-msgid "Log in"
-msgstr "Увійти"
-
-#: lms/templates/register-sidebar.html
-msgid ""
-"Registering with {platform_name} gives you access to all of our current and "
-"future free courses. Not ready to take a course just yet? Registering puts "
-"you on our mailing list - we will update you as courses are added."
-msgstr ""
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Next Steps"
-msgstr ""
-
-#: lms/templates/register-sidebar.html
-msgid ""
-"As part of joining {platform_name}, you will receive an email message with "
-"instructions for activating your account. Don't see the email? Check your "
-"spam folder and mark {platform_name} emails as 'not spam'. At "
-"{platform_name}, we communicate mostly through email."
-msgstr ""
-
-#: lms/templates/register-sidebar.html
-msgid "Need help registering with {platform_name}?"
-msgstr ""
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "View our FAQs for answers to commonly asked questions."
-msgstr ""
-
-#: lms/templates/register-sidebar.html
-msgid ""
-"You can find the answers to most of your questions in our list of FAQs. "
-"After you enroll in a course, you can also find answers in the course "
-"discussions."
-msgstr ""
-
-#: lms/templates/register.html
-msgid "Register for {platform_name}"
-msgstr ""
-
-#: lms/templates/register.html
-msgid "Create My {platform_name} Account"
-msgstr ""
-
-#: lms/templates/register.html
-msgid "Welcome!"
-msgstr ""
-
-#: lms/templates/register.html
-msgid "Register below to create your {platform_name} account"
+#: lms/templates/reset_deadlines_banner.html
+msgid "Reset my deadlines"
 msgstr ""
 
 #: lms/templates/resubscribe.html
@@ -14539,16 +14226,25 @@ msgstr ""
 msgid "Important!"
 msgstr ""
 
+#. Translators: A button for showing the Previous Unit
 #: lms/templates/seq_module.html
+msgctxt "unit"
 msgid "Previous"
 msgstr ""
 
+#. Translators: A button for showing the Next Unit
 #: lms/templates/seq_module.html
+msgctxt "unit"
 msgid "Next"
 msgstr ""
 
 #: lms/templates/seq_module.html
 msgid "Sequence"
+msgstr ""
+
+#: lms/templates/seq_module.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "Completed"
 msgstr ""
 
 #: lms/templates/signup_modal.html
@@ -14572,6 +14268,11 @@ msgid "{start_li}Welcome{end_li} {name}"
 msgstr ""
 
 #: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Enter a public username:"
+msgstr "Введіть загальнодоступне ім’я користувача:"
+
+#: lms/templates/signup_modal.html
 msgid "Full Name *"
 msgstr "Ім'я та прізвище *"
 
@@ -14581,6 +14282,23 @@ msgstr ""
 
 #: lms/templates/signup_modal.html
 msgid "Goals in signing up for {platform_name}"
+msgstr ""
+
+#: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "I agree to the {link_start}Terms of Service{link_end}"
+msgstr "Я погоджуюсь з {link_start} Умовами Надання Послуг{link_end}"
+
+#: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "I agree to the {link_start}Honor Code{link_end}"
+msgstr "Я погоджуюсь з  {link_start} Кодексом Честі {link_end} "
+
+#: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Create My Account"
 msgstr ""
 
 #: lms/templates/signup_modal.html
@@ -15550,6 +15268,36 @@ msgstr ""
 msgid "Enter a username to view catalogs belonging to that user."
 msgstr ""
 
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "Unsubscribe"
+msgstr ""
+
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+msgid "confirm unsubscribe from {org} {course} emails."
+msgstr ""
+
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+msgid "Note:"
+msgstr ""
+
+#: lms/templates/bulk_email/confirm_unsubscribe.html
+msgid ""
+"You will still receive course emails from other courses you are enrolled in."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "You have successfully unsubscribed from {org} {course} emails."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "You have not been unsubscribed from {org} {course} emails."
+msgstr ""
+
+#: lms/templates/bulk_email/unsubscribe_success.html
+msgid "{link_start}Return to edX.org{link_end}"
+msgstr ""
+
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Open Calculator"
 msgstr ""
@@ -16278,8 +16026,9 @@ msgid "You are enrolled in this course"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
 #: lms/templates/shoppingcart/registration_code_receipt.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
 msgid "View Course"
 msgstr "Переглянути курс"
 
@@ -16443,12 +16192,46 @@ msgstr ""
 msgid "Your score is {current_score}%. You have passed the entrance exam."
 msgstr ""
 
+#: lms/templates/courseware/dates.html lms/templates/courseware/syllabus.html
+msgid "{course.display_number_with_default} Course Info"
+msgstr "{course.display_number_with_default} Інформація про курс"
+
+#: lms/templates/courseware/dates.html
+msgid "Important Dates"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid "Due Today"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid "Verified Only"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid ""
+"{a_start}Upgrade{a_end}{space}to a Verified Certificate for full access."
+msgstr ""
+
+#: lms/templates/courseware/error-message.html
+msgid ""
+"We're sorry, this module is temporarily unavailable. Our staff is working to"
+" fix it as soon as possible."
+msgstr ""
+
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
 msgstr ""
 
 #: lms/templates/courseware/gradebook.html
 msgid "Search students"
+msgstr ""
+
+#: lms/templates/courseware/gradebook.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/receipt.html
+msgid "Total"
 msgstr ""
 
 #: lms/templates/courseware/gradebook.html
@@ -16486,8 +16269,9 @@ msgid "Welcome to {course_title}!"
 msgstr ""
 
 #: lms/templates/courseware/info.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
 msgid "Resume Course"
 msgstr "Продовжити курс"
 
@@ -16751,10 +16535,6 @@ msgstr ""
 msgid "No problem scores in this section"
 msgstr "Немає балів за виконання у цьому розділі"
 
-#: lms/templates/courseware/syllabus.html
-msgid "{course.display_number_with_default} Course Info"
-msgstr "{course.display_number_with_default} Інформація про курс"
-
 #: lms/templates/courseware/welcome-back.html
 msgid ""
 "You were most recently in {section_link}.  If you're done with that, choose "
@@ -16818,7 +16598,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
-#: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "The {platform_name} Team"
 msgstr ""
@@ -16835,6 +16614,10 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Grades will be finalized on {cert_available_date}"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
@@ -17214,6 +16997,17 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+"Your photo verification expires on {verification_expiry}. Please be aware "
+"photo verification can take up to three days once initiated and you will not"
+" be able to earn a certificate or take a proctored exam until approved."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Resubmit Verification"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Pending"
 msgstr ""
 
@@ -17239,10 +17033,6 @@ msgid "Your verification was denied for the following reasons:"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Resubmit Verification"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Expired"
 msgstr ""
 
@@ -17251,6 +17041,13 @@ msgid ""
 "Your verification has expired. To receive a verified certificate, you must "
 "submit a new photo of yourself and your government-issued photo ID before "
 "the verification deadline for your course."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+" Please be aware photo verification can take up to three days once initiated"
+" and you will not be able to earn a certificate or take a proctored exam "
+"until approved."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
@@ -17513,33 +17310,6 @@ msgstr ""
 
 #: lms/templates/edxnotes/toggle_notes.html
 msgid "Show notes"
-msgstr ""
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"You're almost there! Use the link to activate your account to access "
-"engaging, high-quality {platform_name} courses. Note that you will not be "
-"able to log back into your account until you have activated it."
-msgstr ""
-
-#: lms/templates/emails/activation_email.txt
-msgid "Enjoy learning with {platform_name}."
-msgstr ""
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"If you need help, please use our web form at {support_url} or email "
-"{support_email}."
-msgstr ""
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"This email message was automatically sent by {lms_url} because someone "
-"attempted to create an account on {platform_name} using this email address."
-msgstr ""
-
-#: lms/templates/emails/activation_email_subject.txt
-msgid "Action Required: Activate your {platform_name} account"
 msgstr ""
 
 #: lms/templates/emails/business_order_confirmation_email.txt
@@ -17836,6 +17606,10 @@ msgid "INVOICE"
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Date: {date}"
+msgstr "Дата: {date}"
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "Invoice No: {invoice_number}"
 msgstr ""
 
@@ -18068,14 +17842,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/header/navbar-authenticated.html
-#: lms/templates/learner_dashboard/programs.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Programs"
-msgstr "Програми"
-
-#: lms/templates/header/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr ""
@@ -18117,6 +17883,10 @@ msgstr ""
 #: lms/templates/header/user_dropdown.html
 msgid "Profile"
 msgstr "Профіль"
+
+#: lms/templates/header/user_dropdown.html
+msgid "Order History"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -19304,6 +19074,18 @@ msgid "Add Discussion Admin"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Course Data Researcher"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Course Data Researchers can access the data download tab."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Add Course Data Researcher"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Discussion Moderators"
 msgstr "Модератори обговорень"
 
@@ -19364,78 +19146,6 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add CCX Coach"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "There is no data available to display at this time."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Use Reload Graphs to refresh the graphs."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Reload Graphs"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Subsection Data"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Each bar shows the number of students that opened the subsection."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid ""
-"You can click on any of the bars to list the students that opened the "
-"subsection."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "You can also download this data as a CSV file."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Download Subsection Data for all Subsections as a CSV"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Grade Distribution Data"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Each bar shows the grade distribution for that problem."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid ""
-"You can click on any of the bars to list the students that attempted the "
-"problem, along with the grades they received."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Download Problem Data for all Problems as a CSV"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Grade Distribution per Problem"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Download Student Opened as a CSV"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Download Student Grades as a CSV"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "This is a partial list, to view all students download as a csv."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "There are no problems in this section."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -19668,6 +19378,10 @@ msgid ""
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Score"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Override Learner's Score"
 msgstr ""
 
@@ -19778,10 +19492,6 @@ msgstr "Показати статуси відправлених на перев
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "My Courses"
 msgstr "Мої курси"
-
-#: lms/templates/learner_dashboard/program_details.html
-msgid "Program Details"
-msgstr ""
 
 #: lms/templates/learner_dashboard/text-me-fragment.html
 msgid "Get the {platform_name} Mobile App!"
@@ -19976,40 +19686,6 @@ msgstr ""
 msgid "Go Back"
 msgstr ""
 
-#: lms/templates/provider/authorize.html
-msgid ""
-"{start_strong}{application_name}{end_strong} would like to access your data "
-"with the following permissions:"
-msgstr ""
-
-#: lms/templates/provider/authorize.html
-msgid "Read your user ID"
-msgstr ""
-
-#: lms/templates/provider/authorize.html
-msgid "Read your user profile"
-msgstr ""
-
-#: lms/templates/provider/authorize.html
-msgid "Read your email address"
-msgstr ""
-
-#: lms/templates/provider/authorize.html
-msgid "Read the list of courses in which you are a staff member."
-msgstr ""
-
-#: lms/templates/provider/authorize.html
-msgid "Read the list of courses in which you are an instructor."
-msgstr ""
-
-#: lms/templates/provider/authorize.html
-msgid "To see if you are a global staff user"
-msgstr ""
-
-#: lms/templates/provider/authorize.html
-msgid "Manage your data: {permission}"
-msgstr ""
-
 #: lms/templates/registration/account_activation_sidebar_notice.html
 msgid "Account Activation Info"
 msgstr ""
@@ -20034,6 +19710,13 @@ msgstr ""
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Invalid Password Reset Link"
 msgstr "Недійсне посилання на скидання паролю"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid ""
+"This password reset link is invalid. It may have been used already. To reset"
+" your password, go to the {start_link}sign-in{end_link} page and select "
+"{start_strong}Forgot password{end_strong}."
+msgstr ""
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"
@@ -20193,6 +19876,10 @@ msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Invalid"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Invoice"
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
@@ -20442,12 +20129,8 @@ msgstr ""
 #: lms/templates/static_templates/404.html
 msgid ""
 "The page that you were looking for was not found. Go back to the "
-"{link_start}homepage{link_end} or let us know about any pages that may have "
-"been moved at {email}."
+"{link_start}homepage{link_end} ."
 msgstr ""
-"Сторінка, яку Ви шукали, не знайдена. Поверніться до {link_start} домашньої "
-"сторінки {link_end} або повідомте нам про будь-які сторінки, які могли бути "
-"переміщені, повідомленням e-mail на {email}."
 
 #: lms/templates/static_templates/about.html
 #: lms/templates/static_templates/blog.html
@@ -20496,7 +20179,6 @@ msgstr ""
 #: lms/templates/static_templates/server-overloaded.html
 msgid ""
 "Our staff is currently working to get the site back up as soon as possible. "
-"Please email us at {tech_support_email} to report any problems or downtime."
 msgstr ""
 
 #: lms/templates/static_templates/server-error.html
@@ -20504,9 +20186,7 @@ msgid "There has been a 500 error on the {platform_name} servers"
 msgstr ""
 
 #: lms/templates/static_templates/server-error.html
-msgid ""
-"Please wait a few seconds and then reload the page. If the problem persists,"
-" please email us at {email}."
+msgid "Please wait a few seconds and then reload the page."
 msgstr ""
 
 #: lms/templates/static_templates/server-overloaded.html
@@ -20516,6 +20196,12 @@ msgstr ""
 #: lms/templates/student_account/account_settings.html
 msgid "Account Settings"
 msgstr "Налаштування облікового запису"
+
+#: lms/templates/student_account/account_settings.html
+msgid ""
+" and access to private sites offered by MIT Open Learning, Wharton Executive"
+" Education, and Harvard Medical School"
+msgstr ""
 
 #: lms/templates/student_account/finish_auth.html
 msgid "Please Wait"
@@ -20563,6 +20249,10 @@ msgstr ""
 
 #: lms/templates/support/manage_user.html
 msgid "Student Support: Manage User"
+msgstr ""
+
+#: lms/templates/support/program_enrollments_inspector.html
+msgid "Program Enrollments Inspector"
 msgstr ""
 
 #: lms/templates/support/refund.html
@@ -20830,7 +20520,7 @@ msgid "Some Rights Reserved"
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-dates-fragment.html
-msgid "Important Course Dates"
+msgid "Upcoming Dates"
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
@@ -20852,6 +20542,14 @@ msgstr ""
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Expand All"
 msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "({number} Question)"
+msgid_plural "({number} Questions)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Prerequisite: "
@@ -20941,12 +20639,16 @@ msgstr ""
 msgid "This course does not have any updates."
 msgstr ""
 
-#: openedx/features/course_experience/templates/course_experience/dates-summary.html
-msgid "Today is {date}"
-msgstr ""
-
 #: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
 msgid "Latest Update"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/next-up-banner-fragment.html
+msgid "Get started on what's next: "
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
+msgid "Show More"
 msgstr ""
 
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
@@ -21033,6 +20735,14 @@ msgid ""
 "subjects."
 msgstr ""
 
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Take advantage of free coaching!"
+msgstr ""
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Get Started"
+msgstr ""
+
 #: themes/edx.org/lms/templates/footer.html
 msgid "Page Footer"
 msgstr ""
@@ -21046,11 +20756,7 @@ msgid "Connect"
 msgstr ""
 
 #: themes/edx.org/lms/templates/footer.html
-msgid "© 2012–{year} edX Inc. "
-msgstr ""
-
-#: themes/edx.org/lms/templates/footer.html
-msgid "edX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
+msgid "© {year} edX Inc. All rights reserved."
 msgstr ""
 
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
@@ -21161,8 +20867,140 @@ msgstr ""
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
+"We're sorry, but this version of your browser is not supported. Try again "
+"using a different browser or a newer version of your browser."
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "The following errors occurred while processing your registration:"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Sign up with {provider_name}"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Create your own {platform_name} account below"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "You've successfully signed in with {selected_provider}."
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid ""
+"We just need a little more information before you start learning with "
+"{platform_name}."
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Please complete the following fields to register for an account. "
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "example: Jane Doe"
+msgstr "приклад:  Петрик П’яточкін"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Your legal name, used for any certificates you earn."
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "example: JaneDoe"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Will be shown in any discussions or forums you participate in"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "cannot be changed later"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Welcome {username}"
+msgstr "Ласкаво просимо, {username}"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Enter a Public Display Name:"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Public Display Name"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Additional Personal Information"
+msgstr "Додаткова персональна інформація"
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "example: New York"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Highest Level of Education Completed"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Please share with us your reasons for registering with {platform_name}"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Account Acknowledgements"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Preferences for {platform_name}"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Update my {platform_name} Account"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Processing your account information"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Welcome {username}!  Please set your preferences below"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid ""
+"Required fields are noted by {strong_indicator}bold text and an asterisk "
+"(*).{strong_close}"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Update My Account"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Registration Help"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Already registered?"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+#: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
+#: wiki/templates/wiki/accounts/signup.html
+msgid "Log in"
+msgstr "Увійти"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Next Steps"
 msgstr ""
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
@@ -21174,7 +21012,15 @@ msgid ""
 msgstr ""
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Need Help?"
+msgstr "Потрібна допомога?"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Need help in registering with {platform_name}?"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "View our FAQs for answers to commonly asked questions."
 msgstr ""
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
@@ -21284,52 +21130,6 @@ msgstr ""
 msgid "Studio Accessibility Policy"
 msgstr ""
 
-#: cms/templates/activation_active.html cms/templates/activation_complete.html
-#: cms/templates/activation_invalid.html
-msgid "{studio_name} Account Activation"
-msgstr ""
-
-#: cms/templates/activation_active.html
-msgid "Your account is already active"
-msgstr ""
-
-#: cms/templates/activation_active.html
-msgid ""
-"This account, set up using {email}, has already been activated. Please sign "
-"in to start working within {studio_name}."
-msgstr ""
-
-#: cms/templates/activation_active.html cms/templates/activation_complete.html
-msgid "Sign into {studio_name}"
-msgstr ""
-
-#: cms/templates/activation_complete.html
-msgid "Your account activation is complete!"
-msgstr ""
-
-#: cms/templates/activation_complete.html
-msgid ""
-"Thank you for activating your account. You may now sign in and start using "
-"{studio_name} to author courses."
-msgstr ""
-
-#: cms/templates/activation_invalid.html
-msgid "Your account activation is invalid"
-msgstr ""
-
-#: cms/templates/activation_invalid.html
-msgid ""
-"We're sorry. Something went wrong with your activation. Check to make sure "
-"the URL you went to was correct, as e-mail programs will sometimes split it "
-"into two lines."
-msgstr ""
-
-#: cms/templates/activation_invalid.html
-msgid ""
-"If you still have issues, contact {platform_name} Support. In the meantime, "
-"you can also return to {link_start}the {studio_name} homepage.{link_end}"
-msgstr ""
-
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
 msgid "Files & Uploads"
 msgstr "Файли і завантаження"
@@ -21399,8 +21199,9 @@ msgstr ""
 msgid "Learn more about certificates"
 msgstr "Дізнайтеся більше про сертифікати"
 
-#: cms/templates/certificates.html cms/templates/settings_graders.html
-msgid "Details &amp; Schedule"
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/settings_advanced.html
+msgid "Details & Schedule"
 msgstr ""
 
 #: cms/templates/certificates.html cms/templates/group_configurations.html
@@ -21539,10 +21340,6 @@ msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
 "\"/jump_to_id/<location ID>\" as the URL value."
 msgstr ""
-
-#: cms/templates/container.html
-msgid "Location in Course Outline"
-msgstr "Місцерозташування в структурі курсу"
 
 #: cms/templates/course-create-rerun.html
 msgid "Create a Course Rerun of:"
@@ -21709,10 +21506,6 @@ msgstr ""
 "курс. Обов'язково перегляньте та відновіть усі дати, зокрема і дату початку "
 "курсу; створіть команду курсу; перегляньте оновлення курсу та інші датовані "
 "матеріали; і збережіть обговорення та вікі."
-
-#: cms/templates/course_outline.html
-msgid "Warning"
-msgstr ""
 
 #: cms/templates/course_outline.html
 msgid "This course uses features that are no longer supported."
@@ -22399,11 +22192,6 @@ msgstr ""
 "групи лише у тому випадку, якщо вона не використовується у блоці. Щоб "
 "видалити налаштування, наведіть курсор миші на її поле та натисніть кнопку "
 "видалення."
-
-#: cms/templates/group_configurations.html
-#: cms/templates/settings_advanced.html
-msgid "Details & Schedule"
-msgstr ""
 
 #: cms/templates/howitworks.html
 msgid "Welcome"
@@ -23403,92 +23191,6 @@ msgid ""
 " library."
 msgstr ""
 
-#: cms/templates/register.html cms/templates/widgets/header.html
-msgid "Sign Up"
-msgstr "Зареєструватися"
-
-#: cms/templates/register.html
-msgid "Sign Up for {studio_name}"
-msgstr "Зареєструватися на {studio_name}"
-
-#: cms/templates/register.html
-msgid "Already have a {studio_name} Account? Sign in"
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"Ready to start creating online courses? Sign up below and start creating "
-"your first {platform_name} course today."
-msgstr ""
-
-#: cms/templates/register.html
-msgid "Required Information to Sign Up for {studio_name}"
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"This will be used in public discussions with your courses and in our edX101 "
-"support forums"
-msgstr ""
-
-#: cms/templates/register.html
-msgid "Your Location"
-msgstr ""
-
-#: cms/templates/register.html
-msgid "Preferred Language"
-msgstr "Обрати бажану мову"
-
-#: cms/templates/register.html
-msgid "I agree to the {a_start} Terms of Service {a_end}"
-msgstr "Я погоджуюсь з {a_start} Умовами Надання Послуг {a_end}"
-
-#: cms/templates/register.html
-msgid "Create My Account &amp; Start Authoring Courses"
-msgstr ""
-
-#: cms/templates/register.html
-msgid "Common {studio_name} Questions"
-msgstr ""
-
-#: cms/templates/register.html
-msgid "Who is {studio_name} for?"
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"{studio_name} is for anyone that wants to create online courses that "
-"leverage the global {platform_name} platform. Our users are often faculty "
-"members, teaching assistants and course staff, and members of instructional "
-"technology groups."
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"How technically savvy do I need to be to create courses in {studio_name}?"
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"{studio_name} is designed to be easy to use by almost anyone familiar with "
-"common web-based authoring environments (Wordpress, Moodle, etc.). No "
-"programming knowledge is required, but for some of the more advanced "
-"features, a technical background would be helpful. As always, we are here to"
-" help, so don't hesitate to dive right in."
-msgstr ""
-
-#: cms/templates/register.html
-msgid "I've never authored a course online before. Is there help?"
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"Absolutely. We have created an online course, edX101, that describes some "
-"best practices: from filming video, creating exercises, to the basics of "
-"running an online course. Additionally, we're always here to help, just drop"
-" us a note."
-msgstr ""
-
 #: cms/templates/settings.html
 msgid "Schedule & Details Settings"
 msgstr "Розклад та деталі налаштувань"
@@ -23545,6 +23247,12 @@ msgid ""
 "Your course summary page will not be viewable until your course has been "
 "announced. To provide content for the page and preview it, follow the "
 "instructions provided by your Program Manager."
+msgstr ""
+
+#: cms/templates/settings.html
+msgid ""
+"Please note that changes here may take up to a business day to appear on "
+"your course summary page."
 msgstr ""
 
 #: cms/templates/settings.html
@@ -23668,6 +23376,18 @@ msgstr ""
 #: cms/templates/settings.html
 msgid "Enrollment End Time"
 msgstr "Час завершення запису на курс"
+
+#: cms/templates/settings.html
+msgid "Upgrade Deadline Date"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Last day students can upgrade to a verified enrollment."
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Upgrade Deadline Time"
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Course Details"
@@ -24121,6 +23841,10 @@ msgstr ""
 " лабораторні роботи, вікторини та іспити, а також визначати, як оцінювати "
 "кожний тип завдання, виконаний студентом."
 
+#: cms/templates/settings_graders.html
+msgid "Details &amp; Schedule"
+msgstr ""
+
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
 msgstr ""
@@ -24268,23 +23992,6 @@ msgid ""
 "restriction."
 msgstr ""
 
-#: cms/templates/emails/activation_email.txt
-msgid ""
-"Thank you for signing up for {studio_name}! To activate your account, please"
-" copy and paste this address into your web browser's address bar:"
-msgstr ""
-
-#: cms/templates/emails/activation_email.txt
-msgid ""
-"If you didn't request this, you don't need to do anything; you won't receive"
-" any more email from us. Please do not reply to this e-mail; if you require "
-"assistance, check the help section of the {studio_name} web site."
-msgstr ""
-
-#: cms/templates/emails/activation_email_subject.txt
-msgid "Your account for {studio_name}"
-msgstr ""
-
 #: cms/templates/emails/course_creator_admin_subject.txt
 msgid "{email} has requested {studio_name} course creator privileges on edge"
 msgstr ""
@@ -24405,12 +24112,6 @@ msgstr ""
 msgid "Return to the {link_start}home page{link_end}."
 msgstr ""
 
-#: cms/templates/registration/reg_complete.html
-msgid ""
-"We've sent an email message to {email} with instructions for activating your"
-" account."
-msgstr ""
-
 #: cms/templates/widgets/footer.html
 msgid "Policies"
 msgstr ""
@@ -24436,6 +24137,10 @@ msgid "Outline"
 msgstr "Структура курсу"
 
 #: cms/templates/widgets/header.html
+msgid "Publisher"
+msgstr ""
+
+#: cms/templates/widgets/header.html
 msgid "Import"
 msgstr "Імпорт"
 
@@ -24458,6 +24163,10 @@ msgstr ""
 #: cms/templates/widgets/header.html
 msgid "Contextual Online Help"
 msgstr ""
+
+#: cms/templates/widgets/header.html
+msgid "Sign Up"
+msgstr "Зареєструватися"
 
 #: cms/templates/widgets/metadata-edit.html
 msgid "Launch Latex Source Compiler"
@@ -24504,7 +24213,7 @@ msgid "Advanced Editor"
 msgstr ""
 
 #: cms/templates/widgets/problem-edit.html
-msgid "Toggle Cheatsheet"
+msgid "Markdown Help"
 msgstr ""
 
 #: cms/templates/widgets/problem-edit.html
@@ -25520,6 +25229,10 @@ msgstr "Джерело"
 #: wiki/templates/wiki/source.html
 msgid "This article is currently locked for editing."
 msgstr "Ця стаття на даний час заблокована для редагування."
+
+#: wiki/templates/wiki/accounts/login.html
+msgid "Please log in"
+msgstr "Будь ласка, увійдіть в систему"
 
 #: wiki/templates/wiki/accounts/login.html
 msgid "Log me in..."

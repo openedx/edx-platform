@@ -2,14 +2,15 @@
 Test data created by CourseSerializer and CourseDetailSerializer
 """
 
-from __future__ import absolute_import, unicode_literals
 
 from datetime import datetime
+from unittest import TestCase
 
 import ddt
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 from xblock.core import XBlock
+from opaque_keys.edx.locator import CourseLocator
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.models.course_details import CourseDetails
@@ -17,7 +18,7 @@ from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
 
-from ..serializers import CourseDetailSerializer, CourseSerializer
+from ..serializers import CourseDetailSerializer, CourseKeySerializer, CourseSerializer
 from .mixins import CourseApiFactoryMixin
 
 
@@ -156,3 +157,11 @@ class TestCourseDetailSerializer(TestCourseSerializer):
         about_descriptor = XBlock.load_class('about')
         overview_template = about_descriptor.get_template('overview.yaml')
         self.expected_data['overview'] = overview_template.get('data')
+
+
+class TestCourseKeySerializer(TestCase):
+
+    def test_course_key_serializer(self):
+        course_key = CourseLocator(org='org', course='course', run='2020_Q3')
+        serializer = CourseKeySerializer(course_key)
+        self.assertEqual(serializer.data, str(course_key))

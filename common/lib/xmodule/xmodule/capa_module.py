@@ -1,5 +1,5 @@
 """Implements basics of Capa, including class CapaModule."""
-from __future__ import absolute_import
+
 
 import json
 import logging
@@ -119,6 +119,20 @@ class ProblemBlock(
         shim_xmodule_js(fragment, 'Problem')
         return fragment
 
+    def public_view(self, context):
+        """
+        Return the view seen by users who aren't logged in or who aren't
+        enrolled in the course.
+        """
+        if getattr(self.runtime, 'suppports_state_for_anonymous_users', False):
+            # The new XBlock runtime can generally support capa problems for users who aren't logged in, so show the
+            # normal student_view. To prevent anonymous users from viewing specific problems, adjust course policies
+            # and/or content groups.
+            return self.student_view(context)
+        else:
+            # Show a message that this content requires users to login/enroll.
+            return super(ProblemBlock, self).public_view(context)
+
     def author_view(self, context):
         """
         Renders the Studio preview view.
@@ -190,7 +204,7 @@ class ProblemBlock(
                 self.scope_ids.user_id
             )
             _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
-            six.reraise(ProcessingError(not_found_error_message), None, traceback_obj)
+            six.reraise(ProcessingError, ProcessingError(not_found_error_message), traceback_obj)
 
         except Exception:
             log.exception(
@@ -200,7 +214,7 @@ class ProblemBlock(
                 self.scope_ids.user_id
             )
             _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
-            six.reraise(ProcessingError(generic_error_message), None, traceback_obj)
+            six.reraise(ProcessingError, ProcessingError(generic_error_message), traceback_obj)
 
         after = self.get_progress()
         after_attempts = self.attempts
@@ -330,7 +344,7 @@ class ProblemBlock(
 
     def max_score(self):
         """
-        Return the problem's max score
+        Return the problem's max score if problem is instantiated successfully, else return max score of 0.
         """
         from capa.capa_problem import LoncapaProblem, LoncapaSystem
         capa_system = LoncapaSystem(
@@ -349,16 +363,22 @@ class ProblemBlock(
             xqueue=None,
             matlab_api_key=None,
         )
-        lcp = LoncapaProblem(
-            problem_text=self.data,
-            id=self.location.html_id(),
-            capa_system=capa_system,
-            capa_module=self,
-            state={},
-            seed=1,
-            minimal_init=True,
-        )
-        return lcp.get_max_score()
+        try:
+            lcp = LoncapaProblem(
+                problem_text=self.data,
+                id=self.location.html_id(),
+                capa_system=capa_system,
+                capa_module=self,
+                state={},
+                seed=1,
+                minimal_init=True,
+            )
+        except responsetypes.LoncapaProblemError:
+            log.exception(u"LcpFatalError for block {} while getting max score".format(str(self.location)))
+            maximum_score = 0
+        else:
+            maximum_score = lcp.get_max_score()
+        return maximum_score
 
     def generate_report_data(self, user_state_iterator, limit_responses=None):
         """

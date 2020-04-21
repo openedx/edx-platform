@@ -2,7 +2,7 @@
 """
 Tests of XML export
 """
-from __future__ import absolute_import, print_function
+
 
 import shutil
 import unittest
@@ -14,6 +14,7 @@ import ddt
 import lxml.etree
 import mock
 import pytz
+import six
 from django.utils.translation import ugettext_lazy
 from fs.osfs import OSFS
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
@@ -103,7 +104,7 @@ class RoundTripTestCase(unittest.TestCase):
         initial_import = XMLModuleStore(root_dir, source_dirs=[course_dir], xblock_mixins=(XModuleMixin,))
 
         courses = initial_import.get_courses()
-        self.assertEquals(len(courses), 1)
+        self.assertEqual(len(courses), 1)
         initial_course = courses[0]
 
         # export to the same directory--that way things like the custom_tags/ folder
@@ -121,7 +122,7 @@ class RoundTripTestCase(unittest.TestCase):
         second_import = XMLModuleStore(root_dir, source_dirs=[course_dir], xblock_mixins=(XModuleMixin,))
 
         courses2 = second_import.get_courses()
-        self.assertEquals(len(courses2), 1)
+        self.assertEqual(len(courses2), 1)
         exported_course = courses2[0]
 
         print("Checking course equality")
@@ -132,11 +133,12 @@ class RoundTripTestCase(unittest.TestCase):
         strip_filenames(exported_course)
 
         self.assertTrue(blocks_are_equivalent(initial_course, exported_course))
-        self.assertEquals(initial_course.id, exported_course.id)
+        self.assertEqual(initial_course.id, exported_course.id)
         course_id = initial_course.id
 
         print("Checking key equality")
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             list(initial_import.modules[course_id].keys()),
             list(second_import.modules[course_id].keys())
         )
@@ -222,7 +224,7 @@ class TestEdxJsonEncoder(unittest.TestCase):
         unicode_text = u"Your 𝓟𝓵𝓪𝓽𝓯𝓸𝓻𝓶 Name Here"
         lazy_text = ugettext_lazy(unicode_text)
 
-        self.assertEquals(
+        self.assertEqual(
             unicode_text,
             self.encoder.default(lazy_text)
         )

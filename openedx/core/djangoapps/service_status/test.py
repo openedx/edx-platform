@@ -1,6 +1,5 @@
 """Test for async task service status"""
 
-from __future__ import absolute_import
 
 import json
 import unittest
@@ -38,7 +37,7 @@ class CeleryConfigTest(unittest.TestCase):
 
         # Expect to get a JSON-serialized dict with
         # task and time information
-        result_dict = json.loads(response.content)
+        result_dict = json.loads(response.content.decode('utf-8'))
 
         # Was it successful?
         self.assertTrue(result_dict['success'])

@@ -1,9 +1,9 @@
 """
 Base test case for the course API views.
 """
-from __future__ import absolute_import
 
-from django.core.urlresolvers import reverse
+
+from django.urls import reverse
 from rest_framework.test import APITestCase
 
 from lms.djangoapps.courseware.tests.factories import StaffFactory

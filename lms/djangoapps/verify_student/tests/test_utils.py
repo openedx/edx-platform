@@ -3,7 +3,6 @@
 Tests for verify_student utility functions.
 """
 
-from __future__ import absolute_import
 
 import unittest
 from datetime import timedelta

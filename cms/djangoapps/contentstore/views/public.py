@@ -1,52 +1,29 @@
 """
 Public views
 """
-from __future__ import absolute_import
+
 
 from django.conf import settings
 from django.shortcuts import redirect
-from django.template.context_processors import csrf
 from django.utils.http import urlquote_plus
-from django.views.decorators.clickjacking import xframe_options_deny
-from django.views.decorators.csrf import ensure_csrf_cookie
 from waffle.decorators import waffle_switch
 
 from contentstore.config import waffle
 from edxmako.shortcuts import render_to_response
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
-__all__ = ['signup', 'login_page', 'login_redirect_to_lms', 'howitworks', 'accessibility']
+__all__ = ['register_redirect_to_lms', 'login_redirect_to_lms', 'howitworks', 'accessibility']
 
 
-@ensure_csrf_cookie
-@xframe_options_deny
-def signup(request):
+def register_redirect_to_lms(request):
     """
-    Display the signup form.
+    This view redirects to the LMS register view. It is used to temporarily keep the old
+    Studio signup url alive.
     """
-    csrf_token = csrf(request)['csrf_token']
-    if request.user.is_authenticated:
-        return redirect('/course/')
-
-    return render_to_response('register.html', {'csrf': csrf_token})
-
-
-@ensure_csrf_cookie
-@xframe_options_deny
-def login_page(request):
-    """
-    Display the login form.
-    """
-    csrf_token = csrf(request)['csrf_token']
-
-    return render_to_response(
-        'login.html',
-        {
-            'csrf': csrf_token,
-            'forgot_password_link': "//{base}/login#forgot-password-modal".format(base=settings.LMS_BASE),
-            'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
-        }
+    register_url = '{register_url}{params}'.format(
+        register_url=settings.FRONTEND_REGISTER_URL,
+        params=_build_next_param(request),
     )
+    return redirect(register_url, permanent=True)
 
 
 def login_redirect_to_lms(request):
@@ -54,13 +31,23 @@ def login_redirect_to_lms(request):
     This view redirects to the LMS login view. It is used for Django's LOGIN_URL
     setting, which is where unauthenticated requests to protected endpoints are redirected.
     """
-    next_url = request.GET.get('next')
-    absolute_next_url = request.build_absolute_uri(next_url)
-    login_url = '{base_url}/login{params}'.format(
-        base_url=settings.LMS_ROOT_URL,
-        params='?next=' + urlquote_plus(absolute_next_url) if next_url else '',
+    login_url = '{login_url}{params}'.format(
+        login_url=settings.FRONTEND_LOGIN_URL,
+        params=_build_next_param(request),
     )
     return redirect(login_url)
+
+
+def _build_next_param(request):
+    """ Returns the next param to be used with login or register. """
+    next_url = request.GET.get('next')
+    next_url = next_url if next_url else settings.LOGIN_REDIRECT_URL
+    if next_url:
+        # Warning: do not use `build_absolute_uri` when `next_url` is empty because `build_absolute_uri` would
+        # build use the login url for the next url, which would cause a login redirect loop.
+        absolute_next_url = request.build_absolute_uri(next_url)
+        return '?next=' + urlquote_plus(absolute_next_url)
+    return ''
 
 
 def howitworks(request):

@@ -1,11 +1,11 @@
 """
 Helper classes and methods for running modulestore tests without Django.
 """
-from __future__ import absolute_import
+
 
 import io
 import os
-from contextlib import contextmanager, nested
+from contextlib import contextmanager
 from importlib import import_module
 from shutil import rmtree
 from tempfile import mkdtemp
@@ -13,6 +13,7 @@ from unittest import TestCase
 from uuid import uuid4
 
 import six
+from contextlib2 import ExitStack
 from path import Path as path
 from six.moves import range, zip
 
@@ -255,7 +256,7 @@ class StoreBuilderBase(object):
     @contextmanager
     def build(self, **kwargs):
         """
-        Build the modulstore, optionally building the contentstore as well.
+        Build the modulestore, optionally building the contentstore as well.
         """
         contentstore = kwargs.pop('contentstore', None)
         if not contentstore:
@@ -419,7 +420,8 @@ class MixedModulestoreBuilder(StoreBuilderBase):
         """
         names, generators = list(zip(*self.store_builders))
 
-        with nested(*(gen.build_with_contentstore(contentstore, **kwargs) for gen in generators)) as modulestores:
+        with ExitStack() as stack:
+            modulestores = [stack.enter_context(gen.build_with_contentstore(contentstore, **kwargs)) for gen in generators]
             # Make the modulestore creation function just return the already-created modulestores
             store_iterator = iter(modulestores)
             next_modulestore = lambda *args, **kwargs: next(store_iterator)

@@ -6,14 +6,14 @@ This is the default template for our main set of AWS servers.
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-order
 
-from __future__ import absolute_import
 
 import codecs
+import copy
 import os
 import yaml
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from path import Path as path
 
 from .common import *
@@ -44,6 +44,37 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
     ENV_TOKENS = __config__
     AUTH_TOKENS = __config__
 
+    # Add the key/values from config into the global namespace of this module.
+    # But don't override the FEATURES dict because we do that in an additive way.
+    __config_copy__ = copy.deepcopy(__config__)
+
+    KEYS_WITH_MERGED_VALUES = [
+        'FEATURES',
+        'TRACKING_BACKENDS',
+        'EVENT_TRACKING_BACKENDS',
+        'JWT_AUTH',
+        'CELERY_QUEUES',
+        'MKTG_URL_LINK_MAP',
+        'MKTG_URL_OVERRIDES',
+    ]
+    for key in KEYS_WITH_MERGED_VALUES:
+        if key in __config_copy__:
+            del __config_copy__[key]
+
+    vars().update(__config_copy__)
+
+
+# A file path to a YAML file from which to load all the code revisions currently deployed
+REVISION_CONFIG_FILE = get_env_setting('REVISION_CFG')
+
+try:
+    with codecs.open(REVISION_CONFIG_FILE, encoding='utf-8') as f:
+        REVISION_CONFIG = yaml.safe_load(f)
+except Exception:  # pylint: disable=broad-except
+    REVISION_CONFIG = {}
+
+# Do NOT calculate this dynamically at startup with git because it's *slow*.
+EDX_PLATFORM_REVISION = REVISION_CONFIG.get('EDX_PLATFORM_REVISION', EDX_PLATFORM_REVISION)
 
 # SERVICE_VARIANT specifies name of the variant used, which decides what JSON
 # configuration files are read during startup.
@@ -85,8 +116,8 @@ CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
 
 # When the broker is behind an ELB, use a heartbeat to refresh the
 # connection and to detect if it has been dropped.
-BROKER_HEARTBEAT = 60.0
-BROKER_HEARTBEAT_CHECKRATE = 2
+BROKER_HEARTBEAT = ENV_TOKENS.get('BROKER_HEARTBEAT', 60.0)
+BROKER_HEARTBEAT_CHECKRATE = ENV_TOKENS.get('BROKER_HEARTBEAT_CHECKRATE', 2)
 
 # Each worker should only fetch one message at a time
 CELERYD_PREFETCH_MULTIPLIER = 1
@@ -110,14 +141,10 @@ CELERY_QUEUES = {
 
 CELERY_ROUTES = "{}celery.Router".format(QUEUE_VARIANT)
 
-# Do NOT calculate this dynamically at startup with git because it's *slow*.
-EDX_PLATFORM_REVISION = ENV_TOKENS.get('EDX_PLATFORM_REVISION', EDX_PLATFORM_REVISION)
-
 # STATIC_URL_BASE specifies the base url to use for static files
 STATIC_URL_BASE = ENV_TOKENS.get('STATIC_URL_BASE', None)
 if STATIC_URL_BASE:
-    # collectstatic will fail if STATIC_URL is a unicode string
-    STATIC_URL = STATIC_URL_BASE.encode('ascii')
+    STATIC_URL = STATIC_URL_BASE
     if not STATIC_URL.endswith("/"):
         STATIC_URL += "/"
     STATIC_URL += 'studio/'
@@ -135,6 +162,9 @@ DEFAULT_MOBILE_AVAILABLE = ENV_TOKENS.get(
     'DEFAULT_MOBILE_AVAILABLE',
     DEFAULT_MOBILE_AVAILABLE
 )
+
+# How long to cache OpenAPI schemas and UI, in seconds.
+OPENAPI_CACHE_TIMEOUT = ENV_TOKENS.get('OPENAPI_CACHE_TIMEOUT', 60 * 60)
 
 # MEDIA_ROOT specifies the directory where user-uploaded files are stored.
 MEDIA_ROOT = ENV_TOKENS.get('MEDIA_ROOT', MEDIA_ROOT)
@@ -160,6 +190,8 @@ EMAIL_HOST = ENV_TOKENS.get('EMAIL_HOST', EMAIL_HOST)
 EMAIL_PORT = ENV_TOKENS.get('EMAIL_PORT', EMAIL_PORT)
 EMAIL_USE_TLS = ENV_TOKENS.get('EMAIL_USE_TLS', EMAIL_USE_TLS)
 
+# CMS_BASE: Public domain name of Studio (should be resolvable from the end-user's browser)
+CMS_BASE = ENV_TOKENS.get('CMS_BASE')
 LMS_BASE = ENV_TOKENS.get('LMS_BASE')
 LMS_ROOT_URL = ENV_TOKENS.get('LMS_ROOT_URL')
 LMS_INTERNAL_ROOT_URL = ENV_TOKENS.get('LMS_INTERNAL_ROOT_URL', LMS_ROOT_URL)
@@ -178,7 +210,7 @@ SITE_NAME = ENV_TOKENS['SITE_NAME']
 ALLOWED_HOSTS = [
     # TODO: bbeggs remove this before prod, temp fix to get load testing running
     "*",
-    ENV_TOKENS.get('CMS_BASE')
+    CMS_BASE,
 ]
 
 LOG_DIR = ENV_TOKENS['LOG_DIR']
@@ -192,6 +224,22 @@ if 'loc_cache' not in CACHES:
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'edx_location_mem_cache',
     }
+
+if 'staticfiles' in CACHES:
+    CACHES['staticfiles']['KEY_PREFIX'] = EDX_PLATFORM_REVISION
+
+# In order to transition from local disk asset storage to S3 backed asset storage,
+# we need to run asset collection twice, once for local disk and once for S3.
+# Once we have migrated to service assets off S3, then we can convert this back to
+# managed by the yaml file contents
+STATICFILES_STORAGE = os.environ.get('STATICFILES_STORAGE', ENV_TOKENS.get('STATICFILES_STORAGE', STATICFILES_STORAGE))
+STATICFILES_STORAGE_KWARGS = ENV_TOKENS.get('STATICFILES_STORAGE_KWARGS', STATICFILES_STORAGE_KWARGS)
+
+# Load all AWS_ prefixed variables to allow an S3Boto3Storage to be configured
+_locals = locals()
+for key, value in ENV_TOKENS.items():
+    if key.startswith('AWS_'):
+        _locals[key] = value
 
 SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
 SESSION_COOKIE_HTTPONLY = ENV_TOKENS.get('SESSION_COOKIE_HTTPONLY', True)
@@ -230,6 +278,7 @@ ADMINS = ENV_TOKENS.get('ADMINS', ADMINS)
 SERVER_EMAIL = ENV_TOKENS.get('SERVER_EMAIL', SERVER_EMAIL)
 MKTG_URLS = ENV_TOKENS.get('MKTG_URLS', MKTG_URLS)
 MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
+MKTG_URL_OVERRIDES.update(ENV_TOKENS.get('MKTG_URL_OVERRIDES', MKTG_URL_OVERRIDES))
 TECH_SUPPORT_EMAIL = ENV_TOKENS.get('TECH_SUPPORT_EMAIL', TECH_SUPPORT_EMAIL)
 
 for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
@@ -304,13 +353,6 @@ HEARTBEAT_CHECKS = ENV_TOKENS.get('HEARTBEAT_CHECKS', HEARTBEAT_CHECKS)
 HEARTBEAT_EXTENDED_CHECKS = ENV_TOKENS.get('HEARTBEAT_EXTENDED_CHECKS', HEARTBEAT_EXTENDED_CHECKS)
 HEARTBEAT_CELERY_TIMEOUT = ENV_TOKENS.get('HEARTBEAT_CELERY_TIMEOUT', HEARTBEAT_CELERY_TIMEOUT)
 
-# Login using the LMS as the identity provider.
-# Turning the flag to True means that the LMS will NOT be used as the Identity Provider (idp)
-if FEATURES.get('DISABLE_STUDIO_SSO_OVER_LMS', False):
-    LOGIN_URL = reverse_lazy('login')
-    FRONTEND_LOGIN_URL = LOGIN_URL
-    FRONTEND_LOGOUT_URL = reverse_lazy('logout')
-
 LOGIN_REDIRECT_WHITELIST = [reverse_lazy('home')]
 
 # Specific setting for the File Upload Service to store media in a bucket.
@@ -320,6 +362,7 @@ FILE_UPLOAD_STORAGE_PREFIX = ENV_TOKENS.get('FILE_UPLOAD_STORAGE_PREFIX', FILE_U
 # Zendesk
 ZENDESK_URL = ENV_TOKENS.get('ZENDESK_URL', ZENDESK_URL)
 ZENDESK_CUSTOM_FIELDS = ENV_TOKENS.get('ZENDESK_CUSTOM_FIELDS', ZENDESK_CUSTOM_FIELDS)
+ZENDESK_GROUP_ID_MAPPING = ENV_TOKENS.get('ZENDESK_GROUP_ID_MAPPING', ZENDESK_GROUP_ID_MAPPING)
 
 ############### XBlock filesystem field config ##########
 if 'DJFS' in AUTH_TOKENS and AUTH_TOKENS['DJFS'] is not None:
@@ -403,6 +446,12 @@ XBLOCK_FIELD_DATA_WRAPPERS = ENV_TOKENS.get(
 
 CONTENTSTORE = AUTH_TOKENS['CONTENTSTORE']
 DOC_STORE_CONFIG = AUTH_TOKENS['DOC_STORE_CONFIG']
+
+############################### BLOCKSTORE #####################################
+BLOCKSTORE_API_URL = ENV_TOKENS.get('BLOCKSTORE_API_URL', None)  # e.g. "https://blockstore.example.com/api/v1/"
+# Configure an API auth token at (blockstore URL)/admin/authtoken/token/
+BLOCKSTORE_API_AUTH_TOKEN = AUTH_TOKENS.get('BLOCKSTORE_API_AUTH_TOKEN', None)
+
 # Datadog for events!
 DATADOG = AUTH_TOKENS.get("DATADOG", {})
 DATADOG.update(ENV_TOKENS.get("DATADOG", {}))
@@ -454,6 +503,11 @@ POLICY_CHANGE_GRADES_ROUTING_KEY = ENV_TOKENS.get('POLICY_CHANGE_GRADES_ROUTING_
 
 # Rate limit for regrading tasks that a grading policy change can kick off
 POLICY_CHANGE_TASK_RATE_LIMIT = ENV_TOKENS.get('POLICY_CHANGE_TASK_RATE_LIMIT', POLICY_CHANGE_TASK_RATE_LIMIT)
+
+SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = ENV_TOKENS.get(
+    'SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY',
+    HIGH_PRIORITY_QUEUE
+)
 
 # Event tracking
 TRACKING_BACKENDS.update(AUTH_TOKENS.get("TRACKING_BACKENDS", {}))
@@ -514,23 +568,7 @@ XBLOCK_SETTINGS = ENV_TOKENS.get('XBLOCK_SETTINGS', {})
 XBLOCK_SETTINGS.setdefault("VideoBlock", {})["licensing_enabled"] = FEATURES.get("LICENSING", False)
 XBLOCK_SETTINGS.setdefault("VideoBlock", {})['YOUTUBE_API_KEY'] = AUTH_TOKENS.get('YOUTUBE_API_KEY', YOUTUBE_API_KEY)
 
-################# MICROSITE ####################
-# microsite specific configurations.
-MICROSITE_CONFIGURATION = ENV_TOKENS.get('MICROSITE_CONFIGURATION', {})
-MICROSITE_ROOT_DIR = path(ENV_TOKENS.get('MICROSITE_ROOT_DIR', ''))
-# this setting specify which backend to be used when pulling microsite specific configuration
-MICROSITE_BACKEND = ENV_TOKENS.get("MICROSITE_BACKEND", MICROSITE_BACKEND)
-# this setting specify which backend to be used when loading microsite specific templates
-MICROSITE_TEMPLATE_BACKEND = ENV_TOKENS.get("MICROSITE_TEMPLATE_BACKEND", MICROSITE_TEMPLATE_BACKEND)
-# TTL for microsite database template cache
-MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = ENV_TOKENS.get(
-    "MICROSITE_DATABASE_TEMPLATE_CACHE_TTL", MICROSITE_DATABASE_TEMPLATE_CACHE_TTL
-)
-
 ############################ OAUTH2 Provider ###################################
-
-# OpenID Connect issuer ID. Normally the URL of the authentication endpoint.
-OAUTH_OIDC_ISSUER = ENV_TOKENS['OAUTH_OIDC_ISSUER']
 
 #### JWT configuration ####
 JWT_AUTH.update(ENV_TOKENS.get('JWT_AUTH', {}))
@@ -559,6 +597,9 @@ VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = ENV_TOKENS.get('VIDEO_TRANSCRIPT_MIGRATI
 ########## Settings youtube thumbnails scraper tasks ############
 SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE = ENV_TOKENS.get('SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE', DEFAULT_PRIORITY_QUEUE)
 
+########## Settings update search index task ############
+UPDATE_SEARCH_INDEX_JOB_QUEUE = ENV_TOKENS.get('UPDATE_SEARCH_INDEX_JOB_QUEUE', DEFAULT_PRIORITY_QUEUE)
+
 ########################## Parental controls config  #######################
 
 # The age at which a learner no longer requires parental consent, or None
@@ -571,7 +612,7 @@ PARENTAL_CONSENT_AGE_LIMIT = ENV_TOKENS.get(
 ########################## Extra middleware classes  #######################
 
 # Allow extra middleware classes to be added to the app through configuration.
-MIDDLEWARE_CLASSES.extend(ENV_TOKENS.get('EXTRA_MIDDLEWARE_CLASSES', []))
+MIDDLEWARE.extend(ENV_TOKENS.get('EXTRA_MIDDLEWARE_CLASSES', []))
 
 ########################## Settings for Completion API #####################
 
@@ -582,19 +623,25 @@ COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get(
     COMPLETION_VIDEO_COMPLETE_PERCENTAGE,
 )
 
+############### Settings for django-fernet-fields ##################
+FERNET_KEYS = AUTH_TOKENS.get('FERNET_KEYS', FERNET_KEYS)
+
 ####################### Enterprise Settings ######################
-# A shared secret to be used for encrypting passwords passed from the enterprise api
-# to the enteprise reporting script.
-ENTERPRISE_REPORTING_SECRET = AUTH_TOKENS.get(
-    'ENTERPRISE_REPORTING_SECRET',
-    ENTERPRISE_REPORTING_SECRET
-)
 
 # A default dictionary to be used for filtering out enterprise customer catalog.
 ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = ENV_TOKENS.get(
     'ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER',
     ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER
 )
+ENTERPRISE_CATALOG_INTERNAL_ROOT_URL = ENV_TOKENS.get(
+    'ENTERPRISE_CATALOG_INTERNAL_ROOT_URL',
+    ENTERPRISE_CATALOG_INTERNAL_ROOT_URL
+)
+
+# This limits the type of roles that are submittable via the `student` app's manual enrollment
+# audit API. While this isn't used in CMS, it is used via Enterprise which is installed in
+# the CMS. Without this, we get errors.
+MANUAL_ENROLLMENT_ROLE_CHOICES = ENV_TOKENS.get('MANUAL_ENROLLMENT_ROLE_CHOICES', MANUAL_ENROLLMENT_ROLE_CHOICES)
 
 ############### Settings for Retirement #####################
 RETIRED_USERNAME_PREFIX = ENV_TOKENS.get('RETIRED_USERNAME_PREFIX', RETIRED_USERNAME_PREFIX)

@@ -1,14 +1,14 @@
 """
 Tests of student.roles
 """
-from __future__ import absolute_import
+
 
 import ddt
 import six
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 
-from courseware.tests.factories import InstructorFactory, StaffFactory, UserFactory
+from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory, UserFactory
 from student.roles import (
     CourseBetaTesterRole,
     CourseInstructorRole,

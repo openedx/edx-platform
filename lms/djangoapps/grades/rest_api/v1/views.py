@@ -1,5 +1,5 @@
 """ API v0 views. """
-from __future__ import absolute_import
+
 
 import logging
 from contextlib import contextmanager
@@ -16,7 +16,7 @@ from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.grades.api import CourseGradeFactory, clear_prefetched_course_grades, prefetch_course_grades
 from lms.djangoapps.grades.rest_api.serializers import GradingPolicySerializer
 from lms.djangoapps.grades.rest_api.v1.utils import CourseEnrollmentPagination, GradeViewMixin
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import PaginatedAPIView, get_course_key, verify_course_exists
 from xmodule.modulestore.django import modulestore
 
@@ -91,7 +91,7 @@ class CourseGradesView(GradeViewMixin, PaginatedAPIView):
     """
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
 
@@ -171,7 +171,7 @@ class CourseGradingPolicy(GradeViewMixin, ListAPIView):
 
     authentication_classes = (
         JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
 

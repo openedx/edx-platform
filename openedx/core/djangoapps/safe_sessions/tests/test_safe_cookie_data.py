@@ -3,7 +3,6 @@
 Unit tests for SafeCookieData
 """
 
-from __future__ import absolute_import
 
 import itertools
 from time import time
@@ -62,7 +61,7 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
         self.assert_cookie_data_equal(safe_cookie_data_1, safe_cookie_data_2)
 
     def test_version(self):
-        self.assertEquals(self.safe_cookie_data.version, SafeCookieData.CURRENT_VERSION)
+        self.assertEqual(self.safe_cookie_data.version, SafeCookieData.CURRENT_VERSION)
 
     def test_serialize(self):
         serialized_value = six.text_type(self.safe_cookie_data)

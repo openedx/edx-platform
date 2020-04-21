@@ -1,7 +1,7 @@
 """
 Configuration for the lti_provider Django application.
 """
-from __future__ import absolute_import
+
 
 from django.apps import AppConfig
 

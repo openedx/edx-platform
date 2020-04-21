@@ -8,7 +8,7 @@ required by server-side events.
 To use, call "from track import segment", then call segment.track() or segment.identify().
 
 """
-from __future__ import absolute_import
+
 
 import analytics
 from django.conf import settings

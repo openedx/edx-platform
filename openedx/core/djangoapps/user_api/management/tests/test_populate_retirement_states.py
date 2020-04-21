@@ -1,7 +1,7 @@
 """
 Test the populate_retirement_states management command
 """
-from __future__ import absolute_import
+
 
 import copy
 
@@ -87,7 +87,7 @@ def test_out_of_order_start_state(settings):
     del settings.RETIREMENT_STATES[0]
     settings.RETIREMENT_STATES.insert(4, 'PENDING')
 
-    with pytest.raises(CommandError, match=ur'{} must be the first state'.format(START_STATE)):
+    with pytest.raises(CommandError, match=u'{} must be the first state'.format(START_STATE)):
         call_command('populate_retirement_states')
 
 

@@ -1,7 +1,7 @@
 """
 Tests for SplitTestTransformer.
 """
-from __future__ import absolute_import
+
 
 import ddt
 
@@ -207,7 +207,7 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
         user_groups = get_user_partition_groups(
             self.course.id, [self.split_test_user_partition], self.user, 'id'
         )
-        self.assertEquals(len(user_groups), 1)
+        self.assertEqual(len(user_groups), 1)
 
         # calling twice should result in the same block set
         block_structure1 = get_course_blocks(

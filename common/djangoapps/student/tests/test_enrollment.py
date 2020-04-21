@@ -1,7 +1,7 @@
 """
 Tests for student enrollment.
 """
-from __future__ import absolute_import
+
 
 import unittest
 
@@ -104,7 +104,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
         # Enroll in the course and verify the URL we get sent to
         resp = self._change_enrollment('enroll')
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.content, full_url)
+        self.assertEqual(resp.content.decode('utf-8'), full_url)
 
         # If we're not expecting to be enrolled, verify that this is the case
         if enrollment_mode is None:
@@ -171,7 +171,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
         with restrict_course(self.course.id) as redirect_url:
             response = self._change_enrollment('enroll')
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.content, redirect_url)
+            self.assertEqual(response.content.decode('utf-8'), redirect_url)
 
         # Verify that we weren't enrolled
         is_enrolled = CourseEnrollment.is_enrolled(self.user, self.course.id)
@@ -181,7 +181,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
     def test_embargo_allow(self):
         response = self._change_enrollment('enroll')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, '')
+        self.assertEqual(response.content.decode('utf-8'), '')
 
         # Verify that we were enrolled
         is_enrolled = CourseEnrollment.is_enrolled(self.user, self.course.id)

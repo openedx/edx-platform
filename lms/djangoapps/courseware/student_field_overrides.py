@@ -2,11 +2,11 @@
 API related to providing field overrides for individual students.  This is used
 by the individual due dates feature.
 """
-from __future__ import absolute_import
+
 
 import json
 
-from courseware.models import StudentFieldOverride
+from lms.djangoapps.courseware.models import StudentFieldOverride
 from openedx.core.lib.xblock_utils import is_xblock_aside
 
 from .field_overrides import FieldOverrideProvider

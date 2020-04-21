@@ -8,9 +8,10 @@ The methods in these classes are organized into several conceptual buckets:
     * Workflows: Complex orchestrations involving any/all of the above
 
 """
-from __future__ import absolute_import
+
 
 import os
+import os.path
 
 from bok_choy.promise import EmptyPromise
 from selenium.webdriver import ActionChains
@@ -443,7 +444,7 @@ class SignatorySectionPage(CertificatesPage):
 
         """
         # Should grab common point between this page module and the data folder.
-        return os.sep.join(__file__.split(os.sep)[:-4]) + '/data/uploads/' + filename
+        return os.sep.join(os.path.abspath(__file__).split(os.sep)[:-4]) + '/data/uploads/' + filename
 
     def get_selector(self, css=''):
         """

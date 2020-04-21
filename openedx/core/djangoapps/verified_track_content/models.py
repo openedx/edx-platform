@@ -1,7 +1,7 @@
 """
 Models for verified track selections.
 """
-from __future__ import absolute_import
+
 
 import logging
 import six
@@ -10,6 +10,7 @@ from config_models.models import ConfigurationModel
 from django.db import models
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.django.models import CourseKeyField
@@ -27,7 +28,7 @@ from student.models import CourseEnrollment
 
 log = logging.getLogger(__name__)
 
-DEFAULT_VERIFIED_COHORT_NAME = "Verified Learners"
+DEFAULT_VERIFIED_COHORT_NAME = u"Verified Learners"
 
 
 @receiver(post_save, sender=CourseEnrollment)
@@ -92,6 +93,7 @@ def pre_save_callback(sender, instance, **kwargs):  # pylint: disable=unused-arg
         instance._old_mode = None  # pylint: disable=protected-access
 
 
+@python_2_unicode_compatible
 class VerifiedTrackCohortedCourse(models.Model):
     """
     Tracks which courses have verified track auto-cohorting enabled.
@@ -109,7 +111,7 @@ class VerifiedTrackCohortedCourse(models.Model):
 
     CACHE_NAMESPACE = u"verified_track_content.VerifiedTrackCohortedCourse.cache."
 
-    def __unicode__(self):
+    def __str__(self):
         return u"Course: {}, enabled: {}".format(six.text_type(self.course_key), self.enabled)
 
     @classmethod
@@ -168,15 +170,15 @@ class MigrateVerifiedTrackCohortsSetting(ConfigurationModel):
     old_course_key = CourseKeyField(
         max_length=255,
         blank=False,
-        help_text="Course key for which to migrate verified track cohorts from"
+        help_text=u"Course key for which to migrate verified track cohorts from"
     )
     rerun_course_key = CourseKeyField(
         max_length=255,
         blank=False,
-        help_text="Course key for which to migrate verified track cohorts to enrollment tracks to"
+        help_text=u"Course key for which to migrate verified track cohorts to enrollment tracks to"
     )
     audit_cohort_names = models.TextField(
-        help_text="Comma-separated list of audit cohort names"
+        help_text=u"Comma-separated list of audit cohort names"
     )
 
     @classmethod

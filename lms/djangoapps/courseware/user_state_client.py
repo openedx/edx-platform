@@ -3,7 +3,6 @@ An implementation of :class:`XBlockUserStateClient`, which stores XBlock Scope.u
 data in a Django ORM model.
 """
 
-from __future__ import absolute_import
 
 import itertools
 import logging
@@ -20,7 +19,7 @@ from edx_django_utils import monitoring as monitoring_utils
 from edx_user_state_client.interface import XBlockUserState, XBlockUserStateClient
 from xblock.fields import Scope
 
-from courseware.models import BaseStudentModuleHistory, StudentModule
+from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
 
 try:
     import simplejson as json
@@ -248,7 +247,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             try:
                 student_module, created = StudentModule.objects.get_or_create(
                     student=user,
-                    course_id=usage_key.course_key,
+                    course_id=usage_key.context_key,
                     module_state_key=usage_key,
                     defaults={
                         'state': json.dumps(state),
@@ -261,7 +260,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                 # process. This seems to happen frequently, and ignoring it is the
                 # best course of action for now
                 log.warning(u"set_many: IntegrityError for student {} - course_id {} - usage key {}".format(
-                    user, repr(six.text_type(usage_key.course_key)), usage_key
+                    user, repr(six.text_type(usage_key.context_key)), usage_key
                 ))
                 return
 
@@ -284,7 +283,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                     # The UPDATE above failed. Log information - but ignore the error.
                     # See https://openedx.atlassian.net/browse/TNL-5365
                     log.warning(u"set_many: IntegrityError for student {} - course_id {} - usage key {}".format(
-                        user, repr(six.text_type(usage_key.course_key)), usage_key
+                        user, repr(six.text_type(usage_key.context_key)), usage_key
                     ))
                     log.warning(u"set_many: All {} block keys: {}".format(
                         len(block_keys_to_state), list(block_keys_to_state.keys())

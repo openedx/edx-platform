@@ -1,7 +1,7 @@
 """
 URLs for the maintenance app.
 """
-from __future__ import absolute_import
+
 
 from django.conf.urls import url
 
@@ -13,6 +13,8 @@ from .views import (
     ForcePublishCourseView,
     MaintenanceIndexView
 )
+
+app_name = 'cms.djangoapps.maintenance'
 
 urlpatterns = [
     url(r'^$', MaintenanceIndexView.as_view(), name='maintenance_index'),

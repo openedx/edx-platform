@@ -1,7 +1,7 @@
 """
 Unit tests for instructor_dashboard.py.
 """
-from __future__ import absolute_import
+
 
 import datetime
 
@@ -20,9 +20,9 @@ from six.moves import range
 
 from common.test.utils import XssTestMixin
 from course_modes.models import CourseMode
-from courseware.tabs import get_course_tab_list
-from courseware.tests.factories import StaffFactory, StudentModuleFactory, UserFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.tabs import get_course_tab_list
+from lms.djangoapps.courseware.tests.factories import StaffFactory, StudentModuleFactory, UserFactory
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
 from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
@@ -92,14 +92,14 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         Returns expected dashboard enrollment message with link to Insights.
         """
         return u'Enrollment data is now available in <a href="http://example.com/courses/{}" ' \
-               'target="_blank">Example</a>.'.format(text_type(self.course.id))
+               'rel="noopener" target="_blank">Example</a>.'.format(text_type(self.course.id))
 
     def get_dashboard_analytics_message(self):
         """
         Returns expected dashboard demographic message with link to Insights.
         """
         return u'For analytics about your course, go to <a href="http://example.com/courses/{}" ' \
-               'target="_blank">Example</a>.'.format(text_type(self.course.id))
+               'rel="noopener" target="_blank">Example</a>.'.format(text_type(self.course.id))
 
     def test_instructor_tab(self):
         """
@@ -107,9 +107,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         def has_instructor_tab(user, course):
             """Returns true if the "Instructor" tab is shown."""
-            request = RequestFactory().request()
-            request.user = user
-            tabs = get_course_tab_list(request, course)
+            tabs = get_course_tab_list(user, course)
             return len([tab for tab in tabs if tab.name == 'Instructor']) == 1
 
         self.assertTrue(has_instructor_tab(self.instructor, self.course))
@@ -158,6 +156,35 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             content('#field-course-organization b').contents()[0].strip()
         )
 
+    @ddt.data(True, False)
+    def test_membership_reason_field_visibility(self, enbale_reason_field):
+        """
+        Verify that reason field is enabled by site configuration flag 'ENABLE_MANUAL_ENROLLMENT_REASON_FIELD'
+        """
+
+        configuration_values = {
+            "ENABLE_MANUAL_ENROLLMENT_REASON_FIELD": enbale_reason_field
+        }
+        site = Site.objects.first()
+        SiteConfiguration.objects.create(
+            site=site,
+            site_values=configuration_values,
+            enabled=True
+        )
+
+        url = reverse(
+            'instructor_dashboard',
+            kwargs={
+                'course_id': six.text_type(self.course_info.id)
+            }
+        )
+        response = self.client.get(url)
+        reason_field = '<textarea rows="2" id="reason-field-id" name="reason-field" placeholder="Reason" spellcheck="false"></textarea>'  # pylint: disable=line-too-long
+        if enbale_reason_field:
+            self.assertContains(response, reason_field)
+        else:
+            self.assertNotContains(response, reason_field)
+
     def test_membership_site_configuration_role(self):
         """
         Verify that the role choices set via site configuration are loaded in the membership tab
@@ -171,7 +198,11 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             ]
         }
         site = Site.objects.first()
-        SiteConfiguration.objects.create(site=site, values=configuration_values, enabled=True)
+        SiteConfiguration.objects.create(
+            site=site,
+            site_values=configuration_values,
+            enabled=True
+        )
         url = reverse(
             'instructor_dashboard',
             kwargs={
@@ -180,8 +211,8 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         )
 
         response = self.client.get(url)
-        self.assertIn('<option value="role1">role1</option>', response.content)
-        self.assertIn('<option value="role2">role2</option>', response.content)
+        self.assertContains(response, '<option value="role1">role1</option>')
+        self.assertContains(response, '<option value="role2">role2</option>')
 
     def test_membership_default_role(self):
         """
@@ -197,9 +228,9 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         )
 
         response = self.client.get(url)
-        self.assertIn('<option value="Learner">Learner</option>', response.content)
-        self.assertIn('<option value="Support">Support</option>', response.content)
-        self.assertIn('<option value="Partner">Partner</option>', response.content)
+        self.assertContains(response, '<option value="Learner">Learner</option>')
+        self.assertContains(response, '<option value="Support">Support</option>')
+        self.assertContains(response, '<option value="Partner">Partner</option>')
 
     def test_student_admin_staff_instructor(self):
         """
@@ -208,15 +239,15 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         # Original (instructor) user can see both specific grades, and course-wide grade adjustment tools
         response = self.client.get(self.url)
-        self.assertIn('<h4 class="hd hd-4">Adjust all enrolled learners', response.content)
-        self.assertIn('<h4 class="hd hd-4">View a specific learner&#39;s grades and progress', response.content)
+        self.assertContains(response, '<h4 class="hd hd-4">Adjust all enrolled learners')
+        self.assertContains(response, '<h4 class="hd hd-4">View a specific learner&#39;s grades and progress')
 
         # But staff user can only see specific grades
         staff = StaffFactory(course_key=self.course.id)
         self.client.login(username=staff.username, password="test")
         response = self.client.get(self.url)
-        self.assertNotIn('<h4 class="hd hd-4">Adjust all enrolled learners', response.content)
-        self.assertIn('<h4 class="hd hd-4">View a specific learner&#39;s grades and progress', response.content)
+        self.assertNotContains(response, '<h4 class="hd hd-4">Adjust all enrolled learners')
+        self.assertContains(response, '<h4 class="hd hd-4">View a specific learner&#39;s grades and progress')
 
     @patch(
         'lms.djangoapps.instructor.views.instructor_dashboard.settings.WRITABLE_GRADEBOOK_URL',
@@ -231,8 +262,8 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             response = self.client.get(self.url)
 
         expected_gradebook_url = 'http://gradebook.local.edx.org/{}'.format(self.course.id)
-        self.assertIn(expected_gradebook_url, response.content)
-        self.assertIn('View Gradebook', response.content)
+        self.assertContains(response, expected_gradebook_url)
+        self.assertContains(response, 'View Gradebook')
 
     GRADEBOOK_LEARNER_COUNT_MESSAGE = (
         'Note: This feature is available only to courses with a small number ' +
@@ -246,11 +277,11 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         numbers of learners.
         """
         response = self.client.get(self.url)
-        self.assertIn(
+        self.assertContains(
+            response,
             self.GRADEBOOK_LEARNER_COUNT_MESSAGE,
-            response.content
         )
-        self.assertIn('View Gradebook', response.content)
+        self.assertContains(response, 'View Gradebook')
 
     @patch(
         'lms.djangoapps.instructor.views.instructor_dashboard.settings.WRITABLE_GRADEBOOK_URL',
@@ -267,9 +298,9 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             response = self.client.get(self.url)
         self.assertNotIn(
             TestInstructorDashboard.GRADEBOOK_LEARNER_COUNT_MESSAGE,
-            response.content
+            response.content.decode('utf-8')
         )
-        self.assertIn('View Gradebook', response.content)
+        self.assertContains(response, 'View Gradebook')
 
     def test_default_currency_in_the_html_response(self):
         """
@@ -278,7 +309,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
         total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
         response = self.client.get(self.url)
-        self.assertIn('${amount}'.format(amount=total_amount), response.content)
+        self.assertContains(response, '${amount}'.format(amount=total_amount))
 
     def test_course_name_xss(self):
         """Test that the instructor dashboard correctly escapes course names
@@ -295,7 +326,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
         total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
         response = self.client.get(self.url)
-        self.assertIn('{currency}{amount}'.format(currency='Rs', amount=total_amount), response.content)
+        self.assertContains(response, '{currency}{amount}'.format(currency='Rs', amount=total_amount))
 
     @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_ENROLLMENTS': False})
     @override_settings(ANALYTICS_DASHBOARD_URL='')
@@ -305,7 +336,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         response = self.client.get(self.url)
         # no enrollment information should be visible
-        self.assertNotIn('<h3 class="hd hd-3">Enrollment Information</h3>', response.content)
+        self.assertNotContains(response, '<h3 class="hd hd-3">Enrollment Information</h3>')
 
     @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_ENROLLMENTS': True})
     @override_settings(ANALYTICS_DASHBOARD_URL='')
@@ -316,14 +347,14 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(self.url)
 
         # enrollment information visible
-        self.assertIn('<h4 class="hd hd-4">Enrollment Information</h4>', response.content)
-        self.assertIn('<th scope="row">Verified</th>', response.content)
-        self.assertIn('<th scope="row">Audit</th>', response.content)
-        self.assertIn('<th scope="row">Honor</th>', response.content)
-        self.assertIn('<th scope="row">Professional</th>', response.content)
+        self.assertContains(response, '<h4 class="hd hd-4">Enrollment Information</h4>')
+        self.assertContains(response, '<th scope="row">Verified</th>')
+        self.assertContains(response, '<th scope="row">Audit</th>')
+        self.assertContains(response, '<th scope="row">Honor</th>')
+        self.assertContains(response, '<th scope="row">Professional</th>')
 
         # dashboard link hidden
-        self.assertNotIn(self.get_dashboard_enrollment_message(), response.content.decode(response.charset))
+        self.assertNotContains(response, self.get_dashboard_enrollment_message())
 
     @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_ENROLLMENTS': True})
     @override_settings(ANALYTICS_DASHBOARD_URL='')
@@ -349,10 +380,10 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(self.url)
 
         # enrollment information hidden
-        self.assertNotIn('<th scope="row">Verified</th>', response.content)
-        self.assertNotIn('<th scope="row">Audit</th>', response.content)
-        self.assertNotIn('<th scope="row">Honor</th>', response.content)
-        self.assertNotIn('<th scope="row">Professional</th>', response.content)
+        self.assertNotContains(response, '<th scope="row">Verified</th>')
+        self.assertNotContains(response, '<th scope="row">Audit</th>')
+        self.assertNotContains(response, '<th scope="row">Honor</th>')
+        self.assertNotContains(response, '<th scope="row">Professional</th>')
 
         # link to dashboard shown
         expected_message = self.get_dashboard_enrollment_message()
@@ -366,7 +397,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         response = self.client.get(self.url)
         analytics_section = '<li class="nav-item"><a href="" data-section="instructor_analytics">Analytics</a></li>'
-        self.assertNotIn(analytics_section, response.content)
+        self.assertNotContains(response, analytics_section)
 
     @override_settings(ANALYTICS_DASHBOARD_URL='http://example.com')
     @override_settings(ANALYTICS_DASHBOARD_NAME='Example')
@@ -376,7 +407,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         response = self.client.get(self.url)
         analytics_section = '<li class="nav-item"><button type="button" class="btn-link instructor_analytics" data-section="instructor_analytics">Analytics</button></li>'  # pylint: disable=line-too-long
-        self.assertIn(analytics_section, response.content)
+        self.assertContains(response, analytics_section)
 
         # link to dashboard shown
         expected_message = self.get_dashboard_analytics_message()
@@ -408,7 +439,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         bulk_purchase_total = CourseRegCodeItem.get_total_amount_of_purchased_item(self.course.id)
         total_amount = single_purchase_total + bulk_purchase_total
         response = self.client.get(self.url)
-        self.assertIn('{currency}{amount}'.format(currency='$', amount=total_amount), response.content)
+        self.assertContains(response, '{currency}{amount}'.format(currency='$', amount=total_amount))
 
     @ddt.data(
         (True, True, True),
@@ -429,17 +460,16 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
             response = self.client.get(self.url)
 
-            self.assertEquals(
-                expected_result,
-                'CCX Coaches are able to create their own Custom Courses based on this course' in response.content
-            )
+            self.assertEqual(expected_result,
+                             'CCX Coaches are able to create their own Custom Courses based on this course'
+                             in response.content.decode('utf-8'))
 
     def test_grade_cutoffs(self):
         """
         Verify that grade cutoffs are displayed in the correct order.
         """
         response = self.client.get(self.url)
-        self.assertIn('D: 0.5, C: 0.57, B: 0.63, A: 0.75', response.content)
+        self.assertContains(response, 'D: 0.5, C: 0.57, B: 0.63, A: 0.75')
 
     @patch('lms.djangoapps.instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 2)
     def test_calculate_page_info(self):
@@ -479,11 +509,11 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         )
 
         response = self.client.get(self.url)
-        self.assertNotIn(ora_section, response.content)
+        self.assertNotContains(response, ora_section)
 
         ItemFactory.create(parent_location=self.course.location, category="openassessment")
         response = self.client.get(self.url)
-        self.assertIn(ora_section, response.content)
+        self.assertContains(response, ora_section)
 
     def test_open_response_assessment_page_orphan(self):
         """

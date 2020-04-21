@@ -2,13 +2,13 @@
 Tests the ``generate_jwt_signing_key`` management command.
 """
 # pylint: disable=missing-docstring
-from __future__ import absolute_import
+
 
 import os
 import sys
 import tempfile
 from contextlib import contextmanager
-from StringIO import StringIO
+from six import StringIO
 
 import ddt
 import yaml

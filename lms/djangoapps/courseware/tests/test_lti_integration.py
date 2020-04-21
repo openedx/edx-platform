@@ -1,6 +1,5 @@
 """LTI integration tests"""
 
-from __future__ import absolute_import
 
 import json
 from collections import OrderedDict
@@ -14,8 +13,8 @@ from django.conf import settings
 from django.urls import reverse
 from six import text_type
 
-from courseware.tests.helpers import BaseTestXmodule
-from courseware.views.views import get_course_lti_endpoints
+from lms.djangoapps.courseware.tests.helpers import BaseTestXmodule
+from lms.djangoapps.courseware.views.views import get_course_lti_endpoints
 from openedx.core.lib.url_utils import quote_slashes
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -126,7 +125,7 @@ class TestLTI(BaseTestXmodule):
     def test_lti_preview_handler(self):
         generated_content = self.item_descriptor.preview_handler(None, None).body
         expected_content = self.runtime.render_template('lti_form.html', self.expected_context)
-        self.assertEqual(generated_content, expected_content)
+        self.assertEqual(generated_content.decode('utf-8'), expected_content)
 
 
 class TestLTIModuleListing(SharedModuleStoreTestCase):
@@ -179,7 +178,7 @@ class TestLTIModuleListing(SharedModuleStoreTestCase):
             'xblock_handler_noauth',
             args=[
                 text_type(self.course.id),
-                quote_slashes(text_type(self.lti_published.scope_ids.usage_id).encode('utf-8')),
+                quote_slashes(text_type(self.lti_published.scope_ids.usage_id)),
                 handler
             ]
         ))
@@ -207,7 +206,7 @@ class TestLTIModuleListing(SharedModuleStoreTestCase):
             self.expected_handler_url('lti_2_0_result_rest_handler') + "/user/{anon_user_id}",
             "display_name": self.lti_published.display_name,
         }
-        self.assertEqual([expected], json.loads(response.content))
+        self.assertEqual([expected], json.loads(response.content.decode('utf-8')))
 
     def test_lti_rest_non_get(self):
         """tests that the endpoint returns 404 when hit with NON-get"""

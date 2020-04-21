@@ -1,5 +1,5 @@
 """Tests the course modules and their functions"""
-from __future__ import absolute_import, print_function
+
 
 import itertools
 import unittest
@@ -15,6 +15,7 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import utc
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 
+from openedx.core.lib.teams_config import TeamsConfig, DEFAULT_COURSE_RUN_MAX_TEAM_SIZE
 import xmodule.course_module
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 
@@ -277,16 +278,16 @@ class TeamsConfigurationTestCase(unittest.TestCase):
     def setUp(self):
         super(TeamsConfigurationTestCase, self).setUp()
         self.course = get_dummy_course('2012-12-02T12:00')
-        self.course.teams_configuration = dict()
+        self.course.teams_configuration = TeamsConfig(None)
         self.count = itertools.count()
 
     def add_team_configuration(self, max_team_size=3, topics=None):
         """ Add a team configuration to the course. """
-        teams_configuration = {}
-        teams_configuration["topics"] = [] if topics is None else topics
+        teams_config_data = {}
+        teams_config_data["topics"] = [] if topics is None else topics
         if max_team_size is not None:
-            teams_configuration["max_team_size"] = max_team_size
-        self.course.teams_configuration = teams_configuration
+            teams_config_data["max_team_size"] = max_team_size
+        self.course.teams_configuration = TeamsConfig(teams_config_data)
 
     def make_topic(self):
         """ Make a sample topic dictionary. """
@@ -317,26 +318,44 @@ class TeamsConfigurationTestCase(unittest.TestCase):
         self.assertTrue(self.course.teams_enabled)
 
     def test_teams_max_size_no_teams_configuration(self):
-        self.assertIsNone(self.course.teams_max_size)
+        self.assertEqual(
+            self.course.teams_configuration.default_max_team_size,
+            DEFAULT_COURSE_RUN_MAX_TEAM_SIZE,
+        )
 
     def test_teams_max_size_with_teams_configured(self):
         size = 4
         self.add_team_configuration(max_team_size=size, topics=[self.make_topic(), self.make_topic()])
         self.assertTrue(self.course.teams_enabled)
-        self.assertEqual(size, self.course.teams_max_size)
+        self.assertEqual(size, self.course.teams_configuration.default_max_team_size)
 
-    def test_teams_topics_no_teams(self):
-        self.assertIsNone(self.course.teams_topics)
+    def test_teamsets_no_config(self):
+        self.assertEqual(self.course.teamsets, [])
 
-    def test_teams_topics_no_topics(self):
+    def test_teamsets_empty(self):
         self.add_team_configuration(max_team_size=4)
-        self.assertEqual(self.course.teams_topics, [])
+        self.assertEqual(self.course.teamsets, [])
 
-    def test_teams_topics_with_topics(self):
+    def test_teamsets_present(self):
         topics = [self.make_topic(), self.make_topic()]
         self.add_team_configuration(max_team_size=4, topics=topics)
         self.assertTrue(self.course.teams_enabled)
-        self.assertEqual(self.course.teams_topics, topics)
+        expected_teamsets_data = [
+            teamset.cleaned_data_old_format
+            for teamset in self.course.teamsets
+        ]
+        self.assertEqual(expected_teamsets_data, topics)
+
+    def test_teams_conf_cached_by_xblock_field(self):
+        self.add_team_configuration(max_team_size=5, topics=[self.make_topic()])
+        cold_cache_conf = self.course.teams_configuration
+        warm_cache_conf = self.course.teams_configuration
+        self.add_team_configuration(max_team_size=5, topics=[self.make_topic(), self.make_topic()])
+        new_cold_cache_conf = self.course.teams_configuration
+        new_warm_cache_conf = self.course.teams_configuration
+        self.assertIs(cold_cache_conf, warm_cache_conf)
+        self.assertIs(new_cold_cache_conf, new_warm_cache_conf)
+        self.assertIsNot(cold_cache_conf, new_cold_cache_conf)
 
 
 class SelfPacedTestCase(unittest.TestCase):

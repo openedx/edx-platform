@@ -1,7 +1,7 @@
 """
 Common code shared by course and library fixtures.
 """
-from __future__ import absolute_import
+
 
 import json
 
@@ -166,10 +166,7 @@ class XBlockContainerFixture(StudioApiFixture):
         """
         Encode `post_dict` (a dictionary) as UTF-8 encoded JSON.
         """
-        return json.dumps({
-            k: v.encode('utf-8') if isinstance(v, six.string_types) else v
-            for k, v in post_dict.items()
-        })
+        return json.dumps(post_dict).encode('utf-8')
 
     def get_nested_xblocks(self, category=None):
         """

@@ -1,6 +1,5 @@
 """ Form widget classes """
 
-from __future__ import absolute_import
 
 from django.conf import settings
 from django.forms.utils import flatatt
@@ -17,7 +16,7 @@ from openedx.core.djangolib.markup import HTML, Text
 class TermsOfServiceCheckboxInput(CheckboxInput):
     """ Renders a checkbox with a label linking to the terms of service. """
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         extra_attrs = attrs.copy()
         extra_attrs.update({'type': 'checkbox', 'name': name})
         final_attrs = self.build_attrs(self.attrs, extra_attrs=extra_attrs)
@@ -34,7 +33,9 @@ class TermsOfServiceCheckboxInput(CheckboxInput):
             u'I, and my organization, accept the {link_start}{platform_name} API Terms of Service{link_end}.'
         )).format(
             platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
-            link_start=HTML(u'<a href="{url}" target="_blank">').format(url=reverse('api_admin:api-tos')),
+            link_start=HTML(u'<a href="{url}" rel="noopener" target="_blank">').format(
+                url=reverse('api_admin:api-tos')
+            ),
             link_end=HTML('</a>'),
         )
 

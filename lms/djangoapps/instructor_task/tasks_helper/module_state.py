@@ -1,7 +1,7 @@
 """
 Instructor Tasks related to module state.
 """
-from __future__ import absolute_import
+
 
 import json
 import logging
@@ -14,10 +14,10 @@ from xblock.runtime import KvsFieldData
 from xblock.scorable import Score
 
 from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
-from courseware.courses import get_course_by_id, get_problems_in_section
-from courseware.model_data import DjangoKeyValueStore, FieldDataCache
-from courseware.models import StudentModule
-from courseware.module_render import get_module_for_descriptor_internal
+from lms.djangoapps.courseware.courses import get_course_by_id, get_problems_in_section
+from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
+from lms.djangoapps.courseware.models import StudentModule
+from lms.djangoapps.courseware.module_render import get_module_for_descriptor_internal
 from lms.djangoapps.grades.api import events as grades_events
 from student.models import get_user_by_username_or_email
 from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type

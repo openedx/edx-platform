@@ -18,7 +18,6 @@ below::
 
 """
 
-from __future__ import absolute_import
 
 import inspect
 from importlib import import_module

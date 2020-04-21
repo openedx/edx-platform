@@ -36,10 +36,10 @@
                 {% endfilter %}
                 {% else %}
                     {% blocktrans trimmed asvar tmsg %}
-                        Many {{ platform_name }} learners in {start_strong}{{course_name}}{end_strong} are completing more problems every week, and
+                        Many {platform_name} learners in {start_strong}{course_name}{end_strong} are completing more problems every week, and
                         participating in the discussion forums. What do you want to do to keep learning?
                     {% endblocktrans %}
-                    {% interpolate_html tmsg start_strong='<strong>'|safe end_strong='</strong>'|safe %}
+                    {% interpolate_html tmsg start_strong='<strong>'|safe end_strong='</strong>'|safe course_name=course_name|force_escape|safe platform_name=platform_name|force_escape|safe %}
                 {% endif %}
             </p>
             {# xss-lint: disable=django-trans-missing-escape #}

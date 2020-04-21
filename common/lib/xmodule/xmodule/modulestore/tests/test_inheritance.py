@@ -1,13 +1,13 @@
 """
 Unit tests for testing inheritance mixins
 """
-from __future__ import absolute_import
 
-import ddt
+
 import unittest
 
-from mock import Mock
+import ddt
 from django.utils.timezone import now, timedelta
+from mock import Mock
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.test.tools import TestRuntime

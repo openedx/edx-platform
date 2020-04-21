@@ -2,11 +2,16 @@
 Tests for the bok-choy paver commands themselves.
 Run just this test with: paver test_lib -t pavelib/paver_tests/test_paver_bok_choy_cmds.py
 """
-from __future__ import absolute_import
+
 
 import os
 import unittest
-from test.test_support import EnvironmentVarGuard
+import six
+
+if six.PY2:
+    from test.test_support import EnvironmentVarGuard
+else:
+    from test.support import EnvironmentVarGuard   # pylint: disable=import-error,no-name-in-module
 
 from pavelib.utils.test.suites import BokChoyTestSuite
 
@@ -28,6 +33,7 @@ class TestPaverBokChoyCmd(unittest.TestCase):
 
         expected_statement = [
             "DEFAULT_STORE={}".format(store),
+            "SAVED_SOURCE_DIR='{}/test_root/log{}'".format(REPO_DIR, shard_str),
             "SCREENSHOT_DIR='{}/test_root/log{}'".format(REPO_DIR, shard_str),
             "BOK_CHOY_HAR_DIR='{}/test_root/log{}/hars'".format(REPO_DIR, shard_str),
             "BOKCHOY_A11Y_CUSTOM_RULES_FILE='{}/{}'".format(

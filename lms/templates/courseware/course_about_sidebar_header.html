@@ -1,7 +1,7 @@
 <%page expression_filter="h"/>
 <%namespace name='static' file='../static_content.html'/>
 <%!
-import urllib
+import six
 
 from django.utils.translation import ugettext as _
 from django.urls import reverse
@@ -33,7 +33,7 @@ from six import text_type
                 path=reverse('about_course', args=[text_type(course.id)])
             )
         ).replace(u" ", u"+")
-        tweet_action = u"http://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=urllib.quote_plus(tweet_text.encode('UTF-8')))
+        tweet_action = u"http://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=six.moves.urllib.parse.quote_plus(tweet_text.encode('UTF-8')))
 
         facebook_link = static.get_value('course_about_facebook_link', settings.PLATFORM_FACEBOOK_ACCOUNT)
 
@@ -50,8 +50,8 @@ from six import text_type
 
         email_subject = _("Take a course with {platform} online").format(platform=platform_name)
         email_link = u"mailto:?subject={subject}&body={body}".format(
-            subject=urllib.quote_plus(email_subject.encode('UTF-8')),
-            body=urllib.quote_plus(email_body.encode('UTF-8'))
+            subject=six.moves.urllib.parse.quote_plus(email_subject.encode('UTF-8')),
+            body=six.moves.urllib.parse.quote_plus(email_body.encode('UTF-8'))
         )
       %>
       <a href="${tweet_action}" class="share">

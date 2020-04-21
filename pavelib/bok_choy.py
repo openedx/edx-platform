@@ -2,7 +2,7 @@
 Run acceptance tests that use the bok-choy framework
 https://bok-choy.readthedocs.org/en/latest/
 """
-from __future__ import absolute_import, print_function
+
 
 import os
 

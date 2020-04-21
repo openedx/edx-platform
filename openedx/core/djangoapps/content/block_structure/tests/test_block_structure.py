@@ -1,7 +1,7 @@
 """
 Tests for block_structure.py
 """
-from __future__ import absolute_import
+
 
 import itertools
 # pylint: disable=protected-access
@@ -66,7 +66,7 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
 
         block_structure = BlockStructureModulestoreData(root_block_usage_key=0)
 
-        with self.assertRaisesRegexp(TransformerException, "Version attributes are not set"):
+        with self.assertRaisesRegex(TransformerException, "Version attributes are not set"):
             block_structure._add_transformer(TestNonVersionedTransformer())
 
     def test_transformer_data(self):
@@ -107,18 +107,18 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
 
         # verify transformer data
         for t_info in transformers_info:
-            self.assertEquals(
+            self.assertEqual(
                 block_structure._get_transformer_data_version(t_info.transformer),
                 MockTransformer.WRITE_VERSION
             )
             for key, val in t_info.structure_wide_data:
-                self.assertEquals(
+                self.assertEqual(
                     block_structure.get_transformer_data(t_info.transformer, key),
                     val,
                 )
             for block, block_data in six.iteritems(t_info.block_specific_data):
                 for key, val in block_data:
-                    self.assertEquals(
+                    self.assertEqual(
                         block_structure.get_transformer_block_field(block, t_info.transformer, key),
                         val,
                     )
@@ -156,7 +156,7 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
         for block in blocks:
             bs_block = block_structure[block.location]
             for field in fields:
-                self.assertEquals(
+                self.assertEqual(
                     getattr(bs_block, field, None),
                     block.field_map.get(field),
                 )
@@ -185,7 +185,7 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
         # verify values of collected fields
         bs_block = block_structure[block.location]
         for field in fields:
-            self.assertEquals(
+            self.assertEqual(
                 getattr(bs_block, field, None),
                 block.field_map.get(field),
             )
@@ -195,7 +195,7 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
             "due",
             override_due_date
         )
-        self.assertEquals(
+        self.assertEqual(
             block_structure.get_xblock_field(block.location, "due", None),
             override_due_date
         )
@@ -288,12 +288,12 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
 
         # create a new copy of the structure and verify they are equivalent
         new_copy = block_structure.copy()
-        self.assertEquals(block_structure.root_block_usage_key, new_copy.root_block_usage_key)
+        self.assertEqual(block_structure.root_block_usage_key, new_copy.root_block_usage_key)
         for block in block_structure:
             self.assertIn(block, new_copy)
-            self.assertEquals(block_structure.get_parents(block), new_copy.get_parents(block))
-            self.assertEquals(block_structure.get_children(block), new_copy.get_children(block))
-            self.assertEquals(_get_value(block_structure), _get_value(new_copy))
+            self.assertEqual(block_structure.get_parents(block), new_copy.get_parents(block))
+            self.assertEqual(block_structure.get_children(block), new_copy.get_children(block))
+            self.assertEqual(_get_value(block_structure), _get_value(new_copy))
 
         # verify edits to original block structure do not affect the copy
         block_structure.remove_block(2, keep_descendants=True)
@@ -301,8 +301,8 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
         self.assert_block_structure(new_copy, [[1], [2], [3], []])
 
         _set_value(block_structure, 'edit1')
-        self.assertEquals(_get_value(block_structure), 'edit1')
-        self.assertEquals(_get_value(new_copy), 'original_value')
+        self.assertEqual(_get_value(block_structure), 'edit1')
+        self.assertEqual(_get_value(new_copy), 'original_value')
 
         # verify edits to copy do not affect the original
         new_copy.remove_block(3, keep_descendants=True)
@@ -310,5 +310,5 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
         self.assert_block_structure(new_copy, [[1], [2], [], []], missing_blocks=[3])
 
         _set_value(new_copy, 'edit2')
-        self.assertEquals(_get_value(block_structure), 'edit1')
-        self.assertEquals(_get_value(new_copy), 'edit2')
+        self.assertEqual(_get_value(block_structure), 'edit1')
+        self.assertEqual(_get_value(new_copy), 'edit2')

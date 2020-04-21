@@ -1,30 +1,29 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
 
-import json
+import base64
 from datetime import datetime, timedelta
 
-import boto
 import ddt
 import mock
 import requests.exceptions
+import simplejson as json
 from django.conf import settings
-from django.test import TestCase
 from django.utils.timezone import now
 from freezegun import freeze_time
 from mock import patch
 from six.moves import range
-from student.tests.factories import UserFactory
-from testfixtures import LogCapture
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-from common.test.utils import MockS3Mixin
+from common.test.utils import MockS3BotoMixin
 from lms.djangoapps.verify_student.models import (
+    ManualVerification,
+    PhotoVerification,
     SoftwareSecurePhotoVerification,
     SSOVerification,
-    ManualVerification,
-    VerificationException,
+    VerificationException
 )
+from student.tests.factories import UserFactory
+from verify_student.tests import TestVerificationBase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 FAKE_SETTINGS = {
     "SOFTWARE_SECURE": {
@@ -44,6 +43,7 @@ iwIDAQAB
         "AWS_ACCESS_KEY": "FAKEACCESSKEY",
         "AWS_SECRET_KEY": "FAKESECRETKEY",
         "S3_BUCKET": "fake-bucket",
+        "CERT_VERIFICATION_PATH": False,
     },
     "DAYS_GOOD_FOR": 10,
 }
@@ -66,8 +66,8 @@ def mock_software_secure_post(url, headers=None, data=None, **kwargs):
         assert data_dict.get(key)
 
     # The keys should be stored as Base64 strings, i.e. this should not explode
-    data_dict["PhotoIDKey"].decode("base64")
-    data_dict["UserPhotoKey"].decode("base64")
+    data_dict["PhotoIDKey"] = base64.b64decode(data_dict["PhotoIDKey"])
+    data_dict["UserPhotoKey"] = base64.b64decode(data_dict["UserPhotoKey"])
 
     response = requests.Response()
     response.status_code = 200
@@ -90,44 +90,11 @@ def mock_software_secure_post_unavailable(url, headers=None, data=None, **kwargs
     raise requests.exceptions.ConnectionError
 
 
-class TestVerification(TestCase):
-    """
-    Common tests across all types of Verications (e.g., SoftwareSecurePhotoVerication, SSOVerification)
-    """
-
-    def verification_active_at_datetime(self, attempt):
-        """
-        Tests to ensure the Verification is active or inactive at the appropriate datetimes.
-        """
-        # Not active before the created date
-        before = attempt.created_at - timedelta(seconds=1)
-        self.assertFalse(attempt.active_at_datetime(before))
-
-        # Active immediately after created date
-        after_created = attempt.created_at + timedelta(seconds=1)
-        self.assertTrue(attempt.active_at_datetime(after_created))
-
-        # Active immediately before expiration date
-        expiration = attempt.created_at + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
-        before_expiration = expiration - timedelta(seconds=1)
-        self.assertTrue(attempt.active_at_datetime(before_expiration))
-
-        # Not active after the expiration date
-        attempt.created_at = attempt.created_at - timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
-        attempt.save()
-        self.assertFalse(attempt.active_at_datetime(now() + timedelta(days=1)))
-
-
 # Lots of patching to stub in our own settings, and HTTP posting
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
 @ddt.ddt
-class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
-
-    def setUp(self):
-        super(TestPhotoVerification, self).setUp()
-        connection = boto.connect_s3()
-        connection.create_bucket(FAKE_SETTINGS['SOFTWARE_SECURE']['S3_BUCKET'])
+class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTestCase):
 
     def test_state_transitions(self):
         """
@@ -143,44 +110,59 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
         """
         user = UserFactory.create()
         attempt = SoftwareSecurePhotoVerification(user=user)
-        self.assertEqual(attempt.status, "created")
+        self.assertEqual(attempt.status, PhotoVerification.STATUS.created)
 
         # These should all fail because we're in the wrong starting state.
         self.assertRaises(VerificationException, attempt.submit)
         self.assertRaises(VerificationException, attempt.approve)
         self.assertRaises(VerificationException, attempt.deny)
+        self.assertRaises(VerificationException, attempt.mark_must_retry)
+        self.assertRaises(VerificationException, attempt.mark_submit)
 
         # Now let's fill in some values so that we can pass the mark_ready() call
         attempt.mark_ready()
-        self.assertEqual(attempt.status, "ready")
+        self.assertEqual(attempt.status, PhotoVerification.STATUS.ready)
 
         # ready (can't approve or deny unless it's "submitted")
         self.assertRaises(VerificationException, attempt.approve)
         self.assertRaises(VerificationException, attempt.deny)
+        attempt.mark_must_retry()
+        attempt.mark_submit()
 
         DENY_ERROR_MSG = '[{"photoIdReasons": ["Not provided"]}]'
 
         # must_retry
-        attempt.status = "must_retry"
+        attempt.status = PhotoVerification.STATUS.must_retry
         attempt.system_error("System error")
+        attempt.mark_must_retry()  # no-op
+        attempt.mark_submit()
         attempt.approve()
-        attempt.status = "must_retry"
+
+        attempt.status = PhotoVerification.STATUS.must_retry
         attempt.deny(DENY_ERROR_MSG)
 
         # submitted
-        attempt.status = "submitted"
+        attempt.status = PhotoVerification.STATUS.submitted
         attempt.deny(DENY_ERROR_MSG)
-        attempt.status = "submitted"
+
+        attempt.status = PhotoVerification.STATUS.submitted
+        attempt.mark_must_retry()
+
+        attempt.status = PhotoVerification.STATUS.submitted
         attempt.approve()
 
         # approved
         self.assertRaises(VerificationException, attempt.submit)
+        self.assertRaises(VerificationException, attempt.mark_must_retry)
+        self.assertRaises(VerificationException, attempt.mark_submit)
         attempt.approve()  # no-op
         attempt.system_error("System error")  # no-op, something processed it without error
         attempt.deny(DENY_ERROR_MSG)
 
         # denied
         self.assertRaises(VerificationException, attempt.submit)
+        self.assertRaises(VerificationException, attempt.mark_must_retry)
+        self.assertRaises(VerificationException, attempt.mark_submit)
         attempt.deny(DENY_ERROR_MSG)  # no-op
         attempt.system_error("System error")  # no-op, something processed it without error
         attempt.approve()
@@ -203,39 +185,21 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
 
         self.assertEqual(u"Clyde \u01B4", attempt.name)
 
-    def create_and_submit(self):
-        """Helper method to create a generic submission and send it."""
-        user = UserFactory.create()
-        attempt = SoftwareSecurePhotoVerification(user=user)
-        user.profile.name = u"Rust\u01B4"
-
-        attempt.upload_face_image("Just pretend this is image data")
-        attempt.upload_photo_id_image("Hey, we're a photo ID")
-        attempt.mark_ready()
-        attempt.submit()
-
-        return attempt
-
     def test_submissions(self):
         """Test that we set our status correctly after a submission."""
         # Basic case, things go well.
-        attempt = self.create_and_submit()
-        self.assertEqual(attempt.status, "submitted")
+        attempt = self.create_upload_and_submit_attempt_for_user()
+        self.assertEqual(attempt.status, PhotoVerification.STATUS.submitted)
 
         # We post, but Software Secure doesn't like what we send for some reason
-        with patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post_error):
-            attempt = self.create_and_submit()
-            self.assertEqual(attempt.status, "must_retry")
+        with patch('lms.djangoapps.verify_student.tasks.requests.post', new=mock_software_secure_post_error):
+            attempt = self.create_upload_and_submit_attempt_for_user()
+            self.assertEqual(attempt.status, PhotoVerification.STATUS.must_retry)
 
         # We try to post, but run into an error (in this case a network connection error)
-        with patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post_unavailable):
-            with LogCapture('lms.djangoapps.verify_student.models') as logger:
-                attempt = self.create_and_submit()
-                self.assertEqual(attempt.status, "must_retry")
-                logger.check(
-                    ('lms.djangoapps.verify_student.models', 'ERROR',
-                     u'Software Secure submission failed for user %s, setting status to must_retry'
-                     % attempt.user.username))
+        with patch('lms.djangoapps.verify_student.tasks.requests.post', new=mock_software_secure_post_unavailable):
+            attempt = self.create_upload_and_submit_attempt_for_user()
+            self.assertEqual(attempt.status, PhotoVerification.STATUS.must_retry)
 
     @mock.patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_submission_while_testing_flag_is_true(self):
@@ -243,24 +207,20 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
         initial verification when the feature flag 'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'
         is enabled.
         """
-        user = UserFactory.create()
-        attempt = SoftwareSecurePhotoVerification(user=user)
-        user.profile.name = "test-user"
-
-        attempt.upload_photo_id_image("Image data")
-        attempt.mark_ready()
-        attempt.submit()
-
+        attempt = self.create_upload_and_submit_attempt_for_user()
         self.assertEqual(attempt.photo_id_key, "fake-photo-id-key")
 
     # pylint: disable=line-too-long
     def test_parse_error_msg_success(self):
         user = UserFactory.create()
         attempt = SoftwareSecurePhotoVerification(user=user)
-        attempt.status = 'denied'
+        attempt.status = PhotoVerification.STATUS.denied
         attempt.error_msg = '[{"userPhotoReasons": ["Face out of view"]}, {"photoIdReasons": ["Photo hidden/No photo", "ID name not provided"]}]'
         parsed_error_msg = attempt.parsed_error_msg()
-        self.assertEquals(parsed_error_msg, ['id_image_missing_name', 'user_image_not_clear', 'id_image_not_clear'])
+        self.assertEqual(
+            sorted(parsed_error_msg),
+            sorted(['id_image_missing_name', 'user_image_not_clear', 'id_image_not_clear'])
+        )
 
     @ddt.data(
         'Not Provided',
@@ -290,7 +250,7 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
 
         # Make an initial verification with 'photo_id_key'
         attempt = SoftwareSecurePhotoVerification(user=user, photo_id_key="dummy_photo_id_key")
-        attempt.status = 'approved'
+        attempt.status = PhotoVerification.STATUS.approved
         attempt.save()
 
         # Check that method 'get_initial_verification' returns the correct
@@ -300,7 +260,7 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
 
         # Now create a second verification without 'photo_id_key'
         attempt = SoftwareSecurePhotoVerification(user=user)
-        attempt.status = 'submitted'
+        attempt.status = PhotoVerification.STATUS.submitted
         attempt.save()
 
         # Test method 'get_initial_verification' still returns the correct
@@ -334,7 +294,7 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
 
         # Populate Record
         attempt.mark_ready()
-        attempt.status = "submitted"
+        attempt.status = PhotoVerification.STATUS.submitted
         attempt.photo_id_image_url = "https://example.com/test/image/img.jpg"
         attempt.face_image_url = "https://example.com/test/face/img.jpg"
         attempt.photo_id_key = 'there_was_an_attempt'
@@ -381,7 +341,7 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
         for _ in range(2):
             # Make an approved verification
             attempt = SoftwareSecurePhotoVerification(user=user)
-            attempt.status = 'approved'
+            attempt.status = PhotoVerification.STATUS.approved
             attempt.expiry_date = datetime.now()
             attempt.save()
 
@@ -402,7 +362,7 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
         for _ in range(2):
             # Make an approved verification
             attempt = SoftwareSecurePhotoVerification(user=user)
-            attempt.status = 'approved'
+            attempt.status = PhotoVerification.STATUS.approved
             attempt.save()
 
         # Test method 'get_recent_verification' returns None
@@ -430,7 +390,7 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
         user = UserFactory.create()
         verification = SoftwareSecurePhotoVerification(user=user)
         verification.expiry_date = now() - timedelta(days=FAKE_SETTINGS['DAYS_GOOD_FOR'])
-        verification.status = 'approved'
+        verification.status = PhotoVerification.STATUS.approved
         verification.save()
 
         self.assertIsNone(verification.expiry_email_date)
@@ -441,7 +401,7 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
         self.assertIsNotNone(result.expiry_email_date)
 
 
-class SSOVerificationTest(TestVerification):
+class SSOVerificationTest(TestVerificationBase):
     """
     Tests for the SSOVerification model
     """
@@ -452,7 +412,7 @@ class SSOVerificationTest(TestVerification):
         self.verification_active_at_datetime(attempt)
 
 
-class ManualVerificationTest(TestVerification):
+class ManualVerificationTest(TestVerificationBase):
     """
     Tests for the ManualVerification model
     """

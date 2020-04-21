@@ -1,6 +1,5 @@
 """ API v0 views. """
 
-from __future__ import absolute_import
 
 import datetime
 import json
@@ -21,7 +20,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from courseware import courses
+from lms.djangoapps.courseware import courses
 from lms.djangoapps.ccx.models import CcxFieldOverride, CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import override_field_for_ccx
 from lms.djangoapps.ccx.utils import add_master_course_staff_to_ccx, assign_staff_role_to_ccx, is_email
@@ -354,7 +353,7 @@ class CCXListView(GenericAPIView):
     """
     authentication_classes = (
         JwtAuthentication,
-        authentication.OAuth2AuthenticationAllowInactiveUser,
+        authentication.BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (IsAuthenticated, permissions.IsMasterCourseStaffInstructor)
@@ -613,7 +612,7 @@ class CCXDetailView(GenericAPIView):
 
     authentication_classes = (
         JwtAuthentication,
-        authentication.OAuth2AuthenticationAllowInactiveUser,
+        authentication.BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (IsAuthenticated, permissions.IsCourseStaffInstructor)

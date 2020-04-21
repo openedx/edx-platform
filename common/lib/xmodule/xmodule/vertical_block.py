@@ -2,7 +2,6 @@
 VerticalBlock - an XBlock which renders its children in a column.
 """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
 
 import logging
 from copy import copy
@@ -78,7 +77,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         # pylint: disable=no-member
         for child in child_blocks:
             child_block_context = copy(child_context)
-            if child in child_blocks_to_complete_on_view:
+            if child in list(child_blocks_to_complete_on_view):
                 child_block_context['wrap_xblock_data'] = {
                     'mark-completed-on-view-after-delay': complete_on_view_delay
                 }
@@ -99,6 +98,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         if view == STUDENT_VIEW:
             fragment_context.update({
                 'show_bookmark_button': child_context.get('show_bookmark_button', not is_child_of_vertical),
+                'show_title': child_context.get('show_title', True),
                 'bookmarked': child_context['bookmarked'],
                 'bookmark_id': u"{},{}".format(
                     child_context['username'], six.text_type(self.location)),  # pylint: disable=no-member

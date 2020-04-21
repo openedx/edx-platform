@@ -1,7 +1,7 @@
 """
 Helper functions for bok_choy test tasks
 """
-from __future__ import absolute_import, print_function
+
 
 import os
 import subprocess
@@ -9,7 +9,6 @@ import sys
 import time
 
 import six
-import six.moves.http_client  # pylint: disable=import-error
 from paver import tasks
 from paver.easy import cmdopts, needs, sh, task
 

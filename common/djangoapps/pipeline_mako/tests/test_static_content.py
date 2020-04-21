@@ -2,7 +2,6 @@
 Tests of pipeline_mako/templates/static_content.html
 """
 
-from __future__ import absolute_import
 
 import unittest
 

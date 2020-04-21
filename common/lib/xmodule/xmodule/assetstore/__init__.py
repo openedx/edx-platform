@@ -2,7 +2,6 @@
 Classes representing asset metadata.
 """
 
-from __future__ import absolute_import
 
 import json
 from datetime import datetime
@@ -57,12 +56,12 @@ class AssetMetadata(object):
     EXPORTED_ASSET_FILENAME = u'assets.xml'
 
     @contract(asset_id='AssetKey',
-              pathname='basestring|None', internal_name='basestring|None',
-              locked='bool|None', contenttype='basestring|None',
-              thumbnail='basestring|None', fields='dict|None',
-              curr_version='basestring|None', prev_version='basestring|None',
-              created_by='int|long|None', created_by_email='basestring|None', created_on='datetime|None',
-              edited_by='int|long|None', edited_by_email='basestring|None', edited_on='datetime|None')
+              pathname='str|None', internal_name='str|None',
+              locked='bool|None', contenttype='str|None',
+              thumbnail='str|None', fields='dict|None',
+              curr_version='str|None', prev_version='str|None',
+              created_by='int|long|None', created_by_email='str|None', created_on='datetime|None',
+              edited_by='int|long|None', edited_by_email='str|None', edited_on='datetime|None')
     def __init__(self, asset_id,
                  pathname=None, internal_name=None,
                  locked=None, contenttype=None,
@@ -306,3 +305,9 @@ class CourseAssetsFromStorage(object):
         Iterates over the items of the asset dict.
         """
         return six.iteritems(self.asset_md)
+
+    def items(self):
+        """
+        Iterates over the items of the asset dict. (Python 3 naming convention)
+        """
+        return self.iteritems()

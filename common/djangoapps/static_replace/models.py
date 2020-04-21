@@ -2,15 +2,16 @@
 Models for static_replace
 """
 
-from __future__ import absolute_import
 
 import six
 from six.moves import map
 
 from config_models.models import ConfigurationModel
 from django.db.models.fields import TextField
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class AssetBaseUrlConfig(ConfigurationModel):
     """
     Configuration for the base URL used for static assets.
@@ -23,7 +24,7 @@ class AssetBaseUrlConfig(ConfigurationModel):
 
     base_url = TextField(
         blank=True,
-        help_text="The alternative hostname to serve static assets from.  Should be in the form of hostname[:port]."
+        help_text=u"The alternative hostname to serve static assets from.  Should be in the form of hostname[:port]."
     )
 
     @classmethod
@@ -34,10 +35,11 @@ class AssetBaseUrlConfig(ConfigurationModel):
     def __repr__(self):
         return '<AssetBaseUrlConfig(base_url={})>'.format(self.get_base_url())
 
-    def __unicode__(self):
+    def __str__(self):
         return six.text_type(repr(self))
 
 
+@python_2_unicode_compatible
 class AssetExcludedExtensionsConfig(ConfigurationModel):
     """
     Configuration for the the excluded file extensions when canonicalizing static asset paths.
@@ -49,8 +51,8 @@ class AssetExcludedExtensionsConfig(ConfigurationModel):
         app_label = 'static_replace'
 
     excluded_extensions = TextField(
-        default='html',
-        help_text='The file extensions to exclude from canonicalization.  No leading period required. ' +
+        default=u'html',
+        help_text=u'The file extensions to exclude from canonicalization.  No leading period required. ' +
         'Values should be space separated i.e. "html svg css"'
     )
 
@@ -63,5 +65,5 @@ class AssetExcludedExtensionsConfig(ConfigurationModel):
     def __repr__(self):
         return '<AssetExcludedExtensionsConfig(extensions={})>'.format(self.get_excluded_extensions())
 
-    def __unicode__(self):
+    def __str__(self):
         return six.text_type(repr(self))

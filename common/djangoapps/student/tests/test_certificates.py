@@ -1,6 +1,5 @@
 """Tests for display of certificates on the student dashboard. """
 
-from __future__ import absolute_import
 
 import datetime
 import unittest
@@ -61,7 +60,7 @@ class CertificateDisplayTestBase(SharedModuleStoreTestCase):
         else:
             self.assertNotContains(response, u'Add Certificate to LinkedIn Profile')
 
-    def _create_certificate(self, enrollment_mode):
+    def _create_certificate(self, enrollment_mode, download_url=DOWNLOAD_URL):
         """Simulate that the user has a generated certificate. """
         CourseEnrollmentFactory.create(
             user=self.user,
@@ -71,7 +70,7 @@ class CertificateDisplayTestBase(SharedModuleStoreTestCase):
             user=self.user,
             course_id=self.course.id,
             mode=enrollment_mode,
-            download_url=self.DOWNLOAD_URL,
+            download_url=download_url,
             status=CertificateStatuses.downloadable,
             grade=0.98,
         )
@@ -259,9 +258,9 @@ class CertificateDisplayTestHtmlView(CertificateDisplayTestBase):
         Tests if CERTIFICATES_HTML_VIEW is True
         and course has enabled web certificates via cert_html_view_enabled setting
         and no active certificate configuration available
-        then any of the Download certificate button should not be visible.
+        then any of the web view certificate Download button should not be visible.
         """
-        self._create_certificate(enrollment_mode)
+        self._create_certificate(enrollment_mode, download_url='')
         self._check_can_not_download_certificate()
 
 

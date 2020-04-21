@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+
 
 from django.db import migrations, models
 
@@ -14,7 +14,7 @@ def add_api_access_group(apps, schema_editor):
 
     group, __ = Group.objects.get_or_create(name=API_GROUP_NAME)
     api_content_type = ContentType.objects.get_for_model(ApiAccessRequest)
-    group.permissions = Permission.objects.filter(content_type=api_content_type)
+    group.permissions.set(Permission.objects.filter(content_type=api_content_type))
     group.save()
 
 

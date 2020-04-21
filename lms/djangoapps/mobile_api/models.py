@@ -1,10 +1,11 @@
 """
 ConfigurationModel for the mobile_api djangoapp.
 """
-from __future__ import absolute_import
+
 
 from config_models.models import ConfigurationModel
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 from . import utils
 from .mobile_platform import PLATFORM_CLASSES
@@ -21,7 +22,7 @@ class MobileApiConfig(ConfigurationModel):
     """
     video_profiles = models.TextField(
         blank=True,
-        help_text="A comma-separated list of names of profiles to include for videos returned from the mobile API."
+        help_text=u"A comma-separated list of names of profiles to include for videos returned from the mobile API."
     )
 
     class Meta(object):
@@ -35,26 +36,27 @@ class MobileApiConfig(ConfigurationModel):
         return [profile.strip() for profile in cls.current().video_profiles.split(",") if profile]
 
 
+@python_2_unicode_compatible
 class AppVersionConfig(models.Model):
     """
     Configuration for mobile app versions available.
 
     .. no_pii:
     """
-    PLATFORM_CHOICES = tuple([
-        (platform, platform)
-        for platform in PLATFORM_CLASSES.keys()
-    ])
+    PLATFORM_CHOICES = tuple(
+        [(platform, platform) for platform in sorted(PLATFORM_CLASSES.keys())]
+    )
+
     platform = models.CharField(max_length=50, choices=PLATFORM_CHOICES, blank=False)
     version = models.CharField(
         max_length=50,
         blank=False,
-        help_text="Version should be in the format X.X.X.Y where X is a number and Y is alphanumeric"
+        help_text=u"Version should be in the format X.X.X.Y where X is a number and Y is alphanumeric"
     )
     major_version = models.IntegerField()
     minor_version = models.IntegerField()
     patch_version = models.IntegerField()
-    expire_at = models.DateTimeField(null=True, blank=True, verbose_name="Expiry date for platform version")
+    expire_at = models.DateTimeField(null=True, blank=True, verbose_name=u"Expiry date for platform version")
     enabled = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -64,7 +66,7 @@ class AppVersionConfig(models.Model):
         unique_together = ('platform', 'version',)
         ordering = ['-major_version', '-minor_version', '-patch_version']
 
-    def __unicode__(self):
+    def __str__(self):
         return "{}_{}".format(self.platform, self.version)
 
     @classmethod

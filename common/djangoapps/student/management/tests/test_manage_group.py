@@ -1,7 +1,7 @@
 """
 Unit tests for user_management management commands.
 """
-from __future__ import absolute_import
+
 
 import sys
 
@@ -75,7 +75,7 @@ class TestManageGroupCommand(TestCase):
             for data in TEST_DATA
             for args, exception in (
                 ((), 'too few arguments' if sys.version_info.major == 2 else 'required: group_name'),  # no group name
-                (('x' * 81,), 'invalid group name'),  # invalid group name
+                (('x' * 151,), 'invalid group name'),  # invalid group name
                 ((TEST_GROUP, 'some-other-group'), 'unrecognized arguments'),  # multiple arguments
                 ((TEST_GROUP, '--some-option', 'dummy'), 'unrecognized arguments')  # unexpected option name
             )

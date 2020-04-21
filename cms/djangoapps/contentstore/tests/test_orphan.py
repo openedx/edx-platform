@@ -1,7 +1,7 @@
 """
 Test finding orphans via the view and django config
 """
-from __future__ import absolute_import
+
 
 import json
 
@@ -93,7 +93,7 @@ class TestOrphan(TestOrphanBase):
             self.client.get(
                 orphan_url,
                 HTTP_ACCEPT='application/json'
-            ).content
+            ).content.decode('utf-8')
         )
         self.assertEqual(len(orphans), 3, u"Wrong # {}".format(orphans))
         location = course.location.replace(category='chapter', name='OrphanChapter')
@@ -119,7 +119,7 @@ class TestOrphan(TestOrphanBase):
             self.client.delete(orphan_url)
 
         orphans = json.loads(
-            self.client.get(orphan_url, HTTP_ACCEPT='application/json').content
+            self.client.get(orphan_url, HTTP_ACCEPT='application/json').content.decode('utf-8')
         )
         self.assertEqual(len(orphans), 0, u"Orphans not deleted {}".format(orphans))
 
@@ -236,7 +236,7 @@ class TestOrphan(TestOrphanBase):
         # Get parent location & verify its either of the two verticals. As both parents are non-orphan,
         # alphabetically least is returned
         html_parent = self.store.get_parent_location(html.location)
-        self.assertEquals(six.text_type(html_parent), six.text_type(vertical1.location))
+        self.assertEqual(six.text_type(html_parent), six.text_type(vertical1.location))
 
         # verify path_to_location returns a expected path
         path = path_to_location(self.store, html.location)

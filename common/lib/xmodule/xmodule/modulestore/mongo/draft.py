@@ -6,7 +6,6 @@ returns the i4x://org/course/cat/name@draft object if that exists,
 and otherwise returns i4x://org/course/cat/name).
 """
 
-from __future__ import absolute_import
 
 import logging
 
@@ -162,7 +161,7 @@ class DraftModuleStore(MongoModuleStore):
         elif revision is None:
             key = usage_key.to_deprecated_son(prefix='_id.')
             del key['_id.revision']
-            return self.collection.find(key).count() > 0
+            return self.collection.count_documents(key) > 0
         else:
             raise UnsupportedRevisionError()
 
@@ -178,7 +177,7 @@ class DraftModuleStore(MongoModuleStore):
 
         # delete all of the db records for the course
         course_query = self._course_key_to_son(course_key)
-        self.collection.remove(course_query, multi=True)
+        self.collection.delete_many(course_query)
         self.delete_all_asset_metadata(course_key, user_id)
 
         self._emit_course_deleted_signal(course_key)
@@ -448,7 +447,7 @@ class DraftModuleStore(MongoModuleStore):
             bulk_record = self._get_bulk_ops_record(location.course_key)
             bulk_record.dirty = True
             try:
-                self.collection.insert(item)
+                self.collection.insert_one(item)
             except pymongo.errors.DuplicateKeyError:
                 # prevent re-creation of DRAFT versions, unless explicitly requested to ignore
                 if not ignore_if_draft:
@@ -558,7 +557,7 @@ class DraftModuleStore(MongoModuleStore):
                 # see if other version of to-be-deleted root exists
                 query = location.to_deprecated_son(prefix='_id.')
                 del query['_id.revision']
-                if self.collection.find(query).count() > 1:
+                if self.collection.count_documents(query) > 1:
                     continue
 
             parent_block = super(DraftModuleStore, self).get_item(parent_location)
@@ -651,7 +650,7 @@ class DraftModuleStore(MongoModuleStore):
         if len(to_be_deleted) > 0:
             bulk_record = self._get_bulk_ops_record(root_usages[0].course_key)
             bulk_record.dirty = True
-            self.collection.remove({'_id': {'$in': to_be_deleted}}, safe=self.collection.safe)
+            self.collection.delete_many({'_id': {'$in': to_be_deleted}})
 
     def has_changes(self, xblock):
         """
@@ -766,7 +765,7 @@ class DraftModuleStore(MongoModuleStore):
         bulk_record = self._get_bulk_ops_record(course_key)
         if len(to_be_deleted) > 0:
             bulk_record.dirty = True
-            self.collection.remove({'_id': {'$in': to_be_deleted}})
+            self.collection.delete_many({'_id': {'$in': to_be_deleted}})
 
         self._flag_publish_event(course_key)
 
@@ -818,9 +817,10 @@ class DraftModuleStore(MongoModuleStore):
             versions_found = self.collection.find(
                 query, {'_id': True, 'definition.children': True}, sort=[SORT_REVISION_FAVOR_DRAFT]
             )
+            versions_found = list(versions_found)
             # If 2 versions versions exist, we can assume one is a published version. Go ahead and do the delete
             # of the draft version.
-            if versions_found.count() > 1:
+            if len(versions_found) > 1:
                 # Moving a child from published parent creates a draft of the parent and moved child.
                 published_version = [
                     version
@@ -831,7 +831,7 @@ class DraftModuleStore(MongoModuleStore):
                     # This change makes sure that parents are updated too i.e. an item will have only one parent.
                     self.update_parent_if_moved(root_location, published_version[0], delete_draft_only, user_id)
                 self._delete_subtree(root_location, [as_draft], draft_only=True)
-            elif versions_found.count() == 1:
+            elif len(versions_found) == 1:
                 # Since this method cannot be called on something in DIRECT_ONLY_CATEGORIES and we call
                 # delete_subtree as soon as we find an item with a draft version, if there is only 1 version
                 # it must be published (since adding a child to a published item creates a draft of the parent).

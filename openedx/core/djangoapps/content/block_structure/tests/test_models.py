@@ -2,8 +2,9 @@
 Unit tests for Block Structure models.
 """
 # pylint: disable=protected-access
-from __future__ import absolute_import
 
+
+import errno
 from itertools import product
 from uuid import uuid4
 
@@ -45,7 +46,7 @@ class BlockStructureModelTestCase(TestCase):
         for field_name, field_value in six.iteritems(self.params):
             self.assertEqual(field_value, getattr(bsm, field_name))
 
-        self.assertEqual(bsm.get_serialized_data(), expected_serialized_data)
+        self.assertEqual(bsm.get_serialized_data().decode('utf-8'), expected_serialized_data)
         self.assertIn(_directory_name(self.usage_key), bsm.data.name)
 
     def _assert_file_count_equal(self, expected_count):
@@ -147,19 +148,23 @@ class BlockStructureModelTestCase(TestCase):
             self._assert_file_count_equal(min(num_prior_edits + 1, prune_keep_count))
 
     @ddt.data(
-        (IOError, BlockStructureNotFound, True),
-        (IOError, IOError, False),
-        (SuspiciousOperation, BlockStructureNotFound, True),
-        (SuspiciousOperation, SuspiciousOperation, False),
-        (OSError, OSError, True),
-        (OSError, OSError, False),
+        (IOError, errno.ENOENT, u'No such file or directory', BlockStructureNotFound, True),
+        (IOError, errno.ENOENT, u'No such file or directory', IOError, False),
+        (SuspiciousOperation, None, None, BlockStructureNotFound, True),
+        (SuspiciousOperation, None, None, SuspiciousOperation, False),
+        (OSError, errno.EACCES, u'Permission denied', OSError, True),
+        (OSError, errno.EACCES, u'Permission denied', OSError, False),
     )
     @ddt.unpack
-    def test_error_handling(self, error_raised_in_operation, expected_error_raised, is_read_operation):
+    def test_error_handling(self, error_raised_in_operation, errno_raised, message_raised,
+                            expected_error_raised, is_read_operation):
         bs_model, _ = BlockStructureModel.update_or_create('test data', **self.params)
         with self.assertRaises(expected_error_raised):
             with _storage_error_handling(bs_model, 'operation', is_read_operation):
-                raise error_raised_in_operation
+                if errno_raised is not None:
+                    raise error_raised_in_operation(errno_raised, message_raised)
+                else:
+                    raise error_raised_in_operation
 
     @patch('openedx.core.djangoapps.content.block_structure.models.log')
     def test_old_mongo_keys(self, mock_log):

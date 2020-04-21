@@ -53,7 +53,7 @@ Representation:
         *** 'original_version': definition_id of the root of the previous version relation on this
         definition. Acts as a pseudo-object identifier.
 """
-from __future__ import absolute_import
+
 
 import copy
 import datetime
@@ -61,7 +61,6 @@ import hashlib
 import logging
 from collections import defaultdict
 from importlib import import_module
-from types import NoneType
 
 import six
 from bson.objectid import ObjectId
@@ -101,6 +100,7 @@ from xmodule.modulestore.exceptions import (
     DuplicateItemError,
     InsufficientSpecificationError,
     MultipleCourseBlocksFound,
+    MultipleLibraryBlocksFound,
     VersionConflictError
 )
 from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
@@ -752,12 +752,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         self.db_connection.close_connections()
 
-    def mongo_wire_version(self):
-        """
-        Returns the wire version for mongo. Only used to unit tests which instrument the connection.
-        """
-        return self.db_connection.mongo_wire_version
-
     def _drop_database(self, database=True, collections=True, connections=True):
         """
         A destructive operation to drop the underlying database and close all connections.
@@ -983,7 +977,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         return version_guids, id_version_map
 
     def _get_structures_for_branch_and_locator(self, branch, locator_factory, **kwargs):
-
         """
         Internal generator for fetching lists of courses, libraries, etc.
         :param str branch: Branch to fetch structures from
@@ -1554,7 +1547,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             next_versions = [struct for struct in next_entries]
             for course_structure in next_versions:
                 result.setdefault(course_structure['previous_version'], []).append(
-                    CourseLocator(version_guid=struct['_id']))
+                    CourseLocator(version_guid=next_entries[-1]['_id']))
         return VersionTree(course_locator, result)
 
     def get_block_generations(self, block_locator):
@@ -2108,7 +2101,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         Broke out guts of update_item for short-circuited internal use only
         """
         with self.bulk_operations(course_key):
-            if allow_not_found and isinstance(block_key.id, (LocalId, NoneType)):
+            if allow_not_found and isinstance(block_key.id, (LocalId, type(None))):
                 fields = {}
                 for subfields in six.itervalues(partitioned_fields):
                     fields.update(subfields)
@@ -2598,7 +2591,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 block_key.id,
                 new_parent_block_key.id,
             )
-            new_block_id = hashlib.sha1(unique_data).hexdigest()[:20]
+            new_block_id = hashlib.sha1(unique_data.encode('utf-8')).hexdigest()[:20]
             new_block_key = BlockKey(block_key.type, new_block_id)
 
             # Now clone block_key to new_block_key:

@@ -1,7 +1,6 @@
 """Helper functions to get data from APIs"""
-from __future__ import unicode_literals
 
-from __future__ import absolute_import
+
 import logging
 
 from django.core.cache import cache
@@ -56,11 +55,17 @@ def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=No
 
         cached = cache.get(cache_key)
         if cached:
-            cached_response = zunpickle(cached)
-            if fields:
-                cached_response = get_fields(fields, cached_response)
+            try:
+                cached_response = zunpickle(cached)
+            except Exception:  # pylint: disable=broad-except
+                # Data is corrupt in some way.
+                log.warning("Data for cache is corrupt for cache key %s", cache_key)
+                cache.delete(cache_key)
+            else:
+                if fields:
+                    cached_response = get_fields(fields, cached_response)
 
-            return cached_response
+                return cached_response
 
     try:
         endpoint = getattr(api, resource)

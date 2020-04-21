@@ -48,7 +48,7 @@ class CourseEnrollView extends Backbone.View {
   handleEnroll() {
     // Enrollment click event handled here
     if (this.model.get('is_mobile_only') !== true) {
-      const courseRunKey = $('.run-select').val() || this.model.get('course_run_key');
+      const courseRunKey = this.$el.find('.run-select').val() || this.model.get('course_run_key');
       this.model.updateCourseRun(courseRunKey);
       if (this.model.get('is_enrolled')) {
         // Create the enrollment.

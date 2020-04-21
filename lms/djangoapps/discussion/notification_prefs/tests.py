@@ -1,8 +1,9 @@
 # pylint: disable=missing-docstring,consider-iterating-dictionary
-from __future__ import absolute_import
+
 
 import json
 
+import six
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
@@ -27,7 +28,7 @@ from util.testing import UrlResetMixin
 
 @override_settings(SECRET_KEY="test secret key")
 class NotificationPrefViewTest(UrlResetMixin, TestCase):
-    INITIALIZATION_VECTOR = "\x00" * 16
+    INITIALIZATION_VECTOR = b"\x00" * 16
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -52,7 +53,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):
     def create_prefs(self):
         """Create all test preferences in the database"""
         for (user, token) in self.tokens.items():
-            UserPreference.objects.create(user=user, key=NOTIFICATION_PREF_KEY, value=token)
+            UserPreference.objects.get_or_create(user=user, key=NOTIFICATION_PREF_KEY, value=token)
 
     def assertPrefValid(self, user):
         """Ensure that the correct preference for the user is persisted"""
@@ -61,7 +62,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):
         # now coerce username to utf-8 encoded str, since we test with non-ascii unicdoe above and
         # the unittest framework has hard time coercing to unicode.
         # decrypt also can't take a unicode input, so coerce its input to str
-        self.assertEqual(str(user.username.encode('utf-8')), UsernameCipher().decrypt(str(pref.value)))
+        self.assertEqual(six.binary_type(user.username.encode('utf-8')), UsernameCipher().decrypt(str(pref.value)))
 
     def assertNotPrefExists(self, user):
         """Ensure that the user does not have a persisted preference"""
@@ -76,7 +77,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):
         request.user = self.user
         response = ajax_status(request)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content), {"status": 0})
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {"status": 0})
 
     def test_ajax_status_get_1(self):
         self.create_prefs()
@@ -84,7 +85,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):
         request.user = self.user
         response = ajax_status(request)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content), {"status": 1})
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {"status": 1})
 
     def test_ajax_status_post(self):
         request = self.request_factory.post("dummy")
@@ -188,7 +189,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):
     def test_unsubscribe_invalid_token(self):
         def test_invalid_token(token, message):
             request = self.request_factory.get("dummy")
-            self.assertRaisesRegexp(Http404, "^{}$".format(message), set_subscription, request, token, False)
+            self.assertRaisesRegex(Http404, "^{}$".format(message), set_subscription, request, token, False)
 
         # Invalid base64 encoding
         test_invalid_token("ZOMG INVALID BASE64 CHARS!!!", "base64url")
