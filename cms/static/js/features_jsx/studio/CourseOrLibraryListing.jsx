@@ -3,10 +3,6 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-<<<<<<< HEAD
-import { Modal, Button } from '@edx/paragon/src';
-=======
->>>>>>> abf6cc1967... removed modal and used js confirm popup
 
 export function CourseOrLibraryListing(props) {
     const handleArchiveConfirmation = event => {
