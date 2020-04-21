@@ -52,9 +52,8 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
   }
 
   failedSubmission(error) {
-    const { status } = error;
-    const title = status === 403 ? gettext('Password is incorrect') : gettext('Unable to delete account');
-    const body = status === 403 ? gettext('Please re-enter your password.') : gettext('Sorry, there was an error trying to process your request. Please try again later.');
+    const title = error.message === '403' ? gettext('Password is incorrect') : gettext('Unable to delete account');
+    const body = error.message === '403' ? gettext('Please re-enter your password.') : gettext('Sorry, there was an error trying to process your request. Please try again later.');
 
     this.setState({
       passwordSubmitted: false,
