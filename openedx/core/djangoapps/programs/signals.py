@@ -134,7 +134,7 @@ def handle_course_cert_changed(sender, user, course_key, mode, status, **kwargs)
 
 
 @receiver(COURSE_CERT_REVOKED)
-def handle_course_cert_revoked(sender, user, course_key, mode, status, **kwargs):
+def handle_course_cert_revoked(sender, user, course_key, mode, status, **kwargs):  # pylint: disable=unused-argument
     """
     If programs is enabled and a learner's course certificate is revoked,
     schedule a celery task to revoke any related program certificates.
@@ -143,9 +143,9 @@ def handle_course_cert_revoked(sender, user, course_key, mode, status, **kwargs)
         sender:
             class of the object instance that sent this signal
         user:
-            django.contrib.auth.User - the user to whom a cert was awarded
+            django.contrib.auth.User - the user for which a cert was revoked
         course_key:
-            refers to the course run for which the cert was awarded
+            refers to the course run for which the cert was revoked
         mode:
             mode / certificate type, e.g. "verified"
         status:
@@ -164,7 +164,7 @@ def handle_course_cert_revoked(sender, user, course_key, mode, status, **kwargs)
         return
 
     # schedule background task to process
-    LOGGER.debug(
+    LOGGER.info(
         u'handling COURSE_CERT_REVOKED: username=%s, course_key=%s, mode=%s, status=%s',
         user,
         course_key,

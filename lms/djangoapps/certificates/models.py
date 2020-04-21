@@ -371,12 +371,12 @@ class GeneratedCertificate(models.Model):
         self.status = CertificateStatuses.unavailable
         self.save()
         COURSE_CERT_REVOKED.send_robust(
-                sender=self.__class__,
-                user=self.user,
-                course_key=self.course_id,
-                mode=self.mode,
-                status=self.status,
-            )
+            sender=self.__class__,
+            user=self.user,
+            course_key=self.course_id,
+            mode=self.mode,
+            status=self.status,
+        )
 
     def mark_notpassing(self, grade):
         """
