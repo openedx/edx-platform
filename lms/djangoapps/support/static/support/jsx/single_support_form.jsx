@@ -5,6 +5,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { StatusAlert } from '@edx/paragon';
 
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 
@@ -148,6 +149,24 @@ class RenderForm extends React.Component {
 
     return (
       <div className="contact-us-wrapper">
+
+        <StatusAlert
+          alertType="info"
+          open
+          dialog={(
+            <div>
+              <span>Due to the recent increase in interest in online education and edX, we are currently experiencing an unusually high volume of support requests. We appreciate your patience as we work to review each request. Please check the </span>
+              <a
+                href="https://support.edx.org/hc/en-us"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Help Center
+              </a>
+              <span> as many questions may have already been answered.</span>
+            </div>
+          )}
+        />
 
         <div className="row">
           <div className="col-sm-12">
