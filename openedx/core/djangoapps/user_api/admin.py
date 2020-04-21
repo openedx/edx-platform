@@ -115,7 +115,6 @@ class UserRetirementStatusAdmin(admin.ModelAdmin):
             return format_html('')
 
     retirement_actions.short_description = _('Actions')
-    retirement_actions.allow_tags = True
 
     def get_actions(self, request):
         """

@@ -7,11 +7,11 @@ from django import forms
 from django.contrib import admin
 from django.db.models import F
 from django.urls import reverse
+from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangolib.markup import HTML
 
 from . import models
 
@@ -151,23 +151,23 @@ class ScheduleAdmin(admin.ModelAdmin):
     experience_display.short_descriptions = _('Experience')
 
     def username(self, obj):
-        return HTML('<a href="{}">{}</a>').format(
+        return format_html(
+            '<a href="{}">{}</a>',
             reverse("admin:auth_user_change", args=(obj.enrollment.user.id,)),
             obj.enrollment.user.username
         )
 
-    username.allow_tags = True
     username.short_description = _('Username')
 
     def course_id(self, obj):
-        return HTML('<a href="{}">{}</a>').format(
+        return format_html(
+            '<a href="{}">{}</a>',
             reverse("admin:course_overviews_courseoverview_change", args=(
                 obj.enrollment.course_id,
             )),
             obj.enrollment.course_id
         )
 
-    course_id.allow_tags = True
     course_id.short_description = _('Course ID')
 
     def get_queryset(self, request):
