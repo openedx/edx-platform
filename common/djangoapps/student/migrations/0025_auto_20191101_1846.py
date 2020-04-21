@@ -26,6 +26,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('student', '0024_fbeenrollmentexclusion'),
+        ('experiments', '0001_initial'),
     ]
 
     operations = [
