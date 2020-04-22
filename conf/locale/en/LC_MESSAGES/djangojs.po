@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-19 20:50+0000\n"
-"PO-Revision-Date: 2020-04-19 20:50:19.017884\n"
+"POT-Creation-Date: 2020-04-22 08:07+0000\n"
+"PO-Revision-Date: 2020-04-22 08:07:28.791917\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -2357,8 +2357,8 @@ msgid "Not specific to a course"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
+#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
+msgid "Topic"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
@@ -2432,8 +2432,7 @@ msgid "The more you tell us, the more quickly and helpfully we can respond!"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
+msgid "Create Support Ticket"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
@@ -2452,7 +2451,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Select a subject for your support request."
+msgid "Select a topic for your support request."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -2481,7 +2480,9 @@ msgid "Go to {platform} Home"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid "Thank you for submitting a request!"
+msgid ""
+"Thank you for submitting a request! We appreciate your patience while we "
+"work to review your request."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
@@ -2809,10 +2810,6 @@ msgid "{team_count} Team"
 msgid_plural "{team_count} Teams"
 msgstr[0] ""
 msgstr[1] ""
-
-#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "Topic"
-msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the {topic_name} Topic"
@@ -4125,6 +4122,10 @@ msgstr ""
 msgid ""
 "An error occurred retrieving your email. Please try again later, and contact"
 " technical support if the problem persists."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/util.js
@@ -7206,7 +7207,7 @@ msgstr ""
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
 "The following information is already a part of your {platform} profile. "
-"We\\'ve included it here for your application."
+"We've included it here for your application."
 msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
@@ -8228,6 +8229,10 @@ msgid ""
 "send it to our authorization service for review. Your photo and information "
 "are not saved or visible anywhere on %(platformName)s after the verification"
 " process is complete."
+msgstr ""
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
 msgstr ""
 
 #: lms/templates/verify_student/intro_step.underscore
