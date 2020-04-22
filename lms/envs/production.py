@@ -45,6 +45,22 @@ def get_env_setting(setting):
         error_msg = u"Set the %s env variable" % setting
         raise ImproperlyConfigured(error_msg)
 
+################################ ALWAYS THE SAME ##############################
+
+DEBUG = False
+DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = False
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+
+# IMPORTANT: With this enabled, the server must always be behind a proxy that
+# strips the header HTTP_X_FORWARDED_PROTO from client requests. Otherwise,
+# a user can fool our server into thinking it was an https connection.
+# See
+# https://docs.djangoproject.com/en/dev/ref/settings/#secure-proxy-ssl-header
+# for other warnings.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+################################ END ALWAYS THE SAME ##############################
+
 # A file path to a YAML file from which to load all the configuration for the edx platform
 CONFIG_FILE = get_env_setting('LMS_CFG')
 
@@ -101,22 +117,6 @@ CONFIG_ROOT = path(os.environ.get('CONFIG_ROOT', ENV_ROOT))
 # based on the service variant. If no variant is use, don't use a
 # prefix.
 CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
-
-################################ ALWAYS THE SAME ##############################
-
-DEBUG = False
-DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = False
-
-EMAIL_BACKEND = 'django_ses.SESBackend'
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-
-# IMPORTANT: With this enabled, the server must always be behind a proxy that
-# strips the header HTTP_X_FORWARDED_PROTO from client requests. Otherwise,
-# a user can fool our server into thinking it was an https connection.
-# See
-# https://docs.djangoproject.com/en/dev/ref/settings/#secure-proxy-ssl-header
-# for other warnings.
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 ###################################### CELERY  ################################
 
