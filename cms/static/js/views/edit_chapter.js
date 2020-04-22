@@ -59,8 +59,8 @@ define(['underscore', 'jquery', 'gettext', 'edx-ui-toolkit/js/utils/html-utils',
                     asset_path: this.$('input.chapter-asset-path').val()
                 });
                 var msg = new FileUploadModel({
-                    title: _.template(gettext('Upload a new PDF to “<%= name %>”'))(
-                        {name: course.escape('name')}),
+                    title: _.template(gettext('Upload a new PDF to “<%- name %>”'))(
+                        {name: course.get('name')}),
                     message: gettext('Please select a PDF file to upload.'),
                     mimeTypes: ['application/pdf']
                 });
