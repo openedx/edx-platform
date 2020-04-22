@@ -1670,7 +1670,6 @@
     "The following email addresses and/or usernames are invalid:": "\u4ee5\u4e0b\u90ae\u7bb1/\u7528\u6237\u540d\u65e0\u6548\uff1a",
     "The following errors were generated:": "\u51fa\u73b0\u4ee5\u4e0b\u9519\u8bef\uff1a",
     "The following file types are not allowed: ": "\u4e0b\u5217\u6587\u4ef6\u7c7b\u578b\u4e0d\u53ef\u7528\uff1a",
-    "The following information is already a part of your {platform} profile. We\\'ve included it here for your application.": "\u4ee5\u4e0b\u4fe1\u606f\u5df2\u7ecf\u662f\u60a8\u7684 {platform} \u7b80\u8ff0\u7684\u4e00\u90e8\u5206\u3002\u6211\u4eec\u5df2\u5c06\u5176\u5217\u5165\u60a8\u7684\u7533\u8bf7\u4e2d\u3002",
     "The following message will be displayed at the bottom of the courseware pages within your course:": "\u4ee5\u4e0b\u4fe1\u606f\u5c06\u4f1a\u5728\u60a8\u8bfe\u7a0b\u7684\u8bfe\u4ef6\u9875\u9762\u5e95\u90e8\u663e\u793a\uff1a",
     "The following options are available for the {license_name} license.": "\u4ee5\u4e0b\u4e3a {license_name}\u8bb8\u53ef\u7684\u53ef\u7528\u9009\u9879",
     "The following users are no longer enrolled in the course:": "\u4ee5\u4e0b\u7528\u6237\u5df2\u4e0d\u518d\u9009\u4fee\u672c\u8bfe\u7a0b\uff1a",

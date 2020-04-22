@@ -1463,7 +1463,6 @@
     "The following email addresses and/or usernames are invalid:": "Les adresses email et/ou noms d'utilisateurs suivants sont invalides :",
     "The following errors were generated:": "Les erreurs suivantes ont \u00e9t\u00e9 g\u00e9n\u00e9r\u00e9es:",
     "The following file types are not allowed: ": "Les types de fichiers suivants ne sont pas support\u00e9s :",
-    "The following information is already a part of your {platform} profile. We\\'ve included it here for your application.": "L'information suivante fait d\u00e9j\u00e0 partie de votre profil {platform}. Nous l\\'avons inclus ici pour votre demander.",
     "The following message will be displayed at the bottom of the courseware pages within your course:": "Le message suivant sera affich\u00e9 au bas des pages du cours :",
     "The following options are available for the {license_name} license.": "Les options suivantes sont disponibles pour la licence {license_name}",
     "The following users are no longer enrolled in the course:": "Les utilisateurs suivants ont \u00e9t\u00e9 d\u00e9sinscrits du cours\u00a0:",

@@ -71,7 +71,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-19 20:42+0000\n"
+"POT-Creation-Date: 2020-04-22 10:05+0000\n"
 "PO-Revision-Date: 2019-09-29 20:43+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Swahili (Kenya) (http://www.transifex.com/open-edx/edx-platform/language/sw_KE/)\n"
@@ -2360,9 +2360,9 @@ msgid "Not specific to a course"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr ""
+#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
+msgid "Topic"
+msgstr "Mada"
 
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
@@ -2432,9 +2432,9 @@ msgstr ""
 msgid "The more you tell us, the more quickly and helpfully we can respond!"
 msgstr ""
 
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr "Wasilisha "
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Create Support Ticket"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
@@ -2452,7 +2452,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Select a subject for your support request."
+msgid "Select a topic for your support request."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -2481,7 +2481,9 @@ msgid "Go to {platform} Home"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid "Thank you for submitting a request!"
+msgid ""
+"Thank you for submitting a request! We appreciate your patience while we "
+"work to review your request."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
@@ -2821,10 +2823,6 @@ msgid "{team_count} Team"
 msgid_plural "{team_count} Teams"
 msgstr[0] ""
 msgstr[1] ""
-
-#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "Topic"
-msgstr "Mada"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the {topic_name} Topic"
@@ -4226,6 +4224,10 @@ msgstr ""
 msgid ""
 "An error occurred retrieving your email. Please try again later, and contact"
 " technical support if the problem persists."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/util.js
@@ -7355,7 +7357,7 @@ msgstr "Kuhusu Wewe"
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
 "The following information is already a part of your {platform} profile. "
-"We\\'ve included it here for your application."
+"We've included it here for your application."
 msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
@@ -8413,6 +8415,10 @@ msgstr ""
 "kuificha picha yako na kuituma kwenye huduma yetu ya kuidhinisha kwa ajili "
 "ya kuikagua Picha yako na taarifa hazihifadhiwi au kuonekana popote kwenye "
 "%(platformName)s baada ya shughuli za uhakiki kukamilika."
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
+msgstr "Wasilisha "
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: {courseName}"

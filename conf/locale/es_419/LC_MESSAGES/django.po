@@ -50,7 +50,7 @@
 # Matt Tuchfarber <matt@tuchfarber.com>, 2018
 # Miguel Bonilla <mbonilla@edx.org>, 2018
 # MarnyLopez, 2014
-# Muhammad Adeel Khan <adeel@edx.org>, 2019
+# Muhammad Adeel Khan <adeel@edx.org>, 2019-2020
 # Natalia, 2013
 # Natalia, 2013-2014,2018
 # Ned Batchelder <ned@edx.org>, 2016
@@ -254,7 +254,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-19 20:42+0000\n"
+"POT-Creation-Date: 2020-04-22 10:05+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -6829,7 +6829,7 @@ msgstr "Ingresos anuales en tu hogar"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Use between 1250 and 2500 characters or so in your response."
-msgstr ""
+msgstr "Use entre 1250 y 2500 caracteres más o menos en su respuesta"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
@@ -13643,6 +13643,12 @@ msgstr "Transcripción en progreso"
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Transcript Ready"
 msgstr "Transcripción lista"
+
+#. Translators: This is the status for a video whose transcription job was
+#. failed for some languages
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Partial Failure"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "An image file is required."

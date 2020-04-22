@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-22 08:07+0000\n"
-"PO-Revision-Date: 2020-04-22 08:07:29.065302\n"
+"POT-Creation-Date: 2020-04-22 12:48+0000\n"
+"PO-Revision-Date: 2020-04-22 12:48:34.459985\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -11927,6 +11927,12 @@ msgstr ""
 #. Translators: This is the status for a video whose transcription is complete
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Transcript Ready"
+msgstr ""
+
+#. Translators: This is the status for a video whose transcription job was
+#. failed for some languages
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Partial Failure"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/videos.py

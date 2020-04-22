@@ -786,7 +786,6 @@
     "The following email addresses and/or usernames are invalid:": "Os seguintes endere\u00e7os de email e/ou nomes de usu\u00e1rio s\u00e3o inv\u00e1lidos:",
     "The following errors were generated:": "Os seguintes erros foram gerados:",
     "The following file types are not allowed: ": "Os seguintes tipos de arquivos n\u00e3o s\u00e3o permitidos:",
-    "The following information is already a part of your {platform} profile. We\\'ve included it here for your application.": "As informa\u00e7\u00f5es a seguir j\u00e1 fazem parte do seu perfil {platform}. N\u00f3s as inclu\u00edmos aqui para seu pedido.",
     "The following message will be displayed at the bottom of the courseware pages within your course:": "A mensagem a seguir ser\u00e1 exibida na parte inferior das p\u00e1ginas do seu curso:",
     "The following options are available for the {license_name} license.": "As seguintes op\u00e7\u00f5es est\u00e3o dispon\u00edveis para a licen\u00e7a {license_name}.",
     "The following users are no longer enrolled in the course:": "Os seguintes usu\u00e1rios n\u00e3o est\u00e3o mais inscritos no curso:",

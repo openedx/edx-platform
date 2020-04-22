@@ -936,7 +936,6 @@
     "Select a group type": "Aukeratu talde-mota",
     "Select a section or problem": "Aukeratu atala edo ariketa",
     "Select a session:": "Aukeratu saioa:",
-    "Select a subject for your support request.": "Aukeratu laguntza-eskaeraren gaia.",
     "Select all": "Aukeratu guztiak",
     "Select language": "Aukeratu hizkuntza",
     "Select one or more groups:": "Aukera talde bat edo gehiago:",

@@ -107,7 +107,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-19 20:42+0000\n"
+"POT-Creation-Date: 2020-04-22 10:05+0000\n"
 "PO-Revision-Date: 2020-02-20 16:22+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
@@ -2502,8 +2502,8 @@ msgid "Not specific to a course"
 msgstr "Bir derse özel değil"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
+#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
+msgid "Topic"
 msgstr "Konu"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
@@ -2579,9 +2579,8 @@ msgstr ""
 "şekilde cevap verebiliriz!"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr "Gönder"
+msgid "Create Support Ticket"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
@@ -2605,8 +2604,8 @@ msgstr ""
 "belirtin."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Select a subject for your support request."
-msgstr "Destek talebiniz için bir konu seçin."
+msgid "Select a topic for your support request."
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
@@ -2635,7 +2634,9 @@ msgid "Go to {platform} Home"
 msgstr "{platform} Anasayfasına Git"
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid "Thank you for submitting a request!"
+msgid ""
+"Thank you for submitting a request! We appreciate your patience while we "
+"work to review your request."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
@@ -2978,10 +2979,6 @@ msgid "{team_count} Team"
 msgid_plural "{team_count} Teams"
 msgstr[0] "{team_count} Takım"
 msgstr[1] "{team_count} Takım"
-
-#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "Topic"
-msgstr "Konu"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the {topic_name} Topic"
@@ -4414,6 +4411,10 @@ msgid ""
 msgstr ""
 "E-posta adresinizi alırken bir hata oluştu. Lütfen daha sonra tekrar "
 "deneyiniz, ve eğer problem devam ederse teknik destek ile iletişime geçiniz."
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
+msgstr "Konu"
 
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By"
@@ -7692,10 +7693,8 @@ msgstr "Hakkınızda"
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
 "The following information is already a part of your {platform} profile. "
-"We\\'ve included it here for your application."
+"We've included it here for your application."
 msgstr ""
-"Aşağıdaki bilgiler profilinizde mevcut {platform} bulunuyor. Başvurunuz için"
-" buraya ekledik."
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Email address"
@@ -8766,6 +8765,10 @@ msgstr ""
 "göndermek için uygun olan en yüksek seviyede güvenliği kullanıyoruz. "
 "Fotoğrafınız ve bilgileriniz kaydedilmez ve doğrulama süreci tamamlandıktan "
 "sonra %(platformName)s üzerinde hiçbir yerde görülmez."
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
+msgstr "Gönder"
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: {courseName}"
