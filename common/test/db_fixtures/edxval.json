@@ -1,41 +1,6 @@
 [
   {
     "pk": 1,
-    "model": "edxval.profile",
-    "fields": {
-      "profile_name": "desktop_mp4"
-    }
-  },
-  {
-    "pk": 2,
-    "model": "edxval.profile",
-    "fields": {
-      "profile_name": "desktop_webm"
-    }
-  },
-  {
-    "pk": 3,
-    "model": "edxval.profile",
-    "fields": {
-      "profile_name": "mobile_high"
-    }
-  },
-  {
-    "pk": 4,
-    "model": "edxval.profile",
-    "fields": {
-      "profile_name": "mobile_low"
-    }
-  },
-  {
-    "pk": 5,
-    "model": "edxval.profile",
-    "fields": {
-      "profile_name": "youtube"
-    }
-  },
-  {
-    "pk": 1,
     "model": "edxval.video",
     "fields": {
       "duration": 20.6,
@@ -49,7 +14,7 @@
     "pk": 1,
     "model": "edxval.encodedvideo",
     "fields": {
-      "profile": 3,
+      "profile": 5,
       "created": "2015-07-30T10:14:50Z",
       "url": "http://localhost:8777/intro.mp4",
       "modified": "2015-07-30T10:14:50Z",
@@ -62,7 +27,7 @@
     "pk": 2,
     "model": "edxval.encodedvideo",
     "fields": {
-      "profile": 4,
+      "profile": 6,
       "created": "2015-07-30T10:14:50Z",
       "url": "http://localhost:8777/intro.mp4",
       "modified": "2015-07-30T10:14:50Z",
@@ -75,7 +40,7 @@
     "pk": 3,
     "model": "edxval.encodedvideo",
     "fields": {
-      "profile": 1,
+      "profile": 3,
       "created": "2015-07-30T10:14:50Z",
       "url": "http://localhost:8777/intro.mp4",
       "modified": "2015-07-30T10:14:50Z",
@@ -88,7 +53,7 @@
     "pk": 4,
     "model": "edxval.encodedvideo",
     "fields": {
-      "profile": 2,
+      "profile": 4,
       "created": "2015-07-30T10:14:50Z",
       "url": "http://localhost:8777/intro.webm",
       "modified": "2015-07-30T10:14:50Z",
@@ -101,7 +66,7 @@
     "pk": 5,
     "model": "edxval.encodedvideo",
     "fields": {
-      "profile": 5,
+      "profile": 7,
       "created": "2015-07-30T10:14:50Z",
       "url": "zeYD3qMxKrI",
       "modified": "2015-07-30T10:14:50Z",
