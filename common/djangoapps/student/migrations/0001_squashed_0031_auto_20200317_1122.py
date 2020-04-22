@@ -516,4 +516,10 @@ class Migration(migrations.Migration):
                 'abstract': False,
             },
         ),
+        migrations.AlterField(
+            model_name='courseenrollment',
+            name='course',
+            field=models.ForeignKey(db_constraint=False, on_delete=django.db.models.deletion.DO_NOTHING,
+                                    to='course_overviews.CourseOverview'),
+        ),
     ]
