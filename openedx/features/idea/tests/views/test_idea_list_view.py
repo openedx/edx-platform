@@ -1,9 +1,8 @@
-from django.contrib.sites.models import Site
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 
-from openedx.core.djangoapps.theming.models import SiteTheme
+from openedx.core.djangolib.testing.philu_utils import configure_philu_theme
 from openedx.features.idea.views import IdeaListingView
 
 
@@ -12,10 +11,7 @@ class IdeaListingViewTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super(IdeaListingViewTest, cls).setUpClass()
-        site = Site(domain='testserver', name='test')
-        site.save()
-        theme = SiteTheme(site=site, theme_dir_name='philu')
-        theme.save()
+        configure_philu_theme()
 
     def test_idea_list_view(self):
         response = self.client.get(reverse('idea-listing'))
