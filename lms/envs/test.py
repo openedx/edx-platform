@@ -193,11 +193,6 @@ DATABASES = {
     },
 }
 
-# if os.environ.get('DISABLE_MIGRATIONS'):
-#     # Create tables directly from apps' models. This can be removed once we upgrade
-#     # to Django 1.9, which allows setting MIGRATION_MODULES to None in order to skip migrations.
-#     MIGRATION_MODULES = NoOpMigrationModules()
-
 CACHES = {
     # This is the cache used for most things.
     # In staging/prod envs, the sessions also live here.

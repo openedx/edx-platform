@@ -161,6 +161,10 @@ against a database created by applying the migrations instead, use the
 
     paver test_system -s lms --enable-migrations
 
+To see the migration output, use::
+
+    paver test_system -s lms --enable-migrations --verbose --disable_capture
+
 To run a single django test class use this command::
 
     paver test_system -t lms/djangoapps/courseware/tests/tests.py::ActivateLoginTest

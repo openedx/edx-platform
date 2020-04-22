@@ -126,8 +126,8 @@ class SystemTestSuite(PytestSuite):
         self.eval_attr = kwargs.get('eval_attr', None)
         self.test_id = kwargs.get('test_id', self._default_test_id)
         self.fasttest = kwargs.get('fasttest', False)
-
-        self.processes = 0
+        self.disable_migrations = kwargs.get('disable_migrations', True)
+        self.processes = kwargs.get('processes', None)
         self.randomize = kwargs.get('randomize', None)
         self.settings = kwargs.get('settings', Env.TEST_SETTINGS)
         self.xdist_ip_addresses = kwargs.get('xdist_ip_addresses', None)
@@ -163,12 +163,22 @@ class SystemTestSuite(PytestSuite):
             'pytest',
             '--ds={}'.format('{}.envs.{}'.format(self.root, self.settings)),
             "--junitxml={}".format(self.xunit_report),
-            '-vvv',
-            '-s',
-            '--create-db',
-            '--migrations',
         ])
         cmd.extend(self.test_options_flags)
+        if self.verbosity < 1:
+            cmd.append("--quiet")
+        elif self.verbosity > 1:
+            # currently only two verbosity settings are supported, so using `-vvv`
+            # in place of `--verbose`, because it is needed to see migrations.
+            cmd.append("-vvv")
+
+        if self.disable_capture:
+            cmd.append("-s")
+
+        # TODO: Restore option
+        # if not self.disable_migrations:
+        if True:
+            cmd.append("--migrations")
 
         if self.xdist_ip_addresses:
             cmd.append('--dist=loadscope')
@@ -287,7 +297,9 @@ class LibTestSuite(PytestSuite):
         if self.verbosity < 1:
             cmd.append("--quiet")
         elif self.verbosity > 1:
-            cmd.append("--verbose")
+            # currently only two verbosity settings are supported, so using `-vvv`
+            # in place of `--verbose`, because it is needed to see migrations.
+            cmd.append("-vvv")
         if self.disable_capture:
             cmd.append("-s")
 
