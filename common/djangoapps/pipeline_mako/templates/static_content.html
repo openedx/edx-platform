@@ -254,3 +254,7 @@ else:
 <%def name="get_contact_email_address()"><%
     return get_value('email_from_address', settings.CONTACT_EMAIL)
 %></%def>
+
+<%def name="get_support_form_link()"><%
+    return get_value('support_form_link', settings.SUPPORT_FORM_LINK)
+%></%def>
