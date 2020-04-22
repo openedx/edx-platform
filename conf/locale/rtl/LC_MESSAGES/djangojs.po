@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-19 20:50+0000\n"
-"PO-Revision-Date: 2020-04-19 20:50:19.017884\n"
+"POT-Creation-Date: 2020-04-22 08:07+0000\n"
+"PO-Revision-Date: 2020-04-22 08:07:28.791917\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2417,9 +2417,9 @@ msgid "Not specific to a course"
 msgstr "رخف سحثذهبهذ فخ ش ذخعقسث"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr "سعزتثذف"
+#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
+msgid "Topic"
+msgstr "فخحهذ"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/templates/student_account/account_settings.underscore
@@ -2492,9 +2492,8 @@ msgid "The more you tell us, the more quickly and helpfully we can respond!"
 msgstr "فاث وخقث غخع فثمم عس, فاث وخقث ضعهذنمغ شري اثمحبعممغ صث ذشر قثسحخري!"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr "سعزوهف"
+msgid "Create Support Ticket"
+msgstr "ذقثشفث سعححخقف فهذنثف"
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
@@ -2515,8 +2514,8 @@ msgstr ""
 "قثضعثسف."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Select a subject for your support request."
-msgstr "سثمثذف ش سعزتثذف بخق غخعق سعححخقف قثضعثسف."
+msgid "Select a topic for your support request."
+msgstr "سثمثذف ش فخحهذ بخق غخعق سعححخقف قثضعثسف."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
@@ -2544,8 +2543,12 @@ msgid "Go to {platform} Home"
 msgstr "لخ فخ {platform} اخوث"
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid "Thank you for submitting a request!"
-msgstr "فاشرن غخع بخق سعزوهففهرل ش قثضعثسف!"
+msgid ""
+"Thank you for submitting a request! We appreciate your patience while we "
+"work to review your request."
+msgstr ""
+"فاشرن غخع بخق سعزوهففهرل ش قثضعثسف! صث شححقثذهشفث غخعق حشفهثرذث صاهمث صث "
+"صخقن فخ قثدهثص غخعق قثضعثسف."
 
 #: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
 msgid "Cancel upload"
@@ -2895,10 +2898,6 @@ msgid "{team_count} Team"
 msgid_plural "{team_count} Teams"
 msgstr[0] "{team_count} فثشو"
 msgstr[1] "{team_count} فثشوس"
-
-#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "Topic"
-msgstr "فخحهذ"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the {topic_name} Topic"
@@ -4360,6 +4359,10 @@ msgid ""
 msgstr ""
 "شر ثققخق خذذعققثي قثفقهثدهرل غخعق ثوشهم. حمثشسث فقغ شلشهر مشفثق, شري ذخرفشذف"
 " فثذارهذشم سعححخقف هب فاث حقخزمثو حثقسهسفس."
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
+msgstr "سعزتثذف"
 
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By"
@@ -7655,10 +7658,10 @@ msgstr "شزخعف غخع"
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
 "The following information is already a part of your {platform} profile. "
-"We\\'ve included it here for your application."
+"We've included it here for your application."
 msgstr ""
 "فاث بخممخصهرل هربخقوشفهخر هس شمقثشيغ ش حشقف خب غخعق {platform} حقخبهمث. "
-"صث\\'دث هرذمعيثي هف اثقث بخق غخعق شححمهذشفهخر."
+"صث'دث هرذمعيثي هف اثقث بخق غخعق شححمهذشفهخر."
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Email address"
@@ -8776,6 +8779,10 @@ msgstr ""
 "سثري هف فخ خعق شعفاخقهظشفهخر سثقدهذث بخق قثدهثص. غخعق حاخفخ شري هربخقوشفهخر "
 "شقث رخف سشدثي خق دهسهزمث شرغصاثقث خر %(platformName)s شبفثق فاث دثقهبهذشفهخر"
 " حقخذثسس هس ذخوحمثفث."
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
+msgstr "سعزوهف"
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: {courseName}"

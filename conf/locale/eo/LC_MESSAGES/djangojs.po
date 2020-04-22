@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-19 20:50+0000\n"
-"PO-Revision-Date: 2020-04-19 20:50:19.017884\n"
+"POT-Creation-Date: 2020-04-22 08:07+0000\n"
+"PO-Revision-Date: 2020-04-22 08:07:28.791917\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -2553,9 +2553,9 @@ msgid "Not specific to a course"
 msgstr "Nöt spéçïfïç tö ä çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr "Süßjéçt Ⱡ'σяєм ιρѕυм #"
+#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
+msgid "Topic"
+msgstr "Töpïç Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/templates/student_account/account_settings.underscore
@@ -2631,9 +2631,8 @@ msgstr ""
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr "Süßmït Ⱡ'σяєм ιρѕυ#"
+msgid "Create Support Ticket"
+msgstr "Çréäté Süppört Tïçkét Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
@@ -2657,10 +2656,10 @@ msgstr ""
 "réqüést. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Select a subject for your support request."
+msgid "Select a topic for your support request."
 msgstr ""
-"Séléçt ä süßjéçt för ýöür süppört réqüést. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
+"Séléçt ä töpïç för ýöür süppört réqüést. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
@@ -2692,9 +2691,12 @@ msgid "Go to {platform} Home"
 msgstr "Gö tö {platform} Hömé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid "Thank you for submitting a request!"
+msgid ""
+"Thank you for submitting a request! We appreciate your patience while we "
+"work to review your request."
 msgstr ""
-"Thänk ýöü för süßmïttïng ä réqüést! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+"Thänk ýöü för süßmïttïng ä réqüést! Wé äppréçïäté ýöür pätïénçé whïlé wé "
+"wörk tö révïéw ýöür réqüést. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
 msgid "Cancel upload"
@@ -3091,10 +3093,6 @@ msgid "{team_count} Team"
 msgid_plural "{team_count} Teams"
 msgstr[0] "{team_count} Téäm Ⱡ'σяєм ιρѕυм ∂#"
 msgstr[1] "{team_count} Téäms Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "Topic"
-msgstr "Töpïç Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the {topic_name} Topic"
@@ -4873,6 +4871,10 @@ msgid ""
 msgstr ""
 "Àn érrör öççürréd rétrïévïng ýöür émäïl. Pléäsé trý ägäïn lätér, änd çöntäçt"
 " téçhnïçäl süppört ïf thé prößlém pérsïsts. Ⱡ'σяєм ιρѕυм#"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
+msgstr "Süßjéçt Ⱡ'σяєм ιρѕυм #"
 
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By"
@@ -8582,10 +8584,10 @@ msgstr "Àßöüt Ýöü Ⱡ'σяєм ιρѕυм ∂σł#"
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
 "The following information is already a part of your {platform} profile. "
-"We\\'ve included it here for your application."
+"We've included it here for your application."
 msgstr ""
 "Thé föllöwïng ïnförmätïön ïs älréädý ä pärt öf ýöür {platform} pröfïlé. "
-"Wé\\'vé ïnçlüdéd ït héré för ýöür äpplïçätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+"Wé'vé ïnçlüdéd ït héré för ýöür äpplïçätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Email address"
@@ -9854,6 +9856,10 @@ msgstr ""
 "єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
 "αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
 "νσłυρтαтє νєłιт єѕѕє ¢ιłłυм#"
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
+msgstr "Süßmït Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: {courseName}"

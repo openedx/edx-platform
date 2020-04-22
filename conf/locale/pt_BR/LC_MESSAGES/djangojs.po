@@ -138,6 +138,7 @@
 # Raíssa Teles Bicock <raissa.bicock@gmail.com>, 2015
 # RenataBarboza, 2013
 # Renata Barboza, 2014-2016
+# Rodrigo Rocha <prof.rodrigorocha@yahoo.com>, 2020
 # Sarina Canelake <sarina@edx.org>, 2014
 # Siderlan Santos <siderlan.santos@gmail.com>, 2015
 # Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019
@@ -233,6 +234,7 @@
 # Renato Monteiro da Silva <renato_city@yahoo.com.br>, 2019
 # Ricardo Pietrobon <pietr007@gmail.com>, 2014
 # Rodrigo Mozelli <romozelli@outlook.com>, 2016
+# Rodrigo Rocha <prof.rodrigorocha@yahoo.com>, 2020
 # Victor Hochgreb <victorfeec@gmail.com>, 2015
 # Victor Hochgreb de Freitas <victorhochgreb@gmail.com>, 2015
 # Willian Pascoal <willianpascoal@protonmail.com>, 2016
@@ -241,8 +243,8 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2020-04-19 20:42+0000\n"
-"PO-Revision-Date: 2019-09-29 20:43+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"PO-Revision-Date: 2020-04-20 22:43+0000\n"
+"Last-Translator: Rodrigo Rocha <prof.rodrigorocha@yahoo.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"

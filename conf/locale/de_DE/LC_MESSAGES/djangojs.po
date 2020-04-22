@@ -129,7 +129,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-12 20:42+0000\n"
+"POT-Creation-Date: 2020-04-19 20:42+0000\n"
 "PO-Revision-Date: 2020-01-06 08:48+0000\n"
 "Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>\n"
 "Language-Team: German (Germany) (http://www.transifex.com/open-edx/edx-platform/language/de_DE/)\n"
@@ -2683,11 +2683,8 @@ msgid "Go to {platform} Home"
 msgstr "Gehe zur Startseite der {platform} "
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid ""
-"Thank you for submitting a request! We will contact you within 24 hours."
+msgid "Thank you for submitting a request!"
 msgstr ""
-"Vielen Dank für Ihre Anfrage! Wir werden Sie innerhalb von 24 Stunden "
-"kontaktieren."
 
 #: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
 msgid "Cancel upload"
@@ -8844,33 +8841,22 @@ msgid "What You Need for Verification"
 msgstr "Was du zur Verifizierung benötigst"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/make_payment_step.underscore
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Webcam"
-msgstr "Webcam"
+msgid "Device with Camera"
+msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"You need a computer or cell phone that has a webcam. When you receive a "
-"browser prompt, make sure that you allow access to the camera."
+"You need a device that has a webcam. If you receive a browser prompt for "
+"access to your camera, please make sure to click 'Allow'."
 msgstr ""
-"Sie benötigen ein Computer oder Handy mit integrierter Webcam. Wenn Sie eine"
-" Anfrage über Ihren Browser bekommen, stellen Sie sicher, dass der Zugriff "
-"auf die Kamera aktiviert ist."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "Photo Identification"
 msgstr "Fotoidentifikation"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-msgid ""
-"You need a driver's license, passport, or other government-issued ID that "
-"has your name and photo."
+msgid "You need a valid ID that contains your full name and photo."
 msgstr ""
-"Sie benötigen einen Führerschein, Reisepass oder einen anderen staatlich "
-"ausgestellten Lichtbildausweis mit Ihrem Namen und Foto."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -8898,18 +8884,10 @@ msgid "Your entire face fits inside the frame."
 msgstr "Dein ganzes Gesicht passt in den Rahmen."
 
 #: lms/templates/verify_student/face_photo_step.underscore
-msgid "The photo of your face matches the photo on your ID."
-msgstr ""
-"Das Foto von deinem Gesicht muss mit dem Foto in deinem Identitätsnachweis "
-"übereinstimmen"
-
-#: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"To use the current photo, select the Take Photo button {icon}. To take "
-"another photo, select the Retake Photo button {icon}."
+"To take the photo of your face, click on the camera button {icon}. If you "
+"need to try again, click 'Retake Photo'."
 msgstr ""
-"Um das aktuelle Foto zu verwenden, wählen Sie die Kamerataste {icon}. Um ein"
-" weiteres Foto aufzunehmen, wählen Sie die Wiederholungs-Taste {icon}."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8925,16 +8903,10 @@ msgid "Why does %(platformName)s need my photo?"
 msgstr "Wieso braucht %(platformName)s mein Foto?"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
 msgid ""
-"As part of the verification process, you take a photo of both your face and "
-"a government-issued photo ID. Our authorization service confirms your "
-"identity by comparing the photo you take with the photo on your ID."
+"We use your verification photos to confirm your identity and ensure the "
+"validity of your certificate."
 msgstr ""
-"Als teil unsere Überprüfung Prozess brauchen wir ein Foto von ihr Gesicht "
-"und ein Bildausweis mit amtlichen Licht. Unser Autorisierungsdienst "
-"bestätigt ihre Identität durch das vergleichen von beide Fotos."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8945,18 +8917,12 @@ msgstr "Was macht %(platformName)s mit dieses Foto?"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
 #, python-format
 msgid ""
-"We use the highest levels of security available to encrypt your photo and "
-"send it to our authorization service for review. Your photo and information "
-"are not saved or visible anywhere on %(platformName)s after the verification"
-" process is complete."
+"We securely encrypt your photo and send it to our authorization service for "
+"review. Your photo and information are not saved or visible anywhere on "
+"%(platformName)s after the verification process is complete."
 msgstr ""
-"Wir verwenden die höchste Sicherheit zur Verfügung um das Foto zu "
-"verschlüsseln und senden es an unsere Autorisierungsdienst für Kritik. Ihre "
-"Fotos und Daten sind nicht gespeichert und auch nicht sichtbar auf "
-"%(platformName)s nach das Überprüfung Prozess."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -9029,22 +8995,14 @@ msgid "Take a Photo of Your ID"
 msgstr "Nehmen Sie ein Foto von ihr Ausweis"
 
 #: lms/templates/verify_student/id_photo_step.underscore
-msgid ""
-"Use your webcam to take a photo of your ID. We will match this photo with "
-"the photo of your face and the name on your account."
+msgid "Use your webcam to take a photo of your ID."
 msgstr ""
-"Benutzen Sie ihre webcam um ein Foto von ihr Ausweis zu nehmen. Wir werden "
-"dieses Foto mit das Foto von ihr Gesicht und der Name auf ihr Konto "
-"vergleichen."
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
-"You need an ID with your name and photo. A driver's license, passport, or "
-"other government-issued IDs are all acceptable."
+"You need an ID with your name and photo. A driver's license, passport, or ID"
+" are all acceptable."
 msgstr ""
-"Sie brauchen ein Ausweis mit ihr Name und Foto. Akzeptierte "
-"Identitätsnachweise sind Führerscheine, Reisepässe oder andere Bildausweise "
-"mit amtlichen Licht."
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -9072,6 +9030,13 @@ msgid "Use the Retake Photo button if you are not pleased with your photo"
 msgstr ""
 "Nutzen Sie den Wiederholungsknopf, wenn Sie unzufrieden mit Ihrer Aufnahme "
 "sind."
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid ""
+"As part of the verification process, you take a photo of both your face and "
+"a photo ID. Our authorization service confirms your identity by comparing "
+"the photo you take with the photo on your ID."
+msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
@@ -9135,6 +9100,29 @@ msgstr ""
 "Dürfen wir das von dir gemachte Foto mit dem aus deinem Identitätsnachweis "
 "vergleichen?"
 
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid ""
+"As part of the verification process, you take a photo of both your face and "
+"a government-issued photo ID. Our authorization service confirms your "
+"identity by comparing the photo you take with the photo on your ID."
+msgstr ""
+"Als teil unsere Überprüfung Prozess brauchen wir ein Foto von ihr Gesicht "
+"und ein Bildausweis mit amtlichen Licht. Unser Autorisierungsdienst "
+"bestätigt ihre Identität durch das vergleichen von beide Fotos."
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+#, python-format
+msgid ""
+"We use the highest levels of security available to encrypt your photo and "
+"send it to our authorization service for review. Your photo and information "
+"are not saved or visible anywhere on %(platformName)s after the verification"
+" process is complete."
+msgstr ""
+"Wir verwenden die höchste Sicherheit zur Verfügung um das Foto zu "
+"verschlüsseln und senden es an unsere Autorisierungsdienst für Kritik. Ihre "
+"Fotos und Daten sind nicht gespeichert und auch nicht sichtbar auf "
+"%(platformName)s nach das Überprüfung Prozess."
+
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: {courseName}"
 msgstr ""
@@ -9169,6 +9157,13 @@ msgid ""
 msgstr ""
 "Ein Führerschein, Reisepass, oder ein anderes Bildausweis mit amtliches "
 "Licht"
+
+#: lms/templates/verify_student/intro_step.underscore
+#: lms/templates/verify_student/make_payment_step.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Webcam"
+msgstr "Webcam"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
@@ -9404,10 +9399,6 @@ msgstr "Fotovoraussetzungen:"
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Does the photo of you show your whole face?"
 msgstr "Zeiget das Foto ihr vollständiges Gesicht?"
-
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Does the photo of you match your ID photo?"
-msgstr "Passt das Foto zu das Foto auf ihr Ausweis?"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Is your name on your ID readable?"
