@@ -25,3 +25,7 @@
 #seq_content .first-purchase-offer-banner {
   max-width: $text-width-readability-max;
 }
+
+body.view-in-mfe .first-purchase-offer-banner {
+  display: none;
+}
