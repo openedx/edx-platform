@@ -45,7 +45,6 @@ class MockView(APIView):  # pylint: disable=missing-docstring
 
 
 urlpatterns = [
-    url(r'^oauth2/', include(('provider.oauth2.urls', 'oauth2'), namespace='oauth2')),
     url(
         r'^oauth2-inactive-test/$',
         MockView.as_view(authentication_classes=[authentication.BearerAuthenticationAllowInactiveUser])

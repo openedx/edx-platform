@@ -127,7 +127,7 @@ class SystemTestSuite(PytestSuite):
         self.test_id = kwargs.get('test_id', self._default_test_id)
         self.fasttest = kwargs.get('fasttest', False)
 
-        self.processes = kwargs.get('processes', None)
+        self.processes = 0
         self.randomize = kwargs.get('randomize', None)
         self.settings = kwargs.get('settings', Env.TEST_SETTINGS)
         self.xdist_ip_addresses = kwargs.get('xdist_ip_addresses', None)
@@ -163,15 +163,13 @@ class SystemTestSuite(PytestSuite):
             'pytest',
             '--ds={}'.format('{}.envs.{}'.format(self.root, self.settings)),
             "--junitxml={}".format(self.xunit_report),
+            '-vvv',
+            '-s',
+            '--create-db',
+            '--migrations',
         ])
         cmd.extend(self.test_options_flags)
-        if self.verbosity < 1:
-            cmd.append("--quiet")
-        elif self.verbosity > 1:
-            cmd.append("--verbose")
 
-        if self.disable_capture:
-            cmd.append("-s")
         if self.xdist_ip_addresses:
             cmd.append('--dist=loadscope')
             if self.processes <= 0:
