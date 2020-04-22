@@ -9,6 +9,7 @@ from django_countries.fields import CountryField
 from functools import partial
 
 from lms.djangoapps.onboarding.models import Organization
+from model_utils.models import TimeStampedModel
 from .helpers import upload_to_path
 from .constants import CITY_MAX_LENGTH, TITLE_MAX_LENGTH, OVERVIEW_MAX_LENGTH
 
@@ -55,7 +56,7 @@ class OrganizationBase(models.Model):
         abstract = True
 
 
-class Idea(OrganizationBase, Location, VisualAttachment):
+class Idea(OrganizationBase, Location, VisualAttachment, TimeStampedModel):
     user = models.ForeignKey(User, related_name='ideas', related_query_name='idea', on_delete=models.CASCADE)
     title = models.CharField(max_length=TITLE_MAX_LENGTH)
     overview = models.CharField(max_length=OVERVIEW_MAX_LENGTH)
