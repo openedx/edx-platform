@@ -1214,7 +1214,7 @@
     "Subject": "Ch\u1ee7 \u0111\u1ec1",
     "Subject:": "Ch\u1ee7 \u0111\u1ec1:",
     "Submission aborted! Sorry, your browser does not support file uploads. If you can, please use Chrome or Safari which have been verified to support file uploads.": "G\u1eedi b\u1ecb h\u1ee7y b\u1ecf! Xin l\u1ed7i, tr\u00ecnh duy\u1ec7t c\u1ee7a b\u1ea1n kh\u00f4ng h\u1ed7 tr\u1ee3 t\u1ea3i l\u00ean t\u1ec7p. N\u1ebfu c\u00f3 th\u1ec3, vui l\u00f2ng s\u1eed d\u1ee5ng Chrome ho\u1eb7c Safari \u0111\u00e3 \u0111\u01b0\u1ee3c x\u00e1c nh\u1eadn h\u1ed7 tr\u1ee3 t\u1ea3i l\u00ean t\u1ec7p tin.",
-    "Submit": "G\u1eedi",
+    "Submit": "N\u1ed9p",
     "Submitted": "\u0110\u00e3 g\u1eedi",
     "Subscript": "Subscript",
     "Subsection": "Ti\u1ec3u m\u1ee5c",

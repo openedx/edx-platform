@@ -50,7 +50,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-19 20:42+0000\n"
+"POT-Creation-Date: 2020-04-22 10:05+0000\n"
 "PO-Revision-Date: 2020-03-05 10:11+0000\n"
 "Last-Translator: Abel Camacho <abelcama@gmail.com>\n"
 "Language-Team: Basque (Spain) (http://www.transifex.com/open-edx/edx-platform/language/eu_ES/)\n"
@@ -2412,8 +2412,8 @@ msgid "Not specific to a course"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
+#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
+msgid "Topic"
 msgstr "Gaia"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
@@ -2488,9 +2488,8 @@ msgstr ""
 "Zenbat eta gehiago esan, orduan eta azkarrago eta hobeto erantzungo dizugu!"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr "Bidali"
+msgid "Create Support Ticket"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
@@ -2508,8 +2507,8 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Select a subject for your support request."
-msgstr "Aukeratu laguntza-eskaeraren gaia."
+msgid "Select a topic for your support request."
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
@@ -2537,7 +2536,9 @@ msgid "Go to {platform} Home"
 msgstr "Joan {platform} plataformako Hasierara"
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid "Thank you for submitting a request!"
+msgid ""
+"Thank you for submitting a request! We appreciate your patience while we "
+"work to review your request."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
@@ -2868,10 +2869,6 @@ msgid "{team_count} Team"
 msgid_plural "{team_count} Teams"
 msgstr[0] ""
 msgstr[1] ""
-
-#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "Topic"
-msgstr "Gaia"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the {topic_name} Topic"
@@ -4216,6 +4213,10 @@ msgid ""
 msgstr ""
 "Errorea gertatu da zure e-posta berreskuratzean. Mesedez, saiatu berriz "
 "beranguago, eta arazoa konpontzen ez bada jarri harremanetan teknikariekin."
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
+msgstr "Gaia"
 
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By"
@@ -7325,7 +7326,7 @@ msgstr "Zuri buruz"
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
 "The following information is already a part of your {platform} profile. "
-"We\\'ve included it here for your application."
+"We've included it here for your application."
 msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
@@ -8350,6 +8351,10 @@ msgid ""
 "are not saved or visible anywhere on %(platformName)s after the verification"
 " process is complete."
 msgstr ""
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
+msgstr "Bidali"
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: {courseName}"

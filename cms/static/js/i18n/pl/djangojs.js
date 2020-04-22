@@ -1210,7 +1210,6 @@
     "The following email addresses and/or usernames are invalid:": "Nast\u0119puj\u0105ce adresy e-mail i/lub nazwy u\u017cytkownika s\u0105 nieprawid\u0142owe:",
     "The following errors were generated:": "Wyst\u0105pi\u0142y nast\u0119puj\u0105ce b\u0142\u0119dy:",
     "The following file types are not allowed: ": "Nast\u0119puj\u0105ce typy plik\u00f3w s\u0105 niedozwolone:",
-    "The following information is already a part of your {platform} profile. We\\'ve included it here for your application.": "Poni\u017csze informacje s\u0105 cz\u0119\u015bci\u0105 twojego profilu w {platform}. Za\u0142\u0105czyli\u015bmy je jako element twojego zg\u0142oszenia.",
     "The following message will be displayed at the bottom of the courseware pages within your course:": "Nast\u0119puj\u0105ca wiadomo\u015b\u0107 b\u0119dzie wy\u015bwietlana w dolnej cz\u0119\u015bci stron twojego kursu:",
     "The following options are available for the {license_name} license.": "Nast\u0119puj\u0105ce opcje s\u0105 dost\u0119pne dla licencji {license_name}.",
     "The following users are no longer enrolled in the course:": "Nast\u0119puj\u0105cy u\u017cytkownicy nie s\u0105 ju\u017c zapisani na kurs:",

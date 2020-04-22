@@ -225,7 +225,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-19 20:42+0000\n"
+"POT-Creation-Date: 2020-04-22 10:05+0000\n"
 "PO-Revision-Date: 2019-09-29 20:43+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -2516,9 +2516,9 @@ msgid "Not specific to a course"
 msgstr "不针对特定课程"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr "标题"
+#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
+msgid "Topic"
+msgstr "主题"
 
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
@@ -2589,9 +2589,8 @@ msgid "The more you tell us, the more quickly and helpfully we can respond!"
 msgstr "您提供的信息越详细，我们越能快速并有效地帮助到您！"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr "提交"
+msgid "Create Support Ticket"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
@@ -2609,7 +2608,7 @@ msgid ""
 msgstr "选择一门课程或选择“不针对特定课程”选项。"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Select a subject for your support request."
+msgid "Select a topic for your support request."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -2638,7 +2637,9 @@ msgid "Go to {platform} Home"
 msgstr "前往{platform}主页"
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid "Thank you for submitting a request!"
+msgid ""
+"Thank you for submitting a request! We appreciate your patience while we "
+"work to review your request."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
@@ -2964,10 +2965,6 @@ msgstr "无法找到\"{team}\"团队。"
 msgid "{team_count} Team"
 msgid_plural "{team_count} Teams"
 msgstr[0] ""
-
-#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "Topic"
-msgstr "主题"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the {topic_name} Topic"
@@ -4291,6 +4288,10 @@ msgid ""
 "An error occurred retrieving your email. Please try again later, and contact"
 " technical support if the problem persists."
 msgstr "获取邮件发生错误，请稍后重试。如问题持续发生，请咨询技术支持。"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
+msgstr "标题"
 
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By"
@@ -7387,8 +7388,8 @@ msgstr "关于您"
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
 "The following information is already a part of your {platform} profile. "
-"We\\'ve included it here for your application."
-msgstr "以下信息已经是您的 {platform} 简述的一部分。我们已将其列入您的申请中。"
+"We've included it here for your application."
+msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Email address"
@@ -8414,6 +8415,10 @@ msgid ""
 " process is complete."
 msgstr ""
 "我们会采用最高级别的安全技术来加密您的照片并发送到我们的授权服务用于审核目的；一旦完成了认证过程，%(platformName)s不会继续保存这些照片和信息。"
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
+msgstr "提交"
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: {courseName}"

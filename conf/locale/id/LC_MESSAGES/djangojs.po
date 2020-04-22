@@ -80,7 +80,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-19 20:42+0000\n"
+"POT-Creation-Date: 2020-04-22 10:05+0000\n"
 "PO-Revision-Date: 2019-09-29 20:43+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)\n"
@@ -2455,9 +2455,9 @@ msgid "Not specific to a course"
 msgstr "Tidak spesifik untuk kursus tertentu"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr "Judul"
+#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
+msgid "Topic"
+msgstr "Topik"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/templates/student_account/account_settings.underscore
@@ -2530,9 +2530,8 @@ msgid "The more you tell us, the more quickly and helpfully we can respond!"
 msgstr "Semakin lengkap informasimu, semakin cepat dan tepat respon kami!"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr "Kirim"
+msgid "Create Support Ticket"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
@@ -2552,8 +2551,8 @@ msgstr ""
 "permintaan Anda."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Select a subject for your support request."
-msgstr "Berikan judul untuk permintaan dukungan Anda."
+msgid "Select a topic for your support request."
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
@@ -2581,7 +2580,9 @@ msgid "Go to {platform} Home"
 msgstr "Menuju Beranda {platform}"
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid "Thank you for submitting a request!"
+msgid ""
+"Thank you for submitting a request! We appreciate your patience while we "
+"work to review your request."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
@@ -2919,10 +2920,6 @@ msgstr "Tim \"{team}\" tidak dapat ditemukan"
 msgid "{team_count} Team"
 msgid_plural "{team_count} Teams"
 msgstr[0] ""
-
-#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "Topic"
-msgstr "Topik"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the {topic_name} Topic"
@@ -4404,6 +4401,10 @@ msgid ""
 msgstr ""
 "Terjadi kesalahan dalam memuat email Anda. Silakan coba kembali beberapa "
 "saat lagi, dan hubungi dukungan teknis jika permasalahan berlanjut."
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
+msgstr "Judul"
 
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By"
@@ -7596,10 +7597,8 @@ msgstr "Tentang Anda"
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
 "The following information is already a part of your {platform} profile. "
-"We\\'ve included it here for your application."
+"We've included it here for your application."
 msgstr ""
-"Informasi berikut merupakan bagian dari profil {platform}. Kami "
-"memasukkannya untuk aplikasi Anda."
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Email address"
@@ -8659,6 +8658,10 @@ msgstr ""
 "mengirimkannya ke layanan otorisasi kami untuk ditinjau. Foto dan informasi "
 "Anda tidak kami simpan atau ditampilkan di manapun di "
 "%(platformName)ssetelah verifikasi selesai."
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
+msgstr "Kirim"
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: {courseName}"

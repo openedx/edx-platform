@@ -129,7 +129,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-19 20:42+0000\n"
+"POT-Creation-Date: 2020-04-22 10:05+0000\n"
 "PO-Revision-Date: 2020-01-06 08:48+0000\n"
 "Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>\n"
 "Language-Team: German (Germany) (http://www.transifex.com/open-edx/edx-platform/language/de_DE/)\n"
@@ -2551,9 +2551,9 @@ msgid "Not specific to a course"
 msgstr "Nicht kursbezogen"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr "Betreff"
+#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
+msgid "Topic"
+msgstr "Thema"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/templates/student_account/account_settings.underscore
@@ -2628,9 +2628,8 @@ msgstr ""
 "können wir Ihnen helfen!"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr "Absenden"
+msgid "Create Support Ticket"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
@@ -2654,8 +2653,8 @@ msgstr ""
 "Supportanfrage."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Select a subject for your support request."
-msgstr "Wählen Sie ein Thema für Ihre Supportanfrage aus."
+msgid "Select a topic for your support request."
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
@@ -2683,7 +2682,9 @@ msgid "Go to {platform} Home"
 msgstr "Gehe zur Startseite der {platform} "
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid "Thank you for submitting a request!"
+msgid ""
+"Thank you for submitting a request! We appreciate your patience while we "
+"work to review your request."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
@@ -3042,10 +3043,6 @@ msgid "{team_count} Team"
 msgid_plural "{team_count} Teams"
 msgstr[0] "{team_count} Team"
 msgstr[1] "{team_count} Teams"
-
-#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "Topic"
-msgstr "Thema"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the {topic_name} Topic"
@@ -4588,6 +4585,10 @@ msgstr ""
 "Es gab einen Fehler beim Abholen deiner E-Mail. Bitte versuche es später "
 "noch einmal, und benachrichtige die technische Ünterstützung, wenn das "
 "Problem weiterhin besteht."
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
+msgstr "Betreff"
 
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By"
@@ -7978,10 +7979,8 @@ msgstr "Über Sie"
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
 "The following information is already a part of your {platform} profile. "
-"We\\'ve included it here for your application."
+"We've included it here for your application."
 msgstr ""
-"Die folgende Information ist bereits in Ihrem {platform} Profil. Wir haben "
-"dies hier eingefügt."
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Email address"
@@ -9122,6 +9121,10 @@ msgstr ""
 "verschlüsseln und senden es an unsere Autorisierungsdienst für Kritik. Ihre "
 "Fotos und Daten sind nicht gespeichert und auch nicht sichtbar auf "
 "%(platformName)s nach das Überprüfung Prozess."
+
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
+msgstr "Absenden"
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: {courseName}"
