@@ -2,6 +2,7 @@
 Helpers methods for site configuration.
 """
 
+
 from django.conf import settings
 from openedx.core.lib.cache_utils import request_cached
 
@@ -15,6 +16,7 @@ def get_current_site_configuration():
          (openedx.core.djangoapps.site_configuration.models.SiteConfiguration): SiteConfiguration instance associated
          with the current site.
     """
+
     # Import is placed here to avoid circular import
     from openedx.core.djangoapps.theming.helpers import get_current_site
     site = get_current_site()
