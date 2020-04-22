@@ -14843,7 +14843,7 @@ msgstr "Илгээсэн түүх"
 
 #: lms/templates/staff_problem_info.html
 msgid "{platform_name} Content Quality Assessment"
-msgstr "{платформ_нэр} Контентын Чанарын Үнэлгээ "
+msgstr "{platform_name} Контентын Чанарын Үнэлгээ "
 
 #: lms/templates/staff_problem_info.html
 msgid "Comment"
@@ -15115,7 +15115,7 @@ msgid ""
 msgstr ""
 "Та {platform_name} дээрх форум мэдэгдэл имэйлийг хүлээн авахгүй болно. Та "
 "{dashboard_link_start} өөрийн хяналтын самбар руу буцах {link_end}. Хэрэв та"
-" үүнийг хийхийг хүсээгүй бол {undo_link_start} {{link_end} -г дахин захиалах"
+" үүнийг хийхийг хүсээгүй бол {undo_link_start} {link_end} -г дахин захиалах"
 " боломжтой."
 
 #: lms/templates/user_dropdown.html lms/templates/header/user_dropdown.html
@@ -16335,7 +16335,7 @@ msgid ""
 "registered for {platform_name} will not be enrolled, but will be allowed to "
 "enroll once they make an account."
 msgstr ""
-"Хэрэв энэ сонголтыг {em_start} {{им_end} тэмдэг тавиагүй бол {platform_name}"
+"Хэрэв энэ сонголтыг {em_start} {em_end} тэмдэг тавиагүй бол {platform_name}"
 " -г бүртгүүлээгүй хэрэглэгчдийг бүртгэлд орохгүй боловч бүртгэлээ хийсний "
 "дараа бүртгүүлэх боломжтой болно."
 
@@ -18825,7 +18825,7 @@ msgid ""
 "course from a country or region in which it is not currently available."
 msgstr ""
 "Манай систем таныг тухайн улс эсвэл бүс нутгаас одоогоор байхгүй байгаа "
-"{{platform_name} курст хамрагдахыг хичээж байгаа болохыг харуулж байна."
+"{platform_name} курст хамрагдахыг хичээж байгаа болохыг харуулж байна."
 
 #: lms/templates/enrollment/course_enrollment_message.html
 msgid "Enrollment Successful"
