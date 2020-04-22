@@ -19149,23 +19149,23 @@ msgstr "Сургалтын төрлийг сонгох"
 msgid ""
 "Regenerate for learners who have already received certificates. ({count})"
 msgstr ""
-"Сертификат авсан аль хэдийн суралцагчдад дахин сэргээгдэх болно. ({тоо})"
+"Сертификат авсан аль хэдийн суралцагчдад дахин сэргээгдэх болно. ({count})"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Regenerate for learners who have not received certificates. ({count})"
-msgstr "Сертификат аваагүй суралцагчдад дахин сэргээгдэх болно. ({тоо})"
+msgstr "Сертификат аваагүй суралцагчдад дахин сэргээгдэх болно. ({count})"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Regenerate for learners with audit passing state. ({count})"
-msgstr "Суралцагчдыг аудитын тахир дутуу улстай дахин нэгтгэх. ({тоо})"
+msgstr "Суралцагчдыг аудитын тахир дутуу улстай дахин нэгтгэх. ({count})"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Regenerate for learners with audit not passing state. ({count})"
-msgstr "Суралцагчдыг аудитын шалгалт өгдөггүй аудитаар нөхөн олгоно. ({тоо})"
+msgstr "Суралцагчдыг аудитын шалгалт өгдөггүй аудитаар нөхөн олгоно. ({count})"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Regenerate for learners in an error state. ({count})"
-msgstr "Суралцагчдыг алдааны төлөв байдалдаа эргэн оруулаарай. ({тоо})"
+msgstr "Суралцагчдыг алдааны төлөв байдалдаа эргэн оруулаарай. ({count})"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Certificate Generation History"
