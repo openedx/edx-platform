@@ -38,6 +38,15 @@ def get_base_template_context(site):
     except NoReverseMatch:
         dashboard_url = reverse('home')
 
+    contact_mailing_address = configuration_helpers.get_value('CONTACT_MAILING_ADDRESS')
+
+    if not contact_mailing_address:
+        contact_mailing_address = get_config_value_from_site_or_settings(
+            'CONTACT_MAILING_ADDRESS',
+            site=site,
+            site_config_name='CONTACT_MAILING_ADDRESS'
+        )
+
     return {
         # Platform information
         'homepage_url': marketing_link('ROOT'),
@@ -50,8 +59,7 @@ def get_base_template_context(site):
         ),
         'contact_email': get_config_value_from_site_or_settings(
             'CONTACT_EMAIL', site=site, site_config_name='contact_email'),
-        'contact_mailing_address': get_config_value_from_site_or_settings(
-            'CONTACT_MAILING_ADDRESS', site=site, site_config_name='CONTACT_MAILING_ADDRESS'),
+        'contact_mailing_address': contact_mailing_address,
         'social_media_urls': get_config_value_from_site_or_settings('SOCIAL_MEDIA_FOOTER_URLS', site=site),
         'mobile_store_urls': get_config_value_from_site_or_settings('MOBILE_STORE_URLS', site=site),
 
