@@ -2,19 +2,14 @@
 Helpers methods for site configuration.
 """
 
-
 from django.conf import settings
+from edx_django_utils.cache import RequestCache
 
 
-def get_current_site_configuration():
+def _uncached_get_current_site_configuration():
     """
-    Return configuration for the current site.
-
-    Returns:
-         (openedx.core.djangoapps.site_configuration.models.SiteConfiguration): SiteConfiguration instance associated
-         with the current site.
+    Uncached implementation of get_current_site_configuration.
     """
-
     # Import is placed here to avoid circular import
     from openedx.core.djangoapps.theming.helpers import get_current_site
     site = get_current_site()
@@ -25,6 +20,25 @@ def get_current_site_configuration():
         return getattr(site, "configuration", None)
     except SiteConfiguration.DoesNotExist:
         return None
+
+
+def get_current_site_configuration():
+    """
+    Return configuration for the current site.
+
+    Returns:
+         (openedx.core.djangoapps.site_configuration.models.SiteConfiguration): SiteConfiguration instance associated
+         with the current site.
+    """
+    dummy_key = "singleton"
+    cache = RequestCache("site_config")
+    response = cache.get_cached_response(dummy_key)
+    if response.is_found:
+        return response.value
+    else:
+        config = _uncached_get_current_site_configuration()
+        cache.set(dummy_key, config)
+        return config
 
 
 def is_site_configuration_enabled():
