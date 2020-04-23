@@ -1749,7 +1749,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
     @patch('lms.djangoapps.verify_student.views.log.error')
-    @patch('lms.djangoapps.verify_student.utils.SailthruClient.send')
+    @patch('sailthru.sailthru_client.SailthruClient.send')
     def test_passed_status_template(self, mock_sailthru_send, mock_log_error):
         """
         Test for verification passed.
@@ -1791,7 +1791,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
     @patch('lms.djangoapps.verify_student.views.log.error')
-    @patch('lms.djangoapps.verify_student.utils.SailthruClient.send')
+    @patch('sailthru.sailthru_client.SailthruClient.send')
     def test_first_time_verification(self, mock_sailthru_send, mock_log_error):  # pylint: disable=unused-argument
         """
         Test for verification passed if the learner does not have any previous verification
