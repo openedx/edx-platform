@@ -1,8 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
-from rest_framework import status
-
 from openedx.core.djangolib.testing.philu_utils import configure_philu_theme
+from rest_framework import status
 
 
 class IdeaListingViewTest(TestCase):
