@@ -18,6 +18,10 @@ rm -rf $venv
 tar -C $venv_parent -xf /home/jenkins/edx-venv_clean-${PYTHON_VERSION}.tar.gz
 source $venv/bin/activate
 
-pip install -q -r ${DJANGO_REQUIREMENT} -r requirements/edx/testing.txt
+# Hack to fix up egg-link files given that the virtualenv is not relocatable
+sed -i "s|\(^/home/jenkins\)/shallow-clone|\1/edx-platform|" -- \
+    $venv/lib/python*/site-packages/*.egg-link
+pip install -qr requirements/edx/pip-tools.txt
+pip-sync -q requirements/edx/testing.txt "${DJANGO_REQUIREMENT}"
 
 mkdir reports
