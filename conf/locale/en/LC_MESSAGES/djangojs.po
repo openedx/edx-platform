@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-16 13:51+0000\n"
-"PO-Revision-Date: 2020-04-16 13:52:41.590603\n"
+"POT-Creation-Date: 2020-04-22 14:40+0000\n"
+"PO-Revision-Date: 2020-04-22 14:40:53.281615\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -214,7 +214,6 @@ msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 #: cms/static/js/views/manage_users_and_roles.js
-#: common/static/bundles/CourseOrLibraryListing.js
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
@@ -222,26 +221,6 @@ msgstr ""
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Are you sure?"
-msgstr ""
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-#: common/static/bundles/CourseOrLibraryListing.js
-msgid "No"
-msgstr ""
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-#: common/static/bundles/CourseOrLibraryListing.js
-msgid ""
-"Courses are archived by default when they pass their end date. Are you sure"
-"         you want to archive this course anyway?"
-msgstr ""
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-#: common/static/bundles/CourseOrLibraryListing.js
-msgid ""
-"Are you sure you want to unarchive this course? End date for this course "
-"will be         changed to 1 year from now. This course will still have to "
-"be published."
 msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
@@ -2948,6 +2927,19 @@ msgstr ""
 #: common/static/bundles/CourseHome.js
 #: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "There was an error updating your goal."
+msgstr ""
+
+#: common/static/bundles/CourseOrLibraryListing.js
+msgid ""
+"Courses are archived by default when they pass their end date. Are you sure "
+"you want to archive this course anyway?"
+msgstr ""
+
+#: common/static/bundles/CourseOrLibraryListing.js
+msgid ""
+"Are you sure you want to unarchive this course? End date for this course "
+"will be changed to 1 year from now. This course will still have to be "
+"published."
 msgstr ""
 
 #: common/static/bundles/CourseOutline.js
@@ -6537,7 +6529,24 @@ msgid "You have unsaved changes. Do you really want to leave this page?"
 msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+msgid "No"
+msgstr ""
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Yes"
+msgstr ""
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+msgid ""
+"Courses are archived by default when they pass their end date. Are you sure"
+"         you want to archive this course anyway?"
+msgstr ""
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+msgid ""
+"Are you sure you want to unarchive this course? End date for this course "
+"will be         changed to 1 year from now. This course will still have to "
+"be published."
 msgstr ""
 
 #: cms/static/js/maintenance/force_publish_course.js

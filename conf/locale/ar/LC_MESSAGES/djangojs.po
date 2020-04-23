@@ -284,7 +284,6 @@ msgstr "{numErrors} تعذر إضافة الطلّاب إلى هذا الفوج:
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 #: cms/static/js/views/manage_users_and_roles.js
-#: common/static/bundles/CourseOrLibraryListing.js
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
@@ -293,30 +292,6 @@ msgstr "{numErrors} تعذر إضافة الطلّاب إلى هذا الفوج:
 #: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Are you sure?"
 msgstr "هل أنت واثق؟"
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-#: common/static/bundles/CourseOrLibraryListing.js
-msgid "No"
-msgstr "لا شيء"
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-#: common/static/bundles/CourseOrLibraryListing.js
-msgid ""
-"Courses are archived by default when they pass their end date. Are you sure"
-"         you want to archive this course anyway?"
-msgstr ""
-"تتم أرشفة الدورات التدريبية افتراضيًا عند اجتياز تاريخ انتهائها. هل أنت "
-"متأكد أنك تريد أرشفة هذه الدورة التدريبية على أي حال؟"
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-#: common/static/bundles/CourseOrLibraryListing.js
-msgid ""
-"Are you sure you want to unarchive this course? End date for this course "
-"will be         changed to 1 year from now. This course will still have to "
-"be published."
-msgstr ""
-"هل أنت متأكد أنك تريد إلغاء أرشفة هذه الدورة؟ سيتم تغيير تاريخ الانتهاء لهذه"
-" الدورة إلى سنة واحدة من الآن. لا يزال يتعين نشر هذه الدورة."
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 #: common/static/bundles/CourseOrLibraryListing.js
@@ -2732,6 +2707,23 @@ msgstr "لقد نجحت في تحديث هدفك."
 #: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "There was an error updating your goal."
 msgstr "حدث خطأ أثناء تحديث هدفك."
+
+#: common/static/bundles/CourseOrLibraryListing.js
+msgid ""
+"Courses are archived by default when they pass their end date. Are you sure "
+"you want to archive this course anyway?"
+msgstr ""
+"تتم أرشفة الدورات التدريبية افتراضيًا عند اجتياز تاريخ انتهائها. هل أنت "
+"متأكد أنك تريد أرشفة هذه الدورة التدريبية على أي حال؟"
+
+#: common/static/bundles/CourseOrLibraryListing.js
+msgid ""
+"Are you sure you want to unarchive this course? End date for this course "
+"will be changed to 1 year from now. This course will still have to be "
+"published."
+msgstr ""
+"هل أنت متأكد أنك تريد إلغاء أرشفة هذه الدورة؟ سيتم تغيير تاريخ الانتهاء لهذه"
+" الدورة إلى سنة واحدة من الآن. لا يزال يتعين نشر هذه الدورة."
 
 #: common/static/bundles/CourseOutline.js
 #: openedx/features/course_experience/static/course_experience/js/CourseOutline.js
@@ -6638,6 +6630,19 @@ msgstr "لديك تغييرات غير محفّظة. هل تريد حقًّا أ
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Yes"
 msgstr "نعم"
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+msgid ""
+"Courses are archived by default when they pass their end date. Are you sure"
+"         you want to archive this course anyway?"
+msgstr ""
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+msgid ""
+"Are you sure you want to unarchive this course? End date for this course "
+"will be         changed to 1 year from now. This course will still have to "
+"be published."
+msgstr ""
 
 #: cms/static/js/maintenance/force_publish_course.js
 msgid "Internal Server Error."
@@ -11874,6 +11879,9 @@ msgstr "استخدم النص الحالي"
 
 #~ msgid "New {component_type}"
 #~ msgstr "{component_type} جديد"
+
+#~ msgid "No"
+#~ msgstr "لا شيء"
 
 #~ msgid "Certificates"
 #~ msgstr "الشهادات"
