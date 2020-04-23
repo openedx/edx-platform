@@ -16616,7 +16616,7 @@ msgid ""
 "contact {email}."
 msgstr ""
 "Таны ажил гүйлгээг цуцалсан. Хэрэв та алдаа гарсан гэж бодож байвал холбоо "
-"барих {имэйл}."
+"барих {email}."
 
 #: lms/templates/commerce/checkout_error.html
 msgid "Checkout Error"
@@ -16959,7 +16959,7 @@ msgstr "Найз нөхөд, гэр бүлийнхэнтэйгээ хуваал�
 
 #: lms/templates/courseware/course_about_sidebar_header.html
 msgid "I just enrolled in {number} {title} through {account}: {url}"
-msgstr "Би дөнгөж {number} {title} -д бүртгүүлсэн {данс}: {url}"
+msgstr "Би дөнгөж {number} {title} -д бүртгүүлсэн {account}: {url}"
 
 #: lms/templates/courseware/course_about_sidebar_header.html
 msgid "Take a course with {platform} online"
@@ -16967,7 +16967,7 @@ msgstr " {platform}-тай онлайнаар хичээл авах"
 
 #: lms/templates/courseware/course_about_sidebar_header.html
 msgid "I just enrolled in {number} {title} through {platform} {url}"
-msgstr "Би саяхан {number} {title} {платформ} {url}"
+msgstr "Би саяхан {number} {title} {platform} {url}"
 
 #: lms/templates/courseware/course_about_sidebar_header.html
 #: themes/stanford-style/lms/templates/courseware/course_about_sidebar_header.html
@@ -17241,7 +17241,7 @@ msgstr "$ {newPrice} {htmlEnd} програмыг бүхэлд нь"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "You save ${discount_value} {currency}"
-msgstr "Та $ {discount_value} {валют} хэмнэнэ"
+msgstr "Та $ {discount_value} {currency} хэмнэнэ"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "${full_program_price} for entire program"
@@ -18708,8 +18708,8 @@ msgid ""
 "Sub-Total:    {currency_symbol}{sub_total}  Discount:  "
 "{currency_symbol}{discount}"
 msgstr ""
-"Үнэ: {currency_symbol} {course_price} Тоо хэмжээ: {тоо хэмжээ} Дэд Нийт: "
-"{currency_symbol} {дэд_total} Хөнгөлөлт: {currency_symbol} {хөнгөлөлт}"
+"Үнэ: {currency_symbol} {course_price} Тоо хэмжээ: {quantity} Дэд Нийт: "
+"{currency_symbol} {дэд_total} Хөнгөлөлт: {currency_symbol} {discount}"
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "Total:      {currency_symbol}{sale_price}"
@@ -18741,16 +18741,16 @@ msgid ""
 "name from {old_name} to {new_name}. If you need further assistance, please "
 "e-mail the course staff at {email}."
 msgstr ""
-"Биднийг уучлаарай. Манай курс ажилтнууд {хуучин_name} -ээс {new_name} руу "
+"Биднийг уучлаарай. Манай курс ажилтнууд {old_name} -ээс {new_name} руу "
 "нэрээ өөрчлөх хүсэлтийг зөвшөөрөөгүй байна. Хэрэв танд нэмэлт тусламж "
-"хэрэгтэй бол курсын ажилтнууд {имэйл} дээр и-мэйлээр илгээнэ үү."
+"хэрэгтэй бол курсын ажилтнууд {email} дээр и-мэйлээр илгээнэ үү."
 
 #: lms/templates/emails/reverification_processed.txt
 msgid ""
 "We have successfully verified your identity for the {assessment} assessment "
 "in the {course_name} course."
 msgstr ""
-"Бид {identity_ course} курсын үнэлгээний {үнэлгээний} үнэлгээг хийснийг "
+"Бид {course_name} курсын үнэлгээний {assessment} үнэлгээг хийснийг "
 "амжилттай шалгаж байна."
 
 #: lms/templates/emails/reverification_processed.txt
@@ -18759,8 +18759,8 @@ msgid ""
 "{course_name} course. You have used {used_attempts} out of "
 "{allowed_attempts} attempts to verify your identity."
 msgstr ""
-"Бид {identity_ course} курсын үнэлгээний {үнэлгээний} үнэлгээг хийх "
-"боломжгүй байна. Та {identity_attempts} -аас {used_attempts} -ийг ашиглан "
+"Бид {course_name} курсын үнэлгээний {assessment} үнэлгээг хийх "
+"боломжгүй байна. Та {allowed_attempts} -аас {used_attempts} -ийг ашиглан "
 "таны таниулалтыг баталгаажуулах оролдлогыг ашигласан."
 
 #: lms/templates/emails/reverification_processed.txt
@@ -18781,8 +18781,8 @@ msgid ""
 "{allowed_attempts} attempts to verify your identity, and verification is no "
 "longer possible."
 msgstr ""
-"Бид {identity_ course} курсын үнэлгээний {үнэлгээний} үнэлгээг хийх "
-"боломжгүй байна. Та {identity_attempts} -аас {used_attempts} -ийг өөрийн "
+"Бид {course_name} курсын үнэлгээний {assessment} үнэлгээг хийх "
+"боломжгүй байна. Та {allowed_attempts} -аас {used_attempts} -ийг өөрийн "
 "таних эсэхийг баталгаажуулах оролдлогуудыг ашигласан ба шалгаж "
 "баталгаажуулах боломжгүй болсон."
 
@@ -19061,11 +19061,11 @@ msgstr "Жишээ {name} сертификатыг үүсгэх"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Error generating example {name} certificate: {error}"
-msgstr "Жишээ үүсгэх алдаа {нэр} гэрчилгээ: {алдаа}"
+msgstr "Жишээ үүсгэх алдаа {name} гэрчилгээ: {error}"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "View {name} certificate"
-msgstr "{Нэр} сертификатыг харах"
+msgstr "{name} сертификатыг харах"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Refresh Status"
@@ -19645,11 +19645,11 @@ msgstr "{code}"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "{description}"
-msgstr "{тодорхойлолт}"
+msgstr "{description}"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "{discount}"
-msgstr "{хөнгөлөлт}"
+msgstr "{discount}"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "The Invoice Number field cannot be empty."
