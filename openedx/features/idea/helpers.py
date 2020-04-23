@@ -1,3 +1,7 @@
+from datetime import datetime
+from django.utils.timezone import utc
+
+
 def upload_to_path(instance, filename, folder):
     """
     Create and return path where files will be uploaded. This path has specific formation
@@ -16,12 +20,9 @@ def upload_to_path(instance, filename, folder):
 
 def pretty_date(time):
     """
-    Get a datetime object and return a pretty string like 'an hour ago',
-    'Yesterday', '3 months ago', 'just now', etc
+    :param time
+    :return: datetime object in "time ago" format
     """
-    from datetime import datetime
-    from django.utils.timezone import utc
-
     now = datetime.utcnow().replace(tzinfo=utc)
     diff = now - time
     second_diff = diff.seconds
