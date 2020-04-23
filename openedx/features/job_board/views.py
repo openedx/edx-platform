@@ -22,6 +22,7 @@ from .constants import (
     JOB_TYPE_ONSITE_KEY,
     JOB_TYPE_REMOTE_KEY
 )
+from .forms import JobCreationForm
 from .models import Job
 
 
@@ -105,8 +106,7 @@ class JobDetailView(DetailView):
 
 
 class JobCreateView(CreateView):
-    model = Job
-    fields = '__all__'
+    form_class = JobCreationForm
     template_name = 'features/job_board/create_job_form.html'
 
     def get_success_url(self):

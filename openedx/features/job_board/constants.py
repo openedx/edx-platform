@@ -32,3 +32,7 @@ JOB_HOURS_CHOICES = (
 
 DJANGO_COUNTRIES_KEY_INDEX = 0
 DJANGO_COUNTRIES_VALUE_INDEX = 1
+
+# Logo image file max allowed file size in bytes
+LOGO_IMAGE_MAX_SIZE = 2 * 1024 * 1024  # 2 MB
+LOGO_ALLOWED_EXTENSION = ['jpg', 'png']
