@@ -4,7 +4,7 @@ from django.utils.translation import ugettext as _
 from openedx.features.job_board.constants import LOGO_IMAGE_MAX_SIZE
 
 
-def validate_file_sie(file):
+def validate_file_size(file):
     """
     Validate maximum allowed file upload size, raise validation error if file size exceeds.
     :param file: file that needs to be validated for size

@@ -7,7 +7,7 @@ from django_countries.fields import CountryField
 from model_utils.models import TimeStampedModel
 
 from .constants import JOB_COMPENSATION_CHOICES, JOB_HOURS_CHOICES, JOB_TYPE_CHOICES, LOGO_ALLOWED_EXTENSION
-from .helpers import validate_file_sie
+from .helpers import validate_file_size
 
 
 class Job(TimeStampedModel):
@@ -39,7 +39,7 @@ class Job(TimeStampedModel):
     logo = models.ImageField(upload_to='job-board/uploaded-logos/', blank=True, null=True,
                              validators=[
                                  FileExtensionValidator(LOGO_ALLOWED_EXTENSION),
-                                 validate_file_sie
+                                 validate_file_size
                              ],
                              help_text='Please upload a file with your company\'s logo. (maximum 2MB)')
 
