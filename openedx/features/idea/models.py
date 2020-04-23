@@ -56,7 +56,7 @@ class OrganizationBase(models.Model):
         abstract = True
 
 
-class Idea(OrganizationBase, Location, TimeStampedModel, VisualAttachment):
+class Idea(OrganizationBase, Location, VisualAttachment, TimeStampedModel):
     user = models.ForeignKey(User, related_name='ideas', related_query_name='idea', on_delete=models.CASCADE)
     title = models.CharField(max_length=TITLE_MAX_LENGTH)
     overview = models.CharField(max_length=OVERVIEW_MAX_LENGTH)
