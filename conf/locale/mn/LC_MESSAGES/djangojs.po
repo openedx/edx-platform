@@ -48,7 +48,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-16 13:34+0000\n"
+"POT-Creation-Date: 2020-04-22 14:40+0000\n"
 "PO-Revision-Date: 2019-09-29 20:43+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Mongolian (http://www.transifex.com/open-edx/edx-platform/language/mn/)\n"
@@ -171,7 +171,6 @@ msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 #: cms/static/js/views/manage_users_and_roles.js
-#: common/static/bundles/CourseOrLibraryListing.js
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
@@ -180,31 +179,6 @@ msgstr ""
 #: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Are you sure?"
 msgstr "Та итгэлтэй байна уу?"
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-#: common/static/bundles/CourseOrLibraryListing.js
-msgid "No"
-msgstr "Хоосон"
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-#: common/static/bundles/CourseOrLibraryListing.js
-msgid ""
-"Courses are archived by default when they pass their end date. Are you sure"
-"         you want to archive this course anyway?"
-msgstr ""
-"Курсууд дуусах хугацааг нь дамжуулж өгдөг. Та энэ курсыг архивлахдаа "
-"итгэлтэй байна уу?"
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-#: common/static/bundles/CourseOrLibraryListing.js
-msgid ""
-"Are you sure you want to unarchive this course? End date for this course "
-"will be         changed to 1 year from now. This course will still have to "
-"be published."
-msgstr ""
-"Та энэ курсыг архивлахдаа итгэлтэй байна уу? Энэ хичээлийн хугацаа дуусах "
-"хугацааг одооноос 1 жил болгон өөрчилнө. Энэ сургалтыг нийтлүүлэх "
-"шаардлагатай хэвээр байх болно."
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 #: common/static/bundles/CourseOrLibraryListing.js
@@ -2813,6 +2787,24 @@ msgstr ""
 #: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "There was an error updating your goal."
 msgstr ""
+
+#: common/static/bundles/CourseOrLibraryListing.js
+msgid ""
+"Courses are archived by default when they pass their end date. Are you sure "
+"you want to archive this course anyway?"
+msgstr ""
+"Курсууд дуусах хугацааг нь дамжуулж өгдөг. Та энэ курсыг архивлахдаа "
+"итгэлтэй байна уу?"
+
+#: common/static/bundles/CourseOrLibraryListing.js
+msgid ""
+"Are you sure you want to unarchive this course? End date for this course "
+"will be changed to 1 year from now. This course will still have to be "
+"published."
+msgstr ""
+"Та энэ курсыг архивлахдаа итгэлтэй байна уу? Энэ хичээлийн хугацаа дуусах "
+"хугацааг одооноос 1 жил болгон өөрчилнө. Энэ сургалтыг нийтлүүлэх "
+"шаардлагатай хэвээр байх болно."
 
 #: common/static/bundles/CourseOutline.js
 #: openedx/features/course_experience/static/course_experience/js/CourseOutline.js
@@ -6411,6 +6403,19 @@ msgstr ""
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Yes"
 msgstr "Тийм"
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+msgid ""
+"Courses are archived by default when they pass their end date. Are you sure"
+"         you want to archive this course anyway?"
+msgstr ""
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+msgid ""
+"Are you sure you want to unarchive this course? End date for this course "
+"will be         changed to 1 year from now. This course will still have to "
+"be published."
+msgstr ""
 
 #: cms/static/js/maintenance/force_publish_course.js
 msgid "Internal Server Error."
@@ -11191,6 +11196,9 @@ msgstr ""
 #~ msgstr ""
 #~ "Таны ачаалсан зүйлийн гарчиг болон тайлбарыг танихгүй байна. Ахин шалгана "
 #~ "уу."
+
+#~ msgid "No"
+#~ msgstr "Хоосон"
 
 #~ msgid "Certificates"
 #~ msgstr "Гэрчилгээнүүд"
