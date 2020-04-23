@@ -16,5 +16,3 @@ class IdeaListingViewTest(TestCase):
     def test_idea_list_view(self):
         response = self.client.get(reverse('idea-listing'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(IdeaListingView.paginate_by, 9)
-        self.assertEqual(IdeaListingView.ordering, ['-created'])
