@@ -10,7 +10,7 @@ git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce8
 cffi==1.14.0              # via -r requirements/edx-sandbox/shared.txt, cryptography
 git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0  # via -r requirements/edx-sandbox/py35.in
 click==7.1.1              # via -r requirements/edx-sandbox/shared.txt, nltk
-cryptography==2.9.1       # via -r requirements/edx-sandbox/shared.txt
+cryptography==2.9.2       # via -r requirements/edx-sandbox/shared.txt
 cycler==0.10.0            # via matplotlib
 decorator==4.4.2          # via networkx
 joblib==0.14.1            # via -r requirements/edx-sandbox/shared.txt, nltk
