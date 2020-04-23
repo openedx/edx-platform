@@ -4,10 +4,10 @@ from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from django_countries import countries
 
+from ..teams.helpers import USER_ICON_COLORS
 from .constants import (
     DJANGO_COUNTRIES_KEY_INDEX,
     DJANGO_COUNTRIES_VALUE_INDEX,
-    ICON_BACKGROUND_COLOR,
     JOB_COMP_HOURLY_KEY,
     JOB_COMP_SALARIED_KEY,
     JOB_COMP_VOLUNTEER_KEY,
@@ -96,7 +96,7 @@ class JobListView(ListView):
         }
 
         context['filtered'] = any(context['search_fields'].values())
-        context['ICON_BACKGROUND_COLOR'] = ICON_BACKGROUND_COLOR
+        context['ICON_BACKGROUND_COLOR'] = USER_ICON_COLORS
 
         return context
 

@@ -37,8 +37,3 @@ DJANGO_COUNTRIES_VALUE_INDEX = 1
 LOGO_IMAGE_MAX_SIZE = 2 * 1024 * 1024  # 2 MB
 LOGO_ALLOWED_EXTENSION = ['jpg', 'png']
 
-ICON_BACKGROUND_COLOR = [
-    '#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3',
-    '#009688', '#1b5e20', '#33691e', '#827717', '#e65100', '#ff5722',
-    '#795548', '#607d8b',
-]
