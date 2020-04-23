@@ -431,7 +431,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `auth_permission_content_type_id_codename_01ab375a_uniq` (`content_type_id`,`codename`),
   CONSTRAINT `auth_permission_content_type_id_2f476e4b_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1629 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1625 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -1225,8 +1225,8 @@ CREATE TABLE `completion_blockcompletion` (
   `user_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `completion_blockcompleti_course_key_block_key_use_b15bac54_uniq` (`course_key`,`block_key`,`user_id`),
-  KEY `completion_blockcompletio_course_key_block_type_use_0f0d4d2d_idx` (`course_key`,`block_type`,`user_id`),
   KEY `completion_blockcompletio_user_id_course_key_modifi_ed54291e_idx` (`user_id`,`course_key`,`modified`),
+  KEY `completion_blockcompletio_course_key_block_type_use_0f0d4d2d_idx` (`course_key`,`block_type`,`user_id`),
   CONSTRAINT `completion_blockcompletion_user_id_20994c23_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -2589,7 +2589,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_model_76bd3d3b_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=407 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=406 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2600,7 +2600,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=697 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=699 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_redirect`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -4886,8 +4886,8 @@ CREATE TABLE `program_enrollments_programenrollment` (
   `status` varchar(9) NOT NULL,
   `user_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `program_enrollments_prog_user_id_program_uuid_cur_ecf769fd_uniq` (`user_id`,`program_uuid`,`curriculum_uuid`),
   UNIQUE KEY `program_enrollments_prog_external_user_key_progra_ec52a567_uniq` (`external_user_key`,`program_uuid`,`curriculum_uuid`),
+  UNIQUE KEY `program_enrollments_prog_user_id_program_uuid_cur_ecf769fd_uniq` (`user_id`,`program_uuid`,`curriculum_uuid`),
   KEY `program_enrollments_programenrollment_external_user_key_c27b83c5` (`external_user_key`),
   KEY `program_enrollments_programenrollment_program_uuid_131378e0` (`program_uuid`),
   KEY `program_enrollments_programenrollment_curriculum_uuid_da64e123` (`curriculum_uuid`),
@@ -5684,9 +5684,10 @@ CREATE TABLE `student_courseenrollment` (
   `user_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `student_courseenrollment_user_id_course_id_5d34a47f_uniq` (`user_id`,`course_id`),
+  KEY `student_courseenrollment_user_id_4263a8e2` (`user_id`),
+  KEY `student_cou_user_id_b19dcd_idx` (`user_id`,`created`),
   KEY `student_courseenrollment_course_id_a6f93be8` (`course_id`),
   KEY `student_courseenrollment_created_79829893` (`created`),
-  KEY `student_cou_user_id_b19dcd_idx` (`user_id`,`created`),
   CONSTRAINT `student_courseenrollment_user_id_4263a8e2_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -5870,19 +5871,6 @@ CREATE TABLE `student_loginfailures` (
   PRIMARY KEY (`id`),
   KEY `student_loginfailures_user_id_50d85202_fk_auth_user_id` (`user_id`),
   CONSTRAINT `student_loginfailures_user_id_50d85202_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `student_logoutviewconfiguration`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `student_logoutviewconfiguration` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `change_date` datetime(6) NOT NULL,
-  `enabled` tinyint(1) NOT NULL,
-  `changed_by_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `student_logoutviewco_changed_by_id_a787d3e7_fk_auth_user` (`changed_by_id`),
-  CONSTRAINT `student_logoutviewco_changed_by_id_a787d3e7_fk_auth_user` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `student_manualenrollmentaudit`;
