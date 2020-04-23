@@ -18709,7 +18709,7 @@ msgid ""
 "{currency_symbol}{discount}"
 msgstr ""
 "Үнэ: {currency_symbol} {course_price} Тоо хэмжээ: {quantity} Дэд Нийт: "
-"{currency_symbol} {дэд_total} Хөнгөлөлт: {currency_symbol} {discount}"
+"{currency_symbol} {sub_total} Хөнгөлөлт: {currency_symbol} {discount}"
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "Total:      {currency_symbol}{sale_price}"
