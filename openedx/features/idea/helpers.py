@@ -21,7 +21,7 @@ def upload_to_path(instance, filename, folder):
 def pretty_date(time):
     """
     :param time
-    :return: datetime object in "time ago" format
+    :return: string object in "time ago" format
     """
     now = datetime.utcnow().replace(tzinfo=utc)
     diff = now - time
