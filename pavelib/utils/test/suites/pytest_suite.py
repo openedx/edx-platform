@@ -175,9 +175,7 @@ class SystemTestSuite(PytestSuite):
         if self.disable_capture:
             cmd.append("-s")
 
-        # TODO: Restore option
-        # if not self.disable_migrations:
-        if True:
+        if not self.disable_migrations:
             cmd.append("--migrations")
 
         if self.xdist_ip_addresses:
