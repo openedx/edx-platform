@@ -2,8 +2,11 @@
 from __future__ import unicode_literals
 
 from django.views import View
+from django.shortcuts import get_object_or_404
 from edxmako.shortcuts import render_to_response
 from django.views.generic.list import ListView
+
+from .models import Idea
 
 from .models import Idea
 
@@ -35,4 +38,6 @@ class IdeaDetailView(View):
     template_name = 'features/idea/idea_details.html'
 
     def get(self, request, *args, **kwargs):
-        return render_to_response(self.template_name, {})
+        idea = get_object_or_404(Idea, pk=kwargs['pk'])
+        context = {'idea': idea}
+        return render_to_response(self.template_name, context)
