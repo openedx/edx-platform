@@ -9,9 +9,6 @@ class JobCreationForm(ModelForm):
     Form to handle job creation.
     """
 
-    def __init__(self, *args, **kwargs):
-        super(JobCreationForm, self).__init__(*args, **kwargs)
-
     class Meta:
         model = Job
         fields = '__all__'
