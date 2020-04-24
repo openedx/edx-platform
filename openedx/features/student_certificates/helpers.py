@@ -1,18 +1,18 @@
 import base64
 import shutil
-from django.core.cache import cache
+from datetime import datetime
 from importlib import import_module
 from logging import getLogger
 from tempfile import TemporaryFile
 
 import boto
 import requests
-
-from datetime import datetime
-from PIL import Image
 from boto.s3.key import Key
 from django.conf import settings
+from django.core.cache import cache
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from PIL import Image
 
 from constants import (
     COMPLETION_DATE_FORMAT,
@@ -31,6 +31,7 @@ from constants import (
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.philu_api.helpers import get_course_custom_settings, get_social_sharing_urls
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.utils import get_credentials
 from openedx.features.student_certificates.signals import USER_CERTIFICATE_DOWNLOADABLE
 
@@ -77,6 +78,17 @@ def get_certificate_image_url_by_uuid(verify_uuid):
         prefix=CERTIFICATE_IMG_PREFIX,
         uuid=verify_uuid
     )
+
+
+def get_course_display_name_by_uuid(verify_uuid):
+    """
+    :param certificate uuid:
+    :return: display name of the course
+    """
+    course_id = get_object_or_404(GeneratedCertificate, verify_uuid=verify_uuid).course_id
+    course_display_name = CourseOverview.objects.get(id=course_id).display_name
+
+    return course_display_name
 
 
 def get_certificate_url(verify_uuid):
