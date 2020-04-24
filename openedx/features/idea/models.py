@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models
-from django.contrib.auth.models import User
-from django.core.validators import FileExtensionValidator
-from django_countries.fields import CountryField
-
 from functools import partial
 
+from django.contrib.auth.models import User
+from django.core.validators import FileExtensionValidator
+from django.db import models
+from django_countries.fields import CountryField
 from lms.djangoapps.onboarding.models import Organization
 from model_utils.models import TimeStampedModel
+
+from .constants import CITY_MAX_LENGTH, OVERVIEW_MAX_LENGTH, TITLE_MAX_LENGTH
 from .helpers import upload_to_path
-from .constants import CITY_MAX_LENGTH, TITLE_MAX_LENGTH, OVERVIEW_MAX_LENGTH
 
 
 class Location(models.Model):
