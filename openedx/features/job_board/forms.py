@@ -20,19 +20,3 @@ class JobCreationForm(ModelForm):
             'compensation': RadioSelect,
             'hours': RadioSelect,
         }
-        labels = {
-            'company': 'Organization Name',
-            'city': 'City',
-            'country': 'Country',
-            'title': 'Job Title',
-            'type': 'Job Type',
-            'compensation': 'Compensation',
-            'hours': 'Job Hours',
-            'description': 'Job Description',
-            'function': 'Job Function',
-            'responsibilities': 'Job Responsibilities',
-            'website_link': 'WEBSITE LINK',
-            'application_link': 'APPLICATION LINK',
-            'contact_email': 'CONTACT EMAIL',
-            'logo': 'Company Logo',
-        }

@@ -12,5 +12,5 @@ def validate_file_size(file):
     size = getattr(file, "size", None)
     if size and LOGO_IMAGE_MAX_SIZE < size:
         raise ValidationError(
-            _('File size must not exceed {size} MB').format(size=LOGO_IMAGE_MAX_SIZE / 1000 / 1000)
+            _('File size must not exceed {size} MB').format(size=LOGO_IMAGE_MAX_SIZE / 1024 / 1024)
         )

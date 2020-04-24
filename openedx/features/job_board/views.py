@@ -4,7 +4,7 @@ from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from django_countries import countries
 
-from ..teams.helpers import USER_ICON_COLORS
+from openedx.features.teams.helpers import USER_ICON_COLORS
 from .constants import (
     DJANGO_COUNTRIES_KEY_INDEX,
     DJANGO_COUNTRIES_VALUE_INDEX,
