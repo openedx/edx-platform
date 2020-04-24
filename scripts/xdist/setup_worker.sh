@@ -22,6 +22,6 @@ source $venv/bin/activate
 sed -i "s|\(^/home/jenkins\)/shallow-clone|\1/edx-platform|" -- \
     $venv/lib/python*/site-packages/*.egg-link
 pip install -qr requirements/edx/pip-tools.txt
-pip-sync requirements/edx/testing.txt "${DJANGO_REQUIREMENT}"
+pip-sync -q requirements/edx/testing.txt "${DJANGO_REQUIREMENT}"
 
 mkdir reports
