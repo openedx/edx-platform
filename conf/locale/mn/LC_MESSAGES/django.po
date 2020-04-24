@@ -17469,7 +17469,7 @@ msgstr ""
 #: themes/st-lutherx/lms/templates/emails/activation_email.txt
 #: themes/st-normanx/lms/templates/emails/activation_email.txt
 msgid "The {platform_name} Team"
-msgstr "{пplatform_name} Баг"
+msgstr "{platform_name} баг"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
