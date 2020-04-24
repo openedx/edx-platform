@@ -1,5 +1,4 @@
-
-from django.forms import CharField, ModelForm, RadioSelect, TextInput
+from django.forms import ModelForm, RadioSelect
 
 from openedx.features.job_board.models import Job
 
