@@ -1,7 +1,7 @@
 <%
   import hashlib
   from six import text_type
-  hlskey = hashlib.md5(text_type(module.location)).hexdigest()
+  hlskey = hashlib.md5(text_type(module.location).encode('utf-8')).hexdigest()
 %>
 
   <section id="hls-modal-${hlskey}" class="upload-modal modal" style="overflow:scroll; background:#ddd; padding: 10px 0;box-shadow: 0 0 5px 0 #555;" >
