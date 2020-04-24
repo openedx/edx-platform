@@ -231,7 +231,6 @@ pycryptodome==3.9.7       # via -r requirements/edx/testing.txt, pdfminer.six
 pycryptodomex==3.9.7      # via -r requirements/edx/testing.txt, edx-proctoring, pyjwkest
 pyflakes==2.1.1           # via -r requirements/edx/testing.txt, flake8
 pygments==2.6.1           # via -r requirements/edx/testing.txt, diff-cover, sphinx
-pyinotify==0.9.6          # via -r requirements/edx/development.in
 pyjwkest==1.4.2           # via -r requirements/edx/testing.txt, edx-drf-extensions
 pyjwt==1.5.2              # via -r requirements/edx/testing.txt, drf-jwt, edx-rest-api-client, social-auth-core
 pylint-celery==0.3        # via -r requirements/edx/testing.txt, edx-lint
@@ -262,6 +261,7 @@ python3-openid==3.1.0 ; python_version >= "3"  # via -r requirements/edx/testing
 python3-saml==1.9.0       # via -r requirements/edx/testing.txt
 pytz==2019.3              # via -r requirements/edx/testing.txt, babel, capa, celery, django, django-ses, edx-completion, edx-enterprise, edx-proctoring, edx-submissions, edx-tincan-py35, event-tracking, fs, icalendar, ora2, pandas, xblock
 pyuca==1.2                # via -r requirements/edx/testing.txt
+pywatchman==1.4.1         # via -r requirements/local.in
 pyyaml==5.3.1             # via -r requirements/edx/testing.txt, code-annotations, edx-django-release-util, edx-i18n-tools, sphinxcontrib-openapi, xblock
 radon==4.1.0              # via -r requirements/edx/testing.txt
 random2==1.0.1            # via -r requirements/edx/testing.txt
