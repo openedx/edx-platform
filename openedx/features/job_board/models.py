@@ -26,13 +26,13 @@ class Job(TimeStampedModel):
     company = models.CharField(max_length=255, verbose_name=_('Organization Name'))
     type = models.CharField(max_length=255, choices=JOB_TYPE_CHOICES, verbose_name=_('Job Type'),
                             help_text=_('Please select whether the job is onsite or can be done remotely.'),
-                            blank=False, default=0)
+                            default=0)
     compensation = models.CharField(max_length=255, choices=JOB_COMPENSATION_CHOICES, verbose_name=_('Compensation'),
                                     help_text=_('Please select the type of compensation you are offering for this job.'),
-                                    blank=False, default=0)
+                                    default=0)
     hours = models.CharField(max_length=255, choices=JOB_HOURS_CHOICES, verbose_name=_('Job Hours'),
                              help_text=_('Please select the expected number of working hours required for this job.'),
-                             blank=False, default=0)
+                             default=0)
     city = models.CharField(max_length=255, verbose_name=_('City'))
     country = CountryField(verbose_name=_('Country'))
     description = models.TextField(verbose_name=_('Job Description'),
