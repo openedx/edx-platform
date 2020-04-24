@@ -1,6 +1,8 @@
 import base64
 import shutil
+from django.core.cache import cache
 from importlib import import_module
+from logging import getLogger
 from tempfile import TemporaryFile
 
 import boto
@@ -28,8 +30,11 @@ from constants import (
 )
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.philu_api.helpers import get_course_custom_settings, get_social_sharing_urls
+from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL
 from openedx.core.djangoapps.credentials.utils import get_credentials
 from openedx.features.student_certificates.signals import USER_CERTIFICATE_DOWNLOADABLE
+
+log = getLogger(__name__)
 
 certs_api = import_module('lms.djangoapps.certificates.api')
 CERTIFICATE_IMG_PREFIX = 'certificates_images'
@@ -113,17 +118,23 @@ def get_credential_certificates(user):
         certificate_url = credential.get('certificate_url')
         if not certificate_url:
             continue
-        program_name = [attribute.get('value') for attribute in credential.get('attributes', [])
-                        if attribute.get('name') == 'program_name']
-        if program_name:
-            completion_date = datetime.strptime(credential.get('created'), CREDENTIALS_DATE_FORMAT)
-            certificates.append({
-                'display_name': program_name[0],
-                'certificate_title': program_name[0],
-                'certificate_url': certificate_url,
-                'completion_date': completion_date.strftime(COMPLETION_DATE_FORMAT),
-                'is_program_cert': True,
-            })
+
+        program_uuid = credential['credential']['program_uuid']
+        program = cache.get(PROGRAM_CACHE_KEY_TPL.format(uuid=program_uuid))
+        if not program:
+            log.error('Program not found! Cache might be empty or does\'t contains program against uuid: {uuid}'
+                      .format(uuid=program_uuid))
+            continue
+
+        program_name = program['title']
+        completion_date = datetime.strptime(credential.get('created'), CREDENTIALS_DATE_FORMAT)
+        certificates.append({
+            'display_name': program_name,
+            'certificate_title': program_name,
+            'certificate_url': certificate_url,
+            'completion_date': completion_date.strftime(COMPLETION_DATE_FORMAT),
+            'is_program_cert': True,
+        })
     return certificates
 
 
