@@ -9150,7 +9150,7 @@ msgstr "تغيير كلمة المرور"
 
 #: lms/templates/student_account/register.underscore
 msgid "Already have an account?"
-msgstr "هل لديك حساب {platformName} مسبقاً؟"
+msgstr "لديك حساب مسبقاً؟"
 
 #: lms/templates/student_account/register.underscore
 msgid "Sign in."
