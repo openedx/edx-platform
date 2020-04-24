@@ -54,7 +54,7 @@ coreschema==0.0.4         # via -r requirements/edx/testing.txt, coreapi, drf-ya
 coverage==5.1             # via -r requirements/edx/testing.txt, pytest-cov
 git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0  # via -r requirements/edx/testing.txt
 git+https://github.com/edx/crowdsourcehinter.git@2178ac72891392106ffef389651aef374177d294#egg=crowdsourcehinter-xblock==0.4  # via -r requirements/edx/testing.txt
-cryptography==2.9.1       # via -r requirements/edx/testing.txt, django-fernet-fields, edx-enterprise, social-auth-core
+cryptography==2.9.2       # via -r requirements/edx/testing.txt, django-fernet-fields, edx-enterprise, social-auth-core
 cssselect==1.1.0          # via -r requirements/edx/testing.txt, pyquery
 cssutils==1.0.2           # via -r requirements/edx/testing.txt, pynliner
 ddt==1.3.1                # via -r requirements/edx/testing.txt, xblock-drag-and-drop-v2, xblock-poll
@@ -90,7 +90,7 @@ django-ratelimit-backend==2.0  # via -r requirements/edx/testing.txt
 django-require==1.0.11    # via -r requirements/edx/testing.txt
 django-sekizai==1.1.0     # via -r requirements/edx/testing.txt, django-wiki
 django-ses==0.8.14        # via -r requirements/edx/testing.txt
-django-simple-history==2.8.0  # via -r requirements/edx/testing.txt, edx-enterprise, edx-organizations, ora2
+django-simple-history==2.9.0  # via -r requirements/edx/testing.txt, edx-enterprise, edx-organizations, ora2
 django-splash==0.2.7      # via -r requirements/edx/testing.txt
 django-statici18n==1.9.0  # via -r requirements/edx/testing.txt
 django-storages==1.8      # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, edxval
@@ -115,7 +115,7 @@ edx-django-release-util==0.4.2  # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==2.4.3  # via -r requirements/edx/testing.txt
 edx-django-utils==3.2.1   # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==5.0.2  # via -r requirements/edx/testing.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.1.3     # via -r requirements/edx/testing.txt
+edx-enterprise==3.2.0     # via -r requirements/edx/testing.txt
 edx-i18n-tools==0.5.0     # via -r requirements/edx/testing.txt, ora2
 edx-lint==1.4.1           # via -r requirements/edx/testing.txt
 edx-milestones==0.2.6     # via -r requirements/edx/testing.txt
@@ -128,7 +128,7 @@ edx-rest-api-client==5.1.0  # via -r requirements/edx/testing.txt, edx-enterpris
 edx-search==1.3.4         # via -r requirements/edx/testing.txt
 edx-sga==0.10.0           # via -r requirements/edx/testing.txt
 edx-sphinx-theme==1.5.0   # via -r requirements/edx/development.in
-edx-submissions==3.0.7    # via -r requirements/edx/testing.txt, ora2
+edx-submissions==3.1.0    # via -r requirements/edx/testing.txt, ora2
 edx-tincan-py35==0.0.5    # via -r requirements/edx/testing.txt, edx-enterprise
 edx-user-state-client==1.1.2  # via -r requirements/edx/testing.txt
 edx-when==1.2.1           # via -r requirements/edx/testing.txt, edx-proctoring
