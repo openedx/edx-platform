@@ -111,7 +111,7 @@ def _is_valid_social_username(value):
 def retrieve_last_sitewide_block_completed(user):
     """
     Completion utility
-    From a string 'username' or object User retrieve
+    From a given User object retrieve
     the last course block marked as 'completed' and construct a URL
 
     :param user: obj(User)
