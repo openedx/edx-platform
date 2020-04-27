@@ -29,6 +29,7 @@ def get_blocks(
         return_type='dict',
         block_types_filter=None,
         hide_access_denials=False,
+        allow_start_dates_in_future=False,
 ):
     """
     Return a serialized representation of the course blocks.
@@ -58,6 +59,9 @@ def get_blocks(
         hide_access_denials (bool): When True, filter out any blocks that were
             denied access to the user, even if they have access denial messages
             attached.
+        allow_start_dates_in_future (bool): When True, will allow blocks to be
+            returned that can bypass the StartDateTransformer's filter to show
+            blocks with start dates in the future.
     """
 
     if HIDE_ACCESS_DENIALS_FLAG.is_enabled():
@@ -101,7 +105,8 @@ def get_blocks(
         transformers += [BlockCompletionTransformer()]
 
     # transform
-    blocks = course_blocks_api.get_course_blocks(user, usage_key, transformers)
+    blocks = course_blocks_api.get_course_blocks(
+        user, usage_key, transformers, allow_start_dates_in_future=allow_start_dates_in_future)
 
     # filter blocks by types
     if block_types_filter:
