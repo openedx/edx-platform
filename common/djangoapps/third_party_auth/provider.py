@@ -4,6 +4,7 @@ Third-party auth provider configuration API.
 
 
 from django.contrib.sites.models import Site
+from more_itertools import unique_everseen
 
 from openedx.core.djangoapps.theming.helpers import get_current_request
 
@@ -29,21 +30,28 @@ class Registry(object):
         """
         Helper method that returns a generator used to iterate over all providers
         of the current site.
+
+        Providers are unique on site + some key (backend name in the case of
+        OAuth, slug for SAML, and consumer key for LTI).
         """
-        oauth2_backend_names = OAuth2ProviderConfig.key_values('backend_name', flat=True)
-        for oauth2_backend_name in oauth2_backend_names:
-            provider = OAuth2ProviderConfig.current(oauth2_backend_name)
-            if provider.enabled_for_current_site and provider.backend_name in _PSA_OAUTH2_BACKENDS:
+        site = Site.objects.get_current(get_current_request())
+        # Pre-filter by site to prevent cross-site shadowing of config records
+        # that share a KEY_FIELDS tuple; replicate the logic of ConfigurationModel.current()
+        # in a site-aware fashion.
+        oauth2_backends = OAuth2ProviderConfig.objects.filter(site=site, backend_name__in=_PSA_OAUTH2_BACKENDS)
+        for provider in unique_everseen(oauth2_backends.order_by('-change_date'), lambda p: p.backend_name):
+            if provider.enabled:
                 yield provider
-        if SAMLConfiguration.is_enabled(Site.objects.get_current(get_current_request()), 'default'):
-            idp_slugs = SAMLProviderConfig.key_values('slug', flat=True)
-            for idp_slug in idp_slugs:
-                provider = SAMLProviderConfig.current(idp_slug)
-                if provider.enabled_for_current_site and provider.backend_name in _PSA_SAML_BACKENDS:
+        if SAMLConfiguration.is_enabled(site, 'default'):
+            idps = SAMLProviderConfig.objects.filter(site=site, backend_name__in=_PSA_SAML_BACKENDS)
+            for provider in unique_everseen(idps.order_by('-change_date'), key=lambda p: p.slug):
+                if provider.enabled:
                     yield provider
-        for consumer_key in LTIProviderConfig.key_values('lti_consumer_key', flat=True):
-            provider = LTIProviderConfig.current(consumer_key)
-            if provider.enabled_for_current_site and provider.backend_name in _LTI_BACKENDS:
+        lti_providers = LTIProviderConfig.objects.filter(site=site)
+        for provider in unique_everseen(lti_providers.order_by('-change_date'), lambda p: p.lti_consumer_key):
+            # backend_name is hardcoded for LTIProviderConfig, not a field, so filtering done here instead
+            # (even though this guard should never return false)
+            if provider.enabled and provider.backend_name in _LTI_BACKENDS:
                 yield provider
 
     @classmethod
