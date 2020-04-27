@@ -121,6 +121,7 @@
 # Leandro Agustín Barrientos <agustinbarrientos@outlook.com>, 2016
 # Luis Manuel Moreno <luis.moreno@edunext.co>, 2019
 # Marcos Buccella <marcosfiore07@hotmail.com>, 2018
+# Marina Pastor <mpastor@edx.org>, 2020
 # Mecabotware <mecabotware.ideas@gmail.com>, 2015
 # Muhammad Adeel Khan <adeel@edx.org>, 2020
 # Natalia Aguillon, 2016
@@ -164,8 +165,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-22 10:05+0000\n"
-"PO-Revision-Date: 2019-09-29 20:43+0000\n"
+"POT-Creation-Date: 2020-04-27 09:11+0000\n"
+"PO-Revision-Date: 2020-04-27 09:13+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "Language: es_419\n"
@@ -194,6 +195,22 @@ msgstr "Guardando"
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/show_textbook.js
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
+#: cms/templates/js/content-group-editor.underscore
+#: cms/templates/js/course-instructor-details.underscore
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/course-settings-learning-fields.underscore
+#: cms/templates/js/course_grade_policy.underscore
+#: cms/templates/js/course_info_update.underscore
+#: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/partition-group-details.underscore
+#: cms/templates/js/show-textbook.underscore
+#: cms/templates/js/signatory-editor.underscore
+#: cms/templates/js/video-transcripts.underscore
+#: cms/templates/js/xblock-outline.underscore
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Delete"
 msgstr "Borrar"
 
@@ -222,6 +239,7 @@ msgstr "Borrar"
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/signatory-actions.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
+#: common/static/common/templates/discussion/templates.underscore
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
@@ -245,6 +263,7 @@ msgstr "Subiendo"
 #: lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
 #: common/static/common/templates/image-modal.underscore
+#: common/static/common/templates/discussion/templates.underscore
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Close"
 msgstr "Cerrar"
@@ -273,6 +292,7 @@ msgstr "Elegir archivo"
 #: cms/static/js/views/course_info_update.js cms/static/js/views/tabs.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/js/Markdown.Editor.js
+#: common/static/common/templates/discussion/templates.underscore
 #: lms/templates/learner_dashboard/verification_popover.underscore
 msgid "OK"
 msgstr "Aceptar"
@@ -899,9 +919,19 @@ msgstr "Propiedades del documento"
 msgid "Edit HTML"
 msgstr "Editar HTML"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/course_info_handouts.underscore
+#: cms/templates/js/course_info_update.underscore
+#: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/partition-group-details.underscore
+#: cms/templates/js/show-textbook.underscore
+#: cms/templates/js/signatory-details.underscore
+#: cms/templates/js/xblock-string-field-editor.underscore
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Edit"
 msgstr "Editar"
 
@@ -1304,6 +1334,7 @@ msgstr "Nueva ventana"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Next"
 msgstr "Siguiente"
 
@@ -1647,9 +1678,13 @@ msgstr ""
 "La URL que introdujiste parece ser un vínculo externo. ¿Desea agregarle el "
 "prefijo requerido http://?"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/course-instructor-details.underscore
+#: cms/templates/js/signatory-details.underscore
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Title"
 msgstr "Título"
 
@@ -2131,6 +2166,7 @@ msgstr ""
 "Tu solicitud no pudo ser completada. Recarga la página e intenta nuevamente."
 
 #: common/static/common/js/discussion/utils.js
+#: common/static/common/templates/discussion/templates.underscore
 msgid "…"
 msgstr "..."
 
@@ -2344,6 +2380,7 @@ msgid "Your post will be discarded."
 msgstr "Tu publicación será descartada."
 
 #: common/static/common/js/discussion/views/response_comment_show_view.js
+#: common/static/common/templates/discussion/templates.underscore
 msgid "anonymous"
 msgstr "anónimo"
 
@@ -3395,6 +3432,7 @@ msgid "There has been an error processing your survey."
 msgstr "Ocurrió un error al procesar tu encuesta."
 
 #: lms/static/js/courseware/credit_progress.js
+#: common/static/common/templates/discussion/templates.underscore
 #: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
 msgid "More"
@@ -3411,6 +3449,7 @@ msgid "HTML preview of post"
 msgstr "previsiualización en HTML"
 
 #: lms/static/js/customwmd.js
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Your question or idea (required)"
 msgstr "Su pregunta o idea (requerido)"
 
@@ -5766,6 +5805,7 @@ msgstr ""
 
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Staff"
 msgstr "Equipo del curso"
 
@@ -7219,6 +7259,7 @@ msgstr "Fecha"
 
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Previous"
 msgstr "Anterior"
 
@@ -7265,6 +7306,321 @@ msgstr "Reiniciar búsqueda"
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 msgid "Search"
 msgstr "Buscar"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Add a Response"
+msgstr "Añade una respuesta"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "This thread is closed."
+msgstr "Este hilo está cerrado."
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Add a response:"
+msgstr "Añade tu respuesta:"
+
+#: common/static/common/templates/discussion/templates.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
+msgstr "Enviar"
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "discussion posted %(time_ago)s by %(author)s"
+msgstr "discusión publicada hace %(time_ago)s por %(author)s"
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "question posted %(time_ago)s by %(author)s"
+msgstr "pregunta publicada hace %(time_ago)s por %(author)s"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Pinned"
+msgstr "Marcado"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Reported"
+msgstr "Denunciado"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Closed"
+msgstr "Cerrado"
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "Related to: %(courseware_title_linked)s"
+msgstr "Relacionado con: %(courseware_title_linked)s"
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "This post is visible only to %(group_name)s."
+msgstr "Este post es visible solo para %(group_name)s."
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "This post is visible to everyone."
+msgstr "Esta publicación es visible para todos."
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Editing post"
+msgstr "Editando publicación"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid ""
+"Add a clear and descriptive title to encourage participation. (Required)"
+msgstr ""
+"Agrega un título claro y descriptivo para fomentar la participación. "
+"(Requerido)"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Edit your post below."
+msgstr "Edita tu publicación a continuación."
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Update post"
+msgstr "Actualiza publicación"
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "Show Comment (%(num_comments)s)"
+msgid_plural "Show Comments (%(num_comments)s)"
+msgstr[0] "Mostrar comentario (%(num_comments)s)"
+msgstr[1] "Mostrar comentarios (%(num_comments)s)"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Add a comment"
+msgstr "Añade un comentario"
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "marked as answer %(time_ago)s by %(user)s"
+msgstr "marcado como respuesta hace %(time_ago)s por %(user)s"
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "marked as answer %(time_ago)s"
+msgstr "marcado como respuesta hace %(time_ago)s"
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "endorsed %(time_ago)s by %(user)s"
+msgstr "Validado hace %(time_ago)s por %(user)s"
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "endorsed %(time_ago)s"
+msgstr "Validado hace %(time_ago)s"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Editing response"
+msgstr "Editando respuesta"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Update response"
+msgstr "Actualiza respuesta"
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "posted %(time_ago)s by %(author)s"
+msgstr "publicado hace %(time_ago)s por %(author)s"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Editing comment"
+msgstr "Editando comentario"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Update comment"
+msgstr "Actualizar comentario"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "discussion"
+msgstr "discusión"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "answered question"
+msgstr "pregunta respondida"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "unanswered question"
+msgstr "pregunta sin responder"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Following"
+msgstr "Siguiendo"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Community TA"
+msgstr "Profesor asistente de la comunidad"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "{unread_comments_count} new"
+msgstr "{unread_comments_count} nuevos"
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid ""
+"%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
+"unread comments)%(span_close)s"
+msgstr ""
+"%(comments_count)s %(span_sr_open)s comentarios (%(unread_comments_count)s "
+"comentarios no leídos)%(span_close)s"
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
+msgstr "%(comments_count)s %(span_sr_open)s comentarios %(span_close)s"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Add a Post"
+msgstr "Añade una publicación"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Visible to"
+msgstr "Visible para"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid ""
+"Discussion admins, moderators, and TAs can make their posts visible to all "
+"students or specify a single group."
+msgstr ""
+"Los administradores de la discusión, moderadores, y profesores asociados "
+"pueden hacer sus publicaciones visibles a todos los estudiantes o "
+"especificar un grupo en particular."
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "All Groups"
+msgstr "Todos los grupos"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "follow this post"
+msgstr "sigue esta publicación"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "post anonymously"
+msgstr "Escribe una publicación de forma anónima"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "post anonymously to classmates"
+msgstr "publica anónimamente a tus compañeros de curso"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Error posting your message."
+msgstr "Error al publicar tu mensaje."
+
+#: common/static/common/templates/discussion/templates.underscore
+#, python-format
+msgid "This post will be visible only to %(group_name)s."
+msgstr "Esta publicación será visible solo para %(group_name)s."
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "This post will be visible to everyone."
+msgstr "Esta publicación será visible para todos."
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Topic area"
+msgstr "Área temática"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Add your post to a relevant topic to help others find it. (Required)"
+msgstr ""
+"Añade tu publicación a un tema relevante para que los demás la puedan "
+"encontrar. (Requerido)"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "(Community TA)"
+msgstr "(Profesor ayudante de la comunidad)"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "(Staff)"
+msgstr "(Equipo del curso)"
+
+#: common/static/common/templates/discussion/templates.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
+msgid "All Posts"
+msgstr "Todas las publicaciones"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Return to all posts"
+msgstr "Volver a todas las publicaciones"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "View discussion"
+msgstr "Ver discusión"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Load more"
+msgstr "Cargar más"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Post type"
+msgstr "Tipo de publicación"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid ""
+"Questions raise issues that need answers. Discussions share ideas and start "
+"conversations. (Required)"
+msgstr ""
+"Utiliza Pregunta para plantear temas que necesitan respuestas. Utiliza "
+"Discusión para compartir tus ideas y comenzar conversaciones. (Requerido)"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Question"
+msgstr "Pregunta"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Discussion"
+msgstr "Discusión"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Endorse"
+msgstr "Validar"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Unendorse"
+msgstr "Invalidar"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Mark as Answer"
+msgstr "Marcar como respuesta"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Unmark as Answer"
+msgstr "Desmarcar como respuesta"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Follow"
+msgstr "Seguir"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Unfollow"
+msgstr "Dejar de seguir"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Vote for this post,"
+msgstr "Votar esta publicación"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Report abuse"
+msgstr "Denunciar un abuso"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Report"
+msgstr "Denunciar"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Unreport"
+msgstr "Dejar de denunciar"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Pin"
+msgstr "Marcar"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Unpin"
+msgstr "Desmarcar"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Open"
+msgstr "Abrir"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Discussion Home"
@@ -7324,10 +7680,6 @@ msgstr ""
 "Marque esta casilla para recibir un resumen diario por correo electrónico "
 "con notificaciones de actividad nueva y sin leer de las conversaciones que "
 "está siguiendo."
-
-#: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
-msgid "All Posts"
-msgstr "Todas las publicaciones"
 
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 msgid "username or email"
@@ -7541,23 +7893,23 @@ msgstr "Editar membresía"
 
 #: lms/djangoapps/teams/static/teams/templates/manage.underscore
 msgid "View Current Team Memberships"
-msgstr ""
+msgstr "Ver las membresías actuales del equipo"
 
 #: lms/djangoapps/teams/static/teams/templates/manage.underscore
 msgid "Download Memberships"
-msgstr ""
+msgstr "Descargar membresías"
 
 #: lms/djangoapps/teams/static/teams/templates/manage.underscore
 msgid "Assign Team Memberships"
-msgstr ""
+msgstr "Asignar membresías de equipo"
 
 #: lms/djangoapps/teams/static/teams/templates/manage.underscore
 msgid "Upload Memberships"
-msgstr ""
+msgstr "Subir membresías"
 
 #: lms/djangoapps/teams/static/teams/templates/manage.underscore
 msgid "Error assigning team memberships"
-msgstr ""
+msgstr "Error al asignar membresías de equipo"
 
 #: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
 msgid "Are you having trouble finding a team to join?"
@@ -7758,7 +8110,7 @@ msgstr "Marcar el examen como completado"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "You are taking \"{exam_link}\" as {exam_type}. "
-msgstr ""
+msgstr "Estás tomando \"{exam_link}\" como {exam_type}. "
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "a timed exam"
@@ -8996,10 +9348,6 @@ msgstr ""
 "información no son guardadas ni quedan visibles en ninguna parte de "
 "%(platformName)s despúes de que el proceso de verificación haya sido "
 "completado."
-
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr "Enviar"
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: {courseName}"
