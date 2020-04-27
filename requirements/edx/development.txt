@@ -158,7 +158,7 @@ icalendar==4.0.5          # via -r requirements/edx/testing.txt
 idna==2.9                 # via -r requirements/edx/testing.txt, requests
 imagesize==1.2.0          # via sphinx
 importlib-metadata==1.6.0  # via -r requirements/edx/testing.txt, importlib-resources, inflect, jsonschema, path, pluggy, pytest, pytest-randomly, tox, virtualenv
-importlib-resources==1.4.0  # via -r requirements/edx/testing.txt, virtualenv
+importlib-resources==1.5.0  # via -r requirements/edx/testing.txt, virtualenv
 inflect==3.0.2            # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, jinja2-pluralize
 inflection==0.4.0         # via -r requirements/edx/testing.txt, drf-yasg
 ipaddress==1.0.23         # via -r requirements/edx/testing.txt
@@ -215,7 +215,7 @@ paver==1.3.4              # via -r requirements/edx/testing.txt
 pbr==5.4.5                # via -r requirements/edx/testing.txt, stevedore
 pdfminer.six==20200402    # via -r requirements/edx/testing.txt
 piexif==1.1.3             # via -r requirements/edx/testing.txt
-pillow==7.1.1             # via -r requirements/edx/testing.txt, edx-enterprise, edx-organizations
+pillow==7.1.2             # via -r requirements/edx/testing.txt, edx-enterprise, edx-organizations
 pip-tools==4.5.1          # via -c requirements/edx/../constraints.txt, -r requirements/edx/pip-tools.txt
 pkgconfig==1.5.1          # via -r requirements/edx/testing.txt, xmlsec
 pluggy==0.13.1            # via -r requirements/edx/testing.txt, diff-cover, pytest, tox
@@ -261,7 +261,7 @@ python3-openid==3.1.0 ; python_version >= "3"  # via -r requirements/edx/testing
 python3-saml==1.9.0       # via -r requirements/edx/testing.txt
 pytz==2019.3              # via -r requirements/edx/testing.txt, babel, capa, celery, django, django-ses, edx-completion, edx-enterprise, edx-proctoring, edx-submissions, edx-tincan-py35, event-tracking, fs, icalendar, ora2, pandas, xblock
 pyuca==1.2                # via -r requirements/edx/testing.txt
-pywatchman==1.4.1         # via -r requirements/local.in
+pywatchman==1.4.1         # via -r requirements/edx/development.in
 pyyaml==5.3.1             # via -r requirements/edx/testing.txt, code-annotations, edx-django-release-util, edx-i18n-tools, sphinxcontrib-openapi, xblock
 radon==4.1.0              # via -r requirements/edx/testing.txt
 random2==1.0.1            # via -r requirements/edx/testing.txt
@@ -290,7 +290,7 @@ social-auth-core==3.3.3   # via -r requirements/edx/testing.txt, social-auth-app
 git+https://github.com/jazzband/sorl-thumbnail.git@13bedfb7d2970809eda597e3ef79318a6fa80ac2#egg=sorl-thumbnail  # via -r requirements/edx/testing.txt
 sortedcontainers==2.1.0   # via -r requirements/edx/testing.txt, pdfminer.six
 soupsieve==2.0            # via -r requirements/edx/testing.txt, beautifulsoup4
-sphinx==3.0.2             # via edx-sphinx-theme, sphinxcontrib-httpdomain
+sphinx==3.0.3             # via edx-sphinx-theme, sphinxcontrib-httpdomain
 sphinxcontrib-applehelp==1.0.2  # via sphinx
 sphinxcontrib-devhelp==1.0.2  # via sphinx
 sphinxcontrib-htmlhelp==1.0.3  # via sphinx
