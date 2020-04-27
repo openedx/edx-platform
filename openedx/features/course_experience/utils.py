@@ -149,8 +149,10 @@ def get_course_outline_block_tree(request, course_id, user=None):
         """
         is_scored = block.get('has_score') and block.get('weight', 1) > 0
         is_graded = block.get('graded')
+        is_countable = block.get('type') not in ('lti', 'lti_consumer')
+        is_graded_problem = is_scored and is_graded and is_countable
 
-        num_graded_problems = 1 if is_scored and is_graded else 0
+        num_graded_problems = 1 if is_graded_problem else 0
         num_graded_problems += sum(recurse_num_graded_problems(child) for child in block.get('children', []))
 
         block['num_graded_problems'] = num_graded_problems
@@ -186,7 +188,9 @@ def get_course_outline_block_tree(request, course_id, user=None):
         'discussion',
         'drag-and-drop-v2',
         'poll',
-        'word_cloud'
+        'word_cloud',
+        'lti',
+        'lti_consumer',
     ]
     all_blocks = get_blocks(
         request,
