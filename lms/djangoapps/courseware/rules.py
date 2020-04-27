@@ -19,9 +19,11 @@ from xblock.core import XBlock
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseAccessRole, CourseEnrollment
+from student.roles import CourseRole, OrgRole
 from xmodule.course_module import CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
 from xmodule.x_module import XModule
+
 
 from .access import has_access
 
@@ -151,3 +153,27 @@ class HasStaffAccessToContent(Rule):
         if not is_global_staff:
             query &= Q(id__in=course_staff_or_instructor_courses) | Q(org__in=org_staff_or_instructor_courses)
         return query
+
+
+class HasRolesRule(Rule):
+    def __init__(self, *roles):
+        self.roles = roles
+
+    def check(self, user, instance=None):
+        if not user.is_authenticated:
+            return False
+        if isinstance(instance, CourseKey):
+            course_key = instance
+        elif isinstance(instance, (CourseDescriptor, CourseOverview)):
+            course_key = instance.id
+        elif isinstance(instance, (ErrorDescriptor, XModule, XBlock)):
+            course_key = instance.scope_ids.usage_id.course_key
+        else:
+            course_key = CourseKey.from_string(str(instance))
+
+        for role in self.roles:
+            if CourseRole(role, course_key).has_user(user):
+                return True
+            if OrgRole(role, course_key.org).has_user(user):
+                return True
+        return False
