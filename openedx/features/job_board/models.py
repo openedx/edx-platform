@@ -42,10 +42,8 @@ class Job(TimeStampedModel):
     responsibilities = models.TextField(verbose_name=_('Job Responsibilities'),
                                         help_text=_('Please share the responsibilities associated with the job.'))
     website_link = models.URLField(max_length=255, blank=True, null=True, verbose_name=_('Website Link'))
-    application_link = models.URLField(max_length=255, blank=True, null=True, verbose_name=_('Application Link'),
-                                       help_text=_('Please share a link to the job application'))
-    contact_email = models.EmailField(max_length=255, verbose_name=_('Contact Email'),
-                                      help_text=_('Please share a contact email for this job.'))
+    application_link = models.URLField(max_length=255, blank=True, null=True, verbose_name=_('Application Link'))
+    contact_email = models.EmailField(max_length=255, verbose_name=_('Contact Email'))
     logo = models.ImageField(upload_to='job-board/uploaded-logos/', blank=True, null=True, verbose_name=_('Company Logo'),
                              validators=[
                                  FileExtensionValidator(LOGO_ALLOWED_EXTENSION), validate_file_size
