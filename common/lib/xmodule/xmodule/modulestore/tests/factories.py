@@ -542,7 +542,6 @@ class StackTraceCounter(object):
         """
         stacks = StackTraceCounter(stack_depth, include_arguments)
 
-        # pylint: disable=missing-docstring
         @functools.wraps(func)
         def capture(*args, **kwargs):
             stacks.capture_stack(args, kwargs)

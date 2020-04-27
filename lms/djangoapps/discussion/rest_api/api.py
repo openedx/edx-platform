@@ -14,7 +14,7 @@ from django.urls import reverse
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
 from rest_framework.exceptions import PermissionDenied
-from six.moves.urllib.parse import urlencode, urlunparse  # pylint: disable=import-error
+from six.moves.urllib.parse import urlencode, urlunparse
 
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect

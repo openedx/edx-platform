@@ -9,7 +9,7 @@ from django.test import TestCase
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import BlockUsageLocator, CourseLocator
-from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
+from six.moves.urllib.parse import urlparse
 from xblock.exceptions import NoSuchServiceError
 from xblock.fields import ScopeIds
 

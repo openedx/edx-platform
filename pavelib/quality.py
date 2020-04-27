@@ -1,4 +1,3 @@
-# pylint: disable=unicode-format-string
 # coding=utf-8
 
 """

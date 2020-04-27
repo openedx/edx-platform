@@ -12,7 +12,7 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import CourseKey
-from six.moves.urllib.parse import urlencode, urljoin  # pylint: disable=import-error
+from six.moves.urllib.parse import urlencode, urljoin
 
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, is_commerce_service_configured

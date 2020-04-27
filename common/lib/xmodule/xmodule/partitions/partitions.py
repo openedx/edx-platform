@@ -126,7 +126,8 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
     # The default scheme to be used when upgrading version 1 partitions.
     VERSION_1_SCHEME = "random"
 
-    def __new__(cls, id, name, description, groups, scheme=None, parameters=None, active=True, scheme_id=VERSION_1_SCHEME):  # pylint: disable=line-too-long
+    def __new__(cls, id, name, description, groups, scheme=None, parameters=None, active=True,
+                scheme_id=VERSION_1_SCHEME):
         if not scheme:
             scheme = UserPartition.get_scheme(scheme_id)
         if parameters is None:

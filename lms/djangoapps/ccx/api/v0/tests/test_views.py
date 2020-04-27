@@ -11,9 +11,6 @@ from datetime import timedelta
 import ddt
 import mock
 import six
-import six.moves.urllib.error  # pylint: disable=import-error
-import six.moves.urllib.parse  # pylint: disable=import-error
-import six.moves.urllib.request  # pylint: disable=import-error
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -25,12 +22,12 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from six.moves import range, zip
 
-from lms.djangoapps.courseware import courses
 from lms.djangoapps.ccx.api.v0 import views
 from lms.djangoapps.ccx.models import CcxFieldOverride, CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import override_field_for_ccx
 from lms.djangoapps.ccx.tests.utils import CcxTestCase
 from lms.djangoapps.ccx.utils import ccx_course as ccx_course_cm
+from lms.djangoapps.courseware import courses
 from lms.djangoapps.instructor.access import allow_access, list_with_level
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
 from student.models import CourseEnrollment
@@ -911,7 +908,7 @@ class CcxDetailTest(CcxRestApiTest):
             resp.data.get('max_students_allowed'),
             self.ccx.max_student_enrollments_allowed
         )
-        self.assertEqual(resp.data.get('coach_email'), self.ccx.coach.email)  # pylint: disable=no-member
+        self.assertEqual(resp.data.get('coach_email'), self.ccx.coach.email)
         self.assertEqual(resp.data.get('master_course_id'), six.text_type(self.ccx.course_id))
         six.assertCountEqual(self, resp.data.get('course_modules'), self.master_course_chapters)
 
@@ -994,7 +991,7 @@ class CcxDetailTest(CcxRestApiTest):
         """
         display_name = self.ccx.display_name
         max_students_allowed = self.ccx.max_student_enrollments_allowed
-        coach_email = self.ccx.coach.email  # pylint: disable=no-member
+        coach_email = self.ccx.coach.email
         ccx_structure = self.ccx.structure
         resp = self.client.patch(self.detail_url, {}, format='json', HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)

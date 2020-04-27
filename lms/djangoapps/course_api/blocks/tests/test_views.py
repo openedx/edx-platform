@@ -6,7 +6,7 @@ Tests for Blocks Views
 from datetime import datetime
 
 import six
-from six.moves.urllib.parse import urlencode, urlunparse  # pylint: disable=import-error
+from six.moves.urllib.parse import urlencode, urlunparse
 from django.urls import reverse
 from opaque_keys.edx.locator import CourseLocator
 

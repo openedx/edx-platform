@@ -10,7 +10,7 @@ from django.dispatch import receiver
 from user_tasks.models import UserTaskArtifact
 from user_tasks.signals import user_task_stopped
 
-from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
+from six.moves.urllib.parse import urljoin
 
 from .tasks import send_task_complete_email
 

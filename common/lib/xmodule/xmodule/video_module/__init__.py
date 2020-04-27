@@ -2,8 +2,6 @@
 Container for video module and its utils.
 """
 
-# pylint: disable=wildcard-import
-
 from .bumper_utils import *
 from .transcripts_utils import *
 from .video_module import *

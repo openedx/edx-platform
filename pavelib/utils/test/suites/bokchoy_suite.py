@@ -1,4 +1,3 @@
-# pylint: disable=unicode-format-string
 """
 Class used for defining and running Bok Choy acceptance test suite
 """

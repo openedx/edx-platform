@@ -102,7 +102,7 @@ def fake_ugettext(translations):
     """
     Create a fake implementation of ugettext, for testing.
     """
-    def _ugettext(text):                # pylint: disable=missing-docstring
+    def _ugettext(text):
         return translations.get(text, text)
     return _ugettext
 
@@ -111,7 +111,7 @@ def fake_pgettext(translations):
     """
     Create a fake implementation of pgettext, for testing.
     """
-    def _pgettext(context, text):       # pylint: disable=missing-docstring
+    def _pgettext(context, text):
         return translations.get((context, text), text)
     return _pgettext
 

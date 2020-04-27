@@ -1032,7 +1032,7 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
         self.page.set_new_post_editor_value(
             six.text_type(
                 r'\begin{equation}'
-                r'\tau_g(\omega) = - \frac{d}{d\omega}\phi(\omega) \hspace{2em} (1) '  # pylint: disable=unicode-format-string
+                r'\tau_g(\omega) = - \frac{d}{d\omega}\phi(\omega) \hspace{2em} (1) '
                 r'\end{equation}'
             )
         )

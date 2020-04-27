@@ -207,7 +207,7 @@ def _course_notifications_json_get(course_action_state_id):
     return JsonResponse(action_state_info)
 
 
-def _dismiss_notification(request, course_action_state_id):  # pylint: disable=unused-argument
+def _dismiss_notification(request, course_action_state_id):
     """
     Update the display of the course notification
     """
@@ -381,7 +381,6 @@ def _accessible_courses_summary_iter(request, org=None):
         """
         Filter out unusable and inaccessible courses
         """
-        # pylint: disable=fixme
         # TODO remove this condition when templates purged from db
         if course_summary.location.course == 'templates':
             return False
@@ -412,7 +411,6 @@ def _accessible_courses_iter(request):
         if isinstance(course.id, CCXLocator):
             return False
 
-        # pylint: disable=fixme
         # TODO remove this condition when templates purged from db
         if course.location.course == 'templates':
             return False
@@ -441,7 +439,6 @@ def _accessible_courses_iter_for_tests(request):
         if isinstance(course.id, CCXLocator):
             return False
 
-        # pylint: disable=fixme
         # TODO remove this condition when templates purged from db
         if course.location.course == 'templates':
             return False

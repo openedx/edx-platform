@@ -689,7 +689,7 @@ class LibraryImportManager(ImportManager):
         """
         Get the descriptor of the library from the XML import modulestore.
         """
-        source_library = self.xml_module_store.get_library(courselike_key)  # pylint: disable=no-member
+        source_library = self.xml_module_store.get_library(courselike_key)
         library, library_data_path = self.import_courselike(
             runtime, courselike_key, dest_id, source_library,
         )
@@ -745,7 +745,7 @@ def _update_and_import_module(
         """
         Move the module to a new course.
         """
-        def _convert_ref_fields_to_new_namespace(reference):  # pylint: disable=invalid-name
+        def _convert_ref_fields_to_new_namespace(reference):
             """
             Convert a reference to the new namespace, but only
             if the original namespace matched the original course.

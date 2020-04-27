@@ -15,7 +15,7 @@ from mock import patch
 from util.db import OuterAtomic
 
 if six.PY3:
-    from importlib import reload  # pylint: disable=no-name-in-module,redefined-builtin
+    from importlib import reload
 
 
 class UrlResetMixin(object):

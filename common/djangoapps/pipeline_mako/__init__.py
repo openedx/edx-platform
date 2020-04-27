@@ -85,7 +85,7 @@ def render_individual_js(package, paths, templates=None):
     return '\n'.join(tags)
 
 
-def render_require_js_path_overrides(path_overrides):  # pylint: disable=invalid-name
+def render_require_js_path_overrides(path_overrides):
     """Render JavaScript to override default RequireJS paths.
 
     The Django pipeline appends a hash to JavaScript files,

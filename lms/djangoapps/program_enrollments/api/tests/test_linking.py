@@ -34,7 +34,7 @@ class TestLinkProgramEnrollmentsMixin(object):
     """ Utility methods and test data for testing linking """
 
     @classmethod
-    def setUpTestData(cls):  # pylint: disable=missing-docstring
+    def setUpTestData(cls):   # pylint: disable=missing-function-docstring
         cls.program = uuid4()
         cls.curriculum = uuid4()
         cls.other_program = uuid4()

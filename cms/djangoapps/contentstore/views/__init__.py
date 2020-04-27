@@ -1,5 +1,3 @@
-# pylint: disable=wildcard-import
-
 "All view functions for contentstore, broken out into submodules"
 
 from .assets import *

@@ -41,7 +41,7 @@ def clean_test_files():
     # This find command removes all the *.pyc files that aren't in the .git
     # directory.  See this blog post for more details:
     # http://nedbatchelder.com/blog/201505/be_careful_deleting_files_around_git.html
-    sh(r"find . -name '.git' -prune -o -name '*.pyc' -exec rm {} \;")  # pylint: disable=unicode-format-string
+    sh(r"find . -name '.git' -prune -o -name '*.pyc' -exec rm {} \;")
     sh("rm -rf test_root/log/auto_screenshots/*")
     sh("rm -rf /tmp/mako_[cl]ms")
 

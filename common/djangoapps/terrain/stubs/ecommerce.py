@@ -5,14 +5,15 @@ Stub implementation of ecommerce service for acceptance tests
 
 import re
 
-import six.moves.urllib.parse  # pylint: disable=import-error
+import six.moves.urllib.parse
 
 from .http import StubHttpRequestHandler, StubHttpService
 
 
-class StubEcommerceServiceHandler(StubHttpRequestHandler):  # pylint: disable=missing-docstring
+class StubEcommerceServiceHandler(StubHttpRequestHandler):  # pylint: disable=missing-class-docstring
 
-    def do_GET(self):  # pylint: disable=invalid-name, missing-docstring
+    # pylint: disable=missing-function-docstring
+    def do_GET(self):
         pattern_handlers = {
             '/api/v2/orders/$': self.get_orders_list,
         }
@@ -59,5 +60,5 @@ class StubEcommerceServiceHandler(StubHttpRequestHandler):  # pylint: disable=mi
         self.send_json_response(orders)
 
 
-class StubEcommerceService(StubHttpService):  # pylint: disable=missing-docstring
+class StubEcommerceService(StubHttpService):
     HANDLER_CLASS = StubEcommerceServiceHandler

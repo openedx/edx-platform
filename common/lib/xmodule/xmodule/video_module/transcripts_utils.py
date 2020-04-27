@@ -19,7 +19,7 @@ from pysrt import SubRipFile, SubRipItem, SubRipTime
 from pysrt.srtexc import Error
 from six import text_type
 from six.moves import range, zip
-from six.moves.html_parser import HTMLParser  # pylint: disable=import-error
+from six.moves.html_parser import HTMLParser
 
 from openedx.core.djangolib import blockstore_cache
 from openedx.core.lib import blockstore_api
@@ -40,19 +40,19 @@ log = logging.getLogger(__name__)
 NON_EXISTENT_TRANSCRIPT = 'non_existent_dummy_file_name'
 
 
-class TranscriptException(Exception):  # pylint: disable=missing-docstring
+class TranscriptException(Exception):
     pass
 
 
-class TranscriptsGenerationException(Exception):  # pylint: disable=missing-docstring
+class TranscriptsGenerationException(Exception):
     pass
 
 
-class GetTranscriptsFromYouTubeException(Exception):  # pylint: disable=missing-docstring
+class GetTranscriptsFromYouTubeException(Exception):
     pass
 
 
-class TranscriptsRequestValidationException(Exception):  # pylint: disable=missing-docstring
+class TranscriptsRequestValidationException(Exception):
     pass
 
 

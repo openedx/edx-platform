@@ -70,7 +70,6 @@ class FieldsMixin(object):
         Return the title of a field.
         """
         self.wait_for_field(field_id)
-        # pylint: disable=unicode-format-string
         query = self.q(css=six.u('.u-field-{} .u-field-title').format(field_id))
         return query.text[0] if query.present else None
 
@@ -79,7 +78,6 @@ class FieldsMixin(object):
         Return the current message in a field.
         """
         self.wait_for_field(field_id)
-        # pylint: disable=unicode-format-string
         query = self.q(css=six.u('.u-field-{} .u-field-message'.format(field_id)))
         return query.text[0] if query.present else None
 
@@ -159,7 +157,6 @@ class FieldsMixin(object):
         Get or set the value of a text field.
         """
         self.wait_for_field(field_id)
-        # pylint: disable=unicode-format-string
         query = self.q(css=six.u('.u-field-{} input'.format(field_id)))
         if not query.present:
             return None

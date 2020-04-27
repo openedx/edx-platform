@@ -205,7 +205,6 @@ def validate_xml(xsd_filename, xml_filename):
         etree.fromstring(f.read(), xmlparser)
 
 if click is not None:
-    # pylint: disable=bad-continuation
     @click.command()
     @click.option('--num_assets',
                   type=click.INT,

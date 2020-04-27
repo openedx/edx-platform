@@ -164,7 +164,7 @@ def common_exceptions_400(func):
     (decorator without arguments)
     """
 
-    def wrapped(request, *args, **kwargs):  # pylint: disable=missing-docstring
+    def wrapped(request, *args, **kwargs):
         use_json = (request.is_ajax() or
                     request.META.get("HTTP_ACCEPT", "").startswith("application/json"))
         try:
@@ -198,8 +198,8 @@ def require_post_params(*args, **kwargs):
     required_params += [(key, kwargs[key]) for key in kwargs]
     # required_params = e.g. [('action', 'enroll or unenroll'), ['emails', None]]
 
-    def decorator(func):  # pylint: disable=missing-docstring
-        def wrapped(*args, **kwargs):  # pylint: disable=missing-docstring
+    def decorator(func):
+        def wrapped(*args, **kwargs):
             request = args[0]
 
             error_response_data = {
@@ -231,7 +231,7 @@ def require_course_permission(permission):
     Assumes that request is in args[0].
     Assumes that course_id is in kwargs['course_id'].
     """
-    def decorator(func):  # pylint: disable=missing-docstring
+    def decorator(func):
         def wrapped(*args, **kwargs):
             request = args[0]
             course = get_course_by_id(CourseKey.from_string(kwargs['course_id']))
@@ -252,7 +252,7 @@ def require_sales_admin(func):
 
     If the user does not have privileges for this operation, this will return HttpResponseForbidden (403).
     """
-    def wrapped(request, course_id):  # pylint: disable=missing-docstring
+    def wrapped(request, course_id):
 
         try:
             course_key = CourseKey.from_string(course_id)
@@ -277,7 +277,7 @@ def require_finance_admin(func):
 
     If the user does not have privileges for this operation, this will return HttpResponseForbidden (403).
     """
-    def wrapped(request, course_id):  # pylint: disable=missing-docstring
+    def wrapped(request, course_id):
 
         try:
             course_key = CourseKey.from_string(course_id)
@@ -1069,7 +1069,7 @@ def get_grading_config(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_course_permission(permissions.CAN_RESEARCH)
-def get_sale_records(request, course_id, csv=False):  # pylint: disable=unused-argument, redefined-outer-name
+def get_sale_records(request, course_id, csv=False):  # pylint: disable=redefined-outer-name
     """
     return the summary of all sales records for a particular course
     """
@@ -1100,7 +1100,7 @@ def get_sale_records(request, course_id, csv=False):  # pylint: disable=unused-a
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_course_permission(permissions.CAN_RESEARCH)
-def get_sale_order_records(request, course_id):  # pylint: disable=unused-argument
+def get_sale_order_records(request, course_id):
     """
     return the summary of all sales records for a particular course
     """
@@ -1462,7 +1462,7 @@ class CohortCSV(DeveloperErrorViewMixin, APIView):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_course_permission(permissions.VIEW_COUPONS)
-def get_coupon_codes(request, course_id):  # pylint: disable=unused-argument
+def get_coupon_codes(request, course_id):
     """
     Respond with csv which contains a summary of all Active Coupons.
     """
@@ -1472,7 +1472,7 @@ def get_coupon_codes(request, course_id):  # pylint: disable=unused-argument
     query_features = [
         ('code', _('Coupon Code')),
         ('course_id', _('Course Id')),
-        ('percentage_discount', _('% Discount')),  # pylint: disable=unicode-format-string
+        ('percentage_discount', _('% Discount')),
         ('description', _('Description')),
         ('expiration_date', _('Expiration Date')),
         ('is_active', _('Is Active')),
@@ -1895,7 +1895,7 @@ def spent_registration_codes(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_course_permission(permissions.CAN_RESEARCH)
-def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
+def get_anon_ids(request, course_id):
     """
     Respond with 2-column CSV output of user-id, anonymized-user-id
     """
@@ -2373,7 +2373,7 @@ def rescore_entrance_exam(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_course_permission(permissions.EMAIL)
-def list_background_email_tasks(request, course_id):  # pylint: disable=unused-argument
+def list_background_email_tasks(request, course_id):
     """
     List background email tasks.
     """
@@ -2395,7 +2395,7 @@ def list_background_email_tasks(request, course_id):  # pylint: disable=unused-a
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_course_permission(permissions.EMAIL)
-def list_email_content(request, course_id):  # pylint: disable=unused-argument
+def list_email_content(request, course_id):
     """
     List the content of bulk emails sent
     """
@@ -2816,7 +2816,7 @@ def update_forum_role_membership(request, course_id):
 
 
 @require_POST
-def get_user_invoice_preference(request, course_id):  # pylint: disable=unused-argument
+def get_user_invoice_preference(request, course_id):
     """
     Gets invoice copy user's preferences.
     """
@@ -2965,7 +2965,7 @@ def _instructor_dash_url(course_key, section=None):
 
 @require_global_staff
 @require_POST
-def generate_example_certificates(request, course_id=None):  # pylint: disable=unused-argument
+def generate_example_certificates(request, course_id=None):
     """Start generating a set of example certificates.
 
     Example certificates are used to verify that certificates have
@@ -3186,7 +3186,7 @@ def remove_certificate_exception(course_key, student):
         )
 
     try:
-        generated_certificate = GeneratedCertificate.objects.get(  # pylint: disable=no-member
+        generated_certificate = GeneratedCertificate.objects.get(
             user=student,
             course_id=course_key
         )

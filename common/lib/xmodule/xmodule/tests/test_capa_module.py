@@ -2,7 +2,6 @@
 """
 Tests of the Capa XModule
 """
-# pylint: disable=missing-docstring
 # pylint: disable=invalid-name
 
 
@@ -861,7 +860,7 @@ class ProblemBlockTest(unittest.TestCase):
         # pylint: enable=line-too-long
 
         self.assertEqual(xqueue_interface._http_post.call_count, 1)
-        _, kwargs = xqueue_interface._http_post.call_args  # pylint: disable=unpacking-non-sequence
+        _, kwargs = xqueue_interface._http_post.call_args
         six.assertCountEqual(self, fpaths, list(kwargs['files'].keys()))
         for fpath, fileobj in six.iteritems(kwargs['files']):
             self.assertEqual(fpath, fileobj.name)
@@ -894,7 +893,7 @@ class ProblemBlockTest(unittest.TestCase):
         module.handle('xmodule_handler', request, 'problem_check')
 
         self.assertEqual(xqueue_interface._http_post.call_count, 1)
-        _, kwargs = xqueue_interface._http_post.call_args  # pylint: disable=unpacking-non-sequence
+        _, kwargs = xqueue_interface._http_post.call_args
         six.assertCountEqual(self, fnames, list(kwargs['files'].keys()))
         for fpath, fileobj in six.iteritems(kwargs['files']):
             self.assertEqual(fpath, fileobj.name)

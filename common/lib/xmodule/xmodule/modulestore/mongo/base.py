@@ -228,7 +228,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         self.course_id = course_key
         self.cached_metadata = cached_metadata
 
-    def load_item(self, location, for_parent=None):  # pylint: disable=method-hidden
+    def load_item(self, location, for_parent=None):
         """
         Return an XModule instance for the specified location
         """
@@ -515,7 +515,6 @@ class ParentLocationCache(dict):
     """
     Dict-based object augmented with a more cache-like interface, for internal use.
     """
-    # pylint: disable=missing-docstring
 
     @contract(key=six.text_type)
     def has(self, key):
@@ -1653,7 +1652,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         if revision == ModuleStoreEnum.RevisionOption.published_only:
             query['_id.revision'] = MongoRevisionKey.published
 
-        def cache_and_return(parent_loc):  # pylint:disable=missing-docstring
+        def cache_and_return(parent_loc):
             parent_cache.set(six.text_type(location), parent_loc)
             return parent_loc
 

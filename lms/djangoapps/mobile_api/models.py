@@ -91,7 +91,7 @@ class AppVersionConfig(models.Model):
         super(AppVersionConfig, self).save(*args, **kwargs)
 
 
-class IgnoreMobileAvailableFlagConfig(ConfigurationModel):  # pylint: disable=W5101
+class IgnoreMobileAvailableFlagConfig(ConfigurationModel):
     """
     Configuration for the mobile_available flag. Default is false.
 

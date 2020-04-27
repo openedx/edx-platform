@@ -234,7 +234,7 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
         key_store = DictKeyValueStore()
         field_data = KvsFieldData(key_store)
 
-        aside = AsideTest(scope_ids=scope_ids, runtime=TestRuntime(services={'field-data': field_data}))   # pylint: disable=abstract-class-instantiated
+        aside = AsideTest(scope_ids=scope_ids, runtime=TestRuntime(services={'field-data': field_data}))
         aside.fields[self.ASIDE_DATA_FIELD.field_name].write_to(aside, self.ASIDE_DATA_FIELD.initial)
         return [aside]
 

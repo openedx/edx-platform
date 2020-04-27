@@ -184,7 +184,6 @@ class LeafDescriptorFactory(Factory):
     """
     Factory to generate leaf XModuleDescriptors.
     """
-    # pylint: disable=missing-docstring
 
     class Meta(object):
         model = XModuleDescriptor
@@ -276,7 +275,7 @@ class XBlockWrapperTestMixin(object):
         """
         pass
 
-    def check_property(self, descriptor):  # pylint: disable=unused-argument
+    def check_property(self, descriptor):
         """
         Execute assertions to verify that the property under test is true for
         the supplied descriptor.
@@ -306,20 +305,19 @@ class XBlockWrapperTestMixin(object):
         descriptor_cls, fields = cls_and_fields
         self.skip_if_invalid(descriptor_cls)
         descriptor = ContainerModuleFactory(descriptor_cls=descriptor_cls, depth=2, **fields)
-        # pylint: disable=no-member
         descriptor.runtime.id_reader.get_definition_id = Mock(return_value='a')
         self.check_property(descriptor)
 
     # Test that when an xmodule is generated from descriptor_cls
     # with mixed xmodule and xblock children, the test property holds
     @ddt.data(*flatten(CONTAINER_XMODULES))
-    def test_container_node_mixed(self, cls_and_fields):  # pylint: disable=unused-argument
+    def test_container_node_mixed(self, cls_and_fields):
         raise SkipTest("XBlock support in XDescriptor not yet fully implemented")
 
     # Test that when an xmodule is generated from descriptor_cls
     # with only xblock children, the test property holds
     @ddt.data(*flatten(CONTAINER_XMODULES))
-    def test_container_node_xblocks_only(self, cls_and_fields):  # pylint: disable=unused-argument
+    def test_container_node_xblocks_only(self, cls_and_fields):
         raise SkipTest("XBlock support in XModules not yet fully implemented")
 
 

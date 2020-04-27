@@ -663,7 +663,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         return params
 
     @XBlock.handler
-    def grade_handler(self, request, suffix):  # pylint: disable=unused-argument
+    def grade_handler(self, request, suffix):
         """
         This is called by courseware.module_render, to handle an AJAX call.
 
