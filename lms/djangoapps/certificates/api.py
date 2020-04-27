@@ -132,6 +132,24 @@ def get_certificate_for_user(username, course_key):
     return format_certificate_for_user(username, cert)
 
 
+def get_certificates_for_user_by_course_keys(user, course_keys):
+    """
+    Retrieve certificate information for a particular user for a set of courses.
+
+    Arguments:
+        user (User)
+        course_keys (set[CourseKey])
+
+    Yields: (User, dict)
+        Yields tuples of (User, dict), where the dict contains the certificate data.
+    """
+    certs = GeneratedCertificate.eligible_certificates.filter(
+        user=user, course_id__in=course_keys
+    )
+    for cert in certs:
+        yield cert.user, format_certificate_for_user(user.username, cert)
+
+
 def get_recently_modified_certificates(course_keys=None, start_date=None, end_date=None):
     """
     Returns a QuerySet of GeneratedCertificate objects filtered by the input
