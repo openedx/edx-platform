@@ -68,7 +68,6 @@ class ProgramEnrollmentUpdateRequestSerializer(ProgramEnrollmentRequestMixin):
     """
     Serializer for program enrollment update requests.
     """
-    pass
 
 
 class ProgramCourseEnrollmentSerializer(serializers.Serializer):

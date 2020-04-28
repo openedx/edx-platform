@@ -6,6 +6,8 @@ Exceptions raised by functions exposed by program_enrollments Django app.
 # Every `__init__` here calls empty Exception() constructor.
 # pylint: disable=super-init-not-called
 
+# pylint: disable=missing-class-docstring
+
 
 class ProgramDoesNotExistException(Exception):
 
