@@ -52,23 +52,20 @@ def get_completed_programs(site, student):
     return meter.completed_programs_with_available_dates
 
 
-def get_inverted_programs(student):
+def get_inverted_programs(site, student):
     """
-    Get programs keyed by course run ID.
+    Given a set of completed courses, determine which programs are completed.
 
     Args:
-        student (User): Representing the student whose programs to check for.
+        site (Site): Site for which data should be retrieved.
+        student (User): Representing the student whose completed programs to check for.
 
     Returns:
-        dict, programs keyed by course run ID
+        dict of {program_UUIDs: visible_dates}
 
     """
-    inverted_programs = {}
-    for site in Site.objects.all():
-        meter = ProgramProgressMeter(site, student)
-        inverted_programs.update(meter.invert_programs())
-
-    return inverted_programs
+    meter = ProgramProgressMeter(site, student)
+    return meter.invert_programs()
 
 
 def get_certified_programs(student):
@@ -352,30 +349,6 @@ def award_course_certificate(self, username, course_run_key):
         raise self.retry(exc=exc, countdown=countdown, max_retries=MAX_RETRIES)
 
 
-def get_revokable_program_uuids(course_specific_programs, student):
-    """
-    Get program uuids for which certificate to be revoked.
-
-    Checks for existing learner certificates and filter out the program UUIDS
-    for which a certificate needs to be revoked.
-
-    Args:
-        course_specific_programs (dict[]): list of programs specific to a course
-        student (User): Representing the student whose programs to check for.
-
-    Returns:
-        list if program UUIDs for which certificates to be revoked
-
-    """
-    program_uuids_to_revoke = []
-    existing_program_uuids = get_certified_programs(student)
-    for program in course_specific_programs:
-        if program['uuid'] in existing_program_uuids:
-            program_uuids_to_revoke.append(program['uuid'])
-
-    return program_uuids_to_revoke
-
-
 def revoke_program_certificate(client, username, program_uuid):
     """
     Revoke a certificate of the given student for the given program.
@@ -430,32 +403,38 @@ def revoke_program_certificates(self, username, course_key):
         raise self.retry(countdown=countdown, max_retries=MAX_RETRIES)
 
     try:
-        student = User.objects.get(username=username)
-    except User.DoesNotExist:
-        LOGGER.exception(u'Task revoke_program_certificates was called with invalid username %s', username)
-        # Don't retry for this case - just conclude the task.
-        return
-
-    try:
-        inverted_programs = get_inverted_programs(student)
-        course_specific_programs = inverted_programs.get(str(course_key))
+        try:
+            student = User.objects.get(username=username)
+        except User.DoesNotExist:
+            LOGGER.exception(u'Task revoke_program_certificates was called with invalid username %s', username)
+            # Don't retry for this case - just conclude the task.
+            return
+        inverted_programs = {}
+        for site in Site.objects.all():
+            inverted_programs.update(get_inverted_programs(site, student))
+            course_specific_programs = inverted_programs.get(str(course_key))
+            import pdb; pdb.set_trace()
         if not course_specific_programs:
             # No reason to continue beyond this point
             LOGGER.info(
                 u'Task revoke_program_certificates was called for user %s and course %s with no engaged programs',
-                username,
-                course_key
-            )
+                    username,
+                    course_key
+                 )
             return
 
         # Determine which program certificates the user has already been awarded, if any.
-        program_uuids_to_revoke = get_revokable_program_uuids(course_specific_programs, student)
+        existing_program_uuids = get_certified_programs(student)
+        program_uuids_to_revoke = []
+        for program in course_specific_programs:
+            if  program['uuid'] in existing_program_uuids:
+                program_uuids_to_revoke.append(program['uuid'])
     except Exception as exc:
         LOGGER.exception(
             u'Failed to determine program certificates to be revoked for user %s with course %s',
-            username,
-            course_key
-        )
+                username,
+                course_key
+            )
         raise self.retry(exc=exc, countdown=countdown, max_retries=MAX_RETRIES)
 
     if program_uuids_to_revoke:
@@ -464,7 +443,7 @@ def revoke_program_certificates(self, username, course_key):
                 User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME),
             )
         except Exception as exc:
-            LOGGER.exception('Failed to create a credentials API client to revoke program certificates')
+            LOGGER.exception('Failed to create a credentials API client to award program certificates')
             # Retry because a misconfiguration could be fixed
             raise self.retry(exc=exc, countdown=countdown, max_retries=MAX_RETRIES)
 
@@ -483,7 +462,7 @@ def revoke_program_certificates(self, username, course_key):
                 # client handles all 4XX errors the same way. In the future,
                 # we may want to fork slumber, add 429 handling, and use that
                 # in edx_rest_api_client.
-                if exc.response.status_code == 429:  # pylint: disable=no-member, no-else-raise
+                if exc.response.status_code == 429:  # pylint: disable=no-member
                     rate_limit_countdown = 60
                     LOGGER.info(
                         u"""Rate limited. Retrying task to revoke certificates for user {username} in {countdown}

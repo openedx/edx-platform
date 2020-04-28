@@ -9,7 +9,6 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import patch
 from opaque_keys.edx.locator import CourseKey, CourseLocator
 from path import Path as path
 
@@ -358,16 +357,3 @@ class CertificateInvalidationTest(SharedModuleStoreTestCase):
         self.assertFalse(
             CertificateInvalidation.has_certificate_invalidation(self.user, self.course_id)
         )
-
-    @patch('openedx.core.djangoapps.programs.tasks.v1.tasks.revoke_program_certificates.delay')
-    @patch(
-        'openedx.core.djangoapps.credentials.models.CredentialsApiConfig.is_learner_issuance_enabled',
-        return_value=True,
-    )
-    def test_revoke_program_certificates(self, mock_issuance, mock_revoke_task):    # pylint: disable=unused-argument
-        """ Verify that `revoke_program_certificates` is invoked upon invalidation. """
-        # Invalidate user certificate
-        self.certificate.invalidate()
-
-        self.assertEqual(mock_revoke_task.call_count, 1)
-        self.assertEqual(mock_revoke_task.call_args[0], (self.user.username, self.course_id))
