@@ -31,7 +31,10 @@ class MasqueradableMixin:
     @cached_property
     def target_user(self):
         """
-        TODO
+        Get user to perform operations as.
+
+        This will generally be the requesting user, but in the case of masquerading,
+        it will be a different user.
 
         Raises: PermssionDenied, if:
             1. target user does not exist,
@@ -54,6 +57,12 @@ class MasqueradableMixin:
                 "%s, as %s does not exist.",
                 cannot_masquerade_message,
                 target_username,
+            )
+            raise PermissionDenied(cannot_masquerade_message)
+        if target != requester:
+            log.info(
+                "%s, as masquerading is not yet enabled in the program_enrollments API."
+                cannot_masquerade_message,
             )
             raise PermissionDenied(cannot_masquerade_message)
         if not requester.is_staff:
