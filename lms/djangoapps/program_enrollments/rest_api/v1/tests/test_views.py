@@ -4,7 +4,7 @@ Unit tests for ProgramEnrollment views.
 
 
 import json
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
 from datetime import datetime, timedelta
 from uuid import UUID, uuid4
 
@@ -38,7 +38,7 @@ from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, P
 from lms.djangoapps.program_enrollments.tests.factories import (
     CourseAccessRoleAssignmentFactory,
     ProgramCourseEnrollmentFactory,
-    ProgramEnrollmentFactory,
+    ProgramEnrollmentFactory
 )
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL, PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL
 from openedx.core.djangoapps.catalog.tests.factories import (
