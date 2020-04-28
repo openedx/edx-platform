@@ -54,7 +54,7 @@ from student.models import CourseEnrollment
 from student.roles import CourseInstructorRole, CourseStaffRole, UserBasedRole
 from util.query import read_replica_or_default
 
-from .constants import ENABLE_ENROLLMENT_RESET_FLAG, MAX_ENROLLMENT_RECORDS
+from .constants import CourseRunProgressStatuses, ENABLE_ENROLLMENT_RESET_FLAG, MAX_ENROLLMENT_RECORDS
 from .serializers import (
     CourseRunOverviewListSerializer,
     ProgramCourseEnrollmentRequestSerializer,
@@ -912,14 +912,16 @@ class ProgramCourseEnrollmentOverviewView(
 
             certificate_info = get_certificate_for_user(user.username, enrollment.course_id) or {}
 
-            due_dates = []
-            if overview.has_started() and not overview.has_ended():
+            course_run_status = get_course_run_status(overview, certificate_info)
+            if course_run_status == CourseRunProgressStatuses.IN_PROGRESS:
                 due_dates = get_due_dates(request, enrollment.course_id, user)
+            else:
+                due_dates = []
 
             course_run_dict = {
                 'course_run_id': enrollment.course_id,
                 'display_name': overview.display_name_with_default,
-                'course_run_status': get_course_run_status(overview, certificate_info),
+                'course_run_status': course_run_status,
                 'course_run_url': get_course_run_url(request, enrollment.course_id),
                 'start_date': overview.start,
                 'end_date': overview.end,
