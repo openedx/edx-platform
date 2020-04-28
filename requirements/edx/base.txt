@@ -40,7 +40,7 @@ certifi==2020.4.5.1       # via -r requirements/edx/paver.txt, requests
 cffi==1.14.0              # via -r requirements/edx/../edx-sandbox/shared.txt, cryptography
 chardet==3.0.4            # via -r requirements/edx/paver.txt, pdfminer.six, pysrt, requests
 git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0  # via -r requirements/edx/github.in
-click==7.1.1              # via -r requirements/edx/../edx-sandbox/shared.txt, code-annotations, nltk, user-util
+click==7.1.2              # via -r requirements/edx/../edx-sandbox/shared.txt, code-annotations, nltk, user-util
 code-annotations==0.3.3   # via edx-enterprise
 contextlib2==0.6.0.post1  # via -r requirements/edx/base.in
 coreapi==2.3.3            # via drf-yasg
@@ -60,7 +60,7 @@ django-config-models==2.0.0  # via -r requirements/edx/base.in, edx-enterprise
 django-cookies-samesite==0.5.1  # via -r requirements/edx/base.in
 django-cors-headers==2.5.3  # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
 django-countries==5.5     # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, edx-enterprise
-django-crum==0.7.5        # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring, edx-rbac, super-csv
+django-crum==0.7.6        # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring, edx-rbac, super-csv
 django-fernet-fields==0.6  # via -r requirements/edx/base.in, edx-enterprise, edxval
 django-filter==2.2.0      # via -r requirements/edx/base.in, edx-enterprise
 django-ipware==2.1.0      # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring
@@ -78,7 +78,7 @@ django-ratelimit-backend==2.0  # via -r requirements/edx/base.in
 django-require==1.0.11    # via -r requirements/edx/base.in
 django-sekizai==1.1.0     # via -r requirements/edx/base.in, django-wiki
 django-ses==0.8.14        # via -r requirements/edx/base.in
-django-simple-history==2.9.0  # via -r requirements/edx/base.in, edx-enterprise, edx-organizations, ora2
+django-simple-history==2.10.0  # via -r requirements/edx/base.in, edx-enterprise, edx-organizations, ora2
 django-splash==0.2.7      # via -r requirements/edx/base.in
 django-statici18n==1.9.0  # via -r requirements/edx/base.in
 django-storages==1.8      # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, edxval
@@ -203,7 +203,7 @@ python-slugify==4.0.0     # via code-annotations
 python-swiftclient==3.9.0  # via ora2
 python3-openid==3.1.0 ; python_version >= "3"  # via -r requirements/edx/base.in, social-auth-core
 python3-saml==1.9.0       # via -r requirements/edx/base.in
-pytz==2019.3              # via -r requirements/edx/base.in, babel, capa, celery, django, django-ses, edx-completion, edx-enterprise, edx-proctoring, edx-submissions, edx-tincan-py35, event-tracking, fs, icalendar, ora2, xblock
+pytz==2020.1              # via -r requirements/edx/base.in, babel, capa, celery, django, django-ses, edx-completion, edx-enterprise, edx-proctoring, edx-submissions, edx-tincan-py35, event-tracking, fs, icalendar, ora2, xblock
 pyuca==1.2                # via -r requirements/edx/base.in
 pyyaml==5.3.1             # via -r requirements/edx/base.in, code-annotations, edx-django-release-util, edx-i18n-tools, xblock
 random2==1.0.1            # via -r requirements/edx/base.in

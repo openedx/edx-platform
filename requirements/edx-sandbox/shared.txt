@@ -5,7 +5,7 @@
 #    make upgrade
 #
 cffi==1.14.0              # via cryptography
-click==7.1.1              # via nltk
+click==7.1.2              # via nltk
 cryptography==2.9.2       # via -r requirements/edx-sandbox/shared.in
 joblib==0.14.1            # via nltk
 lxml==4.5.0               # via -r requirements/edx-sandbox/shared.in
