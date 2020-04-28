@@ -2,22 +2,25 @@
 This file contains the test cases for helper functions of the student_certificates app
 """
 import pytz
+from django.conf import settings
+from django.http import Http404
 
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from student.tests.factories import UserFactory
-from student.models import CourseEnrollment
-from xmodule.modulestore.tests.factories import CourseFactory
 from certificates.tests.factories import GeneratedCertificateFactory
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.student_certificates.helpers import (
     CERTIFICATE_IMG_PREFIX,
-    get_philu_certificate_social_context,
-    get_certificate_img_key,
-    get_certificate_image_path,
     get_certificate_image_name,
-    get_certificate_url,
+    get_certificate_image_path,
     get_certificate_image_url,
+    get_certificate_img_key,
+    get_certificate_url,
+    get_course_display_name_by_uuid,
+    get_philu_certificate_social_context
 )
-from django.conf import settings
+from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class GenerateStudentCertificateHelpersTestCase(SharedModuleStoreTestCase):
@@ -51,11 +54,11 @@ class GenerateStudentCertificateHelpersTestCase(SharedModuleStoreTestCase):
         """
         current_context = get_philu_certificate_social_context(self.course, self.certificate)
         certificate_uuid = self.certificate.verify_uuid
-        
+
         self.assertTrue(certificate_uuid in current_context['twitter'])
         self.assertTrue(certificate_uuid in current_context['facebook'])
         self.assertTrue(certificate_uuid in current_context['email'])
-        self.assertTrue(certificate_uuid in  current_context['linkedin'])
+        self.assertTrue(certificate_uuid in current_context['linkedin'])
         self.assertTrue(certificate_uuid in current_context['facebook_after_enroll'])
 
     def test_get_certificate_img_url(self):
@@ -111,3 +114,16 @@ class GenerateStudentCertificateHelpersTestCase(SharedModuleStoreTestCase):
         current_img_key = get_certificate_img_key(img_name)
 
         self.assertEqual(expected_img_key, current_img_key)
+
+    def test_get_course_display_name_by_uuid(self):
+        """
+            Test generation of course display name
+        """
+        expected_course_display_name = CourseOverview.objects.get(id=self.course.id).display_name
+        current_course_display_name = get_course_display_name_by_uuid(self.certificate.verify_uuid)
+
+        self.assertEqual(expected_course_display_name, current_course_display_name)
+
+        verify_uuid = 'test_uuid'
+        with self.assertRaises(Http404):
+            get_course_display_name_by_uuid(verify_uuid)

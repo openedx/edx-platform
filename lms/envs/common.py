@@ -2400,7 +2400,8 @@ INSTALLED_APPS = [
     # User Leads app
     'openedx.features.user_leads',
 
-    'channels'
+    'channels',
+    'multiselectfield'
 ]
 
 ######################### CSRF #########################################

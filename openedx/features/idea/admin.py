@@ -11,7 +11,7 @@ class IdeaAdmin(admin.ModelAdmin):
 
     list_display = ('title', 'user', 'organization', 'city', 'country')
     search_fields = ('user__username', 'organization__label')
-    raw_id_fields = ('user',)
+    raw_id_fields = ('user', 'favorites')
 
 
 admin.site.register(Idea, IdeaAdmin)
