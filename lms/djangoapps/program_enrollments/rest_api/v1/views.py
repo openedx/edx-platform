@@ -360,14 +360,14 @@ class ProgramEnrollmentsView(
         return self.handle_write_request()
 
     @verify_program_exists
-    def patch(self, request, program_uuid=None):  # pylint: disable=unused-argument
+    def patch(self, request, program_uuid=None):
         """
         Update program enrollments for a list of learners
         """
         return self.handle_write_request()
 
     @verify_program_exists
-    def put(self, request, program_uuid=None):  # pylint: disable=unused-argument
+    def put(self, request, program_uuid=None):
         """
         Create/update program enrollments for a list of learners
         """
@@ -508,7 +508,6 @@ class ProgramCourseEnrollmentsView(
         return self.handle_write_request()
 
     @verify_course_exists_and_in_program
-    # pylint: disable=unused-argument
     def patch(self, request, program_uuid=None, course_id=None):
         """
         Modify the program course enrollments of a list of learners
@@ -516,7 +515,6 @@ class ProgramCourseEnrollmentsView(
         return self.handle_write_request()
 
     @verify_course_exists_and_in_program
-    # pylint: disable=unused-argument
     def put(self, request, program_uuid=None, course_id=None):
         """
         Create or Update the program course enrollments of a list of learners
