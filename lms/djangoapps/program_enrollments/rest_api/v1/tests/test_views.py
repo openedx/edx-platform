@@ -1619,6 +1619,13 @@ class ProgramCourseEnrollmentOverviewGetTests(
             cls.yesterday = timezone.now() - timedelta(1)
             cls.tomorrow = timezone.now() + timedelta(1)
 
+        cls.modulestore_course = ModulestoreCourseFactory.create(
+            org="edX",
+            course="ToyX",
+            run="Toy_Course",
+            start=cls.yesterday,
+            end=cls.tomorrow,
+        )
         cls.relative_certificate_download_url = '/download-the-certificates'
         cls.absolute_certificate_download_url = 'http://www.certificates.com/'
 
@@ -1797,17 +1804,18 @@ class ProgramCourseEnrollmentOverviewGetTests(
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         assert [] == response.data['course_runs'][0]['due_dates']
 
-    def test_due_dates(self):
-        course = ModulestoreCourseFactory.create(
-            org="edX",
-            course="ToyX",
-            run="Toy_Course",
-        )
+    @ddt.data(
+        ('2018-12-01', False),
+        ('2019-01-01', True),
+        ('2019-01-09', False),
+    )
+    @ddt.unpack
+    def test_due_dates(self, now_time, course_in_progress):
         section_1 = ItemFactory.create(
             category='chapter',
             start=self.yesterday,
             due=self.tomorrow,
-            parent=course,
+            parent=self.modulestore_course,
             display_name='section 1'
         )
 
@@ -1839,7 +1847,7 @@ class ProgramCourseEnrollmentOverviewGetTests(
         )
 
         mock_path = 'lms.djangoapps.course_api.api.get_dates_for_course'
-        with mock.patch(mock_path) as mock_get_dates:
+        with mock.patch(mock_path) as mock_get_dates, freeze_time(now_time):
             mock_get_dates.return_value = {
                 (section_1.location, 'due'): section_1.due,
                 (section_1.location, 'start'): section_1.start,
@@ -1880,8 +1888,11 @@ class ProgramCourseEnrollmentOverviewGetTests(
             ]
             due_dates = response.data['course_runs'][0]['due_dates']
 
-            for block in block_data:
-                self.assertIn(block, due_dates)
+            if course_in_progress:
+                for block in block_data:
+                    self.assertIn(block, due_dates)
+            else:
+                assert due_dates == []
 
     @mock.patch.object(CourseOverview, 'has_ended')
     def test_course_run_status_instructor_paced_completed(self, mock_has_ended):

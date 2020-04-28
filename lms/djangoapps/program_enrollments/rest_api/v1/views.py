@@ -816,8 +816,9 @@ class ProgramCourseEnrollmentOverviewView(
                 if absent, the bulk email feature is either not enable at the platform
                 level or is not enabled for the course; if True or False, bulk email
                 feature is enabled, and value represents whether or not user wants
-                to receive emails due_dates: a list of subsection due dates for the
-                course run:
+                to receive emails
+            * due_dates: a list of subsection due dates for the
+                course run. Due dates are only returned if the course run is in progress.
                 ** name: name of the subsection
                 ** url: deep link to the subsection
                 ** date: due date for the subsection
@@ -911,6 +912,10 @@ class ProgramCourseEnrollmentOverviewView(
 
             certificate_info = get_certificate_for_user(user.username, enrollment.course_id) or {}
 
+            due_dates = []
+            if overview.has_started() and not overview.has_ended():
+                due_dates = get_due_dates(request, enrollment.course_id, user)
+
             course_run_dict = {
                 'course_run_id': enrollment.course_id,
                 'display_name': overview.display_name_with_default,
@@ -918,7 +923,7 @@ class ProgramCourseEnrollmentOverviewView(
                 'course_run_url': get_course_run_url(request, enrollment.course_id),
                 'start_date': overview.start,
                 'end_date': overview.end,
-                'due_dates': get_due_dates(request, enrollment.course_id, user),
+                'due_dates': due_dates,
             }
 
             emails_enabled = get_emails_enabled(user, enrollment.course_id)
