@@ -1,5 +1,5 @@
 """Factories for generating fake catalog data."""
-# pylint: disable=missing-docstring, invalid-name
+# pylint: disable=missing-class-docstring, invalid-name
 
 
 import uuid
@@ -60,6 +60,37 @@ class DictFactoryBase(factory.Factory):
     """
     class Meta(object):
         model = dict
+
+    def __getitem__(self, item):
+        """
+        Pass-through to superclass's __getitem__.
+
+        This is a no-op hack to convince pylint that instances of this class
+        are subscriptable.
+
+        As a specific example, it stops pylint from complaining about:
+            program = ProgramFactory()
+            courses = program['courses']
+        with `Value 'program' is unsubscriptable`.
+        """
+        # pylint: disable=useless-super-delegation
+        return super().__getitem__(item)  # pylint: disable=no-member
+
+    def __setitem__(self, item, value):
+        """
+        Pass-through to superclass's __setitem__.
+
+        This is no-op hack to convince pylint that instances of this class
+        support item assignment.
+
+        As a specific example, it stops pylint from complaining about:
+            program = ProgramFactory()
+            new_course = ...
+            program['courses'] += [new_course]
+        with `Value 'program' does not support item assignment`.
+        """
+        # pylint: disable=no-member,useless-super-delegation
+        return super().__setitem__(item, value)
 
 
 class ImageFactoryBase(DictFactoryBase):
