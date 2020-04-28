@@ -3,12 +3,12 @@
 ProgramEnrollment Views
 """
 
-
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.core.management import call_command
 from django.db import transaction
+from django.shortcuts import redirect
 from edx_rest_framework_extensions import permissions
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -54,6 +54,7 @@ from student.models import CourseEnrollment
 from student.roles import CourseInstructorRole, CourseStaffRole, UserBasedRole
 from util.query import read_replica_or_default
 
+from ..masquerading import MasqueradableMixin
 from .constants import ENABLE_ENROLLMENT_RESET_FLAG, MAX_ENROLLMENT_RECORDS
 from .serializers import (
     CourseRunOverviewListSerializer,
@@ -654,9 +655,30 @@ class ProgramCourseGradesView(
         return status.HTTP_200_OK
 
 
-class UserProgramReadOnlyAccessView(DeveloperErrorViewMixin, PaginatedAPIView):
+class UserProgramReadOnlyAccessView(APIView):
     """
     A view for checking the currently logged-in user's program read only access
+
+    Path: `/api/program_enrollments/v1/programs/enrollments/`
+
+    Maintained for backwards compatibility.
+    Is implemented by redirect to new UserEnrolledProgramsView.
+    """
+    def get(self, request):
+        """
+        Redirect to `/api/program_enrollments/v1/users/<username>/`
+        for the username of the current user.
+        """
+        return redirect(
+            'lms.djangoapps.program_enrollments:v1:user_enrolled_programs',
+            username=request.user,
+        )
+
+
+class UserProgramsView(MasqueradableMixin, DeveloperErrorViewMixin, APIView):
+    """
+    A view for seeing which programs a user can view.
+
     There are three major categories of users this API is differentiating. See the table below.
 
     --------------------------------------------------------------------------------------------
@@ -669,11 +691,14 @@ class UserProgramReadOnlyAccessView(DeveloperErrorViewMixin, PaginatedAPIView):
     | learner          | All programs the learner is enrolled in                               |
     --------------------------------------------------------------------------------------------
 
-    Path: `/api/program_enrollments/v1/programs/enrollments/`
+    Path: `/api/program_enrollments/v1/users/{username}/`
 
     Returns:
-      * 200: OK - Contains a list of all programs in which the user has read only acccess to.
+      * 200: Contains a list of all programs in which the specified user can view.
       * 401: The requesting user is not authenticated.
+      * 403: The requesting user cannot see which programs the specified user has
+             read-only access to. This includes the scenario where the specified
+             username is not associated with a non-retired user.
 
     The list will be a list of objects with the following keys:
       * `uuid` - the identifier of the program in which the user has read only access to.
@@ -704,7 +729,6 @@ class UserProgramReadOnlyAccessView(DeveloperErrorViewMixin, PaginatedAPIView):
         """
         How to respond to a GET request to this endpoint
         """
-
         request_user = request.user
 
         programs = []
