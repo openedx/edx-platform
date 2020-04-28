@@ -17,11 +17,7 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 from ..constants import ProgramCourseEnrollmentRoles
 from ..models import ProgramEnrollment
-from .factories import (
-    CourseAccessRoleAssignmentFactory,
-    ProgramCourseEnrollmentFactory,
-    ProgramEnrollmentFactory
-)
+from .factories import CourseAccessRoleAssignmentFactory, ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
 
 
 class ProgramEnrollmentModelTests(TestCase):
