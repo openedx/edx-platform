@@ -8,5 +8,9 @@ class MarketplaceRequestForm(forms.ModelForm):
         model = MarketplaceRequest
         fields = '__all__'
         widgets = {
-            'user': forms.HiddenInput()
+            'user': forms.HiddenInput(),
+            'organization': forms.Select(attrs={
+                'style': 'pointer-events: none;'
+            })
         }
+        readonly_fields = ('organization',)

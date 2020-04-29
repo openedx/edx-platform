@@ -28,7 +28,9 @@ class MarketplaceCreateRequestView(generic.CreateView, LoginRequiredMixin):
 
     def get_initial(self, *args, **kwargs):
         initial = super(MarketplaceCreateRequestView, self).get_initial(**kwargs)
-        initial['user'] = self.request.user
+        user = self.request.user
+        initial['user'] = user
+        initial['organization'] = user.extended_profile.organization
         return initial
 
 
