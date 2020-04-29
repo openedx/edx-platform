@@ -147,6 +147,27 @@ class RegistryTest(testutil.TestCase):
         prov = self.configure_google_provider(visible=True, enabled=True, site=site_b)
         self.assertEqual(prov.enabled_for_current_site, False)
 
+    @with_site_configuration(SITE_DOMAIN_A)
+    def test_providers_with_same_key_independent_across_sites(self):
+        """
+        Verify that having two providers configured with the same key
+        but for different sites do not shadow each other on retrieval.
+        """
+        site_a = Site.objects.get_or_create(domain=SITE_DOMAIN_A, name=SITE_DOMAIN_A)[0]
+        site_b = Site.objects.get_or_create(domain=SITE_DOMAIN_B, name=SITE_DOMAIN_B)[0]
+
+        self.enable_saml(site=site_a)
+        self.enable_saml(site=site_b)
+        self.configure_saml_provider(enabled=True, site=site_b, slug="x", name="Site B first")
+        self.configure_saml_provider(enabled=True, site=site_a, slug="x", name="Site A first")
+        self.configure_saml_provider(enabled=True, site=site_a, slug="x", name="Site A second")
+        self.configure_saml_provider(enabled=True, site=site_b, slug="x", name="Site B second")
+
+        # If sites are not partitioned in retrieval, a site_b record can appear
+        # to be the "current" config, and then be ignored by site_a (resulting
+        # in zero enabled providers for site_a).
+        self.assertEqual([p.name for p in provider.Registry.enabled()], ["Site A second"])
+
     def test_get_returns_enabled_provider(self):
         google_provider = self.configure_google_provider(enabled=True)
         self.assertEqual(google_provider.id, provider.Registry.get(google_provider.provider_id).id)
