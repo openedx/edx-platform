@@ -959,7 +959,8 @@ if 'debug_toolbar' in settings.INSTALLED_APPS:
         url(r'^__debug__/', include(debug_toolbar.urls)),
     ]
 
-if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
+# if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
+if True:
     urlpatterns += [
         url(
             r'^financial-assistance/$',

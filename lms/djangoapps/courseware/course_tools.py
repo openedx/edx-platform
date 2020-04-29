@@ -7,6 +7,7 @@ import datetime
 
 import pytz
 from crum import get_current_request
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from course_modes.models import CourseMode
@@ -73,3 +74,44 @@ class VerifiedUpgradeTool(CourseTool):
         """
         request = get_current_request()
         return verified_upgrade_deadline_link(request.user, course_id=course_key)
+
+
+class FinancialAssistanceTool(CourseTool):
+    """
+    The financial assistance tool.
+    """
+    @classmethod
+    def analytics_id(cls):
+        """
+        Returns an id to uniquely identify this tool in analytics events.
+        """
+        return 'edx.tool.financial_assistance'
+
+    @classmethod
+    def is_enabled(cls, request, course_key):
+        """
+        Show this tool to all learners who are eligible for financial assistance.
+        """
+        return True
+
+    @classmethod
+    def title(cls):
+        """
+        Returns the title of this tool.
+        """
+        return _('Learn about Financial Assistance')
+
+    @classmethod
+    def icon_classes(cls):
+        """
+        Returns the icon classes needed to represent this tool.
+        """
+        return 'fa fa-info'
+
+    @classmethod
+    def url(cls, course_key):
+        """
+        Returns the URL for this tool for the specified course key.
+        """
+        return reverse('financial_assistance')
+        
