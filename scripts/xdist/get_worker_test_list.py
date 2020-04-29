@@ -37,7 +37,10 @@ def main(log_file, test_suite):
                 worker_num_string = regex_search.group(1)
                 if worker_num_string not in worker_test_dict:
                     worker_test_dict[worker_num_string] = []
-                test = line.split()[2]
+                line_parts = line.split()
+                pass_fail_index = line_parts.index(regex_search.group(2))
+                # test is not always found at the same index in the list
+                test = line_parts[pass_fail_index + 1]
                 if test_suite == "commonlib-unit":
                     if "pavelib" not in test and not test.startswith('scripts'):
                         test = u"common/lib/{}".format(test)
