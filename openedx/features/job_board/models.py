@@ -7,6 +7,8 @@ from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 from model_utils.models import TimeStampedModel
 
+from util.philu_utils import UploadToPathAndRename
+
 from .constants import (
     JOB_COMPENSATION_CHOICES,
     JOB_HOURS_CHOICES,
@@ -44,7 +46,8 @@ class Job(TimeStampedModel):
     website_link = models.URLField(max_length=255, blank=True, null=True, verbose_name=_('Website Link'))
     application_link = models.URLField(max_length=255, blank=True, null=True, verbose_name=_('Application Link'))
     contact_email = models.EmailField(max_length=255, verbose_name=_('Contact Email'))
-    logo = models.ImageField(upload_to='job-board/uploaded-logos/', blank=True, null=True, verbose_name=_('Company Logo'),
+    logo = models.ImageField(upload_to=UploadToPathAndRename('job-board/uploaded-logos/', 'image'), blank=True,
+                             null=True, verbose_name=_('Company Logo'), max_length=500,
                              validators=[
                                  FileExtensionValidator(LOGO_ALLOWED_EXTENSION), validate_file_size
                              ],
