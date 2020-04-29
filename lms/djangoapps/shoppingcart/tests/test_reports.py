@@ -55,7 +55,6 @@ class ReportTypeTests(ModuleStoreTestCase):
         self.cost = 40
         self.course = CourseFactory.create(org='MITx', number='999', display_name=u'Robot Super Course')
         self.course_key = self.course.id
-        settings.COURSE_LISTINGS['default'] = [text_type(self.course_key)]
         course_mode = CourseMode(course_id=self.course_key,
                                  mode_slug="honor",
                                  mode_display_name="honor cert",
