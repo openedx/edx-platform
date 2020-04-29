@@ -137,7 +137,7 @@ ${HTML(fragment.foot_html())}
         var newHeight = contentElement.offsetHeight;
         var newWidth = contentElement.offsetWidth;
 
-        if (newWidth === lastWidth && newHeight === lastHeight) {
+        if (eventType !== 'load' && newWidth === lastWidth && newHeight === lastHeight) {
           console.log('MFE', 'Ignore resize', newWidth, newHeight, eventType);
           return;
         }
