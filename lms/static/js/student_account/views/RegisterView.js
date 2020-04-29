@@ -274,9 +274,6 @@
                             handleInputBehavior($input);
                         }
                     });
-                    $('#register-confirm_email').bind('cut copy paste', function(e) {
-                        e.preventDefault();
-                    });
                     setTimeout(handleAutocomplete, 1000);
                 },
 
