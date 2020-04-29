@@ -173,6 +173,8 @@ class StatusDisplayStrings(object):
     _TRANSCRIPT_READY = ugettext_noop("Transcript Ready")
     # Translators: This is the status for a video whose transcription job was failed for some languages
     _PARTIAL_FAILURE = ugettext_noop("Partial Failure")
+    # Translators: This is the status for a video whose transcription job has failed altogether
+    _TRANSCRIPT_FAILED = ugettext_noop("Transcript Failed")
 
     _STATUS_MAP = {
         "upload": _UPLOADING,
@@ -194,6 +196,8 @@ class StatusDisplayStrings(object):
         "transcription_in_progress": _TRANSCRIPTION_IN_PROGRESS,
         "transcript_ready": _TRANSCRIPT_READY,
         "partial_failure": _PARTIAL_FAILURE,
+        # TODO: Add a related unit tests when the VAL update is part of platform
+        "transcript_failed": _TRANSCRIPT_FAILED,
     }
 
     @staticmethod
