@@ -13,7 +13,7 @@ section.tool-wrapper {
   div#graph-container {
     background: none;
 
-    @include box-sizing(border-box);
+    box-sizing: border-box;
 
     display: table-cell;
     padding: lh();
@@ -82,7 +82,7 @@ section.tool-wrapper {
     border-right: 1px solid darken(#002b36, 6%);
     box-shadow: 1px 0 0 lighten(#002b36, 6%), inset 0 0 0 4px darken(#094959, 6%);
 
-    @include box-sizing(border-box);
+    box-sizing: border-box;
 
     display: table-cell;
     padding: lh();

@@ -28,7 +28,7 @@ div.gradebook-wrapper {
       height: 27px;
       padding: 0 ($baseline*0.75) 0 35px;
 
-      @include box-sizing(border-box);
+      box-sizing: border-box;
 
       border-radius: 13px;
       border: 1px solid $table-border-color;
