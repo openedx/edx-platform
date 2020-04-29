@@ -3,7 +3,6 @@ Models for External User Ids that are sent out of Open edX
 """
 
 import uuid as uuid_tools
-
 from logging import getLogger
 
 from django.contrib.auth.models import User
@@ -22,10 +21,14 @@ class ExternalIdType(TimeStampedModel):
     .. no_pii:
     """
     MICROBACHELORS_COACHING = 'mb_coaching'
+    LTI = 'lti'
 
     name = models.CharField(max_length=32, blank=False, unique=True, db_index=True)
     description = models.TextField()
     history = HistoricalRecords()
+
+    class Meta:
+        app_label = 'external_user_ids'
 
     def __str__(self):
         return self.name
@@ -48,6 +51,7 @@ class ExternalId(TimeStampedModel):
 
     class Meta(object):
         unique_together = (('user', 'external_id_type'),)
+        app_label = 'external_user_ids'
 
     @classmethod
     def user_has_external_id(cls, user, type_name):
@@ -86,7 +90,7 @@ class ExternalId(TimeStampedModel):
                     type=type_name
                 )
             )
-            return None
+            return None, False
         external_id, created = cls.objects.get_or_create(
             user=user,
             external_id_type=type_obj
