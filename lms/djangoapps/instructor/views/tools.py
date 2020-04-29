@@ -15,7 +15,6 @@ from edx_when import api
 from opaque_keys.edx.keys import UsageKey
 from pytz import UTC
 from six import string_types, text_type
-from six.moves import zip
 
 from student.models import get_user_by_username_or_email, CourseEnrollment
 

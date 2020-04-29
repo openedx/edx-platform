@@ -4,7 +4,6 @@ from abc import ABCMeta, abstractmethod
 
 import six
 from lxml import etree
-from six.moves import range, zip
 
 
 class ResponseXMLFactory(six.with_metaclass(ABCMeta, object)):

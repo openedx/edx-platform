@@ -4,6 +4,7 @@ API views for Bulk Enrollment
 
 
 import json
+from itertools import zip_longest
 
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from opaque_keys import InvalidKeyError
@@ -11,7 +12,6 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from six.moves import zip_longest
 
 from bulk_enroll.serializers import BulkEnrollmentSerializer
 from lms.djangoapps.instructor.views.api import students_update_enrollment

@@ -8,7 +8,6 @@ import textwrap
 from unittest import TestCase
 
 from ddt import data, ddt
-from six.moves import range, zip
 
 from xsslint.linters import (
     JavaScriptLinter, MakoTemplateLinter,

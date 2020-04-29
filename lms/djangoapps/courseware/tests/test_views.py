@@ -30,7 +30,6 @@ from mock import MagicMock, PropertyMock, call, create_autospec, patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC
 from six import text_type
-from six.moves import range
 from six.moves.html_parser import HTMLParser  # pylint: disable=import-error
 from six.moves.urllib.parse import quote, urlencode  # pylint: disable=import-error
 from web_fragments.fragment import Fragment

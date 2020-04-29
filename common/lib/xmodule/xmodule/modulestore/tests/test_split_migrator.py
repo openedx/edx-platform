@@ -9,7 +9,6 @@ import uuid
 
 import mock
 import six
-from six.moves import range, zip
 from xblock.fields import UNIQUE_ID, Reference, ReferenceList, ReferenceValueDict
 
 from openedx.core.lib.tests import attr

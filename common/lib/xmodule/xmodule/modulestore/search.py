@@ -3,8 +3,6 @@
 
 from logging import getLogger
 
-from six.moves import range
-
 from lms.djangoapps.courseware.masquerade import MASQUERADE_SETTINGS_KEY
 from student.roles import GlobalStaff
 from .exceptions import ItemNotFoundError, NoPathToItem

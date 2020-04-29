@@ -15,7 +15,6 @@ from celery.states import FAILURE, SUCCESS
 from django.utils.translation import ugettext_noop
 from mock import MagicMock, Mock, patch
 from opaque_keys.edx.keys import i4xEncoder
-from six.moves import range
 
 from course_modes.models import CourseMode
 from lms.djangoapps.courseware.models import StudentModule

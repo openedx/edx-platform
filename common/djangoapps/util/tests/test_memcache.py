@@ -6,7 +6,6 @@ Tests for memcache in util app
 from django.core.cache import caches
 from django.test import TestCase
 from six import unichr
-from six.moves import range
 
 from util.memcache import safe_key
 

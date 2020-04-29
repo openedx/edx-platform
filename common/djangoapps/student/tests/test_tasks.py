@@ -6,7 +6,6 @@ Tests for the Sending activation email celery tasks
 import mock
 from django.conf import settings
 from django.test import TestCase
-from six.moves import range
 
 from edx_ace.errors import ChannelError, RecoverableChannelDeliveryError
 from lms.djangoapps.courseware.tests.factories import UserFactory

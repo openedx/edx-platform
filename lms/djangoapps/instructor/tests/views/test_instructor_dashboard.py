@@ -16,7 +16,6 @@ from mock import patch
 from pyquery import PyQuery as pq
 from pytz import UTC
 from six import text_type
-from six.moves import range
 
 from common.test.utils import XssTestMixin
 from course_modes.models import CourseMode

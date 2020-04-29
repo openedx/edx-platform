@@ -8,7 +8,6 @@ from django.core.management import call_command
 from django.test import TestCase, override_settings
 from django.utils.six import StringIO
 from mock import patch
-from six.moves import range
 
 from course_modes.models import CourseMode
 from student.tests.factories import UserFactory, CourseEnrollmentFactory

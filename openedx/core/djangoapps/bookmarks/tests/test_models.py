@@ -13,7 +13,6 @@ from freezegun import freeze_time
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from six import text_type
-from six.moves import range
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import AdminFactory, UserFactory

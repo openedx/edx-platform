@@ -13,7 +13,6 @@ from mock import call, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
-from six.moves import range
 
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory

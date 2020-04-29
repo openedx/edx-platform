@@ -8,7 +8,6 @@ from datetime import timedelta
 from completion.models import BlockCompletion
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
-from six.moves import range
 
 from course_modes.models import CourseMode
 from lms.djangoapps.course_api.blocks.api import get_blocks

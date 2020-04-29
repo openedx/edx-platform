@@ -9,7 +9,6 @@ import json
 from celery.states import FAILURE, PENDING, REVOKED, SUCCESS
 from django.http import QueryDict
 from mock import Mock, patch
-from six.moves import range
 
 from lms.djangoapps.instructor_task.models import PROGRESS
 from lms.djangoapps.instructor_task.tests.test_base import (

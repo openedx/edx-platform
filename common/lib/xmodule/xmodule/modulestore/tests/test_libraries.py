@@ -10,7 +10,6 @@ import ddt
 import six
 from bson.objectid import ObjectId
 from opaque_keys.edx.locator import LibraryLocator
-from six.moves import range
 
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory, check_mongo_calls

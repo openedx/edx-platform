@@ -18,7 +18,6 @@ from opaque_keys.edx.locator import BundleDefinitionLocator
 from pysrt import SubRipFile, SubRipItem, SubRipTime
 from pysrt.srtexc import Error
 from six import text_type
-from six.moves import range, zip
 from six.moves.html_parser import HTMLParser  # pylint: disable=import-error
 
 from openedx.core.djangolib import blockstore_cache

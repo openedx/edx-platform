@@ -35,7 +35,6 @@ from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 import six
 from six import text_type
-from six.moves import range
 
 from xmodule.modulestore.django import modulestore
 

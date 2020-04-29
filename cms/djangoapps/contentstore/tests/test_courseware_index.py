@@ -17,7 +17,6 @@ from lazy.lazy import lazy
 from mock import patch
 from pytz import UTC
 from search.search_engine_base import SearchEngine
-from six.moves import range
 
 from contentstore.courseware_index import (
     CourseAboutSearchIndexer,

@@ -3,8 +3,6 @@ Course Group Configurations page.
 """
 
 
-from six.moves import range
-
 from common.test.acceptance.pages.common.utils import confirm_prompt
 from common.test.acceptance.pages.studio.course_page import CoursePage
 

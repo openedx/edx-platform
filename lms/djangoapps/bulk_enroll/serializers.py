@@ -6,7 +6,6 @@ Serializers for Bulk Enrollment.
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
-from six.moves import zip
 
 from openedx.core.djangoapps.course_groups.cohorts import is_cohort_exists
 

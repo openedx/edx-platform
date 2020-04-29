@@ -9,7 +9,6 @@ from django.urls import reverse
 from django.test.utils import override_settings
 from mock import MagicMock, patch
 import six
-from six.moves import range
 
 from openedx.core.djangoapps.zendesk_proxy.v0.views import ZENDESK_REQUESTS_PER_HOUR
 from openedx.core.lib.api.test_utils import ApiTestCase

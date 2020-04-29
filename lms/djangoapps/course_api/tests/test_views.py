@@ -9,7 +9,6 @@ from unittest import TestCase
 
 import ddt
 import six
-from six.moves import range
 from django.core.exceptions import ImproperlyConfigured
 from django.test import RequestFactory
 from django.test.utils import override_settings

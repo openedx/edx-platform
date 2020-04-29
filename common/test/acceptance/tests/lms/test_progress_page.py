@@ -8,7 +8,6 @@ progress page.
 from contextlib import contextmanager
 
 import ddt
-from six.moves import range
 
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.common.logout import LogoutPage

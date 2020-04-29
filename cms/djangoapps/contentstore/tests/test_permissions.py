@@ -6,7 +6,6 @@ Test CRUD for authorization.
 import copy
 
 from django.contrib.auth.models import User
-from six.moves import range
 
 from contentstore.tests.utils import AjaxEnabledTestClient
 from contentstore.utils import reverse_course_url, reverse_url

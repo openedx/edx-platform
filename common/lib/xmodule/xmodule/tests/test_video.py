@@ -33,7 +33,6 @@ from lxml import etree
 from mock import ANY, MagicMock, Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
-from six.moves import zip
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 

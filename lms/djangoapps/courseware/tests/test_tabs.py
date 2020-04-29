@@ -11,7 +11,6 @@ from django.urls import reverse
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import MagicMock, Mock, patch
 from six import text_type
-from six.moves import range
 
 from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.courseware.tabs import (

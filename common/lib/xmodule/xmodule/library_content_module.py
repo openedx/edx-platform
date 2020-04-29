@@ -16,7 +16,6 @@ from lxml import etree
 from opaque_keys.edx.locator import LibraryLocator
 from pkg_resources import resource_string
 from six import text_type
-from six.moves import zip
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock

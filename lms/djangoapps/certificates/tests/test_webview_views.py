@@ -14,7 +14,6 @@ from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from mock import patch
-from six.moves import range
 from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
 
 from course_modes.models import CourseMode

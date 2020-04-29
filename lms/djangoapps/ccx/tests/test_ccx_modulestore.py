@@ -5,11 +5,10 @@ Test the CCXModulestoreWrapper
 
 import datetime
 from collections import deque
-from itertools import chain
+from itertools import chain, zip_longest
 
 import pytz
 from ccx_keys.locator import CCXLocator
-from six.moves import range, zip_longest
 
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from student.tests.factories import AdminFactory, UserFactory

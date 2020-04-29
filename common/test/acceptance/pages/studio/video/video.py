@@ -12,7 +12,6 @@ from bok_choy.javascript import js_defined, wait_for_js
 from bok_choy.promise import EmptyPromise, Promise
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
-from six.moves import range
 
 from common.test.acceptance.pages.common.utils import sync_on_notification
 from common.test.acceptance.pages.lms.video.video import VideoPage

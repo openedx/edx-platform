@@ -13,7 +13,6 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError, transaction
-from six.moves import range
 
 from lti_provider.models import LtiUser
 from student.models import UserProfile

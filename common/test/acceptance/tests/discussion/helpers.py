@@ -6,8 +6,6 @@ Helper functions and classes for discussion tests.
 import json
 from uuid import uuid4
 
-from six.moves import range
-
 from common.test.acceptance.fixtures import LMS_BASE_URL
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.fixtures.discussion import (

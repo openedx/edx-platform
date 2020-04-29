@@ -6,7 +6,6 @@ However for these tests, we make sure it also works when copying from course to 
 
 
 import ddt
-from six.moves import range
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError

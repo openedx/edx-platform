@@ -6,7 +6,6 @@ Test the partitions and partitions service
 
 import django.test
 from mock import patch
-from six.moves import range
 
 from lms.djangoapps.courseware.tests.test_masquerade import StaffMasqueradeTestCase
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme

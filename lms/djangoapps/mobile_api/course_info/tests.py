@@ -6,7 +6,6 @@ Tests for course_info
 import ddt
 from django.conf import settings
 from milestones.tests.utils import MilestonesTestCaseMixin
-from six.moves import range
 
 from mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
 from mobile_api.utils import API_V1, API_V05

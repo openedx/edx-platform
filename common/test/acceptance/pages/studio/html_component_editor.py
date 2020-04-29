@@ -3,8 +3,6 @@ HTML component editor in studio
 """
 
 
-from six.moves import zip
-
 from common.test.acceptance.pages.common.utils import click_css
 from common.test.acceptance.pages.studio.utils import get_codemirror_value, type_in_codemirror
 from common.test.acceptance.pages.studio.xblock_editor import XBlockEditorView

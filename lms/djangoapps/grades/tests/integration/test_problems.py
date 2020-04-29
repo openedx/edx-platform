@@ -7,7 +7,6 @@ import itertools
 import ddt
 import pytz
 from crum import set_current_request
-from six.moves import range
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin

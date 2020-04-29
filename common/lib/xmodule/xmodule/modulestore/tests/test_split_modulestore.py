@@ -18,7 +18,6 @@ from django.core.cache import InvalidCacheBackendError, caches
 from mock import patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseKey, CourseLocator, LocalId, VersionTree
 from path import Path as path
-from six.moves import range
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
 
 from openedx.core.lib import tempdir

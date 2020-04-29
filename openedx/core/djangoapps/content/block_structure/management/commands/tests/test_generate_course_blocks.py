@@ -9,7 +9,6 @@ import ddt
 from django.core.management.base import CommandError
 from mock import patch
 import six
-from six.moves import range
 
 from openedx.core.djangoapps.content.block_structure.tests.helpers import (
     is_course_in_block_structure_cache,

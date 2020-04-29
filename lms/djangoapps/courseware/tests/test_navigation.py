@@ -10,7 +10,6 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from mock import patch
 from six import text_type
-from six.moves import range
 
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase

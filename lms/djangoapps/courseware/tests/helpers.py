@@ -16,7 +16,6 @@ from django.test.client import Client, RequestFactory
 from django.urls import reverse
 from django.utils.timezone import now
 from six import text_type
-from six.moves import range
 from xblock.field_data import DictFieldData
 
 from edxmako.shortcuts import render_to_string

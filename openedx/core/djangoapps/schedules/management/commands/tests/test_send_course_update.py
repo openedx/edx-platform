@@ -10,7 +10,6 @@ from django.conf import settings
 from django.core import mail
 from edx_ace.utils.date import serialize
 from mock import patch
-from six.moves import range
 
 from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG

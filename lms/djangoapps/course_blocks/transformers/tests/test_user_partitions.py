@@ -10,7 +10,6 @@ from datetime import datetime
 
 import ddt
 import six
-from six.moves import range
 from mock import patch
 
 from course_modes.tests.factories import CourseModeFactory

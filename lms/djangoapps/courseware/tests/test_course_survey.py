@@ -9,7 +9,6 @@ from copy import deepcopy
 import six
 from django.contrib.auth.models import User
 from django.urls import reverse
-from six.moves import range
 
 from common.test.utils import XssTestMixin
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase

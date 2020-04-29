@@ -19,7 +19,6 @@ from django.urls import reverse
 from opaque_keys.edx.locator import CourseLocator
 from pytz import UTC
 from six import text_type
-from six.moves import range
 
 from dashboard.git_import import GitImportErrorNoDir
 from dashboard.models import CourseImportLog

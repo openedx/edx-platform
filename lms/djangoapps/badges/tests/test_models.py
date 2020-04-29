@@ -11,7 +11,6 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from mock import Mock, patch
 from path import Path
-from six.moves import range
 
 from badges.models import (
     BadgeAssertion,

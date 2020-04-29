@@ -25,7 +25,6 @@ from freezegun import freeze_time
 from mock import ANY, MagicMock, Mock, patch
 from pytz import UTC
 from six import text_type
-from six.moves import range, zip
 from six.moves.urllib.parse import quote  # pylint: disable=import-error
 from waffle.testutils import override_switch
 

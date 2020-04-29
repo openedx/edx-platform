@@ -8,7 +8,6 @@ from collections import defaultdict
 import pytest
 from django.test import TestCase
 from mock import patch
-from six.moves import range
 
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme, UserPartitionError
 from student.tests.factories import UserFactory

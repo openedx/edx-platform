@@ -4,7 +4,6 @@ Acceptance tests for grade settings in Studio.
 
 
 from bok_choy.promise import EmptyPromise
-from six.moves import range
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.studio.settings_graders import GradingPage

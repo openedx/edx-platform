@@ -7,7 +7,6 @@ import six
 from ddt import data, ddt, unpack
 from django.conf import settings
 from django.test.utils import override_settings
-from six.moves import range
 
 from badges.tests.factories import BadgeAssertionFactory, BadgeClassFactory, RandomBadgeClassFactory
 from openedx.core.lib.api.test_utils import ApiTestCase

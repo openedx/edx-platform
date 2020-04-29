@@ -11,7 +11,6 @@ import ddt
 import pytest
 import six
 from bok_choy.promise import BrokenPromise
-from six.moves import range
 
 from capa.tests.response_xml_factory import (
     AnnotationResponseXMLFactory,

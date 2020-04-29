@@ -9,7 +9,6 @@ import mock
 import pytz
 import six.moves.urllib.parse  # pylint: disable=import-error
 from opaque_keys.edx.keys import CourseKey
-from six.moves import range
 
 from openedx.core.djangoapps.ccxcon import api as ccxconapi
 from student.tests.factories import AdminFactory

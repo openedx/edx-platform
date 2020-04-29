@@ -15,7 +15,6 @@ from tempfile import mkdtemp
 
 import ddt
 import six
-from six.moves import range
 
 from openedx.core.lib.tests import attr
 from xmodule.exceptions import InvalidVersionError

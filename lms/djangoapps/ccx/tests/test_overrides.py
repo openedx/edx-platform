@@ -11,7 +11,6 @@ import pytz
 from ccx_keys.locator import CCXLocator
 from django.test.utils import override_settings
 from edx_django_utils.cache import RequestCache
-from six.moves import range
 
 from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.courseware.testutils import FieldOverrideTestMixin

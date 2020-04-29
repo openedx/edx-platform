@@ -15,7 +15,6 @@ import six
 from contracts import contract
 from pytz import UTC
 from django.utils.translation import ugettext_lazy as _
-from six.moves import range  # pylint: disable=ungrouped-imports
 
 from xmodule.util.misc import get_short_labeler
 

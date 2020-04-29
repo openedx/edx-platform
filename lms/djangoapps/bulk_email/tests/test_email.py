@@ -10,7 +10,6 @@ from unittest import skipIf
 
 import ddt
 import six
-from six.moves import range
 from django.conf import settings
 from django.core import mail
 from django.core.mail.message import forbid_multi_line_headers

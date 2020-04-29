@@ -17,7 +17,6 @@ from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import reverse
 from mock import patch
-from six.moves import range
 
 # These imports refer to lms djangoapps.
 # Their testcases are only run under lms.

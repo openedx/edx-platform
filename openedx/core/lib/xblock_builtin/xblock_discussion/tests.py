@@ -9,7 +9,6 @@ from unittest import TestCase
 
 import ddt
 import mock
-from six.moves import range
 from xblock.field_data import DictFieldData
 from xblock.fields import NO_CACHE_VALUE, UNIQUE_ID, ScopeIds
 from xblock.runtime import Runtime

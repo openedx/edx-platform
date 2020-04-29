@@ -24,7 +24,6 @@ from django.urls import reverse
 from django.utils.http import int_to_base36
 from mock import Mock, patch
 from oauth2_provider import models as dot_models
-from six.moves import range
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers

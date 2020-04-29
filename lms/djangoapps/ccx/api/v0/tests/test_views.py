@@ -23,7 +23,6 @@ from oauth2_provider import models as dot_models
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.test import APITestCase
-from six.moves import range, zip
 
 from lms.djangoapps.courseware import courses
 from lms.djangoapps.ccx.api.v0 import views

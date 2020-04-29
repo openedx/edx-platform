@@ -22,7 +22,6 @@ from mock import patch
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pyquery import PyQuery as pq
-from six.moves import range
 
 from course_modes.models import CourseMode
 from entitlements.tests.factories import CourseEntitlementFactory

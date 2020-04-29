@@ -15,7 +15,6 @@ from uuid import uuid4
 import six
 from contextlib2 import ExitStack
 from path import Path as path
-from six.moves import range, zip
 
 from xmodule.contentstore.mongo import MongoContentStore
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished

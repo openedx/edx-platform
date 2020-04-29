@@ -16,7 +16,6 @@ from edx_proctoring.models import ProctoredExamStudentAttempt
 from mock import MagicMock, Mock, patch
 from opaque_keys.edx.locator import UsageKey
 from six import text_type
-from six.moves import range, zip
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory

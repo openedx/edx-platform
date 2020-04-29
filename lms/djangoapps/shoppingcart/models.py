@@ -31,7 +31,6 @@ from model_utils.managers import InheritanceManager
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
-from six.moves import range
 
 from course_modes.models import CourseMode
 from lms.djangoapps.courseware.courses import get_course_by_id

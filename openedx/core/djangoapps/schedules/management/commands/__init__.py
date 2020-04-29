@@ -6,7 +6,6 @@ Base management command for sending emails
 import datetime
 
 import pytz
-from six.moves import range
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
 

@@ -13,7 +13,6 @@ from decimal import Decimal
 import ddt
 import pytz
 import six
-from six.moves import range
 from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser

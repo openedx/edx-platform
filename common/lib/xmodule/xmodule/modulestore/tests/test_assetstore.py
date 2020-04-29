@@ -14,7 +14,6 @@ import six
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
-from six.moves import range, zip
 
 from openedx.core.lib.tests import attr
 from xmodule.assetstore import AssetMetadata

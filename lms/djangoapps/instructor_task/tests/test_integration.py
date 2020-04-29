@@ -19,7 +19,6 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from mock import patch
 from six import text_type
-from six.moves import range
 
 from capa.responsetypes import StudentInputError
 from capa.tests.response_xml_factory import CodeResponseXMLFactory, CustomResponseXMLFactory

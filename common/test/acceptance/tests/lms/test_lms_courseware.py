@@ -8,7 +8,6 @@ import json
 from datetime import datetime, timedelta
 
 import ddt
-from six.moves import range
 
 from openedx.core.lib.tests import attr
 

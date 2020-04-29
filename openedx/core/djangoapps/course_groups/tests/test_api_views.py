@@ -8,7 +8,6 @@ import tempfile
 
 import ddt
 import six
-from six.moves import range
 from django.urls import reverse
 
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory, AccessTokenFactory

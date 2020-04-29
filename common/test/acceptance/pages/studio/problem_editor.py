@@ -4,7 +4,6 @@ Studio Problem Editor
 
 
 from selenium.webdriver.support.ui import Select
-from six.moves import range
 
 from common.test.acceptance.pages.common.utils import click_css
 from common.test.acceptance.pages.studio.xblock_editor import XBlockEditorView

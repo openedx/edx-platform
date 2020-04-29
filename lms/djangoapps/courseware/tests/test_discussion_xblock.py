@@ -14,7 +14,6 @@ import ddt
 import mock
 import six
 from django.urls import reverse
-from six.moves import range
 from web_fragments.fragment import Fragment
 from xblock.field_data import DictFieldData
 

@@ -7,7 +7,6 @@ Tests for compute_grades management command.
 
 import ddt
 import six
-from six.moves import range
 from django.contrib.auth import get_user_model
 from django.core.management import CommandError, call_command
 from mock import ANY, patch

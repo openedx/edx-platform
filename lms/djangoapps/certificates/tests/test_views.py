@@ -13,7 +13,6 @@ from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import reverse
 from opaque_keys.edx.locator import CourseLocator
-from six.moves import range
 
 from lms.djangoapps.certificates.api import get_certificate_url
 from lms.djangoapps.certificates.models import (

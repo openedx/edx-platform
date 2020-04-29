@@ -10,7 +10,6 @@ from copy import deepcopy
 import ddt
 import pytz
 import six
-from six.moves import range
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase

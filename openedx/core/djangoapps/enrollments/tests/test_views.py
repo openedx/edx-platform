@@ -25,7 +25,6 @@ from mock import patch
 from rest_framework import status
 from rest_framework.test import APITestCase
 from six import text_type
-from six.moves import range
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory

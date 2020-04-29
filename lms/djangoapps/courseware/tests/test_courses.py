@@ -18,7 +18,6 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
-from six.moves import range
 
 from lms.djangoapps.courseware.courses import (
     course_open_for_self_enrollment,

@@ -18,7 +18,6 @@ from eventtracking.processors.exceptions import EventEmissionExit
 from mock import ANY, Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
-from six.moves import range
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from course_modes.models import CourseMode

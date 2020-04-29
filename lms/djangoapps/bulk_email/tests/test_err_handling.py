@@ -17,7 +17,6 @@ from django.urls import reverse
 from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
-from six.moves import range
 
 from bulk_email.models import SEND_TO_MYSELF, BulkEmailFlag, CourseEmail
 from bulk_email.tasks import perform_delegate_email_batches, send_course_email

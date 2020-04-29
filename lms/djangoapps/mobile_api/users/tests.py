@@ -15,7 +15,6 @@ from django.utils import timezone
 from django.utils.timezone import now
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
-from six.moves import range
 from six.moves.urllib.parse import parse_qs  # pylint: disable=import-error
 
 from course_modes.models import CourseMode

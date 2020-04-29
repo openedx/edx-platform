@@ -11,7 +11,6 @@ from django.test import TestCase
 from django.utils import timezone
 from django.utils.six import StringIO
 from mock import patch
-from six.moves import range
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangoapps.user_api.management.commands.sync_hubspot_contacts import Command as sync_command

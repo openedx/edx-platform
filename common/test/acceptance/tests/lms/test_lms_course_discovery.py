@@ -7,8 +7,6 @@ import datetime
 import json
 import uuid
 
-from six.moves import range
-
 from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.common.logout import LogoutPage

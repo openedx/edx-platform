@@ -13,7 +13,6 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
-from six.moves import zip
 
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name

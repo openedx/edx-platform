@@ -7,7 +7,6 @@ import datetime
 
 import pytz
 from django.conf import settings
-from six.moves import range
 
 from lms.djangoapps.ccx.overrides import override_field_for_ccx
 from lms.djangoapps.ccx.tests.factories import CcxFactory

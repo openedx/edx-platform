@@ -6,7 +6,6 @@ Mixins classes being used by all test classes within this folder
 from datetime import datetime
 
 from pytz import UTC
-from six.moves import range
 
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory, ProgramCourseEnrollmentFactory

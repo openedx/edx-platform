@@ -9,7 +9,6 @@ from completion.test_utils import CompletionWaffleTestMixin, submit_completions_
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from six.moves import range, zip
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import CourseEnrollmentFactory, UserFactory

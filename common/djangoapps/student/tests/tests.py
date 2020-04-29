@@ -23,7 +23,6 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import CourseLocator
 from pyquery import PyQuery as pq
 from six import text_type
-from six.moves import range
 from six.moves.urllib.parse import quote
 
 import shoppingcart  # pylint: disable=import-error

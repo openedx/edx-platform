@@ -24,7 +24,6 @@ from uuid import uuid4
 import openid.oidutil
 from django.utils.translation import ugettext_lazy
 from path import Path as path
-from six.moves import range
 
 from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
 from openedx.core.lib.derived import derive_settings

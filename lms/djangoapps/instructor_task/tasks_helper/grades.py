@@ -6,7 +6,7 @@ import logging
 import re
 from collections import OrderedDict, defaultdict
 from datetime import datetime
-from itertools import chain
+from itertools import chain, zip_longest
 from time import time
 
 import six
@@ -16,7 +16,6 @@ from lazy import lazy
 from opaque_keys.edx.keys import UsageKey
 from pytz import UTC
 from six import text_type
-from six.moves import zip, zip_longest
 
 from course_blocks.api import get_course_blocks
 from course_modes.models import CourseMode

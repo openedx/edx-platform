@@ -11,7 +11,6 @@ from unittest import skip
 
 from pytz import UTC
 import six
-from six.moves import range
 
 from common.test.acceptance.fixtures.config import ConfigModelFixture
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc

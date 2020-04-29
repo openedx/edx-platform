@@ -16,7 +16,6 @@ from django.utils.timezone import now
 from mock import patch
 from opaque_keys.edx.locator import CourseLocator
 import six
-from six.moves import zip
 
 from course_modes.helpers import enrollment_mode_display
 from course_modes.models import CourseMode, Mode, get_cosmetic_display_price, invalidate_course_mode_cache

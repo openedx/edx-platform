@@ -9,7 +9,6 @@ import pytz
 from django.urls import reverse
 from mock import patch
 from six import text_type
-from six.moves import range
 
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.tests.factories import (

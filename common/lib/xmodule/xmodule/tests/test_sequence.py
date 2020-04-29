@@ -13,7 +13,6 @@ import six
 from django.utils.timezone import now
 from freezegun import freeze_time
 from mock import Mock, patch
-from six.moves import range
 
 from xmodule.seq_module import SequenceModule
 from xmodule.tests import get_test_system

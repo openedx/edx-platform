@@ -10,7 +10,6 @@ import six
 from bson.objectid import ObjectId
 from mock import Mock, patch
 from search.search_engine_base import SearchEngine
-from six.moves import range
 from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
 

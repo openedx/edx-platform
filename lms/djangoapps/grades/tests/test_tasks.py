@@ -15,7 +15,6 @@ from django.conf import settings
 from django.db.utils import IntegrityError
 from django.utils import timezone
 from mock import MagicMock, patch
-from six.moves import range
 
 from lms.djangoapps.grades import tasks
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag

@@ -12,7 +12,6 @@ import ddt
 from bson.objectid import ObjectId
 from mock import MagicMock, Mock, call
 from opaque_keys.edx.locator import CourseLocator
-from six.moves import range
 
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
 from xmodule.modulestore.split_mongo.split import SplitBulkWriteMixin

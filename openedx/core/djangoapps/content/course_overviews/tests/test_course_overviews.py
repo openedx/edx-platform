@@ -18,7 +18,6 @@ from django.test.utils import override_settings
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 from PIL import Image
-from six.moves import range  # pylint: disable=ungrouped-imports
 
 from lms.djangoapps.certificates.api import get_active_web_certificate
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin

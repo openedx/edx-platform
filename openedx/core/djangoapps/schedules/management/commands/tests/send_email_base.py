@@ -20,7 +20,6 @@ from edx_ace.utils.date import serialize
 from freezegun import freeze_time
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
-from six.moves import range
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory

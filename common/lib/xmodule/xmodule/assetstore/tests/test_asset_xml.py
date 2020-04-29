@@ -9,7 +9,6 @@ from contracts import ContractNotRespected
 from lxml import etree
 from opaque_keys.edx.locator import CourseLocator
 from path import Path as path
-from six.moves import zip
 
 from xmodule.assetstore import AssetMetadata
 from xmodule.modulestore.tests.test_assetstore import AssetStoreTestData

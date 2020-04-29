@@ -14,7 +14,6 @@ import six
 from django.conf import settings
 from django.test.utils import override_settings
 from opaque_keys.edx.keys import AssetKey
-from six.moves import range
 
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import get_lms_link_for_certificate_web_view, reverse_course_url

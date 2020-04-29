@@ -16,7 +16,6 @@ from celery.states import READY_STATES, RETRY, SUCCESS
 from django.core.cache import cache
 from django.db import DatabaseError, transaction
 from django.utils.encoding import python_2_unicode_compatible
-from six.moves import range, zip
 
 from util.db import outer_atomic
 

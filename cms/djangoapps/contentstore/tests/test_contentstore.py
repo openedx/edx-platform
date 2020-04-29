@@ -27,7 +27,6 @@ from opaque_keys.edx.keys import AssetKey, CourseKey, UsageKey
 from opaque_keys.edx.locations import CourseLocator
 from path import Path as path
 from six import text_type
-from six.moves import range
 from waffle.testutils import override_switch
 
 from contentstore.config import waffle

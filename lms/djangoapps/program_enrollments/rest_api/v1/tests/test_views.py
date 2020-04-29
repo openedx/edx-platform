@@ -22,7 +22,6 @@ from organizations.tests.factories import OrganizationFactory as LMSOrganization
 from rest_framework import status
 from rest_framework.test import APITestCase
 from six import text_type
-from six.moves import range, zip
 from social_django.models import UserSocialAuth
 
 from bulk_email.models import BulkEmailFlag, Optout

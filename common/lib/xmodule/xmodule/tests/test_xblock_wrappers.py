@@ -25,7 +25,6 @@ from fs.memoryfs import MemoryFS
 from lxml import etree
 from mock import Mock
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from six.moves import range
 from xblock.core import XBlock
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds

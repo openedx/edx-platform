@@ -27,7 +27,6 @@ values are (x, y) coordinates of centers of dragged images.
 
 import json
 import six
-from six.moves import zip
 
 
 def flat_user_answer(user_answer):

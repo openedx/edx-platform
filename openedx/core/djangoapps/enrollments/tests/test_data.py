@@ -13,7 +13,6 @@ import six
 from django.conf import settings
 from mock import patch
 from pytz import UTC
-from six.moves import range
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory

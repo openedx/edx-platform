@@ -30,7 +30,6 @@ from integrated_channels.sap_success_factors.models import SapSuccessFactorsLear
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from six import iteritems, text_type
-from six.moves import range
 from social_django.models import UserSocialAuth
 from wiki.models import Article, ArticleRevision
 from wiki.models.pluginbase import RevisionPlugin, RevisionPluginRevision

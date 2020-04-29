@@ -13,7 +13,6 @@ from edx_ace import Message
 from edx_ace.utils.date import serialize
 from mock import patch
 from opaque_keys.edx.locator import CourseLocator
-from six.moves import range
 
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.schedules import resolvers, tasks

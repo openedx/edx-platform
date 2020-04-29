@@ -4,7 +4,6 @@ Test helpers for testing course block transformers.
 
 
 import six
-from six.moves import range
 from mock import patch
 
 from course_modes.models import CourseMode

@@ -7,7 +7,6 @@ import uuid
 
 from django.core.management.base import BaseCommand
 from opaque_keys.edx.keys import CourseKey
-from six.moves import range
 
 from openedx.core.djangoapps.user_authn.views.registration_form import AccountCreationForm
 from student.helpers import do_create_account

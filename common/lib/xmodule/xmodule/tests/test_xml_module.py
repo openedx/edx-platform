@@ -6,7 +6,6 @@ import unittest
 
 from mock import Mock
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from six.moves import range
 from xblock.field_data import DictFieldData
 from xblock.fields import Any, Boolean, Dict, Float, Integer, List, Scope, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData

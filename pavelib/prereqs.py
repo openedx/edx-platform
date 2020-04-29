@@ -13,7 +13,6 @@ from distutils import sysconfig
 
 import six
 from paver.easy import BuildFailure, sh, task
-from six.moves import range
 
 from .utils.envs import Env
 from .utils.timer import timed

@@ -12,7 +12,6 @@ from django.urls import reverse
 from django.utils.timezone import now
 from opaque_keys.edx import locator
 from pytz import UTC
-from six.moves import range, zip
 
 from common.test.utils import XssTestMixin
 from course_modes.tests.factories import CourseModeFactory

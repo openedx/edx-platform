@@ -18,7 +18,6 @@ from contracts import contract, new_contract
 from opaque_keys.edx.keys import AssetKey, CourseKey
 from opaque_keys.edx.locations import Location  # For import backwards compatibility
 from pytz import UTC
-from six.moves import range
 from sortedcontainers import SortedKeyList
 from xblock.core import XBlock
 from xblock.plugin import default_select

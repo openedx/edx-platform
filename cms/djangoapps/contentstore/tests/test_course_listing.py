@@ -12,7 +12,6 @@ from django.conf import settings
 from django.test import RequestFactory
 from mock import Mock, patch
 from opaque_keys.edx.locations import CourseLocator
-from six.moves import range
 
 from contentstore.tests.utils import AjaxEnabledTestClient
 from contentstore.utils import delete_course

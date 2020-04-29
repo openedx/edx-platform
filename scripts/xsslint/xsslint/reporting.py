@@ -6,8 +6,6 @@ Utility classes for reporting linter results.
 import os
 import re
 
-from six.moves import range
-
 from xsslint.utils import StringLines
 
 

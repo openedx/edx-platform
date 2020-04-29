@@ -25,7 +25,6 @@ from textwrap import dedent
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connections
 from django.db.utils import DatabaseError
-from six.moves import range
 
 log = logging.getLogger(__name__)
 

@@ -5,7 +5,6 @@ import itertools
 
 import ddt
 import six
-from six.moves import range
 from django.conf import settings
 from django.test.client import RequestFactory
 from django.test.utils import override_settings

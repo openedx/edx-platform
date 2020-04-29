@@ -10,7 +10,6 @@ import re
 import ddt
 import six
 import six.moves.urllib.parse  # pylint: disable=import-error
-from six.moves import range, zip
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.test import RequestFactory

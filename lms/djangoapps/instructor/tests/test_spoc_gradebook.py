@@ -5,7 +5,6 @@ Tests of the instructor dashboard spoc gradebook
 
 from django.urls import reverse
 from six import text_type
-from six.moves import range
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory

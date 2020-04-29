@@ -10,7 +10,6 @@ from bok_choy.javascript import wait_for_js
 from bok_choy.promise import EmptyPromise
 from opaque_keys.edx.locator import CourseLocator
 from path import Path
-from six.moves import zip
 
 from common.test.acceptance.pages.common.utils import sync_on_notification
 from common.test.acceptance.pages.studio import BASE_URL

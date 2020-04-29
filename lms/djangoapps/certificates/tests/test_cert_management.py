@@ -8,7 +8,6 @@ from django.test.utils import override_settings
 from mock import patch
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
-from six.moves import range
 
 from badges.events.course_complete import get_completion_badge
 from badges.models import BadgeAssertion

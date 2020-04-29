@@ -7,7 +7,6 @@ from bok_choy.javascript import requirejs
 from bok_choy.promise import BrokenPromise
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
-from six.moves import range
 
 from common.test.acceptance.pages.common.utils import click_css
 from common.test.acceptance.pages.studio.settings import SettingsPage

@@ -9,7 +9,6 @@ from django.contrib.auth.models import User
 from django.core import mail
 from django.http import HttpRequest
 from django.test import TestCase
-from six.moves import range
 
 from course_creators.admin import CourseCreatorAdmin
 from course_creators.models import CourseCreator

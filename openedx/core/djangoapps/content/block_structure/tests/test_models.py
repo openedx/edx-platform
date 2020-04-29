@@ -10,7 +10,6 @@ from uuid import uuid4
 
 import ddt
 import six
-from six.moves import range
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.test import TestCase

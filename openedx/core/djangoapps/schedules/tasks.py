@@ -3,7 +3,6 @@
 import datetime
 import logging
 import six
-from six.moves import range
 
 from celery import task
 from celery_utils.logged_task import LoggedTask

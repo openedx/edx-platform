@@ -29,7 +29,6 @@ from lxml import etree
 from lxml.html import fromstring
 from mock import ANY, patch
 from pyparsing import ParseException
-from six.moves import zip
 
 from capa import inputtypes
 from capa.checker import DemoSystem

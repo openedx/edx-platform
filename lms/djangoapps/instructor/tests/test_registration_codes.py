@@ -10,7 +10,6 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from six import text_type
-from six.moves import range
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory

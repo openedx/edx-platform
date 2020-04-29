@@ -15,7 +15,6 @@ from unittest import TestCase
 from i18n import config, dummy, extract, generate
 from polib import pofile
 from pytz import UTC
-from six.moves import range
 
 
 class TestGenerate(TestCase):

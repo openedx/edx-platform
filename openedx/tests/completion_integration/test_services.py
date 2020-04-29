@@ -8,7 +8,6 @@ from completion.models import BlockCompletion
 from completion.services import CompletionService
 from completion.test_utils import CompletionWaffleTestMixin
 from opaque_keys.edx.keys import CourseKey
-from six.moves import range
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory

@@ -11,7 +11,6 @@ import ddt
 import mock
 import pytest
 import six
-from six.moves import range
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.messages.storage.fallback import FallbackStorage

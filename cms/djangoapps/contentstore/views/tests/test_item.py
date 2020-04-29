@@ -20,7 +20,6 @@ from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pyquery import PyQuery
 from pytz import UTC
 from six import text_type
-from six.moves import range
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlockAside

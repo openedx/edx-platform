@@ -18,7 +18,6 @@ from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC, common_timezones_set
 from six import text_type
-from six.moves import range
 from social_django.models import Partial, UserSocialAuth
 
 from openedx.core.djangoapps.django_comment_common import models

@@ -25,7 +25,6 @@ from freezegun import freeze_time
 from mock import Mock, patch
 from pytz import UTC
 from six import text_type
-from six.moves import range
 from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
 from common.test.utils import XssTestMixin

@@ -8,7 +8,6 @@ import mock
 from django.contrib.auth.models import User
 from django.core.management import CommandError, call_command
 from django.test import TestCase
-from six.moves import range
 
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from student.models import Registration, UserAttribute

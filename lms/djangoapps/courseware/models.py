@@ -29,7 +29,6 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import BlockTypeKeyField, CourseKeyField, LearningContextKeyField, UsageKeyField
 from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField
 from six import text_type
-from six.moves import range
 
 import coursewarehistoryextended
 from openedx.core.djangolib.markup import HTML

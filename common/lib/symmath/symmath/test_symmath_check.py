@@ -1,8 +1,6 @@
 
 from unittest import TestCase
 
-from six.moves import range
-
 from .symmath_check import symmath_check
 
 

@@ -20,7 +20,6 @@ from elasticsearch.exceptions import ConnectionError
 from mock import patch
 from rest_framework.test import APIClient, APITestCase
 from search.search_engine_base import SearchEngine
-from six.moves import range
 
 from common.test.utils import skip_signal
 from course_modes.models import CourseMode

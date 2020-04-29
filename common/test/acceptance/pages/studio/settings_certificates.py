@@ -15,7 +15,6 @@ import os.path
 
 from bok_choy.promise import EmptyPromise
 from selenium.webdriver import ActionChains
-from six.moves import range
 
 from common.test.acceptance.pages.studio.course_page import CoursePage
 from common.test.acceptance.tests.helpers import disable_animations

@@ -10,7 +10,6 @@ from uuid import uuid4
 import ddt
 import requests
 import six
-from six.moves import range
 
 from ..edxnotes import StubEdxNotesService
 

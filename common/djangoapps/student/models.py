@@ -51,7 +51,6 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from simple_history.models import HistoricalRecords
 from six import text_type
-from six.moves import range
 from six.moves.urllib.parse import urlencode
 from slumber.exceptions import HttpClientError, HttpServerError
 from user_util import user_util

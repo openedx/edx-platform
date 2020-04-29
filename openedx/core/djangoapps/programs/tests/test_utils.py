@@ -10,7 +10,6 @@ import ddt
 import httpretty
 import mock
 import six
-from six.moves import range
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings

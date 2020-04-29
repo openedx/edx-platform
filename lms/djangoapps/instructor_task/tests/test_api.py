@@ -6,7 +6,6 @@ Test for LMS instructor background task queue management
 import ddt
 from celery.states import FAILURE
 from mock import MagicMock, Mock, patch
-from six.moves import range
 
 from bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail
 from common.test.utils import normalize_repr

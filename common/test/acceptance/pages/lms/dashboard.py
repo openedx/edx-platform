@@ -6,7 +6,6 @@ Student dashboard page.
 
 from bok_choy.page_object import PageObject
 from opaque_keys.edx.keys import CourseKey
-from six.moves import range
 
 from common.test.acceptance.pages.lms import BASE_URL
 

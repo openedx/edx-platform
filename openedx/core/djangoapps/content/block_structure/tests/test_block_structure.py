@@ -12,7 +12,6 @@ from unittest import TestCase
 
 import ddt
 import six
-from six.moves import range
 
 from openedx.core.lib.graph_traversals import traverse_post_order
 

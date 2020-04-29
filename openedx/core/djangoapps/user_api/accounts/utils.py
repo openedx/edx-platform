@@ -11,7 +11,6 @@ from completion.models import BlockCompletion
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from six import text_type
-from six.moves import range
 from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration

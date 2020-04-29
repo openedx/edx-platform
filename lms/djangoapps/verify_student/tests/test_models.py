@@ -11,7 +11,6 @@ from django.conf import settings
 from django.utils.timezone import now
 from freezegun import freeze_time
 from mock import patch
-from six.moves import range
 
 from common.test.utils import MockS3BotoMixin
 from lms.djangoapps.verify_student.models import (

@@ -14,7 +14,6 @@ from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from six import text_type
-from six.moves import range
 
 from openedx.core.djangoapps.user_api.management.commands import email_opt_in_list
 from openedx.core.djangoapps.user_api.models import UserOrgTag

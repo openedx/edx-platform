@@ -12,7 +12,6 @@ import logging
 
 import six
 from opaque_keys.edx.locator import CourseLocator
-from six.moves import range
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
 
 from xmodule.modulestore import ModuleStoreEnum

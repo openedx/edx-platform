@@ -11,7 +11,6 @@ from operator import itemgetter
 import ddt
 import six
 from mock import patch
-from six.moves import range
 
 from contentstore.course_group_config import CONTENT_GROUP_CONFIGURATION_NAME, ENROLLMENT_SCHEME, GroupConfiguration
 from contentstore.tests.utils import CourseTestCase

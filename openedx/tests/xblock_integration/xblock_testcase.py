@@ -48,7 +48,6 @@ import six
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.urls import reverse
-from six.moves import range
 from xblock.plugin import Plugin
 
 import lms.djangoapps.lms_xblock.runtime

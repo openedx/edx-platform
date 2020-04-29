@@ -15,7 +15,6 @@ from django.contrib.auth.models import AnonymousUser, User
 from django.test import TestCase
 from django.test.utils import override_settings
 from mock import patch
-from six.moves import range
 
 from lms.djangoapps.courseware.tests.factories import StaffFactory
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error

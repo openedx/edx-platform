@@ -8,7 +8,6 @@ import six
 from django.test.utils import override_settings
 from mock import Mock, patch
 from opaque_keys.edx.locator import CourseKey, LibraryLocator
-from six.moves import range
 
 from contentstore.tests.utils import AjaxEnabledTestClient, parse_json
 from contentstore.utils import reverse_library_url, reverse_url, reverse_usage_url

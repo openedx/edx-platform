@@ -12,7 +12,6 @@ from bok_choy.javascript import js_defined, wait_for_js
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise, Promise
 from selenium.webdriver.common.action_chains import ActionChains
-from six.moves import zip
 
 log = logging.getLogger('VideoPage')
 
