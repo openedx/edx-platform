@@ -13,6 +13,7 @@ from course_modes.models import CourseMode
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from openedx.features.course_experience.course_tools import CourseTool
 from student.models import CourseEnrollment
+from django.urls import reverse
 
 
 class VerifiedUpgradeTool(CourseTool):
@@ -73,3 +74,42 @@ class VerifiedUpgradeTool(CourseTool):
         """
         request = get_current_request()
         return verified_upgrade_deadline_link(request.user, course_id=course_key)
+
+class FinancialAssistanceTool(CourseTool):
+    """
+    The financial assistance tool.
+    """
+    @classmethod
+    def analytics_id(cls):
+        """
+        Returns an id to uniquely identify this tool in analytics events.
+        """
+        return 'edx.tool.financial_assistance'
+
+    @classmethod
+    def is_enabled(cls, request, course_key):
+        """
+        Show this link for courses where financial assistance is available
+        """
+        return True
+
+    @classmethod
+    def title(cls):
+        """
+        Returns the title of this tool.
+        """
+        return _('Learn about Financial Assistance')
+
+    @classmethod
+    def icon_classes(cls):
+        """
+        Returns the icon classes needed to represent this tool.
+        """
+        return 'fa fa-info'
+
+    @classmethod
+    def url(cls, course_key):
+        """
+        Returns the URL for this tool for the specified course key.
+        """
+        return reverse('financial_assistance')
