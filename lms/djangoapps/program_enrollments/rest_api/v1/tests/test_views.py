@@ -1629,45 +1629,45 @@ class ProgramCourseEnrollmentOverviewGetTests(
         cls.relative_certificate_download_url = '/download-the-certificates'
         cls.absolute_certificate_download_url = 'http://www.certificates.com/'
 
-    def setUp(self):
-        super(ProgramCourseEnrollmentOverviewGetTests, self).setUp()
-
         # create program enrollment
-        self.program_enrollment = ProgramEnrollmentFactory.create(
-            program_uuid=self.program_uuid,
-            curriculum_uuid=self.curriculum_uuid,
-            user=self.student,
+        cls.program_enrollment = ProgramEnrollmentFactory.create(
+            program_uuid=cls.program_uuid,
+            curriculum_uuid=cls.curriculum_uuid,
+            user=cls.student,
         )
 
         # create course overview
-        self.course_overview = CourseOverviewFactory.create(
-            id=self.course_id,
-            start=self.yesterday,
-            end=self.tomorrow,
+        cls.course_overview = CourseOverviewFactory.create(
+            id=cls.course_id,
+            start=cls.yesterday,
+            end=cls.tomorrow,
         )
 
         # create course enrollment
-        self.course_enrollment = CourseEnrollmentFactory.create(
-            course=self.course_overview,
-            user=self.student,
+        cls.course_enrollment = CourseEnrollmentFactory.create(
+            course=cls.course_overview,
+            user=cls.student,
             mode=CourseMode.MASTERS,
         )
 
         # create program course enrollment
-        self.program_course_enrollment = ProgramCourseEnrollmentFactory.create(
-            program_enrollment=self.program_enrollment,
-            course_enrollment=self.course_enrollment,
-            course_key=self.course_id,
+        cls.program_course_enrollment = ProgramCourseEnrollmentFactory.create(
+            program_enrollment=cls.program_enrollment,
+            course_enrollment=cls.course_enrollment,
+            course_key=cls.course_id,
             status='active',
         )
 
         # create program
         catalog_org = OrganizationFactory(key='organization_key')
-        self.program = ProgramFactory(
-            uuid=self.program_uuid,
+        cls.program = ProgramFactory(
+            uuid=cls.program_uuid,
             authoring_organizations=[catalog_org],
         )
-        self.program['curricula'][0]['courses'].append(self.course)
+        cls.program['curricula'][0]['courses'].append(cls.course)
+
+    def setUp(self):
+        super().setUp()
         self.set_program_in_catalog_cache(self.program_uuid, self.program)
 
     def create_generated_certificate(self, download_url=None):
