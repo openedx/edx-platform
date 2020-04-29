@@ -61,8 +61,9 @@ define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/vie
 
             analytics.track('Created a Course', course_info);
             CreateCourseUtils.create(course_info, function(errorMessage) {
+                var msg = edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML('<p>'), errorMessage, edx.HtmlUtils.HTML('</p>'));
                 $('.create-course .wrap-error').addClass('is-shown');
-                $('#course_creation_error').html('<p>' + errorMessage + '</p>');
+                edx.HtmlUtils.setHtml($('#course_creation_error'), msg);
                 $('.new-course-save').addClass('is-disabled').attr('aria-disabled', true);
             });
         };
@@ -136,8 +137,9 @@ define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/vie
 
             analytics.track('Created a Library', lib_info);
             CreateLibraryUtils.create(lib_info, function(errorMessage) {
+                var msg = edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML('<p>'), errorMessage, edx.HtmlUtils.HTML('</p>'));
                 $('.create-library .wrap-error').addClass('is-shown');
-                $('#library_creation_error').html('<p>' + errorMessage + '</p>');
+                edx.HtmlUtils.setHtml($('#library_creation_error'), msg);
                 $('.new-library-save').addClass('is-disabled').attr('aria-disabled', true);
             });
         };
