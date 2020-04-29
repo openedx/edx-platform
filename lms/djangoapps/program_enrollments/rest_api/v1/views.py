@@ -54,7 +54,7 @@ from student.models import CourseEnrollment
 from student.roles import CourseInstructorRole, CourseStaffRole, UserBasedRole
 from util.query import read_replica_or_default
 
-from .constants import ENABLE_ENROLLMENT_RESET_FLAG, MAX_ENROLLMENT_RECORDS
+from .constants import CourseRunProgressStatuses, ENABLE_ENROLLMENT_RESET_FLAG, MAX_ENROLLMENT_RECORDS
 from .serializers import (
     CourseRunOverviewListSerializer,
     ProgramCourseEnrollmentRequestSerializer,
@@ -360,14 +360,14 @@ class ProgramEnrollmentsView(
         return self.handle_write_request()
 
     @verify_program_exists
-    def patch(self, request, program_uuid=None):  # pylint: disable=unused-argument
+    def patch(self, request, program_uuid=None):
         """
         Update program enrollments for a list of learners
         """
         return self.handle_write_request()
 
     @verify_program_exists
-    def put(self, request, program_uuid=None):  # pylint: disable=unused-argument
+    def put(self, request, program_uuid=None):
         """
         Create/update program enrollments for a list of learners
         """
@@ -508,7 +508,6 @@ class ProgramCourseEnrollmentsView(
         return self.handle_write_request()
 
     @verify_course_exists_and_in_program
-    # pylint: disable=unused-argument
     def patch(self, request, program_uuid=None, course_id=None):
         """
         Modify the program course enrollments of a list of learners
@@ -516,7 +515,6 @@ class ProgramCourseEnrollmentsView(
         return self.handle_write_request()
 
     @verify_course_exists_and_in_program
-    # pylint: disable=unused-argument
     def put(self, request, program_uuid=None, course_id=None):
         """
         Create or Update the program course enrollments of a list of learners
@@ -816,8 +814,9 @@ class ProgramCourseEnrollmentOverviewView(
                 if absent, the bulk email feature is either not enable at the platform
                 level or is not enabled for the course; if True or False, bulk email
                 feature is enabled, and value represents whether or not user wants
-                to receive emails due_dates: a list of subsection due dates for the
-                course run:
+                to receive emails
+            * due_dates: a list of subsection due dates for the
+                course run. Due dates are only returned if the course run is in progress.
                 ** name: name of the subsection
                 ** url: deep link to the subsection
                 ** date: due date for the subsection
@@ -911,14 +910,20 @@ class ProgramCourseEnrollmentOverviewView(
 
             certificate_info = get_certificate_for_user(user.username, enrollment.course_id) or {}
 
+            course_run_status = get_course_run_status(overview, certificate_info)
+            if course_run_status == CourseRunProgressStatuses.IN_PROGRESS:
+                due_dates = get_due_dates(request, enrollment.course_id, user)
+            else:
+                due_dates = []
+
             course_run_dict = {
                 'course_run_id': enrollment.course_id,
                 'display_name': overview.display_name_with_default,
-                'course_run_status': get_course_run_status(overview, certificate_info),
+                'course_run_status': course_run_status,
                 'course_run_url': get_course_run_url(request, enrollment.course_id),
                 'start_date': overview.start,
                 'end_date': overview.end,
-                'due_dates': get_due_dates(request, enrollment.course_id, user),
+                'due_dates': due_dates,
             }
 
             emails_enabled = get_emails_enabled(user, enrollment.course_id)
