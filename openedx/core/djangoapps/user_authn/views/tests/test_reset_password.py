@@ -85,6 +85,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         """
 
         bad_pwd_req = self.request_factory.post('/password_reset/', {'email': self.user_bad_passwd.email})
+        bad_pwd_req.user = AnonymousUser()
         bad_pwd_resp = password_reset(bad_pwd_req)
         # If they've got an unusable password, we return a successful response code
         self.assertEqual(bad_pwd_resp.status_code, 200)
@@ -105,6 +106,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         """
 
         bad_email_req = self.request_factory.post('/password_reset/', {'email': self.user.email + "makeItFail"})
+        bad_email_req.user = AnonymousUser()
         bad_email_resp = password_reset(bad_email_req)
         # Note: even if the email is bad, we return a successful response code
         # This prevents someone potentially trying to "brute-force" find out which
@@ -123,20 +125,17 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
     )
     def test_password_reset_ratelimited(self):
         """
-        Try (and fail) resetting password 30 times in a row on an non-existant email address
+        Test that reset password endpoint only allow one request per minute.
         """
         cache.clear()
 
-        for i in range(30):
-            good_req = self.request_factory.post('/password_reset/', {
-                'email': 'thisdoesnotexist{0}@foo.com'.format(i)
-            })
-            good_resp = password_reset(good_req)
-            self.assertEqual(good_resp.status_code, 200)
+        password_reset_req = self.request_factory.post('/password_reset/', {'email': 'thisdoesnotexist@foo.com'})
+        password_reset_req.user = AnonymousUser()
+        good_resp = password_reset(password_reset_req)
+        self.assertEqual(good_resp.status_code, 200)
 
         # then the rate limiter should kick in and give a HttpForbidden response
-        bad_req = self.request_factory.post('/password_reset/', {'email': 'thisdoesnotexist@foo.com'})
-        bad_resp = password_reset(bad_req)
+        bad_resp = password_reset(password_reset_req)
         self.assertEqual(bad_resp.status_code, 403)
         self.assert_no_events_were_emitted()
 
