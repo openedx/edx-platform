@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-16 13:52+0000\n"
-"PO-Revision-Date: 2020-04-16 13:52:40.877311\n"
+"POT-Creation-Date: 2020-04-22 14:40+0000\n"
+"PO-Revision-Date: 2020-04-22 14:40:52.621774\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -75,6 +75,7 @@ msgstr ""
 #: lms/templates/ccx/schedule.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: themes/st-lutherx/lms/templates/seq_module.html
+#: themes/st-normanx/lms/templates/seq_module.html
 msgid "Section"
 msgstr ""
 
@@ -11218,14 +11219,17 @@ msgid "Login"
 msgstr ""
 
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_staff_navbar.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_staff_navbar.html
 msgid "E-Commerce Course Administration"
 msgstr ""
 
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_staff_navbar.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_staff_navbar.html
 msgid "E-Commerce Coupon Administration"
 msgstr ""
 
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_staff_navbar.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_staff_navbar.html
 msgid "E-Commerce Program Offers Administration"
 msgstr ""
 
@@ -12673,6 +12677,7 @@ msgstr ""
 #: lms/templates/courseware/tab-view-v2.html
 #: lms/templates/courseware/tab-view.html
 #: themes/st-lutherx/lms/templates/courseware/tab-view.html
+#: themes/st-normanx/lms/templates/courseware/tab-view.html
 msgid "name"
 msgstr ""
 
@@ -12787,6 +12792,7 @@ msgstr ""
 
 #: lms/templates/_gated_content.html lms/templates/seq_module.html
 #: themes/st-lutherx/lms/templates/seq_module.html
+#: themes/st-normanx/lms/templates/seq_module.html
 msgid "Content Locked"
 msgstr ""
 
@@ -12814,6 +12820,7 @@ msgstr ""
 
 #: lms/templates/bookmark_button.html lms/templates/seq_module.html
 #: themes/st-lutherx/lms/templates/seq_module.html
+#: themes/st-normanx/lms/templates/seq_module.html
 msgid "Bookmarked"
 msgstr ""
 
@@ -13793,21 +13800,25 @@ msgstr ""
 
 #: lms/templates/seq_module.html
 #: themes/st-lutherx/lms/templates/seq_module.html
+#: themes/st-normanx/lms/templates/seq_module.html
 msgid "Important!"
 msgstr ""
 
 #: lms/templates/seq_module.html
 #: themes/st-lutherx/lms/templates/seq_module.html
+#: themes/st-normanx/lms/templates/seq_module.html
 msgid "Previous"
 msgstr ""
 
 #: lms/templates/seq_module.html
 #: themes/st-lutherx/lms/templates/seq_module.html
+#: themes/st-normanx/lms/templates/seq_module.html
 msgid "Next"
 msgstr ""
 
 #: lms/templates/seq_module.html
 #: themes/st-lutherx/lms/templates/seq_module.html
+#: themes/st-normanx/lms/templates/seq_module.html
 msgid "Sequence"
 msgstr ""
 
@@ -20584,22 +20595,27 @@ msgid "Past Courses"
 msgstr ""
 
 #: themes/st-lutherx/lms/templates/edly_progress_widget.html
+#: themes/st-normanx/lms/templates/edly_progress_widget.html
 msgid "TOTAL COURSE PROGRESS"
 msgstr ""
 
 #: themes/st-lutherx/lms/templates/edly_progress_widget.html
+#: themes/st-normanx/lms/templates/edly_progress_widget.html
 msgid "Problems"
 msgstr ""
 
 #: themes/st-lutherx/lms/templates/edly_progress_widget.html
+#: themes/st-normanx/lms/templates/edly_progress_widget.html
 msgid "Videos"
 msgstr ""
 
 #: themes/st-lutherx/lms/templates/edly_progress_widget.html
+#: themes/st-normanx/lms/templates/edly_progress_widget.html
 msgid "Readings"
 msgstr ""
 
 #: themes/st-lutherx/lms/templates/edly_progress_widget.html
+#: themes/st-normanx/lms/templates/edly_progress_widget.html
 msgid "Others"
 msgstr ""
 

@@ -13300,7 +13300,7 @@ msgstr "Хичээлүүд"
 
 #: cms/templates/login.html themes/red-theme/cms/templates/login.html
 msgid "Sign In to {studio_name}"
-msgstr "{platform_name} системд бүртгүүлэх"
+msgstr "{studio_name} системд бүртгүүлэх"
 
 #: cms/templates/login.html themes/red-theme/cms/templates/login.html
 msgid "Don't have a {studio_name} Account? Sign up!"
@@ -14215,7 +14215,7 @@ msgstr "Тусламж хэрэгтэй юу?"
 
 #: lms/templates/login-sidebar.html
 msgid "Looking for help signing in or with your {platform_name} account?"
-msgstr "{studio_name} ашиглахад тусламж хэрэгтэй юу?"
+msgstr "{platform_name} ашиглахад тусламж хэрэгтэй юу?"
 
 #: lms/templates/login-sidebar.html
 msgid "View our help section for answers to commonly asked questions."
@@ -14485,9 +14485,6 @@ msgid ""
 " collection and use of this information will be governed by their terms of "
 "service and privacy policy."
 msgstr ""
-"Your username, email, and full name will be sent to {destination}, where the"
-" collection and use of this information will be governed by their terms of "
-"service and privacy policy."
 
 #: lms/templates/provider_login.html
 #, python-format
@@ -15652,14 +15649,13 @@ msgid ""
 "content, in whole or in part, in any form and in any media formats and "
 "through any media channels (now known or hereafter developed)."
 msgstr ""
-"Та {API_name} -ийг API эсвэл API агуулгыг ашиглахтай холбоотой ямар ч "
-"контентыг {platform_name} -руу оруулахдаа хэрвээ та {platform_name} -ийг "
-"дэлхий даяар, онцгой бус, шилжүүлэгдэх боломжтой, томилогдсон, дэд "
-"лицензтэй, бүрэн төлөгдөх боломжтой , ямар ч тохиолдолд эдгээр контентыг "
-"бүхэлд нь, эсхүл хэсэгчлэн хадгалах, дамжуулах, үзүүлэх, дамжуулах, хувилах,"
-" өөрчлөх, түгээх, дахин хуваарилах, дахин ашиглах, ашиглах, ашиглах, ашиглах"
-" эрхгүй. хэлбэр, медиа формат, ямар ч медиа сувгаар (одоо мэдэгдэж байгаа "
-"эсвэл цаашид боловсруулсан) дамжина."
+"Та API эсвэл Агуулгын Ашиглалтын хэрэглээтэй холбоотой аливаа контентыг {platform_name}-д"
+"оруулсан тохиолдолд, та {platform_name} -д дэлхийн хэмжээнд тусгай бус, шилжүүлэх боломжтой,"
+"шилжүүлэн өгөх боломжтой, дэд лицензтэй, бүрэн төлбөртэй , нөөц ашигласны төлбөргүй, байнгын,"
+"эргэлт буцалтгүй эрх, лицензийг эзэмших, шилжүүлэх, харуулах, гүйцэтгэх, давтан хийх, хуваарилах, "
+"дахин хуваарилах, релиссен байдлаар ашиглах, ашиглах, ашиглах, ашиглахыг бүхэлд нь эсвэл хэсэгчлэн."
+"ямар ч медиа хэлбэрээр эсвэл ямар нэгэн медиа сувгаар (одоо мэдэгдэж байгаа эсвэл цаашид боловсруулагдсан)"
+"хэлбэртэй байна."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Privacy"
@@ -15863,7 +15859,7 @@ msgid ""
 "DEFAMATION, ERRORS, LOSS OF PROFITS, LOSS OF DATA OR INTERRUPTION IN "
 "AVAILABILITY OF DATA)."
 msgstr ""
-"PARTICULAR нь {platform_name} ТӨГСГӨЛИЙН БҮРЭЛДЭХҮҮН {платформ_name} ҮНДСЭН "
+"PARTICULAR нь {platform_name} ТӨГСГӨЛИЙН БҮРЭЛДЭХҮҮН {platform_name} ҮНДСЭН "
 "БАЙГУУЛЛАГУУД ХЭРЭГТЭЙ БОЛОВСРУУЛАХ, БУУРУУЛАХ, ТӨЛӨӨ, ЭРХЭМЖЭЭ, ЭРХЭМЖЭЭ, "
 "АМЬДРАХ ЭРХ ОРЧУУЛАХ, АМЬДРАХ, ЭРҮҮЛ МЭНД бИШ {platform_name} ЭСВЭЛ "
 "{platform_name} оролцогчдын Ямар ч хайнга эсвэл буруу байна (үүнд, үүгээр "
@@ -15916,7 +15912,7 @@ msgid ""
 "with written notice of such claim, action or demand."
 msgstr ""
 "Холбогдох хууль тогтоомжоорын хүрээнд, та {platform_name} болон "
-"{платформын_нэр} Оролцогчид, болон тэдний салбар нэгж, харьяат гишүүд, албан"
+"{platform_name} Оролцогчид, болон тэдний салбар нэгж, харьяат гишүүд, албан"
 " тушаалтнууд,  багш нар, оюутнууд, удирдах зөвлөлийн гишүүд, төлөөлөгчид, "
 "ажилтнуудыг API болон API Агуулгын хэрэглээний үр дүнд эсвэл түүнээс ургах "
 "гарах  бүх төрлийн хүсэлт, зарга, нэхэмжллээс хамгаалах болон чөлөөлөхөө "
@@ -16640,7 +16636,7 @@ msgstr "Захиалгын дэлгэрэнгүй мэдээллийг хүлэ�
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Enroll In {course_name} | Choose Your Track"
-msgstr "{Course_name} -д бүртгүүлэх | Өөрийнхөө замыг сонгоно уу"
+msgstr "{course_name} -д бүртгүүлэх | Өөрийнхөө замыг сонгоно уу"
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -17163,7 +17159,7 @@ msgstr "$ {newPrice}"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "{currency})"
-msgstr "{мөнгөн тэмдэгт})"
+msgstr "{currency})"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Start Learning"
@@ -17229,7 +17225,7 @@ msgstr "Курсын тоо"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "{number_of_courses} courses in program"
-msgstr "хөтөлбөрийн {тоо_of_courses} курс"
+msgstr "хөтөлбөрийн {number_of_courses} курс"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Price (USD)"
@@ -17409,8 +17405,7 @@ msgid ""
 "{providers} for successfully completing your {platform_name} course! "
 "{link_start}Purchase credit now.{link_end}"
 msgstr ""
-"Баяр хүргэе! Та {platform_name} курсээ амжилттай дүүргэсний тулд {үйлчилгээ "
-"үзүүлэгч} -ээс кредит авах эрх авах боломжтой! {link_start} Одоо зээл авах. "
+"Баяр хүргэе! Та {platform_name} курсээ амжилттай дүүргэсний тулд {providers} -ээс кредит авах эрх авах боломжтой! {link_start} Одоо зээл авах. "
 "{link_end}"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
@@ -17547,7 +17542,7 @@ msgstr "Энэ холбоос нь сертификатын вэб харагд�
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "View {cert_name_short}"
-msgstr "{Cert_name_short} харах"
+msgstr "{cert_name_short} харах"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "This link will open/download a PDF document"
@@ -17555,7 +17550,7 @@ msgstr "Энэ линк нь PDF баримт бичиг болон нээнэ/�
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Download {cert_name_short} (PDF)"
-msgstr "{Cert_name_short} татаж авах (PDF)"
+msgstr "{cert_name_short} татаж авах (PDF)"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Download Your {cert_name_short} (PDF)"
@@ -17859,8 +17854,9 @@ msgid ""
 "Your current verification will expire in {days} days. {start_link}Re-verify "
 "your identity now{end_link} using a webcam and a government-issued photo ID."
 msgstr ""
-"Таны одоогийн баталгаажуулалт {days} өдрүүдэд дуусна. {start_link} Вэбкам "
-"болон засгийн газрын гаргасан зургийн ID ашиглан видеогоо ашиглана уу."
+"Таны одоогийн баталгаажуулалт {days} хоногийн дараа хугацаа нь дуусна. {start_link}"
+"Веб сайтын камер болон засгийн газраас олгосон зургийн ID-г ашиглан {end_link}"
+"ашиглан таниулбараа одоо баталгаажуулна уу."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/st-lutherx/lms/templates/dashboard/_dashboard_course_listing.html
@@ -17936,8 +17932,8 @@ msgid ""
 "request for course credit. To see your course credit, visit the "
 "{link_to_provider_site} website."
 msgstr ""
-"{provider_name} курс кредит авах таны хүсэлтийг зөвшөөрөөгүй. Нэмэлт "
-"мэдээллийг {link_to_provider_site} шууд холбоо барина уу."
+"{break_start} Баяр хүргэе! {break_end} {provider_name} хичээлийн кредит авах хүсэлтийг баталлаа. "
+"Курсын зээлийг харахын тулд {link_to_provider_site} вэбсайт руу зочилно уу."
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "View Credit"
@@ -17960,7 +17956,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_entitlement_actions.html
 msgid "Course options for {courseName}"
-msgstr "{CourseName} курсын хувилбарууд"
+msgstr "{courseName} курсын хувилбарууд"
 
 #: lms/templates/dashboard/_dashboard_show_consent.html
 msgid "Consent to share your data"
@@ -18343,7 +18339,7 @@ msgid ""
 "{billing_email}."
 msgstr ""
 "Танд төлбөрийн талаар асуулт байвал Олон Тохиолддог Асуултууд ({faq_url}) "
-"унших буюу {төлбөр_емэйл} холбогдоно уу."
+"унших буюу {billing_email} холбогдоно уу."
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
@@ -18450,7 +18446,7 @@ msgid ""
 "To enroll in {course_names} we have provided a registration URL for you.  "
 "Please follow the instructions below to claim your access."
 msgstr ""
-"{Course_names} -д бүртгүүлэхийн тулд бид танд бүртгүүлэх URL өгсөн байна. "
+"{course_names} -д бүртгүүлэхийн тулд бид танд бүртгүүлэх URL өгсөн байна. "
 "Өөрийн хандалтыг шаардахын тулд доорх зааврыг дагана уу."
 
 #. Translators: please translate the text inside [[ ]]. This is meant as a
@@ -18598,14 +18594,14 @@ msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid "Thank you for purchasing enrollments in {course_name}."
-msgstr "{Course_name} дахь элсэлт худалдан авахад тань баярлалаа."
+msgstr "{course_name} дахь элсэлт худалдан авахад тань баярлалаа."
 
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid ""
 "An invoice for {currency_symbol}{total_price} is attached. Payment is due "
 "upon receipt. You can find information about payment methods on the invoice."
 msgstr ""
-"{Currency_symbol} {total_price} -н нэхэмжлэх хавсаргав. Төлбөрийг хүлээн "
+"{currency_symbol} {total_price} -н нэхэмжлэх хавсаргав. Төлбөрийг хүлээн "
 "авсны дараа төлнө. Та нэхэмжлэх дээр төлбөрийн аргын талаар мэдээлэл олж "
 "авах боломжтой."
 
@@ -18626,7 +18622,9 @@ msgstr ""
 msgid ""
 "Thanks,\n"
 "The {platform_name} Team"
-msgstr "Баярлалаа,"
+msgstr ""
+"Баярлалаа,"
+"{Platform_name} Баг"
 
 #. Translators: please translate the text inside [[ ]]. This is meant as a
 #. template for course teams to use.
@@ -18767,7 +18765,7 @@ msgstr ""
 msgid ""
 "You must verify your identity before the assessment closes on {due_date}."
 msgstr ""
-"{Due_date} дээрх үнэлгээг хаахын өмнө та өөрийн таниулгаа баталгаажуулах "
+"{due_date} дээрх үнэлгээг хаахын өмнө та өөрийн таниулгаа баталгаажуулах "
 "ёстой."
 
 #: lms/templates/emails/reverification_processed.txt
@@ -18852,7 +18850,7 @@ msgid ""
 "everywhere. Your help allows us to continuously improve the learning "
 "experience for millions and make a better future one learner at a time."
 msgstr ""
-"{платформ_нэр} бол хэнд ч хаана ч ашгийн бус өндөр чанартай боловсрол олгох "
+"{platform_name} бол хэнд ч хаана ч ашгийн бус өндөр чанартай боловсрол олгох "
 "байгууллага юм. Таны тусламж сая сая хүний сурах нөхцлийг сайжруулж, "
 "ирээдүйд сайн сурах хүнийг нэмэгдүүлэхэд туслана."
 
@@ -19763,7 +19761,7 @@ msgstr "Купоны кодыг шинэчлэх"
 
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Executive Summary for {display_name}"
-msgstr "{Display_name} -н гүйцэтгэх хураангуй"
+msgstr "{display_name} -н гүйцэтгэх хураангуй"
 
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Report Creation Date"
@@ -19883,7 +19881,7 @@ msgid ""
 "{format_string})."
 msgstr ""
 "Сунгасан хугацаа, цагийг оруулах (UTC цагаар; тодорхой бичнэ "
-"{формат_стринг})."
+"{format_string})."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Change due date for student"
@@ -20475,7 +20473,7 @@ msgstr "(Сурагчдыг шууд когорт өгдөггүй)"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Learners in the {track_name} Track"
-msgstr "{Track_name} Track дахь суралцагчид"
+msgstr "{track_name} Track дахь суралцагчид"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Subject: "
@@ -21057,7 +21055,7 @@ msgstr ""
 
 #: lms/templates/provider/authorize.html
 msgid "Manage your data: {permission}"
-msgstr "Өөрчлөлт хадгалах эсвэл Орхиж гарах"
+msgstr "Өөрийн датаг удирдах: {permission}"
 
 #: lms/templates/registration/account_activation_sidebar_notice.html
 msgid "Account Activation Info"
@@ -21355,7 +21353,7 @@ msgstr "Элсэлтийг Баталгаажуулах "
 #: lms/templates/shoppingcart/registration_code_receipt.html
 #: lms/templates/shoppingcart/registration_code_redemption.html
 msgid "{site_name} -  Confirm Enrollment"
-msgstr "{сайт_нэр} - Элсэлтийг Баталгаажуулах "
+msgstr "{site_name} - Элсэлтийг Баталгаажуулах "
 
 #: lms/templates/shoppingcart/registration_code_receipt.html
 #: lms/templates/shoppingcart/registration_code_redemption.html
@@ -21371,7 +21369,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/registration_code_receipt.html
 msgid "{course_name}"
-msgstr "{хичээл_нэр}"
+msgstr "{course_name}"
 
 #: lms/templates/shoppingcart/registration_code_receipt.html
 #: lms/templates/shoppingcart/registration_code_redemption.html
@@ -21518,7 +21516,7 @@ msgstr "Шоппинг тэрэг "
 
 #: lms/templates/shoppingcart/shopping_cart_flow.html
 msgid "{platform_name} -  Shopping Cart"
-msgstr "{платформ_нэр} - Шоппинг Тэрэг"
+msgstr "{platform_name} - Шоппинг Тэрэг"
 
 #: lms/templates/shoppingcart/shopping_cart_flow.html
 msgid "Confirmation"
@@ -21771,12 +21769,11 @@ msgid ""
 "Please read {a_start}our FAQs to view common questions about our "
 "certificates{a_end}."
 msgstr ""
-"Гэрчилгээний талаарх нийтлэг асуултуудыг Нийтлэг Тохиолддог Асуултууд "
-"хэсгээс харна уу. "
+"Сертификат {a_end} талаар нийтлэг асуултыг үзэхийн тулд {a_start} -ийг манай FAQ-ээр уншина уу."
 
 #: lms/templates/verify_student/incourse_reverify.html
 msgid "Re-Verify for {course_name}"
-msgstr "{Зөвшөөрөгдсөн нэр} -г дахин баталгаажуулах"
+msgstr "{course_name} -г дахин баталгаажуулах"
 
 #: lms/templates/verify_student/missed_deadline.html
 msgid "Verification Deadline Has Passed"
@@ -21827,11 +21824,10 @@ msgid ""
 "{strong_start}webcam is plugged in, turned on, and allowed to function in "
 "your web browser (commonly adjustable in your browser settings).{strong_end}"
 msgstr ""
-"Таны хөтөч шинэчлэгдсэн {strong_start} {a_start} хамгийн сүүлийн хувилбар "
-"{a_end} {strong_end} руу шинэчилнэ үү. Мөн {strong_start} вебкамыг залгасан,"
-" идэвхжсэн, мөн таны вэб хөтөч дээр ажиллах боломжтой (таны хөтчийн "
-"тохиргоонд тохируулагддаг) {strong_start} вебсайттай эсэхийг шалгаарай. "
-"{Strong_end}"
+"Хөтчөө {strong_start} {a_start} хамгийн сүүлийн хувилбар {a_end} {strong_end} болгож "
+"шинэчилсэн эсэхээ шалгана уу. Мөн, таны {strong_start} вэб камер залгасан, асаасан, вэб "
+"хөтөч дээрээ ажиллуулах боломжтой эсэхийг шалгана уу (хөтчийнхөө тохиргоо дээр ихэвчлэн тохируулж "
+"болно). {strong_end}"
 
 #: lms/templates/verify_student/reverify.html
 msgid "Re-Verification"
@@ -22123,7 +22119,7 @@ msgstr "Хянах самбар руу буцах"
 
 #: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
 msgid "{journal_title} Cover Image"
-msgstr "{course_number} {course_title} Хавтасны зураг"
+msgstr "{Journal_title} Хавтасны зураг"
 
 #: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
 msgid "Access Expired: {date}"
