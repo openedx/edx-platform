@@ -27,7 +27,10 @@ then override them with settings pulled from a single YAML config file. For the
 most part this will be a wholesale replacement for any complex values(dicts,
 lists, etc) but for some specific settings they will be additive for now.
 
-eg. ADDITIONAL_INSTALLED_APPS, or ADDITIONAL_MIDDLEWARE
+For example, FEATURES, or JWT_AUTH are both settings where we currently pull
+parts of the data from the config and inject it into an existing data
+structure. While it is possible that in the future we would make these be more
+explicit, we don't want to take on that work now as it may increase complexity.
 
 Consequences
 ============
@@ -35,3 +38,43 @@ Consequences
 Rather than having both python and yaml override files for our dev and test
 environments, we will move towards having all settings defined in a yaml file
 and for all environments to use production.py to load their settings.
+
+The following files should be consolidated with production.py:
+
+* bok_choy_docker.py
+* bok_choy.py
+* devstack_docker.py
+* devstack_optimized.py
+* devstack.py
+* devstack_with_worker.py
+* load_test.py
+* openstack.py
+* static.py
+* test.py
+* test_static_optimized.py
+
+If there exist default YAML files for any of the above environments they should
+be updated to absorb any overrides that lived in these python settings files.
+Any environments that use these files should be updated.
+
+Alternatives Considered
+=======================
+
+Don't use YAML files, just python modules
+-----------------------------------------
+
+Instead of having YAML and then translating that to python, we can just have
+python settings files for all variants we want.
+
+Pros:
+
+* Settings can still be in a single place per environment.
+* You get the full power of python when building out settings.
+* Settings values can be complex python objects.
+
+Cons:
+* Because settings have secrets, we would have to keep our settings file out of
+  the public repository.
+* This wouldn't solve the problem where we would still try to "inherit" from other settings files and make it harder to read the current value of any given setting.
+
+This alternative gives us a lot more power but it's power that we don't actually need.  Building limitiations into what settings can be helps us keep them simple and understandable.
