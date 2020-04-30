@@ -13,6 +13,7 @@ from course_modes.models import CourseMode
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from openedx.features.course_experience.course_tools import CourseTool
 from student.models import CourseEnrollment
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from django.urls import reverse
 
 
@@ -92,7 +93,7 @@ class FinancialAssistanceTool(CourseTool):
         """
         Show this link for courses where financial assistance is available
         """
-        return True
+        return True if CourseOverview.objects.get(id=course_key).eligible_for_financial_aid else False
 
     @classmethod
     def title(cls):
