@@ -6,7 +6,7 @@ Support for course tool plugins.
 from enum import Enum
 
 from openedx.core.lib.plugins import PluginManager
-
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 # Stevedore extension point namespace
 COURSE_TOOLS_NAMESPACE = 'openedx.course_tool'
 
@@ -105,4 +105,12 @@ class CourseToolsPluginManager(PluginManager):
         Returns the course tools applicable to the current user and course.
         """
         course_tools = CourseToolsPluginManager.get_course_tools()
-        return [tool for tool in course_tools if tool.is_enabled(request, course_key)]
+
+        enabled_course_tools = []
+        for tool in course_tools:
+              if tool.__name__ == ('FinancialAssistanceTool'):
+                if CourseOverview.objects.get(id=course_key).eligible_for_financial_aid :
+                    enabled_course_tools.append(tool)
+              elif tool.is_enabled(request,course_key):
+                enabled_course_tools.append(tool)
+        return enabled_course_tools
