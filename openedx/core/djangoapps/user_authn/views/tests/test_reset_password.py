@@ -123,22 +123,62 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         'openedx.core.djangoapps.user_authn.views.password_reset.render_to_string',
         Mock(side_effect=mock_render_to_string, autospec=True)
     )
-    @ddt.data(True, False)
-    def test_password_reset_ratelimited(self, existing_user):
+    def test_password_reset_ratelimited_for_non_existing_user(self):
         """
-        Test that reset password endpoint only allow one request per minute for both
-        existing and non-existing users.
+        Test that reset password endpoint only allow one request per minute
+        for non-existing user.
+        """
+        self.assert_password_reset_ratelimitted('thisdoesnotexist@foo.com', AnonymousUser())
+        self.assert_no_events_were_emitted()
+
+    @patch(
+        'openedx.core.djangoapps.user_authn.views.password_reset.render_to_string',
+        Mock(side_effect=mock_render_to_string, autospec=True)
+    )
+    def test_password_reset_ratelimited_for_existing_user(self):
+        """
+        Test that reset password endpoint only allow one request per minute
+        for existing user.
+        """
+        self.assert_password_reset_ratelimitted(self.user.email, self.user)
+        self.assert_event_emission_count(SETTING_CHANGE_INITIATED, 1)
+
+    def assert_password_reset_ratelimitted(self, email, user):
+        """
+        Assert that password reset endpoint allow one request per minute per email.
         """
         cache.clear()
-        email = self.user.email if existing_user else 'thisdoesnotexist@foo.com'
         password_reset_req = self.request_factory.post('/password_reset/', {'email': email})
-        password_reset_req.user = self.user if existing_user else AnonymousUser()
+        password_reset_req.user = user
         password_reset_req.site = Mock(domain='example.com')
         good_resp = password_reset(password_reset_req)
         self.assertEqual(good_resp.status_code, 200)
 
         # then the rate limiter should kick in and give a HttpForbidden response
         bad_resp = password_reset(password_reset_req)
+        self.assertEqual(bad_resp.status_code, 403)
+
+        cache.clear()
+
+    @patch(
+        'openedx.core.djangoapps.user_authn.views.password_reset.render_to_string',
+        Mock(side_effect=mock_render_to_string, autospec=True)
+    )
+    def test_ratelimitted_from_same_ip_with_different_email(self):
+        """
+        Test that password reset endpoint allow one request per minute per IP.
+        """
+        cache.clear()
+        good_req = self.request_factory.post('/password_reset/', {'email': 'thisdoesnotexist@foo.com'})
+        good_req.user = AnonymousUser()
+        good_resp = password_reset(good_req)
+        self.assertEqual(good_resp.status_code, 200)
+
+        # change the email ID and verify that the rate limiter should kick in and
+        # give a Forbidden response if the request is from same IP.
+        bad_req = self.request_factory.post('/password_reset/', {'email': 'thisdoesnotexist2@foo.com'})
+        bad_req.user = AnonymousUser()
+        bad_resp = password_reset(bad_req)
         self.assertEqual(bad_resp.status_code, 403)
 
         cache.clear()
