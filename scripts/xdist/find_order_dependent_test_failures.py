@@ -161,13 +161,13 @@ def _create_and_check_test_files_for_failures(test_list, test_type):
     """
     print("Testing {}, includes {} test(s)...".format(test_type, len(test_list)))
     global test_suite_option
-    output_file_name = "{}/{}_failing_test_list_{}_{}.txt".format(
+    output_file_name = "{}_failing_test_list_{}_{}.txt".format(
         OUTPUT_FOLDER_NAME, test_suite_option, test_type, len(test_list)
     )
-    dirname, basename = os.path.split(output_file_name)
+    output_file_path = os.path.join(OUTPUT_FOLDER_NAME, output_file_name)
     # Note: We don't really need a temporary file, and could just output the tests directly
     # to the command line, but this keeps the verbose  output cleaner.
-    temp_file = tempfile.NamedTemporaryFile(prefix=basename, dir=dirname, delete=False)
+    temp_file = tempfile.NamedTemporaryFile(prefix=output_file_name, dir=OUTPUT_FOLDER_NAME, delete=False)
 
     with io.open(temp_file.name, 'w') as output_file:
         for line in test_list:
@@ -175,9 +175,9 @@ def _create_and_check_test_files_for_failures(test_list, test_type):
     temp_file.close()
 
     if _run_tests_and_check_for_failures(temp_file.name):
-        os.rename(temp_file.name, output_file_name)
+        os.rename(temp_file.name, output_file_path)
         print('- test failures found.')
-        return _get_pytest_command(output_file_name)
+        return _get_pytest_command(output_file_path)
 
     os.remove(temp_file.name)
     print('- no failures found.')
@@ -214,6 +214,8 @@ def _find_fewest_tests_with_failures(test_list, test_type):
     if failing_test_list_b:
         return failing_test_list_b, pytest_command_b
 
+    # This could occur if there is a complex set of dependencies where the
+    # original list fails, but neither of its halves (A or B) fail.
     return test_list, pytest_command
 
 
