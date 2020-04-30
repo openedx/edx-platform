@@ -1,9 +1,9 @@
-$progress-title-color: $blue-d1 !default;
-$progress-complete-color: $blue-d3 !default;
-$progress-incomplete-color: $gray-l2 !default;
-$progress-complete-number-color: $blue-d1 !default;
+$progress-title-color: $primary-dark1 !default;
+$progress-complete-color: $primary-dark2 !default;
+$progress-incomplete-color: $gray-light2 !default;
+$progress-complete-number-color: $primary-dark1 !default;
 $progress-incomplete-number-color: $gray-600 !default;
-$progress-number-label-color: $gray-b !default;
+$progress-number-label-color: $gray-base !default;
 
 .program-progress {
   width: 300px;

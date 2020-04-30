@@ -109,20 +109,17 @@ $shadow-l2: rgba(0, 0, 0, 0.05) !default;
 $shadow-d1: rgba(0, 0, 0, 0.4) !default;
 $shadow-d2: rgba($black, 0.6) !default;
 
-// Blues
-$blue-d: rgba(6, 86, 131, 100) !default;
-$blue-d1: mix($black, $blue, 20%) !default;
-$blue-d3: desaturate($blue, 15%) !default;
-$blue-b: rgba(0, 117, 180, 100) !default;
-$blue-a: rgba(41, 145, 195, 100) !default;
+$primary-dark: rgba(6, 86, 131, 100) !default;
+$primary-dark1: mix($black, $blue, 20%) !default;
+$primary-dark2: desaturate($blue, 15%) !default;
+$primary-base: rgba(0, 117, 180, 100) !default;
+$primary-accent: rgba(41, 145, 195, 100) !default;
 
-// Grays
-$gray-d: rgba(17, 17, 17, 100) !default;
-$gray-b: rgba(65, 65, 65, 100) !default;
-$gray-a: rgba(160, 160, 160, 100) !default;
-$gray-l1: rgb(252, 252, 252) !default;
-$gray-l2: mix($white, $gray, 60%) !default;
-$gray-l3: mix($white, $gray, 80%) !default;
+$gray-dark: rgba(17, 17, 17, 100) !default;
+$gray-base: rgba(65, 65, 65, 100) !default;
+$gray-light1: rgb(252, 252, 252) !default;
+$gray-light2: mix($white, $gray, 60%) !default;
+$gray-light3: mix($white, $gray, 80%) !default;
 
 // ----------------------------
 // #COLORS- Bootstrap-style

@@ -4,7 +4,7 @@
 
 // +local variables/utilities:
 // ----------------------
-$btn-color-primary: $blue-d;
+$btn-color-primary: $primary-dark;
 
 .program-details {
   .content-wrapper {
@@ -60,21 +60,21 @@ $btn-color-primary: $blue-d;
     position: relative;
     font-size: font-size(x-small);
     line-height: line-height(x-small);
-    color: $gray-d;
+    color: $gray-dark;
 
     &.active {
-      color: $gray-d;
+      color: $gray-dark;
     }
   }
 
   .crumb-link {
     font-size: inherit;
     line-height: inherit;
-    color: $blue-b;
+    color: $primary-base;
 
     &:hover,
     &:focus {
-      color: $gray-d;
+      color: $gray-dark;
       text-decoration: underline;
     }
   }
@@ -102,7 +102,7 @@ $btn-color-primary: $blue-d;
 
 .program-details-wrapper {
   .program-details-header {
-    background-color: $gray-l1;
+    background-color: $gray-light1;
     display: flex;
     color: black;
     font-family: 'Open Sans';
@@ -206,7 +206,7 @@ $btn-color-primary: $blue-d;
       .heading {
         font-family: $font-family-sans-serif;
         font-weight: bold;
-        color: $blue-d;
+        color: $primary-dark;
         font-size: 0.9375em;
         margin-top: auto;
         margin-bottom: auto;
@@ -263,7 +263,7 @@ $btn-color-primary: $blue-d;
   .course-list-heading {
     font-family: $font-family-sans-serif;
     font-weight: bold;
-    color: $blue-d;
+    color: $primary-dark;
     font-size: 0.9375em;
     line-height: normal;
     padding-bottom: 5px;
@@ -314,7 +314,7 @@ $btn-color-primary: $blue-d;
       font-family: $font-family-sans-serif;
       font-weight: 600;
       font-size: 1.3em;
-      color: $gray-b;
+      color: $gray-base;
       margin-bottom: 5px;
       line-height: normal;
     }
@@ -399,7 +399,7 @@ $btn-color-primary: $blue-d;
       font-family: $font-family-sans-serif;
       font-weight: bold;
       font-size: 0.9375em;
-      color: $gray-b;
+      color: $gray-base;
       margin-top: 6px;
       display: block;
 
@@ -497,19 +497,19 @@ $btn-color-primary: $blue-d;
 
         .course-title-link,
         .course-title-link:visited {
-          color: $blue-b;
+          color: $primary-base;
           text-decoration: underline;
         }
       }
 
       .run-period,
       .info-expires-at {
-        color: $gray-b;
+        color: $gray-base;
         font-size: 0.9375em;
       }
 
       .course-text .enrolled {
-        color: $gray-b;
+        color: $gray-base;
       }
     }
 
@@ -545,14 +545,14 @@ $btn-color-primary: $blue-d;
 
     .final-grade {
       .grade-header {
-        color: $gray-b;
+        color: $gray-base;
         font-weight: bold;
       }
 
       .grade-display {
         padding-right: 15px;
         font-size: 1.5em;
-        color: $blue-a;
+        color: $primary-accent;
       }
     }
 
@@ -585,7 +585,7 @@ $btn-color-primary: $blue-d;
           font-family: $font-family-sans-serif;
           font-weight: bold;
           font-size: 0.9375em;
-          color: $gray-b;
+          color: $gray-base;
           display: block;
 
           @include media-breakpoint-up(sm) {
@@ -609,11 +609,11 @@ $btn-color-primary: $blue-d;
         font-family: $font-family-sans-serif;
         font-weight: bold;
         font-size: 0.9375em;
-        color: $gray-b;
+        color: $gray-base;
       }
 
       .certificate-status-msg {
-        color: $gray-b;
+        color: $gray-base;
         font-size: 0.9375em;
       }
     }
@@ -636,7 +636,7 @@ $btn-color-primary: $blue-d;
     .expired-icon {
       @include float(left);
 
-      color: $blue-d;
+      color: $primary-dark;
     }
 
     .expired-text {
@@ -673,7 +673,7 @@ $btn-color-primary: $blue-d;
   .divider-heading {
     font-family: $font-family-sans-serif;
     font-weight: bold;
-    color: $blue-d;
+    color: $primary-dark;
     font-size: 0.9375em;
     line-height: normal;
     padding-bottom: $baseline*0.25;
@@ -697,7 +697,7 @@ $btn-color-primary: $blue-d;
     @include margin-left($baseline*0.75);
 
     width: $baseline*15.5;
-    border-bottom: 1px solid $gray-l3;
+    border-bottom: 1px solid $gray-light3;
 
     @include media-breakpoint-up(sm) {
       width: auto;
@@ -760,7 +760,7 @@ $btn-color-primary: $blue-d;
   &:focus,
   &:hover {
     .program-cert {
-      border-color: $blue-d1;
+      border-color: $primary-dark1;
     }
   }
 }
@@ -818,14 +818,14 @@ $btn-color-primary: $blue-d;
     &:focus,
     &:hover {
       .sample-cert {
-        border-color: $blue-d1;
+        border-color: $primary-dark1;
       }
     }
   }
 
   .sample-cert {
     width: 120px;
-    border: 3px solid $gray-l2;
+    border: 3px solid $gray-light2;
     border-radius: 5px;
 
     @include media-breakpoint-up(md) {
