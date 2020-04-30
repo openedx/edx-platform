@@ -5,8 +5,37 @@
 
   .date-title {
     color: #414141;
-    font-weight: 500;
+    font-size: 24px;
     border-bottom: 0;
+  }
+
+  .upgrade-banner {
+    border-radius: 4px;
+    border: solid 1px #9cd2e6;
+    background-color: #eff8fa;
+    margin-top: 20px;
+    margin-bottom: 40px;
+    padding: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    max-width: $text-width-readability-max;
+
+    .upgrade-banner-text {
+      font-size: 16px;
+      line-height: 24px;
+      color: #414141;
+      flex: 1 1 20em;
+    }
+
+    .upgrade-button {
+      align-self: start;
+      flex: none;
+
+      button {
+        @include white-button-flat-outline;
+      }
+    }
   }
 
   .timeline-item {
@@ -53,6 +82,13 @@
     &.active {
       top: -3px;
     }
+  }
+
+  .no-access {
+    // This is too low-contrast for a11y purposes. But since it only applies to pieces of the page that are
+    // inaccessible to users, and we have a banner explaining the parts that are inaccessible at the top,
+    // we're OK from an accessibility point of view.
+    color: #d1d2d4;
   }
 
   .timeline-date-content {
