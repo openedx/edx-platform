@@ -270,8 +270,11 @@ def reset_deadlines_banner_should_display(course_key, request):
                 if display_reset_dates_banner:
                     break
                 for subsection in section.get('children', []):
-                    if (not subsection.get('complete', True)
-                            and subsection.get('due', timezone.now() + timedelta(1)) < timezone.now()):
+                    if (
+                        not subsection.get('complete', True)
+                        and subsection.get('graded', False)
+                        and subsection.get('due', timezone.now() + timedelta(1)) < timezone.now()
+                    ):
                         display_reset_dates_banner = True
                         break
     return display_reset_dates_banner

@@ -2572,7 +2572,8 @@ class TestIndexView(ModuleStoreTestCase):
             )
 
     @RELATIVE_DATES_FLAG.override(active=True)
-    def test_reset_deadlines_banner_is_present_when_viewing_courseware(self):
+    @ddt.data(True, False)
+    def test_reset_deadlines_banner_is_present_when_viewing_courseware(self, graded_section):
         user = UserFactory()
         course = CourseFactory.create(self_paced=True)
         with self.store.bulk_operations(course.id):
@@ -2581,6 +2582,7 @@ class TestIndexView(ModuleStoreTestCase):
                 parent=chapter, category='sequential',
                 display_name="Sequence",
                 due=datetime.today() - timedelta(1),
+                graded=graded_section,
             )
 
         CourseOverview.load_from_module_store(course.id)
@@ -2597,7 +2599,11 @@ class TestIndexView(ModuleStoreTestCase):
             ) + '?activate_block_id=test_block_id'
         )
 
-        self.assertContains(response, '<div class="reset-deadlines-banner">')
+        banner = '<div class="reset-deadlines-banner">'
+        if graded_section:
+            self.assertContains(response, banner)
+        else:
+            self.assertNotContains(response, banner)
 
 
 @ddt.ddt
