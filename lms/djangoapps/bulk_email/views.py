@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django.http import Http404
 
 from bulk_email.models import Optout
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.discussion.notification_prefs.views import (
     UsernameCipher,
