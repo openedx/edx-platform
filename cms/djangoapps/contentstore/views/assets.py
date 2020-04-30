@@ -405,7 +405,16 @@ def _upload_asset(request, course_key):
         return JsonResponse({'error': text_type(exception)}, status=413)
 
     # readback the saved content - we need the database timestamp
-    readback = contentstore().find(content.location)
+    try:
+        readback = contentstore().find(content.location)
+    except NotFoundError:
+        # [UCSD_CUSTOM] Here we are facing delay in MongoDB replication so we are putting a delay of 5 secs for now
+        # Importing time here so that customization can stay at one place there is no other usage of time library
+        # anywhere other than this in file.
+        import time
+        time.sleep(5)
+        readback = contentstore().find(content.location)
+
     locked = getattr(content, 'locked', False)
     return JsonResponse({
         'asset': _get_asset_json(
