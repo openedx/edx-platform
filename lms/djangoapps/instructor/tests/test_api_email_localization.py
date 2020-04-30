@@ -6,6 +6,7 @@ Unit tests for the localization of emails sent by instructor.api methods.
 from django.core import mail
 from django.urls import reverse
 from django.test.utils import override_settings
+from mock import patch, Mock
 from nose.plugins.attrib import attr
 from six import text_type
 
@@ -19,6 +20,8 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr(shard=1)
+@patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=True))
+@patch('lms.djangoapps.instructor.enrollment.get_user_in_organization_by_email')
 class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
     """
     Test whether the enroll, unenroll and beta role emails are sent in the
@@ -67,12 +70,14 @@ class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
         self.assertIn(expected_message, mail.outbox[0].subject)
         self.assertIn(expected_message, mail.outbox[0].body)
 
-    def test_enroll(self):
+    def test_enroll(self, mock_get_user):
+        mock_get_user.return_value = self.student
         self.update_enrollement("enroll", self.student.email)
 
         self.check_outbox_is_french()
 
-    def test_unenroll(self):
+    def test_unenroll(self, mock_get_user):
+        mock_get_user.return_value = self.student
         CourseEnrollment.enroll(
             self.student,
             self.course.id
@@ -81,19 +86,24 @@ class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
 
         self.check_outbox_is_french()
 
-    def test_set_beta_role(self):
+    def test_set_beta_role(self, mock_get_user):
+        mock_get_user.return_value = self.student
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': text_type(self.course.id)})
         self.client.post(url, {'identifiers': self.student.email, 'action': 'add', 'email_students': 'true'})
 
         self.check_outbox_is_french()
 
-    def test_enroll_unsubscribed_student(self):
-        # Student is unknown, so the platform language should be used
-        self.update_enrollement("enroll", "newuser@hotmail.com")
+    def test_enroll_unsubscribed_student(self, mock_get_user):
+        mock_get_user.return_value = None
+        with patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=False)):
+            # Student is unknown, so the platform language should be used
+            self.update_enrollement("enroll", "newuser@hotmail.com")
         self.check_outbox("You have been")
 
     @override_settings(LANGUAGE_CODE="fr")
-    def test_user_without_preference_receives_email_in_french(self):
+    @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=False))
+    def test_user_without_preference_receives_email_in_french(self, mock_get_user):
+        mock_get_user.return_value = self.student
         delete_user_preference(self.student, LANGUAGE_KEY)
         self.update_enrollement("enroll", self.student.email)
 

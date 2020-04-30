@@ -802,6 +802,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         self.assertEqual(manual_enrollments.count(), 0)
 
     @patch('lms.djangoapps.instructor.views.api.log.info')
+    @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=False))
     def test_csv_user_exist_and_not_enrolled(self, info_log):
         """
         If the email address and username already exists
@@ -1181,7 +1182,10 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         res_json = json.loads(response.content)
         self.assertEqual(res_json, expected)
 
-    def test_enroll_with_username(self):
+    @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=True))
+    @patch('lms.djangoapps.instructor.enrollment.get_user_in_organization_by_email')
+    def test_enroll_with_username(self, mock_get_user):
+        mock_get_user.return_value = self.notenrolled_student
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {'identifiers': self.notenrolled_student.username, 'action': 'enroll',
                                           'email_students': False})
@@ -1215,7 +1219,10 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         res_json = json.loads(response.content)
         self.assertEqual(res_json, expected)
 
-    def test_enroll_without_email(self):
+    @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=True))
+    @patch('lms.djangoapps.instructor.enrollment.get_user_in_organization_by_email')
+    def test_enroll_without_email(self, mock_get_user):
+        mock_get_user.return_value = self.notenrolled_student
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {'identifiers': self.notenrolled_student.email, 'action': 'enroll',
                                           'email_students': False})
@@ -1259,7 +1266,10 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         self.assertEqual(len(mail.outbox), 0)
 
     @ddt.data('http', 'https')
-    def test_enroll_with_email(self, protocol):
+    @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=True))
+    @patch('lms.djangoapps.instructor.enrollment.get_user_in_organization_by_email')
+    def test_enroll_with_email(self, protocol, mock_get_user):
+        mock_get_user.return_value = self.notenrolled_student
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(self.course.id)})
         params = {'identifiers': self.notenrolled_student.email, 'action': 'enroll', 'email_students': True}
         environ = {'wsgi.url_scheme': protocol}
@@ -1318,6 +1328,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         )
 
     @ddt.data('http', 'https')
+    @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=False))
     def test_enroll_with_email_not_registered(self, protocol):
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(self.course.id)})
         params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True}
@@ -1348,6 +1359,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
 
     @ddt.data('http', 'https')
     @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
+    @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=False))
     def test_enroll_email_not_registered_mktgsite(self, protocol):
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(self.course.id)})
         params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True}
@@ -1371,6 +1383,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         )
 
     @ddt.data('http', 'https')
+    @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=False))
     def test_enroll_with_email_not_registered_autoenroll(self, protocol):
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(self.course.id)})
         params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True,
@@ -1402,7 +1415,10 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
             )
         )
 
-    def test_unenroll_without_email(self):
+    @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=True))
+    @patch('lms.djangoapps.instructor.enrollment.get_user_in_organization_by_email')
+    def test_unenroll_without_email(self, mock_get_user):
+        mock_get_user.return_value = self.enrolled_student
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {'identifiers': self.enrolled_student.email, 'action': 'unenroll',
                                           'email_students': False})
@@ -1445,7 +1461,10 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         # Check the outbox
         self.assertEqual(len(mail.outbox), 0)
 
-    def test_unenroll_with_email(self):
+    @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=True))
+    @patch('lms.djangoapps.instructor.enrollment.get_user_in_organization_by_email')
+    def test_unenroll_with_email(self, mock_get_user):
+        mock_get_user.return_value = self.enrolled_student
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {'identifiers': self.enrolled_student.email, 'action': 'unenroll',
                                           'email_students': True})
@@ -1502,6 +1521,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
             )
         )
 
+    @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=False))
     def test_unenroll_with_email_allowed_student(self):
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url,
@@ -1555,6 +1575,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
 
     @ddt.data('http', 'https')
     @patch('lms.djangoapps.instructor.enrollment.uses_shib')
+    @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=False))
     def test_enroll_with_email_not_registered_with_shib(self, protocol, mock_uses_shib):
         mock_uses_shib.return_value = True
 
@@ -1583,6 +1604,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
 
     @patch('lms.djangoapps.instructor.enrollment.uses_shib')
     @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
+    @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=False))
     def test_enroll_email_not_registered_shib_mktgsite(self, mock_uses_shib):
         # Try with marketing site enabled and shib on
         mock_uses_shib.return_value = True
@@ -1604,6 +1626,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
 
     @ddt.data('http', 'https')
     @patch('lms.djangoapps.instructor.enrollment.uses_shib')
+    @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=False))
     def test_enroll_with_email_not_registered_with_shib_autoenroll(self, protocol, mock_uses_shib):
         mock_uses_shib.return_value = True
 
@@ -1633,11 +1656,14 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
             )
         )
 
-    def test_enroll_already_enrolled_student(self):
+    @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=True))
+    @patch('lms.djangoapps.instructor.enrollment.get_user_in_organization_by_email')
+    def test_enroll_already_enrolled_student(self, mock_get_user):
         """
         Ensure that already enrolled "verified" students cannot be downgraded
         to "honor"
         """
+        mock_get_user.return_value = self.enrolled_student
         course_enrollment = CourseEnrollment.objects.get(
             user=self.enrolled_student, course_id=self.course.id
         )
@@ -1667,7 +1693,9 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         CourseInstructorRole(paid_course.id).add_users(self.instructor)
         return paid_course
 
-    def test_unenrolled_allowed_to_enroll_user(self):
+    @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=False))
+    @patch('lms.djangoapps.instructor.enrollment.get_user_in_organization_by_email')
+    def test_unenrolled_allowed_to_enroll_user(self, mock_get_user):
         """
         test to unenroll allow to enroll user.
         """
@@ -1682,11 +1710,13 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         self.assertEqual(response.status_code, 200)
 
         # now registered the user
-        UserFactory(email=self.notregistered_email)
+        user = UserFactory.create(email=self.notregistered_email)
+        mock_get_user.return_value = user
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(paid_course.id)})
         params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': False,
                   'auto_enroll': False, 'reason': 'testing', 'role': 'Learner'}
-        response = self.client.post(url, params)
+        with patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=True)):
+            response = self.client.post(url, params)
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 2)
         self.assertEqual(manual_enrollments[1].state_transition, ALLOWEDTOENROLL_TO_ENROLLED)
@@ -1717,6 +1747,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         res_json = json.loads(response.content)
         self.assertEqual(res_json, expected)
 
+    @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=False))
     def test_unenrolled_already_not_enrolled_user(self):
         """
         test unenrolled user already not enrolled in a course.
@@ -1764,11 +1795,14 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         res_json = json.loads(response.content)
         self.assertEqual(res_json, expected)
 
-    def test_unenroll_and_enroll_verified(self):
+    @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=True))
+    @patch('lms.djangoapps.instructor.enrollment.get_user_in_organization_by_email')
+    def test_unenroll_and_enroll_verified(self, mock_get_user):
         """
         Test that unenrolling and enrolling a student from a verified track
         results in that student being in the default track
         """
+        mock_get_user.return_value = self.enrolled_student
         course_enrollment = CourseEnrollment.objects.get(
             user=self.enrolled_student, course_id=self.course.id
         )
@@ -1786,6 +1820,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         )
         self.assertEqual(course_enrollment.mode, CourseMode.DEFAULT_MODE_SLUG)
 
+    @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=False))
     def test_role_and_reason_are_persisted(self):
         """
         test that role and reason fields are persisted in the database
@@ -3715,6 +3750,15 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
 
 @attr(shard=5)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+@override_settings(
+    DEFAULT_SITE_THEME='edx-theme-codebase',
+    COMPREHENSIVE_THEME_DIRS=[settings.REPO_ROOT / 'common/test/appsembler'],
+)
+@patch.dict(settings.FEATURES, {
+     'AMC_APP_URL': 'http://localhost:13000',
+     'DISABLE_COURSE_CREATION': False,
+     'ENABLE_CREATOR_GROUP': True,
+})
 class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Checks that only instructors have access to email endpoints, and that

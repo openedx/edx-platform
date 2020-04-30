@@ -2,6 +2,7 @@
 Test instructor.access
 """
 
+from mock import patch, Mock
 from nose.plugins.attrib import attr
 from nose.tools import raises
 
@@ -40,6 +41,9 @@ class TestInstructorAccessList(SharedModuleStoreTestCase):
 
 
 @attr(shard=1)
+@patch('lms.djangoapps.instructor.enrollment.get_organization_for_site', Mock())
+@patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=True))
+@patch('lms.djangoapps.instructor.enrollment.get_user_in_organization_by_email')
 class TestInstructorAccessAllow(SharedModuleStoreTestCase):
     """ Test access allow. """
     @classmethod
@@ -52,36 +56,42 @@ class TestInstructorAccessAllow(SharedModuleStoreTestCase):
 
         self.course = CourseFactory.create()
 
-    def test_allow(self):
+    def test_allow(self, mock_get_user):
         user = UserFactory()
+        mock_get_user.return_value = user
         allow_access(self.course, user, 'staff')
         self.assertTrue(CourseStaffRole(self.course.id).has_user(user))
 
-    def test_allow_twice(self):
+    def test_allow_twice(self, mock_get_user):
         user = UserFactory()
+        mock_get_user.return_value = user
         allow_access(self.course, user, 'staff')
         allow_access(self.course, user, 'staff')
         self.assertTrue(CourseStaffRole(self.course.id).has_user(user))
 
-    def test_allow_ccx_coach(self):
+    def test_allow_ccx_coach(self, mock_get_user):
         user = UserFactory()
+        mock_get_user.return_value = user
         allow_access(self.course, user, 'ccx_coach')
         self.assertTrue(CourseCcxCoachRole(self.course.id).has_user(user))
 
-    def test_allow_beta(self):
-        """ Test allow beta against list beta. """
+    def test_allow_beta(self, mock_get_user):
+        """ Test allow beta ag
+        mock_get_user.return_value = userainst list beta. """
         user = UserFactory()
         allow_access(self.course, user, 'beta')
         self.assertTrue(CourseBetaTesterRole(self.course.id).has_user(user))
 
     @raises(ValueError)
-    def test_allow_badlevel(self):
+    def test_allow_badlevel(self, mock_get_user):
         user = UserFactory()
+        mock_get_user.return_value = user
         allow_access(self.course, user, 'robot-not-a-level')
 
     @raises(Exception)
-    def test_allow_noneuser(self):
+    def test_allow_noneuser(self, mock_get_user):
         user = None
+        mock_get_user.return_value = user
         allow_access(self.course, user, 'staff')
 
 
