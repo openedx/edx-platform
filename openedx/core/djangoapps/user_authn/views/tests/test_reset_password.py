@@ -123,21 +123,23 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         'openedx.core.djangoapps.user_authn.views.password_reset.render_to_string',
         Mock(side_effect=mock_render_to_string, autospec=True)
     )
-    def test_password_reset_ratelimited(self):
+    @ddt.data(True, False)
+    def test_password_reset_ratelimited(self, existing_user):
         """
-        Test that reset password endpoint only allow one request per minute.
+        Test that reset password endpoint only allow one request per minute for both
+        existing and non-existing users.
         """
         cache.clear()
-
-        password_reset_req = self.request_factory.post('/password_reset/', {'email': 'thisdoesnotexist@foo.com'})
-        password_reset_req.user = AnonymousUser()
+        email = self.user.email if existing_user else 'thisdoesnotexist@foo.com'
+        password_reset_req = self.request_factory.post('/password_reset/', {'email': email})
+        password_reset_req.user = self.user if existing_user else AnonymousUser()
+        password_reset_req.site = Mock(domain='example.com')
         good_resp = password_reset(password_reset_req)
         self.assertEqual(good_resp.status_code, 200)
 
         # then the rate limiter should kick in and give a HttpForbidden response
         bad_resp = password_reset(password_reset_req)
         self.assertEqual(bad_resp.status_code, 403)
-        self.assert_no_events_were_emitted()
 
         cache.clear()
 
