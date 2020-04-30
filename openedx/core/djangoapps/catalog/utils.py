@@ -417,7 +417,10 @@ def get_course_runs_for_course(course_uuid):
             long_term_cache=True,
             many=False
         )
-        return data.get('course_runs', [])
+
+        courses = data.get('course_runs', [])
+        courses = [ CourseKey.from_string(course) for course in courses ]
+        return courses
     else:
         return []
 
@@ -552,11 +555,11 @@ def get_fulfillable_course_runs_for_entitlement(entitlement, course_runs):
                 course_id == entitlement.enrollment_course_run.course_id):
             # User is enrolled in the course so we should include it in the list of enrollable sessions always
             # this will ensure it is available for the UI
-            enrollable_sessions.append(course_run)
+            enrollable_sessions.append(course_id)
         elif (course_run.get('status') == COURSE_PUBLISHED and not
                 is_enrolled_in_mode and
                 is_course_run_entitlement_fulfillable(course_id, entitlement, search_time)):
-            enrollable_sessions.append(course_run)
+            enrollable_sessions.append(course_id)
 
     enrollable_sessions.sort(key=lambda session: session.get('start'))
     return enrollable_sessions
