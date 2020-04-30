@@ -111,6 +111,6 @@ class CourseToolsPluginManager(PluginManager):
             if tool.__name__ == ('FinancialAssistanceTool'):
                 if CourseOverview.objects.get(id=course_key).eligible_for_financial_aid:
                     enabled_course_tools.append(tool)
-            elif tool.is_enabled(request,course_key):
+            elif tool.is_enabled(request, course_key):
                 enabled_course_tools.append(tool)
         return enabled_course_tools
