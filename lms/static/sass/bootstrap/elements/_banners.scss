@@ -46,8 +46,8 @@ $full-width-banner-margin: 20px;
 }
 
 .page-banner {
-  // max-width: map-get($container-max-widths, xl);
-  // margin: 0 auto;
+  max-width: map-get($grid-breakpoints, xl);
+  margin: 0 auto;
 
   .user-messages {
     padding-top: $baseline;
