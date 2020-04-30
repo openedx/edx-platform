@@ -273,7 +273,8 @@ def password_reset(request):
     else:
         # bad user? tick the rate limiter counter
         AUDIT_LOG.info("Bad password_reset user passed in.")
-        password_reset_email_limiter.tick_request_counter(request)
+
+    password_reset_email_limiter.tick_request_counter(request)
 
     return JsonResponse({
         'success': True,
