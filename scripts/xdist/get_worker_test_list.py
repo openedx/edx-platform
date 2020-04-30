@@ -32,7 +32,7 @@ def main(log_file, test_suite):
     worker_test_dict = {}
     with io.open(log_file, 'r') as console_file:
         for line in console_file:
-            regex_search = re.search(r'\[gw(\d+)] (PASSED|FAILED|SKIPPED|ERROR) (\S+)\b'.format(test_suite), line)
+            regex_search = re.search(r'\[gw(\d+)] (PASSED|FAILED|SKIPPED|ERROR) (\S+)'.format(test_suite), line)
             if regex_search:
                 worker_num_string = regex_search.group(1)
                 if worker_num_string not in worker_test_dict:
