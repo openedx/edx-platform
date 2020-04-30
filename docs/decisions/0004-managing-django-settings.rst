@@ -15,31 +15,48 @@ more confusion.
 
 Decision
 ========
+
 Rather than having multiple python settings files that override things
 differently we will move to just a few python files with most of the settings
 variance living in YAML config files that are managed by environment operators.
+The structure of these files try to match `OEP-45` as bast as we can. Because
+the edx-platform houses both the ``LMS`` and ``Studio`` applications, our
+implementation will differ slightly from the guidance provided by `OEP-45`.
 
-common.py - This file will house the defaults for all settings that are
-referenced in the default installation of the edx-platform.
+LMS and CMS settings will continue to live under ``lms/envs/...`` and ``cms/envs/...``.
 
-production.py - This settings file will pull the defaults from common.py and
-then override them with settings pulled from a single YAML config file. For the
-most part this will be a wholesale replacement for any complex values(dicts,
-lists, etc) but for some specific settings they will be additive for now.
+Underneath those folders, we will follow the layout suggested by `OEP-45`.
 
-For example, FEATURES, or JWT_AUTH are both settings where we currently pull
-parts of the data from the config and inject it into an existing data
-structure. While it is possible that in the future we would make these be more
-explicit, we don't want to take on that work now as it may increase complexity.
+
+To recap that here:
+
+``__init__.py`` will handle the loading of defaults, environment overrides, and ensuring that required settings are set.
+
+``defaults.py`` will house and document all default settings.
+
+``required.py`` will document and validate that required settings have been defined.
+
+For edx-platform there may be cases where settings are additive, in this case
+the managing of those additive settings will be managed within
+``__init__.py``
+
+For example, FEATURES, or JWT_AUTH are both settings where we
+currently pull parts of the data from the config and inject it into an existing
+data structure. While it is possible that in the future we would make these be
+more explicit, we don't want to take on that work now as it may increase
+complexity.
+
+
+.. _OEP-45: https://github.com/edx/open-edx-proposals/pull/143/files
 
 Consequences
 ============
 
 Rather than having both python and yaml override files for our dev and test
 environments, we will move towards having all settings defined in a yaml file
-and for all environments to use production.py to load their settings.
+and for all environments to use __init__.py to load their settings.
 
-The following files should be consolidated with production.py:
+The following files should be obviated by this change:
 
 * bok_choy_docker.py
 * bok_choy.py
