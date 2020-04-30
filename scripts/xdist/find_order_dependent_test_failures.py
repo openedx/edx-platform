@@ -82,7 +82,7 @@ def main(log_file, test_suite, fast, verbose):
         return
 
     if fast_option:
-        print('No tests failed locally with --fast option.  Try --slow.')
+        print('No tests failed locally with --fast option. Try running again with --slow to include more tests.')
         return
 
     print('No tests failed locally.')
@@ -118,7 +118,7 @@ def _strip_console_for_tests_with_failure(log_file, test_suite):
                     # fast option will only take one test per class or module, in case
                     # the failure is a setup/teardown failure.
                     test_base = '::'.join(test.split('::')[:-1])
-                    if not test_base in test_base_included:
+                    if test_base not in test_base_included:
                         worker_test_dict[worker_num_string].append(test)
                         test_base_included[test_base] = True
                 elif (not fast_option or (fast_option and pass_fail_string == 'FAILED')):
