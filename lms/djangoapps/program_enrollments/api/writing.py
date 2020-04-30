@@ -437,7 +437,6 @@ def _assign_course_staff_role(course_key, enrollments, staff_assignments):
         enrollments (list): ProgramCourseEnrollments to update
         staff_assignments (dict): Maps an enrollment's external key to a course staff value
     """
-    role_assignments_to_save = []
     enrollment_role_assignments_to_delete = []
     for enrollment in enrollments:
         if enrollment.course_key != course_key:
@@ -454,15 +453,12 @@ def _assign_course_staff_role(course_key, enrollments, staff_assignments):
                 CourseStaffRole(course_key).remove_users(user)
         else:
             if course_staff is True:
-                role_assignments_to_save.append(CourseAccessRoleAssignment(
+                CourseAccessRoleAssignment.objects.update_or_create(
                     enrollment=enrollment,
                     role=ProgramCourseEnrollmentRoles.COURSE_STAFF
-                ))
+                )
             elif course_staff is False:
                 enrollment_role_assignments_to_delete.append(enrollment)
-
-    if role_assignments_to_save:
-        CourseAccessRoleAssignment.objects.bulk_create(role_assignments_to_save)
 
     if enrollment_role_assignments_to_delete:
         CourseAccessRoleAssignment.objects.filter(

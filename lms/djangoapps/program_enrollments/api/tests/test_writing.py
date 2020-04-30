@@ -426,9 +426,14 @@ class WriteProgramCourseEnrollmentTest(EnrollmentTestMixin):
         self.create_program_and_course_enrollments('learner-1', user=self.student_1)
         self.create_program_and_course_enrollments('learner-2', user=self.student_2)
         self.create_program_and_course_enrollments('learner-3', user=None)
-        enrollment = self.create_program_and_course_enrollments('learner-4', user=None)
+        learner_4_enrollment = self.create_program_and_course_enrollments('learner-4', user=None)
+        learner_5_enrollment = self.create_program_and_course_enrollments('learner-5', user=None)
         CourseAccessRoleAssignment.objects.create(
-            enrollment=enrollment,
+            enrollment=learner_4_enrollment,
+            role=ProgramCourseEnrollmentRoles.COURSE_STAFF,
+        )
+        CourseAccessRoleAssignment.objects.create(
+            enrollment=learner_5_enrollment,
             role=ProgramCourseEnrollmentRoles.COURSE_STAFF,
         )
         course_enrollment_requests = [
@@ -436,6 +441,7 @@ class WriteProgramCourseEnrollmentTest(EnrollmentTestMixin):
             self.course_enrollment_request('learner-2', CourseStatuses.ACTIVE, False),
             self.course_enrollment_request('learner-3', CourseStatuses.ACTIVE, True),
             self.course_enrollment_request('learner-4', CourseStatuses.ACTIVE, False),
+            self.course_enrollment_request('learner-5', CourseStatuses.ACTIVE, True),
         ]
         write_program_course_enrollments(
             self.program_uuid,
@@ -452,9 +458,13 @@ class WriteProgramCourseEnrollmentTest(EnrollmentTestMixin):
 
         # CourseAccessRoleAssignment objects are created/revoked for enrollments with no linked user
         pending_role_assingments = CourseAccessRoleAssignment.objects.all()
-        assert pending_role_assingments.count() == 1
+        assert pending_role_assingments.count() == 2
         pending_role_assingments.get(
             enrollment__program_enrollment__external_user_key='learner-3',
+            enrollment__course_key=self.course_id
+        )
+        pending_role_assingments.get(
+            enrollment__program_enrollment__external_user_key='learner-5',
             enrollment__course_key=self.course_id
         )
 
