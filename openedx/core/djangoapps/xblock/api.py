@@ -9,6 +9,7 @@ Studio APIs cover use cases like adding/deleting/editing blocks.
 """
 
 import logging
+import threading
 
 from django.urls import reverse
 from django.utils.translation import ugettext as _
@@ -38,15 +39,24 @@ def get_runtime_system():
     keep application startup faster, it's only initialized when first accessed
     via this method.
     """
-    # pylint: disable=protected-access
-    if not hasattr(get_runtime_system, '_system'):
+    # The runtime system should not be shared among threads, as there is currently a race condition when parsing XML
+    # that can lead to duplicate children.
+    # (In BlockstoreXBlockRuntime.get_block(), has_cached_definition(def_id) returns false so parse_xml is called, but
+    # meanwhile another thread parses the XML and caches the definition; then when parse_xml gets to XML nodes for
+    # child blocks, it appends them to the children already cached by the other thread and saves the doubled list of
+    # children; this happens only occasionally but is very difficult to avoid in a clean way due to the API of parse_xml
+    # and XBlock field data in general [does not distinguish between setting initial values during parsing and changing
+    # values at runtime due to user interaction], and how it interacts with BlockstoreFieldData. Keeping the caches
+    # local to each thread completely avoids this problem.)
+    cache_name = '_system_{}'.format(threading.get_ident())
+    if not hasattr(get_runtime_system, cache_name):
         params = dict(
             handler_url=get_handler_url,
             runtime_class=BlockstoreXBlockRuntime,
         )
         params.update(get_xblock_app_config().get_runtime_system_params())
-        get_runtime_system._system = XBlockRuntimeSystem(**params)
-    return get_runtime_system._system
+        setattr(get_runtime_system, cache_name, XBlockRuntimeSystem(**params))
+    return getattr(get_runtime_system, cache_name)
 
 
 def load_block(usage_key, user):
