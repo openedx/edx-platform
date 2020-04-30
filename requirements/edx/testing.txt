@@ -32,7 +32,7 @@ attrs==19.3.0             # via -r requirements/edx/base.txt, edx-ace, pytest
 babel==2.8.0              # via -r requirements/edx/base.txt, django-babel, django-babel-underscore
 beautifulsoup4==4.9.0     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, pynliner
 billiard==3.3.0.23        # via -r requirements/edx/base.txt, celery
-bleach==3.1.4             # via -r requirements/edx/base.txt, edx-enterprise, lti-consumer-xblock, ora2
+bleach==3.1.5             # via -r requirements/edx/base.txt, edx-enterprise, lti-consumer-xblock, ora2
 bok-choy==1.0.1           # via -r requirements/edx/testing.in
 boto3==1.4.8              # via -r requirements/edx/base.txt, fs-s3fs
 boto==2.39.0              # via -r requirements/edx/base.txt, django-ses, edxval, ora2
@@ -115,7 +115,7 @@ edx-enterprise==3.2.0     # via -r requirements/edx/base.txt
 edx-i18n-tools==0.5.0     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, ora2
 edx-lint==1.4.1           # via -r requirements/edx/testing.in
 edx-milestones==0.2.6     # via -r requirements/edx/base.txt
-edx-opaque-keys[django]==2.0.2  # via -r requirements/edx/base.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, xmodule
+edx-opaque-keys[django]==2.1.0  # via -r requirements/edx/base.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, xmodule
 edx-organizations==5.1.0  # via -r requirements/edx/base.txt
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/base.txt
 edx-proctoring==2.3.3     # via -r requirements/edx/base.txt, edx-proctoring-proctortrack
@@ -126,7 +126,7 @@ edx-sga==0.10.0           # via -r requirements/edx/base.txt
 edx-submissions==3.1.2    # via -r requirements/edx/base.txt, ora2
 edx-tincan-py35==0.0.5    # via -r requirements/edx/base.txt, edx-enterprise
 edx-user-state-client==1.1.2  # via -r requirements/edx/base.txt
-edx-when==1.2.1           # via -r requirements/edx/base.txt, edx-proctoring
+edx-when==1.2.2           # via -r requirements/edx/base.txt, edx-proctoring
 edxval==1.3.2             # via -r requirements/edx/base.txt
 elasticsearch==1.9.0      # via -r requirements/edx/base.txt, edx-search
 entrypoints==0.3          # via flake8
@@ -196,7 +196,7 @@ git+https://github.com/joestump/python-oauth2.git@b94f69b1ad195513547924e380d926
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
 openedx-calc==1.0.7       # via -r requirements/edx/base.txt
 git+https://github.com/edx/edx-ora2.git@2.6.25#egg=ora2==2.6.25  # via -r requirements/edx/base.txt
-packaging==20.3           # via -r requirements/edx/base.txt, drf-yasg, pytest, tox
+packaging==20.3           # via -r requirements/edx/base.txt, bleach, drf-yasg, pytest, tox
 pandas==0.22.0            # via -c requirements/edx/../constraints.txt, -r requirements/edx/coverage.txt
 path.py==12.4.0           # via -r requirements/edx/base.txt, edx-enterprise, edx-i18n-tools, ora2, xmodule
 path==13.1.0              # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, path.py
