@@ -75,6 +75,7 @@ class VerifiedUpgradeTool(CourseTool):
         request = get_current_request()
         return verified_upgrade_deadline_link(request.user, course_id=course_key)
 
+
 class FinancialAssistanceTool(CourseTool):
     """
     The financial assistance tool.
