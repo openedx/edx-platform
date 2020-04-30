@@ -84,6 +84,32 @@ class LibraryXBlockTypeSerializer(serializers.Serializer):
     display_name = serializers.CharField()
 
 
+class LibraryBundleLinkSerializer(serializers.Serializer):
+    """
+    Serializer for a link from a content library blockstore bundle to another
+    blockstore bundle.
+    """
+    id = serializers.SlugField()  # Link name
+    bundle_uuid = serializers.UUIDField(format='hex_verbose', read_only=True)
+    # What version of this bundle we are currently linking to.
+    # This is never NULL but can optionally be set to null when creating a new link, which means "use latest version."
+    version = serializers.IntegerField(allow_null=True)
+    # What the latest version of the linked bundle is:
+    # (if latest_version > version), the link can be "updated" to the latest version.
+    latest_version = serializers.IntegerField(read_only=True)
+    # Opaque key: If the linked bundle is a library or other learning context whose opaque key we can deduce, then this
+    # is the key. If we don't know what type of blockstore bundle this link is pointing to, then this is blank.
+    opaque_key = serializers.CharField()
+
+
+class LibraryBundleLinkUpdateSerializer(serializers.Serializer):
+    """
+    Serializer for updating an existing link in a content library blockstore
+    bundle.
+    """
+    version = serializers.IntegerField(allow_null=True)
+
+
 class LibraryXBlockCreationSerializer(serializers.Serializer):
     """
     Serializer for adding a new XBlock to a content library
