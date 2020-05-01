@@ -1,6 +1,6 @@
 Status
 ======
-Draft
+Accepted
 
 
 Context
@@ -59,15 +59,19 @@ Outcome: Decision on whether or not to reduce the number of bokchoy tests.
 Experiment Results
 ==================
 
-TBD
+Bokchoy tests were disabled for PRs for 3 weeks.  In that time only one change went out that was not caught by other test suites.  The change in question did not impact edx.org and was specific how configuration is read into the system.  The bokchoy tests did not detect any other failures that were not caught by other tests.  The `PR` where we monitored Bokchoy daily has more specific details.
+
+.. _PR: https://github.com/edx/edx-platform/pull/23682
 
 Decision
 ========
 
-TBD - Based on experiment outcome.
+We initially used the a11y suite as a placeholder for a set of reduced tests.  Given the results of the tests, we will not pull in any tests from the full bokchoy suite and only keep the a11y tests.
 
 Consequences
 ============
 
-TBD
-
+* Bokchoy testing infrastructure will remain off
+* Bokchoy tests jobs will be removed all together rather than just disabled
+* All bokchoy code in edx-platform not related to the a11y tests will be removed
+* Short Term UI Testing Strategy - With the removal of the bokchoy suite from edx-platform, any non-a11y UI tests should be made part of the e2e test suite.  This should be used extremely sparingly for only testing critical paths through the system that have a high amount of usage. If just the UI or frontend logic needs to be tested then the those tests should be written in the javascript test suite for edx-platform.
