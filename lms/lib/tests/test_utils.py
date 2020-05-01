@@ -5,6 +5,7 @@ from lms.lib import utils
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from django.core.files.storage import FileSystemStorage
 
 
 class LmsUtilsTest(ModuleStoreTestCase):

@@ -15,7 +15,7 @@ from django.contrib.sites.models import Site
 from mako.template import Template
 from provider import constants
 from provider.oauth2.models import Client as OAuth2Client
-from storages.backends.overwrite import OverwriteStorage
+from django.core.files.storage import FileSystemStorage
 
 from third_party_auth.models import cache as config_cache
 from third_party_auth.models import (
@@ -307,3 +307,10 @@ def simulate_running_pipeline(pipeline_target, backend, email=None, fullname=Non
     finally:
         pipeline_get.stop()
         pipeline_running.stop()
+
+
+class OverwriteStorage(FileSystemStorage):
+
+    def get_available_name(self, name, max_length=None):
+        self.delete(name)
+        return name

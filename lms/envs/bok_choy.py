@@ -216,7 +216,7 @@ SECRET_KEY = "very_secret_bok_choy_key"
 
 # Set dummy values for profile image settings.
 PROFILE_IMAGE_BACKEND = {
-    'class': 'storages.backends.overwrite.OverwriteStorage',
+    'class': 'django.core.files.storage.FileSystemStorage',
     'options': {
         'location': os.path.join(MEDIA_ROOT, 'profile-images/'),
         'base_url': os.path.join(MEDIA_URL, 'profile-images/'),

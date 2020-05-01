@@ -541,7 +541,7 @@ FEATURES['CUSTOM_COURSES_EDX'] = True
 
 # Set dummy values for profile image settings.
 PROFILE_IMAGE_BACKEND = {
-    'class': 'storages.backends.overwrite.OverwriteStorage',
+    'class': 'django.core.files.storage.FileSystemStorage',
     'options': {
         'location': MEDIA_ROOT,
         'base_url': 'http://example-storage.com/profile-images/',
