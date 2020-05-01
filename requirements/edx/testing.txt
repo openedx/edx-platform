@@ -88,7 +88,7 @@ django-require==1.0.11    # via -r requirements/edx/base.txt
 django-sekizai==1.1.0     # via -r requirements/edx/base.txt, django-wiki
 django-ses==0.8.14        # via -r requirements/edx/base.txt
 django-simple-history==2.10.0  # via -r requirements/edx/base.txt, edx-enterprise, edx-organizations, ora2
-django-splash==0.2.7      # via -r requirements/edx/base.txt
+django-splash==0.2.9      # via -r requirements/edx/base.txt
 django-statici18n==1.9.0  # via -r requirements/edx/base.txt
 django-storages==1.8      # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edxval
 django-user-tasks==1.0.0  # via -r requirements/edx/base.txt
@@ -107,27 +107,27 @@ edx-bulk-grades==0.6.8    # via -r requirements/edx/base.txt, staff-graded-xbloc
 edx-ccx-keys==1.0.1       # via -r requirements/edx/base.txt
 edx-celeryutils==0.5.0    # via -r requirements/edx/base.txt, super-csv
 edx-completion==3.1.1     # via -r requirements/edx/base.txt
-edx-django-release-util==0.4.2  # via -r requirements/edx/base.txt
+edx-django-release-util==0.4.4  # via -r requirements/edx/base.txt
 edx-django-sites-extensions==2.4.3  # via -r requirements/edx/base.txt
 edx-django-utils==3.2.1   # via -r requirements/edx/base.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==5.0.2  # via -r requirements/edx/base.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
 edx-enterprise==3.2.0     # via -r requirements/edx/base.txt
 edx-i18n-tools==0.5.0     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, ora2
 edx-lint==1.4.1           # via -r requirements/edx/testing.in
-edx-milestones==0.2.6     # via -r requirements/edx/base.txt
+edx-milestones==0.3.0     # via -r requirements/edx/base.txt
 edx-opaque-keys[django]==2.1.0  # via -r requirements/edx/base.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, xmodule
-edx-organizations==5.1.0  # via -r requirements/edx/base.txt
+edx-organizations==5.2.0  # via -r requirements/edx/base.txt
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/base.txt
-edx-proctoring==2.3.3     # via -r requirements/edx/base.txt, edx-proctoring-proctortrack
+edx-proctoring==2.4.0     # via -r requirements/edx/base.txt, edx-proctoring-proctortrack
 edx-rbac==1.1.3           # via -r requirements/edx/base.txt, edx-enterprise
 edx-rest-api-client==5.1.0  # via -r requirements/edx/base.txt, edx-enterprise, edx-proctoring
 edx-search==1.3.4         # via -r requirements/edx/base.txt
 edx-sga==0.10.0           # via -r requirements/edx/base.txt
-edx-submissions==3.1.2    # via -r requirements/edx/base.txt, ora2
+edx-submissions==3.1.3    # via -r requirements/edx/base.txt, ora2
 edx-tincan-py35==0.0.5    # via -r requirements/edx/base.txt, edx-enterprise
 edx-user-state-client==1.1.2  # via -r requirements/edx/base.txt
-edx-when==1.2.2           # via -r requirements/edx/base.txt, edx-proctoring
-edxval==1.3.2             # via -r requirements/edx/base.txt
+edx-when==1.2.3           # via -r requirements/edx/base.txt, edx-proctoring
+edxval==1.3.3             # via -r requirements/edx/base.txt
 elasticsearch==1.9.0      # via -r requirements/edx/base.txt, edx-search
 entrypoints==0.3          # via flake8
 enum34==1.1.10            # via -r requirements/edx/base.txt, edxval
@@ -308,7 +308,7 @@ git+https://github.com/open-craft/xblock-poll@da2d8fd21791a7af128595cf82bee83ee5
 xblock-utils==2.0.0       # via -r requirements/edx/base.txt, edx-sga, lti-consumer-xblock, staff-graded-xblock, xblock-drag-and-drop-v2, xblock-google-drive
 xblock==1.2.9             # via -r requirements/edx/base.txt, acid-xblock, crowdsourcehinter-xblock, done-xblock, edx-completion, edx-sga, edx-user-state-client, edx-when, lti-consumer-xblock, ora2, rate-xblock, staff-graded-xblock, xblock-discussion, xblock-drag-and-drop-v2, xblock-google-drive, xblock-poll, xblock-utils
 xmlsec==1.3.3             # via -r requirements/edx/base.txt, python3-saml
-xss-utils==0.1.2          # via -r requirements/edx/base.txt
+xss-utils==0.1.3          # via -r requirements/edx/base.txt
 zipp==1.0.0               # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, importlib-metadata, importlib-resources
 
 # The following packages are considered to be unsafe in a requirements file:
