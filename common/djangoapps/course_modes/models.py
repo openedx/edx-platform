@@ -546,6 +546,19 @@ class CourseMode(models.Model):
         return cls.PROFESSIONAL in modes_dict or cls.NO_ID_PROFESSIONAL_MODE in modes_dict
 
     @classmethod
+    def contains_audit_mode(cls, modes_dict):
+        """
+        Check whether the modes_dict contains an audit mode.
+
+        Args:
+            modes_dict (dict): a dict of course modes
+
+        Returns:
+            bool: whether modes_dict contains an audit mode
+        """
+        return cls.AUDIT in modes_dict
+
+    @classmethod
     def is_professional_mode(cls, course_mode_tuple):
         """
         checking that tuple is professional mode.

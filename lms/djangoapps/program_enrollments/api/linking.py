@@ -1,5 +1,5 @@
 """
-Python API function to link program enrollments and external_student_keys to an
+Python API function to link program enrollments and external_user_keys to an
 LMS user.
 
 Outside of this subpackage, import these functions
@@ -12,6 +12,7 @@ import logging
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
 
+from course_modes.models import CourseMode
 from student.api import get_access_role_by_role_name
 from student.models import CourseEnrollmentException
 
@@ -24,16 +25,15 @@ User = get_user_model()
 
 NO_PROGRAM_ENROLLMENT_TEMPLATE = (
     'No program enrollment found for program uuid={program_uuid} and external student '
-    'key={external_student_key}'
+    'key={external_user_key}'
 )
 NO_LMS_USER_TEMPLATE = 'No user found with username {}'
 EXISTING_USER_TEMPLATE = (
-    'Program enrollment with external_student_key={external_student_key} is already linked to '
+    'Program enrollment with external_student_key={external_user_key} is already linked to '
     '{account_relation} account username={username}'
 )
 
 
-@transaction.atomic
 def link_program_enrollments(program_uuid, external_keys_to_usernames):
     """
     Utility function to link ProgramEnrollments to LMS Users
@@ -55,10 +55,19 @@ def link_program_enrollments(program_uuid, external_keys_to_usernames):
     For each external_user_key:lms_username, if:
         - The user is not found
         - No enrollment is found for the given program and external_user_key
-        - The enrollment already has a user
+        - The enrollment already has a user and that user is the same as the given user
     An error message will be logged, and added to a dictionary of error messages keyed by
     external_key. The input will be skipped. All other inputs will be processed and
     enrollments updated, and then the function will return the dictionary of error messages.
+
+    For each external_user_key:lms_username, if the enrollment already has a user, but that user
+    is different than the requested user, we do the following. We unlink the existing user from
+    the program enrollment and link the requested user to the program enrollment. This is accomplished by
+    removing the existing user's link to the program enrollment. If the program enrollment
+    has course enrollments, then we unenroll the user. If there is an audit track in the course,
+    we also move the enrollment into the audit track. We also remove the association between those
+    course enrollments and the program course enrollments. The
+    requested user is then linked to the program following the above logic.
 
     If there is an error while enrolling a user in a waiting program course enrollment, the
     error will be logged, and added to the returned error dictionary, and we will roll back all
@@ -72,37 +81,56 @@ def link_program_enrollments(program_uuid, external_keys_to_usernames):
         program_uuid, external_keys_to_usernames.keys()
     )
     users_by_username = _get_lms_users(external_keys_to_usernames.values())
-    for external_student_key, username in external_keys_to_usernames.items():
-        program_enrollment = program_enrollments.get(external_student_key)
+    for external_user_key, username in external_keys_to_usernames.items():
+        program_enrollment = program_enrollments.get(external_user_key)
         user = users_by_username.get(username)
         if not user:
             error_message = NO_LMS_USER_TEMPLATE.format(username)
         elif not program_enrollment:
             error_message = NO_PROGRAM_ENROLLMENT_TEMPLATE.format(
                 program_uuid=program_uuid,
-                external_student_key=external_student_key
+                external_user_key=external_user_key
             )
-        elif program_enrollment.user:
+        # if we're trying to establish a link that already exists
+        elif program_enrollment.user and program_enrollment.user == user:
             error_message = _user_already_linked_message(program_enrollment, user)
         else:
             error_message = None
         if error_message:
             logger.warning(error_message)
-            errors[external_student_key] = error_message
+            errors[external_user_key] = error_message
             continue
         try:
             with transaction.atomic():
+                # If the ProgramEnrollment already has a linked edX user that is different than
+                # the requested user, then we should sever the link to the existing edX user before
+                # linking the ProgramEnrollment to the new user.
+                if program_enrollment.user and program_enrollment.user != user:
+                    message = ('Unlinking user with username={old_username} from program enrollment with '
+                               'program uuid={program_uuid} with external_student_key={external_user_key} '
+                               'and linking user with username={new_username} '
+                               'to program enrollment.').format(
+                        old_username=program_enrollment.user.username,
+                        program_uuid=program_uuid,
+                        external_user_key=external_user_key,
+                        new_username=user,
+                    )
+                    logger.info(_user_already_linked_message(program_enrollment, user))
+                    logger.info(message)
+
+                    unlink_program_enrollment(program_enrollment)
+
                 link_program_enrollment_to_lms_user(program_enrollment, user)
         except (CourseEnrollmentException, IntegrityError) as e:
             logger.exception("Rolling back all operations for {}:{}".format(
-                external_student_key,
+                external_user_key,
                 username,
             ))
             error_message = type(e).__name__
             if str(e):
                 error_message += ': '
                 error_message += str(e)
-            errors[external_student_key] = error_message
+            errors[external_user_key] = error_message
     return errors
 
 
@@ -111,22 +139,22 @@ def _user_already_linked_message(program_enrollment, user):
     Creates an error message that the specified program enrollment is already linked to an lms user
     """
     existing_username = program_enrollment.user.username
-    external_student_key = program_enrollment.external_user_key
+    external_user_key = program_enrollment.external_user_key
     return EXISTING_USER_TEMPLATE.format(
-        external_student_key=external_student_key,
+        external_user_key=external_user_key,
         account_relation='target' if program_enrollment.user.id == user.id else 'a different',
         username=existing_username,
     )
 
 
-def _get_program_enrollments_by_ext_key(program_uuid, external_student_keys):
+def _get_program_enrollments_by_ext_key(program_uuid, external_user_keys):
     """
     Does a bulk read of ProgramEnrollments for a given program and list of external student keys
     and returns a dict keyed by external student key
     """
     program_enrollments = fetch_program_enrollments(
         program_uuid=program_uuid,
-        external_user_keys=external_student_keys,
+        external_user_keys=external_user_keys,
     ).prefetch_related(
         'program_course_enrollments'
     ).select_related('user')
@@ -144,6 +172,45 @@ def _get_lms_users(lms_usernames):
         user.username: user
         for user in User.objects.filter(username__in=lms_usernames)
     }
+
+
+def unlink_program_enrollment(program_enrollment):
+    """
+    Unlinks CourseEnrollments from the ProgramEnrollment by doing the following for
+    each ProgramCourseEnrollment associated with the Program Enrollment.
+        1. unenrolling the corresponding user from the course
+        2. moving the user into the audit track, if the track exists
+        3. removing the link between the ProgramCourseEnrollment and the CourseEnrollment
+
+    Arguments:
+        program_enrollment: the ProgramEnrollment object
+    """
+    program_course_enrollments = program_enrollment.program_course_enrollments.all()
+
+    for pce in program_course_enrollments:
+        course_key = pce.course_enrollment.course.id
+        modes = CourseMode.modes_for_course_dict(course_key)
+
+        update_enrollment_kwargs = {
+            'is_active': False,
+            'skip_refund': True,
+        }
+
+        if CourseMode.contains_audit_mode(modes):
+            # if the course contains an audit mode, move the
+            # learner's enrollment into the audit mode
+            update_enrollment_kwargs['mode'] = 'audit'
+
+        # deactive the learner's course enrollment and move them into the
+        # audit track, if it exists
+        pce.course_enrollment.update_enrollment(**update_enrollment_kwargs)
+
+        # sever ties to the user from the ProgramCourseEnrollment
+        pce.course_enrollment = None
+        pce.save()
+
+    program_enrollment.user = None
+    program_enrollment.save()
 
 
 def link_program_enrollment_to_lms_user(program_enrollment, user):
