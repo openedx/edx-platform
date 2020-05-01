@@ -31,27 +31,42 @@ class Registry(object):
         Helper method that returns a generator used to iterate over all providers
         of the current site.
 
-        Providers are unique on site + some key (backend name in the case of
-        OAuth, slug for SAML, and consumer key for LTI).
+        Provider configurations are partitioned on site + some key (backend
+        name in the case of OAuth, slug for SAML, and consumer key for LTI).
         """
+        def current_partitioned(prov_cls, filters=None):
+            """
+            Like ConfigurationModel.current() but partitions on KEY_FIELDS and
+            allows additional filters dict. (Does not include caching.)
+            """
+            def partition_key(obj):
+                """Compute the partition key for this object."""
+                return tuple(getattr(obj, k) for k in prov_cls.KEY_FIELDS)
+
+            configs = prov_cls.objects.filter(**filters) if filters else prov_cls.objects.all()
+            # Get the most recent record in each partition
+            return unique_everseen(configs.order_by('-change_date'), partition_key)
+
         site = Site.objects.get_current(get_current_request())
-        # Pre-filter by site to prevent cross-site shadowing of config records
-        # that share a KEY_FIELDS tuple; replicate the logic of ConfigurationModel.current()
-        # in a site-aware fashion.
-        oauth2_backends = OAuth2ProviderConfig.objects.filter(site=site, backend_name__in=_PSA_OAUTH2_BACKENDS)
-        for provider in unique_everseen(oauth2_backends.order_by('-change_date'), lambda p: p.backend_name):
-            if provider.enabled:
-                yield provider
+
+        def enabled_in_site(prov_cls, filters=None):
+            """
+            Generator for all current configs of this class that are enabled
+            and for this site.
+            """
+            for config in current_partitioned(prov_cls, dict(site=site, **(filters or {}))):
+                if config.enabled:
+                    yield config
+
+        for provider in enabled_in_site(OAuth2ProviderConfig, {'backend_name__in': _PSA_OAUTH2_BACKENDS}):
+            yield provider
         if SAMLConfiguration.is_enabled(site, 'default'):
-            idps = SAMLProviderConfig.objects.filter(site=site, backend_name__in=_PSA_SAML_BACKENDS)
-            for provider in unique_everseen(idps.order_by('-change_date'), key=lambda p: p.slug):
-                if provider.enabled:
-                    yield provider
-        lti_providers = LTIProviderConfig.objects.filter(site=site)
-        for provider in unique_everseen(lti_providers.order_by('-change_date'), lambda p: p.lti_consumer_key):
-            # backend_name is hardcoded for LTIProviderConfig, not a field, so filtering done here instead
-            # (even though this guard should never return false)
-            if provider.enabled and provider.backend_name in _LTI_BACKENDS:
+            for provider in enabled_in_site(SAMLProviderConfig, {'backend_name__in': _PSA_SAML_BACKENDS}):
+                yield provider
+        # backend_name is hardcoded for LTIProviderConfig, not a field, so
+        # filtering done in loop instead of in query
+        for provider in enabled_in_site(LTIProviderConfig):
+            if provider.backend_name in _LTI_BACKENDS:
                 yield provider
 
     @classmethod
