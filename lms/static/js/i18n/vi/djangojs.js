@@ -38,9 +38,24 @@
     ],
     "%(field)s can only contain up to %(count)d characters.": "%(field)s ch\u1ec9 \u0111\u01b0\u1ee3c c\u00f3 t\u1ed1i \u0111a %(count)d k\u00ed t\u1ef1.",
     "%(field)s must have at least %(count)d characters.": "%(field)s ph\u1ea3i c\u00f3 \u00edt nh\u1ea5t %(count)d k\u00ed t\u1ef1.",
+    "%(memberCount)s / %(maxMemberCount)s Member": [
+      "%(memberCount)s / %(maxMemberCount)s th\u00e0nh vi\u00ean t\u1ed1i \u0111a"
+    ],
     "%(new_item_message)s": "%(new_item_message)s",
+    "%(num_questions)s question": [
+      "%(num_questions)s c\u00e2u h\u1ecfi"
+    ],
+    "%(num_students)s student": [
+      "%(num_students)s h\u1ecdc vi\u00ean"
+    ],
+    "%(num_students)s student opened Subsection": [
+      "%(num_students)s h\u1ecdc vi\u00ean m\u1edf Ti\u1ec3u m\u1ee5c"
+    ],
     "%(sel)s of %(cnt)s selected": [
       " %(sel)s  c\u1ee7a %(cnt)s \u0111\u01b0\u1ee3c ch\u1ecdn"
+    ],
+    "%(team_count)s Team": [
+      "%(team_count)s nh\u00f3m"
     ],
     "%(type)s Component Template Menu": "%(type)s Danh m\u1ee5c m\u1eabu th\u00e0nh ph\u1ea7n",
     "%(value)s hour": [
@@ -437,6 +452,7 @@
     "Deleted Content Group": "X\u00f3a n\u1ed9i dung nh\u00f3m",
     "Deleted Group": "\u0110\u00e3 x\u00f3a Nh\u00f3m",
     "Deleting": "\u0110ang x\u00f3a",
+    "Deleting a team is permanent and cannot be undone. All members are removed from the team, and team discussions can no longer be accessed.": "X\u00f3a m\u1ed9t nh\u00f3m l\u00e0 h\u00e0nh \u0111\u1ed9ng kh\u00f4ng th\u1ec3 thu l\u1ea1i \u0111\u01b0\u1ee3c, t\u1ea5t c\u1ea3 th\u00e0nh vi\u00ean s\u1ebd b\u1ecb x\u00f3a kh\u1ecfi nh\u00f3m v\u00e0 c\u00e1c th\u1ea3o lu\u1eadn nh\u00f3m c\u0169ng s\u1ebd b\u1ecb x\u00f3a.",
     "Deleting a textbook cannot be undone and once deleted any reference to it in your courseware's navigation will also be removed.": "X\u00f3a m\u1ed9t gi\u00e1o tr\u00ecnh kh\u00f4ng th\u1ec3 \u0111\u01b0\u1ee3c ho\u00e0n t\u00e1c v\u00e0 m\u1ed9t khi \u0111\u00e3 x\u00f3a b\u1ea5t k\u1ef3 tham chi\u1ebfu \u0111\u1ebfn n\u00f3 trong b\u1ea3ng \u0111i\u1ec1u khi\u1ec3n ch\u01b0\u01a1ng tr\u00ecnh h\u1ecdc c\u1ee7a b\u1ea1n c\u0169ng s\u1ebd b\u1ecb x\u00f3a.",
     "Deleting this %(item_display_name)s is permanent and cannot be undone.": "Xo\u00e1 m\u1ee5c n\u00e0y %(item_display_name)s l\u00e0 v\u0129nh vi\u1ec5n v\u00e0 kh\u00f4ng th\u1ec3 ho\u00e0n t\u00e1c.",
     "Deleting this {xblock_type} is permanent and cannot be undone.": "Xo\u00e1 {xblock_type} l\u00e0 v\u0129nh vi\u1ec5n v\u00e0 kh\u00f4ng th\u1ec3 ho\u00e0n t\u00e1c.",
@@ -456,6 +472,7 @@
     "Do you want to allow this student ('{student_id}') to skip the entrance exam?": "B\u1ea1n c\u00f3 mu\u1ed1n cho ph\u00e9p sinh vi\u00ean n\u00e0y ('{student_id}') \u0111\u01b0\u1ee3c ph\u00e9p b\u1ecf qua b\u00e0i ki\u1ec3m tra \u0111\u1ea7u v\u00e0o?",
     "Do you want to replace the edX transcript with the YouTube transcript?": "B\u1ea1n c\u00f3 mu\u1ed1n thay th\u1ebf b\u1ea3n d\u1ecbch edX b\u1eb1ng b\u1ea3n d\u1ecbch c\u1ee7a YouTube kh\u00f4ng?",
     "Document properties": "\u0110\u1eb7c t\u00ednh t\u00e0i li\u1ec7u",
+    "Does the photo of you match your ID photo?": "H\u00ecnh c\u1ee7a b\u1ea1n c\u00f3 gi\u1ed1ng v\u1edbi h\u00ecnh tr\u00ean ch\u1ee9ng minh nh\u00e2n d\u00e2n kh\u00f4ng?",
     "Does the photo of you show your whole face?": "H\u00ecnh c\u1ee7a b\u1ea1n c\u00f3 hi\u1ec3n th\u1ecb to\u00e0n b\u1ed9 khu\u00f4n m\u1eb7t kh\u00f4ng?",
     "Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission.": "Kh\u00f4ng nh\u00ecn th\u1ea5y h\u00ecnh \u1ea3nh c\u1ee7a b\u1ea1n? H\u00e3y ch\u1eafc ch\u1eafn \u0111\u1ec3 cho ph\u00e9p tr\u00ecnh duy\u1ec7t c\u1ee7a b\u1ea1n \u0111\u1ec3 s\u1eed d\u1ee5ng m\u00e1y \u1ea3nh c\u1ee7a b\u1ea1n khi n\u00f3 y\u00eau c\u1ea7u s\u1ef1 cho ph\u00e9p.",
     "Donate": "Quy\u00ean g\u00f3p",
@@ -493,6 +510,7 @@
     "Edit Your Name": "Ch\u1ec9nh s\u1eeda t\u00ean c\u1ee7a b\u1ea1n",
     "Edit this certificate?": "Ch\u1ec9nh s\u1eeda ch\u1ee9ng ch\u1ec9 n\u00e0y?",
     "Editable": "Ch\u1ec9nh s\u1eeda \u0111\u01b0\u1ee3c",
+    "Editing access for: %(title)s": "Ch\u1ec9nh s\u1eeda quy\u1ec1n truy c\u1eadp: %(title)s",
     "Editor": "Tr\u00ecnh bi\u00ean t\u1eadp",
     "Education Completed": "H\u1ecdc v\u1ea5n cao nh\u1ea5t",
     "Email": "Email",
@@ -685,6 +703,7 @@
     "If the unit was previously published and released to learners, any changes you made to the unit when it was hidden will now be visible to learners.": "N\u1ebfu \u0111\u01a1n v\u1ecb n\u00e0y \u0111\u00e3 \u0111\u01b0\u1ee3c xu\u1ea5t b\u1ea3n v\u00e0 ph\u00e1t h\u00e0nh cho ng\u01b0\u1eddi h\u1ecdc, b\u1ea5t k\u1ef3 thay \u0111\u1ed5i n\u00e0o b\u1ea1n th\u1ef1c hi\u1ec7n cho \u0111\u01a1n v\u1ecb khi n\u00f3 \u0111\u00e3 \u1ea9n s\u1ebd hi\u1ec3n th\u1ecb cho ng\u01b0\u1eddi h\u1ecdc.",
     "If the unit was previously published and released to students, any changes you made to the unit when it was hidden will now be visible to students. Do you want to proceed?": "N\u1ebfu \u0111\u01a1n v\u1ecb n\u00e0y \u0111\u00e3 \u0111\u01b0\u1ee3c xu\u1ea5t b\u1ea3n v\u00e0 ph\u00e1t h\u00e0nh cho h\u1ecdc vi\u00ean, c\u00e1c thay \u0111\u1ed5i m\u00e0 b\u1ea1n \u0111\u00e3 th\u1ef1c hi\u1ec7n tr\u00ean \u0111\u01a1n v\u1ecb khi n\u00f3 \u0111\u01b0\u1ee3c \u1ea9n s\u1ebd \u0111\u01b0\u1ee3c hi\u1ec7n l\u00ean \u0111\u1ed1i v\u1edbi h\u1ecdc vi\u00ean. B\u1ea1n c\u00f3 mu\u1ed1n ti\u1ebfp t\u1ee5c?",
     "If you don't verify your identity now, you can still explore your course from your dashboard. You will receive periodic reminders from %(platformName)s to verify your identity.": "N\u1ebfu b\u1ea1n kh\u00f4ng x\u00e1c minh danh t\u00ednh c\u1ee7a b\u1ea1n b\u00e2y gi\u1edd, b\u1ea1n v\u1eabn c\u00f3 th\u1ec3 kh\u00e1m ph\u00e1 kh\u00f3a h\u1ecdc c\u1ee7a b\u1ea1n t\u1eeb b\u1ea3ng \u0111i\u1ec1u khi\u1ec3n c\u1ee7a b\u1ea1n. B\u1ea1n s\u1ebd nh\u1eadn \u0111\u01b0\u1ee3c nh\u1eafc nh\u1edf \u0111\u1ecbnh k\u1ef3 t\u1eeb %(platformName)s l\u00e0 \u0111\u1ec3 x\u00e1c minh danh t\u00ednh c\u1ee7a b\u1ea1n.",
+    "If you leave, you can no longer post in this team's discussions. Your place will be available to another learner.": "N\u1ebfu b\u1ea1n r\u1eddi nh\u00f3m, b\u1ea1n s\u1ebd kh\u00f4ng th\u1ec3 tham gia v\u00e0o th\u1ea3o lu\u1eadn nh\u00f3m n\u1eefa. Ch\u1ed7 c\u1ee7a b\u1ea1n trong nh\u00f3m s\u1ebd c\u00f3 th\u1ec3 \u0111\u01b0\u1ee3c thay b\u1eb1ng ng\u01b0\u1eddi h\u1ecdc kh\u00e1c.",
     "If you make significant changes, make sure you notify members of the team before making these changes.": "Trong tr\u01b0\u1eddng h\u1ee3p b\u1ea1n mu\u1ed1n t\u1ea1o ra nh\u1eefng thay \u0111\u1ed5i l\u1edbn, b\u1ea1n n\u00ean th\u00f4ng b\u00e1o tr\u01b0\u1edbc v\u1edbi c\u00e1c th\u00e0nh vi\u00ean c\u1ee7a nh\u00f3m v\u1ec1 nh\u1eefng thay \u0111\u1ed5i n\u00e0y.",
     "If you make this %(xblockType)s visible to learners, learners will be able to see its content after the release date has passed and you have published the unit. Only units that are explicitly hidden from learners will remain hidden after you clear this option for the %(xblockType)s.": "N\u1ebfu b\u1ea1n l\u00e0m cho %(xblockType)s n\u00e0y hi\u1ec3n th\u1ecb v\u1edbi ng\u01b0\u1eddi h\u1ecdc, ng\u01b0\u1eddi h\u1ecdc s\u1ebd c\u00f3 th\u1ec3 xem n\u1ed9i dung c\u1ee7a n\u00f3 sau ng\u00e0y ph\u00e1t h\u00e0nh v\u00e0 sau khi b\u1ea1n \u0111\u00e3 xu\u1ea5t b\u1ea3n \u0111\u01a1n v\u1ecb. Ch\u1ec9 c\u00f3 nh\u1eefng \u0111\u01a1n v\u1ecb \u1ea9n \u0111\u1ed1i v\u1edbi ng\u01b0\u1eddi h\u1ecdc s\u1ebd v\u1eabn \u1ea9n sau khi b\u1ea1n \u0111\u00e3 xo\u00e1 t\u00f9y ch\u1ecdn n\u00e0y cho %(xblockType)s.",
     "If you select an option other than \"%(hide_label)s\", published units in this subsection become available to learners unless they are explicitly hidden.": "N\u1ebfu b\u1ea1n ch\u1ecdn m\u1ed9t t\u00f9y ch\u1ecdn kh\u00e1c v\u1edbi \"%(hide_label)s\", nh\u1eefng \u0111\u01a1n v\u1ecb \u0111\u00e3 xu\u1ea5t b\u1ea3n trong ph\u1ea7n con n\u00e0y s\u1ebd su\u1ea5t hi\u1ec7n cho ng\u01b0\u1eddi h\u1ecdc tr\u1eeb khi ch\u00fang \u0111\u01b0\u1ee3c \u1ea9n m\u1ed9t c\u00e1ch r\u00f5 r\u00e0ng.",
@@ -754,6 +773,7 @@
     "Last Activity %(date)s": "Ho\u1ea1t \u0111\u1ed9ng g\u1ea7n nh\u1ea5t %(date)s",
     "Last Edited:": "L\u1ea7n cu\u1ed1i c\u00f9ng \u0111\u01b0\u1ee3c s\u1eeda",
     "Last Updated": "C\u1eadp nh\u1eadt cu\u1ed1i c\u00f9ng",
+    "Last activity %(date)s": "Ho\u1ea1t \u0111\u1ed9ng g\u1ea7n nh\u1ea5t %(date)s",
     "Last published %(last_published_date)s by %(publish_username)s": "Xu\u1ea5t b\u1ea3n l\u1ea7n cu\u1ed1i %(last_published_date)s b\u1edfi %(publish_username)s",
     "Last published {lastPublishedStart}{publishedOn}{lastPublishedEnd} by {publishedByStart}{publishedBy}{publishedByEnd}": "Xu\u1ea5t b\u1ea3n l\u1ea7n cu\u1ed1i {lastPublishedStart}{publishedOn}{lastPublishedEnd} b\u1edfi {publishedByStart}{publishedBy}{publishedByEnd}",
     "Last updated": "C\u1eadp nh\u1eadt m\u1edbi nh\u1ea5t",
@@ -835,6 +855,7 @@
     "Mute": "T\u1eaft ti\u1ebfng",
     "Muted": "Ch\u1ebf \u0111\u1ed9 c\u00e2m",
     "My Orders": "Nh\u1eefng \u0111\u01a1n h\u00e0ng c\u1ee7a t\u00f4i",
+    "My Team": "Nh\u00f3m c\u1ee7a t\u00f4i",
     "Name": "T\u00ean",
     "Name ": "T\u00ean",
     "Name of the certificate": "T\u00ean c\u1ee7a ch\u1ee9ng ch\u1ec9",
@@ -895,6 +916,7 @@
     "Now": "B\u00e2y gi\u1edd",
     "Number Sent": "S\u1ed1 L\u01b0\u1ee3ng \u0110\u00e3 G\u1eedi",
     "Number of Droppable": "S\u1ed1 l\u01b0\u1ee3ng Lo\u1ea1i b\u1ecf",
+    "Number of Students": "S\u1ed1 L\u01b0\u1ee3ng H\u1ecdc Vi\u00ean",
     "Numbered List (Ctrl+O)": "Danh S\u00e1ch \u0110\u00e1nh S\u1ed1 (Ctrl+O)",
     "Numbered list": "Danh s\u00e1ch c\u00f3 th\u1ee9 t\u1ef1",
     "OK": "OK",
@@ -902,6 +924,7 @@
     "ORDER NUMBER": "S\u1ed0 \u0110\u01a0N H\u00c0NG",
     "ORDER PLACED": "\u0110\u00c3 \u0110\u1eb6T H\u00c0NG",
     "Ok": "Ok",
+    "Once your account is deleted, you cannot use it to take courses on the edX app, edx.org, or any other site hosted by edX. This includes access to edx.org from your employer\u2019s or university\u2019s system and access to private sites offered by MIT Open Learning, Wharton Executive Education, and Harvard Medical School.": "Khi t\u00e0i kho\u1ea3n c\u1ee7a b\u1ea1n b\u1ecb x\u00f3a, b\u1ea1n kh\u00f4ng th\u1ec3 s\u1eed d\u1ee5ng n\u00f3 \u0111\u1ec3 tham gia c\u00e1c kh\u00f3a h\u1ecdc tr\u00ean \u1ee9ng d\u1ee5ng edX, edx.org ho\u1eb7c b\u1ea5t k\u1ef3 trang web n\u00e0o kh\u00e1c \u0111\u01b0\u1ee3c l\u01b0u tr\u1eef b\u1edfi edX. \u0110i\u1ec1u n\u00e0y bao g\u1ed3m quy\u1ec1n truy c\u1eadp v\u00e0o edx.org t\u1eeb h\u1ec7 th\u1ed1ng h\u1ec7 th\u1ed1ng tr\u01b0\u1eddng th\u00e0nh vi\u00ean ho\u1eb7c truy c\u1eadp ri\u00eang t\u01b0 b\u1edfi MIT Open Learning, Wharton Executive Education v\u00e0 Harvard Medical School cung c\u1ea5p.",
     "One or more rescheduling tasks failed.": "M\u1ed9t ho\u1eb7c nhi\u1ec1u t\u00e1c v\u1ee5 \u0111i\u1ec1u ch\u1ec9nh l\u1ecbch h\u1ecdc \u0111\u00e3 th\u1ea5t b\u1ea1i.",
     "Only <%= fileTypes %> files can be uploaded. Please select a file ending in <%= fileExtensions %> to upload.": "Ch\u1ec9 t\u1eadp tin d\u1ea1ng <%= fileTypes %> c\u00f3 th\u1ec3 \u0111\u01b0\u1ee3c t\u1ea3i l\u00ean. Xin vui l\u00f2ng ch\u1ecdn m\u1ed9t t\u1eadp tin k\u1ebft th\u00fac b\u1eb1ng  <%= fileExtensions %> \u0111\u1ec3 t\u1ea3i l\u00ean.",
     "Only properly formatted .csv files will be accepted.": "Ch\u1ec9 nh\u1eefng t\u1ec7p tin theo \u0111\u1ecbnh d\u1ea1ng .csv chu\u1ea9n \u0111\u01b0\u1ee3c ch\u1ea5p nh\u1eadn.",
@@ -1107,6 +1130,7 @@
     "Section": "M\u1ee5c",
     "Section Visibility": "Hi\u1ec3n th\u1ecb Ph\u1ea7n n\u1ed9i dung",
     "Sections": "Ph\u1ea7n",
+    "See all teams in your course, organized by topic. Join a team to collaborate with other learners who are interested in the same topic as you are.": "Xem t\u1ea5t c\u1ea3 c\u00e1c nh\u00f3m h\u1ecdc trong kh\u00f3a h\u1ecdc c\u1ee7a b\u1ea1n, s\u1eafp x\u1ebfp theo ch\u1ee7 \u0111\u1ec1. Tham gia m\u1ed9t nh\u00f3m h\u1ecdc \u0111\u1ec3 h\u1ee3p t\u00e1c v\u1edbi nh\u1eefng ng\u01b0\u1eddi h\u1ecdc c\u00f9ng h\u1ee9ng th\u00fa v\u1edbi ch\u1ee7 \u0111\u1ec1 m\u00e0 b\u1ea1n th\u00edch.",
     "Select": "Ch\u1ecdn",
     "Select Session": "Ch\u1ecdn Phi\u00ean",
     "Select a chapter": "Ch\u1ecdn m\u1ed9t ch\u01b0\u01a1ng",
@@ -1318,6 +1342,7 @@
     "The number of subsections in the course that contain problems of this assignment type.": "S\u1ed1 ph\u1ea7n con trong kh\u00f3a h\u1ecdc ch\u1ee9a c\u00e1c c\u00e2u h\u1ecfi c\u1ee7a lo\u1ea1i b\u00e0i t\u1eadp n\u00e0y.",
     "The organization that this signatory belongs to, as it should appear on certificates.": "T\u1ed5 ch\u1ee9c m\u00e0 ng\u01b0\u1eddi k\u00fd t\u00ean n\u00e0y thu\u1ed9c v\u1ec1, nh\u01b0 n\u00f3 s\u1ebd xu\u1ea5t hi\u1ec7n tr\u00ean gi\u1ea5y ch\u1ee9ng nh\u1eadn.",
     "The page \"{route}\" could not be found.": "Kh\u00f4ng th\u1ea5y trang \"{route}\".",
+    "The photo of your face matches the photo on your ID.": "Nh\u1eefng h\u00ecnh \u1ea3nh c\u1ee7a khu\u00f4n m\u1eb7t c\u1ee7a b\u1ea1n ph\u00f9 h\u1ee3p v\u1edbi h\u00ecnh \u1ea3nh tr\u00ean ID c\u1ee7a b\u1ea1n.",
     "The post you selected has been deleted.": "B\u00e0i b\u1ea1n ch\u1ecdn \u0111\u00e3 b\u1ecb x\u00f3a.",
     "The published branch version, {published}, was reset to the draft branch version, {draft}.": "Phi\u00ean b\u1ea3n nh\u00e1nh \u0111\u00e3 xu\u1ea5t b\u1ea3n, {published}, \u0111\u00e3 \u0111\u01b0\u1ee3c \u0111\u1eb7t l\u1ea1i th\u00e0nh phi\u00ean b\u1ea3n nh\u00e1nh d\u1ef1 th\u1ea3o, {draft}.",
     "The raw error message is:": "Th\u00f4ng b\u00e1o l\u1ed7i ban \u0111\u1ea7u l\u00e0:",
@@ -1394,6 +1419,7 @@
     "This is the list of available %s. You may choose some by selecting them in the box below and then clicking the \"Choose\" arrow between the two boxes.": "Danh s\u00e1ch c\u00e1c l\u1ef1a ch\u1ecdn \u0111ang c\u00f3 %s. B\u1ea1n c\u00f3 th\u1ec3 ch\u1ecdn b\u1eb1ng b\u00e1ch click v\u00e0o m\u0169i t\u00ean \"Ch\u1ecdn\" n\u1eb1m gi\u1eefa hai h\u1ed9p.",
     "This is the list of chosen %s. You may remove some by selecting them in the box below and then clicking the \"Remove\" arrow between the two boxes.": "Danh s\u00e1ch b\u1ea1n \u0111\u00e3 ch\u1ecdn %s. B\u1ea1n c\u00f3 th\u1ec3 b\u1ecf ch\u1ecdn b\u1eb1ng c\u00e1ch click v\u00e0o m\u0169i t\u00ean \"Xo\u00e1\" n\u1eb1m gi\u1eefa hai \u00f4.",
     "This is the name of the group": "\u0110\u00e2y l\u00e0 t\u00ean c\u1ee7a nh\u00f3m",
+    "This learner will be removed from the team, allowing another learner to take the available spot.": "Ng\u01b0\u1eddi h\u1ecdc n\u00e0y s\u1ebd b\u1ecb x\u00f3a kh\u1ecfi nh\u00f3m \u0111\u1ec3 nh\u01b0\u1eddng ch\u1ed7 cho m\u1ed9t ng\u01b0\u1eddi h\u1ecdc kh\u00e1c.",
     "This link will open in a modal window": "Li\u00ean k\u1ebft n\u00e0y s\u1ebd m\u1edf ra trong m\u1ed9t c\u1eeda s\u1ed5 con",
     "This link will open in a new browser window/tab": "\u0110\u01b0\u1eddng d\u1eabn s\u1ebd m\u1edf tr\u00ean m\u1ed9t trang tr\u00ecnh duy\u1ec7t m\u1edbi",
     "This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.": "L\u1ed7i n\u00e0y c\u00f3 th\u1ec3 do m\u00e1y ch\u1ee7 c\u1ee7a ch\u00fang t\u00f4i ho\u1eb7c k\u1ebft n\u1ed1i internet c\u1ee7a b\u1ea1n. H\u00e3y th\u1eed t\u1ea3i l\u1ea1i trang ho\u1eb7c ki\u1ec3m tra l\u1ea1i k\u1ebft n\u1ed1i internet.",
@@ -1532,6 +1558,8 @@
     "Use as a Prerequisite": "S\u1eed d\u1ee5ng nh\u01b0 y\u00eau c\u1ea7u b\u0103t bu\u1ed9c",
     "Use cohorts as the basis for dividing discussions. All learners, regardless of cohort, see the same discussion topics, but within divided topics, only members of the same cohort see and respond to each others\u2019 posts. ": "S\u1eed d\u1ee5ng c\u00e1c nh\u00f3m l\u00e0m c\u01a1 s\u1edf \u0111\u1ec3 chia s\u1ebb c\u00e1c cu\u1ed9c th\u1ea3o lu\u1eadn. T\u1ea5t c\u1ea3 ng\u01b0\u1eddi h\u1ecdc, kh\u00f4ng ph\u00e2n bi\u1ec7t nh\u00f3m, xem c\u00e1c ch\u1ee7 \u0111\u1ec1 th\u1ea3o lu\u1eadn gi\u1ed1ng nhau, nh\u01b0ng trong c\u00e1c ch\u1ee7 \u0111\u1ec1 chia s\u1ebb, ch\u1ec9 nh\u1eefng th\u00e0nh vi\u00ean c\u1ee7a c\u00f9ng m\u1ed9t nh\u00f3m m\u1edbi th\u1ea5y v\u00e0 tr\u1ea3 l\u1eddi c\u00e1c b\u00e0i \u0111\u0103ng c\u1ee7a nhau.",
     "Use enrollment tracks as the basis for dividing discussions. All learners, regardless of their enrollment track, see the same discussion topics, but within divided topics, only learners who are in the same enrollment track see and respond to each others\u2019 posts.": "S\u1eed d\u1ee5ng c\u00e1c ki\u1ec3u \u0111\u0103ng k\u00fd l\u00e0m c\u01a1 s\u1edf \u0111\u1ec3 ph\u00e2n chia c\u00e1c cu\u1ed9c th\u1ea3o lu\u1eadn. T\u1ea5t c\u1ea3 h\u1ecdc vi\u00ean, b\u1ea5t k\u1ec3 ki\u1ec3u \u0111\u0103ng k\u00fd c\u1ee7a h\u1ecd, xem c\u00e1c ch\u1ee7 \u0111\u1ec1 th\u1ea3o lu\u1eadn gi\u1ed1ng nhau, nh\u01b0ng trong c\u00e1c ch\u1ee7 \u0111\u1ec1 \u0111\u00e3 ph\u00e2n chia, ch\u1ec9 nh\u1eefng h\u1ecdc vi\u00ean trong c\u00f9ng m\u1ed9t ki\u1ec3u \u0111\u0103ng k\u00fd m\u1edbi nh\u00ecn th\u1ea5y v\u00e0 tr\u1ea3 l\u1eddi c\u00e1c b\u00e0i vi\u1ebft c\u1ee7a nhau.",
+    "Use the retake photo button if you are not pleased with your photo": "S\u1eed d\u1ee5ng c\u00e1c n\u00fat photo chi\u1ebfm l\u1ea1i n\u1ebfu b\u1ea1n kh\u00f4ng h\u00e0i l\u00f2ng v\u1edbi b\u1ee9c \u1ea3nh c\u1ee7a b\u1ea1n",
+    "Use your webcam to take a photo of your ID. We will match this photo with the photo of your face and the name on your account.": "S\u1eed d\u1ee5ng webcam c\u1ee7a b\u1ea1n \u0111\u1ec3 c\u00f3 m\u1ed9t b\u1ee9c \u1ea3nh c\u1ee7a ID c\u1ee7a b\u1ea1n. Ch\u00fang t\u00f4i s\u1ebd \u0111\u1ed1i b\u1ee9c \u1ea3nh n\u00e0y v\u1edbi h\u00ecnh \u1ea3nh c\u1ee7a khu\u00f4n m\u1eb7t c\u1ee7a b\u1ea1n v\u00e0 t\u00ean t\u00e0i kho\u1ea3n c\u1ee7a b\u1ea1n.",
     "Use your webcam to take a photo of your face. We will match this photo with the photo on your ID.": "S\u1eed d\u1ee5ng webcam c\u1ee7a b\u1ea1n \u0111\u1ec3 c\u00f3 m\u1ed9t h\u00ecnh \u1ea3nh c\u1ee7a khu\u00f4n m\u1eb7t c\u1ee7a b\u1ea1n \u0111\u1ec3 ch\u00fang t\u00f4i c\u00f3 th\u1ec3 k\u1ebft h\u1ee3p n\u00f3 v\u1edbi h\u00ecnh \u1ea3nh tr\u00ean ID c\u1ee7a b\u1ea1n.",
     "Used": "\u0110\u01b0\u1ee3c s\u1eed d\u1ee5ng",
     "Used in {count} location": [
@@ -1564,8 +1592,10 @@
     "Video speed: ": "t\u1ed1c \u0111\u1ed9 video",
     "Video transcript": "B\u1ea3n d\u1ecbch video",
     "View": "Xem",
+    "View %(span_start)s %(team_name)s %(span_end)s": "Xem %(span_start)s %(team_name)s %(span_end)s",
     "View Cohort": "Xem Nh\u00f3m",
     "View Live": "Xem b\u1ea3n th\u1ef1c",
+    "View Teams in the %(topic_name)s Topic": "Xem c\u00e1c nh\u00f3m h\u1ecdc trong ch\u1ee7 \u0111\u1ec1 %(topic_name)s ",
     "View all errors": "Xem to\u00e0n b\u1ed9 l\u1ed7i",
     "View child items": "Xem c\u00e1c m\u1ee5c con",
     "Viewing %s course": [
@@ -1611,6 +1641,7 @@
     "Yes, delete this {xblock_type}": "\u0110\u1ed3ng \u00fd, xo\u00e1 {xblock_type}",
     "Yes, replace the edX transcript with the YouTube transcript": "C\u00f3, thay th\u1ebf b\u1ea3n d\u1ecbch edX b\u1eb1ng b\u1ea3n d\u1ecbch c\u1ee7a YouTube",
     "Yesterday": "H\u00f4m qua",
+    "You already belong to another team.": "B\u1ea1n \u0111\u00e3 n\u1eb1m trong m\u1ed9t nh\u00f3m kh\u00e1c.",
     "You are a member of this team.": "B\u1ea1n l\u00e0 m\u1ed9t th\u00e0nh vi\u00ean c\u1ee7a nh\u00f3m n\u00e0y.",
     "You are not currently a member of any team.": "B\u1ea1n hi\u1ec7n kh\u00f4ng ph\u1ea3i th\u00e0nh vi\u00ean c\u1ee7a b\u1ea5t k\u1ef3 nh\u00f3m n\u00e0o.",
     "You are sending an email message with the subject {subject} to the following recipients.": "B\u1ea1n \u0111ang g\u1eedi m\u1ed9t email v\u1edbi ch\u1ee7 \u0111\u1ec1 {subject} t\u1edbi nh\u1eefng ng\u01b0\u1eddi nh\u1eadn sau \u0111\u00e2y.",
@@ -1639,6 +1670,7 @@
     "You have not created any group configurations yet.": "B\u1ea1n v\u1eabn ch\u01b0a t\u1ea1o m\u1ed9t c\u1ea5u h\u00ecnh nh\u00f3m n\u00e0o.",
     "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "B\u1ea1n \u0111\u00e3 l\u1ef1a ch\u1ecdn m\u1ed9t h\u00e0nh \u0111\u1ed9ng, v\u00e0 b\u1ea1n \u0111\u00e3 kh\u00f4ng th\u1ef1c hi\u1ec7n b\u1ea5t k\u1ef3 thay \u0111\u1ed5i n\u00e0o tr\u00ean c\u00e1c tr\u01b0\u1eddng. C\u00f3 l\u1ebd b\u1ea1n \u0111ang t\u00ecm ki\u1ebfm n\u00fat b\u1ea5m Go thay v\u00ec n\u00fat b\u1ea5m Save.",
     "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "B\u1ea1n \u0111\u00e3 l\u1ef1a ch\u1ecdn m\u1ed9t h\u00e0nh \u0111\u1ed9ng, nh\u01b0ng b\u1ea1n kh\u00f4ng l\u01b0u thay \u0111\u1ed5i c\u1ee7a b\u1ea1n \u0111\u1ebfn c\u00e1c l\u0129nh v\u1ef1c c\u00e1 nh\u00e2n \u0111\u01b0\u1ee3c n\u00eau ra. Xin vui l\u00f2ng click OK \u0111\u1ec3 l\u01b0u l\u1ea1i. B\u1ea1n s\u1ebd c\u1ea7n ph\u1ea3i ch\u1ea1y l\u1ea1i c\u00e1c h\u00e0nh \u0111\u1ed9ng.",
+    "You have selected \u201cDelete my account.\u201d Deletion of your account and personal data is permanent and cannot be undone. EdX will not be able to recover your account or the data that is deleted.": "B\u1ea1n \u0111\u00e3 ch\u1ecdn \u201cX\u00f3a t\u00e0i kho\u1ea3n c\u1ee7a t\u00f4i\u201d. X\u00f3a t\u00e0i kho\u1ea3n v\u00e0 d\u1eef li\u1ec7u c\u00e1 nh\u00e2n c\u1ee7a b\u1ea1n l\u00e0 v\u0129nh vi\u1ec5n v\u00e0 kh\u00f4ng th\u1ec3 ho\u00e0n t\u00e1c. EdX s\u1ebd kh\u00f4ng th\u1ec3 kh\u00f4i ph\u1ee5c t\u00e0i kho\u1ea3n c\u1ee7a b\u1ea1n ho\u1eb7c d\u1eef li\u1ec7u b\u1ecb x\u00f3a.",
     "You have successfully signed into %(currentProvider)s, but your %(currentProvider)s account does not have a linked %(platformName)s account. To link your accounts, sign in now using your %(platformName)s password.": "B\u1ea1n \u0111\u00e3 \u0111\u0103ng nh\u1eadp th\u00e0nh c\u00f4ng v\u00e0o %(currentProvider)s, nh\u01b0ng t\u00e0i kho\u1ea3n c\u1ee7a b\u1ea1n %(currentProvider)s kh\u00f4ng \u0111\u01b0\u1ee3c li\u00ean k\u1ebft v\u00e0o t\u00e0i kho\u1ea3n %(platformName)s. \u0110\u1ec3 li\u00ean k\u1ebft c\u00e1c t\u00e0i kho\u1ea3n c\u1ee7a b\u1ea1n, \u0111\u0103ng nh\u1eadp ngay b\u1eb1ng %(platformName)s m\u1eadt kh\u1ea9u.",
     "You have successfully updated your goal.": "B\u1ea1n \u0111\u00e3 c\u1eadp nh\u1eadt th\u00e0nh c\u00f4ng m\u1ee5c ti\u00eau c\u1ee7a m\u00ecnh.",
     "You have unsaved changes are you sure you want to navigate away?": "B\u1ea1n c\u00f2n ch\u01b0a l\u01b0u m\u1ed9t v\u00e0i thay \u0111\u1ed5i, b\u1ea1n ch\u1eafc ch\u1eafn mu\u1ed1n \u0111i\u1ec1u h\u01b0\u1edbng?",
@@ -1656,6 +1688,9 @@
     "You must specify a name": "B\u1ea1n ph\u1ea3i x\u00e1c \u0111\u1ecbnh m\u1ed9t t\u00ean",
     "You must specify a name for the cohort": "B\u1ea1n ph\u1ea3i \u0111\u1eb7t t\u00ean cho nh\u00f3m.",
     "You must specify your birth year before you can share your full profile. To specify your birth year, go to the {account_settings_page_link}": "B\u1ea1n ph\u1ea3i nh\u1eadp v\u00e0o n\u0103m sinh tr\u01b0\u1edbc khi b\u1ea1n c\u00f3 th\u1ec3 chia s\u1ebb to\u00e0n b\u1ed9 h\u1ed3 s\u01a1 c\u1ee7a b\u1ea1n. \u0110\u1ec3 nh\u1eadp v\u00e0o n\u0103m sinh, nh\u1ea5p v\u00e0o {account_settings_page_link}",
+    "You need a computer that has a webcam. When you receive a browser prompt, make sure that you allow access to the camera.": "B\u1ea1n c\u1ea7n m\u1ed9t m\u00e1y t\u00ednh c\u00f3 m\u1ed9t webcam. Khi b\u1ea1n nh\u1eadn \u0111\u01b0\u1ee3c d\u1ea5u nh\u1eafc tr\u00ecnh duy\u1ec7t, h\u00e3y ch\u1eafc ch\u1eafn r\u1eb1ng b\u1ea1n cho ph\u00e9p truy c\u1eadp v\u00e0o m\u00e1y \u1ea3nh.",
+    "You need a driver's license, passport, or other government-issued ID that has your name and photo.": "B\u1ea1n c\u1ea7n c\u00f3 b\u1eb1ng l\u00e1i xe, h\u1ed9 chi\u1ebfu, ho\u1eb7c ID ch\u00ednh ph\u1ee7 ph\u00e1t h\u00e0nh c\u00f3 t\u00ean v\u00e0 \u1ea3nh c\u1ee7a b\u1ea1n.",
+    "You need an ID with your name and photo. A driver's license, passport, or other government-issued IDs are all acceptable.": "B\u1ea1n c\u1ea7n m\u1ed9t ID c\u00f3 t\u00ean v\u00e0 \u1ea3nh c\u1ee7a b\u1ea1n. Gi\u1ea5y ph\u00e9p, h\u1ed9 chi\u1ebfu, ho\u1eb7c ID ch\u00ednh ph\u1ee7 ph\u00e1t h\u00e0nh c\u1ee7a m\u1ed9t tr\u00ecnh \u0111i\u1ec1u khi\u1ec3n \u0111\u01b0\u1ee3c t\u1ea5t c\u1ea3 ch\u1ea5p nh\u1eadn \u0111\u01b0\u1ee3c.",
     "You need to activate your account before you can enroll in courses. Check your inbox for an activation email.": "B\u1ea1n c\u1ea7n k\u00edch ho\u1ea1t t\u00e0i kho\u1ea3n tr\u01b0\u1edbc khi ghi danh v\u00e0o kho\u00e1 h\u1ecdc. Ki\u1ec3m tra h\u1ed9p th\u01b0 \u0111\u1ebfn cho email c\u1ea7n k\u00edch ho\u1ea1t.",
     "You receive messages from {platform_name} and course teams at this address.": "B\u1ea1n nh\u1eadn \u0111\u01b0\u1ee3c tin nh\u1eafn t\u1eeb {platform_name} t\u1ea1i \u0111\u1ecba ch\u1ec9 n\u00e0y.",
     "You reserve all rights for your work": "B\u1ea1n d\u00e0nh t\u1ea5t c\u1ea3 c\u00e1c quy\u1ec1n cho t\u00e1c ph\u1ea9m c\u1ee7a b\u1ea1n",
@@ -1814,6 +1849,7 @@
     ],
     "{seconds} {unit}": "{seconds} {unit}",
     "{start_strong}{total}{end_strong} words submitted in total.": "t\u1ed5ng c\u1ed9ng {start_strong}{total}{end_strong} t\u1eeb \u0111\u00e3 g\u1eedi.",
+    "{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read the above carefully before proceeding. This is an irreversible action, and {strongStart}you will no longer be able to use the same email on edX.{strongEnd}": "{strongStart}C\u1ea3nh B\u00e1o: T\u00e0i kho\u1ea3n s\u1ebd b\u1ecb x\u00f3a v\u0129nh vi\u1ec5n{strongEnd} Vui l\u00f2ng \u0111\u1ecdc k\u1ef9 nh\u1eefng \u0111i\u1ec1u tr\u00ean tr\u01b0\u1edbc khi ti\u1ebfp t\u1ee5c. \u0110\u00e2y l\u00e0 m\u1ed9t h\u00e0nh \u0111\u1ed9ng kh\u00f4ng th\u1ec3 \u0111\u1ea3o ng\u01b0\u1ee3c v\u00e0 {strongStart}b\u1ea1n s\u1ebd kh\u00f4ng th\u1ec3 s\u1eed d\u1ee5ng email n\u00e0y tr\u00ean edX n\u1eefa.{strongEnd}",
     "{totalItems} total": "t\u1ed5ng s\u1ed1 {totalItems}",
     "{total_results} result": [
       "{total_results} k\u1ebft qu\u1ea3"
