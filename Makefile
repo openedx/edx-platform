@@ -61,7 +61,8 @@ pull: ## update the Docker image used by "make shell"
 	docker pull edxops/edxapp:latest
 
 requirements: ## install development environment requirements
-	pip install -qr requirements/edx/development.txt --exists-action w
+	pip install -qr requirements/edx/pip-tools.txt
+	pip-sync -q requirements/edx/development.txt requirements/edx/private.*
 
 shell: ## launch a bash shell in a Docker container with all edx-platform dependencies installed
 	docker run -it -e "NO_PYTHON_UNINSTALL=1" -e "PIP_INDEX_URL=https://pypi.python.org/simple" -e TERM \
