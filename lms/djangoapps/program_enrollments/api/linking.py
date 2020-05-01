@@ -33,7 +33,6 @@ EXISTING_USER_TEMPLATE = (
 )
 
 
-@transaction.atomic
 def link_program_enrollments(program_uuid, external_keys_to_usernames):
     """
     Utility function to link ProgramEnrollments to LMS Users
