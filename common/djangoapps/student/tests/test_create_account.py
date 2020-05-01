@@ -71,6 +71,7 @@ def get_mock_pipeline_data(username=TEST_USERNAME, email=TEST_EMAIL):
 
 @ddt.ddt
 @override_settings(
+    DEFAULT_SITE_THEME='edx-theme-codebase',
     MICROSITE_CONFIGURATION={
         "microsite": {
             "domain_prefix": "microsite",

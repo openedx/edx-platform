@@ -3750,15 +3750,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
 
 @attr(shard=5)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
-@override_settings(
-    DEFAULT_SITE_THEME='edx-theme-codebase',
-    COMPREHENSIVE_THEME_DIRS=[settings.REPO_ROOT / 'common/test/appsembler'],
-)
-@patch.dict(settings.FEATURES, {
-     'AMC_APP_URL': 'http://localhost:13000',
-     'DISABLE_COURSE_CREATION': False,
-     'ENABLE_CREATOR_GROUP': True,
-})
+@override_settings(DEFAULT_SITE_THEME='edx-theme-codebase')
 class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Checks that only instructors have access to email endpoints, and that

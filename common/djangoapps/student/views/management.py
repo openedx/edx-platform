@@ -847,7 +847,7 @@ def create_account_with_params(request, params):
     return new_user
 
 
-def skip_activation_email(user, do_external_auth, running_pipeline, third_party_provider, params):
+def skip_activation_email(user, do_external_auth, running_pipeline, third_party_provider, params=None):
     """
     Return `True` if activation email should be skipped.
 
@@ -874,6 +874,7 @@ def skip_activation_email(user, do_external_auth, running_pipeline, third_party_
         (bool): `True` if account activation email should be skipped, `False` if account activation email should be
             sent.
     """
+    params = params or {}
     sso_pipeline_email = running_pipeline and running_pipeline['kwargs'].get('details', {}).get('email')
 
     # Email is valid if the SAML assertion email matches the user account email or
@@ -905,7 +906,7 @@ def skip_activation_email(user, do_external_auth, running_pipeline, third_party_
         (not params.get('send_activation_email', True)) or  # Appsembler: for Tahoe Registration API
         (settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH') and do_external_auth) or
         (third_party_provider and third_party_provider.skip_email_verification and valid_email) or
-        params.get('registered_from_amc')  # Appsembler: No need for activation email for active AMC users
+        params.get('registered_from_amc', False)  # Appsembler: No need for activation email for active AMC users
     )
 
 

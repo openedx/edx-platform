@@ -23,13 +23,11 @@ from student.roles import CourseCreatorRole
 @override_settings(
     DEBUG=True,
     DEFAULT_SITE_THEME='edx-theme-codebase',
-    FEATURES={
-        'AMC_APP_URL': 'http://localhost:13000',
-        "DISABLE_COURSE_CREATION": False,
-        "ENABLE_CREATOR_GROUP": True,
-    },
-    COMPREHENSIVE_THEME_DIRS=[settings.REPO_ROOT / 'common/test/appsembler'],
 )
+@patch.dict('django.conf.settings.FEATURES', {
+    'DISABLE_COURSE_CREATION': False,
+    'ENABLE_CREATOR_GROUP': True,
+})
 class CreateDevstackSiteCommandTestCase(TestCase):
     """
     Test ./manage.py lms create_devstack_site mydevstack
@@ -79,13 +77,11 @@ class CreateDevstackSiteCommandTestCase(TestCase):
 @override_settings(
     DEBUG=True,
     DEFAULT_SITE_THEME='edx-theme-codebase',
-    FEATURES={
-        'AMC_APP_URL': 'http://localhost:13000',
-        "DISABLE_COURSE_CREATION": False,
-        "ENABLE_CREATOR_GROUP": True,
-    },
-    COMPREHENSIVE_THEME_DIRS=[settings.REPO_ROOT / 'common/test/appsembler'],
 )
+@patch.dict('django.conf.settings.FEATURES', {
+    'DISABLE_COURSE_CREATION': False,
+    'ENABLE_CREATOR_GROUP': True,
+})
 class RemoveSiteCommandTestCase(TestCase):
     """
     Test ./manage.py lms remove_site mysite
