@@ -3,7 +3,6 @@ Common utilities for the course experience, including course outline.
 """
 
 
-import logging
 from datetime import timedelta
 
 from completion.models import BlockCompletion
@@ -23,8 +22,6 @@ from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 from xmodule.partitions.partitions_service import PartitionService
-
-log = logging.getLogger(__name__)
 
 
 @request_cached()
@@ -277,16 +274,6 @@ def reset_deadlines_banner_should_display(course_key, request):
                 if display_reset_dates_banner:
                     break
                 for subsection in section.get('children', []):
-                    if str(course_key) == 'course-v1:BabsonX+BPET.ACCx+2T2018':
-                        log.info('**********DEBUGGING FOR RESET DATES BANNER FOR %s**********', request.user.username)
-                        log.info(u'ALL SUBSECTION INFO: %s', subsection)
-                        log.info(u'SUBSECTION COMPLETE: %s', subsection.get('complete', True))
-                        log.info(u'SUBSECTION GRADED: %s', subsection.get('graded', False))
-                        log.info(
-                            u'SUBSECTION PAST DUE: %s',
-                            subsection.get('due', timezone.now() + timedelta(1)) < timezone.now(),
-                        )
-                        log.info('*********END**********')
                     if (
                         not subsection.get('complete', True)
                         and subsection.get('graded', False)
