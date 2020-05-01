@@ -29,7 +29,7 @@ Longer TODO:
 # pylint: disable=invalid-name, wrong-import-position
 
 
-import imp
+import importlib.util
 import sys
 import os
 
@@ -3181,10 +3181,8 @@ OPTIONAL_APPS = [
 for app_name, insert_before in OPTIONAL_APPS:
     # First attempt to only find the module rather than actually importing it,
     # to avoid circular references - only try to import if it can't be found
-    # by find_module, which doesn't work with import hooks
-    try:
-        imp.find_module(app_name)
-    except ImportError:
+    # by find_spec, which doesn't work with import hooks
+    if importlib.util.find_spec(app_name) is None:
         try:
             __import__(app_name)
         except ImportError:
