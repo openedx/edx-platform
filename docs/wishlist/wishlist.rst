@@ -21,6 +21,12 @@ Note: This document is itself an experiment.
 Ideas
 -----
 
+* Switch to Custom User Model
+
+  * Simplifies future upgrades
+  * Enables custom behavior
+  * See https://www.caktusgroup.com/blog/2019/04/26/how-switch-custom-django-user-model-mid-project/
+
 Ticketed Ideas
 --------------
 
