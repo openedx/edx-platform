@@ -105,11 +105,6 @@ class ProgramCourseEnrollment(TimeStampedModel):
 
         # For each program enrollment, there may be only one
         # waiting program-course enrollment per course key.
-        # This same constraint is implicitly enforced for
-        # completed program-course enrollments by the
-        # OneToOneField on `course_enrollment`, which mandates that
-        # there may be at most one program-course enrollment per
-        # (user, course) pair.
         unique_together = (
             ('program_enrollment', 'course_key'),
         )

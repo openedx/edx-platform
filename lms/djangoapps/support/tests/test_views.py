@@ -550,6 +550,8 @@ class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
         render_call_dict = mocked_render.call_args[0][1]
         assert render_call_dict['errors'] == [msg]
 
+    # TODO: add test case(s) for updating linked accounts
+
 
 @ddt.ddt
 class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
