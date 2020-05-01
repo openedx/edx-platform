@@ -285,11 +285,11 @@ def debounce(seconds=1):
     seconds. Waits until calls stop coming in before calling the decorated
     function.
     """
-    def decorator(func):  # pylint: disable=missing-docstring
+    def decorator(func):
         func.timer = None
 
         @wraps(func)
-        def wrapper(*args, **kwargs):  # pylint: disable=missing-docstring
+        def wrapper(*args, **kwargs):
             def call():
                 func(*args, **kwargs)
                 func.timer = None

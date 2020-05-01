@@ -1,4 +1,4 @@
-# pylint: disable=missing-docstring
+# pylint: disable=missing-module-docstring
 
 
 from django.conf import settings

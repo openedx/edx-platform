@@ -418,7 +418,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         return user_id
 
     @XBlock.handler
-    def refresh_children(self, request=None, suffix=None):  # pylint: disable=unused-argument
+    def refresh_children(self, request=None, suffix=None):
         """
         Refresh children:
         This method is to be used when any of the libraries that this block
@@ -649,7 +649,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         for child in self.get_children():
             self.runtime.add_block_as_child_node(child, xml_object)
         # Set node attributes based on our fields.
-        for field_name, field in six.iteritems(self.fields):  # pylint: disable=no-member
+        for field_name, field in six.iteritems(self.fields):
             if field_name in ('children', 'parent', 'content'):
                 continue
             if field.is_set_on(self):

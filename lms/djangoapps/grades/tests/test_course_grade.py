@@ -1,6 +1,3 @@
-# pylint: disable=missing-docstring
-
-
 import ddt
 import six
 from crum import set_current_request

@@ -1747,7 +1747,7 @@ class CourseRegCodeItem(OrderItem):
         # file, but there's also a shared dependency on a random string generator which
         # is in another PR (for another feature)
         from lms.djangoapps.instructor.views.api import save_registration_code
-        for i in range(total_registration_codes):  # pylint: disable=unused-variable
+        for i in range(total_registration_codes):
             save_registration_code(self.user, self.course_id, self.mode, order=self.order)
 
         log.info(u"Enrolled {0} in paid course {1}, paid ${2}"

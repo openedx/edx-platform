@@ -43,7 +43,6 @@ class TestHandleDashboardError(unittest.TestCase):
     Test handle_dashboard_error decorator.
     """
     def test_error(self):
-        # pylint: disable=unused-argument
         @tools.handle_dashboard_error
         def view(request, course_id):
             """
@@ -55,7 +54,6 @@ class TestHandleDashboardError(unittest.TestCase):
         self.assertEqual(response, {'error': 'Oh noes!'})
 
     def test_no_error(self):
-        # pylint: disable=unused-argument
         @tools.handle_dashboard_error
         def view(request, course_id):
             """

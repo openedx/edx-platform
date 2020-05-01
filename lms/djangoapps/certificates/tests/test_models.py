@@ -33,7 +33,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 FEATURES_INVALID_FILE_PATH = settings.FEATURES.copy()
 FEATURES_INVALID_FILE_PATH['CERTS_HTML_VIEW_CONFIG_PATH'] = 'invalid/path/to/config.json'
 
-# pylint: disable=invalid-name
 TEST_DIR = path(__file__).dirname()
 TEST_DATA_DIR = 'common/test/data/'
 PLATFORM_ROOT = TEST_DIR.parent.parent.parent.parent

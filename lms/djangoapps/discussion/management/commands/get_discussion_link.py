@@ -1,6 +1,3 @@
-# pylint: disable=missing-docstring
-
-
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys.edx.keys import CourseKey
 

@@ -446,7 +446,7 @@ def get_ccx_schedule(course, ccx):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
-def ccx_schedule(request, course, ccx=None):  # pylint: disable=unused-argument
+def ccx_schedule(request, course, ccx=None):
     """
     get json representation of ccx schedule
     """

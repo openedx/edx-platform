@@ -1,4 +1,4 @@
-# pylint: disable=missing-docstring,consider-iterating-dictionary
+# pylint: disable=consider-iterating-dictionary, missing-module-docstring
 
 
 import json

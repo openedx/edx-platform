@@ -332,7 +332,6 @@ class XQueueCertInterface(object):
             mode_is_verified,
             generate_pdf
         )
-        # pylint: disable=no-member
         cert, created = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)
 
         cert.mode = cert_mode

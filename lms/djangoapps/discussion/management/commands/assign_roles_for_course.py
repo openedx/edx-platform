@@ -1,4 +1,3 @@
-# pylint: disable=missing-docstring
 """
 This must be run only after seed_permissions_roles.py!
 

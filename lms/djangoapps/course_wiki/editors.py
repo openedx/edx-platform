@@ -57,7 +57,7 @@ class CodeMirror(BaseEditor):
     def get_widget(self, instance=None):
         return CodeMirrorWidget()
 
-    class AdminMedia(object):  # pylint: disable=missing-docstring
+    class AdminMedia(object):  # pylint: disable=missing-class-docstring
         css = {
             'all': ("wiki/markitup/skins/simple/style.css",
                     "wiki/markitup/sets/admin/style.css",)

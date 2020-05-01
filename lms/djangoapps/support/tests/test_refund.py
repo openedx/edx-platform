@@ -64,7 +64,6 @@ class RefundTests(ModuleStoreTestCase):
         super(RefundTests, self).tearDown()
 
     def _enroll(self, purchase=True):
-        # pylint: disable=missing-docstring
         CourseEnrollment.enroll(self.student, self.course_id, self.course_mode.mode_slug)
         if purchase:
             self.order = Order.get_cart_for_user(self.student)

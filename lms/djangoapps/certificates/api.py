@@ -148,7 +148,7 @@ def get_recently_modified_certificates(course_keys=None, start_date=None, end_da
     if end_date:
         cert_filter_args['modified_date__lte'] = end_date
 
-    return GeneratedCertificate.objects.filter(**cert_filter_args).order_by('modified_date')  # pylint: disable=no-member
+    return GeneratedCertificate.objects.filter(**cert_filter_args).order_by('modified_date')
 
 
 def generate_user_certificates(student, course_key, course=None, insecure=False, generation_mode='batch',

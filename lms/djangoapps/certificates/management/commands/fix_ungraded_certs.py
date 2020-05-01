@@ -45,7 +45,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         course_id = options['course']
         log.info(u'Fetching ungraded students for %s.', course_id)
-        ungraded = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
+        ungraded = GeneratedCertificate.objects.filter(
             course_id__exact=course_id
         ).filter(grade__exact='')
         course = courses.get_course_by_id(course_id)

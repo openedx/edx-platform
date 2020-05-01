@@ -327,7 +327,7 @@ class Env(object):
         if not env_path.isfile():
             print(
                 u"Warning: could not find environment JSON file "
-                "at '{path}'".format(path=env_path),  # pylint: disable=unicode-format-string
+                "at '{path}'".format(path=env_path),
                 file=sys.stderr,
             )
             return dict()
@@ -340,7 +340,7 @@ class Env(object):
         except ValueError:
             print(
                 u"Error: Could not parse JSON "
-                "in {path}".format(path=env_path),  # pylint: disable=unicode-format-string
+                "in {path}".format(path=env_path),
                 file=sys.stderr,
             )
             sys.exit(1)

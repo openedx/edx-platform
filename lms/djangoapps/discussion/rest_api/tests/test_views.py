@@ -16,7 +16,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient, APITestCase
 from six import text_type
 from six.moves import range
-from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
+from six.moves.urllib.parse import urlparse
 
 from common.test.utils import disable_signal
 from course_modes.models import CourseMode

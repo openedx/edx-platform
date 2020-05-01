@@ -8,7 +8,6 @@ of a variety of types.
 Used by capa_problem.py
 """
 
-# pylint: disable=attribute-defined-outside-init
 # standard library imports
 
 

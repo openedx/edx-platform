@@ -31,8 +31,8 @@ from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC
 from six import text_type
 from six.moves import range
-from six.moves.html_parser import HTMLParser  # pylint: disable=import-error
-from six.moves.urllib.parse import quote, urlencode  # pylint: disable=import-error
+from six.moves.html_parser import HTMLParser
+from six.moves.urllib.parse import quote, urlencode
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, String

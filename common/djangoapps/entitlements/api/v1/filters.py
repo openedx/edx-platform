@@ -8,7 +8,7 @@ from entitlements.models import CourseEntitlement
 class CharListFilter(filters.CharFilter):
     """ Filters a field via a comma-delimited list of values. """
 
-    def filter(self, qs, value):  # pylint: disable=method-hidden
+    def filter(self, qs, value):
         if value not in (None, ''):
             value = value.split(',')
 

@@ -1,5 +1,4 @@
 # Factories are self documenting
-# pylint: disable=missing-docstring
 
 
 import json

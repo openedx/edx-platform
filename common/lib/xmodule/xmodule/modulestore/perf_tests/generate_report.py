@@ -50,7 +50,7 @@ class HTMLTable(object):
             th, td {
                 padding: 5px;
             }"""
-                       )  # pylint: disable=bad-continuation
+                       )
 
 
 class HTMLDocument(object):

@@ -7,7 +7,7 @@ from django.contrib.auth.models import User as DjangoUser
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from rest_framework import serializers
-from six.moves.urllib.parse import urlencode, urlunparse  # pylint: disable=import-error
+from six.moves.urllib.parse import urlencode, urlunparse
 
 from lms.djangoapps.discussion.django_comment_client.utils import (
     course_discussion_division_enabled,

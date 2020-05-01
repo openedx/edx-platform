@@ -11,7 +11,7 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import patch
 from opaque_keys.edx.locator import CourseLocator
-from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
+from six.moves.urllib.parse import urlencode
 from waffle.testutils import override_switch
 
 from course_modes.models import CourseMode

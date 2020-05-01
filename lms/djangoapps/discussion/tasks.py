@@ -17,7 +17,7 @@ from edx_ace.recipient import Recipient
 from edx_ace.utils import date
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
-from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
+from six.moves.urllib.parse import urljoin
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from lms.djangoapps.discussion.django_comment_client.utils import (

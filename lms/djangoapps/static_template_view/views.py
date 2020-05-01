@@ -1,4 +1,4 @@
-# pylint: disable=missing-docstring,unused-argument
+# pylint: disable=missing-module-docstring
 
 # View for semi-static templatized content.
 #

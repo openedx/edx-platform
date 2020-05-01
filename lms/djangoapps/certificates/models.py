@@ -319,7 +319,7 @@ class GeneratedCertificate(models.Model):
         return {
             cert.course_id
             for cert
-            in cls.objects.filter(user=user).only('course_id')  # pylint: disable=no-member
+            in cls.objects.filter(user=user).only('course_id')
         }
 
     @classmethod

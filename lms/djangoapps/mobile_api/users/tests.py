@@ -16,7 +16,7 @@ from django.utils.timezone import now
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
 from six.moves import range
-from six.moves.urllib.parse import parse_qs  # pylint: disable=import-error
+from six.moves.urllib.parse import parse_qs
 
 from course_modes.models import CourseMode
 from lms.djangoapps.courseware.access_response import MilestoneAccessError, StartDateError, VisibilityError

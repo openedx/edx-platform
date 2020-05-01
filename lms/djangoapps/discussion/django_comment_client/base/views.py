@@ -1,4 +1,3 @@
-# pylint: disable=missing-docstring,unused-argument
 """Views for discussion forums."""
 
 
@@ -10,7 +9,6 @@ import time
 
 import eventtracking
 import six
-import six.moves.urllib.parse  # pylint: disable=import-error
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core import exceptions
@@ -783,7 +781,7 @@ def upload(request, course_id):  # ajax upload file to a question or answer
         result = _('Good')
         file_url = file_storage.url(new_file_name)
         parsed_url = six.moves.urllib.parse.urlparse(file_url)
-        file_url = six.moves.urllib.parse.urlunparse(  # pylint: disable=too-many-function-args
+        file_url = six.moves.urllib.parse.urlunparse(
             six.moves.urllib.parse.ParseResult(
                 parsed_url.scheme,
                 parsed_url.netloc,

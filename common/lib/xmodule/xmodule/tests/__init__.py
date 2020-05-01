@@ -47,7 +47,7 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     """
     ModuleSystem for testing
     """
-    def __init__(self, **kwargs):  # pylint: disable=unused-argument
+    def __init__(self, **kwargs):
         id_manager = CourseLocationManager(kwargs['course_id'])
         kwargs.setdefault('id_reader', id_manager)
         kwargs.setdefault('id_generator', id_manager)
@@ -107,7 +107,6 @@ def get_test_system(course_id=CourseKey.from_string('/'.join(['org', 'course', '
 
     def get_module(descriptor):
         """Mocks module_system get_module function"""
-        # pylint: disable=protected-access
 
         # Unlike XBlock Runtimes or DescriptorSystems,
         # each XModule is provided with a new ModuleSystem.

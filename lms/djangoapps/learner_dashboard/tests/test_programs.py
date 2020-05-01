@@ -10,7 +10,7 @@ from uuid import uuid4
 
 import mock
 import six
-from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
+from six.moves.urllib.parse import urljoin
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.test import override_settings

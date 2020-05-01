@@ -443,10 +443,10 @@ class PayAndVerifyView(View):
         # utm_params is [(u'utm_content', u'course-v1:IDBx IDB20.1x 1T2017'),...
         utm_params = [item for item in self.request.GET.items() if 'utm_' in item[0]]
         # utm_params is utm_content=course-v1%3AIDBx+IDB20.1x+1T2017&...
-        utm_params = six.moves.urllib.parse.urlencode(utm_params, True)  # pylint: disable=too-many-function-args
+        utm_params = six.moves.urllib.parse.urlencode(utm_params, True)
         # utm_params is utm_content=course-v1:IDBx+IDB20.1x+1T2017&...
         # (course-keys do not have url encoding)
-        utm_params = six.moves.urllib.parse.unquote(utm_params)  # pylint: disable=too-many-function-args
+        utm_params = six.moves.urllib.parse.unquote(utm_params)
         if utm_params:
             if '?' in url:
                 url = url + '&' + utm_params

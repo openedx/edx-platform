@@ -188,7 +188,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
         dumped_id = dump[text_type(discussion_key)]['metadata']['discussion_id']
         self.assertEqual(dumped_id, "custom")
 
-    def check_export_file(self, tar_file):  # pylint: disable=missing-docstring
+    def check_export_file(self, tar_file):  # pylint: disable=missing-function-docstring
         names = tar_file.getnames()
 
         # Check if some of the files are present.

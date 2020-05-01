@@ -160,7 +160,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             descriptor.location = old_descriptor_locn
             return item
 
-    def create_item(self, user_id, course_key, block_type, block_id=None,     # pylint: disable=too-many-statements
+    def create_item(self, user_id, course_key, block_type, block_id=None,     # pylint: disable=W0221
                     definition_locator=None, fields=None, asides=None, force=False, skip_auto_publish=False, **kwargs):
         """
         See :py:meth `ModuleStoreDraftAndPublished.create_item`

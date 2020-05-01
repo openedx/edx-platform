@@ -25,7 +25,7 @@ from bulk_email.models import Optout
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
-from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
+from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.experiments.utils import get_dashboard_course_info
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -150,7 +150,7 @@ def _allow_donation(course_modes, course_id, enrollment):
     )
 
 
-def _create_recent_enrollment_message(course_enrollments, course_modes):  # pylint: disable=invalid-name
+def _create_recent_enrollment_message(course_enrollments, course_modes):
     """
     Builds a recent course enrollment message.
 

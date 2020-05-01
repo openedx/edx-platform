@@ -121,7 +121,7 @@ class TestMigrateSamlUids(TestCase):
     def test_learner_missed_by_mapping_file(self, mock_log):
         auth = UserSocialAuthFactory()
         # pylint disable required b/c this lint rule is confused about subfactories
-        email = auth.user.email  # pylint: disable=no-member
+        email = auth.user.email
         new_urn = '9001'
 
         mock_info = mock_log.info
@@ -162,7 +162,7 @@ class TestMigrateSamlUids(TestCase):
     @patch(_COMMAND_PATH + '.log')
     def test_learner_duplicated_in_mapping(self, mock_log):
         auth = UserSocialAuthFactory()
-        email = auth.user.email  # pylint: disable=no-member
+        email = auth.user.email
         new_urn = '9001'
 
         mock_info = mock_log.info

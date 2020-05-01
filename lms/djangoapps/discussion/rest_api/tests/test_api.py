@@ -16,7 +16,7 @@ from opaque_keys.edx.locator import CourseLocator
 from pytz import UTC
 from rest_framework.exceptions import PermissionDenied
 from six.moves import range
-from six.moves.urllib.parse import parse_qs, urlencode, urlparse, urlunparse  # pylint: disable=import-error
+from six.moves.urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from lms.djangoapps.courseware.tests.factories import BetaTesterFactory, StaffFactory

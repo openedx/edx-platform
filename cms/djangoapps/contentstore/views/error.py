@@ -1,6 +1,3 @@
-# pylint: disable=missing-docstring,unused-argument
-
-
 import functools
 
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError

@@ -2278,6 +2278,6 @@ def modulestore():
     return SplitModuleTest.modulestore
 
 
-# pylint: disable=unused-argument, missing-docstring
+# pylint: disable=unused-argument
 def render_to_template_mock(*args):
     pass

@@ -22,7 +22,7 @@ class CertificatesConfig(AppConfig):
         """
         # Can't import models at module level in AppConfigs, and models get
         # included from the signal handlers
-        from . import signals  # pylint: disable=unused-variable
+        from . import signals  # pylint: disable=unused-import
         if settings.FEATURES.get('ENABLE_SPECIAL_EXAMS'):
             from .services import CertificateService
             set_runtime_service('certificates', CertificateService())

@@ -197,7 +197,8 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             }
         )
         response = self.client.get(url)
-        reason_field = '<textarea rows="2" id="reason-field-id" name="reason-field" placeholder="Reason" spellcheck="false"></textarea>'  # pylint: disable=line-too-long
+        reason_field = '<textarea rows="2" id="reason-field-id" name="reason-field" ' \
+                       'placeholder="Reason" spellcheck="false"></textarea>'
         if enbale_reason_field:
             self.assertContains(response, reason_field)
         else:
@@ -424,7 +425,8 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         Test analytics dashboard message is shown
         """
         response = self.client.get(self.url)
-        analytics_section = '<li class="nav-item"><button type="button" class="btn-link instructor_analytics" data-section="instructor_analytics">Analytics</button></li>'  # pylint: disable=line-too-long
+        analytics_section = '<li class="nav-item"><button type="button" class="btn-link instructor_analytics"' \
+                            ' data-section="instructor_analytics">Analytics</button></li>'
         self.assertContains(response, analytics_section)
 
         # link to dashboard shown

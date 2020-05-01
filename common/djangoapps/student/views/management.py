@@ -692,7 +692,7 @@ def do_email_change_request(user, new_email, activation_key=None, secondary_emai
 
 
 @ensure_csrf_cookie
-def activate_secondary_email(request, key):  # pylint: disable=unused-argument
+def activate_secondary_email(request, key):
     """
     This is called when the activation link is clicked. We activate the secondary email
     for the requested user.
@@ -720,7 +720,7 @@ def activate_secondary_email(request, key):  # pylint: disable=unused-argument
 
 
 @ensure_csrf_cookie
-def confirm_email_change(request, key):  # pylint: disable=unused-argument
+def confirm_email_change(request, key):
     """
     User requested a new e-mail. This is called when the activation
     link is clicked. We confirm with the old e-mail, and update

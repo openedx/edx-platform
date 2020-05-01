@@ -1,6 +1,3 @@
-# pylint: disable=missing-docstring,maybe-no-member
-
-
 import ddt
 import six
 from django.contrib.auth.models import User

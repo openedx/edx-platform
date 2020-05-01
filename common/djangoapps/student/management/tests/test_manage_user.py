@@ -27,7 +27,6 @@ class TestManageUserCommand(TestCase):
         """
         Ensures that users are created if they don't exist and reused if they do.
         """
-        # pylint: disable=no-member
         self.assertEqual([], list(User.objects.all()))
         call_command('manage_user', TEST_USERNAME, TEST_EMAIL)
         user = User.objects.get(username=TEST_USERNAME)
@@ -43,7 +42,6 @@ class TestManageUserCommand(TestCase):
         """
         Ensures that users are removed if they exist and exit cleanly otherwise.
         """
-        # pylint: disable=no-member
         User.objects.create(username=TEST_USERNAME, email=TEST_EMAIL)
         self.assertEqual([(TEST_USERNAME, TEST_EMAIL)], [(u.username, u.email) for u in User.objects.all()])
         call_command('manage_user', TEST_USERNAME, TEST_EMAIL, '--remove')
@@ -108,7 +106,6 @@ class TestManageUserCommand(TestCase):
         Ensure that the operation is aborted if the username matches an
         existing user account but the supplied email doesn't match.
         """
-        # pylint: disable=no-member
         User.objects.create(username=TEST_USERNAME, email=TEST_EMAIL)
         with self.assertRaises(CommandError) as exc_context:
             call_command('manage_user', TEST_USERNAME, 'other@example.com')
@@ -150,7 +147,7 @@ class TestManageUserCommand(TestCase):
         expected_staff, expected_super = expected_bits
         args = [opt for bit, opt in ((expected_staff, '--staff'), (expected_super, '--superuser')) if bit]
         call_command('manage_user', TEST_USERNAME, TEST_EMAIL, *args)
-        user = User.objects.all().first()  # pylint: disable=no-member
+        user = User.objects.all().first()
         self.assertEqual(user.is_staff, expected_staff)
         self.assertEqual(user.is_superuser, expected_super)
 

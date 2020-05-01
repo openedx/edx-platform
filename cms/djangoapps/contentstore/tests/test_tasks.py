@@ -27,7 +27,7 @@ TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 
-def side_effect_exception(*args, **kwargs):  # pylint: disable=unused-argument
+def side_effect_exception(*args, **kwargs):
     """
     Side effect for mocking which raises an exception
     """

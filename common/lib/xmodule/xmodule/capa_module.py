@@ -35,7 +35,7 @@ from .capa_base import CapaMixin, ComplexEncoder, _
 log = logging.getLogger("edx.courseware")
 
 
-@XBlock.wants('user')  # pylint: disable=abstract-method
+@XBlock.wants('user')
 @XBlock.needs('i18n')
 class ProblemBlock(
         CapaMixin, RawMixin, XmlMixin, EditingMixin,
@@ -203,7 +203,7 @@ class ProblemBlock(
                 self.scope_ids.usage_id,
                 self.scope_ids.user_id
             )
-            _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
+            _, _, traceback_obj = sys.exc_info()
             six.reraise(ProcessingError, ProcessingError(not_found_error_message), traceback_obj)
 
         except Exception:
@@ -213,7 +213,7 @@ class ProblemBlock(
                 self.scope_ids.usage_id,
                 self.scope_ids.user_id
             )
-            _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
+            _, _, traceback_obj = sys.exc_info()
             six.reraise(ProcessingError, ProcessingError(generic_error_message), traceback_obj)
 
         after = self.get_progress()

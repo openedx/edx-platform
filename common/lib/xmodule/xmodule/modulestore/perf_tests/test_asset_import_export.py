@@ -37,7 +37,6 @@ ALL_SORTS = (
     ('uploadDate', ModuleStoreEnum.SortOrder.descending),
 )
 
-# pylint: disable=invalid-name
 TEST_DIR = path(__file__).dirname()
 PLATFORM_ROOT = TEST_DIR.parent.parent.parent.parent.parent.parent
 TEST_DATA_ROOT = PLATFORM_ROOT / TEST_DATA_DIR

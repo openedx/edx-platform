@@ -1082,7 +1082,8 @@ class CourseMetadataEditingTest(CourseTestCase):
         fresh = modulestore().get_course(self.course.id)
         test_model = CourseMetadata.fetch(fresh)
 
-        self.assertNotEqual(test_model['advertised_start']['value'], 1, 'advertised_start should not be updated to a wrong value')  # pylint: disable=line-too-long
+        self.assertNotEqual(test_model['advertised_start']['value'], 1,
+                            'advertised_start should not be updated to a wrong value')
         self.assertNotEqual(test_model['days_early_for_beta']['value'], "supposed to be an integer",
                             'days_early_for beta should not be updated to a wrong value')
 
