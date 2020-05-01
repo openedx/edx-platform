@@ -45,8 +45,7 @@ class Registry(object):
     @classmethod
     def _enabled_providers(cls):
         """
-        Helper method that returns a generator used to iterate over all providers
-        of the current site.
+        Generator returning all enabled providers of the current site.
 
         Provider configurations are partitioned on site + some key (backend
         name in the case of OAuth, slug for SAML, and consumer key for LTI).
@@ -145,21 +144,6 @@ class Registry(object):
         Yields:
             Instances of ProviderConfig.
         """
-        if backend_name in _PSA_OAUTH2_BACKENDS:
-            oauth2_backend_names = OAuth2ProviderConfig.key_values('backend_name', flat=True)
-            for oauth2_backend_name in oauth2_backend_names:
-                provider = OAuth2ProviderConfig.current(oauth2_backend_name)
-                if provider.backend_name == backend_name and provider.enabled_for_current_site:
-                    yield provider
-        elif backend_name in _PSA_SAML_BACKENDS and SAMLConfiguration.is_enabled(
-                Site.objects.get_current(get_current_request()), 'default'):
-            idp_names = SAMLProviderConfig.key_values('slug', flat=True)
-            for idp_name in idp_names:
-                provider = SAMLProviderConfig.current(idp_name)
-                if provider.backend_name == backend_name and provider.enabled_for_current_site:
-                    yield provider
-        elif backend_name in _LTI_BACKENDS:
-            for consumer_key in LTIProviderConfig.key_values('lti_consumer_key', flat=True):
-                provider = LTIProviderConfig.current(consumer_key)
-                if provider.backend_name == backend_name and provider.enabled_for_current_site:
-                    yield provider
+        for provider in cls._enabled_providers():
+            if provider.backend_name == backend_name:
+                yield provider
