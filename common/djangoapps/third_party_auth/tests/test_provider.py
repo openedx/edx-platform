@@ -168,6 +168,18 @@ class RegistryTest(testutil.TestCase):
         # in zero enabled providers for site_a).
         self.assertEqual([p.name for p in provider.Registry.enabled()], ["Site A second"])
 
+    def test_mixed_providers(self):
+        """
+        Verify that multiple providers types can be configured at same time.
+        """
+        self.enable_saml()
+        self.configure_saml_provider(enabled=True, slug="saml-slug", name="Some SAML")
+        self.configure_google_provider(enabled=True)
+        self.configure_lti_provider(enabled=True)
+
+        configs = provider.Registry.enabled()
+        self.assertEqual({p.backend_name for p in configs}, {'tpa-saml', 'google-oauth2', 'lti'})
+
     def test_get_returns_enabled_provider(self):
         google_provider = self.configure_google_provider(enabled=True)
         self.assertEqual(google_provider.id, provider.Registry.get(google_provider.provider_id).id)

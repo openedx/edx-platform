@@ -19,6 +19,23 @@ from .models import (
 )
 
 
+# TODO Move to ConfigurationModel in django-config-models
+def current_all(prov_cls, filters=None):
+    """
+    Like ConfigurationModel.current() but returns the current config in every
+    partition as delineated by KEY_FIELDS -- and allows filters dict. (Does
+    not include caching.)
+    """
+
+    def partition_key(obj):
+        """Compute the partition key for this object."""
+        return tuple(getattr(obj, k) for k in prov_cls.KEY_FIELDS)
+
+    configs = prov_cls.objects.filter(**filters) if filters else prov_cls.objects.all()
+    # Get the most recent record in each partition
+    return unique_everseen(configs.order_by('-change_date'), partition_key)
+
+
 class Registry(object):
     """
     API for querying third-party auth ProviderConfig objects.
@@ -34,40 +51,32 @@ class Registry(object):
         Provider configurations are partitioned on site + some key (backend
         name in the case of OAuth, slug for SAML, and consumer key for LTI).
         """
-        def current_partitioned(prov_cls, filters=None):
-            """
-            Like ConfigurationModel.current() but partitions on KEY_FIELDS and
-            allows additional filters dict. (Does not include caching.)
-            """
-            def partition_key(obj):
-                """Compute the partition key for this object."""
-                return tuple(getattr(obj, k) for k in prov_cls.KEY_FIELDS)
-
-            configs = prov_cls.objects.filter(**filters) if filters else prov_cls.objects.all()
-            # Get the most recent record in each partition
-            return unique_everseen(configs.order_by('-change_date'), partition_key)
-
         site = Site.objects.get_current(get_current_request())
 
-        def enabled_in_site(prov_cls, filters=None):
-            """
-            Generator for all current configs of this class that are enabled
-            and for this site.
-            """
-            for config in current_partitioned(prov_cls, dict(site=site, **(filters or {}))):
-                if config.enabled:
+        # Note that site is added as an explicit filter. 'site_id' isn't in the
+        # KEY_FIELDS for these models, but it should be; in the meantime, we
+        # need to be careful not to let two configs belonging to two different
+        # sites but with the same key "shadow" one another. That's easy here;
+        # we just only ask for configs within the current request's site.
+
+        # Get all OAuth2 provider configs for this site...
+        for config in current_all(OAuth2ProviderConfig, {'site_id': site.pk}):
+            # Ignore the config if it's disabled or we don't have a backend
+            # class for it. (Not having a backend class for a config should
+            # be pretty rare if it happens at all.)
+            if config.enabled and config.backend_name in _PSA_OAUTH2_BACKENDS:
+                yield config
+
+        if SAMLConfiguration.is_enabled(site, 'default'):
+            # ...followed by SAML configs, if feature is enabled...
+            for config in current_all(SAMLProviderConfig, {'site_id': site.pk}):
+                if config.enabled and config.backend_name in _PSA_SAML_BACKENDS:
                     yield config
 
-        for provider in enabled_in_site(OAuth2ProviderConfig, {'backend_name__in': _PSA_OAUTH2_BACKENDS}):
-            yield provider
-        if SAMLConfiguration.is_enabled(site, 'default'):
-            for provider in enabled_in_site(SAMLProviderConfig, {'backend_name__in': _PSA_SAML_BACKENDS}):
-                yield provider
-        # backend_name is hardcoded for LTIProviderConfig, not a field, so
-        # filtering done in loop instead of in query
-        for provider in enabled_in_site(LTIProviderConfig):
-            if provider.backend_name in _LTI_BACKENDS:
-                yield provider
+        # ...and finally LTI configs
+        for config in current_all(LTIProviderConfig, {'site_id': site.pk}):
+            if config.enabled and config.backend_name in _LTI_BACKENDS:
+                yield config
 
     @classmethod
     def enabled(cls):
