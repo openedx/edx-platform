@@ -520,7 +520,7 @@ class CoursewareIndex(View):
         )
 
         courseware_context['course_sock_fragment'] = CourseSockFragmentView().render_to_fragment(
-            request, course=self.course_overview)
+            request, course=self.course)
 
         # entrance exam data
         self._add_entrance_exam_to_context(courseware_context)

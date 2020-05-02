@@ -89,16 +89,17 @@ class PartitionService(object):
     with a given course.
     """
 
-    def __init__(self, course_id, cache=None):
+    def __init__(self, course_id, cache=None, course=None):
         self._course_id = course_id
         self._cache = cache
+        self.course = course
 
     def get_course(self):
         """
         Return the course instance associated with this PartitionService.
         This default implementation looks up the course from the modulestore.
         """
-        return modulestore().get_course(self._course_id)
+        return self.course or modulestore().get_course(self._course_id)
 
     @property
     def course_partitions(self):

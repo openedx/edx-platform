@@ -13,7 +13,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import format_course_price, get_cosmetic_verified_display_price, CourseMode
 from lms.djangoapps.courseware.access import has_staff_access_to_preview_mode
-from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
+from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link, can_show_verified_upgrade
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.catalog.utils import get_programs
@@ -82,9 +82,7 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
         return (None, None, None)
 
     if enrollment:
-        if course is None:
-            course = enrollment.course
-        elif enrollment.course_id != course.id:
+        if course and enrollment.course_id != course.id:
             logger.warn(u'{} refers to a different course than {} which was supplied. Enrollment course id={}, '
                         u'repr={!r}, deprecated={}. Course id={}, repr={!r}, deprecated={}.'
                         .format(enrollment,
@@ -116,9 +114,9 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
         if enrollment is None:
             return (None, None, None)
 
-    if user.is_authenticated and verified_upgrade_link_is_valid(enrollment):
+    if user.is_authenticated and can_show_verified_upgrade(user, enrollment, course):
         return (
-            verified_upgrade_deadline_link(user, course),
+            verified_upgrade_deadline_link(user, enrollment.course),
             enrollment.upgrade_deadline,
             enrollment.course_upgrade_deadline,
         )

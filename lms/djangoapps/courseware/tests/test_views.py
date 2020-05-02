@@ -273,7 +273,7 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 11, 170),
+        (ModuleStoreEnum.Type.mongo, 10, 170),
         (ModuleStoreEnum.Type.split, 4, 168),
     )
     @ddt.unpack
