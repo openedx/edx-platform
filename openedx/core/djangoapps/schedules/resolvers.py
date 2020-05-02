@@ -14,7 +14,7 @@ from edx_ace.recipient import Recipient
 from edx_ace.recipient_resolver import RecipientResolver
 from edx_django_utils.monitoring import function_trace, set_custom_metric
 
-from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
+from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link, can_show_verified_upgrade
 from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH
@@ -343,7 +343,7 @@ def _get_upsell_information_for_schedule(user, schedule):
 
 def _get_verified_upgrade_link(user, schedule):
     enrollment = schedule.enrollment
-    if enrollment.dynamic_upgrade_deadline is not None and verified_upgrade_link_is_valid(enrollment):
+    if enrollment.dynamic_upgrade_deadline is not None and can_show_verified_upgrade(user, enrollment):
         return verified_upgrade_deadline_link(user, enrollment.course)
 
 

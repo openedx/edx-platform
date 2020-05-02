@@ -20,7 +20,7 @@ from lazy import lazy
 from pytz import utc
 
 from course_modes.models import CourseMode, get_cosmetic_verified_display_price
-from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
+from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link, can_show_verified_upgrade
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
@@ -488,7 +488,7 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
         if not is_enabled:
             return False
 
-        return verified_upgrade_link_is_valid(self.enrollment)
+        return can_show_verified_upgrade(self.user, self.enrollment, self.course)
 
     @lazy
     def date(self):
