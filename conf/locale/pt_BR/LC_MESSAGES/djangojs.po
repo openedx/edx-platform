@@ -242,7 +242,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-27 09:11+0000\n"
+"POT-Creation-Date: 2020-05-03 20:42+0000\n"
 "PO-Revision-Date: 2020-04-27 09:13+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -2604,6 +2604,18 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid ""
+"Due to the recent increase in interest in online education and edX, we are "
+"currently experiencing an unusually high volume of support requests. We "
+"appreciate your patience as we work to review each request. Please check the"
+" "
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid " as many questions may have already been answered."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
