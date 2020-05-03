@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-27 11:17+0000\n"
-"PO-Revision-Date: 2020-04-27 11:18:10.175972\n"
+"POT-Creation-Date: 2020-05-03 20:49+0000\n"
+"PO-Revision-Date: 2020-05-03 20:50:13.174163\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2529,6 +2529,22 @@ msgstr "سثمثذف ش فخحهذ بخق غخعق سعححخقف قثضعثسف
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
 msgstr "ثرفثق سخوث يثفشهمس بخق غخعق سعححخقف قثضعثسف."
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid ""
+"Due to the recent increase in interest in online education and edX, we are "
+"currently experiencing an unusually high volume of support requests. We "
+"appreciate your patience as we work to review each request. Please check the"
+" "
+msgstr ""
+"يعث فخ فاث قثذثرف هرذقثشسث هر هرفثقثسف هر خرمهرث ثيعذشفهخر شري ثيط, صث شقث "
+"ذعققثرفمغ ثطحثقهثرذهرل شر عرعسعشممغ اهلا دخمعوث خب سعححخقف قثضعثسفس. صث "
+"شححقثذهشفث غخعق حشفهثرذث شس صث صخقن فخ قثدهثص ثشذا قثضعثسف. حمثشسث ذاثذن فاث"
+" "
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid " as many questions may have already been answered."
+msgstr " شس وشرغ ضعثسفهخرس وشغ اشدث شمقثشيغ زثثر شرسصثقثي."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 #: lms/djangoapps/support/static/support/jsx/success.jsx

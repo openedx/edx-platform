@@ -107,9 +107,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-27 09:11+0000\n"
-"PO-Revision-Date: 2020-04-27 09:13+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2020-05-03 20:42+0000\n"
+"PO-Revision-Date: 2020-04-28 20:25+0000\n"
+"Last-Translator: Ali Işıngör <ali@artistanbul.io>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
 "Language: tr_TR\n"
 "MIME-Version: 1.0\n"
@@ -137,6 +137,22 @@ msgstr "Kaydediliyor"
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/show_textbook.js
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
+#: cms/templates/js/content-group-editor.underscore
+#: cms/templates/js/course-instructor-details.underscore
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/course-settings-learning-fields.underscore
+#: cms/templates/js/course_grade_policy.underscore
+#: cms/templates/js/course_info_update.underscore
+#: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/partition-group-details.underscore
+#: cms/templates/js/show-textbook.underscore
+#: cms/templates/js/signatory-editor.underscore
+#: cms/templates/js/video-transcripts.underscore
+#: cms/templates/js/xblock-outline.underscore
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Delete"
 msgstr "Sil"
 
@@ -846,9 +862,19 @@ msgstr "Belge özellikleri"
 msgid "Edit HTML"
 msgstr "HTML düzenle"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/course_info_handouts.underscore
+#: cms/templates/js/course_info_update.underscore
+#: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/partition-group-details.underscore
+#: cms/templates/js/show-textbook.underscore
+#: cms/templates/js/signatory-details.underscore
+#: cms/templates/js/xblock-string-field-editor.underscore
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Edit"
 msgstr "Düzenle"
 
@@ -1595,9 +1621,13 @@ msgstr ""
 "Girdiğiniz URL harici bağlantı gibi görünüyor. Gerekli http:// önekini "
 "eklemek ister misiniz?"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/course-instructor-details.underscore
+#: cms/templates/js/signatory-details.underscore
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Title"
 msgstr "Başlık"
 
@@ -2280,6 +2310,7 @@ msgid "Your post will be discarded."
 msgstr "Gönderiniz çıkartılacaktır."
 
 #: common/static/common/js/discussion/views/response_comment_show_view.js
+#: common/static/common/templates/discussion/templates.underscore
 msgid "anonymous"
 msgstr "anonim"
 
@@ -2587,6 +2618,18 @@ msgstr ""
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
 msgstr "Destek talebinize dair ayrıntıları girin."
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid ""
+"Due to the recent increase in interest in online education and edX, we are "
+"currently experiencing an unusually high volume of support requests. We "
+"appreciate your patience as we work to review each request. Please check the"
+" "
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid " as many questions may have already been answered."
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 #: lms/djangoapps/support/static/support/jsx/success.jsx
@@ -7062,15 +7105,15 @@ msgstr "Ara"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Add a Response"
-msgstr ""
+msgstr "Bir Cevap Ekle"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "This thread is closed."
-msgstr ""
+msgstr "Bu ileti dizisi kapandı."
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Add a response:"
-msgstr ""
+msgstr "Bir cevap ekle:"
 
 #: common/static/common/templates/discussion/templates.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -7089,15 +7132,15 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Pinned"
-msgstr ""
+msgstr "İşaretli"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Reported"
-msgstr ""
+msgstr "Rapor edildi"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Closed"
-msgstr ""
+msgstr "Kapatıldı"
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
@@ -7176,15 +7219,15 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Editing comment"
-msgstr ""
+msgstr "Yorum değiştiriliyor"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Update comment"
-msgstr ""
+msgstr "Yorumu güncelle"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "discussion"
-msgstr ""
+msgstr "tartışma"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "answered question"
@@ -7263,7 +7306,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Topic area"
-msgstr ""
+msgstr "Başlık alanı"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Add your post to a relevant topic to help others find it. (Required)"
@@ -7271,11 +7314,11 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "(Community TA)"
-msgstr ""
+msgstr "(Topluluk Öğretim Elemanı)"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "(Staff)"
-msgstr ""
+msgstr "(Personel)"
 
 #: common/static/common/templates/discussion/templates.underscore
 #: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
@@ -10540,12 +10583,16 @@ msgid ""
 "Draft saved on {lastSavedStart}{editedOn}{lastSavedEnd} by "
 "{editedByStart}{editedBy}{editedByEnd}"
 msgstr ""
+"Taslak {lastSavedStart}{editedOn}{lastSavedEnd} tarihinde "
+"{editedByStart}{editedBy}{editedByEnd} tarafından kaydedildi"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid ""
 "Last published {lastPublishedStart}{publishedOn}{lastPublishedEnd} by "
 "{publishedByStart}{publishedBy}{publishedByEnd}"
 msgstr ""
+"En son {lastPublishedStart}{publishedOn}{lastPublishedEnd} tarihinde "
+"{publishedByStart}{publishedBy}{publishedByEnd} tarafından yayına alındı"
 
 #: cms/templates/js/publish-xblock.underscore
 #, python-format
