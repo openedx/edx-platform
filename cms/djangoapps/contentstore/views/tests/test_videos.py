@@ -367,6 +367,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         assert_bad({"files": [{"file_name": "test.mp4"}]})
 
     @override_settings(AWS_ACCESS_KEY_ID="test_key_id", AWS_SECRET_ACCESS_KEY="test_secret")
+    # TODO: replace boto with boto3
     @patch("boto.s3.key.Key")
     @patch("boto.s3.connection.S3Connection")
     @ddt.data(
@@ -431,6 +432,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             self.assertEqual(response['error'], "Request 'files' entry contain unsupported content_type")
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
+    # TODO: replace boto with boto3
     @patch('boto.s3.connection.S3Connection')
     def test_upload_with_non_ascii_charaters(self, mock_conn):
         """
@@ -452,6 +454,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         self.assertEqual(response['error'], 'The file name for %s must contain only ASCII characters.' % file_name)
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
+    # TODO: replace boto with boto3
     @patch('boto.s3.key.Key')
     @patch('boto.s3.connection.S3Connection')
     def test_post_success(self, mock_conn, mock_key):
@@ -543,6 +546,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             self.assertEqual(response_file['upload_url'], mock_key_instance.generate_url())
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
+    # TODO: replace boto with boto3
     @patch('boto.s3.key.Key')
     @patch('boto.s3.connection.S3Connection')
     @ddt.data(
@@ -1347,6 +1351,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
     )
     @ddt.unpack
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
+    # TODO: replace boto with boto3
     @patch('boto.s3.key.Key')
     @patch('boto.s3.connection.S3Connection')
     @patch('contentstore.views.videos.get_transcript_preferences')

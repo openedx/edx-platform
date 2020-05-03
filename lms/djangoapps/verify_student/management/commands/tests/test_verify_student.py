@@ -3,7 +3,7 @@ Tests for django admin commands in the verify_student module
 
 Lots of imports from verify_student's model tests, since they cover similar ground
 """
-import boto
+import boto3
 from django.conf import settings
 from django.core.management import call_command
 from django.test import TestCase
@@ -30,8 +30,8 @@ class TestVerifyStudentCommand(MockS3Mixin, TestCase):
 
     def setUp(self):
         super(TestVerifyStudentCommand, self).setUp()
-        connection = boto.connect_s3()
-        connection.create_bucket(FAKE_SETTINGS['SOFTWARE_SECURE']['S3_BUCKET'])
+        client = boto3.client('s3')
+        client.create_bucket(Bucket=FAKE_SETTINGS['SOFTWARE_SECURE']['S3_BUCKET'])
 
     def create_and_submit(self, username):
         """

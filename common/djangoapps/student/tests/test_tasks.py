@@ -3,7 +3,7 @@ Tests for the Sending activation email celery tasks
 """
 
 import mock
-from boto.exception import NoAuthHandlerFound
+from botocore.exceptions import ClientError
 from django.conf import settings
 from django.test import TestCase
 
@@ -22,7 +22,10 @@ class SendActivationEmailTestCase(TestCase):
 
     @mock.patch('time.sleep', mock.Mock(return_value=None))
     @mock.patch('student.tasks.log')
-    @mock.patch('django.core.mail.send_mail', mock.Mock(side_effect=NoAuthHandlerFound))
+    @mock.patch(
+        'django.core.mail.send_mail',
+        mock.Mock(side_effect=ClientError({"Error": {"Code": "code", "Message": "msg"}}, "Error"))
+    )
     def test_send_email(self, mock_log):
         """
         Tests retries when the activation email doesn't send

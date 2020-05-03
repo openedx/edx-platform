@@ -2,11 +2,12 @@
 Django storage backends for Open edX.
 """
 from django.contrib.staticfiles.storage import StaticFilesStorage
-from django.core.files.storage import get_storage_class
+from django.core.files.storage import get_storage_class, FileSystemStorage
+from django.utils.deconstruct import deconstructible
 from django.utils.lru_cache import lru_cache
 from pipeline.storage import NonPackagingMixin, PipelineCachedStorage
 from require.storage import OptimizedFilesMixin
-from storages.backends.s3boto import S3BotoStorage
+from storages.backends.s3boto3 import S3Boto3Storage
 
 from openedx.core.djangoapps.theming.storage import ThemeCachedFilesMixin, ThemePipelineMixin, ThemeStorage
 
@@ -65,7 +66,7 @@ class DevelopmentStorage(
     pass
 
 
-class S3ReportStorage(S3BotoStorage):  # pylint: disable=abstract-method
+class S3ReportStorage(S3Boto3Storage):  # pylint: disable=abstract-method
     """
     Storage for reports.
     """
@@ -78,7 +79,7 @@ class S3ReportStorage(S3BotoStorage):  # pylint: disable=abstract-method
             acl: content policy for the uploads i.e. private, public etc.
             bucket: Name of S3 bucket to use for storing and/or retrieving content
             custom_domain: custom domain to use for generating file urls
-            **settings: additional settings to be passed in to S3BotoStorage,
+            **settings: additional settings to be passed in to S3Boto3Storage,
 
         Returns:
 
@@ -86,6 +87,28 @@ class S3ReportStorage(S3BotoStorage):  # pylint: disable=abstract-method
         if custom_domain:
             self.custom_domain = custom_domain
         super(S3ReportStorage, self).__init__(acl=acl, bucket=bucket, **settings)
+
+
+@deconstructible
+class OverwriteStorage(FileSystemStorage):
+    """
+    FileSystemStorage subclass which automatically overwrites any previous
+    file with the same name; used in test runs to avoid test file proliferation.
+    Copied from django-storages when this class was removed in version 1.6.
+
+    Comes from http://www.djangosnippets.org/snippets/976/
+    (even if it already exists in S3Storage for ages)
+    See also Django #4339, which might add this functionality to core.
+    """
+
+    def get_available_name(self, name, max_length=None):
+        """
+        Returns a filename that's free on the target storage system, and
+        available for new content to be written to.
+        """
+        if self.exists(name):
+            self.delete(name)
+        return name
 
 
 @lru_cache()

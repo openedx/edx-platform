@@ -358,11 +358,12 @@ AWS_DEFAULT_ACL = 'private'
 AWS_BUCKET_ACL = AWS_DEFAULT_ACL
 AWS_QUERYSTRING_EXPIRE = 7 * 24 * 60 * 60  # 7 days
 AWS_S3_CUSTOM_DOMAIN = AUTH_TOKENS.get('AWS_S3_CUSTOM_DOMAIN', 'edxuploads.s3.amazonaws.com')
+AWS_S3_ENCRYPTION = ENV_TOKENS.get('AWS_S3_ENCRYPTION', False)
 
 if AUTH_TOKENS.get('DEFAULT_FILE_STORAGE'):
     DEFAULT_FILE_STORAGE = AUTH_TOKENS.get('DEFAULT_FILE_STORAGE')
 elif AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 else:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 

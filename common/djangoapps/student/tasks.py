@@ -3,7 +3,7 @@ This file contains celery tasks for sending email
 """
 import logging
 
-from boto.exception import NoAuthHandlerFound
+from botocore.exceptions import ClientError
 from celery.exceptions import MaxRetriesExceededError
 from celery.task import task  # pylint: disable=no-name-in-module, import-error
 from django.conf import settings
@@ -25,7 +25,7 @@ def send_activation_email(self, subject, message, from_address, dest_addr):
         log.info("Activation Email has been sent to User {user_email}".format(
             user_email=dest_addr
         ))
-    except NoAuthHandlerFound:  # pylint: disable=broad-except
+    except ClientError:
         log.info('Retrying sending email to user {dest_addr}, attempt # {attempt} of {max_attempts}'. format(
             dest_addr=dest_addr,
             attempt=retries,
