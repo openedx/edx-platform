@@ -148,7 +148,8 @@ class RegistryTest(testutil.TestCase):
         self.assertEqual(prov.enabled_for_current_site, False)
 
     @with_site_configuration(SITE_DOMAIN_A)
-    def test_providers_with_same_key_independent_across_sites(self):
+    @patch('edx_django_utils.monitoring.set_custom_metric')
+    def test_providers_with_same_key_independent_across_sites(self, mock_set_custom_metric):
         """
         Verify that having two providers configured with the same key
         but for different sites do not shadow each other on retrieval.
@@ -158,15 +159,24 @@ class RegistryTest(testutil.TestCase):
 
         self.enable_saml(site=site_a)
         self.enable_saml(site=site_b)
-        self.configure_saml_provider(enabled=True, site=site_b, slug="x", name="Site B first")
-        self.configure_saml_provider(enabled=True, site=site_a, slug="x", name="Site A first")
-        self.configure_saml_provider(enabled=True, site=site_a, slug="x", name="Site A second")
-        self.configure_saml_provider(enabled=True, site=site_b, slug="x", name="Site B second")
+        configs = [
+            self.configure_saml_provider(enabled=True, site=site_b, slug="x", name="Site B first"),
+            self.configure_saml_provider(enabled=True, site=site_a, slug="x", name="Site A first"),
+            self.configure_saml_provider(enabled=True, site=site_a, slug="x", name="Site A second"),
+            self.configure_saml_provider(enabled=True, site=site_b, slug="x", name="Site B second"),
+        ]
 
         # If sites are not partitioned in retrieval, a site_b record can appear
         # to be the "current" config, and then be ignored by site_a (resulting
         # in zero enabled providers for site_a).
-        self.assertEqual([p.name for p in provider.Registry.enabled()], ["Site A second"])
+
+        # TODO(ARCHBOM-1139) Uncomment when finished with dark launch in provider.py
+        # self.assertEqual([p.name for p in provider.Registry.enabled()], ["Site A second"])
+        # Until then, just run the generator to its end and show that the dark launch would complain here
+        list(provider.Registry.enabled())
+        mock_set_custom_metric.assert_any_call('temp_tpa_enabled_all_dark_launch_mismatch',
+                                               'old[]new[%s]' % configs[2].id)
+
 
     def test_mixed_providers(self):
         """

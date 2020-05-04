@@ -4,6 +4,7 @@ Third-party auth provider configuration API.
 
 
 from django.contrib.sites.models import Site
+import edx_django_utils.monitoring as monitoring_utils
 from more_itertools import unique_everseen
 
 from openedx.core.djangoapps.theming.helpers import get_current_request
@@ -50,6 +51,54 @@ class Registry(object):
         Provider configurations are partitioned on site + some key (backend
         name in the case of OAuth, slug for SAML, and consumer key for LTI).
         """
+        try:
+            old_values = set(cls._enabled_providers_old())
+        except:
+            # Make sure we have an error baseline to compare to
+            monitoring_utils.increment("temp_tpa_enabled_all_dark_launch_old_threw")
+            raise
+
+        # Dark launch call and metrics
+        try:
+            new_values = set(cls._enabled_providers_new())
+
+            try:
+                if old_values != new_values:
+                    data = "old[%s]new[%s]" % (
+                        ','.join([str(p.id) for p in old_values]),
+                        ','.join([str(p.id) for p in new_values]))
+                    monitoring_utils.set_custom_metric("temp_tpa_enabled_all_dark_launch_mismatch", data)
+            except:  # pylint: disable=bare-except
+                pass
+        except:  # pylint: disable=bare-except
+            monitoring_utils.increment("temp_tpa_enabled_all_dark_launch_new_threw")
+
+        # Could return old_values, but lets keep it a generator for consistency
+        for config in old_values:
+            yield config
+
+    @classmethod
+    def _enabled_providers_old(cls):
+        """Old implementation of _enabled_providers"""
+        oauth2_backend_names = OAuth2ProviderConfig.key_values('backend_name', flat=True)
+        for oauth2_backend_name in oauth2_backend_names:
+            provider = OAuth2ProviderConfig.current(oauth2_backend_name)
+            if provider.enabled_for_current_site and provider.backend_name in _PSA_OAUTH2_BACKENDS:
+                yield provider
+        if SAMLConfiguration.is_enabled(Site.objects.get_current(get_current_request()), 'default'):
+            idp_slugs = SAMLProviderConfig.key_values('slug', flat=True)
+            for idp_slug in idp_slugs:
+                provider = SAMLProviderConfig.current(idp_slug)
+                if provider.enabled_for_current_site and provider.backend_name in _PSA_SAML_BACKENDS:
+                    yield provider
+        for consumer_key in LTIProviderConfig.key_values('lti_consumer_key', flat=True):
+            provider = LTIProviderConfig.current(consumer_key)
+            if provider.enabled_for_current_site and provider.backend_name in _LTI_BACKENDS:
+                yield provider
+
+    @classmethod
+    def _enabled_providers_new(cls):
+        """New implementation of _enabled_providers for dark launch"""
         site = Site.objects.get_current(get_current_request())
 
         # Note that site is added as an explicit filter. 'site_id' isn't in the
@@ -144,6 +193,58 @@ class Registry(object):
         Yields:
             Instances of ProviderConfig.
         """
+        try:
+            old_values = set(cls._get_enabled_by_backend_name_old(backend_name))
+        except:
+            # Make sure we have an error baseline to compare to
+            monitoring_utils.increment("temp_tpa_by_backend_dark_launch_old_threw")
+            raise
+
+        # Dark launch call and metrics
+        try:
+            new_values = set(cls._get_enabled_by_backend_name_new(backend_name))
+
+            try:
+                if old_values != new_values:
+                    data = "backend[%s]old[%s]new[%s]" % (
+                        backend_name,
+                        ','.join([str(p.id) for p in old_values]),
+                        ','.join([str(p.id) for p in new_values]))
+                    monitoring_utils.set_custom_metric("temp_tpa_by_backend_dark_launch_mismatch", data)
+            except:  # pylint: disable=bare-except
+                pass
+        except:  # pylint: disable=bare-except
+            monitoring_utils.increment("temp_tpa_by_backend_dark_launch_new_threw")
+
+        # Could return old_values, but lets keep it a generator for consistency
+        for config in old_values:
+            yield config
+
+    @classmethod
+    def _get_enabled_by_backend_name_old(cls, backend_name):
+        """Old implementation of get_enabled_by_backend_name"""
+        if backend_name in _PSA_OAUTH2_BACKENDS:
+            oauth2_backend_names = OAuth2ProviderConfig.key_values('backend_name', flat=True)
+            for oauth2_backend_name in oauth2_backend_names:
+                provider = OAuth2ProviderConfig.current(oauth2_backend_name)
+                if provider.backend_name == backend_name and provider.enabled_for_current_site:
+                    yield provider
+        elif backend_name in _PSA_SAML_BACKENDS and SAMLConfiguration.is_enabled(
+                Site.objects.get_current(get_current_request()), 'default'):
+            idp_names = SAMLProviderConfig.key_values('slug', flat=True)
+            for idp_name in idp_names:
+                provider = SAMLProviderConfig.current(idp_name)
+                if provider.backend_name == backend_name and provider.enabled_for_current_site:
+                    yield provider
+        elif backend_name in _LTI_BACKENDS:
+            for consumer_key in LTIProviderConfig.key_values('lti_consumer_key', flat=True):
+                provider = LTIProviderConfig.current(consumer_key)
+                if provider.backend_name == backend_name and provider.enabled_for_current_site:
+                    yield provider
+
+    @classmethod
+    def _get_enabled_by_backend_name_new(cls, backend_name):
+        """New implementation of get_enabled_by_backend_name for dark launch"""
         for provider in cls._enabled_providers():
             if provider.backend_name == backend_name:
                 yield provider
