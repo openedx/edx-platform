@@ -12,7 +12,6 @@ from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfi
 
 
 @override_settings(
-    COMPREHENSIVE_THEME_DIRS=[settings.REPO_ROOT / 'common/test/appsembler'],
     ENABLE_COMPREHENSIVE_THEMING=True,
     DEFAULT_SITE_THEME='edx-theme-codebase',
 )

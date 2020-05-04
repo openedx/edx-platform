@@ -83,6 +83,8 @@ FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
 
 FEATURES['ENABLE_BULK_ENROLLMENT_VIEW'] = True
 
+FEATURES['AMC_APP_URL'] = 'http://localhost:13000'  # Appsembler: Fix tests asking for the URL.
+
 DEFAULT_MOBILE_AVAILABLE = True
 
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
@@ -541,7 +543,7 @@ FEATURES['CUSTOM_COURSES_EDX'] = True
 
 # Set dummy values for profile image settings.
 PROFILE_IMAGE_BACKEND = {
-    'class': 'storages.backends.overwrite.OverwriteStorage',
+    'class': 'django.core.files.storage.FileSystemStorage',
     'options': {
         'location': MEDIA_ROOT,
         'base_url': 'http://example-storage.com/profile-images/',
@@ -566,7 +568,7 @@ FEATURES['ENABLE_FINANCIAL_ASSISTANCE_FORM'] = True
 
 COURSE_CATALOG_API_URL = 'https://catalog.example.com/api/v1'
 
-COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "themes", REPO_ROOT / "common/test"]
+COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "common/test/appsembler", REPO_ROOT / "themes", REPO_ROOT / "common/test"]
 COMPREHENSIVE_THEME_LOCALE_PATHS = [REPO_ROOT / "themes/conf/locale", ]
 
 LMS_BASE = "localhost:8000"
