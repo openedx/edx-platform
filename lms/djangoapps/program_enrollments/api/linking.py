@@ -180,9 +180,6 @@ def _unlink_course_enrollments_from_program_course_enrollment(program_enrollment
         2. moving the user into the audit track
         3. removing the link between the ProgramCourseEnrollment and the CourseEnrollment
 
-    Note: It is unlikely that this method should be used on its own.
-    It should only be used as part of the larger unlinking process for a learner via the support tool.
-
     Arguments:
         program_enrollment: the ProgramEnrollment object
     """
