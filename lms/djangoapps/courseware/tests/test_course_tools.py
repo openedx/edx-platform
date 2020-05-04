@@ -12,8 +12,6 @@ from mock import patch
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-# from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-# from student.models import CourseEnrollment
 from lms.djangoapps.courseware.course_tools import FinancialAssistanceTool
 from lms.djangoapps.courseware.course_tools import VerifiedUpgradeTool
 from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
@@ -179,6 +177,7 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
 
         # Or CourseEnrollment has course_upgrade_deadline (that's what gets checked in is_enabled)
         # but once we're in there it's a month ahead
+
         self.enrollment.course_upgrade_deadline = self.now - datetime.timedelta(days=1)
         self.enrollment.save()
 

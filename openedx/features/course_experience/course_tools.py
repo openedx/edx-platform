@@ -105,5 +105,4 @@ class CourseToolsPluginManager(PluginManager):
         Returns the course tools applicable to the current user and course.
         """
         course_tools = CourseToolsPluginManager.get_course_tools()
-
         return [tool for tool in course_tools if tool.is_enabled(request, course_key)]
