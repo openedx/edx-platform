@@ -17,7 +17,7 @@ JOB_COMP_SALARIED_KEY = 'salaried'
 JOB_COMPENSATION_CHOICES = (
     (JOB_COMP_VOLUNTEER_KEY, 'Volunteer'),
     (JOB_COMP_HOURLY_KEY, 'Hourly'),
-    (JOB_COMP_SALARIED_KEY, 'Salaried'),
+    (JOB_COMP_SALARIED_KEY, 'Salaried (Yearly)'),
 )
 
 JOB_HOURS_FULLTIME_KEY = 'fulltime'
