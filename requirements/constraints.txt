@@ -22,6 +22,10 @@ django-cors-headers<3.0.0
 # It seems like django-countries > 5.5 may cause performance issues for us.
 django-countries==5.5
 
+# django-storages version 1.10 will change the default ACL of the files stored in the S3 bucket from 'public-read'
+# to the ACL of the bucket and drop support for 'AWS_S3_ENCRYPTION' and
+django-storages<1.10
+
 # Support was dropped for Python 3.5, Django 2.0, Django 2.1, DRF 3.7
 drf-yasg<1.17.1
 
