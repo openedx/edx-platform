@@ -103,7 +103,7 @@ class TestLinkProgramEnrollmentsMixin(object):
 
     def _assert_user_enrolled_in_program_courses(self, user, program_uuid, *course_keys):
         """
-        Assert that the given user is has active enrollments in the given courses
+        Assert that the given user has active enrollments in the given courses
         through the given program.
         """
         user.refresh_from_db()
@@ -256,6 +256,45 @@ class TestLinkProgramEnrollments(TestLinkProgramEnrollmentsMixin, TestCase):
         # assert that all CourseAccessRoleAssignment objects are deleted
         assert not active_enrollment_1.courseaccessroleassignment_set.all().exists()
 
+    def test_enrollment_already_linked_to_different_user(self):
+        """
+        Test that when link_program_enrollments is called with a program and an external_student_key,
+        user pair and that program is already linked to a different user with the same external_student_key
+        that the original user's link is removed and replaced by a link with the new user.
+        """
+        program_enrollment = self._create_waiting_enrollment(self.program, '0001')
+        self._create_waiting_course_enrollment(program_enrollment, self.fruit_course)
+        self._create_waiting_course_enrollment(program_enrollment, self.animal_course)
+        link_program_enrollments(self.program, {'0001': self.user_1.username})
+
+        self._assert_program_enrollment(self.user_1, self.program, '0001', refresh=False)
+        self._assert_no_program_enrollment(self.user_2, self.program, refresh=False)
+
+        course_enrollments_for_user_1 = [pce.course_enrollment
+                                         for pce
+                                         in program_enrollment.program_course_enrollments.all()]
+
+        errors = link_program_enrollments(
+            self.program,
+            {
+                '0001': self.user_2.username,
+            }
+        )
+
+        assert errors == {}
+        self._assert_program_enrollment(self.user_2, self.program, '0001')
+
+        self._assert_no_program_enrollment(self.user_1, self.program)
+        # assert that all of user_1's course enrollments as part of the program
+        # are inactive and in the audit track
+        for course_enrollment in course_enrollments_for_user_1:
+            course_enrollment.refresh_from_db()
+            assert not course_enrollment.is_active
+            assert course_enrollment.mode == 'audit'
+
+        self._assert_program_enrollment(self.user_2, self.program, '0001')
+        self._assert_user_enrolled_in_program_courses(self.user_2, self.program, self.fruit_course, self.animal_course)
+
 
 class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase):
     """ Tests for linking error behavior """
@@ -336,34 +375,6 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
         self.assertDictEqual(errors, {'0002': expected_error_msg})
         self._assert_program_enrollment(self.user_1, self.program, '0001')
         self._assert_program_enrollment(self.user_2, self.program, '0002')
-
-    def test_enrollment_already_linked_to_different_user(self):
-        self._create_waiting_enrollment(self.program, '0001')
-        enrollment = ProgramEnrollmentFactory.create(
-            program_uuid=self.program,
-            external_user_key='0003',
-        )
-        user_3 = enrollment.user
-
-        self._assert_no_program_enrollment(self.user_1, self.program, refresh=False)
-        self._assert_no_program_enrollment(self.user_2, self.program, refresh=False)
-        self._assert_program_enrollment(user_3, self.program, '0003', refresh=False)
-
-        with LogCapture() as logger:
-            errors = link_program_enrollments(
-                self.program,
-                {
-                    '0001': self.user_1.username,
-                    '0003': self.user_2.username,
-                }
-            )
-            expected_error_msg = _user_already_linked_message(enrollment, self.user_2)
-            logger.check_present((LOG_PATH, 'WARNING', expected_error_msg))
-
-        self.assertDictEqual(errors, {'0003': expected_error_msg})
-        self._assert_program_enrollment(self.user_1, self.program, '0001')
-        self._assert_no_program_enrollment(self.user_2, self.program)
-        self._assert_program_enrollment(user_3, self.program, '0003')
 
     def test_error_enrolling_in_course(self):
         nonexistant_course = CourseKey.from_string('course-v1:edX+Zilch+Bupkis')
