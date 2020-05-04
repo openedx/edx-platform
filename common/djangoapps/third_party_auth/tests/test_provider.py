@@ -177,7 +177,6 @@ class RegistryTest(testutil.TestCase):
         mock_set_custom_metric.assert_any_call('temp_tpa_enabled_all_dark_launch_mismatch',
                                                'old[]new[%s]' % configs[2].id)
 
-
     def test_mixed_providers(self):
         """
         Verify that multiple providers types can be configured at same time.
