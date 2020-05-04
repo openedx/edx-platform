@@ -920,6 +920,11 @@ PARENTAL_CONSENT_AGE_LIMIT = ENV_TOKENS.get(
 # Allow extra middleware classes to be added to the app through configuration.
 MIDDLEWARE.extend(ENV_TOKENS.get('EXTRA_MIDDLEWARE_CLASSES', []))
 
+############### Settings for django-fernet-fields ##################
+VEDA_FERNET_KEYS = AUTH_TOKENS.get('VEDA_FERNET_KEYS', [])
+FERNET_KEYS = AUTH_TOKENS.get('FERNET_KEYS', FERNET_KEYS)
+FERNET_KEYS += VEDA_FERNET_KEYS
+
 ################# Settings for the maintenance banner #################
 MAINTENANCE_BANNER_TEXT = ENV_TOKENS.get('MAINTENANCE_BANNER_TEXT', None)
 
