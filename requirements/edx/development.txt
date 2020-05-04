@@ -110,12 +110,12 @@ edx-api-doc-tools==1.2.0  # via -r requirements/edx/testing.txt
 edx-bulk-grades==0.6.8    # via -r requirements/edx/testing.txt, staff-graded-xblock
 edx-ccx-keys==1.0.1       # via -r requirements/edx/testing.txt
 edx-celeryutils==0.5.0    # via -r requirements/edx/testing.txt, super-csv
-edx-completion==3.1.1     # via -r requirements/edx/testing.txt
+edx-completion==3.2.0     # via -r requirements/edx/testing.txt
 edx-django-release-util==0.4.4  # via -r requirements/edx/testing.txt
-edx-django-sites-extensions==2.4.3  # via -r requirements/edx/testing.txt
+edx-django-sites-extensions==2.5.0  # via -r requirements/edx/testing.txt
 edx-django-utils==3.2.1   # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
-edx-drf-extensions==5.0.2  # via -r requirements/edx/testing.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.2.0     # via -r requirements/edx/testing.txt
+edx-drf-extensions==5.1.0  # via -r requirements/edx/testing.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
+edx-enterprise==3.2.1     # via -r requirements/edx/testing.txt
 edx-i18n-tools==0.5.0     # via -r requirements/edx/testing.txt, ora2
 edx-lint==1.4.1           # via -r requirements/edx/testing.txt
 edx-milestones==0.3.0     # via -r requirements/edx/testing.txt
@@ -132,11 +132,11 @@ edx-submissions==3.1.3    # via -r requirements/edx/testing.txt, ora2
 edx-tincan-py35==0.0.5    # via -r requirements/edx/testing.txt, edx-enterprise
 edx-user-state-client==1.1.2  # via -r requirements/edx/testing.txt
 edx-when==1.2.3           # via -r requirements/edx/testing.txt, edx-proctoring
-edxval==1.3.3             # via -r requirements/edx/testing.txt
+edxval==1.3.4             # via -r requirements/edx/testing.txt
 elasticsearch==1.9.0      # via -r requirements/edx/testing.txt, edx-search
 entrypoints==0.3          # via -r requirements/edx/testing.txt, flake8
 enum34==1.1.10            # via -r requirements/edx/testing.txt, edxval
-event-tracking==0.3.0     # via -r requirements/edx/testing.txt, edx-proctoring, edx-search
+event-tracking==0.3.1     # via -r requirements/edx/testing.txt, edx-proctoring, edx-search
 execnet==1.7.1            # via -r requirements/edx/testing.txt, pytest-xdist
 factory-boy==2.8.1        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 faker==4.0.3              # via -r requirements/edx/testing.txt, factory-boy
@@ -200,7 +200,7 @@ mysqlclient==1.4.6        # via -r requirements/edx/testing.txt
 newrelic==5.12.0.140      # via -r requirements/edx/testing.txt, edx-django-utils
 nltk==3.5                 # via -r requirements/edx/testing.txt, chem
 nodeenv==1.3.5            # via -r requirements/edx/testing.txt
-numpy==1.18.3             # via -r requirements/edx/testing.txt, chem, openedx-calc, pandas, scipy
+numpy==1.18.4             # via -r requirements/edx/testing.txt, chem, openedx-calc, pandas, scipy
 git+https://github.com/joestump/python-oauth2.git@b94f69b1ad195513547924e380d9265133e995fa#egg=oauth2  # via -r requirements/edx/testing.txt
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
 openedx-calc==1.0.7       # via -r requirements/edx/testing.txt
@@ -250,7 +250,7 @@ pytest-forked==1.1.3      # via -r requirements/edx/testing.txt, pytest-xdist
 pytest-json-report==1.2.1  # via -r requirements/edx/testing.txt
 pytest-metadata==1.8.0    # via -r requirements/edx/testing.txt, pytest-json-report
 pytest-randomly==3.3.1    # via -r requirements/edx/testing.txt
-pytest-xdist==1.31.0      # via -r requirements/edx/testing.txt
+pytest-xdist==1.32.0      # via -r requirements/edx/testing.txt
 pytest==5.3.5             # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, pytest-attrib, pytest-cov, pytest-django, pytest-forked, pytest-json-report, pytest-metadata, pytest-randomly, pytest-xdist
 python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, analytics-python, botocore, edx-ace, edx-drf-extensions, edx-enterprise, edx-proctoring, faker, freezegun, icalendar, ora2, pandas, xblock
 python-levenshtein==0.12.0  # via -r requirements/edx/testing.txt
@@ -300,7 +300,7 @@ sphinxcontrib-openapi[markdown]==0.6.0  # via -r requirements/edx/development.in
 sphinxcontrib-qthelp==1.0.3  # via sphinx
 sphinxcontrib-serializinghtml==1.1.4  # via sphinx
 sqlparse==0.3.1           # via -r requirements/edx/testing.txt, django, django-debug-toolbar
-staff-graded-xblock==0.7  # via -r requirements/edx/testing.txt
+staff-graded-xblock==0.8  # via -r requirements/edx/testing.txt
 stevedore==1.32.0         # via -r requirements/edx/testing.txt, code-annotations, edx-ace, edx-enterprise, edx-opaque-keys
 super-csv==0.9.7          # via -r requirements/edx/testing.txt, edx-bulk-grades
 sympy==1.5.1              # via -r requirements/edx/testing.txt, symmath
@@ -308,8 +308,8 @@ testfixtures==6.14.1      # via -r requirements/edx/testing.txt, edx-enterprise
 text-unidecode==1.3       # via -r requirements/edx/testing.txt, faker, python-slugify
 toml==0.10.0              # via -r requirements/edx/testing.txt, tox
 tox-battery==0.5.2        # via -r requirements/edx/testing.txt
-tox==3.14.6               # via -r requirements/edx/testing.txt, tox-battery
-tqdm==4.45.0              # via -r requirements/edx/testing.txt, nltk
+tox==3.15.0               # via -r requirements/edx/testing.txt, tox-battery
+tqdm==4.46.0              # via -r requirements/edx/testing.txt, nltk
 transifex-client==0.13.4  # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 typed-ast==1.4.1          # via -r requirements/edx/testing.txt, astroid
 unicodecsv==0.14.1        # via -r requirements/edx/testing.txt, edx-enterprise
@@ -317,7 +317,7 @@ unidiff==0.5.5            # via -r requirements/edx/testing.txt, coverage-pytest
 uritemplate==3.0.1        # via -r requirements/edx/testing.txt, coreapi, drf-yasg
 urllib3==1.25.9           # via -r requirements/edx/testing.txt, elasticsearch, geoip2, requests, selenium, transifex-client
 user-util==0.1.5          # via -r requirements/edx/testing.txt
-virtualenv==20.0.18       # via -r requirements/edx/testing.txt, tox
+virtualenv==20.0.20       # via -r requirements/edx/testing.txt, tox
 voluptuous==0.11.7        # via -r requirements/edx/testing.txt, ora2
 vulture==1.4              # via -r requirements/edx/development.in
 watchdog==0.10.2          # via -r requirements/edx/testing.txt
