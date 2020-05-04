@@ -1,34 +1,35 @@
 function escapeSelector(id) {
-    // Wrapper around window.CSS.escape that uses a fallback method if CSS.escape is not available.
-    // This is designed to serialize a string to be used as a valid css selector. See https://drafts.csswg.org/cssom/#the-css.escape()-method
-    // For example, can be used with xblock and course ids, which often contain invalid characters that must be escaped
-    // to function properly in css selectors.
-
+    'use strict';
+    // Wrapper around window.CSS.escape that uses a fallback method if CSS.escape is not available.  This is designed to
+    // serialize a string to be used as a valid css selector.  See
+    // https://drafts.csswg.org/cssom/#the-css.escape()-method For example, this can be used with xblock and course ids,
+    // which often contain invalid characters that must be escaped to function properly in css selectors.
     // TODO: if this escaping is also required elsewhere, it may be useful to add a global CSS.escape polyfill and
     // use that directly.
-    if (window.CSS && window.CSS.escape) {
-        return CSS.escape(id);
-    } else {
-        // CSS escape alternative borrowed from https://api.jquery.com/jQuery.escapeSelector/ source. When we upgrade to jQuery 3.0, we can use $.escapeSelector() instead of this shim escapeSelector function.
-        // source: https://github.com/jquery/jquery/blob/3edfa1bc/src/selector/escapeSelector.js
 
-        // CSS string/identifier serialization
-        // https://drafts.csswg.org/cssom/#common-serializing-idioms
-        var rcssescape = /([\0-\x1f\x7f]|^-?\d)|^-$|[^\x80-\uFFFF\w-]/g;
-        function fcssescape( ch, asCodePoint ) {
-            if ( asCodePoint ) {
-                // U+0000 NULL becomes U+FFFD REPLACEMENT CHARACTER
-                if ( ch === "\0" ) {
-                    return "\uFFFD";
-                }
-                // Control characters and (dependent upon position) numbers get escaped as code points
-                return ch.slice( 0, -1 ) + "\\" + ch.charCodeAt( ch.length - 1 ).toString( 16 ) + " ";
+    // CSS string/identifier serialization https://drafts.csswg.org/cssom/#common-serializing-idioms
+    // This code borrowed from https://api.jquery.com/jQuery.escapeSelector/ (source:
+    // https://github.com/jquery/jquery/blob/3edfa1bc/src/selector/escapeSelector.js). When we upgrade to jQuery 3.0, we
+    // can use $.escapeSelector() instead of this shim escapeSelector function.
+    var rcssescape = /([\0-\x1f\x7f]|^-?\d)|^-$|[^\x80-\uFFFF\w-]/g; // eslint-disable-line no-control-regex
+    function fcssescape(ch, asCodePoint) {
+        if (asCodePoint) {
+            // U+0000 NULL becomes U+FFFD REPLACEMENT CHARACTER
+            if (ch === '\0') {
+                return '\uFFFD';
             }
-            // Other potentially-special ASCII characters get backslash-escaped
-            return "\\" + ch;
+            // Control characters and (dependent upon position) numbers get escaped as code points
+            return ch.slice(0, -1) + '\\' + ch.charCodeAt(ch.length - 1).toString(16) + ' ';
         }
+        // Other potentially-special ASCII characters get backslash-escaped
+        return '\\' + ch;
+    }
+
+    if (window.CSS && window.CSS.escape) {
+        return window.CSS.escape(id);
+    } else {
         // ensure string and then run the replacements
-        return (id + "").replace(rcssescape, fcssescape);
+        return (id + '').replace(rcssescape, fcssescape);
     }
 }
 
