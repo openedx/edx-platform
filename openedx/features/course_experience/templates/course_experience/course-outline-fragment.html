@@ -63,7 +63,7 @@ reset_deadlines_banner_displayed = False
                 due_date = subsection.get('due')
                 overdue = due_date is not None and due_date < timezone.now() and not subsection.get('complete', True)
                 %>
-                % if overdue and not reset_deadlines_banner_displayed:
+                % if graded and overdue and not reset_deadlines_banner_displayed:
                     <% reset_deadlines_banner_displayed = True %>
                     <script type="text/javascript">
                         $('.reset-deadlines-banner').css('display', 'flex');
