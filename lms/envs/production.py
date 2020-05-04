@@ -471,6 +471,12 @@ AWS_QUERYSTRING_AUTH = AUTH_TOKENS.get('AWS_QUERYSTRING_AUTH', True)
 AWS_S3_CUSTOM_DOMAIN = AUTH_TOKENS.get('AWS_S3_CUSTOM_DOMAIN', 'edxuploads.s3.amazonaws.com')
 AWS_S3_ENCRYPTION = ENV_TOKENS.get('AWS_S3_ENCRYPTION', False)
 
+# Since django-storages version 1.9, 'AWS_S3_ENCRYPTION' is deprecated and will be removed in version 1.10.
+# The same functionality is available by setting ServerSideEncryption in 'AWS_S3_OBJECT_PARAMETERS'
+# See https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings
+if 'AWS_S3_OBJECT_PARAMETERS' in ENV_TOKENS:
+    AWS_S3_OBJECT_PARAMETERS = ENV_TOKENS['AWS_S3_OBJECT_PARAMETERS']
+
 if AUTH_TOKENS.get('DEFAULT_FILE_STORAGE'):
     DEFAULT_FILE_STORAGE = AUTH_TOKENS.get('DEFAULT_FILE_STORAGE')
 elif AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
