@@ -9,7 +9,6 @@ import ddt
 import six
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from mock import patch
@@ -20,10 +19,10 @@ from six.moves import range
 
 from common.test.utils import XssTestMixin
 from course_modes.models import CourseMode
+from edxmako.shortcuts import render_to_response
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.tests.factories import StaffFactory, StudentModuleFactory, UserFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
-from edxmako.shortcuts import render_to_response
 from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
 from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
@@ -135,6 +134,33 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             org=self.course.id.org
         )
         self.assertTrue(has_instructor_tab(org_researcher, self.course))
+
+    @ddt.data(
+        ('staff', False),
+        ('instructor', False),
+        ('data_researcher', True),
+        ('global_staff', True),
+    )
+    @ddt.unpack
+    def test_data_download(self, access_role, can_access):
+        """
+        Verify that the Data Download tab only shows up for certain roles
+        """
+        download_section = '<li class="nav-item"><button type="button" class="btn-link data_download" '\
+                           'data-section="data_download">Data Download</button></li>'
+        user = UserFactory.create(is_staff=access_role == 'global_staff')
+        CourseAccessRoleFactory(
+            course_id=self.course.id,
+            user=user,
+            role=access_role,
+            org=self.course.id.org
+        )
+        self.client.login(username=user.username, password="test")
+        response = self.client.get(self.url)
+        if can_access:
+            self.assertContains(response, download_section)
+        else:
+            self.assertNotContains(response, download_section)
 
     @ddt.data(
         ("How to defeat the Road Runner", "2017", "001", "ACME"),
