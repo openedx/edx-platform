@@ -20,10 +20,7 @@ module.exports = _.values(Merge.smart(commonConfig, {
                 debug: true
             }),
             new webpack.DefinePlugin({
-                'process.env.NODE_ENV': JSON.stringify('development'),
-                'process.env.LMS_ROOT_URL': JSON.stringify('https://localhost:18000'),
-                'process.env.JWT_AUTH_COOKIE_HEADER_PAYLOAD': JSON.stringify('edx-jwt-cookie-header-payload'),
-                'process.env.EDXMKTG_USER_INFO_COOKIE_NAME': JSON.stringify('edx-user-info')
+                'process.env.NODE_ENV': JSON.stringify('development')
             })
         ],
         module: {
