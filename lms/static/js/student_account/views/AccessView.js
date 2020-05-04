@@ -128,7 +128,12 @@
                 },
 
                 loadForm: function(type) {
-                    var loadFunc = _.bind(this.load[type], this);
+                    var loadFunc;
+                    if (type === 'reset') {
+                        loadFunc = _.bind(this.load.login, this);
+                        loadFunc(this.formDescriptions.login);
+                    }
+                    loadFunc = _.bind(this.load[type], this);
                     loadFunc(this.formDescriptions[type]);
                 },
 
@@ -225,7 +230,7 @@
                 },
 
                 passwordEmailSent: function() {
-                    var $loginAnchorElement = $('#login-anchor');
+                    var $loginAnchorElement = $('#login-form');
                     this.element.hide($(this.el).find('#password-reset-anchor'));
                     this.element.show($loginAnchorElement);
                     this.element.scrollTop($loginAnchorElement);
@@ -236,7 +241,7 @@
                         category: 'user-engagement'
                     });
 
-                    this.element.hide($(this.el).find('#login-anchor'));
+                    this.element.hide($(this.el).find('#login-form'));
                     this.loadForm('reset');
                     this.element.scrollTop($('#password-reset-anchor'));
                 },

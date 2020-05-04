@@ -65,6 +65,22 @@ class SupportViewManageUserTests(SupportViewTestCase):
         super(SupportViewManageUserTests, self).setUp()
         SupportStaffRole().add_users(self.user)
 
+    def test_get_contact_us(self):
+        """
+        Tests Support View contact us Page
+        """
+        url = reverse('support:contact_us')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_password_assistance(self):
+        """
+        Tests password assistance
+        """
+        url = '/password_assistance'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
     def test_get_support_form(self):
         """
         Tests Support View to return Manage User Form
