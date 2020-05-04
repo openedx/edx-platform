@@ -20,10 +20,12 @@ class MultiSelectWithOtherFormField(MultiSelectFormField):
 
         self.other_max_length = other_max_length
         self.error_messages.update(
-            dict(invalid_length=_('Other field value. %(value)s maximum allowed length violation.')))
+            dict(invalid_length=_(
+                'Other field value, maximum allowed length violation. Allowed limit is upto {other_max_length} characters.').format(
+                other_max_length=other_max_length)))
 
     def valid_value(self, value):
-        return len(value) < self.other_max_length
+        return len(value) <= self.other_max_length
 
     def validate(self, value):
         """
