@@ -96,7 +96,7 @@ class FinancialAssistanceTool(CourseTool):
         try: 
             enrollment = CourseEnrollment.get_enrollment(request.user, course_key)
             if enrollment.course_upgrade_deadline: 
-                if datetime.datetime.now(pytz.UTC) >= enrollment.course_upgrade_deadline:
+                if datetime.datetime.now(pytz.UTC) > enrollment.course_upgrade_deadline:
                     return False
         except:
             pass # handle case where there's no logged in user
