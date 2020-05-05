@@ -7,6 +7,7 @@ from datetime import datetime
 import ddt
 import mock
 from django.conf import settings
+from django.db import transaction
 
 from lms.djangoapps.courseware.access_utils import ACCESS_DENIED, ACCESS_GRANTED
 from lms.djangoapps.courseware.tabs import ExternalLinkCourseTab
@@ -82,7 +83,8 @@ class CourseApiTestViews(BaseCoursewareTests):
             if not logged_in:
                 self.client.logout()
             if enrollment_mode:
-                CourseEnrollment.enroll(self.user, self.course.id, enrollment_mode)
+                with transaction.atomic():
+                    CourseEnrollment.enroll(self.user, self.course.id, enrollment_mode)
             response = self.client.get(self.url)
             assert response.status_code == 200
             if enrollment_mode:

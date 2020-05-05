@@ -6,6 +6,7 @@ import json
 
 from babel.numbers import get_currency_symbol
 from django.urls import reverse
+from django.utils.functional import cached_property
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
@@ -22,6 +23,7 @@ from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
+from openedx.core.lib.defer import PrefetchCachedProperties
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import generate_course_expired_message
 from openedx.features.discounts.utils import generate_offer_html
@@ -30,11 +32,12 @@ from student.models import CourseEnrollment
 from .serializers import CourseInfoSerializer
 
 
-class CoursewareMeta:
+class CoursewareMeta(PrefetchCachedProperties):
     """
     Encapsulates courseware and enrollment metadata.
     """
     def __init__(self, course_key, request, username=''):
+        super(CoursewareMeta, self).__init__()
         self.overview = course_detail(
             request,
             username or request.user.username,
@@ -46,11 +49,11 @@ class CoursewareMeta:
     def __getattr__(self, name):
         return getattr(self.overview, name)
 
-    @property
+    @cached_property
     def is_staff(self):
         return has_access(self.effective_user, 'staff', self.overview).has_access
 
-    @property
+    @cached_property
     def enrollment(self):
         """
         Return enrollment information.
@@ -65,24 +68,24 @@ class CoursewareMeta:
             )
         return {'mode': mode, 'is_active': is_active}
 
-    @property
+    @cached_property
     def course_expired_message(self):
         # TODO: TNL-7185 Legacy: Refactor to return the expiration date and format the message in the MFE
         return generate_course_expired_message(self.effective_user, self.overview)
 
-    @property
+    @cached_property
     def offer_html(self):
         # TODO: TNL-7185 Legacy: Refactor to return the offer data and format the message in the MFE
         return generate_offer_html(self.effective_user, self.overview)
 
-    @property
+    @cached_property
     def content_type_gating_enabled(self):
         return ContentTypeGatingConfig.enabled_for_enrollment(
             user=self.effective_user,
             course_key=self.course_key,
         )
 
-    @property
+    @cached_property
     def can_load_courseware(self):
         return check_course_access(
             self.overview,
@@ -93,7 +96,7 @@ class CoursewareMeta:
             check_if_authenticated=True,
         ).to_json()
 
-    @property
+    @cached_property
     def tabs(self):
         """
         Return course tab metadata.
@@ -109,7 +112,7 @@ class CoursewareMeta:
             })
         return tabs
 
-    @property
+    @cached_property
     def verified_mode(self):
         """
         Return verified mode information, or None.
@@ -124,7 +127,7 @@ class CoursewareMeta:
                 'upgrade_url': verified_upgrade_deadline_link(self.effective_user, self.overview),
             }
 
-    @property
+    @cached_property
     def notes(self):
         """
         Return whether edxnotes is enabled and visible.
@@ -215,7 +218,7 @@ class CoursewareInformation(RetrieveAPIView):
             self.request,
             username=username,
         )
-
+        overview.prefetch()
         return overview
 
     def get_serializer_context(self):
