@@ -6,7 +6,7 @@ courseware.
 
 import logging
 from collections import defaultdict, namedtuple
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import pytz
 import six
@@ -60,7 +60,6 @@ from openedx.core.lib.api.view_utils import LazySequence
 from openedx.features.course_duration_limits.access import AuditExpiredError
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
 from static_replace import replace_static_urls
-from student.models import CourseEnrollment
 from survey.utils import SurveyRequiredAccessError, check_survey_required_and_unanswered
 from util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
@@ -503,6 +502,7 @@ def get_course_assignment_date_blocks(course, user, request, num_return=None,
         date_block.contains_gated_content = assignment.contains_gated_content
         date_block.complete = assignment.complete
         date_block.past_due = assignment.past_due
+        date_block.link = assignment.url
         date_block.set_title(assignment.title, link=assignment.url)
         date_blocks.append(date_block)
     date_blocks = sorted((b for b in date_blocks if b.is_enabled or include_past_dates), key=date_block_key_fn)
@@ -534,7 +534,7 @@ def get_course_assignments(course_key, user, request, include_access=False):
                 subsection_key, 'contains_gated_content', False)
             title = block_data.get_xblock_field(subsection_key, 'display_name', _('Assignment'))
 
-            url = None
+            url = ''
             start = block_data.get_xblock_field(subsection_key, 'start')
             assignment_released = not start or start < now
             if assignment_released:
