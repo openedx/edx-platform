@@ -153,10 +153,10 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
 
     def test_tool_not_visible_when_user_not_unrolled(self):
         self.course_financial_mode.save()
-        self.request.user = None;
+        self.request.user = None
         self.assertFalse(FinancialAssistanceTool().is_enabled(self.request, self.course.id))
 
-    @patch ('lms.djangoapps.courseware.course_tools.CourseEnrollment.get_enrollment')
+    @patch('lms.djangoapps.courseware.course_tools.CourseEnrollment.get_enrollment')
     def test_not_visible_when_upgrade_deadline_has_passed(self, get_enrollment_mock):
         get_enrollment_mock.return_value = self.enrollment   # mock the response from get_enrollment to use enrollment with course_upgrade_deadline in the past
         self.assertFalse(FinancialAssistanceTool().is_enabled(self.request, self.course.id))
@@ -164,4 +164,4 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
     def test_tool_not_visible_when_end_date_passed(self):
         self.course_overview.end_date = self.now - datetime.timedelta(days=30)
         self.course_overview.save()
-        self.assertFalse(FinancialAssistanceTool().is_enabled(self.request, self.course_overview.id))
+        self.assertFalse(FinancialAssistanceTool().is_enabled(self.request, self.course_overview.id)
