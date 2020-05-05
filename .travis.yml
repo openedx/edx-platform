@@ -28,8 +28,8 @@ env:
   jobs:
     - TOXENV=pep8
     - TOXENV=py27-common
-    - TOXENV=py27-lms
-    - TOXENV=py27-paver-pep8
+    - TOXENV=py27-lms-1
+    - TOXENV=py27-lms-2
     - TOXENV=py27-studio
 
 script:
