@@ -8,6 +8,7 @@ import edx_django_utils.monitoring as monitoring_utils
 from more_itertools import unique_everseen
 
 from openedx.core.djangoapps.theming.helpers import get_current_request
+from openedx.core.lib.cache_utils import request_cached
 
 from .models import (
     _LTI_BACKENDS,
@@ -19,20 +20,26 @@ from .models import (
     SAMLProviderConfig
 )
 
+CACHE_NAMESPACE = 'third_party_auth.provider'
 
-# TODO Move to ConfigurationModel in django-config-models
-def current_all(prov_cls, filters=None):
+
+@request_cached(namespace=CACHE_NAMESPACE)
+def current_configs_for_site(provider_cls, site_id):
     """
     Like ConfigurationModel.current() but returns the current config in every
-    partition as delineated by KEY_FIELDS -- and allows filters dict. (Does
-    not include caching.)
+    partition as delineated by KEY_FIELDS, but only looking at configs in the
+    specified site.
+
+    This is a hack to support these provider configs, which do not include site
+    in their KEY_FIELDS but need to be partitioned on site. See comment in
+    ``_enabled_providers`` for more details.
     """
 
     def partition_key(obj):
         """Compute the partition key for this object."""
-        return tuple(getattr(obj, k) for k in prov_cls.KEY_FIELDS)
+        return tuple(getattr(obj, k) for k in provider_cls.KEY_FIELDS)
 
-    configs = prov_cls.objects.filter(**filters) if filters else prov_cls.objects.all()
+    configs = provider_cls.objects.filter(site_id=str(site_id))
     # Get the most recent record in each partition
     return unique_everseen(configs.order_by('-change_date'), partition_key)
 
@@ -102,13 +109,22 @@ class Registry(object):
         site = Site.objects.get_current(get_current_request())
 
         # Note that site is added as an explicit filter. 'site_id' isn't in the
-        # KEY_FIELDS for these models, but it should be; in the meantime, we
-        # need to be careful not to let two configs belonging to two different
-        # sites but with the same key "shadow" one another. That's easy here;
-        # we just only ask for configs within the current request's site.
+        # KEY_FIELDS for these models, but it should be, since we want "the most
+        # recent version of the config" to be most recent for a given key *and*
+        # site. Since site is not in KEY_FIELDS, looking up a config by just its
+        # key could result in finding a config for a different site. (The
+        # previous code here would then have returned nothing, having had a
+        # site-filtering step.) In short, we need to be careful not to let two
+        # configs belonging to two different sites but with the same key
+        # "shadow" one another.
+        #
+        # It's not clear if we can safely add site_id to the KEY_FIELDS, and
+        # it's also not clear if we're even going to want to keep support for
+        # sites here long term, so in the meantime we just only ask for
+        # configs within the current request's site.
 
         # Get all OAuth2 provider configs for this site...
-        for config in current_all(OAuth2ProviderConfig, {'site_id': site.pk}):
+        for config in current_configs_for_site(OAuth2ProviderConfig, site.pk):
             # Ignore the config if it's disabled or we don't have a backend
             # class for it. (Not having a backend class for a config should
             # be pretty rare if it happens at all.)
@@ -117,12 +133,12 @@ class Registry(object):
 
         if SAMLConfiguration.is_enabled(site, 'default'):
             # ...followed by SAML configs, if feature is enabled...
-            for config in current_all(SAMLProviderConfig, {'site_id': site.pk}):
+            for config in current_configs_for_site(SAMLProviderConfig, site.pk):
                 if config.enabled and config.backend_name in _PSA_SAML_BACKENDS:
                     yield config
 
         # ...and finally LTI configs
-        for config in current_all(LTIProviderConfig, {'site_id': site.pk}):
+        for config in current_configs_for_site(LTIProviderConfig, site.pk):
             if config.enabled and config.backend_name in _LTI_BACKENDS:
                 yield config
 
