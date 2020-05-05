@@ -80,7 +80,7 @@ class PasswordResetEmailRateLimiter(RequestRateLimiter):
 
     def keys_to_check(self, request):
         """
-        Retun list of IP and email based keys.
+        Return list of IP and email based keys.
         """
         keys = super(PasswordResetEmailRateLimiter, self).keys_to_check(request)
 
@@ -97,7 +97,7 @@ class PasswordResetEmailRateLimiter(RequestRateLimiter):
 
     def tick_request_counter(self, request):
         """
-        Ticks any counters used to compute when rate limt has been reached
+        Ticks any counters used to compute when rate limit has been reached.
         """
         for key in self.keys_to_check(request):
             self.cache_incr(key)
