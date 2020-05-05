@@ -102,7 +102,7 @@ edx-completion==3.2.0     # via -r requirements/edx/base.in
 edx-django-release-util==0.4.4  # via -r requirements/edx/base.in
 edx-django-sites-extensions==2.5.0  # via -r requirements/edx/base.in
 edx-django-utils==3.2.2   # via -r requirements/edx/base.in, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
-edx-drf-extensions==5.1.0  # via -r requirements/edx/base.in, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
+edx-drf-extensions==6.0.0  # via -r requirements/edx/base.in, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
 edx-enterprise==3.2.2     # via -r requirements/edx/base.in
 edx-i18n-tools==0.5.0     # via ora2
 edx-milestones==0.3.0     # via -r requirements/edx/base.in
