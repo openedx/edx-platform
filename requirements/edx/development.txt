@@ -81,7 +81,7 @@ git+https://gitlab.com/Ayub-khan/django-method-override.git@5270af321be2e576d8e8
 django-model-utils==3.2.0  # via -r requirements/edx/testing.txt, django-user-tasks, edx-bulk-grades, edx-celeryutils, edx-completion, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-rbac, edx-submissions, edx-when, edxval, ora2, super-csv
 django-mptt==0.11.0       # via -r requirements/edx/testing.txt, django-wiki
 django-multi-email-field==0.6.1  # via -r requirements/edx/testing.txt, edx-enterprise
-django-mysql==3.4.0       # via -r requirements/edx/testing.txt
+django-mysql==3.5.0       # via -r requirements/edx/testing.txt
 django-oauth-toolkit==1.3.2  # via -r requirements/edx/testing.txt
 django-object-actions==2.0.0  # via -r requirements/edx/testing.txt, edx-enterprise
 django-pipeline==1.7.0    # via -r requirements/edx/testing.txt
@@ -113,9 +113,9 @@ edx-celeryutils==0.5.0    # via -r requirements/edx/testing.txt, super-csv
 edx-completion==3.2.0     # via -r requirements/edx/testing.txt
 edx-django-release-util==0.4.4  # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==2.5.0  # via -r requirements/edx/testing.txt
-edx-django-utils==3.2.1   # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
+edx-django-utils==3.2.2   # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==5.1.0  # via -r requirements/edx/testing.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.2.1     # via -r requirements/edx/testing.txt
+edx-enterprise==3.2.2     # via -r requirements/edx/testing.txt
 edx-i18n-tools==0.5.0     # via -r requirements/edx/testing.txt, ora2
 edx-lint==1.4.1           # via -r requirements/edx/testing.txt
 edx-milestones==0.3.0     # via -r requirements/edx/testing.txt
@@ -188,7 +188,7 @@ mando==0.6.4              # via -r requirements/edx/testing.txt, radon
 markdown==2.6.11          # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, django-wiki, staff-graded-xblock, xblock-poll
 markey==0.8               # via -r requirements/edx/testing.txt, django-babel-underscore
 markupsafe==1.1.1         # via -r requirements/edx/testing.txt, chem, jinja2, mako, xblock
-maxminddb==1.5.2          # via -r requirements/edx/testing.txt, geoip2
+maxminddb==1.5.3          # via -r requirements/edx/testing.txt, geoip2
 mccabe==0.6.1             # via -r requirements/edx/testing.txt, flake8, pylint
 mistune==0.8.4            # via m2r
 mock==3.0.5               # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, xblock-drag-and-drop-v2, xblock-poll
@@ -197,7 +197,7 @@ mongoengine==0.10.0       # via -r requirements/edx/testing.txt
 more-itertools==8.2.0     # via -r requirements/edx/testing.txt, pytest, zipp
 mpmath==1.1.0             # via -r requirements/edx/testing.txt, sympy
 mysqlclient==1.4.6        # via -r requirements/edx/testing.txt
-newrelic==5.12.0.140      # via -r requirements/edx/testing.txt, edx-django-utils
+newrelic==5.12.1.141      # via -r requirements/edx/testing.txt, edx-django-utils
 nltk==3.5                 # via -r requirements/edx/testing.txt, chem
 nodeenv==1.3.5            # via -r requirements/edx/testing.txt
 numpy==1.18.4             # via -r requirements/edx/testing.txt, chem, openedx-calc, pandas, scipy
@@ -265,7 +265,7 @@ pywatchman==1.4.1         # via -r requirements/edx/development.in
 pyyaml==5.3.1             # via -r requirements/edx/testing.txt, code-annotations, edx-django-release-util, edx-i18n-tools, sphinxcontrib-openapi, xblock
 radon==4.1.0              # via -r requirements/edx/testing.txt
 random2==1.0.1            # via -r requirements/edx/testing.txt
-recommender-xblock==1.4.5  # via -r requirements/edx/testing.txt
+recommender-xblock==1.4.7  # via -r requirements/edx/testing.txt
 redis==2.10.6             # via -r requirements/edx/testing.txt
 regex==2020.4.4           # via -r requirements/edx/testing.txt, nltk
 requests-oauthlib==1.3.0  # via -r requirements/edx/testing.txt, social-auth-core
@@ -302,7 +302,7 @@ sphinxcontrib-serializinghtml==1.1.4  # via sphinx
 sqlparse==0.3.1           # via -r requirements/edx/testing.txt, django, django-debug-toolbar
 staff-graded-xblock==0.8  # via -r requirements/edx/testing.txt
 stevedore==1.32.0         # via -r requirements/edx/testing.txt, code-annotations, edx-ace, edx-enterprise, edx-opaque-keys
-super-csv==0.9.7          # via -r requirements/edx/testing.txt, edx-bulk-grades
+super-csv==0.9.8          # via -r requirements/edx/testing.txt, edx-bulk-grades
 sympy==1.5.1              # via -r requirements/edx/testing.txt, symmath
 testfixtures==6.14.1      # via -r requirements/edx/testing.txt, edx-enterprise
 text-unidecode==1.3       # via -r requirements/edx/testing.txt, faker, python-slugify
@@ -329,7 +329,7 @@ wrapt==1.11.2             # via -c requirements/edx/../constraints.txt, -r requi
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.10#egg=xblock-drag-and-drop-v2==2.2.10  # via -r requirements/edx/testing.txt
 git+https://github.com/open-craft/xblock-poll@da2d8fd21791a7af128595cf82bee83ee579e00f#egg=xblock-poll==1.9.6  # via -r requirements/edx/testing.txt
 xblock-utils==2.0.0       # via -r requirements/edx/testing.txt, edx-sga, lti-consumer-xblock, staff-graded-xblock, xblock-drag-and-drop-v2, xblock-google-drive
-xblock==1.2.9             # via -r requirements/edx/testing.txt, acid-xblock, crowdsourcehinter-xblock, done-xblock, edx-completion, edx-sga, edx-user-state-client, edx-when, lti-consumer-xblock, ora2, rate-xblock, staff-graded-xblock, xblock-discussion, xblock-drag-and-drop-v2, xblock-google-drive, xblock-poll, xblock-utils
+xblock==1.3.0             # via -r requirements/edx/testing.txt, acid-xblock, crowdsourcehinter-xblock, done-xblock, edx-completion, edx-sga, edx-user-state-client, edx-when, lti-consumer-xblock, ora2, rate-xblock, staff-graded-xblock, xblock-discussion, xblock-drag-and-drop-v2, xblock-google-drive, xblock-poll, xblock-utils
 xmlsec==1.3.3             # via -r requirements/edx/testing.txt, python3-saml
 xss-utils==0.1.3          # via -r requirements/edx/testing.txt
 zipp==1.0.0               # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, importlib-metadata, importlib-resources
