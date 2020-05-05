@@ -91,8 +91,14 @@ class FinancialAssistanceTool(CourseTool):
     @classmethod
     def is_enabled(cls, request, course_key):
         """
-        Show this link for courses where financial assistance is available, unless upgrade deadline has passed
+        Show this link for active courses where financial assistance is available, unless upgrade deadline has passed
         """
+        course_overview = CourseOverview.objects.get(id=course_key)
+
+        # hide the link for archived courses
+        if course_overview.end_date is not None and datetime.datetime.now(pytz.UTC) > course_overview.end_date:
+            return False
+
         # hide the link if not logged in or user not enrolled in the course
         if not request.user or not CourseEnrollment.is_enrolled(request.user, course_key):
             return False
@@ -103,7 +109,7 @@ class FinancialAssistanceTool(CourseTool):
             if datetime.datetime.now(pytz.UTC) > enrollment.course_upgrade_deadline:
                 return False
 
-        return True if CourseOverview.objects.get(id=course_key).eligible_for_financial_aid else False
+        return True if course_overview.eligible_for_financial_aid else False
 
     @classmethod
     def title(cls):
