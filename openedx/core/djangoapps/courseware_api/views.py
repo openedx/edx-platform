@@ -13,6 +13,8 @@ from rest_framework.views import APIView
 
 from course_modes.models import CourseMode
 from edxnotes.helpers import is_feature_enabled
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import check_course_access
@@ -192,6 +194,11 @@ class CoursewareInformation(RetrieveAPIView):
         * 404 if the course is not available or cannot be seen.
     """
 
+    authentication_classes = (
+        JwtAuthentication,
+        SessionAuthenticationAllowInactiveUser,
+    )
+
     serializer_class = CourseInfoSerializer
 
     def get_object(self):
@@ -243,6 +250,12 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
           another user specifies a username other than their own.
         * 404 if the course is not available or cannot be seen.
     """
+
+    authentication_classes = (
+        JwtAuthentication,
+        SessionAuthenticationAllowInactiveUser,
+    )
+
     def get(self, request, usage_key_string, *args, **kwargs):
         """
         Return response to a GET request.
