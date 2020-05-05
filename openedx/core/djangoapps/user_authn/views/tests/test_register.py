@@ -50,7 +50,9 @@ from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (
 from openedx.core.djangoapps.user_api.tests.test_helpers import TestCaseForm
 from openedx.core.djangoapps.user_api.tests.test_constants import SORTED_COUNTRIES
 from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
-from openedx.core.djangoapps.user_authn.views.register import RegistrationValidationThrottle
+from openedx.core.djangoapps.user_authn.views.register import RegistrationValidationThrottle, \
+    REGISTRATION_FAILURE_LOGGING_FLAG
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.api import test_utils
 from student.helpers import authenticate_new_user
@@ -176,6 +178,42 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
 
     def test_register_duplicate_email_validation_error(self):
         # Register the first user
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        self.assertHttpOK(response)
+
+        # Try to create a second user with the same email address
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": "Someone Else",
+            "username": "someone_else",
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        self.assertEqual(response.status_code, 409)
+        response_json = json.loads(response.content.decode('utf-8'))
+        self.assertDictEqual(
+            response_json,
+            {
+                "email": [{
+                    "user_message": (
+                        u"It looks like {} belongs to an existing account. "
+                        "Try again with a different email address."
+                    ).format(
+                        self.EMAIL
+                    )
+                }]
+            }
+        )
+
+    @override_waffle_flag(REGISTRATION_FAILURE_LOGGING_FLAG, True)
+    def test_registration_failure_logging(self):
+        # Register a user
         response = self.client.post(self.url, {
             "email": self.EMAIL,
             "name": self.NAME,
