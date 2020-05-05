@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 from course_modes.models import CourseMode
 from edxnotes.helpers import is_feature_enabled
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthentication
 from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import check_course_access
@@ -196,7 +196,7 @@ class CoursewareInformation(RetrieveAPIView):
 
     authentication_classes = (
         JwtAuthentication,
-        SessionAuthenticationAllowInactiveUser,
+        SessionAuthentication,
     )
 
     serializer_class = CourseInfoSerializer
@@ -253,7 +253,7 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
 
     authentication_classes = (
         JwtAuthentication,
-        SessionAuthenticationAllowInactiveUser,
+        SessionAuthentication,
     )
 
     def get(self, request, usage_key_string, *args, **kwargs):
