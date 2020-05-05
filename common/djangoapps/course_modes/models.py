@@ -191,13 +191,6 @@ class CourseMode(models.Model):
         unique_together = ('course', 'mode_slug', 'currency')
 
     def __init__(self, *args, **kwargs):
-        if 'course_id' in kwargs:
-            course_id = kwargs['course_id']
-            if isinstance(course_id, str):
-                kwargs['course_id'] = CourseKey.from_string(course_id)
-                call_location = "\n".join("%30s : %s:%d" % (t[3], t[1], t[2]) for t in inspect.stack()[::-1])
-                log.warning("Forced to coerce course_id in CourseMode instantiation: %s", call_location)
-
         super(CourseMode, self).__init__(*args, **kwargs)
 
     def clean(self):
