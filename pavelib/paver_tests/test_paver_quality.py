@@ -325,7 +325,6 @@ class TestPaverRunQuality(PaverTestCase):
         with patch('pavelib.quality._get_pylint_violations', _mock_pylint_violations):
             with self.assertRaises(SystemExit):
                 pavelib.quality.run_quality("")
-                self.assertRaises(BuildFailure)
         print(self._mock_paver_sh.mock_calls)
 
         # Test that pylint is called
@@ -344,7 +343,6 @@ class TestPaverRunQuality(PaverTestCase):
         self._mock_paver_sh.side_effect = [Exception('unrecognized failure!'), 0]
         with self.assertRaises(SystemExit):
             pavelib.quality.run_quality("")
-            self.assertRaises(Exception)
         # Test that pylint is NOT called by counting calls
         self.assertEqual(self._mock_paver_sh.call_count, 1)
 
@@ -357,3 +355,37 @@ class TestPaverRunQuality(PaverTestCase):
         # 1 for diff_quality for pylint
         # 1 for diff_quality for eslint
         self.assertEqual(self._mock_paver_sh.call_count, 8)
+
+
+class TestPaverRunDiffQuality(PaverTestCase):
+    """
+    For testing the paver run_diff_quality task
+
+    Note: Although diff_quality is tested as part of quality, some
+    cases weren't tested properly.
+    """
+    def setUp(self):
+        super(TestPaverRunDiffQuality, self).setUp()
+
+        # mock the @needs decorator to skip it
+        patcher = patch('pavelib.quality.sh')
+        self._mock_paver_sh = patcher.start()
+        self.addCleanup(patcher.stop)
+
+    @patch(OPEN_BUILTIN, mock_open())
+    def test_percentage_failure(self):
+        """
+        When diff_quality is run with a threshold percentage, it ends with an exit code of 1.
+        This bubbles up to paver with a subprocess return code error and should return False.
+        """
+        self._mock_paver_sh.side_effect = [BuildFailure('Subprocess return code: 1')]
+        self.assertEqual(pavelib.quality.run_diff_quality(""), False)
+
+    @patch(OPEN_BUILTIN, mock_open())
+    def test_other_failures(self):
+        """
+        Run diff_quality with an exception that is not a percentage failure.
+        """
+        self._mock_paver_sh.side_effect = [BuildFailure('Some failure.')]
+        with self.assertRaisesRegex(BuildFailure, '.*Diff Quality Report.*Some failure.'):
+            pavelib.quality.run_diff_quality("")

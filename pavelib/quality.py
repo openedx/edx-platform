@@ -1035,7 +1035,10 @@ def run_diff_quality(
         if is_percentage_failure(failure.args):
             return False
         else:
-            fail_quality('diff_quality', 'FAILURE: {}'.format(failure))
+            fail_quality(
+                'diff_quality',
+                'FAILURE: See "Diff Quality Report" in Jenkins left-sidebar for details. {}'.format(failure)
+            )
 
 
 def is_percentage_failure(error_message):
