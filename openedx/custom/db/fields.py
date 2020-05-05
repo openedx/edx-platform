@@ -9,6 +9,11 @@ from openedx.custom.forms.fields import MultiSelectWithOtherFormField
 from openedx.custom.helpers import add_other_field_in_choices
 
 
+class OtherMultiSelectFieldList(MSFList):
+    def __str__(self):
+        selected_choice_list = [self.choices.get(int(i)) if i.isdigit() else (self.choices.get(i) or i) for i in self]
+        return u', '.join([string_type(s) for s in selected_choice_list])
+
 class MultiSelectWithOtherField(MultiSelectField):
     """
         This class is a Django Model field class that supports
@@ -86,7 +91,7 @@ class MultiSelectWithOtherField(MultiSelectField):
             elif isinstance(value, string_type):
                 choices_str = value.replace(self.other_delimiter, '')
                 selected_choices = [choice for choice in choices_str.split(',') if choice.strip()]
-                return MSFList(choices, selected_choices)
+                return OtherMultiSelectFieldList(choices, selected_choices)
             elif isinstance(value, (set, dict)):
                 return MSFList(choices, list(value))
         return MSFList(choices, [])
