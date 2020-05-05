@@ -185,7 +185,7 @@ class CoursewareIndex(View):
         # Set the user in the request to the effective user.
         self.request.user = self.effective_user
 
-    def _redirect_to_learning_mfe(self, request):
+    def _redirect_to_learning_mfe(self):
         """
         Redirect to the new courseware micro frontend,
         unless this is a time limited exam.
@@ -200,11 +200,28 @@ class CoursewareIndex(View):
             if self.is_staff:
                 return
 
-            url = get_microfrontend_url(
-                self.course_key,
-                self.section.location
-            )
-            raise Redirect(url)
+            raise Redirect(self.microfrontend_url)
+
+    @property
+    def microfrontend_url(self):
+        """
+        Return absolute URL to this section in the courseware micro-frontend.
+        """
+        try:
+            unit_key = UsageKey.from_string(self.request.GET.get('activate_block_id', ''))
+            # `activate_block_id` is typically a Unit (a.k.a. Vertical),
+            # but it can technically be any block type. Do a check to
+            # make sure it's really a Unit before we use it for the MFE.
+            if unit_key.block_type != 'vertical':
+                unit_key = None
+        except InvalidKeyError:
+            unit_key = None
+        url = get_microfrontend_url(
+            self.course_key,
+            self.section.location if self.section else None,
+            unit_key
+        )
+        return url
 
     def render(self, request):
         """
@@ -222,7 +239,7 @@ class CoursewareIndex(View):
                 self._redirect_if_not_requested_section()
                 self._save_positions()
                 self._prefetch_and_bind_section()
-                self._redirect_to_learning_mfe(request)
+                self._redirect_to_learning_mfe()
 
             check_content_start_date_for_masquerade_user(self.course_key, self.effective_user, request,
                                                          self.course.start, self.chapter.start, self.section.start)
@@ -534,22 +551,7 @@ class CoursewareIndex(View):
 
         # Courseware MFE link
         if show_courseware_mfe_link(request.user, staff_access, self.course.id):
-            if self.section:
-                try:
-                    unit_key = UsageKey.from_string(request.GET.get('activate_block_id', ''))
-                    # `activate_block_id` is typically a Unit (a.k.a. Vertical),
-                    # but it can technically be any block type. Do a check to
-                    # make sure it's really a Unit before we use it for the MFE.
-                    if unit_key.block_type != 'vertical':
-                        unit_key = None
-                except InvalidKeyError:
-                    unit_key = None
-
-                courseware_context['microfrontend_link'] = get_microfrontend_url(
-                    self.course.id, self.section.location, unit_key
-                )
-            else:
-                courseware_context['microfrontend_link'] = get_microfrontend_url(self.course.id)
+            courseware_context['microfrontend_link'] = self.microfrontend_url
         else:
             courseware_context['microfrontend_link'] = None
 
