@@ -46,7 +46,7 @@ Test Plan
 #. Collect data on which issues bokchoy would have caught by running them manually out-of-band from the standard CI/CD process.
 
   * We'll look at the failures on the out-of-band bokchoy job to find any true failures that would be caught by the removed tests.
-  * On a Daily cadense for 1 month.
+  * On a Daily cadence for 1 month.
 
 #. Assess Impact of change.
 
@@ -74,4 +74,9 @@ Consequences
 * Bokchoy testing infrastructure will remain off
 * Bokchoy tests jobs will be removed all together rather than just disabled
 * All bokchoy code in edx-platform not related to the a11y tests will be removed
-* Short Term UI Testing Strategy - With the removal of the bokchoy suite from edx-platform, any non-a11y UI tests should be made part of the e2e test suite.  This should be used extremely sparingly for only testing critical paths through the system that have a high amount of usage. If just the UI or frontend logic needs to be tested then the those tests should be written in the javascript test suite for edx-platform.
+* Testing Strategy for UI that is not part of a microfrontend
+  * end-to-end smoke tests via the e2e-tests suite should only be for critical happy paths
+  * UI and frontend logic should be tested using UI unit tests(currently Jasmine).
+  * Django backends and rendered HTML should be tested with integration tests that use the `Django test client`
+
+.. _Django test client: https://docs.djangoproject.com/en/2.2/topics/testing/tools/#the-test-client
