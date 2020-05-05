@@ -130,7 +130,7 @@ class ReceiptViewTests(UserMixin, ModuleStoreTestCase):
             response.content.decode('utf-8'),
             user_message if is_user_message_expected else system_message
         )
-        self.assertNotRegexpMatches(
+        self.assertNotRegex(
             response.content.decode('utf-8'),
             user_message if not is_user_message_expected else system_message
         )

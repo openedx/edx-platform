@@ -70,13 +70,13 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
         self.assertRegex(html, r"data-block-type=[\"\']test_aside[\"\']")
         self.assertRegex(html, "Aside rendered")
         # Now ensure the acid_aside is not in the result
-        self.assertNotRegexpMatches(html, r"data-block-type=[\"\']acid_aside[\"\']")
+        self.assertNotRegex(html, r"data-block-type=[\"\']acid_aside[\"\']")
 
         # Ensure about pages don't have asides
         about = modulestore().get_item(course.id.make_usage_key('about', 'overview'))
         html = get_preview_fragment(request, about, context).content
-        self.assertNotRegexpMatches(html, r"data-block-type=[\"\']test_aside[\"\']")
-        self.assertNotRegexpMatches(html, "Aside rendered")
+        self.assertNotRegex(html, r"data-block-type=[\"\']test_aside[\"\']")
+        self.assertNotRegex(html, "Aside rendered")
 
     @XBlockAside.register_temp_plugin(AsideTestType, 'test_aside')
     def test_preview_no_asides(self):
@@ -106,8 +106,8 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
         }
         html = get_preview_fragment(request, html, context).content
 
-        self.assertNotRegexpMatches(html, r"data-block-type=[\"\']test_aside[\"\']")
-        self.assertNotRegexpMatches(html, "Aside rendered")
+        self.assertNotRegex(html, r"data-block-type=[\"\']test_aside[\"\']")
+        self.assertNotRegex(html, "Aside rendered")
 
     @mock.patch('xmodule.conditional_module.ConditionalModule.is_condition_satisfied')
     def test_preview_conditional_module_children_context(self, mock_is_condition_satisfied):
