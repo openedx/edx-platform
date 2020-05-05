@@ -31,5 +31,4 @@ USER_SERVICES = (
     ('delivery-services', _('Delivery Services')),
     ('mentorship', _('Mentorship')),
     ('funding', _('Funding')),
-    ('human-resources', _('Human Resources')),
 )
