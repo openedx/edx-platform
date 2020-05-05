@@ -10,8 +10,8 @@ from logging import getLogger
 
 import six
 from lazy import lazy
-from six.moves.BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer  # pylint: disable=import-error
-from six.moves.socketserver import ThreadingMixIn  # pylint: disable=import-error
+from six.moves.BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+from six.moves.socketserver import ThreadingMixIn
 
 LOGGER = getLogger(__name__)
 

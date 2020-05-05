@@ -244,7 +244,7 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
 
     def _assert_mode_changed(self, mock_tracker, course, user, to_mode):
         """Confirm the analytics event was emitted."""
-        mock_tracker.emit.assert_has_calls(  # pylint: disable=maybe-no-member
+        mock_tracker.emit.assert_has_calls(
             [
                 call(
                     EVENT_NAME_ENROLLMENT_MODE_CHANGED,

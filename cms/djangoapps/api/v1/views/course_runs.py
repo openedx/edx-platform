@@ -20,7 +20,6 @@ from ..serializers.course_runs import (
 )
 
 
-# pylint: disable=unused-argument
 class CourseRunViewSet(viewsets.GenericViewSet):
     authentication_classes = (JwtAuthentication, SessionAuthentication,)
     lookup_value_regex = settings.COURSE_KEY_REGEX

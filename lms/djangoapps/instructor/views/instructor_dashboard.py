@@ -6,7 +6,7 @@ Instructor Dashboard Views
 import datetime
 import logging
 import uuid
-from functools import reduce  # pylint: disable=redefined-builtin
+from functools import reduce
 
 import pytz
 import six
@@ -25,7 +25,7 @@ from mock import patch
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
-from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
+from six.moves.urllib.parse import urljoin
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
@@ -65,6 +65,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab
 
 from .tools import get_units_with_due_date, title_or_url
+from .. import permissions
 
 log = logging.getLogger(__name__)
 
@@ -84,7 +85,7 @@ class InstructorDashboardTab(CourseTab):
         """
         Returns true if the specified user has staff access.
         """
-        return bool(user and has_access(user, 'staff', course, course.id))
+        return bool(user and user.is_authenticated and user.has_perm(permissions.VIEW_DASHBOARD, course.id))
 
 
 def show_analytics_dashboard_message(course_key):
@@ -120,24 +121,27 @@ def instructor_dashboard_2(request, course_id):
         'sales_admin': CourseSalesAdminRole(course_key).has_user(request.user),
         'staff': bool(has_access(request.user, 'staff', course)),
         'forum_admin': has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR),
-        'data_researcher': request.user.has_perm('student.can_research', course_key),
+        'data_researcher': request.user.has_perm(permissions.CAN_RESEARCH, course_key),
     }
 
-    if not access['staff']:
+    if not request.user.has_perm(permissions.VIEW_DASHBOARD, course_key):
         raise Http404()
 
     is_white_label = CourseMode.is_white_label(course_key)
 
     reports_enabled = configuration_helpers.get_value('SHOW_ECOMMERCE_REPORTS', False)
 
-    sections = [
-        _section_course_info(course, access),
-        _section_membership(course, access),
-        _section_cohort_management(course, access),
-        _section_discussions_management(course, access),
-        _section_student_admin(course, access),
-        _section_data_download(course, access),
-    ]
+    sections = []
+    if access['staff']:
+        sections.extend([
+            _section_course_info(course, access),
+            _section_membership(course, access),
+            _section_cohort_management(course, access),
+            _section_discussions_management(course, access),
+            _section_student_admin(course, access),
+        ])
+    if access['data_researcher']:
+        sections.append(_section_data_download(course, access))
 
     analytics_dashboard_message = None
     if show_analytics_dashboard_message(course_key):
@@ -207,7 +211,7 @@ def instructor_dashboard_2(request, course_id):
     openassessment_blocks = [
         block for block in openassessment_blocks if block.parent is not None
     ]
-    if len(openassessment_blocks) > 0:
+    if len(openassessment_blocks) > 0 and access['staff']:
         sections.append(_section_open_response_assessment(request, course, openassessment_blocks, access))
 
     disable_buttons = not _is_small_course(course_key)
@@ -504,7 +508,8 @@ def _section_course_info(course, access):
 
     try:
         sorted_cutoffs = sorted(list(course.grade_cutoffs.items()), key=lambda i: i[1], reverse=True)
-        advance = lambda memo, letter_score_tuple: u"{}: {}, ".format(letter_score_tuple[0], letter_score_tuple[1]) + memo  # pylint: disable=line-too-long
+        advance = lambda memo, letter_score_tuple: u"{}: {}, ".format(letter_score_tuple[0], letter_score_tuple[1]) \
+                                                   + memo
         section_data['grade_cutoffs'] = reduce(advance, sorted_cutoffs, "")[:-2]
     except Exception:  # pylint: disable=broad-except
         section_data['grade_cutoffs'] = "Not Available"

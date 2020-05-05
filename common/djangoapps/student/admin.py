@@ -269,7 +269,7 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
         """
         Returns True if CourseEnrollment objects can be viewed via the admin view.
         """
-        return super(CourseEnrollmentAdmin, self).has_view_permission(request, obj)  # pylint: disable=no-member
+        return super(CourseEnrollmentAdmin, self).has_view_permission(request, obj)
 
     @_Check.is_enabled(COURSE_ENROLLMENT_ADMIN_SWITCH.is_enabled)
     def has_add_permission(self, request):
@@ -394,7 +394,7 @@ class LoginFailuresAdmin(admin.ModelAdmin):
         """
         Only enabled if feature is enabled.
         """
-        return super(LoginFailuresAdmin, self).has_view_permission(request, obj)  # pylint: disable=no-member
+        return super(LoginFailuresAdmin, self).has_view_permission(request, obj)
 
     @_Check.is_enabled(LoginFailures.is_feature_enabled)
     def has_delete_permission(self, request, obj=None):

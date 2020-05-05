@@ -1,13 +1,12 @@
 """
 Tests for Course API forms.
 """
-# pylint: disable=missing-docstring
 
 from itertools import product
 
 import ddt
 import six
-from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
+from six.moves.urllib.parse import urlencode
 from django.contrib.auth.models import AnonymousUser
 from django.http import QueryDict
 

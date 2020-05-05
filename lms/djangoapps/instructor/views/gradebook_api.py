@@ -6,7 +6,6 @@ which is currently use by ccx and instructor apps.
 
 import math
 
-import six
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.urls import reverse
@@ -16,8 +15,10 @@ from opaque_keys.edx.keys import CourseKey
 from lms.djangoapps.courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.grades.api import CourseGradeFactory
-from lms.djangoapps.instructor.views.api import require_level
+from lms.djangoapps.instructor.views.api import require_course_permission
 from xmodule.modulestore.django import modulestore
+
+from .. import permissions
 
 # Grade book: max students per page
 MAX_STUDENTS_PER_PAGE_GRADE_BOOK = 20
@@ -101,7 +102,7 @@ def get_grade_book_page(request, course, course_key):
 
 @transaction.non_atomic_requests
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
+@require_course_permission(permissions.OVERRIDE_GRADES)
 def spoc_gradebook(request, course_id):
     """
     Show the gradebook for this course:
@@ -114,7 +115,7 @@ def spoc_gradebook(request, course_id):
 
     return render_to_response('courseware/gradebook.html', {
         'page': page,
-        'page_url': reverse('spoc_gradebook', kwargs={'course_id': six.text_type(course_key)}),
+        'page_url': reverse('spoc_gradebook', kwargs={'course_id': str(course_key)}),
         'students': student_info,
         'course': course,
         'course_id': course_key,

@@ -42,7 +42,7 @@ from .. import (
     SHOW_UPGRADE_MSG_ON_COURSE_HOME,
     USE_BOOTSTRAP_FLAG
 )
-from ..utils import get_course_outline_block_tree, get_resume_block
+from ..utils import can_show_verified_upgrade, get_course_outline_block_tree, get_resume_block
 from .course_dates import CourseDatesFragmentView
 from .course_home_messages import CourseHomeMessageFragmentView
 from .course_outline import CourseOutlineFragmentView
@@ -222,7 +222,11 @@ class CourseHomeFragmentView(EdxFragmentView):
         has_discount = False
 
         # TODO Add switch to control deployment
-        if SHOW_UPGRADE_MSG_ON_COURSE_HOME.is_enabled(course_key) and enrollment and enrollment.upgrade_deadline:
+        if SHOW_UPGRADE_MSG_ON_COURSE_HOME.is_enabled(course_key) and can_show_verified_upgrade(
+            request.user,
+            course.id,
+            enrollment
+        ):
             upgrade_url = EcommerceService().upgrade_url(request.user, course_key)
             upgrade_price, has_discount = format_strikeout_price(request.user, course_overview)
 

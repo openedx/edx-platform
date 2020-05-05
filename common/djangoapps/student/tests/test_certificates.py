@@ -13,9 +13,9 @@ from mock import patch
 from pytz import UTC
 
 from course_modes.models import CourseMode
-from lms.djangoapps.certificates.api import get_certificate_url  # pylint: disable=import-error
-from lms.djangoapps.certificates.models import CertificateStatuses  # pylint: disable=import-error
-from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
+from lms.djangoapps.certificates.api import get_certificate_url
+from lms.djangoapps.certificates.models import CertificateStatuses
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from student.models import LinkedInAddToProfileConfiguration
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum

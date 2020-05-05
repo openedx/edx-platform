@@ -3,6 +3,8 @@
 <%!
 import six
 from django.utils.translation import ugettext as _
+
+MICROBACHELORS_SLUG = 'microbachelors'
 %>
 
 % if resume_button_url != '':
@@ -11,7 +13,7 @@ from django.utils.translation import ugettext as _
     show_coaching_consent_form  = plugins.get("coaching", {}).get("show_coaching_consent_form")
     if related_programs and account_mfe_url != '' and show_coaching_consent_form:
       for program in related_programs:
-        if program.get('type') == 'MicroBachelors':
+        if program.get('type_attrs', {}).get('slug') == MICROBACHELORS_SLUG:
           resume_button_url = "%s/coaching_consent?next=%s" % (account_mfe_url, getattr(settings, 'LMS_ROOT_URL', '') + resume_button_url)
   %>
   <a href="${resume_button_url}"
@@ -28,7 +30,7 @@ from django.utils.translation import ugettext as _
     show_coaching_consent_form = plugins.get("coaching", {}).get("show_coaching_consent_form")
     if related_programs and account_mfe_url != '' and show_coaching_consent_form:
       for program in related_programs:
-        if program.get('type') == 'MicroBachelors':
+        if program.get('type_attrs', {}).get('slug') == MICROBACHELORS_SLUG:
           course_target = "%s/coaching_consent?next=%s" % (account_mfe_url, getattr(settings, 'LMS_ROOT_URL', '') + course_target)
   %>
   <a href="${course_target}"

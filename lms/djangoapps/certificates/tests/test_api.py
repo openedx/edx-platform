@@ -372,6 +372,11 @@ class CertificateGetTests(SharedModuleStoreTestCase):
             display_name='Verified Course 2',
             cert_html_view_enabled=False
         )
+        cls.no_cert_course = CourseFactory.create(
+            org='edx',
+            number='verified_3',
+            display_name='Verified Course 3',
+        )
         # certificate for the first course
         GeneratedCertificateFactory.create(
             user=cls.student,
@@ -441,6 +446,21 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         self.assertEqual(certs[1]['grade'], '0.99')
         self.assertEqual(certs[0]['download_url'], 'www.google.com')
         self.assertEqual(certs[1]['download_url'], 'www.gmail.com')
+
+    def test_get_certificates_for_user_by_course_keys(self):
+        """
+        Test to get certificates for a user for certain course keys,
+        in a dictionary indexed by those course keys.
+        """
+        certs = certs_api.get_certificates_for_user_by_course_keys(
+            user=self.student,
+            course_keys={self.web_cert_course.id, self.no_cert_course.id},
+        )
+        assert set(certs.keys()) == {self.web_cert_course.id}
+        cert = certs[self.web_cert_course.id]
+        self.assertEqual(cert['username'], self.student.username)
+        self.assertEqual(cert['course_key'], self.web_cert_course.id)
+        self.assertEqual(cert['download_url'], 'www.google.com')
 
     def test_no_certificate_for_user(self):
         """

@@ -22,7 +22,7 @@ from lms.djangoapps.program_enrollments.exceptions import (
     ProviderConfigurationException,
     ProviderDoesNotExistException
 )
-from lms.djangoapps.program_enrollments.models import ProgramEnrollment, ProgramCourseEnrollment
+from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 from lms.djangoapps.program_enrollments.tests.factories import (
     CourseAccessRoleAssignmentFactory,
     ProgramCourseEnrollmentFactory,
@@ -46,7 +46,7 @@ from ..reading import (
     get_program_course_enrollment,
     get_program_enrollment,
     get_users_by_external_keys,
-    is_course_staff_enrollment,
+    is_course_staff_enrollment
 )
 
 User = get_user_model()

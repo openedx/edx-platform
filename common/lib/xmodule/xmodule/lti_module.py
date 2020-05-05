@@ -345,7 +345,8 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         ]
     }
     css = {'scss': [resource_string(__name__, 'css/lti/lti.scss')]}
-    js_module_name = "LTI"
+    js_module_name = 'LTI'
+    icon_class = 'problem'
 
     def get_input_fields(self):
         # LTI provides a list of default parameters that might be passed as
@@ -662,7 +663,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         return params
 
     @XBlock.handler
-    def grade_handler(self, request, suffix):  # pylint: disable=unused-argument
+    def grade_handler(self, request, suffix):
         """
         This is called by courseware.module_render, to handle an AJAX call.
 

@@ -4,24 +4,135 @@ Course API Views
 
 import json
 
+from babel.numbers import get_currency_symbol
+from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from course_modes.models import CourseMode
+from edxnotes.helpers import is_feature_enabled
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import check_course_access
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
-from student.models import CourseEnrollment
-
+from lms.djangoapps.courseware.tabs import get_course_tab_list
+from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import generate_course_expired_message
 from openedx.features.discounts.utils import generate_offer_html
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
+from student.models import CourseEnrollment
 
 from .serializers import CourseInfoSerializer
+
+
+class CoursewareMeta:
+    """
+    Encapsulates courseware and enrollment metadata.
+    """
+    def __init__(self, course_key, request, username=''):
+        self.overview = course_detail(
+            request,
+            username or request.user.username,
+            course_key,
+        )
+        self.effective_user = self.overview.effective_user
+        self.course_key = course_key
+
+    def __getattr__(self, name):
+        return getattr(self.overview, name)
+
+    @property
+    def is_staff(self):
+        return has_access(self.effective_user, 'staff', self.overview).has_access
+
+    @property
+    def enrollment(self):
+        """
+        Return enrollment information.
+        """
+        if self.effective_user.is_anonymous:
+            mode = None
+            is_active = False
+        else:
+            mode, is_active = CourseEnrollment.enrollment_mode_for_user(
+                self.effective_user,
+                self.course_key
+            )
+        return {'mode': mode, 'is_active': is_active}
+
+    @property
+    def course_expired_message(self):
+        # TODO: TNL-7185 Legacy: Refactor to return the expiration date and format the message in the MFE
+        return generate_course_expired_message(self.effective_user, self.overview)
+
+    @property
+    def offer_html(self):
+        # TODO: TNL-7185 Legacy: Refactor to return the offer data and format the message in the MFE
+        return generate_offer_html(self.effective_user, self.overview)
+
+    @property
+    def content_type_gating_enabled(self):
+        return ContentTypeGatingConfig.enabled_for_enrollment(
+            user=self.effective_user,
+            course_key=self.course_key,
+        )
+
+    @property
+    def can_load_courseware(self):
+        return check_course_access(
+            self.overview,
+            self.effective_user,
+            'load',
+            check_if_enrolled=True,
+            check_survey_complete=False,
+            check_if_authenticated=True,
+        ).to_json()
+
+    @property
+    def tabs(self):
+        """
+        Return course tab metadata.
+        """
+        tabs = []
+        for priority, tab in enumerate(get_course_tab_list(self.effective_user, self.overview)):
+            tabs.append({
+                'title': tab.title or tab.get('name', ''),
+                'slug': tab.tab_id,
+                'priority': priority,
+                'type': tab.type,
+                'url': tab.link_func(self.overview, reverse),
+            })
+        return tabs
+
+    @property
+    def verified_mode(self):
+        """
+        Return verified mode information, or None.
+        """
+        mode = CourseMode.verified_mode_for_course(self.course_key)
+        if mode:
+            return {
+                'price': mode.min_price,
+                'currency': mode.currency.upper(),
+                'currency_symbol': get_currency_symbol(mode.currency.upper()),
+                'sku': mode.sku,
+                'upgrade_url': verified_upgrade_deadline_link(self.effective_user, self.overview),
+            }
+
+    @property
+    def notes(self):
+        """
+        Return whether edxnotes is enabled and visible.
+        """
+        return {
+            'enabled': is_feature_enabled(self.overview, self.effective_user),
+            'visible': self.overview.edxnotes_visibility,
+        }
 
 
 class CoursewareInformation(RetrieveAPIView):
@@ -71,6 +182,7 @@ class CoursewareInformation(RetrieveAPIView):
 
         requested_fields (optional) comma separated list:
             If set, then only those fields will be returned.
+        username (optional) username to masquerade as (if requesting user is staff)
 
     **Returns**
 
@@ -82,6 +194,11 @@ class CoursewareInformation(RetrieveAPIView):
         * 404 if the course is not available or cannot be seen.
     """
 
+    authentication_classes = (
+        JwtAuthentication,
+        SessionAuthenticationAllowInactiveUser,
+    )
+
     serializer_class = CourseInfoSerializer
 
     def get_object(self):
@@ -89,43 +206,16 @@ class CoursewareInformation(RetrieveAPIView):
         Return the requested course object, if the user has appropriate
         permissions.
         """
-
-        overview = course_detail(
-            self.request,
-            self.request.user.username,
-            CourseKey.from_string(self.kwargs['course_key_string']),
-        )
-
-        if self.request.user.is_anonymous:
-            mode = None
-            is_active = False
+        if self.request.user.is_staff:
+            username = self.request.GET.get('username', '') or self.request.user.username
         else:
-            mode, is_active = CourseEnrollment.enrollment_mode_for_user(
-                overview.effective_user,
-                overview.id
-            )
-        overview.enrollment = {'mode': mode, 'is_active': is_active}
-
-        overview.is_staff = has_access(self.request.user, 'staff', overview).has_access
-        overview.can_load_courseware = check_course_access(
-            overview,
-            self.request.user,
-            'load',
-            check_if_enrolled=True,
-            check_survey_complete=False,
-            check_if_authenticated=True,
-        ).to_json()
-
-        # TODO: TNL-7185 Legacy: Refactor to return the expiration date and format the message in the MFE
-        overview.course_expired_message = generate_course_expired_message(self.request.user, overview)
-        # TODO: TNL-7185 Legacy: Refactor to return the offer data and format the message in the MFE
-        overview.offer_html = generate_offer_html(self.request.user, overview)
-
-        course_key = CourseKey.from_string(self.kwargs['course_key_string'])
-        overview.content_type_gating_enabled = ContentTypeGatingConfig.enabled_for_enrollment(
-            user=self.request.user,
-            course_key=course_key,
+            username = self.request.user.username
+        overview = CoursewareMeta(
+            CourseKey.from_string(self.kwargs['course_key_string']),
+            self.request,
+            username=username,
         )
+
         return overview
 
     def get_serializer_context(self):
@@ -160,7 +250,13 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
           another user specifies a username other than their own.
         * 404 if the course is not available or cannot be seen.
     """
-    def get(self, request, usage_key_string, *args, **kwargs):  # pylint: disable=unused-argument
+
+    authentication_classes = (
+        JwtAuthentication,
+        SessionAuthenticationAllowInactiveUser,
+    )
+
+    def get(self, request, usage_key_string, *args, **kwargs):
         """
         Return response to a GET request.
         """

@@ -74,7 +74,7 @@ from badges.events.course_meta import completion_check, course_group_check
 from course_modes.models import CourseMode
 from lms.djangoapps.instructor_task.models import InstructorTask
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED, COURSE_CERT_CHANGED
+from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED, COURSE_CERT_CHANGED, COURSE_CERT_REVOKED
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
 
@@ -319,7 +319,7 @@ class GeneratedCertificate(models.Model):
         return {
             cert.course_id
             for cert
-            in cls.objects.filter(user=user).only('course_id')  # pylint: disable=no-member
+            in cls.objects.filter(user=user).only('course_id')
         }
 
     @classmethod
@@ -369,8 +369,14 @@ class GeneratedCertificate(models.Model):
         self.download_url = ''
         self.grade = ''
         self.status = CertificateStatuses.unavailable
-
         self.save()
+        COURSE_CERT_REVOKED.send_robust(
+            sender=self.__class__,
+            user=self.user,
+            course_key=self.course_id,
+            mode=self.mode,
+            status=self.status,
+        )
 
     def mark_notpassing(self, grade):
         """

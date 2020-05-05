@@ -413,7 +413,7 @@ def get_context_dict_from_string(data):
     Retrieve dictionary from string.
     """
     # Replace tuple and un-necessary info from inside string and get the dictionary.
-    cleaned_data = ast.literal_eval(data.split('((\'video.html\',')[1].replace("),\n {})", '').strip())  # pylint: disable=unicode-format-string
+    cleaned_data = ast.literal_eval(data.split('((\'video.html\',')[1].replace("),\n {})", '').strip())
     cleaned_data['metadata'] = OrderedDict(
         sorted(json.loads(cleaned_data['metadata']).items(), key=lambda t: t[0])
     )

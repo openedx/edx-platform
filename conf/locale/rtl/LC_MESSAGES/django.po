@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-22 12:48+0000\n"
-"PO-Revision-Date: 2020-04-22 12:48:34.459985\n"
+"POT-Creation-Date: 2020-05-03 20:50+0000\n"
+"PO-Revision-Date: 2020-05-03 20:50:13.430371\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -11376,6 +11376,7 @@ msgstr ""
 "زغ %(user_schedule_upgrade_deadline_time)s."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
+#: lms/templates/courseware/dates.html
 msgid "Upgrade now"
 msgstr "عحلقشيث رخص"
 
@@ -11902,6 +11903,12 @@ msgstr ""
 "حشسسصخقي."
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"Your previous request is in progress, please try again in a few moments."
+msgstr ""
+"غخعق حقثدهخعس قثضعثسف هس هر حقخلقثسس, حمثشسث فقغ شلشهر هر ش بثص وخوثرفس."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "Password reset unsuccessful"
 msgstr "حشسسصخقي قثسثف عرسعذذثسسبعم"
 
@@ -11921,12 +11928,6 @@ msgid ""
 msgstr ""
 "{html_start}حشسسصخقي ذقثشفهخر ذخوحمثفث{html_end}غخعق حشسسصخقي اشس زثثر "
 "ذقثشفثي. {bold_start}{email}{bold_end} هس رخص غخعق حقهوشقغ مخلهر ثوشهم."
-
-#: openedx/core/djangoapps/user_authn/views/password_reset.py
-msgid ""
-"Your previous request is in progress, please try again in a few moments."
-msgstr ""
-"غخعق حقثدهخعس قثضعثسف هس هر حقخلقثسس, حمثشسث فقغ شلشهر هر ش بثص وخوثرفس."
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "Some error occured during password change. Please try again"
@@ -16670,18 +16671,28 @@ msgid "Important Dates"
 msgstr "هوحخقفشرف يشفثس"
 
 #: lms/templates/courseware/dates.html
+msgid "You are auditing this course."
+msgstr "غخع شقث شعيهفهرل فاهس ذخعقسث."
+
+#: lms/templates/courseware/dates.html
+msgid "This means that you are unable to participate in graded assignments."
+msgstr "فاهس وثشرس فاشف غخع شقث عرشزمث فخ حشقفهذهحشفث هر لقشيثي شسسهلروثرفس."
+
+#: lms/templates/courseware/dates.html
+msgid ""
+"To complete graded assignments as part of this course, you can upgrade "
+"today."
+msgstr ""
+"فخ ذخوحمثفث لقشيثي شسسهلروثرفس شس حشقف خب فاهس ذخعقسث, غخع ذشر عحلقشيث "
+"فخيشغ."
+
+#: lms/templates/courseware/dates.html
 msgid "Due Today"
 msgstr "يعث فخيشغ"
 
 #: lms/templates/courseware/dates.html
 msgid "Verified Only"
 msgstr "دثقهبهثي خرمغ"
-
-#: lms/templates/courseware/dates.html
-msgid ""
-"{a_start}Upgrade{a_end}{space}to a Verified Certificate for full access."
-msgstr ""
-"{a_start}عحلقشيث{a_end}{space}فخ ش دثقهبهثي ذثقفهبهذشفث بخق بعمم شذذثسس."
 
 #: lms/templates/courseware/error-message.html
 msgid ""

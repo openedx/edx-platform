@@ -1,4 +1,3 @@
-# pylint: disable=unicode-format-string
 # coding=utf-8
 
 """
@@ -1032,11 +1031,14 @@ def run_diff_quality(
             )
         )
         return True
-    except BuildFailure as error_message:
-        if is_percentage_failure(error_message):
+    except BuildFailure as failure:
+        if is_percentage_failure(failure.args):
             return False
         else:
-            fail_quality('diff_quality', 'FAILURE: {}'.format(error_message))
+            fail_quality(
+                'diff_quality',
+                'FAILURE: See "Diff Quality Report" in Jenkins left-sidebar for details. {}'.format(failure)
+            )
 
 
 def is_percentage_failure(error_message):

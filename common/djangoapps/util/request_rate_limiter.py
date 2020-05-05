@@ -48,7 +48,7 @@ class PasswordResetEmailRateLimiter(RequestRateLimiter):
         """
         return '%s-%s-%s' % (
             self.reset_email_cache_prefix,
-            self.get_ip(request),
+            self.get_email(request),
             dt.strftime('%Y%m%d%H%M'),
         )
 
@@ -57,3 +57,12 @@ class PasswordResetEmailRateLimiter(RequestRateLimiter):
         Returns timeout for cache keys.
         """
         return self.cache_timeout_seconds
+
+    def get_email(self, request):
+        """
+        Returns email id for cache key.
+        """
+        user = request.user
+        # Prefer logged-in user's email
+        email = user.email if user.is_authenticated else request.POST.get('email')
+        return email

@@ -25,7 +25,7 @@ from bulk_email.models import Optout
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
-from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
+from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.experiments.utils import get_dashboard_course_info
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -40,7 +40,7 @@ from openedx.core.djangoapps.plugins.plugin_contexts import get_plugins_view_con
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled_for_user
+from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.core.djangolib.markup import HTML, Text
@@ -150,7 +150,7 @@ def _allow_donation(course_modes, course_id, enrollment):
     )
 
 
-def _create_recent_enrollment_message(course_enrollments, course_modes):  # pylint: disable=invalid-name
+def _create_recent_enrollment_message(course_enrollments, course_modes):
     """
     Builds a recent course enrollment message.
 
@@ -655,7 +655,7 @@ def student_dashboard(request):
     enterprise_message = get_dashboard_consent_notification(request, user, course_enrollments)
 
     recovery_email_message = recovery_email_activation_message = None
-    if is_secondary_email_feature_enabled_for_user(user=user):
+    if is_secondary_email_feature_enabled():
         try:
             pending_email = PendingSecondaryEmailChange.objects.get(user=user)
         except PendingSecondaryEmailChange.DoesNotExist:

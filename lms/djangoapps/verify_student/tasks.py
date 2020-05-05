@@ -130,7 +130,7 @@ def send_request_to_ss_for_user(self, user_verification_id, copy_id_photo_from):
             'response_ok': getattr(response, 'ok', False),
             'response_text': getattr(response, 'text', '')
         }
-    except Exception as exc:  # pylint: disable=bare-except
+    except Exception as exc:  # pylint: disable=broad-except
         log.error(
             (
                 'Retrying sending request to Software Secure for user: %r, Receipt ID: %r '

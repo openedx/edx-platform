@@ -16,7 +16,7 @@ from six import text_type
 from lms.djangoapps.badges.utils import badges_enabled
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import errors
-from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled_for_user
+from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.user_api.models import RetirementState, UserPreference, UserRetirementStatus
 from openedx.core.djangoapps.user_api.serializers import ReadOnlyFieldsSerializerMixin
 from student.models import LanguageProficiency, SocialLink, UserProfile
@@ -172,7 +172,7 @@ class UserReadOnlySerializer(serializers.Serializer):
                 }
             )
 
-        if is_secondary_email_feature_enabled_for_user(user):
+        if is_secondary_email_feature_enabled():
             data.update(
                 {
                     "secondary_email": account_recovery.secondary_email if account_recovery else None,

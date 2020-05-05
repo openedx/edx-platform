@@ -40,7 +40,7 @@ When refering to XBlocks, we use the entry-point name. For example,
 
 # pylint: disable=unused-import, useless-suppression, wrong-import-order, wrong-import-position
 
-import imp
+import importlib.util
 import os
 import sys
 from datetime import timedelta
@@ -1468,6 +1468,7 @@ INSTALLED_APPS = [
     'openedx.features.discounts',
     'experiments',
 
+    'openedx.core.djangoapps.external_user_ids',
     # so sample_task is available to celery workers
     'openedx.core.djangoapps.heartbeat',
 
@@ -1622,10 +1623,8 @@ OPTIONAL_APPS = (
 for app_name, insert_before in OPTIONAL_APPS:
     # First attempt to only find the module rather than actually importing it,
     # to avoid circular references - only try to import if it can't be found
-    # by find_module, which doesn't work with import hooks
-    try:
-        imp.find_module(app_name)
-    except ImportError:
+    # by find_spec, which doesn't work with import hooks
+    if importlib.util.find_spec(app_name) is None:
         try:
             __import__(app_name)
         except ImportError:

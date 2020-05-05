@@ -30,7 +30,7 @@ from mock import Mock, NonCallableMock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
 from pytz import UTC
-from six import text_type, unichr  # pylint: disable=redefined-builtin
+from six import text_type, unichr
 from six.moves import range, zip
 from testfixtures import LogCapture
 
@@ -249,25 +249,25 @@ def reverse(endpoint, args=None, kwargs=None, is_dashboard_endpoint=True):
 
 
 @common_exceptions_400
-def view_success(request):  # pylint: disable=unused-argument
+def view_success(request):
     "A dummy view for testing that returns a simple HTTP response"
     return HttpResponse('success')
 
 
 @common_exceptions_400
-def view_user_doesnotexist(request):  # pylint: disable=unused-argument
+def view_user_doesnotexist(request):
     "A dummy view that raises a User.DoesNotExist exception"
     raise User.DoesNotExist()
 
 
 @common_exceptions_400
-def view_alreadyrunningerror(request):  # pylint: disable=unused-argument
+def view_alreadyrunningerror(request):
     "A dummy view that raises an AlreadyRunningError exception"
     raise AlreadyRunningError()
 
 
 @common_exceptions_400
-def view_alreadyrunningerror_unicode(request):  # pylint: disable=unused-argument
+def view_alreadyrunningerror_unicode(request):
     """
     A dummy view that raises an AlreadyRunningError exception with unicode message
     """
@@ -275,7 +275,7 @@ def view_alreadyrunningerror_unicode(request):  # pylint: disable=unused-argumen
 
 
 @common_exceptions_400
-def view_queue_connection_error(request):  # pylint: disable=unused-argument
+def view_queue_connection_error(request):
     """
     A dummy view that raises a QueueConnectionError exception.
     """
@@ -299,24 +299,24 @@ class TestCommonExceptions400(TestCase):
 
     def test_user_doesnotexist(self):
         self.request.is_ajax.return_value = False
-        resp = view_user_doesnotexist(self.request)  # pylint: disable=assignment-from-no-return
+        resp = view_user_doesnotexist(self.request)
         self.assertContains(resp, "User does not exist", status_code=400)
 
     def test_user_doesnotexist_ajax(self):
         self.request.is_ajax.return_value = True
-        resp = view_user_doesnotexist(self.request)  # pylint: disable=assignment-from-no-return
+        resp = view_user_doesnotexist(self.request)
         self.assertContains(resp, "User does not exist", status_code=400)
 
     @ddt.data(True, False)
     def test_alreadyrunningerror(self, is_ajax):
         self.request.is_ajax.return_value = is_ajax
-        resp = view_alreadyrunningerror(self.request)  # pylint: disable=assignment-from-no-return
+        resp = view_alreadyrunningerror(self.request)
         self.assertContains(resp, "Requested task is already running", status_code=400)
 
     @ddt.data(True, False)
     def test_alreadyrunningerror_with_unicode(self, is_ajax):
         self.request.is_ajax.return_value = is_ajax
-        resp = view_alreadyrunningerror_unicode(self.request)  # pylint: disable=assignment-from-no-return
+        resp = view_alreadyrunningerror_unicode(self.request)
         self.assertContains(
             resp,
             u'Text with unicode chárácters',
@@ -329,7 +329,7 @@ class TestCommonExceptions400(TestCase):
         Tests that QueueConnectionError exception is handled in common_exception_400.
         """
         self.request.is_ajax.return_value = is_ajax
-        resp = view_queue_connection_error(self.request)  # pylint: disable=assignment-from-no-return
+        resp = view_queue_connection_error(self.request)
         self.assertContains(
             resp,
             'Error occured. Please try again later',

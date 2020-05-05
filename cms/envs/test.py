@@ -11,7 +11,7 @@ sessions. Assumes structure:
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-order
+# pylint: disable=wildcard-import, unused-wildcard-import
 
 
 from .common import *
@@ -25,7 +25,6 @@ from openedx.core.lib.derived import derive_settings
 from util.db import NoOpMigrationModules
 
 # import settings from LMS for consistent behavior with CMS
-# pylint: disable=unused-import
 from lms.envs.test import (
     COMPREHENSIVE_THEME_DIRS,
     DEFAULT_FILE_STORAGE,

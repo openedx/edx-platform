@@ -55,7 +55,7 @@ def ensure_valid_usage_key(view_func):
     If usage_key_string is not valid raise 404.
     """
     @wraps(view_func)
-    def inner(request, *args, **kwargs):  # pylint: disable=missing-docstring
+    def inner(request, *args, **kwargs):
         usage_key = kwargs.get('usage_key_string')
         if usage_key is not None:
             try:
@@ -72,7 +72,7 @@ def ensure_valid_usage_key(view_func):
 def require_global_staff(func):
     """View decorator that requires that the user have global staff permissions. """
     @wraps(func)
-    def wrapped(request, *args, **kwargs):  # pylint: disable=missing-docstring
+    def wrapped(request, *args, **kwargs):
         if GlobalStaff().has_user(request.user):
             return func(request, *args, **kwargs)
         else:
@@ -171,8 +171,7 @@ def calculate(request):
 
 
 def info(request):
-    ''' Info page (link from main header) '''
-    # pylint: disable=unused-argument
+    """ Info page (link from main header) """
     return render_to_response("info.html", {})
 
 

@@ -26,12 +26,12 @@ from six import text_type
 from six.moves import range
 from six.moves.urllib.parse import quote
 
-import shoppingcart  # pylint: disable=import-error
-from bulk_email.models import Optout  # pylint: disable=import-error
+import shoppingcart
+from bulk_email.models import Optout
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from lms.djangoapps.certificates.models import CertificateStatuses  # pylint: disable=import-error
-from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
+from lms.djangoapps.certificates.models import CertificateStatuses
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.verify_student.tests import TestVerificationBase
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory, generate_course_run_key
@@ -715,7 +715,7 @@ class EnrollmentEventTestMixin(EventTestMixin):
 
     def assert_enrollment_mode_change_event_was_emitted(self, user, course_key, mode):
         """Ensures an enrollment mode change event was emitted"""
-        self.mock_tracker.emit.assert_called_once_with(  # pylint: disable=maybe-no-member
+        self.mock_tracker.emit.assert_called_once_with(
             'edx.course.enrollment.mode_changed',
             {
                 'course_id': text_type(course_key),
@@ -727,7 +727,7 @@ class EnrollmentEventTestMixin(EventTestMixin):
 
     def assert_enrollment_event_was_emitted(self, user, course_key):
         """Ensures an enrollment event was emitted since the last event related assertion"""
-        self.mock_tracker.emit.assert_called_once_with(  # pylint: disable=maybe-no-member
+        self.mock_tracker.emit.assert_called_once_with(
             'edx.course.enrollment.activated',
             {
                 'course_id': text_type(course_key),
@@ -739,7 +739,7 @@ class EnrollmentEventTestMixin(EventTestMixin):
 
     def assert_unenrollment_event_was_emitted(self, user, course_key):
         """Ensures an unenrollment event was emitted since the last event related assertion"""
-        self.mock_tracker.emit.assert_called_once_with(  # pylint: disable=maybe-no-member
+        self.mock_tracker.emit.assert_called_once_with(
             'edx.course.enrollment.deactivated',
             {
                 'course_id': text_type(course_key),

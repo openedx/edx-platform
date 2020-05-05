@@ -63,7 +63,7 @@ reset_deadlines_banner_displayed = False
                 due_date = subsection.get('due')
                 overdue = due_date is not None and due_date < timezone.now() and not subsection.get('complete', True)
                 %>
-                % if overdue and not reset_deadlines_banner_displayed:
+                % if graded and overdue and not reset_deadlines_banner_displayed:
                     <% reset_deadlines_banner_displayed = True %>
                     <script type="text/javascript">
                         $('.reset-deadlines-banner').css('display', 'flex');
@@ -79,7 +79,7 @@ reset_deadlines_banner_displayed = False
                                 class="subsection-text outline-button"
                                 id="${ subsection['id'] }"
                             >
-                            % if num_graded_problems and not (subsection.get('format') or 'special_exam_info' in subsection):
+                            % if graded and scored and 'special_exam_info' not in subsection:
                                       <span class="icon fa fa-pencil-square-o" aria-hidden="true"></span>
                             % endif
                                       <h4 class="subsection-title">

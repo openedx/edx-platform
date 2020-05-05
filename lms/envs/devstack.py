@@ -263,7 +263,6 @@ CORS_ALLOW_HEADERS = corsheaders_default_headers + (
 LOGIN_REDIRECT_WHITELIST = [CMS_BASE]
 
 ###################### JWTs ######################
-# pylint: disable=unicode-format-string
 JWT_AUTH.update({
     'JWT_AUDIENCE': 'lms-key',
     'JWT_ISSUER': '{}/oauth2'.format(LMS_ROOT_URL),

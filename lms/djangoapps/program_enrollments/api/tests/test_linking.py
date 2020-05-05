@@ -13,12 +13,12 @@ from testfixtures import LogCapture
 from lms.djangoapps.program_enrollments.tests.factories import (
     CourseAccessRoleAssignmentFactory,
     ProgramCourseEnrollmentFactory,
-    ProgramEnrollmentFactory,
+    ProgramEnrollmentFactory
 )
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.api import get_course_access_role
 from student.roles import CourseStaffRole
-from student.tests.factories import UserFactory, CourseAccessRoleFactory
+from student.tests.factories import CourseAccessRoleFactory, UserFactory
 
 from ..linking import (
     NO_LMS_USER_TEMPLATE,
@@ -34,7 +34,7 @@ class TestLinkProgramEnrollmentsMixin(object):
     """ Utility methods and test data for testing linking """
 
     @classmethod
-    def setUpTestData(cls):  # pylint: disable=missing-docstring
+    def setUpTestData(cls):  # pylint: disable=missing-function-docstring
         cls.program = uuid4()
         cls.curriculum = uuid4()
         cls.other_program = uuid4()

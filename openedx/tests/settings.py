@@ -87,6 +87,8 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.self_paced',
     'openedx.core.djangoapps.schedules.apps.SchedulesConfig',
     'openedx.core.djangoapps.theming.apps.ThemingConfig',
+    'openedx.core.djangoapps.external_user_ids',
+
     'experiments',
     'openedx.features.content_type_gating',
     'openedx.features.course_duration_limits',

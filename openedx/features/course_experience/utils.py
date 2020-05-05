@@ -3,9 +3,11 @@ Common utilities for the course experience, including course outline.
 """
 
 
+import logging
 from datetime import timedelta
 
 from completion.models import BlockCompletion
+from django.conf import settings
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 from six.moves import range
@@ -14,10 +16,15 @@ from course_modes.models import CourseMode
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
 from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.utils import verified_upgrade_link_is_valid
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.cache_utils import request_cached
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
+from xmodule.partitions.partitions_service import PartitionService
+
+log = logging.getLogger(__name__)
 
 
 @request_cached()
@@ -149,8 +156,10 @@ def get_course_outline_block_tree(request, course_id, user=None):
         """
         is_scored = block.get('has_score') and block.get('weight', 1) > 0
         is_graded = block.get('graded')
+        is_countable = block.get('type') not in ('lti', 'lti_consumer')
+        is_graded_problem = is_scored and is_graded and is_countable
 
-        num_graded_problems = 1 if is_scored and is_graded else 0
+        num_graded_problems = 1 if is_graded_problem else 0
         num_graded_problems += sum(recurse_num_graded_problems(child) for child in block.get('children', []))
 
         block['num_graded_problems'] = num_graded_problems
@@ -186,7 +195,9 @@ def get_course_outline_block_tree(request, course_id, user=None):
         'discussion',
         'drag-and-drop-v2',
         'poll',
-        'word_cloud'
+        'word_cloud',
+        'lti',
+        'lti_consumer',
     ]
     all_blocks = get_blocks(
         request,
@@ -266,8 +277,43 @@ def reset_deadlines_banner_should_display(course_key, request):
                 if display_reset_dates_banner:
                     break
                 for subsection in section.get('children', []):
-                    if (not subsection.get('complete', True)
-                            and subsection.get('due', timezone.now() + timedelta(1)) < timezone.now()):
+                    if str(course_key) == 'course-v1:BabsonX+BPET.ACCx+2T2018':
+                        log.info('**********DEBUGGING FOR RESET DATES BANNER FOR %s**********', request.user.username)
+                        log.info(u'ALL SUBSECTION INFO: %s', subsection)
+                        log.info(u'SUBSECTION COMPLETE: %s', subsection.get('complete', True))
+                        log.info(u'SUBSECTION GRADED: %s', subsection.get('graded', False))
+                        log.info(
+                            u'SUBSECTION PAST DUE: %s',
+                            subsection.get('due', timezone.now() + timedelta(1)) < timezone.now(),
+                        )
+                        log.info('*********END**********')
+                    if (
+                        not subsection.get('complete', True)
+                        and subsection.get('graded', False)
+                        and subsection.get('due', timezone.now() + timedelta(1)) < timezone.now()
+                    ):
                         display_reset_dates_banner = True
                         break
     return display_reset_dates_banner
+
+
+def can_show_verified_upgrade(user, course_id, enrollment):
+    """
+    Check if we are able to show verified upgrade message based
+    on the enrollment and current user partition
+    """
+    if not enrollment:
+        return False
+    partition_service = PartitionService(course_id)
+    enrollment_track_partition = partition_service.get_user_partition(ENROLLMENT_TRACK_PARTITION_ID)
+    group = partition_service.get_group(user, enrollment_track_partition)
+    current_mode = None
+    if group:
+        try:
+            current_mode = [
+                mode.get('slug') for mode in settings.COURSE_ENROLLMENT_MODES.values() if mode['id'] == group.id
+            ].pop()
+        except IndexError:
+            pass
+    upgradable_mode = not current_mode or current_mode in CourseMode.UPSELL_TO_VERIFIED_MODES
+    return upgradable_mode and verified_upgrade_link_is_valid(enrollment)

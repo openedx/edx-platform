@@ -59,7 +59,7 @@ class CourseOverview(TimeStampedModel):
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 9
+    VERSION = 11  # this one goes to eleven
 
     # Cache entry versioning.
     version = IntegerField()
@@ -261,6 +261,8 @@ class CourseOverview(TimeStampedModel):
                                 name=tab.name,
                                 course_staff_only=tab.course_staff_only,
                                 url_slug=tab.get('url_slug'),
+                                link=tab.get('link'),
+                                is_hidden=tab.get('is_hidden', False),
                                 course_overview=course_overview)
                             for tab in course.tabs
                         ])
@@ -862,6 +864,8 @@ class CourseOverviewTab(models.Model):
     name = models.TextField(null=True)
     course_staff_only = models.BooleanField(default=False)
     url_slug = models.TextField(null=True)
+    link = models.TextField(null=True)
+    is_hidden = models.BooleanField(default=False)
 
     def __str__(self):
         return self.tab_id

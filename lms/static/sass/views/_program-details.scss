@@ -4,7 +4,7 @@
 
 // +local variables/utilities:
 // ----------------------
-$btn-color-primary: palette(primary, dark);
+$btn-color-primary: $primary-dark;
 
 .program-details {
   .content-wrapper {
@@ -44,7 +44,7 @@ $btn-color-primary: palette(primary, dark);
   .breadcrumb-wrapper {
     padding: $full-width-banner-margin;
 
-    @media (min-width: $bp-screen-xl) {
+    @include media-breakpoint-up(xl) {
       padding-left: 0;
     }
   }
@@ -60,21 +60,21 @@ $btn-color-primary: palette(primary, dark);
     position: relative;
     font-size: font-size(x-small);
     line-height: line-height(x-small);
-    color: palette(grayscale, dark);
+    color: $gray-dark;
 
     &.active {
-      color: palette(grayscale, dark);
+      color: $gray-dark;
     }
   }
 
   .crumb-link {
     font-size: inherit;
     line-height: inherit;
-    color: palette(primary, base);
+    color: $primary-base;
 
     &:hover,
     &:focus {
-      color: palette(grayscale, black);
+      color: $gray-dark;
       text-decoration: underline;
     }
   }
@@ -102,7 +102,7 @@ $btn-color-primary: palette(primary, dark);
 
 .program-details-wrapper {
   .program-details-header {
-    background-color: $light-gray4;
+    background-color: $gray-light1;
     display: flex;
     color: black;
     font-family: 'Open Sans';
@@ -110,7 +110,7 @@ $btn-color-primary: palette(primary, dark);
     flex-wrap: wrap;
     padding: 40px 10px 35px;
 
-    @media (min-width: $bp-screen-md) {
+    @include media-breakpoint-up(md) {
       padding: {
         left: 30px;
         right: 30px;
@@ -127,7 +127,7 @@ $btn-color-primary: palette(primary, dark);
     .hd-1 {
       font-size: 1.5em;
 
-      @media (min-width: $bp-screen-md) {
+      @include media-breakpoint-up(md) {
         font-size: 2.375em;
       }
     }
@@ -143,8 +143,10 @@ $btn-color-primary: palette(primary, dark);
       }
 
       /* IE11 CSS styles */
-      @media (min-width: $bp-screen-md) and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-        height: 50px;
+      @include media-breakpoint-up(md) {
+        @media (-ms-high-contrast: none), (-ms-high-contrast: active) {
+          height: 50px;
+        }
       }
     }
 
@@ -152,7 +154,7 @@ $btn-color-primary: palette(primary, dark);
       fill: $micromasters-color;
       width: 200px;
 
-      @media (min-width: $bp-screen-md) {
+      @include media-breakpoint-up(md) {
         width: 250px;
       }
     }
@@ -161,7 +163,7 @@ $btn-color-primary: palette(primary, dark);
       fill: xseries-color;
       width: 150px;
 
-      @media (min-width: $bp-screen-md) {
+      @include media-breakpoint-up(md) {
         width: 200px;
       }
     }
@@ -170,7 +172,7 @@ $btn-color-primary: palette(primary, dark);
       fill: $professional-certificate-color;
       width: 250px;
 
-      @media (min-width: $bp-screen-md) {
+      @include media-breakpoint-up(md) {
         width: 300px;
       }
     }
@@ -179,11 +181,11 @@ $btn-color-primary: palette(primary, dark);
       margin: 0;
       display: block;
 
-      @media (min-width: $bp-screen-md) {
+      @include media-breakpoint-up(md) {
         width: 70%;
       }
 
-      @media (min-width: $bp-screen-lg) {
+      @include media-breakpoint-up(lg) {
         width: 75%;
       }
 
@@ -197,24 +199,24 @@ $btn-color-primary: palette(primary, dark);
       text-align: center;
       display: flex;
 
-      @media (min-width: $bp-screen-md) {
+      @include media-breakpoint-up(md) {
         display: block;
       }
 
       .heading {
         font-family: $font-family-sans-serif;
         font-weight: bold;
-        color: palette(primary, dark);
+        color: $primary-dark;
         font-size: 0.9375em;
         margin-top: auto;
         margin-bottom: auto;
 
-        @media (min-width: $bp-screen-md) {
+        @include media-breakpoint-up(md) {
           @include margin-right(10px 0 0 0);
         }
       }
 
-      @media (min-width: $bp-screen-md) {
+      @include media-breakpoint-up(md) {
         margin: initial;
         width: 30%;
 
@@ -226,7 +228,7 @@ $btn-color-primary: palette(primary, dark);
         }
       }
 
-      @media (min-width: $bp-screen-lg) {
+      @include media-breakpoint-up(lg) {
         width: 25%;
       }
     }
@@ -237,7 +239,7 @@ $btn-color-primary: palette(primary, dark);
     margin-bottom: 30px;
     padding: 30px 10px;
 
-    @media (min-width: $bp-screen-md) {
+    @include media-breakpoint-up(md) {
       @include float(left);
       padding: {
         left: 30px;
@@ -248,7 +250,7 @@ $btn-color-primary: palette(primary, dark);
       position: relative;
     }
 
-    @media (min-width: $bp-screen-lg) {
+    @include media-breakpoint-up(lg) {
       width: calc(100% - 510px);
       max-width: 700px;
     }
@@ -261,7 +263,7 @@ $btn-color-primary: palette(primary, dark);
   .course-list-heading {
     font-family: $font-family-sans-serif;
     font-weight: bold;
-    color: palette(primary, dark);
+    color: $primary-dark;
     font-size: 0.9375em;
     line-height: normal;
     padding-bottom: 5px;
@@ -287,7 +289,7 @@ $btn-color-primary: palette(primary, dark);
       font-size: 0.9375em;
       width: 310px;
 
-      @media (min-width: $bp-screen-sm) {
+      @include media-breakpoint-up(sm) {
         width: auto;
       }
 
@@ -312,7 +314,7 @@ $btn-color-primary: palette(primary, dark);
       font-family: $font-family-sans-serif;
       font-weight: 600;
       font-size: 1.3em;
-      color: palette(grayscale, base);
+      color: $gray-base;
       margin-bottom: 5px;
       line-height: normal;
     }
@@ -326,6 +328,7 @@ $btn-color-primary: palette(primary, dark);
     .view-course-button {
       background: $btn-color-primary;
       border-color: $btn-color-primary;
+      color: $white;
       height: 37px;
       padding: 7px 18.5px 0;
       width: auto;
@@ -335,11 +338,13 @@ $btn-color-primary: palette(primary, dark);
       margin-top: 5px;
 
       /* IE11 CSS styles */
-      @media (min-width: $bp-screen-md) and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-        @include float(right);
+      @include media-breakpoint-up(lg) {
+        @media (-ms-high-contrast: none), (-ms-high-contrast: active) {
+          @include float(right);
+        }
       }
 
-      @media (min-width: $bp-screen-lg) {
+      @include media-breakpoint-up(lg) {
         margin-top: 0;
       }
     }
@@ -347,20 +352,22 @@ $btn-color-primary: palette(primary, dark);
     .enroll-button {
       width: 100%;
 
-      @media (min-width: $bp-screen-sm) {
+      @include media-breakpoint-up(sm) {
         width: initial;
         margin-bottom: 0;
         margin-top: 17px;
       }
 
-      @media (min-width: $bp-screen-md) {
+      @include media-breakpoint-up(md) {
         width: initial;
         margin-top: 0;
         margin-bottom: 0;
       }
 
-      button, .enroll-course-button {
+      button,
+      .enroll-course-button {
         background-color: $btn-color-primary;
+        color: $white;
         height: 37px;
         width: 128px;
         padding: 0;
@@ -374,8 +381,10 @@ $btn-color-primary: palette(primary, dark);
         }
 
         /* IE11 CSS styles */
-        @media (min-width: $bp-screen-md) and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-          @include float(right);
+        @include media-breakpoint-up(md) {
+          @media (-ms-high-contrast: none), (-ms-high-contrast: active) {
+            @include float(right);
+          }
         }
       }
 
@@ -390,17 +399,17 @@ $btn-color-primary: palette(primary, dark);
       font-family: $font-family-sans-serif;
       font-weight: bold;
       font-size: 0.9375em;
-      color: palette(grayscale, base);
+      color: $gray-base;
       margin-top: 6px;
       display: block;
 
-      @media (min-width: $bp-screen-md) {
+      @include media-breakpoint-up(md) {
         display: inline;
       }
     }
 
     .run-select-container {
-      @media (min-width: $bp-screen-md) {
+      @include media-breakpoint-up(md) {
         margin-top: 8px;
         display: flex;
         flex-wrap: wrap;
@@ -415,23 +424,26 @@ $btn-color-primary: palette(primary, dark);
   }
 
   .upgrade-button {
-    background: palette(success, text);
-    border-color: palette(success, text);
+    background: theme-color("success");
+    border-color: theme-color("success");
+    color: $white;
     border-radius: 0;
     padding: 7px;
     text-align: center;
     font-size: 0.9375em;
 
     /* IE11 CSS styles */
-    @media (min-width: $bp-screen-md) and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-      @include float(right);
+    @include media-breakpoint-up(md) {
+      @media (-ms-high-contrast: none), (-ms-high-contrast: active) {
+        @include float(right);
+      }
     }
 
     &.complete-program {
       margin: 10px 15px 10px 5px;
       align-self: flex-start;
 
-      @media (min-width: $bp-screen-md) {
+      @include media-breakpoint-up(md) {
         align-self: flex-end;
       }
 
@@ -446,7 +458,7 @@ $btn-color-primary: palette(primary, dark);
     width: 100%;
     padding: 15px;
 
-    @media (min-width: $bp-screen-md) {
+    @include media-breakpoint-up(md) {
       height: auto;
     }
 
@@ -455,7 +467,7 @@ $btn-color-primary: palette(primary, dark);
       flex-direction: column;
       justify-content: space-between;
 
-      @media (min-width: $bp-screen-md) {
+      @include media-breakpoint-up(md) {
         flex-wrap: wrap;
       }
     }
@@ -472,7 +484,7 @@ $btn-color-primary: palette(primary, dark);
       width: 100%;
       float: none;
 
-      @media (min-width: $bp-screen-md) {
+      @include media-breakpoint-up(md) {
         display: table-cell;
         vertical-align: top;
         float: left;
@@ -484,25 +496,25 @@ $btn-color-primary: palette(primary, dark);
         margin: 0;
 
         .course-title-link,
-        .course-title-link:visited{
-          color: palette(primary, base);
+        .course-title-link:visited {
+          color: $primary-base;
           text-decoration: underline;
         }
       }
 
       .run-period,
       .info-expires-at {
-        color: palette(grayscale, base);
+        color: $gray-base;
         font-size: 0.9375em;
       }
 
       .course-text .enrolled {
-        color: palette(grayscale, base);
+        color: $gray-base;
       }
     }
 
     .course-meta-container {
-      @media (min-width: $bp-screen-md) {
+      @include media-breakpoint-up(md) {
         display: table;
         width: 100%;
       }
@@ -513,14 +525,14 @@ $btn-color-primary: palette(primary, dark);
     }
 
     .course-actions {
-      @media (min-width: $bp-screen-md) {
+      @include media-breakpoint-up(md) {
         width: 100%;
         text-align: right;
         float: right;
       }
 
       .course-enroll-view {
-        @media (min-width: $bp-screen-md) {
+        @include media-breakpoint-up(md) {
           text-align: right;
         }
       }
@@ -533,14 +545,14 @@ $btn-color-primary: palette(primary, dark);
 
     .final-grade {
       .grade-header {
-        color: palette(grayscale, base);
+        color: $gray-base;
         font-weight: bold;
       }
 
       .grade-display {
         padding-right: 15px;
         font-size: 1.5em;
-        color: palette(primary, accent);
+        color: $primary-accent;
       }
     }
 
@@ -551,7 +563,7 @@ $btn-color-primary: palette(primary, dark);
         width: 100%;
         margin: 5px 0;
 
-        @media (min-width: $bp-screen-md) {
+        @include media-breakpoint-up(md) {
           margin-left: auto;
           width: initial;
         }
@@ -561,11 +573,11 @@ $btn-color-primary: palette(primary, dark);
         padding-top: 0;
         width: initial;
 
-        @media (min-width: $bp-screen-sm) {
+        @include media-breakpoint-up(sm) {
           width: 300px;
         }
 
-        @media (min-width: $bp-screen-md) {
+        @include media-breakpoint-up(md) {
           width: initial;
         }
 
@@ -573,36 +585,35 @@ $btn-color-primary: palette(primary, dark);
           font-family: $font-family-sans-serif;
           font-weight: bold;
           font-size: 0.9375em;
-          color: palette(grayscale, base);
+          color: $gray-base;
           display: block;
 
-          @media (min-width: $bp-screen-sm) {
+          @include media-breakpoint-up(sm) {
             display: inline;
           }
         }
 
         .price {
-          color: palette(success, text);
+          color: theme-color("success");
           font-weight: bold;
         }
       }
-
     }
 
     .certificate-status {
       .fa-check-circle {
-        color: palette(success, text);
+        color: theme-color("success");
       }
 
       .card-msg {
         font-family: $font-family-sans-serif;
         font-weight: bold;
         font-size: 0.9375em;
-        color: palette(grayscale, base);
+        color: $gray-base;
       }
 
       .certificate-status-msg {
-        color: palette(grayscale, base);
+        color: $gray-base;
         font-size: 0.9375em;
       }
     }
@@ -612,12 +623,12 @@ $btn-color-primary: palette(primary, dark);
       padding-top: 5px;
       width: 300px;
 
-      @media (min-width: $bp-screen-sm) {
+      @include media-breakpoint-up(sm) {
         padding-top: 10px;
         width: 500px;
       }
 
-      @media (min-width: $bp-screen-md) {
+      @include media-breakpoint-up(md) {
         width: initial;
       }
     }
@@ -625,7 +636,7 @@ $btn-color-primary: palette(primary, dark);
     .expired-icon {
       @include float(left);
 
-      color: palette(primary, dark);
+      color: $primary-dark;
     }
 
     .expired-text {
@@ -650,7 +661,7 @@ $btn-color-primary: palette(primary, dark);
     font-size: 0.9375em;
     width: $baseline*15.5;
 
-    @media (min-width: $bp-screen-sm) {
+    @include media-breakpoint-up(sm) {
       width: auto;
     }
 
@@ -662,7 +673,7 @@ $btn-color-primary: palette(primary, dark);
   .divider-heading {
     font-family: $font-family-sans-serif;
     font-weight: bold;
-    color: palette(primary, dark);
+    color: $primary-dark;
     font-size: 0.9375em;
     line-height: normal;
     padding-bottom: $baseline*0.25;
@@ -686,11 +697,12 @@ $btn-color-primary: palette(primary, dark);
     @include margin-left($baseline*0.75);
 
     width: $baseline*15.5;
-    border-bottom: 1px solid $gray-l4;
+    border-bottom: 1px solid $gray-light3;
 
-    @media (min-width: $bp-screen-sm) {
-        width: auto;
+    @include media-breakpoint-up(sm) {
+      width: auto;
     }
+
     .pathway-info {
       margin: 15px 0;
       font-size: 0.9375em;
@@ -707,7 +719,7 @@ $btn-color-primary: palette(primary, dark);
     border-bottom: none;
   }
 
-  @media (min-width: $bp-screen-md) {
+  @include media-breakpoint-up(md) {
     @include float(right);
 
     width: $baseline*15;
@@ -715,7 +727,7 @@ $btn-color-primary: palette(primary, dark);
     position: relative;
   }
 
-  @media (min-width: $bp-screen-lg) {
+  @include media-breakpoint-up(lg) {
     width: $baseline*22.5;
 
     .program-progress {
@@ -731,11 +743,11 @@ $btn-color-primary: palette(primary, dark);
 .certificate-heading {
   margin-bottom: 10px;
 
-  @media (min-width: $bp-screen-md) {
+  @include media-breakpoint-up(md) {
     @include margin-right(30px);
   }
 
-  @media (min-width: $bp-screen-lg) {
+  @include media-breakpoint-up(lg) {
     @include margin-left(10px);
     @include margin-right(0);
   }
@@ -748,7 +760,7 @@ $btn-color-primary: palette(primary, dark);
   &:focus,
   &:hover {
     .program-cert {
-      border-color: $blue-d1;
+      border-color: $primary-dark1;
     }
   }
 }
@@ -757,11 +769,11 @@ $btn-color-primary: palette(primary, dark);
   width: 100%;
   border: 1px solid $divider-color;
 
-  @media (min-width: $bp-screen-md) {
+  @include media-breakpoint-up(md) {
     width: calc(100% - 30px);
   }
 
-  @media (min-width: $bp-screen-lg) {
+  @include media-breakpoint-up(lg) {
     width: 100%;
   }
 }
@@ -779,7 +791,7 @@ $btn-color-primary: palette(primary, dark);
     .image-link {
       flex: 0 0 100px;
 
-      @media (min-width: $bp-screen-md) {
+      @include media-breakpoint-up(md) {
         flex: 0 0 120px;
       }
     }
@@ -794,11 +806,11 @@ $btn-color-primary: palette(primary, dark);
       weight: 600;
     }
 
-    @media (min-width: $bp-screen-md) {
+    @include media-breakpoint-up(md) {
       font-size: 0.9em;
     }
 
-    @media (min-width: $bp-screen-lg) {
+    @include media-breakpoint-up(lg) {
       font-size: 1.1em;
     }
 
@@ -806,21 +818,21 @@ $btn-color-primary: palette(primary, dark);
     &:focus,
     &:hover {
       .sample-cert {
-        border-color: $blue-d1;
+        border-color: $primary-dark1;
       }
     }
   }
 
   .sample-cert {
     width: 120px;
-    border: 3px solid $gray-l3;
+    border: 3px solid $gray-light2;
     border-radius: 5px;
 
-    @media (min-width: $bp-screen-md) {
+    @include media-breakpoint-up(md) {
       width: 100px;
     }
 
-    @media (min-width: $bp-screen-lg) {
+    @include media-breakpoint-up(lg) {
       width: 120px;
     }
   }

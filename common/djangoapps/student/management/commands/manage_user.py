@@ -30,8 +30,6 @@ def is_valid_django_hash(encoded):
 
 
 class Command(BaseCommand):
-    # pylint: disable=missing-docstring
-
     help = 'Creates the specified user, if it does not exist, and sets its groups.'
 
     def add_arguments(self, parser):
@@ -135,7 +133,7 @@ class Command(BaseCommand):
         for group_name in groups or set():
 
             try:
-                group = Group.objects.get(name=group_name)  # pylint: disable=no-member
+                group = Group.objects.get(name=group_name)
                 new_groups.add(group)
             except Group.DoesNotExist:
                 # warn, but move on.

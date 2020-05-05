@@ -821,7 +821,8 @@ class VideoBlock(
 
         _ = self.runtime.service(self, "i18n").ugettext
         video_url.update({
-            'help': _('The URL for your video. This can be a YouTube URL or a link to an .mp4, .ogg, or .webm video file hosted elsewhere on the Internet.'),  # pylint: disable=line-too-long
+            'help': _('The URL for your video. This can be a YouTube URL or a link to an .mp4, .ogg, or '
+                      '.webm video file hosted elsewhere on the Internet.'),
             'display_name': _('Default Video URL'),
             'field_name': 'video_url',
             'type': 'VideoList',

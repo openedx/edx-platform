@@ -57,7 +57,7 @@ SUPPORT_INDEX_URLS = [
 
 
 @require_support_permission
-def index(request):  # pylint: disable=unused-argument
+def index(request):
     """Render the support index view. """
     context = {
         "urls": SUPPORT_INDEX_URLS

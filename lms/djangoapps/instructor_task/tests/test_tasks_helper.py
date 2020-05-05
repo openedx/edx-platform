@@ -26,7 +26,7 @@ from mock import ANY, MagicMock, Mock, patch
 from pytz import UTC
 from six import text_type
 from six.moves import range, zip
-from six.moves.urllib.parse import quote  # pylint: disable=import-error
+from six.moves.urllib.parse import quote
 from waffle.testutils import override_switch
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api

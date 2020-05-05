@@ -1,26 +1,20 @@
 """
 Tests for courseware API
 """
-from datetime import datetime
 import unittest
+from datetime import datetime
+
 import ddt
 import mock
-
 from django.conf import settings
 
-from lms.djangoapps.courseware.access_utils import (
-    ACCESS_DENIED,
-    ACCESS_GRANTED
-)
-from xmodule.modulestore.django import modulestore
-
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_SPLIT_MODULESTORE,
-    SharedModuleStoreTestCase
-)
-from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory
-from student.tests.factories import UserFactory
+from lms.djangoapps.courseware.access_utils import ACCESS_DENIED, ACCESS_GRANTED
+from lms.djangoapps.courseware.tabs import ExternalLinkCourseTab
 from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -40,6 +34,7 @@ class BaseCoursewareTests(SharedModuleStoreTestCase):
             emit_signals=True,
             modulestore=cls.store,
         )
+
         cls.user = UserFactory(
             username='student',
             email=u'user@example.com',
@@ -63,6 +58,15 @@ class CourseApiTestViews(BaseCoursewareTests):
     """
     Tests for the courseware REST API
     """
+    @classmethod
+    def setUpClass(cls):
+        BaseCoursewareTests.setUpClass()
+        cls.course.tabs.append(ExternalLinkCourseTab.load('external_link', name='Zombo', link='http://zombo.com'))
+        cls.course.tabs.append(
+            ExternalLinkCourseTab.load('external_link', name='Hidden', link='http://hidden.com', is_hidden=True)
+        )
+        cls.store.update_item(cls.course, cls.user.id)
+
     @ddt.data(
         (True, None, ACCESS_DENIED),
         (True, 'audit', ACCESS_DENIED),
@@ -85,7 +89,14 @@ class CourseApiTestViews(BaseCoursewareTests):
                 enrollment = response.data['enrollment']
                 assert enrollment_mode == enrollment['mode']
                 assert enrollment['is_active']
-                assert len(response.data['tabs']) == 4
+                assert len(response.data['tabs']) == 5
+                found = False
+                for tab in response.data['tabs']:
+                    if tab['type'] == 'external_link':
+                        assert tab['url'] != 'http://hidden.com', "Hidden tab is not hidden"
+                        if tab['url'] == 'http://zombo.com':
+                            found = True
+                assert found, 'external link not in course tabs'
             elif enable_anonymous and not logged_in:
                 # multiple checks use this handler
                 check_public_access.assert_called()

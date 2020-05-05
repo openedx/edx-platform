@@ -6,7 +6,6 @@ Helper functions for loading environment settings.
 import io
 import json
 import os
-import re
 import sys
 from time import sleep
 
@@ -273,25 +272,6 @@ class Env(object):
             sys.exit(1)
 
     @classmethod
-    def get_nested_django_setting(cls, django_setting, nested_django_setting, system, settings=None):
-        """
-        Interrogate Django environment for specific nested settings values
-        :param django_setting: the root django setting to get
-        :param nested_django_setting: the nested django setting to get
-        :param system: the django app to use when asking for the setting (lms | cms)
-        :param settings: the settings file to use when asking for the value
-        :return: unicode value of the django setting
-        """
-        django_setting_value = cls.get_django_setting(django_setting, system, settings)
-        pattern = re.compile(
-            u"[\"']{setting}[\"']: [\"'](?P<setting_value>.*?)[\"']".format(setting=nested_django_setting)
-        )
-        match = pattern.search(django_setting_value)
-        if match:
-            return match.group('setting_value')
-        return None
-
-    @classmethod
     def covered_modules(cls):
         """
         List the source modules listed in .coveragerc for which coverage
@@ -327,7 +307,7 @@ class Env(object):
         if not env_path.isfile():
             print(
                 u"Warning: could not find environment JSON file "
-                "at '{path}'".format(path=env_path),  # pylint: disable=unicode-format-string
+                "at '{path}'".format(path=env_path),
                 file=sys.stderr,
             )
             return dict()
@@ -340,7 +320,7 @@ class Env(object):
         except ValueError:
             print(
                 u"Error: Could not parse JSON "
-                "in {path}".format(path=env_path),  # pylint: disable=unicode-format-string
+                "in {path}".format(path=env_path),
                 file=sys.stderr,
             )
             sys.exit(1)
