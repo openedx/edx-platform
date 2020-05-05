@@ -160,13 +160,9 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
 
         cache.clear()
 
-    @patch(
-        'openedx.core.djangoapps.user_authn.views.password_reset.render_to_string',
-        Mock(side_effect=mock_render_to_string, autospec=True)
-    )
     def test_ratelimitted_from_same_ip_with_different_email(self):
         """
-        Test that password reset endpoint allow one request per minute per IP.
+        Test that password reset endpoint allow only one request per minute per IP.
         """
         cache.clear()
         good_req = self.request_factory.post('/password_reset/', {'email': 'thisdoesnotexist@foo.com'})
@@ -180,6 +176,34 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         bad_req.user = AnonymousUser()
         bad_resp = password_reset(bad_req)
         self.assertEqual(bad_resp.status_code, 403)
+
+        cache.clear()
+
+    def test_ratelimited_from_different_ips_with_same_email(self):
+        """
+        Test that password reset endpoint allow only one request per minute
+        per email address.
+        """
+        cache.clear()
+        good_req = self.request_factory.post('/password_reset/', {'email': 'thisdoesnotexist@foo.com'})
+        good_req.user = AnonymousUser()
+        good_resp = password_reset(good_req)
+        self.assertEqual(good_resp.status_code, 200)
+
+        # change the IP and verify that the rate limiter should kick in and
+        # give a Forbidden response if the request is for same email address.
+        new_ip = "8.8.8.8"
+        self.assertNotEqual(good_req.META.get('REMOTE_ADDR'), new_ip)
+
+        bad_req = self.request_factory.post(
+            '/password_reset/',
+            {'email': 'thisdoesnotexist@foo.com'},
+            REMOTE_ADDR=new_ip
+        )
+        bad_req.user = AnonymousUser()
+        bad_resp = password_reset(bad_req)
+        self.assertEqual(bad_resp.status_code, 403)
+        self.assertEqual(bad_req.META.get('REMOTE_ADDR'), new_ip)
 
         cache.clear()
 
