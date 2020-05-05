@@ -9,9 +9,6 @@ import crum
 import pytz
 from django.test import RequestFactory
 from mock import patch, Mock
-import mock
-from django.core.management import CommandError, call_command
-
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -145,13 +142,6 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
         self.request.user = self.enrollment.user
         self.enrollment.course_upgrade_deadline = self.now - datetime.timedelta(days=1)
         self.enrollment.save()
-
-        # point to the file where it's being called and should be mocked, not where it originates
-        # patcher = patch('lms.djangoapps.courseware.course_tools.CourseEnrollment.get_enrollment')
-        # mock_get_enrollment = patcher.start()
-        # self.addCleanup(patcher.stop)
-        # mock_get_enrollment().return_value = self.enrollment  # this one has course_upgrade_deadline populated
-
 
     def test_tool_visible_logged_in(self):
         self.course_financial_mode.save()
