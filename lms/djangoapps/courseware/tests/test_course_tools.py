@@ -9,7 +9,6 @@ import crum
 import pytz
 from django.test import RequestFactory
 from mock import patch, Mock
-from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.course_tools import FinancialAssistanceTool
