@@ -9,6 +9,8 @@ import crum
 import pytz
 from django.test import RequestFactory
 from mock import patch, Mock
+import mock
+from django.core.management import CommandError, call_command
 
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
@@ -166,18 +168,40 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
 
 # For this test we need to figure out get the upgrade_deadline set to the past (it's not set directly)
     def test_not_visible_when_upgrade_deadline_has_passed(self):
-
-        # we're not able to directly or indirectly update course_upgrade_deadline to be in the past
-        # So in FinancialAssistanceTool's is_enabled method, it calls CourseEnrollment.get_enrollment
-        # We need to mock that get_enrollment method so for this test, it returns the value we have in scope here for self.enrollment
+        # We can't update course_upgrade_deadline to be in the past (directly or indirectly update)
+        # In course_tools.py, FinancialAssistanceTool's "is_enabled" method calls CourseEnrollment.get_enrollment
+        # We need to mock CourseEnrollment.get_enrollment method to return (only in this test) an object we have in scope: self.enrollment 
         # (that value has self.enrollment.course_upgrade_deadline one day in the past)
 
-        #import pdb; pdb.set_trace()
+        # I'm trying patch mock based on this example: https://github.com/edx/edx-platform/blob/master/openedx/features/content_type_gating/tests/test_access.py#L788-L802
+        # use path to the file where it's called (course_tools), not where it originates
+        @patch(
+        'lms.djangoapps.courseware.course_tools.CourseEnrollment.get_enrollment',
+        Mock(return_value=self.enrollment)
+        ) 
+        def get_enrollment(self):
+            with patch.object(CourseEnrollment, '_get_enrollment', return_value='#'):
+                block_content = self.enrollment
 
-        self.assertFalse(FinancialAssistanceTool().is_enabled(self.request, self.course.id)) 
+            import pdb; pdb.set_trace()
+            assertFalse(FinancialAssistanceTool().is_enabled(block_content)) 
+           
+        # CODE ABOVE DOESN'T SEEM TO BE CALLED
+
+        #self.assertFalse(FinancialAssistanceTool().is_enabled(self.request, self.course.id)) 
 
 
+    # old reference notes (will remove when test is working)
 
+    # @mock.patch('lms.djangoapps.courseware.course_tools.CourseEnrollment.get_enrollment')
+    # def test_not_visible_when_upgrade_deadline_has_passed(self, mock):
+    #     """
+    #     Test that providing an invalid user in the course JSON will result in the appropriate error message
+    #     """
+    #     settings = {self.enrollment}
+    #     arg = settings
+    #     call_command("CourseEnrollment.get_enrollment", arg)
+    #     mock.warning.assert_any_call("invalid_user user does not exist")
 
 
 
