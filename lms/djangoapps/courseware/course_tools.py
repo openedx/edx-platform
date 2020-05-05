@@ -99,7 +99,6 @@ class FinancialAssistanceTool(CourseTool):
 
         # hide if there's a course_upgrade_enrollment in the past
         enrollment = CourseEnrollment.get_enrollment(request.user, course_key)
-
         if enrollment.course_upgrade_deadline:
             if datetime.datetime.now(pytz.UTC) > enrollment.course_upgrade_deadline:
                 return False

@@ -26,6 +26,7 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+
 class VerifiedUpgradeToolTest(SharedModuleStoreTestCase):
 
     @classmethod
@@ -107,6 +108,7 @@ class VerifiedUpgradeToolTest(SharedModuleStoreTestCase):
         self.course_verified_mode.save()
         self.assertFalse(VerifiedUpgradeTool().is_enabled(self.request, self.course.id))
 
+
 class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
@@ -141,7 +143,6 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
             course=self.course_overview,
         )
         self.request.user = self.enrollment.user
-
         self.enrollment.course_upgrade_deadline = self.now - datetime.timedelta(days=1)
         self.enrollment.save()
 
@@ -166,9 +167,8 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
         self.request.user = None;  
         self.assertFalse(FinancialAssistanceTool().is_enabled(self.request, self.course.id))
 
-# For this test we need to figure out get the upgrade_deadline set to the past (it's not set directly)
     def test_not_visible_when_upgrade_deadline_has_passed(self):
-        # We can't update course_upgrade_deadline to be in the past (directly or indirectly update)
+        # We can't update course_upgrade_deadline to be in the past (directly or indirectly)
         # In course_tools.py, FinancialAssistanceTool's "is_enabled" method calls CourseEnrollment.get_enrollment
         # We need to mock CourseEnrollment.get_enrollment method to return (only in this test) an object we have in scope: self.enrollment 
         # (that value has self.enrollment.course_upgrade_deadline one day in the past)
@@ -176,19 +176,23 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
         # I'm trying patch mock based on this example: https://github.com/edx/edx-platform/blob/master/openedx/features/content_type_gating/tests/test_access.py#L788-L802
         # use path to the file where it's called (course_tools), not where it originates
         @patch(
-        'lms.djangoapps.courseware.course_tools.CourseEnrollment.get_enrollment',
-        Mock(return_value=self.enrollment)
+            'lms.djangoapps.courseware.course_tools.CourseEnrollment.get_enrollment',
+            Mock(return_value=self.enrollment) 
         ) 
-        def get_enrollment(self):
-            with patch.object(CourseEnrollment, '_get_enrollment', return_value='#'):
-                block_content = self.enrollment
+        def test_get_enrollment(self):
+
+            with patch.object(CourseEnrollment, 'get_enrollment', return_value=self.enrollment):
+                # In example, block_content was used for the assertion- sounds like behavior only mocked in here
+                block_content = FinancialAssistanceTool().is_enabled(self.request, self.course.id)   # unclear on how this gets used- in example it's for the assertion, but not needed for True/False?
+            
+            assert block_content is False
 
             import pdb; pdb.set_trace()
-            assertFalse(FinancialAssistanceTool().is_enabled(block_content)) 
-           
-        # CODE ABOVE DOESN'T SEEM TO BE CALLED
+            mocked_result = FinancialAssistanceTool().is_enabled(self.request, self.course.id) 
+            assertFalse(mocked_result) 
+        # # CODE ABOVE DOESN'T SEEM TO BE CALLED
 
-        #self.assertFalse(FinancialAssistanceTool().is_enabled(self.request, self.course.id)) 
+        self.assertFalse(FinancialAssistanceTool().is_enabled(self.request, self.course.id)) 
 
 
     # old reference notes (will remove when test is working)
@@ -202,10 +206,6 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
     #     arg = settings
     #     call_command("CourseEnrollment.get_enrollment", arg)
     #     mock.warning.assert_any_call("invalid_user user does not exist")
-
-
-
-
 
 
         # Then in course.py, that's used to set upgrade_deadline:
@@ -242,9 +242,3 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
 
         #FinancialAssistanceTool().is_enabled(self.request, self.course.id)
         #TypeError: unorderable types: datetime.datetime() > MagicMock()
-        
-
-
-
-
-
