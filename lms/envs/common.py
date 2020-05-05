@@ -2321,6 +2321,8 @@ INSTALLED_APPS = [
     # edx-drf-extensions
     'csrf.apps.CsrfAppConfig',  # Enables frontend apps to retrieve CSRF tokens.
 
+    # Edly apps
+    'openedx.features.edly',
     'edly_panel_app',
 ]
 
