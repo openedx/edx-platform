@@ -1124,13 +1124,6 @@ class CourseEnrollment(models.Model):
         ordering = ('user', 'course')
 
     def __init__(self, *args, **kwargs):
-        if 'course_id' in kwargs:
-            course_id = kwargs['course_id']
-            if isinstance(course_id, str):
-                kwargs['course_id'] = CourseKey.from_string(course_id)
-                call_location = "\n".join("%30s : %s:%d" % (t[3], t[1], t[2]) for t in inspect.stack()[::-1])
-                log.warning("Forced to coerce course_id in CourseEnrollment instantiation: %s", call_location)
-
         super(CourseEnrollment, self).__init__(*args, **kwargs)
 
         # Private variable for storing course_overview to minimize calls to the database.
