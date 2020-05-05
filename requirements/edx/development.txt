@@ -21,6 +21,7 @@
 -e openedx/core/lib/xblock_builtin/xblock_discussion  # via -r requirements/edx/testing.txt
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive  # via -r requirements/edx/testing.txt
 -e common/lib/xmodule  # via -r requirements/edx/testing.txt
+-e git+https://github.com/edx/edx-drf-extensions.git@robrap/ARCHBOM-128-improve-auth-metrics#egg=edx-drf-extensions
 alabaster==0.7.12         # via sphinx
 amqp==1.4.9               # via -r requirements/edx/testing.txt, kombu
 analytics-python==1.2.9   # via -r requirements/edx/testing.txt
@@ -114,7 +115,7 @@ edx-completion==3.2.0     # via -r requirements/edx/testing.txt
 edx-django-release-util==0.4.4  # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==2.5.0  # via -r requirements/edx/testing.txt
 edx-django-utils==3.2.1   # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
-edx-drf-extensions==5.1.0  # via -r requirements/edx/testing.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
+#edx-drf-extensions==5.1.0  # via -r requirements/edx/testing.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
 edx-enterprise==3.2.1     # via -r requirements/edx/testing.txt
 edx-i18n-tools==0.5.0     # via -r requirements/edx/testing.txt, ora2
 edx-lint==1.4.1           # via -r requirements/edx/testing.txt
