@@ -14,7 +14,7 @@ from six.moves import range
 
 from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
-from openedx.core.djangoapps.schedules.management.commands import send_course_update as nudge
+from openedx.core.djangoapps.schedules.management.commands import send_course_next_section_update as nudge
 from openedx.core.djangoapps.schedules.management.commands.tests.send_email_base import (
     ExperienceTest,
     ScheduleSendEmailTestMixin
@@ -34,15 +34,15 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
     'openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
     "Can't test schedules if the app isn't installed",
 )
-class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, ModuleStoreTestCase):
+class TestSendCourseNextSectionUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, ModuleStoreTestCase):
     """
     Tests for django management command 'send_course_update'
     """
     __test__ = True
 
     # pylint: disable=protected-access
-    resolver = resolvers.CourseUpdateResolver
-    task = tasks.ScheduleCourseUpdate
+    resolver = resolvers.CourseNextSectionUpdateResolver
+    task = tasks.ScheduleCourseNextSectionUpdate
     deliver_task = tasks._course_update_schedule_send
     command = nudge.Command
     deliver_config = 'deliver_course_update'
@@ -53,7 +53,7 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
     queries_deadline_for_each_course = True
 
     def setUp(self):
-        super(TestSendCourseUpdate, self).setUp()
+        super(TestSendCourseNextSectionUpdate, self).setUp()
         self.highlights_patcher = patch('openedx.core.djangoapps.schedules.resolvers.get_week_highlights')
         mock_highlights = self.highlights_patcher.start()
         mock_highlights.return_value = [u'Highlight {}'.format(num + 1) for num in range(3)]
@@ -115,7 +115,7 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
     @patch('openedx.core.djangoapps.schedules.signals.get_current_site')
     def test_template_for_instructor_led_courses(self, mock_get_current_site):
         """
-        Test that InstructorLedCourseUpdate template is picked for instructor led
+        Test that InstructorLedCourseNextSectionUpdate template is picked for instructor led
         courses
         """
         offset, target_day, enrollment = self.prepare_course_data(mock_get_current_site, is_self_paced=False)

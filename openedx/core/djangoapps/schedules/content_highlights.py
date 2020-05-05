@@ -6,8 +6,6 @@ schedule experience built on the Schedules app.
 
 import logging
 
-from datetime import datetime, timedelta
-
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from openedx.core.lib.request_utils import get_request_or_stub

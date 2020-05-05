@@ -348,76 +348,6 @@ def _get_verified_upgrade_link(user, schedule):
         return verified_upgrade_deadline_link(user, enrollment.course)
 
 
-class CourseUpdateResolver(BinnedSchedulesBaseResolver):
-    """
-    Send a message to all users whose schedule started at ``self.current_date`` + ``day_offset`` and the
-    course has updates.
-    """
-    log_prefix = 'Course Update'
-    schedule_date_field = 'start_date'
-    num_bins = COURSE_UPDATE_NUM_BINS
-    experience_filter = Q(experience__experience_type=ScheduleExperience.EXPERIENCES.course_updates)
-
-    def send(self, msg_type):
-        for (user, language, context, is_self_paced) in self.schedules_for_bin():
-            msg_type = CourseUpdate() if is_self_paced else InstructorLedCourseUpdate()
-            msg = msg_type.personalize(
-                Recipient(
-                    user.username,
-                    self.override_recipient_email or user.email,
-                ),
-                language,
-                context,
-            )
-            with function_trace('enqueue_send_task'):
-                self.async_send_task.apply_async((self.site.id, str(msg)), retry=False)  # pylint: disable=no-member
-
-    def schedules_for_bin(self):
-        week_num = abs(self.day_offset) // 7
-        schedules = self.get_schedules_with_target_date_by_bin_and_orgs(
-            order_by='enrollment__course',
-        )
-
-        template_context = get_base_template_context(self.site)
-        for schedule in schedules:
-            enrollment = schedule.enrollment
-            course = schedule.enrollment.course
-            user = enrollment.user
-
-            try:
-                week_highlights = get_week_highlights(user, enrollment.course_id, week_num)
-            except CourseUpdateDoesNotExist:
-                LOG.warning(
-                    u'Weekly highlights for user {} in week {} of course {} does not exist or is disabled'.format(
-                        user, week_num, enrollment.course_id
-                    )
-                )
-                # continue to the next schedule, don't yield an email for this one
-            else:
-                unsubscribe_url = None
-                if (COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH.is_enabled() and
-                        'bulk_email_optout' in settings.ACE_ENABLED_POLICIES):
-                    unsubscribe_url = reverse('bulk_email_opt_out', kwargs={
-                        'token': UsernameCipher.encrypt(user.username),
-                        'course_id': str(enrollment.course_id),
-                    })
-
-                template_context.update({
-                    'course_name': schedule.enrollment.course.display_name,
-                    'course_url': _get_trackable_course_home_url(enrollment.course_id),
-
-                    'week_num': week_num,
-                    'week_highlights': week_highlights,
-
-                    # This is used by the bulk email optout policy
-                    'course_ids': [str(enrollment.course_id)],
-                    'unsubscribe_url': unsubscribe_url,
-                })
-                template_context.update(_get_upsell_information_for_schedule(user, schedule))
-
-                yield (user, schedule.enrollment.course.closest_released_language, template_context, course.self_paced)
-
-
 @attr.s
 class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
     """
@@ -434,11 +364,6 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
 
     def send(self):
         schedules = self.get_schedules()
-        LOG.info(
-            u'Found {} emails to send for course-key: {}'.format(
-                len(schedules), self.course_key
-            )
-        )
         for (user, language, context, is_self_paced) in schedules:
             msg_type = CourseUpdate() if is_self_paced else InstructorLedCourseUpdate()
             msg = msg_type.personalize(
