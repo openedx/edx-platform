@@ -8,8 +8,9 @@ import datetime
 import crum
 import pytz
 from django.test import RequestFactory
-from mock import patch
+from mock import patch, Mock
 
+from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.course_tools import FinancialAssistanceTool
@@ -125,15 +126,9 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
         self.course_financial_mode = CourseModeFactory(
             course_id=self.course.id,
             mode_slug=CourseMode.VERIFIED,
-            expiration_datetime=self.now + datetime.timedelta(days=30),
+            expiration_datetime=self.now + datetime.timedelta(days=1),
         )
-
-        patcher = patch('openedx.core.djangoapps.schedules.signals.get_current_site')
-        mock_get_current_site = patcher.start()
-        self.addCleanup(patcher.stop)
-        mock_get_current_site.return_value = SiteFactory.create()
-
-       # DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True) # not sure if this is doing anything
+        DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True) 
 
         self.request = RequestFactory().request()
         crum.set_current_request(self.request)
@@ -145,13 +140,18 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
         )
         self.request.user = self.enrollment.user
 
+        self.enrollment.course_upgrade_deadline = self.now - datetime.timedelta(days=1)
+        self.enrollment.save()
+
+        # point to the file where it's being called and should be mocked, not where it originates
+        # patcher = patch('lms.djangoapps.courseware.course_tools.CourseEnrollment.get_enrollment')
+        # mock_get_enrollment = patcher.start()
+        # self.addCleanup(patcher.stop)
+        # mock_get_enrollment().return_value = self.enrollment  # this one has course_upgrade_deadline populated
+
+
     def test_tool_visible_logged_in(self):
         self.course_financial_mode.save()
-        self.assertTrue(FinancialAssistanceTool().is_enabled(self.request, self.course.id))
-
-    def test_tool_visible_logged_out(self):
-        self.course_financial_mode.save()
-        self.request.user = None;
         self.assertTrue(FinancialAssistanceTool().is_enabled(self.request, self.course.id))
 
     def test_tool_not_visible_when_not_eligible(self):
@@ -159,12 +159,31 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
         self.course_overview.save()
         self.assertFalse(FinancialAssistanceTool().is_enabled(self.request, self.course_overview.id))
 
+    def test_tool_not_visible_when_user_not_unrolled(self):
+        self.course_financial_mode.save()
+        self.request.user = None;  
+        self.assertFalse(FinancialAssistanceTool().is_enabled(self.request, self.course.id))
 
 # For this test we need to figure out get the upgrade_deadline set to the past (it's not set directly)
     def test_not_visible_when_upgrade_deadline_has_passed(self):
-        # existing test used expiration_datetime- upgrade deadline is typically 10 days before the end date (is end date expiration?)
-        self.course_financial_mode.expiration_datetime = self.now - datetime.timedelta(days=1)
-        self.course_financial_mode.save()
+
+        # we're not able to directly or indirectly update course_upgrade_deadline to be in the past
+        # So in FinancialAssistanceTool's is_enabled method, it calls CourseEnrollment.get_enrollment
+        # We need to mock that get_enrollment method so for this test, it returns the value we have in scope here for self.enrollment
+        # (that value has self.enrollment.course_upgrade_deadline one day in the past)
+
+        #import pdb; pdb.set_trace()
+
+        self.assertFalse(FinancialAssistanceTool().is_enabled(self.request, self.course.id)) 
+
+
+
+
+
+
+
+
+
         # Then in course.py, that's used to set upgrade_deadline:
         #             upgrade_deadline = (verified_mode and verified_mode.expiration_datetime and
         #                        verified_mode.expiration_datetime.isoformat())
@@ -175,13 +194,33 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
         # there's also a verification deadline (for user photo check) 
         # verified upgrade deadline - is that the same as upgrade deadline?
 
-        # Or CourseEnrollment has course_upgrade_deadline (that's what gets checked in is_enabled)
-        # but once we're in there it's a month ahead
+        # ===when we update here, course_upgrade_deadline stays at 5/15 (no change)
+        # CourseEnrollment has course_upgrade_deadline (that's what gets checked in is_enabled)
+        # but once we're in there it's a month ahead, or None
+        # self.enrollment.course_upgrade_deadline = self.now - datetime.timedelta(days=1)
+        # self.enrollment.save()
 
-        self.enrollment.course_upgrade_deadline = self.now - datetime.timedelta(days=1)
-        self.enrollment.save()
+        # Mock enrollment to control the enrollment in course_tools (for course_upgrade_deadline)
+        # enrollment = Mock()
+        # Mock get_enrollment to return the result we made earlier
+        # get_enrollment(request.user, course_key).return_value = self.enrollment
 
-        import pdb; pdb.set_trace()
 
-        self.assertFalse(FinancialAssistanceTool().is_enabled(self.request, self.course.id))  # self.enrollment.course.id
+        # temporary, for troubleshooting 
+        #enrollment = CourseEnrollment.get_enrollment(self.enrollment.user, self.enrollment.course.id)
+        # is_enabled line moved here for simplification- (gives course_upgrade_deadline as 5/15 just like course_tools.py)
+        # what's difference?
+        #                            self.enrollment               get_enrollment result below
+        # course_upgrade_deadline       5/3                         5/15
+        # expiration_datetime           None                        5/15 (when left in place in setUp, otherwise None)
+
+        # If I set initial expiration date to tomorrow, value for course_upgrade_deadline is: 
+
+        #FinancialAssistanceTool().is_enabled(self.request, self.course.id)
+        #TypeError: unorderable types: datetime.datetime() > MagicMock()
+        
+
+
+
+
 
