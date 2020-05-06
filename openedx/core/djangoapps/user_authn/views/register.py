@@ -479,6 +479,10 @@ class RegistrationView(APIView):
                 address already exists
             HttpResponse: 403 operation not allowed
         """
+        if not pipeline.running(request):
+            # if request is not running a third-party auth pipeline
+            return HttpResponseForbidden("Not allowed to register")
+
         data = request.POST.copy()
         self._handle_terms_of_service(data)
 
