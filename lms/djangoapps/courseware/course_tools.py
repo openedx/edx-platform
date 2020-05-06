@@ -115,14 +115,14 @@ class FinancialAssistanceTool(CourseTool):
         return bool(course_overview.eligible_for_financial_aid)
 
     @classmethod
-    def title(cls):
+    def title(*args):
         """
         Returns the title of this tool.
         """
         return _('Learn about Financial Assistance')
 
     @classmethod
-    def icon_classes(cls):
+    def icon_classes(*args):
         """
         Returns the icon classes needed to represent this tool.
         """
