@@ -3,8 +3,8 @@
 
 import datetime
 
-from lms.djangoapps.commerce.utils import EcommerceService
 from pytz import utc
+from lms.djangoapps.commerce.utils import EcommerceService
 
 from course_modes.models import CourseMode
 
