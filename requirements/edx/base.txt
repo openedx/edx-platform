@@ -160,7 +160,7 @@ maxminddb==1.5.3          # via geoip2
 mock==3.0.5               # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.txt, xblock-drag-and-drop-v2, xblock-poll
 git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a#egg=MongoDBProxy==0.1.0+edx.2  # via -r requirements/edx/github.in
 mongoengine==0.10.0       # via -r requirements/edx/base.in
-more-itertools==8.2.0     # via -r requirements/edx/paver.txt, zipp
+more-itertools==8.2.0     # via -r requirements/edx/base.in, -r requirements/edx/paver.txt, zipp
 mpmath==1.1.0             # via sympy
 mysqlclient==1.4.6        # via -r requirements/edx/base.in
 newrelic==5.12.1.141      # via -r requirements/edx/base.in, edx-django-utils

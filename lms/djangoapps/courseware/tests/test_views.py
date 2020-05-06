@@ -273,7 +273,7 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 11, 170),
+        (ModuleStoreEnum.Type.mongo, 10, 170),
         (ModuleStoreEnum.Type.split, 4, 168),
     )
     @ddt.unpack
@@ -3187,55 +3187,47 @@ class DatesTabTestCase(ModuleStoreTestCase):
                 display_name='Released',
                 parent_location=section.location,
                 start=now - timedelta(days=1),
-                due=now,  # Setting this today so it'll show the 'Due Today' pill
+                due=now + timedelta(days=1),  # Setting this to tomorrow so it'll show the 'Due Next' pill
                 graded=True,
             )
 
-        with patch('lms.djangoapps.courseware.courses.get_dates_for_course') as mock_get_dates:
-            with patch('lms.djangoapps.courseware.views.views.get_enrollment') as mock_get_enrollment:
-                mock_get_dates.return_value = {
-                    (subsection.location, 'due'): subsection.due,
-                    (subsection.location, 'start'): subsection.start,
-                }
-                mock_get_enrollment.return_value = {
-                    'mode': enrollment.mode
-                }
-                response = self._get_response(self.course)
-                self.assertContains(response, subsection.display_name)
-                # Show the Verification Deadline for everyone
-                self.assertContains(response, 'Verification Deadline')
-                # Make sure pill exists for assignment due today
-                self.assertContains(response, '<div class="pill due">')
-                # No pills for verified enrollments
-                self.assertNotContains(response, '<div class="pill verified">')
+        with patch('lms.djangoapps.courseware.views.views.get_enrollment') as mock_get_enrollment:
+            mock_get_enrollment.return_value = {
+                'mode': enrollment.mode
+            }
+            response = self._get_response(self.course)
+            self.assertContains(response, subsection.display_name)
+            # Show the Verification Deadline for everyone
+            self.assertContains(response, 'Verification Deadline')
+            # Make sure pill exists for today's date
+            self.assertContains(response, '<div class="pill today">')
+            # Make sure pill exists for next due assignment
+            self.assertContains(response, '<div class="pill due-next">')
+            # No pills for verified enrollments
+            self.assertNotContains(response, '<div class="pill verified">')
 
-                enrollment.delete()
-                subsection.due = now + timedelta(days=1)
-                enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.AUDIT)
-                mock_get_dates.return_value = {
-                    (subsection.location, 'due'): subsection.due,
-                    (subsection.location, 'start'): subsection.start,
-                }
-                mock_get_enrollment.return_value = {
-                    'mode': enrollment.mode
-                }
+            enrollment.delete()
+            enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.AUDIT)
+            mock_get_enrollment.return_value = {
+                'mode': enrollment.mode
+            }
 
-                expected_calls = [
-                    call('course_id', text_type(self.course.id)),
-                    call('user_id', self.user.id),
-                    call('is_staff', self.user.is_staff),
-                ]
+            expected_calls = [
+                call('course_id', text_type(self.course.id)),
+                call('user_id', self.user.id),
+                call('is_staff', self.user.is_staff),
+            ]
 
-                response = self._get_response(self.course)
+            response = self._get_response(self.course)
 
-                mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
-                self.assertContains(response, subsection.display_name)
-                # Show the Verification Deadline for everyone
-                self.assertContains(response, 'Verification Deadline')
-                # Pill doesn't exist for assignment due tomorrow
-                self.assertNotContains(response, '<div class="pill due">')
-                # Should have verified pills for audit enrollments
-                self.assertContains(response, '<div class="pill verified">')
+            mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
+            self.assertContains(response, subsection.display_name)
+            # Show the Verification Deadline for everyone
+            self.assertContains(response, 'Verification Deadline')
+            # Pill doesn't exist for assignment due tomorrow
+            self.assertNotContains(response, '<div class="pill due-next">')
+            # Should have verified pills for audit enrollments
+            self.assertContains(response, '<div class="pill verified">')
 
 
 class TestShowCoursewareMFE(TestCase):
