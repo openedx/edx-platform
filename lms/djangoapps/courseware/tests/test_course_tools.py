@@ -105,6 +105,7 @@ class VerifiedUpgradeToolTest(SharedModuleStoreTestCase):
         self.course_verified_mode.save()
         self.assertFalse(VerifiedUpgradeTool().is_enabled(self.request, self.course.id))
 
+
 class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
     """
     Tests for FinancialAssistanceTool
