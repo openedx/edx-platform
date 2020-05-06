@@ -24,9 +24,13 @@ log = logging.getLogger(__name__)
 
 
 @request_cached()
-def get_course_outline_block_tree(request, course_id, user=None):
+def get_course_outline_block_tree(request, course_id, user=None, allow_start_dates_in_future=False):
     """
     Returns the root block of the course outline, with children as blocks.
+
+    allow_start_dates_in_future (bool): When True, will allow blocks to be
+            returned that can bypass the StartDateTransformer's filter to show
+            blocks with start dates in the future.
     """
 
     assert user is None or user.is_authenticated
@@ -204,6 +208,8 @@ def get_course_outline_block_tree(request, course_id, user=None):
             'children',
             'display_name',
             'type',
+            'start',
+            'contains_gated_content',
             'due',
             'graded',
             'has_score',
@@ -212,7 +218,8 @@ def get_course_outline_block_tree(request, course_id, user=None):
             'show_gated_sections',
             'format'
         ],
-        block_types_filter=block_types_filter
+        block_types_filter=block_types_filter,
+        allow_start_dates_in_future=allow_start_dates_in_future,
     )
 
     course_outline_root_block = all_blocks['blocks'].get(all_blocks['root'], None)
