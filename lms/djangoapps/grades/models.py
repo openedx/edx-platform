@@ -584,7 +584,10 @@ class PersistentCourseGrade(TimeStampedModel):
         Interleave different means of prefetching at your peril
         """
         cache = get_cache(cls._CACHE_NAMESPACE)
-        grades = cls.objects.filter(user_id=user.id, course_id__in=course_keys)
+        grades = cls.objects.filter(user_id=user.id)
+        # we don't want to generate huge WHERE course_id IN (...) clauses in SQL
+        if len(course_keys) < 100:
+            grades = grades.filter(course_id__in=course_keys)
         for grade in grades:
             cache[grade.course_id] = {
                 user.id: grade
