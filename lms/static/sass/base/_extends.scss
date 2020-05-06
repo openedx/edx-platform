@@ -100,7 +100,7 @@
 // ====================
 
 // needed utility extend for resetting poor basic <button> elem styling
-%ui-reset-button  {
+%ui-reset-button {
   border: none !important;
   box-shadow: none !important;
   background: transparent !important;
@@ -108,13 +108,13 @@
   letter-spacing: 0 !important;
   text-transform: none !important;
 
-  &:focus {
-    // outline: thin dotted !important;
-  }
+  // &:focus {
+  //   // outline: thin dotted !important;
+  // }
 }
 
 // light button reset
-%ui-clear-button  {
+%ui-clear-button {
   background: none;
   border-radius: ($baseline/4);
   box-shadow: none;
@@ -164,6 +164,6 @@
 // Adds a simple extend that indicates that this user interface element should not print
 %ui-print-excluded {
   @media print {
-    display:none;
+    display: none;
   }
 }

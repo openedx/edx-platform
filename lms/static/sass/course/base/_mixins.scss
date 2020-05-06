@@ -55,7 +55,9 @@
   font-weight: bold;
   line-height: 24px;
 
-  &:hover, &:focus, &:active {
+  &:hover,
+  &:focus,
+  &:active {
     box-shadow: 0 2px 1px $shadow;
   }
 }

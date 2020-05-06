@@ -3,7 +3,7 @@ div.book-wrapper {
   margin: 0 auto;
   width: 100%;
 
-  /*background-color: $white;*/
+  // background-color: $white;
 
   #open_close_accordion {
     display: none;
@@ -61,7 +61,8 @@ div.book-wrapper {
           padding: 0;
           color: theme-color("primary");
 
-          &:hover, &:focus {
+          &:hover,
+          &:focus {
             background-color: transparent;
             color: $uxpl-blue-hover-active;
 
@@ -76,7 +77,8 @@ div.book-wrapper {
           position: relative;
           top: 4px;
 
-          &:hover, &:focus {
+          &:hover,
+          &:focus {
             filter: alpha(opacity=60);
             opacity: 0.6;
           }
@@ -104,7 +106,7 @@ div.book-wrapper {
     @extend .content;
 
     padding: 0;
-    width:76%;
+    width: 76%;
 
     nav {
       @extend .clearfix;
@@ -142,12 +144,13 @@ div.book-wrapper {
             vertical-align: middle;
             width: 100%;
 
-            &:hover, &:focus {
+            &:hover,
+            &:focus {
               opacity: 1;
             }
 
             &.is-disabled {
-              display:none;
+              display: none;
             }
           }
 
@@ -166,7 +169,6 @@ div.book-wrapper {
               background-image: url('#{$static-path}/images/textbook/textbook-right.png');
             }
           }
-
         }
       }
 
@@ -197,7 +199,8 @@ div.book-wrapper {
         line-height: 1.6em;
         margin: ($baseline/4);
 
-        .Paragraph, h2 {
+        .Paragraph,
+        h2 {
           margin-top: ($baseline/2);
         }
       }

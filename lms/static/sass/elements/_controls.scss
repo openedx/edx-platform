@@ -266,7 +266,6 @@
   color: $white-t3;
   pointer-events: none;
   cursor: default;
-  pointer-events: none;
   box-shadow: none;
 
   &:hover,
@@ -364,7 +363,7 @@
 %btn-pl-primary-base {
   @extend %btn-pl-default-base;
 
-  background-color: darken($action-primary-bg,10%);
+  background-color: darken($action-primary-bg, 10%);
   color: $action-primary-fg;
 }
 

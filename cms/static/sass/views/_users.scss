@@ -4,7 +4,8 @@
 .view-team {
 
   // LAYOUT: page
-  .content-primary, .content-supplementary {
+  .content-primary,
+  .content-supplementary {
     @include box-sizing(border-box);
   }
 
@@ -32,7 +33,8 @@
 
     // CASE: notice has actions {
     &.has-actions {
-      .msg, .list-actions {
+      .msg,
+      .list-actions {
         display: inline-block;
         vertical-align: middle;
       }
@@ -47,9 +49,9 @@
         text-align: right;
         margin-top: 0;
 
-        .action-item {
+        // .action-item {
 
-        }
+        // }
 
         .action-primary {
           @extend %btn-primary-green;
@@ -69,7 +71,10 @@
   }
 
   // ELEM: listing of users
-  .user-list, .user-item, .item-metadata, .item-actions {
+  .user-list,
+  .user-item,
+  .item-metadata,
+  .item-actions {
     @include box-sizing(border-box);
   }
 
@@ -88,7 +93,8 @@
         margin-bottom: 0;
       }
 
-      .item-metadata, .item-actions {
+      .item-metadata,
+      .item-actions {
         display: inline-block;
         vertical-align: middle;
       }
@@ -133,7 +139,8 @@
 
         @include margin-right(flex-gutter());
 
-        .user-username, .user-email {
+        .user-username,
+        .user-email {
           display: inline-block;
           vertical-align: middle;
         }
@@ -222,18 +229,18 @@
       }
 
       // STATE: hover
-      &:hover {
-        .user-username {
-        }
+      // &:hover {
+      //   .user-username {
+      //   }
 
-        .user-email {
+      //   .user-email {
 
-        }
+      //   }
 
-        .item-actions {
+      //   .item-actions {
 
-        }
-      }
+      //   }
+      // }
     }
   }
 }

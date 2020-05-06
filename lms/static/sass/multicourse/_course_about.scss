@@ -16,7 +16,6 @@
     background: $course-profile-bg;
     background-image: $homepage-bg-image;
     background-size: cover;
-    box-shadow: 0 1px 80px 0 rgba(0, 0, 0, 0.5);
     border-bottom: 1px solid $border-color-3;
     box-shadow: inset 0 1px 5px 0 $shadow-l1;
     height: 100%;
@@ -88,7 +87,8 @@
               color: $body-color !important;
               letter-spacing: 0 !important;
 
-              &:hover, &:focus {
+              &:hover,
+              &:focus {
                 color: $link-color;
               }
             }
@@ -105,7 +105,8 @@
               text-shadow: 0 1px rgba(255, 255, 255, 0.6);
               text-transform: none;
 
-              &:hover, &:focus {
+              &:hover,
+              &:focus {
                 color: $link-color;
               }
             }
@@ -120,7 +121,9 @@
 
           width: flex-grid(12);
 
-          > a.find-courses, a.register, a.add-to-cart {
+          > a.find-courses,
+          a.register,
+          a.add-to-cart {
             @include button(shiny, $button-color);
             @include box-sizing(border-box);
 
@@ -132,7 +135,8 @@
             text-align: center;
             width: flex-grid(6);
 
-            &:hover, &:focus {
+            &:hover,
+            &:focus {
               color: rgb(255, 255, 255);
             }
 
@@ -142,7 +146,9 @@
           }
 
           a {
-            &:hover, &:visited, &:focus {
+            &:hover,
+            &:visited,
+            &:focus {
               text-decoration: none;
             }
           }
@@ -162,12 +168,14 @@
             text-align: center;
             width: flex-grid(3, 8);
 
-            &:hover, &:focus {
+            &:hover,
+            &:focus {
               color: rgb(255, 255, 255);
             }
           }
 
-          span.register, span.add-to-cart {
+          span.register,
+          span.add-to-cart {
             background: $button-archive-color;
             border: 1px solid darken($button-archive-color, 50%);
 
@@ -254,7 +262,8 @@
           }
         }
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           text-decoration: none;
 
           .play-intro {
@@ -367,7 +376,8 @@
         }
       }
 
-      .prerequisites, .syllabus {
+      .prerequisites,
+      .syllabus {
         ul {
           li {
             font: normal 1em/1.6em $serif;
@@ -481,7 +491,8 @@
         @include margin-right($baseline*0.75);
         @include padding-right(15px);
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           color: $lighter-base-font-color;
         }
       }
@@ -497,7 +508,8 @@
         z-index: 2;
         float: none;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           .sharing-message {
             opacity: 1;
             top: 56px;
@@ -535,7 +547,8 @@
           top: 65px;
           width: 220px;
 
-          &:hover, &:focus {
+          &:hover,
+          &:focus {
             opacity: 0;
           }
         }
@@ -555,7 +568,8 @@
 
           @include transition(all 0.15s linear 0s);
 
-          &:hover, &:focus {
+          &:hover,
+          &:focus {
             opacity: 1;
           }
 
@@ -585,7 +599,8 @@
         margin-bottom: $baseline;
         padding-bottom: ($baseline/2);
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           .icon {
             opacity: 1;
           }

@@ -183,6 +183,7 @@ footer#footer-edx-v3 {
     a {
       text-decoration: underline !important;
     }
+
     @include margin-left(8px);
     @include font-size(16);
     @include line-height(24px);
@@ -855,10 +856,10 @@ footer#footer-edx-v3 {
     &:hover,
     &:active,
     &:focus {
-        background: $m-blue-d3 !important;
-        color: white !important;
+      background: $m-blue-d3 !important;
+      color: white !important;
     }
-}
+  }
 
 
   @extend %ui-print-excluded;

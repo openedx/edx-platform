@@ -80,9 +80,9 @@
   background: $white;
 }
 
-.header-app {
+// .header-app {
 
-}
+// }
 
 // ------------------------------
 // #BANNER
@@ -112,7 +112,9 @@
   .message-actions .action {
 
     // STATE: hover, active, focus
-    &:hover, &:active, &:focus {
+    &:hover,
+    &:active,
+    &:focus {
       // customizations from UXPL
       color: palette(grayscale, dark);
     }
@@ -166,7 +168,8 @@
 .accomplishment-brief {
   @extend %depth-card;
 
-  .accomplishment-type-symbol, .accomplishment-details {
+  .accomplishment-type-symbol,
+  .accomplishment-details {
     display: inline-block;
     vertical-align: middle;
   }
@@ -224,7 +227,8 @@
     margin-bottom: spacing-vertical(base);
   }
 
-  .accomplishment-type-label, .accomplishment-type-symbol {
+  .accomplishment-type-label,
+  .accomplishment-type-symbol {
     display: block;
   }
 
@@ -266,11 +270,11 @@
     @extend %rendering-accomplishment-line;
   }
 
-  .accomplishment-course-org {
-  }
+  // .accomplishment-course-org {
+  // }
 
-  .accomplishment-course-name {
-  }
+  // .accomplishment-course-name {
+  // }
 
   .accomplishment-course-description {
     @extend %rendering-accomplishment-line;
@@ -306,7 +310,8 @@
       margin: 0 auto spacing-vertical(x-small) auto;
     }
 
-    .signatory-name, .signatory-credentials {
+    .signatory-name,
+    .signatory-credentials {
       @include text-align(center);
     }
 
@@ -315,7 +320,8 @@
     }
 
     .signatory-credentials {
-      .role, .organization {
+      .role,
+      .organization {
         white-space: pre-line;
         display: block;
       }
@@ -354,7 +360,8 @@
     }
   }
 
-  .recipient-img, .recipient-details {
+  .recipient-img,
+  .recipient-details {
     display: inline-block;
     vertical-align: middle;
   }
@@ -401,9 +408,9 @@
 // ------------------------------
 // #ACCOMPLISHMENT RELATED
 // ------------------------------
-.accomplishment-related {
+// .accomplishment-related {
 
-}
+// }
 
 .accomplishment-related-title {
   @extend %hd-subsection;
@@ -453,7 +460,8 @@
       color: $cert-base-color;
     }
 
-    .accomplishment-signatories-title, .accomplishment-orgs-title {
+    .accomplishment-signatories-title,
+    .accomplishment-orgs-title {
       color: $cert-decorative-color;
     }
 
@@ -461,8 +469,7 @@
     .accomplishment-statement,
     .accomplishment-statement-lead,
     .accomplishment-recipient,
-    .accomplishment-course,
-         {
+    .accomplishment-course {
       font-family: $font-family-serif;
     }
 
@@ -520,7 +527,6 @@
 
     .deco-corner-bl {
       @include triangle(20px, $cert-distinguished-color, down-right);
-
     }
 
     .deco-corner-br {
@@ -540,9 +546,9 @@
 // ------------------------------
 // #ABOUT
 // ------------------------------
-.about {
+// .about {
 
-}
+// }
 
 // ------------------------------
 // #FOOTER
@@ -602,7 +608,7 @@
       display: table;
     }
 
-    .image-container{
+    .image-container {
       // Lines the image up with the content of the above list.
       @include ltr {
         @include padding-left(2em);

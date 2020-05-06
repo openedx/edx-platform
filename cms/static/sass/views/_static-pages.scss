@@ -293,7 +293,8 @@
           vertical-align: bottom;
         }
 
-        &.action-duplicate, &.action-move {
+        &.action-duplicate,
+        &.action-move {
           display: none;
         }
       }
@@ -315,7 +316,7 @@
 
     .course-nav-item-header {
       display: inline-block;
-      width:80%;
+      width: 80%;
 
       .title {
         @extend %t-title4;

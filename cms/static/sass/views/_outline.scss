@@ -11,7 +11,8 @@
   // CASE: is-editable
   // TODO: abstract out
   .is-editable {
-    .incontext-editor-value, .incontext-editor-action-wrapper {
+    .incontext-editor-value,
+    .incontext-editor-action-wrapper {
       vertical-align: top;
     }
 
@@ -226,9 +227,9 @@
       margin-left: $baseline / 2;
     }
 
-    .status-release-label,	
-    .status-highlights-enabled-label {	
-      margin-right: ($baseline/4);	
+    .status-release-label,
+    .status-highlights-enabled-label {
+      margin-right: ($baseline/4);
     }
 
     .status-highlights-enabled-value.button {
@@ -253,9 +254,9 @@
   // --------------------
 
   // UI: simple version of the outline
-  .outline-simple {
+  // .outline-simple {
 
-  }
+  // }
 
   // UI: complex version of the outline
   .outline-complex {
@@ -270,10 +271,12 @@
       &.is-collapsible {
 
         // only select the current item's toggle expansion controls
-        &:nth-child(1) .ui-toggle-expansion, &:nth-child(1) .item-title {
+        &:nth-child(1) .ui-toggle-expansion,
+        &:nth-child(1) .item-title {
 
           // STATE: hover/active
-          &:hover, &:active {
+          &:hover,
+          &:active {
             color: $blue;
           }
         }
@@ -331,7 +334,8 @@
 
         width: flex-grid(6, 9);
 
-        .icon, .wrapper-section-title {
+        .icon,
+        .wrapper-section-title {
           display: inline-block;
           vertical-align: top;
         }
@@ -431,7 +435,8 @@
 
         width: flex-grid(5, 9);
 
-        .icon, .wrapper-subsection-title {
+        .icon,
+        .wrapper-subsection-title {
           display: inline-block;
           vertical-align: top;
         }
@@ -571,9 +576,9 @@
       margin-bottom: $baseline;
     }
 
-    .add-subsection {
+    // .add-subsection {
 
-    }
+    // }
 
     .add-unit {
       margin-left: $outline-indent-width;
@@ -716,7 +721,9 @@
 
 
         // TODO: refactor the _forms.scss partial to allow for this area to inherit from it
-        label, input, textarea {
+        label,
+        input,
+        textarea {
           display: block;
         }
 
@@ -734,7 +741,8 @@
         }
 
 
-        input, textarea {
+        input,
+        textarea {
           @extend %t-copy-base;
 
           @include transition(all $tmg-f2 ease-in-out 0s);
@@ -765,7 +773,8 @@
 
       // CASE: select input
       .field-select {
-        .label, .input {
+        .label,
+        .input {
           display: inline-block;
           vertical-align: middle;
         }
@@ -816,7 +825,8 @@
       text-transform: uppercase;
     }
 
-    .outline-unit .unit-title, .outline-unit .unit-status {
+    .outline-unit .unit-title,
+    .outline-unit .unit-status {
       display: inline-block;
       vertical-align: middle;
     }
@@ -832,7 +842,6 @@
 
       text-align: right;
     }
-
   }
 
   // it is the only element there
@@ -841,5 +850,4 @@
       margin-bottom: 0;
     }
   }
-
 }

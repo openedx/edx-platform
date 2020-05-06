@@ -4,7 +4,8 @@
 .view-export-git {
 
   // UI: basic layout
-  .content-primary, .content-supplementary {
+  .content-primary,
+  .content-supplementary {
     @include box-sizing(border-box);
 
     float: left;

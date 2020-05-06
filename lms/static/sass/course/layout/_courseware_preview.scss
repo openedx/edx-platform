@@ -1,4 +1,5 @@
 $proctoring-banner-text-size: 14px;
+
 .wrapper-preview-menu {
   @include clearfix();
 
@@ -192,6 +193,7 @@ $proctoring-banner-text-size: 14px;
         border-top-left-radius: 0;
         margin-right: 0;
       }
+
       h3 {
         display: inline;
         font-size: $proctoring-banner-text-size;
