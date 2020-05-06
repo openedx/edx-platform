@@ -122,7 +122,7 @@ class UserProfilePropertiesTest(CacheIsolationTestCase):
         self.profile.phone_number = '123!@#$%^&*'
         self.assertRaises(ValidationError, self.profile.full_clean)
         # valid phone number
-        self.profile.phone_number = '123456789'
+        self.profile.phone_number = '1234567890'
         try:
             self.profile.full_clean()
         except ValidationError:
