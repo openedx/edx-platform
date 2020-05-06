@@ -1237,7 +1237,7 @@ def xblock_view(request, course_id, usage_id, view_name):
     """
     if not settings.FEATURES.get('ENABLE_XBLOCK_VIEW_ENDPOINT', False):
         log.warning("Attempt to use deactivated XBlock view endpoint -"
-                 " see FEATURES['ENABLE_XBLOCK_VIEW_ENDPOINT']")
+                    " see FEATURES['ENABLE_XBLOCK_VIEW_ENDPOINT']")
         raise Http404
 
     try:

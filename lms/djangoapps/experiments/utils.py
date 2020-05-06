@@ -84,29 +84,29 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
     if enrollment:
         if course and enrollment.course_id != course.id:
             logger.warning(u'{} refers to a different course than {} which was supplied. Enrollment course id={}, '
-                        u'repr={!r}, deprecated={}. Course id={}, repr={!r}, deprecated={}.'
-                        .format(enrollment,
-                                course,
-                                enrollment.course_id,
-                                enrollment.course_id,
-                                enrollment.course_id.deprecated,
-                                course.id,
-                                course.id,
-                                course.id.deprecated
-                                )
-                        )
+                           u'repr={!r}, deprecated={}. Course id={}, repr={!r}, deprecated={}.'
+                           .format(enrollment,
+                                   course,
+                                   enrollment.course_id,
+                                   enrollment.course_id,
+                                   enrollment.course_id.deprecated,
+                                   course.id,
+                                   course.id,
+                                   course.id.deprecated
+                                   )
+                           )
             return (None, None, None)
 
         if enrollment.user_id != user.id:
             logger.warning(u'{} refers to a different user than {} which was supplied. Enrollment user id={}, repr={!r}. '
-                        u'User id={}, repr={!r}.'.format(enrollment,
-                                                         user,
-                                                         enrollment.user_id,
-                                                         enrollment.user_id,
-                                                         user.id,
-                                                         user.id,
-                                                         )
-                        )
+                           u'User id={}, repr={!r}.'.format(enrollment,
+                                                            user,
+                                                            enrollment.user_id,
+                                                            enrollment.user_id,
+                                                            user.id,
+                                                            user.id,
+                                                            )
+                           )
             return (None, None, None)
 
     if enrollment is None:
