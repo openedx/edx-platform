@@ -98,7 +98,8 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
             return (None, None, None)
 
         if enrollment.user_id != user.id:
-            logger.warning(u'{} refers to a different user than {} which was supplied. Enrollment user id={}, repr={!r}. '
+            logger.warning(u'{} refers to a different user than {} which was supplied. '
+                           u'Enrollment user id={}, repr={!r}. '
                            u'User id={}, repr={!r}.'.format(enrollment,
                                                             user,
                                                             enrollment.user_id,
