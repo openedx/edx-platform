@@ -3,7 +3,7 @@
 .view-group-configurations {
   .content-primary,
   .content-supplementary {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     @include float(left);
   }
 
@@ -129,7 +129,7 @@
           width: 70%;
 
           li {
-            @include box-sizing(border-box);
+            box-sizing: border-box;
             @include margin-right(1%);
 
             display: table-cell;
@@ -153,7 +153,7 @@
           width: 70%;
 
           li {
-            @include box-sizing(border-box);
+            box-sizing: border-box;
             @include margin-right(1%);
 
             display: table-cell;
@@ -288,7 +288,7 @@
       }
 
       .collection-edit {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
 
         border-radius: 2px;
         width: 100%;

@@ -55,7 +55,7 @@
 
       // UI: individual course item
       .course {
-        @include box-sizing(box);
+        box-sizing: box;
         @include transition(all 0.15s linear 0s);
         @include clearfix();
 
@@ -73,7 +73,7 @@
             overflow: hidden;
 
             .cover {
-              @include box-sizing(border-box);
+              box-sizing: border-box;
               @include transition(all 0.15s linear 0s);
               @include float(left);
 
@@ -227,7 +227,7 @@
 
             // UI: course item actions
             .action {
-              @include box-sizing(border-box);
+              box-sizing: border-box;
               @include margin-right($baseline/2);
               @include float(right);
 
@@ -299,7 +299,7 @@
                 .actions-dropdown-list {
                   @extend %ui-no-list;
 
-                  @include box-sizing(border-box);
+                  box-sizing: border-box;
 
                   display: table;
                   box-shadow: 0 1px 1px $shadow-l1;
@@ -376,7 +376,7 @@
             width: flex-grid(8);
 
             @include float(left);
-            @include box-sizing(border-box);
+            box-sizing: border-box;
 
             p {
               color: $lighter-base-font-color;
@@ -892,7 +892,7 @@
           }
 
           .btn {
-            @include box-sizing(border-box);
+            box-sizing: border-box;
             @include float(left);
 
             border-radius: 3px;
@@ -1007,7 +1007,7 @@
           .action-certificate .btn {
             @extend %btn-inherited-primary;
 
-            @include box-sizing(border-box);
+            box-sizing: border-box;
 
             padding: 7px $baseline*0.75;
             float: none;
@@ -1158,7 +1158,7 @@
     border: 1px solid theme-color('primary');
     box-shadow: 0 1px 8px 0 $shadow-l1;
 
-    @include box-sizing(border-box);
+    box-sizing: border-box;
 
     color: $white;
     font-family: $font-family-sans-serif;
@@ -1391,7 +1391,7 @@ p.course-block {
 }
 
 .enter-course-blocked {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   @include float(right);
 
   display: block;

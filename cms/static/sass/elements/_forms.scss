@@ -33,7 +33,7 @@ input[type="text"],
 input[type="email"],
 input[type="password"],
 textarea.text {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   @include linear-gradient($gray-l5, $white);
 
   @extend %t-copy-sub2;
@@ -143,7 +143,7 @@ form {
   }
 
   .note {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
 
     // note with actions
     &.has-actions {
@@ -449,7 +449,7 @@ form {
 input.search {
   padding: 6px 15px 8px 30px;
 
-  @include box-sizing(border-box);
+  box-sizing: border-box;
 
   border: 1px solid $darkGrey;
   border-radius: 20px;
@@ -486,7 +486,7 @@ code {
   min-height: 80px;
   padding: 10px;
 
-  @include box-sizing(border-box);
+  box-sizing: border-box;
 
   border: 1px solid $mediumGrey;
 

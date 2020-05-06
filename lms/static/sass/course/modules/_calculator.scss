@@ -68,7 +68,7 @@
     form {
       @extend .clearfix;
 
-      @include box-sizing(border-box);
+      box-sizing: border-box;
 
       padding: lh();
 
@@ -82,7 +82,7 @@
         border-radius: 0;
         box-shadow: none;
 
-        @include box-sizing(border-box);
+        box-sizing: border-box;
 
         color: $black;
         float: left;
@@ -113,7 +113,7 @@
         border: 1px solid $white;
         box-shadow: none;
 
-        @include box-sizing(border-box);
+        box-sizing: border-box;
 
         color: $black;
         float: left;
@@ -148,7 +148,7 @@
           border: none;
           box-shadow: none;
 
-          @include box-sizing(border-box);
+          box-sizing: border-box;
 
           font-size: 16px;
           padding: 10px;

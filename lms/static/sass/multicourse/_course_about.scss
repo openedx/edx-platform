@@ -28,7 +28,7 @@
       border: 1px solid $border-color-3;
       box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
 
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       @include clearfix();
 
       margin: 0 auto;
@@ -47,7 +47,7 @@
       }
 
       .intro {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         @include clearfix();
 
         display: table-cell;
@@ -125,7 +125,7 @@
           a.register,
           a.add-to-cart {
             @include button(shiny, $button-color);
-            @include box-sizing(border-box);
+            box-sizing: border-box;
 
             border-radius: 3px;
             display: block;
@@ -155,7 +155,7 @@
 
           strong {
             @include button(shiny, $button-color);
-            @include box-sizing(border-box);
+            box-sizing: border-box;
 
             border-radius: 3px;
             display: block;
@@ -179,7 +179,7 @@
             background: $button-archive-color;
             border: 1px solid darken($button-archive-color, 50%);
 
-            @include box-sizing(border-box);
+            box-sizing: border-box;
 
             color: darken($button-archive-color, 50%);
             display: block;
@@ -208,7 +208,7 @@
       .media {
         background: transparent;
 
-        @include box-sizing(border-box);
+        box-sizing: border-box;
 
         display: table-cell;
         padding: 20px;
@@ -411,7 +411,7 @@
 
   .course-sidebar {
     @include media-breakpoint-up(dm) {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       @include float(left);
 
       width: flex-grid(4);
@@ -498,7 +498,7 @@
       }
 
       .social-sharing {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         @include float(left);
 
         height: 44px;
@@ -524,7 +524,7 @@
           border-radius: 4px;
           box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
 
-          @include box-sizing(border-box);
+          box-sizing: border-box;
 
           color: rgb(255, 255, 255);
 

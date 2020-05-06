@@ -209,7 +209,7 @@ div.problem {
   width: 100px;
 
   label {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
 
     display: inline-block;
     clear: both;
@@ -231,7 +231,7 @@ div.problem {
   }
 
   fieldset {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
   }
 
   input[type="radio"],
@@ -775,7 +775,7 @@ div.problem {
 .problem {
   .capa_inputtype.textline, .inputtype.formulaequationinput {
     input {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
 
       border: 2px solid $gray-l4;
       border-radius: 3px;
@@ -1284,7 +1284,7 @@ div.problem {
 
       a.full {
         @include position(absolute, 0 0 1px 0);
-        @include box-sizing(border-box);
+        box-sizing: border-box;
 
         display: block;
         padding: ($baseline/5);

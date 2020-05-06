@@ -736,7 +736,7 @@
 
       .member-list-widget {
         .header {
-          @include box-sizing(border-box);
+          box-sizing: border-box;
           @include border-top-radius(3);
 
           position: relative;
@@ -758,7 +758,7 @@
         }
 
         .info {
-          @include box-sizing(border-box);
+          box-sizing: border-box;
 
           padding: ($baseline/2);
           border: 1px solid $light-gray;
@@ -768,7 +768,7 @@
         }
 
         .member-list {
-          @include box-sizing(border-box);
+          box-sizing: border-box;
 
           table {
             width: 100%;
@@ -797,7 +797,7 @@
         }
 
         .bottom-bar {
-          @include box-sizing(border-box);
+          box-sizing: border-box;
           @include border-bottom-radius(3);
 
           position: relative;
