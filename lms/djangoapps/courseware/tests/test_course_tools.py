@@ -106,6 +106,9 @@ class VerifiedUpgradeToolTest(SharedModuleStoreTestCase):
 
 
 class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
+    """
+    Tests for FinancialAssistanceTool
+    """
     @classmethod
     def setUpClass(cls):
         super(FinancialAssistanceToolTest, cls).setUpClass()
