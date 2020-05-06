@@ -49,10 +49,6 @@
         text-align: right;
         margin-top: 0;
 
-        // .action-item {
-
-        // }
-
         .action-primary {
           @extend %btn-primary-green;
 
@@ -227,20 +223,6 @@
           color: inherit;
         }
       }
-
-      // STATE: hover
-      // &:hover {
-      //   .user-username {
-      //   }
-
-      //   .user-email {
-
-      //   }
-
-      //   .item-actions {
-
-      //   }
-      // }
     }
   }
 }

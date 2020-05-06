@@ -72,10 +72,6 @@
 
     // course details that should appear more like content than elements to change
     .is-not-editable {
-      // label {
-
-      // }
-
       input,
       textarea {
         @extend %t-copy-lead1;
@@ -123,15 +119,6 @@
     legend {
       width: 100%;
     }
-
-    // basic layout/elements
-    // .title-2 {
-
-    // }
-
-    // .title-3 {
-
-    // }
 
     // in form  -UI hints/tips/messages
     .header-help {
@@ -261,12 +248,6 @@
           @include size(100%, 100%);
 
           padding: ($baseline/2);
-
-          // &.long {
-          // }
-
-          // &.short {
-          // }
 
           &.error {
             border-color: $red;
@@ -754,10 +735,6 @@
                   display: block;
                 }
               }
-
-              // &.is-dragging {
-
-              // }
 
               .remove-button {
                 @extend %t-action5;

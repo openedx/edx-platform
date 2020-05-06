@@ -564,10 +564,6 @@
         margin-right: ($baseline/4);
         line-height: 3rem;
       }
-
-      // .copy {
-
-      // }
     }
   }
 
@@ -948,10 +944,6 @@
   .wrapper-prompt {
     visibility: hidden;
     pointer-events: none;
-
-    // .prompt {
-
-    // }
   }
 
   // prompt showing
@@ -974,9 +966,6 @@
       }
     }
   }
-
-  // alert showing/hiding done by jQuery
-  // .wrapper-alert { }
 
   // notification showing/hiding
   .wrapper-notification {
@@ -1127,7 +1116,7 @@ body.uxdesign.alerts {
     border-radius: 3px;
     border: 1px solid #edbd3c;
     background: #fbf6e1;
-    // background: #edbd3c;
+
     @include clearfix();
 
     .alert-message {
