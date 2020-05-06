@@ -8,11 +8,12 @@ import datetime
 import pytz
 from crum import get_current_request
 from django.utils.translation import ugettext as _
-
+from django.urls import reverse
 from course_modes.models import CourseMode
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from openedx.features.course_experience.course_tools import CourseTool
 from student.models import CourseEnrollment
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 
 class VerifiedUpgradeTool(CourseTool):
@@ -73,3 +74,63 @@ class VerifiedUpgradeTool(CourseTool):
         """
         request = get_current_request()
         return verified_upgrade_deadline_link(request.user, course_id=course_key)
+
+
+class FinancialAssistanceTool(CourseTool):
+    """
+    The financial assistance tool.
+    """
+    @classmethod
+    def analytics_id(cls):
+        """
+        Returns an id to uniquely identify this tool in analytics events.
+        """
+        return 'edx.tool.financial_assistance'
+
+    @classmethod
+    def is_enabled(cls, request, course_key):
+        """
+        Show this link for active courses where financial assistance is available, unless upgrade deadline has passed
+        """
+        now = datetime.datetime.now(pytz.UTC)
+        try:
+            course_overview = CourseOverview.objects.get(id=course_key)
+        except CourseOverview.DoesNotExist:
+            course_overview = None
+
+        # hide the link for archived courses
+        if course_overview is not None and course_overview.end_date is not None and now > course_overview.end_date:
+            return False
+
+        # hide the link if not logged in or user not enrolled in the course
+        if not request.user or not CourseEnrollment.is_enrolled(request.user, course_key):
+            return False
+
+        # hide if there's a course_upgrade_enrollment in the past
+        enrollment = CourseEnrollment.get_enrollment(request.user, course_key)
+        if enrollment.course_upgrade_deadline:
+            if now > enrollment.course_upgrade_deadline:
+                return False
+
+        return True if course_overview.eligible_for_financial_aid else False
+
+    @classmethod
+    def title(cls):
+        """
+        Returns the title of this tool.
+        """
+        return _('Learn about Financial Assistance')
+
+    @classmethod
+    def icon_classes(cls):
+        """
+        Returns the icon classes needed to represent this tool.
+        """
+        return 'fa fa-info'
+
+    @classmethod
+    def url(cls, course_key):
+        """
+        Returns the URL for this tool for the specified course key.
+        """
+        return reverse('financial_assistance')
