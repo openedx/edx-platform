@@ -11,6 +11,7 @@ from django.views.generic import TemplateView
 from provider.oauth2.models import Client
 from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
+from openedx.features.edly.cookies import delete_logged_in_edly_cookies
 
 
 class LogoutView(TemplateView):
@@ -65,6 +66,7 @@ class LogoutView(TemplateView):
 
         # Clear the cookie used by the edx.org marketing site
         delete_logged_in_cookies(response)
+        delete_logged_in_edly_cookies(response)
 
         return response
 
