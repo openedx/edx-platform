@@ -11,7 +11,7 @@ from django.conf import settings
 from mock import DEFAULT, Mock, patch
 
 from openedx.core.djangoapps.schedules.resolvers import DEFAULT_NUM_BINS
-from openedx.core.djangoapps.schedules.tasks import ScheduleMessageBaseTask
+from openedx.core.djangoapps.schedules.tasks import BinnedScheduleMessageBaseTask
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
@@ -21,13 +21,13 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_un
 @skip_unless_lms
 @skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
             "Can't test schedules if the app isn't installed")
-class TestScheduleMessageBaseTask(CacheIsolationTestCase):
+class TestBinnedScheduleMessageBaseTask(CacheIsolationTestCase):
     def setUp(self):
-        super(TestScheduleMessageBaseTask, self).setUp()
+        super(TestBinnedScheduleMessageBaseTask, self).setUp()
 
         self.site = SiteFactory.create()
         self.schedule_config = ScheduleConfigFactory.create(site=self.site)
-        self.basetask = ScheduleMessageBaseTask
+        self.basetask = BinnedScheduleMessageBaseTask
 
     def test_send_enqueue_disabled(self):
         send = Mock(name='async_send_task')
