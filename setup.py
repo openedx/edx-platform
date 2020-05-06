@@ -42,6 +42,7 @@ setup(
             "course_updates = openedx.features.course_experience.plugins:CourseUpdatesTool",
             "course_reviews = openedx.features.course_experience.plugins:CourseReviewsTool",
             "verified_upgrade = lms.djangoapps.courseware.course_tools:VerifiedUpgradeTool",
+            "financial_assistance = lms.djangoapps.courseware.course_tools:FinancialAssistanceTool",
         ],
         "openedx.user_partition_scheme": [
             "random = openedx.core.djangoapps.user_api.partition_schemes:RandomUserPartitionScheme",
@@ -49,7 +50,6 @@ setup(
             "verification = openedx.core.djangoapps.user_api.partition_schemes:ReturnGroup1PartitionScheme",
             "enrollment_track = openedx.core.djangoapps.verified_track_content.partition_scheme:EnrollmentTrackPartitionScheme",
             "content_type_gate = openedx.features.content_type_gating.partitions:ContentTypeGatingPartitionScheme",
-            "financial_assistance = lms.djangoapps.courseware.course_tools:FinancialAssistanceTool",
         ],
         "openedx.block_structure_transformer": [
             "library_content = lms.djangoapps.course_blocks.transformers.library_content:ContentLibraryTransformer",

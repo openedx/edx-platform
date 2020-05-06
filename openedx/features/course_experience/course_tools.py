@@ -48,14 +48,14 @@ class CourseTool(object):
         return True
 
     @classmethod
-    def title(cls, course_key):
+    def title(*args):
         """
         Returns the title for the course tool.
         """
         raise NotImplementedError("Must specify a title for a course tool.")
 
     @classmethod
-    def icon_classes(cls, course_key):
+    def icon_classes(*args):
         """
         Returns the icon classes needed to represent this tool.
 
