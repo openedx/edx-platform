@@ -35,7 +35,6 @@
   // UI: xblock header primary for main title and xblock actions
   .xblock-header-primary {
     box-sizing: border-box;
-
     border-bottom: 1px solid $gray-l4;
     border-radius: ($baseline/5) ($baseline/5) 0 0;
     min-height: ($baseline*2.5);
@@ -542,7 +541,6 @@
       @extend %t-strong;
 
       box-sizing: border-box;
-
       display: inline-block;
       padding: ($baseline/2);
       width: 49%;
@@ -555,7 +553,6 @@
       @extend %t-strong;
 
       box-sizing: border-box;
-
       display: inline-block;
       padding: ($baseline/2);
       width: 49%;

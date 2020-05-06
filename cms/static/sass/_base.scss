@@ -70,8 +70,8 @@ h1 {
 
 .wrapper {
   @include clearfix();
-  box-sizing: border-box;
 
+  box-sizing: border-box;
   width: 100%;
 }
 
@@ -674,8 +674,8 @@ hr.divider {
 // lean/simple modal window
 .content-modal {
   @include border-bottom-radius(2px);
-  box-sizing: border-box;
 
+  box-sizing: border-box;
   position: relative;
   display: none;
   width: 700px;
@@ -715,7 +715,6 @@ hr.divider {
 
   img {
     box-sizing: border-box;
-
     width: 100%;
     overflow-y: scroll;
     padding: ($baseline/10);

@@ -151,7 +151,6 @@
 // extends - content - text overflow by ellipsis
 %cont-truncated {
   box-sizing: border-box;
-
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

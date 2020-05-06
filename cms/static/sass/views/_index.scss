@@ -11,7 +11,6 @@
     .wrapper-content-features,
     .wrapper-content-cta {
       box-sizing: border-box;
-
       margin: 0;
       padding: 0 $baseline;
       position: relative;
@@ -140,14 +139,12 @@
 
         .img {
           box-sizing: border-box;
-
           float: left;
           width: flex-grid(3, 12);
           margin-right: flex-gutter();
 
           a {
             box-sizing: border-box;
-
             box-shadow: 0 1px ($baseline/10) $shadow-l1;
             position: relative;
             top: 0;
@@ -229,6 +226,7 @@
 
             .proofpoint {
               box-sizing: border-box;
+
               @include transition(all $tmg-f2 ease-in-out 0s);
 
               border-radius: ($baseline/4);

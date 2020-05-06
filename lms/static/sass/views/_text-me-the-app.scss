@@ -1,5 +1,6 @@
 .text-me-content {
   box-sizing: border-box;
+
   @include outer-container;
 
   width: 100%;

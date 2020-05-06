@@ -56,6 +56,7 @@
       // UI: individual course item
       .course {
         box-sizing: box;
+
         @include transition(all 0.15s linear 0s);
         @include clearfix();
 
@@ -74,6 +75,7 @@
 
             .cover {
               box-sizing: border-box;
+
               @include transition(all 0.15s linear 0s);
               @include float(left);
 
@@ -228,6 +230,7 @@
             // UI: course item actions
             .action {
               box-sizing: border-box;
+
               @include margin-right($baseline/2);
               @include float(right);
 
@@ -300,7 +303,6 @@
                   @extend %ui-no-list;
 
                   box-sizing: border-box;
-
                   display: table;
                   box-shadow: 0 1px 1px $shadow-l1;
                   position: relative;
@@ -376,6 +378,7 @@
             width: flex-grid(8);
 
             @include float(left);
+
             box-sizing: border-box;
 
             p {
@@ -893,6 +896,7 @@
 
           .btn {
             box-sizing: border-box;
+
             @include float(left);
 
             border-radius: 3px;
@@ -1008,7 +1012,6 @@
             @extend %btn-inherited-primary;
 
             box-sizing: border-box;
-
             padding: 7px $baseline*0.75;
             float: none;
             border-radius: 3px;
@@ -1157,9 +1160,7 @@
     background-color: theme-color('primary');
     border: 1px solid theme-color('primary');
     box-shadow: 0 1px 8px 0 $shadow-l1;
-
     box-sizing: border-box;
-
     color: $white;
     font-family: $font-family-sans-serif;
     display: inline-block;
@@ -1392,6 +1393,7 @@ p.course-block {
 
 .enter-course-blocked {
   box-sizing: border-box;
+
   @include float(right);
 
   display: block;

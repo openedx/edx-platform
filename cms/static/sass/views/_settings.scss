@@ -31,6 +31,7 @@
 
   .message-status {
     @include border-top-radius(2px);
+
     box-sizing: border-box;
 
     @extend %t-strong;
@@ -297,7 +298,6 @@
       &.enum {
         .field-group {
           box-sizing: border-box;
-
           border-radius: 3px;
           background: $gray-l5;
           padding: $baseline;
@@ -411,7 +411,6 @@
             @extend %t-copy-lead1;
 
             box-sizing: border-box;
-
             display: block;
             width: 100%;
             overflow: hidden;
@@ -515,7 +514,6 @@
     #field-course-introduction-video {
       .input-existing {
         box-sizing: border-box;
-
         border-radius: 3px;
         background: $gray-l5;
         padding: ($baseline/2);
@@ -619,6 +617,7 @@
 
       .new-grade-button {
         box-sizing: border-box;
+
         @include linear-gradient(top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
 
         box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset;
@@ -645,7 +644,6 @@
 
       .grade-slider {
         box-sizing: border-box;
-
         width: flex-grid(8, 9);
         display: inline-block;
         vertical-align: middle;
@@ -1132,7 +1130,6 @@
         @extend %t-copy-base;
 
         box-sizing: border-box;
-
         box-shadow: 0 1px 2px $shadow-l1 inset;
 
         @include linear-gradient($lightGrey, tint($lightGrey, 90%));

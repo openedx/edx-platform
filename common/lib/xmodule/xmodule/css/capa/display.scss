@@ -130,10 +130,10 @@ h2 {
   display: block;
 }
 
-iframe[seamless]{
+iframe[seamless] {
   overflow: hidden;
   padding: 0;
-  border: 0px none transparent;
+  border: 0 none transparent;
   background-color: transparent;
 }
 
@@ -157,7 +157,8 @@ div.problem {
     padding: 0;
     width: auto;
 
-    canvas, img {
+    canvas,
+    img {
       page-break-inside: avoid;
     }
   }

@@ -14,7 +14,6 @@
   .content-primary,
   .content-supplementary {
     box-sizing: border-box;
-
     float: left;
   }
 
@@ -116,7 +115,6 @@
 
         li {
           box-sizing: border-box;
-
           display: table-cell;
           margin-right: 1%;
           padding: ($baseline/4) 0;
@@ -216,7 +214,6 @@
 
     .collection-edit {
       box-sizing: border-box;
-
       border-radius: 2px;
       width: 100%;
       background: $white;

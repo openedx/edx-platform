@@ -145,6 +145,7 @@ a:visited:not(.btn) {
 
 .container {
   @include clearfix();
+
   box-sizing: border-box;
 
   @include media-breakpoint-up(md) {

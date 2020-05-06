@@ -17,14 +17,12 @@ form#wiki_revision {
     @extend textarea;
 
     box-sizing: border-box;
-
     font-family: monospace;
     margin-bottom: $baseline;
   }
 
   textarea {
     box-sizing: border-box;
-
     margin-bottom: $baseline;
     min-height: 450px;
     width: 100%;

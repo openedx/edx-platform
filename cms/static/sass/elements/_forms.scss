@@ -34,6 +34,7 @@ input[type="email"],
 input[type="password"],
 textarea.text {
   box-sizing: border-box;
+
   @include linear-gradient($gray-l5, $white);
 
   @extend %t-copy-sub2;
@@ -448,9 +449,7 @@ form {
 // ====================
 input.search {
   padding: 6px 15px 8px 30px;
-
   box-sizing: border-box;
-
   border: 1px solid $darkGrey;
   border-radius: 20px;
   background: url('#{$static-path}/images/search-icon.png') no-repeat 8px 7px #edf1f5;
@@ -485,9 +484,7 @@ code {
   width: 100%;
   min-height: 80px;
   padding: 10px;
-
   box-sizing: border-box;
-
   border: 1px solid $mediumGrey;
 
   @include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3));

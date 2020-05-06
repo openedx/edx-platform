@@ -7,7 +7,6 @@
   .content-primary,
   .content-supplementary {
     box-sizing: border-box;
-
     float: left;
   }
 
@@ -234,7 +233,6 @@
     // uses similar styling as assets.scss, unit.scss
     .wrapper-component-action-header {
       box-sizing: border-box;
-
       position: absolute;
       width: 100%;
       padding: $baseline/4 $baseline/2;
@@ -401,6 +399,7 @@
 
   .page-contents {
     box-sizing: border-box;
+
     @include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3));
 
     @extend %t-copy-sub1;

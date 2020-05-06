@@ -1375,6 +1375,7 @@
 
   .content-supplementary {
     box-sizing: border-box;
+
     @include outer-container;
     @include span-columns(12);
 

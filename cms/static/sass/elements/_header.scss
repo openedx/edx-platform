@@ -13,6 +13,7 @@
 
   header.primary {
     box-sizing: border-box;
+
     @include clearfix();
 
     max-width: $fg-max-width;
@@ -49,7 +50,6 @@
   .nav-account,
   .nav-pitch {
     box-sizing: border-box;
-
     display: inline-block;
     vertical-align: middle;
   }

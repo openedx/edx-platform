@@ -27,8 +27,8 @@
       background: $course-header-bg;
       border: 1px solid $border-color-3;
       box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
-
       box-sizing: border-box;
+
       @include clearfix();
 
       margin: 0 auto;
@@ -48,6 +48,7 @@
 
       .intro {
         box-sizing: border-box;
+
         @include clearfix();
 
         display: table-cell;
@@ -125,8 +126,8 @@
           a.register,
           a.add-to-cart {
             @include button(shiny, $button-color);
-            box-sizing: border-box;
 
+            box-sizing: border-box;
             border-radius: 3px;
             display: block;
             font: normal 1.2rem/1.6rem $font-family-sans-serif;
@@ -155,8 +156,8 @@
 
           strong {
             @include button(shiny, $button-color);
-            box-sizing: border-box;
 
+            box-sizing: border-box;
             border-radius: 3px;
             display: block;
 
@@ -178,9 +179,7 @@
           span.add-to-cart {
             background: $button-archive-color;
             border: 1px solid darken($button-archive-color, 50%);
-
             box-sizing: border-box;
-
             color: darken($button-archive-color, 50%);
             display: block;
             letter-spacing: 1px;
@@ -207,9 +206,7 @@
 
       .media {
         background: transparent;
-
         box-sizing: border-box;
-
         display: table-cell;
         padding: 20px;
         position: relative;
@@ -412,6 +409,7 @@
   .course-sidebar {
     @include media-breakpoint-up(dm) {
       box-sizing: border-box;
+
       @include float(left);
 
       width: flex-grid(4);
@@ -499,6 +497,7 @@
 
       .social-sharing {
         box-sizing: border-box;
+
         @include float(left);
 
         height: 44px;
@@ -523,9 +522,7 @@
           border: 1px solid rgba(0, 0, 0, 0.5);
           border-radius: 4px;
           box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
-
           box-sizing: border-box;
-
           color: rgb(255, 255, 255);
 
           @include float(right);

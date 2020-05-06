@@ -24,6 +24,7 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
 
     .course {
       box-sizing: border-box;
+
       @include transition(all $tmg-f3 linear 0s);
 
       position: relative;
@@ -58,6 +59,7 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
 
         .learn-more {
           @include left($learn-more-horizontal-position);
+
           box-sizing: border-box;
 
           @extend %ui-depth2;

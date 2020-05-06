@@ -10,6 +10,7 @@
 
 .message-status {
   @include border-top-radius(2px);
+
   box-sizing: border-box;
 
   @extend %t-strong;
@@ -416,6 +417,7 @@
 
     .notification {
       box-sizing: border-box;
+
       @include clearfix();
 
       width: 100%;
@@ -449,6 +451,7 @@
 
     .notification {
       box-sizing: border-box;
+
       @include clearfix();
 
       width: 100%;
@@ -473,6 +476,7 @@
 
 .notification {
   box-sizing: border-box;
+
   @include clearfix();
 
   margin: 0 auto;
@@ -603,7 +607,6 @@
   @extend %ui-depth2;
 
   box-sizing: border-box;
-
   box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $blue;
   position: relative;
   overflow: hidden;
@@ -664,6 +667,7 @@
 // adopted alerts
 .alert {
   box-sizing: border-box;
+
   @include clearfix();
 
   margin: 0 auto;
@@ -922,7 +926,6 @@ body.uxdesign.alerts {
   .content-primary,
   .content-supplementary {
     box-sizing: border-box;
-
     float: left;
   }
 

@@ -416,6 +416,7 @@ $facet-background-color: #007db8;
   .search-facets {
     @include fill-parent();
     @include omega();
+
     box-sizing: border-box;
 
     @extend %ui-depth1;
@@ -521,7 +522,9 @@ $facet-background-color: #007db8;
       .count {
         @include right($baseline*0.6);
         @include text-align(right);
+
         box-sizing: border-box;
+
         @include transition(all 0.2s ease-out);
 
         position: absolute;

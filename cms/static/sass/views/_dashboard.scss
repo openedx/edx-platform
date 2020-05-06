@@ -366,7 +366,6 @@
     &.has-status {
       .course-status {
         box-sizing: border-box;
-
         display: inline-block;
         vertical-align: middle;
         width: flex-grid(3, 9);
@@ -445,7 +444,6 @@
   // UI: individual course listings
   .course-item {
     box-sizing: border-box;
-
     width: flex-grid(9, 9);
     position: relative;
     border-bottom: 1px solid $gray-l2;
@@ -459,7 +457,6 @@
     .course-link,
     .course-actions {
       box-sizing: border-box;
-
       display: inline-block;
       vertical-align: middle;
     }
@@ -536,7 +533,6 @@
       // view live button
       .view-button {
         box-sizing: border-box;
-
         padding: ($baseline/2);
       }
 

@@ -1,6 +1,5 @@
 .search-bar {
   box-sizing: border-box;
-
   position: relative;
 
   .search-field-wrapper {
@@ -11,7 +10,6 @@
     @extend %t-weight2;
 
     box-sizing: border-box;
-
     top: 5px;
     width: 100%;
     border-radius: 4px;
@@ -25,6 +23,7 @@
     @extend %t-regular;
 
     box-sizing: border-box;
+
     @include right(0);
 
     display: block;

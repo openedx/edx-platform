@@ -737,6 +737,7 @@
       .member-list-widget {
         .header {
           box-sizing: border-box;
+
           @include border-top-radius(3);
 
           position: relative;
@@ -759,7 +760,6 @@
 
         .info {
           box-sizing: border-box;
-
           padding: ($baseline/2);
           border: 1px solid $light-gray;
           color: $lighter-base-font-color;
@@ -798,6 +798,7 @@
 
         .bottom-bar {
           box-sizing: border-box;
+
           @include border-bottom-radius(3);
 
           position: relative;

@@ -4,16 +4,13 @@ $white: rgb(255, 255, 255);
 
 .mediakit {
   box-sizing: border-box;
-
   margin: 0 auto;
   padding: ($baseline*3) 0;
   width: 980px;
 
   .wrapper-mediakit {
     border-radius: 4px;
-
     box-sizing: border-box;
-
     box-shadow: 0 1px 10px 0 $shadow-l1;
     margin: ($baseline*3) 0 0 0;
     border: 1px solid $border-color;
@@ -112,7 +109,6 @@ $white: rgb(255, 255, 255);
 
     article {
       box-sizing: border-box;
-
       width: 500px;
 
       @include margin-right($baseline);
@@ -121,9 +117,7 @@ $white: rgb(255, 255, 255);
 
     aside {
       border-radius: 2px;
-
       box-sizing: border-box;
-
       box-shadow: 0 1px 4px 0 $shadow;
       width: 330px;
 
@@ -157,7 +151,6 @@ $white: rgb(255, 255, 255);
 
       figure {
         box-sizing: border-box;
-
         background: $white;
         width: 100%;
 
@@ -182,9 +175,7 @@ $white: rgb(255, 255, 255);
   // library section
   .library {
     border-radius: 2px;
-
     box-sizing: border-box;
-
     box-shadow: 0 1px 4px 0 $shadow;
     border: 3px solid tint($light-gray, 50%);
     padding: 0;
@@ -220,7 +211,6 @@ $white: rgb(255, 255, 255);
 
       li {
         box-sizing: border-box;
-
         overflow-y: auto;
 
         @include float(left);
@@ -237,9 +227,7 @@ $white: rgb(255, 255, 255);
       figure {
         a {
           border-radius: 2px;
-
           box-sizing: border-box;
-
           box-shadow: 0 1px 2px 0 $shadow-l1;
           display: block;
           min-height: 380px;
