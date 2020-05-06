@@ -2,7 +2,8 @@
 // ====================
 
 .view-import {
-  .content-primary, .content-supplementary {
+  .content-primary,
+  .content-supplementary {
     @include box-sizing(border-box);
   }
 
@@ -233,7 +234,7 @@
 
         // STATE: started
         &.is-started {
-          .fa-warning  {
+          .fa-warning {
             visibility: hidden;
             opacity: 0;
           }
@@ -287,7 +288,8 @@
             color: $red;
           }
 
-          .status-detail .title, .status-detail .copy {
+          .status-detail .title,
+          .status-detail .copy {
             color: $red;
           }
         }

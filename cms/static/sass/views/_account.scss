@@ -54,7 +54,8 @@
     }
   }
 
-  .content-primary, .content-supplementary {
+  .content-primary,
+  .content-supplementary {
     @include box-sizing(border-box);
   }
 
@@ -109,7 +110,9 @@
             }
           }
 
-          label, input, textarea {
+          label,
+          input,
+          textarea {
             display: block;
           }
 
@@ -125,7 +128,8 @@
             }
           }
 
-          input, textarea {
+          input,
+          textarea {
             @extend %t-copy-base;
 
             height: 100%;
@@ -218,7 +222,8 @@
               margin-right: 0;
             }
 
-            input, textarea {
+            input,
+            textarea {
               width: 100%;
             }
           }
@@ -251,7 +256,6 @@
         margin: 0 0 ($baseline/4) 0;
         color: $gray-d2;
       }
-
     }
   }
 

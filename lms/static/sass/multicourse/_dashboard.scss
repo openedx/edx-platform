@@ -135,8 +135,10 @@
               flex-basis: 100%;
               padding-top: $baseline/2;
 
-              a, span {
+              a,
+              span {
                 font: -apple-system-short-headline !important;
+
                 @extend %t-title3;
                 @extend %t-regular;
 
@@ -164,8 +166,9 @@
               .info-date-block-container {
                 display: block;
 
-                .info-date-block{
+                .info-date-block {
                   font: -apple-system-short-subheadline !important;
+
                   @extend %t-title7;
 
                   color: $gray; // WCAG 2.0 AA compliant
@@ -235,7 +238,8 @@
               border: 1px solid $white;
               text-align: center;
 
-              &:hover, &:focus {
+              &:hover,
+              &:focus {
                 color: $gray-d3;
                 border: 1px solid $gray-l4;
               }
@@ -397,6 +401,7 @@
 
           .enter-course {
             font: -apple-system-short-subheadline !important;
+
             @extend %btn-pl-white-base;
 
             @include float(right);
@@ -584,7 +589,7 @@
         .coaching-link .btn-neutral {
           display: block;
           text-align: center;
-          margin: 20px 20px 0 20px;
+          margin: 20px 20px 0;
           border-radius: 20px;
           padding: 10px;
           border: 1px solid theme-color('primary');
@@ -817,7 +822,8 @@
           color: $white; // nasty but needed override for poor <span> styling
         }
 
-        .copy, .copy-sub {
+        .copy,
+        .copy-sub {
           display: inline-block;
           vertical-align: middle;
         }
@@ -869,7 +875,7 @@
           @include float(right);
           @include margin-right(5px);
 
-          background-image: none ;
+          background-image: none;
           text-shadow: none;
           box-shadow: none;
           text-transform: none;
@@ -898,7 +904,8 @@
             &.disabled {
               cursor: default !important;
 
-              &:hover, &:focus {
+              &:hover,
+              &:focus {
                 @include background-image(linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%));
 
                 background: #eee;
@@ -958,7 +965,8 @@
         font-weight: bold;
         letter-spacing: 0;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           text-decoration: none;
         }
       }
@@ -1136,7 +1144,7 @@
 
     color: $lighter-base-font-color;
     margin-bottom: $baseline;
-    text-shadow: 0 1px rgba(255,255,255, 0.6);
+    text-shadow: 0 1px rgba(255, 255, 255, 0.6);
   }
 
   p.custom-message {
@@ -1160,8 +1168,9 @@
     margin-left: ($baseline/4);
     padding: $baseline*0.75 $baseline;
 
-    &:hover, &:focus {
-      background: theme-color('primary')-l2;
+    &:hover,
+    &:focus {
+      background: theme-color('primary')-l2; /* stylelint-disable-line */
       text-decoration: none;
     }
   }
@@ -1286,6 +1295,7 @@
     .btn-reverify {
       margin-top: ($baseline/2);
     }
+
     .deco-arrow {
       @include triangle(($baseline/2), $verified-color-lvl4, up);
     }
@@ -1328,7 +1338,6 @@
       color: #fff;
       background-color: #0079bc;
     }
-
   }
 }
 
@@ -1379,7 +1388,6 @@ p.course-block {
   padding: ($baseline/4);
   border-width: 1px;
   background: #fdfbe4;
-
 }
 
 .enter-course-blocked {
@@ -1404,7 +1412,8 @@ p.course-block {
     font: normal 15px/1.6rem $font-family-sans-serif;
     padding: 6px 32px 7px;
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       text-decoration: none;
     }
   }
@@ -1628,7 +1637,9 @@ a.fade-cover {
     color: theme-color("inverse");
   }
 
-  .survey_button:visited, .survey_button:hover, .survey_button:focus {
+  .survey_button:visited,
+  .survey_button:hover,
+  .survey_button:focus {
     color: theme-color("inverse");
     text-decoration: none;
   }

@@ -37,7 +37,7 @@
     padding: $baseline;
     background-color: $forum-color-background;
   }
-  
+
   .posted-by {
     @extend %t-ultrastrong;
   }
@@ -47,7 +47,7 @@
 .discussion-response {
   .response-header-content {
 
-    // CASE: larger username for responses 
+    // CASE: larger username for responses
     .username {
       @extend %t-weight5;
 
@@ -56,7 +56,8 @@
   }
 
   // rtl resets for response list elements
-  .response-body ol, .response-body ul { // Fix up the RTL-only _reset.scss, but only in specific places
+  .response-body ol,
+  .response-body ul { // Fix up the RTL-only _reset.scss, but only in specific places
     @include padding-left($baseline*2);
     @include padding-right(0);
   }
@@ -80,7 +81,7 @@
 }
 
 // +response - labels and banners
-// NOTE - these styles seem to no longer be in use. They have been isolated here, but should be ideally removed or fixed. 
+// NOTE - these styles seem to no longer be in use. They have been isolated here, but should be ideally removed or fixed.
 .discussion .responses .forum-response {
 
   // CASE: label - staff response

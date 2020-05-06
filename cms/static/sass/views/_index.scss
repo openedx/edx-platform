@@ -7,7 +7,9 @@
       margin-bottom: 0;
     }
 
-    .wrapper-content-header, .wrapper-content-features, .wrapper-content-cta {
+    .wrapper-content-header,
+    .wrapper-content-features,
+    .wrapper-content-cta {
       @include box-sizing(border-box);
 
       margin: 0;
@@ -33,20 +35,13 @@
         margin-bottom: 0;
       }
 
-      h1, h2, h3, h4, h5, h6 {
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
         color: $gray-d3;
-      }
-
-      h2 {
-
-      }
-
-      h3 {
-
-      }
-
-      h4 {
-
       }
     }
 
@@ -74,7 +69,8 @@
         color: $white;
       }
 
-      .wrapper-text-welcome, .logo {
+      .wrapper-text-welcome,
+      .logo {
         display: inline-block;
       }
 
@@ -98,7 +94,8 @@
       border: 4px solid $black;
     }
 
-    .arrow_box::after, .arrow_box::before {
+    .arrow_box::after,
+    .arrow_box::before {
       top: 100%;
       border: solid transparent;
       content: " ";
@@ -133,10 +130,6 @@
     }
 
     .content-features {
-      .list-features {
-
-      }
-
       // indiv features
       .feature {
         @include clearfix();

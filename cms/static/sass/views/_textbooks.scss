@@ -2,7 +2,8 @@
 // ====================
 
 .view-textbooks {
-  .content-primary, .content-supplementary {
+  .content-primary,
+  .content-supplementary {
     @include box-sizing(border-box);
   }
 
@@ -113,9 +114,7 @@
               @extend %ui-btn-non;
             }
           }
-
         }
-
       }
 
       &:hover .actions {
@@ -177,8 +176,6 @@
             padding: ($baseline/5) $baseline;
             text-transform: uppercase;
           }
-
-
         }
 
         .copy {
@@ -187,12 +184,9 @@
           margin: ($baseline) 0 ($baseline/2) 0;
           color: $gray;
 
-
           strong {
             @extend %t-strong;
           }
-
-
         }
 
         .chapters-fields,
@@ -217,7 +211,9 @@
               }
             }
 
-            label, input, textarea {
+            label,
+            input,
+            textarea {
               display: block;
             }
 
@@ -239,7 +235,8 @@
 
 
             //this section is borrowed from _account.scss - we should clean up and unify later
-            input, textarea {
+            input,
+            textarea {
               @extend %t-copy-base;
 
               height: 100%;
@@ -331,7 +328,8 @@
 
               position: relative;
 
-              input, textarea {
+              input,
+              textarea {
                 width: 100%;
               }
 
@@ -343,7 +341,6 @@
 
                 @include right(0);
               }
-
             }
 
             .action-close {
