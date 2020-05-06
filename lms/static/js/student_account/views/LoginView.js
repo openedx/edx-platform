@@ -24,7 +24,8 @@
                 'click .js-login': 'submitForm',
                 'click .forgot-password': 'forgotPassword',
                 'click .login-provider': 'thirdPartyAuth',
-                'click .enterprise-login': 'enterpriseSlugLogin'
+                'click .enterprise-login': 'enterpriseSlugLogin',
+                'click .login-help': 'toggleLoginHelp'
             },
             formType: 'login',
             requiredStr: '',
@@ -137,6 +138,13 @@
 
                 this.trigger('password-help');
                 this.clearPasswordResetSuccess();
+            },
+
+            toggleLoginHelp: function(event) {
+                var $help;
+                event.preventDefault();
+                $help = $('#login-help');
+                this.toggleHelp(event, $help);
             },
 
             enterpriseSlugLogin: function(event) {
