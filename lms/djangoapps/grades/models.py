@@ -576,6 +576,21 @@ class PersistentCourseGrade(TimeStampedModel):
         }
 
     @classmethod
+    def prefetch_by_user(cls, user, course_keys):
+        """
+        Prefetches grades for the given user for each given course
+
+        Note that this may clobber data from prefetches done by a different access pattern
+        Interleave different means of prefetching at your peril
+        """
+        cache = get_cache(cls._CACHE_NAMESPACE)
+        grades = cls.objects.filter(user_id=user.id, course_id__in=course_keys)
+        for grade in grades:
+            cache[grade.course_id] = {
+                user.id: grade
+            }
+
+    @classmethod
     def clear_prefetched_data(cls, course_key):
         """
         Clears prefetched grades for this course from the RequestCache.

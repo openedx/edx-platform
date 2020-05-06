@@ -26,7 +26,7 @@ from entitlements.models import CourseEntitlement
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.commerce.utils import EcommerceService
-from lms.djangoapps.grades.api import CourseGradeFactory
+from lms.djangoapps.grades.api import CourseGradeFactory, prefetch_course_grades_by_user
 from openedx.core.djangoapps.catalog.utils import get_fulfillable_course_runs_for_entitlement, get_programs
 from openedx.core.djangoapps.certificates.api import available_date_for_certificate
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
@@ -115,6 +115,7 @@ class ProgramProgressMeter(object):
         self.course_uuids = [str(entitlement.course_uuid) for entitlement in self.entitlements]
 
         self.course_grade_factory = CourseGradeFactory()
+        prefetch_course_grades_by_user(self.user, self.course_run_ids)
 
         if uuid:
             self.programs = [get_programs(uuid=uuid)]

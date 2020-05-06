@@ -21,6 +21,10 @@ def prefetch_course_grades(course_key, users):
     _PersistentCourseGrade.prefetch(course_key, users)
 
 
+def prefetch_course_grades_by_user(user, course_keys):
+    _PersistentCourseGrade.prefetch_by_user(user, course_keys)
+
+
 def prefetch_course_and_subsection_grades(course_key, users):
     _PersistentCourseGrade.prefetch(course_key, users)
     _PersistentSubsectionGrade.prefetch(course_key, users)
