@@ -504,7 +504,10 @@ class UserProfile(models.Model):
     allow_certificate = models.BooleanField(default=1)
     bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False)
     profile_image_uploaded_at = models.DateTimeField(null=True, blank=True)
-    phone_regex = RegexValidator(regex=r'^\(?\d{3}\)?( |-)?\d{3}-?\d{4}$', message="Phone number can only contain numbers, () and -")
+    phone_regex = RegexValidator(
+        regex=r'^\(?\d{3}\)?( |-)?\d{3}-?\d{4}$',
+        message="Phone number can only contain numbers, () and -"
+    )
     phone_number = models.CharField(validators=[phone_regex], blank=True, null=True, max_length=50)
 
     @property
