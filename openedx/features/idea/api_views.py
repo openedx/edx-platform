@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from rest_framework import status
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
@@ -12,7 +12,7 @@ class FavoriteAPIView(APIView):
     """
     FavoriteAPIView is used to toggle favorite idea for the user
     """
-    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    authentication_classes = (SessionAuthenticationAllowInactiveUser,)
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, idea_id):
