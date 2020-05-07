@@ -550,6 +550,74 @@ class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
         render_call_dict = mocked_render.call_args[0][1]
         assert render_call_dict['errors'] == [msg]
 
+    def _setup_user_from_username(self, username):
+        """
+        Setup a user from the passed in username.
+        If username passed in is falsy, return None
+        """
+        created_user = None
+        if username:
+            created_user = UserFactory(username=username, password=self.PASSWORD)
+        return created_user
+
+    def _setup_enrollments(self, external_user_key, linked_user=None):
+        """
+        Create enrollments for testing linking.
+        The enrollments can be create with already linked edX user.
+        """
+        program_enrollment = ProgramEnrollmentFactory.create(
+            external_user_key=external_user_key,
+            program_uuid=self.program_uuid,
+            user=linked_user
+        )
+        course_enrollment = None
+        if linked_user:
+            course_enrollment = CourseEnrollmentFactory.create(
+                course_id=self.course.id,
+                user=linked_user,
+                mode=CourseMode.MASTERS,
+                is_active=True
+            )
+        program_course_enrollment = ProgramCourseEnrollmentFactory.create(
+            program_enrollment=program_enrollment,
+            course_key=self.course.id,
+            course_enrollment=course_enrollment,
+            status='active'
+        )
+
+        return program_enrollment, program_course_enrollment
+
+    @ddt.data(
+        ('', None),
+        ('linked_user', None),
+        ('linked_user', 'original_user')
+    )
+    @ddt.unpack
+    @patch_render
+    def test_linking_program_enrollment(self, username, original_username, mocked_render):
+        external_user_key = '0001'
+        linked_user = self._setup_user_from_username(username)
+        original_user = self._setup_user_from_username(original_username)
+        program_enrollment, program_course_enrollment = self._setup_enrollments(
+            external_user_key,
+            original_user
+        )
+        self.client.post(self.url, data={
+            'program_uuid': self.program_uuid,
+            'text': external_user_key + ',' + username
+        })
+        render_call_dict = mocked_render.call_args[0][1]
+        if username:
+            expected_success = "('{}', '{}')".format(external_user_key, username)
+            assert render_call_dict['successes'] == [expected_success]
+            program_enrollment.refresh_from_db()
+            assert program_enrollment.user == linked_user
+            program_course_enrollment.refresh_from_db()
+            assert program_course_enrollment.course_enrollment.user == linked_user
+        else:
+            error = u"All linking lines must be in the format 'external_user_key,lms_username'"
+            assert render_call_dict['errors'] == [error]
+
 
 @ddt.ddt
 class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
