@@ -638,6 +638,7 @@ class ProgramDataExtender(object):
         applicable_seat_types = set(seat for seat in self.data['applicable_seat_types'] if seat != 'credit')
 
         is_learner_eligible_for_one_click_purchase = self.data['is_program_eligible_for_one_click_purchase']
+        bundle_uuid = self.data.get('uuid')
         skus = []
         bundle_variant = 'full'
 
@@ -688,9 +689,18 @@ class ProgramDataExtender(object):
                 # The user specific program price is slow to calculate, so use switch to force the
                 # anonymous price for all users. See LEARNER-5555 for more details.
                 if is_anonymous or ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER.is_enabled():
-                    discount_data = api.baskets.calculate.get(sku=skus, is_anonymous=True)
+                    # The bundle uuid is necessary to see the program's discounted price
+                    if bundle_uuid:
+                        discount_data = api.baskets.calculate.get(sku=skus, is_anonymous=True, bundle=bundle_uuid)
+                    else:
+                        discount_data = api.baskets.calculate.get(sku=skus, is_anonymous=True)
                 else:
-                    discount_data = api.baskets.calculate.get(sku=skus, username=self.user.username)
+                    if bundle_uuid:
+                        discount_data = api.baskets.calculate.get(
+                            sku=skus, username=self.user.username, bundle=bundle_uuid
+                        )
+                    else:
+                        discount_data = api.baskets.calculate.get(sku=skus, username=self.user.username)
 
                 program_discounted_price = discount_data['total_incl_tax']
                 program_full_price = discount_data['total_incl_tax_excl_discounts']

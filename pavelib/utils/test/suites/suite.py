@@ -1,4 +1,3 @@
-# pylint: disable=unicode-format-string
 """
 A class used for defining and running test suites
 """

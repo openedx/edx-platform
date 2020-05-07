@@ -3,6 +3,7 @@ Provides Python APIs exposed from Student models.
 """
 import logging
 
+from student.models import CourseAccessRole as _CourseAccessRole
 from student.models import CourseEnrollment as _CourseEnrollment
 from student.models import ManualEnrollmentAudit as _ManualEnrollmentAudit
 from student.models import (
@@ -62,3 +63,33 @@ def get_phone_number(user_id):
         log.exception(exception)
         return None
     return student.phone_number or None
+
+
+def get_course_access_role(user, org, course_id, role):
+    """
+    Get a specific CourseAccessRole object. Return None if
+    it does not exist.
+
+    Arguments:
+        user: User object for the user who has access in a course
+        org: the org the course is in
+        course_id: the course_id of the CourseAccessRole
+        role: the role type of the role
+    """
+    try:
+        course_access_role = _CourseAccessRole.objects.get(
+            user=user,
+            org=org,
+            course_id=course_id,
+            role=role,
+        )
+    except _CourseAccessRole.DoesNotExist:
+        log.exception('No CourseAccessRole found for user_id=%(user_id)s, org=%(org)s, '
+                      'course_id=%(course_id)s, and role=%(role)s.', {
+                          'user': user.id,
+                          'org': org,
+                          'course_id': course_id,
+                          'role': role,
+                      })
+        return None
+    return course_access_role

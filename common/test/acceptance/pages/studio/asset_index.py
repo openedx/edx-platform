@@ -6,9 +6,6 @@ The Files and Uploads page for a course in Studio
 import os
 
 import six
-import six.moves.urllib.error  # pylint: disable=import-error
-import six.moves.urllib.parse  # pylint: disable=import-error
-import six.moves.urllib.request  # pylint: disable=import-error
 from bok_choy.javascript import wait_for_js
 from bok_choy.promise import EmptyPromise
 from opaque_keys.edx.locator import CourseLocator
@@ -21,7 +18,6 @@ from common.test.acceptance.pages.studio.course_page import CoursePage
 
 # file path found from CourseFixture logic
 UPLOAD_SUFFIX = '/data/uploads/studio-uploads/'
-# pylint: disable=no-value-for-parameter
 UPLOAD_FILE_DIR = Path(__file__).abspath().dirname().dirname().dirname().dirname() + UPLOAD_SUFFIX
 
 

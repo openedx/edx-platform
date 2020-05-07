@@ -6,6 +6,8 @@ schedule experience built on the Schedules app.
 
 import logging
 
+from datetime import datetime, timedelta
+
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from openedx.core.lib.request_utils import get_request_or_stub
@@ -58,6 +60,24 @@ def get_week_highlights(user, course_key, week_num):
         sections_with_highlights,
         week_num,
         course_key,
+    )
+    return highlights
+
+
+def get_next_section_highlights(user, course_key, target_date):
+    """
+    Get highlights (list of unicode strings) for a week, based upon the current date.
+
+    Raises:
+        CourseUpdateDoeNotExist: if highlights do not exist for the requested date
+    """
+    course_descriptor = _get_course_with_highlights(course_key)
+    course_module = _get_course_module(course_descriptor, user)
+    sections_with_highlights = _get_sections_with_highlights(course_module)
+    highlights = _get_highlights_for_next_section(
+        sections_with_highlights,
+        course_key,
+        target_date
     )
     return highlights
 
@@ -128,3 +148,17 @@ def _get_highlights_for_week(sections, week_num, course_key):
 
     section = sections[week_num - 1]
     return section.highlights
+
+
+def _get_highlights_for_next_section(sections, course_key, target_date):
+    sorted_sections = sorted(sections, key=lambda section: section.due)
+    for index, sorted_section in enumerate(sorted_sections):
+        if sorted_section.due.date() == target_date and index + 1 < len(sorted_sections):
+            # Return index + 2 for "week_num", since weeks start at 1 as opposed to indexes,
+            # and we want the next week, so +1 for index and +1 for next
+            return sections[index + 1].highlights, index + 2
+    raise CourseUpdateDoesNotExist(
+        u"No section found ending on {} for {}".format(
+            target_date, course_key
+        )
+    )

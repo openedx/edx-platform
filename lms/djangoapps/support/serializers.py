@@ -1,7 +1,7 @@
 """
 Serializers for use in the support app.
 """
-
+from django.urls import reverse
 
 from rest_framework import serializers
 
@@ -10,6 +10,8 @@ from lms.djangoapps.program_enrollments.models import (
     ProgramEnrollment,
     ProgramCourseEnrollment,
 )
+from openedx.core.djangoapps.catalog.utils import get_programs_by_uuids
+from openedx.features.course_experience import default_course_url_name
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
 # pylint: disable=abstract-method
@@ -41,9 +43,14 @@ class ProgramCourseEnrollmentSerializer(serializers.Serializer):
     status = serializers.CharField()
     course_key = serializers.CharField()
     course_enrollment = CourseEnrollmentSerializer()
+    course_url = serializers.SerializerMethodField()
 
     class Meta(object):
         model = ProgramCourseEnrollment
+
+    def get_course_url(self, obj):
+        course_url_name = default_course_url_name(obj.course_key)
+        return reverse(course_url_name, kwargs={'course_id': obj.course_key})
 
 
 class ProgramEnrollmentSerializer(serializers.Serializer):
@@ -54,9 +61,14 @@ class ProgramEnrollmentSerializer(serializers.Serializer):
     status = serializers.CharField()
     program_uuid = serializers.UUIDField()
     program_course_enrollments = ProgramCourseEnrollmentSerializer(many=True)
+    program_name = serializers.SerializerMethodField()
 
     class Meta(object):
         model = ProgramEnrollment
+
+    def get_program_name(self, obj):
+        program_list = get_programs_by_uuids([obj.program_uuid])
+        return next(iter(program_list), {}).get('title', '')
 
 
 def serialize_user_info(user, user_social_auths=None):

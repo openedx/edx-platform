@@ -731,6 +731,11 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         status = convert_video_status(video, is_video_encodes_ready=True)
         self.assertEqual(status, StatusDisplayStrings.get('file_complete'))
 
+        # The encode status should be converted to `file_complete` if video encodes are complete
+        video['status'] = 'partial_failure'
+        status = convert_video_status(video, is_video_encodes_ready=True)
+        self.assertEqual(status, StatusDisplayStrings.get('file_complete'))
+
         # for all other status, there should not be any conversion
         statuses = list(StatusDisplayStrings._STATUS_MAP.keys())  # pylint: disable=protected-access
         statuses.remove('invalid_token')
@@ -1492,7 +1497,7 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
             self.assertEqual(response_video["Video ID"], original_video["edx_video_id"])
             self.assertEqual(response_video["Status"], convert_video_status(original_video))
             for profile in expected_profiles:
-                response_profile_url = response_video["{} URL".format(profile)]  # pylint: disable=unicode-format-string
+                response_profile_url = response_video["{} URL".format(profile)]
                 original_encoded_for_profile = next(
                     (
                         original_encoded

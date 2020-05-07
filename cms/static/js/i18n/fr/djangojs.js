@@ -544,7 +544,6 @@
     "Do you want to upload your file before submitting?": "Charger le fichier avant l'envoi?",
     "Document properties": "Propri\u00e9t\u00e9s du document",
     "Does the name on your ID match your account name: %(fullName)s?": "Le nom sur votre ID correspond-il \u00e0 votre nom de compte: %(fullName)s?",
-    "Does the photo of you match your ID photo?": "Votre photo correspond-elle \u00e0 celle de votre document d'identit\u00e9 ?",
     "Does the photo of you show your whole face?": "Votre photo montre-t-elle votre visage en entier ?",
     "Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission.": "Vous ne voyez pas votre photo ? Assurez-vous que votre navigateur est autoris\u00e9 \u00e0 utiliser votre webcam quand il le demande.",
     "Donate": "Faire un don",
@@ -1464,7 +1463,6 @@
     "The following email addresses and/or usernames are invalid:": "Les adresses email et/ou noms d'utilisateurs suivants sont invalides :",
     "The following errors were generated:": "Les erreurs suivantes ont \u00e9t\u00e9 g\u00e9n\u00e9r\u00e9es:",
     "The following file types are not allowed: ": "Les types de fichiers suivants ne sont pas support\u00e9s :",
-    "The following information is already a part of your {platform} profile. We\\'ve included it here for your application.": "L'information suivante fait d\u00e9j\u00e0 partie de votre profil {platform}. Nous l\\'avons inclus ici pour votre demander.",
     "The following message will be displayed at the bottom of the courseware pages within your course:": "Le message suivant sera affich\u00e9 au bas des pages du cours :",
     "The following options are available for the {license_name} license.": "Les options suivantes sont disponibles pour la licence {license_name}",
     "The following users are no longer enrolled in the course:": "Les utilisateurs suivants ont \u00e9t\u00e9 d\u00e9sinscrits du cours\u00a0:",
@@ -1482,7 +1480,6 @@
     "The number of subsections in the course that contain problems of this assignment type.": "Le nombre de sous-sections de ce cours qui contiennent des probl\u00e8mes de ce type de devoir.",
     "The organization that this signatory belongs to, as it should appear on certificates.": "L'organisation \u00e0 laquelle ce signataire appartient, telle qu'elle devrait apparaitre sur les attestations.",
     "The page \"{route}\" could not be found.": "Page \"{route}\" non trouv\u00e9e.",
-    "The photo of your face matches the photo on your ID.": "La photo de votre visage concorde avec la photo sur votre pi\u00e8ce d'identit\u00e9.",
     "The post you selected has been deleted.": "Le message que vous avez s\u00e9lectionn\u00e9 a \u00e9t\u00e9 effac\u00e9.",
     "The published branch version, {published}, was reset to the draft branch version, {draft}.": "La version de la branche publi\u00e9e, {published}, a \u00e9t\u00e9 r\u00e9initialis\u00e9e \u00e0 la branche de la version du brouillon, {draft}.",
     "The raw error message is:": "Le message d'erreur est:",
@@ -1699,7 +1696,6 @@
     "Use as a Prerequisite": "Utilis\u00e9 comme Pr\u00e9-requis",
     "Use my institution/campus credentials": "Utiliser mes informations institution/campus",
     "Use the All Topics menu to find specific topics.": "Utilisez le menu 'Tous les sujets' pour trouver un sujet sp\u00e9cific",
-    "Use your webcam to take a photo of your ID. We will match this photo with the photo of your face and the name on your account.": "Utilisez votre webcam pour prendre une photo de votre pi\u00e8ce d'identit\u00e9. Nous allons v\u00e9rifier sa concordance avec la photo de votre visage et le nom de votre compte.",
     "Use your webcam to take a photo of your face. We will match this photo with the photo on your ID.": "Utiliser votre webcam pour prendre une photo de votre visage, afin que nous puissions la comparer avec celle de votre pi\u00e8ce d'identit\u00e9.",
     "Used": "Utilis\u00e9",
     "Used in {count} location": [
@@ -1826,7 +1822,7 @@
     "You have not created any certificates yet.": "Vous n'avez pas encore cr\u00e9e de certificat.",
     "You have not created any content groups yet.": "Vous n'avez pas encore cr\u00e9\u00e9 de groupes de contenu.",
     "You have not created any group configurations yet.": "Vous n'avez pas encore cr\u00e9\u00e9 de configuration des groupes.",
-    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "Vous avez s\u00e9lectionn\u00e9 une action, et vous n'avez fait aucune modification sur des champs. Vous cherchez probablement le bouton Envoyer et non le bouton Sauvegarder.",
+    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "Vous avez s\u00e9lectionn\u00e9 une action, et vous n'avez fait aucune modification sur des champs. Vous cherchez probablement le bouton Envoyer et non le bouton Enregistrer.",
     "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "Vous avez s\u00e9lectionn\u00e9 une action, mais vous n'avez pas encore sauvegard\u00e9 certains champs modifi\u00e9s. Cliquez sur OK pour sauver. Vous devrez r\u00e9appliquer l'action.",
     "You have successfully signed into %(currentProvider)s, but your %(currentProvider)s account does not have a linked %(platformName)s account. To link your accounts, sign in now using your %(platformName)s password.": "Vous \u00eates connect\u00e9 \u00e0 %(currentProvider)s avec succ\u00e8s,mais votre compte %(currentProvider)s n'est pas reli\u00e9 \u00e0 votre compte %(platformName)s. Pour lier vos comptes, connectez-vous en utilisant votre mot de passe %(platformName)s.",
     "You have unsaved changes are you sure you want to navigate away?": "Vous avez des modifications non enregistr\u00e9es, \u00eates-vous s\u00fbr de vouloir quitter cette page ?",
@@ -1842,8 +1838,6 @@
     "You must sign out and sign back in before your language changes take effect.": "Vous devez vous d\u00e9connecter puis vous connecter \u00e0 nouveau afin que les param\u00e8tres de langue prennent effet.",
     "You must specify a name for the cohort": "Vous devez indiquer un nom pour la cohorte",
     "You must specify your birth year before you can share your full profile. To specify your birth year, go to the {account_settings_page_link}": "Vous devez renseigner votre ann\u00e9e de naissance avant de pouvoir partager votre profil complet. Pour renseigner votre ann\u00e9e de naissance, allez sur {account_settings_page_link}",
-    "You need a driver's license, passport, or other government-issued ID that has your name and photo.": "Vous avez besoin d'un permis de conduire, d'un passeport ou d'une pi\u00e8ce d'identit\u00e9 avec votre nom et photo.",
-    "You need an ID with your name and photo. A driver's license, passport, or other government-issued IDs are all acceptable.": "Vous avez besoin d'un permis de conduire, un passeport ou toute pi\u00e8ce d'identit\u00e9 avec votre nom et photo.",
     "You need to activate your account before you can enroll in courses. Check your inbox for an activation email.": "Vous devez activer votre compte avant de vous inscrire \u00e0 des cours. V\u00e9rifier votre bo\u00eete de r\u00e9ception.",
     "You need to activate your account before you can enroll in courses. Check your inbox for an activation email. After you complete activation you can return and refresh this page.": "Vous devez activer votre compte avant de pouvoir vous inscrire aux cours. V\u00e9rifier votre bo\u00eete de r\u00e9ception pour un email d'activation. Apr\u00e8s l'activation vous pouvez revenir et rafraichir cette page.",
     "You receive messages from {platform_name} and course teams at this address.": "Les messages que vous recevrez de la part de la plateforme {platform_name} et des \u00e9quipes p\u00e9dagogiques seront envoy\u00e9s \u00e0 cette adresse.",
@@ -2051,7 +2045,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -2109,9 +2103,9 @@
       "%Y-%m-%d"
     ],
     "DECIMAL_SEPARATOR": ",",
-    "FIRST_DAY_OF_WEEK": "1",
+    "FIRST_DAY_OF_WEEK": 1,
     "MONTH_DAY_FORMAT": "j F",
-    "NUMBER_GROUPING": "3",
+    "NUMBER_GROUPING": 3,
     "SHORT_DATETIME_FORMAT": "j N Y H:i",
     "SHORT_DATE_FORMAT": "j N Y",
     "THOUSAND_SEPARATOR": "\u00a0",

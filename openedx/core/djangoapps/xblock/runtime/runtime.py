@@ -4,36 +4,36 @@ Common base classes for all new XBlock runtimes.
 
 import logging
 
+import crum
 from completion import waffle as completion_waffle
 from completion.models import BlockCompletion
 from completion.services import CompletionService
-import crum
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
 from django.utils.lru_cache import lru_cache
 from eventtracking import tracker
 from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
-import track.contexts
-import track.views
+from web_fragments.fragment import Fragment
 from xblock.exceptions import NoSuchServiceError
 from xblock.field_data import SplitFieldData
 from xblock.fields import Scope
-from xblock.runtime import DictKeyValueStore, KvsFieldData, NullI18nService, MemoryIdManager, Runtime
-from web_fragments.fragment import Fragment
+from xblock.runtime import KvsFieldData, MemoryIdManager, NullI18nService, Runtime
 
+import track.contexts
+import track.views
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from lms.djangoapps.grades.api import signals as grades_signals
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
-from openedx.core.djangoapps.xblock.runtime.blockstore_field_data import BlockstoreFieldData, BlockstoreChildrenData
+from openedx.core.djangoapps.xblock.runtime.blockstore_field_data import BlockstoreChildrenData, BlockstoreFieldData
 from openedx.core.djangoapps.xblock.runtime.ephemeral_field_data import EphemeralKeyValueStore
 from openedx.core.djangoapps.xblock.runtime.mixin import LmsBlockMixin
 from openedx.core.djangoapps.xblock.utils import get_xblock_id_for_anonymous_user
 from openedx.core.lib.xblock_utils import wrap_fragment, xblock_local_resource_url
 from static_replace import process_static_urls
 from xmodule.errortracker import make_error_tracker
+
 from .id_managers import OpaqueKeyReader
 from .shims import RuntimeShim, XBlockShim
-
 
 log = logging.getLogger(__name__)
 User = get_user_model()

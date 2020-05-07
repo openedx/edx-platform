@@ -8,9 +8,10 @@ from abc import ABCMeta
 
 import six
 from django.core.files.storage import get_storage_class
-from openedx.core.lib.plugins import PluginError
 from six import text_type
 from xblock.fields import List
+
+from openedx.core.lib.plugins import PluginError
 
 log = logging.getLogger("edx.courseware")
 

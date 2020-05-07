@@ -10,9 +10,6 @@ from uuid import uuid4
 
 import pytz
 import six
-import six.moves.urllib.error  # pylint: disable=import-error
-import six.moves.urllib.parse  # pylint: disable=import-error
-import six.moves.urllib.request  # pylint: disable=import-error
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import Http404, HttpResponse
@@ -25,7 +22,6 @@ from opaque_keys.edx.keys import CourseKey
 
 from badges.events.course_complete import get_completion_badge
 from badges.utils import badges_enabled
-from lms.djangoapps.courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_response
 from edxmako.template import Template
 from lms.djangoapps.certificates.api import (
@@ -44,6 +40,7 @@ from lms.djangoapps.certificates.models import (
     GeneratedCertificate
 )
 from lms.djangoapps.certificates.permissions import PREVIEW_CERTIFICATES
+from lms.djangoapps.courseware.courses import get_course_by_id
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course, display_date_for_certificate
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language

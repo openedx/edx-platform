@@ -14,7 +14,7 @@ from time import time
 import pymongo
 import pytz
 import six
-import six.moves.cPickle as pickle
+from six.moves import cPickle as pickle
 from contracts import check, new_contract
 from mongodb_proxy import autoretry_read
 # Import this just to export it

@@ -1,4 +1,3 @@
-# pylint: disable=missing-docstring,broad-except
 """
 Reload forum (comment client) users from existing users.
 """

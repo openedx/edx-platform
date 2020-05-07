@@ -155,7 +155,6 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
 
         self.user_id = ModuleStoreEnum.UserID.test
 
-    # pylint: disable=invalid-name
     def _create_course(self, course_key, asides=None):
         """
         Create a course w/ one item in the persistence store using the given course & item location.
@@ -249,7 +248,6 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         """
         return self.store.has_changes(self.store.get_item(location))
 
-    # pylint: disable=dangerous-default-value
     def _initialize_mixed(self, mappings=None, contentstore=None):
         """
         initializes the mixed modulestore.
@@ -3571,7 +3569,7 @@ class TestAsidesWithMixedModuleStore(CommonMixedModuleStoreSetup):
         super(TestAsidesWithMixedModuleStore, self).setUp()
         key_store = DictKeyValueStore()
         field_data = KvsFieldData(key_store)
-        self.runtime = TestRuntime(services={'field-data': field_data})  # pylint: disable=abstract-class-instantiated
+        self.runtime = TestRuntime(services={'field-data': field_data})
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     @XBlockAside.register_temp_plugin(AsideFoo, 'test_aside1')

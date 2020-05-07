@@ -1,0 +1,2 @@
+Django>=1.11,<1.12
+django-oauth-toolkit==1.1.3

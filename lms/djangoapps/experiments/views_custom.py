@@ -23,7 +23,7 @@ from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiv
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermissionIsAuthenticated
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 
-from lms.djangoapps.courseware.utils import verified_upgrade_link_is_valid
+from lms.djangoapps.courseware.utils import can_show_verified_upgrade
 from course_modes.models import get_cosmetic_verified_display_price
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
@@ -135,7 +135,7 @@ class Rev934(DeveloperErrorViewMixin, APIView):
             enrollment = CourseEnrollment.objects.select_related(
                 'course'
             ).get(user_id=user.id, course_id=course.id)
-            user_upsell = verified_upgrade_link_is_valid(enrollment)
+            user_upsell = can_show_verified_upgrade(user, enrollment)
         except CourseEnrollment.DoesNotExist:
             user_upsell = True
 

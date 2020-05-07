@@ -456,7 +456,6 @@
     "Do you want to allow this student ('{student_id}') to skip the entrance exam?": "B\u1ea1n c\u00f3 mu\u1ed1n cho ph\u00e9p sinh vi\u00ean n\u00e0y ('{student_id}') \u0111\u01b0\u1ee3c ph\u00e9p b\u1ecf qua b\u00e0i ki\u1ec3m tra \u0111\u1ea7u v\u00e0o?",
     "Do you want to replace the edX transcript with the YouTube transcript?": "B\u1ea1n c\u00f3 mu\u1ed1n thay th\u1ebf b\u1ea3n d\u1ecbch edX b\u1eb1ng b\u1ea3n d\u1ecbch c\u1ee7a YouTube kh\u00f4ng?",
     "Document properties": "\u0110\u1eb7c t\u00ednh t\u00e0i li\u1ec7u",
-    "Does the photo of you match your ID photo?": "H\u00ecnh c\u1ee7a b\u1ea1n c\u00f3 gi\u1ed1ng v\u1edbi h\u00ecnh tr\u00ean ch\u1ee9ng minh nh\u00e2n d\u00e2n kh\u00f4ng?",
     "Does the photo of you show your whole face?": "H\u00ecnh c\u1ee7a b\u1ea1n c\u00f3 hi\u1ec3n th\u1ecb to\u00e0n b\u1ed9 khu\u00f4n m\u1eb7t kh\u00f4ng?",
     "Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission.": "Kh\u00f4ng nh\u00ecn th\u1ea5y h\u00ecnh \u1ea3nh c\u1ee7a b\u1ea1n? H\u00e3y ch\u1eafc ch\u1eafn \u0111\u1ec3 cho ph\u00e9p tr\u00ecnh duy\u1ec7t c\u1ee7a b\u1ea1n \u0111\u1ec3 s\u1eed d\u1ee5ng m\u00e1y \u1ea3nh c\u1ee7a b\u1ea1n khi n\u00f3 y\u00eau c\u1ea7u s\u1ef1 cho ph\u00e9p.",
     "Donate": "Quy\u00ean g\u00f3p",
@@ -1215,7 +1214,7 @@
     "Subject": "Ch\u1ee7 \u0111\u1ec1",
     "Subject:": "Ch\u1ee7 \u0111\u1ec1:",
     "Submission aborted! Sorry, your browser does not support file uploads. If you can, please use Chrome or Safari which have been verified to support file uploads.": "G\u1eedi b\u1ecb h\u1ee7y b\u1ecf! Xin l\u1ed7i, tr\u00ecnh duy\u1ec7t c\u1ee7a b\u1ea1n kh\u00f4ng h\u1ed7 tr\u1ee3 t\u1ea3i l\u00ean t\u1ec7p. N\u1ebfu c\u00f3 th\u1ec3, vui l\u00f2ng s\u1eed d\u1ee5ng Chrome ho\u1eb7c Safari \u0111\u00e3 \u0111\u01b0\u1ee3c x\u00e1c nh\u1eadn h\u1ed7 tr\u1ee3 t\u1ea3i l\u00ean t\u1ec7p tin.",
-    "Submit": "G\u1eedi",
+    "Submit": "N\u1ed9p",
     "Submitted": "\u0110\u00e3 g\u1eedi",
     "Subscript": "Subscript",
     "Subsection": "Ti\u1ec3u m\u1ee5c",
@@ -1319,7 +1318,6 @@
     "The number of subsections in the course that contain problems of this assignment type.": "S\u1ed1 ph\u1ea7n con trong kh\u00f3a h\u1ecdc ch\u1ee9a c\u00e1c c\u00e2u h\u1ecfi c\u1ee7a lo\u1ea1i b\u00e0i t\u1eadp n\u00e0y.",
     "The organization that this signatory belongs to, as it should appear on certificates.": "T\u1ed5 ch\u1ee9c m\u00e0 ng\u01b0\u1eddi k\u00fd t\u00ean n\u00e0y thu\u1ed9c v\u1ec1, nh\u01b0 n\u00f3 s\u1ebd xu\u1ea5t hi\u1ec7n tr\u00ean gi\u1ea5y ch\u1ee9ng nh\u1eadn.",
     "The page \"{route}\" could not be found.": "Kh\u00f4ng th\u1ea5y trang \"{route}\".",
-    "The photo of your face matches the photo on your ID.": "Nh\u1eefng h\u00ecnh \u1ea3nh c\u1ee7a khu\u00f4n m\u1eb7t c\u1ee7a b\u1ea1n ph\u00f9 h\u1ee3p v\u1edbi h\u00ecnh \u1ea3nh tr\u00ean ID c\u1ee7a b\u1ea1n.",
     "The post you selected has been deleted.": "B\u00e0i b\u1ea1n ch\u1ecdn \u0111\u00e3 b\u1ecb x\u00f3a.",
     "The published branch version, {published}, was reset to the draft branch version, {draft}.": "Phi\u00ean b\u1ea3n nh\u00e1nh \u0111\u00e3 xu\u1ea5t b\u1ea3n, {published}, \u0111\u00e3 \u0111\u01b0\u1ee3c \u0111\u1eb7t l\u1ea1i th\u00e0nh phi\u00ean b\u1ea3n nh\u00e1nh d\u1ef1 th\u1ea3o, {draft}.",
     "The raw error message is:": "Th\u00f4ng b\u00e1o l\u1ed7i ban \u0111\u1ea7u l\u00e0:",
@@ -1534,7 +1532,6 @@
     "Use as a Prerequisite": "S\u1eed d\u1ee5ng nh\u01b0 y\u00eau c\u1ea7u b\u0103t bu\u1ed9c",
     "Use cohorts as the basis for dividing discussions. All learners, regardless of cohort, see the same discussion topics, but within divided topics, only members of the same cohort see and respond to each others\u2019 posts. ": "S\u1eed d\u1ee5ng c\u00e1c nh\u00f3m l\u00e0m c\u01a1 s\u1edf \u0111\u1ec3 chia s\u1ebb c\u00e1c cu\u1ed9c th\u1ea3o lu\u1eadn. T\u1ea5t c\u1ea3 ng\u01b0\u1eddi h\u1ecdc, kh\u00f4ng ph\u00e2n bi\u1ec7t nh\u00f3m, xem c\u00e1c ch\u1ee7 \u0111\u1ec1 th\u1ea3o lu\u1eadn gi\u1ed1ng nhau, nh\u01b0ng trong c\u00e1c ch\u1ee7 \u0111\u1ec1 chia s\u1ebb, ch\u1ec9 nh\u1eefng th\u00e0nh vi\u00ean c\u1ee7a c\u00f9ng m\u1ed9t nh\u00f3m m\u1edbi th\u1ea5y v\u00e0 tr\u1ea3 l\u1eddi c\u00e1c b\u00e0i \u0111\u0103ng c\u1ee7a nhau.",
     "Use enrollment tracks as the basis for dividing discussions. All learners, regardless of their enrollment track, see the same discussion topics, but within divided topics, only learners who are in the same enrollment track see and respond to each others\u2019 posts.": "S\u1eed d\u1ee5ng c\u00e1c ki\u1ec3u \u0111\u0103ng k\u00fd l\u00e0m c\u01a1 s\u1edf \u0111\u1ec3 ph\u00e2n chia c\u00e1c cu\u1ed9c th\u1ea3o lu\u1eadn. T\u1ea5t c\u1ea3 h\u1ecdc vi\u00ean, b\u1ea5t k\u1ec3 ki\u1ec3u \u0111\u0103ng k\u00fd c\u1ee7a h\u1ecd, xem c\u00e1c ch\u1ee7 \u0111\u1ec1 th\u1ea3o lu\u1eadn gi\u1ed1ng nhau, nh\u01b0ng trong c\u00e1c ch\u1ee7 \u0111\u1ec1 \u0111\u00e3 ph\u00e2n chia, ch\u1ec9 nh\u1eefng h\u1ecdc vi\u00ean trong c\u00f9ng m\u1ed9t ki\u1ec3u \u0111\u0103ng k\u00fd m\u1edbi nh\u00ecn th\u1ea5y v\u00e0 tr\u1ea3 l\u1eddi c\u00e1c b\u00e0i vi\u1ebft c\u1ee7a nhau.",
-    "Use your webcam to take a photo of your ID. We will match this photo with the photo of your face and the name on your account.": "S\u1eed d\u1ee5ng webcam c\u1ee7a b\u1ea1n \u0111\u1ec3 c\u00f3 m\u1ed9t b\u1ee9c \u1ea3nh c\u1ee7a ID c\u1ee7a b\u1ea1n. Ch\u00fang t\u00f4i s\u1ebd \u0111\u1ed1i b\u1ee9c \u1ea3nh n\u00e0y v\u1edbi h\u00ecnh \u1ea3nh c\u1ee7a khu\u00f4n m\u1eb7t c\u1ee7a b\u1ea1n v\u00e0 t\u00ean t\u00e0i kho\u1ea3n c\u1ee7a b\u1ea1n.",
     "Use your webcam to take a photo of your face. We will match this photo with the photo on your ID.": "S\u1eed d\u1ee5ng webcam c\u1ee7a b\u1ea1n \u0111\u1ec3 c\u00f3 m\u1ed9t h\u00ecnh \u1ea3nh c\u1ee7a khu\u00f4n m\u1eb7t c\u1ee7a b\u1ea1n \u0111\u1ec3 ch\u00fang t\u00f4i c\u00f3 th\u1ec3 k\u1ebft h\u1ee3p n\u00f3 v\u1edbi h\u00ecnh \u1ea3nh tr\u00ean ID c\u1ee7a b\u1ea1n.",
     "Used": "\u0110\u01b0\u1ee3c s\u1eed d\u1ee5ng",
     "Used in {count} location": [
@@ -1659,8 +1656,6 @@
     "You must specify a name": "B\u1ea1n ph\u1ea3i x\u00e1c \u0111\u1ecbnh m\u1ed9t t\u00ean",
     "You must specify a name for the cohort": "B\u1ea1n ph\u1ea3i \u0111\u1eb7t t\u00ean cho nh\u00f3m.",
     "You must specify your birth year before you can share your full profile. To specify your birth year, go to the {account_settings_page_link}": "B\u1ea1n ph\u1ea3i nh\u1eadp v\u00e0o n\u0103m sinh tr\u01b0\u1edbc khi b\u1ea1n c\u00f3 th\u1ec3 chia s\u1ebb to\u00e0n b\u1ed9 h\u1ed3 s\u01a1 c\u1ee7a b\u1ea1n. \u0110\u1ec3 nh\u1eadp v\u00e0o n\u0103m sinh, nh\u1ea5p v\u00e0o {account_settings_page_link}",
-    "You need a driver's license, passport, or other government-issued ID that has your name and photo.": "B\u1ea1n c\u1ea7n c\u00f3 b\u1eb1ng l\u00e1i xe, h\u1ed9 chi\u1ebfu, ho\u1eb7c ID ch\u00ednh ph\u1ee7 ph\u00e1t h\u00e0nh c\u00f3 t\u00ean v\u00e0 \u1ea3nh c\u1ee7a b\u1ea1n.",
-    "You need an ID with your name and photo. A driver's license, passport, or other government-issued IDs are all acceptable.": "B\u1ea1n c\u1ea7n m\u1ed9t ID c\u00f3 t\u00ean v\u00e0 \u1ea3nh c\u1ee7a b\u1ea1n. Gi\u1ea5y ph\u00e9p, h\u1ed9 chi\u1ebfu, ho\u1eb7c ID ch\u00ednh ph\u1ee7 ph\u00e1t h\u00e0nh c\u1ee7a m\u1ed9t tr\u00ecnh \u0111i\u1ec1u khi\u1ec3n \u0111\u01b0\u1ee3c t\u1ea5t c\u1ea3 ch\u1ea5p nh\u1eadn \u0111\u01b0\u1ee3c.",
     "You need to activate your account before you can enroll in courses. Check your inbox for an activation email.": "B\u1ea1n c\u1ea7n k\u00edch ho\u1ea1t t\u00e0i kho\u1ea3n tr\u01b0\u1edbc khi ghi danh v\u00e0o kho\u00e1 h\u1ecdc. Ki\u1ec3m tra h\u1ed9p th\u01b0 \u0111\u1ebfn cho email c\u1ea7n k\u00edch ho\u1ea1t.",
     "You receive messages from {platform_name} and course teams at this address.": "B\u1ea1n nh\u1eadn \u0111\u01b0\u1ee3c tin nh\u1eafn t\u1eeb {platform_name} t\u1ea1i \u0111\u1ecba ch\u1ec9 n\u00e0y.",
     "You reserve all rights for your work": "B\u1ea1n d\u00e0nh t\u1ea5t c\u1ea3 c\u00e1c quy\u1ec1n cho t\u00e1c ph\u1ea9m c\u1ee7a b\u1ea1n",
@@ -1846,7 +1841,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -1910,9 +1905,9 @@
       "%d %B, %Y"
     ],
     "DECIMAL_SEPARATOR": ",",
-    "FIRST_DAY_OF_WEEK": "0",
+    "FIRST_DAY_OF_WEEK": 0,
     "MONTH_DAY_FORMAT": "j F",
-    "NUMBER_GROUPING": "0",
+    "NUMBER_GROUPING": 0,
     "SHORT_DATETIME_FORMAT": "H:i d-m-Y",
     "SHORT_DATE_FORMAT": "d-m-Y",
     "THOUSAND_SEPARATOR": ".",

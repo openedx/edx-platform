@@ -691,10 +691,9 @@ def permalink(content):
     else:
         course_id = content['course_id']
     if content['type'] == 'thread':
-        return reverse('discussion.views.single_thread',
-                       args=[course_id, content['commentable_id'], content['id']])
+        return reverse('single_thread', args=[course_id, content['commentable_id'], content['id']])
     else:
-        return reverse('discussion.views.single_thread',
+        return reverse('single_thread',
                        args=[course_id, content['commentable_id'], content['thread_id']]) + '#' + content['id']
 
 

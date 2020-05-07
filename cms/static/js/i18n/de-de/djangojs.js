@@ -96,6 +96,10 @@
     " ${price} {currency} )": " ${price} {currency} )",
     " From this point in time, you must follow the <a href=\"%(link_urls.online_proctoring_rules)s\" target=\"_blank\">online proctoring rules</a> to pass the proctoring review for your exam. ": " Von jetzt an m\u00fcssen Sie den <a href=\"%(link_urls.online_proctoring_rules)s\" target=\"_blank\">online Beaufsichtigungsregeln</a> folgen, um damit Ihre Pr\u00fcfung zugelassen wird.",
     " Link": " Link",
+    " Member": [
+      "Mitglied",
+      "Mitglieder"
+    ],
     " Your Proctoring Session Has Started ": "Ihre beaufsichtigte Sitzung hat begonnen",
     " and ": "und",
     " and {num_of_minutes} minute": " und {num_of_minutes} Minuten",
@@ -664,7 +668,6 @@
     "Do you want to upload your file before submitting?": "M\u00f6chten Sie die Datei hochladen, bevor Sie Ihre Antwort einreichen?",
     "Document properties": "Dokumenteneigenschaften",
     "Does the name on your ID match your account name: %(fullName)s?": "Passt der Name auf ihr Ausweis zu ihr Kontoname: %(fullName)s?",
-    "Does the photo of you match your ID photo?": "Passt das Foto zu das Foto auf ihr Ausweis?",
     "Does the photo of you show your whole face?": "Zeiget das Foto ihr vollst\u00e4ndiges Gesicht?",
     "Doing so means that you are no longer eligible for academic credit.": "Die Konsequenz hieraus ist, dass Sie nicht l\u00e4nger zum Erwerb akademische Kreditpunkte berechtigt sind.",
     "Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission.": "Wir sehen dein Bild nicht? Vergewissere dich, deinem Browser die Nutzung der Kamera zu erlauben, wenn er nach der Genehmigung fragt.",
@@ -759,6 +762,7 @@
     "Error adding learners.": "Fehler beim Hinzuf\u00fcgen von Lernenden.",
     "Error adding user": "Fehler beim Hinzuf\u00fcgen des Nutzers",
     "Error adding/removing users as beta testers.": "Fehler beim Hinzuf\u00fcgen/Entfernen von Nutzern als Beta-Tester.",
+    "Error assigning team memberships": "Fehler beim zuweisen von Team-Mitgliedschaften",
     "Error changing user's permissions.": "Fehler beim \u00c4ndern der Rechte des Nutzers.",
     "Error deleting entrance exam state for student '{student_id}'. Make sure student identifier is correct.": "Fehler beim L\u00f6schen des Status der Aufnahmepr\u00fcfung f\u00fcr den Teilnehmer '{student_id}'. Vergewissern Sie sich, dass die Teilnehmercode korrekt ist.",
     "Error deleting student '<%- student_id %>'s state on problem '<%- problem_id %>'. Make sure that the problem and student identifiers are complete and correct.": "Fehler beim L\u00f6schen von Teilnehmer '<%- student_id %>'s Status bei Problem '<%- problem_id %>'. Stellen Sie sicher, dass die Problem- und Teilnehmercodes vollst\u00e4ndig und korrekt sind.",
@@ -1132,6 +1136,7 @@
     "Merge cells": "Zellen verbinden",
     "Message:": "Nachricht: ",
     "MicroBachelors": "MicroBachelors",
+    "MicroMasters": "MicroMasters",
     "Middle": "Realschule",
     "Midnight": "Mitternacht",
     "Minimum Completion:": "Mindestabschluss:",
@@ -1150,6 +1155,7 @@
     "Mute": "Stumm",
     "Muted": "Stumm",
     "My Orders": "Meine Bestellungen",
+    "My Teams": "Meine Teams",
     "N/A": "nicht verf\u00fcgbar",
     "Name": "Name",
     "Name ": "Name",
@@ -1503,6 +1509,9 @@
     "Section Visibility": "Sichtbarkeit des Abschnitt",
     "Sections": "Abschnitte",
     "Security": "Sicherheit",
+    "See all teams you belong to and all public teams in your course, organized by topic.": "Lassen Sie alle Teams, denen Sie angeh\u00f6ren, und alle \u00f6ffentlichen Teams in Ihrem Kurs, geordnet nach Themen anzeigen.",
+    "See all teams you belong to and all public teams in your course, organized by topic. Join an open public team to collaborate with other learners who are interested in the same topic as you are.": "Lassen Sie alle Teams, denen Sie angeh\u00f6ren, und alle \u00f6ffentlichen Teams in Ihrem Kurs, die nach Themen geordnet sind anzeigen. Schlie\u00dfen Sie sich einem \u00f6ffentlichen Team an, um mit anderen Teilnehmen zusammenzuarbeiten, die sich f\u00fcr dasselbe Thema interessieren wie Sie.",
+    "See all teams you belong to.": "Alle Teams anzeigen, denen Sie angeh\u00f6ren.",
     "Select": "Ausw\u00e4hlen",
     "Select Session": "Sitzung ausw\u00e4hlen",
     "Select a Content Group": "W\u00e4hle eine Inhaltsgruppe",
@@ -1514,7 +1523,6 @@
     "Select a prerequisite subsection and enter a minimum score percentage and minimum completion percentage to limit access to this subsection. Allowed values are 0-100": "W\u00e4hlen Sie einen vorausgesetzten Unterabschnitt aus und geben Sie einen Mindestpunktzahlanteil und einen Mindestprozentsatz der Vollst\u00e4ndigkeit ein, um den Zugang zu diesem Unterabschnitt einzuschr\u00e4nken. Erlaubte Werte sind 0-100",
     "Select a section or problem": "W\u00e4hlen Sie einen Abschnitt oder eine Aufgabe",
     "Select a session:": "W\u00e4hlen Sie eine Sitzung aus:",
-    "Select a subject for your support request.": "W\u00e4hlen Sie ein Thema f\u00fcr Ihre Supportanfrage aus.",
     "Select a time allotment for the exam. If it is over 24 hours, type in the amount of time. You can grant individual learners extra time to complete the exam through the Instructor Dashboard.": "W\u00e4hlen Sie eine Zeitzuteilung f\u00fcr die Pr\u00fcfung aus. Wenn es mehr als 24 Stunden sind, geben Sie die Zeitspanne ein. Sie k\u00f6nnen einzelnen Lernenden \u00fcber das Lehrer-Dashboard zus\u00e4tzliche Zeit geben, um die Pr\u00fcfung abzuschlie\u00dfen.",
     "Select all": "Alles ausw\u00e4hlen",
     "Select fidelity": "Treue ausw\u00e4hlen",
@@ -1718,7 +1726,6 @@
     "Textbook name is required": "Name f\u00fcr das Textbook wird ben\u00f6tigt",
     "Thank you %(full_name)s! We have received your payment for %(course_name)s.": "Viele Dank %(full_name)s! Wir haben Ihre Zahlung f\u00fcr %(course_name)s erhalten.",
     "Thank you for setting your course goal to {goal}!": "Danke, f\u00fcr das definieren eines Kursziels zu {goal}!",
-    "Thank you for submitting a request! We will contact you within 24 hours.": "Vielen Dank f\u00fcr Ihre Anfrage! Wir werden Sie innerhalb von 24 Stunden kontaktieren.",
     "Thank you for submitting your financial assistance application for {course_name}! You can expect a response in 2-4 business days.": "Vielen Dank, dass Sie Ihren Antrag auf finanzielle Unterst\u00fctzung f\u00fcr {course_name} gestellt haben! Sie k\u00f6nnen mit einer Antwort in 2-4 Werktagen rechnen.",
     "Thank you for submitting your photos. We will review them shortly. You can now sign up for any %(platformName)s course that offers verified certificates. Verification is good for one year. After one year, you must submit photos for verification again.": "Danke f\u00fcr das Einsenden ihre Fotos. Wir werden diese zeitnah pr\u00fcfen. Sie k\u00f6nnen sich jetzt f\u00fcr jeden von %(platformName)s Kurse mit gepr\u00fcftem Zertifikat anmelden. Ihre \u00dcberpr\u00fcfung ist g\u00fcltig f\u00fcr ein Jahr. Nach einem Jahr m\u00fcssen Sie ihre Fotos wieder zur \u00dcberpr\u00fcfungeinsenden. ",
     "Thank you! We have received your payment for {courseName}.": "Dankesch\u00f6n! Wir haben Ihre Zahlung f\u00fcr {courseName} bekommen",
@@ -1747,7 +1754,6 @@
     "The following email addresses and/or usernames are invalid:": "Die folgenden E-Mail-Adressen und/oder Nutzernamen sind ung\u00fcltig:",
     "The following errors were generated:": "Folgende Fehler wurden generiert:",
     "The following file types are not allowed: ": "Die folgenden Dateitypen sind nicht erlaubt:",
-    "The following information is already a part of your {platform} profile. We\\'ve included it here for your application.": "Die folgende Information ist bereits in Ihrem {platform} Profil. Wir haben dies hier eingef\u00fcgt.",
     "The following message will be displayed at the bottom of the courseware pages within your course:": "Die folgende Nachricht wird im unteren Bereich Ihrers Kurses angezeigt. ",
     "The following options are available for the {license_name} license.": "Die folgenden Optionen sind f\u00fcr die {license_name} Lizenz verf\u00fcgbar.",
     "The following users are no longer enrolled in the course:": "Die folgenden Nutzer sind nicht l\u00e4nger in den Kurs eingeschrieben:",
@@ -1767,7 +1773,6 @@
     "The number of subsections in the course that contain problems of this assignment type.": "Anzahl der Unterabschnitte im Kurs, die Aufgaben dieses typs enthalten.",
     "The organization that this signatory belongs to, as it should appear on certificates.": "Die Organisation, zu welcher der Unterzeichner geh\u00f6rt, soll auf dem Zertifikat erscheinen.",
     "The page \"{route}\" could not be found.": "Die Seite \"{route}\" konnte nicht gefunden werden.",
-    "The photo of your face matches the photo on your ID.": "Das Foto von deinem Gesicht muss mit dem Foto in deinem Identit\u00e4tsnachweis \u00fcbereinstimmen",
     "The post you selected has been deleted.": "Der Beitrag, den Sie ausgew\u00e4hlt haben, wurde bereits gel\u00f6scht.",
     "The published branch version, {published}, was reset to the draft branch version, {draft}.": "Die ver\u00f6ffentlichte Branch-Version, {published}, wurde auf den Entwurf der Branch-Version, {draft}, zur\u00fcckgesetzt.",
     "The raw error message is:": "Die urspr\u00fcngliche Fehlermeldung ist:",
@@ -1917,7 +1922,6 @@
     "To review learner cohort assignments or see the results of uploading a CSV file, download course profile information or cohort results on the {link_start}Data Download{link_end} page.": "Um die Kohortenzuordnungen der Lernenden zu \u00fcberpr\u00fcfen oder die Ergebnisse des Hochladens einer CSV-Datei zu sehen, laden Sie Kursprofilinformationen oder Kohortenergebnisse auf der Seite {link_start}Daten-Download{link_end} herunter.",
     "To share your certificate on Mozilla Backpack, you must first have a Backpack account. Complete the following steps to add your certificate to Backpack.": "Um Ihr Zertifikat auf Mozilla Backpack zu teilen, m\u00fcssen Sie zuerst ein Backpack-Konto haben. F\u00fchren Sie die folgenden Schritte aus, um Ihr Zertifikat zum Backpack hinzuzuf\u00fcgen.",
     "To take a successful photo, make sure that:": "Um ein erfolgreiches Bild zu machen, stell sicher dass:",
-    "To use the current photo, select the Take Photo button {icon}. To take another photo, select the Retake Photo button {icon}.": "Um das aktuelle Foto zu verwenden, w\u00e4hlen Sie die Kamerataste {icon}. Um ein weiteres Foto aufzunehmen, w\u00e4hlen Sie die Wiederholungs-Taste {icon}.",
     "To verify your identity, you need a webcam and a government-issued photo ID.": "Um Ihre Identit\u00e4t zu verifizieren, ben\u00f6tigen Sie eine Webcam und einen staatlich ausgestellten Lichtbildausweis.",
     "Today": "Heute",
     "Toggle Account Password (Usable/Unusable)": "Passwort des Benutzerkontos einblenden (Verwendbar/nicht verwendbar)",
@@ -2031,7 +2035,6 @@
     "Use my university info": "Meine Universit\u00e4tsinformationen verwenden",
     "Use the All Topics menu to find specific topics.": "Benutzen Sie das Men\u00fc \"Alle Diskussionen\" um bestimmte Themen zu finden. ",
     "Use the Retake Photo button if you are not pleased with your photo": "Nutzen Sie den Wiederholungsknopf, wenn Sie unzufrieden mit Ihrer Aufnahme sind.",
-    "Use your webcam to take a photo of your ID. We will match this photo with the photo of your face and the name on your account.": "Benutzen Sie ihre webcam um ein Foto von ihr Ausweis zu nehmen. Wir werden dieses Foto mit das Foto von ihr Gesicht und der Name auf ihr Konto vergleichen.",
     "Use your webcam to take a photo of your face. We will match this photo with the photo on your ID.": "Benutze ihre Webcam um ein Foto von ihren Gesicht aufzunehmen damit wir dieses mit dem Foto ihres Ausweises abgleichen k\u00f6nnen.",
     "Used": "benutzt",
     "Used in {count} location": [
@@ -2141,6 +2144,7 @@
     "Yes, delete this {xblock_type}": "Ja, diese {xblock_type} l\u00f6schen",
     "Yes, replace the edX transcript with the YouTube transcript": "Ja, ersetze da sedX-Transkript durch das YouTube-Transkript",
     "Yesterday": "Gestern",
+    "You already belong to another team in this team set.": "Sie geh\u00f6ren bereits zu einem anderen Team in diesem Team-Set.",
     "You already have an edX account with your {enterprise_name} email address.": "Sie haben bereits ein edX Account mit dieser {enterprise_name} E-Mail Adresse.",
     "You are a member of this team.": "Du bist ein Mitglieder dieses Teams.",
     "You are currently sharing a limited profile.": "Sie teilen aktuell ein limitiertes Profil.",
@@ -2210,9 +2214,6 @@
     "You must specify a name": "Sie m\u00fcssen einen Namen auff\u00fchren",
     "You must specify a name for the cohort": "Sie m\u00fcssen einen Namen f\u00fcr die Gro\u00dfgruppe angeben",
     "You must specify your birth year before you can share your full profile. To specify your birth year, go to the {account_settings_page_link}": "Sie m\u00fcssen Ihr Geburtsjahr eintragen, bevor Sie Ihr volles Profil teilen k\u00f6nnen. Gehen Sie zur {account_settings_page_link}, um Ihr Geburtsjahr einzutragen.",
-    "You need a computer or cell phone that has a webcam. When you receive a browser prompt, make sure that you allow access to the camera.": "Sie ben\u00f6tigen ein Computer oder Handy mit integrierter Webcam. Wenn Sie eine Anfrage \u00fcber Ihren Browser bekommen, stellen Sie sicher, dass der Zugriff auf die Kamera aktiviert ist.",
-    "You need a driver's license, passport, or other government-issued ID that has your name and photo.": "Sie ben\u00f6tigen einen F\u00fchrerschein, Reisepass oder einen anderen staatlich ausgestellten Lichtbildausweis mit Ihrem Namen und Foto.",
-    "You need an ID with your name and photo. A driver's license, passport, or other government-issued IDs are all acceptable.": "Sie brauchen ein Ausweis mit ihr Name und Foto. Akzeptierte Identit\u00e4tsnachweise sind F\u00fchrerscheine, Reisep\u00e4sse oder andere Bildausweise mit amtlichen Licht.",
     "You need to activate your account before you can enroll in courses. Check your inbox for an activation email.": "Sie m\u00fcssen ihren Konto aktivieren vor Sie sich an ein Kurs anmelden k\u00f6nnen. Bitte kontrollieren Sie Ihr Posteingang f\u00fcr das Aktivierungsmail. ",
     "You need to activate your account before you can enroll in courses. Check your inbox for an activation email. After you complete activation you can return and refresh this page.": "Vor Sie sich in Kurse eingeladen k\u00f6nnen, m\u00fcssen Sie ihr Konto aktivieren. Kontrollieren Sie ihr Posteingang f\u00fcr das Aktivierungsmail. Nach Sie ihre Aktivierung best\u00e4tigen, k\u00f6nnen Sie diese Seite neuladen.",
     "You receive messages from {platform_name} and course teams at this address.": "Auf diese E-Mail Adresse werden Sie alle Benachrichtigungen und Neuigkeiten der {platform_name} zugesandt bekommen.",
@@ -2489,7 +2490,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -2541,9 +2542,9 @@
       "%Y-%m-%d"
     ],
     "DECIMAL_SEPARATOR": ",",
-    "FIRST_DAY_OF_WEEK": "1",
+    "FIRST_DAY_OF_WEEK": 1,
     "MONTH_DAY_FORMAT": "j. F",
-    "NUMBER_GROUPING": "3",
+    "NUMBER_GROUPING": 3,
     "SHORT_DATETIME_FORMAT": "d.m.Y H:i",
     "SHORT_DATE_FORMAT": "d.m.Y",
     "THOUSAND_SEPARATOR": ".",

@@ -61,11 +61,11 @@ can't yet be deleted, for example if there are straggling course overrides.
 
 """
 
-import crum
 import logging
 from abc import ABCMeta
 from contextlib import contextmanager
 
+import crum
 import six
 from opaque_keys.edx.keys import CourseKey
 from waffle import flag_is_active, switch_is_active

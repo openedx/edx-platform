@@ -57,8 +57,6 @@ for log_name, log_level in LOG_OVERRIDES:
 MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
 MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
 
-os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8000-9000'
-
 THIS_UUID = uuid4().hex[:5]
 
 FEATURES['DISABLE_SET_JWT_COOKIES_FOR_TESTS'] = True
@@ -195,11 +193,6 @@ DATABASES = {
     },
 }
 
-if os.environ.get('DISABLE_MIGRATIONS'):
-    # Create tables directly from apps' models. This can be removed once we upgrade
-    # to Django 1.9, which allows setting MIGRATION_MODULES to None in order to skip migrations.
-    MIGRATION_MODULES = NoOpMigrationModules()
-
 CACHES = {
     # This is the cache used for most things.
     # In staging/prod envs, the sessions also live here.
@@ -261,6 +254,7 @@ AUTHENTICATION_BACKENDS = [
     'social_core.backends.facebook.FacebookOAuth2',
     'social_core.backends.azuread.AzureADOAuth2',
     'social_core.backends.twitter.TwitterOAuth',
+    'third_party_auth.identityserver3.IdentityServer3',
     'third_party_auth.dummy.DummyBackend',
     'third_party_auth.saml.SAMLAuthBackend',
     'third_party_auth.lti.LTIAuthBackend',
@@ -530,7 +524,6 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
 )
 
 ####################### Authentication Settings ##########################
-# pylint: disable=unicode-format-string
 JWT_AUTH.update({
     'JWT_PUBLIC_SIGNING_JWK_SET': (
         '{"keys": [{"kid": "BTZ9HA6K", "e": "AQAB", "kty": "RSA", "n": "o5cn3ljSRi6FaDEKTn0PS-oL9EFyv1pI7dRgffQLD1qf5D6'

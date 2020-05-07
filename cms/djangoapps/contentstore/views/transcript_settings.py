@@ -23,6 +23,10 @@ from opaque_keys.edx.keys import CourseKey
 
 from contentstore.views.videos import TranscriptProvider
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
+from openedx.core.djangoapps.video_pipeline.config.waffle import (
+    SAVE_CREDENTIALS_IN_VAL,
+    waffle_flags
+)
 from openedx.core.djangoapps.video_pipeline.api import update_3rd_party_transcription_service_credentials
 from student.auth import has_studio_write_access
 from util.json_request import JsonResponse, expect_json
@@ -110,7 +114,12 @@ def transcript_credentials_handler(request, course_key_string):
     else:
         # Send the validated credentials to edx-video-pipeline.
         credentials_payload = dict(validated_credentials, org=course_key.org, provider=provider)
-        error_response, is_updated = update_3rd_party_transcription_service_credentials(**credentials_payload)
+        if waffle_flags()[SAVE_CREDENTIALS_IN_VAL].is_enabled(course_key):
+            from edxval.api import create_or_update_transcript_credentials
+            response = create_or_update_transcript_credentials(**credentials_payload)
+            error_response, is_updated = response, not response.get('error_type')
+        else:
+            error_response, is_updated = update_3rd_party_transcription_service_credentials(**credentials_payload)
         # Send appropriate response based on whether credentials were updated or not.
         if is_updated:
             # Cache credentials state in edx-val.

@@ -12,7 +12,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
-from lms.djangoapps.teams.models import CourseTeam
+from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.lib.teams_config import TeamsetType
 from student.models import CourseEnrollment, anonymous_id_for_user
 from student.roles import CourseInstructorRole, CourseStaffRole
@@ -181,6 +181,61 @@ def user_organization_protection_status(user, course_key):
 
 
 def has_specific_team_access(user, team):
+    """
+    To have access to a team a user must:
+        - Be course staff
+        OR
+        - be in the correct bubble
+        - be in the team if it is private
+    """
+    return has_course_staff_privileges(user, team.course_id) or (
+        user_protection_status_matches_team(user, team) and user_on_team_or_team_is_public(user, team)
+    )
+
+
+def has_specific_teamset_access(user, course_module, teamset_id):
+    """
+    Staff have access to all teamsets.
+    All non-staff users have access to open and public_managed teamsets.
+    Non-staff users only have access to a private_managed teamset if they are in a team in that teamset
+    """
+    return has_course_staff_privileges(user, course_module.id) or \
+        teamset_is_public_or_user_is_on_team_in_teamset(user, course_module, teamset_id)
+
+
+def teamset_is_public_or_user_is_on_team_in_teamset(user, course_module, teamset_id):
+    """
+    The only users who should be able to see private_managed teamsets
+    or recieve any information about them at all from the API are:
+    - Course staff
+    - Users who are enrolled in a team in a private_managed teamset
+
+    course_module is passed in because almost universally where we'll be calling this, we will already
+    need to have looked up the course from modulestore to make sure that the topic we're interested in
+    exists in the course.
+    """
+    teamset = course_module.teams_configuration.teamsets_by_id[teamset_id]
+    if teamset.teamset_type != TeamsetType.private_managed:
+        return True
+    return CourseTeamMembership.user_in_team_for_course(user, course_module.id, topic_id=teamset_id)
+
+
+def user_on_team_or_team_is_public(user, team):
+    """
+    The only users who should be able to see private_managed teams
+    or recieve any information about them at all from the API are:
+    - Course staff
+    - Users who are enrolled in a team in a private_managed teamset
+    * They should only be able to see their own team, no other teams.
+    """
+    if CourseTeamMembership.is_user_on_team(user, team):
+        return True
+    course_module = modulestore().get_course(team.course_id)
+    teamset = course_module.teams_configuration.teamsets_by_id[team.topic_id]
+    return teamset.teamset_type != TeamsetType.private_managed
+
+
+def user_protection_status_matches_team(user, team):
     """
     Check whether the user have access to the specific team.
     The user can be of a different organization protection bubble with the team in question.

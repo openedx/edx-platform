@@ -314,9 +314,13 @@ div.reset-deadlines-banner {
 
   div.reset-deadlines-text {
     color: theme-color("inverse");
-    padding-top: 10px;
-    margin-right: 10px;
-    flex: 0 0 auto;
+    margin: 10px 10px 10px 0;
+    flex: 0 1 auto;
+
+    a {
+      color: #fff;
+      text-decoration: underline;
+    }
   }
 
   form {

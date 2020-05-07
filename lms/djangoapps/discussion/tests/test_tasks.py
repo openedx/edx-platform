@@ -232,7 +232,6 @@ class TaskTestCase(ModuleStoreTestCase):
         with emulate_http_request(
             site=message.context['site'], user=self.thread_author
         ):
-            # pylint: disable=unsupported-membership-test
             rendered_email = EmailRenderer().render(get_channel_for_message(ChannelType.EMAIL, message), message)
             assert self.comment['body'] in rendered_email.body_html
             assert self.comment_author.username in rendered_email.body_html

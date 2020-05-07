@@ -1,0 +1,127 @@
+$full-width-banner-img-height: 260px !default;
+$full-width-banner-img-width: 1140px !default;
+$full-width-banner-margin: 20px;
+
+.full-width-banner {
+  position: relative;
+
+  .banner-background-wrapper {
+    height: $full-width-banner-img-height;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    background: $black;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background: $black;
+      opacity: 0.65;
+
+      @include media-breakpoint-up(md) {
+        opacity: 0.4;
+      }
+    }
+  }
+
+  .banner-background-image {
+    height: $full-width-banner-img-height;
+
+    @include media-breakpoint-up($full-width-banner-img-width) {
+      height: auto;
+      width: 100%;
+    }
+  }
+
+  .banner-content {
+    position: absolute;
+    top: 0;
+    left: $full-width-banner-margin;
+    right: $full-width-banner-margin;
+  }
+}
+
+.page-banner {
+  max-width: map-get($grid-breakpoints, xl);
+  margin: 0 auto;
+
+  .user-messages {
+    padding-top: $baseline;
+
+    // Hack: force override the global important rule
+    // that courseware links don't have an underline.
+    a:hover {
+      color: $link-color;
+      text-decoration: underline !important;
+    }
+
+    .user-messages-ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        margin: 5px 0;
+      }
+    }
+  }
+
+  .alert {
+    display: flex;
+    padding: $baseline;
+    border: 1px solid;
+
+    &:not(:last-child) {
+      margin-bottom: $baseline / 2;
+    }
+
+    .icon-alert {
+      @include margin-right($baseline);
+    }
+
+    .message-actions {
+      @include margin-left($baseline);
+    }
+
+    &.alert-info {
+      color: $state-info-text;
+      background-color: $state-info-bg;
+      border-color: $state-info-border;
+      box-shadow: none;
+      line-height: initial;
+
+      a,
+      a:visited,
+      .btn-link {
+        color: $state-info-text-link;
+        font-weight: bold;
+        border-color: transparent;
+      }
+    }
+
+    &.alert-success {
+      color: $state-success-text;
+      background-color: $state-success-bg;
+      border-color: $state-success-border;
+      box-shadow: none;
+    }
+
+    &.alert-warning {
+      color: $state-warning-text;
+      background-color: $state-warning-bg;
+      border-color: $state-warning-border;
+      box-shadow: none;
+    }
+
+    &.alert-danger {
+      color: $state-danger-text;
+      background-color: $state-danger-bg;
+      border-color: $state-danger-border;
+      box-shadow: none;
+    }
+  }
+}

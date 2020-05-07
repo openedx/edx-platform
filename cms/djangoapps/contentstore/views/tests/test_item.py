@@ -2202,7 +2202,7 @@ class TestComponentHandler(TestCase):
         """
         test get_aside_from_xblock called
         """
-        def create_response(handler, request, suffix):  # pylint: disable=unused-argument
+        def create_response(handler, request, suffix):
             """create dummy response"""
             return Response(status_code=200)
 

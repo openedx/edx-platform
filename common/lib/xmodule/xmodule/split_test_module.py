@@ -329,7 +329,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
             return fragment
 
     @XBlock.handler
-    def log_child_render(self, request, suffix=''):  # pylint: disable=unused-argument
+    def log_child_render(self, request, suffix=''):
         """
         Record in the tracking logs which child was rendered
         """
@@ -382,9 +382,10 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         return self.descriptor.validate()
 
 
-@XBlock.needs('user_tags')  # pylint: disable=abstract-method
+@XBlock.needs('user_tags')
 @XBlock.needs('partitions')
 @XBlock.needs('user')
+# pylint: disable=missing-class-docstring
 class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDescriptor):
     # the editing interface can be the same as for sequences -- just a container
     module_class = SplitTestModule
@@ -648,7 +649,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         return None
 
     @XBlock.handler
-    def add_missing_groups(self, request, suffix=''):  # pylint: disable=unused-argument
+    def add_missing_groups(self, request, suffix=''):
         """
         Create verticals for any missing groups in the split test instance.
 

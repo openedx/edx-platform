@@ -6,13 +6,13 @@ Tests for exporting OLX content.
 import shutil
 import tarfile
 import unittest
-from six import StringIO
 from tempfile import mkdtemp
 
 import ddt
 import six
 from django.core.management import CommandError, call_command
 from path import Path as path
+from six import StringIO
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

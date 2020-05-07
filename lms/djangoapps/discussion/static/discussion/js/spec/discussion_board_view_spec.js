@@ -1,4 +1,4 @@
-/* globals Discussion, DiscussionCourseSettings */
+/* globals Discussion, DiscussionCourseSettings, DiscussionUser, DiscussionUtil */
 (function(define) {
     'use strict';
     define(
@@ -26,9 +26,32 @@
                         discussion: discussion,
                         courseSettings: courseSettings
                     });
+                    window.ENABLE_FORUM_DAILY_DIGEST = true;
+                    window.user = new DiscussionUser({
+                        id: 99
+                    });
 
                     return discussionBoardView;
                 };
+
+                describe('goHome view', function() {
+                    it('Ensure no ajax request when digests are unavailable', function() {
+                        var discussionBoardView = createDiscussionBoardView();
+                        spyOn(DiscussionUtil, 'safeAjax').and.callThrough();
+                        window.ENABLE_FORUM_DAILY_DIGEST = false;
+
+                        discussionBoardView.goHome();
+                        expect(DiscussionUtil.safeAjax).not.toHaveBeenCalled();
+                    });
+                    it('Verify the ajax request when digests are available', function() {
+                        var discussionBoardView = createDiscussionBoardView();
+                        discussionBoardView.render();
+                        spyOn(DiscussionUtil, 'safeAjax').and.callThrough();
+
+                        discussionBoardView.goHome();
+                        expect(DiscussionUtil.safeAjax).toHaveBeenCalled();
+                    });
+                });
 
                 describe('Thread List View', function() {
                     it('should ensure the mode is all', function() {

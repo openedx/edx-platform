@@ -5,22 +5,21 @@ API for the gating djangoapp
 import json
 import logging
 
+from completion.models import BlockCompletion
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.translation import ugettext as _
-
-from completion.models import BlockCompletion
-from lms.djangoapps.courseware.access import _has_access_to_course
-from lms.djangoapps.course_blocks.api import get_course_blocks
-from lms.djangoapps.grades.api import SubsectionGradeFactory
 from milestones import api as milestones_api
 from opaque_keys.edx.keys import UsageKey
+from xblock.completable import XBlockCompletionMode as CompletionMode
+
+from lms.djangoapps.course_blocks.api import get_course_blocks
+from lms.djangoapps.courseware.access import _has_access_to_course
+from lms.djangoapps.grades.api import SubsectionGradeFactory
 from openedx.core.lib.gating.exceptions import GatingValidationError
 from util import milestones_helpers
-from xblock.completable import XBlockCompletionMode as CompletionMode
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-
 
 log = logging.getLogger(__name__)
 

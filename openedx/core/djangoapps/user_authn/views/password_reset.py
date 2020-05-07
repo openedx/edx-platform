@@ -3,34 +3,30 @@
 import logging
 
 from django import forms
-
-from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
-
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth.views import (
-    INTERNAL_RESET_SESSION_TOKEN, PasswordResetConfirmView)
+from django.contrib.auth.views import INTERNAL_RESET_SESSION_TOKEN, PasswordResetConfirmView
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import ValidationError
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
 from django.template.response import TemplateResponse
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import base36_to_int, int_to_base36, urlsafe_base64_encode
 from django.utils.translation import ugettext_lazy as _
-from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_POST
-
 from edx_ace import ace
 from edx_ace.recipient import Recipient
-from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from rest_framework.views import APIView
 
+from edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.oauth_dispatch.api import destroy_oauth_tokens
@@ -41,16 +37,13 @@ from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_f
 from openedx.core.djangoapps.user_api.helpers import FormDescription
 from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
-from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangoapps.user_authn.message_types import PasswordReset
 from openedx.core.djangolib.markup import HTML
-
-from student.models import AccountRecovery
 from student.forms import send_account_recovery_email_for_user
-
+from student.models import AccountRecovery
 from util.json_request import JsonResponse
 from util.password_policy_validators import normalize_password, validate_password
-from util.request_rate_limiter import BadRequestRateLimiter, PasswordResetEmailRateLimiter
+from util.request_rate_limiter import PasswordResetEmailRateLimiter
 
 SETTING_CHANGE_INITIATED = 'edx.user.settings.change_initiated'
 
@@ -249,11 +242,18 @@ def password_reset(request):
     """
     Attempts to send a password reset e-mail.
     """
-    # Add some rate limiting here by re-using the RateLimitMixin as a helper class
-    limiter = BadRequestRateLimiter()
-    if limiter.is_rate_limit_exceeded(request):
-        AUDIT_LOG.warning("Rate limit exceeded in password_reset")
-        return HttpResponseForbidden()
+
+    password_reset_email_limiter = PasswordResetEmailRateLimiter()
+
+    if password_reset_email_limiter.is_rate_limit_exceeded(request):
+        AUDIT_LOG.warning("Password reset rate limit exceeded")
+        return JsonResponse(
+            {
+                'success': False,
+                'value': _("Your previous request is in progress, please try again in a few moments.")
+            },
+            status=403
+        )
 
     form = PasswordResetFormNoActive(request.POST)
     if form.is_valid():
@@ -276,7 +276,8 @@ def password_reset(request):
     else:
         # bad user? tick the rate limiter counter
         AUDIT_LOG.info("Bad password_reset user passed in.")
-        limiter.tick_request_counter(request)
+
+    password_reset_email_limiter.tick_request_counter(request)
 
     return JsonResponse({
         'success': True,
@@ -367,22 +368,6 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
             'form': None,
             'title': _('Password reset unsuccessful'),
             'err_msg': _('Error in resetting your password.'),
-        }
-        context.update(self.platform_name)
-        return TemplateResponse(
-            request, 'registration/password_reset_confirm.html', context
-        )
-
-    def _handle_system_unavailability(self, request):
-        """
-        method to stop password reset process if system is under maintenance
-        """
-
-        context = {
-            'validlink': False,
-            'form': None,
-            'title': _('Password reset unsuccessful'),
-            'err_msg': SYSTEM_MAINTENANCE_MSG,
         }
         context.update(self.platform_name)
         return TemplateResponse(
@@ -499,8 +484,6 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
             return response
         if UserRetirementRequest.has_user_requested_retirement(self.user):
             return self._handle_retired_user(self.request)
-        if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
-            return self._handle_system_unavailability(self.request)
 
         if self.request.method == 'POST':
             return self.post(self.request, *args, **kwargs)

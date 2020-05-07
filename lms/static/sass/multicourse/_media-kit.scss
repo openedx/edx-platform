@@ -25,10 +25,6 @@ $white: rgb(255, 255, 255);
       &:last-child {
         margin-bottom: 0;
       }
-
-      header {
-
-      }
     }
   }
 
@@ -86,7 +82,8 @@ $white: rgb(255, 255, 255);
       }
     }
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       .note {
         color: shade($blue, 25%);
       }
@@ -189,9 +186,9 @@ $white: rgb(255, 255, 255);
     @include box-sizing(border-box);
 
     box-shadow: 0 1px 4px 0 $shadow;
-    border: 3px solid tint($light-gray,50%);
+    border: 3px solid tint($light-gray, 50%);
     padding: 0;
-    background: tint($light-gray,50%);
+    background: tint($light-gray, 50%);
 
     header {
       padding: ($baseline*0.75) $baseline;
@@ -246,17 +243,18 @@ $white: rgb(255, 255, 255);
           box-shadow: 0 1px 2px 0 $shadow-l1;
           display: block;
           min-height: 380px;
-          border: 2px solid tint($light-gray,75%);
+          border: 2px solid tint($light-gray, 75%);
           padding: $baseline;
 
-          &:hover, &:focus {
+          &:hover,
+          &:focus {
             border-color: $blue;
           }
         }
 
         img {
           display: block;
-          border: 2px solid tint($light-gray,80%);
+          border: 2px solid tint($light-gray, 80%);
           margin: 0 auto ($baseline*0.75);
         }
 
@@ -272,10 +270,5 @@ $white: rgb(255, 255, 255);
         }
       }
     }
-  }
-
-  // share
-  .share {
-
   }
 }

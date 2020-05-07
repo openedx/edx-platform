@@ -7,12 +7,11 @@ div.reset-deadlines-banner {
 
   div,
   button {
-    flex: 0 0 auto;
+    flex: 0 1 auto;
 
     &.reset-deadlines-text {
       color: theme-color("inverse");
-      padding-top: 10px;
-      margin-right: 10px;
+      margin: 10px 10px 10px 0;
     }
 
     &.reset-deadlines-button {

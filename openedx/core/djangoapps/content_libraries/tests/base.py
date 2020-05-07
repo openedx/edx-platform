@@ -3,12 +3,12 @@
 Tests for Blockstore-based Content Libraries
 """
 from contextlib import contextmanager
+from io import BytesIO
 import unittest
 
 from django.conf import settings
 from organizations.models import Organization
 from rest_framework.test import APITestCase, APIClient
-import six
 
 from student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import skip_unless_cms
@@ -20,6 +20,7 @@ URL_PREFIX = '/api/libraries/v2/'
 URL_LIB_CREATE = URL_PREFIX
 URL_LIB_DETAIL = URL_PREFIX + '{lib_key}/'  # Get data about a library, update or delete library
 URL_LIB_BLOCK_TYPES = URL_LIB_DETAIL + 'block_types/'  # Get the list of XBlock types that can be added to this library
+URL_LIB_LINKS = URL_LIB_DETAIL + 'links/'  # Get the list of links in this library, or add a new one
 URL_LIB_COMMIT = URL_LIB_DETAIL + 'commit/'  # Commit (POST) or revert (DELETE) all pending changes to this library
 URL_LIB_BLOCKS = URL_LIB_DETAIL + 'blocks/'  # Get the list of XBlocks in this library, or add a new one
 URL_LIB_TEAM = URL_LIB_DETAIL + 'team/'  # Get the list of users/groups authorized to use this library
@@ -32,6 +33,7 @@ URL_LIB_BLOCK_ASSET_FILE = URL_LIB_BLOCK + 'assets/{file_name}'  # Get, delete, 
 
 URL_BLOCK_RENDER_VIEW = '/api/xblock/v2/xblocks/{block_key}/view/{view_name}/'
 URL_BLOCK_GET_HANDLER_URL = '/api/xblock/v2/xblocks/{block_key}/handler_url/{handler_name}/'
+URL_BLOCK_METADATA_URL = '/api/xblock/v2/xblocks/{block_key}/'
 
 
 # Decorator for tests that require blockstore
@@ -66,19 +68,19 @@ class ContentLibrariesRestApiTest(APITestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(ContentLibrariesRestApiTest, cls).setUpClass()
+        super().setUpClass()
         cls.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
         # Create a collection using Blockstore API directly only because there
         # is not yet any Studio REST API for doing so:
         cls.collection = blockstore_api.create_collection("Content Library Test Collection")
         # Create an organization
-        cls.organization = Organization.objects.create(
-            name="Content Libraries Tachyon Exploration & Survey Team",
+        cls.organization, _ = Organization.objects.get_or_create(
             short_name="CL-TEST",
+            defaults={"name": "Content Libraries Tachyon Exploration & Survey Team"},
         )
 
     def setUp(self):
-        super(ContentLibrariesRestApiTest, self).setUp()
+        super().setUp()
         self.clients_by_user = {}
         self.client.login(username=self.user.username, password="edx")
 
@@ -141,6 +143,23 @@ class ContentLibrariesRestApiTest(APITestCase):
     def _delete_library(self, lib_key, expect_response=200):
         """ Delete an existing library """
         return self._api('delete', URL_LIB_DETAIL.format(lib_key=lib_key), None, expect_response)
+
+    def _get_library_links(self, lib_key):
+        """ Get the links of the specified content library """
+        return self._api('get', URL_LIB_LINKS.format(lib_key=lib_key), None, expect_response=200)
+
+    def _link_to_library(self, lib_key, link_id, other_library_key, version=None):
+        """
+        Modify the library identified by lib_key to create a named link to
+        other_library_key. This allows you to use XBlocks from other_library in
+        lib. Optionally specify a version to link to.
+        """
+        data = {
+            "id": link_id,
+            "opaque_key": other_library_key,
+            "version": version,
+        }
+        return self._api('post', URL_LIB_LINKS.format(lib_key=lib_key), data, expect_response=200)
 
     def _commit_library_changes(self, lib_key, expect_response=200):
         """ Commit changes to an existing library """
@@ -220,8 +239,8 @@ class ContentLibrariesRestApiTest(APITestCase):
 
         content should be a binary string.
         """
-        assert isinstance(content, six.binary_type)
-        file_handle = six.BytesIO(content)
+        assert isinstance(content, bytes)
+        file_handle = BytesIO(content)
         url = URL_LIB_BLOCK_ASSET_FILE.format(block_key=block_key, file_name=file_name)
         response = self.client.put(url, data={"content": file_handle})
         self.assertEqual(

@@ -34,7 +34,7 @@
     "Choose a Date": "Kies een datum",
     "Choose a Time": "Kies een tijdstip",
     "Choose a time": "Kies een tijd",
-    "Choose all": "Kies alle",
+    "Choose all": "Alle kiezen",
     "Chosen %s": "Gekozen %s",
     "Click to choose all %s at once.": "Klik om alle %s te kiezen.",
     "Click to remove all chosen %s at once.": "Klik om alle gekozen %s tegelijk te verwijderen.",
@@ -50,12 +50,12 @@
     "Midnight": "Middernacht",
     "Noon": "12 uur 's middags",
     "Note: You are %s hour ahead of server time.": [
-      "Let op: U ligt %s uur voor ten opzichte van de server-tijd.",
-      "Let op: U ligt %s uren voor ten opzichte van de server-tijd."
+      "Let op: u ligt %s uur voor ten opzichte van de servertijd.",
+      "Let op: u ligt %s uur voor ten opzichte van de servertijd."
     ],
     "Note: You are %s hour behind server time.": [
-      "Let op: U ligt %s uur achter ten opzichte van de server-tijd.",
-      "Let op: U ligt %s uren achter ten opzichte van de server-tijd."
+      "Let op: u ligt %s uur achter ten opzichte van de servertijd.",
+      "Let op: u ligt %s uur achter ten opzichte van de servertijd."
     ],
     "November": "november",
     "Now": "Nu",
@@ -64,15 +64,15 @@
     "Remove all": "Verwijder alles",
     "September": "september",
     "Show": "Tonen",
-    "This is the list of available %s. You may choose some by selecting them in the box below and then clicking the \"Choose\" arrow between the two boxes.": "Dit is de lijst met beschikbare %s. U kunt kiezen uit een aantal door ze te selecteren in het vak hieronder en vervolgens op de \"Kiezen\" pijl tussen de twee lijsten te klikken.",
-    "This is the list of chosen %s. You may remove some by selecting them in the box below and then clicking the \"Remove\" arrow between the two boxes.": "Dit is de lijst van de gekozen %s. Je kunt ze verwijderen door ze te selecteren in het vak hieronder en vervolgens op de \"Verwijderen\" pijl tussen de twee lijsten te klikken.",
+    "This is the list of available %s. You may choose some by selecting them in the box below and then clicking the \"Choose\" arrow between the two boxes.": "Dit is de lijst met beschikbare %s. U kunt er een aantal kiezen door ze in het vak hieronder te selecteren en daarna op de pijl 'Kiezen' tussen de twee vakken te klikken.",
+    "This is the list of chosen %s. You may remove some by selecting them in the box below and then clicking the \"Remove\" arrow between the two boxes.": "Dit is de lijst met gekozen %s. U kunt er een aantal verwijderen door ze in het vak hieronder te selecteren en daarna op de pijl 'Verwijderen' tussen de twee vakken te klikken.",
     "Today": "Vandaag",
     "Tomorrow": "Morgen",
-    "Type into this box to filter down the list of available %s.": "Type in dit vak om te filteren in de lijst met beschikbare %s.",
+    "Type into this box to filter down the list of available %s.": "Typ in dit vak om de lijst met beschikbare %s te filteren.",
     "Yesterday": "Gisteren",
-    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "U heeft een actie geselecteerd en heeft geen wijzigingen gemaakt op de individuele velden. U zoekt waarschijnlijk naar de Gaan knop in plaats van de Opslaan knop.",
-    "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "U heeft een actie geselecteerd, maar heeft de wijzigingen op de individuele velden nog niet opgeslagen. Klik alstublieft op OK om op te slaan. U zult vervolgens de actie opnieuw moeten uitvoeren.",
-    "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "U heeft niet opgeslagen wijzigingen op enkele indviduele velden. Als u nu een actie uitvoert zullen uw wijzigingen verloren gaan.",
+    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "U hebt een actie geselecteerd, en geen wijzigingen in afzonderlijke velden aangebracht. Waarschijnlijk zoekt u de knop Gaan in plaats van de knop Opslaan.",
+    "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "U hebt een actie geselecteerd, maar uw wijzigingen in afzonderlijke velden nog niet opgeslagen. Klik op OK om op te slaan. U dient de actie opnieuw uit te voeren.",
+    "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "U hebt niet-opgeslagen wijzigingen op afzonderlijke bewerkbare velden. Als u een actie uitvoert, gaan uw wijzigingen verloren.",
     "one letter Friday\u0004F": "F",
     "one letter Monday\u0004M": "M",
     "one letter Saturday\u0004S": "S",
@@ -101,7 +101,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -183,9 +183,9 @@
       "%Y-%m-%d"
     ],
     "DECIMAL_SEPARATOR": ",",
-    "FIRST_DAY_OF_WEEK": "1",
+    "FIRST_DAY_OF_WEEK": 1,
     "MONTH_DAY_FORMAT": "j F",
-    "NUMBER_GROUPING": "3",
+    "NUMBER_GROUPING": 3,
     "SHORT_DATETIME_FORMAT": "j-n-Y H:i",
     "SHORT_DATE_FORMAT": "j-n-Y",
     "THOUSAND_SEPARATOR": ".",

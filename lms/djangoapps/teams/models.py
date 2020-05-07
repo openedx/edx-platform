@@ -205,13 +205,13 @@ class CourseTeam(models.Model):
 
     def add_user(self, user):
         """Adds the given user to the CourseTeam."""
-        from lms.djangoapps.teams.api import has_specific_team_access
+        from lms.djangoapps.teams.api import user_protection_status_matches_team
 
         if not CourseEnrollment.is_enrolled(user, self.course_id):
             raise NotEnrolledInCourseForTeam
         if CourseTeamMembership.user_in_team_for_course(user, self.course_id, self.topic_id):
             raise AlreadyOnTeamInCourse
-        if not has_specific_team_access(user, self):
+        if not user_protection_status_matches_team(user, self):
             raise AddToIncompatibleTeamError
         return CourseTeamMembership.objects.create(
             user=user,

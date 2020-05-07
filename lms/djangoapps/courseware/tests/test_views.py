@@ -26,13 +26,13 @@ from django.urls import reverse, reverse_lazy
 from freezegun import freeze_time
 from markupsafe import escape
 from milestones.tests.utils import MilestonesTestCaseMixin
-from mock import MagicMock, PropertyMock, create_autospec, patch
+from mock import MagicMock, PropertyMock, call, create_autospec, patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC
 from six import text_type
 from six.moves import range
-from six.moves.html_parser import HTMLParser  # pylint: disable=import-error
-from six.moves.urllib.parse import quote, urlencode  # pylint: disable=import-error
+from six.moves.html_parser import HTMLParser
+from six.moves.urllib.parse import quote, urlencode
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, String
@@ -835,35 +835,6 @@ class ViewsTestCase(BaseViewsTestCase):
         self.assertEqual(response.status_code, 200)
 
         self.assertNotContains(response, str(course.id))
-
-    @patch.object(CourseOverview, 'load_from_module_store', return_value=None)
-    def test_financial_assistance_form_missing_course_overview(self, _mock_course_overview):
-        """
-        Verify that learners can not get financial aid for the courses with no
-        course overview.
-        """
-        # Create course
-        course = CourseFactory.create().id
-
-        # Create Course Modes
-        CourseModeFactory.create(mode_slug=CourseMode.AUDIT, course_id=course)
-        CourseModeFactory.create(mode_slug=CourseMode.VERIFIED, course_id=course)
-
-        # Enroll user in the course
-        # Don't use the CourseEnrollmentFactory since it ensures a CourseOverview is available
-        enrollment = CourseEnrollment.objects.create(
-            course_id=course,
-            user=self.user,
-            mode=CourseMode.AUDIT,
-        )
-
-        self.assertEqual(enrollment.course_overview, None)
-
-        url = reverse('financial_assistance_form')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-        self.assertNotContains(response, str(course))
 
     def test_financial_assistance_form(self):
         """Verify that learner can get the financial aid for the course in which
@@ -2601,7 +2572,8 @@ class TestIndexView(ModuleStoreTestCase):
             )
 
     @RELATIVE_DATES_FLAG.override(active=True)
-    def test_reset_deadlines_banner_is_present_when_viewing_courseware(self):
+    @ddt.data(True, False)
+    def test_reset_deadlines_banner_is_present_when_viewing_courseware(self, graded_section):
         user = UserFactory()
         course = CourseFactory.create(self_paced=True)
         with self.store.bulk_operations(course.id):
@@ -2610,6 +2582,7 @@ class TestIndexView(ModuleStoreTestCase):
                 parent=chapter, category='sequential',
                 display_name="Sequence",
                 due=datetime.today() - timedelta(1),
+                graded=graded_section,
             )
 
         CourseOverview.load_from_module_store(course.id)
@@ -2626,7 +2599,11 @@ class TestIndexView(ModuleStoreTestCase):
             ) + '?activate_block_id=test_block_id'
         )
 
-        self.assertContains(response, '<div class="reset-deadlines-banner">')
+        banner = '<div class="reset-deadlines-banner">'
+        if graded_section:
+            self.assertContains(response, banner)
+        else:
+            self.assertNotContains(response, banner)
 
 
 @ddt.ddt
@@ -3191,12 +3168,16 @@ class DatesTabTestCase(ModuleStoreTestCase):
             deadline=now + timedelta(days=2)
         )
 
+        self.user = UserFactory()
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+
     def _get_response(self, course):
         """ Returns the HTML for the progress page """
         return self.client.get(reverse('dates', args=[six.text_type(course.id)]))
 
     @RELATIVE_DATES_FLAG.override(active=True)
-    def test_defaults(self):
+    @patch('edx_django_utils.monitoring.set_custom_metric')
+    def test_defaults(self, mock_set_custom_metric):
         enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.VERIFIED)
         now = datetime.now(utc)
         with self.store.bulk_operations(self.course.id):
@@ -3206,47 +3187,47 @@ class DatesTabTestCase(ModuleStoreTestCase):
                 display_name='Released',
                 parent_location=section.location,
                 start=now - timedelta(days=1),
-                due=now,  # Setting this today so it'll show the 'Due Today' pill
+                due=now + timedelta(days=1),  # Setting this to tomorrow so it'll show the 'Due Next' pill
                 graded=True,
             )
 
-        with patch('lms.djangoapps.courseware.courses.get_dates_for_course') as mock_get_dates:
-            with patch('lms.djangoapps.courseware.views.views.get_enrollment') as mock_get_enrollment:
-                mock_get_dates.return_value = {
-                    (subsection.location, 'due'): subsection.due,
-                    (subsection.location, 'start'): subsection.start,
-                }
-                mock_get_enrollment.return_value = {
-                    'mode': enrollment.mode
-                }
-                response = self._get_response(self.course)
-                self.assertContains(response, subsection.display_name)
-                # Show the Verification Deadline for everyone
-                self.assertContains(response, 'Verification Deadline')
-                # Make sure pill exists for assignment due today
-                self.assertContains(response, '<div class="pill due">')
-                # No pills for verified enrollments
-                self.assertNotContains(response, '<div class="pill verified">')
+        with patch('lms.djangoapps.courseware.views.views.get_enrollment') as mock_get_enrollment:
+            mock_get_enrollment.return_value = {
+                'mode': enrollment.mode
+            }
+            response = self._get_response(self.course)
+            self.assertContains(response, subsection.display_name)
+            # Show the Verification Deadline for everyone
+            self.assertContains(response, 'Verification Deadline')
+            # Make sure pill exists for today's date
+            self.assertContains(response, '<div class="pill today">')
+            # Make sure pill exists for next due assignment
+            self.assertContains(response, '<div class="pill due-next">')
+            # No pills for verified enrollments
+            self.assertNotContains(response, '<div class="pill verified">')
 
-                enrollment.delete()
-                subsection.due = now + timedelta(days=1)
-                enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.AUDIT)
-                mock_get_dates.return_value = {
-                    (subsection.location, 'due'): subsection.due,
-                    (subsection.location, 'start'): subsection.start,
-                }
-                mock_get_enrollment.return_value = {
-                    'mode': enrollment.mode
-                }
+            enrollment.delete()
+            enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.AUDIT)
+            mock_get_enrollment.return_value = {
+                'mode': enrollment.mode
+            }
 
-                response = self._get_response(self.course)
-                self.assertContains(response, subsection.display_name)
-                # Show the Verification Deadline for everyone
-                self.assertContains(response, 'Verification Deadline')
-                # Pill doesn't exist for assignment due tomorrow
-                self.assertNotContains(response, '<div class="pill due">')
-                # Should have verified pills for audit enrollments
-                self.assertContains(response, '<div class="pill verified">')
+            expected_calls = [
+                call('course_id', text_type(self.course.id)),
+                call('user_id', self.user.id),
+                call('is_staff', self.user.is_staff),
+            ]
+
+            response = self._get_response(self.course)
+
+            mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
+            self.assertContains(response, subsection.display_name)
+            # Show the Verification Deadline for everyone
+            self.assertContains(response, 'Verification Deadline')
+            # Pill doesn't exist for assignment due tomorrow
+            self.assertNotContains(response, '<div class="pill due-next">')
+            # Should have verified pills for audit enrollments
+            self.assertContains(response, '<div class="pill verified">')
 
 
 class TestShowCoursewareMFE(TestCase):
@@ -3285,7 +3266,7 @@ class TestShowCoursewareMFE(TestCase):
         )
         for user, course_key, is_course_staff, preview_active, redirect_active in combos:
             with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, preview_active):
-                with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, redirect_active):
+                with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=redirect_active):
                     assert show_courseware_mfe_link(user, is_course_staff, course_key) is False
 
     @patch.dict(settings.FEATURES, {'ENABLE_COURSEWARE_MICROFRONTEND': True})
@@ -3305,14 +3286,14 @@ class TestShowCoursewareMFE(TestCase):
         )
         for user, is_course_staff, preview_active, redirect_active in old_mongo_combos:
             with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, preview_active):
-                with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, redirect_active):
+                with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=redirect_active):
                     assert show_courseware_mfe_link(user, is_course_staff, old_course_key) is False
 
         # We've checked all old-style course keys now, so we can test only the
         # new ones going forward. Now we check combinations of waffle flags and
         # user permissions...
         with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, True):
-            with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, True):
+            with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=True):
                 # (preview=on, redirect=on)
                 # Global and Course Staff can see the link.
                 self.assertTrue(show_courseware_mfe_link(global_staff_user, True, new_course_key))
@@ -3321,7 +3302,7 @@ class TestShowCoursewareMFE(TestCase):
 
                 # Regular users don't see the link.
                 self.assertFalse(show_courseware_mfe_link(regular_user, False, new_course_key))
-            with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, False):
+            with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=False):
                 # (preview=on, redirect=off)
                 # Global and Course Staff can see the link.
                 self.assertTrue(show_courseware_mfe_link(global_staff_user, True, new_course_key))
@@ -3332,7 +3313,7 @@ class TestShowCoursewareMFE(TestCase):
                 self.assertFalse(show_courseware_mfe_link(regular_user, False, new_course_key))
 
         with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, False):
-            with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, True):
+            with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=True):
                 # (preview=off, redirect=on)
                 # Global staff see the link anyway
                 self.assertTrue(show_courseware_mfe_link(global_staff_user, True, new_course_key))
@@ -3344,7 +3325,7 @@ class TestShowCoursewareMFE(TestCase):
 
                 # Regular users don't see the link.
                 self.assertFalse(show_courseware_mfe_link(regular_user, False, new_course_key))
-            with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, False):
+            with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=False):
                 # (preview=off, redirect=off)
                 # Global staff see the link anyway
                 self.assertTrue(show_courseware_mfe_link(global_staff_user, True, new_course_key))
@@ -3377,8 +3358,7 @@ class TestShowCoursewareMFE(TestCase):
             '/block-v1:OpenEdX+MFE+2020+type@vertical+block@Getting_To_Know_You'
         )
 
-# TODO: TNL-7157 Re-enable these tests before Courseware MFE Canary
-@unittest.skip
+
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSEWARE_MICROFRONTEND': True})
 @ddt.ddt
 class MFERedirectTests(BaseViewsTestCase):
@@ -3404,7 +3384,7 @@ class MFERedirectTests(BaseViewsTestCase):
         # learners will be redirected when the waffle flag is set
         lms_url, mfe_url = self._get_urls()
 
-        with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, True):
+        with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=True):
             assert self.client.get(lms_url).url == mfe_url
 
     def test_staff_no_redirect(self):
@@ -3416,14 +3396,14 @@ class MFERedirectTests(BaseViewsTestCase):
         self.client.login(username=course_staff.username, password='test')
 
         assert self.client.get(lms_url).status_code == 200
-        with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, True):
+        with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=True):
             assert self.client.get(lms_url).status_code == 200
 
         # global staff will never be redirected
         self._create_global_staff_user()
         assert self.client.get(lms_url).status_code == 200
 
-        with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, True):
+        with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=True):
             assert self.client.get(lms_url).status_code == 200
 
     def test_exam_no_redirect(self):
@@ -3433,5 +3413,5 @@ class MFERedirectTests(BaseViewsTestCase):
 
         lms_url, mfe_url = self._get_urls()
 
-        with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, True):
+        with REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=True):
             assert self.client.get(lms_url).status_code == 200

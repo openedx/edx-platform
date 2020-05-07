@@ -7,21 +7,20 @@ Tests of responsetypes
 import io
 import json
 import os
-import random2 as random
 import textwrap
 import unittest
 import zipfile
-from six import StringIO
 from datetime import datetime
 
+import calc
 import mock
 import pyparsing
+import random2 as random
 import requests
 import six
 from pytz import UTC
 from six import text_type
 
-import calc
 from capa.correctmap import CorrectMap
 from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
 from capa.tests.helpers import load_fixture, new_loncapa_problem, test_capa_system
@@ -58,11 +57,12 @@ class ResponseTest(unittest.TestCase):
         if self.xml_factory_class:
             self.xml_factory = self.xml_factory_class()
 
-    def build_problem(self, capa_system=None, **kwargs):  # pylint: disable=missing-docstring
+    def build_problem(self, capa_system=None, **kwargs):
         xml = self.xml_factory.build_xml(**kwargs)
         return new_loncapa_problem(xml, capa_system=capa_system)
 
-    def assert_grade(self, problem, submission, expected_correctness, msg=None):  # pylint: disable=missing-docstring
+    # pylint: disable=missing-function-docstring
+    def assert_grade(self, problem, submission, expected_correctness, msg=None):
         input_dict = {'1_2_1': submission}
         correct_map = problem.grade_answers(input_dict)
         if msg is None:
@@ -70,11 +70,12 @@ class ResponseTest(unittest.TestCase):
         else:
             self.assertEqual(correct_map.get_correctness('1_2_1'), expected_correctness, msg)
 
-    def assert_answer_format(self, problem):  # pylint: disable=missing-docstring
+    def assert_answer_format(self, problem):
         answers = problem.get_question_answers()
         self.assertIsNotNone(answers['1_2_1'])
 
-    def assert_multiple_grade(self, problem, correct_answers, incorrect_answers):  # pylint: disable=missing-docstring
+    # pylint: disable=missing-function-docstring
+    def assert_multiple_grade(self, problem, correct_answers, incorrect_answers):
         for input_str in correct_answers:
             result = problem.grade_answers({'1_2_1': input_str}).get_correctness('1_2_1')
             self.assertEqual(result, 'correct')
@@ -110,7 +111,7 @@ class ResponseTest(unittest.TestCase):
         return str(rand.randint(0, 1e9))
 
 
-class MultiChoiceResponseTest(ResponseTest):  # pylint: disable=missing-docstring
+class MultiChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
     xml_factory_class = MultipleChoiceResponseXMLFactory
 
     def test_multiple_choice_grade(self):
@@ -200,7 +201,7 @@ class MultiChoiceResponseTest(ResponseTest):  # pylint: disable=missing-docstrin
         self.assert_grade(problem, 'choice_infinity may be both ... (should be partial)', 'partially-correct')
 
 
-class TrueFalseResponseTest(ResponseTest):  # pylint: disable=missing-docstring
+class TrueFalseResponseTest(ResponseTest):   # pylint: disable=missing-class-docstring
     xml_factory_class = TrueFalseResponseXMLFactory
 
     def test_true_false_grade(self):
@@ -244,7 +245,7 @@ class TrueFalseResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         self.assert_grade(problem, ['choice_0'], 'correct')
 
 
-class ImageResponseTest(ResponseTest):  # pylint: disable=missing-docstring
+class ImageResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
     xml_factory_class = ImageResponseXMLFactory
 
     def test_rectangle_grade(self):
@@ -307,7 +308,7 @@ class ImageResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         self.assert_answer_format(problem)
 
 
-class SymbolicResponseTest(ResponseTest):  # pylint: disable=missing-docstring
+class SymbolicResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
     xml_factory_class = SymbolicResponseXMLFactory
 
     def test_grade_single_input_incorrect(self):
@@ -379,7 +380,7 @@ class SymbolicResponseTest(ResponseTest):  # pylint: disable=missing-docstring
             )
 
 
-class OptionResponseTest(ResponseTest):  # pylint: disable=missing-docstring
+class OptionResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
     xml_factory_class = OptionResponseXMLFactory
 
     def test_grade(self):
@@ -577,7 +578,7 @@ class FormulaResponseTest(ResponseTest):
         self.assertFalse(list(problem.responders.values())[0].validate_answer('3*y+2*x'))
 
 
-class StringResponseTest(ResponseTest):  # pylint: disable=missing-docstring
+class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
     xml_factory_class = StringResponseXMLFactory
 
     def test_backward_compatibility_for_multiple_answers(self):
@@ -939,7 +940,7 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         self.assert_grade(problem, u" ", "incorrect")
 
 
-class CodeResponseTest(ResponseTest):  # pylint: disable=missing-docstring
+class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
     xml_factory_class = CodeResponseXMLFactory
 
     def setUp(self):
@@ -1130,7 +1131,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-docstring
                 self.assertEqual(output[answer_id]['msg'], u'Invalid grader reply. Please contact the course staff.')
 
 
-class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-docstring
+class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
     xml_factory_class = ChoiceResponseXMLFactory
 
     def test_radio_group_grade(self):
@@ -1298,7 +1299,7 @@ class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         self.assert_grade(problem, ['choice_1', 'choice_3'], 'incorrect')
 
 
-class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-docstring
+class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
     xml_factory_class = NumericalResponseXMLFactory
 
     # We blend the line between integration (using evaluator) and exclusively
@@ -1663,7 +1664,7 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         self.assertFalse(responder.validate_answer('fish'))
 
 
-class CustomResponseTest(ResponseTest):  # pylint: disable=missing-docstring
+class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
     xml_factory_class = CustomResponseXMLFactory
 
     def test_inline_code(self):

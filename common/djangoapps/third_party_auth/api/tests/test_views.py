@@ -11,17 +11,19 @@ from django.conf import settings
 from django.http import QueryDict
 from django.test.utils import override_settings
 from django.urls import reverse
+from edx_rest_framework_extensions.auth.jwt.tests.utils import generate_jwt
 from mock import patch
 from rest_framework.test import APITestCase
 from six.moves import range
 from social_django.models import UserSocialAuth
 
 from student.tests.factories import UserFactory
+from third_party_auth.api.permissions import (
+    JwtHasScope,
+    JwtHasTpaProviderFilterForRequestedProvider,
+    JwtRestrictedApplication
+)
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
-from third_party_auth.api.permissions import (JwtRestrictedApplication,
-                                              JwtHasScope,
-                                              JwtHasTpaProviderFilterForRequestedProvider)
-from edx_rest_framework_extensions.auth.jwt.tests.utils import generate_jwt
 
 VALID_API_KEY = "i am a key"
 IDP_SLUG_TESTSHIB = 'testshib'

@@ -3,19 +3,18 @@
 
 import logging
 
+import edx_api_doc_tools as apidocs
 import six
 from django.contrib.auth import get_user_model
-import edx_api_doc_tools as apidocs
 from edx_rest_framework_extensions import permissions
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
-
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_condition import C
-from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from lms.djangoapps.certificates.api import get_certificate_for_user, get_certificates_for_user
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
@@ -23,7 +22,6 @@ from openedx.core.djangoapps.certificates.api import certificates_viewable_for_c
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.user_api.accounts.api import visible_fields
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
-
 
 log = logging.getLogger(__name__)
 User = get_user_model()

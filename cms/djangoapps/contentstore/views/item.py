@@ -15,14 +15,17 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
+from edx_proctoring.api import does_backend_support_onboarding, get_exam_configuration_dashboard_url
+from help_tokens.core import HelpUrlExpert
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
 from pytz import UTC
-from six import text_type, binary_type
+from six import binary_type, text_type
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope
 
+from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
 from contentstore.utils import (
     ancestor_has_staff_lock,
@@ -46,17 +49,11 @@ from contentstore.views.helpers import (
 )
 from contentstore.views.preview import get_preview_fragment
 from edxmako.shortcuts import render_to_string
-from help_tokens.core import HelpUrlExpert
 from models.settings.course_grading import CourseGradingModel
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.waffle_utils import WaffleSwitch
 from openedx.core.lib.gating import api as gating_api
-from openedx.core.lib.xblock_utils import (
-    hash_resource,
-    request_token,
-    wrap_xblock,
-    wrap_xblock_aside,
-)
+from openedx.core.lib.xblock_utils import hash_resource, request_token, wrap_xblock, wrap_xblock_aside
 from static_replace import replace_static_urls
 from student.auth import has_studio_read_access, has_studio_write_access
 from util.date_utils import get_default_time_display
@@ -73,8 +70,6 @@ from xmodule.modulestore.inheritance import own_metadata
 from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService
 from xmodule.tabs import CourseTabList
 from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW
-from edx_proctoring.api import get_exam_configuration_dashboard_url, does_backend_support_onboarding
-from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 
 __all__ = [
     'orphan_handler', 'xblock_handler', 'xblock_view_handler', 'xblock_outline_handler', 'xblock_container_handler'

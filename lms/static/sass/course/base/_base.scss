@@ -41,7 +41,15 @@ body {
   background-color: $course-bg-color;
 }
 
-body, h1, h2, h3, h4, h5, h6, p, label {
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+label {
   @include text-align(left);
 
   font-family: $font-family-sans-serif;
@@ -200,7 +208,8 @@ img {
   opacity: 0;
   -webkit-transition: all 0.2s;
 
-  p, span {
+  p,
+  span {
     color: $white;
   }
 

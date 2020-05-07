@@ -1,4 +1,3 @@
-# pylint: disable=unicode-format-string
 """
 Classes used for defining and running pytest test suites
 """
@@ -126,7 +125,7 @@ class SystemTestSuite(PytestSuite):
         self.eval_attr = kwargs.get('eval_attr', None)
         self.test_id = kwargs.get('test_id', self._default_test_id)
         self.fasttest = kwargs.get('fasttest', False)
-
+        self.disable_migrations = kwargs.get('disable_migrations', True)
         self.processes = kwargs.get('processes', None)
         self.randomize = kwargs.get('randomize', None)
         self.settings = kwargs.get('settings', Env.TEST_SETTINGS)
@@ -168,10 +167,16 @@ class SystemTestSuite(PytestSuite):
         if self.verbosity < 1:
             cmd.append("--quiet")
         elif self.verbosity > 1:
-            cmd.append("--verbose")
+            # currently only two verbosity settings are supported, so using `-vvv`
+            # in place of `--verbose`, because it is needed to see migrations.
+            cmd.append("-vvv")
 
         if self.disable_capture:
             cmd.append("-s")
+
+        if not self.disable_migrations:
+            cmd.append("--migrations")
+
         if self.xdist_ip_addresses:
             cmd.append('--dist=loadscope')
             if self.processes <= 0:
@@ -289,7 +294,9 @@ class LibTestSuite(PytestSuite):
         if self.verbosity < 1:
             cmd.append("--quiet")
         elif self.verbosity > 1:
-            cmd.append("--verbose")
+            # currently only two verbosity settings are supported, so using `-vvv`
+            # in place of `--verbose`, because it is needed to see migrations.
+            cmd.append("-vvv")
         if self.disable_capture:
             cmd.append("-s")
 

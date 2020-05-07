@@ -355,3 +355,91 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
             self._delete_library_block(block3_key)
             self._commit_library_changes(lib_id)
             self._revert_library_changes(lib_id)  # This is a no-op after the commit, but should still have 200 response
+
+    def test_library_blocks_with_links(self):
+        """
+        Test that libraries can link to XBlocks in other content libraries
+        """
+        # Create a problem bank:
+        bank_lib = self._create_library(slug="problem_bank", title="Problem Bank")
+        bank_lib_id = bank_lib["id"]
+        # Add problem1 to the problem bank:
+        p1 = self._add_block_to_library(bank_lib_id, "problem", "problem1")
+        self._set_library_block_olx(p1["id"], """
+            <problem><multiplechoiceresponse>
+                    <p>What is an even number?</p>
+                    <choicegroup type="MultipleChoice">
+                        <choice correct="false">3</choice>
+                        <choice correct="true">2</choice>
+                    </choicegroup>
+            </multiplechoiceresponse></problem>
+        """)
+        # Commit the changes, creating version 1:
+        self._commit_library_changes(bank_lib_id)
+        # Now update problem 1 and create a new problem 2:
+        self._set_library_block_olx(p1["id"], """
+            <problem><multiplechoiceresponse>
+                    <p>What is an odd number?</p>
+                    <choicegroup type="MultipleChoice">
+                        <choice correct="true">3</choice>
+                        <choice correct="false">2</choice>
+                    </choicegroup>
+            </multiplechoiceresponse></problem>
+        """)
+        p2 = self._add_block_to_library(bank_lib_id, "problem", "problem2")
+        self._set_library_block_olx(p2["id"], """
+            <problem><multiplechoiceresponse>
+                    <p>What holds this XBlock?</p>
+                    <choicegroup type="MultipleChoice">
+                        <choice correct="false">A course</choice>
+                        <choice correct="true">A problem bank</choice>
+                    </choicegroup>
+            </multiplechoiceresponse></problem>
+        """)
+        # Commit the changes, creating version 2:
+        self._commit_library_changes(bank_lib_id)
+        # At this point, bank_lib contains two problems and has two versions.
+        # In version 1, problem1 is "What is an event number", and in version 2 it's "What is an odd number".
+        # Problem2 exists only in version 2 and asks "What holds this XBlock?"
+
+        lib = self._create_library(slug="links_test_lib", title="Link Test Library")
+        lib_id = lib["id"]
+        # Link to the problem bank:
+        self._link_to_library(lib_id, "problem_bank", bank_lib_id)
+        self._link_to_library(lib_id, "problem_bank_v1", bank_lib_id, version=1)
+
+        # Add a 'unit' XBlock to the library:
+        unit_block = self._add_block_to_library(lib_id, "unit", "unit1")
+        self._set_library_block_olx(unit_block["id"], """
+            <unit>
+                <!-- version 2 link to "What is an odd number?" -->
+                <xblock-include source="problem_bank" definition="problem/problem1"/>
+                <!-- version 1 link to "What is an even number?" -->
+                <xblock-include source="problem_bank_v1" definition="problem/problem1" usage="p1v1" />
+                <!-- link to "What holds this XBlock?" -->
+                <xblock-include source="problem_bank" definition="problem/problem2"/>
+            </unit>
+        """)
+
+        # The unit can see and render its children:
+        fragment = self._render_block_view(unit_block["id"], "student_view")
+        self.assertIn("What is an odd number?", fragment["content"])
+        self.assertIn("What is an even number?", fragment["content"])
+        self.assertIn("What holds this XBlock?", fragment["content"])
+
+        # Also check the API for retrieving links:
+        links_created = self._get_library_links(lib_id)
+        links_created.sort(key=lambda link: link["id"])
+        self.assertEqual(len(links_created), 2)
+
+        self.assertEqual(links_created[0]["id"], "problem_bank")
+        self.assertEqual(links_created[0]["bundle_uuid"], bank_lib["bundle_uuid"])
+        self.assertEqual(links_created[0]["version"], 2)
+        self.assertEqual(links_created[0]["latest_version"], 2)
+        self.assertEqual(links_created[0]["opaque_key"], bank_lib_id)
+
+        self.assertEqual(links_created[1]["id"], "problem_bank_v1")
+        self.assertEqual(links_created[1]["bundle_uuid"], bank_lib["bundle_uuid"])
+        self.assertEqual(links_created[1]["version"], 1)
+        self.assertEqual(links_created[1]["latest_version"], 2)
+        self.assertEqual(links_created[1]["opaque_key"], bank_lib_id)

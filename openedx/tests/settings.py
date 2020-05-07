@@ -72,6 +72,7 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.bookmarks.apps.BookmarksConfig',
     'edxval',
     'lms.djangoapps.courseware',
+    'lms.djangoapps.instructor_task',
     'student',
     'openedx.core.djangoapps.site_configuration',
     'lms.djangoapps.grades.apps.GradesConfig',
@@ -86,6 +87,8 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.self_paced',
     'openedx.core.djangoapps.schedules.apps.SchedulesConfig',
     'openedx.core.djangoapps.theming.apps.ThemingConfig',
+    'openedx.core.djangoapps.external_user_ids',
+
     'experiments',
     'openedx.features.content_type_gating',
     'openedx.features.course_duration_limits',
@@ -122,3 +125,10 @@ RETIREMENT_SERVICE_WORKER_USERNAME = 'RETIREMENT_SERVICE_USER'
 RETIRED_USERNAME_PREFIX = 'retired__user_'
 
 PROCTORING_SETTINGS = {}
+
+
+# Software Secure request retry settings
+# Time in seconds before a retry of the task should be 60 mints.
+SOFTWARE_SECURE_REQUEST_RETRY_DELAY = 60 * 60
+# Maximum of 6 retries before giving up.
+SOFTWARE_SECURE_RETRY_MAX_ATTEMPTS = 6

@@ -106,7 +106,7 @@ class LogoutView(TemplateView):
         Args: url(str): url path
         """
         unquoted_url = parse.unquote_plus(parse.quote(url))
-        return bool(re.match(r'^/enterprise/[a-z0-9\-]+/course', unquoted_url))
+        return bool(re.match(r'^/enterprise(/handle_consent_enrollment)?/[a-z0-9\-]+/course', unquoted_url))
 
     def _show_tpa_logout_link(self, target, referrer):
         """

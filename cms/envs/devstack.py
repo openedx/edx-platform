@@ -19,6 +19,8 @@ DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = DEBUG
 SITE_NAME = 'localhost:8001'
 HTTPS = 'off'
 
+CMS_BASE = 'localhost:18010'
+
 ################################ LOGGERS ######################################
 
 
@@ -26,6 +28,12 @@ HTTPS = 'off'
 for pkg_name in ['track.contexts', 'track.middleware']:
     logging.getLogger(pkg_name).setLevel(logging.CRITICAL)
 
+# Docker does not support the syslog socket at /dev/log. Rely on the console.
+LOGGING['handlers']['local'] = LOGGING['handlers']['tracking'] = {
+    'class': 'logging.NullHandler',
+}
+
+LOGGING['loggers']['tracking']['handlers'] = ['console']
 
 ################################ EMAIL ########################################
 
@@ -34,8 +42,8 @@ EMAIL_FILE_PATH = '/edx/src/ace_messages/'
 
 ################################# LMS INTEGRATION #############################
 
-LMS_BASE = "localhost:8000"
-LMS_ROOT_URL = "http://{}".format(LMS_BASE)
+LMS_BASE = 'localhost:18000'
+LMS_ROOT_URL = 'http://{}'.format(LMS_BASE)
 FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
 ########################### PIPELINE #################################
@@ -117,9 +125,15 @@ FEATURES['LICENSING'] = True
 XBLOCK_SETTINGS.update({'VideoBlock': {'licensing_enabled': True}})
 
 ################################ SEARCH INDEX ################################
-FEATURES['ENABLE_COURSEWARE_INDEX'] = True
-FEATURES['ENABLE_LIBRARY_INDEX'] = True
+FEATURES['ENABLE_COURSEWARE_INDEX'] = False
+FEATURES['ENABLE_LIBRARY_INDEX'] = False
 SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
+
+################################ COURSE DISCUSSIONS ###########################
+FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
+
+################################ CREDENTIALS ###########################
+CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
 
 ########################## Certificates Web/HTML View #######################
 FEATURES['CERTIFICATES_HTML_VIEW'] = True
@@ -137,8 +151,13 @@ REQUIRE_DEBUG = DEBUG
 
 ########################### OAUTH2 #################################
 JWT_AUTH.update({
+    'JWT_ISSUER': '{}/oauth2'.format(LMS_ROOT_URL),
+    'JWT_ISSUERS': [{
+        'AUDIENCE': 'lms-key',
+        'ISSUER': '{}/oauth2'.format(LMS_ROOT_URL),
+        'SECRET_KEY': 'lms-secret',
+    }],
     'JWT_SECRET_KEY': 'lms-secret',
-    'JWT_ISSUER': 'http://127.0.0.1:8000/oauth2',
     'JWT_AUDIENCE': 'lms-key',
     'JWT_PUBLIC_SIGNING_JWK_SET': (
         '{"keys": [{"kid": "devstack_key", "e": "AQAB", "kty": "RSA", "n": "smKFSYowG6nNUAdeqH1jQQnH1PmIHphzBmwJ5vRf1vu'
@@ -189,3 +208,8 @@ MODULESTORE = convert_module_store_setting_if_needed(MODULESTORE)
 
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
+###############################################################################
+# See if the developer has any local overrides.
+if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):
+    from .private import *  # pylint: disable=import-error,wildcard-import

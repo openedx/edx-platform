@@ -398,7 +398,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -457,9 +457,9 @@
       "%Y\ub144 %m\uc6d4 %d\uc77c"
     ],
     "DECIMAL_SEPARATOR": ".",
-    "FIRST_DAY_OF_WEEK": "0",
+    "FIRST_DAY_OF_WEEK": 0,
     "MONTH_DAY_FORMAT": "n\uc6d4 j\uc77c",
-    "NUMBER_GROUPING": "3",
+    "NUMBER_GROUPING": 3,
     "SHORT_DATETIME_FORMAT": "Y-n-j H:i",
     "SHORT_DATE_FORMAT": "Y-n-j.",
     "THOUSAND_SEPARATOR": ",",

@@ -34,10 +34,18 @@ User = get_user_model()
 def block_metadata(request, usage_key_str):
     """
     Get metadata about the specified block.
+
+    Accepts an "include" query parameter which must be a comma separated list of keys to include. Valid keys are
+    "index_dictionary" and "student_view_data".
     """
     usage_key = UsageKey.from_string(usage_key_str)
     block = load_block(usage_key, request.user)
-    metadata_dict = get_block_metadata(block)
+    includes = request.GET.get("include", "").split(",")
+    metadata_dict = get_block_metadata(block, includes=includes)
+    if 'children' in metadata_dict:
+        metadata_dict['children'] = [str(key) for key in metadata_dict['children']]
+    if 'editable_children' in metadata_dict:
+        metadata_dict['editable_children'] = [str(key) for key in metadata_dict['editable_children']]
     return Response(metadata_dict)
 
 

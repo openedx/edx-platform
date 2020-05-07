@@ -6,6 +6,7 @@ import logging
 
 from edx_rest_framework_extensions.auth.jwt.decoder import decode_jwt_filters
 from edx_rest_framework_extensions.permissions import (
+    IsStaff,
     IsSuperuser,
     JwtHasScope,
     JwtRestrictedApplication,
@@ -51,7 +52,7 @@ class JwtHasTpaProviderFilterForRequestedProvider(BasePermission):
 # TODO: Remove ApiKeyHeaderPermission. Check deprecated_api_key_header custom metric for active usage.
 _NOT_JWT_RESTRICTED_TPA_PERMISSIONS = (
     C(NotJwtRestrictedApplication) &
-    (C(IsSuperuser) | ApiKeyHeaderPermission)
+    (C(IsSuperuser) | ApiKeyHeaderPermission | C(IsStaff))
 )
 _JWT_RESTRICTED_TPA_PERMISSIONS = (
     C(JwtRestrictedApplication) &

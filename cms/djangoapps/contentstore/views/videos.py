@@ -171,6 +171,10 @@ class StatusDisplayStrings(object):
     _TRANSCRIPTION_IN_PROGRESS = ugettext_noop("Transcription in Progress")
     # Translators: This is the status for a video whose transcription is complete
     _TRANSCRIPT_READY = ugettext_noop("Transcript Ready")
+    # Translators: This is the status for a video whose transcription job was failed for some languages
+    _PARTIAL_FAILURE = ugettext_noop("Partial Failure")
+    # Translators: This is the status for a video whose transcription job has failed altogether
+    _TRANSCRIPT_FAILED = ugettext_noop("Transcript Failed")
 
     _STATUS_MAP = {
         "upload": _UPLOADING,
@@ -191,6 +195,9 @@ class StatusDisplayStrings(object):
         "imported": _IMPORTED,
         "transcription_in_progress": _TRANSCRIPTION_IN_PROGRESS,
         "transcript_ready": _TRANSCRIPT_READY,
+        "partial_failure": _PARTIAL_FAILURE,
+        # TODO: Add a related unit tests when the VAL update is part of platform
+        "transcript_failed": _TRANSCRIPT_FAILED,
     }
 
     @staticmethod
@@ -546,6 +553,8 @@ def _get_videos(course, pagination_conf=None):
 
     # This is required to see if edx video pipeline is enabled while converting the video status.
     course_video_upload_token = course.video_upload_pipeline.get('course_video_upload_token')
+    # TODO: add 'transcript_ready' when we have moved to VEM to keep transcript and encode status separate
+    transcription_statuses = ['partial_failure', 'transcription_in_progress']
 
     # convert VAL's status to studio's Video Upload feature status.
     for video in videos:
@@ -553,10 +562,13 @@ def _get_videos(course, pagination_conf=None):
         # This is because Transcription starts once all the encodes are complete except for YT, but according to
         # "new video workflow" YT is disabled as well as deprecated. So, Its precise to say that the Transcription
         # starts once all the encodings are complete *for the new video workflow*.
-        is_video_encodes_ready = not course_video_upload_token and video['status'] == 'transcription_in_progress'
+        # If the video status is 'partial_failure', it means during the transcription flow, some transcription jobs
+        # failed. As mentioned, transcript jobs start only when the encodes have finished
+        is_video_encodes_ready = not course_video_upload_token and (video['status'] in transcription_statuses)
         # Update with transcript languages
         video['transcripts'] = get_available_transcript_languages(video_id=video['edx_video_id'])
         # Transcription status should only be visible if 3rd party transcripts are pending.
+        # TODO: change logic to separate transcript status from video status
         video['transcription_status'] = (
             StatusDisplayStrings.get(video['status'])
             if not video['transcripts'] and is_video_encodes_ready else

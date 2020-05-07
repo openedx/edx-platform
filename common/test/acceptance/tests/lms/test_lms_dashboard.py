@@ -7,7 +7,7 @@ End-to-end tests for the main LMS Dashboard (aka, Student Dashboard).
 import datetime
 import re
 import six
-from six.moves.urllib.parse import unquote  # pylint: disable=import-error
+from six.moves.urllib.parse import unquote
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.course_home import CourseHomePage

@@ -842,7 +842,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         return {'xml': True}
 
     @contextmanager
-    def branch_setting(self, branch_setting, course_id=None):  # pylint: disable=unused-argument
+    def branch_setting(self, branch_setting, course_id=None):
         """
         A context manager for temporarily setting the branch value for the store to the given branch_setting.
         """

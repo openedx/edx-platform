@@ -1,3 +1,0 @@
-Django>=2.2,<3.0
-git+https://github.com/jazzband/django-oauth-toolkit.git@bf1525e85a06929016b1fe35d863e62e58124a2f#egg=oauth2_provider
-

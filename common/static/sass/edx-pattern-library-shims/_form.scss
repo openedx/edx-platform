@@ -19,9 +19,9 @@
   .field-input:checked + .field-input-label {
     color: theme-color("primary");
   }
-
 }
 
-.input-radio, .input-checkbox {
+.input-radio,
+.input-checkbox {
   @include margin-right($baseline / 2);
 }

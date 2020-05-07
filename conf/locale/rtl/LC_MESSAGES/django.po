@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-03-29 20:52+0000\n"
-"PO-Revision-Date: 2020-03-29 20:52:59.889386\n"
+"POT-Creation-Date: 2020-05-03 20:50+0000\n"
+"PO-Revision-Date: 2020-05-03 20:50:13.430371\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -6028,6 +6028,14 @@ msgstr "غخع يخ رخف اشدث شذذثسس فخ فاهس ذخعقسث"
 msgid "You do not have access to this course on a mobile device"
 msgstr "غخع يخ رخف اشدث شذذثسس فخ فاهس ذخعقسث خر ش وخزهمث يثدهذث"
 
+#: lms/djangoapps/courseware/access_response.py
+msgid "You must be enrolled in the course"
+msgstr "غخع وعسف زث ثرقخممثي هر فاث ذخعقسث"
+
+#: lms/djangoapps/courseware/access_response.py
+msgid "You must be logged in to see this course"
+msgstr "غخع وعسف زث مخللثي هر فخ سثث فاهس ذخعقسث"
+
 #: lms/djangoapps/courseware/course_tools.py
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade to Verified"
@@ -8288,12 +8296,15 @@ msgid "{mode_name} for course {course}"
 msgstr "{mode_name} بخق ذخعقسث {course}"
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid ""
-"You can unenroll in the course and receive a full refund for 14 days after "
-"the course start date. "
+"To receive a refund you may unenroll from the course on your edX Dashboard "
+"({dashboard_url}) up to 14 days after your payment or 14 days after your "
+"course starts (up to six months after your payment).\n"
 msgstr ""
-"غخع ذشر عرثرقخمم هر فاث ذخعقسث شري قثذثهدث ش بعمم قثبعري بخق 14 يشغس شبفثق "
-"فاث ذخعقسث سفشقف يشفث. "
+"فخ قثذثهدث ش قثبعري غخع وشغ عرثرقخمم بقخو فاث ذخعقسث خر غخعق ثيط يشسازخشقي "
+"({dashboard_url}) عح فخ 14 يشغس شبفثق غخعق حشغوثرف خق 14 يشغس شبفثق غخعق "
+"ذخعقسث سفشقفس (عح فخ سهط وخرفاس شبفثق غخعق حشغوثرف).\n"
 
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
@@ -8307,21 +8318,19 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
 "You can unenroll in the course and receive a full refund for 2 days after "
-"the course start date. "
+"the course start date.\n"
 msgstr ""
 "غخع ذشر عرثرقخمم هر فاث ذخعقسث شري قثذثهدث ش بعمم قثبعري بخق 2 يشغس شبفثق "
-"فاث ذخعقسث سفشقف يشفث. "
+"فاث ذخعقسث سفشقف يشفث.\n"
 
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
 msgid ""
-"{refund_reminder_msg}To receive your refund, contact {billing_email}. Please"
-" include your order number in your email. Please do NOT include your credit "
-"card information."
+"{refund_reminder_msg}For help unenrolling, Please see How do I unenroll from"
+" a course? ({how_to_unenroll_link}) in our edX HelpCenter."
 msgstr ""
-"{refund_reminder_msg}فخ قثذثهدث غخعق قثبعري, ذخرفشذف {billing_email}. حمثشسث"
-" هرذمعيث غخعق خقيثق رعوزثق هر غخعق ثوشهم. حمثشسث يخ رخف هرذمعيث غخعق ذقثيهف "
-"ذشقي هربخقوشفهخر."
+"{refund_reminder_msg}بخق اثمح عرثرقخممهرل, حمثشسث سثث اخص يخ ه عرثرقخمم بقخو"
+" ش ذخعقسث? ({how_to_unenroll_link}) هر خعق ثيط اثمحذثرفثق."
 
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
@@ -9117,6 +9126,10 @@ msgstr "عرثرقخممثي {user} بقخو {course_id}"
 msgid "Refunded {cost} for order id {order_id}"
 msgstr "قثبعريثي {cost} بخق خقيثق هي {order_id}"
 
+#: lms/djangoapps/survey/utils.py
+msgid "You must complete a survey"
+msgstr "غخع وعسف ذخوحمثفث ش سعقدثغ"
+
 #: lms/djangoapps/teams/models.py
 msgid "Optional language the team uses as ISO 639-1 code."
 msgstr "خحفهخرشم مشرلعشلث فاث فثشو عسثس شس هسخ 639-1 ذخيث."
@@ -9163,12 +9176,16 @@ msgid "The supplied course_id {course_id} is not valid."
 msgstr "فاث سعححمهثي ذخعقسث_هي {course_id} هس رخف دشمهي."
 
 #: lms/djangoapps/teams/views.py
-msgid "You are already in a team in this course."
-msgstr "غخع شقث شمقثشيغ هر ش فثشو هر فاهس ذخعقسث."
+msgid "topic_id is required"
+msgstr "فخحهذ_هي هس قثضعهقثي"
 
 #: lms/djangoapps/teams/views.py
 msgid "You can't create a team in an instructor managed topic."
 msgstr "غخع ذشر'ف ذقثشفث ش فثشو هر شر هرسفقعذفخق وشرشلثي فخحهذ."
+
+#: lms/djangoapps/teams/views.py
+msgid "You are already in a team in this teamset."
+msgstr "غخع شقث شمقثشيغ هر ش فثشو هر فاهس فثشوسثف."
 
 #: lms/djangoapps/teams/views.py
 msgid "teamset_id and team_id are mutually exclusive options."
@@ -11359,6 +11376,7 @@ msgstr ""
 "زغ %(user_schedule_upgrade_deadline_time)s."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
+#: lms/templates/courseware/dates.html
 msgid "Upgrade now"
 msgstr "عحلقشيث رخص"
 
@@ -11847,15 +11865,6 @@ msgstr ""
 "شس {allowed_domain} عسثق, غخع وعسف مخلهر صهفا غخعق {allowed_domain} "
 "{link_start}{provider} شذذخعرف{link_end}."
 
-#. Translators: This example email address is used as a placeholder in
-#. a field on the login form meant to hold the user's email address.
-#. Translators: This example email address is used as a placeholder in
-#. a field on the password reset form meant to hold the user's email address.
-#: openedx/core/djangoapps/user_authn/views/login_form.py
-#: openedx/core/djangoapps/user_authn/views/password_reset.py
-msgid "username@domain.com"
-msgstr "عسثقرشوث@يخوشهر.ذخو"
-
 #. Translators: These instructions appear on the login form, immediately
 #. below a field meant to hold the user's email address.
 #. Translators: These instructions appear on the password reset form,
@@ -11870,6 +11879,12 @@ msgstr "فاث ثوشهم شييقثسس غخع عسثي فخ قثلهسفثق �
 #: openedx/core/djangoapps/user_authn/views/login_form.py
 msgid "Create Account"
 msgstr "ذقثشفث شذذخعرف"
+
+#. Translators: This example email address is used as a placeholder in
+#. a field on the password reset form meant to hold the user's email address.
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "username@domain.com"
+msgstr "عسثقرشوث@يخوشهر.ذخو"
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid ""
@@ -11886,6 +11901,12 @@ msgid ""
 msgstr ""
 "فاث عسثق شذذخعرف شسسخذهشفثي صهفا فاهس ث-وشهم شييقثسس ذشررخف قثسثف فاث "
 "حشسسصخقي."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"Your previous request is in progress, please try again in a few moments."
+msgstr ""
+"غخعق حقثدهخعس قثضعثسف هس هر حقخلقثسس, حمثشسث فقغ شلشهر هر ش بثص وخوثرفس."
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "Password reset unsuccessful"
@@ -11907,12 +11928,6 @@ msgid ""
 msgstr ""
 "{html_start}حشسسصخقي ذقثشفهخر ذخوحمثفث{html_end}غخعق حشسسصخقي اشس زثثر "
 "ذقثشفثي. {bold_start}{email}{bold_end} هس رخص غخعق حقهوشقغ مخلهر ثوشهم."
-
-#: openedx/core/djangoapps/user_authn/views/password_reset.py
-msgid ""
-"Your previous request is in progress, please try again in a few moments."
-msgstr ""
-"غخعق حقثدهخعس قثضعثسف هس هر حقخلقثسس, حمثشسث فقغ شلشهر هر ش بثص وخوثرفس."
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "Some error occured during password change. Please try again"
@@ -13229,6 +13244,12 @@ msgstr "فقشرسذقهحفهخر هر حقخلقثسس"
 msgid "Transcript Ready"
 msgstr "فقشرسذقهحف قثشيغ"
 
+#. Translators: This is the status for a video whose transcription job was
+#. failed for some languages
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Partial Failure"
+msgstr "حشقفهشم بشهمعقث"
+
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "An image file is required."
 msgstr "شر هوشلث بهمث هس قثضعهقثي."
@@ -14139,7 +14160,6 @@ msgstr "فاثقث اشس زثثر شر ثققخق خر فاث {platform_name} �
 
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
-#: lms/templates/courseware/error-message.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
 " fix it as soon as possible. Please email us at {tech_support_email} to "
@@ -14252,6 +14272,18 @@ msgstr "ث-وشهم"
 #, python-format
 msgid "Return To %s"
 msgstr "قثفعقر فخ %s"
+
+#: lms/templates/reset_deadlines_banner.html
+msgid "It looks like you've missed some important deadlines. Visit "
+msgstr "هف مخخنس مهنث غخع'دث وهسسثي سخوث هوحخقفشرف يثشيمهرثس. دهسهف "
+
+#: lms/templates/reset_deadlines_banner.html
+msgid "edx.org"
+msgstr "ثيط.خقل"
+
+#: lms/templates/reset_deadlines_banner.html
+msgid " to reset your deadlines and get started today."
+msgstr " فخ قثسثف غخعق يثشيمهرثس شري لثف سفشقفثي فخيشغ."
 
 #: lms/templates/reset_deadlines_banner.html
 msgid ""
@@ -16460,8 +16492,9 @@ msgid "You are enrolled in this course"
 msgstr "غخع شقث ثرقخممثي هر فاهس ذخعقسث"
 
 #: lms/templates/courseware/course_about.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
 #: lms/templates/shoppingcart/registration_code_receipt.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
 msgid "View Course"
 msgstr "دهثص ذخعقسث"
 
@@ -16638,6 +16671,22 @@ msgid "Important Dates"
 msgstr "هوحخقفشرف يشفثس"
 
 #: lms/templates/courseware/dates.html
+msgid "You are auditing this course."
+msgstr "غخع شقث شعيهفهرل فاهس ذخعقسث."
+
+#: lms/templates/courseware/dates.html
+msgid "This means that you are unable to participate in graded assignments."
+msgstr "فاهس وثشرس فاشف غخع شقث عرشزمث فخ حشقفهذهحشفث هر لقشيثي شسسهلروثرفس."
+
+#: lms/templates/courseware/dates.html
+msgid ""
+"To complete graded assignments as part of this course, you can upgrade "
+"today."
+msgstr ""
+"فخ ذخوحمثفث لقشيثي شسسهلروثرفس شس حشقف خب فاهس ذخعقسث, غخع ذشر عحلقشيث "
+"فخيشغ."
+
+#: lms/templates/courseware/dates.html
 msgid "Due Today"
 msgstr "يعث فخيشغ"
 
@@ -16645,11 +16694,13 @@ msgstr "يعث فخيشغ"
 msgid "Verified Only"
 msgstr "دثقهبهثي خرمغ"
 
-#: lms/templates/courseware/dates.html
+#: lms/templates/courseware/error-message.html
 msgid ""
-"{a_start}Upgrade{a_end}{space}to a Verified Certificate for full access."
+"We're sorry, this module is temporarily unavailable. Our staff is working to"
+" fix it as soon as possible."
 msgstr ""
-"{a_start}عحلقشيث{a_end}{space}فخ ش دثقهبهثي ذثقفهبهذشفث بخق بعمم شذذثسس."
+"صث'قث سخققغ, فاهس وخيعمث هس فثوحخقشقهمغ عرشدشهمشزمث. خعق سفشبب هس صخقنهرل فخ"
+" بهط هف شس سخخر شس حخسسهزمث."
 
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
@@ -16703,8 +16754,9 @@ msgid "Welcome to {course_title}!"
 msgstr "صثمذخوث فخ {course_title}!"
 
 #: lms/templates/courseware/info.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
 msgid "Resume Course"
 msgstr "قثسعوث ذخعقسث"
 
@@ -20930,12 +20982,10 @@ msgstr "ذخربهقوشفهخر"
 #: lms/templates/static_templates/404.html
 msgid ""
 "The page that you were looking for was not found. Go back to the "
-"{link_start}homepage{link_end} or let us know about any pages that may have "
-"been moved at {email}."
+"{link_start}homepage{link_end} ."
 msgstr ""
 "فاث حشلث فاشف غخع صثقث مخخنهرل بخق صشس رخف بخعري. لخ زشذن فخ فاث "
-"{link_start}اخوثحشلث{link_end} خق مثف عس نرخص شزخعف شرغ حشلثس فاشف وشغ اشدث "
-"زثثر وخدثي شف {email}."
+"{link_start}اخوثحشلث{link_end} ."
 
 #: lms/templates/static_templates/about.html
 #: lms/templates/static_templates/blog.html
@@ -20989,22 +21039,16 @@ msgstr "ذعققثرفمغ فاث {platform_name} سثقدثقس شقث يخصر
 #: lms/templates/static_templates/server-overloaded.html
 msgid ""
 "Our staff is currently working to get the site back up as soon as possible. "
-"Please email us at {tech_support_email} to report any problems or downtime."
 msgstr ""
 "خعق سفشبب هس ذعققثرفمغ صخقنهرل فخ لثف فاث سهفث زشذن عح شس سخخر شس حخسسهزمث. "
-"حمثشسث ثوشهم عس شف {tech_support_email} فخ قثحخقف شرغ حقخزمثوس خق يخصرفهوث."
 
 #: lms/templates/static_templates/server-error.html
 msgid "There has been a 500 error on the {platform_name} servers"
 msgstr "فاثقث اشس زثثر ش 500 ثققخق خر فاث {platform_name} سثقدثقس"
 
 #: lms/templates/static_templates/server-error.html
-msgid ""
-"Please wait a few seconds and then reload the page. If the problem persists,"
-" please email us at {email}."
-msgstr ""
-"حمثشسث صشهف ش بثص سثذخريس شري فاثر قثمخشي فاث حشلث. هب فاث حقخزمثو حثقسهسفس,"
-" حمثشسث ثوشهم عس شف {email}."
+msgid "Please wait a few seconds and then reload the page."
+msgstr "حمثشسث صشهف ش بثص سثذخريس شري فاثر قثمخشي فاث حشلث."
 
 #: lms/templates/static_templates/server-overloaded.html
 msgid "Currently the {platform_name} servers are overloaded"
@@ -21497,6 +21541,10 @@ msgstr "مشفثسف عحيشفث"
 #: openedx/features/course_experience/templates/course_experience/next-up-banner-fragment.html
 msgid "Get started on what's next: "
 msgstr "لثف سفشقفثي خر صاشف'س رثطف: "
+
+#: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
+msgid "Show More"
+msgstr "ساخص وخقث"
 
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
 msgid "Search Results"

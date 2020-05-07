@@ -21,9 +21,9 @@ from collections import OrderedDict
 from copy import deepcopy
 from datetime import datetime
 from xml.sax.saxutils import unescape
-from openedx.core.lib.edx_six import get_gettext
 
 import six
+from django.utils.encoding import python_2_unicode_compatible
 from lxml import etree
 from pytz import UTC
 
@@ -34,8 +34,8 @@ import capa.xqueue_interface as xqueue_interface
 from capa.correctmap import CorrectMap
 from capa.safe_exec import safe_exec
 from capa.util import contextualize_text, convert_files_to_filenames
-from django.utils.encoding import python_2_unicode_compatible
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.lib.edx_six import get_gettext
 from xmodule.stringify import stringify_children
 
 # extra things displayed after "show answers" is pressed
@@ -95,20 +95,20 @@ class LoncapaSystem(object):
     See :class:`ModuleSystem` for documentation of other attributes.
 
     """
-    def __init__(                                       # pylint: disable=invalid-name
+    def __init__(
         self,
         ajax_url,
         anonymous_student_id,
         cache,
         can_execute_unsafe_code,
         get_python_lib_zip,
-        DEBUG,                                          # pylint: disable=invalid-name
+        DEBUG,
         filestore,
         i18n,
         node_path,
         render_template,
         seed,      # Why do we do this if we have self.seed?
-        STATIC_URL,                                     # pylint: disable=invalid-name
+        STATIC_URL,
         xqueue,
         matlab_api_key=None
     ):

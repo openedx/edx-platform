@@ -77,7 +77,7 @@ class StructuredTagsAside(XBlockAside):
             return Fragment(u'')
 
     @XBlock.handler
-    def save_tags(self, request=None, suffix=None):  # pylint: disable=unused-argument
+    def save_tags(self, request=None, suffix=None):
         """
         Handler to save choosen tags with connected XBlock
         """

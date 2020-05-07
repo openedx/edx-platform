@@ -49,7 +49,6 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
-from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangolib.markup import HTML, Text
 from student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info, generate_activation_email_context
@@ -520,16 +519,6 @@ def activate_account(request, key):
                 ),
                 extra_tags='account-activation aa-icon',
             )
-        elif waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
-            messages.error(
-                request,
-                HTML(u'{html_start}{message}{html_end}').format(
-                    message=Text(SYSTEM_MAINTENANCE_MSG),
-                    html_start=HTML('<p class="message-title">'),
-                    html_end=HTML('</p>'),
-                ),
-                extra_tags='account-activation aa-icon',
-            )
         else:
             registration.activate()
             # Success message for logged in users.
@@ -572,9 +561,6 @@ def activate_account_studio(request, key):
         user_logged_in = request.user.is_authenticated
         already_active = True
         if not registration.user.is_active:
-            if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
-                return render_to_response('registration/activation_invalid.html',
-                                          {'csrf': csrf(request)['csrf_token']})
             registration.activate()
             already_active = False
 
@@ -706,7 +692,7 @@ def do_email_change_request(user, new_email, activation_key=None, secondary_emai
 
 
 @ensure_csrf_cookie
-def activate_secondary_email(request, key):  # pylint: disable=unused-argument
+def activate_secondary_email(request, key):
     """
     This is called when the activation link is clicked. We activate the secondary email
     for the requested user.
@@ -734,14 +720,11 @@ def activate_secondary_email(request, key):  # pylint: disable=unused-argument
 
 
 @ensure_csrf_cookie
-def confirm_email_change(request, key):  # pylint: disable=unused-argument
+def confirm_email_change(request, key):
     """
     User requested a new e-mail. This is called when the activation
     link is clicked. We confirm with the old e-mail, and update
     """
-    if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
-        return render_to_response('email_change_failed.html', {'err_msg': SYSTEM_MAINTENANCE_MSG})
-
     with transaction.atomic():
         try:
             pec = PendingEmailChange.objects.get(activation_key=key)

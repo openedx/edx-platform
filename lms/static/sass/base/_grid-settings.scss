@@ -27,7 +27,7 @@ $edx-bp-huge:  new-breakpoint(min-width 980px 12);
 @mixin grid-container() {
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
+  flex-wrap: wrap; /* stylelint-disable-line */
   justify-content: flex-start;
   align-items: flex-start;
   box-sizing: border-box;

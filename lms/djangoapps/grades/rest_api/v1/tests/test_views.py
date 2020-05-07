@@ -100,7 +100,7 @@ class SingleUserGradesTests(GradeViewTestMixin, AuthAndScopesTestMixin, APITestC
         """
         Test that a request for an invalid course key returns an error.
         """
-        def mock_from_string(*args, **kwargs):  # pylint: disable=unused-argument
+        def mock_from_string(*args, **kwargs):
             """Mocked function to always raise an exception"""
             raise InvalidKeyError('foo', 'bar')
 

@@ -160,24 +160,3 @@ class CourseOutlineFragmentView(EdxFragmentView):
         if children:
             children[0]['resume_block'] = True
             self.mark_first_unit_to_resume(children[0])
-
-
-@ensure_csrf_cookie
-def reset_course_deadlines(request, course_id):
-    """
-    Set the start_date of a schedule to today, which in turn will adjust due dates for
-    sequentials belonging to a self paced course
-    """
-    course_key = CourseKey.from_string(course_id)
-    masquerade_details, masquerade_user = setup_masquerade(
-        request,
-        course_key,
-        has_access(request.user, 'staff', course_key)
-    )
-    if masquerade_details and masquerade_details.role == 'student' and masquerade_details.user_name:
-        # Masquerading as a specific student, so reset that student's schedule
-        user = masquerade_user
-    else:
-        user = request.user
-    reset_self_paced_schedule(user, course_key)
-    return redirect(reverse('openedx.course_experience.course_home', args=[six.text_type(course_key)]))

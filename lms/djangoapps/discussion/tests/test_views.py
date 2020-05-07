@@ -72,8 +72,6 @@ log = logging.getLogger(__name__)
 
 QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
-# pylint: disable=missing-docstring
-
 
 class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
 
@@ -698,7 +696,7 @@ class SingleThreadAccessTestCase(CohortedTestCase):
                 mock_request,
                 'non_cohorted_topic',
                 user_not_in_team,
-                None
+                ''
             )
             self.assertEqual(403, response.status_code)
             self.assertEqual(
@@ -769,8 +767,10 @@ class ForumFormDiscussionContentGroupTestCase(ForumsEnableMixin, ContentGroupTes
         self.thread_list = [
             {"thread_id": "test_general_thread_id"},
             {"thread_id": "test_global_group_thread_id", "commentable_id": self.global_module.discussion_id},
-            {"thread_id": "test_alpha_group_thread_id", "group_id": self.alpha_module.group_access[0][0], "commentable_id": self.alpha_module.discussion_id},  # pylint: disable=line-too-long
-            {"thread_id": "test_beta_group_thread_id", "group_id": self.beta_module.group_access[0][0], "commentable_id": self.beta_module.discussion_id}  # pylint: disable=line-too-long
+            {"thread_id": "test_alpha_group_thread_id", "group_id": self.alpha_module.group_access[0][0],
+             "commentable_id": self.alpha_module.discussion_id},
+            {"thread_id": "test_beta_group_thread_id", "group_id": self.beta_module.group_access[0][0],
+             "commentable_id": self.beta_module.discussion_id}
         ]
 
     def assert_has_access(self, response, expected_discussion_threads):
@@ -1633,7 +1633,7 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
 
     @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
     @patch('student.models.cc.User.from_django_user')
-    def test_forum_discussion_xss_prevent(self, malicious_code, mock_user, mock_req):  # pylint: disable=unused-argument
+    def test_forum_discussion_xss_prevent(self, malicious_code, mock_user, mock_req):
         """
         Test that XSS attack is prevented
         """

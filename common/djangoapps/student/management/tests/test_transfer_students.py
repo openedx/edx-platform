@@ -13,7 +13,7 @@ from opaque_keys.edx import locator
 from six import text_type
 
 from course_modes.models import CourseMode
-from shoppingcart.models import CertificateItem, Order  # pylint: disable=import-error
+from shoppingcart.models import CertificateItem, Order
 from student.models import (
     EVENT_NAME_ENROLLMENT_ACTIVATED,
     EVENT_NAME_ENROLLMENT_DEACTIVATED,
@@ -93,7 +93,7 @@ class TestTransferStudents(ModuleStoreTestCase):
         self.assertTrue(self.signal_fired)
 
         # Confirm the analytics event was emitted.
-        self.mock_tracker.emit.assert_has_calls(  # pylint: disable=maybe-no-member
+        self.mock_tracker.emit.assert_has_calls(
             [
                 call(
                     EVENT_NAME_ENROLLMENT_ACTIVATED,

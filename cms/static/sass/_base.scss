@@ -257,7 +257,8 @@ dl {
   padding: 0 $baseline;
   position: relative;
 
-  .mast, .metadata {
+  .mast,
+  .metadata {
     @include clearfix();
 
     position: relative;
@@ -383,11 +384,6 @@ dl {
       font-weight: 600;
     }
   }
-
-  // page metadata/action bar
-  .metadata {
-
-  }
 }
 
 // +Layout - Basic Page Content
@@ -434,7 +430,8 @@ dl {
   }
 }
 
-.content-primary, .content-supplementary {
+.content-primary,
+.content-supplementary {
   @include box-sizing(border-box);
 }
 
@@ -630,7 +627,8 @@ hr.divide {
 // ====================
 
 // UI - semantically hide text
-.sr, .sr-only {
+.sr,
+.sr-only {
   @extend %cont-text-sr;
 }
 

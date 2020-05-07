@@ -1,4 +1,3 @@
-# pylint: disable=missing-docstring
 # coding=utf-8
 
 

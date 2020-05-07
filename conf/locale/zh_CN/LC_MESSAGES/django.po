@@ -395,7 +395,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-03-29 20:42+0000\n"
+"POT-Creation-Date: 2020-05-03 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/open-edx/teams/6205/zh_CN/)\n"
@@ -5817,6 +5817,14 @@ msgstr "您无权访问学习该课程"
 msgid "You do not have access to this course on a mobile device"
 msgstr "您无法在移动设备上学习该课程"
 
+#: lms/djangoapps/courseware/access_response.py
+msgid "You must be enrolled in the course"
+msgstr ""
+
+#: lms/djangoapps/courseware/access_response.py
+msgid "You must be logged in to see this course"
+msgstr ""
+
 #: lms/djangoapps/courseware/course_tools.py
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade to Verified"
@@ -7943,10 +7951,12 @@ msgid "{mode_name} for course {course}"
 msgstr "课程{course}的{mode_name} "
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid ""
-"You can unenroll in the course and receive a full refund for 14 days after "
-"the course start date. "
-msgstr "您可以取消注册课程，并在开课后14天内可全额退费。"
+"To receive a refund you may unenroll from the course on your edX Dashboard "
+"({dashboard_url}) up to 14 days after your payment or 14 days after your "
+"course starts (up to six months after your payment).\n"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
@@ -7958,18 +7968,15 @@ msgstr "如果您还没有验证您的身份，请立即开始验证吧（{verif
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
 "You can unenroll in the course and receive a full refund for 2 days after "
-"the course start date. "
-msgstr "您可以取消注册课程，并在开课后2天收到全额退费。"
+"the course start date.\n"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
 msgid ""
-"{refund_reminder_msg}To receive your refund, contact {billing_email}. Please"
-" include your order number in your email. Please do NOT include your credit "
-"card information."
+"{refund_reminder_msg}For help unenrolling, Please see How do I unenroll from"
+" a course? ({how_to_unenroll_link}) in our edX HelpCenter."
 msgstr ""
-"{refund_reminder_msg} 如要收到退费请联系 "
-"{billing_email}。请包含您的订单号码及您的email。请不要提供您的信用卡讯息。"
 
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
@@ -8706,6 +8713,10 @@ msgstr "放弃选修{course_id}的{user}"
 msgid "Refunded {cost} for order id {order_id}"
 msgstr "订单{order_id}已退款{cost}"
 
+#: lms/djangoapps/survey/utils.py
+msgid "You must complete a survey"
+msgstr ""
+
 #: lms/djangoapps/teams/models.py
 msgid "Optional language the team uses as ISO 639-1 code."
 msgstr "团队所使用之选择性语言的代码为 ISO 639-1 。"
@@ -8752,11 +8763,15 @@ msgid "The supplied course_id {course_id} is not valid."
 msgstr "提供的课程编号{course_id}无效。"
 
 #: lms/djangoapps/teams/views.py
-msgid "You are already in a team in this course."
-msgstr "您已经加入了该课程中的一个小组。"
+msgid "topic_id is required"
+msgstr ""
 
 #: lms/djangoapps/teams/views.py
 msgid "You can't create a team in an instructor managed topic."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "You are already in a team in this teamset."
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
@@ -11191,15 +11206,6 @@ msgid ""
 "{link_start}{provider} account{link_end}."
 msgstr ""
 
-#. Translators: This example email address is used as a placeholder in
-#. a field on the login form meant to hold the user's email address.
-#. Translators: This example email address is used as a placeholder in
-#. a field on the password reset form meant to hold the user's email address.
-#: openedx/core/djangoapps/user_authn/views/login_form.py
-#: openedx/core/djangoapps/user_authn/views/password_reset.py
-msgid "username@domain.com"
-msgstr "username@domain.com"
-
 #. Translators: These instructions appear on the login form, immediately
 #. below a field meant to hold the user's email address.
 #. Translators: These instructions appear on the password reset form,
@@ -11215,6 +11221,12 @@ msgstr "您在{platform_name}上注册的邮箱"
 msgid "Create Account"
 msgstr "创建账号"
 
+#. Translators: This example email address is used as a placeholder in
+#. a field on the password reset form meant to hold the user's email address.
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "username@domain.com"
+msgstr "username@domain.com"
+
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
@@ -11226,6 +11238,11 @@ msgid ""
 "The user account associated with this e-mail address cannot reset the "
 "password."
 msgstr "与此邮箱关联的用户账号无法重新设置密码。"
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"Your previous request is in progress, please try again in a few moments."
+msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "Password reset unsuccessful"
@@ -11246,11 +11263,6 @@ msgid ""
 "created. {bold_start}{email}{bold_end} is now your primary login email."
 msgstr ""
 "{html_start}密码创建完成{html_end}已经创建了您的密码。{bold_start}{email}{bold_end}现在是您的主登录电子邮件。"
-
-#: openedx/core/djangoapps/user_authn/views/password_reset.py
-msgid ""
-"Your previous request is in progress, please try again in a few moments."
-msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "Some error occured during password change. Please try again"
@@ -12456,6 +12468,12 @@ msgstr "字幕转载进行中"
 msgid "Transcript Ready"
 msgstr "字幕完成"
 
+#. Translators: This is the status for a video whose transcription job was
+#. failed for some languages
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Partial Failure"
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "An image file is required."
 msgstr "必须提供图片文件。"
@@ -13330,7 +13348,6 @@ msgstr "{platform_name} 平台的服务器发生了错误"
 
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
-#: lms/templates/courseware/error-message.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
 " fix it as soon as possible. Please email us at {tech_support_email} to "
@@ -13435,6 +13452,18 @@ msgstr "邮箱"
 #, python-format
 msgid "Return To %s"
 msgstr "返回%s"
+
+#: lms/templates/reset_deadlines_banner.html
+msgid "It looks like you've missed some important deadlines. Visit "
+msgstr ""
+
+#: lms/templates/reset_deadlines_banner.html
+msgid "edx.org"
+msgstr ""
+
+#: lms/templates/reset_deadlines_banner.html
+msgid " to reset your deadlines and get started today."
+msgstr ""
 
 #: lms/templates/reset_deadlines_banner.html
 msgid ""
@@ -15329,8 +15358,9 @@ msgid "You are enrolled in this course"
 msgstr "您选修了本课程"
 
 #: lms/templates/courseware/course_about.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
 #: lms/templates/shoppingcart/registration_code_receipt.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
 msgid "View Course"
 msgstr "查看课程"
 
@@ -15503,6 +15533,20 @@ msgid "Important Dates"
 msgstr ""
 
 #: lms/templates/courseware/dates.html
+msgid "You are auditing this course."
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid "This means that you are unable to participate in graded assignments."
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid ""
+"To complete graded assignments as part of this course, you can upgrade "
+"today."
+msgstr ""
+
+#: lms/templates/courseware/dates.html
 msgid "Due Today"
 msgstr ""
 
@@ -15510,9 +15554,10 @@ msgstr ""
 msgid "Verified Only"
 msgstr ""
 
-#: lms/templates/courseware/dates.html
+#: lms/templates/courseware/error-message.html
 msgid ""
-"{a_start}Upgrade{a_end}{space}to a Verified Certificate for full access."
+"We're sorry, this module is temporarily unavailable. Our staff is working to"
+" fix it as soon as possible."
 msgstr ""
 
 #: lms/templates/courseware/gradebook.html
@@ -15565,8 +15610,9 @@ msgid "Welcome to {course_title}!"
 msgstr "欢迎来到{course_title}！"
 
 #: lms/templates/courseware/info.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
 msgid "Resume Course"
 msgstr "继续课程"
 
@@ -19418,9 +19464,8 @@ msgstr "确认"
 #: lms/templates/static_templates/404.html
 msgid ""
 "The page that you were looking for was not found. Go back to the "
-"{link_start}homepage{link_end} or let us know about any pages that may have "
-"been moved at {email}."
-msgstr "未能找到您查找的页面。返回到{link_start}主页{link_end}或发电子邮件至{email}告诉我们可能被移除的页面。"
+"{link_start}homepage{link_end} ."
+msgstr ""
 
 #: lms/templates/static_templates/about.html
 #: lms/templates/static_templates/blog.html
@@ -19470,19 +19515,15 @@ msgstr "目前{platform_name} 平台的服务器非正常运行"
 #: lms/templates/static_templates/server-overloaded.html
 msgid ""
 "Our staff is currently working to get the site back up as soon as possible. "
-"Please email us at {tech_support_email} to report any problems or downtime."
 msgstr ""
-"我们的工作人员正在努力尽快恢复网站的正常运行。要报告您发现的任何问题或遇到网站非正常运行，请发送邮件至{tech_support_email}。"
 
 #: lms/templates/static_templates/server-error.html
 msgid "There has been a 500 error on the {platform_name} servers"
 msgstr "{platform_name} 平台的服务器发生代码为500的错误"
 
 #: lms/templates/static_templates/server-error.html
-msgid ""
-"Please wait a few seconds and then reload the page. If the problem persists,"
-" please email us at {email}."
-msgstr "请等待几秒钟后再刷新该页面。如果问题照旧，请向{email}发邮件。"
+msgid "Please wait a few seconds and then reload the page."
+msgstr ""
 
 #: lms/templates/static_templates/server-overloaded.html
 msgid "Currently the {platform_name} servers are overloaded"
@@ -19940,6 +19981,10 @@ msgstr "最近更新"
 
 #: openedx/features/course_experience/templates/course_experience/next-up-banner-fragment.html
 msgid "Get started on what's next: "
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
+msgid "Show More"
 msgstr ""
 
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html

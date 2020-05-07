@@ -465,7 +465,6 @@
     "Do you want to upload your file before submitting?": "Apakah Anda ingin mengunggah berkas Anda sebelum mengirimkan?",
     "Document properties": "Properti dokumen",
     "Does the name on your ID match your account name: %(fullName)s?": "Apakah nama pada ID anda sesuai dengan nama account anda: %(fullName)s?",
-    "Does the photo of you match your ID photo?": "Apakah photo anda sesuai dengan photo ID?",
     "Does the photo of you show your whole face?": "Apakah photo anda menunjukkan seluruh wajah?",
     "Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission.": "Tidakmelihat gambar anda? pastikan membolehkan browser anda untuk menggunakan kamera jika  dia meminta izin ",
     "Donate": "Donasi",
@@ -1158,7 +1157,6 @@
     "Select a course or select \"Not specific to a course\" for your support request.": "Pilih satu kursus atau pilih \"Tidak spesifik untuk kursus tertentu\" untuk permintaan Anda.",
     "Select a section or problem": "Pilih bagian atau masalah",
     "Select a session:": "Pilih sesi:",
-    "Select a subject for your support request.": "Berikan judul untuk permintaan dukungan Anda.",
     "Select a time allotment for the exam. If it is over 24 hours, type in the amount of time. You can grant individual learners extra time to complete the exam through the Instructor Dashboard.": "Pilih penjatahan waktu untuk ujian. Jika lebih dari 24 jam, ketik jumlah waktu. Anda dapat memberikan peserta didik waktu tambahan untuk menyelesaikan ujian melalui Dashboard Instruktur.",
     "Select all": "pilih semua",
     "Select fidelity": "Pilih fidelity",
@@ -1320,7 +1318,6 @@
     "Textbook Name": "Nama textbook",
     "Textbook information": "Informasi textbook",
     "Thank you for setting your course goal to {goal}!": "Terima kasih sudah membuat {goal} sebagai tujuan kursus Anda!",
-    "Thank you for submitting a request! We will contact you within 24 hours.": "Terima kasih atas permintaan Anda! Kami akan menghubungi Anda dalam 24 jam.",
     "Thank you for submitting your financial assistance application for {course_name}! You can expect a response in 2-4 business days.": "Terimakasih sudah mengirimkan aplikasi bantuan finansial untuk {course_name}. Anda dapat mengharapkan balasan dalam 2-4 hari kerja.",
     "Thank you for submitting your photos. We will review them shortly. You can now sign up for any %(platformName)s course that offers verified certificates. Verification is good for one year. After one year, you must submit photos for verification again.": "Terimakasih sudah mengirimkan foto Anda. Kami akan meninjaunya segera. Anda dapat mengikuti kursus %(platformName)s apapun yang menawarkan sertifikat terverifikasi. Verifikasi berlaku selamat satu tahun. Setelah itu, Anda harus mengirimkan foto untuk verifikasi lagi.",
     "The URL you entered seems to be an email address. Do you want to add the required mailto: prefix?": "URL anda tampak seperti alamat email. Apakah anda ingin menambahkan prefiks mailto:?",
@@ -1340,7 +1337,6 @@
     "The following email addresses and/or usernames are invalid:": "Alamat email dan atau nama pengguna berikut tidak valid:",
     "The following errors were generated:": "Kesalahan berikut terjadi:",
     "The following file types are not allowed: ": "Jenis berkas berikut tidak diperkenankan:",
-    "The following information is already a part of your {platform} profile. We\\'ve included it here for your application.": "Informasi berikut merupakan bagian dari profil {platform}. Kami memasukkannya untuk aplikasi Anda.",
     "The following message will be displayed at the bottom of the courseware pages within your course:": "Pesan berikut akan ditunjukkan pada bagian bawah dari halaman courseware dengan kursus anda",
     "The following options are available for the {license_name} license.": "Opsi berikut tersedia untuk {license_name} license.",
     "The following users are no longer enrolled in the course:": "Pengguna berikut sudah tidak terdaftar pada pembelajaran:",
@@ -1358,7 +1354,6 @@
     "The number of subsections in the course that contain problems of this assignment type.": "Jumlah subbagian dalam kursus yang berisi masalah dari jenis tugas ini.",
     "The organization that this signatory belongs to, as it should appear on certificates.": "Organisasi penandatangan yang harus tercetak di sertifikat",
     "The page \"{route}\" could not be found.": "Halaman \"{route}\" tidak dapat ditemukan.",
-    "The photo of your face matches the photo on your ID.": "Photo wajah anda sesuai dengan photo pada ID anda",
     "The post you selected has been deleted.": "Post yang Anda pilih telah dihapus.",
     "The refund deadline for this course has passed,so you will not receive a refund.": "Batas waktu refund untuk kursus ini telah berakhir, sehingga Anda tidak dapat menerima refund.",
     "The selected content group does not exist": "Grup isi yang dipilih tidak ada",
@@ -1559,7 +1554,6 @@
     "Use my institution/campus credentials": "Gunakan Kredensial Kampus/Institusi",
     "Use my university info": "Gunakan informasi universitas saya",
     "Use the All Topics menu to find specific topics.": "Gunakan menu Semua Topik untuk menemukan topik tertentu.",
-    "Use your webcam to take a photo of your ID. We will match this photo with the photo of your face and the name on your account.": "Gunakan webcan untuk mengambil foto ID Anda. Kami akan mencocokkan foto ini dengan foto wajah Anda dan nama di akun Anda.",
     "Use your webcam to take a photo of your face. We will match this photo with the photo on your ID.": "Gunakan webcan untuk mengambil foto ID Anda. Kami akan mencocokkan foto ini dengan foto wajah di kartu identitas Anda.",
     "Used": "Terpakai",
     "Username": "Pengguna",
@@ -1696,8 +1690,6 @@
     "You must specify a name": "Anda harus berikan nama",
     "You must specify a name for the cohort": "Anda harus menentukan nama untuk kohort ini",
     "You must specify your birth year before you can share your full profile. To specify your birth year, go to the {account_settings_page_link}": "Anda harus menentukan tahun lahir sebelum Anda dapat membagikan profil lengkap Anda. Untuk memilih tahun lahir, klik {account_settings_page_link}",
-    "You need a driver's license, passport, or other government-issued ID that has your name and photo.": "Anda memerlukan surat izin mengemudi, paspor, atau kartu identitas lain yang diterbitkan pemerintah yang memiliki nama dan foto Anda.",
-    "You need an ID with your name and photo. A driver's license, passport, or other government-issued IDs are all acceptable.": "Anda membutuhkan kartu identitas dengan nama dan foto Anda. Surat izin mengemudi, paspor, atau kartu identitas lain yang diterbitkan oleh pemerintah dapat digunakan.",
     "You need to activate your account before you can enroll in courses. Check your inbox for an activation email.": "Anda memerlukan untuk aktifasi account anda sebelum anda dapat mendaftar kursus. Periksa inbok anda pada aktifasi email",
     "You need to activate your account before you can enroll in courses. Check your inbox for an activation email. After you complete activation you can return and refresh this page.": "Anda harus mengaktifkan akun sebelum Anda dapat mendaftar kursus. Periksa kotak masuk email Anda untuk email aktivasi. Setelah Anda menyelesaikan aktivasi Anda dapat memuat kembali halaman ini.",
     "You receive messages from {platform_name} and course teams at this address.": "Anda menerima pesan dari {platform_name} dan tim kursus di alamat ini.",
@@ -1890,7 +1882,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -1958,9 +1950,9 @@
       "%Y-%m-%d"
     ],
     "DECIMAL_SEPARATOR": ",",
-    "FIRST_DAY_OF_WEEK": "1",
+    "FIRST_DAY_OF_WEEK": 1,
     "MONTH_DAY_FORMAT": "j F",
-    "NUMBER_GROUPING": "3",
+    "NUMBER_GROUPING": 3,
     "SHORT_DATETIME_FORMAT": "d-m-Y G.i",
     "SHORT_DATE_FORMAT": "d-m-Y",
     "THOUSAND_SEPARATOR": ".",

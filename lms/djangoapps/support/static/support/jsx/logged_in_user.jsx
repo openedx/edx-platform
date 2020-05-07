@@ -34,10 +34,10 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitFo
     </div>);
   }
 
-  let subjectElement;
-  subjectElement = (<div>
-    <label htmlFor="subject">{gettext('Subject')}</label>
-    <select className="form-control select-subject" id="subject">
+  let topicElement;
+  topicElement = (<div>
+    <label htmlFor="topic">{gettext('Topic')}</label>
+    <select className="form-control select-subject" id="topic">
       <option value="">--------</option>
       <option value="Account Settings">{gettext('Account Settings')}</option>
       <option value="Billing/Payment Options">{gettext('Billing/Payment Options')}</option>
@@ -57,6 +57,9 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitFo
   </div>);
 
   return (<div>
+    <div className="row">
+      <hr className="col-sm-12"></hr>
+    </div>
     <div className="row">
       <div
         className="col-sm-12 user-info"
@@ -83,7 +86,7 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitFo
     <div className="row">
       <div className="col-sm-12">
         <div className="form-group">
-          {subjectElement}
+          {topicElement}
         </div>
       </div>
     </div>
@@ -117,7 +120,7 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitFo
         <button
           className="btn btn-primary btn-submit"
           onClick={submitForm}
-        >{gettext('Submit')}</button>
+        >{gettext('Create Support Ticket')}</button>
       </div>
     </div>
   </div>);

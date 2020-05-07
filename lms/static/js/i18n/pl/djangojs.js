@@ -46,10 +46,10 @@
     "%(new_item_message)s": "%(new_item_message)s",
     "%(programName)s Home Page.": "Strona g\u0142\u00f3wna programu %(programName)s.",
     "%(sel)s of %(cnt)s selected": [
-      "Zaznaczono %(sel)s z %(cnt)s",
-      "Zaznaczono %(sel)s z %(cnt)s",
-      "Zaznaczono %(sel)s z %(cnt)s",
-      "Zaznaczono %(sel)s z %(cnt)s"
+      "Wybrano %(sel)s z %(cnt)s",
+      "Wybrano %(sel)s z %(cnt)s",
+      "Wybrano %(sel)s z %(cnt)s",
+      "Wybrano %(sel)s z %(cnt)s"
     ],
     "%(type)s Component Template Menu": "%(type)s menu szablon\u00f3w elementu",
     "(Add signatories for a certificate)": "(Dodaj sygnatariuszy certyfikatu)",
@@ -428,7 +428,6 @@
     "Do you want to replace the edX transcript with the YouTube transcript?": "Czy chcesz podmieni\u0107 bie\u017c\u0105c\u0105 transkrypcj\u0119 na nowsz\u0105 transkrypcj\u0119 z YouTube?",
     "Do you want to upload your file before submitting?": "Czy chcesz wgra\u0107 sw\u00f3j plik przed wys\u0142aniem odpowiedzi?",
     "Does the name on your ID match your account name: %(fullName)s?": "Czy imi\u0119 i nazwisko na dokumencie zgadzaj\u0105 si\u0119 z danymi konta: %(fullName)s?",
-    "Does the photo of you match your ID photo?": "Czy zdj\u0119cie twojej twarzy odpowiada temu z dokumentu to\u017csamo\u015bci?",
     "Does the photo of you show your whole face?": "Czy na zdj\u0119ciu wida\u0107 ca\u0142\u0105 twoj\u0105 twarz?",
     "Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission.": "Nie widzisz swojego zdj\u0119cia? Upewnij si\u0119, \u017ce zezwalasz swojej przegl\u0105darce na u\u017cycie kamerki, gdy pojawia si\u0119 pro\u015bba o zgod\u0119.",
     "Donate": "Przeka\u017c darowizn\u0119",
@@ -1211,7 +1210,6 @@
     "The following email addresses and/or usernames are invalid:": "Nast\u0119puj\u0105ce adresy e-mail i/lub nazwy u\u017cytkownika s\u0105 nieprawid\u0142owe:",
     "The following errors were generated:": "Wyst\u0105pi\u0142y nast\u0119puj\u0105ce b\u0142\u0119dy:",
     "The following file types are not allowed: ": "Nast\u0119puj\u0105ce typy plik\u00f3w s\u0105 niedozwolone:",
-    "The following information is already a part of your {platform} profile. We\\'ve included it here for your application.": "Poni\u017csze informacje s\u0105 cz\u0119\u015bci\u0105 twojego profilu w {platform}. Za\u0142\u0105czyli\u015bmy je jako element twojego zg\u0142oszenia.",
     "The following message will be displayed at the bottom of the courseware pages within your course:": "Nast\u0119puj\u0105ca wiadomo\u015b\u0107 b\u0119dzie wy\u015bwietlana w dolnej cz\u0119\u015bci stron twojego kursu:",
     "The following options are available for the {license_name} license.": "Nast\u0119puj\u0105ce opcje s\u0105 dost\u0119pne dla licencji {license_name}.",
     "The following users are no longer enrolled in the course:": "Nast\u0119puj\u0105cy u\u017cytkownicy nie s\u0105 ju\u017c zapisani na kurs:",
@@ -1228,7 +1226,6 @@
     "The number of subsections in the course that contain problems of this assignment type.": "Liczba lekcji kursu zawieraj\u0105cych \u0107wiczenia wykorzystuj\u0105ce tego typu zadanie.",
     "The organization that this signatory belongs to, as it should appear on certificates.": "Organizacja, do kt\u00f3rej nale\u017cy sygnatariusz, zapisana w takiej formie, w jakiem ma si\u0119 znale\u017a\u0107 na certyfikatach.",
     "The page \"{route}\" could not be found.": "Nie uda\u0142o si\u0119 odnale\u017a\u0107 strony \"{route}\".",
-    "The photo of your face matches the photo on your ID.": "Zdj\u0119cie twojej twarzy odpowiada temu z dokumentu to\u017csamo\u015bci.",
     "The post you selected has been deleted.": "Wybrany przez ciebie wpis zosta\u0142 usuni\u0119ty.",
     "The published branch version, {published}, was reset to the draft branch version, {draft}.": "Opublikowana wersja ga\u0142\u0119zi {published} zosta\u0142a zresetowana do wersji roboczej ga\u0142\u0119zi {draft}.",
     "The raw error message is:": "Surowy komunikat b\u0142\u0119du:",
@@ -1446,7 +1443,6 @@
     "Use enrollment tracks as the basis for dividing discussions. All learners, regardless of their enrollment track, see the same discussion topics, but within divided topics, only learners who are in the same enrollment track see and respond to each others\u2019 posts.": "U\u017cywaj \u015bcie\u017cek kursu jako podstawy do dzielenia dyskusji. Wszyscy studenci, niezale\u017cnie od ich \u015bcie\u017cki, widz\u0105 te same tematy dyskusji, natomiast wpisy wewn\u0105trz podzielonych dyskusji widz\u0105 wy\u0142\u0105cznie studenci b\u0119d\u0105cy na tych samych \u015bcie\u017ckach kursu.",
     "Use my institution/campus credentials": "U\u017cyj danych do logowania z mojej uczelni",
     "Use the All Topics menu to find specific topics.": "U\u017cyj menu \"Wszystkie tematy\", aby znale\u017a\u0107 okre\u015blone tematy.",
-    "Use your webcam to take a photo of your ID. We will match this photo with the photo of your face and the name on your account.": "U\u017cyj kamerki internetowej, aby zrobi\u0107 zdj\u0119cie swojego dokumentu to\u017csamo\u015bci. Por\u00f3wnamy to zdj\u0119cie ze zdj\u0119ciem twojej twarzy oraz zweryfikujemy dane osobowe.",
     "Use your webcam to take a photo of your face. We will match this photo with the photo on your ID.": "U\u017cyj kamerki internetowej, aby zrobi\u0107 zdj\u0119cie swojej twarzy. Por\u00f3wnamy to zdj\u0119cie ze zdj\u0119ciem w twoim dokumencie to\u017csamo\u015bci.",
     "Used": "Wykorzystany",
     "Used in {count} location": [
@@ -1582,8 +1578,6 @@
     "You must sign out and sign back in before your language changes take effect.": "Musisz si\u0119 wylogowa\u0107 i ponownie zalogowa\u0107, aby zmiany j\u0119zykowe zacz\u0119\u0142y obowi\u0105zywa\u0107.",
     "You must specify a name for the cohort": "Musisz okre\u015bli\u0107 nazw\u0119 tej kohorty",
     "You must specify your birth year before you can share your full profile. To specify your birth year, go to the {account_settings_page_link}": "Przed udost\u0119pnieniem swojego pe\u0142nego profilu musisz poda\u0107 rok urodzenia. Aby wskaza\u0107 sw\u00f3j rok urodzenia, odwied\u017a {account_settings_page_link}",
-    "You need a driver's license, passport, or other government-issued ID that has your name and photo.": "Potrzebujesz dowodu osobistego, paszportu lub innego oficjalnego dokumentu to\u017csamo\u015bci ze zdj\u0119ciem i twoim nazwiskiem.",
-    "You need an ID with your name and photo. A driver's license, passport, or other government-issued IDs are all acceptable.": "Potrzebujesz dokumentu to\u017csamo\u015bci ze zdj\u0119ciem i danymi osobowymi. Zaakceptujemy dow\u00f3d osobisty, paszport, prawo jazdy lub inny oficjalny dokument.",
     "You need to activate your account before you can enroll in courses. Check your inbox for an activation email.": "Aby m\u00f3c zarejestrowa\u0107 si\u0119 na kursy, musisz najpierw aktywowa\u0107 swoje konto. Sprawd\u017a poczt\u0119 i odnajd\u017a e-mail z odno\u015bnikiem aktywacyjnym.",
     "You need to activate your account before you can enroll in courses. Check your inbox for an activation email. After you complete activation you can return and refresh this page.": "Przed zapisaniem si\u0119 na pierwszy kurs musisz aktywowa\u0107 swoje konto. Sprawd\u017a poczt\u0119 e-mail i znajd\u017a wiadomo\u015b\u0107 z instrukcj\u0105 aktywacji. Po jej dokonaniu wr\u00f3\u0107 i od\u015bwie\u017c t\u0119 stron\u0119.",
     "You receive messages from {platform_name} and course teams at this address.": "Na ten adres otrzymujesz wiadomo\u015bci z {platform_name} i od prowadz\u0105cych kursy.",
@@ -1792,7 +1786,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -1845,9 +1839,9 @@
       "%Y-%m-%d"
     ],
     "DECIMAL_SEPARATOR": ",",
-    "FIRST_DAY_OF_WEEK": "1",
-    "MONTH_DAY_FORMAT": "j F",
-    "NUMBER_GROUPING": "3",
+    "FIRST_DAY_OF_WEEK": 1,
+    "MONTH_DAY_FORMAT": "j E",
+    "NUMBER_GROUPING": 3,
     "SHORT_DATETIME_FORMAT": "d-m-Y  H:i",
     "SHORT_DATE_FORMAT": "d-m-Y",
     "THOUSAND_SEPARATOR": "\u00a0",

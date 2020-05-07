@@ -235,13 +235,22 @@ class TeamAccessTests(SharedModuleStoreTestCase):
             'user_unenrolled': cls.user_unenrolled,
         }
 
+        cls.topic_id = 'RANDOM TOPIC'
+        cls.course_1 = CourseFactory.create(
+            teams_configuration=TeamsConfig({
+                'team_sets': [{'id': cls.topic_id, 'name': cls.topic_id, 'description': cls.topic_id}]
+            }),
+            org=COURSE_KEY1.org,
+            course=COURSE_KEY1.course,
+            run=COURSE_KEY1.run
+        )
+
         for user in (cls.user_audit, cls.user_staff):
             CourseEnrollmentFactory.create(user=user, course_id=COURSE_KEY1)
         CourseEnrollmentFactory.create(user=cls.user_masters, course_id=COURSE_KEY1, mode=CourseMode.MASTERS)
 
         CourseStaffRole(COURSE_KEY1).add_users(cls.user_staff)
 
-        cls.topic_id = 'RANDOM TOPIC'
         cls.team_unprotected_1 = CourseTeamFactory(
             course_id=COURSE_KEY1,
             topic_id=cls.topic_id,

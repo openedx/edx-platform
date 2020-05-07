@@ -88,7 +88,6 @@ def store_uploaded_file(
     return file_storage, stored_file_name
 
 
-# pylint: disable=invalid-name
 def course_filename_prefix_generator(course_id, separator='_'):
     """
     Generates a course-identifying unicode string for use in a file
@@ -103,7 +102,6 @@ def course_filename_prefix_generator(course_id, separator='_'):
     return get_valid_filename(six.text_type(separator).join([course_id.org, course_id.course, course_id.run]))
 
 
-# pylint: disable=invalid-name
 def course_and_time_based_filename_generator(course_id, base_name):
     """
     Generates a filename (without extension) based on the current time and the supplied filename.

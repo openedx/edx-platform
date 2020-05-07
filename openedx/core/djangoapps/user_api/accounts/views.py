@@ -460,12 +460,15 @@ class DeactivateLogoutView(APIView):
                 logout(request)
             return Response(status=status.HTTP_204_NO_CONTENT)
         except KeyError:
+            log.exception('Username not specified {}'.format(request.user))
             return Response(u'Username not specified.', status=status.HTTP_404_NOT_FOUND)
         except user_model.DoesNotExist:
+            log.exception('The user "{}" does not exist.'.format(request.user.username))
             return Response(
                 u'The user "{}" does not exist.'.format(request.user.username), status=status.HTTP_404_NOT_FOUND
             )
         except Exception as exc:  # pylint: disable=broad-except
+            log.exception('500 error deactivating account {}'.format(exc))
             return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def _verify_user_password(self, request):
@@ -486,6 +489,9 @@ class DeactivateLogoutView(APIView):
             else:
                 self._handle_failed_authentication(request.user)
         except AuthFailedError as err:
+            log.exception(
+                "The user password to deactivate was incorrect. {}".format(request.user.username)
+            )
             return Response(text_type(err), status=status.HTTP_403_FORBIDDEN)
         except Exception as err:  # pylint: disable=broad-except
             return Response(u"Could not verify user password: {}".format(err), status=status.HTTP_400_BAD_REQUEST)

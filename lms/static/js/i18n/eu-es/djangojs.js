@@ -936,7 +936,6 @@
     "Select a group type": "Aukeratu talde-mota",
     "Select a section or problem": "Aukeratu atala edo ariketa",
     "Select a session:": "Aukeratu saioa:",
-    "Select a subject for your support request.": "Aukeratu laguntza-eskaeraren gaia.",
     "Select all": "Aukeratu guztiak",
     "Select language": "Aukeratu hizkuntza",
     "Select one or more groups:": "Aukera talde bat edo gehiago:",
@@ -1465,7 +1464,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -1499,7 +1498,7 @@
     /* formatting library */
 
     django.formats = {
-    "DATETIME_FORMAT": "N j, Y, P",
+    "DATETIME_FORMAT": "Y\\k\\o N j\\a, H:i",
     "DATETIME_INPUT_FORMATS": [
       "%Y-%m-%d %H:%M:%S",
       "%Y-%m-%d %H:%M:%S.%f",
@@ -1529,11 +1528,11 @@
       "%d %B, %Y"
     ],
     "DECIMAL_SEPARATOR": ",",
-    "FIRST_DAY_OF_WEEK": "0",
-    "MONTH_DAY_FORMAT": "F j",
-    "NUMBER_GROUPING": "0",
-    "SHORT_DATETIME_FORMAT": "m/d/Y P",
-    "SHORT_DATE_FORMAT": "Y M j",
+    "FIRST_DAY_OF_WEEK": 1,
+    "MONTH_DAY_FORMAT": "F\\r\\e\\n j\\a",
+    "NUMBER_GROUPING": 3,
+    "SHORT_DATETIME_FORMAT": "Y-m-d H:i",
+    "SHORT_DATE_FORMAT": "Y-m-d",
     "THOUSAND_SEPARATOR": ".",
     "TIME_FORMAT": "H:i",
     "TIME_INPUT_FORMATS": [
@@ -1541,7 +1540,7 @@
       "%H:%M:%S.%f",
       "%H:%M"
     ],
-    "YEAR_MONTH_FORMAT": "F Y"
+    "YEAR_MONTH_FORMAT": "Y\\k\\o F"
   };
 
     django.get_format = function(format_type) {

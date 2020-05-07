@@ -14,7 +14,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
-from six.moves.urllib.parse import quote_plus  # pylint: disable=import-error
+from six.moves.urllib.parse import quote_plus
 from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xblock.exceptions import NoSuchHandlerError

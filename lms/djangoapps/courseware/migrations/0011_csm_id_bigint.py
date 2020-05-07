@@ -15,6 +15,9 @@ class CsmBigInt(AlterField):
     level and the coursewarehistoryextended_studentmodulehistoryextended table is in a different database
     '''
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        if hasattr(schema_editor.connection, 'is_in_memory_db') and schema_editor.connection.is_in_memory_db():
+            # sqlite3 doesn't support 'MODIFY', so skipping during tests
+            return
         to_model = to_state.apps.get_model(app_label, self.model_name)
         if schema_editor.connection.alias == 'student_module_history':
             if settings.FEATURES["ENABLE_CSMH_EXTENDED"]:

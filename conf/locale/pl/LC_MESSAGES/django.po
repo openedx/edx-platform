@@ -126,7 +126,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-03-29 20:42+0000\n"
+"POT-Creation-Date: 2020-04-27 09:12+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Polish (https://www.transifex.com/open-edx/teams/6205/pl/)\n"
@@ -6158,6 +6158,14 @@ msgstr "Nie posiadasz dostępu do tego kursu."
 msgid "You do not have access to this course on a mobile device"
 msgstr "Nie posiadasz dostępu do tego kursu na urządzeniu mobilnym."
 
+#: lms/djangoapps/courseware/access_response.py
+msgid "You must be enrolled in the course"
+msgstr ""
+
+#: lms/djangoapps/courseware/access_response.py
+msgid "You must be logged in to see this course"
+msgstr ""
+
 #: lms/djangoapps/courseware/course_tools.py
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade to Verified"
@@ -8443,12 +8451,12 @@ msgid "{mode_name} for course {course}"
 msgstr "Tryb {mode_name} dla kursu {course}"
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid ""
-"You can unenroll in the course and receive a full refund for 14 days after "
-"the course start date. "
+"To receive a refund you may unenroll from the course on your edX Dashboard "
+"({dashboard_url}) up to 14 days after your payment or 14 days after your "
+"course starts (up to six months after your payment).\n"
 msgstr ""
-"Możesz wypisać się z kursu i otrzymać pełny zwrot pieniędzy w ciągu 14 dni "
-"od daty jego rozpoczęcia."
 
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
@@ -8462,22 +8470,15 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
 "You can unenroll in the course and receive a full refund for 2 days after "
-"the course start date. "
+"the course start date.\n"
 msgstr ""
-"Możesz wypisać się z kursu i otrzymać pełny zwrot pieniędzy w ciągu 2 dni od"
-" daty jego rozpoczęcia."
 
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
 msgid ""
-"{refund_reminder_msg}To receive your refund, contact {billing_email}. Please"
-" include your order number in your email. Please do NOT include your credit "
-"card information."
+"{refund_reminder_msg}For help unenrolling, Please see How do I unenroll from"
+" a course? ({how_to_unenroll_link}) in our edX HelpCenter."
 msgstr ""
-"{refund_reminder_msg}Aby otrzymać zwrot pieniędzy, wyślij żądanie na "
-"{billing_email}. W wiadomości zawrzyj numer swojego zamówienia. Ze względów "
-"bezpieczeństwa prosimy NIE załączać informacji rozliczeniowych, takich jak "
-"np. dane karty płatniczej."
 
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
@@ -9165,6 +9166,10 @@ msgstr "Wypisano studenta {user} z kursu {course_id}"
 msgid "Refunded {cost} for order id {order_id}"
 msgstr "Zwrócono {cost} z zamówienia numer {order_id}"
 
+#: lms/djangoapps/survey/utils.py
+msgid "You must complete a survey"
+msgstr ""
+
 #: lms/djangoapps/teams/models.py
 msgid "Optional language the team uses as ISO 639-1 code."
 msgstr "Opcjonalny język zespołu jako kod ISO 639-1."
@@ -9211,11 +9216,15 @@ msgid "The supplied course_id {course_id} is not valid."
 msgstr "Podany identyfikator kursu {course_id} jest nieprawidłowy."
 
 #: lms/djangoapps/teams/views.py
-msgid "You are already in a team in this course."
-msgstr "Jesteś już członkiem zespołu w tym kursie."
+msgid "topic_id is required"
+msgstr ""
 
 #: lms/djangoapps/teams/views.py
 msgid "You can't create a team in an instructor managed topic."
+msgstr ""
+
+#: lms/djangoapps/teams/views.py
+msgid "You are already in a team in this teamset."
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
@@ -11722,15 +11731,6 @@ msgid ""
 "{link_start}{provider} account{link_end}."
 msgstr ""
 
-#. Translators: This example email address is used as a placeholder in
-#. a field on the login form meant to hold the user's email address.
-#. Translators: This example email address is used as a placeholder in
-#. a field on the password reset form meant to hold the user's email address.
-#: openedx/core/djangoapps/user_authn/views/login_form.py
-#: openedx/core/djangoapps/user_authn/views/password_reset.py
-msgid "username@domain.com"
-msgstr "uzytkownik@domena.com"
-
 #. Translators: These instructions appear on the login form, immediately
 #. below a field meant to hold the user's email address.
 #. Translators: These instructions appear on the password reset form,
@@ -11745,6 +11745,12 @@ msgstr "Adres e-mail, którego użyłeś podczas rejestracji w {platform_name}"
 #: openedx/core/djangoapps/user_authn/views/login_form.py
 msgid "Create Account"
 msgstr "Utwórz konto"
+
+#. Translators: This example email address is used as a placeholder in
+#. a field on the password reset form meant to hold the user's email address.
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid "username@domain.com"
+msgstr "uzytkownik@domena.com"
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid ""
@@ -13034,6 +13040,12 @@ msgstr "Trwa generowanie transkrypcji"
 msgid "Transcript Ready"
 msgstr "Transkrypcja gotowa"
 
+#. Translators: This is the status for a video whose transcription job was
+#. failed for some languages
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Partial Failure"
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "An image file is required."
 msgstr "Wymagany jest plik obrazka."
@@ -13951,7 +13963,6 @@ msgstr "Wystąpił błąd na serwerach platformy {platform_name}"
 
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
-#: lms/templates/courseware/error-message.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
 " fix it as soon as possible. Please email us at {tech_support_email} to "
@@ -14066,6 +14077,18 @@ msgstr "E-mail"
 #, python-format
 msgid "Return To %s"
 msgstr "Wróć do %s"
+
+#: lms/templates/reset_deadlines_banner.html
+msgid "It looks like you've missed some important deadlines. Visit "
+msgstr ""
+
+#: lms/templates/reset_deadlines_banner.html
+msgid "edx.org"
+msgstr ""
+
+#: lms/templates/reset_deadlines_banner.html
+msgid " to reset your deadlines and get started today."
+msgstr ""
 
 #: lms/templates/reset_deadlines_banner.html
 msgid ""
@@ -15997,8 +16020,9 @@ msgid "You are enrolled in this course"
 msgstr "Jesteś zapisany na ten kurs"
 
 #: lms/templates/courseware/course_about.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
 #: lms/templates/shoppingcart/registration_code_receipt.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
 msgid "View Course"
 msgstr "Wyświetl kurs"
 
@@ -16190,6 +16214,12 @@ msgid ""
 "{a_start}Upgrade{a_end}{space}to a Verified Certificate for full access."
 msgstr ""
 
+#: lms/templates/courseware/error-message.html
+msgid ""
+"We're sorry, this module is temporarily unavailable. Our staff is working to"
+" fix it as soon as possible."
+msgstr ""
+
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
 msgstr "Dziennik ocen"
@@ -16241,8 +16271,9 @@ msgid "Welcome to {course_title}!"
 msgstr ""
 
 #: lms/templates/courseware/info.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
 msgid "Resume Course"
 msgstr "Wznów kurs"
 
@@ -20462,12 +20493,8 @@ msgstr "Potwierdzenie"
 #: lms/templates/static_templates/404.html
 msgid ""
 "The page that you were looking for was not found. Go back to the "
-"{link_start}homepage{link_end} or let us know about any pages that may have "
-"been moved at {email}."
+"{link_start}homepage{link_end} ."
 msgstr ""
-"Strona której szukasz nie została odnaleziona. Wróć do {link_start}strony "
-"głównej{link_end} i jeśli chcesz, poinformuj nas o brakującej podstronie "
-"wysyłając e-mail na adres {email}."
 
 #: lms/templates/static_templates/about.html
 #: lms/templates/static_templates/blog.html
@@ -20522,23 +20549,15 @@ msgstr "Przepraszamy, chwilowo serwery {platform_name} nie działają"
 #: lms/templates/static_templates/server-overloaded.html
 msgid ""
 "Our staff is currently working to get the site back up as soon as possible. "
-"Please email us at {tech_support_email} to report any problems or downtime."
 msgstr ""
-"Nasi technicy pracują nad jak najszybszym wznowieniem działania strony. "
-"Chcąc zgłosić nam występujący problem w działaniu serwisu, można wysłać "
-"e-mail na adres {tech_support_email}."
 
 #: lms/templates/static_templates/server-error.html
 msgid "There has been a 500 error on the {platform_name} servers"
 msgstr "Wystąpił błąd 500 na serwerach {platform_name}"
 
 #: lms/templates/static_templates/server-error.html
-msgid ""
-"Please wait a few seconds and then reload the page. If the problem persists,"
-" please email us at {email}."
+msgid "Please wait a few seconds and then reload the page."
 msgstr ""
-"Proszę odczekać kilka sekund, a następnie odświeżyć stronę. Jeśli problem "
-"nie ustąpi, prosimy o e-mail na {email}."
 
 #: lms/templates/static_templates/server-overloaded.html
 msgid "Currently the {platform_name} servers are overloaded"
@@ -21022,6 +21041,10 @@ msgstr "Ostatnia aktualizacja"
 
 #: openedx/features/course_experience/templates/course_experience/next-up-banner-fragment.html
 msgid "Get started on what's next: "
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
+msgid "Show More"
 msgstr ""
 
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html

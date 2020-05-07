@@ -52,7 +52,6 @@ class CourseDatesFragmentMobileView(CourseDatesFragmentView):
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             raise Http404
-        print('****************', CourseDatesFragmentMobileView.__dict__)
         return super(CourseDatesFragmentMobileView, self).get(request, *args, **kwargs)
 
     def css_dependencies(self):

@@ -6,7 +6,7 @@
 
   
   django.pluralidx = function(n) {
-    var v=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;
+    var v=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;
     if (typeof(v) == 'boolean') {
       return v ? 1 : 0;
     } else {
@@ -23,6 +23,7 @@
     "%(sel)s of %(cnt)s selected": [
       "Vybr\u00e1na je %(sel)s polo\u017eka z celkem %(cnt)s.",
       "Vybr\u00e1ny jsou %(sel)s polo\u017eky z celkem %(cnt)s.",
+      "Vybran\u00fdch je %(sel)s polo\u017eek z celkem %(cnt)s.",
       "Vybran\u00fdch je %(sel)s polo\u017eek z celkem %(cnt)s."
     ],
     "6 a.m.": "6h r\u00e1no",
@@ -53,11 +54,13 @@
     "Note: You are %s hour ahead of server time.": [
       "Pozn\u00e1mka: V\u00e1\u0161 \u010das o %s hodinu p\u0159edstihuje \u010das na serveru.",
       "Pozn\u00e1mka: V\u00e1\u0161 \u010das o %s hodiny p\u0159edstihuje \u010das na serveru.",
+      "Pozn\u00e1mka: V\u00e1\u0161 \u010das o %s hodin p\u0159edstihuje \u010das na serveru.",
       "Pozn\u00e1mka: V\u00e1\u0161 \u010das o %s hodin p\u0159edstihuje \u010das na serveru."
     ],
     "Note: You are %s hour behind server time.": [
       "Pozn\u00e1mka: V\u00e1\u0161 \u010das se o %s hodinu zpo\u017e\u010fuje za \u010dasem na serveru.",
       "Pozn\u00e1mka: V\u00e1\u0161 \u010das se o %s hodiny zpo\u017e\u010fuje za \u010dasem na serveru.",
+      "Pozn\u00e1mka: V\u00e1\u0161 \u010das se o %s hodin zpo\u017e\u010fuje za \u010dasem na serveru.",
       "Pozn\u00e1mka: V\u00e1\u0161 \u010das se o %s hodin zpo\u017e\u010fuje za \u010dasem na serveru."
     ],
     "November": "listopad",
@@ -104,7 +107,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -165,9 +168,9 @@
       "%Y-%m-%d"
     ],
     "DECIMAL_SEPARATOR": ",",
-    "FIRST_DAY_OF_WEEK": "1",
+    "FIRST_DAY_OF_WEEK": 1,
     "MONTH_DAY_FORMAT": "j. F",
-    "NUMBER_GROUPING": "3",
+    "NUMBER_GROUPING": 3,
     "SHORT_DATETIME_FORMAT": "d.m.Y G:i",
     "SHORT_DATE_FORMAT": "d.m.Y",
     "THOUSAND_SEPARATOR": "\u00a0",

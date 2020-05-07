@@ -53,6 +53,7 @@ from .api import (
     can_user_create_team_in_topic,
     has_course_staff_privileges,
     has_specific_team_access,
+    has_specific_teamset_access,
     has_team_api_access,
     user_organization_protection_status
 )
@@ -363,7 +364,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         **Response Values for POST**
 
             Any logged in user who has verified their email address can create
-            a team. The format mirrors that of a GET for an individual team,
+            a team in an open teamset. The format mirrors that of a GET for an individual team,
             but does not include the id, date_created, or membership fields.
             id is automatically computed based on name.
 
@@ -373,10 +374,13 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             global staff, or does not have discussion privileges a 403 error
             is returned.
 
-            If the course_id is not valid or extra fields are included in the
-            request, a 400 error is returned.
+            If the course_id is not valid, or the topic_id is missing, or extra fields
+            are included in the request, a 400 error is returned.
 
             If the specified course does not exist, a 404 error is returned.
+            If the specified teamset does not exist, a 404 error is returned.
+            If the specified teamset does exist, but the requesting user shouldn't be
+            able to see it, a 404 is returned.
     """
 
     # BearerAuthentication must come first to return a 401 for unauthenticated users
@@ -461,6 +465,30 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 size=MAXIMUM_SEARCH_SIZE,
             )
 
+            # We need to manually exclude some potential private_managed teams from results, because
+            # it doesn't appear that the search supports "field__in" style lookups
+
+            # Non-staff users should not be able to see private_managed teams that they are not on.
+            # Staff shouldn't have any excluded teams.
+
+            if not has_access(request.user, 'staff', course_key):
+                private_teamset_ids = [ts.teamset_id for ts in course_module.teamsets if ts.is_private_managed]
+                excluded_team_ids = CourseTeam.objects.filter(
+                    course_id=course_key,
+                    topic_id__in=private_teamset_ids
+                ).exclude(
+                    membership__user=request.user
+                ).values_list('team_id', flat=True)
+                excluded_team_ids = set(excluded_team_ids)
+            else:
+                excluded_team_ids = set()
+
+            search_results['results'] = [
+                result for result in search_results['results']
+                if result['data']['id'] not in excluded_team_ids
+            ]
+            search_results['total'] = len(search_results['results'])
+
             paginated_results = paginate_search_results(
                 CourseTeam,
                 search_results,
@@ -523,12 +551,13 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         """POST /api/team/v0/teams/"""
         field_errors = {}
         course_key = None
-
         course_id = request.data.get('course_id')
+        #Handle field errors and check that the course exists
         try:
             course_key = CourseKey.from_string(course_id)
             # Ensure the course exists
-            if not modulestore().has_course(course_key):
+            course_module = modulestore().get_course(course_key)
+            if not course_module:
                 return Response(status=status.HTTP_404_NOT_FOUND)
         except InvalidKeyError:
             field_errors['course_id'] = build_api_error(
@@ -539,26 +568,45 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 'field_errors': field_errors,
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Course and global staff, as well as discussion "privileged" users, will not automatically
-        # be added to a team when they create it. They are allowed to create multiple teams.
-        team_administrator = (has_access(request.user, 'staff', course_key)
-                              or has_discussion_privileges(request.user, course_key))
-        if not team_administrator and CourseTeamMembership.user_in_team_for_course(request.user, course_key):
-            error_message = build_api_error(
-                ugettext_noop('You are already in a team in this course.'),
+        topic_id = request.data.get('topic_id')
+        if not topic_id:
+            field_errors['topic_id'] = build_api_error(
+                ugettext_noop(u'topic_id is required'),
                 course_id=course_id
             )
-            return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'field_errors': field_errors,
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         if course_key and not has_team_api_access(request.user, course_key):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        topic_id = request.data.get('topic_id')
+        if topic_id not in course_module.teams_configuration.teamsets_by_id or (
+            not has_specific_teamset_access(request.user, course_module, topic_id)
+        ):
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        # The user has to have access to this teamset at this point, so we can return 403
+        # and not leak the existance of a private teamset
         if not can_user_create_team_in_topic(request.user, course_key, topic_id):
             return Response(
                 build_api_error(ugettext_noop("You can't create a team in an instructor managed topic.")),
                 status=status.HTTP_403_FORBIDDEN
             )
+
+        # Course and global staff, as well as discussion "privileged" users, will not automatically
+        # be added to a team when they create it. They are allowed to create multiple teams.
+        is_team_administrator = (has_access(request.user, 'staff', course_key)
+                                 or has_discussion_privileges(request.user, course_key))
+        if not is_team_administrator and (
+            CourseTeamMembership.user_in_team_for_course(request.user, course_key, topic_id=topic_id)
+        ):
+            error_message = build_api_error(
+                ugettext_noop('You are already in a team in this teamset.'),
+                course_id=course_id,
+                teamset_id=topic_id,
+            )
+            return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
 
         data = request.data.copy()
         data['course_id'] = six.text_type(course_key)
@@ -579,7 +627,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             emit_team_event('edx.team.created', course_key, {
                 'team_id': team.team_id
             })
-            if not team_administrator:
+            if not is_team_administrator:
                 # Add the creating user to the team.
                 team.add_user(request.user)
                 emit_team_event(
@@ -624,6 +672,19 @@ class IsStaffOrPrivilegedOrReadOnly(IsStaffOrReadOnly):
             has_discussion_privileges(request.user, obj.course_id) or
             super(IsStaffOrPrivilegedOrReadOnly, self).has_object_permission(request, view, obj)
         )
+
+
+class HasSpecificTeamAccess(permissions.BasePermission):
+    """
+    Permission that checks if the user has access to a specific team.
+    If the user doesn't have access to the team, the endpoint should behave as if
+    the team does not exist,
+    """
+
+    def has_object_permission(self, request, view, obj):
+        if not has_specific_team_access(request.user, obj):
+            raise Http404
+        return True
 
 
 class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
@@ -724,7 +785,12 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
 
     """
     authentication_classes = (BearerAuthentication, SessionAuthentication)
-    permission_classes = (permissions.IsAuthenticated, IsStaffOrPrivilegedOrReadOnly, IsEnrolledOrIsStaff,)
+    permission_classes = (
+        permissions.IsAuthenticated,
+        IsEnrolledOrIsStaff,
+        HasSpecificTeamAccess,
+        IsStaffOrPrivilegedOrReadOnly,
+    )
     lookup_field = 'team_id'
     serializer_class = CourseTeamSerializer
     parser_classes = (MergePatchParser,)
@@ -864,6 +930,8 @@ class TopicListView(GenericAPIView):
         # in the case of "team_count".
         organization_protection_status = user_organization_protection_status(request.user, course_id)
         topics = get_alphabetical_topics(course_module)
+        topics = self._filter_hidden_private_teamsets(topics, course_module)
+
         if ordering == 'team_count':
             add_team_count(topics, course_id, organization_protection_status)
             topics.sort(key=lambda t: t['team_count'], reverse=True)
@@ -889,6 +957,26 @@ class TopicListView(GenericAPIView):
         response.data['sort_order'] = ordering
 
         return response
+
+    def _filter_hidden_private_teamsets(self, teamsets, course_module):
+        """
+        Return a filtered list of teamsets, removing any private teamsets that a user doesn't have access to.
+        Follows the same logic as `has_specific_teamset_access` but in bulk rather than for one teamset at a time
+        """
+        if has_course_staff_privileges(self.request.user, course_module.id):
+            return teamsets
+        private_teamset_ids = [teamset.teamset_id for teamset in course_module.teamsets if teamset.is_private_managed]
+        teamset_ids_user_has_access_to = set(
+            CourseTeam.objects.filter(
+                course_id=course_module.id,
+                topic_id__in=private_teamset_ids,
+                membership__user=self.request.user
+            ).values_list('topic_id', flat=True)
+        )
+        return [
+            teamset for teamset in teamsets
+            if teamset['type'] != TeamsetType.private_managed.value or teamset['id'] in teamset_ids_user_has_access_to
+        ]
 
 
 def get_alphabetical_topics(course_module):
@@ -971,6 +1059,9 @@ class TopicDetailView(APIView):
         try:
             topic = course_module.teamsets_by_id[topic_id]
         except KeyError:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        if not has_specific_teamset_access(request.user, course_module, topic_id):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         organization_protection_status = user_organization_protection_status(request.user, course_id)
@@ -1247,7 +1338,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         if not has_specific_team_access(request.user, team):
-            return Response(status=status.HTTP_403_FORBIDDEN)
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
         try:
             user = User.objects.get(username=username)
@@ -1396,7 +1487,7 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         if not has_specific_team_access(request.user, team):
-            return Response(status=status.HTTP_403_FORBIDDEN)
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
         membership = self.get_membership(username, team)
 
@@ -1410,7 +1501,7 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         if not has_specific_team_access(request.user, team):
-            return Response(status=status.HTTP_403_FORBIDDEN)
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
         if not can_user_modify_team(request.user, team):
             return Response(

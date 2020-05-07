@@ -18,6 +18,8 @@ $static-path: '../..';
 @import 'course/layout/reset_deadlines';
 @import 'shared/modal';
 @import 'shared/help-tab';
+@import './elements/banners';
+@import './elements/progress-circle';
 
 // Features
 @import 'features/bookmarks';
@@ -26,13 +28,14 @@ $static-path: '../..';
 @import 'features/course-sock';
 @import 'features/course-upgrade-message';
 @import 'features/course-duration-limits';
-@import 'features/enterprise-learner-portal-banner';
 @import 'features/first-purchase-banner';
 @import 'features/next-up-banner';
 
 // Individual Pages
 @import "views/program-marketing-page";
 @import "views/entitlement-support-page";
+@import "views/course-entitlements";
+@import "views/program-details";
 
 // Responsive Design
 @import '../header';

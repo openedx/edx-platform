@@ -534,6 +534,7 @@ class AccountSettingsOnCreationTest(CreateAccountMixin, TestCase):
             'accomplishments_shared': False,
             'extended_profile': [],
             'secondary_email': None,
+            'secondary_email_enabled': None,
             'time_zone': None,
             'course_certificates': None,
             'phone_number': None,

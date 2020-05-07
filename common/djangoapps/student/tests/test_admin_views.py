@@ -347,6 +347,12 @@ class LoginFailuresAdminTest(TestCase):
         )
         self.assertEqual(str(LoginFailures.objects.get(user=self.user2)), 'Zażółć gęślą jaźń: 2 - -')
 
+    @override_settings(FEATURES={'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': True})
+    def test_feature_enabled(self):
+        url = reverse('admin:student_loginfailures_changelist')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
     @ddt.data(
         reverse('admin:student_loginfailures_changelist'),
         reverse('admin:student_loginfailures_add'),

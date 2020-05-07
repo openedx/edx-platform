@@ -201,6 +201,13 @@
       border-color: transparent;
     }
   }
+
+  .welcome-message-show-more {
+    float: right;
+    background-color: transparent;
+    color: $black;
+    cursor: pointer;
+  }
 }
 
 // Course sidebar
@@ -381,7 +388,6 @@
           margin: 0 0 0 35px;
 
           .subsection-title {
-            display: inline-block;
             margin: 0;
             font-weight: $font-regular;
             display: inline;
@@ -406,7 +412,7 @@
 
 #expand-collapse-outline-all-button {
   float: right;
-  background-color: $white;
+  background-color: transparent;
   color: $black;
   cursor: pointer;
 }

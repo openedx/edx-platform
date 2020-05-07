@@ -1,4 +1,3 @@
-# pylint: disable=attribute-defined-outside-init
 """
 A mixin class for LTI 2.0 functionality.  This is really just done to refactor the code to
 keep the LTIModule class from getting too big
@@ -13,11 +12,11 @@ import re
 
 import mock
 import six
-import six.moves.urllib.parse
 from oauthlib.oauth1 import Client
 from six import text_type
 from webob import Response
 from xblock.core import XBlock
+
 from openedx.core.lib.grade_utils import round_away_from_zero
 
 log = logging.getLogger(__name__)
@@ -156,7 +155,7 @@ class LTI20ModuleMixin(object):
         log.info("[LTI]: {}".format(msg))
         raise LTIError(msg)
 
-    def _lti_2_0_result_get_handler(self, request, real_user):  # pylint: disable=unused-argument
+    def _lti_2_0_result_get_handler(self, request, real_user):
         """
         Helper request handler for GET requests to LTI 2.0 result endpoint
 
@@ -182,7 +181,7 @@ class LTI20ModuleMixin(object):
         base_json_obj['comment'] = self.score_comment
         return Response(json.dumps(base_json_obj).encode('utf-8'), content_type=LTI_2_0_JSON_CONTENT_TYPE)
 
-    def _lti_2_0_result_del_handler(self, request, real_user):  # pylint: disable=unused-argument
+    def _lti_2_0_result_del_handler(self, request, real_user):
         """
         Helper request handler for DELETE requests to LTI 2.0 result endpoint
 

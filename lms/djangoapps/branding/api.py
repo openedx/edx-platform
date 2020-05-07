@@ -21,12 +21,11 @@ from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+from six.moves.urllib.parse import urljoin
 
 from branding.models import BrandingApiConfig
 from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
-
 
 log = logging.getLogger("edx.footer")
 EMPTY_URL = '#'
@@ -496,7 +495,7 @@ def _absolute_url(is_secure, url_path):
     """
     site_name = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
     parts = ("https" if is_secure else "http", site_name, url_path, '', '', '')
-    return six.moves.urllib.parse.urlunparse(parts)  # pylint: disable=too-many-function-args
+    return six.moves.urllib.parse.urlunparse(parts)
 
 
 def _absolute_url_staticfile(is_secure, name):

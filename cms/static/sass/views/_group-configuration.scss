@@ -1,7 +1,8 @@
 // studio - views - group-configurations
 // ====================
 .view-group-configurations {
-  .content-primary, .content-supplementary {
+  .content-primary,
+  .content-supplementary {
     @include box-sizing(border-box);
     @include float(left);
   }
@@ -341,7 +342,9 @@
             }
           }
 
-          label, input, textarea {
+          label,
+          input,
+          textarea {
             display: block;
           }
 
@@ -361,7 +364,8 @@
           }
 
           //this section is borrowed from _account.scss - we should clean up and unify later
-          input, textarea {
+          input,
+          textarea {
             @extend %t-copy-base;
 
             height: 100%;
@@ -536,7 +540,7 @@
 
     // specific group-type styles
     .content-groups {
-      .collection-header{
+      .collection-header {
         .title {
           margin-bottom: 0;
         }

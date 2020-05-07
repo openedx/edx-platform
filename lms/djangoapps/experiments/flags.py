@@ -40,6 +40,21 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
     Bucket 0 is assumed to be the control bucket.
 
     See a HOWTO here: https://openedx.atlassian.net/wiki/spaces/AC/pages/1250623700/Bucketing+users+for+an+experiment
+
+    When writing tests involving an ExperimentWaffleFlag you must not use the
+    override_waffle_flag utility. That will only turn the experiment on or off and won't
+    override bucketing. Instead use ExperimentWaffleFlag's override method which
+    will do both. Example:
+
+        with MY_EXPERIMENT_WAFFLE_FLAG.override(active=True, bucket=1):
+            ...
+
+    or as a decorator:
+
+        @MY_EXPERIMENT_WAFFLE_FLAG.override(active=True, bucket=1)
+        def test_my_experiment(self):
+            ...
+
     """
     def __init__(self, waffle_namespace, flag_name, num_buckets=2, experiment_id=None, **kwargs):
         super().__init__(waffle_namespace, flag_name, **kwargs)
@@ -123,7 +138,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
             return cache_response.value
 
         # Check if the main flag is even enabled for this user and course.
-        if not self._is_enabled(course_key):  # grabs user from the current request, if any
+        if not self.is_experiment_on(course_key):  # grabs user from the current request, if any
             return self._cache_bucket(experiment_name, 0)
 
         # Check if the enrollment should even be considered (if it started before the experiment wants, we ignore)
@@ -170,12 +185,19 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         return self.is_enabled()
 
     def is_experiment_on(self, course_key=None):
+        # If no course_key is supplied check the global flag irrespective of courses
+        if course_key is None:
+            return super().is_enabled_without_course_context()
+
         return super().is_enabled(course_key)
 
     @contextmanager
     def override(self, active=True, bucket=1):  # pylint: disable=arguments-differ
-        from mock import patch
-        if not active:
-            bucket = 0
-        with patch.object(self, 'get_bucket', return_value=bucket):
-            yield
+        # Let CourseWaffleFlag override the base waffle flag value
+        with super().override(active=active):
+            # Now override the experiment bucket value
+            from mock import patch
+            if not active:
+                bucket = 0
+            with patch.object(self, 'get_bucket', return_value=bucket):
+                yield

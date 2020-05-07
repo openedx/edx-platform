@@ -18,14 +18,14 @@ $cert-decorative-color-emphasized: palette(grayscale, accent);
 @include font-face(
   'Domine',
   '../../certificates/fonts/Domine/Domine-Regular-webfont',
-    400,
-    $file-formats: woff woff2 ttf
+  400,
+  $file-formats: woff woff2 ttf
 );
 @include font-face(
   'Domine',
   '../../certificates/fonts/Domine/Domine-Bold-webfont',
-    700,
-    $file-formats: woff woff2 ttf
+  700,
+  $file-formats: woff woff2 ttf
 );
 
 // typography: config - stacks

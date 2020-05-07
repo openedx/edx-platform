@@ -52,12 +52,12 @@
 
   .has-actions {
     .msg-content {
-      width: flex-grid(10,12);
+      width: flex-grid(10, 12);
     }
 
     .nav-actions,
     .msg-actions {
-      width: flex-grid(2,12);
+      width: flex-grid(2, 12);
       display: inline-block;
       vertical-align: middle;
       text-align: right;
@@ -70,11 +70,11 @@
 
   .is-dismissable {
     .msg-content {
-      width: flex-grid(11,12);
+      width: flex-grid(11, 12);
     }
 
     .action-dismiss {
-      width: flex-grid(1,12);
+      width: flex-grid(1, 12);
       display: inline-block;
       vertical-align: top;
       text-align: right;
@@ -88,7 +88,8 @@
         text-shadow: none;
         color: inherit;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           color: $action-primary-bg;
         }
       }
@@ -115,16 +116,18 @@
 
   &.recovery-email-alert {
     &#banner-msg {
-      background: $state-info-bg ;
+      background: $state-info-bg;
       box-shadow: none;
       border-top: 1px solid #579cc5;
       padding: 20px 20px 20px 40px;
-      margin: -16px 0 5px 0
+      margin: -16px 0 5px 0;
     }
+
     .fa-close {
       position: relative;
       float: right;
     }
+
     .fa-close:hover {
       cursor: pointer;
     }
@@ -133,6 +136,7 @@
   &.urgency-low {
     background: $notify-banner-bg-3;
     box-shadow: 0 1px 2px $shadow;
+
     .msg {
       color: $black;
     }
@@ -240,7 +244,9 @@
 // ====================
 
 // shared
-.wrapper-notification, .wrapper-alert, .prompt {
+.wrapper-notification,
+.wrapper-alert,
+.prompt {
   @include box-sizing(border-box);
 
   .copy {
@@ -248,7 +254,9 @@
   }
 }
 
-.wrapper-notification, .wrapper-alert, .prompt {
+.wrapper-notification,
+.wrapper-alert,
+.prompt {
   background: $gray-d3;
 
   .copy {
@@ -266,7 +274,9 @@
   }
 }
 
-.alert, .notification, .prompt {
+.alert,
+.notification,
+.prompt {
 
   // types - confirm
   &.confirm {
@@ -541,7 +551,8 @@
       max-width: none;
       min-width: none;
 
-      .feedback-symbol, .copy {
+      .feedback-symbol,
+      .copy {
         float: none;
         display: inline-block;
         vertical-align: middle;
@@ -552,10 +563,6 @@
         height: ($baseline*1.25);
         margin-right: ($baseline/4);
         line-height: 3rem;
-      }
-
-      .copy {
-
       }
     }
   }
@@ -606,7 +613,8 @@
     @extend %t-strong;
   }
 
-  .feedback-symbol, .copy {
+  .feedback-symbol,
+  .copy {
     float: left;
     display: inline-block;
     vertical-align: middle;
@@ -797,7 +805,8 @@
     @extend %t-strong;
   }
 
-  .feedback-symbol, .copy {
+  .feedback-symbol,
+  .copy {
     float: left;
   }
 
@@ -905,10 +914,11 @@
       // Making this optional wouldn't cause any issue for confirmation dialog at-least.
       @extend %btn-secondary-white !optional;
 
-      padding:($baseline/4) ($baseline/2);
+      padding: ($baseline/4) ($baseline/2);
     }
 
-    .icon,.button-copy {
+    .icon,
+    .button-copy {
       display: inline-block;
       vertical-align: middle;
     }
@@ -934,10 +944,6 @@
   .wrapper-prompt {
     visibility: hidden;
     pointer-events: none;
-
-    .prompt {
-
-    }
   }
 
   // prompt showing
@@ -960,9 +966,6 @@
       }
     }
   }
-
-  // alert showing/hiding done by jQuery
-  .wrapper-alert { }
 
   // notification showing/hiding
   .wrapper-notification {
@@ -1050,7 +1053,8 @@
 
 // temporary
 body.uxdesign.alerts {
-  .content-primary, .content-supplementary {
+  .content-primary,
+  .content-supplementary {
     @include box-sizing(border-box);
 
     float: left;
@@ -1111,9 +1115,8 @@ body.uxdesign.alerts {
     margin-bottom: ($baseline*1.5);
     border-radius: 3px;
     border: 1px solid #edbd3c;
-    border-radius: 3px;
     background: #fbf6e1;
-    // background: #edbd3c;
+
     @include clearfix();
 
     .alert-message {
