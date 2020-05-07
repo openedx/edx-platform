@@ -105,4 +105,4 @@
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.1.6#egg=xblock-drag-and-drop-v2==2.1.6
 # Forks of pycaption and xblock-video with updated dependencies
 -e git+https://github.com/ucsd-ets/pycaption.git@3c6b85e5ccfd180a945a4a9725d355401810352b#egg=pycaption
--e git+https://github.com/ucsd-ets/xblock-video.git@1fda7cbff7a95c4f5ffe220010e9a642a7f2e6af#egg=video_xblock
+-e git+https://github.com/ucsd-ets/xblock-video.git@online-ucsd#egg=video_xblock
