@@ -26,6 +26,7 @@ from openedx.core.djangoapps.password_policy import compliance as password_polic
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.features.edly.cookies import set_logged_in_edly_cookies
 from student.models import LoginFailures
 from student.views import send_reactivation_email_for_user
 from student.forms import send_password_reset_email_for_user
@@ -372,6 +373,7 @@ def login_user(request):
 
         # Ensure that the external marketing site can
         # detect that the user is logged in.
+        set_logged_in_edly_cookies(request, response, possibly_authenticated_user)
         return set_logged_in_cookies(request, response, possibly_authenticated_user)
     except AuthFailedError as error:
         log.exception(error.get_response())
