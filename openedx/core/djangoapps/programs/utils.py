@@ -26,7 +26,6 @@ from entitlements.models import CourseEntitlement
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.commerce.utils import EcommerceService
-from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.core.djangoapps.catalog.utils import get_fulfillable_course_runs_for_entitlement, get_programs
 from openedx.core.djangoapps.certificates.api import available_date_for_certificate
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
@@ -113,8 +112,6 @@ class ProgramProgressMeter(object):
 
         self.entitlements = list(CourseEntitlement.unexpired_entitlements_for_user(self.user))
         self.course_uuids = [str(entitlement.course_uuid) for entitlement in self.entitlements]
-
-        self.course_grade_factory = CourseGradeFactory()
 
         if uuid:
             self.programs = [get_programs(uuid=uuid)]
@@ -270,17 +267,11 @@ class ProgramProgressMeter(object):
                 else:
                     not_started.append(course)
 
-            grades = {}
-            for run in self.course_run_ids:
-                grade = self.course_grade_factory.read(self.user, course_key=CourseKey.from_string(run))
-                grades[run] = grade.percent
-
             progress.append({
                 'uuid': program_copy['uuid'],
                 'completed': len(completed) if count_only else completed,
                 'in_progress': len(in_progress) if count_only else in_progress,
                 'not_started': len(not_started) if count_only else not_started,
-                'grades': grades,
             })
 
         return progress

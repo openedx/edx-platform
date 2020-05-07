@@ -21,7 +21,8 @@ class CourseEnrollView extends Backbone.View {
     this.$parentEl = options.$parentEl;
     this.enrollModel = options.enrollModel;
     this.urlModel = options.urlModel;
-    this.grade = options.grade;
+    // EDUCATOR-5043
+    // this.grade = options.grade;
     this.collectionCourseStatus = options.collectionCourseStatus;
     this.render();
   }
@@ -30,7 +31,7 @@ class CourseEnrollView extends Backbone.View {
     let filledTemplate;
     const context = this.model.toJSON();
     if (this.$parentEl && this.enrollModel) {
-      context.grade = this.grade;
+      // context.grade = this.grade;
       context.collectionCourseStatus = this.collectionCourseStatus;
       filledTemplate = this.tpl(context);
       HtmlUtils.setHtml(this.$el, filledTemplate);

@@ -14,9 +14,9 @@ describe('Course Card View', () => {
     const programData = $.extend({}, data);
     const context = {
       courseData: {
-        grades: {
-          'course-v1:WageningenX+FFESx+1T2017': 0.8,
-        },
+        // grades: {
+        //   'course-v1:WageningenX+FFESx+1T2017': 0.8,
+        // },
       },
       collectionCourseStatus,
     };
@@ -88,10 +88,10 @@ describe('Course Card View', () => {
     expect(view).toBeDefined();
   });
 
-  it('should render final grade if course is completed', () => {
+  it('should not render final grade even if course has been completed', () => {
     view.remove();
     setupView(course, true);
-    expect(view.$('.grade-display').text()).toEqual('80%');
+    expect(view.$('.final-grade').length).toEqual(0);
   });
 
   it('should not render final grade if course has not been completed', () => {

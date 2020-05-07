@@ -27,11 +27,12 @@ class CourseCardView extends Backbone.View {
       this.enrollModel.urlRoot = this.urlModel.get('commerce_api_url');
     }
     this.context = options.context || {};
-    if (this.context.collectionCourseStatus === 'completed') {
-      this.model.updateCourseRunWithHighestGrade(this.context.courseData.grades);
-    }
-    this.grade = this.context.courseData.grades[this.model.get('course_run_key')];
-    this.grade = Math.round(this.grade * 100);
+    // if (this.context.collectionCourseStatus === 'completed') {
+    //   this.model.updateCourseRunWithHighestGrade(this.context.courseData.grades);
+    // }
+    // EDUCATOR-5043
+    // this.grade = this.context.courseData.grades[this.model.get('course_run_key')];
+    // this.grade = Math.round(this.grade * 100);
     this.collectionCourseStatus = this.context.collectionCourseStatus || '';
     this.entitlement = this.model.get('user_entitlement');
 
@@ -58,7 +59,7 @@ class CourseCardView extends Backbone.View {
     this.enrollView = new CourseEnrollView({
       $parentEl: this.$('.course-actions'),
       model: this.model,
-      grade: this.grade,
+      // grade: this.grade,
       collectionCourseStatus: this.collectionCourseStatus,
       urlModel: this.urlModel,
       enrollModel: this.enrollModel,
