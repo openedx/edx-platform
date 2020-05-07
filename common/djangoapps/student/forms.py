@@ -367,7 +367,7 @@ class AccountCreationForm(forms.Form):
 
     def clean_password(self):
         """Enforce password policies (if applicable)"""
-        password = self.cleaned_data["password"]
+        password = self.data["password"]
         if not self.do_third_party_auth:
             # Creating a temporary user object to test password against username
             # This user should NOT be saved
