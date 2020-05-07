@@ -5,16 +5,19 @@ Course API Views
 import json
 
 from babel.numbers import get_currency_symbol
+from completion.exceptions import UnavailableCompletionData
+from completion.utilities import get_key_to_last_completed_block
 from django.urls import reverse
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework.generics import RetrieveAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from course_modes.models import CourseMode
 from edxnotes.helpers import is_feature_enabled
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import check_course_access
@@ -26,6 +29,8 @@ from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import generate_course_expired_message
 from openedx.features.discounts.utils import generate_offer_html
 from student.models import CourseEnrollment
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.search import path_to_location
 
 from .serializers import CourseInfoSerializer
 
@@ -268,3 +273,61 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
             str(usage_key),
             disable_staff_debug_info=True)
         return Response(json.loads(sequence.handle_ajax('metadata', None)))
+
+
+class Resume(DeveloperErrorViewMixin, APIView):
+    """
+    **Use Cases**
+
+        Request the last completed block in a course
+
+    **Example Requests**
+
+        GET /api/courseware/resume/{course_key}
+
+    **Response Values**
+
+        Body consists of the following fields:
+
+            * block: the last completed block key
+            * section: the key to the section
+            * unit: the key to the unit
+        If no completion data is available, the keys will be null
+
+    **Returns**
+
+        * 200 on success with above fields.
+        * 400 if an invalid parameter was sent.
+        * 403 if a user who does not have permission to masquerade as
+          another user specifies a username other than their own.
+        * 404 if the course is not available or cannot be seen.
+    """
+
+    authentication_classes = (
+        JwtAuthentication,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, course_key_string, *args, **kwargs):
+        """
+        Return response to a GET request.
+        """
+        course_id = CourseKey.from_string(course_key_string)
+        resp = {
+            'block_id': None,
+            'section_id': None,
+            'unit_id': None,
+        }
+
+        try:
+            block_key = get_key_to_last_completed_block(request.user, course_id)
+            path = path_to_location(modulestore(), block_key, request, full_path=True)
+            resp['section_id'] = str(path[2])
+            resp['unit_id'] = str(path[3])
+            resp['block_id'] = str(block_key)
+
+        except UnavailableCompletionData:
+            pass
+
+        return Response(resp)
