@@ -1,11 +1,5 @@
 <% if (is_enrolled && collectionCourseStatus === 'completed') { %>
-    <%
-        // Commented out for EDUCATOR-5043
-        // <div class="final-grade">
-        //    <div class="grade-header"><%- gettext('Final Grade') %><span class="sr"><%- StringUtils.interpolate(gettext('for {courseName}'), {courseName: title}) %></span></div>
-        //    <div class="grade-display"><%- grade %>%</div>
-        // </div>
-    %>
+    <% // do nothing %>
 <% } else if (is_enrolled && (typeof expired === 'undefined' || expired === false)) { %>
     <a href="<%- course_url %>" class="view-course-button btn-brand btn cta-primary">
         <% if (is_course_ended) { %>
