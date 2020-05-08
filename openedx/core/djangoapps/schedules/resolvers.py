@@ -434,11 +434,6 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
 
     def send(self):
         schedules = self.get_schedules()
-        LOG.info(
-            u'Found {} emails to send for course-key: {}'.format(
-                len(schedules), self.course_key
-            )
-        )
         for (user, language, context, is_self_paced) in schedules:
             msg_type = CourseUpdate() if is_self_paced else InstructorLedCourseUpdate()
             msg_type.personalize(

@@ -213,17 +213,17 @@ class ScheduleCourseNextSectionUpdate(ScheduleMessageBaseTask):
 
     @classmethod
     def enqueue(cls, site, current_date, day_offset, override_recipient_email=None):
-        target_date = (current_date - datetime.timedelta(days=day_offset)).date()
+        target_datetime = (current_date - datetime.timedelta(days=day_offset))
 
         if not cls.is_enqueue_enabled(site):
             cls.log_info(u'Message queuing disabled for site %s', site.domain)
             return
 
-        cls.log_info(u'Target date = %s', target_date.isoformat())
+        cls.log_info(u'Target date = %s', target_datetime.date().isoformat())
         for course_key in CourseOverview.get_all_course_keys():
             task_args = (
                 site.id,
-                serialize(target_date),
+                serialize(target_datetime),  # Need to leave as a datetime for serialization purposes here
                 course_key,
                 override_recipient_email,
             )
