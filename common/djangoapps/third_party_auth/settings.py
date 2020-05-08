@@ -81,6 +81,9 @@ def apply_settings(django_settings):
     # enable this when you want to get stack traces rather than redirections.
     django_settings.SOCIAL_AUTH_RAISE_EXCEPTIONS = False
 
+    # Clean username to make sure username is compatible with our system requirements
+    django_settings.SOCIAL_AUTH_CLEAN_USERNAME_FUNCTION = 'third_party_auth.models.clean_username'
+
     # Allow users to login using social auth even if their account is not verified yet
     # This is required since we [ab]use django's 'is_active' flag to indicate verified
     # accounts; without this set to True, python-social-auth won't allow us to link the

@@ -85,6 +85,7 @@ from edxmako.shortcuts import render_to_string
 from lms.djangoapps.verify_student.models import SSOVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
 from third_party_auth.utils import user_exists
 from track import segment
@@ -850,7 +851,10 @@ def set_id_verification_status(auth_entry, strategy, details, user=None, *args, 
 
 def get_username(strategy, details, backend, user=None, *args, **kwargs):
     """
-    Copy of social_core.pipeline.user.get_username with additional logging and case insensitive username checks.
+    Copy of social_core.pipeline.user.get_username to achieve
+    1. additional logging
+    2. case insensitive username checks
+    3. enforce same maximum and minimum length restrictions we have in `user_api/accounts`
     """
     if 'username' not in backend.setting('USER_FIELDS', USER_FIELDS):
         return
@@ -859,7 +863,8 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):
     if not user:
         email_as_username = strategy.setting('USERNAME_IS_FULL_EMAIL', False)
         uuid_length = strategy.setting('UUID_LENGTH', 16)
-        max_length = storage.user.username_max_length()
+        min_length = strategy.setting('USERNAME_MIN_LENGTH', accounts.USERNAME_MIN_LENGTH)
+        max_length = strategy.setting('USERNAME_MAX_LENGTH', accounts.USERNAME_MAX_LENGTH)
         do_slugify = strategy.setting('SLUGIFY_USERNAMES', False)
         do_clean = strategy.setting('CLEAN_USERNAMES', True)
 
@@ -898,7 +903,7 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):
         # username is cut to avoid any field max_length.
         # The final_username may be empty and will skip the loop.
         # We are using our own version of user_exists to avoid possible case sensitivity issues.
-        while not final_username or user_exists({'username': final_username}):
+        while not final_username or len(final_username) < min_length or user_exists({'username': final_username}):
             username = short_username + uuid4().hex[:uuid_length]
             final_username = slug_func(clean_func(username[:max_length]))
             logger.info(u'[THIRD_PARTY_AUTH] New username generated. Username: {username}'.format(
