@@ -24,7 +24,9 @@
     .course-navigation {
       .button-chapter {
         @include transition(all $tmg-s3 ease-in-out);
-        @include box-sizing(border-box);
+
+        box-sizing: border-box;
+
         @include linear-gradient(top, $sidebar-chapter-bg-top, $sidebar-chapter-bg-bottom);
         @include transition(background-color 0.1s linear 0s);
 

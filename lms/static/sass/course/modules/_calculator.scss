@@ -68,8 +68,7 @@
     form {
       @extend .clearfix;
 
-      @include box-sizing(border-box);
-
+      box-sizing: border-box;
       padding: lh();
 
       .calc-output-label {
@@ -81,9 +80,7 @@
         border: 1px solid $white;
         border-radius: 0;
         box-shadow: none;
-
-        @include box-sizing(border-box);
-
+        box-sizing: border-box;
         color: $black;
         float: left;
         font-size: 30px;
@@ -112,9 +109,7 @@
         background: $white;
         border: 1px solid $white;
         box-shadow: none;
-
-        @include box-sizing(border-box);
-
+        box-sizing: border-box;
         color: $black;
         float: left;
         font-size: 16px;
@@ -147,9 +142,7 @@
           direction: ltr;  // Almost all of the real-world calculators are LTR
           border: none;
           box-shadow: none;
-
-          @include box-sizing(border-box);
-
+          box-sizing: border-box;
           font-size: 16px;
           padding: 10px;
           -webkit-appearance: none;

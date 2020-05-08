@@ -56,7 +56,8 @@
 }
 
 .login-register-content {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
+
   @include outer-container;
 
   width: 100%;
@@ -116,7 +117,7 @@
 
   /* Temp. fix until applied globally */
   > {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
   }
 
 
@@ -141,7 +142,8 @@
     overflow: hidden;
 
     .headline {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
+
       @include font-size(35);
 
       padding: 0 10px;
@@ -153,7 +155,8 @@
     }
 
     .tagline {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
+
       @include font-size(24);
 
       padding: 0 10px;
@@ -215,8 +218,7 @@
 
   .form-type,
   .toggle-form {
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     max-width: 600px;
     min-width: 250px;
     margin: 0 auto;
@@ -652,8 +654,7 @@
 
   /** Error Container - from _account.scss **/
   .status {
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     margin: 0 0 25px;
     border-bottom: 3px solid shade($yellow, 10%);
     padding: 25px;
@@ -746,7 +747,8 @@
 }
 
 .finish-auth {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
+
   @include outer-container;
   $grid-columns: 12;
 
@@ -755,8 +757,7 @@
   width: 100%;
 
   .finish-auth-inner {
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     max-width: 650px;
     margin: 1em auto;
   }
