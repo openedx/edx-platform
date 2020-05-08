@@ -92,7 +92,7 @@ class RegistryTest(testutil.TestCase):
         self.assertEqual(len(enabled_slugs), 100)
         # Should not involve any queries for Site, or at least should not *scale* with number of providers
         all_queries = [q['sql'] for q in cq.captured_queries]
-        django_site_queries = list(filter(lambda sql: re_django_site_query.search(sql), all_queries))
+        django_site_queries = list(filter(re_django_site_query.search, all_queries))
         self.assertEqual(len(django_site_queries), 0)  # previously was 100 (1 for each provider)
 
     def test_providers_displayed_for_login(self):
