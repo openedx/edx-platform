@@ -208,7 +208,7 @@ class GetItemTest(ItemTest):
         # XBlock messages are added by the Studio wrapper.
         self.assertIn('wrapper-xblock-message', html)
         # Make sure that "wrapper-xblock" does not appear by itself (without -message at end).
-        self.assertNotRegexpMatches(html, r'wrapper-xblock[^-]+')
+        self.assertNotRegex(html, r'wrapper-xblock[^-]+')
 
         # Verify that the header and article tags are still added
         self.assertIn('<header class="xblock-header xblock-header-vertical">', html)
