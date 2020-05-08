@@ -83,17 +83,18 @@ class RegistryTest(testutil.TestCase):
         re_django_site_query = re.compile(r'FROM\s+"django_site"')
 
         self.enable_saml()
-        for i in range(100):
+        provider_count = 5
+        for i in range(provider_count):
             self.configure_saml_provider(enabled=True, slug="saml-slug-%s" % i)
 
         with CaptureQueriesContext(connections[DEFAULT_DB_ALIAS]) as cq:
             enabled_slugs = {p.slug for p in provider.Registry.enabled()}
 
-        self.assertEqual(len(enabled_slugs), 100)
+        self.assertEqual(len(enabled_slugs), provider_count)
         # Should not involve any queries for Site, or at least should not *scale* with number of providers
         all_queries = [q['sql'] for q in cq.captured_queries]
         django_site_queries = list(filter(re_django_site_query.search, all_queries))
-        self.assertEqual(len(django_site_queries), 0)  # previously was 100 (1 for each provider)
+        self.assertEqual(len(django_site_queries), 0)  # previously was == provider_count (1 for each provider)
 
     def test_providers_displayed_for_login(self):
         """
