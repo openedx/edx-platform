@@ -71,6 +71,11 @@ def plugin_settings(settings):
             'tiers',
         )
 
+    if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
+        settings.INSTALLED_APPS += (
+            'openedx.core.djangoapps.appsembler.multi_tenant_emails',
+        )
+
     settings.TAHOE_DEFAULT_COURSE_NAME = settings.ENV_TOKENS.get('TAHOE_DEFAULT_COURSE_NAME', '')
     settings.TAHOE_DEFAULT_COURSE_GITHUB_ORG = settings.ENV_TOKENS.get('TAHOE_DEFAULT_COURSE_GITHUB_ORG', '')
     settings.TAHOE_DEFAULT_COURSE_GITHUB_NAME = settings.ENV_TOKENS.get('TAHOE_DEFAULT_COURSE_GITHUB_NAME', '')
