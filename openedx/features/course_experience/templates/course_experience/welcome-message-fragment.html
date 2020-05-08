@@ -37,6 +37,5 @@ from openedx.core.djangolib.markup import HTML
 <%static:webpack entry="WelcomeMessage">
     new WelcomeMessage({
         dismissUrl: "${dismiss_url | n, js_escaped_string}",
-        shortenWelcomeMessage: ${shorten_welcome_message | n, dump_js_escaped_json},
     });
 </%static:webpack>
