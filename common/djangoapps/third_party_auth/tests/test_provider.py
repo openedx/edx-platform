@@ -1,9 +1,12 @@
 """Unit tests for provider.py."""
 
 
+import re
 import unittest
 
 from django.contrib.sites.models import Site
+from django.db import connections, DEFAULT_DB_ALIAS
+from django.test.utils import CaptureQueriesContext
 from mock import Mock, patch
 
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
@@ -74,6 +77,22 @@ class RegistryTest(testutil.TestCase):
 
         with patch('third_party_auth.provider._PSA_OAUTH2_BACKENDS', backend_names):
             self.assertEqual(sorted(provider_names), [prov.name for prov in provider.Registry.enabled()])
+
+    def test_enabled_doesnt_query_site(self):
+        """Regression test for 1+N queries for django_site (ARCHBOM-1139)"""
+        re_from_ds = re.compile(r'FROM\s+"django_site"')
+
+        self.enable_saml()
+        for i in range(100):
+            self.configure_saml_provider(enabled=True, slug="saml-slug-%s" % i)
+
+        with CaptureQueriesContext(connections[DEFAULT_DB_ALIAS]) as cq:
+            enabled_slugs = {p.slug for p in provider.Registry.enabled()}
+
+        self.assertEqual(len(enabled_slugs), 100)
+        # Should not involve any queries for Site, or at least should not *scale* with number of providers
+        django_site_queries = [q['sql'] for q in cq.captured_queries if re_from_ds.search(q['sql'])]
+        self.assertLessEqual(len(django_site_queries), 5)  # 5 just a low number for future-proofing
 
     def test_providers_displayed_for_login(self):
         """
