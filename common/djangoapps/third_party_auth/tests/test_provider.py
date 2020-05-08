@@ -80,7 +80,7 @@ class RegistryTest(testutil.TestCase):
 
     def test_enabled_doesnt_query_site(self):
         """Regression test for 1+N queries for django_site (ARCHBOM-1139)"""
-        re_from_ds = re.compile(r'FROM\s+"django_site"')
+        re_django_site_query = re.compile(r'FROM\s+"django_site"')
 
         self.enable_saml()
         for i in range(100):
@@ -91,8 +91,9 @@ class RegistryTest(testutil.TestCase):
 
         self.assertEqual(len(enabled_slugs), 100)
         # Should not involve any queries for Site, or at least should not *scale* with number of providers
-        django_site_queries = [q['sql'] for q in cq.captured_queries if re_from_ds.search(q['sql'])]
-        self.assertLessEqual(len(django_site_queries), 5)  # 5 just a low number for future-proofing
+        all_queries = [q['sql'] for q in cq.captured_queries]
+        django_site_queries = list(filter(lambda sql: re_django_site_query.search(sql), all_queries))
+        self.assertEqual(len(django_site_queries), 0)  # previously was 100 (1 for each provider)
 
     def test_providers_displayed_for_login(self):
         """
