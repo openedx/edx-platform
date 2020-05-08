@@ -58,9 +58,10 @@ def extract_dates_from_course(course):
                 items = [section]
                 while items:
                     next_item = items.pop()
-                    # TODO: Once studio can manually set relative dates,
-                    # we would need to manually check for them here
-                    date_items.append((next_item.location, {'due': time_per_week * (idx + 1)}))
+                    if next_item.graded:
+                        # TODO: Once studio can manually set relative dates,
+                        # we would need to manually check for them here
+                        date_items.append((next_item.location, {'due': time_per_week * (idx + 1)}))
                     items.extend(next_item.get_children())
     else:
         date_items = []
