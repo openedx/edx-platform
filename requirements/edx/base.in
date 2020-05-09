@@ -82,7 +82,7 @@ edx-proctoring>=2.0.1
 edx-proctoring-proctortrack==1.0.5  # Intentionally and permanently pinned to ensure code changes are reviewed
 edx-rest-api-client
 edx-search
-edx-sga
+git+https://github.com/mitodl/edx-sga/@463aaacf5e889bf1133583a143cfce605ac6d9a6#egg=edx-sga==0.10.0+dev
 edx-submissions
 edx-user-state-client
 edx-when
