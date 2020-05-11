@@ -4,12 +4,12 @@ Django Admin pages for Edly.
 
 from django.contrib import admin
 
-from openedx.features.edly.models import EdlyOrganization, EdlySubOrganization
+from openedx.features.edly.models import EdlyOrganization, EdlySubOrganization, EdlyUserProfile
 
 
 class EdlySubOrganizationAdmin(admin.ModelAdmin):
     """
-    Admin interface for the EdlySubOrganization object.
+    Admin interface for the "EdlySubOrganization" object.
     """
     search_fields = ['name', 'slug']
 
@@ -39,7 +39,7 @@ class EdlySubOrganizationAdmin(admin.ModelAdmin):
 
 class EdlySubOrganizationInlineAdmin(admin.StackedInline):
     """
-    Admin inline interface for the EdlySubOrganization object.
+    Admin inline interface for the "EdlySubOrganization" object.
     """
     model = EdlySubOrganization
     extra = 0
@@ -47,11 +47,30 @@ class EdlySubOrganizationInlineAdmin(admin.StackedInline):
 
 class EdlyOrganizationAdmin(admin.ModelAdmin):
     """
-    Admin interface for the EdlyOrganization object.
+    Admin interface for the "EdlyOrganization" object.
     """
+    search_fields = ['name', 'slug']
     list_display = ['name', 'slug', 'created', 'modified']
     inlines = [EdlySubOrganizationInlineAdmin]
 
 
+class EdlyUserProfileAdmin(admin.ModelAdmin):
+    """
+    Admin interface for the "EdlyUserProfile" object.
+    """
+    search_fields = ['edly_sub_organization__name']
+    list_display = ['username', 'email', 'edly_sub_organizations_slugs']
+
+    def username(self, obj):
+        return obj.user.username
+
+    def email(self, obj):
+        return obj.user.email
+
+    def edly_sub_organizations_slugs(self, obj):
+        return ', '.join(obj.edly_sub_organizations.values_list('slug', flat=True))
+
+
 admin.site.register(EdlyOrganization, EdlyOrganizationAdmin)
 admin.site.register(EdlySubOrganization, EdlySubOrganizationAdmin)
+admin.site.register(EdlyUserProfile, EdlyUserProfileAdmin)

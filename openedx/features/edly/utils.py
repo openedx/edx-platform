@@ -3,12 +3,43 @@ import logging
 import jwt
 import waffle
 from django.conf import settings
+from django.db.models import Q
 from django.forms.models import model_to_dict
 
 from openedx.features.edly.models import EdlySubOrganization
 from util.organizations_helpers import get_organizations
 
 LOGGER = logging.getLogger(__name__)
+
+
+def user_has_edly_organization_access(request):
+    """
+    Check if the requested URL site is allowed for the user.
+
+    This method checks if the requested URL site is in the requesting user's
+    edly sub organizations list.
+
+    Arguments:
+        request: HTTP request object
+
+    Returns:
+        bool: Returns True if User has Edly Organization Access Otherwise False.
+    """
+    if not request.user.edly_profile:
+        return False
+
+    current_site = request.site
+    edly_sub_org = EdlySubOrganization.objects.filter(
+        Q(lms_site=current_site) |
+        Q(studio_site=current_site)
+    ).first()
+
+    edly_user_info_cookie = request.COOKIES.get(settings.EDLY_USER_INFO_COOKIE_NAME, None)
+    if edly_sub_org and edly_sub_org.slug == get_edly_sub_org_from_cookie(edly_user_info_cookie):
+        return True
+
+    return False
+
 
 def encode_edly_user_info_cookie(cookie_data):
     """
@@ -22,6 +53,7 @@ def encode_edly_user_info_cookie(cookie_data):
     """
     return jwt.encode(cookie_data, settings.EDLY_COOKIE_SECRET_KEY, algorithm=settings.EDLY_JWT_ALGORITHM)
 
+
 def decode_edly_user_info_cookie(encoded_cookie_data):
     """
     Decode edly_user_info cookie data from JWT string.
@@ -33,6 +65,25 @@ def decode_edly_user_info_cookie(encoded_cookie_data):
         dict
     """
     return jwt.decode(encoded_cookie_data, settings.EDLY_COOKIE_SECRET_KEY, algorithms=[settings.EDLY_JWT_ALGORITHM])
+
+
+def get_edly_sub_org_from_cookie(encoded_cookie_data):
+    """
+    Returns edly-sub-org slug from the edly-user-info cookie.
+
+    Arguments:
+        encoded_cookie_data (dict): Edly user info cookie JWT encoded string.
+
+    Returns:
+        string
+    """
+
+    if not encoded_cookie_data:
+        return ''
+
+    decoded_cookie_data = decode_edly_user_info_cookie(encoded_cookie_data)
+    return decoded_cookie_data['edly-sub-org']
+
 
 def get_enabled_organizations(request):
     """

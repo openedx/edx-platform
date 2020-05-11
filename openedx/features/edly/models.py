@@ -1,6 +1,8 @@
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.validators import RegexValidator
 from django.db import models
+
 from model_utils.models import TimeStampedModel
 from organizations.models import Organization
 
@@ -35,3 +37,22 @@ class EdlySubOrganization(TimeStampedModel):
 
     def __str__(self):
         return '{name}: ({slug})'.format(name=self.name, slug=self.slug)
+
+
+class EdlyUserProfile(models.Model):
+    """
+    User profile model for Edly users.
+    """
+    user = models.OneToOneField(User, unique=True, db_index=True, related_name='edly_profile', on_delete=models.CASCADE)
+    edly_sub_organizations = models.ManyToManyField(EdlySubOrganization)
+
+    @property
+    def get_linked_edly_sub_organizations(self):
+        """
+        Helper method to get list of slugs of edly sub organizations of a user.
+
+        Returns:
+            list: List of edly sub organizations slugs
+        """
+        edly_sub_org_slugs = self.edly_sub_organizations.values_list('slug', flat=True)
+        return edly_sub_org_slugs
