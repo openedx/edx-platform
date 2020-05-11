@@ -5,7 +5,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import View
 
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
-from util.organizations_helpers import get_organizations
+from openedx.features.edly.utils import get_enabled_organizations
 
 
 class OrganizationListView(View):
@@ -18,6 +18,6 @@ class OrganizationListView(View):
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         """Returns organization list as json."""
-        organizations = get_organizations()
+        organizations = get_enabled_organizations(request)
         org_names_list = [(org["short_name"]) for org in organizations]
         return HttpResponse(dump_js_escaped_json(org_names_list), content_type='application/json; charset=utf-8')

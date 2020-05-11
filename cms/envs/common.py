@@ -550,6 +550,9 @@ MIDDLEWARE_CLASSES = [
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 ]
 
+# Edly Configuration
+ENABLE_EDLY_ORGANIZATIONS_SWITCH = 'enable_edly_organizations'
+
 # Clickjacking protection can be disabled by setting this to 'ALLOW'
 X_FRAME_OPTIONS = 'DENY'
 
