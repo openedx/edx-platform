@@ -61,6 +61,9 @@ update_module_store_settings(
 PLATFORM_NAME = ugettext_lazy(u"édX")
 PLATFORM_DESCRIPTION = ugettext_lazy(u"Open édX Platform")
 
+################################ FEATURE FLAGS ################################
+FEATURES['ENABLE_FINANCIAL_ASSISTANCE_FORM'] = True
+
 ############################ STATIC FILES #############################
 
 # Serve static files at /static directly from the staticfiles directory under test root
