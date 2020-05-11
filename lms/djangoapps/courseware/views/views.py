@@ -1069,6 +1069,18 @@ def dates(request, course_id):
     monitoring_utils.set_custom_metric('is_staff', request.user.is_staff)
 
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
+
+    masquerade = None
+    can_masquerade = request.user.has_perm(MASQUERADE_AS_STUDENT, course)
+    if can_masquerade:
+        masquerade, masquerade_user = setup_masquerade(
+            request,
+            course.id,
+            can_masquerade,
+            reset_masquerade_data=True,
+        )
+        request.user = masquerade_user
+
     course_date_blocks = get_course_date_blocks(course, request.user, request,
                                                 include_access=True, include_past_dates=True)
 
@@ -1089,6 +1101,9 @@ def dates(request, course_id):
         'learner_is_verified': learner_is_verified,
         'user_timezone': user_timezone,
         'user_language': user_language,
+        'supports_preview_menu': True,
+        'can_masquerade': can_masquerade,
+        'masquerade': masquerade,
     }
 
     return render_to_response('courseware/dates.html', context)

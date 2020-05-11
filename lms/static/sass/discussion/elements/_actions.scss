@@ -155,7 +155,8 @@
       padding: 2px 8px;
     }
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       .action-label {
         display: inline-block;
       }
@@ -171,7 +172,9 @@
         color: theme-color("primary");
       }
 
-      &.is-checked, &:hover, &:focus {
+      &.is-checked,
+      &:hover,
+      &:focus {
         .action-icon {
           background-color: $forum-color-following;
           border: 1px solid theme-color("primary");
@@ -179,7 +182,8 @@
         }
       }
 
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         border-color: $forum-color-following;
       }
     }
@@ -189,7 +193,9 @@
         opacity: 1;
       }
 
-      &.is-checked, &:hover, &:focus {
+      &.is-checked,
+      &:hover,
+      &:focus {
         .action-icon {
           background-color: $green;
           border: 1px solid $green;
@@ -197,7 +203,8 @@
         }
       }
 
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         border-color: $green;
 
         .action-label {
@@ -207,7 +214,9 @@
     }
 
     &.action-endorse {
-      &.is-checked, &:hover, &:focus {
+      &.is-checked,
+      &:hover,
+      &:focus {
         .action-icon {
           background-color: theme-color("primary");
           border: 1px solid theme-color("primary");
@@ -215,7 +224,8 @@
         }
       }
 
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         border-color: theme-color("primary");
         background-color: $forum-color-background;
 
@@ -226,7 +236,9 @@
     }
 
     &.action-answer {
-      &.is-checked, &:hover, &:focus {
+      &.is-checked,
+      &:hover,
+      &:focus {
         .action-icon {
           border: 1px solid $green;
           background-color: $green;
@@ -234,7 +246,8 @@
         }
       }
 
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         border-color: $green;
         background-color: $forum-color-background;
 
@@ -248,7 +261,8 @@
     &.action-more {
       position: relative;
 
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         border-color: theme-color("dark");
         background-color: $forum-color-background;
 
@@ -282,7 +296,8 @@
       white-space: nowrap;
       color: theme-color("secondary");
 
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         color: $link-color;
       }
 
@@ -312,14 +327,16 @@
         }
 
         // CASE: hover for any action
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           color: $link-color;
         }
       }
     }
   }
 
-  .action-button, .action-list-item {
+  .action-button,
+  .action-list-item {
     .action-label {
       @include float(left);
 
@@ -339,9 +356,10 @@
     }
   }
 
-  .btn-primary, .btn-outline-primary{
-    &:focus{
-      box-shadow: 0 0 0 2px rgb(0,120,180);
+  .btn-primary,
+  .btn-outline-primary {
+    &:focus {
+      box-shadow: 0 0 0 2px rgb(0, 120, 180);
     }
   }
 }

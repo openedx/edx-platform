@@ -12,7 +12,9 @@ section.outside-app {
     text-align: center;
   }
 
-  p, ul, form {
+  p,
+  ul,
+  form {
     max-width: 600px;
     margin: 0 auto;
     font: normal 1em/1.6em $serif;

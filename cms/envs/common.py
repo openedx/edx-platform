@@ -2097,13 +2097,12 @@ VIDEO_TRANSCRIPTS_MAX_AGE = 31536000
 ############################ TRANSCRIPT PROVIDERS SETTINGS ########################
 
 # Note: These settings will also exist in video-encode-manager, so any update here
-# should also be done there. Additionally, the BASE & LOGIN URL will be overridden at
-# deployment as the actual URL is different from sandboxing URL.
-CIELO24_SETTINGS = dict(
-    CIELO24_API_VERSION=1,
-    CIELO24_BASE_API_URL="https://sandbox.cielo24.com/api",
-    CIELO24_LOGIN_URL="https://sandbox.cielo24.com/api/account/login"
-)
+# should also be done there.
+CIELO24_SETTINGS = {
+    'CIELO24_API_VERSION': 1,
+    'CIELO24_BASE_API_URL': "https://api.cielo24.com/api",
+    'CIELO24_LOGIN_URL': "https://api.cielo24.com/api/account/login"
+}
 
 ##### shoppingcart Payment #####
 PAYMENT_SUPPORT_EMAIL = 'billing@example.com'

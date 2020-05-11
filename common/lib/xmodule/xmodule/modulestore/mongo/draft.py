@@ -196,7 +196,7 @@ class DraftModuleStore(MongoModuleStore):
             # b/c we don't want the payload, I'm copying the guts of get_items here
             query = self._course_key_to_son(dest_course_id)
             query['_id.category'] = {'$nin': ['course', 'about']}
-            if self.collection.find(query).limit(1).count() > 0:
+            if self.collection.count_documents(query, limit=1) > 0:
                 raise DuplicateCourseError(
                     dest_course_id,
                     "Course at destination {0} is not an empty course. "

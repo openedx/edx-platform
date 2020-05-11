@@ -1558,7 +1558,7 @@ class MembershipBulkManagementView(GenericAPIView):
         team_import_manager.set_team_membership_from_csv(inputfile_handle)
 
         if team_import_manager.import_succeeded:
-            msg = "{} learners were assigned to teams.".format(team_import_manager.number_of_learners_assigned)
+            msg = "{} learners were affected.".format(team_import_manager.number_of_learners_assigned)
             return JsonResponse({'message': msg}, status=status.HTTP_201_CREATED)
         else:
             return JsonResponse({

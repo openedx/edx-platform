@@ -36,7 +36,7 @@
       width: flex-grid(4);
 
       img {
-        background: rgb(245,245,245);
+        background: rgb(245, 245, 245);
         display: block;
         max-width: 100%;
       }
@@ -89,9 +89,8 @@
     }
 
     .jobs-sidebar {
-      @include box-sizing(border-box);
-
-      border: 1px solid rgb(220,220,220);
+      box-sizing: border-box;
+      border: 1px solid rgb(220, 220, 220);
 
       @include float(left);
 
@@ -109,8 +108,9 @@
           @include padding(12px, 0, 12px, 20px);
           @include text-align(left);
 
-          &:hover, &:focus {
-            background: rgb(245,245,245);
+          &:hover,
+          &:focus {
+            background: rgb(245, 245, 245);
             text-decoration: none;
           }
         }
@@ -128,7 +128,7 @@
       width: flex-grid(9);
 
       .job {
-        border-bottom: 1px solid rgb(220,220,220);
+        border-bottom: 1px solid rgb(220, 220, 220);
         padding: 40px 0;
 
         &:first-child {
@@ -138,9 +138,6 @@
         &:last-child {
           border: none;
           padding-bottom: 0;
-        }
-
-        .inner-wrapper {
         }
 
         h3 {

@@ -78,35 +78,36 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
     otherwise, returns None for both the link and date.
     """
     if enrollment is None and course is None:
-        logger.warn(u'Must specify either an enrollment or a course')
+        logger.warning(u'Must specify either an enrollment or a course')
         return (None, None, None)
 
     if enrollment:
         if course and enrollment.course_id != course.id:
-            logger.warn(u'{} refers to a different course than {} which was supplied. Enrollment course id={}, '
-                        u'repr={!r}, deprecated={}. Course id={}, repr={!r}, deprecated={}.'
-                        .format(enrollment,
-                                course,
-                                enrollment.course_id,
-                                enrollment.course_id,
-                                enrollment.course_id.deprecated,
-                                course.id,
-                                course.id,
-                                course.id.deprecated
-                                )
-                        )
+            logger.warning(u'{} refers to a different course than {} which was supplied. Enrollment course id={}, '
+                           u'repr={!r}, deprecated={}. Course id={}, repr={!r}, deprecated={}.'
+                           .format(enrollment,
+                                   course,
+                                   enrollment.course_id,
+                                   enrollment.course_id,
+                                   enrollment.course_id.deprecated,
+                                   course.id,
+                                   course.id,
+                                   course.id.deprecated
+                                   )
+                           )
             return (None, None, None)
 
         if enrollment.user_id != user.id:
-            logger.warn(u'{} refers to a different user than {} which was supplied. Enrollment user id={}, repr={!r}. '
-                        u'User id={}, repr={!r}.'.format(enrollment,
-                                                         user,
-                                                         enrollment.user_id,
-                                                         enrollment.user_id,
-                                                         user.id,
-                                                         user.id,
-                                                         )
-                        )
+            logger.warning(u'{} refers to a different user than {} which was supplied. '
+                           u'Enrollment user id={}, repr={!r}. '
+                           u'User id={}, repr={!r}.'.format(enrollment,
+                                                            user,
+                                                            enrollment.user_id,
+                                                            enrollment.user_id,
+                                                            user.id,
+                                                            user.id,
+                                                            )
+                           )
             return (None, None, None)
 
     if enrollment is None:
@@ -225,7 +226,7 @@ def is_enrolled_in_course_run(course_run, enrollment_course_ids):
         course_run_key = CourseKey.from_string(key)
         return course_run_key in enrollment_course_ids
     except InvalidKeyError:
-        logger.warn(
+        logger.warning(
             u'Unable to determine if user was enrolled since the course key {} is invalid'.format(key)
         )
         return False  # Invalid course run key. Assume user is not enrolled.

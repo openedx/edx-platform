@@ -145,7 +145,8 @@ a:visited:not(.btn) {
 
 .container {
   @include clearfix();
-  @include box-sizing(border-box);
+
+  box-sizing: border-box;
 
   @include media-breakpoint-up(md) {
     margin: 0 auto;
@@ -318,7 +319,7 @@ div.reset-deadlines-banner {
     flex: 0 1 auto;
 
     a {
-      color: #FFFFFF;
+      color: #fff;
       text-decoration: underline;
     }
   }

@@ -74,7 +74,7 @@
     // shared elements
     .support,
     .feedback {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
 
       .title {
         @extend %t-title6;

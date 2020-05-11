@@ -54,16 +54,16 @@
     }
   }
 
-  .content-primary, .content-supplementary {
-    @include box-sizing(border-box);
+  .content-primary,
+  .content-supplementary {
+    box-sizing: border-box;
   }
 
   .content-primary {
     @extend .ui-col-wide;
 
     form {
-      @include box-sizing(border-box);
-
+      box-sizing: border-box;
       box-shadow: 0 1px 2px $shadow-l1;
       border-radius: 2px;
       width: 100%;
@@ -109,7 +109,9 @@
             }
           }
 
-          label, input, textarea {
+          label,
+          input,
+          textarea {
             display: block;
           }
 
@@ -125,7 +127,8 @@
             }
           }
 
-          input, textarea {
+          input,
+          textarea {
             @extend %t-copy-base;
 
             height: 100%;
@@ -218,7 +221,8 @@
               margin-right: 0;
             }
 
-            input, textarea {
+            input,
+            textarea {
               width: 100%;
             }
           }
@@ -251,7 +255,6 @@
         margin: 0 0 ($baseline/4) 0;
         color: $gray-d2;
       }
-
     }
   }
 

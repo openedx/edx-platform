@@ -103,7 +103,6 @@ mailsnake                           # Needed for mailchimp (mailing djangoapp)
 mako==1.0.2                         # Primary template language used for server-side page rendering
 Markdown                            # Convert text markup to HTML; used in capa problems, forums, and course wikis
 mongoengine==0.10.0                 # Object-document mapper for MongoDB, used in the LMS dashboard
-more-itertools                      # Additional utilities for working with iterators
 mysqlclient                         # Driver for the default production relational database
 newrelic                            # New Relic agent for performance monitoring
 nodeenv                             # Utility for managing Node.js environments; we use this for deployments and testing

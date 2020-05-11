@@ -205,7 +205,9 @@ $light-border: 1px solid $gray-l5;
     position: relative;
   }
 
-  input[type="text"], input[type="email"], select {
+  input[type="text"],
+  input[type="email"],
+  select {
     @extend %t-action2;
     @extend %t-strong;
 
@@ -324,7 +326,8 @@ $light-border: 1px solid $gray-l5;
 
       width: calc(100% - #{$data-input-width-difference});
 
-      h3, h3 span {
+      h3,
+      h3 span {
         @extend %t-title6;
 
         padding: 0;
@@ -1050,7 +1053,7 @@ $light-border: 1px solid $gray-l5;
       border-bottom: 1px solid $light-gray1;
 
       // CASE: has last child
-      &:last-child  {
+      &:last-child {
         border-bottom: none;
       }
 
@@ -1111,7 +1114,8 @@ $light-border: 1px solid $gray-l5;
   }
 }
 
-.course-image, .image {
+.course-image,
+.image {
   .item-image {
     width: 100%;
     height: 100%;
@@ -1174,7 +1178,10 @@ $light-border: 1px solid $gray-l5;
     content: none !important;
   }
 
-  .steps, .blue.pull-right, .bordered-bar .pull-right, .left.nav-global.authenticated {
+  .steps,
+  .blue.pull-right,
+  .bordered-bar .pull-right,
+  .left.nav-global.authenticated {
     display: none;
   }
 
@@ -1211,7 +1218,7 @@ $light-border: 1px solid $gray-l5;
       .redemption-url {
         &::before {
           display: inline-block;
-          content:" " attr(data-base-url) " ";
+          content: " " attr(data-base-url) " ";
         }
       }
 

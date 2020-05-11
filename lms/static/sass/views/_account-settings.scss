@@ -133,6 +133,7 @@
 
     .account-settings-header-subtitle-warning {
       @extend .account-settings-header-subtitle;
+
       color: $alert-color;
     }
 
@@ -397,7 +398,8 @@
       }
 
       .u-field {
-        &.u-field-dropdown, &.editable-never &.mode-display {
+        &.u-field-dropdown,
+        &.editable-never &.mode-display {
           .u-field-value {
             margin-bottom: ($baseline);
 
@@ -642,7 +644,7 @@
 }
 
 .account-settings-message {
-  margin-bottom: 0px;
+  margin-bottom: 0;
 
   .alert-message {
     padding: 10px;
