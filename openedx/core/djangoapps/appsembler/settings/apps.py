@@ -21,12 +21,13 @@ class SettingsConfig(AppConfig):
                 SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: u'settings.common'},
                 SettingsType.AWS: {PluginSettings.RELATIVE_PATH: u'settings.aws_lms'},
                 SettingsType.DEVSTACK: {PluginSettings.RELATIVE_PATH: u'settings.devstack_lms'},
-                SettingsType.TEST: {PluginSettings.RELATIVE_PATH: u'settings.test_lms'},
+                SettingsType.TEST: {PluginSettings.RELATIVE_PATH: u'settings.test_common'},
             },
             ProjectType.CMS: {
                 SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: u'settings.common'},
                 SettingsType.AWS: {PluginSettings.RELATIVE_PATH: u'settings.aws_cms'},
                 SettingsType.DEVSTACK: {PluginSettings.RELATIVE_PATH: u'settings.devstack_cms'},
+                SettingsType.TEST: {PluginSettings.RELATIVE_PATH: u'settings.test_common'},
             }
         }
     }
