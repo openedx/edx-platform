@@ -100,7 +100,8 @@ class FinancialAssistanceTool(CourseTool):
             course_overview = None
 
         # hide link if there's no ENABLE_FINANCIAL_ASSISTANCE_FORM setting (ex: Edge)
-        setting_features = getattr(settings, 'FEATURES')
+        subset_name = 'FEATURES'
+        setting_features = getattr(settings, subset_name)
         if not setting_features['ENABLE_FINANCIAL_ASSISTANCE_FORM']:
             return False
 
