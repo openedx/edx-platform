@@ -7,6 +7,7 @@ import datetime
 
 import pytz
 from crum import get_current_request
+from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.urls import reverse
 from course_modes.models import CourseMode
@@ -98,11 +99,16 @@ class FinancialAssistanceTool(CourseTool):
         except CourseOverview.DoesNotExist:
             course_overview = None
 
-        # hide the link for archived courses
+        # hide link if there's no ENABLE_FINANCIAL_ASSISTANCE_FORM setting (ex: Edge)
+        setting_features = getattr(settings, 'FEATURES')
+        if not setting_features['ENABLE_FINANCIAL_ASSISTANCE_FORM']: 
+            return False
+
+        # hide link for archived courses
         if course_overview is not None and course_overview.end_date is not None and now > course_overview.end_date:
             return False
 
-        # hide the link if not logged in or user not enrolled in the course
+        # hide link if not logged in or user not enrolled in the course
         if not request.user or not CourseEnrollment.is_enrolled(request.user, course_key):
             return False
 
