@@ -224,7 +224,7 @@ class ScheduleCourseNextSectionUpdate(ScheduleMessageBaseTask):
             task_args = (
                 site.id,
                 serialize(target_datetime),  # Need to leave as a datetime for serialization purposes here
-                course_key,
+                str(course_key),  # Needs to be a string for celery to properly process
                 override_recipient_email,
             )
             cls.log_info(u'Launching task with args = %r', task_args)
@@ -241,7 +241,7 @@ class ScheduleCourseNextSectionUpdate(ScheduleMessageBaseTask):
                 self.async_send_task,
                 site,
                 deserialize(target_day_str),
-                course_key,
+                str(course_key),
                 override_recipient_email,
             ).send()
 
