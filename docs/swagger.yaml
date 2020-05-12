@@ -19,10 +19,10 @@ paths:
   /badges/v1/assertions/user/{username}/:
     get:
       operationId: badges_v1_assertions_user_read
-      summary: '** Use cases **'
+      summary: '**Use Cases**'
       description: "Request a list of assertions for a user, optionally constrained\
-        \ to a course.\n\n** Example Requests **\n\n    GET /api/badges/v1/assertions/user/{username}/\n\
-        \n** Response Values **\n\n    Body comprised of a list of objects with the\
+        \ to a course.\n\n**Example Requests**\n\n    GET /api/badges/v1/assertions/user/{username}/\n\
+        \n**Response Values**\n\n    Body comprised of a list of objects with the\
         \ following fields:\n\n    * badge_class: The badge class the assertion was\
         \ awarded for. Represented as an object\n      with the following fields:\n\
         \        * slug: The identifier for the badge class\n        * issuing_component:\
@@ -35,28 +35,27 @@ paths:
         \    * image_url: The baked assertion image derived from the badge_class icon--\
         \ contains metadata about the award\n      in its headers.\n    * assertion_url:\
         \ The URL to the OpenBadges BadgeAssertion object, for verification by compatible\
-        \ tools\n      and software.\n\n** Params **\n\n    * slug (optional): The\
-        \ identifier for a particular badge class to filter by.\n    * issuing_component\
-        \ (optional): The issuing component for a particular badge class to filter\
-        \ by\n      (requires slug to have been specified, or this will be ignored.)\
-        \ If slug is provided and this is not,\n      assumes the issuing_component\
-        \ should be empty.\n    * course_id (optional): Returns assertions that were\
-        \ awarded as part of a particular course. If slug is\n      provided, and\
-        \ this field is not specified, assumes that the target badge has an empty\
-        \ course_id field.\n      '*' may be used to get all badges with the specified\
-        \ slug, issuing_component combination across all courses.\n\n** Returns **\n\
-        \n    * 200 on success, with a list of Badge Assertion objects.\n    * 403\
-        \ if a user who does not have permission to masquerade as\n      another user\
-        \ specifies a username other than their own.\n    * 404 if the specified user\
-        \ does not exist\n\n    {\n        \"count\": 7,\n        \"previous\": null,\n\
-        \        \"num_pages\": 1,\n        \"results\": [\n            {\n      \
-        \          \"badge_class\": {\n                    \"slug\": \"special_award\"\
-        ,\n                    \"issuing_component\": \"openedx__course\",\n     \
-        \               \"display_name\": \"Very Special Award\",\n              \
-        \      \"course_id\": \"course-v1:edX+DemoX+Demo_Course\",\n             \
-        \       \"description\": \"Awarded for people who did something incredibly\
-        \ special\",\n                    \"criteria\": \"Do something incredibly\
-        \ special.\",\n                    \"image\": \"http://example.com/media/badge_classes/badges/special_xdpqpBv_9FYOZwN.png\"\
+        \ tools\n      and software.\n\n**Params**\n\n    * slug (optional): The identifier\
+        \ for a particular badge class to filter by.\n    * issuing_component (optional):\
+        \ The issuing component for a particular badge class to filter by\n      (requires\
+        \ slug to have been specified, or this will be ignored.) If slug is provided\
+        \ and this is not,\n      assumes the issuing_component should be empty.\n\
+        \    * course_id (optional): Returns assertions that were awarded as part\
+        \ of a particular course. If slug is\n      provided, and this field is not\
+        \ specified, assumes that the target badge has an empty course_id field.\n\
+        \      '*' may be used to get all badges with the specified slug, issuing_component\
+        \ combination across all courses.\n\n**Returns**\n\n    * 200 on success,\
+        \ with a list of Badge Assertion objects.\n    * 403 if a user who does not\
+        \ have permission to masquerade as\n      another user specifies a username\
+        \ other than their own.\n    * 404 if the specified user does not exist\n\n\
+        \    {\n        \"count\": 7,\n        \"previous\": null,\n        \"num_pages\"\
+        : 1,\n        \"results\": [\n            {\n                \"badge_class\"\
+        : {\n                    \"slug\": \"special_award\",\n                  \
+        \  \"issuing_component\": \"openedx__course\",\n                    \"display_name\"\
+        : \"Very Special Award\",\n                    \"course_id\": \"course-v1:edX+DemoX+Demo_Course\"\
+        ,\n                    \"description\": \"Awarded for people who did something\
+        \ incredibly special\",\n                    \"criteria\": \"Do something\
+        \ incredibly special.\",\n                    \"image\": \"http://example.com/media/badge_classes/badges/special_xdpqpBv_9FYOZwN.png\"\
         \n                },\n                \"image_url\": \"http://badges.example.com/media/issued/cd75b69fc1c979fcc1697c8403da2bdf.png\"\
         ,\n                \"assertion_url\": \"http://badges.example.com/public/assertions/07020647-e772-44dd-98b7-d13d34335ca6\"\
         \n            },\n        ...\n        ]\n    }"
@@ -111,7 +110,7 @@ paths:
         \ list contains 10 bookmarks by default. The page\nsize can be altered by\
         \ passing parameter \"page_size=<page_size>\".\n\nTo include the optional\
         \ fields pass the values in \"fields\" parameter\nas a comma separated list.\
-        \ Possible values are:\n\n* \"display_name\"\n* \"path\"\n\n# Example Requests\n\
+        \ Possible values are:\n\n* \"display_name\"\n* \"path\"\n\n**Example Requests**\n\
         \nGET /api/bookmarks/v1/bookmarks/?course_id={course_id1}&fields=display_name,path"
       parameters:
         - name: page
@@ -143,8 +142,8 @@ paths:
       description: "The POST request only needs to contain one parameter \"usage_id\"\
         .\n\nHttp400 is returned if the format of the request is not correct,\nthe\
         \ usage_id is invalid or a block corresponding to the usage_id\ncould not\
-        \ be found.\n\n# Example Requests\n\nPOST /api/bookmarks/v1/bookmarks/\nRequest\
-        \ data: {\"usage_id\": <usage-id>}"
+        \ be found.\n\n**Example Requests**\n\nPOST /api/bookmarks/v1/bookmarks/\n\
+        Request data: {\"usage_id\": <usage-id>}"
       parameters: []
       responses:
         '201':
@@ -156,7 +155,7 @@ paths:
     get:
       operationId: bookmarks_v1_bookmarks_read
       summary: Get a specific bookmark for a user.
-      description: "# Example Requests\n\nGET /api/bookmarks/v1/bookmarks/{username},{usage_id}?fields=display_name,path"
+      description: "**Example Requests**\n\nGET /api/bookmarks/v1/bookmarks/{username},{usage_id}?fields=display_name,path"
       parameters: []
       responses:
         '200':
@@ -4150,10 +4149,10 @@ paths:
     get:
       operationId: third_party_auth_v0_providers_user_status_list
       summary: GET /api/third_party_auth/v0/providers/user_status/
-      description: "**GET Response Values**\n{\n    \"accepts_logins\": true,\n  \
-        \  \"name\": \"Google\",\n    \"disconnect_url\": \"/auth/disconnect/google-oauth2/?\"\
+      description: "**GET Response Values**\n```\n{\n    \"accepts_logins\": true,\n\
+        \    \"name\": \"Google\",\n    \"disconnect_url\": \"/auth/disconnect/google-oauth2/?\"\
         ,\n    \"connect_url\": \"/auth/login/google-oauth2/?auth_entry=account_settings&next=%2Faccount%2Fsettings\"\
-        ,\n    \"connected\": false,\n    \"id\": \"oa2-google-oauth2\"\n}"
+        ,\n    \"connected\": false,\n    \"id\": \"oa2-google-oauth2\"\n}\n```"
       parameters: []
       responses:
         '200':
@@ -4301,16 +4300,17 @@ paths:
   /user/v1/accounts/replace_usernames/:
     post:
       operationId: user_v1_accounts_replace_usernames_create
-      description: "POST /api/user/v1/accounts/replace_usernames/\n{\n    \"username_mappings\"\
-        : [\n        {\"current_username_1\": \"desired_username_1\"},\n        {\"\
-        current_username_2\": \"desired_username_2\"}\n    ]\n}\n\n**POST Parameters**\n\
-        \nA POST request must include the following parameter.\n\n* username_mappings:\
-        \ Required. A list of objects that map the current username (key)\n  to the\
-        \ desired username (value)\n\n**POST Response Values**\n\nAs long as data\
-        \ validation passes, the request will return a 200 with a new mapping\nof\
-        \ old usernames (key) to new username (value)\n\n{\n    \"successful_replacements\"\
-        : [\n        {\"old_username_1\": \"new_username_1\"}\n    ],\n    \"failed_replacements\"\
-        : [\n        {\"old_username_2\": \"new_username_2\"}\n    ]\n}"
+      description: "POST /api/user/v1/accounts/replace_usernames/\n```\n{\n    \"\
+        username_mappings\": [\n        {\"current_username_1\": \"desired_username_1\"\
+        },\n        {\"current_username_2\": \"desired_username_2\"}\n    ]\n}\n```\n\
+        \n**POST Parameters**\n\nA POST request must include the following parameter.\n\
+        \n* username_mappings: Required. A list of objects that map the current username\
+        \ (key)\n  to the desired username (value)\n\n**POST Response Values**\n\n\
+        As long as data validation passes, the request will return a 200 with a new\
+        \ mapping\nof old usernames (key) to new username (value)\n\n```\n{\n    \"\
+        successful_replacements\": [\n        {\"old_username_1\": \"new_username_1\"\
+        }\n    ],\n    \"failed_replacements\": [\n        {\"old_username_2\": \"\
+        new_username_2\"}\n    ]\n}\n```"
       parameters: []
       responses:
         '201':
@@ -4322,9 +4322,9 @@ paths:
     post:
       operationId: user_v1_accounts_post
       summary: POST /api/user/v1/accounts/retire/
-      description: "{\n    'username': 'user_to_retire'\n}\n\nRetires the user with\
-        \ the given username.  This includes\nretiring this username, the associated\
-        \ email address, and\nany other PII associated with this user."
+      description: "```\n{\n    'username': 'user_to_retire'\n}\n```\n\nRetires the\
+        \ user with the given username.  This includes\nretiring this username, the\
+        \ associated email address, and\nany other PII associated with this user."
       parameters: []
       responses:
         '201':
@@ -4336,8 +4336,8 @@ paths:
     post:
       operationId: user_v1_accounts_post
       summary: POST /api/user/v1/accounts/retire_misc/
-      description: "{\n    'username': 'user_to_retire'\n}\n\nRetires the user with\
-        \ the given username in the LMS."
+      description: "```\n{\n    'username': 'user_to_retire'\n}\n```\n\nRetires the\
+        \ user with the given username in the LMS."
       parameters: []
       responses:
         '201':
@@ -4349,8 +4349,8 @@ paths:
     post:
       operationId: user_v1_accounts_cleanup
       summary: POST /api/user/v1/accounts/retirement_cleanup/
-      description: "{\n    'usernames': ['user1', 'user2', ...]\n}\n\nDeletes a batch\
-        \ of retirement requests by username."
+      description: "```\n{\n    'usernames': ['user1', 'user2', ...]\n}\n```\n\nDeletes\
+        \ a batch of retirement requests by username."
       parameters: []
       responses:
         '201':
@@ -4374,8 +4374,9 @@ paths:
     put:
       operationId: user_v1_accounts_retirement_partner_report_update
       summary: PUT /api/user/v1/accounts/retirement_partner_report/
-      description: "{\n    'username': 'user_to_retire'\n}\n\nCreates a UserRetirementPartnerReportingStatus\
-        \ object for the given user\nas part of the retirement pipeline."
+      description: "```\n{\n    'username': 'user_to_retire'\n}\n```\n\nCreates a\
+        \ UserRetirementPartnerReportingStatus object for the given user\nas part\
+        \ of the retirement pipeline."
       parameters: []
       responses:
         '200':
@@ -4430,13 +4431,13 @@ paths:
     patch:
       operationId: user_v1_accounts_update_retirement_status_partial_update
       summary: PATCH /api/user/v1/accounts/update_retirement_status/
-      description: "{\n    'username': 'user_to_retire',\n    'new_state': 'LOCKING_COMPLETE',\n\
-        \    'response': 'User account locked and logged out.'\n}\n\nUpdates the RetirementStatus\
-        \ row for the given user to the new\nstatus, and append any messages to the\
-        \ message log.\n\nNote that this implementation DOES NOT use the \"merge patch\"\
-        \nimplementation seen in AccountViewSet. Slumber, the project\nwe use to power\
-        \ edx-rest-api-client, does not currently support\nit. The content type for\
-        \ this request is 'application/json'."
+      description: "```\n{\n    'username': 'user_to_retire',\n    'new_state': 'LOCKING_COMPLETE',\n\
+        \    'response': 'User account locked and logged out.'\n}\n```\n\nUpdates\
+        \ the RetirementStatus row for the given user to the new\nstatus, and append\
+        \ any messages to the message log.\n\nNote that this implementation DOES NOT\
+        \ use the \"merge patch\"\nimplementation seen in AccountViewSet. Slumber,\
+        \ the project\nwe use to power edx-rest-api-client, does not currently support\n\
+        it. The content type for this request is 'application/json'."
       parameters: []
       responses:
         '200':
@@ -4633,14 +4634,13 @@ paths:
     post:
       operationId: user_v1_validation_registration_create
       summary: POST /api/user/v1/validation/registration/
-      description: "Expects request of the form\n>>> {\n>>>     \"name\": \"Dan the\
-        \ Validator\",\n>>>     \"username\": \"mslm\",\n>>>     \"email\": \"mslm@gmail.com\"\
-        ,\n>>>     \"confirm_email\": \"mslm@gmail.com\",\n>>>     \"password\": \"\
-        password123\",\n>>>     \"country\": \"PK\"\n>>> }\nwhere each key is the\
-        \ appropriate form field name and the value is\nuser input. One may enter\
-        \ individual inputs if needed. Some inputs\ncan get extra verification checks\
-        \ if entered along with others,\nlike when the password may not equal the\
-        \ username."
+      description: "Expects request of the form\n```\n{\n    \"name\": \"Dan the Validator\"\
+        ,\n    \"username\": \"mslm\",\n    \"email\": \"mslm@gmail.com\",\n    \"\
+        confirm_email\": \"mslm@gmail.com\",\n    \"password\": \"password123\",\n\
+        \    \"country\": \"PK\"\n}\n```\nwhere each key is the appropriate form field\
+        \ name and the value is\nuser input. One may enter individual inputs if needed.\
+        \ Some inputs\ncan get extra verification checks if entered along with others,\n\
+        like when the password may not equal the username."
       parameters: []
       responses:
         '201':
